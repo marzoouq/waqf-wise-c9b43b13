@@ -49,13 +49,13 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-6 space-y-8">
+      <div className="container mx-auto p-4 md:p-6 space-y-6 md:space-y-8">
         {/* Header */}
         <header className="space-y-2">
-          <h1 className="text-4xl font-bold text-gradient-primary">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gradient-primary">
             لوحة التحكم الرئيسية
           </h1>
-          <p className="text-muted-foreground text-lg">
+          <p className="text-muted-foreground text-sm md:text-base lg:text-lg">
             مرحباً بك في منصة إدارة الوقف الإلكترونية
           </p>
         </header>
@@ -165,25 +165,25 @@ const Dashboard = () => {
         {/* Quick Actions */}
         <Card className="shadow-soft bg-gradient-to-br from-primary/5 to-accent/5">
           <CardHeader>
-            <CardTitle className="text-xl font-bold">الإجراءات السريعة</CardTitle>
+            <CardTitle className="text-lg md:text-xl font-bold">الإجراءات السريعة</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <button className="p-4 bg-card hover:bg-primary hover:text-primary-foreground rounded-lg shadow-soft transition-all duration-300 text-right">
-                <Users className="h-6 w-6 mb-2" />
-                <p className="font-medium">إضافة مستفيد</p>
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+              <button className="p-3 md:p-4 bg-card hover:bg-primary hover:text-primary-foreground rounded-lg shadow-soft transition-all duration-300 text-right">
+                <Users className="h-5 w-5 md:h-6 md:w-6 mb-2" />
+                <p className="font-medium text-xs md:text-sm">إضافة مستفيد</p>
               </button>
-              <button className="p-4 bg-card hover:bg-primary hover:text-primary-foreground rounded-lg shadow-soft transition-all duration-300 text-right">
-                <Building2 className="h-6 w-6 mb-2" />
-                <p className="font-medium">إضافة عقار</p>
+              <button className="p-3 md:p-4 bg-card hover:bg-primary hover:text-primary-foreground rounded-lg shadow-soft transition-all duration-300 text-right">
+                <Building2 className="h-5 w-5 md:h-6 md:w-6 mb-2" />
+                <p className="font-medium text-xs md:text-sm">إضافة عقار</p>
               </button>
-              <button className="p-4 bg-card hover:bg-primary hover:text-primary-foreground rounded-lg shadow-soft transition-all duration-300 text-right">
-                <Wallet className="h-6 w-6 mb-2" />
-                <p className="font-medium">توزيع الغلة</p>
+              <button className="p-3 md:p-4 bg-card hover:bg-primary hover:text-primary-foreground rounded-lg shadow-soft transition-all duration-300 text-right">
+                <Wallet className="h-5 w-5 md:h-6 md:w-6 mb-2" />
+                <p className="font-medium text-xs md:text-sm">توزيع الغلة</p>
               </button>
-              <button className="p-4 bg-card hover:bg-primary hover:text-primary-foreground rounded-lg shadow-soft transition-all duration-300 text-right">
-                <FileText className="h-6 w-6 mb-2" />
-                <p className="font-medium">إنشاء تقرير</p>
+              <button className="p-3 md:p-4 bg-card hover:bg-primary hover:text-primary-foreground rounded-lg shadow-soft transition-all duration-300 text-right">
+                <FileText className="h-5 w-5 md:h-6 md:w-6 mb-2" />
+                <p className="font-medium text-xs md:text-sm">إنشاء تقرير</p>
               </button>
             </div>
           </CardContent>

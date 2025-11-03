@@ -67,20 +67,20 @@ const Beneficiaries = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-6 space-y-6">
+      <div className="container mx-auto p-4 md:p-6 space-y-4 md:space-y-6">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gradient-primary">
+            <h1 className="text-2xl md:text-3xl font-bold text-gradient-primary">
               إدارة المستفيدين
             </h1>
-            <p className="text-muted-foreground mt-1">
+            <p className="text-muted-foreground mt-1 text-sm md:text-base">
               إدارة حسابات المستفيدين والموقوف عليهم
             </p>
           </div>
-          <Button className="bg-primary hover:bg-primary-hover text-primary-foreground shadow-soft">
-            <Plus className="ml-2 h-5 w-5" />
-            إضافة مستفيد جديد
+          <Button className="bg-primary hover:bg-primary-hover text-primary-foreground shadow-soft w-full md:w-auto">
+            <Plus className="ml-2 h-4 w-4 md:h-5 md:w-5" />
+            <span className="text-sm md:text-base">إضافة مستفيد جديد</span>
           </Button>
         </div>
 
@@ -156,9 +156,9 @@ const Beneficiaries = () => {
         {/* Beneficiaries Table */}
         <Card className="shadow-soft">
           <CardHeader>
-            <CardTitle>قائمة المستفيدين</CardTitle>
+            <CardTitle className="text-lg md:text-xl">قائمة المستفيدين</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
