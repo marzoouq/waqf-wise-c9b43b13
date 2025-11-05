@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import AppSidebar from "./Sidebar";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { Menu } from "lucide-react";
 
 interface MainLayoutProps {
@@ -13,7 +13,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       <SidebarProvider>
         <div className="min-h-screen flex w-full bg-background">
           <AppSidebar />
-          <main className="flex-1 flex flex-col">
+          <SidebarInset>
             {/* Mobile Header */}
             <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 lg:hidden">
               <SidebarTrigger>
@@ -39,7 +39,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
             <div className="flex-1 overflow-auto">
               {children}
             </div>
-          </main>
+          </SidebarInset>
         </div>
       </SidebarProvider>
     </div>
