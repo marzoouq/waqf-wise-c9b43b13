@@ -67,6 +67,47 @@ export type Database = {
           },
         ]
       }
+      approvals: {
+        Row: {
+          approved_at: string | null
+          approver_name: string
+          created_at: string
+          id: string
+          journal_entry_id: string
+          notes: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approver_name: string
+          created_at?: string
+          id?: string
+          journal_entry_id: string
+          notes?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          approved_at?: string | null
+          approver_name?: string
+          created_at?: string
+          id?: string
+          journal_entry_id?: string
+          notes?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "approvals_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
+            referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       beneficiaries: {
         Row: {
           category: string
@@ -305,6 +346,122 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      invoice_lines: {
+        Row: {
+          account_id: string | null
+          created_at: string
+          description: string
+          id: string
+          invoice_id: string
+          line_number: number
+          line_total: number
+          quantity: number
+          unit_price: number
+        }
+        Insert: {
+          account_id?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          invoice_id: string
+          line_number: number
+          line_total?: number
+          quantity?: number
+          unit_price?: number
+        }
+        Update: {
+          account_id?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          invoice_id?: string
+          line_number?: number
+          line_total?: number
+          quantity?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_lines_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoice_lines_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoices: {
+        Row: {
+          created_at: string
+          customer_address: string | null
+          customer_email: string | null
+          customer_name: string
+          customer_phone: string | null
+          due_date: string | null
+          id: string
+          invoice_date: string
+          invoice_number: string
+          journal_entry_id: string | null
+          notes: string | null
+          status: string
+          subtotal: number
+          tax_amount: number
+          total_amount: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_address?: string | null
+          customer_email?: string | null
+          customer_name: string
+          customer_phone?: string | null
+          due_date?: string | null
+          id?: string
+          invoice_date: string
+          invoice_number: string
+          journal_entry_id?: string | null
+          notes?: string | null
+          status?: string
+          subtotal?: number
+          tax_amount?: number
+          total_amount?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_address?: string | null
+          customer_email?: string | null
+          customer_name?: string
+          customer_phone?: string | null
+          due_date?: string | null
+          id?: string
+          invoice_date?: string
+          invoice_number?: string
+          journal_entry_id?: string | null
+          notes?: string | null
+          status?: string
+          subtotal?: number
+          tax_amount?: number
+          total_amount?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
+            referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       journal_entries: {
         Row: {

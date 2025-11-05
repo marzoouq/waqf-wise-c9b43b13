@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -8,9 +9,10 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Printer, CheckCircle } from "lucide-react";
+import { Printer, CheckCircle, UserCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
+import ApprovalDialog from "./ApprovalDialog";
 import {
   Table,
   TableBody,
@@ -41,6 +43,7 @@ type Props = {
 const ViewJournalEntryDialog = ({ open, onOpenChange, entry }: Props) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [isApprovalDialogOpen, setIsApprovalDialogOpen] = useState(false);
 
   const { data: lines } = useQuery({
     queryKey: ["journal_entry_lines", entry.id],
@@ -191,6 +194,12 @@ const ViewJournalEntryDialog = ({ open, onOpenChange, entry }: Props) => {
             <Printer className="h-4 w-4 ml-2" />
             طباعة
           </Button>
+          {entry.status === "posted" && (
+            <Button variant="secondary" onClick={() => setIsApprovalDialogOpen(true)}>
+              <UserCheck className="h-4 w-4 ml-2" />
+              طلب موافقة
+            </Button>
+          )}
           {entry.status === "draft" && (
             <Button onClick={handlePost} disabled={postEntryMutation.isPending}>
               <CheckCircle className="h-4 w-4 ml-2" />
@@ -199,6 +208,13 @@ const ViewJournalEntryDialog = ({ open, onOpenChange, entry }: Props) => {
           )}
         </DialogFooter>
       </DialogContent>
+
+      <ApprovalDialog
+        open={isApprovalDialogOpen}
+        onOpenChange={setIsApprovalDialogOpen}
+        journalEntryId={entry.id}
+        entryNumber={entry.entry_number}
+      />
     </Dialog>
   );
 };

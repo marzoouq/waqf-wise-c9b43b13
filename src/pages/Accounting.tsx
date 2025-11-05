@@ -5,12 +5,15 @@ import {
   BookOpen, 
   FileText, 
   TrendingUp, 
-  Calculator 
+  Calculator,
+  FileSpreadsheet
 } from "lucide-react";
 import AccountsTree from "@/components/accounting/AccountsTree";
 import JournalEntries from "@/components/accounting/JournalEntries";
 import BudgetReports from "@/components/accounting/BudgetReports";
 import FinancialReports from "@/components/accounting/FinancialReports";
+import GeneralLedgerReport from "@/components/accounting/GeneralLedgerReport";
+import DetailedTrialBalance from "@/components/accounting/DetailedTrialBalance";
 
 const Accounting = () => {
   const [activeTab, setActiveTab] = useState("accounts");
@@ -27,7 +30,7 @@ const Accounting = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 h-auto">
           <TabsTrigger value="accounts" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2">
             <BookOpen className="h-3 w-3 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline">شجرة الحسابات</span>
@@ -47,6 +50,16 @@ const Accounting = () => {
             <Calculator className="h-3 w-3 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline">التقارير المالية</span>
             <span className="sm:hidden">التقارير</span>
+          </TabsTrigger>
+          <TabsTrigger value="ledger" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2">
+            <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">دفتر الأستاذ</span>
+            <span className="sm:hidden">الأستاذ</span>
+          </TabsTrigger>
+          <TabsTrigger value="trial-balance" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2">
+            <FileSpreadsheet className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">ميزان المراجعة</span>
+            <span className="sm:hidden">الميزان</span>
           </TabsTrigger>
         </TabsList>
 
@@ -71,6 +84,18 @@ const Accounting = () => {
         <TabsContent value="reports" className="mt-4">
           <Card className="p-3 sm:p-6">
             <FinancialReports />
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="ledger" className="mt-4">
+          <Card className="p-3 sm:p-6">
+            <GeneralLedgerReport />
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="trial-balance" className="mt-4">
+          <Card className="p-3 sm:p-6">
+            <DetailedTrialBalance />
           </Card>
         </TabsContent>
       </Tabs>
