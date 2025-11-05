@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { TOAST_MESSAGES, QUERY_STALE_TIME } from "@/lib/constants";
+import { useAuth } from "./useAuth";
 
 export interface Profile {
   id: string;
@@ -15,33 +16,36 @@ export interface Profile {
   updated_at: string;
 }
 
-export function useProfile(userId?: string) {
+export function useProfile() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const { data: profile, isLoading } = useQuery({
-    queryKey: ["profile", userId],
+    queryKey: ["profile", user?.id],
     queryFn: async () => {
-      if (!userId) return null;
+      if (!user?.id) return null;
 
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
-        .eq("user_id", userId)
+        .eq("user_id", user.id)
         .single();
 
       if (error && error.code !== "PGRST116") throw error; // Ignore not found
       return data as Profile | null;
     },
-    enabled: !!userId,
+    enabled: !!user?.id,
     staleTime: QUERY_STALE_TIME.DEFAULT,
   });
 
   const upsertProfile = useMutation({
     mutationFn: async (profileData: Partial<Profile>) => {
+      if (!user?.id) throw new Error("User not authenticated");
+
       const { data, error } = await supabase
         .from("profiles")
-        .upsert([profileData], { onConflict: "user_id" })
+        .upsert([{ ...profileData, user_id: user.id }], { onConflict: "user_id" })
         .select()
         .single();
 

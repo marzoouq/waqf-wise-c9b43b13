@@ -11,6 +11,7 @@ import {
   Receipt,
   CheckSquare,
   CreditCard,
+  LogOut,
 } from "lucide-react";
 import {
   Sidebar,
@@ -26,11 +27,14 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { NotificationsBell } from "./NotificationsBell";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
 
 const AppSidebar = () => {
   const location = useLocation();
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
+  const { user, signOut } = useAuth();
 
   const menuItems = [
     { icon: LayoutDashboard, label: "لوحة التحكم", path: "/" },
@@ -100,22 +104,35 @@ const AppSidebar = () => {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-sidebar-border p-4 bg-sidebar-accent/30">
+      <SidebarFooter className="border-t border-sidebar-border p-4 bg-sidebar-accent/30 space-y-3">
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-full bg-accent/30 flex items-center justify-center flex-shrink-0 border-2 border-accent/50">
-            <span className="text-accent font-bold">ن</span>
+            <span className="text-accent font-bold">
+              {user?.email?.[0]?.toUpperCase() || 'U'}
+            </span>
           </div>
           {!isCollapsed && (
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-sidebar-foreground truncate">
-                الناظر
+                {user?.user_metadata?.full_name || 'مستخدم'}
               </p>
               <p className="text-xs text-sidebar-foreground/90 truncate">
-                admin@waqf.sa
+                {user?.email}
               </p>
             </div>
           )}
         </div>
+        {!isCollapsed && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full"
+            onClick={signOut}
+          >
+            <LogOut className="h-4 w-4 ml-2" />
+            تسجيل الخروج
+          </Button>
+        )}
       </SidebarFooter>
     </Sidebar>
   );

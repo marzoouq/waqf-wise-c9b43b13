@@ -46,8 +46,7 @@ interface ProfileDialogProps {
 }
 
 export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
-  const userId = "current-user"; // Replace with actual user ID from auth
-  const { profile, isLoading, upsertProfile } = useProfile(userId);
+  const { profile, isLoading, upsertProfile } = useProfile();
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -74,7 +73,6 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
   const handleSubmit = async (values: ProfileFormValues) => {
     try {
       await upsertProfile({
-        user_id: userId,
         full_name: values.fullName,
         email: values.email,
         phone: values.phone,

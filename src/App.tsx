@@ -7,6 +7,7 @@ import { lazy, Suspense } from "react";
 import MainLayout from "./components/layout/MainLayout";
 import ErrorBoundary from "./components/shared/ErrorBoundary";
 import { LoadingState } from "./components/shared/LoadingState";
+import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 
 // Lazy load React Query DevTools (TanStack recommended pattern)
 const ReactQueryDevtools =
@@ -19,6 +20,7 @@ const ReactQueryDevtools =
     : null;
 
 // Lazy load pages for better performance
+const Auth = lazy(() => import("./pages/Auth"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Beneficiaries = lazy(() => import("./pages/Beneficiaries"));
 const Properties = lazy(() => import("./pages/Properties"));
@@ -52,25 +54,38 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <MainLayout>
-            <Suspense fallback={<LoadingState size="lg" />}>
-              <Routes>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/beneficiaries" element={<Beneficiaries />} />
-                <Route path="/properties" element={<Properties />} />
-                <Route path="/funds" element={<Funds />} />
-                <Route path="/archive" element={<Archive />} />
-                <Route path="/accounting" element={<Accounting />} />
-                <Route path="/invoices" element={<Invoices />} />
-                <Route path="/approvals" element={<Approvals />} />
-                <Route path="/payments" element={<Payments />} />
-                <Route path="/reports" element={<Reports />} />
-                <Route path="/settings" element={<Settings />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Suspense>
-          </MainLayout>
+          <Suspense fallback={<LoadingState size="lg" fullScreen />}>
+            <Routes>
+              {/* Public route */}
+              <Route path="/auth" element={<Auth />} />
+              
+              {/* Protected routes */}
+              <Route
+                path="/*"
+                element={
+                  <ProtectedRoute>
+                    <MainLayout>
+                      <Routes>
+                        <Route path="/" element={<Dashboard />} />
+                        <Route path="/beneficiaries" element={<Beneficiaries />} />
+                        <Route path="/properties" element={<Properties />} />
+                        <Route path="/funds" element={<Funds />} />
+                        <Route path="/archive" element={<Archive />} />
+                        <Route path="/accounting" element={<Accounting />} />
+                        <Route path="/invoices" element={<Invoices />} />
+                        <Route path="/approvals" element={<Approvals />} />
+                        <Route path="/payments" element={<Payments />} />
+                        <Route path="/reports" element={<Reports />} />
+                        <Route path="/settings" element={<Settings />} />
+                        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                        <Route path="*" element={<NotFound />} />
+                      </Routes>
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </Suspense>
         </BrowserRouter>
       </TooltipProvider>
       
