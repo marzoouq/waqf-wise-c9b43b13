@@ -149,3 +149,20 @@ export const TOAST_MESSAGES = {
     GENERIC: "حدث خطأ غير متوقع",
   },
 } as const;
+
+// Company Information (for Invoices and Legal Documents)
+export const COMPANY_INFO = {
+  NAME_AR: "منصة الوقف",
+  NAME_EN: "Waqf Platform",
+  DESCRIPTION_AR: "نظام إدارة الوقف الإلكتروني",
+  DESCRIPTION_EN: "Electronic Waqf Management System",
+  TAX_NUMBER: "300000000000003",
+  COMMERCIAL_REGISTRATION: "1010000000",
+  ADDRESS_AR: "الرياض - المملكة العربية السعودية",
+  ADDRESS_EN: "Riyadh - Kingdom of Saudi Arabia",
+  PHONE: "+966 11 123 4567",
+  EMAIL: "info@waqfplatform.sa",
+  WEBSITE: "www.waqfplatform.sa",
+  COPYRIGHT_AR: "© 2025 منصة الوقف - جميع الحقوق محفوظة",
+  COPYRIGHT_EN: "© 2025 Waqf Platform - All Rights Reserved",
+} as const;

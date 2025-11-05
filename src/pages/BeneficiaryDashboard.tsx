@@ -6,41 +6,68 @@ import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { useAuth } from "@/hooks/useAuth";
 
+interface Beneficiary {
+  id: string;
+  full_name: string;
+  national_id: string;
+  phone: string;
+  email?: string | null;
+  family_name?: string | null;
+  relationship?: string | null;
+  category: string;
+  status: string;
+  notes?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+interface Payment {
+  id: string;
+  payment_number: string;
+  payment_date: string;
+  amount: number;
+  description: string;
+}
+
 const BeneficiaryDashboard = () => {
   const { user } = useAuth();
-  const [beneficiary, setBeneficiary] = useState<any>(null);
-  const [payments, setPayments] = useState<any[]>([]);
+  const [beneficiary, setBeneficiary] = useState<Beneficiary | null>(null);
+  const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?.email) return;
 
     const fetchData = async () => {
       try {
-        const { data: benData } = await supabase
+        const { data: benData, error: benError } = await supabase
           .from("beneficiaries")
-          .select("*")
-          .eq("user_id", user.id)
+          .select("id, full_name, national_id, phone, email, family_name, relationship, category, status, notes, created_at, updated_at")
+          .eq("email", user.email)
           .maybeSingle();
         
+        if (benError) throw benError;
         setBeneficiary(benData);
 
         if (benData) {
-          const { data: payData } = await supabase
+          const { data: payData, error: payError } = await supabase
             .from("payments")
-            .select("*")
+            .select("id, payment_number, payment_date, amount, description")
             .eq("payer_name", benData.full_name)
             .order("payment_date", { ascending: false });
           
+          if (payError) throw payError;
           setPayments(payData || []);
         }
+      } catch (error) {
+        console.error("Error fetching beneficiary data:", error);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [user?.id]);
+  }, [user?.email]);
 
   const stats = {
     totalPayments: payments.reduce((sum, p) => sum + Number(p.amount), 0),

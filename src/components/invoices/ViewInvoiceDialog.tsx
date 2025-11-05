@@ -23,6 +23,7 @@ import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import { COMPANY_INFO } from "@/lib/constants";
 
 interface ViewInvoiceDialogProps {
   invoiceId: string | null;
@@ -116,24 +117,25 @@ export const ViewInvoiceDialog = ({
     // Header - Company Info (required by ZATCA)
     doc.setFontSize(20);
     doc.setFont("helvetica", "bold");
-    doc.text("منصة الوقف", 105, 20, { align: "center" });
+    doc.text(COMPANY_INFO.NAME_AR, 105, 20, { align: "center" });
     
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
-    doc.text("نظام إدارة الوقف الإلكتروني", 105, 28, { align: "center" });
-    doc.text("الرقم الضريبي: 300000000000003", 105, 34, { align: "center" });
-    doc.text("المملكة العربية السعودية", 105, 40, { align: "center" });
+    doc.text(COMPANY_INFO.DESCRIPTION_AR, 105, 28, { align: "center" });
+    doc.text(`الرقم الضريبي: ${COMPANY_INFO.TAX_NUMBER}`, 105, 34, { align: "center" });
+    doc.text(`السجل التجاري: ${COMPANY_INFO.COMMERCIAL_REGISTRATION}`, 105, 40, { align: "center" });
+    doc.text(COMPANY_INFO.ADDRESS_AR, 105, 46, { align: "center" });
     
     // Title
     doc.setFontSize(16);
     doc.setFont("helvetica", "bold");
-    doc.text("فـاتـورة ضـريـبـيـة مـبـسـطـة", 105, 52, { align: "center" });
-    doc.text("SIMPLIFIED TAX INVOICE", 105, 60, { align: "center" });
+    doc.text("فـاتـورة ضـريـبـيـة مـبـسـطـة", 105, 58, { align: "center" });
+    doc.text("SIMPLIFIED TAX INVOICE", 105, 66, { align: "center" });
     
     // Invoice Details Box
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
-    const invoiceDetailsY = 70;
+    const invoiceDetailsY = 76;
     
     doc.text(`رقم الفاتورة: ${invoice.invoice_number}`, 15, invoiceDetailsY);
     doc.text(`Invoice No: ${invoice.invoice_number}`, 15, invoiceDetailsY + 6);
@@ -224,13 +226,14 @@ export const ViewInvoiceDialog = ({
     doc.text("ZATCA QR Code", 15, finalY + 30);
     doc.rect(15, finalY + 5, 30, 30);
     
-    // Footer - Copyright
+    // Footer - Copyright & Contact
     const pageHeight = doc.internal.pageSize.height;
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(100, 100, 100);
-    doc.text("© 2025 منصة الوقف - جميع الحقوق محفوظة", 105, pageHeight - 15, { align: "center" });
-    doc.text("Waqf Platform - All Rights Reserved", 105, pageHeight - 10, { align: "center" });
+    doc.text(COMPANY_INFO.COPYRIGHT_AR, 105, pageHeight - 20, { align: "center" });
+    doc.text(COMPANY_INFO.COPYRIGHT_EN, 105, pageHeight - 15, { align: "center" });
+    doc.text(`${COMPANY_INFO.PHONE} | ${COMPANY_INFO.EMAIL} | ${COMPANY_INFO.WEBSITE}`, 105, pageHeight - 10, { align: "center" });
     
     // Save
     doc.save(`فاتورة-${invoice.invoice_number}.pdf`);
@@ -265,10 +268,12 @@ export const ViewInvoiceDialog = ({
         <div id="invoice-print-content" className="space-y-6">
           {/* Header - Company Info */}
           <div className="text-center print:block hidden border-b-2 border-primary pb-6 mb-6">
-            <h1 className="text-3xl font-bold text-primary mb-2">منصة الوقف</h1>
-            <p className="text-sm text-muted-foreground">نظام إدارة الوقف الإلكتروني</p>
-            <p className="text-sm font-mono mt-1">الرقم الضريبي: 300000000000003</p>
-            <p className="text-sm">المملكة العربية السعودية</p>
+            <h1 className="text-3xl font-bold text-primary mb-2">{COMPANY_INFO.NAME_AR}</h1>
+            <p className="text-sm text-muted-foreground">{COMPANY_INFO.DESCRIPTION_AR}</p>
+            <p className="text-sm font-mono mt-1">الرقم الضريبي: {COMPANY_INFO.TAX_NUMBER}</p>
+            <p className="text-sm font-mono">السجل التجاري: {COMPANY_INFO.COMMERCIAL_REGISTRATION}</p>
+            <p className="text-sm mt-1">{COMPANY_INFO.ADDRESS_AR}</p>
+            <p className="text-xs text-muted-foreground">{COMPANY_INFO.PHONE} | {COMPANY_INFO.EMAIL}</p>
             <h2 className="text-2xl font-bold mt-4 mb-1">فـاتـورة ضـريـبـيـة مـبـسـطـة</h2>
             <p className="text-sm text-muted-foreground">SIMPLIFIED TAX INVOICE</p>
           </div>
@@ -411,10 +416,12 @@ export const ViewInvoiceDialog = ({
             </div>
           )}
 
-          {/* Footer - Copyright */}
-          <div className="print:block hidden text-center pt-8 border-t-2 border-primary mt-8">
-            <p className="text-xs text-muted-foreground">© 2025 منصة الوقف - جميع الحقوق محفوظة</p>
-            <p className="text-xs text-muted-foreground mt-1">Waqf Platform - All Rights Reserved</p>
+          {/* Footer - Copyright & Contact */}
+          <div className="print:block hidden text-center mt-8 pt-4 border-t-2 border-primary/20 text-xs text-muted-foreground space-y-1">
+            <p className="font-semibold">{COMPANY_INFO.COPYRIGHT_AR}</p>
+            <p>{COMPANY_INFO.COPYRIGHT_EN}</p>
+            <p>{COMPANY_INFO.PHONE} | {COMPANY_INFO.EMAIL} | {COMPANY_INFO.WEBSITE}</p>
+            <p className="text-xs">{COMPANY_INFO.ADDRESS_AR}</p>
           </div>
 
           {/* Journal Entry Link */}
