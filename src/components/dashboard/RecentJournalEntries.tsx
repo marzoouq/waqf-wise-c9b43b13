@@ -1,0 +1,95 @@
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { format } from "date-fns";
+import { ar } from "date-fns/locale";
+import { FileText } from "lucide-react";
+
+const RecentJournalEntries = () => {
+  const { data: entries, isLoading } = useQuery({
+    queryKey: ["recent_journal_entries"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("journal_entries")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(5);
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const getStatusBadge = (status: string) => {
+    const variants: Record<string, { label: string; variant: any }> = {
+      draft: { label: "مسودة", variant: "secondary" },
+      posted: { label: "مرحّل", variant: "default" },
+      cancelled: { label: "ملغى", variant: "destructive" },
+    };
+    const config = variants[status] || { label: status, variant: "outline" };
+    return <Badge variant={config.variant}>{config.label}</Badge>;
+  };
+
+  if (isLoading) {
+    return (
+      <Card className="shadow-soft">
+        <CardHeader>
+          <CardTitle className="text-xl font-bold">آخر القيود المحاسبية</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="shadow-soft">
+      <CardHeader>
+        <CardTitle className="text-xl font-bold">آخر القيود المحاسبية</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {!entries || entries.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
+            <p>لا توجد قيود محاسبية بعد</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {entries.map((entry) => (
+              <div
+                key={entry.id}
+                className="flex items-start gap-4 pb-4 border-b border-border last:border-0 last:pb-0"
+              >
+                <div className="p-2 bg-primary/10 rounded-lg">
+                  <FileText className="h-4 w-4 text-primary" />
+                </div>
+                <div className="flex-1 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-mono font-medium">
+                      {entry.entry_number}
+                    </p>
+                    {getStatusBadge(entry.status)}
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    {entry.description}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {format(new Date(entry.entry_date), "dd MMMM yyyy", {
+                      locale: ar,
+                    })}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
+export default RecentJournalEntries;

@@ -4,6 +4,8 @@ import FinancialStats from "@/components/dashboard/FinancialStats";
 import RevenueExpenseChart from "@/components/dashboard/RevenueExpenseChart";
 import AccountDistributionChart from "@/components/dashboard/AccountDistributionChart";
 import BudgetComparisonChart from "@/components/dashboard/BudgetComparisonChart";
+import AccountingStats from "@/components/dashboard/AccountingStats";
+import RecentJournalEntries from "@/components/dashboard/RecentJournalEntries";
 
 const Dashboard = () => {
 
@@ -37,6 +39,9 @@ const Dashboard = () => {
         {/* Financial Stats */}
         <FinancialStats />
 
+        {/* Accounting Stats */}
+        <AccountingStats />
+
         {/* Revenue & Expense Chart */}
         <RevenueExpenseChart />
 
@@ -46,8 +51,11 @@ const Dashboard = () => {
           <BudgetComparisonChart />
         </div>
 
-        {/* Two Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Three Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Recent Journal Entries */}
+          <RecentJournalEntries />
+
           {/* Recent Activities */}
           <Card className="shadow-soft">
             <CardHeader>

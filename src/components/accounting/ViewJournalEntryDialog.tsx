@@ -1,11 +1,16 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Printer, CheckCircle } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -24,6 +29,7 @@ type JournalEntry = {
   entry_date: string;
   description: string;
   status: string;
+  posted_at: string | null;
 };
 
 type Props = {
@@ -33,6 +39,9 @@ type Props = {
 };
 
 const ViewJournalEntryDialog = ({ open, onOpenChange, entry }: Props) => {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
   const { data: lines } = useQuery({
     queryKey: ["journal_entry_lines", entry.id],
     queryFn: async () => {
@@ -50,8 +59,53 @@ const ViewJournalEntryDialog = ({ open, onOpenChange, entry }: Props) => {
     enabled: open,
   });
 
+  const postEntryMutation = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from("journal_entries")
+        .update({ status: "posted", posted_at: new Date().toISOString() })
+        .eq("id", entry.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
+      toast({
+        title: "تم الترحيل بنجاح",
+        description: "تم ترحيل القيد المحاسبي بنجاح",
+      });
+      onOpenChange(false);
+    },
+    onError: () => {
+      toast({
+        title: "خطأ",
+        description: "حدث خطأ أثناء ترحيل القيد",
+        variant: "destructive",
+      });
+    },
+  });
+
   const totalDebit = lines?.reduce((sum, line) => sum + Number(line.debit_amount), 0) || 0;
   const totalCredit = lines?.reduce((sum, line) => sum + Number(line.credit_amount), 0) || 0;
+
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const handlePost = () => {
+    if (entry.status === "draft") {
+      postEntryMutation.mutate();
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    const variants: Record<string, { label: string; variant: any }> = {
+      draft: { label: "مسودة", variant: "secondary" },
+      posted: { label: "مرحّل", variant: "default" },
+      cancelled: { label: "ملغى", variant: "destructive" },
+    };
+    const config = variants[status] || { label: status, variant: "outline" };
+    return <Badge variant={config.variant}>{config.label}</Badge>;
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -60,8 +114,8 @@ const ViewJournalEntryDialog = ({ open, onOpenChange, entry }: Props) => {
           <DialogTitle>تفاصيل القيد المحاسبي</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4 p-4 bg-accent/20 rounded-lg">
+        <div className="space-y-4" id="print-content">
+          <div className="grid grid-cols-2 gap-4 p-4 bg-accent/20 rounded-lg print:bg-white print:border print:border-gray-300">
             <div>
               <div className="text-sm text-muted-foreground">رقم القيد</div>
               <div className="font-mono font-semibold">{entry.entry_number}</div>
@@ -72,6 +126,18 @@ const ViewJournalEntryDialog = ({ open, onOpenChange, entry }: Props) => {
                 {format(new Date(entry.entry_date), "dd MMMM yyyy", { locale: ar })}
               </div>
             </div>
+            <div>
+              <div className="text-sm text-muted-foreground">الحالة</div>
+              <div>{getStatusBadge(entry.status)}</div>
+            </div>
+            {entry.posted_at && (
+              <div>
+                <div className="text-sm text-muted-foreground">تاريخ الترحيل</div>
+                <div className="font-semibold">
+                  {format(new Date(entry.posted_at), "dd MMMM yyyy", { locale: ar })}
+                </div>
+              </div>
+            )}
             <div className="col-span-2">
               <div className="text-sm text-muted-foreground">البيان</div>
               <div>{entry.description}</div>
@@ -119,6 +185,19 @@ const ViewJournalEntryDialog = ({ open, onOpenChange, entry }: Props) => {
             </TableFooter>
           </Table>
         </div>
+
+        <DialogFooter className="flex gap-2 print:hidden">
+          <Button variant="outline" onClick={handlePrint}>
+            <Printer className="h-4 w-4 ml-2" />
+            طباعة
+          </Button>
+          {entry.status === "draft" && (
+            <Button onClick={handlePost} disabled={postEntryMutation.isPending}>
+              <CheckCircle className="h-4 w-4 ml-2" />
+              {postEntryMutation.isPending ? "جاري الترحيل..." : "ترحيل القيد"}
+            </Button>
+          )}
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

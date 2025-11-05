@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Plus, Eye, CheckCircle, XCircle } from "lucide-react";
+import { Plus, Eye, Search, Filter } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -31,8 +34,12 @@ const JournalEntries = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
 
-  const { data: entries, isLoading } = useQuery({
+  const { data: allEntries, isLoading } = useQuery({
     queryKey: ["journal_entries"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -43,6 +50,28 @@ const JournalEntries = () => {
       return data as JournalEntry[];
     },
   });
+
+  const entries = useMemo(() => {
+    if (!allEntries) return [];
+    
+    return allEntries.filter((entry) => {
+      // Search filter
+      const matchesSearch = 
+        searchQuery === "" ||
+        entry.entry_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        entry.description.toLowerCase().includes(searchQuery.toLowerCase());
+
+      // Status filter
+      const matchesStatus = statusFilter === "all" || entry.status === statusFilter;
+
+      // Date filters
+      const entryDate = new Date(entry.entry_date);
+      const matchesDateFrom = !dateFrom || entryDate >= new Date(dateFrom);
+      const matchesDateTo = !dateTo || entryDate <= new Date(dateTo);
+
+      return matchesSearch && matchesStatus && matchesDateFrom && matchesDateTo;
+    });
+  }, [allEntries, searchQuery, statusFilter, dateFrom, dateTo]);
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { label: string; variant: any }> = {
@@ -76,6 +105,46 @@ const JournalEntries = () => {
           إضافة قيد جديد
         </Button>
       </div>
+
+      {/* Filters */}
+      <Card>
+        <CardContent className="pt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="relative">
+              <Search className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="بحث برقم القيد أو البيان..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pr-10"
+              />
+            </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="جميع الحالات" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">جميع الحالات</SelectItem>
+                <SelectItem value="draft">مسودة</SelectItem>
+                <SelectItem value="posted">مرحّل</SelectItem>
+                <SelectItem value="cancelled">ملغى</SelectItem>
+              </SelectContent>
+            </Select>
+            <Input
+              type="date"
+              placeholder="من تاريخ"
+              value={dateFrom}
+              onChange={(e) => setDateFrom(e.target.value)}
+            />
+            <Input
+              type="date"
+              placeholder="إلى تاريخ"
+              value={dateTo}
+              onChange={(e) => setDateTo(e.target.value)}
+            />
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="border rounded-lg overflow-x-auto">
         <Table>
