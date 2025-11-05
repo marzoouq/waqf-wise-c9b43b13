@@ -22,6 +22,8 @@ const ReactQueryDevtools =
 // Lazy load pages for better performance
 const Auth = lazy(() => import("./pages/Auth"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
+const BeneficiaryDashboard = lazy(() => import("./pages/BeneficiaryDashboard"));
+const AccountantDashboard = lazy(() => import("./pages/AccountantDashboard"));
 const Beneficiaries = lazy(() => import("./pages/Beneficiaries"));
 const Properties = lazy(() => import("./pages/Properties"));
 const Funds = lazy(() => import("./pages/Funds"));
@@ -67,6 +69,8 @@ const App = () => (
                     <MainLayout>
                       <Routes>
                         <Route path="/" element={<Dashboard />} />
+                        <Route path="/beneficiary-dashboard" element={<BeneficiaryDashboard />} />
+                        <Route path="/accountant-dashboard" element={<AccountantDashboard />} />
                         <Route path="/beneficiaries" element={<Beneficiaries />} />
                         <Route path="/properties" element={<Properties />} />
                         <Route path="/funds" element={<Funds />} />

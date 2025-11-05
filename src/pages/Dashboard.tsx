@@ -11,8 +11,24 @@ import { useActivities } from "@/hooks/useActivities";
 import { useTasks } from "@/hooks/useTasks";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { useUserRole } from "@/hooks/useUserRole";
+import { Navigate } from "react-router-dom";
 
 const Dashboard = () => {
+  const { isBeneficiary, isAccountant, isLoading: roleLoading } = useUserRole();
+
+  // Redirect based on role
+  if (roleLoading) {
+    return <LoadingState message="جاري التحقق من الصلاحيات..." />;
+  }
+
+  if (isBeneficiary) {
+    return <Navigate to="/beneficiary-dashboard" replace />;
+  }
+
+  if (isAccountant) {
+    return <Navigate to="/accountant-dashboard" replace />;
+  }
   const { activities, isLoading: activitiesLoading } = useActivities();
   const { tasks, isLoading: tasksLoading } = useTasks();
 
