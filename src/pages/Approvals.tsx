@@ -1,3 +1,4 @@
+import { useState, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +14,8 @@ import {
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { CheckCircle, XCircle, Clock } from "lucide-react";
+import { LoadingState } from "@/components/shared/LoadingState";
+import { EmptyState } from "@/components/shared/EmptyState";
 
 const Approvals = () => {
   const { data: approvals, isLoading } = useQuery({
@@ -34,7 +37,7 @@ const Approvals = () => {
     },
   });
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = useCallback((status: string) => {
     const variants: Record<string, { label: string; variant: any; icon: any }> = {
       pending: { label: "قيد المراجعة", variant: "secondary", icon: Clock },
       approved: { label: "موافق عليه", variant: "default", icon: CheckCircle },
@@ -48,19 +51,17 @@ const Approvals = () => {
         {config.label}
       </Badge>
     );
+  }, []);
+
+  // Calculate stats
+  const stats = {
+    pending: approvals?.filter((a: any) => a.status === "pending").length || 0,
+    approved: approvals?.filter((a: any) => a.status === "approved").length || 0,
+    rejected: approvals?.filter((a: any) => a.status === "rejected").length || 0,
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto p-4 md:p-6">
-          <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-            <p className="mt-2 text-muted-foreground">جاري التحميل...</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <LoadingState message="جاري تحميل الموافقات..." />;
   }
 
   return (
@@ -71,6 +72,49 @@ const Approvals = () => {
             الموافقات المحاسبية
           </h1>
           <p className="text-muted-foreground mt-1">سجل الموافقات على القيود المحاسبية</p>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card className="shadow-soft">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-full bg-warning/10">
+                  <Clock className="h-6 w-6 text-warning" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">قيد المراجعة</p>
+                  <p className="text-2xl font-bold">{stats.pending}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="shadow-soft">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-full bg-success/10">
+                  <CheckCircle className="h-6 w-6 text-success" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">موافق عليها</p>
+                  <p className="text-2xl font-bold">{stats.approved}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="shadow-soft">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-full bg-destructive/10">
+                  <XCircle className="h-6 w-6 text-destructive" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">مرفوضة</p>
+                  <p className="text-2xl font-bold">{stats.rejected}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         <div className="border rounded-lg overflow-x-auto">
@@ -90,15 +134,12 @@ const Approvals = () => {
               {!approvals || approvals.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7}>
-                    <Card>
-                      <CardContent className="py-12 text-center">
-                        <CheckCircle className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-                        <h3 className="text-lg font-semibold mb-2">لا توجد موافقات بعد</h3>
-                        <p className="text-sm text-muted-foreground">
-                          ستظهر هنا جميع الموافقات على القيود المحاسبية
-                        </p>
-                      </CardContent>
-                    </Card>
+                    <EmptyState
+                      icon={CheckCircle}
+                      title="لا توجد موافقات بعد"
+                      description="ستظهر هنا جميع الموافقات على القيود المحاسبية"
+                      className="py-8"
+                    />
                   </TableCell>
                 </TableRow>
               ) : (

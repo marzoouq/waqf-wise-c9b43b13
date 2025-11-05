@@ -56,14 +56,14 @@ export function CreateFolderDialog({
     },
   });
 
-  const handleSubmit = (data: FolderFormValues) => {
-    onCreate(data);
-    toast({
-      title: "تم الإنشاء بنجاح",
-      description: "تم إنشاء المجلد الجديد بنجاح",
-    });
-    form.reset();
-    onOpenChange(false);
+  const handleSubmit = async (data: FolderFormValues) => {
+    try {
+      await onCreate(data);
+      form.reset();
+      onOpenChange(false);
+    } catch (error) {
+      console.error("Create folder error:", error);
+    }
   };
 
   return (

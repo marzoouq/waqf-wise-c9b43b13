@@ -63,7 +63,7 @@ export function UploadDocumentDialog({
     },
   });
 
-  const handleSubmit = (data: UploadFormValues) => {
+  const handleSubmit = async (data: UploadFormValues) => {
     const file = data.file[0];
     const maxSize = 10 * 1024 * 1024; // 10MB
     
@@ -76,13 +76,31 @@ export function UploadDocumentDialog({
       return;
     }
 
-    onUpload(data);
-    toast({
-      title: "تم الرفع بنجاح",
-      description: "تم رفع المستند بنجاح إلى الأرشيف",
-    });
-    form.reset();
-    onOpenChange(false);
+    // Format file size
+    const formatFileSize = (bytes: number): string => {
+      if (bytes < 1024) return `${bytes} B`;
+      if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+      return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+    };
+
+    // Get file extension
+    const fileExtension = file.name.split(".").pop()?.toUpperCase() || "FILE";
+
+    const documentData = {
+      name: data.name,
+      description: data.description || "",
+      category: data.category,
+      file_type: fileExtension,
+      file_size: formatFileSize(file.size),
+    };
+
+    try {
+      await onUpload(documentData);
+      form.reset();
+      onOpenChange(false);
+    } catch (error) {
+      console.error("Upload error:", error);
+    }
   };
 
   return (

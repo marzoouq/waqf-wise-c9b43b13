@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import { Building2, Users, Wallet, FileText, AlertCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import FinancialStats from "@/components/dashboard/FinancialStats";
@@ -7,25 +7,28 @@ import AccountDistributionChart from "@/components/dashboard/AccountDistribution
 import BudgetComparisonChart from "@/components/dashboard/BudgetComparisonChart";
 import AccountingStats from "@/components/dashboard/AccountingStats";
 import RecentJournalEntries from "@/components/dashboard/RecentJournalEntries";
-
-// Move static data outside component
-const RECENT_ACTIVITIES = [
-  { id: 1, action: "إضافة مستفيد جديد", user: "أحمد محمد", time: "منذ 5 دقائق" },
-  { id: 2, action: "تحديث بيانات عقار", user: "فاطمة علي", time: "منذ 15 دقيقة" },
-  { id: 3, action: "صرف مستحقات", user: "محمد أحمد", time: "منذ ساعة" },
-  { id: 4, action: "رفع مستند جديد", user: "سارة خالد", time: "منذ ساعتين" },
-] as const;
-
-const PENDING_TASKS = [
-  { id: 1, task: "مراجعة طلب فزعة طارئة", priority: "عالية" },
-  { id: 2, task: "اعتماد توزيع الغلة الشهرية", priority: "عالية" },
-  { id: 3, task: "تجديد عقد إيجار", priority: "متوسطة" },
-  { id: 4, task: "مراجعة بيانات مستفيد", priority: "منخفضة" },
-] as const;
+import { useActivities } from "@/hooks/useActivities";
+import { useTasks } from "@/hooks/useTasks";
+import { LoadingState } from "@/components/shared/LoadingState";
+import { EmptyState } from "@/components/shared/EmptyState";
 
 const Dashboard = () => {
-  const recentActivities = useMemo(() => RECENT_ACTIVITIES, []);
-  const pendingTasks = useMemo(() => PENDING_TASKS, []);
+  const { activities, isLoading: activitiesLoading } = useActivities();
+  const { tasks, isLoading: tasksLoading } = useTasks();
+
+  const getPriorityBadgeClasses = useCallback((priority: string) => {
+    if (priority === "عالية") {
+      return "bg-destructive/15 text-destructive border border-destructive/30";
+    }
+    if (priority === "متوسطة") {
+      return "bg-warning/15 text-warning border border-warning/30";
+    }
+    return "bg-muted text-muted-foreground border border-border";
+  }, []);
+
+  if (activitiesLoading || tasksLoading) {
+    return <LoadingState message="جاري تحميل لوحة التحكم..." />;
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -66,29 +69,38 @@ const Dashboard = () => {
               <CardTitle className="text-xl font-bold">النشاطات الأخيرة</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {recentActivities.map((activity) => (
-                  <div
-                    key={activity.id}
-                    className="flex items-start gap-4 pb-4 border-b border-border last:border-0 last:pb-0"
-                  >
-                    <div className="p-2 bg-primary/10 rounded-full">
-                      <div className="h-2 w-2 bg-primary rounded-full"></div>
+              {activities.length === 0 ? (
+                <EmptyState
+                  icon={FileText}
+                  title="لا توجد نشاطات"
+                  description="ستظهر هنا أحدث النشاطات في النظام"
+                  className="py-8"
+                />
+              ) : (
+                <div className="space-y-4">
+                  {activities.map((activity) => (
+                    <div
+                      key={activity.id}
+                      className="flex items-start gap-4 pb-4 border-b border-border last:border-0 last:pb-0"
+                    >
+                      <div className="p-2 bg-primary/10 rounded-full">
+                        <div className="h-2 w-2 bg-primary rounded-full"></div>
+                      </div>
+                      <div className="flex-1 space-y-1">
+                        <p className="text-sm font-medium text-foreground">
+                          {activity.action}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          بواسطة {activity.user_name}
+                        </p>
+                      </div>
+                      <span className="text-xs text-muted-foreground whitespace-nowrap">
+                        {new Date(activity.timestamp).toLocaleDateString("ar-SA")}
+                      </span>
                     </div>
-                    <div className="flex-1 space-y-1">
-                      <p className="text-sm font-medium text-foreground">
-                        {activity.action}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        بواسطة {activity.user}
-                      </p>
-                    </div>
-                    <span className="text-xs text-muted-foreground whitespace-nowrap">
-                      {activity.time}
-                    </span>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -98,32 +110,35 @@ const Dashboard = () => {
               <CardTitle className="text-xl font-bold">المهام المعلقة</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {pendingTasks.map((task) => (
-                  <div
-                    key={task.id}
-                    className="flex items-start gap-4 pb-4 border-b border-border last:border-0 last:pb-0"
-                  >
-                    <AlertCircle className="h-5 w-5 text-warning mt-0.5" />
-                    <div className="flex-1 space-y-1">
-                      <p className="text-sm font-medium text-foreground">
-                        {task.task}
-                      </p>
-                      <span
-                       className={`inline-block text-xs px-2.5 py-1 rounded-full font-medium ${
-                          task.priority === "عالية"
-                            ? "bg-destructive/15 text-destructive border border-destructive/30"
-                            : task.priority === "متوسطة"
-                            ? "bg-warning/15 text-warning border border-warning/30"
-                            : "bg-muted text-muted-foreground border border-border"
-                        }`}
-                      >
-                        الأولوية: {task.priority}
-                      </span>
+              {tasks.length === 0 ? (
+                <EmptyState
+                  icon={AlertCircle}
+                  title="لا توجد مهام"
+                  description="ستظهر هنا المهام المعلقة التي تحتاج إلى إجراء"
+                  className="py-8"
+                />
+              ) : (
+                <div className="space-y-4">
+                  {tasks.map((task) => (
+                    <div
+                      key={task.id}
+                      className="flex items-start gap-4 pb-4 border-b border-border last:border-0 last:pb-0"
+                    >
+                      <AlertCircle className="h-5 w-5 text-warning mt-0.5" />
+                      <div className="flex-1 space-y-1">
+                        <p className="text-sm font-medium text-foreground">
+                          {task.task}
+                        </p>
+                        <span
+                          className={`inline-block text-xs px-2.5 py-1 rounded-full font-medium ${getPriorityBadgeClasses(task.priority)}`}
+                        >
+                          الأولوية: {task.priority}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
