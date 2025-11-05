@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { Printer, FileText, CheckCircle, XCircle, Send, Download } from "lucide-react";
+import { Printer, FileText, CheckCircle, XCircle, Send, Download, Mail } from "lucide-react";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import jsPDF from "jspdf";
@@ -114,6 +114,34 @@ export const ViewInvoiceDialog = ({
     setTimeout(() => {
       window.print();
     }, 100);
+  };
+
+  const handleSendEmail = async () => {
+    if (!invoice.customer_email) {
+      toast.error("لا يوجد بريد إلكتروني للعميل");
+      return;
+    }
+
+    try {
+      toast.loading("جاري إرسال الفاتورة...");
+      
+      const { data, error } = await supabase.functions.invoke("send-invoice-email", {
+        body: {
+          invoiceId: invoice.id,
+          customerEmail: invoice.customer_email,
+          customerName: invoice.customer_name,
+          invoiceNumber: invoice.invoice_number,
+          totalAmount: invoice.total_amount,
+        },
+      });
+
+      if (error) throw error;
+
+      toast.success("تم إرسال الفاتورة بنجاح");
+    } catch (error: any) {
+      console.error("Error sending email:", error);
+      toast.error("حدث خطأ أثناء إرسال الفاتورة: " + error.message);
+    }
   };
 
   const handleDownloadPDF = () => {
@@ -287,42 +315,53 @@ export const ViewInvoiceDialog = ({
           </DialogTitle>
         </DialogHeader>
 
-        <div id="invoice-print-content" className="space-y-6">
+        <div id="invoice-print-content" className="space-y-6 relative">
+          {/* Watermark */}
+          {invoice.status !== 'sent' && (
+            <div className="hidden print:block absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+              <div className="transform -rotate-45 opacity-10 text-9xl font-bold text-primary select-none">
+                {invoice.status === 'draft' ? 'مسودة' : 
+                 invoice.status === 'paid' ? 'مدفوعة' : 
+                 invoice.status === 'cancelled' ? 'ملغاة' : ''}
+              </div>
+            </div>
+          )}
+
           {/* Header - Company Info */}
           <div className="hidden print:block text-center border-b-2 border-primary pb-6 mb-6">
             <h1 className="text-3xl font-bold text-primary mb-2">{COMPANY_INFO.NAME_AR}</h1>
-            <p className="text-sm text-muted-foreground">{COMPANY_INFO.DESCRIPTION_AR}</p>
-            <p className="text-sm font-mono mt-1">الرقم الضريبي: {COMPANY_INFO.TAX_NUMBER}</p>
-            <p className="text-sm font-mono">السجل التجاري: {COMPANY_INFO.COMMERCIAL_REGISTRATION}</p>
-            <p className="text-sm mt-1">{COMPANY_INFO.ADDRESS_AR}</p>
-            <p className="text-xs text-muted-foreground">{COMPANY_INFO.PHONE} | {COMPANY_INFO.EMAIL}</p>
-            <h2 className="text-2xl font-bold mt-4 mb-1">فـاتـورة ضـريـبـيـة مـبـسـطـة</h2>
-            <p className="text-sm text-muted-foreground">SIMPLIFIED TAX INVOICE</p>
+            <p className="text-sm print:text-gray-700">{COMPANY_INFO.DESCRIPTION_AR}</p>
+            <p className="text-sm font-mono mt-1 print:text-black">الرقم الضريبي: {COMPANY_INFO.TAX_NUMBER}</p>
+            <p className="text-sm font-mono print:text-black">السجل التجاري: {COMPANY_INFO.COMMERCIAL_REGISTRATION}</p>
+            <p className="text-sm mt-1 print:text-black">{COMPANY_INFO.ADDRESS_AR}</p>
+            <p className="text-xs print:text-gray-600">{COMPANY_INFO.PHONE} | {COMPANY_INFO.EMAIL}</p>
+            <h2 className="text-2xl font-bold mt-4 mb-1 text-primary">فـاتـورة ضـريـبـيـة مـبـسـطـة</h2>
+            <p className="text-sm print:text-gray-700">SIMPLIFIED TAX INVOICE</p>
           </div>
 
           {/* Invoice Info */}
           <div className="grid grid-cols-2 gap-6 p-6 bg-muted/30 rounded-lg print:bg-white print:border-2 print:border-primary">
             <div className="space-y-1">
-              <div className="text-sm font-medium text-muted-foreground">رقم الفاتورة</div>
+              <div className="text-sm font-medium text-muted-foreground print:text-gray-700">رقم الفاتورة</div>
               <div className="font-mono font-bold text-xl text-primary">{invoice.invoice_number}</div>
-              <div className="text-xs text-muted-foreground">Invoice Number</div>
+              <div className="text-xs text-muted-foreground print:text-gray-500">Invoice Number</div>
             </div>
             <div className="space-y-1">
-              <div className="text-sm font-medium text-muted-foreground">التاريخ</div>
-              <div className="font-semibold text-lg">
+              <div className="text-sm font-medium text-muted-foreground print:text-gray-700">التاريخ</div>
+              <div className="font-semibold text-lg print:text-black">
                 {format(new Date(invoice.invoice_date), "dd MMMM yyyy", { locale: ar })}
               </div>
-              <div className="text-xs text-muted-foreground">
+              <div className="text-xs text-muted-foreground print:text-gray-500">
                 {format(new Date(invoice.invoice_date), "dd/MM/yyyy")}
               </div>
             </div>
             {invoice.due_date && (
               <div className="space-y-1">
-                <div className="text-sm font-medium text-muted-foreground">تاريخ الاستحقاق</div>
-                <div className="font-semibold text-lg">
+                <div className="text-sm font-medium text-muted-foreground print:text-gray-700">تاريخ الاستحقاق</div>
+                <div className="font-semibold text-lg print:text-black">
                   {format(new Date(invoice.due_date), "dd MMMM yyyy", { locale: ar })}
                 </div>
-                <div className="text-xs text-muted-foreground">Due Date</div>
+                <div className="text-xs text-muted-foreground print:text-gray-500">Due Date</div>
               </div>
             )}
             <div className="print:hidden space-y-1">
@@ -335,30 +374,30 @@ export const ViewInvoiceDialog = ({
           <div className="space-y-4 p-6 border-2 rounded-lg bg-muted/20 print:border-2 print:border-primary print:bg-gray-50">
             <div className="flex items-center gap-2">
               <h3 className="font-bold text-lg text-primary">بيانات العميل</h3>
-              <span className="text-sm text-muted-foreground">/ Customer Information</span>
+              <span className="text-sm text-muted-foreground print:text-gray-600">/ Customer Information</span>
             </div>
-            <Separator className="bg-primary/20" />
+            <Separator className="bg-primary/20 print:bg-gray-300" />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div className="space-y-1">
-                <span className="text-muted-foreground block">الاسم / Name</span>
-                <span className="font-semibold text-base">{invoice.customer_name}</span>
+                <span className="text-muted-foreground print:text-gray-700 block">الاسم / Name</span>
+                <span className="font-semibold text-base print:text-black">{invoice.customer_name}</span>
               </div>
               {invoice.customer_email && (
                 <div className="space-y-1">
-                  <span className="text-muted-foreground block">البريد / Email</span>
-                  <span className="font-mono">{invoice.customer_email}</span>
+                  <span className="text-muted-foreground print:text-gray-700 block">البريد / Email</span>
+                  <span className="font-mono print:text-black">{invoice.customer_email}</span>
                 </div>
               )}
               {invoice.customer_phone && (
                 <div className="space-y-1">
-                  <span className="text-muted-foreground block">الهاتف / Phone</span>
-                  <span className="font-mono">{invoice.customer_phone}</span>
+                  <span className="text-muted-foreground print:text-gray-700 block">الهاتف / Phone</span>
+                  <span className="font-mono print:text-black">{invoice.customer_phone}</span>
                 </div>
               )}
               {invoice.customer_address && (
                 <div className="col-span-2 space-y-1">
-                  <span className="text-muted-foreground block">العنوان / Address</span>
-                  <span>{invoice.customer_address}</span>
+                  <span className="text-muted-foreground print:text-gray-700 block">العنوان / Address</span>
+                  <span className="print:text-black">{invoice.customer_address}</span>
                 </div>
               )}
             </div>
@@ -369,34 +408,34 @@ export const ViewInvoiceDialog = ({
             <Table>
               <TableHeader>
                 <TableRow className="bg-primary/10 print:bg-primary/20 print:border-2 print:border-primary">
-                  <TableHead className="font-bold print:border-2 print:border-primary text-center">#</TableHead>
-                  <TableHead className="font-bold print:border-2 print:border-primary">الوصف / Description</TableHead>
-                  <TableHead className="font-bold text-center print:border-2 print:border-primary">الكمية<br/><span className="text-xs font-normal">Qty</span></TableHead>
-                  <TableHead className="font-bold text-center print:border-2 print:border-primary">السعر<br/><span className="text-xs font-normal">Price</span></TableHead>
-                  <TableHead className="font-bold text-center print:border-2 print:border-primary">الإجمالي<br/><span className="text-xs font-normal">Total</span></TableHead>
+                  <TableHead className="font-bold print:border-2 print:border-primary print:text-black text-center">#</TableHead>
+                  <TableHead className="font-bold print:border-2 print:border-primary print:text-black">الوصف / Description</TableHead>
+                  <TableHead className="font-bold text-center print:border-2 print:border-primary print:text-black">الكمية<br/><span className="text-xs font-normal print:text-gray-700">Qty</span></TableHead>
+                  <TableHead className="font-bold text-center print:border-2 print:border-primary print:text-black">السعر<br/><span className="text-xs font-normal print:text-gray-700">Price</span></TableHead>
+                  <TableHead className="font-bold text-center print:border-2 print:border-primary print:text-black">الإجمالي<br/><span className="text-xs font-normal print:text-gray-700">Total</span></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {invoiceLines?.map((line, index) => (
                   <TableRow key={line.id} className="print:border-2 print:border-primary hover:bg-muted/50">
-                    <TableCell className="print:border-2 print:border-primary text-center font-semibold">
+                    <TableCell className="print:border-2 print:border-primary print:text-black text-center font-semibold">
                       {line.line_number}
                     </TableCell>
-                    <TableCell className="print:border-2 print:border-primary">
+                    <TableCell className="print:border-2 print:border-primary print:text-black">
                       <div className="space-y-1">
                         <div className="font-medium">{line.description}</div>
-                        <div className="text-xs text-muted-foreground">
+                        <div className="text-xs text-muted-foreground print:text-gray-600">
                           {line.accounts?.code} - {line.accounts?.name_ar}
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="text-center print:border-2 print:border-primary font-mono">
+                    <TableCell className="text-center print:border-2 print:border-primary print:text-black font-mono">
                       {Number(line.quantity)}
                     </TableCell>
-                    <TableCell className="text-center font-mono print:border-2 print:border-primary">
+                    <TableCell className="text-center font-mono print:border-2 print:border-primary print:text-black">
                       {Number(line.unit_price).toFixed(2)}
                     </TableCell>
-                    <TableCell className="text-center font-mono font-semibold print:border-2 print:border-primary text-primary">
+                    <TableCell className="text-center font-mono font-semibold print:border-2 print:border-primary text-primary print:text-black">
                       {Number(line.line_total).toFixed(2)}
                     </TableCell>
                   </TableRow>
@@ -489,6 +528,13 @@ export const ViewInvoiceDialog = ({
             <Download className="h-4 w-4" />
             تحميل PDF
           </Button>
+
+          {invoice.customer_email && (
+            <Button onClick={handleSendEmail} variant="outline" size="default" className="gap-2">
+              <Mail className="h-4 w-4" />
+              إرسال بالإيميل
+            </Button>
+          )}
 
           {invoice.status === "draft" && (
             <Button

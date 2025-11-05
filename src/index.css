@@ -226,9 +226,31 @@ All colors MUST be HSL.
     display: block !important;
   }
   
+  /* Force black text for print */
+  #invoice-print-content,
+  #invoice-print-content * {
+    color: black !important;
+  }
+  
+  #invoice-print-content .print\:text-black,
+  #invoice-print-content .print\:text-gray-700,
+  #invoice-print-content .print\:text-gray-600,
+  #invoice-print-content .print\:text-gray-500 {
+    color: inherit !important;
+  }
+  
+  /* Keep primary color for specific elements */
+  #invoice-print-content h1,
+  #invoice-print-content h2,
+  #invoice-print-content h3,
+  #invoice-print-content .text-primary {
+    color: hsl(150 45% 35%) !important;
+  }
+  
   /* Ensure tables display correctly */
   #invoice-print-content table {
     display: table !important;
+    border-collapse: collapse !important;
   }
   
   #invoice-print-content thead,
@@ -243,8 +265,9 @@ All colors MUST be HSL.
   #invoice-print-content th,
   #invoice-print-content td {
     display: table-cell !important;
-    border: 1px solid #ddd !important;
+    border: 1px solid #333 !important;
     padding: 8px !important;
+    color: black !important;
   }
   
   /* Position the printable content at top */
