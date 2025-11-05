@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Search, Filter, Download, MoreVertical } from "lucide-react";
+import { Plus, Search, Filter, Download, MoreVertical, Users, UserCheck, UserX, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -78,7 +78,7 @@ const Beneficiaries = () => {
               إدارة حسابات المستفيدين والموقوف عليهم
             </p>
           </div>
-          <Button className="bg-primary hover:bg-primary-hover text-primary-foreground shadow-soft w-full md:w-auto">
+          <Button className="bg-primary hover:bg-primary-hover text-primary-foreground shadow-soft hover:shadow-medium transition-all duration-300 w-full md:w-auto">
             <Plus className="ml-2 h-4 w-4 md:h-5 md:w-5" />
             <span className="text-sm md:text-base">إضافة مستفيد جديد</span>
           </Button>
@@ -97,58 +97,79 @@ const Beneficiaries = () => {
                   className="pr-10"
                 />
               </div>
-              <Button variant="outline" className="shadow-soft">
-                <Filter className="ml-2 h-5 w-5" />
-                تصفية متقدمة
+              <Button variant="outline" className="shadow-soft hover:shadow-medium transition-all duration-300 hover:bg-primary hover:text-primary-foreground border-primary/20">
+                <Filter className="ml-2 h-4 w-4 md:h-5 md:w-5" />
+                <span className="hidden md:inline">تصفية متقدمة</span>
+                <span className="md:hidden">تصفية</span>
               </Button>
-              <Button variant="outline" className="shadow-soft">
-                <Download className="ml-2 h-5 w-5" />
-                تصدير البيانات
+              <Button variant="outline" className="shadow-soft hover:shadow-medium transition-all duration-300 hover:bg-accent hover:text-accent-foreground border-accent/20">
+                <Download className="ml-2 h-4 w-4 md:h-5 md:w-5" />
+                <span className="hidden md:inline">تصدير البيانات</span>
+                <span className="md:hidden">تصدير</span>
               </Button>
             </div>
           </CardContent>
         </Card>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="shadow-soft">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+          <Card className="shadow-soft hover:shadow-medium transition-all duration-300 border-l-4 border-l-primary">
+            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+              <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground">
                 إجمالي المستفيدين
               </CardTitle>
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Users className="h-4 w-4 md:h-5 md:w-5 text-primary" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-primary">1,247</div>
+              <div className="text-2xl md:text-3xl font-bold text-primary">1,247</div>
+              <p className="text-xs text-muted-foreground mt-1">جميع الحسابات</p>
             </CardContent>
           </Card>
-          <Card className="shadow-soft">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
+          
+          <Card className="shadow-soft hover:shadow-medium transition-all duration-300 border-l-4 border-l-success">
+            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+              <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground">
                 المستفيدين النشطين
               </CardTitle>
+              <div className="p-2 bg-success/10 rounded-lg">
+                <UserCheck className="h-4 w-4 md:h-5 md:w-5 text-success" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-success">1,189</div>
+              <div className="text-2xl md:text-3xl font-bold text-success">1,189</div>
+              <p className="text-xs text-muted-foreground mt-1">حسابات نشطة</p>
             </CardContent>
           </Card>
-          <Card className="shadow-soft">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
+          
+          <Card className="shadow-soft hover:shadow-medium transition-all duration-300 border-l-4 border-l-warning">
+            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+              <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground">
                 المعلقين
               </CardTitle>
+              <div className="p-2 bg-warning/10 rounded-lg">
+                <UserX className="h-4 w-4 md:h-5 md:w-5 text-warning" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-warning">58</div>
+              <div className="text-2xl md:text-3xl font-bold text-warning">58</div>
+              <p className="text-xs text-muted-foreground mt-1">حسابات معلقة</p>
             </CardContent>
           </Card>
-          <Card className="shadow-soft">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
+          
+          <Card className="shadow-soft hover:shadow-medium transition-all duration-300 border-l-4 border-l-accent">
+            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+              <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground">
                 العائلات
               </CardTitle>
+              <div className="p-2 bg-accent/10 rounded-lg">
+                <Home className="h-4 w-4 md:h-5 md:w-5 text-accent" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-accent">324</div>
+              <div className="text-2xl md:text-3xl font-bold text-accent">324</div>
+              <p className="text-xs text-muted-foreground mt-1">عائلات مسجلة</p>
             </CardContent>
           </Card>
         </div>
@@ -158,72 +179,81 @@ const Beneficiaries = () => {
           <CardHeader>
             <CardTitle className="text-lg md:text-xl">قائمة المستفيدين</CardTitle>
           </CardHeader>
-          <CardContent className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-right">الاسم</TableHead>
-                  <TableHead className="text-right">رقم الهوية</TableHead>
-                  <TableHead className="text-right">العائلة</TableHead>
-                  <TableHead className="text-right">الفئة</TableHead>
-                  <TableHead className="text-right">الحالة</TableHead>
-                  <TableHead className="text-right">رقم الهاتف</TableHead>
-                  <TableHead className="text-right">إجمالي المدفوعات</TableHead>
-                  <TableHead className="text-right">الإجراءات</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {beneficiaries.map((beneficiary) => (
-                  <TableRow key={beneficiary.id} className="hover:bg-muted/50">
-                    <TableCell className="font-medium">
-                      {beneficiary.name}
-                    </TableCell>
-                    <TableCell className="font-mono text-sm">
-                      {beneficiary.idNumber}
-                    </TableCell>
-                    <TableCell>{beneficiary.family}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{beneficiary.category}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        className={
-                          beneficiary.status === "نشط"
-                            ? "bg-success/10 text-success hover:bg-success/20"
-                            : "bg-warning/10 text-warning hover:bg-warning/20"
-                        }
-                      >
-                        {beneficiary.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="font-mono text-sm">
-                      {beneficiary.phone}
-                    </TableCell>
-                    <TableCell className="font-semibold text-primary">
-                      {beneficiary.totalPayments}
-                    </TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start">
-                          <DropdownMenuItem>عرض التفاصيل</DropdownMenuItem>
-                          <DropdownMenuItem>تعديل البيانات</DropdownMenuItem>
-                          <DropdownMenuItem>سجل النشاط</DropdownMenuItem>
-                          <DropdownMenuItem>المستندات</DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive">
-                            تعطيل الحساب
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/30">
+                    <TableHead className="text-right font-semibold">الاسم</TableHead>
+                    <TableHead className="text-right font-semibold hidden md:table-cell">رقم الهوية</TableHead>
+                    <TableHead className="text-right font-semibold hidden lg:table-cell">العائلة</TableHead>
+                    <TableHead className="text-right font-semibold hidden lg:table-cell">الفئة</TableHead>
+                    <TableHead className="text-right font-semibold">الحالة</TableHead>
+                    <TableHead className="text-right font-semibold hidden md:table-cell">رقم الهاتف</TableHead>
+                    <TableHead className="text-right font-semibold hidden lg:table-cell">إجمالي المدفوعات</TableHead>
+                    <TableHead className="text-right font-semibold">الإجراءات</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {beneficiaries.map((beneficiary) => (
+                    <TableRow key={beneficiary.id} className="hover:bg-muted/50 transition-colors">
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                            <span className="text-primary font-semibold text-sm">
+                              {beneficiary.name.charAt(0)}
+                            </span>
+                          </div>
+                          <span className="truncate max-w-[150px] md:max-w-none">{beneficiary.name}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="font-mono text-sm hidden md:table-cell">
+                        {beneficiary.idNumber}
+                      </TableCell>
+                      <TableCell className="hidden lg:table-cell">{beneficiary.family}</TableCell>
+                      <TableCell className="hidden lg:table-cell">
+                        <Badge variant="outline" className="border-primary/30">{beneficiary.category}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          className={
+                            beneficiary.status === "نشط"
+                              ? "bg-success/10 text-success hover:bg-success/20 border border-success/30"
+                              : "bg-warning/10 text-warning hover:bg-warning/20 border border-warning/30"
+                          }
+                        >
+                          {beneficiary.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="font-mono text-sm hidden md:table-cell">
+                        {beneficiary.phone}
+                      </TableCell>
+                      <TableCell className="font-semibold text-primary hidden lg:table-cell">
+                        {beneficiary.totalPayments}
+                      </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="start">
+                            <DropdownMenuItem>عرض التفاصيل</DropdownMenuItem>
+                            <DropdownMenuItem>تعديل البيانات</DropdownMenuItem>
+                            <DropdownMenuItem>سجل النشاط</DropdownMenuItem>
+                            <DropdownMenuItem>المستندات</DropdownMenuItem>
+                            <DropdownMenuItem className="text-destructive">
+                              تعطيل الحساب
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
         </Card>
       </div>
