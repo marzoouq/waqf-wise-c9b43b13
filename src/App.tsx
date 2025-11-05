@@ -8,6 +8,7 @@ import MainLayout from "./components/layout/MainLayout";
 import ErrorBoundary from "./components/shared/ErrorBoundary";
 import { LoadingState } from "./components/shared/LoadingState";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+import { usePWAUpdate } from "./lib/pwa";
 
 // Lazy load React Query DevTools (TanStack recommended pattern)
 const ReactQueryDevtools =
@@ -34,6 +35,7 @@ const Settings = lazy(() => import("./pages/Settings"));
 const Invoices = lazy(() => import("./pages/Invoices"));
 const Approvals = lazy(() => import("./pages/Approvals"));
 const Payments = lazy(() => import("./pages/Payments"));
+const Install = lazy(() => import("./pages/Install"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Configure QueryClient with optimized defaults
@@ -49,17 +51,21 @@ const queryClient = new QueryClient({
   },
 });
 
-const App = () => (
-  <ErrorBoundary>
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Suspense fallback={<LoadingState size="lg" fullScreen />}>
-            <Routes>
-              {/* Public route */}
-              <Route path="/auth" element={<Auth />} />
+const App = () => {
+  usePWAUpdate();
+  
+  return (
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Suspense fallback={<LoadingState size="lg" fullScreen />}>
+              <Routes>
+                {/* Public routes */}
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/install" element={<Install />} />
               
               {/* Protected routes */}
               <Route
@@ -93,17 +99,18 @@ const App = () => (
         </BrowserRouter>
       </TooltipProvider>
       
-      {/* React Query DevTools - Lazy loaded, only in development */}
-      {import.meta.env.DEV && ReactQueryDevtools && (
-        <Suspense fallback={null}>
-          <ReactQueryDevtools 
-            initialIsOpen={false}
-            buttonPosition="bottom-right"
-          />
-        </Suspense>
-      )}
-    </QueryClientProvider>
-  </ErrorBoundary>
-);
+        {/* React Query DevTools - Lazy loaded, only in development */}
+        {import.meta.env.DEV && ReactQueryDevtools && (
+          <Suspense fallback={null}>
+            <ReactQueryDevtools 
+              initialIsOpen={false}
+              buttonPosition="bottom-right"
+            />
+          </Suspense>
+        )}
+      </QueryClientProvider>
+    </ErrorBoundary>
+  );
+};
 
 export default App;
