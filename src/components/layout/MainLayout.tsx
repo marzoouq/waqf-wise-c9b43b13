@@ -12,7 +12,8 @@ const MainLayout = ({ children }: MainLayoutProps) => {
     <div dir="rtl">
       <SidebarProvider>
         <div className="min-h-screen flex w-full bg-background">
-          <main className="flex-1 flex flex-col w-full">
+          <AppSidebar />
+          <main className="flex-1 flex flex-col">
             {/* Mobile Header */}
             <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 lg:hidden">
               <SidebarTrigger>
@@ -39,7 +40,6 @@ const MainLayout = ({ children }: MainLayoutProps) => {
               {children}
             </div>
           </main>
-          <AppSidebar />
         </div>
       </SidebarProvider>
     </div>
