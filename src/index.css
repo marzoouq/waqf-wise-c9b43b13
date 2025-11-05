@@ -208,58 +208,85 @@ All colors MUST be HSL.
 
 /* Print Styles */
 @media print {
-  /* Hide most elements by default */
+  /* 1. إخفاء كل شيء أولاً */
   body * {
-    visibility: hidden;
+    visibility: hidden !important;
   }
   
-  /* Make invoice content and its children visible */
-  #print-content,
-  #print-content *,
+  /* 2. إظهار محتوى الفاتورة فقط */
   #invoice-print-content,
   #invoice-print-content * {
     visibility: visible !important;
   }
   
-  /* Override hidden classes inside invoice */
-  #invoice-print-content .hidden {
+  /* 3. إلغاء display: none بقوة للعناصر المخفية */
+  #invoice-print-content .hidden,
+  #invoice-print-content [class*="hidden"] {
     display: block !important;
+    visibility: visible !important;
   }
   
-  /* Force black text for print */
-  #invoice-print-content,
+  /* 4. تطبيق print:block بقوة */
+  #invoice-print-content .print\:block {
+    display: block !important;
+    visibility: visible !important;
+  }
+  
+  /* 5. إخفاء العناصر مع print:hidden */
+  #invoice-print-content .print\:hidden {
+    display: none !important;
+    visibility: hidden !important;
+  }
+  
+  /* 6. جعل النصوص سوداء */
   #invoice-print-content * {
     color: black !important;
   }
   
-  #invoice-print-content .print\:text-black,
-  #invoice-print-content .print\:text-gray-700,
-  #invoice-print-content .print\:text-gray-600,
-  #invoice-print-content .print\:text-gray-500 {
-    color: inherit !important;
-  }
-  
-  /* Keep primary color for specific elements */
+  /* 7. الحفاظ على لون primary للعناوين */
   #invoice-print-content h1,
   #invoice-print-content h2,
   #invoice-print-content h3,
-  #invoice-print-content .text-primary {
+  #invoice-print-content .text-primary,
+  #invoice-print-content [class*="text-primary"] {
     color: hsl(150 45% 35%) !important;
   }
   
-  /* Ensure tables display correctly */
+  /* 8. الحفاظ على الألوان لـ print:text-* classes */
+  #invoice-print-content [class*="print:text-black"] {
+    color: black !important;
+  }
+  
+  #invoice-print-content [class*="print:text-gray-700"] {
+    color: rgb(55, 65, 81) !important;
+  }
+  
+  #invoice-print-content [class*="print:text-gray-600"] {
+    color: rgb(75, 85, 99) !important;
+  }
+  
+  #invoice-print-content [class*="print:text-gray-500"] {
+    color: rgb(107, 114, 128) !important;
+  }
+  
+  /* 9. تطبيق display الصحيح للجداول */
   #invoice-print-content table {
     display: table !important;
+    width: 100% !important;
     border-collapse: collapse !important;
   }
   
-  #invoice-print-content thead,
+  #invoice-print-content thead {
+    display: table-header-group !important;
+  }
+  
   #invoice-print-content tbody {
     display: table-row-group !important;
   }
   
   #invoice-print-content tr {
     display: table-row !important;
+    page-break-inside: avoid !important;
   }
   
   #invoice-print-content th,
@@ -267,76 +294,59 @@ All colors MUST be HSL.
     display: table-cell !important;
     border: 1px solid #333 !important;
     padding: 8px !important;
-    color: black !important;
   }
   
-  /* Position the printable content at top */
-  #print-content,
-  #invoice-print-content {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    background: white !important;
-    padding: 20px;
-  }
-  
-  /* Override hidden classes */
-  .print\:hidden {
-    display: none !important;
-  }
-  
-  .print\:block {
-    display: block !important;
-  }
-  
-  /* Ensure backgrounds and borders show */
-  .print\:bg-white {
+  /* 10. تطبيق الخلفيات والحدود */
+  #invoice-print-content [class*="print:bg-white"] {
     background-color: white !important;
   }
   
-  .print\:bg-gray-50 {
-    background-color: #f9fafb !important;
+  #invoice-print-content [class*="print:bg-gray-50"] {
+    background-color: rgb(249, 250, 251) !important;
   }
   
-  .print\:border {
-    border: 1px solid black !important;
+  #invoice-print-content [class*="print:border"] {
+    border-style: solid !important;
   }
   
-  .print\:border-2 {
+  #invoice-print-content [class*="print:border-2"] {
     border-width: 2px !important;
   }
   
-  .print\:border-primary {
+  #invoice-print-content [class*="print:border-primary"] {
     border-color: hsl(150 45% 35%) !important;
   }
   
-  .print\:border-black {
-    border-color: black !important;
-  }
-  
-  .print\:bg-primary\/20 {
+  #invoice-print-content [class*="print:bg-primary"] {
     background-color: hsla(150, 45%, 35%, 0.2) !important;
   }
   
-  /* Remove shadows for cleaner print */
+  /* 11. وضع محتوى الفاتورة في أعلى الصفحة */
+  #invoice-print-content {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    background: white !important;
+    padding: 20px !important;
+  }
+  
+  /* 12. إزالة الظلال */
   * {
     box-shadow: none !important;
     text-shadow: none !important;
   }
   
-  /* Ensure tables print correctly */
-  table {
-    border-collapse: collapse !important;
-  }
-  
-  tr, td, th {
-    page-break-inside: avoid;
-  }
-  
-  /* Page settings */
+  /* 13. إعدادات الصفحة */
   @page {
     margin: 1cm;
     size: A4 portrait;
+  }
+  
+  /* 14. تأكيد طباعة الألوان */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
   }
 }

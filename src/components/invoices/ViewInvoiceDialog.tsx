@@ -109,6 +109,13 @@ export const ViewInvoiceDialog = ({
     console.log("🖨️ Print triggered");
     console.log("📋 Invoice:", invoice);
     console.log("📝 Lines:", invoiceLines?.length || 0);
+    console.log("📊 Invoice data loaded:", !!invoice);
+    console.log("📋 Lines data loaded:", !!invoiceLines);
+    
+    if (!invoice || !invoiceLines) {
+      toast.error("الرجاء الانتظار حتى يتم تحميل البيانات");
+      return;
+    }
     
     // Wait a bit to ensure all data is loaded
     setTimeout(() => {
@@ -147,19 +154,22 @@ export const ViewInvoiceDialog = ({
   const handleDownloadPDF = () => {
     if (!invoice) {
       console.error("❌ No invoice data");
+      toast.error("الرجاء الانتظار حتى يتم تحميل بيانات الفاتورة");
       return;
     }
     
     // Check if invoice lines are loaded
     if (!invoiceLines || invoiceLines.length === 0) {
       console.error("❌ No invoice lines:", invoiceLines);
-      toast.error("لا يمكن تحميل الفاتورة: لا توجد بنود في الفاتورة");
+      toast.error("الرجاء الانتظار حتى يتم تحميل بنود الفاتورة");
       return;
     }
 
     console.log("✅ Generating PDF with", invoiceLines.length, "lines");
 
-    const doc = new jsPDF();
+    // انتظر قليلاً للتأكد من رسم كل العناصر
+    setTimeout(() => {
+      const doc = new jsPDF();
     
     // Add Arabic font support
     doc.setLanguage("ar");
@@ -285,9 +295,10 @@ export const ViewInvoiceDialog = ({
     doc.text(COMPANY_INFO.COPYRIGHT_EN, 105, pageHeight - 15, { align: "center" });
     doc.text(`${COMPANY_INFO.PHONE} | ${COMPANY_INFO.EMAIL} | ${COMPANY_INFO.WEBSITE}`, 105, pageHeight - 10, { align: "center" });
     
-    // Save
-    doc.save(`فاتورة-${invoice.invoice_number}.pdf`);
-    toast.success("تم تحميل الفاتورة بصيغة PDF");
+      // Save
+      doc.save(`فاتورة-${invoice.invoice_number}.pdf`);
+      toast.success("تم تحميل الفاتورة بصيغة PDF");
+    }, 100);
   };
 
   const getStatusBadge = (status: string) => {
@@ -328,7 +339,7 @@ export const ViewInvoiceDialog = ({
           )}
 
           {/* Header - Company Info */}
-          <div className="hidden print:block text-center border-b-2 border-primary pb-6 mb-6">
+          <div className="print:block hidden text-center border-b-2 border-primary pb-6 mb-6">
             <h1 className="text-3xl font-bold text-primary mb-2">{COMPANY_INFO.NAME_AR}</h1>
             <p className="text-sm print:text-gray-700">{COMPANY_INFO.DESCRIPTION_AR}</p>
             <p className="text-sm font-mono mt-1 print:text-black">الرقم الضريبي: {COMPANY_INFO.TAX_NUMBER}</p>
