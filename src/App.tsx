@@ -17,6 +17,7 @@ const Reports = lazy(() => import("./pages/Reports"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Invoices = lazy(() => import("./pages/Invoices"));
 const Approvals = lazy(() => import("./pages/Approvals"));
+const Payments = lazy(() => import("./pages/Payments"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Configure QueryClient with optimized defaults
@@ -59,6 +60,7 @@ const App = () => (
               <Route path="/accounting" element={<Accounting />} />
               <Route path="/invoices" element={<Invoices />} />
               <Route path="/approvals" element={<Approvals />} />
+              <Route path="/payments" element={<Payments />} />
               <Route path="/reports" element={<Reports />} />
               <Route path="/settings" element={<Settings />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -10,6 +10,7 @@ import {
   Settings,
   Receipt,
   CheckSquare,
+  CreditCard,
 } from "lucide-react";
 import {
   Sidebar,
@@ -39,6 +40,7 @@ const AppSidebar = () => {
     { icon: FileText, label: "الأرشيف", path: "/archive" },
     { icon: Calculator, label: "المحاسبة", path: "/accounting" },
     { icon: Receipt, label: "الفواتير", path: "/invoices" },
+    { icon: CreditCard, label: "المدفوعات", path: "/payments" },
     { icon: CheckSquare, label: "الموافقات", path: "/approvals" },
     { icon: BarChart3, label: "التقارير", path: "/reports" },
     { icon: Settings, label: "الإعدادات", path: "/settings" },

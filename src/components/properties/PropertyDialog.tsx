@@ -40,7 +40,7 @@ const propertySchema = z.object({
     .number()
     .min(1, { message: "عدد الوحدات يجب أن يكون 1 على الأقل" }),
   occupied: z.coerce.number().min(0, { message: "عدد الوحدات المؤجرة لا يمكن أن يكون سالباً" }),
-  monthlyRevenue: z.coerce
+  monthly_revenue: z.coerce
     .number()
     .min(0, { message: "الإيراد الشهري لا يمكن أن يكون سالباً" }),
   status: z.string().min(1, { message: "الحالة مطلوبة" }),
@@ -75,7 +75,7 @@ export function PropertyDialog({
       location: property?.location || "",
       units: property?.units || 1,
       occupied: property?.occupied || 0,
-      monthlyRevenue: property?.monthly_revenue || 0,
+      monthly_revenue: property?.monthly_revenue || 0,
       status: property?.status || "",
       description: property?.description || "",
     },
@@ -217,7 +217,7 @@ export function PropertyDialog({
 
               <FormField
                 control={form.control}
-                name="monthlyRevenue"
+                name="monthly_revenue"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>الإيراد الشهري (ر.س) *</FormLabel>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Plus, Search, MapPin, DollarSign, Home, Building, Edit, Trash2 } from "lucide-react";
 import { PropertyDialog } from "@/components/properties/PropertyDialog";
 import { useProperties } from "@/hooks/useProperties";
@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { StatCard } from "@/components/dashboard/DashboardStats";
 
 const Properties = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -14,36 +15,53 @@ const Properties = () => {
 
   const { properties, isLoading, addProperty, updateProperty, deleteProperty } = useProperties();
 
-  const totalUnits = properties.reduce((sum, p) => sum + p.units, 0);
-  const occupiedUnits = properties.reduce((sum, p) => sum + p.occupied, 0);
-  const totalRevenue = properties.reduce((sum, p) => sum + Number(p.monthly_revenue), 0);
+  // Memoize filtered properties for better performance
+  const filteredProperties = useMemo(() => {
+    if (!searchQuery) return properties;
+    
+    const query = searchQuery.toLowerCase();
+    return properties.filter(
+      (p) =>
+        p.name.toLowerCase().includes(query) ||
+        p.type.toLowerCase().includes(query) ||
+        p.location.toLowerCase().includes(query) ||
+        p.status.toLowerCase().includes(query)
+    );
+  }, [properties, searchQuery]);
 
-  const stats = [
-            {
-              label: "إجمالي العقارات",
-              value: properties.length.toString(),
-              icon: Building,
-              color: "text-primary",
-            },
-            {
-              label: "الوحدات المؤجرة",
-              value: occupiedUnits.toString(),
-              icon: Home,
-              color: "text-success",
-            },
-            {
-              label: "الوحدات الشاغرة",
-              value: (totalUnits - occupiedUnits).toString(),
-              icon: MapPin,
-              color: "text-warning",
-            },
-            {
-              label: "الإيرادات الشهرية",
-              value: `${totalRevenue.toLocaleString()} ر.س`,
-              icon: DollarSign,
-              color: "text-accent",
-            },
-  ];
+  // Memoize stats calculations
+  const stats = useMemo(() => {
+    const totalUnits = properties.reduce((sum, p) => sum + p.units, 0);
+    const occupiedUnits = properties.reduce((sum, p) => sum + p.occupied, 0);
+    const totalRevenue = properties.reduce((sum, p) => sum + Number(p.monthly_revenue), 0);
+
+    return [
+      {
+        label: "إجمالي العقارات",
+        value: properties.length.toString(),
+        icon: Building,
+        color: "text-primary",
+      },
+      {
+        label: "الوحدات المؤجرة",
+        value: occupiedUnits.toString(),
+        icon: Home,
+        color: "text-success",
+      },
+      {
+        label: "الوحدات الشاغرة",
+        value: (totalUnits - occupiedUnits).toString(),
+        icon: MapPin,
+        color: "text-warning",
+      },
+      {
+        label: "الإيرادات الشهرية",
+        value: `${totalRevenue.toLocaleString()} ر.س`,
+        icon: DollarSign,
+        color: "text-accent",
+      },
+    ];
+  }, [properties]);
 
   const handleAddProperty = () => {
     setSelectedProperty(null);
@@ -113,26 +131,15 @@ const Properties = () => {
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {stats.map((stat) => {
-            const Icon = stat.icon;
-            return (
-              <Card key={stat.label} className="shadow-soft">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">
-                      {stat.label}
-                    </CardTitle>
-                    <Icon className={`h-5 w-5 ${stat.color}`} />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className={`text-3xl font-bold ${stat.color}`}>
-                    {stat.value}
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+          {stats.map((stat) => (
+            <StatCard
+              key={stat.label}
+              label={stat.label}
+              value={stat.value}
+              icon={stat.icon}
+              color={stat.color}
+            />
+          ))}
         </div>
 
         {/* Properties Grid */}
@@ -141,12 +148,14 @@ const Properties = () => {
             <div className="col-span-full text-center py-12 text-muted-foreground">
               جاري التحميل...
             </div>
-          ) : properties.length === 0 ? (
+          ) : filteredProperties.length === 0 ? (
             <div className="col-span-full text-center py-12 text-muted-foreground">
-              لا يوجد عقارات حالياً. قم بإضافة عقار جديد.
+              {searchQuery 
+                ? "لا توجد نتائج تطابق البحث" 
+                : "لا يوجد عقارات حالياً. قم بإضافة عقار جديد."}
             </div>
           ) : (
-            properties.map((property) => {
+            filteredProperties.map((property) => {
               const propertyIcons: Record<string, string> = {
                 "سكني": "🏢",
                 "تجاري": "🏪",

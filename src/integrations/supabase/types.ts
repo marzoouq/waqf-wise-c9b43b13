@@ -564,6 +564,62 @@ export type Database = {
           },
         ]
       }
+      payments: {
+        Row: {
+          amount: number
+          created_at: string
+          description: string
+          id: string
+          journal_entry_id: string | null
+          notes: string | null
+          payer_name: string
+          payment_date: string
+          payment_method: string
+          payment_number: string
+          payment_type: string
+          reference_number: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          description: string
+          id?: string
+          journal_entry_id?: string | null
+          notes?: string | null
+          payer_name: string
+          payment_date: string
+          payment_method: string
+          payment_number: string
+          payment_type: string
+          reference_number?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string
+          id?: string
+          journal_entry_id?: string | null
+          notes?: string | null
+          payer_name?: string
+          payment_date?: string
+          payment_method?: string
+          payment_number?: string
+          payment_type?: string
+          reference_number?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
+            referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       properties: {
         Row: {
           created_at: string
