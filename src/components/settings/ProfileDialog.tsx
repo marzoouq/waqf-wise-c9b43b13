@@ -19,7 +19,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
+import { useProfile } from "@/hooks/useProfile";
+import { useEffect } from "react";
 
 const profileSchema = z.object({
   fullName: z
@@ -45,24 +46,44 @@ interface ProfileDialogProps {
 }
 
 export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
-  const { toast } = useToast();
+  const userId = "current-user"; // Replace with actual user ID from auth
+  const { profile, isLoading, upsertProfile } = useProfile(userId);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      fullName: "محمد أحمد العلي",
-      email: "m.ali@example.com",
-      phone: "0501234567",
-      position: "مدير النظام",
+      fullName: profile?.full_name || "",
+      email: profile?.email || "",
+      phone: profile?.phone || "",
+      position: profile?.position || "",
     },
   });
 
-  const handleSubmit = (data: ProfileFormValues) => {
-    toast({
-      title: "تم التحديث بنجاح",
-      description: "تم حفظ بيانات الملف الشخصي بنجاح",
-    });
-    onOpenChange(false);
+  // Update form when profile loads
+  useEffect(() => {
+    if (profile) {
+      form.reset({
+        fullName: profile.full_name || "",
+        email: profile.email || "",
+        phone: profile.phone || "",
+        position: profile.position || "",
+      });
+    }
+  }, [profile, form]);
+
+  const handleSubmit = async (values: ProfileFormValues) => {
+    try {
+      await upsertProfile({
+        user_id: userId,
+        full_name: values.fullName,
+        email: values.email,
+        phone: values.phone,
+        position: values.position,
+      });
+      onOpenChange(false);
+    } catch (error) {
+      console.error("Profile update error:", error);
+    }
   };
 
   return (
