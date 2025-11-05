@@ -1,13 +1,14 @@
+import { memo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText, CheckCircle, FileX, PenSquare } from "lucide-react";
 
-const AccountingStats = () => {
+const AccountingStats = memo(() => {
   const { data: stats } = useQuery({
     queryKey: ["accounting_stats"],
     queryFn: async () => {
-      // Get journal entries stats
+      // Optimized: Select only status field
       const { data: entries, error } = await supabase
         .from("journal_entries")
         .select("status");
@@ -26,6 +27,7 @@ const AccountingStats = () => {
         cancelledEntries,
       };
     },
+    staleTime: 3 * 60 * 1000, // 3 minutes cache
   });
 
   const statCards = [
@@ -76,6 +78,8 @@ const AccountingStats = () => {
       ))}
     </div>
   );
-};
+});
+
+AccountingStats.displayName = "AccountingStats";
 
 export default AccountingStats;

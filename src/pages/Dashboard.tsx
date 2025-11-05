@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Building2, Users, Wallet, FileText, AlertCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import FinancialStats from "@/components/dashboard/FinancialStats";
@@ -7,21 +8,24 @@ import BudgetComparisonChart from "@/components/dashboard/BudgetComparisonChart"
 import AccountingStats from "@/components/dashboard/AccountingStats";
 import RecentJournalEntries from "@/components/dashboard/RecentJournalEntries";
 
+// Move static data outside component
+const RECENT_ACTIVITIES = [
+  { id: 1, action: "إضافة مستفيد جديد", user: "أحمد محمد", time: "منذ 5 دقائق" },
+  { id: 2, action: "تحديث بيانات عقار", user: "فاطمة علي", time: "منذ 15 دقيقة" },
+  { id: 3, action: "صرف مستحقات", user: "محمد أحمد", time: "منذ ساعة" },
+  { id: 4, action: "رفع مستند جديد", user: "سارة خالد", time: "منذ ساعتين" },
+] as const;
+
+const PENDING_TASKS = [
+  { id: 1, task: "مراجعة طلب فزعة طارئة", priority: "عالية" },
+  { id: 2, task: "اعتماد توزيع الغلة الشهرية", priority: "عالية" },
+  { id: 3, task: "تجديد عقد إيجار", priority: "متوسطة" },
+  { id: 4, task: "مراجعة بيانات مستفيد", priority: "منخفضة" },
+] as const;
+
 const Dashboard = () => {
-
-  const recentActivities = [
-    { id: 1, action: "إضافة مستفيد جديد", user: "أحمد محمد", time: "منذ 5 دقائق" },
-    { id: 2, action: "تحديث بيانات عقار", user: "فاطمة علي", time: "منذ 15 دقيقة" },
-    { id: 3, action: "صرف مستحقات", user: "محمد أحمد", time: "منذ ساعة" },
-    { id: 4, action: "رفع مستند جديد", user: "سارة خالد", time: "منذ ساعتين" },
-  ];
-
-  const pendingTasks = [
-    { id: 1, task: "مراجعة طلب فزعة طارئة", priority: "عالية" },
-    { id: 2, task: "اعتماد توزيع الغلة الشهرية", priority: "عالية" },
-    { id: 3, task: "تجديد عقد إيجار", priority: "متوسطة" },
-    { id: 4, task: "مراجعة بيانات مستفيد", priority: "منخفضة" },
-  ];
+  const recentActivities = useMemo(() => RECENT_ACTIVITIES, []);
+  const pendingTasks = useMemo(() => PENDING_TASKS, []);
 
   return (
     <div className="min-h-screen bg-background">

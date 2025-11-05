@@ -1,3 +1,4 @@
+import { memo, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,22 +7,24 @@ import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { FileText } from "lucide-react";
 
-const RecentJournalEntries = () => {
+const RecentJournalEntries = memo(() => {
   const { data: entries, isLoading } = useQuery({
     queryKey: ["recent_journal_entries"],
     queryFn: async () => {
+      // Optimized: Select only needed fields
       const { data, error } = await supabase
         .from("journal_entries")
-        .select("*")
+        .select("id, entry_number, description, status, entry_date")
         .order("created_at", { ascending: false })
         .limit(5);
       
       if (error) throw error;
       return data;
     },
+    staleTime: 2 * 60 * 1000, // 2 minutes cache
   });
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = useCallback((status: string) => {
     const variants: Record<string, { label: string; variant: any }> = {
       draft: { label: "مسودة", variant: "secondary" },
       posted: { label: "مرحّل", variant: "default" },
@@ -29,7 +32,7 @@ const RecentJournalEntries = () => {
     };
     const config = variants[status] || { label: status, variant: "outline" };
     return <Badge variant={config.variant}>{config.label}</Badge>;
-  };
+  }, []);
 
   if (isLoading) {
     return (
@@ -90,6 +93,8 @@ const RecentJournalEntries = () => {
       </CardContent>
     </Card>
   );
-};
+});
+
+RecentJournalEntries.displayName = "RecentJournalEntries";
 
 export default RecentJournalEntries;

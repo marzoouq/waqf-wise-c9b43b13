@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/table";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import { Pagination } from "@/components/ui/pagination";
 
 type Invoice = {
   id: string;
@@ -27,24 +28,38 @@ type Invoice = {
   status: string;
 };
 
+const ITEMS_PER_PAGE = 20;
+
 const Invoices = () => {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { data: invoices, isLoading } = useQuery({
     queryKey: ["invoices"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("invoices")
-        .select("*")
+        .select("id, invoice_number, invoice_date, customer_name, total_amount, status")
         .order("invoice_date", { ascending: false });
       if (error) throw error;
       return data as Invoice[];
     },
+    staleTime: 3 * 60 * 1000,
   });
 
-  const getStatusBadge = (status: string) => {
+  // Paginate invoices
+  const paginatedInvoices = useMemo(() => {
+    if (!invoices) return [];
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return invoices.slice(startIndex, endIndex);
+  }, [invoices, currentPage]);
+
+  const totalPages = Math.ceil((invoices?.length || 0) / ITEMS_PER_PAGE);
+
+  const getStatusBadge = useCallback((status: string) => {
     const variants: Record<string, { label: string; variant: any }> = {
       draft: { label: "مسودة", variant: "secondary" },
       sent: { label: "مرسلة", variant: "default" },
@@ -53,7 +68,7 @@ const Invoices = () => {
     };
     const config = variants[status] || { label: status, variant: "outline" };
     return <Badge variant={config.variant}>{config.label}</Badge>;
-  };
+  }, []);
 
   if (isLoading) {
     return (
@@ -116,7 +131,7 @@ const Invoices = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                invoices.map((invoice) => (
+                paginatedInvoices.map((invoice) => (
                   <TableRow key={invoice.id}>
                     <TableCell className="font-mono text-sm font-semibold">
                       {invoice.invoice_number}
@@ -153,6 +168,16 @@ const Invoices = () => {
             </TableBody>
           </Table>
         </div>
+
+        {totalPages > 1 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            itemsPerPage={ITEMS_PER_PAGE}
+            totalItems={invoices?.length || 0}
+          />
+        )}
 
         <AddInvoiceDialog open={addDialogOpen} onOpenChange={setAddDialogOpen} />
         <ViewInvoiceDialog 

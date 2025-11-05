@@ -18,31 +18,31 @@ import { ar } from "date-fns/locale";
 export const NotificationsBell = () => {
   const navigate = useNavigate();
 
-  // Get pending approvals - optimized with staleTime
+  // Get pending approvals - optimized
   const { data: pendingApprovals } = useQuery({
     queryKey: ["pending-approvals"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("approvals")
-        .select("*, journal_entries(entry_number)")
+        .select("id, approver_name, journal_entries(entry_number)")
         .eq("status", "pending")
         .order("created_at", { ascending: false })
         .limit(5);
       if (error) throw error;
       return data;
     },
-    staleTime: 2 * 60 * 1000, // Consider data fresh for 2 minutes
-    refetchInterval: 3 * 60 * 1000, // Refetch every 3 minutes (less aggressive)
+    staleTime: 5 * 60 * 1000, // 5 minutes cache
+    refetchInterval: 10 * 60 * 1000, // Refetch every 10 minutes
   });
 
-  // Get overdue invoices - optimized with staleTime
+  // Get overdue invoices - optimized
   const { data: overdueInvoices } = useQuery({
     queryKey: ["overdue-invoices"],
     queryFn: async () => {
       const today = format(new Date(), "yyyy-MM-dd");
       const { data, error } = await supabase
         .from("invoices")
-        .select("*")
+        .select("id, invoice_number, customer_name, due_date")
         .in("status", ["sent", "draft"])
         .not("due_date", "is", null)
         .lt("due_date", today)
@@ -51,20 +51,20 @@ export const NotificationsBell = () => {
       if (error) throw error;
       return data;
     },
-    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
-    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
+    staleTime: 10 * 60 * 1000, // 10 minutes cache
+    refetchInterval: 10 * 60 * 1000, // Refetch every 10 minutes
   });
 
-  // Get unbalanced journal entries - optimized
+  // Get unbalanced journal entries - heavily optimized
   const { data: unbalancedEntries } = useQuery({
     queryKey: ["unbalanced-entries"],
     queryFn: async () => {
       const { data: entries, error } = await supabase
         .from("journal_entries")
-        .select("*, journal_entry_lines(*)")
+        .select("id, entry_number, description, journal_entry_lines(debit_amount, credit_amount)")
         .eq("status", "draft")
         .order("created_at", { ascending: false })
-        .limit(20); // Limit at query level for better performance
+        .limit(10); // Reduced limit
 
       if (error) throw error;
 
@@ -83,8 +83,8 @@ export const NotificationsBell = () => {
 
       return unbalanced.slice(0, 5);
     },
-    staleTime: 2 * 60 * 1000, // Consider data fresh for 2 minutes
-    refetchInterval: 3 * 60 * 1000, // Refetch every 3 minutes
+    staleTime: 5 * 60 * 1000, // 5 minutes cache
+    refetchInterval: 10 * 60 * 1000, // Refetch every 10 minutes
   });
 
   const totalNotifications =

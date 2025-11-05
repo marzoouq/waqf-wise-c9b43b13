@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { Plus, Search, Filter, Download, MoreVertical, Users, UserCheck, UserX, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useBeneficiaries } from "@/hooks/useBeneficiaries";
@@ -20,30 +20,58 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import BeneficiaryDialog from "@/components/beneficiaries/BeneficiaryDialog";
+import { Pagination } from "@/components/ui/pagination";
+
+const ITEMS_PER_PAGE = 20;
 
 const Beneficiaries = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedBeneficiary, setSelectedBeneficiary] = useState<any>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const { beneficiaries, isLoading, addBeneficiary, updateBeneficiary, deleteBeneficiary } = useBeneficiaries();
+  const { beneficiaries, totalCount, isLoading, addBeneficiary, updateBeneficiary, deleteBeneficiary } = useBeneficiaries();
 
-  const stats = {
+  // Memoize filtered beneficiaries
+  const filteredBeneficiaries = useMemo(() => {
+    if (!searchQuery) return beneficiaries;
+    
+    const query = searchQuery.toLowerCase();
+    return beneficiaries.filter(
+      (b) =>
+        b.full_name.toLowerCase().includes(query) ||
+        b.national_id.includes(query) ||
+        b.phone.includes(query) ||
+        (b.family_name && b.family_name.toLowerCase().includes(query))
+    );
+  }, [beneficiaries, searchQuery]);
+
+  // Paginate filtered results
+  const paginatedBeneficiaries = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return filteredBeneficiaries.slice(startIndex, endIndex);
+  }, [filteredBeneficiaries, currentPage]);
+
+  const totalPages = Math.ceil(filteredBeneficiaries.length / ITEMS_PER_PAGE);
+
+  // Memoize stats
+  const stats = useMemo(() => ({
     total: beneficiaries.length,
     active: beneficiaries.filter(b => b.status === "نشط").length,
     suspended: beneficiaries.filter(b => b.status === "معلق").length,
     families: new Set(beneficiaries.map(b => b.family_name).filter(Boolean)).size,
-  };
+  }), [beneficiaries]);
 
-  const handleAddBeneficiary = () => {
+  const handleAddBeneficiary = useCallback(() => {
     setSelectedBeneficiary(null);
     setDialogOpen(true);
-  };
+  }, []);
 
-  const handleEditBeneficiary = (beneficiary: any) => {
+  const handleEditBeneficiary = useCallback((beneficiary: any) => {
     setSelectedBeneficiary(beneficiary);
     setDialogOpen(true);
-  };
+  }, []);
 
   const handleSaveBeneficiary = async (data: any) => {
     try {
@@ -58,11 +86,11 @@ const Beneficiaries = () => {
     }
   };
 
-  const handleDeleteBeneficiary = async (id: string) => {
+  const handleDeleteBeneficiary = useCallback(async (id: string) => {
     if (confirm("هل أنت متأكد من حذف هذا المستفيد؟")) {
       await deleteBeneficiary(id);
     }
-  };
+  }, [deleteBeneficiary]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -203,14 +231,14 @@ const Beneficiaries = () => {
                         جاري التحميل...
                       </TableCell>
                     </TableRow>
-                  ) : beneficiaries.length === 0 ? (
+                  ) : paginatedBeneficiaries.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
-                        لا يوجد مستفيدين حالياً. قم بإضافة مستفيد جديد.
+                        {searchQuery ? "لا توجد نتائج تطابق البحث" : "لا يوجد مستفيدين حالياً. قم بإضافة مستفيد جديد."}
                       </TableCell>
                     </TableRow>
                   ) : (
-                    beneficiaries.map((beneficiary) => (
+                    paginatedBeneficiaries.map((beneficiary) => (
                       <TableRow key={beneficiary.id} className="hover:bg-muted/50 transition-colors">
                         <TableCell className="font-medium">
                           <div className="flex items-center gap-2">
@@ -277,6 +305,15 @@ const Beneficiaries = () => {
                 </TableBody>
               </Table>
             </div>
+            {totalPages > 1 && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+                itemsPerPage={ITEMS_PER_PAGE}
+                totalItems={filteredBeneficiaries.length}
+              />
+            )}
           </CardContent>
         </Card>
 

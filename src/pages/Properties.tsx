@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { Plus, Search, MapPin, DollarSign, Home, Building, Edit, Trash2 } from "lucide-react";
 import { PropertyDialog } from "@/components/properties/PropertyDialog";
 import { useProperties } from "@/hooks/useProperties";
@@ -7,11 +7,15 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { StatCard } from "@/components/dashboard/DashboardStats";
+import { Pagination } from "@/components/ui/pagination";
+
+const ITEMS_PER_PAGE = 12;
 
 const Properties = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { properties, isLoading, addProperty, updateProperty, deleteProperty } = useProperties();
 
@@ -28,6 +32,15 @@ const Properties = () => {
         p.status.toLowerCase().includes(query)
     );
   }, [properties, searchQuery]);
+
+  // Paginate filtered results
+  const paginatedProperties = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return filteredProperties.slice(startIndex, endIndex);
+  }, [filteredProperties, currentPage]);
+
+  const totalPages = Math.ceil(filteredProperties.length / ITEMS_PER_PAGE);
 
   // Memoize stats calculations
   const stats = useMemo(() => {
@@ -63,15 +76,15 @@ const Properties = () => {
     ];
   }, [properties]);
 
-  const handleAddProperty = () => {
+  const handleAddProperty = useCallback(() => {
     setSelectedProperty(null);
     setDialogOpen(true);
-  };
+  }, []);
 
-  const handleEditProperty = (property: any) => {
+  const handleEditProperty = useCallback((property: any) => {
     setSelectedProperty(property);
     setDialogOpen(true);
-  };
+  }, []);
 
   const handleSaveProperty = async (data: any) => {
     try {
@@ -86,11 +99,11 @@ const Properties = () => {
     }
   };
 
-  const handleDeleteProperty = async (id: string) => {
+  const handleDeleteProperty = useCallback(async (id: string) => {
     if (confirm("هل أنت متأكد من حذف هذا العقار؟")) {
       await deleteProperty(id);
     }
-  };
+  }, [deleteProperty]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -155,7 +168,7 @@ const Properties = () => {
                 : "لا يوجد عقارات حالياً. قم بإضافة عقار جديد."}
             </div>
           ) : (
-            filteredProperties.map((property) => {
+            paginatedProperties.map((property) => {
               const propertyIcons: Record<string, string> = {
                 "سكني": "🏢",
                 "تجاري": "🏪",
@@ -239,6 +252,16 @@ const Properties = () => {
           })
           )}
         </div>
+
+        {totalPages > 1 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            itemsPerPage={ITEMS_PER_PAGE}
+            totalItems={filteredProperties.length}
+          />
+        )}
 
         <PropertyDialog
           open={dialogOpen}

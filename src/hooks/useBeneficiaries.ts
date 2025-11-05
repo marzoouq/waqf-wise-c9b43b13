@@ -21,19 +21,23 @@ export function useBeneficiaries() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: beneficiaries = [], isLoading } = useQuery({
+  // Paginated query with count
+  const { data: beneficiariesData, isLoading } = useQuery({
     queryKey: ["beneficiaries"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error, count } = await supabase
         .from("beneficiaries")
-        .select("*")
+        .select("*", { count: "exact" })
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as Beneficiary[];
+      return { beneficiaries: data as Beneficiary[], totalCount: count || 0 };
     },
-    staleTime: 3 * 60 * 1000, // Data stays fresh for 3 minutes
+    staleTime: 3 * 60 * 1000,
   });
+
+  const beneficiaries = beneficiariesData?.beneficiaries || [];
+  const totalCount = beneficiariesData?.totalCount || 0;
 
   const addBeneficiary = useMutation({
     mutationFn: async (beneficiary: Omit<Beneficiary, "id" | "created_at" | "updated_at">) => {
@@ -117,6 +121,7 @@ export function useBeneficiaries() {
 
   return {
     beneficiaries,
+    totalCount,
     isLoading,
     addBeneficiary: addBeneficiary.mutateAsync,
     updateBeneficiary: updateBeneficiary.mutateAsync,

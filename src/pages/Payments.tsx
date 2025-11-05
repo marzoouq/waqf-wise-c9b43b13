@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { Plus, Search, Receipt, CreditCard, Printer, Edit, Trash2, FileText } from "lucide-react";
 import { PaymentDialog } from "@/components/payments/PaymentDialog";
 import { usePayments } from "@/hooks/usePayments";
@@ -17,11 +17,15 @@ import {
 import { StatCard } from "@/components/dashboard/DashboardStats";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import { Pagination } from "@/components/ui/pagination";
+
+const ITEMS_PER_PAGE = 20;
 
 const Payments = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<any>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { payments, isLoading, addPayment, updatePayment, deletePayment } = usePayments();
 
@@ -37,6 +41,15 @@ const Payments = () => {
         p.description.toLowerCase().includes(query)
     );
   }, [payments, searchQuery]);
+
+  // Paginate filtered results
+  const paginatedPayments = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return filteredPayments.slice(startIndex, endIndex);
+  }, [filteredPayments, currentPage]);
+
+  const totalPages = Math.ceil(filteredPayments.length / ITEMS_PER_PAGE);
 
   // Memoize stats
   const stats = useMemo(() => {
@@ -73,15 +86,15 @@ const Payments = () => {
     ];
   }, [payments]);
 
-  const handleAddPayment = () => {
+  const handleAddPayment = useCallback(() => {
     setSelectedPayment(null);
     setDialogOpen(true);
-  };
+  }, []);
 
-  const handleEditPayment = (payment: any) => {
+  const handleEditPayment = useCallback((payment: any) => {
     setSelectedPayment(payment);
     setDialogOpen(true);
-  };
+  }, []);
 
   const handleSavePayment = async (data: any) => {
     if (selectedPayment) {
@@ -92,11 +105,11 @@ const Payments = () => {
     setDialogOpen(false);
   };
 
-  const handleDeletePayment = async (id: string) => {
+  const handleDeletePayment = useCallback(async (id: string) => {
     if (confirm("هل أنت متأكد من حذف هذا السند؟")) {
       await deletePayment(id);
     }
-  };
+  }, [deletePayment]);
 
   const handlePrint = (payment: any) => {
     // TODO: Implement print functionality
@@ -199,7 +212,7 @@ const Payments = () => {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filteredPayments.map((payment) => (
+                    paginatedPayments.map((payment) => (
                       <TableRow key={payment.id}>
                         <TableCell className="font-medium">
                           {payment.payment_number}
@@ -262,6 +275,15 @@ const Payments = () => {
                 </TableBody>
               </Table>
             </div>
+            {totalPages > 1 && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+                itemsPerPage={ITEMS_PER_PAGE}
+                totalItems={filteredPayments.length}
+              />
+            )}
           </CardContent>
         </Card>
 
