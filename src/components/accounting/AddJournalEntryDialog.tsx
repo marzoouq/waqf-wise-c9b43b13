@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -104,6 +104,45 @@ const AddJournalEntryDialog = ({ open, onOpenChange }: Props) => {
       if (error) throw error;
       return data;
     },
+  });
+
+  // توليد رقم القيد تلقائياً
+  useEffect(() => {
+    const generateEntryNumber = async () => {
+      if (open && !form.getValues("entry_number")) {
+        const year = new Date().getFullYear();
+        const { data: lastEntry } = await supabase
+          .from("journal_entries")
+          .select("entry_number")
+          .like("entry_number", `JV-${year}-%`)
+          .order("entry_number", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        let nextNumber = 1;
+        if (lastEntry && lastEntry.entry_number) {
+          const match = lastEntry.entry_number.match(/JV-\d+-(\d+)/);
+          if (match) {
+            nextNumber = parseInt(match[1]) + 1;
+          }
+        }
+
+        const entryNumber = `JV-${year}-${nextNumber.toString().padStart(3, '0')}`;
+        form.setValue("entry_number", entryNumber);
+      }
+    };
+
+    generateEntryNumber();
+  }, [open, form]);
+
+  // تحديد السنة المالية النشطة افتراضياً
+  useEffect(() => {
+    if (fiscalYears && fiscalYears.length > 0 && !form.getValues("fiscal_year_id")) {
+      const activeFiscalYear = fiscalYears.find(fy => fy.is_active && !fy.is_closed);
+      if (activeFiscalYear) {
+        form.setValue('fiscal_year_id', activeFiscalYear.id);
+      }
+    }
   });
 
   const mutation = useMutation({

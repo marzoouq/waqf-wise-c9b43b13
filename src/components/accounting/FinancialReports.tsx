@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Card } from "@/components/ui/card";
+import { Card, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { BarChart3, FileText } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -70,8 +71,9 @@ const FinancialReports = () => {
         <TabsContent value="trial-balance" className="mt-4">
           <Card className="p-3 sm:p-6">
             <h3 className="text-lg sm:text-xl font-bold mb-4">ميزان المراجعة</h3>
-            <div className="overflow-x-auto">
-              <Table>
+            {trialBalance && trialBalance.filter((acc) => acc.debit > 0 || acc.credit > 0).length > 0 ? (
+              <div className="overflow-x-auto">
+                <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead className="text-xs sm:text-sm">رمز الحساب</TableHead>
@@ -135,24 +137,45 @@ const FinancialReports = () => {
                 </TableRow>
               </TableFooter>
             </Table>
-            </div>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center gap-4 py-12">
+                <FileText className="h-12 w-12 text-muted-foreground" />
+                <div className="text-center">
+                  <h4 className="text-lg font-medium mb-2">لا توجد بيانات</h4>
+                  <CardDescription>
+                    لم يتم ترحيل أي قيود محاسبية بعد. قم بإضافة قيود وترحيلها لتظهر في ميزان المراجعة.
+                  </CardDescription>
+                </div>
+              </div>
+            )}
           </Card>
         </TabsContent>
 
         <TabsContent value="income-statement" className="mt-4">
           <Card className="p-3 sm:p-6">
-            <h3 className="text-lg sm:text-xl font-bold mb-4">قائمة الدخل</h3>
-            <div className="text-center text-muted-foreground py-8 text-sm">
-              قريباً - سيتم عرض الإيرادات والمصروفات وصافي الربح
+            <div className="flex flex-col items-center gap-4 py-12">
+              <BarChart3 className="h-12 w-12 text-muted-foreground" />
+              <div className="text-center">
+                <h3 className="text-lg font-medium mb-2">قائمة الدخل</h3>
+                <CardDescription>
+                  قريباً - سيتم عرض الإيرادات والمصروفات وصافي الربح
+                </CardDescription>
+              </div>
             </div>
           </Card>
         </TabsContent>
 
         <TabsContent value="balance-sheet" className="mt-4">
           <Card className="p-3 sm:p-6">
-            <h3 className="text-lg sm:text-xl font-bold mb-4">الميزانية العمومية</h3>
-            <div className="text-center text-muted-foreground py-8 text-sm">
-              قريباً - سيتم عرض الأصول والخصوم وحقوق الملكية
+            <div className="flex flex-col items-center gap-4 py-12">
+              <BarChart3 className="h-12 w-12 text-muted-foreground" />
+              <div className="text-center">
+                <h3 className="text-lg font-medium mb-2">الميزانية العمومية</h3>
+                <CardDescription>
+                  قريباً - سيتم عرض الأصول والخصوم وحقوق الملكية
+                </CardDescription>
+              </div>
             </div>
           </Card>
         </TabsContent>

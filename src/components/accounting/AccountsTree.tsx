@@ -2,8 +2,9 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Plus, ChevronDown, ChevronLeft, Edit } from "lucide-react";
+import { Plus, ChevronDown, ChevronLeft, Edit, FolderTree } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardDescription } from "@/components/ui/card";
 import AddAccountDialog from "./AddAccountDialog";
 
 type Account = {
@@ -150,8 +151,41 @@ const AccountsTree = () => {
 
   if (!accounts || accounts.length === 0) {
     return (
-      <div className="text-center py-8">
-        <p className="text-muted-foreground">لا توجد حسابات متاحة</p>
+      <div className="space-y-4">
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl sm:text-2xl font-bold">شجرة الحسابات</h2>
+          <Button 
+            onClick={() => {
+              setSelectedAccount(null);
+              setIsAddDialogOpen(true);
+            }}
+            size="sm"
+          >
+            <Plus className="h-4 w-4 ml-2" />
+            إضافة حساب
+          </Button>
+        </div>
+        <Card className="p-12 text-center">
+          <div className="flex flex-col items-center gap-4">
+            <FolderTree className="h-12 w-12 text-muted-foreground" />
+            <div>
+              <h3 className="text-lg font-medium mb-2">لا توجد حسابات</h3>
+              <CardDescription className="mb-4">
+                ابدأ ببناء شجرة الحسابات الخاصة بك
+              </CardDescription>
+              <Button onClick={() => setIsAddDialogOpen(true)}>
+                <Plus className="h-4 w-4 ml-2" />
+                إضافة أول حساب
+              </Button>
+            </div>
+          </div>
+        </Card>
+        <AddAccountDialog
+          open={isAddDialogOpen}
+          onOpenChange={setIsAddDialogOpen}
+          account={selectedAccount}
+          accounts={[]}
+        />
       </div>
     );
   }

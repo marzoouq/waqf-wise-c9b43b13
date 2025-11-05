@@ -55,7 +55,12 @@ const JournalEntries = () => {
   };
 
   if (isLoading) {
-    return <div className="text-center py-8">جاري التحميل...</div>;
+    return (
+      <div className="text-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+        <p className="mt-2 text-muted-foreground">جاري التحميل...</p>
+      </div>
+    );
   }
 
   return (

@@ -8,9 +8,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Card } from "@/components/ui/card";
+import { Card, CardDescription } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { TrendingUp } from "lucide-react";
 
 const BudgetReports = () => {
   const { data: budgets, isLoading } = useQuery({
@@ -41,7 +42,12 @@ const BudgetReports = () => {
   };
 
   if (isLoading) {
-    return <div className="text-center py-8">جاري التحميل...</div>;
+    return (
+      <div className="text-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+        <p className="mt-2 text-muted-foreground">جاري التحميل...</p>
+      </div>
+    );
   }
 
   return (
@@ -120,8 +126,16 @@ const BudgetReports = () => {
           </Table>
         </div>
       ) : (
-        <Card className="p-8 text-center text-muted-foreground">
-          لا توجد بيانات ميزانيات متاحة
+        <Card className="p-12 text-center">
+          <div className="flex flex-col items-center gap-4">
+            <TrendingUp className="h-12 w-12 text-muted-foreground" />
+            <div>
+              <h3 className="text-lg font-medium mb-2">لا توجد بيانات ميزانيات</h3>
+              <CardDescription>
+                لم يتم إضافة أي ميزانيات بعد. قم بإنشاء ميزانيات للحسابات من خلال القيود المحاسبية.
+              </CardDescription>
+            </div>
+          </div>
         </Card>
       )}
     </div>

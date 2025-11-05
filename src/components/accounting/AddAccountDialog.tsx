@@ -1,16 +1,24 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { z } from "zod";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import {
   Select,
   SelectContent,
@@ -18,8 +26,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { toast } from "sonner";
 
 type Account = {
   id: string;
@@ -29,33 +39,55 @@ type Account = {
   parent_id: string | null;
   account_type: string;
   account_nature: string;
+  description: string | null;
   is_active: boolean;
   is_header: boolean;
 };
 
-type FormData = {
-  code: string;
-  name_ar: string;
-  name_en: string;
-  parent_id: string;
-  account_type: string;
-  account_nature: string;
-  is_active: boolean;
-  is_header: boolean;
-  description: string;
-};
+const accountSchema = z.object({
+  code: z.string()
+    .min(1, { message: "رمز الحساب مطلوب" })
+    .max(20, { message: "رمز الحساب يجب ألا يزيد عن 20 حرف" })
+    .regex(/^[0-9]+$/, { message: "رمز الحساب يجب أن يحتوي على أرقام فقط" }),
+  name_ar: z.string()
+    .min(3, { message: "الاسم العربي يجب ألا يقل عن 3 حروف" })
+    .max(200, { message: "الاسم العربي يجب ألا يزيد عن 200 حرف" }),
+  name_en: z.string().optional(),
+  parent_id: z.string().optional(),
+  account_type: z.enum(['asset', 'liability', 'equity', 'revenue', 'expense'], {
+    message: "نوع الحساب مطلوب"
+  }),
+  account_nature: z.enum(['debit', 'credit'], {
+    message: "طبيعة الحساب مطلوبة"
+  }),
+  is_active: z.boolean(),
+  is_header: z.boolean(),
+  description: z.string().optional(),
+});
+
+type FormData = z.infer<typeof accountSchema>;
 
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  account: Account | null;
+  account?: Account | null;
   accounts: Account[];
 };
 
 const AddAccountDialog = ({ open, onOpenChange, account, accounts }: Props) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
-  const { register, handleSubmit, reset, setValue, watch } = useForm<FormData>({
+
+  const form = useForm<FormData>({
+    resolver: zodResolver(accountSchema),
     defaultValues: {
+      code: "",
+      name_ar: "",
+      name_en: "",
+      parent_id: undefined,
+      account_type: "asset",
+      account_nature: "debit",
+      description: "",
       is_active: true,
       is_header: false,
     },
@@ -63,54 +95,79 @@ const AddAccountDialog = ({ open, onOpenChange, account, accounts }: Props) => {
 
   useEffect(() => {
     if (account) {
-      setValue("code", account.code);
-      setValue("name_ar", account.name_ar);
-      setValue("name_en", account.name_en || "");
-      setValue("parent_id", account.parent_id || "");
-      setValue("account_type", account.account_type);
-      setValue("account_nature", account.account_nature);
-      setValue("is_active", account.is_active);
-      setValue("is_header", account.is_header);
+      form.reset({
+        code: account.code,
+        name_ar: account.name_ar,
+        name_en: account.name_en || "",
+        parent_id: account.parent_id || undefined,
+        account_type: account.account_type as any,
+        account_nature: account.account_nature as any,
+        description: account.description || "",
+        is_active: account.is_active,
+        is_header: account.is_header,
+      });
     } else {
-      reset();
+      form.reset();
     }
-  }, [account, setValue, reset]);
+  }, [account, form, open]);
 
   const mutation = useMutation({
     mutationFn: async (data: FormData) => {
+      setIsSubmitting(true);
+      
+      // التحقق من عدم تكرار رمز الحساب
+      if (!account || (account && account.code !== data.code)) {
+        const { data: existingAccount } = await supabase
+          .from("accounts")
+          .select("id")
+          .eq("code", data.code)
+          .maybeSingle();
+
+        if (existingAccount) {
+          throw new Error("رمز الحساب موجود مسبقاً. يرجى اختيار رمز آخر.");
+        }
+      }
+
       const accountData = {
         code: data.code,
         name_ar: data.name_ar,
         name_en: data.name_en || null,
         parent_id: data.parent_id || null,
-        account_type: data.account_type as "asset" | "liability" | "equity" | "revenue" | "expense",
-        account_nature: data.account_nature as "debit" | "credit",
+        account_type: data.account_type,
+        account_nature: data.account_nature,
+        description: data.description || null,
         is_active: data.is_active,
         is_header: data.is_header,
-        description: data.description || null,
       };
 
+      let result;
       if (account) {
-        const { error } = await supabase
+        result = await supabase
           .from("accounts")
           .update(accountData)
-          .eq("id", account.id);
-        if (error) throw error;
+          .eq("id", account.id)
+          .select()
+          .single();
       } else {
-        const { error } = await supabase
+        result = await supabase
           .from("accounts")
-          .insert([accountData]);
-        if (error) throw error;
+          .insert([accountData])
+          .select()
+          .single();
       }
+
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["accounts"] });
       toast.success(account ? "تم تحديث الحساب بنجاح" : "تم إضافة الحساب بنجاح");
       onOpenChange(false);
-      reset();
+      form.reset();
+      setIsSubmitting(false);
     },
-    onError: (error: any) => {
-      toast.error("حدث خطأ: " + error.message);
+    onError: (error: Error) => {
+      toast.error(error.message || "حدث خطأ أثناء حفظ الحساب");
+      setIsSubmitting(false);
     },
   });
 
@@ -120,148 +177,195 @@ const AddAccountDialog = ({ open, onOpenChange, account, accounts }: Props) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
-            {account ? "تعديل حساب" : "إضافة حساب جديد"}
-          </DialogTitle>
+          <DialogTitle>{account ? "تعديل حساب" : "إضافة حساب جديد"}</DialogTitle>
         </DialogHeader>
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="code">رمز الحساب *</Label>
-              <Input
-                id="code"
-                {...register("code", { required: true })}
-                placeholder="مثال: 111"
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="code"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>رمز الحساب <span className="text-destructive">*</span></FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="مثال: 1010" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="name_ar"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>الاسم العربي <span className="text-destructive">*</span></FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="اسم الحساب" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="parent_id">الحساب الأب</Label>
-              <Select
-                value={watch("parent_id")}
-                onValueChange={(value) => setValue("parent_id", value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="اختر الحساب الأب" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">بدون حساب أب</SelectItem>
-                  {accounts
-                    .filter((a) => a.is_header && a.id !== account?.id)
-                    .map((a) => (
-                      <SelectItem key={a.id} value={a.id}>
-                        {a.code} - {a.name_ar}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="name_ar">اسم الحساب (عربي) *</Label>
-            <Input
-              id="name_ar"
-              {...register("name_ar", { required: true })}
-              placeholder="مثال: النقدية"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="name_en">اسم الحساب (إنجليزي)</Label>
-            <Input
-              id="name_en"
-              {...register("name_en")}
-              placeholder="Example: Cash"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="account_type">نوع الحساب *</Label>
-              <Select
-                value={watch("account_type")}
-                onValueChange={(value) => setValue("account_type", value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="اختر نوع الحساب" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="asset">أصول</SelectItem>
-                  <SelectItem value="liability">خصوم</SelectItem>
-                  <SelectItem value="equity">حقوق ملكية</SelectItem>
-                  <SelectItem value="revenue">إيرادات</SelectItem>
-                  <SelectItem value="expense">مصروفات</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="account_nature">طبيعة الحساب *</Label>
-              <Select
-                value={watch("account_nature")}
-                onValueChange={(value) => setValue("account_nature", value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="اختر طبيعة الحساب" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="debit">مدين</SelectItem>
-                  <SelectItem value="credit">دائن</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="description">الوصف</Label>
-            <Input
-              id="description"
-              {...register("description")}
-              placeholder="وصف اختياري للحساب"
-            />
-          </div>
-
-          <div className="flex gap-4">
-            <div className="flex items-center space-x-2 space-x-reverse">
-              <Checkbox
-                id="is_header"
-                checked={watch("is_header")}
-                onCheckedChange={(checked) =>
-                  setValue("is_header", checked as boolean)
-                }
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="name_en"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>الاسم الإنجليزي (اختياري)</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Account Name" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              <Label htmlFor="is_header">حساب رئيسي</Label>
-            </div>
-
-            <div className="flex items-center space-x-2 space-x-reverse">
-              <Checkbox
-                id="is_active"
-                checked={watch("is_active")}
-                onCheckedChange={(checked) =>
-                  setValue("is_active", checked as boolean)
-                }
+              <FormField
+                control={form.control}
+                name="parent_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>الحساب الأب</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="لا يوجد (حساب رئيسي)" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="">لا يوجد (حساب رئيسي)</SelectItem>
+                        {accounts
+                          ?.filter(
+                            (acc) => acc.is_header && (!account || acc.id !== account.id)
+                          )
+                          .map((acc) => (
+                            <SelectItem key={acc.id} value={acc.id}>
+                              {acc.code} - {acc.name_ar}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              <Label htmlFor="is_active">نشط</Label>
             </div>
-          </div>
 
-          <div className="flex justify-end gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
-              إلغاء
-            </Button>
-            <Button type="submit" disabled={mutation.isPending}>
-              {mutation.isPending ? "جاري الحفظ..." : account ? "تحديث" : "إضافة"}
-            </Button>
-          </div>
-        </form>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="account_type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>نوع الحساب <span className="text-destructive">*</span></FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="asset">أصول</SelectItem>
+                        <SelectItem value="liability">خصوم</SelectItem>
+                        <SelectItem value="equity">حقوق ملكية</SelectItem>
+                        <SelectItem value="revenue">إيرادات</SelectItem>
+                        <SelectItem value="expense">مصروفات</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="account_nature"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>طبيعة الحساب <span className="text-destructive">*</span></FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="debit">مدين</SelectItem>
+                        <SelectItem value="credit">دائن</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>الوصف (اختياري)</FormLabel>
+                  <FormControl>
+                    <Textarea {...field} rows={3} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="flex flex-col sm:flex-row gap-4">
+              <FormField
+                control={form.control}
+                name="is_active"
+                render={({ field }) => (
+                  <FormItem className="flex items-center space-x-2 space-x-reverse">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormLabel className="!mt-0">حساب نشط</FormLabel>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="is_header"
+                render={({ field }) => (
+                  <FormItem className="flex items-center space-x-2 space-x-reverse">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormLabel className="!mt-0">حساب رئيسي (يحتوي على حسابات فرعية)</FormLabel>
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="flex justify-end gap-2 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
+                إلغاء
+              </Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "جاري الحفظ..." : account ? "حفظ التعديلات" : "إضافة"}
+              </Button>
+            </div>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
