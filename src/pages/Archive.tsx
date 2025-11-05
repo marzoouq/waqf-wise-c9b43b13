@@ -1,12 +1,16 @@
 import { useState } from "react";
 import { Plus, Search, FolderOpen, FileText, Download, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { UploadDocumentDialog } from "@/components/archive/UploadDocumentDialog";
+import { CreateFolderDialog } from "@/components/archive/CreateFolderDialog";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 const Archive = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+  const [folderDialogOpen, setFolderDialogOpen] = useState(false);
 
   const folders = [
     { id: 1, name: "عقود الإيجار", files: 45, size: "12.3 MB", color: "bg-primary/10 text-primary" },
@@ -50,6 +54,14 @@ const Archive = () => {
     },
   ];
 
+  const handleUpload = (data: any) => {
+    console.log("Document uploaded:", data);
+  };
+
+  const handleCreateFolder = (data: any) => {
+    console.log("Folder created:", data);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto p-4 md:p-6 space-y-4 md:space-y-6">
@@ -63,7 +75,10 @@ const Archive = () => {
               إدارة وأرشفة المستندات والملفات
             </p>
           </div>
-          <Button className="bg-primary hover:bg-primary-hover text-primary-foreground shadow-soft w-full md:w-auto">
+          <Button 
+            className="bg-primary hover:bg-primary-hover text-primary-foreground shadow-soft w-full md:w-auto"
+            onClick={() => setUploadDialogOpen(true)}
+          >
             <Upload className="ml-2 h-4 w-4 md:h-5 md:w-5" />
             <span className="text-sm md:text-base">رفع مستند</span>
           </Button>
@@ -133,7 +148,11 @@ const Archive = () => {
           <CardHeader>
             <div className="flex justify-between items-center">
               <CardTitle className="text-xl font-bold">المجلدات الرئيسية</CardTitle>
-              <Button variant="outline" size="sm">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setFolderDialogOpen(true)}
+              >
                 <Plus className="ml-2 h-4 w-4" />
                 مجلد جديد
               </Button>
@@ -209,6 +228,18 @@ const Archive = () => {
             </div>
           </CardContent>
         </Card>
+
+        <UploadDocumentDialog
+          open={uploadDialogOpen}
+          onOpenChange={setUploadDialogOpen}
+          onUpload={handleUpload}
+        />
+
+        <CreateFolderDialog
+          open={folderDialogOpen}
+          onOpenChange={setFolderDialogOpen}
+          onCreate={handleCreateFolder}
+        />
       </div>
     </div>
   );

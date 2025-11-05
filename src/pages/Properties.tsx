@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Plus, Search, MapPin, DollarSign, Home, Building } from "lucide-react";
+import { Plus, Search, MapPin, DollarSign, Home, Building, Edit, Trash2 } from "lucide-react";
+import { PropertyDialog } from "@/components/properties/PropertyDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 
 const Properties = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedProperty, setSelectedProperty] = useState<any>(null);
 
   const properties = [
     {
@@ -82,6 +85,20 @@ const Properties = () => {
     },
   ];
 
+  const handleAddProperty = () => {
+    setSelectedProperty(null);
+    setDialogOpen(true);
+  };
+
+  const handleEditProperty = (property: any) => {
+    setSelectedProperty(property);
+    setDialogOpen(true);
+  };
+
+  const handleSaveProperty = (data: any) => {
+    console.log("Property saved:", data);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto p-4 md:p-6 space-y-4 md:space-y-6">
@@ -95,7 +112,10 @@ const Properties = () => {
               إدارة الأصول العقارية والوحدات والإيجارات
             </p>
           </div>
-          <Button className="bg-primary hover:bg-primary-hover text-primary-foreground shadow-soft w-full md:w-auto">
+          <Button 
+            className="bg-primary hover:bg-primary-hover text-primary-foreground shadow-soft w-full md:w-auto"
+            onClick={handleAddProperty}
+          >
             <Plus className="ml-2 h-4 w-4 md:h-5 md:w-5" />
             <span className="text-sm md:text-base">إضافة عقار جديد</span>
           </Button>
@@ -193,16 +213,35 @@ const Properties = () => {
                   </div>
                 </div>
 
-                <Button
-                  variant="outline"
-                  className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
-                >
-                  عرض التفاصيل
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => handleEditProperty(property)}
+                  >
+                    <Edit className="ml-1 h-3 w-3" />
+                    تعديل
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}
         </div>
+
+        <PropertyDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          property={selectedProperty}
+          onSave={handleSaveProperty}
+        />
       </div>
     </div>
   );

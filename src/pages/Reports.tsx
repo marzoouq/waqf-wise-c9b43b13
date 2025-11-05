@@ -1,8 +1,25 @@
+import { useState } from "react";
 import { Download, FileText, BarChart3, PieChart, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CustomReportDialog } from "@/components/reports/CustomReportDialog";
+import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const Reports = () => {
+  const { toast } = useToast();
+  const [reportDialogOpen, setReportDialogOpen] = useState(false);
+
+  const handleDownloadReport = (reportName: string) => {
+    toast({
+      title: "جاري تحميل التقرير",
+      description: `سيتم تحميل ${reportName} تلقائياً`,
+    });
+  };
+
+  const handleGenerateCustomReport = (data: any) => {
+    console.log("Generating custom report:", data);
+  };
+
   const reportCategories = [
     {
       id: 1,
@@ -73,7 +90,10 @@ const Reports = () => {
               تقارير شاملة عن جميع أنشطة الوقف
             </p>
           </div>
-          <Button className="bg-primary hover:bg-primary-hover text-primary-foreground shadow-soft w-full md:w-auto">
+          <Button 
+            className="bg-primary hover:bg-primary-hover text-primary-foreground shadow-soft w-full md:w-auto"
+            onClick={() => setReportDialogOpen(true)}
+          >
             <FileText className="ml-2 h-4 w-4 md:h-5 md:w-5" />
             <span className="text-sm md:text-base">إنشاء تقرير مخصص</span>
           </Button>
@@ -98,6 +118,7 @@ const Reports = () => {
                     {category.reports.map((report, index) => (
                       <button
                         key={index}
+                        onClick={() => handleDownloadReport(report)}
                         className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors text-right group"
                       >
                         <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
@@ -175,6 +196,12 @@ const Reports = () => {
             </div>
           </CardContent>
         </Card>
+
+        <CustomReportDialog
+          open={reportDialogOpen}
+          onOpenChange={setReportDialogOpen}
+          onGenerate={handleGenerateCustomReport}
+        />
       </div>
     </div>
   );

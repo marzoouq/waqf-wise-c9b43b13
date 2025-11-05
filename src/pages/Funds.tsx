@@ -1,9 +1,19 @@
+import { useState } from "react";
 import { Plus, TrendingUp, PieChart, DollarSign, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DistributionDialog } from "@/components/funds/DistributionDialog";
+import { SimulationDialog } from "@/components/funds/SimulationDialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 
 const Funds = () => {
+  const [distributionDialogOpen, setDistributionDialogOpen] = useState(false);
+  const [simulationDialogOpen, setSimulationDialogOpen] = useState(false);
+
+  const handleDistribute = (data: any) => {
+    console.log("Distribution created:", data);
+  };
+
   const funds = [
     {
       id: 1,
@@ -87,11 +97,15 @@ const Funds = () => {
             <Button
               variant="outline"
               className="shadow-soft w-full md:w-auto"
+              onClick={() => setSimulationDialogOpen(true)}
             >
               <PieChart className="ml-2 h-4 w-4 md:h-5 md:w-5" />
               <span className="text-sm md:text-base">محاكاة التوزيع</span>
             </Button>
-            <Button className="bg-primary hover:bg-primary-hover text-primary-foreground shadow-soft w-full md:w-auto">
+            <Button 
+              className="bg-primary hover:bg-primary-hover text-primary-foreground shadow-soft w-full md:w-auto"
+              onClick={() => setDistributionDialogOpen(true)}
+            >
               <Plus className="ml-2 h-4 w-4 md:h-5 md:w-5" />
               <span className="text-sm md:text-base">توزيع جديد</span>
             </Button>
@@ -250,6 +264,17 @@ const Funds = () => {
             </div>
           </CardContent>
         </Card>
+
+        <DistributionDialog
+          open={distributionDialogOpen}
+          onOpenChange={setDistributionDialogOpen}
+          onDistribute={handleDistribute}
+        />
+
+        <SimulationDialog
+          open={simulationDialogOpen}
+          onOpenChange={setSimulationDialogOpen}
+        />
       </div>
     </div>
   );

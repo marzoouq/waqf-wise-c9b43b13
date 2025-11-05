@@ -1,7 +1,24 @@
+import { useState } from "react";
 import { User, Bell, Shield, Database, Palette, Globe } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ProfileDialog } from "@/components/settings/ProfileDialog";
+import { useToast } from "@/hooks/use-toast";
 
 const Settings = () => {
+  const { toast } = useToast();
+  const [profileDialogOpen, setProfileDialogOpen] = useState(false);
+
+  const handleSectionClick = (sectionTitle: string) => {
+    if (sectionTitle === "الملف الشخصي") {
+      setProfileDialogOpen(true);
+    } else {
+      toast({
+        title: `إعدادات ${sectionTitle}`,
+        description: "هذه الميزة قيد التطوير",
+      });
+    }
+  };
+
   const settingsSections = [
     {
       id: 1,
@@ -67,6 +84,7 @@ const Settings = () => {
             return (
               <Card
                 key={section.id}
+                onClick={() => handleSectionClick(section.title)}
                 className="shadow-soft hover:shadow-medium transition-all duration-300 cursor-pointer group"
               >
                 <CardHeader>
@@ -111,6 +129,11 @@ const Settings = () => {
             </div>
           </CardContent>
         </Card>
+
+        <ProfileDialog
+          open={profileDialogOpen}
+          onOpenChange={setProfileDialogOpen}
+        />
       </div>
     </div>
   );
