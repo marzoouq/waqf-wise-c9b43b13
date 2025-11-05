@@ -39,6 +39,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
               {children}
             </div>
           </main>
+          <AppSidebar />
         </div>
       </SidebarProvider>
     </div>
