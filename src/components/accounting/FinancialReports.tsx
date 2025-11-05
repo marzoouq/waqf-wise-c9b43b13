@@ -58,51 +58,52 @@ const FinancialReports = () => {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-bold">التقارير المالية</h2>
+      <h2 className="text-xl sm:text-2xl font-bold">التقارير المالية</h2>
 
       <Tabs defaultValue="trial-balance" className="w-full">
-        <TabsList>
-          <TabsTrigger value="trial-balance">ميزان المراجعة</TabsTrigger>
-          <TabsTrigger value="income-statement">قائمة الدخل</TabsTrigger>
-          <TabsTrigger value="balance-sheet">الميزانية العمومية</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3 h-auto">
+          <TabsTrigger value="trial-balance" className="text-xs sm:text-sm py-2">ميزان المراجعة</TabsTrigger>
+          <TabsTrigger value="income-statement" className="text-xs sm:text-sm py-2">قائمة الدخل</TabsTrigger>
+          <TabsTrigger value="balance-sheet" className="text-xs sm:text-sm py-2">الميزانية العمومية</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="trial-balance">
-          <Card className="p-6">
-            <h3 className="text-xl font-bold mb-4">ميزان المراجعة</h3>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>رمز الحساب</TableHead>
-                  <TableHead>اسم الحساب</TableHead>
-                  <TableHead className="text-center">مدين</TableHead>
-                  <TableHead className="text-center">دائن</TableHead>
-                  <TableHead className="text-center">الرصيد</TableHead>
-                </TableRow>
-              </TableHeader>
+        <TabsContent value="trial-balance" className="mt-4">
+          <Card className="p-3 sm:p-6">
+            <h3 className="text-lg sm:text-xl font-bold mb-4">ميزان المراجعة</h3>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-xs sm:text-sm">رمز الحساب</TableHead>
+                    <TableHead className="text-xs sm:text-sm">اسم الحساب</TableHead>
+                    <TableHead className="text-center text-xs sm:text-sm">مدين</TableHead>
+                    <TableHead className="text-center text-xs sm:text-sm">دائن</TableHead>
+                    <TableHead className="text-center text-xs sm:text-sm hidden sm:table-cell">الرصيد</TableHead>
+                  </TableRow>
+                </TableHeader>
               <TableBody>
                 {trialBalance
                   ?.filter((acc) => acc.debit > 0 || acc.credit > 0)
                   .map((account) => (
                     <TableRow key={account.id}>
-                      <TableCell className="font-mono">{account.code}</TableCell>
-                      <TableCell>{account.name_ar}</TableCell>
-                      <TableCell className="text-center font-mono">
+                      <TableCell className="font-mono text-xs sm:text-sm">{account.code}</TableCell>
+                      <TableCell className="text-xs sm:text-sm">{account.name_ar}</TableCell>
+                      <TableCell className="text-center font-mono text-xs sm:text-sm">
                         {account.debit.toLocaleString("ar-SA", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
+                          minimumFractionDigits: 0,
+                          maximumFractionDigits: 0,
                         })}
                       </TableCell>
-                      <TableCell className="text-center font-mono">
+                      <TableCell className="text-center font-mono text-xs sm:text-sm">
                         {account.credit.toLocaleString("ar-SA", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
+                          minimumFractionDigits: 0,
+                          maximumFractionDigits: 0,
                         })}
                       </TableCell>
-                      <TableCell className="text-center font-mono">
+                      <TableCell className="text-center font-mono text-xs sm:text-sm hidden sm:table-cell">
                         {account.balance.toLocaleString("ar-SA", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
+                          minimumFractionDigits: 0,
+                          maximumFractionDigits: 0,
                         })}
                       </TableCell>
                     </TableRow>
@@ -110,46 +111,47 @@ const FinancialReports = () => {
               </TableBody>
               <TableFooter>
                 <TableRow>
-                  <TableCell colSpan={2} className="font-bold">
+                  <TableCell colSpan={2} className="text-left font-bold text-xs sm:text-sm">
                     الإجمالي
                   </TableCell>
-                  <TableCell className="text-center font-bold font-mono">
+                  <TableCell className="text-center font-bold font-mono text-xs sm:text-sm">
                     {totalDebit.toLocaleString("ar-SA", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0,
                     })}
                   </TableCell>
-                  <TableCell className="text-center font-bold font-mono">
+                  <TableCell className="text-center font-bold font-mono text-xs sm:text-sm">
                     {totalCredit.toLocaleString("ar-SA", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0,
                     })}
                   </TableCell>
-                  <TableCell className="text-center font-bold font-mono">
+                  <TableCell className="text-center font-bold font-mono text-xs sm:text-sm hidden sm:table-cell">
                     {(totalDebit - totalCredit).toLocaleString("ar-SA", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0,
                     })}
                   </TableCell>
                 </TableRow>
               </TableFooter>
             </Table>
+            </div>
           </Card>
         </TabsContent>
 
-        <TabsContent value="income-statement">
-          <Card className="p-6">
-            <h3 className="text-xl font-bold mb-4">قائمة الدخل</h3>
-            <div className="text-center text-muted-foreground py-8">
+        <TabsContent value="income-statement" className="mt-4">
+          <Card className="p-3 sm:p-6">
+            <h3 className="text-lg sm:text-xl font-bold mb-4">قائمة الدخل</h3>
+            <div className="text-center text-muted-foreground py-8 text-sm">
               قريباً - سيتم عرض الإيرادات والمصروفات وصافي الربح
             </div>
           </Card>
         </TabsContent>
 
-        <TabsContent value="balance-sheet">
-          <Card className="p-6">
-            <h3 className="text-xl font-bold mb-4">الميزانية العمومية</h3>
-            <div className="text-center text-muted-foreground py-8">
+        <TabsContent value="balance-sheet" className="mt-4">
+          <Card className="p-3 sm:p-6">
+            <h3 className="text-lg sm:text-xl font-bold mb-4">الميزانية العمومية</h3>
+            <div className="text-center text-muted-foreground py-8 text-sm">
               قريباً - سيتم عرض الأصول والخصوم وحقوق الملكية
             </div>
           </Card>

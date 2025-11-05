@@ -140,26 +140,49 @@ const AccountsTree = () => {
   };
 
   if (isLoading) {
-    return <div className="text-center py-8">جاري التحميل...</div>;
+    return (
+      <div className="text-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+        <p className="mt-2 text-muted-foreground">جاري التحميل...</p>
+      </div>
+    );
+  }
+
+  if (!accounts || accounts.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-muted-foreground">لا توجد حسابات متاحة</p>
+      </div>
+    );
   }
 
   const rootAccounts = buildTree(accounts || [], null);
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">شجرة الحسابات</h2>
-        <Button onClick={() => {
-          setSelectedAccount(null);
-          setIsAddDialogOpen(true);
-        }}>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h2 className="text-xl sm:text-2xl font-bold">شجرة الحسابات</h2>
+        <Button 
+          onClick={() => {
+            setSelectedAccount(null);
+            setIsAddDialogOpen(true);
+          }}
+          size="sm"
+          className="w-full sm:w-auto"
+        >
           <Plus className="h-4 w-4 ml-2" />
           إضافة حساب
         </Button>
       </div>
 
-      <div className="space-y-1">
-        {rootAccounts.map((account) => renderAccount(account))}
+      <div className="space-y-1 bg-card rounded-lg border p-2 sm:p-4">
+        {rootAccounts.length > 0 ? (
+          rootAccounts.map((account) => renderAccount(account))
+        ) : (
+          <div className="text-center py-8 text-muted-foreground">
+            لا توجد حسابات رئيسية
+          </div>
+        )}
       </div>
 
       <AddAccountDialog

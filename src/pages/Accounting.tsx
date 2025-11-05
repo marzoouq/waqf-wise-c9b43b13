@@ -16,56 +16,60 @@ const Accounting = () => {
   const [activeTab, setActiveTab] = useState("accounts");
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="container mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
         <div>
-          <h1 className="text-3xl font-bold">النظام المحاسبي</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="text-2xl sm:text-3xl font-bold">النظام المحاسبي</h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">
             إدارة الحسابات والقيود المحاسبية والميزانيات
           </p>
         </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="accounts" className="flex items-center gap-2">
-            <BookOpen className="h-4 w-4" />
-            <span>شجرة الحسابات</span>
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto">
+          <TabsTrigger value="accounts" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2">
+            <BookOpen className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">شجرة الحسابات</span>
+            <span className="sm:hidden">الحسابات</span>
           </TabsTrigger>
-          <TabsTrigger value="entries" className="flex items-center gap-2">
-            <FileText className="h-4 w-4" />
-            <span>القيود المحاسبية</span>
+          <TabsTrigger value="entries" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2">
+            <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">القيود المحاسبية</span>
+            <span className="sm:hidden">القيود</span>
           </TabsTrigger>
-          <TabsTrigger value="budgets" className="flex items-center gap-2">
-            <TrendingUp className="h-4 w-4" />
-            <span>الميزانيات</span>
+          <TabsTrigger value="budgets" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2">
+            <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">الميزانيات</span>
+            <span className="sm:hidden">الميزانية</span>
           </TabsTrigger>
-          <TabsTrigger value="reports" className="flex items-center gap-2">
-            <Calculator className="h-4 w-4" />
-            <span>التقارير المالية</span>
+          <TabsTrigger value="reports" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2">
+            <Calculator className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">التقارير المالية</span>
+            <span className="sm:hidden">التقارير</span>
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="accounts" className="space-y-4">
-          <Card className="p-6">
+        <TabsContent value="accounts" className="mt-4">
+          <Card className="p-3 sm:p-6">
             <AccountsTree />
           </Card>
         </TabsContent>
 
-        <TabsContent value="entries" className="space-y-4">
-          <Card className="p-6">
+        <TabsContent value="entries" className="mt-4">
+          <Card className="p-3 sm:p-6">
             <JournalEntries />
           </Card>
         </TabsContent>
 
-        <TabsContent value="budgets" className="space-y-4">
-          <Card className="p-6">
+        <TabsContent value="budgets" className="mt-4">
+          <Card className="p-3 sm:p-6">
             <BudgetReports />
           </Card>
         </TabsContent>
 
-        <TabsContent value="reports" className="space-y-4">
-          <Card className="p-6">
+        <TabsContent value="reports" className="mt-4">
+          <Card className="p-3 sm:p-6">
             <FinancialReports />
           </Card>
         </TabsContent>

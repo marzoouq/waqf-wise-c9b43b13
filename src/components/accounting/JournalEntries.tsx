@@ -60,23 +60,27 @@ const JournalEntries = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">القيود المحاسبية</h2>
-        <Button onClick={() => setIsAddDialogOpen(true)}>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h2 className="text-xl sm:text-2xl font-bold">القيود المحاسبية</h2>
+        <Button 
+          onClick={() => setIsAddDialogOpen(true)}
+          size="sm"
+          className="w-full sm:w-auto"
+        >
           <Plus className="h-4 w-4 ml-2" />
           إضافة قيد جديد
         </Button>
       </div>
 
-      <div className="border rounded-lg">
+      <div className="border rounded-lg overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>رقم القيد</TableHead>
               <TableHead>التاريخ</TableHead>
-              <TableHead>البيان</TableHead>
+              <TableHead className="hidden sm:table-cell">البيان</TableHead>
               <TableHead>الحالة</TableHead>
-              <TableHead>تاريخ الترحيل</TableHead>
+              <TableHead className="hidden md:table-cell">تاريخ الترحيل</TableHead>
               <TableHead className="text-left">الإجراءات</TableHead>
             </TableRow>
           </TableHeader>
@@ -90,15 +94,15 @@ const JournalEntries = () => {
             ) : (
               entries?.map((entry) => (
                 <TableRow key={entry.id}>
-                  <TableCell className="font-mono">{entry.entry_number}</TableCell>
-                  <TableCell>
+                  <TableCell className="font-mono text-sm">{entry.entry_number}</TableCell>
+                  <TableCell className="text-sm">
                     {format(new Date(entry.entry_date), "dd MMM yyyy", {
                       locale: ar,
                     })}
                   </TableCell>
-                  <TableCell>{entry.description}</TableCell>
+                  <TableCell className="hidden sm:table-cell">{entry.description}</TableCell>
                   <TableCell>{getStatusBadge(entry.status)}</TableCell>
-                  <TableCell>
+                  <TableCell className="hidden md:table-cell text-sm">
                     {entry.posted_at
                       ? format(new Date(entry.posted_at), "dd MMM yyyy", {
                           locale: ar,

@@ -47,20 +47,20 @@ const BudgetReports = () => {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">تقارير الميزانيات</h2>
+        <h2 className="text-xl sm:text-2xl font-bold">تقارير الميزانيات</h2>
       </div>
 
       {budgets && budgets.length > 0 ? (
-        <div className="border rounded-lg">
+        <div className="border rounded-lg overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>السنة المالية</TableHead>
+                <TableHead className="hidden md:table-cell">السنة المالية</TableHead>
                 <TableHead>الحساب</TableHead>
-                <TableHead>الفترة</TableHead>
-                <TableHead className="text-center">المبلغ المخطط</TableHead>
-                <TableHead className="text-center">المبلغ الفعلي</TableHead>
-                <TableHead className="text-center">الانحراف</TableHead>
+                <TableHead className="hidden sm:table-cell">الفترة</TableHead>
+                <TableHead className="text-center">المخطط</TableHead>
+                <TableHead className="text-center">الفعلي</TableHead>
+                <TableHead className="text-center hidden lg:table-cell">الانحراف</TableHead>
                 <TableHead className="text-center">النسبة</TableHead>
               </TableRow>
             </TableHeader>
@@ -74,43 +74,43 @@ const BudgetReports = () => {
 
                 return (
                   <TableRow key={budget.id}>
-                    <TableCell>{budget.fiscal_year.name}</TableCell>
+                    <TableCell className="hidden md:table-cell">{budget.fiscal_year.name}</TableCell>
                     <TableCell>
-                      <div className="font-mono text-sm">{budget.account.code}</div>
-                      <div className="text-sm">{budget.account.name_ar}</div>
+                      <div className="font-mono text-xs sm:text-sm">{budget.account.code}</div>
+                      <div className="text-xs sm:text-sm">{budget.account.name_ar}</div>
                     </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">
+                    <TableCell className="hidden sm:table-cell">
+                      <Badge variant="outline" className="text-xs">
                         {budget.period_type === "monthly" && `شهر ${budget.period_number}`}
                         {budget.period_type === "quarterly" && `ربع ${budget.period_number}`}
                         {budget.period_type === "yearly" && "سنوي"}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-center font-mono">
+                    <TableCell className="text-center font-mono text-xs sm:text-sm">
                       {Number(budget.budgeted_amount).toLocaleString("ar-SA", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0,
                       })}
                     </TableCell>
-                    <TableCell className="text-center font-mono">
+                    <TableCell className="text-center font-mono text-xs sm:text-sm">
                       {Number(budget.actual_amount).toLocaleString("ar-SA", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0,
                       })}
                     </TableCell>
-                    <TableCell className={`text-center font-mono ${getVarianceColor(variance)}`}>
+                    <TableCell className={`text-center font-mono text-xs sm:text-sm hidden lg:table-cell ${getVarianceColor(variance)}`}>
                       {variance.toLocaleString("ar-SA", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0,
                         signDisplay: "always",
                       })}
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col items-center gap-1">
-                        <span className="text-sm font-mono">
-                          {percentage.toFixed(1)}%
+                        <span className="text-xs sm:text-sm font-mono">
+                          {percentage.toFixed(0)}%
                         </span>
-                        <Progress value={Math.min(percentage, 100)} className="w-20" />
+                        <Progress value={Math.min(percentage, 100)} className="w-12 sm:w-20" />
                       </div>
                     </TableCell>
                   </TableRow>
