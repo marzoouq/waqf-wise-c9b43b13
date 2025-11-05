@@ -106,7 +106,14 @@ export const ViewInvoiceDialog = ({
   });
 
   const handlePrint = () => {
-    window.print();
+    console.log("🖨️ Print triggered");
+    console.log("📋 Invoice:", invoice);
+    console.log("📝 Lines:", invoiceLines?.length || 0);
+    
+    // Wait a bit to ensure all data is loaded
+    setTimeout(() => {
+      window.print();
+    }, 100);
   };
 
   const handleDownloadPDF = () => {
@@ -282,7 +289,7 @@ export const ViewInvoiceDialog = ({
 
         <div id="invoice-print-content" className="space-y-6">
           {/* Header - Company Info */}
-          <div className="text-center print:block hidden border-b-2 border-primary pb-6 mb-6">
+          <div className="hidden print:block text-center border-b-2 border-primary pb-6 mb-6">
             <h1 className="text-3xl font-bold text-primary mb-2">{COMPANY_INFO.NAME_AR}</h1>
             <p className="text-sm text-muted-foreground">{COMPANY_INFO.DESCRIPTION_AR}</p>
             <p className="text-sm font-mono mt-1">الرقم الضريبي: {COMPANY_INFO.TAX_NUMBER}</p>
