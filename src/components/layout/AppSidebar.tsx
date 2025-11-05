@@ -28,27 +28,43 @@ import {
 } from "@/components/ui/sidebar";
 import { NotificationsBell } from "./NotificationsBell";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserRole } from "@/hooks/useUserRole";
 import { Button } from "@/components/ui/button";
+import { useMemo } from "react";
 
 const AppSidebar = () => {
   const location = useLocation();
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
   const { user, signOut } = useAuth();
+  const { isAdmin, isAccountant, isBeneficiary, isLoading: roleLoading } = useUserRole();
 
-  const menuItems = [
-    { icon: LayoutDashboard, label: "لوحة التحكم", path: "/" },
-    { icon: Users, label: "المستفيدون", path: "/beneficiaries" },
-    { icon: Building2, label: "العقارات", path: "/properties" },
-    { icon: Wallet, label: "الأموال والمصارف", path: "/funds" },
-    { icon: FileText, label: "الأرشيف", path: "/archive" },
-    { icon: Calculator, label: "المحاسبة", path: "/accounting" },
-    { icon: Receipt, label: "الفواتير", path: "/invoices" },
-    { icon: CreditCard, label: "المدفوعات", path: "/payments" },
-    { icon: CheckSquare, label: "الموافقات", path: "/approvals" },
-    { icon: BarChart3, label: "التقارير", path: "/reports" },
-    { icon: Settings, label: "الإعدادات", path: "/settings" },
+  const allMenuItems = [
+    { icon: LayoutDashboard, label: "لوحة التحكم", path: "/", roles: ['admin', 'accountant', 'beneficiary', 'user'] },
+    { icon: Users, label: "المستفيدون", path: "/beneficiaries", roles: ['admin', 'accountant'] },
+    { icon: Building2, label: "العقارات", path: "/properties", roles: ['admin', 'accountant'] },
+    { icon: Wallet, label: "الأموال والمصارف", path: "/funds", roles: ['admin', 'accountant'] },
+    { icon: FileText, label: "الأرشيف", path: "/archive", roles: ['admin', 'accountant'] },
+    { icon: Calculator, label: "المحاسبة", path: "/accounting", roles: ['admin', 'accountant'] },
+    { icon: Receipt, label: "الفواتير", path: "/invoices", roles: ['admin', 'accountant'] },
+    { icon: CreditCard, label: "المدفوعات", path: "/payments", roles: ['admin', 'accountant', 'beneficiary'] },
+    { icon: CheckSquare, label: "الموافقات", path: "/approvals", roles: ['admin', 'accountant'] },
+    { icon: BarChart3, label: "التقارير", path: "/reports", roles: ['admin', 'accountant', 'beneficiary'] },
+    { icon: Settings, label: "الإعدادات", path: "/settings", roles: ['admin', 'accountant', 'beneficiary', 'user'] },
   ];
+
+  // Filter menu items based on user role
+  const menuItems = useMemo(() => {
+    if (roleLoading) return [];
+    
+    return allMenuItems.filter(item => {
+      if (isAdmin) return true; // Admin sees everything
+      if (isAccountant && item.roles.includes('accountant')) return true;
+      if (isBeneficiary && item.roles.includes('beneficiary')) return true;
+      if (item.roles.includes('user')) return true;
+      return false;
+    });
+  }, [isAdmin, isAccountant, isBeneficiary, roleLoading]);
 
   return (
     <Sidebar collapsible="icon" side="right">
