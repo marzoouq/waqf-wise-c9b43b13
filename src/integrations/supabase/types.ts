@@ -67,6 +67,51 @@ export type Database = {
           },
         ]
       }
+      beneficiaries: {
+        Row: {
+          category: string
+          created_at: string
+          email: string | null
+          family_name: string | null
+          full_name: string
+          id: string
+          national_id: string
+          notes: string | null
+          phone: string
+          relationship: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          email?: string | null
+          family_name?: string | null
+          full_name: string
+          id?: string
+          national_id: string
+          notes?: string | null
+          phone: string
+          relationship?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          email?: string | null
+          family_name?: string | null
+          full_name?: string
+          id?: string
+          national_id?: string
+          notes?: string | null
+          phone?: string
+          relationship?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       budgets: {
         Row: {
           account_id: string
@@ -121,6 +166,86 @@ export type Database = {
           },
         ]
       }
+      distributions: {
+        Row: {
+          beneficiaries_count: number
+          created_at: string
+          distribution_date: string
+          id: string
+          month: string
+          notes: string | null
+          status: string
+          total_amount: number
+          updated_at: string
+        }
+        Insert: {
+          beneficiaries_count: number
+          created_at?: string
+          distribution_date: string
+          id?: string
+          month: string
+          notes?: string | null
+          status?: string
+          total_amount: number
+          updated_at?: string
+        }
+        Update: {
+          beneficiaries_count?: number
+          created_at?: string
+          distribution_date?: string
+          id?: string
+          month?: string
+          notes?: string | null
+          status?: string
+          total_amount?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      documents: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          file_size: string
+          file_type: string
+          folder_id: string | null
+          id: string
+          name: string
+          uploaded_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          file_size: string
+          file_type: string
+          folder_id?: string | null
+          id?: string
+          name: string
+          uploaded_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          file_size?: string
+          file_type?: string
+          folder_id?: string | null
+          id?: string
+          name?: string
+          uploaded_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documents_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "folders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fiscal_years: {
         Row: {
           created_at: string
@@ -150,6 +275,33 @@ export type Database = {
           is_closed?: boolean
           name?: string
           start_date?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      folders: {
+        Row: {
+          created_at: string
+          description: string | null
+          files_count: number
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          files_count?: number
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          files_count?: number
+          id?: string
+          name?: string
           updated_at?: string
         }
         Relationships: []
@@ -254,6 +406,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      properties: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          location: string
+          monthly_revenue: number
+          name: string
+          occupied: number
+          status: string
+          type: string
+          units: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          location: string
+          monthly_revenue?: number
+          name: string
+          occupied?: number
+          status: string
+          type: string
+          units?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          location?: string
+          monthly_revenue?: number
+          name?: string
+          occupied?: number
+          status?: string
+          type?: string
+          units?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
     }
     Views: {

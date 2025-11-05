@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Plus, Search, MapPin, DollarSign, Home, Building, Edit, Trash2 } from "lucide-react";
 import { PropertyDialog } from "@/components/properties/PropertyDialog";
+import { useProperties } from "@/hooks/useProperties";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,78 +12,37 @@ const Properties = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
 
-  const properties = [
-    {
-      id: 1,
-      name: "مبنى سكني - حي الملك فهد",
-      type: "سكني",
-      location: "الرياض، حي الملك فهد",
-      units: 12,
-      occupied: 10,
-      monthlyRevenue: "120,000 ر.س",
-      status: "مؤجر",
-      image: "🏢",
-    },
-    {
-      id: 2,
-      name: "محل تجاري - طريق الملك عبدالله",
-      type: "تجاري",
-      location: "جدة، طريق الملك عبدالله",
-      units: 1,
-      occupied: 1,
-      monthlyRevenue: "50,000 ر.س",
-      status: "مؤجر",
-      image: "🏪",
-    },
-    {
-      id: 3,
-      name: "مزرعة - منطقة الخرج",
-      type: "زراعي",
-      location: "الخرج",
-      units: 1,
-      occupied: 0,
-      monthlyRevenue: "0 ر.س",
-      status: "شاغر",
-      image: "🌾",
-    },
-    {
-      id: 4,
-      name: "مبنى إداري - حي النخيل",
-      type: "إداري",
-      location: "الدمام، حي النخيل",
-      units: 8,
-      occupied: 6,
-      monthlyRevenue: "80,000 ر.س",
-      status: "مؤجر جزئياً",
-      image: "🏛️",
-    },
-  ];
+  const { properties, isLoading, addProperty, updateProperty, deleteProperty } = useProperties();
+
+  const totalUnits = properties.reduce((sum, p) => sum + p.units, 0);
+  const occupiedUnits = properties.reduce((sum, p) => sum + p.occupied, 0);
+  const totalRevenue = properties.reduce((sum, p) => sum + Number(p.monthly_revenue), 0);
 
   const stats = [
-    {
-      label: "إجمالي العقارات",
-      value: "89",
-      icon: Building,
-      color: "text-primary",
-    },
-    {
-      label: "الوحدات المؤجرة",
-      value: "156",
-      icon: Home,
-      color: "text-success",
-    },
-    {
-      label: "الوحدات الشاغرة",
-      value: "23",
-      icon: MapPin,
-      color: "text-warning",
-    },
-    {
-      label: "الإيرادات الشهرية",
-      value: "850,000 ر.س",
-      icon: DollarSign,
-      color: "text-accent",
-    },
+            {
+              label: "إجمالي العقارات",
+              value: properties.length.toString(),
+              icon: Building,
+              color: "text-primary",
+            },
+            {
+              label: "الوحدات المؤجرة",
+              value: occupiedUnits.toString(),
+              icon: Home,
+              color: "text-success",
+            },
+            {
+              label: "الوحدات الشاغرة",
+              value: (totalUnits - occupiedUnits).toString(),
+              icon: MapPin,
+              color: "text-warning",
+            },
+            {
+              label: "الإيرادات الشهرية",
+              value: `${totalRevenue.toLocaleString()} ر.س`,
+              icon: DollarSign,
+              color: "text-accent",
+            },
   ];
 
   const handleAddProperty = () => {
@@ -95,8 +55,23 @@ const Properties = () => {
     setDialogOpen(true);
   };
 
-  const handleSaveProperty = (data: any) => {
-    console.log("Property saved:", data);
+  const handleSaveProperty = async (data: any) => {
+    try {
+      if (selectedProperty) {
+        await updateProperty({ id: selectedProperty.id, ...data });
+      } else {
+        await addProperty(data);
+      }
+      setDialogOpen(false);
+    } catch (error) {
+      console.error("Error saving property:", error);
+    }
+  };
+
+  const handleDeleteProperty = async (id: string) => {
+    if (confirm("هل أنت متأكد من حذف هذا العقار؟")) {
+      await deleteProperty(id);
+    }
   };
 
   return (
@@ -162,78 +137,98 @@ const Properties = () => {
 
         {/* Properties Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {properties.map((property) => (
-            <Card
-              key={property.id}
-              className="shadow-soft hover:shadow-medium transition-all duration-300 cursor-pointer group"
-            >
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="text-5xl mb-4">{property.image}</div>
-                  <Badge
-                    className={
-                      property.status === "مؤجر"
-                        ? "bg-success/10 text-success"
-                        : property.status === "شاغر"
-                        ? "bg-warning/10 text-warning"
-                        : "bg-primary/10 text-primary"
-                    }
-                  >
-                    {property.status}
-                  </Badge>
-                </div>
-                <CardTitle className="text-xl group-hover:text-primary transition-colors">
-                  {property.name}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Building className="h-4 w-4" />
-                    <span>{property.type}</span>
+          {isLoading ? (
+            <div className="col-span-full text-center py-12 text-muted-foreground">
+              جاري التحميل...
+            </div>
+          ) : properties.length === 0 ? (
+            <div className="col-span-full text-center py-12 text-muted-foreground">
+              لا يوجد عقارات حالياً. قم بإضافة عقار جديد.
+            </div>
+          ) : (
+            properties.map((property) => {
+              const propertyIcons: Record<string, string> = {
+                "سكني": "🏢",
+                "تجاري": "🏪",
+                "زراعي": "🌾",
+                "إداري": "🏛️"
+              };
+              
+              return (
+              <Card
+                key={property.id}
+                className="shadow-soft hover:shadow-medium transition-all duration-300 cursor-pointer group"
+              >
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="text-5xl mb-4">{propertyIcons[property.type] || "🏢"}</div>
+                    <Badge
+                      className={
+                        property.status === "مؤجر"
+                          ? "bg-success/10 text-success"
+                          : property.status === "شاغر"
+                          ? "bg-warning/10 text-warning"
+                          : "bg-primary/10 text-primary"
+                      }
+                    >
+                      {property.status}
+                    </Badge>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <MapPin className="h-4 w-4" />
-                    <span>{property.location}</span>
+                  <CardTitle className="text-xl group-hover:text-primary transition-colors">
+                    {property.name}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Building className="h-4 w-4" />
+                      <span>{property.type}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <MapPin className="h-4 w-4" />
+                      <span>{property.location}</span>
+                    </div>
                   </div>
-                </div>
 
-                <div className="pt-4 border-t border-border space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">الوحدات:</span>
-                    <span className="font-medium">
-                      {property.occupied}/{property.units}
-                    </span>
+                  <div className="pt-4 border-t border-border space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">الوحدات:</span>
+                      <span className="font-medium">
+                        {property.occupied}/{property.units}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">الإيراد الشهري:</span>
+                      <span className="font-bold text-primary">
+                        {Number(property.monthly_revenue).toLocaleString()} ر.س
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">الإيراد الشهري:</span>
-                    <span className="font-bold text-primary">
-                      {property.monthlyRevenue}
-                    </span>
-                  </div>
-                </div>
 
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1"
-                    onClick={() => handleEditProperty(property)}
-                  >
-                    <Edit className="ml-1 h-3 w-3" />
-                    تعديل
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => handleEditProperty(property)}
+                    >
+                      <Edit className="ml-1 h-3 w-3" />
+                      تعديل
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                      onClick={() => handleDeleteProperty(property.id)}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })
+          )}
         </div>
 
         <PropertyDialog

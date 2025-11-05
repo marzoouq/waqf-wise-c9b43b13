@@ -3,6 +3,7 @@ import { Plus, TrendingUp, PieChart, DollarSign, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DistributionDialog } from "@/components/funds/DistributionDialog";
 import { SimulationDialog } from "@/components/funds/SimulationDialog";
+import { useDistributions } from "@/hooks/useDistributions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 
@@ -10,8 +11,19 @@ const Funds = () => {
   const [distributionDialogOpen, setDistributionDialogOpen] = useState(false);
   const [simulationDialogOpen, setSimulationDialogOpen] = useState(false);
 
-  const handleDistribute = (data: any) => {
-    console.log("Distribution created:", data);
+  const { distributions, isLoading, addDistribution } = useDistributions();
+
+  const handleDistribute = async (data: any) => {
+    const dbData = {
+      month: `${data.month} 1446`,
+      total_amount: data.totalAmount,
+      beneficiaries_count: data.beneficiaries,
+      status: "معلق",
+      distribution_date: new Date().toISOString().split('T')[0],
+      notes: data.notes || null,
+    };
+    await addDistribution(dbData);
+    setDistributionDialogOpen(false);
   };
 
   const funds = [
@@ -50,33 +62,6 @@ const Funds = () => {
       percentage: 50,
       beneficiaries: 0,
       color: "bg-accent",
-    },
-  ];
-
-  const distributions = [
-    {
-      id: 1,
-      month: "محرم 1446",
-      amount: "450,000 ر.س",
-      beneficiaries: 124,
-      status: "مكتمل",
-      date: "2024-07-15",
-    },
-    {
-      id: 2,
-      month: "صفر 1446",
-      amount: "460,000 ر.س",
-      beneficiaries: 126,
-      status: "قيد المعالجة",
-      date: "2024-08-15",
-    },
-    {
-      id: 3,
-      month: "ربيع الأول 1446",
-      amount: "470,000 ر.س",
-      beneficiaries: 128,
-      status: "معلق",
-      date: "2024-09-15",
     },
   ];
 
@@ -228,39 +213,47 @@ const Funds = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {distributions.map((dist) => (
+              {isLoading ? (
+                <div className="text-center py-8 text-muted-foreground">جاري التحميل...</div>
+              ) : distributions.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  لا يوجد توزيعات حالياً. قم بإنشاء توزيع جديد.
+                </div>
+              ) : (
+                distributions.map((dist) => (
                 <div
-                  key={dist.id}
-                  className="flex items-center justify-between p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
-                >
-                  <div className="space-y-1">
-                    <h3 className="font-medium text-foreground">{dist.month}</h3>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <span>{dist.date}</span>
-                      <span>•</span>
-                      <span>{dist.beneficiaries} مستفيد</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="text-left">
-                      <div className="text-lg font-bold text-primary">
-                        {dist.amount}
+                    key={dist.id}
+                    className="flex items-center justify-between p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                  >
+                    <div className="space-y-1">
+                      <h3 className="font-medium text-foreground">{dist.month}</h3>
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        <span>{new Date(dist.distribution_date).toLocaleDateString('ar-SA')}</span>
+                        <span>•</span>
+                        <span>{dist.beneficiaries_count} مستفيد</span>
                       </div>
                     </div>
-                    <div
-                      className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        dist.status === "مكتمل"
-                          ? "bg-success/10 text-success"
-                          : dist.status === "قيد المعالجة"
-                          ? "bg-warning/10 text-warning"
-                          : "bg-muted text-muted-foreground"
-                      }`}
-                    >
-                      {dist.status}
+                    <div className="flex items-center gap-4">
+                      <div className="text-left">
+                        <div className="text-lg font-bold text-primary">
+                          {Number(dist.total_amount).toLocaleString()} ر.س
+                        </div>
+                      </div>
+                      <div
+                        className={`px-3 py-1 rounded-full text-sm font-medium ${
+                          dist.status === "مكتمل"
+                            ? "bg-success/10 text-success"
+                            : dist.status === "قيد المعالجة"
+                            ? "bg-warning/10 text-warning"
+                            : "bg-muted text-muted-foreground"
+                        }`}
+                      >
+                        {dist.status}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </CardContent>
         </Card>

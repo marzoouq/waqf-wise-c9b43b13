@@ -75,7 +75,7 @@ export function PropertyDialog({
       location: property?.location || "",
       units: property?.units || 1,
       occupied: property?.occupied || 0,
-      monthlyRevenue: property?.monthlyRevenue ? parseFloat(property.monthlyRevenue.replace(/[^\d.]/g, '')) : 0,
+      monthlyRevenue: property?.monthly_revenue || 0,
       status: property?.status || "",
       description: property?.description || "",
     },

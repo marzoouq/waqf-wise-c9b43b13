@@ -27,35 +27,37 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
 
 const beneficiarySchema = z.object({
-  name: z
+  fullName: z
     .string()
     .trim()
     .min(3, { message: "الاسم يجب أن يكون 3 أحرف على الأقل" })
     .max(100, { message: "الاسم يجب أن يكون أقل من 100 حرف" })
     .regex(/^[\u0600-\u06FF\s]+$/, { message: "الرجاء إدخال الاسم بالعربية فقط" }),
   
-  idNumber: z
+  nationalId: z
     .string()
     .trim()
     .length(10, { message: "رقم الهوية يجب أن يكون 10 أرقام" })
     .regex(/^[0-9]+$/, { message: "رقم الهوية يجب أن يحتوي على أرقام فقط" }),
   
-  family: z
+  familyName: z
     .string()
     .trim()
     .min(3, { message: "اسم العائلة يجب أن يكون 3 أحرف على الأقل" })
-    .max(100, { message: "اسم العائلة يجب أن يكون أقل من 100 حرف" }),
+    .max(100, { message: "اسم العائلة يجب أن يكون أقل من 100 حرف" })
+    .optional()
+    .or(z.literal("")),
   
   category: z
     .string()
     .min(1, { message: "الرجاء اختيار فئة المستفيد" }),
   
-  status: z
+  relationship: z
     .string()
-    .min(1, { message: "الرجاء اختيار حالة المستفيد" }),
+    .optional()
+    .or(z.literal("")),
   
   phone: z
     .string()
@@ -70,14 +72,6 @@ const beneficiarySchema = z.object({
     .optional()
     .or(z.literal("")),
   
-  address: z
-    .string()
-    .trim()
-    .min(10, { message: "العنوان يجب أن يكون 10 أحرف على الأقل" })
-    .max(500, { message: "العنوان يجب أن يكون أقل من 500 حرف" })
-    .optional()
-    .or(z.literal("")),
-  
   notes: z
     .string()
     .trim()
@@ -89,15 +83,14 @@ const beneficiarySchema = z.object({
 type BeneficiaryFormData = z.infer<typeof beneficiarySchema>;
 
 interface Beneficiary {
-  id: number;
-  name: string;
-  idNumber: string;
-  family: string;
+  id: string;
+  full_name: string;
+  national_id: string;
+  family_name?: string;
   category: string;
-  status: string;
+  relationship?: string;
   phone: string;
   email?: string;
-  address?: string;
   notes?: string;
 }
 
@@ -105,7 +98,7 @@ interface BeneficiaryDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   beneficiary?: Beneficiary | null;
-  onSave: (data: BeneficiaryFormData) => void;
+  onSave: (data: any) => void;
 }
 
 const BeneficiaryDialog = ({
@@ -114,20 +107,18 @@ const BeneficiaryDialog = ({
   beneficiary,
   onSave,
 }: BeneficiaryDialogProps) => {
-  const { toast } = useToast();
   const isEditMode = !!beneficiary;
 
   const form = useForm<BeneficiaryFormData>({
     resolver: zodResolver(beneficiarySchema),
     defaultValues: {
-      name: "",
-      idNumber: "",
-      family: "",
+      fullName: "",
+      nationalId: "",
+      familyName: "",
       category: "",
-      status: "نشط",
+      relationship: "",
       phone: "",
       email: "",
-      address: "",
       notes: "",
     },
   });
@@ -135,49 +126,45 @@ const BeneficiaryDialog = ({
   useEffect(() => {
     if (beneficiary) {
       form.reset({
-        name: beneficiary.name,
-        idNumber: beneficiary.idNumber,
-        family: beneficiary.family,
+        fullName: beneficiary.full_name,
+        nationalId: beneficiary.national_id,
+        familyName: beneficiary.family_name || "",
         category: beneficiary.category,
-        status: beneficiary.status,
+        relationship: beneficiary.relationship || "",
         phone: beneficiary.phone,
         email: beneficiary.email || "",
-        address: beneficiary.address || "",
         notes: beneficiary.notes || "",
       });
     } else {
       form.reset({
-        name: "",
-        idNumber: "",
-        family: "",
+        fullName: "",
+        nationalId: "",
+        familyName: "",
         category: "",
-        status: "نشط",
+        relationship: "",
         phone: "",
         email: "",
-        address: "",
         notes: "",
       });
     }
   }, [beneficiary, form]);
 
-  const onSubmit = (data: BeneficiaryFormData) => {
-    try {
-      onSave(data);
-      toast({
-        title: isEditMode ? "تم التحديث بنجاح" : "تمت الإضافة بنجاح",
-        description: isEditMode
-          ? "تم تحديث بيانات المستفيد بنجاح"
-          : "تم إضافة المستفيد الجديد بنجاح",
-      });
-      onOpenChange(false);
-      form.reset();
-    } catch (error) {
-      toast({
-        title: "حدث خطأ",
-        description: "حدث خطأ أثناء حفظ البيانات. الرجاء المحاولة مرة أخرى",
-        variant: "destructive",
-      });
-    }
+  const onSubmit = async (data: BeneficiaryFormData) => {
+    const dbData = {
+      full_name: data.fullName,
+      national_id: data.nationalId,
+      phone: data.phone,
+      email: data.email || null,
+      category: data.category,
+      family_name: data.familyName || null,
+      relationship: data.relationship || null,
+      status: "نشط",
+      notes: data.notes || null,
+    };
+    
+    await onSave(dbData);
+    onOpenChange(false);
+    form.reset();
   };
 
   return (
@@ -205,7 +192,7 @@ const BeneficiaryDialog = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
-                  name="name"
+                  name="fullName"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-sm font-medium">
@@ -225,7 +212,7 @@ const BeneficiaryDialog = ({
 
                 <FormField
                   control={form.control}
-                  name="idNumber"
+                  name="nationalId"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-sm font-medium">
@@ -248,11 +235,11 @@ const BeneficiaryDialog = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
-                  name="family"
+                  name="familyName"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-sm font-medium">
-                        العائلة <span className="text-destructive">*</span>
+                        العائلة
                       </FormLabel>
                       <FormControl>
                         <Input
@@ -349,27 +336,19 @@ const BeneficiaryDialog = ({
 
                 <FormField
                   control={form.control}
-                  name="status"
+                  name="relationship"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-sm font-medium">
-                        الحالة <span className="text-destructive">*</span>
+                        صلة القرابة
                       </FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="text-right">
-                            <SelectValue placeholder="اختر الحالة" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="نشط">نشط</SelectItem>
-                          <SelectItem value="معلق">معلق</SelectItem>
-                          <SelectItem value="موقوف">موقوف</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <Input
+                          placeholder="مثال: ابن، زوجة، أخ"
+                          {...field}
+                          className="text-right"
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -382,27 +361,6 @@ const BeneficiaryDialog = ({
               <h3 className="text-lg font-semibold text-foreground border-r-4 border-r-success pr-3">
                 معلومات إضافية
               </h3>
-
-              <FormField
-                control={form.control}
-                name="address"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium">
-                      العنوان (اختياري)
-                    </FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="مثال: الرياض - حي السليمانية - شارع الملك فهد"
-                        {...field}
-                        className="text-right resize-none"
-                        rows={3}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
 
               <FormField
                 control={form.control}
