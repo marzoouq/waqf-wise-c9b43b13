@@ -40,7 +40,7 @@ const AppSidebar = () => {
   ];
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="icon" side="right">
       <SidebarHeader className="border-b border-sidebar-border p-4 bg-sidebar-accent/30">
         {!isCollapsed && (
           <div className="space-y-1">
