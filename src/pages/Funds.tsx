@@ -1,17 +1,21 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Plus, TrendingUp, PieChart, DollarSign, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DistributionDialog } from "@/components/funds/DistributionDialog";
 import { SimulationDialog } from "@/components/funds/SimulationDialog";
 import { useDistributions } from "@/hooks/useDistributions";
+import { useFunds } from "@/hooks/useFunds";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { LoadingState, CardLoadingSkeleton } from "@/components/shared/LoadingState";
+import { EmptyState } from "@/components/shared/EmptyState";
 
 const Funds = () => {
   const [distributionDialogOpen, setDistributionDialogOpen] = useState(false);
   const [simulationDialogOpen, setSimulationDialogOpen] = useState(false);
 
-  const { distributions, isLoading, addDistribution } = useDistributions();
+  const { distributions, isLoading: distributionsLoading, addDistribution } = useDistributions();
+  const { funds, isLoading: fundsLoading } = useFunds();
 
   const handleDistribute = async (data: any) => {
     const dbData = {
@@ -26,44 +30,20 @@ const Funds = () => {
     setDistributionDialogOpen(false);
   };
 
-  const funds = [
-    {
-      id: 1,
-      name: "صرف مستحقات العائلات",
-      allocated: 500000,
-      spent: 350000,
-      percentage: 70,
-      beneficiaries: 124,
-      color: "bg-primary",
-    },
-    {
-      id: 2,
-      name: "مصاريف الصيانة",
-      allocated: 200000,
-      spent: 120000,
-      percentage: 60,
-      beneficiaries: 0,
-      color: "bg-warning",
-    },
-    {
-      id: 3,
-      name: "الاحتياطي",
-      allocated: 300000,
-      spent: 50000,
-      percentage: 17,
-      beneficiaries: 0,
-      color: "bg-success",
-    },
-    {
-      id: 4,
-      name: "التطوير والاستثمار",
-      allocated: 400000,
-      spent: 200000,
-      percentage: 50,
-      beneficiaries: 0,
-      color: "bg-accent",
-    },
-  ];
+  // Calculate summary stats from funds
+  const summaryStats = useMemo(() => {
+    const totalAllocated = funds.reduce((sum, f) => sum + Number(f.allocated_amount), 0);
+    const totalSpent = funds.reduce((sum, f) => sum + Number(f.spent_amount), 0);
+    const totalAvailable = totalAllocated - totalSpent;
+    const activeBeneficiaries = funds.reduce((sum, f) => sum + f.beneficiaries_count, 0);
+
+    return {
+      totalAllocated,
+      totalSpent,
+      totalAvailable,
+      activeBeneficiaries,
+    };
+  }, [funds]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -106,13 +86,19 @@ const Funds = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-primary">
-                2,450,000 ر.س
-              </div>
-              <div className="flex items-center gap-1 text-sm text-success mt-2">
-                <TrendingUp className="h-4 w-4" />
-                <span>+8.3%</span>
-              </div>
+              {fundsLoading ? (
+                <LoadingState size="sm" message="" />
+              ) : (
+                <>
+                  <div className="text-3xl font-bold text-primary">
+                    {summaryStats.totalAllocated.toLocaleString()} ر.س
+                  </div>
+                  <div className="flex items-center gap-1 text-sm text-success mt-2">
+                    <TrendingUp className="h-4 w-4" />
+                    <span>+8.3%</span>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
 
@@ -123,12 +109,18 @@ const Funds = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-warning">
-                720,000 ر.س
-              </div>
-              <div className="text-sm text-muted-foreground mt-2">
-                من إجمالي 1,400,000 ر.س
-              </div>
+              {fundsLoading ? (
+                <LoadingState size="sm" message="" />
+              ) : (
+                <>
+                  <div className="text-3xl font-bold text-warning">
+                    {summaryStats.totalSpent.toLocaleString()} ر.س
+                  </div>
+                  <div className="text-sm text-muted-foreground mt-2">
+                    من إجمالي {summaryStats.totalAllocated.toLocaleString()} ر.س
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
 
@@ -139,12 +131,18 @@ const Funds = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-success">
-                1,730,000 ر.س
-              </div>
-              <div className="text-sm text-muted-foreground mt-2">
-                متاح للتوزيع
-              </div>
+              {fundsLoading ? (
+                <LoadingState size="sm" message="" />
+              ) : (
+                <>
+                  <div className="text-3xl font-bold text-success">
+                    {summaryStats.totalAvailable.toLocaleString()} ر.س
+                  </div>
+                  <div className="text-sm text-muted-foreground mt-2">
+                    متاح للتوزيع
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
 
@@ -155,12 +153,18 @@ const Funds = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-accent">
-                124
-              </div>
-              <div className="text-sm text-muted-foreground mt-2">
-                مستفيد نشط
-              </div>
+              {fundsLoading ? (
+                <LoadingState size="sm" message="" />
+              ) : (
+                <>
+                  <div className="text-3xl font-bold text-accent">
+                    {summaryStats.activeBeneficiaries}
+                  </div>
+                  <div className="text-sm text-muted-foreground mt-2">
+                    مستفيد نشط
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -171,38 +175,48 @@ const Funds = () => {
             <CardTitle className="text-xl font-bold">توزيع المصارف</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-6">
-              {funds.map((fund) => (
-                <div key={fund.id} className="space-y-2">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-medium text-foreground">{fund.name}</h3>
-                      <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
-                        <div className="flex items-center gap-1">
-                          <DollarSign className="h-3 w-3" />
-                          <span>المخصص: {fund.allocated.toLocaleString()} ر.س</span>
-                        </div>
-                        {fund.beneficiaries > 0 && (
+            {fundsLoading ? (
+              <CardLoadingSkeleton />
+            ) : funds.length === 0 ? (
+              <EmptyState
+                icon={DollarSign}
+                title="لا يوجد صناديق"
+                description="لم يتم إضافة أي صناديق بعد"
+              />
+            ) : (
+              <div className="space-y-6">
+                {funds.map((fund) => (
+                  <div key={fund.id} className="space-y-2">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-medium text-foreground">{fund.name}</h3>
+                        <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
                           <div className="flex items-center gap-1">
-                            <Users className="h-3 w-3" />
-                            <span>{fund.beneficiaries} مستفيد</span>
+                            <DollarSign className="h-3 w-3" />
+                            <span>المخصص: {Number(fund.allocated_amount).toLocaleString()} ر.س</span>
                           </div>
-                        )}
+                          {fund.beneficiaries_count > 0 && (
+                            <div className="flex items-center gap-1">
+                              <Users className="h-3 w-3" />
+                              <span>{fund.beneficiaries_count} مستفيد</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <div className="text-left">
+                        <div className="text-lg font-bold text-primary">
+                          {Number(fund.spent_amount).toLocaleString()} ر.س
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          {fund.percentage}% مصروف
+                        </div>
                       </div>
                     </div>
-                    <div className="text-left">
-                      <div className="text-lg font-bold text-primary">
-                        {fund.spent.toLocaleString()} ر.س
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        {fund.percentage}% مصروف
-                      </div>
-                    </div>
+                    <Progress value={fund.percentage} className="h-2" />
                   </div>
-                  <Progress value={fund.percentage} className="h-2" />
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -212,16 +226,20 @@ const Funds = () => {
             <CardTitle className="text-xl font-bold">التوزيعات الأخيرة</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {isLoading ? (
-                <div className="text-center py-8 text-muted-foreground">جاري التحميل...</div>
-              ) : distributions.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  لا يوجد توزيعات حالياً. قم بإنشاء توزيع جديد.
-                </div>
-              ) : (
-                distributions.map((dist) => (
-                <div
+            {distributionsLoading ? (
+              <CardLoadingSkeleton />
+            ) : distributions.length === 0 ? (
+              <EmptyState
+                icon={PieChart}
+                title="لا يوجد توزيعات"
+                description="لا يوجد توزيعات حالياً. قم بإنشاء توزيع جديد."
+                actionLabel="توزيع جديد"
+                onAction={() => setDistributionDialogOpen(true)}
+              />
+            ) : (
+              <div className="space-y-4">
+                {distributions.map((dist) => (
+                  <div
                     key={dist.id}
                     className="flex items-center justify-between p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
                   >
@@ -252,9 +270,9 @@ const Funds = () => {
                       </div>
                     </div>
                   </div>
-                ))
-              )}
-            </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
 

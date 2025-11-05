@@ -347,6 +347,48 @@ export type Database = {
         }
         Relationships: []
       }
+      funds: {
+        Row: {
+          allocated_amount: number
+          beneficiaries_count: number
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          percentage: number
+          spent_amount: number
+          updated_at: string
+        }
+        Insert: {
+          allocated_amount?: number
+          beneficiaries_count?: number
+          category: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          percentage?: number
+          spent_amount?: number
+          updated_at?: string
+        }
+        Update: {
+          allocated_amount?: number
+          beneficiaries_count?: number
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          percentage?: number
+          spent_amount?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       invoice_lines: {
         Row: {
           account_id: string | null

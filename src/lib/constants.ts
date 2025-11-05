@@ -111,6 +111,9 @@ export const QUERY_KEYS = {
   APPROVALS: "approvals",
   DASHBOARD_STATS: "dashboard_stats",
   ACCOUNTING_STATS: "accounting_stats",
+  FUNDS: "funds",
+  FOLDERS: "folders",
+  DOCUMENTS: "documents",
 } as const;
 
 // Local Storage Keys
