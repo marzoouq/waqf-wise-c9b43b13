@@ -1,37 +1,11 @@
-import { Building2, Users, Wallet, FileText, TrendingUp, AlertCircle } from "lucide-react";
+import { Building2, Users, Wallet, FileText, AlertCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import FinancialStats from "@/components/dashboard/FinancialStats";
+import RevenueExpenseChart from "@/components/dashboard/RevenueExpenseChart";
+import AccountDistributionChart from "@/components/dashboard/AccountDistributionChart";
+import BudgetComparisonChart from "@/components/dashboard/BudgetComparisonChart";
 
 const Dashboard = () => {
-  const stats = [
-    {
-      title: "إجمالي المستفيدين",
-      value: "1,247",
-      icon: Users,
-      trend: "+12.5%",
-      trendUp: true,
-    },
-    {
-      title: "إجمالي العقارات",
-      value: "89",
-      icon: Building2,
-      trend: "+3.2%",
-      trendUp: true,
-    },
-    {
-      title: "إجمالي الأموال",
-      value: "2,450,000 ر.س",
-      icon: Wallet,
-      trend: "+8.3%",
-      trendUp: true,
-    },
-    {
-      title: "المستندات المؤرشفة",
-      value: "3,456",
-      icon: FileText,
-      trend: "+15.7%",
-      trendUp: true,
-    },
-  ];
 
   const recentActivities = [
     { id: 1, action: "إضافة مستفيد جديد", user: "أحمد محمد", time: "منذ 5 دقائق" },
@@ -60,36 +34,16 @@ const Dashboard = () => {
           </p>
         </header>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {stats.map((stat) => {
-            const Icon = stat.icon;
-            return (
-              <Card key={stat.title} className="shadow-soft hover:shadow-medium transition-all duration-300">
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
-                    {stat.title}
-                  </CardTitle>
-                  <div className="p-2 bg-primary/10 rounded-lg">
-                    <Icon className="h-5 w-5 text-primary" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-baseline justify-between">
-                    <div className="text-3xl font-bold text-foreground">
-                      {stat.value}
-                    </div>
-                    <div className={`flex items-center gap-1 text-sm font-medium ${
-                      stat.trendUp ? 'text-success' : 'text-destructive'
-                    }`}>
-                      <TrendingUp className="h-4 w-4" />
-                      {stat.trend}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+        {/* Financial Stats */}
+        <FinancialStats />
+
+        {/* Revenue & Expense Chart */}
+        <RevenueExpenseChart />
+
+        {/* Charts Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <AccountDistributionChart />
+          <BudgetComparisonChart />
         </div>
 
         {/* Two Column Layout */}
