@@ -122,6 +122,29 @@ export const createFolderSchema = z.object({
   description: commonValidation.optionalString(),
 });
 
+// Fund Schema
+export const fundSchema = z.object({
+  name: commonValidation.requiredString("اسم الصندوق مطلوب"),
+  allocated_amount: commonValidation.amount("المبلغ المخصص مطلوب"),
+  percentage: commonValidation.percentage(),
+  category: commonValidation.requiredString("الفئة مطلوبة"),
+  description: commonValidation.optionalString(),
+});
+
+// Document Schema
+export const documentSchema = z.object({
+  name: commonValidation.requiredString("اسم المستند مطلوب"),
+  file_type: commonValidation.requiredString("نوع الملف مطلوب"),
+  category: commonValidation.requiredString("الفئة مطلوبة"),
+  description: commonValidation.optionalString(),
+});
+
+// Folder Schema
+export const folderSchema = z.object({
+  name: commonValidation.requiredString("اسم المجلد مطلوب"),
+  description: commonValidation.optionalString(),
+});
+
 export type BeneficiaryFormValues = z.infer<typeof beneficiarySchema>;
 export type PropertyFormValues = z.infer<typeof propertySchema>;
 export type PaymentFormValues = z.infer<typeof paymentSchema>;
@@ -130,3 +153,6 @@ export type SimulationFormValues = z.infer<typeof simulationSchema>;
 export type ProfileFormValues = z.infer<typeof profileSchema>;
 export type UploadDocumentFormValues = z.infer<typeof uploadDocumentSchema>;
 export type CreateFolderFormValues = z.infer<typeof createFolderSchema>;
+export type FundFormValues = z.infer<typeof fundSchema>;
+export type DocumentFormValues = z.infer<typeof documentSchema>;
+export type FolderFormValues = z.infer<typeof folderSchema>;

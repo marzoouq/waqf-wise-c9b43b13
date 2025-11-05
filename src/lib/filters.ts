@@ -158,3 +158,50 @@ export function getPaginationMeta(totalItems: number, page: number, pageSize: nu
     endIndex: Math.min(page * pageSize, totalItems),
   };
 }
+
+/**
+ * Filter by status
+ */
+export function filterByStatus<T extends { status: string }>(
+  items: T[],
+  status: string
+): T[] {
+  if (status === "all") return items;
+  return items.filter((item) => item.status === status);
+}
+
+/**
+ * Filter by date range
+ */
+export function filterByDateRange<T extends { date: string }>(
+  items: T[],
+  dateFrom?: string,
+  dateTo?: string
+): T[] {
+  if (!dateFrom && !dateTo) return items;
+  
+  return items.filter((item) => {
+    const itemDate = new Date(item.date);
+    if (dateFrom && itemDate < new Date(dateFrom)) return false;
+    if (dateTo && itemDate > new Date(dateTo)) return false;
+    return true;
+  });
+}
+
+/**
+ * Search by text
+ */
+export function searchByText<T extends Record<string, any>>(
+  items: T[],
+  query: string,
+  fields: (keyof T)[]
+): T[] {
+  if (!query) return items;
+  
+  const lowerQuery = query.toLowerCase();
+  return items.filter((item) =>
+    fields.some((field) =>
+      String(item[field]).toLowerCase().includes(lowerQuery)
+    )
+  );
+}
