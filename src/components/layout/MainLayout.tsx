@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import AppSidebar from "./Sidebar";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { Menu } from "lucide-react";
+import { NotificationsBell } from "./NotificationsBell";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -24,6 +25,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                   منصة الوقف
                 </h1>
               </div>
+              <NotificationsBell />
             </header>
 
             {/* Desktop Toggle */}
