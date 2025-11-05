@@ -18,9 +18,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import BeneficiaryDialog from "@/components/beneficiaries/BeneficiaryDialog";
 
 const Beneficiaries = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedBeneficiary, setSelectedBeneficiary] = useState<any>(null);
 
   const beneficiaries = [
     {
@@ -31,6 +34,9 @@ const Beneficiaries = () => {
       category: "الفئة الأولى",
       status: "نشط",
       phone: "0501234567",
+      email: "ahmad@example.com",
+      address: "الرياض - حي النخيل",
+      notes: "مستفيد منتظم",
       totalPayments: "12,000 ر.س",
     },
     {
@@ -41,6 +47,9 @@ const Beneficiaries = () => {
       category: "الفئة الثانية",
       status: "نشط",
       phone: "0507654321",
+      email: "fatima@example.com",
+      address: "جدة - حي الزهراء",
+      notes: "",
       totalPayments: "8,500 ر.س",
     },
     {
@@ -51,6 +60,9 @@ const Beneficiaries = () => {
       category: "الفئة الأولى",
       status: "معلق",
       phone: "0509876543",
+      email: "",
+      address: "الدمام - حي الفيصلية",
+      notes: "بحاجة إلى تحديث البيانات",
       totalPayments: "15,000 ر.س",
     },
     {
@@ -61,9 +73,27 @@ const Beneficiaries = () => {
       category: "الفئة الثالثة",
       status: "نشط",
       phone: "0502345678",
+      email: "sara@example.com",
+      address: "مكة المكرمة - حي العزيزية",
+      notes: "",
       totalPayments: "6,200 ر.س",
     },
   ];
+
+  const handleAddBeneficiary = () => {
+    setSelectedBeneficiary(null);
+    setDialogOpen(true);
+  };
+
+  const handleEditBeneficiary = (beneficiary: any) => {
+    setSelectedBeneficiary(beneficiary);
+    setDialogOpen(true);
+  };
+
+  const handleSaveBeneficiary = (data: any) => {
+    console.log("Saving beneficiary:", data);
+    // TODO: Save to database using Supabase
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -78,7 +108,10 @@ const Beneficiaries = () => {
               إدارة حسابات المستفيدين والموقوف عليهم
             </p>
           </div>
-          <Button className="bg-primary hover:bg-primary-hover text-primary-foreground shadow-soft hover:shadow-medium transition-all duration-300 w-full md:w-auto">
+          <Button 
+            className="bg-primary hover:bg-primary-hover text-primary-foreground shadow-soft hover:shadow-medium transition-all duration-300 w-full md:w-auto"
+            onClick={handleAddBeneficiary}
+          >
             <Plus className="ml-2 h-4 w-4 md:h-5 md:w-5" />
             <span className="text-sm md:text-base">إضافة مستفيد جديد</span>
           </Button>
@@ -239,8 +272,12 @@ const Beneficiaries = () => {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="start">
-                            <DropdownMenuItem>عرض التفاصيل</DropdownMenuItem>
-                            <DropdownMenuItem>تعديل البيانات</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleEditBeneficiary(beneficiary)}>
+                              عرض التفاصيل
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleEditBeneficiary(beneficiary)}>
+                              تعديل البيانات
+                            </DropdownMenuItem>
                             <DropdownMenuItem>سجل النشاط</DropdownMenuItem>
                             <DropdownMenuItem>المستندات</DropdownMenuItem>
                             <DropdownMenuItem className="text-destructive">
@@ -256,6 +293,14 @@ const Beneficiaries = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Beneficiary Dialog */}
+        <BeneficiaryDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          beneficiary={selectedBeneficiary}
+          onSave={handleSaveBeneficiary}
+        />
       </div>
     </div>
   );
