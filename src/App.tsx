@@ -9,6 +9,7 @@ import Beneficiaries from "./pages/Beneficiaries";
 import Properties from "./pages/Properties";
 import Funds from "./pages/Funds";
 import Archive from "./pages/Archive";
+import Accounting from "./pages/Accounting";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -28,6 +29,7 @@ const App = () => (
             <Route path="/properties" element={<Properties />} />
             <Route path="/funds" element={<Funds />} />
             <Route path="/archive" element={<Archive />} />
+            <Route path="/accounting" element={<Accounting />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/settings" element={<Settings />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
