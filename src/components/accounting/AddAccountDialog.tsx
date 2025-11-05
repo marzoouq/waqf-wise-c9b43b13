@@ -232,14 +232,17 @@ const AddAccountDialog = ({ open, onOpenChange, account, accounts }: Props) => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>الحساب الأب</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+                    <Select 
+                      onValueChange={(value) => field.onChange(value === "none" ? undefined : value)} 
+                      value={field.value || "none"}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="لا يوجد (حساب رئيسي)" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="">لا يوجد (حساب رئيسي)</SelectItem>
+                        <SelectItem value="none">لا يوجد (حساب رئيسي)</SelectItem>
                         {accounts
                           ?.filter(
                             (acc) => acc.is_header && (!account || acc.id !== account.id)
