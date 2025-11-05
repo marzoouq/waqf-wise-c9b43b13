@@ -18,7 +18,7 @@ import { ar } from "date-fns/locale";
 export const NotificationsBell = () => {
   const navigate = useNavigate();
 
-  // Get pending approvals
+  // Get pending approvals - optimized with staleTime
   const { data: pendingApprovals } = useQuery({
     queryKey: ["pending-approvals"],
     queryFn: async () => {
@@ -31,10 +31,11 @@ export const NotificationsBell = () => {
       if (error) throw error;
       return data;
     },
-    refetchInterval: 30000, // Refetch every 30 seconds
+    staleTime: 2 * 60 * 1000, // Consider data fresh for 2 minutes
+    refetchInterval: 3 * 60 * 1000, // Refetch every 3 minutes (less aggressive)
   });
 
-  // Get overdue invoices
+  // Get overdue invoices - optimized with staleTime
   const { data: overdueInvoices } = useQuery({
     queryKey: ["overdue-invoices"],
     queryFn: async () => {
@@ -50,10 +51,11 @@ export const NotificationsBell = () => {
       if (error) throw error;
       return data;
     },
-    refetchInterval: 60000, // Refetch every minute
+    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
+    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
   });
 
-  // Get unbalanced journal entries
+  // Get unbalanced journal entries - optimized
   const { data: unbalancedEntries } = useQuery({
     queryKey: ["unbalanced-entries"],
     queryFn: async () => {
@@ -61,10 +63,12 @@ export const NotificationsBell = () => {
         .from("journal_entries")
         .select("*, journal_entry_lines(*)")
         .eq("status", "draft")
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .limit(20); // Limit at query level for better performance
 
       if (error) throw error;
 
+      // Filter unbalanced entries
       const unbalanced = entries.filter((entry: any) => {
         const totalDebit = entry.journal_entry_lines.reduce(
           (sum: number, line: any) => sum + Number(line.debit_amount),
@@ -79,7 +83,8 @@ export const NotificationsBell = () => {
 
       return unbalanced.slice(0, 5);
     },
-    refetchInterval: 60000,
+    staleTime: 2 * 60 * 1000, // Consider data fresh for 2 minutes
+    refetchInterval: 3 * 60 * 1000, // Refetch every 3 minutes
   });
 
   const totalNotifications =

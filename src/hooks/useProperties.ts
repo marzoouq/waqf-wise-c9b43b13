@@ -31,6 +31,7 @@ export function useProperties() {
       if (error) throw error;
       return data as Property[];
     },
+    staleTime: 3 * 60 * 1000, // Data stays fresh for 3 minutes
   });
 
   const addProperty = useMutation({

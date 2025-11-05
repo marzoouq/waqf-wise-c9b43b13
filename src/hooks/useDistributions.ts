@@ -29,6 +29,7 @@ export function useDistributions() {
       if (error) throw error;
       return data as Distribution[];
     },
+    staleTime: 3 * 60 * 1000, // Data stays fresh for 3 minutes
   });
 
   const addDistribution = useMutation({

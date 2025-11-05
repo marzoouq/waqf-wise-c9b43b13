@@ -32,6 +32,7 @@ export function useBeneficiaries() {
       if (error) throw error;
       return data as Beneficiary[];
     },
+    staleTime: 3 * 60 * 1000, // Data stays fresh for 3 minutes
   });
 
   const addBeneficiary = useMutation({
