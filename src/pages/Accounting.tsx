@@ -19,7 +19,7 @@ const Accounting = () => {
   const [activeTab, setActiveTab] = useState("accounts");
 
   return (
-    <div className="container mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
+    <div className="container mx-auto p-6 md:p-8 lg:p-10 space-y-6 md:space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold">النظام المحاسبي</h1>

@@ -66,7 +66,7 @@ const Settings = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-4 md:p-6 space-y-4 md:space-y-6">
+      <div className="container mx-auto p-6 md:p-8 lg:p-10 space-y-6 md:space-y-8">
         {/* Header */}
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-gradient-primary">
