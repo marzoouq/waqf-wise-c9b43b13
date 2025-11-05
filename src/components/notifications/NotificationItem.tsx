@@ -1,0 +1,92 @@
+import { Bell, CheckCircle, AlertCircle, DollarSign, FileText, Users } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+import { ar } from "date-fns/locale";
+import { cn } from "@/lib/utils";
+import type { Notification } from "@/hooks/useNotifications";
+
+interface NotificationItemProps {
+  notification: Notification;
+  onMarkAsRead: (id: string) => void;
+  onClick?: () => void;
+}
+
+const getNotificationIcon = (type: Notification["type"]) => {
+  switch (type) {
+    case "approval":
+      return <CheckCircle className="w-5 h-5 text-green-600" />;
+    case "payment":
+      return <DollarSign className="w-5 h-5 text-blue-600" />;
+    case "journal_entry":
+      return <FileText className="w-5 h-5 text-purple-600" />;
+    case "distribution":
+      return <Users className="w-5 h-5 text-orange-600" />;
+    case "system":
+      return <AlertCircle className="w-5 h-5 text-yellow-600" />;
+    default:
+      return <Bell className="w-5 h-5 text-gray-600" />;
+  }
+};
+
+const getNotificationBg = (type: Notification["type"]) => {
+  switch (type) {
+    case "approval":
+      return "bg-green-50 dark:bg-green-950";
+    case "payment":
+      return "bg-blue-50 dark:bg-blue-950";
+    case "journal_entry":
+      return "bg-purple-50 dark:bg-purple-950";
+    case "distribution":
+      return "bg-orange-50 dark:bg-orange-950";
+    case "system":
+      return "bg-yellow-50 dark:bg-yellow-950";
+    default:
+      return "bg-gray-50 dark:bg-gray-950";
+  }
+};
+
+export const NotificationItem = ({ notification, onMarkAsRead, onClick }: NotificationItemProps) => {
+  const handleClick = () => {
+    if (!notification.is_read) {
+      onMarkAsRead(notification.id);
+    }
+    onClick?.();
+  };
+
+  return (
+    <div
+      onClick={handleClick}
+      className={cn(
+        "p-4 hover:bg-accent cursor-pointer transition-colors border-b last:border-b-0",
+        !notification.is_read && "bg-accent/50"
+      )}
+    >
+      <div className="flex gap-3">
+        <div className={cn("p-2 rounded-full h-fit", getNotificationBg(notification.type))}>
+          {getNotificationIcon(notification.type)}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2">
+            <h4 className={cn(
+              "text-sm font-medium",
+              !notification.is_read && "font-semibold"
+            )}>
+              {notification.title}
+            </h4>
+            {!notification.is_read && (
+              <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-1" />
+            )}
+          </div>
+          <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+            {notification.message}
+          </p>
+          <p className="text-xs text-muted-foreground mt-2">
+            {formatDistanceToNow(new Date(notification.created_at), {
+              addSuffix: true,
+              locale: ar,
+            })}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};

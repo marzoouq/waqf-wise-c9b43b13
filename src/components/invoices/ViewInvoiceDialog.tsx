@@ -24,6 +24,8 @@ import { ar } from "date-fns/locale";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { COMPANY_INFO } from "@/lib/constants";
+import { ZATCAQRCode } from "./ZATCAQRCode";
+import { formatZATCADate, formatZATCACurrency } from "@/lib/zatca";
 
 interface ViewInvoiceDialogProps {
   invoiceId: string | null;
@@ -406,6 +408,20 @@ export const ViewInvoiceDialog = ({
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* ZATCA QR Code */}
+          <div className="print:hidden">
+            <ZATCAQRCode
+              data={{
+                sellerName: COMPANY_INFO.NAME_AR,
+                sellerVatNumber: COMPANY_INFO.TAX_NUMBER,
+                invoiceDate: formatZATCADate(new Date(invoice.invoice_date)),
+                invoiceTotal: formatZATCACurrency(Number(invoice.total_amount)),
+                vatTotal: formatZATCACurrency(Number(invoice.tax_amount)),
+              }}
+              size={200}
+            />
           </div>
 
           {/* Notes */}
