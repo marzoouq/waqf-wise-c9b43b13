@@ -208,27 +208,31 @@ All colors MUST be HSL.
 
 /* Print Styles */
 @media print {
+  /* Hide most elements by default */
   body * {
     visibility: hidden;
   }
   
+  /* Make invoice content and its children visible */
   #print-content,
   #print-content *,
   #invoice-print-content,
   #invoice-print-content * {
-    visibility: visible;
+    visibility: visible !important;
   }
   
+  /* Position the printable content at top */
   #print-content,
   #invoice-print-content {
     position: absolute;
     left: 0;
     top: 0;
     width: 100%;
-    background: white;
+    background: white !important;
     padding: 20px;
   }
   
+  /* Override hidden classes */
   .print\:hidden {
     display: none !important;
   }
@@ -237,19 +241,53 @@ All colors MUST be HSL.
     display: block !important;
   }
   
+  /* Ensure backgrounds and borders show */
   .print\:bg-white {
     background-color: white !important;
+  }
+  
+  .print\:bg-gray-50 {
+    background-color: #f9fafb !important;
   }
   
   .print\:border {
     border: 1px solid black !important;
   }
   
+  .print\:border-2 {
+    border-width: 2px !important;
+  }
+  
+  .print\:border-primary {
+    border-color: hsl(150 45% 35%) !important;
+  }
+  
   .print\:border-black {
     border-color: black !important;
   }
   
+  .print\:bg-primary\/20 {
+    background-color: hsla(150, 45%, 35%, 0.2) !important;
+  }
+  
+  /* Remove shadows for cleaner print */
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  
+  /* Ensure tables print correctly */
+  table {
+    border-collapse: collapse !important;
+  }
+  
+  tr, td, th {
+    page-break-inside: avoid;
+  }
+  
+  /* Page settings */
   @page {
     margin: 1cm;
+    size: A4 portrait;
   }
 }

@@ -40,7 +40,7 @@ export const ViewInvoiceDialog = ({
 }: ViewInvoiceDialogProps) => {
   const queryClient = useQueryClient();
 
-  const { data: invoice, isLoading } = useQuery({
+  const { data: invoice, isLoading: invoiceLoading } = useQuery({
     queryKey: ["invoice", invoiceId],
     queryFn: async () => {
       if (!invoiceId) return null;
@@ -55,7 +55,7 @@ export const ViewInvoiceDialog = ({
     enabled: !!invoiceId,
   });
 
-  const { data: invoiceLines } = useQuery({
+  const { data: invoiceLines, isLoading: linesLoading } = useQuery({
     queryKey: ["invoice-lines", invoiceId],
     queryFn: async () => {
       if (!invoiceId) return [];
@@ -65,6 +65,7 @@ export const ViewInvoiceDialog = ({
         .eq("invoice_id", invoiceId)
         .order("line_number");
       if (error) throw error;
+      console.log("📋 Invoice Lines loaded:", data?.length || 0, "lines");
       return data;
     },
     enabled: !!invoiceId,
@@ -109,7 +110,19 @@ export const ViewInvoiceDialog = ({
   };
 
   const handleDownloadPDF = () => {
-    if (!invoice) return;
+    if (!invoice) {
+      console.error("❌ No invoice data");
+      return;
+    }
+    
+    // Check if invoice lines are loaded
+    if (!invoiceLines || invoiceLines.length === 0) {
+      console.error("❌ No invoice lines:", invoiceLines);
+      toast.error("لا يمكن تحميل الفاتورة: لا توجد بنود في الفاتورة");
+      return;
+    }
+
+    console.log("✅ Generating PDF with", invoiceLines.length, "lines");
 
     const doc = new jsPDF();
     
@@ -253,7 +266,7 @@ export const ViewInvoiceDialog = ({
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
-  if (isLoading || !invoice) {
+  if (invoiceLoading || linesLoading || !invoice) {
     return null;
   }
 
