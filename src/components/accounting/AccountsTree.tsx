@@ -15,6 +15,7 @@ type Account = {
   parent_id: string | null;
   account_type: string;
   account_nature: string;
+  description: string | null;
   is_active: boolean;
   is_header: boolean;
 };
