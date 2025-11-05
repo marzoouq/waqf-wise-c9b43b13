@@ -144,12 +144,12 @@ const Dashboard = () => {
                         {task.task}
                       </p>
                       <span
-                        className={`inline-block text-xs px-2 py-1 rounded-full ${
+                       className={`inline-block text-xs px-2.5 py-1 rounded-full font-medium ${
                           task.priority === "عالية"
-                            ? "bg-destructive/10 text-destructive"
+                            ? "bg-destructive/15 text-destructive border border-destructive/30"
                             : task.priority === "متوسطة"
-                            ? "bg-warning/10 text-warning"
-                            : "bg-muted text-muted-foreground"
+                            ? "bg-warning/15 text-warning border border-warning/30"
+                            : "bg-muted text-muted-foreground border border-border"
                         }`}
                       >
                         الأولوية: {task.priority}
@@ -163,27 +163,27 @@ const Dashboard = () => {
         </div>
 
         {/* Quick Actions */}
-        <Card className="shadow-soft bg-gradient-to-br from-primary/5 to-accent/5">
+        <Card className="shadow-soft bg-gradient-to-br from-primary/5 to-accent/5 border-primary/10">
           <CardHeader>
             <CardTitle className="text-lg md:text-xl font-bold">الإجراءات السريعة</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-              <button className="p-3 md:p-4 bg-card hover:bg-primary hover:text-primary-foreground rounded-lg shadow-soft transition-all duration-300 text-right">
-                <Users className="h-5 w-5 md:h-6 md:w-6 mb-2" />
-                <p className="font-medium text-xs md:text-sm">إضافة مستفيد</p>
+              <button className="group p-3 md:p-4 bg-card hover:bg-primary rounded-lg shadow-soft hover:shadow-medium transition-all duration-300 text-right border border-transparent hover:border-primary">
+                <Users className="h-5 w-5 md:h-6 md:w-6 mb-2 text-primary group-hover:text-primary-foreground transition-colors" />
+                <p className="font-medium text-xs md:text-sm text-foreground group-hover:text-primary-foreground transition-colors">إضافة مستفيد</p>
               </button>
-              <button className="p-3 md:p-4 bg-card hover:bg-primary hover:text-primary-foreground rounded-lg shadow-soft transition-all duration-300 text-right">
-                <Building2 className="h-5 w-5 md:h-6 md:w-6 mb-2" />
-                <p className="font-medium text-xs md:text-sm">إضافة عقار</p>
+              <button className="group p-3 md:p-4 bg-card hover:bg-primary rounded-lg shadow-soft hover:shadow-medium transition-all duration-300 text-right border border-transparent hover:border-primary">
+                <Building2 className="h-5 w-5 md:h-6 md:w-6 mb-2 text-primary group-hover:text-primary-foreground transition-colors" />
+                <p className="font-medium text-xs md:text-sm text-foreground group-hover:text-primary-foreground transition-colors">إضافة عقار</p>
               </button>
-              <button className="p-3 md:p-4 bg-card hover:bg-primary hover:text-primary-foreground rounded-lg shadow-soft transition-all duration-300 text-right">
-                <Wallet className="h-5 w-5 md:h-6 md:w-6 mb-2" />
-                <p className="font-medium text-xs md:text-sm">توزيع الغلة</p>
+              <button className="group p-3 md:p-4 bg-card hover:bg-primary rounded-lg shadow-soft hover:shadow-medium transition-all duration-300 text-right border border-transparent hover:border-primary">
+                <Wallet className="h-5 w-5 md:h-6 md:w-6 mb-2 text-primary group-hover:text-primary-foreground transition-colors" />
+                <p className="font-medium text-xs md:text-sm text-foreground group-hover:text-primary-foreground transition-colors">توزيع الغلة</p>
               </button>
-              <button className="p-3 md:p-4 bg-card hover:bg-primary hover:text-primary-foreground rounded-lg shadow-soft transition-all duration-300 text-right">
-                <FileText className="h-5 w-5 md:h-6 md:w-6 mb-2" />
-                <p className="font-medium text-xs md:text-sm">إنشاء تقرير</p>
+              <button className="group p-3 md:p-4 bg-card hover:bg-primary rounded-lg shadow-soft hover:shadow-medium transition-all duration-300 text-right border border-transparent hover:border-primary">
+                <FileText className="h-5 w-5 md:h-6 md:w-6 mb-2 text-primary group-hover:text-primary-foreground transition-colors" />
+                <p className="font-medium text-xs md:text-sm text-foreground group-hover:text-primary-foreground transition-colors">إنشاء تقرير</p>
               </button>
             </div>
           </CardContent>

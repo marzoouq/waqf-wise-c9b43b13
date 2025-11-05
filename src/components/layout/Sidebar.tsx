@@ -41,21 +41,21 @@ const AppSidebar = () => {
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader className="border-b border-sidebar-border p-4">
+      <SidebarHeader className="border-b border-sidebar-border p-4 bg-sidebar-accent/30">
         {!isCollapsed && (
           <div className="space-y-1">
             <h2 className="text-xl font-bold text-sidebar-foreground">
               منصة الوقف
             </h2>
-            <p className="text-xs text-sidebar-foreground/60">
+            <p className="text-xs text-sidebar-foreground/80">
               نظام إدارة متكامل
             </p>
           </div>
         )}
         {isCollapsed && (
           <div className="flex justify-center">
-            <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
-              <span className="text-primary font-bold text-sm">و</span>
+            <div className="h-8 w-8 rounded-full bg-accent/20 flex items-center justify-center">
+              <span className="text-accent font-bold text-sm">و</span>
             </div>
           </div>
         )}
@@ -90,17 +90,17 @@ const AppSidebar = () => {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-sidebar-border p-4">
+      <SidebarFooter className="border-t border-sidebar-border p-4 bg-sidebar-accent/30">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-            <span className="text-primary font-bold text-sm">ن</span>
+          <div className="h-10 w-10 rounded-full bg-accent/30 flex items-center justify-center flex-shrink-0 border-2 border-accent/50">
+            <span className="text-accent font-bold">ن</span>
           </div>
           {!isCollapsed && (
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-sidebar-foreground truncate">
+              <p className="text-sm font-semibold text-sidebar-foreground truncate">
                 الناظر
               </p>
-              <p className="text-xs text-sidebar-foreground/60 truncate">
+              <p className="text-xs text-sidebar-foreground/90 truncate">
                 admin@waqf.sa
               </p>
             </div>
