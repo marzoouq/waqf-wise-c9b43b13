@@ -1,15 +1,8 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CustomReportDialog } from "@/components/reports/CustomReportDialog";
 import { IncomeStatement } from "@/components/reports/IncomeStatement";
 import { BalanceSheet } from "@/components/reports/BalanceSheet";
-import { useState } from "react";
 
 const Reports = () => {
-  const [reportDialogOpen, setReportDialogOpen] = useState(false);
-
-  const handleGenerateCustomReport = (data: any) => {
-    console.log("Generating custom report:", data);
-  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -55,12 +48,6 @@ const Reports = () => {
             </div>
           </TabsContent>
         </Tabs>
-
-        <CustomReportDialog
-          open={reportDialogOpen}
-          onOpenChange={setReportDialogOpen}
-          onGenerate={handleGenerateCustomReport}
-        />
       </div>
     </div>
   );

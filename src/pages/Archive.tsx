@@ -54,14 +54,6 @@ const Archive = () => {
     },
   ];
 
-  const handleUpload = (data: any) => {
-    console.log("Document uploaded:", data);
-  };
-
-  const handleCreateFolder = (data: any) => {
-    console.log("Folder created:", data);
-  };
-
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto p-4 md:p-6 space-y-4 md:space-y-6">
@@ -232,13 +224,13 @@ const Archive = () => {
         <UploadDocumentDialog
           open={uploadDialogOpen}
           onOpenChange={setUploadDialogOpen}
-          onUpload={handleUpload}
+          onUpload={() => {}}
         />
 
         <CreateFolderDialog
           open={folderDialogOpen}
           onOpenChange={setFolderDialogOpen}
-          onCreate={handleCreateFolder}
+          onCreate={() => {}}
         />
       </div>
     </div>
