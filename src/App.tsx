@@ -8,6 +8,16 @@ import MainLayout from "./components/layout/MainLayout";
 import ErrorBoundary from "./components/shared/ErrorBoundary";
 import { LoadingState } from "./components/shared/LoadingState";
 
+// Lazy load React Query DevTools (TanStack recommended pattern)
+const ReactQueryDevtools =
+  import.meta.env.DEV
+    ? lazy(() =>
+        import("@tanstack/react-query-devtools").then((d) => ({
+          default: d.ReactQueryDevtools,
+        }))
+      )
+    : null;
+
 // Lazy load pages for better performance
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Beneficiaries = lazy(() => import("./pages/Beneficiaries"));
@@ -63,6 +73,16 @@ const App = () => (
           </MainLayout>
         </BrowserRouter>
       </TooltipProvider>
+      
+      {/* React Query DevTools - Lazy loaded, only in development */}
+      {import.meta.env.DEV && ReactQueryDevtools && (
+        <Suspense fallback={null}>
+          <ReactQueryDevtools 
+            initialIsOpen={false}
+            buttonPosition="bottom-right"
+          />
+        </Suspense>
+      )}
     </QueryClientProvider>
   </ErrorBoundary>
 );

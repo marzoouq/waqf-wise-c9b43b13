@@ -60,6 +60,35 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
+## 🛠️ Development Tools
+
+### React Query DevTools
+
+أداة تطوير لمراقبة ومتابعة الـ cache والـ queries في التطبيق.
+
+**التفعيل:**
+- تظهر تلقائيًا في Development Mode فقط
+- موقع الزر: أسفل يمين الشاشة
+- لا تؤثر على Production Build (حجم 0KB في production)
+
+**الاستخدام:**
+1. انقر على أيقونة React Query أسفل الشاشة
+2. راقب جميع الـ queries والـ mutations
+3. افحص حالة الـ cache
+4. قم بـ invalidate أو refetch يدويًا للبيانات
+
+**معلومات إضافية:**
+```js
+// في console المتصفح
+toggleQueryDevtools() // لعرض معلومات عن الأداة
+```
+
+**المزايا:**
+- ✅ Lazy Loading: لا تُحمّل في production
+- ✅ Code Splitting: تحميل منفصل ومحسّن
+- ✅ Zero Bundle Impact: حجم 0KB في production
+- ✅ Type Safe: مع TypeScript definitions كاملة
+
 ## How can I deploy this project?
 
 Simply open [Lovable](https://lovable.dev/projects/7e9dbf7a-c129-486b-a449-d22a31562001) and click on Share -> Publish.
