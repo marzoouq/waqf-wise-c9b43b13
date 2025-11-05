@@ -15,20 +15,8 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { Navigate } from "react-router-dom";
 
 const Dashboard = () => {
+  // ALL HOOKS MUST BE CALLED FIRST - Before any conditional returns
   const { isBeneficiary, isAccountant, isLoading: roleLoading } = useUserRole();
-
-  // Redirect based on role
-  if (roleLoading) {
-    return <LoadingState message="جاري التحقق من الصلاحيات..." />;
-  }
-
-  if (isBeneficiary) {
-    return <Navigate to="/beneficiary-dashboard" replace />;
-  }
-
-  if (isAccountant) {
-    return <Navigate to="/accountant-dashboard" replace />;
-  }
   const { activities, isLoading: activitiesLoading } = useActivities();
   const { tasks, isLoading: tasksLoading } = useTasks();
 
@@ -42,8 +30,17 @@ const Dashboard = () => {
     return "bg-muted text-muted-foreground border border-border";
   }, []);
 
-  if (activitiesLoading || tasksLoading) {
+  // NOW we can do conditional returns after all hooks are called
+  if (roleLoading || activitiesLoading || tasksLoading) {
     return <LoadingState message="جاري تحميل لوحة التحكم..." />;
+  }
+
+  if (isBeneficiary) {
+    return <Navigate to="/beneficiary-dashboard" replace />;
+  }
+
+  if (isAccountant) {
+    return <Navigate to="/accountant-dashboard" replace />;
   }
 
   return (
