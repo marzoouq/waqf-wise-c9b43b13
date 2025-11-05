@@ -3,6 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Plus, Eye, FileText } from "lucide-react";
+import { AddInvoiceDialog } from "@/components/invoices/AddInvoiceDialog";
+import { ViewInvoiceDialog } from "@/components/invoices/ViewInvoiceDialog";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -26,6 +28,10 @@ type Invoice = {
 };
 
 const Invoices = () => {
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(null);
+
   const { data: invoices, isLoading } = useQuery({
     queryKey: ["invoices"],
     queryFn: async () => {
@@ -72,7 +78,7 @@ const Invoices = () => {
             </h1>
             <p className="text-muted-foreground mt-1">إدارة الفواتير والمقبوضات</p>
           </div>
-          <Button size="sm" className="w-full sm:w-auto">
+          <Button size="sm" className="w-full sm:w-auto" onClick={() => setAddDialogOpen(true)}>
             <Plus className="h-4 w-4 ml-2" />
             فاتورة جديدة
           </Button>
@@ -101,7 +107,7 @@ const Invoices = () => {
                         <p className="text-sm text-muted-foreground mb-4">
                           ابدأ بإنشاء أول فاتورة لتتبع المقبوضات والمبيعات
                         </p>
-                        <Button size="sm">
+                        <Button size="sm" onClick={() => setAddDialogOpen(true)}>
                           <Plus className="h-4 w-4 ml-2" />
                           إنشاء فاتورة
                         </Button>
@@ -129,7 +135,14 @@ const Invoices = () => {
                     <TableCell>{getStatusBadge(invoice.status)}</TableCell>
                     <TableCell>
                       <div className="flex gap-2 justify-end">
-                        <Button variant="ghost" size="sm">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => {
+                            setSelectedInvoiceId(invoice.id);
+                            setViewDialogOpen(true);
+                          }}
+                        >
                           <Eye className="h-4 w-4" />
                         </Button>
                       </div>
@@ -140,6 +153,13 @@ const Invoices = () => {
             </TableBody>
           </Table>
         </div>
+
+        <AddInvoiceDialog open={addDialogOpen} onOpenChange={setAddDialogOpen} />
+        <ViewInvoiceDialog 
+          invoiceId={selectedInvoiceId} 
+          open={viewDialogOpen} 
+          onOpenChange={setViewDialogOpen} 
+        />
       </div>
     </div>
   );
