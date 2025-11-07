@@ -86,7 +86,6 @@ export const useNotifications = () => {
           table: "notifications",
         },
         (payload) => {
-          console.log("New notification:", payload);
           const newNotification = payload.new as Notification;
           
           // Show toast notification

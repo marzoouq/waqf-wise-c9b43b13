@@ -65,7 +65,6 @@ export const ViewInvoiceDialog = ({
         .eq("invoice_id", invoiceId)
         .order("line_number");
       if (error) throw error;
-      console.log("📋 Invoice Lines loaded:", data?.length || 0, "lines");
       return data;
     },
     enabled: !!invoiceId,
@@ -106,12 +105,6 @@ export const ViewInvoiceDialog = ({
   });
 
   const handlePrint = () => {
-    console.log("🖨️ Print triggered");
-    console.log("📋 Invoice:", invoice);
-    console.log("📝 Lines:", invoiceLines?.length || 0);
-    console.log("📊 Invoice data loaded:", !!invoice);
-    console.log("📋 Lines data loaded:", !!invoiceLines);
-    
     if (!invoice || !invoiceLines) {
       toast.error("الرجاء الانتظار حتى يتم تحميل البيانات");
       return;
@@ -160,12 +153,9 @@ export const ViewInvoiceDialog = ({
     
     // Check if invoice lines are loaded
     if (!invoiceLines || invoiceLines.length === 0) {
-      console.error("❌ No invoice lines:", invoiceLines);
       toast.error("الرجاء الانتظار حتى يتم تحميل بنود الفاتورة");
       return;
     }
-
-    console.log("✅ Generating PDF with", invoiceLines.length, "lines");
 
     // انتظر قليلاً للتأكد من رسم كل العناصر
     setTimeout(() => {

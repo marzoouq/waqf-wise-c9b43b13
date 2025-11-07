@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 import {
   Table,
   TableBody,
@@ -22,6 +23,7 @@ import { Pagination } from "@/components/ui/pagination";
 const ITEMS_PER_PAGE = 20;
 
 const Payments = () => {
+  const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<any>(null);
@@ -112,8 +114,10 @@ const Payments = () => {
   }, [deletePayment]);
 
   const handlePrint = (payment: any) => {
-    // TODO: Implement print functionality
-    console.log("Print payment:", payment);
+    toast({
+      title: "قريباً",
+      description: "سيتم إضافة وظيفة الطباعة قريباً",
+    });
   };
 
   const getPaymentMethodLabel = (method: string) => {
