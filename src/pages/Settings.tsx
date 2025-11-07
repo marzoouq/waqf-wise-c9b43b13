@@ -2,20 +2,47 @@ import { useState } from "react";
 import { User, Bell, Shield, Database, Palette, Globe } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProfileDialog } from "@/components/settings/ProfileDialog";
+import { NotificationsSettingsDialog } from "@/components/settings/NotificationsSettingsDialog";
+import { SecuritySettingsDialog } from "@/components/settings/SecuritySettingsDialog";
+import { DatabaseSettingsDialog } from "@/components/settings/DatabaseSettingsDialog";
+import { AppearanceSettingsDialog } from "@/components/settings/AppearanceSettingsDialog";
+import { LanguageSettingsDialog } from "@/components/settings/LanguageSettingsDialog";
 import { useToast } from "@/hooks/use-toast";
 
 const Settings = () => {
   const { toast } = useToast();
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
+  const [notificationsDialogOpen, setNotificationsDialogOpen] = useState(false);
+  const [securityDialogOpen, setSecurityDialogOpen] = useState(false);
+  const [databaseDialogOpen, setDatabaseDialogOpen] = useState(false);
+  const [appearanceDialogOpen, setAppearanceDialogOpen] = useState(false);
+  const [languageDialogOpen, setLanguageDialogOpen] = useState(false);
 
   const handleSectionClick = (sectionTitle: string) => {
-    if (sectionTitle === "الملف الشخصي") {
-      setProfileDialogOpen(true);
-    } else {
-      toast({
-        title: `إعدادات ${sectionTitle}`,
-        description: "هذه الميزة قيد التطوير",
-      });
+    switch (sectionTitle) {
+      case "الملف الشخصي":
+        setProfileDialogOpen(true);
+        break;
+      case "الإشعارات":
+        setNotificationsDialogOpen(true);
+        break;
+      case "الأمان والخصوصية":
+        setSecurityDialogOpen(true);
+        break;
+      case "قاعدة البيانات":
+        setDatabaseDialogOpen(true);
+        break;
+      case "المظهر":
+        setAppearanceDialogOpen(true);
+        break;
+      case "اللغة والمنطقة":
+        setLanguageDialogOpen(true);
+        break;
+      default:
+        toast({
+          title: `إعدادات ${sectionTitle}`,
+          description: "هذه الميزة قيد التطوير",
+        });
     }
   };
 
@@ -133,6 +160,26 @@ const Settings = () => {
         <ProfileDialog
           open={profileDialogOpen}
           onOpenChange={setProfileDialogOpen}
+        />
+        <NotificationsSettingsDialog
+          open={notificationsDialogOpen}
+          onOpenChange={setNotificationsDialogOpen}
+        />
+        <SecuritySettingsDialog
+          open={securityDialogOpen}
+          onOpenChange={setSecurityDialogOpen}
+        />
+        <DatabaseSettingsDialog
+          open={databaseDialogOpen}
+          onOpenChange={setDatabaseDialogOpen}
+        />
+        <AppearanceSettingsDialog
+          open={appearanceDialogOpen}
+          onOpenChange={setAppearanceDialogOpen}
+        />
+        <LanguageSettingsDialog
+          open={languageDialogOpen}
+          onOpenChange={setLanguageDialogOpen}
         />
       </div>
     </div>
