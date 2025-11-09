@@ -53,7 +53,7 @@ const BudgetComparisonChart = () => {
 
       setData(chartData);
     } catch (error) {
-      console.error("Error fetching budget comparison:", error);
+      setData([]);
     } finally {
       setLoading(false);
     }

@@ -82,7 +82,7 @@ const Beneficiaries = () => {
       }
       setDialogOpen(false);
     } catch (error) {
-      console.error("Error saving beneficiary:", error);
+      // Error is handled by the mutation's onError callback
     }
   };
 

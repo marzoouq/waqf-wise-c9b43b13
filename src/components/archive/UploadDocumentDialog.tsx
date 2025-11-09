@@ -99,7 +99,7 @@ export function UploadDocumentDialog({
       form.reset();
       onOpenChange(false);
     } catch (error) {
-      console.error("Upload error:", error);
+      // Error is handled by the mutation's onError callback
     }
   };
 

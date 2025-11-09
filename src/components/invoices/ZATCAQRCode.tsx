@@ -35,7 +35,6 @@ export const ZATCAQRCode = ({ data, size = 256, className }: ZATCAQRCodeProps) =
         },
         (error) => {
           if (error) {
-            console.error("Error generating QR code:", error);
             toast.error("فشل في إنشاء رمز QR");
           }
         }
@@ -68,7 +67,6 @@ export const ZATCAQRCode = ({ data, size = 256, className }: ZATCAQRCodeProps) =
       
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
-      console.error("Error copying to clipboard:", error);
       toast.error("فشل في النسخ إلى الحافظة");
     }
   };

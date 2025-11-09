@@ -62,7 +62,7 @@ export function CreateFolderDialog({
       form.reset();
       onOpenChange(false);
     } catch (error) {
-      console.error("Create folder error:", error);
+      // Error is handled by the mutation's onError callback
     }
   };
 

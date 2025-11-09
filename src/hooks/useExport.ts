@@ -38,7 +38,6 @@ export function useExport() {
         description: `تم تصدير البيانات إلى ${options.format === "pdf" ? "PDF" : "Excel"}`,
       });
     } catch (error) {
-      console.error("Export error:", error);
       toast({
         title: "خطأ في التصدير",
         description: "حدث خطأ أثناء تصدير البيانات",

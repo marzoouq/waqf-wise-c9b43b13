@@ -95,7 +95,7 @@ const Properties = () => {
       }
       setDialogOpen(false);
     } catch (error) {
-      console.error("Error saving property:", error);
+      // Error is handled by the mutation's onError callback
     }
   };
 

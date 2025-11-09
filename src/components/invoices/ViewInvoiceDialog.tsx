@@ -139,14 +139,12 @@ export const ViewInvoiceDialog = ({
 
       toast.success("تم إرسال الفاتورة بنجاح");
     } catch (error: any) {
-      console.error("Error sending email:", error);
       toast.error("حدث خطأ أثناء إرسال الفاتورة: " + error.message);
     }
   };
 
   const handleDownloadPDF = () => {
     if (!invoice) {
-      console.error("❌ No invoice data");
       toast.error("الرجاء الانتظار حتى يتم تحميل بيانات الفاتورة");
       return;
     }

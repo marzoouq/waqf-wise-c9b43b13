@@ -78,7 +78,7 @@ const RevenueExpenseChart = () => {
 
       setData(chartData);
     } catch (error) {
-      console.error("Error fetching monthly data:", error);
+      setData([]);
     } finally {
       setLoading(false);
     }

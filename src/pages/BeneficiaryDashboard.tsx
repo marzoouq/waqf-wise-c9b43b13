@@ -60,7 +60,8 @@ const BeneficiaryDashboard = () => {
           setPayments(payData || []);
         }
       } catch (error) {
-        console.error("Error fetching beneficiary data:", error);
+        setBeneficiary(null);
+        setPayments([]);
       } finally {
         setLoading(false);
       }

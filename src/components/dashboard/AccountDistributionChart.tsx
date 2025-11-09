@@ -58,7 +58,7 @@ const AccountDistributionChart = () => {
 
       setData(chartData);
     } catch (error) {
-      console.error("Error fetching account distribution:", error);
+      setData([]);
     } finally {
       setLoading(false);
     }

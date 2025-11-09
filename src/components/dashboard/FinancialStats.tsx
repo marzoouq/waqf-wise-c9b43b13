@@ -75,7 +75,7 @@ const FinancialStats = () => {
         netIncome,
       });
     } catch (error) {
-      console.error("Error fetching financial data:", error);
+      setData(null);
     } finally {
       setLoading(false);
     }

@@ -80,7 +80,7 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
       });
       onOpenChange(false);
     } catch (error) {
-      console.error("Profile update error:", error);
+      // Error is handled by the mutation's onError callback
     }
   };
 
