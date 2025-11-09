@@ -52,13 +52,13 @@ export function DatabaseSettingsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto" aria-describedby="database-description">
         <DialogHeader>
           <DialogTitle className="text-xl flex items-center gap-2">
             <Database className="h-5 w-5" />
             إعدادات قاعدة البيانات
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription id="database-description">
             إدارة النسخ الاحتياطي واستعادة البيانات
           </DialogDescription>
         </DialogHeader>

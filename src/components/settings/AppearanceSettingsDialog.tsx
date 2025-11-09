@@ -74,13 +74,13 @@ export function AppearanceSettingsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto" aria-describedby="appearance-description">
         <DialogHeader>
           <DialogTitle className="text-xl flex items-center gap-2">
             <Palette className="h-5 w-5" />
             المظهر والثيم
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription id="appearance-description">
             تخصيص ألوان وسمة التطبيق
           </DialogDescription>
         </DialogHeader>
