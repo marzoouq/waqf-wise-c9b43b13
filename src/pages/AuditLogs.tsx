@@ -92,16 +92,16 @@ const AuditLogs = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
           <Select
-            value={filters.tableName}
+            value={filters.tableName || "all"}
             onValueChange={(value) =>
-              setFilters({ ...filters, tableName: value })
+              setFilters({ ...filters, tableName: value === "all" ? "" : value })
             }
           >
             <SelectTrigger>
               <SelectValue placeholder="الجدول" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">الكل</SelectItem>
+              <SelectItem value="all">الكل</SelectItem>
               <SelectItem value="beneficiaries">المستفيدون</SelectItem>
               <SelectItem value="families">العائلات</SelectItem>
               <SelectItem value="properties">العقارات</SelectItem>
@@ -111,16 +111,16 @@ const AuditLogs = () => {
           </Select>
 
           <Select
-            value={filters.actionType}
+            value={filters.actionType || "all"}
             onValueChange={(value) =>
-              setFilters({ ...filters, actionType: value })
+              setFilters({ ...filters, actionType: value === "all" ? "" : value })
             }
           >
             <SelectTrigger>
               <SelectValue placeholder="نوع العملية" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">الكل</SelectItem>
+              <SelectItem value="all">الكل</SelectItem>
               <SelectItem value="INSERT">إضافة</SelectItem>
               <SelectItem value="UPDATE">تحديث</SelectItem>
               <SelectItem value="DELETE">حذف</SelectItem>
@@ -128,16 +128,16 @@ const AuditLogs = () => {
           </Select>
 
           <Select
-            value={filters.severity}
+            value={filters.severity || "all"}
             onValueChange={(value) =>
-              setFilters({ ...filters, severity: value })
+              setFilters({ ...filters, severity: value === "all" ? "" : value })
             }
           >
             <SelectTrigger>
               <SelectValue placeholder="مستوى الخطورة" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">الكل</SelectItem>
+              <SelectItem value="all">الكل</SelectItem>
               <SelectItem value="info">معلومة</SelectItem>
               <SelectItem value="warning">تحذير</SelectItem>
               <SelectItem value="error">خطأ</SelectItem>

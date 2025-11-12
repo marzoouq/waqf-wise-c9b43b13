@@ -102,12 +102,15 @@ export function AdvancedSearchDialog({ open, onOpenChange, onSearch }: AdvancedS
           {/* الفئة */}
           <div className="space-y-2">
             <Label htmlFor="category">الفئة</Label>
-            <Select value={criteria.category || ""} onValueChange={(value) => setCriteria({ ...criteria, category: value })}>
+            <Select 
+              value={criteria.category || "all"} 
+              onValueChange={(value) => setCriteria({ ...criteria, category: value === "all" ? "" : value })}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="اختر الفئة" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">الكل</SelectItem>
+                <SelectItem value="all">الكل</SelectItem>
                 {activeCategories.map((cat) => (
                   <SelectItem key={cat.id} value={cat.name}>
                     {cat.name}
@@ -120,12 +123,15 @@ export function AdvancedSearchDialog({ open, onOpenChange, onSearch }: AdvancedS
           {/* الحالة */}
           <div className="space-y-2">
             <Label htmlFor="status">الحالة</Label>
-            <Select value={criteria.status || ""} onValueChange={(value) => setCriteria({ ...criteria, status: value })}>
+            <Select 
+              value={criteria.status || "all"} 
+              onValueChange={(value) => setCriteria({ ...criteria, status: value === "all" ? "" : value })}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="اختر الحالة" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">الكل</SelectItem>
+                <SelectItem value="all">الكل</SelectItem>
                 <SelectItem value="نشط">نشط</SelectItem>
                 <SelectItem value="معلق">معلق</SelectItem>
                 <SelectItem value="غير نشط">غير نشط</SelectItem>
@@ -158,12 +164,15 @@ export function AdvancedSearchDialog({ open, onOpenChange, onSearch }: AdvancedS
           {/* مستوى الأولوية */}
           <div className="space-y-2">
             <Label htmlFor="priorityLevel">مستوى الأولوية</Label>
-            <Select value={criteria.priorityLevel || ""} onValueChange={(value) => setCriteria({ ...criteria, priorityLevel: value })}>
+            <Select 
+              value={criteria.priorityLevel || "all"} 
+              onValueChange={(value) => setCriteria({ ...criteria, priorityLevel: value === "all" ? "" : value })}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="اختر الأولوية" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">الكل</SelectItem>
+                <SelectItem value="all">الكل</SelectItem>
                 <SelectItem value="1">عادي</SelectItem>
                 <SelectItem value="2">متوسط</SelectItem>
                 <SelectItem value="3">عالي</SelectItem>
@@ -175,12 +184,15 @@ export function AdvancedSearchDialog({ open, onOpenChange, onSearch }: AdvancedS
           {/* الجنس */}
           <div className="space-y-2">
             <Label htmlFor="gender">الجنس</Label>
-            <Select value={criteria.gender || ""} onValueChange={(value) => setCriteria({ ...criteria, gender: value })}>
+            <Select 
+              value={criteria.gender || "all"} 
+              onValueChange={(value) => setCriteria({ ...criteria, gender: value === "all" ? "" : value })}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="اختر الجنس" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">الكل</SelectItem>
+                <SelectItem value="all">الكل</SelectItem>
                 <SelectItem value="ذكر">ذكر</SelectItem>
                 <SelectItem value="أنثى">أنثى</SelectItem>
               </SelectContent>
@@ -190,12 +202,15 @@ export function AdvancedSearchDialog({ open, onOpenChange, onSearch }: AdvancedS
           {/* الحالة الاجتماعية */}
           <div className="space-y-2">
             <Label htmlFor="maritalStatus">الحالة الاجتماعية</Label>
-            <Select value={criteria.maritalStatus || ""} onValueChange={(value) => setCriteria({ ...criteria, maritalStatus: value })}>
+            <Select 
+              value={criteria.maritalStatus || "all"} 
+              onValueChange={(value) => setCriteria({ ...criteria, maritalStatus: value === "all" ? "" : value })}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="اختر الحالة" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">الكل</SelectItem>
+                <SelectItem value="all">الكل</SelectItem>
                 <SelectItem value="أعزب">أعزب</SelectItem>
                 <SelectItem value="متزوج">متزوج</SelectItem>
                 <SelectItem value="مطلق">مطلق</SelectItem>
