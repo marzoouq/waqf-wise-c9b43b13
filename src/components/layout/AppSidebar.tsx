@@ -19,6 +19,7 @@ import {
   FolderOpen,
   ChevronDown,
   DollarSign,
+  HandCoins,
 } from "lucide-react";
 import {
   Sidebar,
@@ -63,6 +64,7 @@ const menuGroups = [
       { icon: Users, label: "المستفيدون", path: "/beneficiaries", roles: ["admin", "accountant", "nazer"] },
       { icon: UsersRound, label: "العائلات", path: "/families", roles: ["admin", "accountant", "nazer"] },
       { icon: ClipboardList, label: "الطلبات", path: "/requests", roles: ["admin", "accountant", "nazer"] },
+      { icon: Building2, label: "أقلام الوقف", path: "/waqf-units", roles: ["admin", "accountant", "nazer"] },
       { icon: Wallet, label: "الأموال والمصارف", path: "/funds", roles: ["admin", "accountant", "nazer"] },
     ]
   },
@@ -83,6 +85,7 @@ const menuGroups = [
       { icon: Calculator, label: "المحاسبة", path: "/accounting", roles: ["admin", "accountant", "nazer"] },
       { icon: Receipt, label: "الفواتير", path: "/invoices", roles: ["admin", "accountant", "nazer"] },
       { icon: CreditCard, label: "المدفوعات", path: "/payments", roles: ["admin", "accountant", "cashier", "nazer"] },
+      { icon: HandCoins, label: "القروض", path: "/loans", roles: ["admin", "accountant", "nazer"] },
       { icon: CheckSquare, label: "الموافقات", path: "/approvals", roles: ["admin", "accountant", "nazer"] },
     ]
   },

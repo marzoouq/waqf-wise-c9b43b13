@@ -36,6 +36,8 @@ const Settings = lazy(() => import("./pages/Settings"));
 const Invoices = lazy(() => import("./pages/Invoices"));
 const Approvals = lazy(() => import("./pages/Approvals"));
 const Payments = lazy(() => import("./pages/Payments"));
+const Loans = lazy(() => import("./pages/Loans"));
+const WaqfUnits = lazy(() => import("./pages/WaqfUnits"));
 const Install = lazy(() => import("./pages/Install"));
 const Notifications = lazy(() => import("./pages/Notifications"));
 const Requests = lazy(() => import("./pages/Requests"));
@@ -92,9 +94,11 @@ const App = () => {
                 <Route path="/funds" element={<Funds />} />
                 <Route path="/archive" element={<Archive />} />
                 <Route path="/accounting" element={<Accounting />} />
-                <Route path="/invoices" element={<Invoices />} />
-                <Route path="/approvals" element={<Approvals />} />
-                <Route path="/payments" element={<Payments />} />
+            <Route path="/invoices" element={<Invoices />} />
+            <Route path="/approvals" element={<Approvals />} />
+            <Route path="/payments" element={<Payments />} />
+            <Route path="/loans" element={<Loans />} />
+            <Route path="/waqf-units" element={<WaqfUnits />} />
                 <Route path="/reports" element={<Reports />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/notifications" element={<Notifications />} />

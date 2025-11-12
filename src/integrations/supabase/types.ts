@@ -1222,6 +1222,7 @@ export type Database = {
           percentage: number
           spent_amount: number
           updated_at: string
+          waqf_unit_id: string | null
         }
         Insert: {
           allocated_amount?: number
@@ -1235,6 +1236,7 @@ export type Database = {
           percentage?: number
           spent_amount?: number
           updated_at?: string
+          waqf_unit_id?: string | null
         }
         Update: {
           allocated_amount?: number
@@ -1248,8 +1250,17 @@ export type Database = {
           percentage?: number
           spent_amount?: number
           updated_at?: string
+          waqf_unit_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "funds_waqf_unit_id_fkey"
+            columns: ["waqf_unit_id"]
+            isOneToOne: false
+            referencedRelation: "waqf_units"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       invoice_lines: {
         Row: {
@@ -1464,6 +1475,189 @@ export type Database = {
             columns: ["journal_entry_id"]
             isOneToOne: false
             referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      loan_installments: {
+        Row: {
+          created_at: string
+          due_date: string
+          id: string
+          installment_number: number
+          interest_amount: number | null
+          loan_id: string
+          paid_amount: number | null
+          paid_at: string | null
+          principal_amount: number
+          remaining_amount: number | null
+          status: string | null
+          total_amount: number
+        }
+        Insert: {
+          created_at?: string
+          due_date: string
+          id?: string
+          installment_number: number
+          interest_amount?: number | null
+          loan_id: string
+          paid_amount?: number | null
+          paid_at?: string | null
+          principal_amount: number
+          remaining_amount?: number | null
+          status?: string | null
+          total_amount: number
+        }
+        Update: {
+          created_at?: string
+          due_date?: string
+          id?: string
+          installment_number?: number
+          interest_amount?: number | null
+          loan_id?: string
+          paid_amount?: number | null
+          paid_at?: string | null
+          principal_amount?: number
+          remaining_amount?: number | null
+          status?: string | null
+          total_amount?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loan_installments_loan_id_fkey"
+            columns: ["loan_id"]
+            isOneToOne: false
+            referencedRelation: "loans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      loan_payments: {
+        Row: {
+          created_at: string
+          id: string
+          installment_id: string | null
+          journal_entry_id: string | null
+          loan_id: string
+          notes: string | null
+          payment_amount: number
+          payment_date: string
+          payment_method: string | null
+          payment_number: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          installment_id?: string | null
+          journal_entry_id?: string | null
+          loan_id: string
+          notes?: string | null
+          payment_amount: number
+          payment_date: string
+          payment_method?: string | null
+          payment_number?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          installment_id?: string | null
+          journal_entry_id?: string | null
+          loan_id?: string
+          notes?: string | null
+          payment_amount?: number
+          payment_date?: string
+          payment_method?: string | null
+          payment_number?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loan_payments_installment_id_fkey"
+            columns: ["installment_id"]
+            isOneToOne: false
+            referencedRelation: "loan_installments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loan_payments_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
+            referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loan_payments_loan_id_fkey"
+            columns: ["loan_id"]
+            isOneToOne: false
+            referencedRelation: "loans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      loans: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          beneficiary_id: string
+          created_at: string
+          end_date: string | null
+          id: string
+          interest_rate: number | null
+          loan_amount: number
+          loan_number: string | null
+          monthly_installment: number | null
+          notes: string | null
+          start_date: string
+          status: string | null
+          term_months: number
+          updated_at: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          beneficiary_id: string
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          interest_rate?: number | null
+          loan_amount: number
+          loan_number?: string | null
+          monthly_installment?: number | null
+          notes?: string | null
+          start_date: string
+          status?: string | null
+          term_months: number
+          updated_at?: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          beneficiary_id?: string
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          interest_rate?: number | null
+          loan_amount?: number
+          loan_number?: string | null
+          monthly_installment?: number | null
+          notes?: string | null
+          start_date?: string
+          status?: string | null
+          term_months?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loans_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "loans_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries"
             referencedColumns: ["id"]
           },
         ]
@@ -1715,6 +1909,7 @@ export type Database = {
           type: string
           units: number
           updated_at: string
+          waqf_unit_id: string | null
         }
         Insert: {
           created_at?: string
@@ -1728,6 +1923,7 @@ export type Database = {
           type: string
           units?: number
           updated_at?: string
+          waqf_unit_id?: string | null
         }
         Update: {
           created_at?: string
@@ -1741,8 +1937,17 @@ export type Database = {
           type?: string
           units?: number
           updated_at?: string
+          waqf_unit_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "properties_waqf_unit_id_fkey"
+            columns: ["waqf_unit_id"]
+            isOneToOne: false
+            referencedRelation: "waqf_units"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       rental_payments: {
         Row: {
@@ -2009,11 +2214,75 @@ export type Database = {
         }
         Relationships: []
       }
+      waqf_units: {
+        Row: {
+          acquisition_date: string | null
+          acquisition_value: number | null
+          annual_return: number | null
+          code: string
+          created_at: string
+          current_value: number | null
+          description: string | null
+          documents: Json | null
+          id: string
+          is_active: boolean | null
+          location: string | null
+          name: string
+          notes: string | null
+          updated_at: string
+          waqf_type: string | null
+        }
+        Insert: {
+          acquisition_date?: string | null
+          acquisition_value?: number | null
+          annual_return?: number | null
+          code: string
+          created_at?: string
+          current_value?: number | null
+          description?: string | null
+          documents?: Json | null
+          id?: string
+          is_active?: boolean | null
+          location?: string | null
+          name: string
+          notes?: string | null
+          updated_at?: string
+          waqf_type?: string | null
+        }
+        Update: {
+          acquisition_date?: string | null
+          acquisition_value?: number | null
+          annual_return?: number | null
+          code?: string
+          created_at?: string
+          current_value?: number | null
+          description?: string | null
+          documents?: Json | null
+          id?: string
+          is_active?: boolean | null
+          location?: string | null
+          name?: string
+          notes?: string | null
+          updated_at?: string
+          waqf_type?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      calculate_loan_schedule: {
+        Args: {
+          p_interest_rate: number
+          p_loan_id: string
+          p_principal: number
+          p_start_date: string
+          p_term_months: number
+        }
+        Returns: undefined
+      }
       create_auto_journal_entry: {
         Args: {
           p_amount: number
@@ -2045,6 +2314,7 @@ export type Database = {
       }
       notify_contract_expiring: { Args: never; Returns: undefined }
       notify_rental_payment_due: { Args: never; Returns: undefined }
+      update_overdue_installments: { Args: never; Returns: undefined }
     }
     Enums: {
       account_nature: "debit" | "credit"
