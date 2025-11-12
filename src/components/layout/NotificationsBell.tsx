@@ -51,6 +51,14 @@ export const NotificationsBell = () => {
         
         queryClient.invalidateQueries({ queryKey: ["notifications"] });
       })
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'notifications',
+        filter: `user_id=eq.${user.id}`
+      }, () => {
+        queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      })
       .subscribe();
       
     return () => {

@@ -38,13 +38,14 @@ const BudgetComparisonChart = () => {
         table: 'budgets'
       }, () => {
         fetchBudgetComparison();
+        queryClient.invalidateQueries({ queryKey: ["budgets"] });
       })
       .subscribe();
       
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [queryClient]);
 
   const fetchBudgetComparison = async () => {
     try {

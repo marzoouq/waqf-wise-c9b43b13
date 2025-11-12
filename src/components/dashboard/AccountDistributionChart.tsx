@@ -36,13 +36,14 @@ const AccountDistributionChart = () => {
         table: 'accounts'
       }, () => {
         fetchAccountDistribution();
+        queryClient.invalidateQueries({ queryKey: ["accounts"] });
       })
       .subscribe();
       
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [queryClient]);
 
   const fetchAccountDistribution = async () => {
     try {
