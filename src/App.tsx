@@ -37,7 +37,6 @@ const Approvals = lazy(() => import("./pages/Approvals"));
 const Payments = lazy(() => import("./pages/Payments"));
 const Install = lazy(() => import("./pages/Install"));
 const Notifications = lazy(() => import("./pages/Notifications"));
-const Families = lazy(() => import("./pages/Families"));
 const Requests = lazy(() => import("./pages/Requests"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -91,7 +90,6 @@ const App = () => {
                         <Route path="/reports" element={<Reports />} />
                         <Route path="/settings" element={<Settings />} />
                         <Route path="/notifications" element={<Notifications />} />
-                        <Route path="/families" element={<Families />} />
                         <Route path="/requests" element={<Requests />} />
                         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                         <Route path="*" element={<NotFound />} />
