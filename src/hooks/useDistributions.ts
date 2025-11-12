@@ -70,15 +70,21 @@ export function useDistributions() {
       // إنشاء قيد محاسبي تلقائي للتوزيع
       if (data && data.status === "معتمد") {
         try {
-          await createAutoEntry(
+          const entryId = await createAutoEntry(
             "distribution",
             data.id,
             data.total_amount,
-            `توزيع غلة - ${data.month}`,
+            `توزيع غلة - ${data.month} - عدد المستفيدين: ${data.beneficiaries_count}`,
             data.distribution_date
           );
+
+          // تحديث رقم القيد في التوزيع (إذا كان هناك حقل لذلك)
+          if (entryId) {
+            console.log(`Created journal entry ${entryId} for distribution ${data.id}`);
+          }
         } catch (journalError) {
           console.error("Error creating journal entry:", journalError);
+          // لا نوقف العملية في حال فشل القيد المحاسبي
         }
       }
 

@@ -1,6 +1,4 @@
 import { useState, useMemo, useCallback } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Plus, Eye, FileText } from "lucide-react";
 import { AddInvoiceDialog } from "@/components/invoices/AddInvoiceDialog";
@@ -18,6 +16,7 @@ import {
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { Pagination } from "@/components/ui/pagination";
+import { useInvoices } from "@/hooks/useInvoices";
 
 type Invoice = {
   id: string;
@@ -36,18 +35,7 @@ const Invoices = () => {
   const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { data: invoices, isLoading } = useQuery({
-    queryKey: ["invoices"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("invoices")
-        .select("id, invoice_number, invoice_date, customer_name, total_amount, status")
-        .order("invoice_date", { ascending: false });
-      if (error) throw error;
-      return data as Invoice[];
-    },
-    staleTime: 3 * 60 * 1000,
-  });
+  const { invoices, isLoading } = useInvoices();
 
   // Paginate invoices
   const paginatedInvoices = useMemo(() => {

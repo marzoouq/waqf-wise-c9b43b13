@@ -71,17 +71,24 @@ export function usePayments() {
 
       if (error) throw error;
 
-      // إنشاء قيد محاسبي تلقائي
-      if (data) {
+      // إنشاء قيد محاسبي تلقائي للمدفوعات
+      if (data && data.amount && data.payment_date) {
         try {
-          const triggerEvent = data.payment_type === "receipt" ? "payment_receipt" : "payment_voucher";
-          await createAutoEntry(
-            triggerEvent,
+          const entryId = await createAutoEntry(
+            data.payment_type === "قبض" ? "payment_receipt" : "payment_voucher",
             data.id,
             data.amount,
-            data.description,
+            `${data.payment_type} - ${data.description} - ${data.payer_name}`,
             data.payment_date
           );
+
+          // تحديث رقم القيد في الدفعة
+          if (entryId) {
+            await supabase
+              .from("payments")
+              .update({ journal_entry_id: entryId })
+              .eq("id", data.id);
+          }
         } catch (journalError) {
           console.error("Error creating journal entry:", journalError);
         }
@@ -108,6 +115,13 @@ export function usePayments() {
 
   const updatePayment = useMutation({
     mutationFn: async ({ id, ...updates }: Partial<Payment> & { id: string }) => {
+      // الحصول على البيانات القديمة
+      const { data: oldPayment } = await supabase
+        .from("payments")
+        .select("journal_entry_id, amount, payment_date")
+        .eq("id", id)
+        .single();
+
       const { data, error } = await supabase
         .from("payments")
         .update(updates)
@@ -116,6 +130,29 @@ export function usePayments() {
         .single();
 
       if (error) throw error;
+
+      // إنشاء قيد محاسبي جديد إذا لم يكن موجوداً وتم تحديث المبلغ
+      if (!oldPayment?.journal_entry_id && data.amount && data.payment_date) {
+        try {
+          const entryId = await createAutoEntry(
+            data.payment_type === "قبض" ? "payment_receipt" : "payment_voucher",
+            data.id,
+            data.amount,
+            `${data.payment_type} - ${data.description} - ${data.payer_name}`,
+            data.payment_date
+          );
+
+          if (entryId) {
+            await supabase
+              .from("payments")
+              .update({ journal_entry_id: entryId })
+              .eq("id", id);
+          }
+        } catch (journalError) {
+          console.error("Error creating journal entry:", journalError);
+        }
+      }
+
       return data;
     },
     onSuccess: () => {

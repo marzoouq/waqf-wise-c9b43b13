@@ -14,6 +14,11 @@ import {
   UsersRound,
   ClipboardList,
   Shield,
+  Archive,
+  Bell,
+  FolderOpen,
+  ChevronDown,
+  DollarSign,
 } from "lucide-react";
 import {
   Sidebar,
@@ -26,28 +31,83 @@ import {
   SidebarMenuItem,
   SidebarHeader,
   useSidebar,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
 } from "@/components/ui/sidebar";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { NotificationsBell } from "./NotificationsBell";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useMemo } from "react";
 
-// تعريف القوائم خارج الـ component لتجنب إعادة الإنشاء في كل render
-const allMenuItems = [
-  { icon: LayoutDashboard, label: "لوحة التحكم", path: "/", roles: ['all'] },
-  { icon: Shield, label: "إدارة المستخدمين", path: "/users", roles: ['admin', 'nazer'] },
-  { icon: Users, label: "المستفيدون", path: "/beneficiaries", roles: ['admin', 'accountant', 'nazer'] },
-  { icon: UsersRound, label: "العائلات", path: "/families", roles: ['admin', 'accountant', 'nazer'] },
-  { icon: ClipboardList, label: "الطلبات", path: "/requests", roles: ['admin', 'accountant', 'nazer'] },
-  { icon: Building2, label: "العقارات", path: "/properties", roles: ['admin', 'accountant', 'nazer'] },
-  { icon: Wallet, label: "الأموال والمصارف", path: "/funds", roles: ['admin', 'accountant', 'nazer'] },
-  { icon: FileText, label: "الأرشيف", path: "/archive", roles: ['admin', 'archivist', 'nazer'] },
-  { icon: Calculator, label: "المحاسبة", path: "/accounting", roles: ['admin', 'accountant', 'nazer'] },
-  { icon: Receipt, label: "الفواتير", path: "/invoices", roles: ['admin', 'accountant', 'nazer'] },
-  { icon: CreditCard, label: "المدفوعات", path: "/payments", roles: ['admin', 'accountant', 'cashier', 'nazer'] },
-  { icon: CheckSquare, label: "الموافقات", path: "/approvals", roles: ['admin', 'accountant', 'nazer'] },
-  { icon: BarChart3, label: "التقارير", path: "/reports", roles: ['all'] },
-  { icon: Shield, label: "سجل العمليات", path: "/audit-logs", roles: ['admin', 'nazer'] },
-  { icon: Settings, label: "الإعدادات", path: "/settings", roles: ['all'] },
+// القائمة المنظمة الجديدة - 6 مجموعات رئيسية
+const menuGroups = [
+  {
+    id: "dashboard",
+    label: "لوحة التحكم",
+    icon: LayoutDashboard,
+    path: "/",
+    roles: ["all"],
+    subItems: []
+  },
+  {
+    id: "waqf",
+    label: "إدارة الوقف",
+    icon: Users,
+    roles: ["admin", "accountant", "nazer"],
+    subItems: [
+      { icon: Users, label: "المستفيدون", path: "/beneficiaries", roles: ["admin", "accountant", "nazer"] },
+      { icon: UsersRound, label: "العائلات", path: "/families", roles: ["admin", "accountant", "nazer"] },
+      { icon: ClipboardList, label: "الطلبات", path: "/requests", roles: ["admin", "accountant", "nazer"] },
+      { icon: Wallet, label: "الأموال والمصارف", path: "/funds", roles: ["admin", "accountant", "nazer"] },
+    ]
+  },
+  {
+    id: "properties",
+    label: "العقارات",
+    icon: Building2,
+    path: "/properties",
+    roles: ["admin", "accountant", "nazer"],
+    subItems: []
+  },
+  {
+    id: "finance",
+    label: "المالية والمحاسبة",
+    icon: Calculator,
+    roles: ["admin", "accountant", "nazer", "cashier"],
+    subItems: [
+      { icon: Calculator, label: "المحاسبة", path: "/accounting", roles: ["admin", "accountant", "nazer"] },
+      { icon: Receipt, label: "الفواتير", path: "/invoices", roles: ["admin", "accountant", "nazer"] },
+      { icon: CreditCard, label: "المدفوعات", path: "/payments", roles: ["admin", "accountant", "cashier", "nazer"] },
+      { icon: CheckSquare, label: "الموافقات", path: "/approvals", roles: ["admin", "accountant", "nazer"] },
+    ]
+  },
+  {
+    id: "management",
+    label: "الإدارة والتقارير",
+    icon: FolderOpen,
+    roles: ["admin", "accountant", "nazer", "archivist"],
+    subItems: [
+      { icon: Archive, label: "الأرشيف", path: "/archive", roles: ["admin", "archivist", "nazer"] },
+      { icon: BarChart3, label: "التقارير", path: "/reports", roles: ["all"] },
+      { icon: Shield, label: "سجل العمليات", path: "/audit-logs", roles: ["admin", "nazer"] },
+    ]
+  },
+  {
+    id: "settings",
+    label: "الإعدادات",
+    icon: Settings,
+    roles: ["all"],
+    subItems: [
+      { icon: Shield, label: "المستخدمون", path: "/users", roles: ["admin", "nazer"] },
+      { icon: Bell, label: "الإشعارات", path: "/notifications", roles: ["all"] },
+      { icon: Settings, label: "الإعدادات العامة", path: "/settings", roles: ["all"] },
+    ]
+  },
 ];
 
 const AppSidebar = () => {
@@ -60,40 +120,31 @@ const AppSidebar = () => {
     isLoading: roleLoading 
   } = useUserRole();
 
-  // تسجيل حالة المصادقة لتتبع الأدوار
-  console.log("🔐 AppSidebar - Current auth state:", {
-    roles,
-    roleLoading,
-    timestamp: new Date().toISOString()
-  });
-
-  // Filter menu items based on user role
-  const menuItems = useMemo(() => {
-    console.log("🔄 Filtering menu items with roles:", {
-      roles,
-      allMenuItemsCount: allMenuItems.length
-    });
-    
-    // Show items with 'all' role during loading
+  // تصفية القوائم حسب صلاحيات المستخدم
+  const filteredMenuGroups = useMemo(() => {
     if (roleLoading) {
-      return allMenuItems.filter(item => item.roles.includes('all'));
+      // عرض العناصر الأساسية فقط أثناء التحميل
+      return menuGroups.filter(group => group.roles.includes('all'));
     }
-    
-    const filtered = allMenuItems.filter(item => {
-      // 'all' means everyone can access
-      if (item.roles.includes('all')) return true;
-      
-      // Check if user has any of the required roles
-      return item.roles.some(role => hasRole(role as any));
+
+    return menuGroups.filter(group => {
+      // التحقق من صلاحية الوصول للمجموعة الرئيسية
+      const hasGroupAccess = group.roles.includes('all') || 
+        group.roles.some(role => hasRole(role as any));
+
+      if (!hasGroupAccess) return false;
+
+      // تصفية العناصر الفرعية
+      if (group.subItems && group.subItems.length > 0) {
+        const filteredSubItems = group.subItems.filter(subItem => 
+          subItem.roles.includes('all') || subItem.roles.some(role => hasRole(role as any))
+        );
+        // إظهار المجموعة فقط إذا كان هناك عناصر فرعية متاحة
+        return filteredSubItems.length > 0;
+      }
+
+      return true;
     });
-    
-    console.log("✅ Filtered menu items:", {
-      totalItems: allMenuItems.length,
-      filteredItems: filtered.length,
-      items: filtered.map(i => i.label)
-    });
-    
-    return filtered;
   }, [roles, roleLoading, hasRole]);
 
   return (
@@ -126,30 +177,73 @@ const AppSidebar = () => {
           <SidebarGroupLabel>القائمة الرئيسية</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {menuItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = location.pathname === item.path;
+              {filteredMenuGroups.map((group) => {
+                const Icon = group.icon;
+                const isActive = group.path && location.pathname === group.path;
+
+                // إذا كانت المجموعة لا تحتوي على عناصر فرعية
+                if (!group.subItems || group.subItems.length === 0) {
+                  return (
+                    <SidebarMenuItem key={group.id}>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={isActive}
+                        tooltip={group.label}
+                      >
+                        <NavLink to={group.path || "#"}>
+                          <Icon className="h-5 w-5" />
+                          <span>{group.label}</span>
+                        </NavLink>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                }
+
+                // إذا كانت المجموعة تحتوي على عناصر فرعية - استخدام Collapsible
+                const filteredSubItems = group.subItems.filter(subItem => 
+                  subItem.roles.includes('all') || subItem.roles.some(role => hasRole(role as any))
+                );
 
                 return (
-                  <SidebarMenuItem key={item.path}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={isActive}
-                      tooltip={item.label}
-                    >
-                      <NavLink to={item.path}>
-                        <Icon className="h-5 w-5" />
-                        <span>{item.label}</span>
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
+                  <Collapsible key={group.id} className="group/collapsible">
+                    <SidebarMenuItem>
+                      <CollapsibleTrigger asChild>
+                        <SidebarMenuButton tooltip={group.label}>
+                          <Icon className="h-5 w-5" />
+                          <span>{group.label}</span>
+                          <ChevronDown className="mr-auto h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                        </SidebarMenuButton>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <SidebarMenuSub>
+                          {filteredSubItems.map((subItem, index) => {
+                            const SubIcon = subItem.icon;
+                            const isSubActive = location.pathname === subItem.path;
+                            
+                            return (
+                              <SidebarMenuSubItem key={index}>
+                                <SidebarMenuSubButton
+                                  asChild
+                                  isActive={isSubActive}
+                                >
+                                  <NavLink to={subItem.path}>
+                                    <SubIcon className="h-4 w-4" />
+                                    <span>{subItem.label}</span>
+                                  </NavLink>
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+                            );
+                          })}
+                        </SidebarMenuSub>
+                      </CollapsibleContent>
+                    </SidebarMenuItem>
+                  </Collapsible>
                 );
               })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-
     </Sidebar>
   );
 };
