@@ -83,14 +83,7 @@ export function PropertyDialog({
 
   const handleSubmit = (data: PropertyFormValues) => {
     onSave(data);
-    toast({
-      title: property ? "تم التحديث بنجاح" : "تم الإضافة بنجاح",
-      description: property
-        ? "تم تحديث بيانات العقار بنجاح"
-        : "تم إضافة العقار الجديد بنجاح",
-    });
     form.reset();
-    onOpenChange(false);
   };
 
   return (

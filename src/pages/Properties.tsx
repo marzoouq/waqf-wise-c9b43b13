@@ -11,8 +11,11 @@ import { PropertiesTab } from "@/components/properties/tabs/PropertiesTab";
 import { ContractsTab } from "@/components/properties/tabs/ContractsTab";
 import { PaymentsTab } from "@/components/properties/tabs/PaymentsTab";
 import { MaintenanceTab } from "@/components/properties/tabs/MaintenanceTab";
+import { useProperties } from "@/hooks/useProperties";
 
 const Properties = () => {
+  const { addProperty, updateProperty } = useProperties();
+  
   const [activeTab, setActiveTab] = useState("properties");
   const [propertyDialogOpen, setPropertyDialogOpen] = useState(false);
   const [contractDialogOpen, setContractDialogOpen] = useState(false);
@@ -23,6 +26,20 @@ const Properties = () => {
   const [selectedContract, setSelectedContract] = useState<any>(null);
   const [selectedPayment, setSelectedPayment] = useState<any>(null);
   const [selectedMaintenance, setSelectedMaintenance] = useState<any>(null);
+
+  const handlePropertySave = async (data: any) => {
+    try {
+      if (selectedProperty) {
+        await updateProperty({ id: selectedProperty.id, ...data });
+      } else {
+        await addProperty(data);
+      }
+      setPropertyDialogOpen(false);
+      setSelectedProperty(null);
+    } catch (error) {
+      console.error("Error saving property:", error);
+    }
+  };
 
   const getAddButton = () => {
     const buttons = {
@@ -158,7 +175,7 @@ const Properties = () => {
           open={propertyDialogOpen}
           onOpenChange={setPropertyDialogOpen}
           property={selectedProperty}
-          onSave={() => {}}
+          onSave={handlePropertySave}
         />
 
         <ContractDialog
