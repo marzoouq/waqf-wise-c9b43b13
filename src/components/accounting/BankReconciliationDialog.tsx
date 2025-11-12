@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useBankReconciliation } from "@/hooks/useBankReconciliation";
-import { useAccounts } from "@/hooks/useAccounts";
+import { useBankAccounts } from "@/hooks/useBankAccounts";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -18,8 +18,8 @@ interface BankReconciliationDialogProps {
 }
 
 export function BankReconciliationDialog({ open, onOpenChange }: BankReconciliationDialogProps) {
-  const { accounts } = useAccounts();
   const { statements, transactions, createStatement, addTransaction, matchTransaction, reconcileStatement } = useBankReconciliation();
+  const { bankAccounts, isLoading: loadingBankAccounts } = useBankAccounts();
   
   const [step, setStep] = useState<"select" | "import" | "match">("select");
   const [selectedStatement, setSelectedStatement] = useState<any>(null);
@@ -31,17 +31,22 @@ export function BankReconciliationDialog({ open, onOpenChange }: BankReconciliat
     closing_balance: 0,
   });
 
-  const bankAccounts = accounts.filter(a => a.code.startsWith("1.1.2"));
-
   const handleCreateStatement = async () => {
-    if (!newStatement.bank_account_id || !newStatement.statement_date) return;
+    if (!newStatement.bank_account_id || !newStatement.statement_date) {
+      return;
+    }
+    
+    if (newStatement.opening_balance === 0 || newStatement.closing_balance === 0) {
+      alert("يرجى إدخال الرصيد الافتتاحي والختامي");
+      return;
+    }
     
     await createStatement({
       ...newStatement,
       status: 'pending',
     });
     
-    setStep("import");
+    onOpenChange(false);
   };
 
   const handleImportTransactions = async (csvData: any[]) => {
@@ -76,6 +81,7 @@ export function BankReconciliationDialog({ open, onOpenChange }: BankReconciliat
                 <Select
                   value={newStatement.bank_account_id}
                   onValueChange={(value) => setNewStatement({ ...newStatement, bank_account_id: value })}
+                  disabled={loadingBankAccounts}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="اختر الحساب البنكي" />
@@ -83,7 +89,7 @@ export function BankReconciliationDialog({ open, onOpenChange }: BankReconciliat
                   <SelectContent>
                     {bankAccounts.map((account) => (
                       <SelectItem key={account.id} value={account.id}>
-                        {account.name_ar} ({account.code})
+                        {account.bank_name} - {account.account_number}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -142,7 +148,9 @@ export function BankReconciliationDialog({ open, onOpenChange }: BankReconciliat
                       <TableCell>
                         {format(new Date(statement.statement_date), "dd/MM/yyyy", { locale: ar })}
                       </TableCell>
-                      <TableCell>{statement.accounts?.name_ar}</TableCell>
+                      <TableCell>
+                        {statement.bank_accounts?.bank_name} - {statement.bank_accounts?.account_number}
+                      </TableCell>
                       <TableCell>{statement.opening_balance.toLocaleString('ar-SA')}</TableCell>
                       <TableCell>{statement.closing_balance.toLocaleString('ar-SA')}</TableCell>
                       <TableCell>

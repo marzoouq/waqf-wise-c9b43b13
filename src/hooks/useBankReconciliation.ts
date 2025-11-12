@@ -42,7 +42,11 @@ export function useBankReconciliation() {
           .from("bank_statements" as any)
           .select(`
             *,
-            accounts (code, name_ar)
+            bank_accounts!inner (
+              bank_name,
+              account_number,
+              accounts (code, name_ar)
+            )
           `)
           .order("statement_date", { ascending: false });
 
