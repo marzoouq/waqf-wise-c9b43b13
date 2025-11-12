@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
-import { Plus, Search, Filter, Download, MoreVertical, Users, UserCheck, UserX, Home, Eye, FileText, Activity, Save, Star, Key } from "lucide-react";
+import { Plus, Search, Filter, Download, MoreVertical, Users, UserCheck, UserX, Home, Eye, FileText, Activity, Save, Star, Key, Shield } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { useBeneficiaries } from "@/hooks/useBeneficiaries";
@@ -27,6 +27,7 @@ import { AdvancedSearchDialog, SearchCriteria } from "@/components/beneficiaries
 import { AttachmentsDialog } from "@/components/beneficiaries/AttachmentsDialog";
 import { ActivityLogDialog } from "@/components/beneficiaries/ActivityLogDialog";
 import { EnableLoginDialog } from "@/components/beneficiaries/EnableLoginDialog";
+import { TribeManagementDialog } from "@/components/beneficiaries/TribeManagementDialog";
 import { Pagination } from "@/components/ui/pagination";
 import { useNavigate } from "react-router-dom";
 
@@ -41,6 +42,7 @@ const Beneficiaries = () => {
   const [attachmentsDialogOpen, setAttachmentsDialogOpen] = useState(false);
   const [activityLogDialogOpen, setActivityLogDialogOpen] = useState(false);
   const [enableLoginDialogOpen, setEnableLoginDialogOpen] = useState(false);
+  const [tribeManagementDialogOpen, setTribeManagementDialogOpen] = useState(false);
   const [selectedBeneficiary, setSelectedBeneficiary] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [advancedCriteria, setAdvancedCriteria] = useState<SearchCriteria>({});
@@ -236,6 +238,15 @@ const Beneficiaries = () => {
                 <Download className="ml-2 h-4 w-4 md:h-5 md:w-5" />
                 <span className="hidden md:inline">تصدير البيانات</span>
                 <span className="md:hidden">تصدير</span>
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => setTribeManagementDialogOpen(true)}
+                className="shadow-soft hover:shadow-medium transition-all duration-300 hover:bg-primary hover:text-primary-foreground border-primary/20"
+              >
+                <Shield className="ml-2 h-4 w-4 md:h-5 md:w-5" />
+                <span className="hidden md:inline">إدارة القبائل</span>
+                <span className="md:hidden">القبائل</span>
               </Button>
             </div>
           </CardContent>
@@ -468,6 +479,11 @@ const Beneficiaries = () => {
               onSuccess={() => {
                 queryClient.invalidateQueries({ queryKey: ["beneficiaries"] });
               }}
+            />
+            
+            <TribeManagementDialog
+              open={tribeManagementDialogOpen}
+              onOpenChange={setTribeManagementDialogOpen}
             />
           </>
         )}

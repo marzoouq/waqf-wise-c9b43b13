@@ -22,7 +22,8 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
-import { Shield, Lock } from "lucide-react";
+import { Shield, Lock, Key } from "lucide-react";
+import { TwoFactorDialog } from "./TwoFactorDialog";
 
 interface SecuritySettingsDialogProps {
   open: boolean;
@@ -46,6 +47,7 @@ export function SecuritySettingsDialog({
 }: SecuritySettingsDialogProps) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [twoFactorDialogOpen, setTwoFactorDialogOpen] = useState(false);
 
   const form = useForm<PasswordFormValues>({
     resolver: zodResolver(passwordSchema),
@@ -196,16 +198,28 @@ export function SecuritySettingsDialog({
           {/* المصادقة الثنائية */}
           <Card>
             <CardContent className="pt-6">
-              <h3 className="font-semibold mb-2">المصادقة الثنائية</h3>
+              <div className="flex items-center gap-2 mb-2">
+                <Key className="h-4 w-4" />
+                <h3 className="font-semibold">المصادقة الثنائية (2FA)</h3>
+              </div>
               <p className="text-sm text-muted-foreground mb-4">
-                قريباً: إضافة طبقة أمان إضافية لحسابك
+                إضافة طبقة أمان إضافية لحسابك عن طريق المصادقة الثنائية
               </p>
-              <Button variant="outline" disabled>
-                قريباً
+              <Button 
+                variant="outline"
+                onClick={() => setTwoFactorDialogOpen(true)}
+              >
+                <Key className="h-4 w-4 ml-2" />
+                إعداد المصادقة الثنائية
               </Button>
             </CardContent>
           </Card>
         </div>
+        
+        <TwoFactorDialog 
+          open={twoFactorDialogOpen}
+          onOpenChange={setTwoFactorDialogOpen}
+        />
       </DialogContent>
     </Dialog>
   );
