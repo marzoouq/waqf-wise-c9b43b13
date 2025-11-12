@@ -26,6 +26,7 @@ const Dashboard = lazy(() => import("./pages/Dashboard"));
 const BeneficiaryDashboard = lazy(() => import("./pages/BeneficiaryDashboard"));
 const AccountantDashboard = lazy(() => import("./pages/AccountantDashboard"));
 const Beneficiaries = lazy(() => import("./pages/Beneficiaries"));
+const BeneficiaryProfile = lazy(() => import("./pages/BeneficiaryProfile"));
 const Properties = lazy(() => import("./pages/Properties"));
 const Funds = lazy(() => import("./pages/Funds"));
 const Archive = lazy(() => import("./pages/Archive"));
@@ -80,6 +81,7 @@ const App = () => {
                         <Route path="/beneficiary-dashboard" element={<BeneficiaryDashboard />} />
                         <Route path="/accountant-dashboard" element={<AccountantDashboard />} />
                         <Route path="/beneficiaries" element={<Beneficiaries />} />
+                        <Route path="/beneficiaries/:id" element={<BeneficiaryProfile />} />
                         <Route path="/properties" element={<Properties />} />
                         <Route path="/funds" element={<Funds />} />
                         <Route path="/archive" element={<Archive />} />

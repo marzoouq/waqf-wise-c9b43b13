@@ -1,7 +1,8 @@
 import { useState, useMemo, useCallback } from "react";
-import { Plus, Search, Filter, Download, MoreVertical, Users, UserCheck, UserX, Home } from "lucide-react";
+import { Plus, Search, Filter, Download, MoreVertical, Users, UserCheck, UserX, Home, Eye, FileText, Activity, Save, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useBeneficiaries } from "@/hooks/useBeneficiaries";
+import { useSavedSearches } from "@/hooks/useSavedSearches";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -18,33 +19,81 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import BeneficiaryDialog from "@/components/beneficiaries/BeneficiaryDialog";
+import { AdvancedSearchDialog, SearchCriteria } from "@/components/beneficiaries/AdvancedSearchDialog";
+import { AttachmentsDialog } from "@/components/beneficiaries/AttachmentsDialog";
+import { ActivityLogDialog } from "@/components/beneficiaries/ActivityLogDialog";
 import { Pagination } from "@/components/ui/pagination";
+import { useNavigate } from "react-router-dom";
 
 const ITEMS_PER_PAGE = 20;
 
 const Beneficiaries = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [advancedSearchOpen, setAdvancedSearchOpen] = useState(false);
+  const [attachmentsDialogOpen, setAttachmentsDialogOpen] = useState(false);
+  const [activityLogDialogOpen, setActivityLogDialogOpen] = useState(false);
   const [selectedBeneficiary, setSelectedBeneficiary] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [advancedCriteria, setAdvancedCriteria] = useState<SearchCriteria>({});
 
   const { beneficiaries, totalCount, isLoading, addBeneficiary, updateBeneficiary, deleteBeneficiary } = useBeneficiaries();
+  const { searches, saveSearch, deleteSearch } = useSavedSearches();
 
-  // Memoize filtered beneficiaries
+  // Memoize filtered beneficiaries with advanced search
   const filteredBeneficiaries = useMemo(() => {
-    if (!searchQuery) return beneficiaries;
+    let results = beneficiaries;
     
-    const query = searchQuery.toLowerCase();
-    return beneficiaries.filter(
-      (b) =>
-        b.full_name.toLowerCase().includes(query) ||
-        b.national_id.includes(query) ||
-        b.phone.includes(query) ||
-        (b.family_name && b.family_name.toLowerCase().includes(query))
-    );
-  }, [beneficiaries, searchQuery]);
+    // Apply quick search
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      results = results.filter(
+        (b) =>
+          b.full_name.toLowerCase().includes(query) ||
+          b.national_id.includes(query) ||
+          b.phone.includes(query) ||
+          (b.family_name && b.family_name.toLowerCase().includes(query))
+      );
+    }
+    
+    // Apply advanced criteria
+    if (advancedCriteria.fullName) {
+      results = results.filter(b => b.full_name.toLowerCase().includes(advancedCriteria.fullName!.toLowerCase()));
+    }
+    if (advancedCriteria.nationalId) {
+      results = results.filter(b => b.national_id.includes(advancedCriteria.nationalId!));
+    }
+    if (advancedCriteria.phone) {
+      results = results.filter(b => b.phone.includes(advancedCriteria.phone!));
+    }
+    if (advancedCriteria.category) {
+      results = results.filter(b => b.category === advancedCriteria.category);
+    }
+    if (advancedCriteria.status) {
+      results = results.filter(b => b.status === advancedCriteria.status);
+    }
+    if (advancedCriteria.tribe) {
+      results = results.filter(b => b.tribe && b.tribe.toLowerCase().includes(advancedCriteria.tribe!.toLowerCase()));
+    }
+    if (advancedCriteria.city) {
+      results = results.filter(b => b.city && b.city.toLowerCase().includes(advancedCriteria.city!.toLowerCase()));
+    }
+    if (advancedCriteria.gender) {
+      results = results.filter(b => b.gender === advancedCriteria.gender);
+    }
+    if (advancedCriteria.maritalStatus) {
+      results = results.filter(b => b.marital_status === advancedCriteria.maritalStatus);
+    }
+    if (advancedCriteria.priorityLevel) {
+      results = results.filter(b => String(b.priority_level || 1) === advancedCriteria.priorityLevel);
+    }
+    
+    return results;
+  }, [beneficiaries, searchQuery, advancedCriteria]);
 
   // Paginate filtered results
   const paginatedBeneficiaries = useMemo(() => {
@@ -92,6 +141,30 @@ const Beneficiaries = () => {
     }
   }, [deleteBeneficiary]);
 
+  const handleAdvancedSearch = (criteria: SearchCriteria) => {
+    setAdvancedCriteria(criteria);
+    setCurrentPage(1);
+  };
+
+  const handleViewProfile = (beneficiary: any) => {
+    navigate(`/beneficiaries/${beneficiary.id}`);
+  };
+
+  const handleViewAttachments = (beneficiary: any) => {
+    setSelectedBeneficiary(beneficiary);
+    setAttachmentsDialogOpen(true);
+  };
+
+  const handleViewActivity = (beneficiary: any) => {
+    setSelectedBeneficiary(beneficiary);
+    setActivityLogDialogOpen(true);
+  };
+
+  const handleLoadSavedSearch = (search: any) => {
+    setAdvancedCriteria(search.search_criteria);
+    setCurrentPage(1);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto p-6 md:p-8 lg:p-10 space-y-6 md:space-y-8">
@@ -127,11 +200,29 @@ const Beneficiaries = () => {
                   className="pr-10"
                 />
               </div>
-              <Button variant="outline" className="shadow-soft hover:shadow-medium transition-all duration-300 hover:bg-primary hover:text-primary-foreground border-primary/20">
+              <Button variant="outline" onClick={() => setAdvancedSearchOpen(true)} className="shadow-soft hover:shadow-medium transition-all duration-300 hover:bg-primary hover:text-primary-foreground border-primary/20">
                 <Filter className="ml-2 h-4 w-4 md:h-5 md:w-5" />
-                <span className="hidden md:inline">تصفية متقدمة</span>
-                <span className="md:hidden">تصفية</span>
+                <span className="hidden md:inline">بحث متقدم</span>
+                <span className="md:hidden">بحث</span>
               </Button>
+              {searches.length > 0 && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline">
+                      <Save className="ml-2 h-4 w-4" />
+                      عمليات بحث محفوظة
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    {searches.map((search) => (
+                      <DropdownMenuItem key={search.id} onClick={() => handleLoadSavedSearch(search)}>
+                        {search.is_favorite && <Star className="ml-2 h-3 w-3 fill-current" />}
+                        {search.name}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
               <Button variant="outline" className="shadow-soft hover:shadow-medium transition-all duration-300 hover:bg-accent hover:text-accent-foreground border-accent/20">
                 <Download className="ml-2 h-4 w-4 md:h-5 md:w-5" />
                 <span className="hidden md:inline">تصدير البيانات</span>
@@ -281,12 +372,22 @@ const Beneficiaries = () => {
                                 <MoreVertical className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="start">
-                              <DropdownMenuItem onClick={() => handleEditBeneficiary(beneficiary)}>
-                                عرض التفاصيل
+                            <DropdownMenuContent align="end" className="w-48">
+                              <DropdownMenuItem onClick={() => handleViewProfile(beneficiary)}>
+                                <Eye className="ml-2 h-4 w-4" />
+                                عرض الملف الكامل
                               </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleViewAttachments(beneficiary)}>
+                                <FileText className="ml-2 h-4 w-4" />
+                                المرفقات
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleViewActivity(beneficiary)}>
+                                <Activity className="ml-2 h-4 w-4" />
+                                سجل النشاط
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
                               <DropdownMenuItem onClick={() => handleEditBeneficiary(beneficiary)}>
-                                تعديل البيانات
+                                تعديل
                               </DropdownMenuItem>
                               <DropdownMenuItem>سجل النشاط</DropdownMenuItem>
                               <DropdownMenuItem>المستندات</DropdownMenuItem>
@@ -324,6 +425,30 @@ const Beneficiaries = () => {
           beneficiary={selectedBeneficiary}
           onSave={handleSaveBeneficiary}
         />
+        
+        <AdvancedSearchDialog
+          open={advancedSearchOpen}
+          onOpenChange={setAdvancedSearchOpen}
+          onSearch={handleAdvancedSearch}
+        />
+
+        {selectedBeneficiary && (
+          <>
+            <AttachmentsDialog
+              open={attachmentsDialogOpen}
+              onOpenChange={setAttachmentsDialogOpen}
+              beneficiaryId={selectedBeneficiary.id}
+              beneficiaryName={selectedBeneficiary.full_name}
+            />
+
+            <ActivityLogDialog
+              open={activityLogDialogOpen}
+              onOpenChange={setActivityLogDialogOpen}
+              beneficiaryId={selectedBeneficiary.id}
+              beneficiaryName={selectedBeneficiary.full_name}
+            />
+          </>
+        )}
       </div>
     </div>
   );

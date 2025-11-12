@@ -13,6 +13,22 @@ export interface Beneficiary {
   relationship?: string;
   status: string;
   notes?: string;
+  tribe?: string;
+  priority_level?: number;
+  marital_status?: string;
+  nationality?: string;
+  city?: string;
+  address?: string;
+  date_of_birth?: string;
+  gender?: string;
+  bank_name?: string;
+  bank_account_number?: string;
+  iban?: string;
+  monthly_income?: number;
+  family_size?: number;
+  is_head_of_family?: boolean;
+  parent_beneficiary_id?: string;
+  tags?: string[];
   created_at: string;
   updated_at: string;
 }

@@ -134,49 +134,253 @@ export type Database = {
       }
       beneficiaries: {
         Row: {
+          address: string | null
+          bank_account_number: string | null
+          bank_name: string | null
           category: string
+          city: string | null
           created_at: string
+          date_of_birth: string | null
           email: string | null
           family_name: string | null
+          family_size: number | null
           full_name: string
+          gender: string | null
+          iban: string | null
           id: string
+          is_head_of_family: boolean | null
+          marital_status: string | null
+          monthly_income: number | null
           national_id: string
+          nationality: string | null
           notes: string | null
+          parent_beneficiary_id: string | null
           phone: string
+          priority_level: number | null
           relationship: string | null
           status: string
+          tags: string[] | null
+          tribe: string | null
           updated_at: string
           user_id: string | null
         }
         Insert: {
+          address?: string | null
+          bank_account_number?: string | null
+          bank_name?: string | null
           category: string
+          city?: string | null
           created_at?: string
+          date_of_birth?: string | null
           email?: string | null
           family_name?: string | null
+          family_size?: number | null
           full_name: string
+          gender?: string | null
+          iban?: string | null
           id?: string
+          is_head_of_family?: boolean | null
+          marital_status?: string | null
+          monthly_income?: number | null
           national_id: string
+          nationality?: string | null
           notes?: string | null
+          parent_beneficiary_id?: string | null
           phone: string
+          priority_level?: number | null
           relationship?: string | null
           status?: string
+          tags?: string[] | null
+          tribe?: string | null
           updated_at?: string
           user_id?: string | null
         }
         Update: {
+          address?: string | null
+          bank_account_number?: string | null
+          bank_name?: string | null
           category?: string
+          city?: string | null
           created_at?: string
+          date_of_birth?: string | null
           email?: string | null
           family_name?: string | null
+          family_size?: number | null
           full_name?: string
+          gender?: string | null
+          iban?: string | null
           id?: string
+          is_head_of_family?: boolean | null
+          marital_status?: string | null
+          monthly_income?: number | null
           national_id?: string
+          nationality?: string | null
           notes?: string | null
+          parent_beneficiary_id?: string | null
           phone?: string
+          priority_level?: number | null
           relationship?: string | null
           status?: string
+          tags?: string[] | null
+          tribe?: string | null
           updated_at?: string
           user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beneficiaries_parent_beneficiary_id_fkey"
+            columns: ["parent_beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      beneficiary_activity_log: {
+        Row: {
+          action_description: string
+          action_type: string
+          beneficiary_id: string
+          created_at: string | null
+          id: string
+          ip_address: string | null
+          new_values: Json | null
+          old_values: Json | null
+          performed_by: string | null
+          performed_by_name: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          action_description: string
+          action_type: string
+          beneficiary_id: string
+          created_at?: string | null
+          id?: string
+          ip_address?: string | null
+          new_values?: Json | null
+          old_values?: Json | null
+          performed_by?: string | null
+          performed_by_name?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          action_description?: string
+          action_type?: string
+          beneficiary_id?: string
+          created_at?: string | null
+          id?: string
+          ip_address?: string | null
+          new_values?: Json | null
+          old_values?: Json | null
+          performed_by?: string | null
+          performed_by_name?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beneficiary_activity_log_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      beneficiary_attachments: {
+        Row: {
+          beneficiary_id: string
+          created_at: string | null
+          description: string | null
+          file_name: string
+          file_path: string
+          file_size: number | null
+          file_type: string
+          id: string
+          is_verified: boolean | null
+          mime_type: string | null
+          updated_at: string | null
+          uploaded_by: string | null
+          uploaded_by_name: string | null
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          beneficiary_id: string
+          created_at?: string | null
+          description?: string | null
+          file_name: string
+          file_path: string
+          file_size?: number | null
+          file_type: string
+          id?: string
+          is_verified?: boolean | null
+          mime_type?: string | null
+          updated_at?: string | null
+          uploaded_by?: string | null
+          uploaded_by_name?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          beneficiary_id?: string
+          created_at?: string | null
+          description?: string | null
+          file_name?: string
+          file_path?: string
+          file_size?: number | null
+          file_type?: string
+          id?: string
+          is_verified?: boolean | null
+          mime_type?: string | null
+          updated_at?: string | null
+          uploaded_by?: string | null
+          uploaded_by_name?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beneficiary_attachments_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      beneficiary_categories: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          sort_order?: number | null
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -1079,6 +1283,45 @@ export type Database = {
           name?: string
           requires_approval?: boolean | null
           sla_hours?: number | null
+        }
+        Relationships: []
+      }
+      saved_searches: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_favorite: boolean | null
+          last_used_at: string | null
+          name: string
+          search_criteria: Json
+          updated_at: string | null
+          usage_count: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_favorite?: boolean | null
+          last_used_at?: string | null
+          name: string
+          search_criteria: Json
+          updated_at?: string | null
+          usage_count?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_favorite?: boolean | null
+          last_used_at?: string | null
+          name?: string
+          search_criteria?: Json
+          updated_at?: string | null
+          usage_count?: number | null
+          user_id?: string
         }
         Relationships: []
       }
