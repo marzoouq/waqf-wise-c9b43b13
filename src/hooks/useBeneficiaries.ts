@@ -29,6 +29,11 @@ export interface Beneficiary {
   is_head_of_family?: boolean;
   parent_beneficiary_id?: string;
   tags?: string[];
+  username?: string;
+  can_login?: boolean;
+  last_login_at?: string;
+  login_enabled_at?: string;
+  user_id?: string;
   created_at: string;
   updated_at: string;
 }

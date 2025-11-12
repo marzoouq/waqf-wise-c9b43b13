@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from "react";
-import { Plus, Search, Filter, Download, MoreVertical, Users, UserCheck, UserX, Home, Eye, FileText, Activity, Save, Star } from "lucide-react";
+import { Plus, Search, Filter, Download, MoreVertical, Users, UserCheck, UserX, Home, Eye, FileText, Activity, Save, Star, Key } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { useBeneficiaries } from "@/hooks/useBeneficiaries";
 import { useSavedSearches } from "@/hooks/useSavedSearches";
@@ -25,6 +26,7 @@ import BeneficiaryDialog from "@/components/beneficiaries/BeneficiaryDialog";
 import { AdvancedSearchDialog, SearchCriteria } from "@/components/beneficiaries/AdvancedSearchDialog";
 import { AttachmentsDialog } from "@/components/beneficiaries/AttachmentsDialog";
 import { ActivityLogDialog } from "@/components/beneficiaries/ActivityLogDialog";
+import { EnableLoginDialog } from "@/components/beneficiaries/EnableLoginDialog";
 import { Pagination } from "@/components/ui/pagination";
 import { useNavigate } from "react-router-dom";
 
@@ -32,11 +34,13 @@ const ITEMS_PER_PAGE = 20;
 
 const Beneficiaries = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [advancedSearchOpen, setAdvancedSearchOpen] = useState(false);
   const [attachmentsDialogOpen, setAttachmentsDialogOpen] = useState(false);
   const [activityLogDialogOpen, setActivityLogDialogOpen] = useState(false);
+  const [enableLoginDialogOpen, setEnableLoginDialogOpen] = useState(false);
   const [selectedBeneficiary, setSelectedBeneficiary] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [advancedCriteria, setAdvancedCriteria] = useState<SearchCriteria>({});
@@ -163,6 +167,11 @@ const Beneficiaries = () => {
   const handleLoadSavedSearch = (search: any) => {
     setAdvancedCriteria(search.search_criteria);
     setCurrentPage(1);
+  };
+
+  const handleEnableLogin = (beneficiary: any) => {
+    setSelectedBeneficiary(beneficiary);
+    setEnableLoginDialogOpen(true);
   };
 
   return (
@@ -386,6 +395,10 @@ const Beneficiaries = () => {
                                 سجل النشاط
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
+                              <DropdownMenuItem onClick={() => handleEnableLogin(beneficiary)}>
+                                <Key className="ml-2 h-4 w-4" />
+                                {beneficiary.can_login ? "إدارة الحساب" : "تفعيل حساب الدخول"}
+                              </DropdownMenuItem>
                               <DropdownMenuItem onClick={() => handleEditBeneficiary(beneficiary)}>
                                 تعديل
                               </DropdownMenuItem>
@@ -446,6 +459,15 @@ const Beneficiaries = () => {
               onOpenChange={setActivityLogDialogOpen}
               beneficiaryId={selectedBeneficiary.id}
               beneficiaryName={selectedBeneficiary.full_name}
+            />
+
+            <EnableLoginDialog
+              open={enableLoginDialogOpen}
+              onOpenChange={setEnableLoginDialogOpen}
+              beneficiary={selectedBeneficiary}
+              onSuccess={() => {
+                queryClient.invalidateQueries({ queryKey: ["beneficiaries"] });
+              }}
             />
           </>
         )}
