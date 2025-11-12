@@ -70,7 +70,7 @@ const Requests = () => {
   };
 
   if (isLoading) {
-    return <LoadingState size="lg" text="جاري تحميل الطلبات..." />;
+    return <LoadingState size="lg" />;
   }
 
   return (

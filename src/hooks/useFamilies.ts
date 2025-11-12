@@ -16,7 +16,7 @@ export const useFamilies = () => {
     queryKey: ['families'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('families')
+        .from('families' as any)
         .select(`
           *,
           head_of_family:beneficiaries!families_head_of_family_id_fkey(
@@ -28,7 +28,7 @@ export const useFamilies = () => {
         .order('family_name', { ascending: true });
 
       if (error) throw error;
-      return data as Family[];
+      return data as unknown as Family[];
     },
   });
 
@@ -36,8 +36,8 @@ export const useFamilies = () => {
   const addFamily = useMutation({
     mutationFn: async (newFamily: Omit<Family, 'id' | 'created_at' | 'updated_at' | 'total_members'>) => {
       const { data, error } = await supabase
-        .from('families')
-        .insert(newFamily)
+        .from('families' as any)
+        .insert(newFamily as any)
         .select()
         .single();
 
@@ -64,8 +64,8 @@ export const useFamilies = () => {
   const updateFamily = useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<Family> }) => {
       const { data, error } = await supabase
-        .from('families')
-        .update(updates)
+        .from('families' as any)
+        .update(updates as any)
         .eq('id', id)
         .select()
         .single();
@@ -93,7 +93,7 @@ export const useFamilies = () => {
   const deleteFamily = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
-        .from('families')
+        .from('families' as any)
         .delete()
         .eq('id', id);
 
@@ -140,7 +140,7 @@ export const useFamilyMembers = (familyId?: string) => {
       if (!familyId) return [];
 
       const { data, error } = await supabase
-        .from('family_members')
+        .from('family_members' as any)
         .select(`
           *,
           beneficiary:beneficiaries(
@@ -156,7 +156,7 @@ export const useFamilyMembers = (familyId?: string) => {
         .order('priority_level', { ascending: true });
 
       if (error) throw error;
-      return data as FamilyMember[];
+      return data as unknown as FamilyMember[];
     },
     enabled: !!familyId,
   });
@@ -165,8 +165,8 @@ export const useFamilyMembers = (familyId?: string) => {
   const addMember = useMutation({
     mutationFn: async (newMember: Omit<FamilyMember, 'id' | 'created_at' | 'updated_at'>) => {
       const { data, error } = await supabase
-        .from('family_members')
-        .insert(newMember)
+        .from('family_members' as any)
+        .insert(newMember as any)
         .select()
         .single();
 
@@ -194,8 +194,8 @@ export const useFamilyMembers = (familyId?: string) => {
   const updateMember = useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<FamilyMember> }) => {
       const { data, error } = await supabase
-        .from('family_members')
-        .update(updates)
+        .from('family_members' as any)
+        .update(updates as any)
         .eq('id', id)
         .select()
         .single();
@@ -223,7 +223,7 @@ export const useFamilyMembers = (familyId?: string) => {
   const removeMember = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
-        .from('family_members')
+        .from('family_members' as any)
         .delete()
         .eq('id', id);
 

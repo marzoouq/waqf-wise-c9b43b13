@@ -26,7 +26,7 @@ const Families = () => {
   );
 
   if (isLoading) {
-    return <LoadingState size="lg" text="جاري تحميل العائلات..." />;
+    return <LoadingState size="lg" />;
   }
 
   return (

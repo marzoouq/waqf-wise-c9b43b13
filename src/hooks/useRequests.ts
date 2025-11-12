@@ -12,13 +12,13 @@ export const useRequestTypes = () => {
     queryKey: ['request-types'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('request_types')
+        .from('request_types' as any)
         .select('*')
         .eq('is_active', true)
         .order('name', { ascending: true });
 
       if (error) throw error;
-      return data as RequestType[];
+      return data as unknown as RequestType[];
     },
   });
 
@@ -41,7 +41,7 @@ export const useRequests = (beneficiaryId?: string) => {
     queryKey: beneficiaryId ? ['requests', 'beneficiary', beneficiaryId] : ['requests'],
     queryFn: async () => {
       let query = supabase
-        .from('beneficiary_requests')
+        .from('beneficiary_requests' as any)
         .select(`
           *,
           request_type:request_types(*),
@@ -61,7 +61,7 @@ export const useRequests = (beneficiaryId?: string) => {
       const { data, error } = await query;
 
       if (error) throw error;
-      return data as BeneficiaryRequest[];
+      return data as unknown as BeneficiaryRequest[];
     },
   });
 
@@ -71,17 +71,17 @@ export const useRequests = (beneficiaryId?: string) => {
       queryKey: ['request', requestId],
       queryFn: async () => {
         const { data, error } = await supabase
-          .from('beneficiary_requests')
+          .from('beneficiary_requests' as any)
           .select(`
             *,
             request_type:request_types(*),
             beneficiary:beneficiaries(*)
           `)
           .eq('id', requestId)
-          .single();
+          .maybeSingle();
 
         if (error) throw error;
-        return data as BeneficiaryRequest;
+        return data as unknown as BeneficiaryRequest | null;
       },
       enabled: !!requestId,
     });
@@ -91,11 +91,11 @@ export const useRequests = (beneficiaryId?: string) => {
   const createRequest = useMutation({
     mutationFn: async (newRequest: Omit<BeneficiaryRequest, 'id' | 'request_number' | 'created_at' | 'updated_at' | 'submitted_at' | 'sla_due_at' | 'is_overdue'>) => {
       const { data, error } = await supabase
-        .from('beneficiary_requests')
+        .from('beneficiary_requests' as any)
         .insert({
           ...newRequest,
           submitted_at: new Date().toISOString(),
-        })
+        } as any)
         .select()
         .single();
 
@@ -122,8 +122,8 @@ export const useRequests = (beneficiaryId?: string) => {
   const updateRequest = useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<BeneficiaryRequest> }) => {
       const { data, error } = await supabase
-        .from('beneficiary_requests')
-        .update(updates)
+        .from('beneficiary_requests' as any)
+        .update(updates as any)
         .eq('id', id)
         .select()
         .single();
@@ -151,7 +151,7 @@ export const useRequests = (beneficiaryId?: string) => {
   const deleteRequest = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
-        .from('beneficiary_requests')
+        .from('beneficiary_requests' as any)
         .delete()
         .eq('id', id);
 
@@ -186,7 +186,7 @@ export const useRequests = (beneficiaryId?: string) => {
       decision_notes?: string;
       rejection_reason?: string;
     }) => {
-      const updates: Partial<BeneficiaryRequest> = {
+      const updates: any = {
         status,
         decision_notes,
         rejection_reason,
@@ -198,7 +198,7 @@ export const useRequests = (beneficiaryId?: string) => {
       }
 
       const { data, error } = await supabase
-        .from('beneficiary_requests')
+        .from('beneficiary_requests' as any)
         .update(updates)
         .eq('id', id)
         .select()
