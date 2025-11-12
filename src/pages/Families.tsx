@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Users, Search } from 'lucide-react';
+import { Plus, Users, Search, MoreVertical, Edit, Trash2, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,15 +15,94 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import FamilyDialog from '@/components/families/FamilyDialog';
+import { Family } from '@/types';
+import { toast } from 'sonner';
 
 const Families = () => {
-  const { families, isLoading } = useFamilies();
+  const { families, isLoading, addFamily, updateFamily, deleteFamily } = useFamilies();
   const [searchQuery, setSearchQuery] = useState('');
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedFamily, setSelectedFamily] = useState<Family | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [familyToDelete, setFamilyToDelete] = useState<Family | null>(null);
 
   const filteredFamilies = families.filter(family =>
     family.family_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     family.tribe?.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleAddFamily = () => {
+    setSelectedFamily(null);
+    setDialogOpen(true);
+  };
+
+  const handleEditFamily = (family: Family) => {
+    setSelectedFamily(family);
+    setDialogOpen(true);
+  };
+
+  const handleDeleteClick = (family: Family) => {
+    setFamilyToDelete(family);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (familyToDelete) {
+      deleteFamily.mutate(familyToDelete.id, {
+        onSuccess: () => {
+          toast.success('تم حذف العائلة بنجاح');
+          setDeleteDialogOpen(false);
+          setFamilyToDelete(null);
+        },
+        onError: () => {
+          toast.error('فشل حذف العائلة');
+        }
+      });
+    }
+  };
+
+  const handleSaveFamily = async (data: Partial<Family>) => {
+    if (selectedFamily) {
+      updateFamily.mutate({ id: selectedFamily.id, updates: data }, {
+        onSuccess: () => {
+          toast.success('تم تحديث بيانات العائلة بنجاح');
+          setDialogOpen(false);
+          setSelectedFamily(null);
+        },
+        onError: () => {
+          toast.error('فشل تحديث العائلة');
+        }
+      });
+    } else {
+      addFamily.mutate(data as any, {
+        onSuccess: () => {
+          toast.success('تم إضافة العائلة بنجاح');
+          setDialogOpen(false);
+          setSelectedFamily(null);
+        },
+        onError: () => {
+          toast.error('فشل إضافة العائلة');
+        }
+      });
+    }
+  };
 
   if (isLoading) {
     return <LoadingState size="lg" />;
@@ -39,7 +118,7 @@ const Families = () => {
             إدارة العائلات وربط أفرادها ببعضهم البعض
           </p>
         </div>
-        <Button size="lg">
+        <Button size="lg" onClick={handleAddFamily}>
           <Plus className="ml-2 h-5 w-5" />
           إضافة عائلة جديدة
         </Button>
@@ -134,11 +213,12 @@ const Families = () => {
                     <TableHead className="text-right">عدد الأفراد</TableHead>
                     <TableHead className="text-right">الحالة</TableHead>
                     <TableHead className="text-right">تاريخ التسجيل</TableHead>
+                    <TableHead className="text-right w-[100px]">الإجراءات</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredFamilies.map((family) => (
-                    <TableRow key={family.id} className="cursor-pointer hover:bg-muted/50">
+                    <TableRow key={family.id} className="hover:bg-muted/50">
                       <TableCell className="font-medium">{family.family_name}</TableCell>
                       <TableCell>
                         {(family as any).head_of_family?.full_name || '-'}
@@ -159,6 +239,28 @@ const Families = () => {
                       <TableCell className="text-muted-foreground">
                         {new Date(family.created_at).toLocaleDateString('ar-SA')}
                       </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleEditFamily(family)}>
+                              <Edit className="ml-2 h-4 w-4" />
+                              تعديل
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              onClick={() => handleDeleteClick(family)}
+                              className="text-destructive"
+                            >
+                              <Trash2 className="ml-2 h-4 w-4" />
+                              حذف
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -167,8 +269,44 @@ const Families = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Family Dialog */}
+      <FamilyDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        family={selectedFamily}
+        onSave={handleSaveFamily}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent dir="rtl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
+            <AlertDialogDescription>
+              هل أنت متأكد من حذف عائلة "{familyToDelete?.family_name}"؟
+              <br />
+              <span className="text-destructive font-semibold">
+                تحذير: سيتم حذف جميع أفراد العائلة ({familyToDelete?.total_members || 0} أفراد) أيضاً!
+              </span>
+              <br />
+              هذا الإجراء لا يمكن التراجع عنه.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>إلغاء</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              حذف
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
 
 export default Families;
+
