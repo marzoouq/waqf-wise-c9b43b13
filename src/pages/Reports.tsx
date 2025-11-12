@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EnhancedIncomeStatement } from "@/components/accounting/EnhancedIncomeStatement";
 import { EnhancedBalanceSheet } from "@/components/accounting/EnhancedBalanceSheet";
 import { TrialBalanceReport } from "@/components/accounting/TrialBalanceReport";
+import { CashFlowStatement } from "@/components/accounting/CashFlowStatement";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, FileText } from "lucide-react";
@@ -83,15 +84,16 @@ const Reports = () => {
           </div>
         </div>
 
-        <Tabs defaultValue="income" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:w-auto">
-            <TabsTrigger value="trial">ميزان المراجعة</TabsTrigger>
-            <TabsTrigger value="balance">الميزانية العمومية</TabsTrigger>
+        <Tabs defaultValue="trial-balance" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-5">
+            <TabsTrigger value="trial-balance">ميزان المراجعة</TabsTrigger>
+            <TabsTrigger value="balance-sheet">الميزانية العمومية</TabsTrigger>
             <TabsTrigger value="income">قائمة الدخل</TabsTrigger>
+            <TabsTrigger value="cash-flow">التدفقات النقدية</TabsTrigger>
             <TabsTrigger value="distributions">التوزيعات</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="trial" className="space-y-4">
+          <TabsContent value="trial-balance" className="space-y-4">
             <div className="flex gap-2 mb-4">
               <Button onClick={() => handleExportPDF("ميزان المراجعة")} variant="outline">
                 <Download className="h-4 w-4 mr-2" />
@@ -105,7 +107,7 @@ const Reports = () => {
             <TrialBalanceReport />
           </TabsContent>
 
-          <TabsContent value="balance" className="space-y-4">
+          <TabsContent value="balance-sheet" className="space-y-4">
             <div className="flex gap-2 mb-4">
               <Button onClick={() => handleExportPDF("الميزانية العمومية")} variant="outline">
                 <Download className="h-4 w-4 mr-2" />
@@ -131,6 +133,20 @@ const Reports = () => {
               </Button>
             </div>
             <EnhancedIncomeStatement />
+          </TabsContent>
+
+          <TabsContent value="cash-flow" className="space-y-4">
+            <div className="flex gap-2 mb-4">
+              <Button onClick={() => handleExportPDF("قائمة التدفقات النقدية")} variant="outline">
+                <Download className="h-4 w-4 mr-2" />
+                تصدير PDF
+              </Button>
+              <Button onClick={() => handleExportExcel("قائمة التدفقات النقدية", [])} variant="outline">
+                <Download className="h-4 w-4 mr-2" />
+                تصدير Excel
+              </Button>
+            </div>
+            <CashFlowStatement />
           </TabsContent>
 
           <TabsContent value="distributions" className="space-y-4">

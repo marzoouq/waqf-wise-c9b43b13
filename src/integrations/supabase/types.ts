@@ -132,6 +132,154 @@ export type Database = {
           },
         ]
       }
+      bank_accounts: {
+        Row: {
+          account_id: string | null
+          account_number: string
+          bank_name: string
+          created_at: string
+          currency: string
+          current_balance: number
+          iban: string | null
+          id: string
+          is_active: boolean
+          swift_code: string | null
+          updated_at: string
+        }
+        Insert: {
+          account_id?: string | null
+          account_number: string
+          bank_name: string
+          created_at?: string
+          currency?: string
+          current_balance?: number
+          iban?: string | null
+          id?: string
+          is_active?: boolean
+          swift_code?: string | null
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string | null
+          account_number?: string
+          bank_name?: string
+          created_at?: string
+          currency?: string
+          current_balance?: number
+          iban?: string | null
+          id?: string
+          is_active?: boolean
+          swift_code?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bank_accounts_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bank_statements: {
+        Row: {
+          bank_account_id: string
+          closing_balance: number
+          created_at: string
+          id: string
+          opening_balance: number
+          reconciled_at: string | null
+          statement_date: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          bank_account_id: string
+          closing_balance: number
+          created_at?: string
+          id?: string
+          opening_balance: number
+          reconciled_at?: string | null
+          statement_date: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          bank_account_id?: string
+          closing_balance?: number
+          created_at?: string
+          id?: string
+          opening_balance?: number
+          reconciled_at?: string | null
+          statement_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bank_statements_bank_account_id_fkey"
+            columns: ["bank_account_id"]
+            isOneToOne: false
+            referencedRelation: "bank_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bank_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          description: string
+          id: string
+          is_matched: boolean
+          journal_entry_id: string | null
+          reference_number: string | null
+          statement_id: string
+          transaction_date: string
+          transaction_type: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          description: string
+          id?: string
+          is_matched?: boolean
+          journal_entry_id?: string | null
+          reference_number?: string | null
+          statement_id: string
+          transaction_date: string
+          transaction_type: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string
+          id?: string
+          is_matched?: boolean
+          journal_entry_id?: string | null
+          reference_number?: string | null
+          statement_id?: string
+          transaction_date?: string
+          transaction_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bank_transactions_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
+            referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bank_transactions_statement_id_fkey"
+            columns: ["statement_id"]
+            isOneToOne: false
+            referencedRelation: "bank_statements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       beneficiaries: {
         Row: {
           address: string | null
@@ -521,6 +669,59 @@ export type Database = {
           },
           {
             foreignKeyName: "budgets_fiscal_year_id_fkey"
+            columns: ["fiscal_year_id"]
+            isOneToOne: false
+            referencedRelation: "fiscal_years"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cash_flows: {
+        Row: {
+          closing_cash: number
+          created_at: string
+          financing_activities: number
+          fiscal_year_id: string
+          id: string
+          investing_activities: number
+          net_cash_flow: number
+          opening_cash: number
+          operating_activities: number
+          period_end: string
+          period_start: string
+          updated_at: string
+        }
+        Insert: {
+          closing_cash?: number
+          created_at?: string
+          financing_activities?: number
+          fiscal_year_id: string
+          id?: string
+          investing_activities?: number
+          net_cash_flow?: number
+          opening_cash?: number
+          operating_activities?: number
+          period_end: string
+          period_start: string
+          updated_at?: string
+        }
+        Update: {
+          closing_cash?: number
+          created_at?: string
+          financing_activities?: number
+          fiscal_year_id?: string
+          id?: string
+          investing_activities?: number
+          net_cash_flow?: number
+          opening_cash?: number
+          operating_activities?: number
+          period_end?: string
+          period_start?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cash_flows_fiscal_year_id_fkey"
             columns: ["fiscal_year_id"]
             isOneToOne: false
             referencedRelation: "fiscal_years"
@@ -1755,6 +1956,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_auto_journal_entry: {
+        Args: {
+          p_amount: number
+          p_description: string
+          p_reference_id: string
+          p_transaction_date?: string
+          p_trigger_event: string
+        }
+        Returns: string
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
