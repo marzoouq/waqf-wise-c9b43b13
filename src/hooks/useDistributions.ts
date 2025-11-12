@@ -14,6 +14,7 @@ export interface Distribution {
   status: string;
   distribution_date: string;
   notes?: string;
+  journal_entry_id?: string;
   created_at: string;
   updated_at: string;
 }
@@ -70,28 +71,6 @@ export function useDistributions() {
         .single();
 
       if (error) throw error;
-
-      // إنشاء قيد محاسبي تلقائي للتوزيع
-      if (data && data.status === "معتمد") {
-        try {
-          const entryId = await createAutoEntry(
-            "distribution",
-            data.id,
-            data.total_amount,
-            `توزيع غلة - ${data.month} - عدد المستفيدين: ${data.beneficiaries_count}`,
-            data.distribution_date
-          );
-
-          // تحديث رقم القيد في التوزيع (إذا كان هناك حقل لذلك)
-          if (entryId) {
-            console.log(`Created journal entry ${entryId} for distribution ${data.id}`);
-          }
-        } catch (journalError) {
-          console.error("Error creating journal entry:", journalError);
-          // لا نوقف العملية في حال فشل القيد المحاسبي
-        }
-      }
-
       return data;
     },
     onSuccess: async (data) => {
@@ -123,9 +102,78 @@ export function useDistributions() {
     },
   });
 
+  const updateDistribution = useMutation({
+    mutationFn: async ({ id, updates }: { id: string; updates: Partial<Distribution> }) => {
+      const { data, error } = await supabase
+        .from("distributions")
+        .update(updates)
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // إنشاء قيد محاسبي عند اعتماد التوزيع
+      if (updates.status === "معتمد" && !data.journal_entry_id) {
+        try {
+          const entryId = await createAutoEntry(
+            "distribution_approved",
+            data.id,
+            data.total_amount,
+            `توزيع معتمد - ${data.month} - عدد المستفيدين: ${data.beneficiaries_count}`,
+            data.distribution_date
+          );
+
+          if (entryId) {
+            await supabase
+              .from("distributions")
+              .update({ journal_entry_id: entryId })
+              .eq("id", id);
+          }
+        } catch (journalError) {
+          console.error("Error creating journal entry:", journalError);
+        }
+      }
+
+      return data;
+    },
+    onSuccess: async (data) => {
+      queryClient.invalidateQueries({ queryKey: ["distributions"] });
+      queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
+      
+      toast({
+        title: "تم التحديث بنجاح",
+        description: "تم تحديث التوزيع بنجاح",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "خطأ في التحديث",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const simulateDistribution = async (totalAmount: number, beneficiariesCount: number) => {
+    // محاكاة توزيع بسيط: تقسيم المبلغ بالتساوي
+    const perBeneficiary = totalAmount / beneficiariesCount;
+    return {
+      totalAmount,
+      beneficiariesCount,
+      perBeneficiary,
+      distribution: Array.from({ length: Math.min(beneficiariesCount, 10) }, (_, i) => ({
+        beneficiaryNumber: i + 1,
+        amount: perBeneficiary,
+      })),
+    };
+  };
+
   return {
     distributions,
     isLoading,
     addDistribution: addDistribution.mutateAsync,
+    updateDistribution: updateDistribution.mutateAsync,
+    simulateDistribution,
   };
 }

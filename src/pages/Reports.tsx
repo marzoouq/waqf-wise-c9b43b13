@@ -5,6 +5,7 @@ import { EnhancedIncomeStatement } from "@/components/accounting/EnhancedIncomeS
 import { EnhancedBalanceSheet } from "@/components/accounting/EnhancedBalanceSheet";
 import { TrialBalanceReport } from "@/components/accounting/TrialBalanceReport";
 import { CashFlowStatement } from "@/components/accounting/CashFlowStatement";
+import { AccountingLinkReport } from "@/components/reports/AccountingLinkReport";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, FileText } from "lucide-react";
@@ -85,11 +86,12 @@ const Reports = () => {
         </div>
 
         <Tabs defaultValue="trial-balance" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-5">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-6">
             <TabsTrigger value="trial-balance">ميزان المراجعة</TabsTrigger>
             <TabsTrigger value="balance-sheet">الميزانية العمومية</TabsTrigger>
             <TabsTrigger value="income">قائمة الدخل</TabsTrigger>
             <TabsTrigger value="cash-flow">التدفقات النقدية</TabsTrigger>
+            <TabsTrigger value="accounting-link">الربط المحاسبي</TabsTrigger>
             <TabsTrigger value="distributions">التوزيعات</TabsTrigger>
           </TabsList>
 
@@ -147,6 +149,10 @@ const Reports = () => {
               </Button>
             </div>
             <CashFlowStatement />
+          </TabsContent>
+
+          <TabsContent value="accounting-link" className="space-y-4">
+            <AccountingLinkReport />
           </TabsContent>
 
           <TabsContent value="distributions" className="space-y-4">

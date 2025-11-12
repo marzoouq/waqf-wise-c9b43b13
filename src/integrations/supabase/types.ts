@@ -919,12 +919,60 @@ export type Database = {
           },
         ]
       }
+      distribution_approvals: {
+        Row: {
+          approved_at: string | null
+          approver_id: string | null
+          approver_name: string
+          created_at: string | null
+          distribution_id: string
+          id: string
+          level: number
+          notes: string | null
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          approver_id?: string | null
+          approver_name: string
+          created_at?: string | null
+          distribution_id: string
+          id?: string
+          level: number
+          notes?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          approver_id?: string | null
+          approver_name?: string
+          created_at?: string | null
+          distribution_id?: string
+          id?: string
+          level?: number
+          notes?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "distribution_approvals_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "distributions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       distributions: {
         Row: {
           beneficiaries_count: number
           created_at: string
           distribution_date: string
           id: string
+          journal_entry_id: string | null
           month: string
           notes: string | null
           status: string
@@ -936,6 +984,7 @@ export type Database = {
           created_at?: string
           distribution_date: string
           id?: string
+          journal_entry_id?: string | null
           month: string
           notes?: string | null
           status?: string
@@ -947,13 +996,22 @@ export type Database = {
           created_at?: string
           distribution_date?: string
           id?: string
+          journal_entry_id?: string | null
           month?: string
           notes?: string | null
           status?: string
           total_amount?: number
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "distributions_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
+            referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       documents: {
         Row: {
