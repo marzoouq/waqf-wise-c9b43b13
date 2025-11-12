@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
-import AppSidebar from "./Sidebar";
+// ⚠️ IMPORTANT: Always import from AppSidebar.tsx (not Sidebar.tsx)
+import AppSidebar from "./AppSidebar";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { Menu, LogOut } from "lucide-react";
 import { NotificationsBell } from "./NotificationsBell";
