@@ -174,17 +174,16 @@ const AppSidebar = () => {
             </div>
           )}
         </div>
-        {!isCollapsed && (
-          <Button
-            variant="outline"
-            size="sm"
-            className="w-full"
-            onClick={signOut}
-          >
-            <LogOut className="h-4 w-4 ml-2" />
-            تسجيل الخروج
-          </Button>
-        )}
+        <Button
+          variant="outline"
+          size={isCollapsed ? "icon" : "sm"}
+          className={isCollapsed ? "w-10 h-10 p-0" : "w-full"}
+          onClick={signOut}
+          title="تسجيل الخروج"
+        >
+          <LogOut className="h-4 w-4" />
+          {!isCollapsed && <span className="mr-2">تسجيل الخروج</span>}
+        </Button>
       </SidebarFooter>
     </Sidebar>
   );
