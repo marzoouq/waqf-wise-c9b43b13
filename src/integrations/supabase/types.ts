@@ -146,6 +146,7 @@ export type Database = {
           relationship: string | null
           status: string
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           category: string
@@ -160,6 +161,7 @@ export type Database = {
           relationship?: string | null
           status?: string
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           category?: string
@@ -174,8 +176,84 @@ export type Database = {
           relationship?: string | null
           status?: string
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
+      }
+      beneficiary_requests: {
+        Row: {
+          amount: number | null
+          approved_at: string | null
+          beneficiary_id: string
+          created_at: string | null
+          decision_notes: string | null
+          description: string
+          id: string
+          is_overdue: boolean | null
+          priority: string | null
+          rejection_reason: string | null
+          request_number: string | null
+          request_type_id: string
+          reviewed_at: string | null
+          sla_due_at: string | null
+          status: string | null
+          submitted_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          amount?: number | null
+          approved_at?: string | null
+          beneficiary_id: string
+          created_at?: string | null
+          decision_notes?: string | null
+          description: string
+          id?: string
+          is_overdue?: boolean | null
+          priority?: string | null
+          rejection_reason?: string | null
+          request_number?: string | null
+          request_type_id: string
+          reviewed_at?: string | null
+          sla_due_at?: string | null
+          status?: string | null
+          submitted_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number | null
+          approved_at?: string | null
+          beneficiary_id?: string
+          created_at?: string | null
+          decision_notes?: string | null
+          description?: string
+          id?: string
+          is_overdue?: boolean | null
+          priority?: string | null
+          rejection_reason?: string | null
+          request_number?: string | null
+          request_type_id?: string
+          reviewed_at?: string | null
+          sla_due_at?: string | null
+          status?: string | null
+          submitted_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beneficiary_requests_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "beneficiary_requests_request_type_id_fkey"
+            columns: ["request_type_id"]
+            isOneToOne: false
+            referencedRelation: "request_types"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       budgets: {
         Row: {
@@ -307,6 +385,98 @@ export type Database = {
             columns: ["folder_id"]
             isOneToOne: false
             referencedRelation: "folders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      families: {
+        Row: {
+          created_at: string | null
+          family_name: string
+          head_of_family_id: string | null
+          id: string
+          notes: string | null
+          status: string | null
+          total_members: number | null
+          tribe: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          family_name: string
+          head_of_family_id?: string | null
+          id?: string
+          notes?: string | null
+          status?: string | null
+          total_members?: number | null
+          tribe?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          family_name?: string
+          head_of_family_id?: string | null
+          id?: string
+          notes?: string | null
+          status?: string | null
+          total_members?: number | null
+          tribe?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "families_head_of_family_id_fkey"
+            columns: ["head_of_family_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      family_members: {
+        Row: {
+          beneficiary_id: string
+          created_at: string | null
+          family_id: string
+          id: string
+          is_dependent: boolean | null
+          priority_level: number | null
+          relationship_to_head: string
+          updated_at: string | null
+        }
+        Insert: {
+          beneficiary_id: string
+          created_at?: string | null
+          family_id: string
+          id?: string
+          is_dependent?: boolean | null
+          priority_level?: number | null
+          relationship_to_head: string
+          updated_at?: string | null
+        }
+        Update: {
+          beneficiary_id?: string
+          created_at?: string | null
+          family_id?: string
+          id?: string
+          is_dependent?: boolean | null
+          priority_level?: number | null
+          relationship_to_head?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_members_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "family_members_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
             referencedColumns: ["id"]
           },
         ]
@@ -803,6 +973,112 @@ export type Database = {
           type?: string
           units?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      request_attachments: {
+        Row: {
+          file_name: string
+          file_path: string
+          file_size: number | null
+          file_type: string | null
+          id: string
+          request_id: string
+          uploaded_at: string | null
+        }
+        Insert: {
+          file_name: string
+          file_path: string
+          file_size?: number | null
+          file_type?: string | null
+          id?: string
+          request_id: string
+          uploaded_at?: string | null
+        }
+        Update: {
+          file_name?: string
+          file_path?: string
+          file_size?: number | null
+          file_type?: string | null
+          id?: string
+          request_id?: string
+          uploaded_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "request_attachments_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      request_comments: {
+        Row: {
+          comment: string
+          created_at: string | null
+          id: string
+          is_internal: boolean | null
+          request_id: string
+          user_id: string
+        }
+        Insert: {
+          comment: string
+          created_at?: string | null
+          id?: string
+          is_internal?: boolean | null
+          request_id: string
+          user_id: string
+        }
+        Update: {
+          comment?: string
+          created_at?: string | null
+          id?: string
+          is_internal?: boolean | null
+          request_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "request_comments_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      request_types: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          requires_approval: boolean | null
+          sla_hours: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          requires_approval?: boolean | null
+          sla_hours?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          requires_approval?: boolean | null
+          sla_hours?: number | null
         }
         Relationships: []
       }
