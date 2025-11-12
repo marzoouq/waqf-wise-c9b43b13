@@ -401,15 +401,12 @@ const AddJournalEntryDialog = ({ open, onOpenChange }: Props) => {
                         type="number"
                         step="0.01"
                         min="0"
-                        value={line.debit_amount === 0 ? '' : line.debit_amount}
+                        value={line.debit_amount}
                         onChange={(e) => {
-                          const value = e.target.value;
-                          const numValue = value === '' ? 0 : parseFloat(value);
-                          if (!isNaN(numValue)) {
-                            updateLine(index, "debit_amount", numValue);
-                            if (numValue > 0) {
-                              updateLine(index, "credit_amount", 0);
-                            }
+                          const value = parseFloat(e.target.value) || 0;
+                          updateLine(index, "debit_amount", value);
+                          if (value > 0) {
+                            updateLine(index, "credit_amount", 0);
                           }
                         }}
                         placeholder="0.00"
@@ -425,15 +422,12 @@ const AddJournalEntryDialog = ({ open, onOpenChange }: Props) => {
                         type="number"
                         step="0.01"
                         min="0"
-                        value={line.credit_amount === 0 ? '' : line.credit_amount}
+                        value={line.credit_amount}
                         onChange={(e) => {
-                          const value = e.target.value;
-                          const numValue = value === '' ? 0 : parseFloat(value);
-                          if (!isNaN(numValue)) {
-                            updateLine(index, "credit_amount", numValue);
-                            if (numValue > 0) {
-                              updateLine(index, "debit_amount", 0);
-                            }
+                          const value = parseFloat(e.target.value) || 0;
+                          updateLine(index, "credit_amount", value);
+                          if (value > 0) {
+                            updateLine(index, "debit_amount", 0);
                           }
                         }}
                         placeholder="0.00"
