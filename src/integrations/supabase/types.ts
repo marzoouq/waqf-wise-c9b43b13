@@ -142,10 +142,12 @@ export type Database = {
           created_at: string
           date_of_birth: string | null
           email: string | null
+          employment_status: string | null
           family_name: string | null
           family_size: number | null
           full_name: string
           gender: string | null
+          housing_type: string | null
           iban: string | null
           id: string
           is_head_of_family: boolean | null
@@ -154,6 +156,9 @@ export type Database = {
           national_id: string
           nationality: string | null
           notes: string | null
+          number_of_daughters: number | null
+          number_of_sons: number | null
+          number_of_wives: number | null
           parent_beneficiary_id: string | null
           phone: string
           priority_level: number | null
@@ -173,10 +178,12 @@ export type Database = {
           created_at?: string
           date_of_birth?: string | null
           email?: string | null
+          employment_status?: string | null
           family_name?: string | null
           family_size?: number | null
           full_name: string
           gender?: string | null
+          housing_type?: string | null
           iban?: string | null
           id?: string
           is_head_of_family?: boolean | null
@@ -185,6 +192,9 @@ export type Database = {
           national_id: string
           nationality?: string | null
           notes?: string | null
+          number_of_daughters?: number | null
+          number_of_sons?: number | null
+          number_of_wives?: number | null
           parent_beneficiary_id?: string | null
           phone: string
           priority_level?: number | null
@@ -204,10 +214,12 @@ export type Database = {
           created_at?: string
           date_of_birth?: string | null
           email?: string | null
+          employment_status?: string | null
           family_name?: string | null
           family_size?: number | null
           full_name?: string
           gender?: string | null
+          housing_type?: string | null
           iban?: string | null
           id?: string
           is_head_of_family?: boolean | null
@@ -216,6 +228,9 @@ export type Database = {
           national_id?: string
           nationality?: string | null
           notes?: string | null
+          number_of_daughters?: number | null
+          number_of_sons?: number | null
+          number_of_wives?: number | null
           parent_beneficiary_id?: string | null
           phone?: string
           priority_level?: number | null

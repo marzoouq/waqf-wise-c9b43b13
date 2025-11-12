@@ -34,6 +34,11 @@ export interface Beneficiary {
   last_login_at?: string;
   login_enabled_at?: string;
   user_id?: string;
+  number_of_sons?: number;
+  number_of_daughters?: number;
+  number_of_wives?: number;
+  employment_status?: string;
+  housing_type?: string;
   created_at: string;
   updated_at: string;
 }

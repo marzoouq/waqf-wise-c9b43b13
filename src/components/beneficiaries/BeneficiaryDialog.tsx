@@ -72,6 +72,38 @@ const beneficiarySchema = z.object({
     .optional()
     .or(z.literal("")),
   
+  numberOfSons: z
+    .number()
+    .int()
+    .min(0, { message: "عدد الأبناء لا يمكن أن يكون سالباً" })
+    .optional()
+    .default(0),
+  
+  numberOfDaughters: z
+    .number()
+    .int()
+    .min(0, { message: "عدد البنات لا يمكن أن يكون سالباً" })
+    .optional()
+    .default(0),
+  
+  numberOfWives: z
+    .number()
+    .int()
+    .min(0, { message: "عدد الزوجات لا يمكن أن يكون سالباً" })
+    .max(4, { message: "عدد الزوجات لا يمكن أن يتجاوز 4" })
+    .optional()
+    .default(0),
+  
+  employmentStatus: z
+    .string()
+    .optional()
+    .or(z.literal("")),
+  
+  housingType: z
+    .string()
+    .optional()
+    .or(z.literal("")),
+  
   notes: z
     .string()
     .trim()
@@ -91,6 +123,11 @@ interface Beneficiary {
   relationship?: string;
   phone: string;
   email?: string;
+  number_of_sons?: number;
+  number_of_daughters?: number;
+  number_of_wives?: number;
+  employment_status?: string;
+  housing_type?: string;
   notes?: string;
 }
 
@@ -119,6 +156,11 @@ const BeneficiaryDialog = ({
       relationship: "",
       phone: "",
       email: "",
+      numberOfSons: 0,
+      numberOfDaughters: 0,
+      numberOfWives: 0,
+      employmentStatus: "",
+      housingType: "",
       notes: "",
     },
   });
@@ -133,6 +175,11 @@ const BeneficiaryDialog = ({
         relationship: beneficiary.relationship || "",
         phone: beneficiary.phone,
         email: beneficiary.email || "",
+        numberOfSons: beneficiary.number_of_sons || 0,
+        numberOfDaughters: beneficiary.number_of_daughters || 0,
+        numberOfWives: beneficiary.number_of_wives || 0,
+        employmentStatus: beneficiary.employment_status || "",
+        housingType: beneficiary.housing_type || "",
         notes: beneficiary.notes || "",
       });
     } else {
@@ -144,6 +191,11 @@ const BeneficiaryDialog = ({
         relationship: "",
         phone: "",
         email: "",
+        numberOfSons: 0,
+        numberOfDaughters: 0,
+        numberOfWives: 0,
+        employmentStatus: "",
+        housingType: "",
         notes: "",
       });
     }
@@ -158,6 +210,11 @@ const BeneficiaryDialog = ({
       category: data.category,
       family_name: data.familyName || null,
       relationship: data.relationship || null,
+      number_of_sons: data.numberOfSons || 0,
+      number_of_daughters: data.numberOfDaughters || 0,
+      number_of_wives: data.numberOfWives || 0,
+      employment_status: data.employmentStatus || null,
+      housing_type: data.housingType || null,
       status: "نشط",
       notes: data.notes || null,
     };
@@ -169,7 +226,7 @@ const BeneficiaryDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-gradient-primary">
             {isEditMode ? "تعديل بيانات المستفيد" : "إضافة مستفيد جديد"}
@@ -349,6 +406,154 @@ const BeneficiaryDialog = ({
                           className="text-right"
                         />
                       </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* Family Information Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-foreground border-r-4 border-r-secondary pr-3">
+                معلومات العائلة
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <FormField
+                  control={form.control}
+                  name="numberOfSons"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium">
+                        عدد الأبناء
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="0"
+                          placeholder="0"
+                          {...field}
+                          onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                          className="text-right"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="numberOfDaughters"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium">
+                        عدد البنات
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="0"
+                          placeholder="0"
+                          {...field}
+                          onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                          className="text-right"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="numberOfWives"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium">
+                        عدد الزوجات
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="0"
+                          max="4"
+                          placeholder="0"
+                          {...field}
+                          onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                          className="text-right"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* Employment & Housing Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-foreground border-r-4 border-r-warning pr-3">
+                معلومات الوظيفة والسكن
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="employmentStatus"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium">
+                        الحالة الوظيفية
+                      </FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="text-right">
+                            <SelectValue placeholder="اختر الحالة الوظيفية" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="موظف">موظف</SelectItem>
+                          <SelectItem value="غير موظف">غير موظف</SelectItem>
+                          <SelectItem value="متقاعد">متقاعد</SelectItem>
+                          <SelectItem value="طالب">طالب</SelectItem>
+                          <SelectItem value="أعمال حرة">أعمال حرة</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="housingType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium">
+                        نوع السكن
+                      </FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="text-right">
+                            <SelectValue placeholder="اختر نوع السكن" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="ملك">ملك</SelectItem>
+                          <SelectItem value="إيجار">إيجار</SelectItem>
+                          <SelectItem value="سكن حكومي">سكن حكومي</SelectItem>
+                          <SelectItem value="مع العائلة">مع العائلة</SelectItem>
+                          <SelectItem value="آخر">آخر</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
