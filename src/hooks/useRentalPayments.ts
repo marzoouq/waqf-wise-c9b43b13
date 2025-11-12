@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { useJournalEntries } from "./useJournalEntries";
+import { useEffect } from "react";
 
 export interface RentalPayment {
   id: string;
@@ -32,6 +33,28 @@ export interface RentalPayment {
 export const useRentalPayments = (contractId?: string) => {
   const queryClient = useQueryClient();
   const { createAutoEntry } = useJournalEntries();
+
+  // Real-time subscription
+  useEffect(() => {
+    const channel = supabase
+      .channel('rental-payments-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'rental_payments'
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["rental_payments"] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   const { data: payments, isLoading } = useQuery({
     queryKey: ["rental_payments", contractId],

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useEffect } from "react";
 
 export interface JournalEntry {
   id: string;
@@ -31,6 +32,29 @@ export interface JournalEntryLine {
 export function useJournalEntries() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Real-time subscription
+  useEffect(() => {
+    const channel = supabase
+      .channel('journal-entries-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'journal_entries'
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
+          queryClient.invalidateQueries({ queryKey: ["accounts"] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   const { data: entries = [], isLoading } = useQuery({
     queryKey: ["journal_entries"],

@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, Wallet, PiggyBank, Calculator } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface FinancialData {
   totalAssets: number;
@@ -16,9 +17,30 @@ interface FinancialData {
 const FinancialStats = () => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<FinancialData | null>(null);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     fetchFinancialData();
+
+    // Real-time subscription for journal entries
+    const channel = supabase
+      .channel('journal-entries-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'journal_entry_lines'
+        },
+        () => {
+          fetchFinancialData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchFinancialData = async () => {

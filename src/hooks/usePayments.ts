@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useJournalEntries } from "./useJournalEntries";
+import { useEffect } from "react";
 
 export interface Payment {
   id: string;
@@ -21,6 +23,29 @@ export interface Payment {
 export function usePayments() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { createAutoEntry } = useJournalEntries();
+
+  // Real-time subscription
+  useEffect(() => {
+    const channel = supabase
+      .channel('payments-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'payments'
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["payments"] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   const { data: payments = [], isLoading } = useQuery({
     queryKey: ["payments"],
@@ -45,13 +70,31 @@ export function usePayments() {
         .single();
 
       if (error) throw error;
+
+      // إنشاء قيد محاسبي تلقائي
+      if (data) {
+        try {
+          const triggerEvent = data.payment_type === "receipt" ? "payment_receipt" : "payment_voucher";
+          await createAutoEntry(
+            triggerEvent,
+            data.id,
+            data.amount,
+            data.description,
+            data.payment_date
+          );
+        } catch (journalError) {
+          console.error("Error creating journal entry:", journalError);
+        }
+      }
+
       return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["payments"] });
+      queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
       toast({
         title: "تمت الإضافة بنجاح",
-        description: "تم إضافة السند الجديد بنجاح",
+        description: "تم إضافة السند وإنشاء القيد المحاسبي",
       });
     },
     onError: (error: any) => {

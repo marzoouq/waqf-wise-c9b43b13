@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { useJournalEntries } from "./useJournalEntries";
+import { useEffect } from "react";
 
 export interface MaintenanceRequest {
   id: string;
@@ -34,6 +35,28 @@ export interface MaintenanceRequest {
 export const useMaintenanceRequests = () => {
   const queryClient = useQueryClient();
   const { createAutoEntry } = useJournalEntries();
+
+  // Real-time subscription
+  useEffect(() => {
+    const channel = supabase
+      .channel('maintenance-requests-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'maintenance_requests'
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["maintenance_requests"] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   const { data: requests, isLoading } = useQuery({
     queryKey: ["maintenance_requests"],

@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { QUERY_KEYS, TOAST_MESSAGES, QUERY_STALE_TIME } from "@/lib/constants";
+import { useEffect } from "react";
 
 export interface Fund {
   id: string;
@@ -20,6 +21,28 @@ export interface Fund {
 export function useFunds() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Real-time subscription
+  useEffect(() => {
+    const channel = supabase
+      .channel('funds-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'funds'
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.FUNDS] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   const { data: funds = [], isLoading } = useQuery({
     queryKey: [QUERY_KEYS.FUNDS],
