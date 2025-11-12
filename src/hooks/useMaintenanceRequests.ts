@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { useJournalEntries } from "./useJournalEntries";
 
 export interface MaintenanceRequest {
   id: string;
@@ -32,6 +33,7 @@ export interface MaintenanceRequest {
 
 export const useMaintenanceRequests = () => {
   const queryClient = useQueryClient();
+  const { createAutoEntry } = useJournalEntries();
 
   const { data: requests, isLoading } = useQuery({
     queryKey: ["maintenance_requests"],
@@ -79,21 +81,52 @@ export const useMaintenanceRequests = () => {
 
   const updateRequest = useMutation({
     mutationFn: async ({ id, ...request }: Partial<MaintenanceRequest> & { id: string }) => {
+      // جلب البيانات القديمة
+      const { data: oldData } = await supabase
+        .from("maintenance_requests")
+        .select("actual_cost, status, completed_date")
+        .eq("id", id)
+        .single();
+
       const { data, error } = await supabase
         .from("maintenance_requests")
         .update(request)
         .eq("id", id)
-        .select()
+        .select(`
+          *,
+          properties(name, location)
+        `)
         .single();
 
       if (error) throw error;
+
+      // إنشاء قيد محاسبي عند تسجيل التكلفة الفعلية والإكتمال
+      const hasNewCost = data && data.actual_cost && (!oldData || oldData.actual_cost !== data.actual_cost);
+      const isCompleted = data.status === "مكتمل";
+      const completedDate = data.completed_date || new Date().toISOString().split('T')[0];
+
+      if (hasNewCost && isCompleted) {
+        try {
+          await createAutoEntry(
+            "maintenance_expense",
+            data.id,
+            data.actual_cost,
+            `مصروف صيانة - ${data.request_number} - ${data.title}`,
+            completedDate
+          );
+        } catch (journalError) {
+          console.error("Error creating journal entry:", journalError);
+        }
+      }
+
       return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["maintenance_requests"] });
+      queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
       toast({
         title: "تم تحديث الطلب",
-        description: "تم تحديث طلب الصيانة بنجاح",
+        description: "تم تحديث طلب الصيانة والقيد المحاسبي",
       });
     },
     onError: (error) => {

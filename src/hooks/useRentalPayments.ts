@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { useJournalEntries } from "./useJournalEntries";
 
 export interface RentalPayment {
   id: string;
@@ -30,6 +31,7 @@ export interface RentalPayment {
 
 export const useRentalPayments = (contractId?: string) => {
   const queryClient = useQueryClient();
+  const { createAutoEntry } = useJournalEntries();
 
   const { data: payments, isLoading } = useQuery({
     queryKey: ["rental_payments", contractId],
@@ -61,17 +63,41 @@ export const useRentalPayments = (contractId?: string) => {
       const { data, error } = await supabase
         .from("rental_payments")
         .insert([payment])
-        .select()
+        .select(`
+          *,
+          contracts(
+            contract_number,
+            tenant_name,
+            properties(name)
+          )
+        `)
         .single();
 
       if (error) throw error;
+
+      // إنشاء قيد محاسبي تلقائي إذا تم الدفع
+      if (data && data.amount_paid > 0 && data.payment_date) {
+        try {
+          await createAutoEntry(
+            "rental_payment",
+            data.id,
+            data.amount_paid,
+            `إيراد إيجار - ${data.payment_number}`,
+            data.payment_date
+          );
+        } catch (journalError) {
+          console.error("Error creating journal entry:", journalError);
+        }
+      }
+
       return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["rental_payments"] });
+      queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
       toast({
         title: "تم إضافة الدفعة",
-        description: "تم إضافة الدفعة بنجاح",
+        description: "تم إضافة الدفعة وإنشاء القيد المحاسبي",
       });
     },
     onError: (error) => {
@@ -86,21 +112,55 @@ export const useRentalPayments = (contractId?: string) => {
 
   const updatePayment = useMutation({
     mutationFn: async ({ id, ...payment }: Partial<RentalPayment> & { id: string }) => {
+      // جلب البيانات القديمة
+      const { data: oldData } = await supabase
+        .from("rental_payments")
+        .select("amount_paid, payment_date")
+        .eq("id", id)
+        .single();
+
       const { data, error } = await supabase
         .from("rental_payments")
         .update(payment)
         .eq("id", id)
-        .select()
+        .select(`
+          *,
+          contracts(
+            contract_number,
+            tenant_name,
+            properties(name)
+          )
+        `)
         .single();
 
       if (error) throw error;
+
+      // إنشاء قيد محاسبي إذا تم الدفع لأول مرة أو تحديث المبلغ
+      const isNewPayment = oldData && oldData.amount_paid === 0 && data.amount_paid > 0;
+      const isPaymentUpdate = oldData && data.amount_paid !== oldData.amount_paid && data.amount_paid > 0;
+
+      if (data && (isNewPayment || isPaymentUpdate) && data.payment_date) {
+        try {
+          await createAutoEntry(
+            "rental_payment",
+            data.id,
+            data.amount_paid,
+            `إيراد إيجار - ${data.payment_number}`,
+            data.payment_date
+          );
+        } catch (journalError) {
+          console.error("Error creating journal entry:", journalError);
+        }
+      }
+
       return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["rental_payments"] });
+      queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
       toast({
         title: "تم تحديث الدفعة",
-        description: "تم تحديث الدفعة بنجاح",
+        description: "تم تحديث الدفعة والقيد المحاسبي",
       });
     },
     onError: (error) => {

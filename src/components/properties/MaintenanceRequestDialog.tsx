@@ -28,7 +28,9 @@ export const MaintenanceRequestDialog = ({ open, onOpenChange, request }: Props)
     requested_by: "",
     requested_date: new Date().toISOString().split('T')[0],
     scheduled_date: "",
+    completed_date: "",
     estimated_cost: "",
+    actual_cost: "",
     assigned_to: "",
     vendor_name: "",
     notes: "",
@@ -46,7 +48,9 @@ export const MaintenanceRequestDialog = ({ open, onOpenChange, request }: Props)
         requested_by: request.requested_by,
         requested_date: request.requested_date,
         scheduled_date: request.scheduled_date || "",
+        completed_date: request.completed_date || "",
         estimated_cost: request.estimated_cost?.toString() || "",
+        actual_cost: request.actual_cost?.toString() || "",
         assigned_to: request.assigned_to || "",
         vendor_name: request.vendor_name || "",
         notes: request.notes || "",
@@ -60,6 +64,7 @@ export const MaintenanceRequestDialog = ({ open, onOpenChange, request }: Props)
     const requestData = {
       ...formData,
       estimated_cost: formData.estimated_cost ? parseFloat(formData.estimated_cost) : undefined,
+      actual_cost: formData.actual_cost ? parseFloat(formData.actual_cost) : undefined,
     };
 
     if (request) {
@@ -82,7 +87,9 @@ export const MaintenanceRequestDialog = ({ open, onOpenChange, request }: Props)
       requested_by: "",
       requested_date: new Date().toISOString().split('T')[0],
       scheduled_date: "",
+      completed_date: "",
       estimated_cost: "",
+      actual_cost: "",
       assigned_to: "",
       vendor_name: "",
       notes: "",
@@ -207,6 +214,28 @@ export const MaintenanceRequestDialog = ({ open, onOpenChange, request }: Props)
                 step="0.01"
                 value={formData.estimated_cost}
                 onChange={(e) => setFormData({ ...formData, estimated_cost: e.target.value })}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>التكلفة الفعلية</Label>
+              <Input
+                type="number"
+                step="0.01"
+                value={formData.actual_cost}
+                onChange={(e) => setFormData({ ...formData, actual_cost: e.target.value })}
+                placeholder="التكلفة الفعلية للصيانة"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>تاريخ الإنجاز</Label>
+              <Input
+                type="date"
+                value={formData.completed_date}
+                onChange={(e) => setFormData({ ...formData, completed_date: e.target.value })}
               />
             </div>
           </div>
