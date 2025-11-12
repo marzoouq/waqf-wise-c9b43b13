@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { useJournalEntries } from "./useJournalEntries";
+import { useTasks } from "@/hooks/useTasks";
 import { useEffect } from "react";
 
 export interface MaintenanceRequest {
@@ -35,6 +36,7 @@ export interface MaintenanceRequest {
 export const useMaintenanceRequests = () => {
   const queryClient = useQueryClient();
   const { createAutoEntry } = useJournalEntries();
+  const { addTask } = useTasks();
 
   // Real-time subscription
   useEffect(() => {
@@ -85,8 +87,22 @@ export const useMaintenanceRequests = () => {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: async (data) => {
       queryClient.invalidateQueries({ queryKey: ["maintenance_requests"] });
+      
+      // إنشاء مهمة إذا كانت مجدولة
+      if (data.scheduled_date) {
+        try {
+          await addTask({
+            task: `صيانة مجدولة - ${data.title}`,
+            priority: data.priority === 'عاجلة' ? 'عالية' : 'متوسطة',
+            status: 'pending',
+          });
+        } catch (error) {
+          console.error("Error adding task:", error);
+        }
+      }
+      
       toast({
         title: "تم إضافة الطلب",
         description: "تم إضافة طلب الصيانة بنجاح",

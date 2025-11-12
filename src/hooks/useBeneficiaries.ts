@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useActivities } from "@/hooks/useActivities";
+import { useAuth } from "@/hooks/useAuth";
 
 export interface Beneficiary {
   id: string;
@@ -46,6 +48,8 @@ export interface Beneficiary {
 export function useBeneficiaries() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { addActivity } = useActivities();
+  const { user } = useAuth();
 
   // Paginated query with count
   const { data: beneficiariesData, isLoading } = useQuery({
@@ -76,8 +80,19 @@ export function useBeneficiaries() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: async (data) => {
       queryClient.invalidateQueries({ queryKey: ["beneficiaries"] });
+      
+      // إضافة نشاط
+      try {
+        await addActivity({
+          action: `تم إضافة مستفيد جديد: ${data.full_name}`,
+          user_name: user?.email || 'النظام',
+        });
+      } catch (error) {
+        console.error("Error adding activity:", error);
+      }
+      
       toast({
         title: "تمت الإضافة بنجاح",
         description: "تم إضافة المستفيد الجديد بنجاح",
@@ -104,8 +119,19 @@ export function useBeneficiaries() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: async (data) => {
       queryClient.invalidateQueries({ queryKey: ["beneficiaries"] });
+      
+      // إضافة نشاط
+      try {
+        await addActivity({
+          action: `تم تحديث بيانات المستفيد: ${data.full_name}`,
+          user_name: user?.email || 'النظام',
+        });
+      } catch (error) {
+        console.error("Error adding activity:", error);
+      }
+      
       toast({
         title: "تم التحديث بنجاح",
         description: "تم تحديث بيانات المستفيد بنجاح",

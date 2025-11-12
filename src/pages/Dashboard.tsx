@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useState } from "react";
+import { useMemo, useCallback, useState, useEffect } from "react";
 import { Building2, Users, Wallet, FileText, AlertCircle, UsersRound, ClipboardList, Plus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,8 @@ import { Navigate, useNavigate } from "react-router-dom";
 import BeneficiaryDialog from "@/components/beneficiaries/BeneficiaryDialog";
 import { PropertyDialog } from "@/components/properties/PropertyDialog";
 import { DistributionDialog } from "@/components/funds/DistributionDialog";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -32,6 +34,37 @@ const Dashboard = () => {
   const { isBeneficiary, isAccountant, isLoading: roleLoading } = useUserRole();
   const { activities, isLoading: activitiesLoading } = useActivities();
   const { tasks, isLoading: tasksLoading } = useTasks();
+  const queryClient = useQueryClient();
+  
+  // Real-time subscriptions for activities and tasks
+  useEffect(() => {
+    const activitiesChannel = supabase
+      .channel('activities-realtime')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'activities'
+      }, () => {
+        queryClient.invalidateQueries({ queryKey: ["activities"] });
+      })
+      .subscribe();
+      
+    const tasksChannel = supabase
+      .channel('tasks-realtime')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'tasks'
+      }, () => {
+        queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      })
+      .subscribe();
+      
+    return () => {
+      supabase.removeChannel(activitiesChannel);
+      supabase.removeChannel(tasksChannel);
+    };
+  }, [queryClient]);
 
   const getPriorityBadgeClasses = useCallback((priority: string) => {
     if (priority === "عالية") {

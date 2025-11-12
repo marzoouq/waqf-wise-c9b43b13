@@ -2,6 +2,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useJournalEntries } from "./useJournalEntries";
+import { useActivities } from "@/hooks/useActivities";
+import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
 
 export interface Distribution {
@@ -20,6 +22,8 @@ export function useDistributions() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { createAutoEntry } = useJournalEntries();
+  const { addActivity } = useActivities();
+  const { user } = useAuth();
 
   // Real-time subscription
   useEffect(() => {
@@ -90,10 +94,21 @@ export function useDistributions() {
 
       return data;
     },
-    onSuccess: () => {
+    onSuccess: async (data) => {
       queryClient.invalidateQueries({ queryKey: ["distributions"] });
       queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
       queryClient.invalidateQueries({ queryKey: ["funds"] });
+      
+      // إضافة نشاط
+      try {
+        await addActivity({
+          action: `تم إنشاء توزيع جديد لشهر ${data.month} بمبلغ ${data.total_amount} ريال`,
+          user_name: user?.email || 'النظام',
+        });
+      } catch (error) {
+        console.error("Error adding activity:", error);
+      }
+      
       toast({
         title: "تم إنشاء التوزيع بنجاح",
         description: "تم إنشاء التوزيع وإنشاء القيد المحاسبي",

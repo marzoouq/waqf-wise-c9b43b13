@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   BarChart,
   Bar,
@@ -23,9 +24,26 @@ interface BudgetData {
 const BudgetComparisonChart = () => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<BudgetData[]>([]);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     fetchBudgetComparison();
+    
+    // Real-time subscription
+    const channel = supabase
+      .channel('budgets-realtime')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'budgets'
+      }, () => {
+        fetchBudgetComparison();
+      })
+      .subscribe();
+      
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchBudgetComparison = async () => {

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useTasks } from '@/hooks/useTasks';
 import type { BeneficiaryRequest, RequestType } from '@/types';
 
 // ===========================
@@ -35,6 +36,7 @@ export const useRequestTypes = () => {
 export const useRequests = (beneficiaryId?: string) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { addTask } = useTasks();
 
   // Fetch requests
   const { data: requests = [], isLoading } = useQuery({
@@ -102,8 +104,22 @@ export const useRequests = (beneficiaryId?: string) => {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: async (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['requests'] });
+      
+      // إنشاء مهمة للمراجعة
+      if (data?.status === 'قيد المراجعة') {
+        try {
+          await addTask({
+            task: `مراجعة طلب رقم ${data.request_number || 'جديد'}`,
+            priority: data.priority === 'عاجلة' ? 'عالية' : 'متوسطة',
+            status: 'pending',
+          });
+        } catch (error) {
+          console.error("Error adding task:", error);
+        }
+      }
+      
       toast({
         title: 'تم بنجاح',
         description: 'تم إرسال الطلب بنجاح',

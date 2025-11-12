@@ -12,9 +12,16 @@ import { useNotifications } from "@/hooks/useNotifications";
 import { NotificationItem } from "@/components/notifications/NotificationItem";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { toast } from "sonner";
 
 export const NotificationsBell = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
   const { 
     notifications, 
     isLoading, 
@@ -23,6 +30,33 @@ export const NotificationsBell = () => {
     markAllAsRead,
     isMarkingAllAsRead 
   } = useNotifications();
+  
+  // Real-time subscription for new notifications
+  useEffect(() => {
+    if (!user?.id) return;
+    
+    const channel = supabase
+      .channel('new-notifications')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'notifications',
+        filter: `user_id=eq.${user.id}`
+      }, (payload) => {
+        // إظهار toast للإشعار الجديد
+        const newNotification = payload.new as any;
+        toast.info(newNotification.title, {
+          description: newNotification.message,
+        });
+        
+        queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      })
+      .subscribe();
+      
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id, queryClient]);
 
   const handleNotificationClick = (notification: any) => {
     if (notification.action_url) {

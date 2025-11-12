@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface AccountData {
   name: string;
@@ -21,9 +22,26 @@ const COLORS = [
 const AccountDistributionChart = () => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<AccountData[]>([]);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     fetchAccountDistribution();
+    
+    // Real-time subscription
+    const channel = supabase
+      .channel('accounts-realtime')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'accounts'
+      }, () => {
+        fetchAccountDistribution();
+      })
+      .subscribe();
+      
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchAccountDistribution = async () => {

@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useActivities } from "@/hooks/useActivities";
+import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
 
 export interface JournalEntry {
@@ -32,6 +34,8 @@ export interface JournalEntryLine {
 export function useJournalEntries() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { addActivity } = useActivities();
+  const { user } = useAuth();
 
   // Real-time subscription
   useEffect(() => {
@@ -114,8 +118,19 @@ export function useJournalEntries() {
 
       return entryData;
     },
-    onSuccess: () => {
+    onSuccess: async (data) => {
       queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
+      
+      // إضافة نشاط
+      try {
+        await addActivity({
+          action: `تم إنشاء قيد محاسبي: ${data.entry_number}`,
+          user_name: user?.email || 'النظام',
+        });
+      } catch (error) {
+        console.error("Error adding activity:", error);
+      }
+      
       toast({
         title: "تم الإنشاء",
         description: "تم إنشاء القيد بنجاح",

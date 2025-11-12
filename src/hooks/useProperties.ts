@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useActivities } from "@/hooks/useActivities";
+import { useAuth } from "@/hooks/useAuth";
 
 export interface Property {
   id: string;
@@ -19,6 +21,8 @@ export interface Property {
 export function useProperties() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { addActivity } = useActivities();
+  const { user } = useAuth();
 
   const { data: properties = [], isLoading } = useQuery({
     queryKey: ["properties"],
@@ -45,8 +49,19 @@ export function useProperties() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: async (data) => {
       queryClient.invalidateQueries({ queryKey: ["properties"] });
+      
+      // إضافة نشاط
+      try {
+        await addActivity({
+          action: `تم إضافة عقار جديد: ${data.name}`,
+          user_name: user?.email || 'النظام',
+        });
+      } catch (error) {
+        console.error("Error adding activity:", error);
+      }
+      
       toast({
         title: "تمت الإضافة بنجاح",
         description: "تم إضافة العقار الجديد بنجاح",
