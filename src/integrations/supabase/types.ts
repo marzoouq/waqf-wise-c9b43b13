@@ -528,6 +528,196 @@ export type Database = {
           },
         ]
       }
+      contract_attachments: {
+        Row: {
+          contract_id: string
+          description: string | null
+          file_name: string
+          file_path: string
+          file_size: number | null
+          file_type: string
+          id: string
+          uploaded_at: string | null
+          uploaded_by: string | null
+        }
+        Insert: {
+          contract_id: string
+          description?: string | null
+          file_name: string
+          file_path: string
+          file_size?: number | null
+          file_type: string
+          id?: string
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+        }
+        Update: {
+          contract_id?: string
+          description?: string | null
+          file_name?: string
+          file_path?: string
+          file_size?: number | null
+          file_type?: string
+          id?: string
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contract_attachments_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "contracts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contract_renewals: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          new_contract_id: string | null
+          new_end_date: string
+          new_monthly_rent: number
+          new_start_date: string
+          notes: string | null
+          original_contract_id: string
+          renewal_date: string
+          rent_increase_amount: number | null
+          rent_increase_percentage: number | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          new_contract_id?: string | null
+          new_end_date: string
+          new_monthly_rent: number
+          new_start_date: string
+          notes?: string | null
+          original_contract_id: string
+          renewal_date: string
+          rent_increase_amount?: number | null
+          rent_increase_percentage?: number | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          new_contract_id?: string | null
+          new_end_date?: string
+          new_monthly_rent?: number
+          new_start_date?: string
+          notes?: string | null
+          original_contract_id?: string
+          renewal_date?: string
+          rent_increase_amount?: number | null
+          rent_increase_percentage?: number | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contract_renewals_new_contract_id_fkey"
+            columns: ["new_contract_id"]
+            isOneToOne: false
+            referencedRelation: "contracts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contract_renewals_original_contract_id_fkey"
+            columns: ["original_contract_id"]
+            isOneToOne: false
+            referencedRelation: "contracts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contracts: {
+        Row: {
+          auto_renew: boolean | null
+          contract_number: string
+          contract_type: string
+          created_at: string
+          created_by: string | null
+          end_date: string
+          id: string
+          is_renewable: boolean | null
+          monthly_rent: number
+          notes: string | null
+          payment_frequency: string
+          property_id: string
+          renewal_notice_days: number | null
+          security_deposit: number | null
+          start_date: string
+          status: string
+          tenant_email: string | null
+          tenant_id_number: string
+          tenant_name: string
+          tenant_phone: string
+          terms_and_conditions: string | null
+          updated_at: string
+        }
+        Insert: {
+          auto_renew?: boolean | null
+          contract_number: string
+          contract_type: string
+          created_at?: string
+          created_by?: string | null
+          end_date: string
+          id?: string
+          is_renewable?: boolean | null
+          monthly_rent?: number
+          notes?: string | null
+          payment_frequency?: string
+          property_id: string
+          renewal_notice_days?: number | null
+          security_deposit?: number | null
+          start_date: string
+          status?: string
+          tenant_email?: string | null
+          tenant_id_number: string
+          tenant_name: string
+          tenant_phone: string
+          terms_and_conditions?: string | null
+          updated_at?: string
+        }
+        Update: {
+          auto_renew?: boolean | null
+          contract_number?: string
+          contract_type?: string
+          created_at?: string
+          created_by?: string | null
+          end_date?: string
+          id?: string
+          is_renewable?: boolean | null
+          monthly_rent?: number
+          notes?: string | null
+          payment_frequency?: string
+          property_id?: string
+          renewal_notice_days?: number | null
+          security_deposit?: number | null
+          start_date?: string
+          status?: string
+          tenant_email?: string | null
+          tenant_id_number?: string
+          tenant_name?: string
+          tenant_phone?: string
+          terms_and_conditions?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contracts_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       distributions: {
         Row: {
           beneficiaries_count: number
@@ -1019,6 +1209,100 @@ export type Database = {
           },
         ]
       }
+      maintenance_requests: {
+        Row: {
+          actual_cost: number | null
+          assigned_to: string | null
+          category: string
+          completed_date: string | null
+          contract_id: string | null
+          created_at: string
+          description: string
+          estimated_cost: number | null
+          id: string
+          journal_entry_id: string | null
+          notes: string | null
+          priority: string
+          property_id: string
+          request_number: string
+          requested_by: string
+          requested_date: string
+          scheduled_date: string | null
+          status: string
+          title: string
+          updated_at: string
+          vendor_name: string | null
+        }
+        Insert: {
+          actual_cost?: number | null
+          assigned_to?: string | null
+          category: string
+          completed_date?: string | null
+          contract_id?: string | null
+          created_at?: string
+          description: string
+          estimated_cost?: number | null
+          id?: string
+          journal_entry_id?: string | null
+          notes?: string | null
+          priority?: string
+          property_id: string
+          request_number: string
+          requested_by: string
+          requested_date?: string
+          scheduled_date?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          vendor_name?: string | null
+        }
+        Update: {
+          actual_cost?: number | null
+          assigned_to?: string | null
+          category?: string
+          completed_date?: string | null
+          contract_id?: string | null
+          created_at?: string
+          description?: string
+          estimated_cost?: number | null
+          id?: string
+          journal_entry_id?: string | null
+          notes?: string | null
+          priority?: string
+          property_id?: string
+          request_number?: string
+          requested_by?: string
+          requested_date?: string
+          scheduled_date?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          vendor_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_requests_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "contracts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_requests_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
+            referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_requests_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           action_url: string | null
@@ -1194,6 +1478,78 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      rental_payments: {
+        Row: {
+          amount_due: number
+          amount_paid: number | null
+          contract_id: string
+          created_at: string
+          discount: number | null
+          due_date: string
+          id: string
+          journal_entry_id: string | null
+          late_fee: number | null
+          notes: string | null
+          payment_date: string | null
+          payment_method: string | null
+          payment_number: string
+          receipt_number: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount_due: number
+          amount_paid?: number | null
+          contract_id: string
+          created_at?: string
+          discount?: number | null
+          due_date: string
+          id?: string
+          journal_entry_id?: string | null
+          late_fee?: number | null
+          notes?: string | null
+          payment_date?: string | null
+          payment_method?: string | null
+          payment_number: string
+          receipt_number?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount_due?: number
+          amount_paid?: number | null
+          contract_id?: string
+          created_at?: string
+          discount?: number | null
+          due_date?: string
+          id?: string
+          journal_entry_id?: string | null
+          late_fee?: number | null
+          notes?: string | null
+          payment_date?: string | null
+          payment_method?: string | null
+          payment_number?: string
+          receipt_number?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rental_payments_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "contracts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rental_payments_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
+            referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       request_attachments: {
         Row: {
