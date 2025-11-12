@@ -39,6 +39,8 @@ const Payments = lazy(() => import("./pages/Payments"));
 const Install = lazy(() => import("./pages/Install"));
 const Notifications = lazy(() => import("./pages/Notifications"));
 const Requests = lazy(() => import("./pages/Requests"));
+const Families = lazy(() => import("./pages/Families"));
+const Users = lazy(() => import("./pages/Users"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Configure QueryClient with optimized defaults
@@ -76,26 +78,28 @@ const App = () => {
                 element={
                   <ProtectedRoute>
                     <MainLayout>
-                      <Routes>
-                        <Route path="/" element={<Dashboard />} />
-                        <Route path="/beneficiary-dashboard" element={<BeneficiaryDashboard />} />
-                        <Route path="/accountant-dashboard" element={<AccountantDashboard />} />
-                        <Route path="/beneficiaries" element={<Beneficiaries />} />
-                        <Route path="/beneficiaries/:id" element={<BeneficiaryProfile />} />
-                        <Route path="/properties" element={<Properties />} />
-                        <Route path="/funds" element={<Funds />} />
-                        <Route path="/archive" element={<Archive />} />
-                        <Route path="/accounting" element={<Accounting />} />
-                        <Route path="/invoices" element={<Invoices />} />
-                        <Route path="/approvals" element={<Approvals />} />
-                        <Route path="/payments" element={<Payments />} />
-                        <Route path="/reports" element={<Reports />} />
-                        <Route path="/settings" element={<Settings />} />
-                        <Route path="/notifications" element={<Notifications />} />
-                        <Route path="/requests" element={<Requests />} />
-                        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                        <Route path="*" element={<NotFound />} />
-                      </Routes>
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/beneficiary-dashboard" element={<BeneficiaryDashboard />} />
+                <Route path="/accountant-dashboard" element={<AccountantDashboard />} />
+                <Route path="/users" element={<Users />} />
+                <Route path="/beneficiaries" element={<Beneficiaries />} />
+                <Route path="/beneficiaries/:id" element={<BeneficiaryProfile />} />
+                <Route path="/families" element={<Families />} />
+                <Route path="/properties" element={<Properties />} />
+                <Route path="/funds" element={<Funds />} />
+                <Route path="/archive" element={<Archive />} />
+                <Route path="/accounting" element={<Accounting />} />
+                <Route path="/invoices" element={<Invoices />} />
+                <Route path="/approvals" element={<Approvals />} />
+                <Route path="/payments" element={<Payments />} />
+                <Route path="/reports" element={<Reports />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/notifications" element={<Notifications />} />
+                <Route path="/requests" element={<Requests />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
                     </MainLayout>
                   </ProtectedRoute>
                 }

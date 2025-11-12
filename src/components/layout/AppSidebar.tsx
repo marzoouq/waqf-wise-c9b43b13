@@ -14,6 +14,7 @@ import {
   LogOut,
   UsersRound,
   ClipboardList,
+  Shield,
 } from "lucide-react";
 import {
   Sidebar,
@@ -39,21 +40,31 @@ const AppSidebar = () => {
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
   const { user, signOut } = useAuth();
-  const { isAdmin, isAccountant, isBeneficiary, isLoading: roleLoading } = useUserRole();
+  const { 
+    isAdmin, 
+    isAccountant, 
+    isBeneficiary, 
+    isNazer, 
+    isCashier, 
+    isArchivist,
+    isLoading: roleLoading 
+  } = useUserRole();
 
   const allMenuItems = [
-    { icon: LayoutDashboard, label: "لوحة التحكم", path: "/", roles: ['admin', 'accountant', 'beneficiary', 'user'] },
-    { icon: Users, label: "المستفيدون", path: "/beneficiaries", roles: ['admin', 'accountant'] },
-    { icon: ClipboardList, label: "الطلبات", path: "/requests", roles: ['admin', 'accountant'] },
-    { icon: Building2, label: "العقارات", path: "/properties", roles: ['admin', 'accountant'] },
-    { icon: Wallet, label: "الأموال والمصارف", path: "/funds", roles: ['admin', 'accountant'] },
-    { icon: FileText, label: "الأرشيف", path: "/archive", roles: ['admin', 'accountant'] },
-    { icon: Calculator, label: "المحاسبة", path: "/accounting", roles: ['admin', 'accountant'] },
-    { icon: Receipt, label: "الفواتير", path: "/invoices", roles: ['admin', 'accountant'] },
-    { icon: CreditCard, label: "المدفوعات", path: "/payments", roles: ['admin', 'accountant', 'beneficiary'] },
-    { icon: CheckSquare, label: "الموافقات", path: "/approvals", roles: ['admin', 'accountant'] },
-    { icon: BarChart3, label: "التقارير", path: "/reports", roles: ['admin', 'accountant', 'beneficiary'] },
-    { icon: Settings, label: "الإعدادات", path: "/settings", roles: ['admin', 'accountant', 'beneficiary', 'user'] },
+    { icon: LayoutDashboard, label: "لوحة التحكم", path: "/", roles: ['all'] },
+    { icon: Shield, label: "إدارة المستخدمين", path: "/users", roles: ['admin', 'nazer'] },
+    { icon: Users, label: "المستفيدون", path: "/beneficiaries", roles: ['admin', 'accountant', 'nazer'] },
+    { icon: UsersRound, label: "العائلات", path: "/families", roles: ['admin', 'accountant', 'nazer'] },
+    { icon: ClipboardList, label: "الطلبات", path: "/requests", roles: ['admin', 'accountant', 'nazer'] },
+    { icon: Building2, label: "العقارات", path: "/properties", roles: ['admin', 'accountant', 'nazer'] },
+    { icon: Wallet, label: "الأموال والمصارف", path: "/funds", roles: ['admin', 'accountant', 'nazer'] },
+    { icon: FileText, label: "الأرشيف", path: "/archive", roles: ['admin', 'archivist', 'nazer'] },
+    { icon: Calculator, label: "المحاسبة", path: "/accounting", roles: ['admin', 'accountant', 'nazer'] },
+    { icon: Receipt, label: "الفواتير", path: "/invoices", roles: ['admin', 'accountant', 'nazer'] },
+    { icon: CreditCard, label: "المدفوعات", path: "/payments", roles: ['admin', 'accountant', 'cashier', 'nazer'] },
+    { icon: CheckSquare, label: "الموافقات", path: "/approvals", roles: ['admin', 'accountant', 'nazer'] },
+    { icon: BarChart3, label: "التقارير", path: "/reports", roles: ['all'] },
+    { icon: Settings, label: "الإعدادات", path: "/settings", roles: ['all'] },
   ];
 
   // Filter menu items based on user role
@@ -61,13 +72,23 @@ const AppSidebar = () => {
     if (roleLoading) return [];
     
     return allMenuItems.filter(item => {
-      if (isAdmin) return true; // Admin sees everything
-      if (isAccountant && item.roles.includes('accountant')) return true;
-      if (isBeneficiary && item.roles.includes('beneficiary')) return true;
-      if (item.roles.includes('user')) return true;
+      // 'all' means everyone can access
+      if (item.roles.includes('all')) return true;
+      
+      // Check specific roles
+      if (isAdmin) return true;
+      if (item.roles.some((role: string) => {
+        if (role === 'nazer' && isNazer) return true;
+        if (role === 'accountant' && isAccountant) return true;
+        if (role === 'beneficiary' && isBeneficiary) return true;
+        if (role === 'cashier' && isCashier) return true;
+        if (role === 'archivist' && isArchivist) return true;
+        return false;
+      })) return true;
+      
       return false;
     });
-  }, [isAdmin, isAccountant, isBeneficiary, roleLoading]);
+  }, [isAdmin, isAccountant, isBeneficiary, isNazer, isCashier, isArchivist, roleLoading]);
 
   return (
     <Sidebar collapsible="icon" side="right">

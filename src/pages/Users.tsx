@@ -1,0 +1,366 @@
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Search, UserPlus, Shield, Edit, Trash2, CheckCircle, XCircle } from "lucide-react";
+import { LoadingState } from "@/components/shared/LoadingState";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+
+interface UserProfile {
+  id: string;
+  user_id: string;
+  full_name: string;
+  email: string;
+  phone?: string;
+  position?: string;
+  is_active: boolean;
+  last_login_at?: string;
+  created_at: string;
+  user_roles?: Array<{ role: string }>;
+}
+
+type AppRole = "nazer" | "admin" | "accountant" | "cashier" | "archivist" | "beneficiary" | "user";
+
+const roleLabels: Record<AppRole, string> = {
+  nazer: "الناظر",
+  admin: "المشرف",
+  accountant: "المحاسب",
+  cashier: "موظف صرف",
+  archivist: "أرشيفي",
+  beneficiary: "مستفيد",
+  user: "مستخدم",
+};
+
+const roleColors: Record<AppRole, string> = {
+  nazer: "bg-purple-500/10 text-purple-500 border-purple-500/30",
+  admin: "bg-red-500/10 text-red-500 border-red-500/30",
+  accountant: "bg-blue-500/10 text-blue-500 border-blue-500/30",
+  cashier: "bg-green-500/10 text-green-500 border-green-500/30",
+  archivist: "bg-orange-500/10 text-orange-500 border-orange-500/30",
+  beneficiary: "bg-cyan-500/10 text-cyan-500 border-cyan-500/30",
+  user: "bg-gray-500/10 text-gray-500 border-gray-500/30",
+};
+
+const Users = () => {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
+  const [selectedRoles, setSelectedRoles] = useState<AppRole[]>([]);
+
+  // Fetch all users with their roles
+  const { data: users = [], isLoading } = useQuery({
+    queryKey: ["users"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      // Fetch roles for each user
+      const usersWithRoles = await Promise.all(
+        (data || []).map(async (profile) => {
+          const { data: rolesData } = await supabase
+            .from("user_roles")
+            .select("role")
+            .eq("user_id", profile.user_id);
+
+          return {
+            ...profile,
+            user_roles: rolesData || [],
+          };
+        })
+      );
+
+      return usersWithRoles as UserProfile[];
+    },
+  });
+
+  // Toggle user active status
+  const toggleActiveMutation = useMutation({
+    mutationFn: async ({ userId, isActive }: { userId: string; isActive: boolean }) => {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ is_active: isActive })
+        .eq("user_id", userId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      toast({
+        title: "تم التحديث",
+        description: "تم تحديث حالة المستخدم بنجاح",
+      });
+    },
+  });
+
+  // Update user roles
+  const updateRolesMutation = useMutation({
+    mutationFn: async ({ userId, roles }: { userId: string; roles: AppRole[] }) => {
+      // حذف الأدوار الحالية
+      await supabase.from("user_roles").delete().eq("user_id", userId);
+
+      // إضافة الأدوار الجديدة
+      const rolesToInsert = roles.map(role => ({ 
+        user_id: userId, 
+        role: role as any 
+      }));
+
+      const { error } = await supabase
+        .from("user_roles")
+        .insert(rolesToInsert);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      setEditDialogOpen(false);
+      toast({
+        title: "تم التحديث",
+        description: "تم تحديث أدوار المستخدم بنجاح",
+      });
+    },
+  });
+
+  const handleEditRoles = (user: UserProfile) => {
+    setSelectedUser(user);
+    setSelectedRoles(user.user_roles?.map(r => r.role as AppRole) || ["user"]);
+    setEditDialogOpen(true);
+  };
+
+  const handleSaveRoles = () => {
+    if (selectedUser && selectedRoles.length > 0) {
+      updateRolesMutation.mutate({
+        userId: selectedUser.user_id,
+        roles: selectedRoles,
+      });
+    }
+  };
+
+  const toggleRole = (role: AppRole) => {
+    if (selectedRoles.includes(role)) {
+      setSelectedRoles(selectedRoles.filter(r => r !== role));
+    } else {
+      setSelectedRoles([...selectedRoles, role]);
+    }
+  };
+
+  // Filter users
+  const filteredUsers = users.filter(user => {
+    const matchesSearch = user.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         user.email.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesRole = roleFilter === "all" || 
+                       user.user_roles?.some(r => r.role === roleFilter);
+
+    return matchesSearch && matchesRole;
+  });
+
+  if (isLoading) {
+    return <LoadingState message="جاري تحميل المستخدمين..." />;
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto p-6 md:p-8 lg:p-10 space-y-6">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-gradient-primary">
+              إدارة المستخدمين والصلاحيات
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              إدارة شاملة لمستخدمي النظام وصلاحياتهم
+            </p>
+          </div>
+        </div>
+
+        {/* Filters */}
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="البحث بالاسم أو البريد الإلكتروني..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pr-10"
+                />
+              </div>
+
+              <Select value={roleFilter} onValueChange={setRoleFilter}>
+                <SelectTrigger className="w-full md:w-[200px]">
+                  <SelectValue placeholder="تصفية حسب الدور" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">جميع الأدوار</SelectItem>
+                  <SelectItem value="nazer">الناظر</SelectItem>
+                  <SelectItem value="admin">المشرف</SelectItem>
+                  <SelectItem value="accountant">المحاسب</SelectItem>
+                  <SelectItem value="cashier">موظف صرف</SelectItem>
+                  <SelectItem value="archivist">أرشيفي</SelectItem>
+                  <SelectItem value="beneficiary">مستفيد</SelectItem>
+                  <SelectItem value="user">مستخدم</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Users Table */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5" />
+              المستخدمون ({filteredUsers.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {filteredUsers.length === 0 ? (
+              <EmptyState
+                icon={Shield}
+                title="لا يوجد مستخدمون"
+                description="لا يوجد مستخدمون مطابقون للبحث"
+              />
+            ) : (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-right">الاسم</TableHead>
+                      <TableHead className="text-right">البريد الإلكتروني</TableHead>
+                      <TableHead className="text-right">الهاتف</TableHead>
+                      <TableHead className="text-right">الأدوار</TableHead>
+                      <TableHead className="text-right">الحالة</TableHead>
+                      <TableHead className="text-right">آخر تسجيل دخول</TableHead>
+                      <TableHead className="text-right">الإجراءات</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredUsers.map((user) => (
+                      <TableRow key={user.id}>
+                        <TableCell className="font-medium">{user.full_name}</TableCell>
+                        <TableCell>{user.email}</TableCell>
+                        <TableCell>{user.phone || "-"}</TableCell>
+                        <TableCell>
+                          <div className="flex flex-wrap gap-1">
+                            {user.user_roles?.map((roleObj, idx) => {
+                              const role = roleObj.role as AppRole;
+                              return (
+                                <Badge
+                                  key={idx}
+                                  variant="outline"
+                                  className={roleColors[role]}
+                                >
+                                  {roleLabels[role]}
+                                </Badge>
+                              );
+                            })}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Switch
+                              checked={user.is_active}
+                              onCheckedChange={(checked) =>
+                                toggleActiveMutation.mutate({
+                                  userId: user.user_id,
+                                  isActive: checked,
+                                })
+                              }
+                            />
+                            {user.is_active ? (
+                              <CheckCircle className="h-4 w-4 text-success" />
+                            ) : (
+                              <XCircle className="h-4 w-4 text-destructive" />
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          {user.last_login_at
+                            ? new Date(user.last_login_at).toLocaleDateString("ar-SA")
+                            : "-"}
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditRoles(user)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Edit Roles Dialog */}
+        <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>تعديل الأدوار</DialogTitle>
+              <DialogDescription>
+                تحديد أدوار المستخدم: {selectedUser?.full_name}
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4">
+              {(Object.keys(roleLabels) as AppRole[]).map((role) => (
+                <div
+                  key={role}
+                  className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent/50 transition-colors cursor-pointer"
+                  onClick={() => toggleRole(role)}
+                >
+                  <div className="flex items-center gap-3">
+                    <Switch
+                      checked={selectedRoles.includes(role)}
+                      onCheckedChange={() => toggleRole(role)}
+                    />
+                    <Label className="cursor-pointer">{roleLabels[role]}</Label>
+                  </div>
+                  <Badge variant="outline" className={roleColors[role]}>
+                    {role}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex gap-2 justify-end mt-4">
+              <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
+                إلغاء
+              </Button>
+              <Button
+                onClick={handleSaveRoles}
+                disabled={selectedRoles.length === 0}
+              >
+                حفظ التغييرات
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </div>
+  );
+};
+
+export default Users;

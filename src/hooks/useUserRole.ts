@@ -1,13 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
+import { useEffect } from "react";
 
-export type UserRole = 'admin' | 'user' | 'accountant' | 'beneficiary';
+export type AppRole = "nazer" | "admin" | "accountant" | "cashier" | "archivist" | "beneficiary" | "user";
 
 export function useUserRole() {
   const { user } = useAuth();
 
-  const { data: roles = [], isLoading } = useQuery({
+  const { data: roles = [], isLoading, refetch } = useQuery({
     queryKey: ["user-roles", user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
@@ -18,22 +19,50 @@ export function useUserRole() {
         .eq("user_id", user.id);
 
       if (error) throw error;
-      return (data || []).map(r => r.role as UserRole);
+      return (data || []).map(r => r.role as AppRole);
     },
     enabled: !!user?.id,
   });
 
-  const hasRole = (role: UserRole) => roles.includes(role);
-  const isAdmin = hasRole('admin');
-  const isAccountant = hasRole('accountant');
-  const isBeneficiary = hasRole('beneficiary');
+  // Real-time subscription
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const channel = supabase
+      .channel('user-roles-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'user_roles',
+          filter: `user_id=eq.${user.id}`
+        },
+        () => {
+          refetch();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id, refetch]);
+
+  const hasRole = (role: AppRole) => roles.includes(role);
+  const primaryRole = roles[0] || "user";
 
   return {
     roles,
+    primaryRole,
     isLoading,
     hasRole,
-    isAdmin,
-    isAccountant,
-    isBeneficiary,
+    isNazer: hasRole("nazer"),
+    isAdmin: hasRole("admin"),
+    isAccountant: hasRole("accountant"),
+    isCashier: hasRole("cashier"),
+    isArchivist: hasRole("archivist"),
+    isBeneficiary: hasRole("beneficiary"),
+    isUser: hasRole("user"),
   };
 }
