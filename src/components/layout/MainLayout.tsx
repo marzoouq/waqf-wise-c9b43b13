@@ -5,6 +5,7 @@ import { Menu, LogOut } from "lucide-react";
 import { NotificationsBell } from "./NotificationsBell";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { useProfile } from "@/hooks/useProfile";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,6 +22,10 @@ interface MainLayoutProps {
 
 const MainLayout = ({ children }: MainLayoutProps) => {
   const { user, signOut } = useAuth();
+  const { profile } = useProfile();
+  
+  const displayName = profile?.full_name || user?.user_metadata?.full_name || 'مستخدم';
+  const displayEmail = profile?.email || user?.email || '';
 
   return (
     <div dir="rtl">
@@ -54,8 +59,8 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                 <DropdownMenuContent align="start" className="w-56 bg-popover">
                   <DropdownMenuLabel>
                     <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium">{user?.user_metadata?.full_name || 'مستخدم'}</p>
-                      <p className="text-xs text-muted-foreground">{user?.email}</p>
+                      <p className="text-sm font-medium">{displayName}</p>
+                      <p className="text-xs text-muted-foreground">{displayEmail}</p>
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
@@ -86,8 +91,8 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col items-start">
-                          <span className="text-sm font-medium">{user?.user_metadata?.full_name || 'مستخدم'}</span>
-                          <span className="text-xs text-muted-foreground">{user?.email}</span>
+                          <span className="text-sm font-medium">{displayName}</span>
+                          <span className="text-xs text-muted-foreground">{displayEmail}</span>
                         </div>
                       </Button>
                     </DropdownMenuTrigger>
