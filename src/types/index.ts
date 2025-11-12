@@ -127,3 +127,95 @@ export interface AccountData {
   amount: number;
   percentage?: number;
 }
+
+// Family Management Types
+export interface Family {
+  id: string;
+  family_name: string;
+  head_of_family_id?: string;
+  tribe?: string;
+  status: string;
+  total_members: number;
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface FamilyMember {
+  id: string;
+  family_id: string;
+  beneficiary_id: string;
+  relationship: string;
+  priority_level: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+// Request Management Types
+export interface RequestType {
+  id: string;
+  name: string;
+  name_en?: string;
+  description?: string;
+  category: string;
+  requires_documents: boolean;
+  required_documents?: string[];
+  requires_approval: boolean;
+  approval_levels: number;
+  sla_hours: number;
+  max_amount?: number;
+  is_active: boolean;
+  icon?: string;
+  color?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BeneficiaryRequest {
+  id: string;
+  request_number: string;
+  beneficiary_id: string;
+  request_type_id: string;
+  title: string;
+  description: string;
+  amount: number;
+  status: string;
+  priority: string;
+  assigned_to?: string;
+  submitted_at: string;
+  reviewed_at?: string;
+  reviewed_by?: string;
+  approved_at?: string;
+  approved_by?: string;
+  decision_notes?: string;
+  rejection_reason?: string;
+  sla_due_at: string;
+  is_overdue: boolean;
+  created_at: string;
+  updated_at: string;
+  // Relations
+  request_type?: RequestType;
+  beneficiary?: Beneficiary;
+}
+
+export interface RequestAttachment {
+  id: string;
+  request_id: string;
+  file_name: string;
+  file_type: string;
+  file_size: number;
+  storage_path: string;
+  description?: string;
+  uploaded_at: string;
+  uploaded_by: string;
+}
+
+export interface RequestComment {
+  id: string;
+  request_id: string;
+  user_id: string;
+  comment: string;
+  is_internal: boolean;
+  created_at: string;
+}
