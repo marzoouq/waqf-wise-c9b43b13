@@ -398,16 +398,19 @@ const AddJournalEntryDialog = ({ open, onOpenChange }: Props) => {
                         مدين <span className="text-destructive">*</span>
                       </FormLabel>
                       <Input
-                        type="number"
-                        step="0.01"
-                        value={line.debit_amount || ""}
+                        type="text"
+                        inputMode="decimal"
+                        value={line.debit_amount === 0 ? "" : line.debit_amount}
                         onChange={(e) => {
-                          updateLine(index, "debit_amount", parseFloat(e.target.value) || 0);
-                          if (parseFloat(e.target.value) > 0) {
+                          const value = e.target.value.replace(/[^\d.]/g, '');
+                          const numValue = value === '' ? 0 : parseFloat(value);
+                          updateLine(index, "debit_amount", numValue);
+                          if (numValue > 0) {
                             updateLine(index, "credit_amount", 0);
                           }
                         }}
                         placeholder="0.00"
+                        className="text-right"
                       />
                     </div>
 
@@ -416,16 +419,19 @@ const AddJournalEntryDialog = ({ open, onOpenChange }: Props) => {
                         دائن <span className="text-destructive">*</span>
                       </FormLabel>
                       <Input
-                        type="number"
-                        step="0.01"
-                        value={line.credit_amount || ""}
+                        type="text"
+                        inputMode="decimal"
+                        value={line.credit_amount === 0 ? "" : line.credit_amount}
                         onChange={(e) => {
-                          updateLine(index, "credit_amount", parseFloat(e.target.value) || 0);
-                          if (parseFloat(e.target.value) > 0) {
+                          const value = e.target.value.replace(/[^\d.]/g, '');
+                          const numValue = value === '' ? 0 : parseFloat(value);
+                          updateLine(index, "credit_amount", numValue);
+                          if (numValue > 0) {
                             updateLine(index, "debit_amount", 0);
                           }
                         }}
                         placeholder="0.00"
+                        className="text-right"
                       />
                     </div>
 

@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import AddAccountDialog from "./AddAccountDialog";
 
 interface AccountNodeProps {
   account: Account & { children?: Account[] };
@@ -92,28 +93,32 @@ function AccountNode({ account, level, onEdit, onAddChild }: AccountNodeProps) {
             {account.current_balance < 0 && <TrendingDown className="inline h-3 w-3 mr-1" />}
           </span>
 
-          <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-            {!account.is_system_account && onEdit && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 w-7 p-0"
-                onClick={() => onEdit(account)}
-              >
-                <Edit className="h-3 w-3" />
-              </Button>
-            )}
-            {account.is_header && onAddChild && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 w-7 p-0"
-                onClick={() => onAddChild(account)}
-              >
-                <Plus className="h-3 w-3" />
-              </Button>
-            )}
-          </div>
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+              {!account.is_system_account && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 p-0"
+                  onClick={() => {
+                    if (onEdit) onEdit(account);
+                  }}
+                >
+                  <Edit className="h-3 w-3" />
+                </Button>
+              )}
+              {account.is_header && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 p-0"
+                  onClick={() => {
+                    if (onAddChild) onAddChild(account);
+                  }}
+                >
+                  <Plus className="h-3 w-3" />
+                </Button>
+              )}
+            </div>
         </div>
       </div>
 
@@ -135,41 +140,63 @@ function AccountNode({ account, level, onEdit, onAddChild }: AccountNodeProps) {
 }
 
 export function EnhancedAccountsTree() {
-  const { accountTree, isLoading } = useAccounts();
+  const { accountTree, accounts, isLoading } = useAccounts();
   const [searchTerm, setSearchTerm] = useState("");
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
 
   if (isLoading) {
     return <div className="text-center py-8">جاري التحميل...</div>;
   }
 
   return (
-    <Card className="p-6">
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold">شجرة الحسابات</h2>
-          <Button>
-            <Plus className="ml-2 h-4 w-4" />
-            إضافة حساب رئيسي
-          </Button>
-        </div>
+    <>
+      <Card className="p-6">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold">شجرة الحسابات</h2>
+            <Button onClick={() => {
+              setSelectedAccount(null);
+              setDialogOpen(true);
+            }}>
+              <Plus className="ml-2 h-4 w-4" />
+              إضافة حساب رئيسي
+            </Button>
+          </div>
 
-        <Input
-          placeholder="بحث في الحسابات..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="max-w-md"
-        />
+          <Input
+            placeholder="بحث في الحسابات..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="max-w-md"
+          />
 
-        <div className="space-y-1">
-          {accountTree.map((account) => (
-            <AccountNode
-              key={account.id}
-              account={account}
-              level={1}
-            />
-          ))}
+          <div className="space-y-1">
+            {accountTree.map((account) => (
+              <AccountNode
+                key={account.id}
+                account={account}
+                level={1}
+                onEdit={(acc) => {
+                  setSelectedAccount(acc);
+                  setDialogOpen(true);
+                }}
+                onAddChild={(acc) => {
+                  setSelectedAccount(acc);
+                  setDialogOpen(true);
+                }}
+              />
+            ))}
+          </div>
         </div>
-      </div>
-    </Card>
+      </Card>
+
+      <AddAccountDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        account={selectedAccount as any}
+        accounts={accounts as any[]}
+      />
+    </>
   );
 }
