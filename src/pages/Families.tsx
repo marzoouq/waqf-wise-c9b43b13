@@ -34,9 +34,9 @@ const Families = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">إدارة العائلات</h1>
+          <h1 className="text-3xl font-bold text-foreground">سجل العائلات</h1>
           <p className="text-muted-foreground mt-2">
-            عرض وإدارة العائلات المستفيدة من الوقف
+            إدارة العائلات وربط أفرادها ببعضهم البعض
           </p>
         </div>
         <Button size="lg">

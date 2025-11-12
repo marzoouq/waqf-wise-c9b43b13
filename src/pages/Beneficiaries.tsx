@@ -99,10 +99,10 @@ const Beneficiaries = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-gradient-primary">
-              إدارة المستفيدين
+              سجل المستفيدين
             </h1>
             <p className="text-muted-foreground mt-1 text-sm md:text-base">
-              إدارة حسابات المستفيدين والموقوف عليهم
+              إدارة بيانات الأفراد المستفيدين من الوقف
             </p>
           </div>
           <Button 

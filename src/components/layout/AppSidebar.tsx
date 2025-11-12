@@ -43,7 +43,7 @@ const AppSidebar = () => {
 
   const allMenuItems = [
     { icon: LayoutDashboard, label: "لوحة التحكم", path: "/", roles: ['admin', 'accountant', 'beneficiary', 'user'] },
-    { icon: Users, label: "المستفيدون", path: "/beneficiaries", roles: ['admin', 'accountant'] },
+    { icon: Users, label: "الأفراد", path: "/beneficiaries", roles: ['admin', 'accountant'] },
     { icon: UsersRound, label: "العائلات", path: "/families", roles: ['admin', 'accountant'] },
     { icon: ClipboardList, label: "الطلبات", path: "/requests", roles: ['admin', 'accountant'] },
     { icon: Building2, label: "العقارات", path: "/properties", roles: ['admin', 'accountant'] },
