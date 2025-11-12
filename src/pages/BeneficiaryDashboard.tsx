@@ -1,10 +1,17 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DollarSign, FileText, Calendar, TrendingUp } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DollarSign, FileText, Calendar, TrendingUp, MessageSquare, AlertCircle, Wallet } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { useAuth } from "@/hooks/useAuth";
+import { useRequests } from "@/hooks/useRequests";
+import { EmergencyRequestForm } from "@/components/beneficiary/EmergencyRequestForm";
+import { LoanRequestForm } from "@/components/beneficiary/LoanRequestForm";
+import { InternalMessagesDialog } from "@/components/messages/InternalMessagesDialog";
+import { useToast } from "@/hooks/use-toast";
 
 interface Beneficiary {
   id: string;
@@ -31,9 +38,13 @@ interface Payment {
 
 const BeneficiaryDashboard = () => {
   const { user } = useAuth();
+  const { toast } = useToast();
+  const { createRequest } = useRequests();
   const [beneficiary, setBeneficiary] = useState<Beneficiary | null>(null);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [messagesDialogOpen, setMessagesDialogOpen] = useState(false);
+  const [activeRequestTab, setActiveRequestTab] = useState("view");
 
   useEffect(() => {
     if (!user?.email) return;
@@ -77,6 +88,49 @@ const BeneficiaryDashboard = () => {
     averagePayment: payments.length > 0 ? payments.reduce((sum, p) => sum + Number(p.amount), 0) / payments.length : 0,
   };
 
+  const handleEmergencyRequest = async (data: any) => {
+    try {
+      await createRequest.mutateAsync({
+        beneficiary_id: beneficiary?.id || "",
+        request_type_id: "emergency" as any, // يجب أن يكون UUID حقيقي
+        description: data.description,
+        amount: data.amount,
+        emergency_reason: data.emergency_reason,
+        priority: "عاجل",
+        status: "قيد المراجعة",
+      } as any);
+      toast({
+        title: "تم تقديم الطلب",
+        description: "سيتم مراجعة طلبك في أقرب وقت",
+      });
+      setActiveRequestTab("view");
+    } catch (error) {
+      console.error("Error submitting emergency request:", error);
+    }
+  };
+
+  const handleLoanRequest = async (data: any) => {
+    try {
+      await createRequest.mutateAsync({
+        beneficiary_id: beneficiary?.id || "",
+        request_type_id: "loan" as any, // يجب أن يكون UUID حقيقي
+        description: data.description,
+        loan_amount: data.loan_amount,
+        loan_term_months: data.loan_term_months,
+        loan_reason: data.loan_reason,
+        priority: "عادية",
+        status: "قيد المراجعة",
+      } as any);
+      toast({
+        title: "تم تقديم طلب القرض",
+        description: "سيتم مراجعة طلبك ومعالجته",
+      });
+      setActiveRequestTab("view");
+    } catch (error) {
+      console.error("Error submitting loan request:", error);
+    }
+  };
+
   if (loading) return <LoadingState message="جاري تحميل البيانات..." />;
   if (!beneficiary) {
     return (
@@ -89,9 +143,15 @@ const BeneficiaryDashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto p-6 space-y-8">
-        <header>
-          <h1 className="text-3xl font-bold text-gradient-primary">مرحباً، {beneficiary.full_name}</h1>
-          <p className="text-muted-foreground">عرض المدفوعات والتقارير الشخصية</p>
+        <header className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gradient-primary">مرحباً، {beneficiary.full_name}</h1>
+            <p className="text-muted-foreground">عرض المدفوعات والتقارير الشخصية</p>
+          </div>
+          <Button onClick={() => setMessagesDialogOpen(true)} variant="outline">
+            <MessageSquare className="h-4 w-4 ml-2" />
+            الرسائل
+          </Button>
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -146,6 +206,43 @@ const BeneficiaryDashboard = () => {
 
         <Card>
           <CardHeader>
+            <CardTitle>الخدمات والطلبات</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Tabs value={activeRequestTab} onValueChange={setActiveRequestTab}>
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="view">سجل الطلبات</TabsTrigger>
+                <TabsTrigger value="emergency">
+                  <AlertCircle className="h-4 w-4 ml-2" />
+                  فزعة طارئة
+                </TabsTrigger>
+                <TabsTrigger value="loan">
+                  <Wallet className="h-4 w-4 ml-2" />
+                  طلب قرض
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="view" className="space-y-4">
+                <EmptyState 
+                  icon={FileText} 
+                  title="لا توجد طلبات سابقة" 
+                  description="يمكنك تقديم طلب جديد من التبويبات أعلاه" 
+                />
+              </TabsContent>
+
+              <TabsContent value="emergency">
+                <EmergencyRequestForm onSubmit={handleEmergencyRequest} />
+              </TabsContent>
+
+              <TabsContent value="loan">
+                <LoanRequestForm onSubmit={handleLoanRequest} />
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
             <CardTitle>سجل المدفوعات</CardTitle>
           </CardHeader>
           <CardContent>
@@ -177,6 +274,12 @@ const BeneficiaryDashboard = () => {
             )}
           </CardContent>
         </Card>
+
+        {/* Internal Messages Dialog */}
+        <InternalMessagesDialog
+          open={messagesDialogOpen}
+          onOpenChange={setMessagesDialogOpen}
+        />
       </div>
     </div>
   );

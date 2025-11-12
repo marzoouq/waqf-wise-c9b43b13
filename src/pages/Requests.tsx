@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Filter, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { Search, Filter, Clock, CheckCircle, XCircle, AlertCircle, GitBranch } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { useRequests } from '@/hooks/useRequests';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { RequestApprovalDialog } from '@/components/requests/RequestApprovalDialog';
 import {
   Table,
   TableBody,
@@ -27,6 +28,8 @@ const Requests = () => {
   const { requests, isLoading } = useRequests();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [selectedRequest, setSelectedRequest] = useState<any>(null);
+  const [approvalDialogOpen, setApprovalDialogOpen] = useState(false);
 
   const filteredRequests = requests.filter(request => {
     const matchesSearch = 
@@ -221,6 +224,7 @@ const Requests = () => {
                     <TableHead className="text-right">الحالة</TableHead>
                     <TableHead className="text-right">الأولوية</TableHead>
                     <TableHead className="text-right">تاريخ التقديم</TableHead>
+                    <TableHead className="text-right">الإجراءات</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -267,6 +271,19 @@ const Requests = () => {
                       <TableCell className="text-muted-foreground">
                         {new Date(request.submitted_at).toLocaleDateString('ar-SA')}
                       </TableCell>
+                      <TableCell>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setSelectedRequest(request);
+                            setApprovalDialogOpen(true);
+                          }}
+                        >
+                          <GitBranch className="h-4 w-4 ml-2" />
+                          مسار الموافقات
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -275,6 +292,17 @@ const Requests = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Request Approval Dialog */}
+      {selectedRequest && (
+        <RequestApprovalDialog
+          open={approvalDialogOpen}
+          onOpenChange={setApprovalDialogOpen}
+          requestId={selectedRequest.id}
+          requestType={(selectedRequest.request_type as any)?.name || "طلب"}
+          requestDescription={selectedRequest.description}
+        />
+      )}
     </div>
   );
 };
