@@ -54,23 +54,14 @@ const AppSidebar = () => {
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
   const { 
-    isAdmin, 
-    isAccountant, 
-    isBeneficiary, 
-    isNazer, 
-    isCashier, 
-    isArchivist,
+    hasRole,
+    roles,
     isLoading: roleLoading 
   } = useUserRole();
 
   // تسجيل حالة المصادقة لتتبع الأدوار
   console.log("🔐 AppSidebar - Current auth state:", {
-    isAdmin,
-    isNazer,
-    isAccountant,
-    isCashier,
-    isArchivist,
-    isBeneficiary,
+    roles,
     roleLoading,
     timestamp: new Date().toISOString()
   });
@@ -78,14 +69,10 @@ const AppSidebar = () => {
   // Filter menu items based on user role
   const menuItems = useMemo(() => {
     console.log("🔄 Filtering menu items with roles:", {
-      isAdmin,
-      isNazer,
-      isAccountant,
-      isCashier,
-      isArchivist,
-      isBeneficiary,
+      roles,
       allMenuItemsCount: allMenuItems.length
     });
+    
     // Show items with 'all' role during loading
     if (roleLoading) {
       return allMenuItems.filter(item => item.roles.includes('all'));
@@ -95,29 +82,18 @@ const AppSidebar = () => {
       // 'all' means everyone can access
       if (item.roles.includes('all')) return true;
       
-      // Check specific roles
-      if (isAdmin) return true;
-      if (item.roles.some((role: string) => {
-        if (role === 'nazer' && isNazer) return true;
-        if (role === 'accountant' && isAccountant) return true;
-        if (role === 'beneficiary' && isBeneficiary) return true;
-        if (role === 'cashier' && isCashier) return true;
-        if (role === 'archivist' && isArchivist) return true;
-        return false;
-      })) return true;
-      
-      return false;
+      // Check if user has any of the required roles
+      return item.roles.some(role => hasRole(role as any));
     });
     
-    console.log("Menu filtering:", { 
-      isAdmin, isNazer, isAccountant, isCashier, isArchivist, isBeneficiary, 
+    console.log("✅ Filtered menu items:", {
       totalItems: allMenuItems.length,
       filteredItems: filtered.length,
-      filtered: filtered.map(i => i.label)
+      items: filtered.map(i => i.label)
     });
     
     return filtered;
-  }, [isAdmin, isAccountant, isBeneficiary, isNazer, isCashier, isArchivist, roleLoading]);
+  }, [roles, roleLoading, hasRole]);
 
   return (
     <Sidebar collapsible="icon" side="right">
