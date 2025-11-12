@@ -38,9 +38,7 @@ export function BankReconciliationDialog({ open, onOpenChange }: BankReconciliat
     
     await createStatement({
       ...newStatement,
-      total_debits: 0,
-      total_credits: 0,
-      is_reconciled: false,
+      status: 'pending',
     });
     
     setStep("import");
@@ -148,7 +146,7 @@ export function BankReconciliationDialog({ open, onOpenChange }: BankReconciliat
                       <TableCell>{statement.opening_balance.toLocaleString('ar-SA')}</TableCell>
                       <TableCell>{statement.closing_balance.toLocaleString('ar-SA')}</TableCell>
                       <TableCell>
-                        {statement.is_reconciled ? (
+                        {statement.status === 'reconciled' ? (
                           <Badge variant="default" className="gap-1">
                             <CheckCircle className="h-3 w-3" />
                             مسوى

@@ -169,7 +169,7 @@ export function useBankReconciliation() {
       const { data, error } = await supabase
         .from("bank_statements" as any)
         .update({
-          is_reconciled: true,
+          status: 'reconciled',
           reconciled_at: new Date().toISOString(),
         })
         .eq("id", statementId)
