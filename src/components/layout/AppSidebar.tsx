@@ -77,6 +77,15 @@ const AppSidebar = () => {
 
   // Filter menu items based on user role
   const menuItems = useMemo(() => {
+    console.log("🔄 Filtering menu items with roles:", {
+      isAdmin,
+      isNazer,
+      isAccountant,
+      isCashier,
+      isArchivist,
+      isBeneficiary,
+      allMenuItemsCount: allMenuItems.length
+    });
     // Show items with 'all' role during loading
     if (roleLoading) {
       return allMenuItems.filter(item => item.roles.includes('all'));
