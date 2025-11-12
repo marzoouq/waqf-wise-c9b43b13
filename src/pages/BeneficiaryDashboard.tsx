@@ -3,13 +3,19 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DollarSign, FileText, Calendar, TrendingUp, MessageSquare, AlertCircle, Wallet } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { DollarSign, FileText, Calendar, TrendingUp, MessageSquare, AlertCircle, Wallet, Upload, UserCog, UserPlus } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { useAuth } from "@/hooks/useAuth";
 import { useRequests } from "@/hooks/useRequests";
 import { EmergencyRequestForm } from "@/components/beneficiary/EmergencyRequestForm";
 import { LoanRequestForm } from "@/components/beneficiary/LoanRequestForm";
+import { DataUpdateForm } from "@/components/beneficiary/DataUpdateForm";
+import { AddFamilyMemberForm } from "@/components/beneficiary/AddFamilyMemberForm";
+import { DocumentUploadDialog } from "@/components/beneficiary/DocumentUploadDialog";
+import { AccountStatementView } from "@/components/beneficiary/AccountStatementView";
+import { BeneficiaryCertificate } from "@/components/beneficiary/BeneficiaryCertificate";
 import { InternalMessagesDialog } from "@/components/messages/InternalMessagesDialog";
 import { useToast } from "@/hooks/use-toast";
 
@@ -19,6 +25,10 @@ interface Beneficiary {
   national_id: string;
   phone: string;
   email?: string | null;
+  address?: string | null;
+  bank_name?: string | null;
+  bank_account_number?: string | null;
+  iban?: string | null;
   family_name?: string | null;
   relationship?: string | null;
   category: string;
@@ -26,6 +36,14 @@ interface Beneficiary {
   notes?: string | null;
   created_at: string;
   updated_at: string;
+}
+
+interface Request {
+  id: string;
+  description: string;
+  status: string;
+  amount?: number | null;
+  created_at: string;
 }
 
 interface Payment {
@@ -39,11 +57,13 @@ interface Payment {
 const BeneficiaryDashboard = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const { createRequest } = useRequests();
+  const { createRequest, requests } = useRequests();
   const [beneficiary, setBeneficiary] = useState<Beneficiary | null>(null);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
   const [messagesDialogOpen, setMessagesDialogOpen] = useState(false);
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+  const [selectedRequestId, setSelectedRequestId] = useState<string>();
   const [activeRequestTab, setActiveRequestTab] = useState("view");
 
   useEffect(() => {
@@ -53,7 +73,7 @@ const BeneficiaryDashboard = () => {
       try {
         const { data: benData, error: benError } = await supabase
           .from("beneficiaries")
-          .select("id, full_name, national_id, phone, email, family_name, relationship, category, status, notes, created_at, updated_at")
+          .select("*")
           .eq("email", user.email)
           .maybeSingle();
         
@@ -113,8 +133,9 @@ const BeneficiaryDashboard = () => {
     try {
       await createRequest.mutateAsync({
         beneficiary_id: beneficiary?.id || "",
-        request_type_id: "loan" as any, // يجب أن يكون UUID حقيقي
-        description: data.description,
+        request_type_id: "loan" as any,
+        description: `طلب قرض: ${data.description}`,
+        amount: data.loan_amount,
         loan_amount: data.loan_amount,
         loan_term_months: data.loan_term_months,
         loan_reason: data.loan_reason,
@@ -128,6 +149,46 @@ const BeneficiaryDashboard = () => {
       setActiveRequestTab("view");
     } catch (error) {
       console.error("Error submitting loan request:", error);
+    }
+  };
+
+  const handleDataUpdate = async (data: any) => {
+    try {
+      await createRequest.mutateAsync({
+        beneficiary_id: beneficiary?.id || "",
+        request_type_id: "data-update" as any,
+        description: `طلب تحديث ${data.update_type}: ${data.description}`,
+        new_data: JSON.stringify(data),
+        priority: "عادية",
+        status: "قيد المراجعة",
+      } as any);
+      toast({
+        title: "تم تقديم الطلب",
+        description: "تم تقديم طلب تحديث البيانات بنجاح",
+      });
+      setActiveRequestTab("view");
+    } catch (error) {
+      console.error("Error submitting data update request:", error);
+    }
+  };
+
+  const handleAddFamilyMember = async (data: any) => {
+    try {
+      await createRequest.mutateAsync({
+        beneficiary_id: beneficiary?.id || "",
+        request_type_id: "add-family-member" as any,
+        description: `طلب إضافة فرد: ${data.member_name} (${data.relationship})`,
+        new_data: JSON.stringify(data),
+        priority: "عادية",
+        status: "قيد المراجعة",
+      } as any);
+      toast({
+        title: "تم تقديم الطلب",
+        description: "تم تقديم طلب إضافة فرد للعائلة بنجاح",
+      });
+      setActiveRequestTab("view");
+    } catch (error) {
+      console.error("Error submitting add family member request:", error);
     }
   };
 
@@ -210,24 +271,78 @@ const BeneficiaryDashboard = () => {
           </CardHeader>
           <CardContent>
             <Tabs value={activeRequestTab} onValueChange={setActiveRequestTab}>
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="view">سجل الطلبات</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-5">
+                <TabsTrigger value="view">السجل</TabsTrigger>
                 <TabsTrigger value="emergency">
                   <AlertCircle className="h-4 w-4 ml-2" />
-                  فزعة طارئة
+                  فزعة
                 </TabsTrigger>
                 <TabsTrigger value="loan">
                   <Wallet className="h-4 w-4 ml-2" />
-                  طلب قرض
+                  قرض
+                </TabsTrigger>
+                <TabsTrigger value="update">
+                  <UserCog className="h-4 w-4 ml-2" />
+                  تحديث
+                </TabsTrigger>
+                <TabsTrigger value="family">
+                  <UserPlus className="h-4 w-4 ml-2" />
+                  إضافة فرد
                 </TabsTrigger>
               </TabsList>
 
               <TabsContent value="view" className="space-y-4">
-                <EmptyState 
-                  icon={FileText} 
-                  title="لا توجد طلبات سابقة" 
-                  description="يمكنك تقديم طلب جديد من التبويبات أعلاه" 
-                />
+                {requests.length === 0 ? (
+                  <EmptyState 
+                    icon={FileText} 
+                    title="لا توجد طلبات سابقة" 
+                    description="يمكنك تقديم طلب جديد من التبويبات أعلاه" 
+                  />
+                ) : (
+                  requests.map((request: Request) => (
+                    <Card key={request.id}>
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex-1">
+                            <h4 className="font-semibold">{request.description}</h4>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              {new Date(request.created_at).toLocaleDateString("ar-SA")}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge
+                              variant={
+                                request.status === "موافق"
+                                  ? "default"
+                                  : request.status === "مرفوض"
+                                  ? "destructive"
+                                  : "secondary"
+                              }
+                            >
+                              {request.status}
+                            </Badge>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                setSelectedRequestId(request.id);
+                                setUploadDialogOpen(true);
+                              }}
+                            >
+                              <Upload className="h-4 w-4 ml-2" />
+                              رفع مستند
+                            </Button>
+                          </div>
+                        </div>
+                        {request.amount && (
+                          <p className="text-sm text-muted-foreground">
+                            المبلغ: <span className="font-semibold">{request.amount} ر.س</span>
+                          </p>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
               </TabsContent>
 
               <TabsContent value="emergency">
@@ -236,6 +351,67 @@ const BeneficiaryDashboard = () => {
 
               <TabsContent value="loan">
                 <LoanRequestForm onSubmit={handleLoanRequest} />
+              </TabsContent>
+
+              <TabsContent value="update">
+                <DataUpdateForm
+                  onSubmit={handleDataUpdate}
+                  isLoading={createRequest.isPending}
+                  currentData={{
+                    phone: beneficiary?.phone,
+                    email: beneficiary?.email || undefined,
+                    address: beneficiary?.address || undefined,
+                    bank_name: beneficiary?.bank_name || undefined,
+                    bank_account_number: beneficiary?.bank_account_number || undefined,
+                    iban: beneficiary?.iban || undefined,
+                  }}
+                />
+              </TabsContent>
+
+              <TabsContent value="family">
+                <AddFamilyMemberForm
+                  onSubmit={handleAddFamilyMember}
+                  isLoading={createRequest.isPending}
+                />
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>المستندات والشهادات</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="statement" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="statement">كشف الحساب</TabsTrigger>
+                <TabsTrigger value="certificate">شهادة الاستحقاق</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="statement">
+                <AccountStatementView
+                  beneficiaryName={beneficiary?.full_name || ""}
+                  beneficiaryId={beneficiary?.id || ""}
+                  payments={payments.map(p => ({
+                    id: p.id,
+                    date: p.payment_date,
+                    type: "دفعة",
+                    amount: Number(p.amount),
+                    description: p.description,
+                    status: "مكتمل",
+                  }))}
+                />
+              </TabsContent>
+
+              <TabsContent value="certificate">
+                <BeneficiaryCertificate
+                  beneficiaryName={beneficiary?.full_name || ""}
+                  nationalId={beneficiary?.national_id || ""}
+                  category={beneficiary?.category || ""}
+                  registrationDate={beneficiary?.created_at || ""}
+                  status={beneficiary?.status || ""}
+                />
               </TabsContent>
             </Tabs>
           </CardContent>
@@ -275,10 +451,21 @@ const BeneficiaryDashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Internal Messages Dialog */}
+        {/* Dialogs */}
         <InternalMessagesDialog
           open={messagesDialogOpen}
           onOpenChange={setMessagesDialogOpen}
+        />
+        <DocumentUploadDialog
+          open={uploadDialogOpen}
+          onOpenChange={setUploadDialogOpen}
+          requestId={selectedRequestId}
+          onUploadComplete={() => {
+            toast({
+              title: "تم الرفع",
+              description: "تم رفع المستند بنجاح",
+            });
+          }}
         />
       </div>
     </div>
