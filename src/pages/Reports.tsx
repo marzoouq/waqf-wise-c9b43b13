@@ -1,8 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { IncomeStatement } from "@/components/reports/IncomeStatement";
-import { BalanceSheet } from "@/components/reports/BalanceSheet";
+import { EnhancedIncomeStatement } from "@/components/accounting/EnhancedIncomeStatement";
+import { EnhancedBalanceSheet } from "@/components/accounting/EnhancedBalanceSheet";
+import { TrialBalanceReport } from "@/components/accounting/TrialBalanceReport";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, FileText } from "lucide-react";
@@ -84,24 +85,24 @@ const Reports = () => {
 
         <Tabs defaultValue="income" className="space-y-4">
           <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:w-auto">
-            <TabsTrigger value="income">قائمة الدخل</TabsTrigger>
+            <TabsTrigger value="trial">ميزان المراجعة</TabsTrigger>
             <TabsTrigger value="balance">الميزانية العمومية</TabsTrigger>
-            <TabsTrigger value="custom">تقارير مخصصة</TabsTrigger>
+            <TabsTrigger value="income">قائمة الدخل</TabsTrigger>
             <TabsTrigger value="distributions">التوزيعات</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="income" className="space-y-4">
+          <TabsContent value="trial" className="space-y-4">
             <div className="flex gap-2 mb-4">
-              <Button onClick={() => handleExportPDF("قائمة الدخل")} variant="outline">
+              <Button onClick={() => handleExportPDF("ميزان المراجعة")} variant="outline">
                 <Download className="h-4 w-4 mr-2" />
                 تصدير PDF
               </Button>
-              <Button onClick={() => handleExportExcel("قائمة الدخل", [])} variant="outline">
+              <Button onClick={() => handleExportExcel("ميزان المراجعة", [])} variant="outline">
                 <Download className="h-4 w-4 mr-2" />
                 تصدير Excel
               </Button>
             </div>
-            <IncomeStatement />
+            <TrialBalanceReport />
           </TabsContent>
 
           <TabsContent value="balance" className="space-y-4">
@@ -115,21 +116,21 @@ const Reports = () => {
                 تصدير Excel
               </Button>
             </div>
-            <BalanceSheet />
+            <EnhancedBalanceSheet />
           </TabsContent>
 
-          <TabsContent value="custom" className="space-y-4">
-            <Card className="shadow-soft">
-              <CardHeader>
-                <CardTitle>تقارير مخصصة</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-8">
-                  <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-                  <p className="text-muted-foreground">التقارير المخصصة قيد التطوير</p>
-                </div>
-              </CardContent>
-            </Card>
+          <TabsContent value="income" className="space-y-4">
+            <div className="flex gap-2 mb-4">
+              <Button onClick={() => handleExportPDF("قائمة الدخل")} variant="outline">
+                <Download className="h-4 w-4 mr-2" />
+                تصدير PDF
+              </Button>
+              <Button onClick={() => handleExportExcel("قائمة الدخل", [])} variant="outline">
+                <Download className="h-4 w-4 mr-2" />
+                تصدير Excel
+              </Button>
+            </div>
+            <EnhancedIncomeStatement />
           </TabsContent>
 
           <TabsContent value="distributions" className="space-y-4">

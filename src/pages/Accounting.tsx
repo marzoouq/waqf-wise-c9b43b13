@@ -5,20 +5,22 @@ import {
   BookOpen, 
   FileText, 
   TrendingUp, 
-  Calculator,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Building2
 } from "lucide-react";
-import AccountsTree from "@/components/accounting/AccountsTree";
+import { EnhancedAccountsTree } from "@/components/accounting/EnhancedAccountsTree";
 import JournalEntries from "@/components/accounting/JournalEntries";
 import BudgetReports from "@/components/accounting/BudgetReports";
-import FinancialReports from "@/components/accounting/FinancialReports";
+import { TrialBalanceReport } from "@/components/accounting/TrialBalanceReport";
 import GeneralLedgerReport from "@/components/accounting/GeneralLedgerReport";
-import DetailedTrialBalance from "@/components/accounting/DetailedTrialBalance";
+import { BankReconciliationDialog } from "@/components/accounting/BankReconciliationDialog";
+import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/shared/LoadingState";
 
 const Accounting = () => {
   const [activeTab, setActiveTab] = useState("accounts");
   const [isLoadingTab, setIsLoadingTab] = useState(false);
+  const [bankDialogOpen, setBankDialogOpen] = useState(false);
 
   // Keyboard shortcuts for tabs
   const handleKeyPress = useCallback((e: KeyboardEvent) => {
@@ -27,9 +29,8 @@ const Accounting = () => {
         "1": "accounts",
         "2": "entries",
         "3": "budgets",
-        "4": "reports",
+        "4": "trial-balance",
         "5": "ledger",
-        "6": "trial-balance",
       };
       
       if (tabMap[e.key]) {
@@ -52,12 +53,11 @@ const Accounting = () => {
   }, []);
 
   const tabContent = useMemo(() => ({
-    accounts: <AccountsTree />,
+    accounts: <EnhancedAccountsTree />,
     entries: <JournalEntries />,
     budgets: <BudgetReports />,
-    reports: <FinancialReports />,
+    "trial-balance": <TrialBalanceReport />,
     ledger: <GeneralLedgerReport />,
-    "trial-balance": <DetailedTrialBalance />,
   }), []);
 
   return (
@@ -69,10 +69,14 @@ const Accounting = () => {
             إدارة الحسابات والقيود المحاسبية والميزانيات
           </p>
         </div>
+        <Button onClick={() => setBankDialogOpen(true)} variant="outline">
+          <Building2 className="ml-2 h-4 w-4" />
+          التسوية البنكية
+        </Button>
       </div>
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 h-auto">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 h-auto">
           <TabsTrigger value="accounts" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2" title="Alt+1">
             <BookOpen className="h-3 w-3 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline">شجرة الحسابات</span>
@@ -88,20 +92,15 @@ const Accounting = () => {
             <span className="hidden sm:inline">الميزانيات</span>
             <span className="sm:hidden">الميزانية</span>
           </TabsTrigger>
-          <TabsTrigger value="reports" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2" title="Alt+4">
-            <Calculator className="h-3 w-3 sm:h-4 sm:w-4" />
-            <span className="hidden sm:inline">التقارير المالية</span>
-            <span className="sm:hidden">التقارير</span>
+          <TabsTrigger value="trial-balance" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2" title="Alt+4">
+            <FileSpreadsheet className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">ميزان المراجعة</span>
+            <span className="sm:hidden">الميزان</span>
           </TabsTrigger>
           <TabsTrigger value="ledger" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2" title="Alt+5">
             <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline">دفتر الأستاذ</span>
             <span className="sm:hidden">الأستاذ</span>
-          </TabsTrigger>
-          <TabsTrigger value="trial-balance" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2" title="Alt+6">
-            <FileSpreadsheet className="h-3 w-3 sm:h-4 sm:w-4" />
-            <span className="hidden sm:inline">ميزان المراجعة</span>
-            <span className="sm:hidden">الميزان</span>
           </TabsTrigger>
         </TabsList>
 
@@ -117,6 +116,11 @@ const Accounting = () => {
           </TabsContent>
         ))}
       </Tabs>
+
+      <BankReconciliationDialog
+        open={bankDialogOpen}
+        onOpenChange={setBankDialogOpen}
+      />
     </div>
   );
 };

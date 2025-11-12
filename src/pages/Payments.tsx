@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback } from "react";
 import { Plus, Search, Receipt, CreditCard, Printer, Edit, Trash2, FileText } from "lucide-react";
 import { PaymentDialog } from "@/components/payments/PaymentDialog";
 import { usePayments } from "@/hooks/usePayments";
+import { useJournalEntries } from "@/hooks/useJournalEntries";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,6 +31,7 @@ const Payments = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const { payments, isLoading, addPayment, updatePayment, deletePayment } = usePayments();
+  const { createAutoEntry } = useJournalEntries();
 
   // Memoize filtered payments
   const filteredPayments = useMemo(() => {
@@ -99,12 +101,31 @@ const Payments = () => {
   }, []);
 
   const handleSavePayment = async (data: any) => {
-    if (selectedPayment) {
-      await updatePayment({ id: selectedPayment.id, ...data });
-    } else {
-      await addPayment(data);
+    try {
+      let paymentId: string;
+      
+      if (selectedPayment) {
+        await updatePayment({ id: selectedPayment.id, ...data });
+        paymentId = selectedPayment.id;
+      } else {
+        const result = await addPayment(data);
+        paymentId = result.id;
+      }
+
+      // Create automatic journal entry
+      const triggerEvent = data.payment_type === 'receipt' ? 'payment_received' : 'payment_made';
+      await createAutoEntry(
+        triggerEvent,
+        paymentId,
+        Number(data.amount),
+        data.description,
+        data.payment_date
+      );
+
+      setDialogOpen(false);
+    } catch (error) {
+      console.error("Error saving payment:", error);
     }
-    setDialogOpen(false);
   };
 
   const handleDeletePayment = useCallback(async (id: string) => {

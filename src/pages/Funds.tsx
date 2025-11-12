@@ -5,6 +5,7 @@ import { DistributionDialog } from "@/components/funds/DistributionDialog";
 import { SimulationDialog } from "@/components/funds/SimulationDialog";
 import { useDistributions } from "@/hooks/useDistributions";
 import { useFunds } from "@/hooks/useFunds";
+import { useJournalEntries } from "@/hooks/useJournalEntries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { LoadingState, CardLoadingSkeleton } from "@/components/shared/LoadingState";
@@ -16,18 +17,34 @@ const Funds = () => {
 
   const { distributions, isLoading: distributionsLoading, addDistribution } = useDistributions();
   const { funds, isLoading: fundsLoading } = useFunds();
+  const { createAutoEntry } = useJournalEntries();
 
   const handleDistribute = async (data: any) => {
-    const dbData = {
-      month: `${data.month} 1446`,
-      total_amount: data.totalAmount,
-      beneficiaries_count: data.beneficiaries,
-      status: "معلق",
-      distribution_date: new Date().toISOString().split('T')[0],
-      notes: data.notes || null,
-    };
-    await addDistribution(dbData);
-    setDistributionDialogOpen(false);
+    try {
+      const dbData = {
+        month: `${data.month} 1446`,
+        total_amount: data.totalAmount,
+        beneficiaries_count: data.beneficiaries,
+        status: "معلق",
+        distribution_date: new Date().toISOString().split('T')[0],
+        notes: data.notes || null,
+      };
+      
+      const result = await addDistribution(dbData);
+
+      // Create automatic journal entry for distribution
+      await createAutoEntry(
+        'distribution_created',
+        result.id,
+        Number(data.totalAmount),
+        `توزيع ${data.month} - ${data.beneficiaries} مستفيد`,
+        dbData.distribution_date
+      );
+
+      setDistributionDialogOpen(false);
+    } catch (error) {
+      console.error("Error creating distribution:", error);
+    }
   };
 
   // Calculate summary stats from funds
