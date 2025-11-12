@@ -41,6 +41,7 @@ const Notifications = lazy(() => import("./pages/Notifications"));
 const Requests = lazy(() => import("./pages/Requests"));
 const Families = lazy(() => import("./pages/Families"));
 const Users = lazy(() => import("./pages/Users"));
+const AuditLogs = lazy(() => import("./pages/AuditLogs"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Configure QueryClient with optimized defaults
@@ -97,6 +98,7 @@ const App = () => {
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/notifications" element={<Notifications />} />
                 <Route path="/requests" element={<Requests />} />
+                <Route path="/audit-logs" element={<AuditLogs />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

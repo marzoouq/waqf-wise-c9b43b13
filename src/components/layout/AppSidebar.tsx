@@ -46,6 +46,7 @@ const allMenuItems = [
   { icon: CreditCard, label: "المدفوعات", path: "/payments", roles: ['admin', 'accountant', 'cashier', 'nazer'] },
   { icon: CheckSquare, label: "الموافقات", path: "/approvals", roles: ['admin', 'accountant', 'nazer'] },
   { icon: BarChart3, label: "التقارير", path: "/reports", roles: ['all'] },
+  { icon: Shield, label: "سجل العمليات", path: "/audit-logs", roles: ['admin', 'nazer'] },
   { icon: Settings, label: "الإعدادات", path: "/settings", roles: ['all'] },
 ];
 
