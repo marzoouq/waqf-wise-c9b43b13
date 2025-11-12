@@ -26,6 +26,8 @@ export function useProfile() {
     queryFn: async () => {
       if (!user?.id) return null;
 
+      console.log("Fetching profile for user:", user.id, user.email);
+
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
@@ -33,6 +35,8 @@ export function useProfile() {
         .single();
 
       if (error && error.code !== "PGRST116") throw error; // Ignore not found
+      
+      console.log("Profile data:", data);
       return data as Profile | null;
     },
     enabled: !!user?.id,

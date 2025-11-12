@@ -74,7 +74,7 @@ const AppSidebar = () => {
       return allMenuItems.filter(item => item.roles.includes('all'));
     }
     
-    return allMenuItems.filter(item => {
+    const filtered = allMenuItems.filter(item => {
       // 'all' means everyone can access
       if (item.roles.includes('all')) return true;
       
@@ -91,6 +91,15 @@ const AppSidebar = () => {
       
       return false;
     });
+    
+    console.log("Menu filtering:", { 
+      isAdmin, isNazer, isAccountant, isCashier, isArchivist, isBeneficiary, 
+      totalItems: allMenuItems.length,
+      filteredItems: filtered.length,
+      filtered: filtered.map(i => i.label)
+    });
+    
+    return filtered;
   }, [isAdmin, isAccountant, isBeneficiary, isNazer, isCashier, isArchivist, roleLoading]);
 
   return (
