@@ -30,7 +30,7 @@ const Requests = () => {
 
   const filteredRequests = requests.filter(request => {
     const matchesSearch = 
-      request.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      request.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
       request.request_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (request.beneficiary as any)?.full_name.toLowerCase().includes(searchQuery.toLowerCase());
 
@@ -216,7 +216,7 @@ const Requests = () => {
                     <TableHead className="text-right">رقم الطلب</TableHead>
                     <TableHead className="text-right">المستفيد</TableHead>
                     <TableHead className="text-right">نوع الطلب</TableHead>
-                    <TableHead className="text-right">العنوان</TableHead>
+                    <TableHead className="text-right">الوصف</TableHead>
                     <TableHead className="text-right">المبلغ</TableHead>
                     <TableHead className="text-right">الحالة</TableHead>
                     <TableHead className="text-right">الأولوية</TableHead>
@@ -243,7 +243,7 @@ const Requests = () => {
                         </Badge>
                       </TableCell>
                       <TableCell className="max-w-xs truncate">
-                        {request.title}
+                        {request.description}
                       </TableCell>
                       <TableCell>
                         {request.amount > 0

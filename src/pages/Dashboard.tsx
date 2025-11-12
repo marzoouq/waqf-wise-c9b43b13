@@ -1,20 +1,33 @@
-import { useMemo, useCallback } from "react";
-import { Building2, Users, Wallet, FileText, AlertCircle } from "lucide-react";
+import { useMemo, useCallback, useState } from "react";
+import { Building2, Users, Wallet, FileText, AlertCircle, UsersRound, ClipboardList, Plus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import FinancialStats from "@/components/dashboard/FinancialStats";
 import RevenueExpenseChart from "@/components/dashboard/RevenueExpenseChart";
 import AccountDistributionChart from "@/components/dashboard/AccountDistributionChart";
 import BudgetComparisonChart from "@/components/dashboard/BudgetComparisonChart";
 import AccountingStats from "@/components/dashboard/AccountingStats";
 import RecentJournalEntries from "@/components/dashboard/RecentJournalEntries";
+import FamiliesStats from "@/components/dashboard/FamiliesStats";
+import RequestsStats from "@/components/dashboard/RequestsStats";
 import { useActivities } from "@/hooks/useActivities";
 import { useTasks } from "@/hooks/useTasks";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { useUserRole } from "@/hooks/useUserRole";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
+import BeneficiaryDialog from "@/components/beneficiaries/BeneficiaryDialog";
+import { PropertyDialog } from "@/components/properties/PropertyDialog";
+import { DistributionDialog } from "@/components/funds/DistributionDialog";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+  
+  // Dialogs State
+  const [isBeneficiaryDialogOpen, setIsBeneficiaryDialogOpen] = useState(false);
+  const [isPropertyDialogOpen, setIsPropertyDialogOpen] = useState(false);
+  const [isDistributionDialogOpen, setIsDistributionDialogOpen] = useState(false);
+  
   // ALL HOOKS MUST BE CALLED FIRST - Before any conditional returns
   const { isBeneficiary, isAccountant, isLoading: roleLoading } = useUserRole();
   const { activities, isLoading: activitiesLoading } = useActivities();
@@ -58,6 +71,12 @@ const Dashboard = () => {
 
         {/* Financial Stats */}
         <FinancialStats />
+
+        {/* Families Stats */}
+        <FamiliesStats />
+
+        {/* Requests Stats */}
+        <RequestsStats />
 
         {/* Accounting Stats */}
         <AccountingStats />
@@ -162,27 +181,83 @@ const Dashboard = () => {
             <CardTitle className="text-lg md:text-xl font-bold">الإجراءات السريعة</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-              <button className="group p-3 md:p-4 bg-card hover:bg-primary rounded-lg shadow-soft hover:shadow-medium transition-all duration-300 text-right border border-transparent hover:border-primary">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
+              <Button
+                onClick={() => setIsBeneficiaryDialogOpen(true)}
+                variant="outline"
+                className="group h-auto p-3 md:p-4 bg-card hover:bg-primary rounded-lg shadow-soft hover:shadow-medium transition-all duration-300 text-right border border-transparent hover:border-primary flex flex-col items-start"
+              >
                 <Users className="h-5 w-5 md:h-6 md:w-6 mb-2 text-primary group-hover:text-primary-foreground transition-colors" />
-                <p className="font-medium text-xs md:text-sm text-foreground group-hover:text-primary-foreground transition-colors">إضافة مستفيد</p>
-              </button>
-              <button className="group p-3 md:p-4 bg-card hover:bg-primary rounded-lg shadow-soft hover:shadow-medium transition-all duration-300 text-right border border-transparent hover:border-primary">
+                <span className="font-medium text-xs md:text-sm text-foreground group-hover:text-primary-foreground transition-colors">إضافة مستفيد</span>
+              </Button>
+              
+              <Button
+                onClick={() => navigate('/families')}
+                variant="outline"
+                className="group h-auto p-3 md:p-4 bg-card hover:bg-primary rounded-lg shadow-soft hover:shadow-medium transition-all duration-300 text-right border border-transparent hover:border-primary flex flex-col items-start"
+              >
+                <UsersRound className="h-5 w-5 md:h-6 md:w-6 mb-2 text-primary group-hover:text-primary-foreground transition-colors" />
+                <span className="font-medium text-xs md:text-sm text-foreground group-hover:text-primary-foreground transition-colors">إدارة العائلات</span>
+              </Button>
+
+              <Button
+                onClick={() => navigate('/requests')}
+                variant="outline"
+                className="group h-auto p-3 md:p-4 bg-card hover:bg-primary rounded-lg shadow-soft hover:shadow-medium transition-all duration-300 text-right border border-transparent hover:border-primary flex flex-col items-start"
+              >
+                <ClipboardList className="h-5 w-5 md:h-6 md:w-6 mb-2 text-primary group-hover:text-primary-foreground transition-colors" />
+                <span className="font-medium text-xs md:text-sm text-foreground group-hover:text-primary-foreground transition-colors">عرض الطلبات</span>
+              </Button>
+              
+              <Button
+                onClick={() => setIsPropertyDialogOpen(true)}
+                variant="outline"
+                className="group h-auto p-3 md:p-4 bg-card hover:bg-primary rounded-lg shadow-soft hover:shadow-medium transition-all duration-300 text-right border border-transparent hover:border-primary flex flex-col items-start"
+              >
                 <Building2 className="h-5 w-5 md:h-6 md:w-6 mb-2 text-primary group-hover:text-primary-foreground transition-colors" />
-                <p className="font-medium text-xs md:text-sm text-foreground group-hover:text-primary-foreground transition-colors">إضافة عقار</p>
-              </button>
-              <button className="group p-3 md:p-4 bg-card hover:bg-primary rounded-lg shadow-soft hover:shadow-medium transition-all duration-300 text-right border border-transparent hover:border-primary">
+                <span className="font-medium text-xs md:text-sm text-foreground group-hover:text-primary-foreground transition-colors">إضافة عقار</span>
+              </Button>
+              
+              <Button
+                onClick={() => setIsDistributionDialogOpen(true)}
+                variant="outline"
+                className="group h-auto p-3 md:p-4 bg-card hover:bg-primary rounded-lg shadow-soft hover:shadow-medium transition-all duration-300 text-right border border-transparent hover:border-primary flex flex-col items-start"
+              >
                 <Wallet className="h-5 w-5 md:h-6 md:w-6 mb-2 text-primary group-hover:text-primary-foreground transition-colors" />
-                <p className="font-medium text-xs md:text-sm text-foreground group-hover:text-primary-foreground transition-colors">توزيع الغلة</p>
-              </button>
-              <button className="group p-3 md:p-4 bg-card hover:bg-primary rounded-lg shadow-soft hover:shadow-medium transition-all duration-300 text-right border border-transparent hover:border-primary">
+                <span className="font-medium text-xs md:text-sm text-foreground group-hover:text-primary-foreground transition-colors">توزيع الغلة</span>
+              </Button>
+              
+              <Button
+                onClick={() => navigate('/reports')}
+                variant="outline"
+                className="group h-auto p-3 md:p-4 bg-card hover:bg-primary rounded-lg shadow-soft hover:shadow-medium transition-all duration-300 text-right border border-transparent hover:border-primary flex flex-col items-start"
+              >
                 <FileText className="h-5 w-5 md:h-6 md:w-6 mb-2 text-primary group-hover:text-primary-foreground transition-colors" />
-                <p className="font-medium text-xs md:text-sm text-foreground group-hover:text-primary-foreground transition-colors">إنشاء تقرير</p>
-              </button>
+                <span className="font-medium text-xs md:text-sm text-foreground group-hover:text-primary-foreground transition-colors">إنشاء تقرير</span>
+              </Button>
             </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Dialogs */}
+      <BeneficiaryDialog
+        open={isBeneficiaryDialogOpen}
+        onOpenChange={setIsBeneficiaryDialogOpen}
+        onSave={() => setIsBeneficiaryDialogOpen(false)}
+      />
+      
+      <PropertyDialog
+        open={isPropertyDialogOpen}
+        onOpenChange={setIsPropertyDialogOpen}
+        onSave={() => setIsPropertyDialogOpen(false)}
+      />
+      
+      <DistributionDialog
+        open={isDistributionDialogOpen}
+        onOpenChange={setIsDistributionDialogOpen}
+        onDistribute={() => setIsDistributionDialogOpen(false)}
+      />
     </div>
   );
 };
