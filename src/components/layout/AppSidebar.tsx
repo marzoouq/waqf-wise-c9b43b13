@@ -156,8 +156,8 @@ const AppSidebar = () => {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-sidebar-border p-4 bg-sidebar-accent/30 space-y-3">
-        <div className="flex items-center gap-3">
+      <SidebarFooter className="border-t border-sidebar-border p-4 bg-sidebar-accent/30 space-y-3 mt-auto">
+        <div className="flex items-center gap-3 mb-2">
           <div className="h-10 w-10 rounded-full bg-accent/30 flex items-center justify-center flex-shrink-0 border-2 border-accent/50">
             <span className="text-accent font-bold">
               {user?.email?.[0]?.toUpperCase() || 'U'}
@@ -175,14 +175,14 @@ const AppSidebar = () => {
           )}
         </div>
         <Button
-          variant="outline"
-          size={isCollapsed ? "icon" : "sm"}
-          className={isCollapsed ? "w-10 h-10 p-0" : "w-full"}
+          variant="destructive"
+          size={isCollapsed ? "icon" : "default"}
+          className={`${isCollapsed ? "w-10 h-10 p-0" : "w-full"} bg-red-600 hover:bg-red-700 text-white font-semibold`}
           onClick={signOut}
           title="تسجيل الخروج"
         >
-          <LogOut className="h-4 w-4" />
-          {!isCollapsed && <span className="mr-2">تسجيل الخروج</span>}
+          <LogOut className={isCollapsed ? "h-5 w-5" : "h-5 w-5 ml-2"} />
+          {!isCollapsed && <span>تسجيل الخروج</span>}
         </Button>
       </SidebarFooter>
     </Sidebar>
