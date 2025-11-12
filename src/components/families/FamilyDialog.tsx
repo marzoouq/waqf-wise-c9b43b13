@@ -79,14 +79,14 @@ const FamilyDialog = ({ open, onOpenChange, family, onSave }: FamilyDialogProps)
           <div className="space-y-2">
             <Label htmlFor="head_of_family_id">رب الأسرة</Label>
             <Select
-              value={formData.head_of_family_id}
-              onValueChange={(value) => setFormData({ ...formData, head_of_family_id: value })}
+              value={formData.head_of_family_id || "none"}
+              onValueChange={(value) => setFormData({ ...formData, head_of_family_id: value === "none" ? "" : value })}
             >
               <SelectTrigger>
                 <SelectValue placeholder="اختر رب الأسرة" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">بدون</SelectItem>
+                <SelectItem value="none">بدون</SelectItem>
                 {beneficiaries.map((beneficiary) => (
                   <SelectItem key={beneficiary.id} value={beneficiary.id}>
                     {beneficiary.full_name} - {beneficiary.national_id}
