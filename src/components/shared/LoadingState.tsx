@@ -1,5 +1,7 @@
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface LoadingStateProps {
   message?: string;
@@ -76,6 +78,114 @@ export function StatsLoadingSkeleton() {
           <div className="h-8 w-3/4 bg-muted animate-pulse rounded" />
         </div>
       ))}
+    </div>
+  );
+}
+
+// Advanced Dashboard Skeleton
+export function DashboardLoadingSkeleton() {
+  return (
+    <div className="container mx-auto p-6 space-y-8">
+      {/* Header Skeleton */}
+      <div className="space-y-2">
+        <Skeleton className="h-10 w-64" />
+        <Skeleton className="h-4 w-96" />
+      </div>
+
+      {/* Stats Cards Skeleton */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[1, 2, 3, 4].map((i) => (
+          <Card key={i} className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-10 w-10 rounded-lg" />
+            </div>
+            <Skeleton className="h-8 w-32 mb-2" />
+            <Skeleton className="h-3 w-20" />
+          </Card>
+        ))}
+      </div>
+
+      {/* Chart Skeleton */}
+      <Card className="p-6">
+        <Skeleton className="h-6 w-48 mb-6" />
+        <Skeleton className="h-64 w-full" />
+      </Card>
+
+      {/* Three Column Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {[1, 2, 3].map((i) => (
+          <Card key={i} className="p-6">
+            <Skeleton className="h-6 w-32 mb-4" />
+            <div className="space-y-3">
+              {[1, 2, 3].map((j) => (
+                <Skeleton key={j} className="h-16 w-full" />
+              ))}
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Advanced Beneficiaries Skeleton
+export function BeneficiariesLoadingSkeleton() {
+  return (
+    <div className="container mx-auto p-6 space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-4 w-64" />
+        </div>
+        <Skeleton className="h-10 w-40" />
+      </div>
+
+      {/* Search */}
+      <Card className="p-6">
+        <Skeleton className="h-10 w-full" />
+      </Card>
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[1, 2, 3, 4].map((i) => (
+          <Card key={i} className="p-4">
+            <Skeleton className="h-4 w-20 mb-2" />
+            <Skeleton className="h-8 w-16 mb-2" />
+            <Skeleton className="h-3 w-24" />
+          </Card>
+        ))}
+      </div>
+
+      {/* Table */}
+      <TableLoadingSkeleton rows={10} />
+    </div>
+  );
+}
+
+// Advanced Accounting Skeleton
+export function AccountingLoadingSkeleton() {
+  return (
+    <div className="container mx-auto p-6 space-y-6">
+      <div className="flex justify-between items-center">
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-4 w-64" />
+        </div>
+        <Skeleton className="h-10 w-32" />
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-2">
+        {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+          <Skeleton key={i} className="h-10 w-24" />
+        ))}
+      </div>
+
+      <Card className="p-6">
+        <Skeleton className="h-96 w-full" />
+      </Card>
     </div>
   );
 }

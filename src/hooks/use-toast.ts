@@ -183,4 +183,39 @@ function useToast() {
   };
 }
 
+// Toast Helper Functions for common patterns
+export function toastSuccess(message: string, title: string = "نجح") {
+  return toast({
+    title: `✅ ${title}`,
+    description: message,
+    variant: "default",
+    duration: 3000,
+  });
+}
+
+export function toastError(message: string, title: string = "خطأ") {
+  return toast({
+    title: `❌ ${title}`,
+    description: message,
+    variant: "destructive",
+    duration: 5000,
+  });
+}
+
+export function toastWarning(message: string, title: string = "تنبيه") {
+  return toast({
+    title: `⚠️ ${title}`,
+    description: message,
+    duration: 4000,
+  });
+}
+
+export function toastInfo(message: string, title: string = "معلومة") {
+  return toast({
+    title: `ℹ️ ${title}`,
+    description: message,
+    duration: 3000,
+  });
+}
+
 export { useToast, toast };

@@ -52,7 +52,8 @@ const queryClient = new QueryClient({
       gcTime: 10 * 60 * 1000, // 10 minutes - cache retention (was cacheTime)
       refetchOnWindowFocus: false, // Prevent unnecessary refetches
       refetchOnReconnect: true, // Refetch on reconnect
-      retry: 1, // Only retry once on failure
+      retry: 2, // Retry twice on failure for better reliability
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
     },
   },
 });
