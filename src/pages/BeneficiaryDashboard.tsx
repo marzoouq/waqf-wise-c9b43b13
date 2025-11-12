@@ -14,6 +14,7 @@ import { LoanRequestForm } from "@/components/beneficiary/LoanRequestForm";
 import { DataUpdateForm } from "@/components/beneficiary/DataUpdateForm";
 import { AddFamilyMemberForm } from "@/components/beneficiary/AddFamilyMemberForm";
 import { DocumentUploadDialog } from "@/components/beneficiary/DocumentUploadDialog";
+import { useBeneficiaryAttachments } from "@/hooks/useBeneficiaryAttachments";
 import { AccountStatementView } from "@/components/beneficiary/AccountStatementView";
 import { BeneficiaryCertificate } from "@/components/beneficiary/BeneficiaryCertificate";
 import { InternalMessagesDialog } from "@/components/messages/InternalMessagesDialog";
@@ -65,6 +66,8 @@ const BeneficiaryDashboard = () => {
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [selectedRequestId, setSelectedRequestId] = useState<string>();
   const [activeRequestTab, setActiveRequestTab] = useState("view");
+  
+  const { attachments } = useBeneficiaryAttachments(beneficiary?.id);
 
   useEffect(() => {
     if (!user?.email) return;
@@ -407,6 +410,7 @@ const BeneficiaryDashboard = () => {
               <TabsContent value="certificate">
                 <BeneficiaryCertificate
                   beneficiaryName={beneficiary?.full_name || ""}
+                  beneficiaryId={beneficiary?.id || ""}
                   nationalId={beneficiary?.national_id || ""}
                   category={beneficiary?.category || ""}
                   registrationDate={beneficiary?.created_at || ""}
@@ -456,17 +460,20 @@ const BeneficiaryDashboard = () => {
           open={messagesDialogOpen}
           onOpenChange={setMessagesDialogOpen}
         />
-        <DocumentUploadDialog
-          open={uploadDialogOpen}
-          onOpenChange={setUploadDialogOpen}
-          requestId={selectedRequestId}
-          onUploadComplete={() => {
-            toast({
-              title: "تم الرفع",
-              description: "تم رفع المستند بنجاح",
-            });
-          }}
-        />
+        {beneficiary && (
+          <DocumentUploadDialog
+            open={uploadDialogOpen}
+            onOpenChange={setUploadDialogOpen}
+            beneficiaryId={beneficiary.id}
+            requestId={selectedRequestId}
+            onUploadComplete={() => {
+              toast({
+                title: "تم الرفع",
+                description: "تم رفع المستند بنجاح",
+              });
+            }}
+          />
+        )}
       </div>
     </div>
   );

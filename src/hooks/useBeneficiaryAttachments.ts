@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 export interface BeneficiaryAttachment {
   id: string;
@@ -8,22 +9,24 @@ export interface BeneficiaryAttachment {
   file_name: string;
   file_path: string;
   file_type: string;
-  file_size?: number;
   mime_type?: string;
+  file_size: number;
+  document_type?: string;
   description?: string;
-  uploaded_by?: string;
-  uploaded_by_name?: string;
-  is_verified: boolean;
+  is_verified?: boolean;
   verified_by?: string;
   verified_at?: string;
   created_at: string;
-  updated_at: string;
+  uploaded_by?: string;
+  uploaded_by_name?: string;
 }
 
 export function useBeneficiaryAttachments(beneficiaryId?: string) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
+  // Fetch attachments
   const { data: attachments = [], isLoading } = useQuery({
     queryKey: ["beneficiary-attachments", beneficiaryId],
     queryFn: async () => {
@@ -36,27 +39,51 @@ export function useBeneficiaryAttachments(beneficiaryId?: string) {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as BeneficiaryAttachment[];
+      return data;
     },
     enabled: !!beneficiaryId,
   });
 
-  const addAttachment = useMutation({
-    mutationFn: async (attachment: Omit<BeneficiaryAttachment, "id" | "created_at" | "updated_at">) => {
-      const { data: userData } = await supabase.auth.getUser();
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("full_name")
-        .eq("user_id", userData?.user?.id)
-        .single();
+  // Upload attachment
+  const uploadAttachment = useMutation({
+    mutationFn: async ({
+      file,
+      documentType,
+      description,
+    }: {
+      file: File;
+      documentType: string;
+      description?: string;
+    }) => {
+      if (!beneficiaryId) throw new Error("Beneficiary ID is required");
 
+      // Upload file to Supabase Storage
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${beneficiaryId}/${Date.now()}.${fileExt}`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from("beneficiary-documents")
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from("beneficiary-documents")
+        .getPublicUrl(fileName);
+
+      // Save metadata to database
       const { data, error } = await supabase
         .from("beneficiary_attachments")
-        .insert([{
-          ...attachment,
-          uploaded_by: userData?.user?.id,
-          uploaded_by_name: profile?.full_name || "مستخدم",
-        }])
+        .insert({
+          beneficiary_id: beneficiaryId,
+          file_name: file.name,
+          file_path: urlData.publicUrl,
+          file_type: file.type,
+          file_size: file.size,
+          document_type: documentType,
+          description,
+          uploaded_by: user?.id,
+        })
         .select()
         .single();
 
@@ -64,41 +91,54 @@ export function useBeneficiaryAttachments(beneficiaryId?: string) {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["beneficiary-attachments"] });
+      queryClient.invalidateQueries({ queryKey: ["beneficiary-attachments", beneficiaryId] });
       toast({
-        title: "تمت الإضافة بنجاح",
-        description: "تم رفع المرفق بنجاح",
+        title: "تم رفع المستند",
+        description: "تم رفع المستند بنجاح",
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "خطأ في الرفع",
-        description: error.message || "حدث خطأ أثناء رفع المرفق",
+        description: error.message,
         variant: "destructive",
       });
     },
   });
 
+  // Delete attachment
   const deleteAttachment = useMutation({
-    mutationFn: async (id: string) => {
+    mutationFn: async (attachmentId: string) => {
+      const attachment = attachments.find((a) => a.id === attachmentId);
+      if (!attachment) throw new Error("Attachment not found");
+
+      // Delete from storage
+      const fileName = attachment.file_path.split("/").pop();
+      if (fileName) {
+        await supabase.storage
+          .from("beneficiary-documents")
+          .remove([`${beneficiaryId}/${fileName}`]);
+      }
+
+      // Delete from database
       const { error } = await supabase
         .from("beneficiary_attachments")
         .delete()
-        .eq("id", id);
+        .eq("id", attachmentId);
 
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["beneficiary-attachments"] });
+      queryClient.invalidateQueries({ queryKey: ["beneficiary-attachments", beneficiaryId] });
       toast({
-        title: "تم الحذف بنجاح",
-        description: "تم حذف المرفق بنجاح",
+        title: "تم الحذف",
+        description: "تم حذف المستند بنجاح",
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "خطأ في الحذف",
-        description: error.message || "حدث خطأ أثناء حذف المرفق",
+        description: error.message,
         variant: "destructive",
       });
     },
@@ -107,7 +147,7 @@ export function useBeneficiaryAttachments(beneficiaryId?: string) {
   return {
     attachments,
     isLoading,
-    addAttachment: addAttachment.mutateAsync,
+    uploadAttachment: uploadAttachment.mutateAsync,
     deleteAttachment: deleteAttachment.mutateAsync,
   };
 }

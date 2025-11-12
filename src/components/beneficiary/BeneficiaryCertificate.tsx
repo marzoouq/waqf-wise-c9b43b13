@@ -3,9 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Download, FileCheck, Printer } from "lucide-react";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 interface BeneficiaryCertificateProps {
   beneficiaryName: string;
+  beneficiaryId: string;
   nationalId: string;
   category: string;
   registrationDate: string;
@@ -14,6 +17,7 @@ interface BeneficiaryCertificateProps {
 
 export function BeneficiaryCertificate({
   beneficiaryName,
+  beneficiaryId,
   nationalId,
   category,
   registrationDate,
@@ -23,9 +27,89 @@ export function BeneficiaryCertificate({
     window.print();
   };
 
-  const handleDownloadPDF = () => {
-    // TODO: Implement PDF generation using jsPDF
-    console.log("Generating certificate PDF");
+  const handleGeneratePDF = () => {
+    const doc = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4",
+    });
+
+    // Set Arabic font
+    doc.addFont("https://cdn.jsdelivr.net/npm/amiri-font@1.0.0/Amiri-Regular.ttf", "Amiri", "normal");
+    doc.setFont("Amiri");
+    doc.setR2L(true);
+
+    // Border
+    doc.setLineWidth(1);
+    doc.rect(10, 10, 190, 277);
+    doc.setLineWidth(0.5);
+    doc.rect(15, 15, 180, 267);
+
+    // Title with decorative elements
+    doc.setFontSize(24);
+    doc.text("شهادة استحقاق", 105, 40, { align: "center" });
+
+    // Subtitle
+    doc.setFontSize(16);
+    doc.text("من منصة إدارة الوقف الإلكترونية", 105, 55, { align: "center" });
+
+    // Main content
+    doc.setFontSize(14);
+    const startY = 80;
+    
+    doc.text(`تشهد منصة إدارة الوقف أن:`, 105, startY, { align: "center" });
+    
+    doc.setFontSize(18);
+    doc.text(beneficiaryName, 105, startY + 20, { align: "center" });
+    
+    doc.setFontSize(14);
+    doc.text(`رقم الهوية: ${nationalId}`, 105, startY + 35, { align: "center" });
+    
+    doc.text(
+      `هو من المستفيدين المسجلين لدى الوقف`,
+      105,
+      startY + 55,
+      { align: "center" }
+    );
+    
+    doc.text(
+      `وله الحق في الانتفاع من غلة الوقف حسب الشروط`,
+      105,
+      startY + 70,
+      { align: "center" }
+    );
+
+    // Category and Status
+    doc.text(`الفئة: ${category}`, 105, startY + 90, { align: "center" });
+    doc.text(`الحالة: ${status}`, 105, startY + 105, { align: "center" });
+
+    // Issue date
+    doc.setFontSize(12);
+    doc.text(
+      `تاريخ الإصدار: ${format(new Date(), "dd MMMM yyyy", { locale: ar })}`,
+      105,
+      startY + 130,
+      { align: "center" }
+    );
+
+    // Signature area
+    doc.setFontSize(14);
+    doc.text("الناظر", 50, 240);
+    doc.line(30, 245, 80, 245);
+    
+    doc.text("الختم الرسمي", 150, 240);
+    doc.circle(150, 255, 15);
+
+    // Footer
+    doc.setFontSize(10);
+    doc.text(
+      "هذه الشهادة صادرة إلكترونياً ولا تحتاج لتوقيع",
+      105,
+      270,
+      { align: "center" }
+    );
+
+    doc.save(`شهادة-استحقاق-${beneficiaryName}-${format(new Date(), "yyyy-MM-dd")}.pdf`);
   };
 
   return (
@@ -41,7 +125,7 @@ export function BeneficiaryCertificate({
               <Printer className="h-4 w-4 ml-2" />
               طباعة
             </Button>
-            <Button variant="outline" size="sm" onClick={handleDownloadPDF}>
+            <Button variant="outline" size="sm" onClick={handleGeneratePDF}>
               <Download className="h-4 w-4 ml-2" />
               تحميل PDF
             </Button>

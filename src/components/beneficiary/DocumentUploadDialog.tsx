@@ -13,10 +13,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload, File, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useBeneficiaryAttachments } from "@/hooks/useBeneficiaryAttachments";
 
 interface DocumentUploadDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  beneficiaryId: string;
   requestId?: string;
   onUploadComplete?: () => void;
 }
@@ -24,10 +26,12 @@ interface DocumentUploadDialogProps {
 export function DocumentUploadDialog({
   open,
   onOpenChange,
+  beneficiaryId,
   requestId,
   onUploadComplete,
 }: DocumentUploadDialogProps) {
   const { toast } = useToast();
+  const { uploadAttachment } = useBeneficiaryAttachments(beneficiaryId);
   const [fileType, setFileType] = useState("");
   const [description, setDescription] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -62,12 +66,10 @@ export function DocumentUploadDialog({
     setUploading(true);
 
     try {
-      // Simulate upload (replace with actual Supabase storage upload)
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      toast({
-        title: "تم رفع المستند",
-        description: "تم رفع المستند بنجاح",
+      await uploadAttachment({
+        file: selectedFile,
+        documentType: fileType,
+        description,
       });
 
       // Reset form
@@ -77,11 +79,7 @@ export function DocumentUploadDialog({
       onOpenChange(false);
       onUploadComplete?.();
     } catch (error) {
-      toast({
-        title: "خطأ في الرفع",
-        description: "حدث خطأ أثناء رفع المستند",
-        variant: "destructive",
-      });
+      // Error handled in hook
     } finally {
       setUploading(false);
     }

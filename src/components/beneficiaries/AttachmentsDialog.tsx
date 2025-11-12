@@ -20,13 +20,12 @@ interface AttachmentsDialogProps {
 }
 
 export function AttachmentsDialog({ open, onOpenChange, beneficiaryId, beneficiaryName }: AttachmentsDialogProps) {
-  const { attachments, isLoading, addAttachment, deleteAttachment } = useBeneficiaryAttachments(beneficiaryId);
+  const { attachments, isLoading, uploadAttachment, deleteAttachment } = useBeneficiaryAttachments(beneficiaryId);
   const [showUploadForm, setShowUploadForm] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   
   const [formData, setFormData] = useState({
-    file_name: "",
-    file_path: "",
     file_type: "",
     description: "",
   });
@@ -41,16 +40,16 @@ export function AttachmentsDialog({ open, onOpenChange, beneficiaryId, beneficia
   ];
 
   const handleSubmit = async () => {
-    if (!formData.file_name || !formData.file_path || !formData.file_type) return;
+    if (!selectedFile || !formData.file_type) return;
 
-    await addAttachment({
-      beneficiary_id: beneficiaryId,
-      ...formData,
-      file_size: 0,
-      is_verified: false,
+    await uploadAttachment({
+      file: selectedFile,
+      documentType: formData.file_type,
+      description: formData.description,
     });
 
-    setFormData({ file_name: "", file_path: "", file_type: "", description: "" });
+    setFormData({ file_type: "", description: "" });
+    setSelectedFile(null);
     setShowUploadForm(false);
   };
 
@@ -80,23 +79,18 @@ export function AttachmentsDialog({ open, onOpenChange, beneficiaryId, beneficia
             {showUploadForm && (
               <div className="border rounded-lg p-4 space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="fileName">اسم الملف</Label>
+                  <Label htmlFor="fileInput">اختر الملف</Label>
                   <Input
-                    id="fileName"
-                    placeholder="أدخل اسم الملف..."
-                    value={formData.file_name}
-                    onChange={(e) => setFormData({ ...formData, file_name: e.target.value })}
+                    id="fileInput"
+                    type="file"
+                    onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
                   />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="filePath">مسار الملف</Label>
-                  <Input
-                    id="filePath"
-                    placeholder="أدخل مسار الملف..."
-                    value={formData.file_path}
-                    onChange={(e) => setFormData({ ...formData, file_path: e.target.value })}
-                  />
+                  {selectedFile && (
+                    <p className="text-sm text-muted-foreground">
+                      {selectedFile.name} ({(selectedFile.size / 1024).toFixed(2)} KB)
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -126,7 +120,9 @@ export function AttachmentsDialog({ open, onOpenChange, beneficiaryId, beneficia
                 </div>
 
                 <div className="flex gap-2">
-                  <Button onClick={handleSubmit}>رفع المرفق</Button>
+                  <Button onClick={handleSubmit} disabled={!selectedFile || !formData.file_type}>
+                    رفع المرفق
+                  </Button>
                   <Button variant="outline" onClick={() => setShowUploadForm(false)}>إلغاء</Button>
                 </div>
               </div>
@@ -164,8 +160,8 @@ export function AttachmentsDialog({ open, onOpenChange, beneficiaryId, beneficia
                           {attachment.description && (
                             <p className="text-sm">{attachment.description}</p>
                           )}
-                          <p className="text-xs text-muted-foreground">
-                            رفع بواسطة: {attachment.uploaded_by_name} • {format(new Date(attachment.created_at), "dd MMMM yyyy", { locale: ar })}
+                           <p className="text-xs text-muted-foreground">
+                            رفع بتاريخ: {format(new Date(attachment.created_at), "dd MMMM yyyy", { locale: ar })}
                           </p>
                         </div>
                       </div>
