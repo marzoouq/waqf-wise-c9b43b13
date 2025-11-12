@@ -398,12 +398,12 @@ const AddJournalEntryDialog = ({ open, onOpenChange }: Props) => {
                         مدين <span className="text-destructive">*</span>
                       </FormLabel>
                       <Input
-                        type="text"
-                        inputMode="decimal"
-                        value={line.debit_amount === 0 ? "" : line.debit_amount}
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={line.debit_amount || ""}
                         onChange={(e) => {
-                          const value = e.target.value.replace(/[^\d.]/g, '');
-                          const numValue = value === '' ? 0 : parseFloat(value);
+                          const numValue = e.target.value === '' ? 0 : parseFloat(e.target.value);
                           updateLine(index, "debit_amount", numValue);
                           if (numValue > 0) {
                             updateLine(index, "credit_amount", 0);
@@ -419,12 +419,12 @@ const AddJournalEntryDialog = ({ open, onOpenChange }: Props) => {
                         دائن <span className="text-destructive">*</span>
                       </FormLabel>
                       <Input
-                        type="text"
-                        inputMode="decimal"
-                        value={line.credit_amount === 0 ? "" : line.credit_amount}
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={line.credit_amount || ""}
                         onChange={(e) => {
-                          const value = e.target.value.replace(/[^\d.]/g, '');
-                          const numValue = value === '' ? 0 : parseFloat(value);
+                          const numValue = e.target.value === '' ? 0 : parseFloat(e.target.value);
                           updateLine(index, "credit_amount", numValue);
                           if (numValue > 0) {
                             updateLine(index, "debit_amount", 0);
