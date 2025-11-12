@@ -31,6 +31,24 @@ import { NotificationsBell } from "./NotificationsBell";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useMemo } from "react";
 
+// تعريف القوائم خارج الـ component لتجنب إعادة الإنشاء في كل render
+const allMenuItems = [
+  { icon: LayoutDashboard, label: "لوحة التحكم", path: "/", roles: ['all'] },
+  { icon: Shield, label: "إدارة المستخدمين", path: "/users", roles: ['admin', 'nazer'] },
+  { icon: Users, label: "المستفيدون", path: "/beneficiaries", roles: ['admin', 'accountant', 'nazer'] },
+  { icon: UsersRound, label: "العائلات", path: "/families", roles: ['admin', 'accountant', 'nazer'] },
+  { icon: ClipboardList, label: "الطلبات", path: "/requests", roles: ['admin', 'accountant', 'nazer'] },
+  { icon: Building2, label: "العقارات", path: "/properties", roles: ['admin', 'accountant', 'nazer'] },
+  { icon: Wallet, label: "الأموال والمصارف", path: "/funds", roles: ['admin', 'accountant', 'nazer'] },
+  { icon: FileText, label: "الأرشيف", path: "/archive", roles: ['admin', 'archivist', 'nazer'] },
+  { icon: Calculator, label: "المحاسبة", path: "/accounting", roles: ['admin', 'accountant', 'nazer'] },
+  { icon: Receipt, label: "الفواتير", path: "/invoices", roles: ['admin', 'accountant', 'nazer'] },
+  { icon: CreditCard, label: "المدفوعات", path: "/payments", roles: ['admin', 'accountant', 'cashier', 'nazer'] },
+  { icon: CheckSquare, label: "الموافقات", path: "/approvals", roles: ['admin', 'accountant', 'nazer'] },
+  { icon: BarChart3, label: "التقارير", path: "/reports", roles: ['all'] },
+  { icon: Settings, label: "الإعدادات", path: "/settings", roles: ['all'] },
+];
+
 const AppSidebar = () => {
   const location = useLocation();
   const { state } = useSidebar();
@@ -45,22 +63,17 @@ const AppSidebar = () => {
     isLoading: roleLoading 
   } = useUserRole();
 
-  const allMenuItems = [
-    { icon: LayoutDashboard, label: "لوحة التحكم", path: "/", roles: ['all'] },
-    { icon: Shield, label: "إدارة المستخدمين", path: "/users", roles: ['admin', 'nazer'] },
-    { icon: Users, label: "المستفيدون", path: "/beneficiaries", roles: ['admin', 'accountant', 'nazer'] },
-    { icon: UsersRound, label: "العائلات", path: "/families", roles: ['admin', 'accountant', 'nazer'] },
-    { icon: ClipboardList, label: "الطلبات", path: "/requests", roles: ['admin', 'accountant', 'nazer'] },
-    { icon: Building2, label: "العقارات", path: "/properties", roles: ['admin', 'accountant', 'nazer'] },
-    { icon: Wallet, label: "الأموال والمصارف", path: "/funds", roles: ['admin', 'accountant', 'nazer'] },
-    { icon: FileText, label: "الأرشيف", path: "/archive", roles: ['admin', 'archivist', 'nazer'] },
-    { icon: Calculator, label: "المحاسبة", path: "/accounting", roles: ['admin', 'accountant', 'nazer'] },
-    { icon: Receipt, label: "الفواتير", path: "/invoices", roles: ['admin', 'accountant', 'nazer'] },
-    { icon: CreditCard, label: "المدفوعات", path: "/payments", roles: ['admin', 'accountant', 'cashier', 'nazer'] },
-    { icon: CheckSquare, label: "الموافقات", path: "/approvals", roles: ['admin', 'accountant', 'nazer'] },
-    { icon: BarChart3, label: "التقارير", path: "/reports", roles: ['all'] },
-    { icon: Settings, label: "الإعدادات", path: "/settings", roles: ['all'] },
-  ];
+  // تسجيل حالة المصادقة لتتبع الأدوار
+  console.log("🔐 AppSidebar - Current auth state:", {
+    isAdmin,
+    isNazer,
+    isAccountant,
+    isCashier,
+    isArchivist,
+    isBeneficiary,
+    roleLoading,
+    timestamp: new Date().toISOString()
+  });
 
   // Filter menu items based on user role
   const menuItems = useMemo(() => {
