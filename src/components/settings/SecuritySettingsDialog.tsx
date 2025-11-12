@@ -59,7 +59,21 @@ export function SecuritySettingsDialog({
   const onSubmit = async (values: PasswordFormValues) => {
     try {
       setIsLoading(true);
-
+      
+      // Step 1: Verify current password by attempting sign in
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.email) throw new Error('User not found');
+      
+      const { error: verifyError } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: values.currentPassword,
+      });
+      
+      if (verifyError) {
+        throw new Error('كلمة المرور الحالية غير صحيحة');
+      }
+      
+      // Step 2: Update to new password
       const { error } = await supabase.auth.updateUser({
         password: values.newPassword,
       });
