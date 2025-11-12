@@ -401,12 +401,15 @@ const AddJournalEntryDialog = ({ open, onOpenChange }: Props) => {
                         type="number"
                         step="0.01"
                         min="0"
-                        value={line.debit_amount || ""}
+                        value={line.debit_amount === 0 ? '' : line.debit_amount}
                         onChange={(e) => {
-                          const numValue = e.target.value === '' ? 0 : parseFloat(e.target.value);
-                          updateLine(index, "debit_amount", numValue);
-                          if (numValue > 0) {
-                            updateLine(index, "credit_amount", 0);
+                          const value = e.target.value;
+                          const numValue = value === '' ? 0 : parseFloat(value);
+                          if (!isNaN(numValue)) {
+                            updateLine(index, "debit_amount", numValue);
+                            if (numValue > 0) {
+                              updateLine(index, "credit_amount", 0);
+                            }
                           }
                         }}
                         placeholder="0.00"
@@ -422,12 +425,15 @@ const AddJournalEntryDialog = ({ open, onOpenChange }: Props) => {
                         type="number"
                         step="0.01"
                         min="0"
-                        value={line.credit_amount || ""}
+                        value={line.credit_amount === 0 ? '' : line.credit_amount}
                         onChange={(e) => {
-                          const numValue = e.target.value === '' ? 0 : parseFloat(e.target.value);
-                          updateLine(index, "credit_amount", numValue);
-                          if (numValue > 0) {
-                            updateLine(index, "debit_amount", 0);
+                          const value = e.target.value;
+                          const numValue = value === '' ? 0 : parseFloat(value);
+                          if (!isNaN(numValue)) {
+                            updateLine(index, "credit_amount", numValue);
+                            if (numValue > 0) {
+                              updateLine(index, "debit_amount", 0);
+                            }
                           }
                         }}
                         placeholder="0.00"
@@ -436,15 +442,16 @@ const AddJournalEntryDialog = ({ open, onOpenChange }: Props) => {
                     </div>
 
                     <div className="col-span-1">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeLine(index)}
-                        disabled={lines.length <= 2}
-                      >
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeLine(index)}
+                      disabled={lines.length <= 1}
+                      className="hover:bg-destructive/10"
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
                     </div>
                   </div>
                 ))}
