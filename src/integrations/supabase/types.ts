@@ -1766,7 +1766,14 @@ export type Database = {
     Enums: {
       account_nature: "debit" | "credit"
       account_type: "asset" | "liability" | "equity" | "revenue" | "expense"
-      app_role: "admin" | "user"
+      app_role:
+        | "admin"
+        | "user"
+        | "nazer"
+        | "accountant"
+        | "cashier"
+        | "archivist"
+        | "beneficiary"
       entry_status: "draft" | "posted" | "cancelled"
     }
     CompositeTypes: {
@@ -1897,7 +1904,15 @@ export const Constants = {
     Enums: {
       account_nature: ["debit", "credit"],
       account_type: ["asset", "liability", "equity", "revenue", "expense"],
-      app_role: ["admin", "user"],
+      app_role: [
+        "admin",
+        "user",
+        "nazer",
+        "accountant",
+        "cashier",
+        "archivist",
+        "beneficiary",
+      ],
       entry_status: ["draft", "posted", "cancelled"],
     },
   },

@@ -69,7 +69,10 @@ const AppSidebar = () => {
 
   // Filter menu items based on user role
   const menuItems = useMemo(() => {
-    if (roleLoading) return [];
+    // Show items with 'all' role during loading
+    if (roleLoading) {
+      return allMenuItems.filter(item => item.roles.includes('all'));
+    }
     
     return allMenuItems.filter(item => {
       // 'all' means everyone can access

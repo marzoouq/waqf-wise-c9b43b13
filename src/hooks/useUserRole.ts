@@ -11,17 +11,26 @@ export function useUserRole() {
   const { data: roles = [], isLoading, refetch } = useQuery({
     queryKey: ["user-roles", user?.id],
     queryFn: async () => {
-      if (!user?.id) return [];
+      if (!user) return [];
+
+      // Get current authenticated user's ID
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (!authUser) return [];
 
       const { data, error } = await supabase
         .from("user_roles")
         .select("role")
-        .eq("user_id", user.id);
+        .eq("user_id", authUser.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching user roles:", error);
+        return [];
+      }
+      
+      console.log("User roles loaded:", data);
       return (data || []).map(r => r.role as AppRole);
     },
-    enabled: !!user?.id,
+    enabled: !!user,
   });
 
   // Real-time subscription
