@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Database } from "@/integrations/supabase/types";
+import type { Database } from "@/integrations/supabase/types";
 
-// نوع مؤقت يمتد من النوع الأساسي
 type BeneficiaryRow = Database["public"]["Tables"]["beneficiaries"]["Row"];
 
-export interface Beneficiary extends Omit<BeneficiaryRow, "beneficiary_number"> {
-  beneficiary_number?: string;
+export interface Beneficiary extends BeneficiaryRow {
+  beneficiary_number?: string | null;
 }
 
 interface Payment {
@@ -29,13 +28,11 @@ export const useBeneficiaryData = (userId?: string) => {
 
     const loadData = async () => {
       try {
-        const queryResult = await supabase
+        const { data: benData, error: benError } = await supabase
           .from("beneficiaries")
-          .select()
+          .select("*")
           .eq("user_id", userId)
           .maybeSingle();
-
-        const { data: benData, error: benError } = queryResult;
 
         if (benError) {
           toast({
@@ -57,23 +54,24 @@ export const useBeneficiaryData = (userId?: string) => {
           return;
         }
 
-        // نضيف الحقل الجديد يدوياً
-        const fullBeneficiary: Beneficiary = {
-          ...benData,
-          beneficiary_number: (benData as any).beneficiary_number,
-        };
+        setBeneficiary(benData);
 
-        setBeneficiary(fullBeneficiary);
-
-        const { data: payData, error: payError } = await supabase
+        // Fetch payments separately to avoid type complexity
+        const paymentsResponse = await supabase
           .from("payments")
-          .select("id, payment_number, payment_date, amount, description")
+          .select("*")
           .eq("beneficiary_id", benData.id)
           .order("payment_date", { ascending: false })
           .limit(50);
-
-        if (!payError && payData) {
-          setPayments(payData);
+        
+        if (paymentsResponse.data) {
+          setPayments(paymentsResponse.data.map((p: any) => ({
+            id: p.id,
+            payment_number: p.payment_number,
+            payment_date: p.payment_date,
+            amount: p.amount,
+            description: p.description || ''
+          })));
         }
 
         setLoading(false);

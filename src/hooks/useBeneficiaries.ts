@@ -3,49 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useActivities } from "@/hooks/useActivities";
 import { useAuth } from "@/hooks/useAuth";
-
-export interface Beneficiary {
-  id: string;
-  full_name: string;
-  national_id: string;
-  phone: string;
-  email?: string;
-  category: string;
-  family_name?: string;
-  relationship?: string;
-  status: string;
-  notes?: string;
-  tribe?: string;
-  priority_level?: number;
-  marital_status?: string;
-  nationality?: string;
-  city?: string;
-  address?: string;
-  date_of_birth?: string;
-  gender?: string;
-  bank_name?: string;
-  bank_account_number?: string;
-  iban?: string;
-  monthly_income?: number;
-  family_size?: number;
-  is_head_of_family?: boolean;
-  parent_beneficiary_id?: string;
-  tags?: string[];
-  username?: string;
-  can_login?: boolean;
-  last_login_at?: string;
-  login_enabled_at?: string;
-  user_id?: string;
-  number_of_sons?: number;
-  number_of_daughters?: number;
-  number_of_wives?: number;
-  employment_status?: string;
-  housing_type?: string;
-  notification_preferences?: any;
-  last_notification_at?: string;
-  created_at: string;
-  updated_at: string;
-}
+import { Beneficiary } from "@/types/beneficiary";
 
 export function useBeneficiaries() {
   const { toast } = useToast();
@@ -63,7 +21,7 @@ export function useBeneficiaries() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return { beneficiaries: (data || []) as any as Beneficiary[], totalCount: count || 0 };
+      return { beneficiaries: (data || []) as Beneficiary[], totalCount: count || 0 };
     },
     staleTime: 3 * 60 * 1000,
   });
