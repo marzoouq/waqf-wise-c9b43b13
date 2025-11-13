@@ -6,6 +6,15 @@ export function usePWAUpdate() {
 
   useEffect(() => {
     if ('serviceWorker' in navigator) {
+      // Check for updates every 30 minutes
+      const checkForUpdates = () => {
+        navigator.serviceWorker.ready.then((registration) => {
+          registration.update();
+        });
+      };
+
+      const interval = setInterval(checkForUpdates, 30 * 60 * 1000);
+
       navigator.serviceWorker.ready.then((registration) => {
         registration.addEventListener('updatefound', () => {
           const newWorker = registration.installing;
@@ -15,11 +24,14 @@ export function usePWAUpdate() {
               if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                 toast({
                   title: "⬆️ تحديث متوفر",
-                  description: "إصدار جديد من التطبيق متاح الآن",
+                  description: "إصدار جديد من التطبيق متاح الآن (v2.0.0)",
                   action: (
                     <button 
-                      onClick={() => window.location.reload()}
-                      className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+                      onClick={() => {
+                        newWorker.postMessage({ type: 'SKIP_WAITING' });
+                        window.location.reload();
+                      }}
+                      className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
                     >
                       تحديث الآن
                     </button>
@@ -31,6 +43,8 @@ export function usePWAUpdate() {
           }
         });
       });
+
+      return () => clearInterval(interval);
     }
   }, [toast]);
 }

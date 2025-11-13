@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => ({
     react(), 
     mode === "development" && componentTagger(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       includeAssets: ['favicon.ico', 'robots.txt', 'placeholder.svg'],
       
       manifest: {
@@ -53,6 +53,7 @@ export default defineConfig(({ mode }) => ({
       
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,woff}'],
+        navigateFallback: null,
         
         runtimeCaching: [
           {
@@ -117,8 +118,8 @@ export default defineConfig(({ mode }) => ({
         ],
         
         cleanupOutdatedCaches: true,
-        skipWaiting: true,
-        clientsClaim: true
+        skipWaiting: false,
+        clientsClaim: false
       },
       
       devOptions: {
