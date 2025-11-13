@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Plus, Users, Search, MoreVertical, Edit, Trash2, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -36,6 +37,7 @@ import { Family } from '@/types';
 import { toast } from 'sonner';
 
 const Families = () => {
+  const navigate = useNavigate();
   const { families, isLoading, addFamily, updateFamily, deleteFamily } = useFamilies();
   const [searchQuery, setSearchQuery] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -144,7 +146,7 @@ const Families = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-2xl font-bold text-primary">
               {families.filter(f => f.status === 'نشط').length}
             </div>
           </CardContent>
@@ -247,6 +249,10 @@ const Families = () => {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => navigate(`/beneficiaries?family=${family.id}`)}>
+                              <Users className="ml-2 h-4 w-4" />
+                              عرض الأفراد ({family.total_members})
+                            </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleEditFamily(family)}>
                               <Edit className="ml-2 h-4 w-4" />
                               تعديل
