@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { useBeneficiaryData } from "@/hooks/useBeneficiaryData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -60,10 +61,8 @@ const BeneficiaryDashboard = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [beneficiary, setBeneficiary] = useState<Beneficiary | null>(null);
-  const [payments, setPayments] = useState<Payment[]>([]);
+  const { beneficiary, payments, loading } = useBeneficiaryData(user?.id);
   const [requests, setRequests] = useState<Request[]>([]);
-  const [loading, setLoading] = useState(true);
   const [messagesDialogOpen, setMessagesDialogOpen] = useState(false);
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [selectedRequestId, setSelectedRequestId] = useState<string>();
@@ -72,81 +71,12 @@ const BeneficiaryDashboard = () => {
   const { attachments } = useBeneficiaryAttachments(beneficiary?.id);
 
   useEffect(() => {
-    if (!user?.id) return;
-
-    let isMounted = true;
-
-    supabase
-      .from("beneficiaries")
-      .select("id, full_name, national_id, phone, email, address, bank_name, bank_account_number, iban, family_name, relationship, category, status, notes, created_at, updated_at, user_id")
-      .eq("user_id", user.id)
-      .maybeSingle()
-      .then(({ data: benData, error: benError }) => {
-        if (!isMounted) return;
-
-        if (benError) {
-          console.error("Error fetching beneficiary:", benError);
-          toast({
-            title: "خطأ في تحميل البيانات",
-            description: benError.message,
-            variant: "destructive",
-          });
-          setLoading(false);
-          return;
-        }
-
-        if (!benData) {
-          toast({
-            title: "لم يتم العثور على حساب مستفيد",
-            description: "يرجى التواصل مع الإدارة لتفعيل حسابك",
-            variant: "destructive",
-          });
-          setLoading(false);
-          return;
-        }
-
-        setBeneficiary(benData as Beneficiary);
-
-        return supabase
-          .from("payments")
-          .select("id, payment_number, payment_date, amount, description")
-          .eq("beneficiary_id", benData.id)
-          .order("payment_date", { ascending: false })
-          .limit(50);
-      })
-      .then((result) => {
-        if (!isMounted || !result) return;
-
-        if (result.error) {
-          console.error("Error fetching payments:", result.error);
-        } else {
-          setPayments(result.data || []);
-        }
-        setLoading(false);
-      })
-      .catch((error) => {
-        if (!isMounted) return;
-        console.error("Unexpected error:", error);
-        toast({
-          title: "خطأ في تحميل البيانات",
-          description: "حدث خطأ غير متوقع",
-          variant: "destructive",
-        });
-        setLoading(false);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [user?.id]);
-
-  useEffect(() => {
     if (!user?.id || !beneficiary?.id) return;
 
     const fetchRequests = async () => {
       const { data, error } = await supabase
         .from("beneficiary_requests")
-        .select("*")
+        .select("id, description, status, amount, created_at")
         .eq("beneficiary_id", beneficiary.id)
         .order("submitted_at", { ascending: false });
       
