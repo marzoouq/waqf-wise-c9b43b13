@@ -90,10 +90,8 @@ export function useBankAccounts() {
 
   const deleteBankAccount = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from("bank_accounts" as any)
-        .delete()
-        .eq("id", id);
+      const result = await deleteFromTable("bank_accounts", id);
+      const error = result.error;
 
       if (error) throw error;
     },

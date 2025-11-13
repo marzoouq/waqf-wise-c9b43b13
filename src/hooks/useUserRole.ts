@@ -11,33 +11,20 @@ export function useUserRole() {
   const { data: roles = [], isLoading, refetch } = useQuery({
     queryKey: ["user-roles", user?.id],
     queryFn: async () => {
-      if (!user) {
-        console.log("❌ No user in useUserRole");
-        return [];
-      }
+      if (!user) return [];
 
       // Get current authenticated user's ID
       const { data: { user: authUser } } = await supabase.auth.getUser();
-      if (!authUser) {
-        console.log("❌ No authUser from getUser()");
-        return [];
-      }
-
-      console.log("🔍 Fetching roles for user:", authUser.id, authUser.email);
+      if (!authUser) return [];
 
       const { data, error } = await supabase
         .from("user_roles")
         .select("role")
         .eq("user_id", authUser.id);
 
-      if (error) {
-        console.error("❌ Error fetching user roles:", error);
-        return [];
-      }
+      if (error) return [];
       
-      const rolesList = (data || []).map(r => r.role as AppRole);
-      console.log("✅ User roles loaded:", rolesList);
-      return rolesList;
+      return (data || []).map(r => r.role as AppRole);
     },
     enabled: !!user,
   });
@@ -77,17 +64,6 @@ export function useUserRole() {
   const isArchivist = hasRole("archivist");
   const isBeneficiary = hasRole("beneficiary");
   const isUser = hasRole("user");
-
-  console.log("🎭 Role flags:", { 
-    roles, 
-    isAdmin, 
-    isNazer, 
-    isAccountant, 
-    isCashier, 
-    isArchivist, 
-    isBeneficiary,
-    isUser
-  });
 
   return {
     roles,

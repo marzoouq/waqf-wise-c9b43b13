@@ -63,12 +63,9 @@ export const useFamilies = () => {
   // Update family
   const updateFamily = useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<Family> }) => {
-      const { data, error } = await supabase
-        .from('families' as any)
-        .update(updates as any)
-        .eq('id', id)
-        .select()
-        .single();
+      const result = await updateInTable<Family>('families', id, updates);
+      const error = result.error;
+      const data = result.data;
 
       if (error) throw error;
       return data;
@@ -92,10 +89,8 @@ export const useFamilies = () => {
   // Delete family
   const deleteFamily = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('families' as any)
-        .delete()
-        .eq('id', id);
+      const result = await deleteFromTable('families', id);
+      const error = result.error;
 
       if (error) throw error;
     },
