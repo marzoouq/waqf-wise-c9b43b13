@@ -37,6 +37,12 @@ interface Beneficiary {
   notes?: string | null;
   created_at: string;
   updated_at: string;
+  user_id?: string | null;
+  notification_preferences?: {
+    email: boolean;
+    sms: boolean;
+    push: boolean;
+  } | null;
 }
 
 interface Request {
@@ -69,13 +75,11 @@ const BeneficiaryDashboard = () => {
   
   const { attachments } = useBeneficiaryAttachments(beneficiary?.id);
 
-  // جلب بيانات المستفيد والمدفوعات مع Real-time Updates
   useEffect(() => {
     if (!user?.id) return;
 
     const fetchData = async () => {
       try {
-        // جلب بيانات المستفيد باستخدام user_id بدلاً من email
         const { data: benData, error: benError } = await supabase
           .from("beneficiaries")
           .select("*")
@@ -96,7 +100,6 @@ const BeneficiaryDashboard = () => {
         
         setBeneficiary(benData);
 
-        // جلب المدفوعات باستخدام beneficiary_id
         const { data: payData, error: payError } = await supabase
           .from("payments")
           .select("id, payment_number, payment_date, amount, description")
@@ -121,58 +124,7 @@ const BeneficiaryDashboard = () => {
     };
 
     fetchData();
-
-    // إعداد Real-time Subscriptions للتحديثات الفورية
-    const paymentsChannel = supabase
-      .channel('beneficiary-payments')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'payments',
-          filter: `beneficiary_id=eq.${beneficiary?.id}`,
-        },
-        (payload) => {
-          console.log('Payment update:', payload);
-          // إعادة جلب المدفوعات عند التحديث
-          if (beneficiary?.id) {
-            supabase
-              .from("payments")
-              .select("id, payment_number, payment_date, amount, description")
-              .eq("beneficiary_id", beneficiary.id)
-              .order("payment_date", { ascending: false })
-              .limit(50)
-              .then(({ data }) => {
-                if (data) setPayments(data);
-              });
-          }
-        }
-      )
-      .subscribe();
-
-    const beneficiaryChannel = supabase
-      .channel('beneficiary-updates')
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'beneficiaries',
-          filter: `user_id=eq.${user.id}`,
-        },
-        (payload) => {
-          console.log('Beneficiary update:', payload);
-          setBeneficiary(payload.new as Beneficiary);
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(paymentsChannel);
-      supabase.removeChannel(beneficiaryChannel);
-    };
-  }, [user?.id, toast, beneficiary?.id]);
+  }, [user?.id, toast]);
 
   const stats = {
     totalPayments: payments.reduce((sum, p) => sum + Number(p.amount), 0),

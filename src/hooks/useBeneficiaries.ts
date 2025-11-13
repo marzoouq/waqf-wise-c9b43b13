@@ -41,6 +41,11 @@ export interface Beneficiary {
   number_of_wives?: number;
   employment_status?: string;
   housing_type?: string;
+  notification_preferences?: {
+    email: boolean;
+    sms: boolean;
+    push: boolean;
+  };
   created_at: string;
   updated_at: string;
 }
