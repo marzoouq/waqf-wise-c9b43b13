@@ -24,6 +24,7 @@ import { FirstClassReports } from "@/components/beneficiary/FirstClassReports";
 
 interface Beneficiary {
   id: string;
+  beneficiary_number: string;
   full_name: string;
   national_id: string;
   phone: string;
@@ -245,50 +246,50 @@ const BeneficiaryDashboard = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card>
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-2 md:pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-sm">إجمالي المدفوعات</CardTitle>
-                <DollarSign className="h-5 w-5 text-primary" />
+                <CardTitle className="text-xs md:text-sm">إجمالي المدفوعات</CardTitle>
+                <DollarSign className="h-4 w-4 md:h-5 md:w-5 text-primary" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-primary">{stats.totalPayments.toLocaleString("ar-SA")} ر.س</div>
+              <div className="text-lg md:text-2xl font-bold text-primary">{stats.totalPayments.toLocaleString("ar-SA")} ر.س</div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-2 md:pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-sm">عدد المدفوعات</CardTitle>
-                <FileText className="h-5 w-5 text-success" />
+                <CardTitle className="text-xs md:text-sm">عدد المدفوعات</CardTitle>
+                <FileText className="h-4 w-4 md:h-5 md:w-5 text-success" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-success">{stats.paymentsCount}</div>
+              <div className="text-lg md:text-2xl font-bold text-success">{stats.paymentsCount}</div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-2 md:pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-sm">آخر دفعة</CardTitle>
-                <Calendar className="h-5 w-5 text-accent" />
+                <CardTitle className="text-xs md:text-sm">آخر دفعة</CardTitle>
+                <Calendar className="h-4 w-4 md:h-5 md:w-5 text-accent" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-lg font-bold text-accent">{stats.lastPaymentDate}</div>
+              <div className="text-sm md:text-lg font-bold text-accent">{stats.lastPaymentDate}</div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-2 md:pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-sm">متوسط الدفعة</CardTitle>
-                <TrendingUp className="h-5 w-5 text-warning" />
+                <CardTitle className="text-xs md:text-sm">متوسط الدفعة</CardTitle>
+                <TrendingUp className="h-4 w-4 md:h-5 md:w-5 text-warning" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-warning">{stats.averagePayment.toLocaleString("ar-SA", { maximumFractionDigits: 0 })} ر.س</div>
+              <div className="text-lg md:text-2xl font-bold text-warning">{stats.averagePayment.toLocaleString("ar-SA", { maximumFractionDigits: 0 })} ر.س</div>
             </CardContent>
           </Card>
         </div>
@@ -299,23 +300,27 @@ const BeneficiaryDashboard = () => {
           </CardHeader>
           <CardContent>
             <Tabs value={activeRequestTab} onValueChange={setActiveRequestTab}>
-              <TabsList className="grid w-full grid-cols-5">
-                <TabsTrigger value="view">السجل</TabsTrigger>
-                <TabsTrigger value="emergency">
-                  <AlertCircle className="h-4 w-4 ml-2" />
-                  فزعة
+              <TabsList className="grid w-full grid-cols-5 text-xs md:text-sm h-auto">
+                <TabsTrigger value="view" className="px-2 py-2">السجل</TabsTrigger>
+                <TabsTrigger value="emergency" className="px-2 py-2">
+                  <AlertCircle className="h-3 w-3 md:h-4 md:w-4 ml-1 md:ml-2" />
+                  <span className="hidden sm:inline">فزعة</span>
+                  <span className="sm:hidden">فزعة</span>
                 </TabsTrigger>
-                <TabsTrigger value="loan">
-                  <Wallet className="h-4 w-4 ml-2" />
-                  قرض
+                <TabsTrigger value="loan" className="px-2 py-2">
+                  <Wallet className="h-3 w-3 md:h-4 md:w-4 ml-1 md:ml-2" />
+                  <span className="hidden sm:inline">قرض</span>
+                  <span className="sm:hidden">قرض</span>
                 </TabsTrigger>
-                <TabsTrigger value="update">
-                  <UserCog className="h-4 w-4 ml-2" />
-                  تحديث
+                <TabsTrigger value="update" className="px-2 py-2">
+                  <UserCog className="h-3 w-3 md:h-4 md:w-4 ml-1 md:ml-2" />
+                  <span className="hidden sm:inline">تحديث</span>
+                  <span className="sm:hidden">تحديث</span>
                 </TabsTrigger>
-                <TabsTrigger value="family">
-                  <UserPlus className="h-4 w-4 ml-2" />
-                  إضافة فرد
+                <TabsTrigger value="family" className="px-2 py-2">
+                  <UserPlus className="h-3 w-3 md:h-4 md:w-4 ml-1 md:ml-2" />
+                  <span className="hidden sm:inline">عائلة</span>
+                  <span className="sm:hidden">عائلة</span>
                 </TabsTrigger>
               </TabsList>
 

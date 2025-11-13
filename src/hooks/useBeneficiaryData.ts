@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 
 interface Beneficiary {
   id: string;
+  beneficiary_number: string;
   full_name: string;
   national_id: string;
   phone: string;
@@ -43,7 +44,7 @@ export const useBeneficiaryData = (userId?: string) => {
       try {
         const { data: benData, error: benError } = await supabase
           .from("beneficiaries")
-          .select("id, full_name, national_id, phone, email, address, bank_name, bank_account_number, iban, family_name, relationship, category, status, notes, created_at, updated_at, user_id")
+          .select("id, beneficiary_number, full_name, national_id, phone, email, address, bank_name, bank_account_number, iban, family_name, relationship, category, status, notes, created_at, updated_at, user_id")
           .eq("user_id", userId)
           .maybeSingle();
 
