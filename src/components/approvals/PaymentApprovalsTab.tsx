@@ -29,31 +29,36 @@ export function PaymentApprovalsTab() {
   const [approvalNotes, setApprovalNotes] = useState("");
   const [approvalAction, setApprovalAction] = useState<"approve" | "reject">("approve");
 
-  const { data: payments, isLoading } = useQuery<any[]>({
+  const { data: payments, isLoading } = useQuery({
     queryKey: ["payments_with_approvals"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // جلب جميع المدفوعات وفلترة المعلقة
+      const result: any = await supabase
         .from("payments")
         .select("*")
-        .eq("status", "pending")
         .order("payment_date", { ascending: false });
 
-      if (error) throw error;
-
+      if (result.error) throw result.error;
+      
+      const allPayments = result.data || [];
+      const pendingPayments = allPayments.filter((p: any) => p.status === "pending");
+      
+      if (pendingPayments.length === 0) return [];
+      
       // جلب الموافقات بشكل منفصل
-      if (!data || data.length === 0) return [];
+      const paymentIds = pendingPayments.map((p: any) => p.id);
       
-      const paymentIds = data.map((p) => p.id);
-      
-      const { data: approvalsData } = await supabase
+      const approvalsResult: any = await supabase
         .from("payment_approvals" as any)
         .select("*")
         .in("payment_id", paymentIds);
 
+      const approvalsData = approvalsResult.data || [];
+
       // دمج الموافقات مع المدفوعات
-      return data.map((payment) => ({
+      return pendingPayments.map((payment: any) => ({
         ...payment,
-        payment_approvals: approvalsData?.filter((a: any) => a.payment_id === payment.id) || []
+        payment_approvals: approvalsData.filter((a: any) => a.payment_id === payment.id)
       }));
     },
   });

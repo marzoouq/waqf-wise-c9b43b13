@@ -24,7 +24,7 @@ export function useSystemSettings() {
         .order("setting_key");
 
       if (error) throw error;
-      return data as SystemSetting[];
+      return (data || []) as unknown as SystemSetting[];
     },
   });
 
