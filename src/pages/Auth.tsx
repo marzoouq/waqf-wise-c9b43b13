@@ -6,10 +6,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Building2, Loader2 } from 'lucide-react';
+import { Building2, Loader2, UserCog, Shield, Calculator, Wallet, Archive, User, Users } from 'lucide-react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'sonner';
 
 const signInSchema = z.object({
   email: z.string().email('البريد الإلكتروني غير صحيح'),
@@ -28,6 +29,17 @@ const signUpSchema = z.object({
 
 type SignInFormData = z.infer<typeof signInSchema>;
 type SignUpFormData = z.infer<typeof signUpSchema>;
+
+// Demo accounts for quick testing
+const demoAccounts = [
+  { email: 'nazer@waqf.sa', password: '123456', role: 'الناظر', icon: UserCog, color: 'text-purple-600', bg: 'bg-purple-50 hover:bg-purple-100' },
+  { email: 'admin@waqf.sa', password: '123456', role: 'المشرف', icon: Shield, color: 'text-blue-600', bg: 'bg-blue-50 hover:bg-blue-100' },
+  { email: 'accountant@waqf.sa', password: '123456', role: 'المحاسب', icon: Calculator, color: 'text-green-600', bg: 'bg-green-50 hover:bg-green-100' },
+  { email: 'cashier@waqf.sa', password: '123456', role: 'أمين الصندوق', icon: Wallet, color: 'text-orange-600', bg: 'bg-orange-50 hover:bg-orange-100' },
+  { email: 'archivist@waqf.sa', password: '123456', role: 'أمين الأرشيف', icon: Archive, color: 'text-teal-600', bg: 'bg-teal-50 hover:bg-teal-100' },
+  { email: 'beneficiary@waqf.sa', password: '123456', role: 'مستفيد', icon: Users, color: 'text-pink-600', bg: 'bg-pink-50 hover:bg-pink-100' },
+  { email: 'user@waqf.sa', password: '123456', role: 'مستخدم', icon: User, color: 'text-gray-600', bg: 'bg-gray-50 hover:bg-gray-100' },
+];
 
 export default function Auth() {
   const [isLoading, setIsLoading] = useState(false);
@@ -70,9 +82,57 @@ export default function Auth() {
     }
   };
 
+  const handleQuickLogin = async (email: string, password: string, role: string) => {
+    setIsLoading(true);
+    toast.loading(`جاري تسجيل الدخول كـ ${role}...`);
+    const { error } = await signIn(email, password);
+    setIsLoading(false);
+    toast.dismiss();
+    
+    if (!error) {
+      toast.success(`تم تسجيل الدخول بنجاح كـ ${role}`);
+      navigate('/', { replace: true });
+    } else {
+      toast.error(`فشل تسجيل الدخول. تأكد من إنشاء الحساب أولاً.`);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/5 p-4">
-      <Card className="w-full max-w-md shadow-strong">
+      <div className="w-full max-w-4xl space-y-6">
+        {/* Demo Accounts Quick Access */}
+        <Card className="shadow-strong">
+          <CardHeader>
+            <CardTitle className="text-xl">تسجيل دخول سريع - حسابات تجريبية</CardTitle>
+            <CardDescription>
+              اضغط على أي دور للدخول مباشرة (كلمة المرور: 123456)
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {demoAccounts.map((account) => {
+                const Icon = account.icon;
+                return (
+                  <Button
+                    key={account.email}
+                    variant="outline"
+                    className={`h-auto flex flex-col items-center gap-2 p-4 ${account.bg} border-2 transition-all`}
+                    onClick={() => handleQuickLogin(account.email, account.password, account.role)}
+                    disabled={isLoading}
+                  >
+                    <Icon className={`h-8 w-8 ${account.color}`} />
+                    <span className={`text-sm font-medium ${account.color}`}>
+                      {account.role}
+                    </span>
+                  </Button>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Main Login Card */}
+        <Card className="shadow-strong">
         <CardHeader className="space-y-4 text-center">
           <div className="flex justify-center">
             <div className="p-4 bg-primary/10 rounded-full">
@@ -221,6 +281,7 @@ export default function Auth() {
           </Tabs>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }
