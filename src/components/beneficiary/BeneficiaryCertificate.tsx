@@ -117,7 +117,7 @@ export function BeneficiaryCertificate({
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
-            <FileCheck className="h-5 w-5 text-green-500" />
+            <FileCheck className="h-5 w-5 text-success" />
             شهادة استحقاق
           </CardTitle>
           <div className="flex gap-2 print:hidden">

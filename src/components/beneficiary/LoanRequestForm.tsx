@@ -42,7 +42,7 @@ export function LoanRequestForm({ onSubmit, isLoading }: LoanRequestFormProps) {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Wallet className="h-5 w-5 text-blue-500" />
+          <Wallet className="h-5 w-5 text-primary" />
           طلب قرض
         </CardTitle>
         <CardDescription>
