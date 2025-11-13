@@ -87,8 +87,8 @@ export function useLoans(beneficiaryId?: string) {
         .from('loans')
         .insert([{
           ...loan,
+          status: 'pending', // سيتم تفعيله بعد الموافقات
           approved_by: user?.id,
-          approved_at: new Date().toISOString()
         }])
         .select()
         .single();
@@ -105,6 +105,27 @@ export function useLoans(beneficiaryId?: string) {
       });
 
       if (scheduleError) throw scheduleError;
+
+      // إنشاء موافقات القرض (3 مستويات)
+      const approvals = [
+        { level: 1, approver_name: 'المشرف' },
+        { level: 2, approver_name: 'المدير' },
+        { level: 3, approver_name: 'الناظر' }
+      ];
+
+      const { error: approvalsError } = await supabase
+        .from('loan_approvals' as any)
+        .insert(
+          approvals.map(approval => ({
+            loan_id: loanData.id,
+            ...approval,
+            status: 'معلق'
+          }))
+        );
+
+      if (approvalsError) throw approvalsError;
+
+      // بعد الموافقة النهائية، سيتم إنشاء القيد المحاسبي تلقائياً عبر trigger
 
       return loanData;
     },
