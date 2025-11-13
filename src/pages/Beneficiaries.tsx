@@ -6,6 +6,7 @@ import { useBeneficiaries } from "@/hooks/useBeneficiaries";
 import { useSavedSearches } from "@/hooks/useSavedSearches";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Beneficiary } from "@/types/beneficiary";
 import {
   Table,
   TableBody,
@@ -43,7 +44,7 @@ const Beneficiaries = () => {
   const [activityLogDialogOpen, setActivityLogDialogOpen] = useState(false);
   const [enableLoginDialogOpen, setEnableLoginDialogOpen] = useState(false);
   const [tribeManagementDialogOpen, setTribeManagementDialogOpen] = useState(false);
-  const [selectedBeneficiary, setSelectedBeneficiary] = useState<any>(null);
+  const [selectedBeneficiary, setSelectedBeneficiary] = useState<Beneficiary | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [advancedCriteria, setAdvancedCriteria] = useState<SearchCriteria>({});
 
@@ -354,7 +355,7 @@ const Beneficiaries = () => {
                       <TableRow key={beneficiary.id} className="hover:bg-muted/50 transition-colors">
                         <TableCell className="font-mono text-xs">
                           <Badge variant="secondary" className="whitespace-nowrap">
-                            {(beneficiary as any).beneficiary_number || 'قيد الإنشاء'}
+                            {beneficiary.beneficiary_number || 'قيد الإنشاء'}
                           </Badge>
                         </TableCell>
                         <TableCell className="font-medium">
