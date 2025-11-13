@@ -1,26 +1,13 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Database } from "@/integrations/supabase/types";
 
-interface Beneficiary {
-  id: string;
-  beneficiary_number: string;
-  full_name: string;
-  national_id: string;
-  phone: string;
-  email?: string | null;
-  address?: string | null;
-  bank_name?: string | null;
-  bank_account_number?: string | null;
-  iban?: string | null;
-  family_name?: string | null;
-  relationship?: string | null;
-  category: string;
-  status: string;
-  notes?: string | null;
-  created_at: string;
-  updated_at: string;
-  user_id?: string | null;
+// نوع مؤقت يمتد من النوع الأساسي
+type BeneficiaryRow = Database["public"]["Tables"]["beneficiaries"]["Row"];
+
+export interface Beneficiary extends Omit<BeneficiaryRow, "beneficiary_number"> {
+  beneficiary_number?: string;
 }
 
 interface Payment {
@@ -42,11 +29,13 @@ export const useBeneficiaryData = (userId?: string) => {
 
     const loadData = async () => {
       try {
-        const { data: benData, error: benError } = await supabase
+        const queryResult = await supabase
           .from("beneficiaries")
-          .select("id, beneficiary_number, full_name, national_id, phone, email, address, bank_name, bank_account_number, iban, family_name, relationship, category, status, notes, created_at, updated_at, user_id")
+          .select()
           .eq("user_id", userId)
-          .maybeSingle() as any;
+          .maybeSingle();
+
+        const { data: benData, error: benError } = queryResult;
 
         if (benError) {
           toast({
@@ -68,15 +57,20 @@ export const useBeneficiaryData = (userId?: string) => {
           return;
         }
 
-        setBeneficiary(benData);
+        // نضيف الحقل الجديد يدوياً
+        const fullBeneficiary: Beneficiary = {
+          ...benData,
+          beneficiary_number: (benData as any).beneficiary_number,
+        };
 
-        const paymentQuery = (supabase.from("payments") as any)
+        setBeneficiary(fullBeneficiary);
+
+        const { data: payData, error: payError } = await supabase
+          .from("payments")
           .select("id, payment_number, payment_date, amount, description")
           .eq("beneficiary_id", benData.id)
           .order("payment_date", { ascending: false })
           .limit(50);
-        
-        const { data: payData, error: payError } = await paymentQuery;
 
         if (!payError && payData) {
           setPayments(payData);
@@ -95,7 +89,7 @@ export const useBeneficiaryData = (userId?: string) => {
     };
 
     loadData();
-  }, [userId]);
+  }, [userId, toast]);
 
   return { beneficiary, payments, loading };
 };

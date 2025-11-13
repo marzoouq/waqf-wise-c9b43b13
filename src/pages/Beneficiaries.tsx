@@ -354,7 +354,7 @@ const Beneficiaries = () => {
                       <TableRow key={beneficiary.id} className="hover:bg-muted/50 transition-colors">
                         <TableCell className="font-mono text-xs">
                           <Badge variant="secondary" className="whitespace-nowrap">
-                            {(beneficiary as any).beneficiary_number || 'N/A'}
+                            {(beneficiary as any).beneficiary_number || 'قيد الإنشاء'}
                           </Badge>
                         </TableCell>
                         <TableCell className="font-medium">
