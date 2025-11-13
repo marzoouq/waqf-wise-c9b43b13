@@ -41,11 +41,8 @@ export interface Beneficiary {
   number_of_wives?: number;
   employment_status?: string;
   housing_type?: string;
-  notification_preferences?: {
-    email: boolean;
-    sms: boolean;
-    push: boolean;
-  };
+  notification_preferences?: any;
+  last_notification_at?: string;
   created_at: string;
   updated_at: string;
 }
@@ -66,7 +63,7 @@ export function useBeneficiaries() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return { beneficiaries: data as Beneficiary[], totalCount: count || 0 };
+      return { beneficiaries: (data || []) as any as Beneficiary[], totalCount: count || 0 };
     },
     staleTime: 3 * 60 * 1000,
   });
