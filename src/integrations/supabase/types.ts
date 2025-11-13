@@ -2383,6 +2383,15 @@ export type Database = {
         }
         Returns: string
       }
+      create_user_profile_and_role: {
+        Args: {
+          p_email: string
+          p_full_name: string
+          p_role?: Database["public"]["Enums"]["app_role"]
+          p_user_id: string
+        }
+        Returns: undefined
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

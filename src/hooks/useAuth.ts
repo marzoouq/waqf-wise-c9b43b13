@@ -66,6 +66,23 @@ export function useAuth() {
 
       if (error) throw error;
 
+      // Create profile and assign default role
+      if (data.user) {
+        const { error: profileError } = await supabase.rpc(
+          'create_user_profile_and_role',
+          {
+            p_user_id: data.user.id,
+            p_full_name: fullName,
+            p_email: email,
+            p_role: 'user'
+          }
+        );
+
+        if (profileError) {
+          console.error('Error creating profile:', profileError);
+        }
+      }
+
       toast({
         title: "تم إنشاء الحساب بنجاح",
         description: "يمكنك الآن تسجيل الدخول",
