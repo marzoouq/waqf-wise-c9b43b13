@@ -91,6 +91,36 @@ export type Database = {
         }
         Relationships: []
       }
+      approval_stats: {
+        Row: {
+          approved_count: number | null
+          avg_approval_time_hours: number | null
+          created_at: string | null
+          id: string
+          pending_approvals: number | null
+          rejected_count: number | null
+          report_date: string
+        }
+        Insert: {
+          approved_count?: number | null
+          avg_approval_time_hours?: number | null
+          created_at?: string | null
+          id?: string
+          pending_approvals?: number | null
+          rejected_count?: number | null
+          report_date?: string
+        }
+        Update: {
+          approved_count?: number | null
+          avg_approval_time_hours?: number | null
+          created_at?: string | null
+          id?: string
+          pending_approvals?: number | null
+          rejected_count?: number | null
+          report_date?: string
+        }
+        Relationships: []
+      }
       approvals: {
         Row: {
           approved_at: string | null
@@ -2017,6 +2047,53 @@ export type Database = {
             columns: ["journal_entry_id"]
             isOneToOne: false
             referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      request_approvals: {
+        Row: {
+          approved_at: string | null
+          approver_id: string | null
+          approver_name: string
+          created_at: string | null
+          id: string
+          level: number
+          notes: string | null
+          request_id: string
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          approver_id?: string | null
+          approver_name: string
+          created_at?: string | null
+          id?: string
+          level: number
+          notes?: string | null
+          request_id: string
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          approver_id?: string | null
+          approver_name?: string
+          created_at?: string | null
+          id?: string
+          level?: number
+          notes?: string | null
+          request_id?: string
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "request_approvals_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_requests"
             referencedColumns: ["id"]
           },
         ]
