@@ -63,16 +63,40 @@ export function usePayments() {
 
   const addPayment = useMutation({
     mutationFn: async (payment: Omit<Payment, "id" | "created_at" | "updated_at">) => {
+      // التحقق من حاجة المدفوعة للموافقة
+      const { data: requiresApproval } = await supabase.rpc(
+        'payment_requires_approval' as any,
+        { p_amount: payment.amount }
+      );
+
+      const paymentStatus = requiresApproval ? 'pending' : 'completed';
+
       const { data, error } = await supabase
         .from("payments")
-        .insert([payment])
+        .insert([{ ...payment, status: paymentStatus }])
         .select()
         .single();
 
       if (error) throw error;
 
-      // إنشاء قيد محاسبي تلقائي للمدفوعات
-      if (data && data.amount && data.payment_date) {
+      // إذا كانت تحتاج موافقة، إنشاء موافقات (مستويين)
+      if (requiresApproval) {
+        const approvals = [
+          { level: 1, approver_name: 'المشرف المالي' },
+          { level: 2, approver_name: 'المدير' }
+        ];
+
+        await supabase.from('payment_approvals' as any).insert(
+          approvals.map(approval => ({
+            payment_id: data.id,
+            ...approval,
+            status: 'معلق'
+          }))
+        );
+      }
+
+      // إنشاء قيد محاسبي تلقائي للمدفوعات (فقط إذا لم تحتاج موافقة أو تمت الموافقة)
+      if (data && data.amount && data.payment_date && paymentStatus === 'completed') {
         try {
           const entryId = await createAutoEntry(
             data.payment_type === "قبض" ? "payment_receipt" : "payment_voucher",
