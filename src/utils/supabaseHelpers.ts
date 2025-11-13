@@ -16,7 +16,9 @@ export async function fetchFromTable<T>(
   } = {}
 ): Promise<{ data: T | T[] | null; error: any }> {
   try {
-    let query: any = supabase.from(tableName);
+    // استخدام any لتجنب "Type instantiation is excessively deep"
+    const client: any = supabase;
+    let query: any = client.from(tableName);
 
     // Select
     if (options.select) {
@@ -74,7 +76,8 @@ export async function insertIntoTable<T>(
   data: any
 ): Promise<{ data: T | null; error: any }> {
   try {
-    const query: any = supabase.from(tableName).insert([data]).select().single();
+    const client: any = supabase;
+    const query: any = client.from(tableName).insert([data]).select().single();
     const result: any = await query;
     return { data: result.data, error: result.error };
   } catch (error) {
@@ -91,7 +94,8 @@ export async function updateInTable<T>(
   updates: any
 ): Promise<{ data: T | null; error: any }> {
   try {
-    const query: any = supabase
+    const client: any = supabase;
+    const query: any = client
       .from(tableName)
       .update(updates)
       .eq('id', id)
@@ -112,7 +116,8 @@ export async function deleteFromTable(
   id: string
 ): Promise<{ error: any }> {
   try {
-    const query: any = supabase.from(tableName).delete().eq('id', id);
+    const client: any = supabase;
+    const query: any = client.from(tableName).delete().eq('id', id);
     const result: any = await query;
     return { error: result.error };
   } catch (error) {
