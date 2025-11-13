@@ -53,12 +53,21 @@ export default function PendingApprovalsSection() {
       setIsLoading(true);
       const allApprovals: PendingApproval[] = [];
 
-      // جلب موافقات التوزيعات
+      // جلب موافقات التوزيعات (محسّن)
       const { data: distApprovals, error: distError } = await supabase
         .from('distribution_approvals')
-        .select('*, distributions(*)')
+        .select(`
+          id,
+          created_at,
+          distributions(
+            month,
+            total_amount,
+            beneficiaries_count
+          )
+        `)
         .eq('status', 'معلق')
-        .eq('level', 3);
+        .eq('level', 3)
+        .limit(10);  // فقط آخر 10 موافقات
 
       if (distError) throw distError;
 
@@ -78,12 +87,22 @@ export default function PendingApprovalsSection() {
       });
     }
 
-      // جلب موافقات الطلبات
+      // جلب موافقات الطلبات (محسّن)
       const { data: reqApprovals, error: reqError } = await supabase
         .from('request_approvals')
-        .select('*, beneficiary_requests(*, beneficiaries(*))')
+        .select(`
+          id,
+          created_at,
+          beneficiary_requests(
+            request_number,
+            amount,
+            priority,
+            beneficiaries(full_name)
+          )
+        `)
         .eq('status', 'معلق')
-        .eq('level', 3);
+        .eq('level', 3)
+        .limit(10);  // فقط آخر 10 موافقات
 
       if (reqError) throw reqError;
 
@@ -103,11 +122,19 @@ export default function PendingApprovalsSection() {
       });
     }
 
-      // جلب القيود المحاسبية المعلقة
+      // جلب القيود المحاسبية المعلقة (محسّن)
       const { data: journalApprovals, error: journalError } = await supabase
         .from('approvals')
-        .select('*, journal_entries(*)')
-        .eq('status', 'pending');
+        .select(`
+          id,
+          created_at,
+          journal_entries(
+            entry_number,
+            description
+          )
+        `)
+        .eq('status', 'pending')
+        .limit(10);  // فقط آخر 10 موافقات
 
       if (journalError) throw journalError;
 

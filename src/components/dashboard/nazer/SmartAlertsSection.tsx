@@ -52,13 +52,20 @@ export default function SmartAlertsSection() {
       const allAlerts: Alert[] = [];
       const today = new Date();
 
-      // 1. عقود قرب الانتهاء
+      // 1. عقود قرب الانتهاء (محسّن)
       const { data: expiringContracts, error: contractsError } = await supabase
         .from('contracts')
-        .select('*, properties(name)')
+        .select(`
+          id,
+          contract_number,
+          tenant_name,
+          end_date,
+          properties(name)
+        `)
         .eq('status', 'نشط')
         .gte('end_date', format(today, 'yyyy-MM-dd'))
-        .lte('end_date', format(new Date(today.getTime() + 60 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd'));
+        .lte('end_date', format(new Date(today.getTime() + 60 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd'))
+        .limit(10);  // فقط أول 10 عقود
 
       if (contractsError) throw contractsError;
 
@@ -77,11 +84,21 @@ export default function SmartAlertsSection() {
       });
     }
 
-    // 2. إيجارات متأخرة
+    // 2. إيجارات متأخرة (محسّن)
     const { data: overduePayments } = await supabase
       .from('rental_payments')
-      .select('*, contracts(tenant_name, properties(name))')
-      .eq('status', 'متأخر');
+      .select(`
+        id,
+        payment_number,
+        amount_due,
+        due_date,
+        contracts(
+          tenant_name,
+          properties(name)
+        )
+      `)
+      .eq('status', 'متأخر')
+      .limit(10);  // فقط أول 10 متأخرات
 
     if (overduePayments) {
       overduePayments.forEach(payment => {
@@ -98,15 +115,25 @@ export default function SmartAlertsSection() {
       });
     }
 
-    // 3. قروض مستحقة
+    // 3. قروض مستحقة (محسّن)
     const { data: dueInstallments } = await supabase
       .from('loan_installments')
-      .select('*, loans(loan_number, beneficiaries(full_name))')
+      .select(`
+        id,
+        installment_number,
+        due_date,
+        total_amount,
+        loans(
+          loan_number,
+          beneficiaries(full_name)
+        )
+      `)
       .in('status', ['pending', 'overdue'])
-      .lte('due_date', format(new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd'));
+      .lte('due_date', format(new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd'))
+      .limit(10);  // فقط أول 10 أقساط
 
     if (dueInstallments) {
-      dueInstallments.forEach(installment => {
+      dueInstallments.forEach((installment: any) => {
         const daysUntilDue = differenceInDays(new Date(installment.due_date), today);
         allAlerts.push({
           id: installment.id,

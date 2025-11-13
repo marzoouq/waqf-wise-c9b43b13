@@ -13,17 +13,11 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-
-interface BudgetData {
-  account: string;
-  budgeted: number;
-  actual: number;
-  variance: number;
-}
+import type { BudgetComparison } from "@/types/dashboard";
 
 const BudgetComparisonChart = () => {
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<BudgetData[]>([]);
+  const [data, setData] = useState<BudgetComparison[]>([]);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -63,7 +57,7 @@ const BudgetComparisonChart = () => {
 
       if (error) throw error;
 
-      const chartData: BudgetData[] = budgets?.map((budget: any) => ({
+      const chartData: BudgetComparison[] = budgets?.map((budget: any) => ({
         account: budget.accounts.name_ar.substring(0, 15) + '...',
         budgeted: Number(budget.budgeted_amount || 0),
         actual: Number(budget.actual_amount || 0),

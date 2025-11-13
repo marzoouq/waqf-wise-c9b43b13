@@ -7,16 +7,24 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import type { RecentDocument } from "@/types/dashboard";
+
+interface ArchiveStatsLocal {
+  totalFolders: number;
+  totalDocuments: number;
+  todayUploads: number;
+  totalSize: number;
+}
 
 export default function ArchivistDashboard() {
   const navigate = useNavigate();
-  const [archiveStats, setArchiveStats] = useState({
+  const [archiveStats, setArchiveStats] = useState<ArchiveStatsLocal>({
     totalFolders: 0,
     totalDocuments: 0,
     todayUploads: 0,
     totalSize: 0
   });
-  const [recentDocuments, setRecentDocuments] = useState<any[]>([]);
+  const [recentDocuments, setRecentDocuments] = useState<RecentDocument[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
