@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { User, Bell, Shield, Database, Palette, Globe } from "lucide-react";
+import { User, Bell, Shield, Database, Palette, Globe, Settings as SettingsIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProfileDialog } from "@/components/settings/ProfileDialog";
 import { NotificationsSettingsDialog } from "@/components/settings/NotificationsSettingsDialog";
@@ -7,6 +7,7 @@ import { SecuritySettingsDialog } from "@/components/settings/SecuritySettingsDi
 import { DatabaseSettingsDialog } from "@/components/settings/DatabaseSettingsDialog";
 import { AppearanceSettingsDialog } from "@/components/settings/AppearanceSettingsDialog";
 import { LanguageSettingsDialog } from "@/components/settings/LanguageSettingsDialog";
+import { SystemSettingsDialog } from "@/components/settings/SystemSettingsDialog";
 import { useToast } from "@/hooks/use-toast";
 
 const Settings = () => {
@@ -17,6 +18,7 @@ const Settings = () => {
   const [databaseDialogOpen, setDatabaseDialogOpen] = useState(false);
   const [appearanceDialogOpen, setAppearanceDialogOpen] = useState(false);
   const [languageDialogOpen, setLanguageDialogOpen] = useState(false);
+  const [systemSettingsDialogOpen, setSystemSettingsDialogOpen] = useState(false);
 
   const handleSectionClick = (sectionTitle: string) => {
     switch (sectionTitle) {
@@ -37,6 +39,9 @@ const Settings = () => {
         break;
       case "اللغة والمنطقة":
         setLanguageDialogOpen(true);
+        break;
+      case "إعدادات النظام":
+        setSystemSettingsDialogOpen(true);
         break;
       default:
         toast({
@@ -88,6 +93,13 @@ const Settings = () => {
       description: "إعدادات اللغة والمنطقة الزمنية",
       icon: Globe,
       color: "bg-success/10 text-success",
+    },
+    {
+      id: 7,
+      title: "إعدادات النظام",
+      description: "إدارة الإعدادات العامة والمتقدمة",
+      icon: SettingsIcon,
+      color: "bg-indigo-500/10 text-indigo-500",
     },
   ];
 
@@ -180,6 +192,10 @@ const Settings = () => {
         <LanguageSettingsDialog
           open={languageDialogOpen}
           onOpenChange={setLanguageDialogOpen}
+        />
+        <SystemSettingsDialog
+          open={systemSettingsDialogOpen}
+          onOpenChange={setSystemSettingsDialogOpen}
         />
       </div>
     </div>

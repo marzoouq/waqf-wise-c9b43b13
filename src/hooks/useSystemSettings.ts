@@ -6,6 +6,8 @@ export interface SystemSetting {
   id: string;
   setting_key: string;
   setting_value: string;
+  setting_type?: string;
+  category?: string;
   description?: string;
   created_at: string;
   updated_at: string;
