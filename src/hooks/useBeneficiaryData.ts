@@ -46,7 +46,7 @@ export const useBeneficiaryData = (userId?: string) => {
           .from("beneficiaries")
           .select("id, beneficiary_number, full_name, national_id, phone, email, address, bank_name, bank_account_number, iban, family_name, relationship, category, status, notes, created_at, updated_at, user_id")
           .eq("user_id", userId)
-          .maybeSingle();
+          .maybeSingle() as any;
 
         if (benError) {
           toast({

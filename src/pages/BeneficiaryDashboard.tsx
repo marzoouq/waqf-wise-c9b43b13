@@ -232,19 +232,26 @@ const BeneficiaryDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-6 space-y-8">
-        <header className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gradient-primary">مرحباً، {beneficiary.full_name}</h1>
-            <p className="text-muted-foreground">عرض المدفوعات والتقارير الشخصية</p>
+      <div className="container mx-auto p-3 md:p-6 space-y-4 md:space-y-8">
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-3 flex-wrap">
+              <h1 className="text-xl md:text-3xl font-bold text-gradient-primary">مرحباً، {beneficiary.full_name}</h1>
+              {(beneficiary as any).beneficiary_number && (
+                <Badge variant="secondary" className="text-xs md:text-sm whitespace-nowrap">
+                  {(beneficiary as any).beneficiary_number}
+                </Badge>
+              )}
+            </div>
+            <p className="text-sm md:text-base text-muted-foreground">عرض المدفوعات والتقارير الشخصية</p>
           </div>
-          <Button onClick={() => setMessagesDialogOpen(true)} variant="outline">
+          <Button onClick={() => setMessagesDialogOpen(true)} variant="outline" size="sm" className="w-full md:w-auto">
             <MessageSquare className="h-4 w-4 ml-2" />
             الرسائل
           </Button>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
           <Card>
             <CardHeader className="pb-2 md:pb-3">
               <div className="flex items-center justify-between">

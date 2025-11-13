@@ -325,6 +325,7 @@ const Beneficiaries = () => {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-muted/30">
+                    <TableHead className="text-right font-semibold">رقم المستفيد</TableHead>
                     <TableHead className="text-right font-semibold">الاسم</TableHead>
                     <TableHead className="text-right font-semibold hidden md:table-cell">رقم الهوية</TableHead>
                     <TableHead className="text-right font-semibold hidden lg:table-cell">العائلة</TableHead>
@@ -351,6 +352,11 @@ const Beneficiaries = () => {
                   ) : (
                     paginatedBeneficiaries.map((beneficiary) => (
                       <TableRow key={beneficiary.id} className="hover:bg-muted/50 transition-colors">
+                        <TableCell className="font-mono text-xs">
+                          <Badge variant="secondary" className="whitespace-nowrap">
+                            {(beneficiary as any).beneficiary_number || 'N/A'}
+                          </Badge>
+                        </TableCell>
                         <TableCell className="font-medium">
                           <div className="flex items-center gap-2">
                             <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
