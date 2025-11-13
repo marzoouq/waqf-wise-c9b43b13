@@ -378,6 +378,12 @@ const Beneficiaries = () => {
                           >
                             {beneficiary.status}
                           </Badge>
+                          {beneficiary.can_login && (
+                            <Badge variant="outline" className="mr-1 bg-primary/10 text-primary border-primary/30">
+                              <Key className="h-3 w-3 ml-1" />
+                              مفعل
+                            </Badge>
+                          )}
                         </TableCell>
                         <TableCell className="font-mono text-sm hidden md:table-cell">
                           {beneficiary.phone}

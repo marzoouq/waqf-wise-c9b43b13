@@ -195,10 +195,35 @@ const BeneficiaryDashboard = () => {
   };
 
   if (loading) return <LoadingState message="جاري تحميل البيانات..." />;
+  
   if (!beneficiary) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <EmptyState icon={FileText} title="لم يتم العثور على بيانات المستفيد" description="يرجى التواصل مع الإدارة" />
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
+        <Card className="max-w-md w-full">
+          <CardHeader>
+            <CardTitle className="text-center text-destructive">لم يتم العثور على حساب مستفيد</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="text-center text-muted-foreground">
+              <p className="mb-4">حسابك غير مرتبط ببيانات مستفيد في النظام.</p>
+              <div className="bg-muted p-4 rounded-lg text-right space-y-2">
+                <p className="font-semibold">لتفعيل حسابك:</p>
+                <ol className="list-decimal list-inside space-y-1 text-sm">
+                  <li>تواصل مع إدارة الوقف</li>
+                  <li>قدم بريدك الإلكتروني: <span className="font-mono bg-background px-2 py-1 rounded">{user?.email}</span></li>
+                  <li>سيقوم المدير بتفعيل تسجيل الدخول لك</li>
+                </ol>
+              </div>
+            </div>
+            <Button 
+              onClick={() => supabase.auth.signOut()} 
+              variant="outline" 
+              className="w-full"
+            >
+              تسجيل الخروج
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
