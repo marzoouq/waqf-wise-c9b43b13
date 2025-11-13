@@ -21,11 +21,11 @@ function AccountNode({ account, level, onEdit, onAddChild }: AccountNodeProps) {
 
   const getAccountTypeColor = (type: string) => {
     switch (type) {
-      case "أصول": return "text-blue-600 dark:text-blue-400";
-      case "خصوم": return "text-orange-600 dark:text-orange-400";
-      case "حقوق ملكية": return "text-purple-600 dark:text-purple-400";
-      case "إيرادات": return "text-green-600 dark:text-green-400";
-      case "مصروفات": return "text-red-600 dark:text-red-400";
+      case "أصول": return "text-primary";
+      case "خصوم": return "text-warning";
+      case "حقوق ملكية": return "text-accent";
+      case "إيرادات": return "text-success";
+      case "مصروفات": return "text-destructive";
       default: return "text-foreground";
     }
   };
@@ -86,7 +86,7 @@ function AccountNode({ account, level, onEdit, onAddChild }: AccountNodeProps) {
         <div className="flex items-center gap-2">
           <span className={cn(
             "font-mono text-sm font-medium min-w-[120px] text-left",
-            account.current_balance > 0 ? "text-green-600" : account.current_balance < 0 ? "text-red-600" : "text-muted-foreground"
+            account.current_balance > 0 ? "text-success" : account.current_balance < 0 ? "text-destructive" : "text-muted-foreground"
           )}>
             {formatBalance(account.current_balance)}
             {account.current_balance > 0 && <TrendingUp className="inline h-3 w-3 mr-1" />}
