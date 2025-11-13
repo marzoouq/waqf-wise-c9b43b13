@@ -39,26 +39,25 @@ export const useBeneficiaryData = (userId?: string) => {
   useEffect(() => {
     if (!userId) return;
 
-    const fetchData = async () => {
+    const loadData = async () => {
       try {
-        // Use type assertion to avoid deep instantiation
-        const benResult: any = await supabase
+        const { data: benData, error: benError } = await supabase
           .from("beneficiaries")
-          .select("*")
+          .select("id, full_name, national_id, phone, email, address, bank_name, bank_account_number, iban, family_name, relationship, category, status, notes, created_at, updated_at, user_id")
           .eq("user_id", userId)
           .maybeSingle();
 
-        if (benResult.error) {
+        if (benError) {
           toast({
             title: "خطأ في تحميل البيانات",
-            description: benResult.error.message,
+            description: benError.message,
             variant: "destructive",
           });
           setLoading(false);
           return;
         }
 
-        if (!benResult.data) {
+        if (!benData) {
           toast({
             title: "لم يتم العثور على حساب مستفيد",
             description: "يرجى التواصل مع الإدارة لتفعيل حسابك",
@@ -68,17 +67,18 @@ export const useBeneficiaryData = (userId?: string) => {
           return;
         }
 
-        setBeneficiary(benResult.data as Beneficiary);
+        setBeneficiary(benData);
 
-        const payResult: any = await supabase
-          .from("payments")
-          .select("*")
-          .eq("beneficiary_id", benResult.data.id)
+        const paymentQuery = (supabase.from("payments") as any)
+          .select("id, payment_number, payment_date, amount, description")
+          .eq("beneficiary_id", benData.id)
           .order("payment_date", { ascending: false })
           .limit(50);
+        
+        const { data: payData, error: payError } = await paymentQuery;
 
-        if (!payResult.error && payResult.data) {
-          setPayments(payResult.data as Payment[]);
+        if (!payError && payData) {
+          setPayments(payData);
         }
 
         setLoading(false);
@@ -93,8 +93,8 @@ export const useBeneficiaryData = (userId?: string) => {
       }
     };
 
-    fetchData();
-  }, [userId, toast]);
+    loadData();
+  }, [userId]);
 
   return { beneficiary, payments, loading };
 };
