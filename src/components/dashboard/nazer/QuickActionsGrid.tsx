@@ -20,64 +20,64 @@ export default function QuickActionsGrid() {
       icon: CheckCircle,
       label: "اعتماد الموافقات",
       description: "مراجعة واعتماد الموافقات المعلقة",
-      color: "text-green-600",
-      bgColor: "bg-green-50",
+      color: "text-primary",
+      bgColor: "bg-primary/10",
       path: "/approvals"
     },
     {
       icon: TrendingUp,
       label: "محاكاة التوزيع",
       description: "معاينة توزيع الغلة قبل الاعتماد",
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
+      color: "text-primary",
+      bgColor: "bg-primary/10",
       path: "/funds"
     },
     {
       icon: FileText,
       label: "التقارير التنفيذية",
       description: "عرض التقارير والإحصائيات",
-      color: "text-purple-600",
-      bgColor: "bg-purple-50",
+      color: "text-primary",
+      bgColor: "bg-primary/10",
       path: "/reports"
     },
     {
       icon: Users,
       label: "إدارة المستفيدين",
       description: "عرض وإدارة المستفيدين",
-      color: "text-orange-600",
-      bgColor: "bg-orange-50",
+      color: "text-primary",
+      bgColor: "bg-primary/10",
       path: "/beneficiaries"
     },
     {
       icon: Building2,
       label: "إدارة العقارات",
       description: "متابعة العقارات والعقود",
-      color: "text-indigo-600",
-      bgColor: "bg-indigo-50",
+      color: "text-primary",
+      bgColor: "bg-primary/10",
       path: "/properties"
     },
     {
       icon: DollarSign,
       label: "القروض والفزعات",
       description: "متابعة القروض والسلف",
-      color: "text-red-600",
-      bgColor: "bg-red-50",
+      color: "text-primary",
+      bgColor: "bg-primary/10",
       path: "/loans"
     },
     {
       icon: PieChart,
       label: "المحاسبة",
       description: "القيود المالية والتقارير",
-      color: "text-teal-600",
-      bgColor: "bg-teal-50",
+      color: "text-primary",
+      bgColor: "bg-primary/10",
       path: "/accounting"
     },
     {
       icon: Settings,
       label: "الإعدادات",
       description: "إعدادات النظام والمستخدمين",
-      color: "text-gray-600",
-      bgColor: "bg-gray-50",
+      color: "text-muted-foreground",
+      bgColor: "bg-muted",
       path: "/settings"
     }
   ];

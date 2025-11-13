@@ -56,16 +56,13 @@ export default function NazerKPIs() {
   const fetchKPIs = async () => {
     try {
       setIsLoading(true);
-      console.log('🔄 Fetching KPIs...');
 
       // جلب الأصول الكلية
       const { data: accountsData, error: accountsError } = await supabase
         .from('journal_entry_lines')
         .select('debit_amount, credit_amount, accounts(account_type, account_nature)');
 
-      if (accountsError) {
-        console.error('❌ Error fetching accounts data:', accountsError);
-      }
+      if (accountsError) throw accountsError;
 
     let totalAssets = 0;
     let totalRevenue = 0;
@@ -138,7 +135,8 @@ export default function NazerKPIs() {
       console.log('✅ KPIs fetched:', kpiData);
       setData(kpiData);
     } catch (error) {
-      console.error('❌ Error in fetchKPIs:', error);
+      console.error('Error fetching KPIs:', error);
+      // Keep default values on error
     } finally {
       setIsLoading(false);
     }
@@ -149,56 +147,56 @@ export default function NazerKPIs() {
       title: "إجمالي الأصول",
       value: data.totalAssets,
       icon: Building2,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
+      color: "text-primary",
+      bgColor: "bg-primary/10",
       format: "currency"
     },
     {
       title: "العوائد الشهرية",
       value: data.monthlyReturn,
       icon: TrendingUp,
-      color: "text-green-600",
-      bgColor: "bg-green-50",
+      color: "text-primary",
+      bgColor: "bg-primary/10",
       format: "currency"
     },
     {
       title: "المستفيدون النشطون",
       value: data.activeBeneficiaries,
       icon: Users,
-      color: "text-purple-600",
-      bgColor: "bg-purple-50",
+      color: "text-primary",
+      bgColor: "bg-primary/10",
       format: "number"
     },
     {
       title: "الميزانية المتاحة",
       value: data.availableBudget,
       icon: Wallet,
-      color: "text-orange-600",
-      bgColor: "bg-orange-50",
+      color: "text-primary",
+      bgColor: "bg-primary/10",
       format: "currency"
     },
     {
       title: "العقارات النشطة",
       value: data.activeProperties,
       icon: Home,
-      color: "text-indigo-600",
-      bgColor: "bg-indigo-50",
+      color: "text-primary",
+      bgColor: "bg-primary/10",
       format: "number"
     },
     {
       title: "العقارات المؤجرة",
       value: data.occupiedProperties,
       icon: Building2,
-      color: "text-teal-600",
-      bgColor: "bg-teal-50",
+      color: "text-primary",
+      bgColor: "bg-primary/10",
       format: "number"
     },
     {
       title: "القروض المستحقة",
       value: data.pendingLoans,
       icon: CreditCard,
-      color: "text-red-600",
-      bgColor: "bg-red-50",
+      color: "text-destructive",
+      bgColor: "bg-destructive/10",
       format: "number"
     },
     {
