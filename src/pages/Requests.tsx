@@ -110,7 +110,7 @@ const Requests = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
+            <div className="text-2xl font-bold text-warning">{stats.pending}</div>
           </CardContent>
         </Card>
 
@@ -121,7 +121,7 @@ const Requests = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{stats.inProgress}</div>
+            <div className="text-2xl font-bold text-primary">{stats.inProgress}</div>
           </CardContent>
         </Card>
 
@@ -132,7 +132,7 @@ const Requests = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{stats.approved}</div>
+            <div className="text-2xl font-bold text-success">{stats.approved}</div>
           </CardContent>
         </Card>
 
@@ -143,18 +143,18 @@ const Requests = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{stats.rejected}</div>
+            <div className="text-2xl font-bold text-destructive">{stats.rejected}</div>
           </CardContent>
         </Card>
 
-        <Card className="border-red-500">
+        <Card className="border-destructive">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-red-600">
+            <CardTitle className="text-sm font-medium text-destructive">
               متأخر
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{stats.overdue}</div>
+            <div className="text-2xl font-bold text-destructive">{stats.overdue}</div>
           </CardContent>
         </Card>
       </div>
@@ -234,7 +234,7 @@ const Requests = () => {
                     <TableRow
                       key={request.id}
                       className={`cursor-pointer hover:bg-muted/50 ${
-                        request.is_overdue ? 'bg-red-50 dark:bg-red-950/20' : ''
+                        request.is_overdue ? 'bg-destructive/5' : ''
                       }`}
                     >
                       <TableCell className="font-mono font-medium">
