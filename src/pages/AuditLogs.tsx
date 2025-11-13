@@ -36,6 +36,29 @@ const AuditLogs = () => {
 
   const { data: logs, isLoading } = useAuditLogs(filters);
 
+  const exportLogs = () => {
+    if (!logs || logs.length === 0) {
+      return;
+    }
+
+    const csvHeaders = ["التاريخ", "المستخدم", "نوع العملية", "الجدول", "الوصف", "الخطورة"];
+    const csvData = logs.map(log => [
+      format(new Date(log.created_at), "dd/MM/yyyy HH:mm", { locale: ar }),
+      log.user_email || "-",
+      actionTypeLabels[log.action_type] || log.action_type,
+      tableNameLabels[log.table_name || ""] || log.table_name || "-",
+      log.description || "-",
+      severityConfig[log.severity].label
+    ]);
+
+    const csv = [csvHeaders, ...csvData].map(row => row.join(",")).join("\n");
+    const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `audit_logs_${format(new Date(), "yyyy-MM-dd")}.csv`;
+    link.click();
+  };
+
   const severityConfig = {
     info: { label: "معلومة", icon: Info, color: "bg-blue-500/10 text-blue-600" },
     warning: { label: "تحذير", icon: AlertTriangle, color: "bg-yellow-500/10 text-yellow-600" },
@@ -77,7 +100,7 @@ const AuditLogs = () => {
             تتبع جميع العمليات والأنشطة في النظام
           </p>
         </div>
-        <Button variant="outline" className="gap-2">
+        <Button variant="outline" onClick={exportLogs} className="gap-2">
           <Download className="h-4 w-4" />
           تصدير
         </Button>

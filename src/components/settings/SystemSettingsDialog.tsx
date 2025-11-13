@@ -32,7 +32,42 @@ export function SystemSettingsDialog({ open, onOpenChange }: SystemSettingsDialo
     }
   }, [settings]);
 
+  const validateSettings = () => {
+    const errors: string[] = [];
+    
+    // Validate payment threshold
+    const threshold = Number(editedSettings['payment_approval_threshold']);
+    if (threshold && (threshold < 0 || threshold > 1000000)) {
+      errors.push("حد الموافقة على المدفوعات يجب أن يكون بين 0 و 1,000,000");
+    }
+
+    // Validate password length
+    const passLength = Number(editedSettings['password_min_length']);
+    if (passLength && (passLength < 6 || passLength > 20)) {
+      errors.push("الحد الأدنى لطول كلمة المرور يجب أن يكون بين 6 و 20");
+    }
+
+    // Validate session timeout
+    const sessionTimeout = Number(editedSettings['session_timeout_minutes']);
+    if (sessionTimeout && (sessionTimeout < 5 || sessionTimeout > 1440)) {
+      errors.push("مهلة الجلسة يجب أن تكون بين 5 و 1440 دقيقة");
+    }
+
+    return errors;
+  };
+
   const handleSave = async () => {
+    // Validation
+    const errors = validateSettings();
+    if (errors.length > 0) {
+      toast({
+        title: "خطأ في التحقق",
+        description: errors.join(", "),
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSaving(true);
     try {
       // حفظ التغييرات
@@ -83,10 +118,11 @@ export function SystemSettingsDialog({ open, onOpenChange }: SystemSettingsDialo
 
   const renderSetting = (setting: any) => {
     const value = editedSettings[setting.setting_key] || setting.setting_value;
+    const hasChanged = value !== setting.setting_value;
 
     if (setting.setting_type === 'boolean') {
       return (
-        <div key={setting.id} className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
+        <div key={setting.id} className={`flex items-center justify-between p-4 rounded-lg transition-colors ${hasChanged ? 'bg-primary/5 border border-primary/20' : 'bg-muted/30'}`}>
           <div className="flex-1">
             <Label htmlFor={setting.setting_key} className="text-base font-medium">
               {setting.description}
@@ -105,7 +141,7 @@ export function SystemSettingsDialog({ open, onOpenChange }: SystemSettingsDialo
     }
 
     return (
-      <div key={setting.id} className="p-4 bg-muted/30 rounded-lg space-y-2">
+      <div key={setting.id} className={`p-4 rounded-lg space-y-2 transition-colors ${hasChanged ? 'bg-primary/5 border border-primary/20' : 'bg-muted/30'}`}>
         <Label htmlFor={setting.setting_key} className="text-base font-medium">
           {setting.description}
         </Label>
@@ -119,6 +155,11 @@ export function SystemSettingsDialog({ open, onOpenChange }: SystemSettingsDialo
           onChange={(e) => updateValue(setting.setting_key, e.target.value)}
           className="mt-2"
         />
+        {hasChanged && (
+          <p className="text-xs text-primary mt-1">
+            القيمة الأصلية: {setting.setting_value}
+          </p>
+        )}
       </div>
     );
   };

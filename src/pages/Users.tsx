@@ -8,12 +8,14 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Search, UserPlus, Shield, Edit, Trash2, CheckCircle, XCircle } from "lucide-react";
+import { Search, UserPlus, Shield, Edit, Trash2, CheckCircle, XCircle, Download } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { format } from "date-fns";
+import { ar } from "date-fns/locale";
 
 interface UserProfile {
   id: string;
@@ -58,6 +60,32 @@ const Users = () => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
   const [selectedRoles, setSelectedRoles] = useState<AppRole[]>([]);
+
+  // Export users to CSV
+  const exportUsers = () => {
+    const csvHeaders = ["الاسم", "البريد الإلكتروني", "الهاتف", "المنصب", "الأدوار", "الحالة", "تاريخ الإنشاء"];
+    const csvData = filteredUsers.map(user => [
+      user.full_name,
+      user.email,
+      user.phone || "-",
+      user.position || "-",
+      user.user_roles?.map(r => roleLabels[r.role as AppRole]).join(", ") || "-",
+      user.is_active ? "نشط" : "غير نشط",
+      format(new Date(user.created_at), "dd/MM/yyyy", { locale: ar })
+    ]);
+
+    const csv = [csvHeaders, ...csvData].map(row => row.join(",")).join("\n");
+    const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `users_${format(new Date(), "yyyy-MM-dd")}.csv`;
+    link.click();
+
+    toast({
+      title: "تم التصدير",
+      description: `تم تصدير ${filteredUsers.length} مستخدم بنجاح`,
+    });
+  };
 
   // Fetch all users with their roles
   const { data: users = [], isLoading } = useQuery({
@@ -187,6 +215,10 @@ const Users = () => {
               إدارة شاملة لمستخدمي النظام وصلاحياتهم
             </p>
           </div>
+          <Button onClick={exportUsers} variant="outline" className="gap-2">
+            <Download className="h-4 w-4" />
+            تصدير ({filteredUsers.length})
+          </Button>
         </div>
 
         {/* Filters */}

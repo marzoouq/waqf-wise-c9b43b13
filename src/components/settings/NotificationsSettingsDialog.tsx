@@ -8,8 +8,11 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent } from "@/components/ui/card";
+import { Eye } from "lucide-react";
+import { NotificationsPreviewDialog } from "./NotificationsPreviewDialog";
 
 interface NotificationsSettingsDialogProps {
   open: boolean;
@@ -21,9 +24,14 @@ export function NotificationsSettingsDialog({
   onOpenChange,
 }: NotificationsSettingsDialogProps) {
   const { toast } = useToast();
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [settings, setSettings] = useState({
     emailNotifications: true,
+    smsNotifications: false,
     pushNotifications: true,
+    requestNotifications: true,
+    paymentNotifications: true,
+    reportNotifications: true,
     approvalAlerts: true,
     paymentAlerts: true,
     journalEntryAlerts: true,
@@ -40,14 +48,28 @@ export function NotificationsSettingsDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto" aria-describedby="notifications-description">
-        <DialogHeader>
-          <DialogTitle className="text-xl">إعدادات الإشعارات</DialogTitle>
-          <DialogDescription id="notifications-description">
-            تخصيص تفضيلات التنبيهات والإشعارات
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto" aria-describedby="notifications-description">
+          <DialogHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <DialogTitle className="text-xl">إعدادات الإشعارات</DialogTitle>
+                <DialogDescription id="notifications-description">
+                  تخصيص تفضيلات التنبيهات والإشعارات
+                </DialogDescription>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPreviewOpen(true)}
+                className="gap-2"
+              >
+                <Eye className="h-4 w-4" />
+                معاينة
+              </Button>
+            </div>
+          </DialogHeader>
 
         <div className="space-y-6">
           {/* قنوات الإشعارات */}
@@ -164,5 +186,12 @@ export function NotificationsSettingsDialog({
         </div>
       </DialogContent>
     </Dialog>
+
+    <NotificationsPreviewDialog
+      open={previewOpen}
+      onOpenChange={setPreviewOpen}
+      settings={settings}
+    />
+    </>
   );
 }
