@@ -104,19 +104,18 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
 
       if (updateError) throw updateError;
 
-      // 3. إضافة دور beneficiary
+      // 3. إنشاء Profile و دور beneficiary
       if (authData.user) {
         try {
-          await supabase
-            .from("user_roles")
-            .upsert({ 
-              user_id: authData.user.id, 
-              role: "beneficiary" as any
-            }, {
-              onConflict: "user_id,role"
-            });
+          // إنشاء Profile
+          await supabase.rpc('create_user_profile_and_role', {
+            p_user_id: authData.user.id,
+            p_full_name: beneficiary.full_name,
+            p_email: formData.email,
+            p_role: 'beneficiary'
+          });
         } catch (roleError) {
-          console.error("Role assignment error:", roleError);
+          console.error("Profile/Role creation error:", roleError);
         }
       }
 

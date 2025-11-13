@@ -20,6 +20,7 @@ import { AccountStatementView } from "@/components/beneficiary/AccountStatementV
 import { BeneficiaryCertificate } from "@/components/beneficiary/BeneficiaryCertificate";
 import { InternalMessagesDialog } from "@/components/messages/InternalMessagesDialog";
 import { useToast } from "@/hooks/use-toast";
+import { FirstClassReports } from "@/components/beneficiary/FirstClassReports";
 
 interface Beneficiary {
   id: string;
@@ -404,6 +405,11 @@ const BeneficiaryDashboard = () => {
             </Tabs>
           </CardContent>
         </Card>
+
+        {/* تقارير خاصة بالدرجة الأولى فقط */}
+        {beneficiary.category === "الفئة الأولى" && (
+          <FirstClassReports />
+        )}
 
         <Card>
           <CardHeader>
