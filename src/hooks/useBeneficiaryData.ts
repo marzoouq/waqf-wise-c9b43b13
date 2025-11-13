@@ -1,13 +1,7 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import type { Database } from "@/integrations/supabase/types";
-
-type BeneficiaryRow = Database["public"]["Tables"]["beneficiaries"]["Row"];
-
-export interface Beneficiary extends BeneficiaryRow {
-  beneficiary_number?: string | null;
-}
+import { Beneficiary } from "@/types/beneficiary";
+import { fetchFromTable } from "@/utils/supabaseHelpers";
 
 interface Payment {
   id: string;
@@ -28,23 +22,23 @@ export const useBeneficiaryData = (userId?: string) => {
 
     const loadData = async () => {
       try {
-        const { data: benData, error: benError } = await supabase
-          .from("beneficiaries")
-          .select("*")
-          .eq("user_id", userId)
-          .maybeSingle();
+        // جلب بيانات المستفيد
+        const beneficiaryResult = await fetchFromTable<Beneficiary>("beneficiaries", {
+          filters: [{ column: "user_id", operator: "eq", value: userId }],
+          single: true,
+        });
 
-        if (benError) {
+        if (beneficiaryResult.error) {
           toast({
             title: "خطأ في تحميل البيانات",
-            description: benError.message,
+            description: beneficiaryResult.error.message,
             variant: "destructive",
           });
           setLoading(false);
           return;
         }
 
-        if (!benData) {
+        if (!beneficiaryResult.data) {
           toast({
             title: "لم يتم العثور على حساب مستفيد",
             description: "يرجى التواصل مع الإدارة لتفعيل حسابك",
@@ -54,29 +48,22 @@ export const useBeneficiaryData = (userId?: string) => {
           return;
         }
 
-        setBeneficiary(benData);
+        setBeneficiary(beneficiaryResult.data as Beneficiary);
 
-        // Fetch payments separately to avoid type complexity
-        const paymentsResponse = await supabase
-          .from("payments")
-          .select("*")
-          .eq("beneficiary_id", benData.id)
-          .order("payment_date", { ascending: false })
-          .limit(50);
-        
-        if (paymentsResponse.data) {
-          setPayments(paymentsResponse.data.map((p: any) => ({
-            id: p.id,
-            payment_number: p.payment_number,
-            payment_date: p.payment_date,
-            amount: p.amount,
-            description: p.description || ''
-          })));
+        // جلب المدفوعات
+        const paymentsResult = await fetchFromTable<Payment>("payments", {
+          filters: [{ column: "beneficiary_id", operator: "eq", value: (beneficiaryResult.data as Beneficiary).id }],
+          order: { column: "payment_date", ascending: false },
+          limit: 50,
+        });
+
+        if (paymentsResult.data) {
+          setPayments(paymentsResult.data as Payment[]);
         }
 
         setLoading(false);
       } catch (error) {
-        console.error("Error:", error);
+        console.error("Error loading beneficiary data:", error);
         toast({
           title: "خطأ في تحميل البيانات",
           description: "حدث خطأ غير متوقع",
