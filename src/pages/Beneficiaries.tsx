@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
-import { Plus, Search, Filter, Download, MoreVertical, Users, UserCheck, UserX, Home, Eye, FileText, Activity, Save, Star, Key, Shield } from "lucide-react";
+import { Plus, Search, Filter, Download, MoreVertical, Users, UserCheck, UserX, Home, Eye, FileText, Activity, Save, Star, Key, Shield, Edit, Trash2 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { useBeneficiaries } from "@/hooks/useBeneficiaries";
@@ -397,6 +397,15 @@ const Beneficiaries = () => {
                                 <Eye className="ml-2 h-4 w-4" />
                                 عرض الملف الكامل
                               </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleViewProfile(beneficiary)}>
+                                <Eye className="ml-2 h-4 w-4" />
+                                عرض الملف الشخصي
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleEditBeneficiary(beneficiary)}>
+                                <Edit className="ml-2 h-4 w-4" />
+                                تعديل البيانات
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
                               <DropdownMenuItem onClick={() => handleViewAttachments(beneficiary)}>
                                 <FileText className="ml-2 h-4 w-4" />
                                 المرفقات
@@ -410,15 +419,12 @@ const Beneficiaries = () => {
                                 <Key className="ml-2 h-4 w-4" />
                                 {beneficiary.can_login ? "إدارة الحساب" : "تفعيل حساب الدخول"}
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleEditBeneficiary(beneficiary)}>
-                                تعديل
-                              </DropdownMenuItem>
-                              <DropdownMenuItem>سجل النشاط</DropdownMenuItem>
-                              <DropdownMenuItem>المستندات</DropdownMenuItem>
+                              <DropdownMenuSeparator />
                               <DropdownMenuItem 
                                 className="text-destructive"
                                 onClick={() => handleDeleteBeneficiary(beneficiary.id)}
                               >
+                                <Trash2 className="ml-2 h-4 w-4" />
                                 حذف المستفيد
                               </DropdownMenuItem>
                             </DropdownMenuContent>
