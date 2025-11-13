@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
+import type { PropertyPerformance } from "@/types/dashboard";
+import { ChartSkeleton } from "@/components/shared/ChartSkeleton";
 
 export default function PropertiesPerformanceChart() {
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<PropertyPerformance[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -24,11 +26,16 @@ export default function PropertiesPerformanceChart() {
   const fetchPropertiesData = async () => {
     setIsLoading(true);
 
-    // جلب العقود النشطة مع الدفعات
+    // جلب العقود النشطة مع الدفعات (محسّن)
     const { data: contractsData } = await supabase
       .from('contracts')
-      .select('*, properties(name, type), rental_payments(amount_paid, status)')
-      .eq('status', 'نشط');
+      .select(`
+        id,
+        properties(name),
+        rental_payments(amount_paid, status)
+      `)
+      .eq('status', 'نشط')
+      .limit(6);  // فقط أول 6 عقارات
 
     const propertyStats: { [key: string]: { revenue: number, paid: number, pending: number } } = {};
 
@@ -69,16 +76,7 @@ export default function PropertiesPerformanceChart() {
   };
 
   if (isLoading) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>أداء العقارات</CardTitle>
-        </CardHeader>
-        <CardContent className="h-80 flex items-center justify-center">
-          <div className="animate-pulse text-muted-foreground">جاري التحميل...</div>
-        </CardContent>
-      </Card>
-    );
+    return <ChartSkeleton title="أداء العقارات" />;
   }
 
   if (data.length === 0) {

@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
+import type { RevenueDistribution } from "@/types/dashboard";
+import { ChartSkeleton } from "@/components/shared/ChartSkeleton";
 
 export default function RevenueDistributionChart() {
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<RevenueDistribution[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -25,8 +27,13 @@ export default function RevenueDistributionChart() {
 
     const { data: revenueData } = await supabase
       .from('journal_entry_lines')
-      .select('credit_amount, debit_amount, accounts!inner(name_ar, account_type)')
-      .eq('accounts.account_type', 'revenue');
+      .select(`
+        credit_amount,
+        debit_amount,
+        accounts!inner(name_ar)
+      `)
+      .eq('accounts.account_type', 'revenue')
+      .limit(50);  // فقط آخر 50 سجل
 
     const revenueByType: { [key: string]: number } = {};
 
@@ -62,16 +69,7 @@ export default function RevenueDistributionChart() {
   const COLORS = ['#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#6366f1'];
 
   if (isLoading) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>توزيع الإيرادات</CardTitle>
-        </CardHeader>
-        <CardContent className="h-80 flex items-center justify-center">
-          <div className="animate-pulse text-muted-foreground">جاري التحميل...</div>
-        </CardContent>
-      </Card>
-    );
+    return <ChartSkeleton title="توزيع الإيرادات" />;
   }
 
   if (data.length === 0) {
