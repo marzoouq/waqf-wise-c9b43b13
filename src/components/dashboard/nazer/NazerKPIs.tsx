@@ -54,12 +54,18 @@ export default function NazerKPIs() {
   }, []);
 
   const fetchKPIs = async () => {
-    setIsLoading(true);
+    try {
+      setIsLoading(true);
+      console.log('🔄 Fetching KPIs...');
 
-    // جلب الأصول الكلية
-    const { data: accountsData } = await supabase
-      .from('journal_entry_lines')
-      .select('debit_amount, credit_amount, accounts(account_type, account_nature)');
+      // جلب الأصول الكلية
+      const { data: accountsData, error: accountsError } = await supabase
+        .from('journal_entry_lines')
+        .select('debit_amount, credit_amount, accounts(account_type, account_nature)');
+
+      if (accountsError) {
+        console.error('❌ Error fetching accounts data:', accountsError);
+      }
 
     let totalAssets = 0;
     let totalRevenue = 0;
@@ -115,22 +121,27 @@ export default function NazerKPIs() {
       .eq('accounts.account_type', 'revenue')
       .gte('journal_entries.entry_date', `${currentYear}-${String(currentMonth).padStart(2, '0')}-01`);
 
-    const monthlyReturn = monthlyData?.reduce((sum, line) => 
-      sum + (line.credit_amount || 0) - (line.debit_amount || 0), 0
-    ) || 0;
+      const monthlyReturn = monthlyData?.reduce((sum, line) => 
+        sum + ((line.credit_amount || 0) - (line.debit_amount || 0)), 0) || 0;
 
-    setData({
-      totalAssets,
-      totalRevenue,
-      activeBeneficiaries: beneficiariesCount || 0,
-      activeProperties: propertiesCount || 0,
-      occupiedProperties: occupiedCount || 0,
-      pendingLoans: loansCount || 0,
-      availableBudget,
-      monthlyReturn
-    });
+      const kpiData = {
+        totalAssets,
+        totalRevenue,
+        activeBeneficiaries: beneficiariesCount || 0,
+        activeProperties: propertiesCount || 0,
+        occupiedProperties: occupiedCount || 0,
+        pendingLoans: loansCount || 0,
+        availableBudget,
+        monthlyReturn
+      };
 
-    setIsLoading(false);
+      console.log('✅ KPIs fetched:', kpiData);
+      setData(kpiData);
+    } catch (error) {
+      console.error('❌ Error in fetchKPIs:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const kpis = [

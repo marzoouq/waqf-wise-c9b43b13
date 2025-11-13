@@ -49,15 +49,22 @@ export default function PendingApprovalsSection() {
   }, []);
 
   const fetchPendingApprovals = async () => {
-    setIsLoading(true);
-    const allApprovals: PendingApproval[] = [];
+    try {
+      setIsLoading(true);
+      const allApprovals: PendingApproval[] = [];
 
-    // جلب موافقات التوزيعات
-    const { data: distApprovals } = await supabase
-      .from('distribution_approvals')
-      .select('*, distributions(*)')
-      .eq('status', 'معلق')
-      .eq('level', 3);
+      console.log('🔄 Fetching pending approvals...');
+
+      // جلب موافقات التوزيعات
+      const { data: distApprovals, error: distError } = await supabase
+        .from('distribution_approvals')
+        .select('*, distributions(*)')
+        .eq('status', 'معلق')
+        .eq('level', 3);
+
+      if (distError) {
+        console.error('❌ Error fetching distribution approvals:', distError);
+      }
 
     if (distApprovals) {
       distApprovals.forEach(app => {
@@ -75,12 +82,16 @@ export default function PendingApprovalsSection() {
       });
     }
 
-    // جلب موافقات الطلبات
-    const { data: reqApprovals } = await supabase
-      .from('request_approvals')
-      .select('*, beneficiary_requests(*, beneficiaries(*))')
-      .eq('status', 'معلق')
-      .eq('level', 3);
+      // جلب موافقات الطلبات
+      const { data: reqApprovals, error: reqError } = await supabase
+        .from('request_approvals')
+        .select('*, beneficiary_requests(*, beneficiaries(*))')
+        .eq('status', 'معلق')
+        .eq('level', 3);
+
+      if (reqError) {
+        console.error('❌ Error fetching request approvals:', reqError);
+      }
 
     if (reqApprovals) {
       reqApprovals.forEach(app => {
@@ -98,29 +109,47 @@ export default function PendingApprovalsSection() {
       });
     }
 
-    // جلب القيود المحاسبية المعلقة
-    const { data: journalApprovals } = await supabase
-      .from('approvals')
-      .select('*, journal_entries(*)')
-      .eq('status', 'pending');
+      // جلب القيود المحاسبية المعلقة
+      const { data: journalApprovals, error: journalError } = await supabase
+        .from('approvals')
+        .select('*, journal_entries(*)')
+        .eq('status', 'pending');
 
-    if (journalApprovals) {
-      journalApprovals.forEach(app => {
-        if (app.journal_entries) {
-          allApprovals.push({
-            id: app.id,
-            type: 'journal',
-            title: `قيد ${app.journal_entries.entry_number}`,
-            date: new Date(app.created_at),
-            priority: 'medium',
-            description: app.journal_entries.description
-          });
+      if (journalError) {
+        console.error('❌ Error fetching journal approvals:', journalError);
+      }
+
+      if (journalApprovals) {
+        journalApprovals.forEach(app => {
+          if (app.journal_entries) {
+            allApprovals.push({
+              id: app.id,
+              type: 'journal',
+              title: `قيد ${app.journal_entries.entry_number}`,
+              date: new Date(app.created_at),
+              priority: 'medium',
+              description: app.journal_entries.description
+            });
+          }
+        });
+      }
+
+      // ترتيب حسب الأولوية والتاريخ
+      allApprovals.sort((a, b) => {
+        const priorityOrder = { high: 0, medium: 1, low: 2 };
+        if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
+          return priorityOrder[a.priority] - priorityOrder[b.priority];
         }
+        return b.date.getTime() - a.date.getTime();
       });
-    }
 
-    setApprovals(allApprovals.sort((a, b) => b.date.getTime() - a.date.getTime()));
-    setIsLoading(false);
+      console.log('✅ Fetched approvals:', allApprovals.length);
+      setApprovals(allApprovals);
+    } catch (error) {
+      console.error('❌ Error in fetchPendingApprovals:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const getPriorityColor = (priority: string) => {

@@ -47,17 +47,23 @@ export default function SmartAlertsSection() {
   }, []);
 
   const fetchAlerts = async () => {
-    setIsLoading(true);
-    const allAlerts: Alert[] = [];
-    const today = new Date();
+    try {
+      setIsLoading(true);
+      console.log('🔄 Fetching alerts...');
+      const allAlerts: Alert[] = [];
+      const today = new Date();
 
-    // 1. عقود قرب الانتهاء
-    const { data: expiringContracts } = await supabase
-      .from('contracts')
-      .select('*, properties(name)')
-      .eq('status', 'نشط')
-      .gte('end_date', format(today, 'yyyy-MM-dd'))
-      .lte('end_date', format(new Date(today.getTime() + 60 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd'));
+      // 1. عقود قرب الانتهاء
+      const { data: expiringContracts, error: contractsError } = await supabase
+        .from('contracts')
+        .select('*, properties(name)')
+        .eq('status', 'نشط')
+        .gte('end_date', format(today, 'yyyy-MM-dd'))
+        .lte('end_date', format(new Date(today.getTime() + 60 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd'));
+
+      if (contractsError) {
+        console.error('❌ Error fetching expiring contracts:', contractsError);
+      }
 
     if (expiringContracts) {
       expiringContracts.forEach(contract => {
@@ -138,15 +144,22 @@ export default function SmartAlertsSection() {
       });
     }
 
-    setAlerts(allAlerts.sort((a, b) => {
-      // ترتيب حسب الأولوية ثم التاريخ
-      if (a.severity !== b.severity) {
-        return a.severity === 'high' ? -1 : 1;
-      }
-      return a.date.getTime() - b.date.getTime();
-    }));
+      // ترتيب حسب الخطورة والتاريخ
+      allAlerts.sort((a, b) => {
+        const severityOrder = { high: 0, medium: 1, low: 2 };
+        if (severityOrder[a.severity] !== severityOrder[b.severity]) {
+          return severityOrder[a.severity] - severityOrder[b.severity];
+        }
+        return a.date.getTime() - b.date.getTime();
+      });
 
-    setIsLoading(false);
+      console.log('✅ Alerts fetched:', allAlerts.length);
+      setAlerts(allAlerts);
+    } catch (error) {
+      console.error('❌ Error in fetchAlerts:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const getSeverityColor = (severity: string) => {
