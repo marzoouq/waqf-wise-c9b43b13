@@ -95,8 +95,8 @@ export default function WaqfUnits() {
 
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-500/10 rounded-lg">
-              <AlertCircle className="h-5 w-5 text-green-500" />
+            <div className="p-2 bg-success/10 rounded-lg">
+              <AlertCircle className="h-5 w-5 text-success" />
             </div>
             <div>
               <p className="text-sm text-muted-foreground">أقلام نشطة</p>
@@ -107,8 +107,8 @@ export default function WaqfUnits() {
 
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-500/10 rounded-lg">
-              <DollarSign className="h-5 w-5 text-blue-500" />
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <DollarSign className="h-5 w-5 text-primary" />
             </div>
             <div>
               <p className="text-sm text-muted-foreground">القيمة الإجمالية</p>
@@ -121,8 +121,8 @@ export default function WaqfUnits() {
 
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-purple-500/10 rounded-lg">
-              <TrendingUp className="h-5 w-5 text-purple-500" />
+            <div className="p-2 bg-accent/10 rounded-lg">
+              <TrendingUp className="h-5 w-5 text-accent" />
             </div>
             <div>
               <p className="text-sm text-muted-foreground">العائد السنوي</p>
@@ -204,10 +204,10 @@ export default function WaqfUnits() {
                   <TableCell className="font-semibold">
                     {unit.acquisition_value?.toLocaleString('ar-SA') || 0} ريال
                   </TableCell>
-                  <TableCell className="font-semibold text-blue-600">
+                  <TableCell className="font-semibold text-primary">
                     {unit.current_value?.toLocaleString('ar-SA') || 0} ريال
                   </TableCell>
-                  <TableCell className="font-semibold text-green-600">
+                  <TableCell className="font-semibold text-success">
                     {unit.annual_return?.toLocaleString('ar-SA') || 0} ريال
                   </TableCell>
                   <TableCell>
