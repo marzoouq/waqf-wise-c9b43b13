@@ -69,31 +69,50 @@ const BeneficiaryDashboard = () => {
   
   const { attachments } = useBeneficiaryAttachments(beneficiary?.id);
 
+  // جلب بيانات المستفيد والمدفوعات مع Real-time Updates
   useEffect(() => {
-    if (!user?.email) return;
+    if (!user?.id) return;
 
     const fetchData = async () => {
       try {
+        // جلب بيانات المستفيد باستخدام user_id بدلاً من email
         const { data: benData, error: benError } = await supabase
           .from("beneficiaries")
           .select("*")
-          .eq("email", user.email)
+          .eq("user_id", user.id)
           .maybeSingle();
         
         if (benError) throw benError;
+        
+        if (!benData) {
+          toast({
+            title: "لم يتم العثور على حساب مستفيد",
+            description: "يرجى التواصل مع الإدارة لتفعيل حسابك",
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
+        }
+        
         setBeneficiary(benData);
 
-        if (benData) {
-          const { data: payData, error: payError } = await supabase
-            .from("payments")
-            .select("id, payment_number, payment_date, amount, description")
-            .eq("payer_name", benData.full_name)
-            .order("payment_date", { ascending: false });
-          
-          if (payError) throw payError;
-          setPayments(payData || []);
-        }
-      } catch (error) {
+        // جلب المدفوعات باستخدام beneficiary_id
+        const { data: payData, error: payError } = await supabase
+          .from("payments")
+          .select("id, payment_number, payment_date, amount, description")
+          .eq("beneficiary_id", benData.id)
+          .order("payment_date", { ascending: false })
+          .limit(50);
+        
+        if (payError) throw payError;
+        setPayments(payData || []);
+      } catch (error: any) {
+        console.error("Error fetching beneficiary data:", error);
+        toast({
+          title: "خطأ في تحميل البيانات",
+          description: error.message || "حدث خطأ أثناء تحميل بياناتك",
+          variant: "destructive",
+        });
         setBeneficiary(null);
         setPayments([]);
       } finally {
@@ -102,7 +121,58 @@ const BeneficiaryDashboard = () => {
     };
 
     fetchData();
-  }, [user?.email]);
+
+    // إعداد Real-time Subscriptions للتحديثات الفورية
+    const paymentsChannel = supabase
+      .channel('beneficiary-payments')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'payments',
+          filter: `beneficiary_id=eq.${beneficiary?.id}`,
+        },
+        (payload) => {
+          console.log('Payment update:', payload);
+          // إعادة جلب المدفوعات عند التحديث
+          if (beneficiary?.id) {
+            supabase
+              .from("payments")
+              .select("id, payment_number, payment_date, amount, description")
+              .eq("beneficiary_id", beneficiary.id)
+              .order("payment_date", { ascending: false })
+              .limit(50)
+              .then(({ data }) => {
+                if (data) setPayments(data);
+              });
+          }
+        }
+      )
+      .subscribe();
+
+    const beneficiaryChannel = supabase
+      .channel('beneficiary-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'beneficiaries',
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload) => {
+          console.log('Beneficiary update:', payload);
+          setBeneficiary(payload.new as Beneficiary);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(paymentsChannel);
+      supabase.removeChannel(beneficiaryChannel);
+    };
+  }, [user?.id, toast, beneficiary?.id]);
 
   const stats = {
     totalPayments: payments.reduce((sum, p) => sum + Number(p.amount), 0),

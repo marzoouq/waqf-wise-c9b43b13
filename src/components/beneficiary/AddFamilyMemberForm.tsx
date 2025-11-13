@@ -44,7 +44,7 @@ export function AddFamilyMemberForm({ onSubmit, isLoading }: AddFamilyMemberForm
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <UserPlus className="h-5 w-5 text-green-500" />
+          <UserPlus className="h-5 w-5 text-success" />
           طلب إضافة فرد للعائلة
         </CardTitle>
         <CardDescription>

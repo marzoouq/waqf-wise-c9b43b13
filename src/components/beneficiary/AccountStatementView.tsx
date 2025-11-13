@@ -92,7 +92,7 @@ export function AccountStatementView({
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-blue-500" />
+              <FileText className="h-5 w-5 text-primary" />
               كشف حساب
             </CardTitle>
             <CardDescription>سجل المدفوعات والمستحقات</CardDescription>
