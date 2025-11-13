@@ -95,7 +95,7 @@ export default function StaffRequests() {
         );
       case "موافق عليه":
         return (
-          <Badge className="gap-1 bg-green-500 hover:bg-green-600">
+          <Badge className="gap-1 bg-success hover:bg-success/90">
             <CheckCircle className="h-3 w-3" />
             موافق عليه
           </Badge>
@@ -155,7 +155,7 @@ export default function StaffRequests() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{stats.approved}</div>
+            <div className="text-2xl font-bold text-success">{stats.approved}</div>
           </CardContent>
         </Card>
 
@@ -166,18 +166,18 @@ export default function StaffRequests() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{stats.rejected}</div>
+            <div className="text-2xl font-bold text-destructive">{stats.rejected}</div>
           </CardContent>
         </Card>
 
-        <Card className="border-red-200 dark:border-red-900">
+        <Card className="border-destructive">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-red-600 dark:text-red-400">
+            <CardTitle className="text-sm font-medium text-destructive">
               متأخرة
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600 dark:text-red-400">
+            <div className="text-2xl font-bold text-destructive">
               {stats.overdue}
             </div>
           </CardContent>
@@ -292,7 +292,7 @@ export default function StaffRequests() {
                         <span
                           className={`text-xs ${
                             request.is_overdue
-                              ? "text-red-600 dark:text-red-400"
+                              ? "text-destructive"
                               : "text-muted-foreground"
                           }`}
                         >
