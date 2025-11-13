@@ -21,27 +21,7 @@ import { BeneficiaryCertificate } from "@/components/beneficiary/BeneficiaryCert
 import { InternalMessagesDialog } from "@/components/messages/InternalMessagesDialog";
 import { useToast } from "@/hooks/use-toast";
 import { FirstClassReports } from "@/components/beneficiary/FirstClassReports";
-
-interface Beneficiary {
-  id: string;
-  beneficiary_number: string;
-  full_name: string;
-  national_id: string;
-  phone: string;
-  email?: string | null;
-  address?: string | null;
-  bank_name?: string | null;
-  bank_account_number?: string | null;
-  iban?: string | null;
-  family_name?: string | null;
-  relationship?: string | null;
-  category: string;
-  status: string;
-  notes?: string | null;
-  created_at: string;
-  updated_at: string;
-  user_id?: string | null;
-}
+import { Beneficiary } from "@/types/beneficiary";
 
 interface Request {
   id: string;
@@ -237,9 +217,9 @@ const BeneficiaryDashboard = () => {
           <div className="space-y-1">
             <div className="flex items-center gap-3 flex-wrap">
               <h1 className="text-xl md:text-3xl font-bold text-gradient-primary">مرحباً، {beneficiary.full_name}</h1>
-              {(beneficiary as any).beneficiary_number && (
+              {beneficiary.beneficiary_number && (
                 <Badge variant="secondary" className="text-xs md:text-sm whitespace-nowrap">
-                  {(beneficiary as any).beneficiary_number}
+                  {beneficiary.beneficiary_number}
                 </Badge>
               )}
             </div>
