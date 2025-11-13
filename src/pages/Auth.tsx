@@ -86,16 +86,63 @@ export default function Auth() {
 
   const handleQuickLogin = async (email: string, password: string, role: string) => {
     setIsLoading(true);
-    toast.loading(`جاري تسجيل الدخول كـ ${role}...`);
-    const { error } = await signIn(email, password);
+    const loadingToast = toast.loading(`جاري تسجيل الدخول كـ ${role}...`);
+    
+    // محاولة تسجيل الدخول أولاً
+    let { error } = await signIn(email, password);
+    
+    // إذا فشل تسجيل الدخول، نحاول إنشاء الحساب
+    if (error && error.message?.includes('Invalid login credentials')) {
+      toast.loading(`الحساب غير موجود. جاري إنشاء حساب ${role}...`, { id: loadingToast });
+      
+      // إنشاء الحساب
+      const signUpResult = await signUp(email, password, role);
+      
+      if (signUpResult.error) {
+        setIsLoading(false);
+        toast.error(`فشل إنشاء الحساب: ${signUpResult.error.message}`, { id: loadingToast });
+        return;
+      }
+      
+      // انتظار قليلاً لضمان إنشاء الحساب
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // تعيين الدور الصحيح
+      try {
+        const roleMap: Record<string, 'nazer' | 'admin' | 'accountant' | 'cashier' | 'archivist' | 'beneficiary' | 'user'> = {
+          'الناظر': 'nazer',
+          'المشرف': 'admin',
+          'المحاسب': 'accountant',
+          'أمين الصندوق': 'cashier',
+          'أمين الأرشيف': 'archivist',
+          'مستفيد': 'beneficiary',
+          'مستخدم': 'user'
+        };
+        
+        const appRole = roleMap[role];
+        if (appRole) {
+          await supabase.rpc('assign_user_role', {
+            p_email: email,
+            p_role: appRole
+          });
+        }
+      } catch (err) {
+        console.error('Error assigning role:', err);
+      }
+      
+      // محاولة تسجيل الدخول مرة أخرى
+      toast.loading(`جاري تسجيل الدخول...`, { id: loadingToast });
+      const loginResult = await signIn(email, password);
+      error = loginResult.error;
+    }
+    
     setIsLoading(false);
-    toast.dismiss();
     
     if (!error) {
-      toast.success(`تم تسجيل الدخول بنجاح كـ ${role}`);
+      toast.success(`مرحباً! تم تسجيل الدخول بنجاح كـ ${role} 🎉`, { id: loadingToast });
       navigate('/', { replace: true });
     } else {
-      toast.error(`فشل تسجيل الدخول. تأكد من إنشاء الحساب أولاً.`);
+      toast.error(`فشل تسجيل الدخول: ${error.message}`, { id: loadingToast });
     }
   };
 
