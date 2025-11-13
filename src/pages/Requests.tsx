@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Filter, Clock, CheckCircle, XCircle, AlertCircle, GitBranch } from 'lucide-react';
+import { Search, Filter, Clock, CheckCircle, XCircle, AlertCircle, GitBranch, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,6 +8,7 @@ import { useRequests } from '@/hooks/useRequests';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { RequestApprovalDialog } from '@/components/requests/RequestApprovalDialog';
+import { RequestCommentsDialog } from '@/components/requests/RequestCommentsDialog';
 import {
   Table,
   TableBody,
@@ -30,6 +31,7 @@ const Requests = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
   const [approvalDialogOpen, setApprovalDialogOpen] = useState(false);
+  const [commentsDialogOpen, setCommentsDialogOpen] = useState(false);
 
   const filteredRequests = requests.filter(request => {
     const matchesSearch = 
@@ -272,17 +274,30 @@ const Requests = () => {
                         {new Date(request.submitted_at).toLocaleDateString('ar-SA')}
                       </TableCell>
                       <TableCell>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => {
-                            setSelectedRequest(request);
-                            setApprovalDialogOpen(true);
-                          }}
-                        >
-                          <GitBranch className="h-4 w-4 ml-2" />
-                          مسار الموافقات
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setSelectedRequest(request);
+                              setApprovalDialogOpen(true);
+                            }}
+                          >
+                            <GitBranch className="h-4 w-4 ml-2" />
+                            مسار الموافقات
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setSelectedRequest(request);
+                              setCommentsDialogOpen(true);
+                            }}
+                          >
+                            <MessageSquare className="h-4 w-4 ml-2" />
+                            التعليقات
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -295,13 +310,21 @@ const Requests = () => {
 
       {/* Request Approval Dialog */}
       {selectedRequest && (
-        <RequestApprovalDialog
-          open={approvalDialogOpen}
-          onOpenChange={setApprovalDialogOpen}
-          requestId={selectedRequest.id}
-          requestType={(selectedRequest.request_type as any)?.name || "طلب"}
-          requestDescription={selectedRequest.description}
-        />
+        <>
+          <RequestApprovalDialog
+            open={approvalDialogOpen}
+            onOpenChange={setApprovalDialogOpen}
+            requestId={selectedRequest.id}
+            requestType={(selectedRequest.request_type as any)?.name || "طلب"}
+            requestDescription={selectedRequest.description}
+          />
+          <RequestCommentsDialog
+            open={commentsDialogOpen}
+            onOpenChange={setCommentsDialogOpen}
+            requestId={selectedRequest.id}
+            requestNumber={selectedRequest.request_number}
+          />
+        </>
       )}
     </div>
   );

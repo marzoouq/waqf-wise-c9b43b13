@@ -41,6 +41,7 @@ const WaqfUnits = lazy(() => import("./pages/WaqfUnits"));
 const Install = lazy(() => import("./pages/Install"));
 const Notifications = lazy(() => import("./pages/Notifications"));
 const Requests = lazy(() => import("./pages/Requests"));
+const StaffRequests = lazy(() => import("./pages/StaffRequests"));
 const Families = lazy(() => import("./pages/Families"));
 const Users = lazy(() => import("./pages/Users"));
 const AuditLogs = lazy(() => import("./pages/AuditLogs"));
@@ -103,6 +104,7 @@ const App = () => {
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/notifications" element={<Notifications />} />
                 <Route path="/requests" element={<Requests />} />
+                <Route path="/staff/requests" element={<StaffRequests />} />
                 <Route path="/audit-logs" element={<AuditLogs />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />

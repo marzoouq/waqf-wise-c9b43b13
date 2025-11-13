@@ -2283,6 +2283,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      check_overdue_requests: { Args: never; Returns: undefined }
       create_auto_journal_entry: {
         Args: {
           p_amount: number

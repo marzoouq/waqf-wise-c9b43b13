@@ -19,6 +19,16 @@ Deno.serve(async (req) => {
 
     console.log('🔔 بدء تشغيل الإشعارات الدورية اليومية...');
 
+    // تحديث الطلبات المتأخرة
+    console.log('📋 فحص الطلبات المتأخرة...');
+    const { error: overdueError } = await supabase.rpc('check_overdue_requests');
+    
+    if (overdueError) {
+      console.error('❌ خطأ في تحديث الطلبات المتأخرة:', overdueError);
+    } else {
+      console.log('✅ تم تحديث الطلبات المتأخرة');
+    }
+
     // تشغيل دالة إشعارات دفعات الإيجار المستحقة
     console.log('📋 فحص دفعات الإيجار المستحقة...');
     const { error: rentalError } = await supabase.rpc('notify_rental_payment_due');
