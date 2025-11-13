@@ -2431,6 +2431,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      assign_user_role: {
+        Args: {
+          p_email: string
+          p_role: Database["public"]["Enums"]["app_role"]
+        }
+        Returns: undefined
+      }
       calculate_loan_schedule: {
         Args: {
           p_interest_rate: number
@@ -2482,6 +2489,14 @@ export type Database = {
       }
       notify_contract_expiring: { Args: never; Returns: undefined }
       notify_rental_payment_due: { Args: never; Returns: undefined }
+      setup_demo_accounts: {
+        Args: never
+        Returns: {
+          email: string
+          role: string
+          status: string
+        }[]
+      }
       update_overdue_installments: { Args: never; Returns: undefined }
     }
     Enums: {

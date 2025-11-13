@@ -11,6 +11,7 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 const signInSchema = z.object({
   email: z.string().email('البريد الإلكتروني غير صحيح'),
@@ -43,6 +44,7 @@ const demoAccounts = [
 
 export default function Auth() {
   const [isLoading, setIsLoading] = useState(false);
+  const [isCreatingAccounts, setIsCreatingAccounts] = useState(false);
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
 
@@ -97,16 +99,92 @@ export default function Auth() {
     }
   };
 
+  const createAllDemoAccounts = async () => {
+    setIsCreatingAccounts(true);
+    const loadingToast = toast.loading('جاري إنشاء الحسابات التجريبية...');
+    
+    let successCount = 0;
+    let errorCount = 0;
+
+    // إنشاء الحسابات أولاً
+    for (const account of demoAccounts) {
+      try {
+        const { error } = await signUp(account.email, account.password, account.role);
+        if (!error) {
+          successCount++;
+        } else {
+          if (error.message?.includes('already registered')) {
+            // الحساب موجود بالفعل، هذا جيد
+            successCount++;
+          } else {
+            errorCount++;
+            console.error(`Error creating ${account.role}:`, error);
+          }
+        }
+      } catch (err) {
+        errorCount++;
+        console.error(`Exception creating ${account.role}:`, err);
+      }
+      
+      // تأخير قصير بين الطلبات
+      await new Promise(resolve => setTimeout(resolve, 300));
+    }
+
+    // الآن نقوم بتعيين الأدوار الصحيحة
+    try {
+      const { data, error } = await supabase.rpc('setup_demo_accounts');
+      
+      if (error) {
+        console.error('Error setting up roles:', error);
+        toast.error('حدث خطأ في تعيين الأدوار');
+      } else {
+        console.log('Roles setup result:', data);
+      }
+    } catch (err) {
+      console.error('Exception setting up roles:', err);
+    }
+
+    toast.dismiss(loadingToast);
+    setIsCreatingAccounts(false);
+    
+    if (successCount > 0) {
+      toast.success(`تم إنشاء وإعداد ${successCount} حساب بنجاح! 🎉\nيمكنك الآن تسجيل الدخول`);
+    }
+    
+    if (errorCount > 0) {
+      toast.warning(`فشل إنشاء ${errorCount} حساب`);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/5 p-4">
       <div className="w-full max-w-4xl space-y-6">
         {/* Demo Accounts Quick Access */}
         <Card className="shadow-strong">
           <CardHeader>
-            <CardTitle className="text-xl">تسجيل دخول سريع - حسابات تجريبية</CardTitle>
-            <CardDescription>
-              اضغط على أي دور للدخول مباشرة (كلمة المرور: 123456)
-            </CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-xl">تسجيل دخول سريع - حسابات تجريبية</CardTitle>
+                <CardDescription>
+                  اضغط على أي دور للدخول مباشرة (كلمة المرور: 123456)
+                </CardDescription>
+              </div>
+              <Button
+                variant="outline"
+                onClick={createAllDemoAccounts}
+                disabled={isCreatingAccounts || isLoading}
+                className="shrink-0"
+              >
+                {isCreatingAccounts ? (
+                  <>
+                    <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                    جاري الإنشاء...
+                  </>
+                ) : (
+                  'إنشاء جميع الحسابات'
+                )}
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
