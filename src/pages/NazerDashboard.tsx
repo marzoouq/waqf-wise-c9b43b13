@@ -16,9 +16,9 @@ export default function NazerDashboard() {
         {/* Header */}
         <header className="space-y-2">
           <div className="flex items-center gap-3">
-            <Shield className="h-10 w-10 text-purple-600" />
+            <Shield className="h-10 w-10 text-primary" />
             <div>
-              <h1 className="text-3xl font-bold text-gradient-primary">
+              <h1 className="text-3xl font-bold text-foreground">
                 لوحة تحكم الناظر
               </h1>
               <p className="text-muted-foreground">

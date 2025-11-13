@@ -53,8 +53,6 @@ export default function PendingApprovalsSection() {
       setIsLoading(true);
       const allApprovals: PendingApproval[] = [];
 
-      console.log('🔄 Fetching pending approvals...');
-
       // جلب موافقات التوزيعات
       const { data: distApprovals, error: distError } = await supabase
         .from('distribution_approvals')
@@ -62,9 +60,7 @@ export default function PendingApprovalsSection() {
         .eq('status', 'معلق')
         .eq('level', 3);
 
-      if (distError) {
-        console.error('❌ Error fetching distribution approvals:', distError);
-      }
+      if (distError) throw distError;
 
     if (distApprovals) {
       distApprovals.forEach(app => {
@@ -89,9 +85,7 @@ export default function PendingApprovalsSection() {
         .eq('status', 'معلق')
         .eq('level', 3);
 
-      if (reqError) {
-        console.error('❌ Error fetching request approvals:', reqError);
-      }
+      if (reqError) throw reqError;
 
     if (reqApprovals) {
       reqApprovals.forEach(app => {
@@ -115,9 +109,7 @@ export default function PendingApprovalsSection() {
         .select('*, journal_entries(*)')
         .eq('status', 'pending');
 
-      if (journalError) {
-        console.error('❌ Error fetching journal approvals:', journalError);
-      }
+      if (journalError) throw journalError;
 
       if (journalApprovals) {
         journalApprovals.forEach(app => {
@@ -146,7 +138,8 @@ export default function PendingApprovalsSection() {
       console.log('✅ Fetched approvals:', allApprovals.length);
       setApprovals(allApprovals);
     } catch (error) {
-      console.error('❌ Error in fetchPendingApprovals:', error);
+      console.error('Error fetching approvals:', error);
+      setApprovals([]);
     } finally {
       setIsLoading(false);
     }

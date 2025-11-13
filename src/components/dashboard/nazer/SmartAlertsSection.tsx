@@ -49,7 +49,6 @@ export default function SmartAlertsSection() {
   const fetchAlerts = async () => {
     try {
       setIsLoading(true);
-      console.log('🔄 Fetching alerts...');
       const allAlerts: Alert[] = [];
       const today = new Date();
 
@@ -61,9 +60,7 @@ export default function SmartAlertsSection() {
         .gte('end_date', format(today, 'yyyy-MM-dd'))
         .lte('end_date', format(new Date(today.getTime() + 60 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd'));
 
-      if (contractsError) {
-        console.error('❌ Error fetching expiring contracts:', contractsError);
-      }
+      if (contractsError) throw contractsError;
 
     if (expiringContracts) {
       expiringContracts.forEach(contract => {
@@ -156,7 +153,8 @@ export default function SmartAlertsSection() {
       console.log('✅ Alerts fetched:', allAlerts.length);
       setAlerts(allAlerts);
     } catch (error) {
-      console.error('❌ Error in fetchAlerts:', error);
+      console.error('Error fetching alerts:', error);
+      setAlerts([]);
     } finally {
       setIsLoading(false);
     }
