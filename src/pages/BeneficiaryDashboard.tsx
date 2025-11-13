@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,7 +9,6 @@ import { DollarSign, FileText, Calendar, TrendingUp, MessageSquare, AlertCircle,
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { useAuth } from "@/hooks/useAuth";
-import { useRequests } from "@/hooks/useRequests";
 import { EmergencyRequestForm } from "@/components/beneficiary/EmergencyRequestForm";
 import { LoanRequestForm } from "@/components/beneficiary/LoanRequestForm";
 import { DataUpdateForm } from "@/components/beneficiary/DataUpdateForm";
@@ -38,11 +38,6 @@ interface Beneficiary {
   created_at: string;
   updated_at: string;
   user_id?: string | null;
-  notification_preferences?: {
-    email: boolean;
-    sms: boolean;
-    push: boolean;
-  } | null;
 }
 
 interface Request {
@@ -64,9 +59,10 @@ interface Payment {
 const BeneficiaryDashboard = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const { createRequest, requests } = useRequests();
+  const queryClient = useQueryClient();
   const [beneficiary, setBeneficiary] = useState<Beneficiary | null>(null);
   const [payments, setPayments] = useState<Payment[]>([]);
+  const [requests, setRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
   const [messagesDialogOpen, setMessagesDialogOpen] = useState(false);
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
@@ -78,16 +74,27 @@ const BeneficiaryDashboard = () => {
   useEffect(() => {
     if (!user?.id) return;
 
-    const fetchData = async () => {
-      try {
-        const { data: benData, error: benError } = await supabase
-          .from("beneficiaries")
-          .select("*")
-          .eq("user_id", user.id)
-          .maybeSingle();
-        
-        if (benError) throw benError;
-        
+    let isMounted = true;
+
+    supabase
+      .from("beneficiaries")
+      .select("id, full_name, national_id, phone, email, address, bank_name, bank_account_number, iban, family_name, relationship, category, status, notes, created_at, updated_at, user_id")
+      .eq("user_id", user.id)
+      .maybeSingle()
+      .then(({ data: benData, error: benError }) => {
+        if (!isMounted) return;
+
+        if (benError) {
+          console.error("Error fetching beneficiary:", benError);
+          toast({
+            title: "خطأ في تحميل البيانات",
+            description: benError.message,
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
+        }
+
         if (!benData) {
           toast({
             title: "لم يتم العثور على حساب مستفيد",
@@ -97,34 +104,90 @@ const BeneficiaryDashboard = () => {
           setLoading(false);
           return;
         }
-        
-        setBeneficiary(benData);
 
-        const { data: payData, error: payError } = await supabase
+        setBeneficiary(benData as Beneficiary);
+
+        return supabase
           .from("payments")
           .select("id, payment_number, payment_date, amount, description")
           .eq("beneficiary_id", benData.id)
           .order("payment_date", { ascending: false })
           .limit(50);
-        
-        if (payError) throw payError;
-        setPayments(payData || []);
-      } catch (error: any) {
-        console.error("Error fetching beneficiary data:", error);
+      })
+      .then((result) => {
+        if (!isMounted || !result) return;
+
+        if (result.error) {
+          console.error("Error fetching payments:", result.error);
+        } else {
+          setPayments(result.data || []);
+        }
+        setLoading(false);
+      })
+      .catch((error) => {
+        if (!isMounted) return;
+        console.error("Unexpected error:", error);
         toast({
           title: "خطأ في تحميل البيانات",
-          description: error.message || "حدث خطأ أثناء تحميل بياناتك",
+          description: "حدث خطأ غير متوقع",
           variant: "destructive",
         });
-        setBeneficiary(null);
-        setPayments([]);
-      } finally {
         setLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (!user?.id || !beneficiary?.id) return;
+
+    const fetchRequests = async () => {
+      const { data, error } = await supabase
+        .from("beneficiary_requests")
+        .select("*")
+        .eq("beneficiary_id", beneficiary.id)
+        .order("submitted_at", { ascending: false });
+      
+      if (!error && data) {
+        setRequests(data as Request[]);
       }
     };
 
-    fetchData();
-  }, [user?.id, toast]);
+    fetchRequests();
+  }, [user?.id, beneficiary?.id]);
+
+  // Create request mutation
+  const createRequestMutation = useMutation({
+    mutationFn: async (newRequest: any) => {
+      const { data, error } = await supabase
+        .from("beneficiary_requests")
+        .insert({
+          ...newRequest,
+          submitted_at: new Date().toISOString(),
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['requests'] });
+      toast({
+        title: 'تم بنجاح',
+        description: 'تم إرسال الطلب بنجاح',
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'خطأ',
+        description: error.message || 'حدث خطأ أثناء إرسال الطلب',
+        variant: 'destructive',
+      });
+    },
+  });
 
   const stats = {
     totalPayments: payments.reduce((sum, p) => sum + Number(p.amount), 0),
@@ -135,18 +198,14 @@ const BeneficiaryDashboard = () => {
 
   const handleEmergencyRequest = async (data: any) => {
     try {
-      await createRequest.mutateAsync({
+      await createRequestMutation.mutateAsync({
         beneficiary_id: beneficiary?.id || "",
-        request_type_id: "emergency" as any, // يجب أن يكون UUID حقيقي
+        request_type_id: "emergency" as any,
         description: data.description,
         amount: data.amount,
         emergency_reason: data.emergency_reason,
         priority: "عاجل",
         status: "قيد المراجعة",
-      } as any);
-      toast({
-        title: "تم تقديم الطلب",
-        description: "سيتم مراجعة طلبك في أقرب وقت",
       });
       setActiveRequestTab("view");
     } catch (error) {
@@ -156,7 +215,7 @@ const BeneficiaryDashboard = () => {
 
   const handleLoanRequest = async (data: any) => {
     try {
-      await createRequest.mutateAsync({
+      await createRequestMutation.mutateAsync({
         beneficiary_id: beneficiary?.id || "",
         request_type_id: "loan" as any,
         description: `طلب قرض: ${data.description}`,
@@ -166,10 +225,6 @@ const BeneficiaryDashboard = () => {
         loan_reason: data.loan_reason,
         priority: "عادية",
         status: "قيد المراجعة",
-      } as any);
-      toast({
-        title: "تم تقديم طلب القرض",
-        description: "سيتم مراجعة طلبك ومعالجته",
       });
       setActiveRequestTab("view");
     } catch (error) {
@@ -179,17 +234,13 @@ const BeneficiaryDashboard = () => {
 
   const handleDataUpdate = async (data: any) => {
     try {
-      await createRequest.mutateAsync({
+      await createRequestMutation.mutateAsync({
         beneficiary_id: beneficiary?.id || "",
         request_type_id: "data-update" as any,
         description: `طلب تحديث ${data.update_type}: ${data.description}`,
         new_data: JSON.stringify(data),
         priority: "عادية",
         status: "قيد المراجعة",
-      } as any);
-      toast({
-        title: "تم تقديم الطلب",
-        description: "تم تقديم طلب تحديث البيانات بنجاح",
       });
       setActiveRequestTab("view");
     } catch (error) {
@@ -199,17 +250,13 @@ const BeneficiaryDashboard = () => {
 
   const handleAddFamilyMember = async (data: any) => {
     try {
-      await createRequest.mutateAsync({
+      await createRequestMutation.mutateAsync({
         beneficiary_id: beneficiary?.id || "",
         request_type_id: "add-family-member" as any,
         description: `طلب إضافة فرد: ${data.member_name} (${data.relationship})`,
         new_data: JSON.stringify(data),
         priority: "عادية",
         status: "قيد المراجعة",
-      } as any);
-      toast({
-        title: "تم تقديم الطلب",
-        description: "تم تقديم طلب إضافة فرد للعائلة بنجاح",
       });
       setActiveRequestTab("view");
     } catch (error) {
@@ -381,7 +428,7 @@ const BeneficiaryDashboard = () => {
               <TabsContent value="update">
                 <DataUpdateForm
                   onSubmit={handleDataUpdate}
-                  isLoading={createRequest.isPending}
+                  isLoading={createRequestMutation.isPending}
                   currentData={{
                     phone: beneficiary?.phone,
                     email: beneficiary?.email || undefined,
@@ -396,7 +443,7 @@ const BeneficiaryDashboard = () => {
               <TabsContent value="family">
                 <AddFamilyMemberForm
                   onSubmit={handleAddFamilyMember}
-                  isLoading={createRequest.isPending}
+                  isLoading={createRequestMutation.isPending}
                 />
               </TabsContent>
             </Tabs>
