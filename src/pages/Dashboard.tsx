@@ -31,7 +31,7 @@ const Dashboard = () => {
   const [isDistributionDialogOpen, setIsDistributionDialogOpen] = useState(false);
   
   // ALL HOOKS MUST BE CALLED FIRST - Before any conditional returns
-  const { isBeneficiary, isAccountant, isLoading: roleLoading } = useUserRole();
+  const { isBeneficiary, isAccountant, isNazer, isCashier, isArchivist, isLoading: roleLoading } = useUserRole();
   const { activities, isLoading: activitiesLoading } = useActivities();
   const { tasks, isLoading: tasksLoading } = useTasks();
   const queryClient = useQueryClient();
@@ -81,12 +81,25 @@ const Dashboard = () => {
     return <LoadingState message="جاري تحميل لوحة التحكم..." />;
   }
 
+  // التوجيه حسب الدور
   if (isBeneficiary) {
     return <Navigate to="/beneficiary-dashboard" replace />;
   }
 
   if (isAccountant) {
     return <Navigate to="/accountant-dashboard" replace />;
+  }
+
+  if (isNazer) {
+    return <Navigate to="/nazer-dashboard" replace />;
+  }
+
+  if (isCashier) {
+    return <Navigate to="/cashier-dashboard" replace />;
+  }
+
+  if (isArchivist) {
+    return <Navigate to="/archivist-dashboard" replace />;
   }
 
   return (

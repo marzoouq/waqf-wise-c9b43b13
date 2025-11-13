@@ -25,6 +25,9 @@ const Auth = lazy(() => import("./pages/Auth"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const BeneficiaryDashboard = lazy(() => import("./pages/BeneficiaryDashboard"));
 const AccountantDashboard = lazy(() => import("./pages/AccountantDashboard"));
+const NazerDashboard = lazy(() => import("./pages/NazerDashboard"));
+const CashierDashboard = lazy(() => import("./pages/CashierDashboard"));
+const ArchivistDashboard = lazy(() => import("./pages/ArchivistDashboard"));
 const Beneficiaries = lazy(() => import("./pages/Beneficiaries"));
 const BeneficiaryProfile = lazy(() => import("./pages/BeneficiaryProfile"));
 const Properties = lazy(() => import("./pages/Properties"));
@@ -87,6 +90,9 @@ const App = () => {
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/beneficiary-dashboard" element={<BeneficiaryDashboard />} />
                 <Route path="/accountant-dashboard" element={<AccountantDashboard />} />
+                <Route path="/nazer-dashboard" element={<NazerDashboard />} />
+                <Route path="/cashier-dashboard" element={<CashierDashboard />} />
+                <Route path="/archivist-dashboard" element={<ArchivistDashboard />} />
                 <Route path="/users" element={<Users />} />
                 <Route path="/beneficiaries" element={<Beneficiaries />} />
                 <Route path="/beneficiaries/:id" element={<BeneficiaryProfile />} />
