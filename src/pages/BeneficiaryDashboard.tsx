@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { useBeneficiaryData } from "@/hooks/useBeneficiaryData";
+import { useRealtimeNotifications } from "@/hooks/useRealtimeNotifications";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -44,6 +45,10 @@ const BeneficiaryDashboard = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { beneficiary, payments, loading } = useBeneficiaryData(user?.id);
+  
+  // تفعيل الإشعارات في الوقت الفعلي
+  useRealtimeNotifications();
+  
   const [requests, setRequests] = useState<Request[]>([]);
   const [messagesDialogOpen, setMessagesDialogOpen] = useState(false);
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
