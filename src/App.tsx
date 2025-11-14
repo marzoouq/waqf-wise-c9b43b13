@@ -50,7 +50,7 @@ const Users = lazy(() => import("./pages/Users"));
 const AuditLogs = lazy(() => import("./pages/AuditLogs"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
-// Configure QueryClient with optimized defaults
+// Configure QueryClient with optimized defaults and error handling
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -58,8 +58,21 @@ const queryClient = new QueryClient({
       gcTime: 10 * 60 * 1000, // 10 minutes - cache retention (was cacheTime)
       refetchOnWindowFocus: false, // Prevent unnecessary refetches
       refetchOnReconnect: true, // Refetch on reconnect
-      retry: 2, // Retry twice on failure for better reliability
-      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
+      retry: (failureCount, error: any) => {
+        // لا تعيد المحاولة على أخطاء 404 أو 403
+        if (error?.status === 404 || error?.status === 403) return false;
+        // لا تعيد المحاولة على أخطاء المصادقة
+        if (error?.message?.includes('auth') || error?.message?.includes('credentials')) return false;
+        // أعد المحاولة 3 مرات للأخطاء الأخرى
+        return failureCount < 3;
+      },
+      retryDelay: (attemptIndex) => {
+        // Exponential backoff: 1s, 2s, 4s
+        return Math.min(1000 * 2 ** attemptIndex, 4000);
+      },
+    },
+    mutations: {
+      retry: false, // لا تعيد محاولة العمليات التي تغير البيانات
     },
   },
 });
