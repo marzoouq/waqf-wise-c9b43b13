@@ -7,6 +7,7 @@ import RevenueDistributionChart from "@/components/dashboard/nazer/RevenueDistri
 import PropertiesPerformanceChart from "@/components/dashboard/nazer/PropertiesPerformanceChart";
 import RevenueExpenseChart from "@/components/dashboard/RevenueExpenseChart";
 import BudgetComparisonChart from "@/components/dashboard/BudgetComparisonChart";
+import { AIInsightsWidget } from "@/components/dashboard/AIInsightsWidget";
 
 import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
 
@@ -27,6 +28,9 @@ export default function NazerDashboard() {
 
         {/* Smart Alerts */}
         <SmartAlertsSection />
+
+        {/* AI Insights Widget */}
+        <AIInsightsWidget />
 
       {/* Charts Grid */}
       <div className="grid gap-3 sm:gap-4 md:gap-5 lg:gap-6 grid-cols-1 lg:grid-cols-2">

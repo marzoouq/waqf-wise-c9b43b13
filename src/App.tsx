@@ -48,6 +48,7 @@ const StaffRequests = lazy(() => import("./pages/StaffRequests"));
 const Families = lazy(() => import("./pages/Families"));
 const Users = lazy(() => import("./pages/Users"));
 const AuditLogs = lazy(() => import("./pages/AuditLogs"));
+const AIInsights = lazy(() => import("./pages/AIInsights"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Configure QueryClient with optimized defaults and error handling
@@ -125,6 +126,7 @@ const App = () => {
                 <Route path="/requests" element={<Requests />} />
                 <Route path="/staff/requests" element={<StaffRequests />} />
                 <Route path="/audit-logs" element={<AuditLogs />} />
+                <Route path="/ai-insights" element={<AIInsights />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

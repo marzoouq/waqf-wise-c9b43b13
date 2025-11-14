@@ -20,6 +20,7 @@ import {
   ChevronDown,
   DollarSign,
   HandCoins,
+  Sparkles,
 } from "lucide-react";
 import {
   Sidebar,
@@ -98,6 +99,7 @@ const menuGroups = [
     subItems: [
       { icon: Archive, label: "الأرشيف", path: "/archive", roles: ["admin", "archivist", "nazer"] },
       { icon: BarChart3, label: "التقارير", path: "/reports", roles: ["all"] },
+      { icon: Sparkles, label: "الرؤى الذكية", path: "/ai-insights", roles: ["admin", "nazer"] },
       { icon: Shield, label: "سجل العمليات", path: "/audit-logs", roles: ["admin", "nazer"] },
     ]
   },
