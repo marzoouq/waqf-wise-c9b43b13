@@ -219,18 +219,13 @@ const BeneficiaryDialog = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-gradient-primary">
-            {isEditMode ? "تعديل بيانات المستفيد" : "إضافة مستفيد جديد"}
-          </DialogTitle>
-          <DialogDescription>
-            {isEditMode
-              ? "قم بتحديث بيانات المستفيد في النموذج أدناه"
-              : "أدخل بيانات المستفيد الجديد في النموذج أدناه"}
-          </DialogDescription>
-        </DialogHeader>
+    <ResponsiveDialog 
+      open={open} 
+      onOpenChange={onOpenChange}
+      title={isEditMode ? "تعديل بيانات المستفيد" : "إضافة مستفيد جديد"}
+      description={isEditMode ? "قم بتحديث بيانات المستفيد في النموذج أدناه" : "أدخل بيانات المستفيد الجديد في النموذج أدناه"}
+      size="xl"
+    >
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

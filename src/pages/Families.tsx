@@ -111,55 +111,55 @@ const Families = () => {
   }
 
   return (
-    <div className="space-y-6 p-6" dir="rtl">
+    <div className="space-y-4 sm:space-y-6 p-3 sm:p-4 md:p-6" dir="rtl">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">سجل العائلات</h1>
-          <p className="text-muted-foreground mt-2">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground break-words">سجل العائلات</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1 sm:mt-2">
             إدارة العائلات وربط أفرادها ببعضهم البعض
           </p>
         </div>
-        <Button size="lg" onClick={handleAddFamily}>
-          <Plus className="ml-2 h-5 w-5" />
-          إضافة عائلة جديدة
+        <Button onClick={handleAddFamily} className="w-full sm:w-auto gap-2 text-sm sm:text-base" size="sm">
+          <Plus className="h-4 w-4" />
+          إضافة عائلة
         </Button>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+          <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
               إجمالي العائلات
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{families.length}</div>
+          <CardContent className="p-3 sm:p-6">
+            <div className="text-xl sm:text-2xl font-bold">{families.length}</div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+          <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
               العائلات النشطة
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-primary">
+          <CardContent className="p-3 sm:p-6">
+            <div className="text-xl sm:text-2xl font-bold text-primary">
               {families.filter(f => f.status === 'نشط').length}
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+          <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
               إجمالي الأفراد
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
+          <CardContent className="p-3 sm:p-6">
+            <div className="text-xl sm:text-2xl font-bold">
               {families.reduce((sum, f) => sum + f.total_members, 0)}
             </div>
           </CardContent>
