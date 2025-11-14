@@ -1,0 +1,89 @@
+import { useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+
+interface RateLimitResult {
+  allowed: boolean;
+  remainingAttempts?: number;
+  resetTime?: Date;
+}
+
+/**
+ * Hook للتحقق من Rate Limiting
+ */
+export function useRateLimit() {
+  const [isChecking, setIsChecking] = useState(false);
+
+  /**
+   * التحقق من إمكانية تسجيل الدخول
+   */
+  const checkLoginRateLimit = async (
+    email: string,
+    maxAttempts: number = 5,
+    timeWindowMinutes: number = 15
+  ): Promise<RateLimitResult> => {
+    setIsChecking(true);
+    
+    try {
+      const ipAddress = await getClientIP();
+      
+      const { data, error } = await (supabase as any).rpc('check_rate_limit', {
+        p_email: email,
+        p_ip_address: ipAddress,
+        p_max_attempts: maxAttempts,
+        p_time_window_minutes: timeWindowMinutes,
+      });
+
+      if (error) {
+        console.error('Rate limit check error:', error);
+        return { allowed: true }; // في حالة الخطأ، نسمح بالمحاولة
+      }
+
+      return {
+        allowed: data as boolean,
+        remainingAttempts: data ? undefined : 0,
+        resetTime: data ? undefined : new Date(Date.now() + timeWindowMinutes * 60000),
+      };
+    } catch (error) {
+      console.error('Rate limit error:', error);
+      return { allowed: true };
+    } finally {
+      setIsChecking(false);
+    }
+  };
+
+  /**
+   * تسجيل محاولة تسجيل دخول
+   */
+  const logLoginAttempt = async (email: string, success: boolean): Promise<void> => {
+    try {
+      const ipAddress = await getClientIP();
+      
+      await (supabase as any).rpc('log_login_attempt', {
+        p_email: email,
+        p_ip_address: ipAddress,
+        p_success: success,
+      });
+    } catch (error) {
+      console.error('Error logging login attempt:', error);
+    }
+  };
+
+  return {
+    checkLoginRateLimit,
+    logLoginAttempt,
+    isChecking,
+  };
+}
+
+/**
+ * الحصول على IP العميل
+ */
+async function getClientIP(): Promise<string> {
+  try {
+    const response = await fetch('https://api.ipify.org?format=json');
+    const data = await response.json();
+    return data.ip || 'unknown';
+  } catch {
+    return 'unknown';
+  }
+}

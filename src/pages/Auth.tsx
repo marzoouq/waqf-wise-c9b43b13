@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useRateLimit } from '@/hooks/useRateLimit';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -46,6 +47,7 @@ export default function Auth() {
   const [isLoading, setIsLoading] = useState(false);
   const [isCreatingAccounts, setIsCreatingAccounts] = useState(false);
   const { signIn, signUp, user } = useAuth();
+  const { checkLoginRateLimit, logLoginAttempt } = useRateLimit();
   const navigate = useNavigate();
 
   const signInForm = useForm<SignInFormData>({
@@ -65,11 +67,33 @@ export default function Auth() {
 
   const handleSignIn = async (data: SignInFormData) => {
     setIsLoading(true);
-    const { error } = await signIn(data.email, data.password);
-    setIsLoading(false);
     
-    if (!error) {
-      navigate('/', { replace: true });
+    try {
+      // التحقق من Rate Limiting
+      const rateLimit = await checkLoginRateLimit(data.email);
+      
+      if (!rateLimit.allowed) {
+        toast.error('تم تجاوز عدد محاولات تسجيل الدخول', {
+          description: 'الرجاء المحاولة بعد 15 دقيقة'
+        });
+        setIsLoading(false);
+        return;
+      }
+      
+      const { error } = await signIn(data.email, data.password);
+      
+      // تسجيل المحاولة
+      await logLoginAttempt(data.email, !error);
+      
+      setIsLoading(false);
+      
+      if (!error) {
+        navigate('/', { replace: true });
+      }
+    } catch (error) {
+      console.error('Sign in error:', error);
+      setIsLoading(false);
+      toast.error('حدث خطأ غير متوقع');
     }
   };
 
