@@ -220,7 +220,7 @@ export default function NazerKPIs() {
     return (
       <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
         {[...Array(8)].map((_, i) => (
-          <Card key={i} className="animate-pulse">
+          <Card key={`kpi-skeleton-${i}`} className="animate-pulse">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <div className="h-4 bg-muted rounded w-1/2"></div>
               <div className="h-10 w-10 bg-muted rounded-full"></div>
@@ -237,8 +237,8 @@ export default function NazerKPIs() {
 
   return (
     <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
-      {kpis.map((kpi, index) => (
-        <Card key={index} className="hover:shadow-lg transition-shadow">
+      {kpis.map((kpi) => (
+        <Card key={`kpi-${kpi.title}`} className="hover:shadow-lg transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               {kpi.title}

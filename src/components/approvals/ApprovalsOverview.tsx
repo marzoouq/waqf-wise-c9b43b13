@@ -70,8 +70,8 @@ export function ApprovalsOverview() {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      {statCards.map((stat, index) => (
-        <Card key={index} className="shadow-soft">
+      {statCards.map((stat) => (
+        <Card key={`stat-${stat.title}`} className="shadow-soft">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
               <div className={`p-3 rounded-full ${stat.bgColor}`}>

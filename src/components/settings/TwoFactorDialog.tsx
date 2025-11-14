@@ -232,8 +232,8 @@ export const TwoFactorDialog = ({ open, onOpenChange }: TwoFactorDialogProps) =>
                     احفظ هذه الرموز في مكان آمن. يمكنك استخدامها إذا فقدت الوصول لتطبيق المصادقة.
                   </p>
                   <div className="grid grid-cols-2 gap-2">
-                    {backupCodes.map((backupCode, index) => (
-                      <div key={index} className="flex items-center gap-2">
+                    {backupCodes.map((backupCode, codeIndex) => (
+                      <div key={`backup-${backupCode}`} className="flex items-center gap-2">
                         <code className="flex-1 bg-background p-2 rounded border text-xs font-mono">
                           {backupCode}
                         </code>
@@ -241,9 +241,9 @@ export const TwoFactorDialog = ({ open, onOpenChange }: TwoFactorDialogProps) =>
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8"
-                          onClick={() => copyToClipboard(backupCode, `backup-${index}`)}
+                          onClick={() => copyToClipboard(backupCode, `backup-${codeIndex}`)}
                         >
-                          {copiedCode === `backup-${index}` ? (
+                          {copiedCode === `backup-${codeIndex}` ? (
                             <Check className="h-3 w-3 text-green-600" />
                           ) : (
                             <Copy className="h-3 w-3" />

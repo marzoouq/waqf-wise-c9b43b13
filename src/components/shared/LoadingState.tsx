@@ -53,7 +53,7 @@ export function TableLoadingSkeleton({ rows = 5 }: { rows?: number }) {
   return (
     <div className="space-y-3">
       {Array.from({ length: rows }).map((_, i) => (
-        <div key={i} className="h-12 bg-muted animate-pulse rounded" />
+        <div key={`table-row-${i}`} className="h-12 bg-muted animate-pulse rounded" />
       ))}
     </div>
   );
@@ -73,7 +73,7 @@ export function StatsLoadingSkeleton() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
       {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className="p-6 bg-card rounded-lg border space-y-3">
+        <div key={`stats-${i}`} className="p-6 bg-card rounded-lg border space-y-3">
           <div className="h-4 w-1/2 bg-muted animate-pulse rounded" />
           <div className="h-8 w-3/4 bg-muted animate-pulse rounded" />
         </div>
@@ -95,7 +95,7 @@ export function DashboardLoadingSkeleton() {
       {/* Stats Cards Skeleton */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {[1, 2, 3, 4].map((i) => (
-          <Card key={i} className="p-6">
+          <Card key={`dashboard-card-${i}`} className="p-6">
             <div className="flex items-center justify-between mb-4">
               <Skeleton className="h-4 w-24" />
               <Skeleton className="h-10 w-10 rounded-lg" />
@@ -115,11 +115,11 @@ export function DashboardLoadingSkeleton() {
       {/* Three Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {[1, 2, 3].map((i) => (
-          <Card key={i} className="p-6">
+          <Card key={`col-${i}`} className="p-6">
             <Skeleton className="h-6 w-32 mb-4" />
             <div className="space-y-3">
               {[1, 2, 3].map((j) => (
-                <Skeleton key={j} className="h-16 w-full" />
+                <Skeleton key={`col-${i}-${j}`} className="h-16 w-full" />
               ))}
             </div>
           </Card>
@@ -150,7 +150,7 @@ export function BeneficiariesLoadingSkeleton() {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[1, 2, 3, 4].map((i) => (
-          <Card key={i} className="p-4">
+          <Card key={`stats-grid-${i}`} className="p-4">
             <Skeleton className="h-4 w-20 mb-2" />
             <Skeleton className="h-8 w-16 mb-2" />
             <Skeleton className="h-3 w-24" />
@@ -179,7 +179,7 @@ export function AccountingLoadingSkeleton() {
       {/* Tabs */}
       <div className="flex gap-2">
         {[1, 2, 3, 4, 5, 6, 7].map((i) => (
-          <Skeleton key={i} className="h-10 w-24" />
+          <Skeleton key={`tab-${i}`} className="h-10 w-24" />
         ))}
       </div>
 
