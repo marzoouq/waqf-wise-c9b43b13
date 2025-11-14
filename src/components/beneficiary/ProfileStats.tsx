@@ -11,53 +11,53 @@ interface ProfileStatsProps {
 export function ProfileStats({ beneficiaryId }: ProfileStatsProps) {
   const { data: stats, isLoading } = useQuery({
     queryKey: ['beneficiary-stats', beneficiaryId],
-    queryFn: async () => {
-      // Get payments count and total
-      const { data: payments, error: paymentsError } = await supabase
+    queryFn: async (): Promise<any> => {
+      // Fetch payments
+      const paymentsRes: any = await supabase
         .from('payments')
         .select('amount')
         .eq('beneficiary_id', beneficiaryId);
+      
+      if (paymentsRes.error) throw paymentsRes.error;
 
-      if (paymentsError) throw paymentsError;
-
-      // Get requests stats
-      const { data: requests, error: requestsError } = await supabase
+      // Fetch requests
+      const requestsRes: any = await supabase
         .from('beneficiary_requests')
         .select('status')
         .eq('beneficiary_id', beneficiaryId);
+      
+      if (requestsRes.error) throw requestsRes.error;
 
-      if (requestsError) throw requestsError;
-
-      // Get attachments count
-      const { count: attachmentsCount, error: attachmentsError } = await supabase
+      // Fetch attachments count
+      const attachmentsRes: any = await supabase
         .from('beneficiary_attachments')
         .select('*', { count: 'exact', head: true })
         .eq('beneficiary_id', beneficiaryId);
+      
+      if (attachmentsRes.error) throw attachmentsRes.error;
 
-      if (attachmentsError) throw attachmentsError;
-
-      // Get family members count
-      const { count: familyMembersCount, error: familyError } = await supabase
+      // Fetch family members count
+      const familyRes: any = await supabase
         .from('family_members')
         .select('*', { count: 'exact', head: true })
         .eq('beneficiary_id', beneficiaryId);
+      
+      if (familyRes.error) throw familyRes.error;
 
-      if (familyError) throw familyError;
-
-      const totalPayments = payments?.reduce((sum, p) => sum + (Number(p.amount) || 0), 0) || 0;
-      const paymentsCount = payments?.length || 0;
-      const totalRequests = requests?.length || 0;
-      const approvedRequests = requests?.filter(r => r.status === 'معتمد')?.length || 0;
-      const pendingRequests = requests?.filter(r => r.status === 'قيد المراجعة')?.length || 0;
+      const payments = paymentsRes.data || [];
+      const requests = requestsRes.data || [];
+      const totalPayments = payments.reduce((sum: number, p: any) => sum + (Number(p.amount) || 0), 0);
+      const approvedRequests = requests.filter((r: any) => r.status === 'معتمد').length;
+      const pendingRequests = requests.filter((r: any) => r.status === 'قيد المراجعة').length;
 
       return {
         totalPayments,
-        paymentsCount,
-        totalRequests,
+        paymentsCount: payments.length,
+        totalRequests: requests.length,
         approvedRequests,
         pendingRequests,
-        attachmentsCount: attachmentsCount || 0,
-        familyMembersCount: familyMembersCount || 0,
+        attachmentsCount: attachmentsRes.count || 0,
+        familyMembersCount: familyRes.count || 0,
       };
     },
   });
@@ -72,14 +72,14 @@ export function ProfileStats({ beneficiaryId }: ProfileStatsProps) {
       value: `${stats?.totalPayments?.toLocaleString('ar-SA') || 0} ريال`,
       icon: DollarSign,
       color: 'text-green-600 bg-green-100 dark:bg-green-900/30',
-      subtext: `${stats?.paymentsCount} دفعة`,
+      subtext: `${stats?.paymentsCount || 0} دفعة`,
     },
     {
       title: 'الطلبات المعتمدة',
       value: stats?.approvedRequests || 0,
       icon: CheckCircle,
       color: 'text-blue-600 bg-blue-100 dark:bg-blue-900/30',
-      subtext: `من ${stats?.totalRequests} طلب`,
+      subtext: `من ${stats?.totalRequests || 0} طلب`,
     },
     {
       title: 'الطلبات المعلقة',
@@ -109,20 +109,18 @@ export function ProfileStats({ beneficiaryId }: ProfileStatsProps) {
         : '0 ريال',
       icon: TrendingUp,
       color: 'text-orange-600 bg-orange-100 dark:bg-orange-900/30',
-      subtext: 'للدفعة الواحدة',
+      subtext: 'لكل دفعة',
     },
   ];
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {statCards.map((stat, index) => (
-        <Card key={index} className="hover:shadow-md transition-shadow">
+      {statCards.map((stat) => (
+        <Card key={stat.title}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              {stat.title}
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
             <div className={`p-2 rounded-lg ${stat.color}`}>
-              <stat.icon className="h-4 w-4" />
+              <stat.icon className="w-4 h-4" />
             </div>
           </CardHeader>
           <CardContent>
