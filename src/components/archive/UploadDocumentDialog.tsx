@@ -1,14 +1,8 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
+import { DialogFooter } from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -104,14 +98,13 @@ export function UploadDocumentDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>رفع مستند جديد</DialogTitle>
-          <DialogDescription>
-            قم برفع المستند وإدخال البيانات المطلوبة
-          </DialogDescription>
-        </DialogHeader>
+    <ResponsiveDialog 
+      open={open} 
+      onOpenChange={onOpenChange}
+      title="رفع مستند جديد"
+      description="قم بإدخال بيانات المستند واختر الملف"
+      size="md"
+    >
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
@@ -203,7 +196,6 @@ export function UploadDocumentDialog({
             </DialogFooter>
           </form>
         </Form>
-      </DialogContent>
-    </Dialog>
+    </ResponsiveDialog>
   );
 }

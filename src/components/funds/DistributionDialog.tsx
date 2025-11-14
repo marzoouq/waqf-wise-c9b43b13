@@ -2,14 +2,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
+import { DialogFooter } from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -110,16 +104,14 @@ export function DistributionDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>إنشاء توزيع جديد</DialogTitle>
-          <DialogDescription>
-            قم بإدخال بيانات التوزيع الشهري للمستفيدين
-          </DialogDescription>
-        </DialogHeader>
-
-        <Form {...form}>
+    <ResponsiveDialog 
+      open={open} 
+      onOpenChange={onOpenChange}
+      title="إنشاء توزيع جديد"
+      description="قم بإدخال بيانات التوزيع الشهري للمستفيدين"
+      size="md"
+    >
+      <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
             <FormField
               control={form.control}
@@ -264,7 +256,6 @@ export function DistributionDialog({
             </DialogFooter>
           </form>
         </Form>
-      </DialogContent>
-    </Dialog>
+    </ResponsiveDialog>
   );
 }

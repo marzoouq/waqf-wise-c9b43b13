@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -79,13 +79,13 @@ export function LoanDialog({ open, onOpenChange, loan }: LoanDialogProps) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{loan ? "تعديل قرض" : "إضافة قرض جديد"}</DialogTitle>
-        </DialogHeader>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <ResponsiveDialog 
+      open={open} 
+      onOpenChange={onOpenChange}
+      title={loan ? "تعديل قرض" : "إضافة قرض جديد"}
+      size="lg"
+    >
+      <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="beneficiary">المستفيد *</Label>
             <Select
@@ -234,7 +234,6 @@ export function LoanDialog({ open, onOpenChange, loan }: LoanDialogProps) {
             </Button>
           </div>
         </form>
-      </DialogContent>
-    </Dialog>
+    </ResponsiveDialog>
   );
 }

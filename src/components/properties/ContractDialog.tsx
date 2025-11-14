@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -102,16 +102,14 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{contract ? "تعديل عقد" : "إضافة عقد جديد"}</DialogTitle>
-          <DialogDescription>
-            {contract ? "تعديل بيانات العقد" : "أدخل بيانات العقد الجديد"}
-          </DialogDescription>
-        </DialogHeader>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <ResponsiveDialog 
+      open={open} 
+      onOpenChange={onOpenChange}
+      title={contract ? "تعديل عقد" : "إضافة عقد جديد"}
+      description={contract ? "تعديل بيانات العقد" : "أدخل بيانات العقد الجديد"}
+      size="xl"
+    >
+      <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>العقار *</Label>
@@ -309,7 +307,6 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
             </Button>
           </div>
         </form>
-      </DialogContent>
-    </Dialog>
+    </ResponsiveDialog>
   );
 };

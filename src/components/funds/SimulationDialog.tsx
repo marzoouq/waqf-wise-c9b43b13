@@ -2,13 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import {
   Form,
   FormControl,
@@ -76,16 +70,14 @@ export function SimulationDialog({ open, onOpenChange }: SimulationDialogProps) 
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>محاكاة التوزيع</DialogTitle>
-          <DialogDescription>
-            قم بإدخال المعطيات لمحاكاة توزيع الأموال
-          </DialogDescription>
-        </DialogHeader>
-
-        <Form {...form}>
+    <ResponsiveDialog 
+      open={open} 
+      onOpenChange={onOpenChange}
+      title="محاكاة التوزيع"
+      description="قم بإدخال المعطيات لمحاكاة توزيع الأموال"
+      size="lg"
+    >
+      <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSimulate)} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
@@ -220,7 +212,6 @@ export function SimulationDialog({ open, onOpenChange }: SimulationDialogProps) 
             </Card>
           </div>
         )}
-      </DialogContent>
-    </Dialog>
+    </ResponsiveDialog>
   );
 }
