@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import type { Family, FamilyMember } from '@/types';
+import { updateInTable, deleteFromTable } from '@/utils/supabaseHelpers';
 
 // ===========================
 // Families Hook
