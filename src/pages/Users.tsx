@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Search, UserPlus, Shield, Edit, Trash2, CheckCircle, XCircle, Download } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { format } from "date-fns";
@@ -347,49 +347,46 @@ const Users = () => {
         </Card>
 
         {/* Edit Roles Dialog */}
-        <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>تعديل الأدوار</DialogTitle>
-              <DialogDescription>
-                تحديد أدوار المستخدم: {selectedUser?.full_name}
-              </DialogDescription>
-            </DialogHeader>
-
-            <div className="space-y-4">
-              {(Object.keys(roleLabels) as AppRole[]).map((role) => (
-                <div
-                  key={role}
-                  className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent/50 transition-colors cursor-pointer"
-                  onClick={() => toggleRole(role)}
-                >
-                  <div className="flex items-center gap-3">
-                    <Switch
-                      checked={selectedRoles.includes(role)}
-                      onCheckedChange={() => toggleRole(role)}
-                    />
-                    <Label className="cursor-pointer">{roleLabels[role]}</Label>
-                  </div>
-                  <Badge variant="outline" className={roleColors[role]}>
-                    {role}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-
-            <div className="flex gap-2 justify-end mt-4">
-              <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
-                إلغاء
-              </Button>
-              <Button
-                onClick={handleSaveRoles}
-                disabled={selectedRoles.length === 0}
+        <ResponsiveDialog 
+          open={editDialogOpen} 
+          onOpenChange={setEditDialogOpen}
+          title="تعديل الأدوار"
+          description={`تحديد أدوار المستخدم: ${selectedUser?.full_name}`}
+          size="md"
+        >
+          <div className="space-y-4">
+            {(Object.keys(roleLabels) as AppRole[]).map((role) => (
+              <div
+                key={role}
+                className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent/50 transition-colors cursor-pointer"
+                onClick={() => toggleRole(role)}
               >
-                حفظ التغييرات
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+                <div className="flex items-center gap-3">
+                  <Switch
+                    checked={selectedRoles.includes(role)}
+                    onCheckedChange={() => toggleRole(role)}
+                  />
+                  <Label className="cursor-pointer">{roleLabels[role]}</Label>
+                </div>
+                <Badge variant="outline" className={roleColors[role]}>
+                  {role}
+                </Badge>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex gap-2 justify-end mt-4">
+            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
+              إلغاء
+            </Button>
+            <Button
+              onClick={handleSaveRoles}
+              disabled={selectedRoles.length === 0}
+            >
+              حفظ التغييرات
+            </Button>
+          </div>
+        </ResponsiveDialog>
       </div>
     </div>
   );
