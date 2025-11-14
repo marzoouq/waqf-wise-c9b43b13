@@ -1,11 +1,5 @@
 import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent } from "@/components/ui/card";
@@ -51,19 +45,14 @@ export function DatabaseSettingsDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto" aria-describedby="database-description">
-        <DialogHeader>
-          <DialogTitle className="text-xl flex items-center gap-2">
-            <Database className="h-5 w-5" />
-            إعدادات قاعدة البيانات
-          </DialogTitle>
-          <DialogDescription id="database-description">
-            إدارة النسخ الاحتياطي واستعادة البيانات
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="space-y-6">
+    <ResponsiveDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title="إعدادات قاعدة البيانات"
+      description="إدارة النسخ الاحتياطي واستعادة البيانات"
+      size="lg"
+    >
+      <div className="space-y-6">
           <Alert>
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
@@ -155,7 +144,6 @@ export function DatabaseSettingsDialog({
             </CardContent>
           </Card>
         </div>
-      </DialogContent>
-    </Dialog>
+    </ResponsiveDialog>
   );
 }

@@ -1,11 +1,5 @@
 import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
@@ -73,19 +67,14 @@ export function AppearanceSettingsDialog({
   ];
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto" aria-describedby="appearance-description">
-        <DialogHeader>
-          <DialogTitle className="text-xl flex items-center gap-2">
-            <Palette className="h-5 w-5" />
-            المظهر والثيم
-          </DialogTitle>
-          <DialogDescription id="appearance-description">
-            تخصيص ألوان وسمة التطبيق
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="space-y-6">
+    <ResponsiveDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title="المظهر والثيم"
+      description="تخصيص ألوان وسمة التطبيق"
+      size="lg"
+    >
+      <div className="space-y-6">
           {/* اختيار الثيم */}
           <Card>
             <CardContent className="pt-6">
@@ -170,7 +159,6 @@ export function AppearanceSettingsDialog({
             </CardContent>
           </Card>
         </div>
-      </DialogContent>
-    </Dialog>
+    </ResponsiveDialog>
   );
 }

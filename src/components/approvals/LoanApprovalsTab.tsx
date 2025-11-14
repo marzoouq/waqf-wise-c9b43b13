@@ -9,14 +9,7 @@ import { ar } from "date-fns/locale";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 
@@ -293,20 +286,15 @@ export function LoanApprovalsTab() {
       </div>
 
       {/* Dialog للموافقة/الرفض */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {approvalAction === "approve" ? "تأكيد الموافقة" : "تأكيد الرفض"}
-            </DialogTitle>
-            <DialogDescription>
-              {approvalAction === "approve"
-                ? "هل أنت متأكد من الموافقة على هذا القرض؟"
-                : "هل أنت متأكد من رفض هذا القرض؟"}
-            </DialogDescription>
-          </DialogHeader>
-
-          {selectedLoan && (
+      <ResponsiveDialog 
+        open={isDialogOpen} 
+        onOpenChange={setIsDialogOpen}
+        title={approvalAction === "approve" ? "تأكيد الموافقة" : "تأكيد الرفض"}
+        description={approvalAction === "approve"
+          ? "هل أنت متأكد من الموافقة على هذا القرض؟"
+          : "هل أنت متأكد من رفض هذا القرض؟"}
+      >
+        {selectedLoan && (
             <div className="space-y-4">
               <div className="bg-muted p-3 rounded-md">
                 <p className="text-sm">
@@ -334,7 +322,7 @@ export function LoanApprovalsTab() {
             </div>
           )}
 
-          <DialogFooter>
+          <div className="flex justify-end gap-2 pt-4">
             <Button
               variant="outline"
               onClick={() => {
@@ -352,9 +340,8 @@ export function LoanApprovalsTab() {
             >
               {approveMutation.isPending ? "جاري المعالجة..." : "تأكيد"}
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </div>
+      </ResponsiveDialog>
     </>
   );
 }
