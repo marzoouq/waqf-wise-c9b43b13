@@ -89,9 +89,9 @@ export default function QuickActionsGrid() {
       </CardHeader>
       <CardContent>
         <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
-          {actions.map((action, index) => (
+          {actions.map((action) => (
             <Button
-              key={index}
+              key={`action-${action.label}`}
               variant="outline"
               className="h-auto flex flex-col items-center gap-3 p-6 hover:shadow-md transition-all"
               onClick={() => navigate(action.path)}

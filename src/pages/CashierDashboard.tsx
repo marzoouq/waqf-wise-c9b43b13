@@ -2,9 +2,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Wallet, TrendingUp, TrendingDown, DollarSign, Receipt } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useCashierStats } from "@/hooks/useCashierStats";
+import { LoadingState } from "@/components/shared/LoadingState";
 
 export default function CashierDashboard() {
   const navigate = useNavigate();
+  const { data: stats, isLoading } = useCashierStats();
+
+  if (isLoading) {
+    return <LoadingState message="جاري تحميل بيانات أمين الصندوق..." />;
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -30,7 +37,9 @@ export default function CashierDashboard() {
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">250,000 ريال</div>
+              <div className="text-2xl font-bold">
+                {stats?.cashBalance.toLocaleString('ar-SA')} ريال
+              </div>
               <p className="text-xs text-muted-foreground mt-1">الرصيد الحالي</p>
             </CardContent>
           </Card>
@@ -41,7 +50,9 @@ export default function CashierDashboard() {
               <TrendingUp className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">15,000 ريال</div>
+              <div className="text-2xl font-bold text-green-600">
+                {stats?.todayReceipts.toLocaleString('ar-SA')} ريال
+              </div>
               <p className="text-xs text-muted-foreground mt-1">إجمالي المقبوضات</p>
             </CardContent>
           </Card>
@@ -52,7 +63,9 @@ export default function CashierDashboard() {
               <TrendingDown className="h-4 w-4 text-red-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-red-600">8,500 ريال</div>
+              <div className="text-2xl font-bold text-red-600">
+                {stats?.todayPayments.toLocaleString('ar-SA')} ريال
+              </div>
               <p className="text-xs text-muted-foreground mt-1">إجمالي المدفوعات</p>
             </CardContent>
           </Card>
@@ -63,7 +76,9 @@ export default function CashierDashboard() {
               <Receipt className="h-4 w-4 text-warning" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">5</div>
+              <div className="text-2xl font-bold">
+                {stats?.pendingTransactions || 0}
+              </div>
               <p className="text-xs text-muted-foreground mt-1">تحتاج للمعالجة</p>
             </CardContent>
           </Card>

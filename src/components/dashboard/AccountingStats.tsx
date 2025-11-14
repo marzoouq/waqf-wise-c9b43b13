@@ -63,8 +63,8 @@ const AccountingStats = memo(() => {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      {statCards.map((stat, index) => (
-        <Card key={index} className="shadow-soft">
+      {statCards.map((stat) => (
+        <Card key={`accounting-${stat.title}`} className="shadow-soft">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
             <div className={`p-2 rounded-lg ${stat.bgColor}`}>

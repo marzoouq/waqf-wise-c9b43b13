@@ -60,8 +60,8 @@ export function EnhancedEmptyState({
               💡 نصائح مفيدة:
             </h4>
             <ul className="space-y-2 text-sm text-muted-foreground text-right">
-              {tips.map((tip, index) => (
-                <li key={index} className="flex items-start gap-2">
+              {tips.map((tip) => (
+                <li key={`tip-${tip.substring(0, 20)}`} className="flex items-start gap-2">
                   <span className="text-primary mt-0.5">•</span>
                   <span>{tip}</span>
                 </li>

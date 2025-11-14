@@ -54,35 +54,38 @@ export function ResponsiveTable({
   if (isMobile && mobileCardView) {
     return (
       <div className="space-y-3">
-        {data.map((row, index) => (
-          <Card
-            key={index}
-            className={cn(
-              'p-4 space-y-2',
-              onRowClick && 'cursor-pointer hover:bg-muted/50 transition-colors'
-            )}
-            onClick={() => onRowClick?.(row)}
-          >
-            {mobileCardRender ? (
-              mobileCardRender(row)
-            ) : (
-              <div className="space-y-2">
-                {columns
-                  .filter(col => !col.mobileHidden)
-                  .map((col) => (
-                    <div key={col.key} className="flex justify-between items-start gap-2">
-                      <span className="text-sm text-muted-foreground font-medium min-w-[100px]">
-                        {col.label}:
-                      </span>
-                      <span className="text-sm flex-1 text-left">
-                        {col.render ? col.render(row[col.key], row) : row[col.key]}
-                      </span>
-                    </div>
-                  ))}
-              </div>
-            )}
-          </Card>
-        ))}
+        {data.map((row, index) => {
+          const rowId = (row as any).id || `row-${index}`;
+          return (
+            <Card
+              key={rowId}
+              className={cn(
+                'p-4 space-y-2',
+                onRowClick && 'cursor-pointer hover:bg-muted/50 transition-colors'
+              )}
+              onClick={() => onRowClick?.(row)}
+            >
+              {mobileCardRender ? (
+                mobileCardRender(row)
+              ) : (
+                <div className="space-y-2">
+                  {columns
+                    .filter(col => !col.mobileHidden)
+                    .map((col) => (
+                      <div key={col.key} className="flex justify-between items-start gap-2">
+                        <span className="text-sm text-muted-foreground font-medium min-w-[100px]">
+                          {col.label}:
+                        </span>
+                        <span className="text-sm flex-1 text-left">
+                          {col.render ? col.render(row[col.key], row) : row[col.key]}
+                        </span>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </Card>
+          );
+        })}
       </div>
     );
   }
@@ -103,21 +106,24 @@ export function ResponsiveTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.map((row, index) => (
-            <TableRow
-              key={index}
-              className={cn(onRowClick && 'cursor-pointer')}
-              onClick={() => onRowClick?.(row)}
-            >
-              {columns
-                .filter(col => !col.mobileHidden || !isMobile)
-                .map((col) => (
-                  <TableCell key={col.key} className={col.className}>
-                    {col.render ? col.render(row[col.key], row) : row[col.key]}
-                  </TableCell>
-                ))}
-            </TableRow>
-          ))}
+          {data.map((row, index) => {
+            const rowId = (row as any).id || `row-${index}`;
+            return (
+              <TableRow
+                key={rowId}
+                className={cn(onRowClick && 'cursor-pointer')}
+                onClick={() => onRowClick?.(row)}
+              >
+                {columns
+                  .filter(col => !col.mobileHidden || !isMobile)
+                  .map((col) => (
+                    <TableCell key={col.key} className={col.className}>
+                      {col.render ? col.render(row[col.key], row) : row[col.key]}
+                    </TableCell>
+                  ))}
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </div>

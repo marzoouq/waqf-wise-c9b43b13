@@ -220,12 +220,12 @@ const AppSidebar = () => {
                       </CollapsibleTrigger>
                       <CollapsibleContent>
                         <SidebarMenuSub>
-                          {filteredSubItems.map((subItem, index) => {
+                          {filteredSubItems.map((subItem) => {
                             const SubIcon = subItem.icon;
                             const isSubActive = location.pathname === subItem.path;
                             
                             return (
-                              <SidebarMenuSubItem key={index}>
+                              <SidebarMenuSubItem key={`sub-${subItem.path}`}>
                                 <SidebarMenuSubButton
                                   asChild
                                   isActive={isSubActive}

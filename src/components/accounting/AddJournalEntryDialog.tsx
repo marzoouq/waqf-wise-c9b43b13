@@ -358,7 +358,7 @@ const AddJournalEntryDialog = ({ open, onOpenChange }: Props) => {
 
               <div className="border rounded-lg p-4 space-y-3">
                 {lines.map((line, index) => (
-                  <div key={index} className="grid grid-cols-12 gap-2 items-end">
+                  <div key={`line-${index}-${line.account_id || ''}`} className="grid grid-cols-12 gap-2 items-end">
                     <div className="col-span-4">
                       <FormLabel className="text-xs">
                         الحساب <span className="text-destructive">*</span>

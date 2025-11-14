@@ -1,8 +1,9 @@
 import { useState, useMemo } from "react";
-import { Plus, Search, FolderOpen, FileText, Download, Upload } from "lucide-react";
+import { Plus, Search, FolderOpen, FileText, Download, Upload, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { UploadDocumentDialog } from "@/components/archive/UploadDocumentDialog";
 import { CreateFolderDialog } from "@/components/archive/CreateFolderDialog";
+import { DocumentPreviewDialog } from "@/components/archive/DocumentPreviewDialog";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +19,8 @@ const Archive = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [folderDialogOpen, setFolderDialogOpen] = useState(false);
+  const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
+  const [selectedDocument, setSelectedDocument] = useState<any>(null);
 
   const { documents, isLoading: documentsLoading, addDocument } = useDocuments();
   const { folders, isLoading: foldersLoading, addFolder } = useFolders();
@@ -46,6 +49,11 @@ const Archive = () => {
   const handleCreateFolder = async (data: any) => {
     await addFolder(data);
     setFolderDialogOpen(false);
+  };
+
+  const handlePreviewDocument = (document: any) => {
+    setSelectedDocument(document);
+    setPreviewDialogOpen(true);
   };
 
   if (isLoading) {
@@ -239,11 +247,19 @@ const Archive = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <div className="text-left">
+                    <div className="flex items-center gap-2">
+                      <div className="text-left ml-4">
                         <div className="text-sm font-medium">{file.file_type}</div>
                         <div className="text-xs text-muted-foreground">{file.file_size}</div>
                       </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handlePreviewDocument(file)}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
                       <Button
                         variant="ghost"
                         size="sm"
@@ -269,6 +285,12 @@ const Archive = () => {
           open={folderDialogOpen}
           onOpenChange={setFolderDialogOpen}
           onCreate={handleCreateFolder}
+        />
+
+        <DocumentPreviewDialog
+          open={previewDialogOpen}
+          onOpenChange={setPreviewDialogOpen}
+          document={selectedDocument}
         />
       </div>
     </div>
