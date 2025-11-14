@@ -1,13 +1,8 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
+import { DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Printer, CheckCircle, UserCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -111,12 +106,13 @@ const ViewJournalEntryDialog = ({ open, onOpenChange, entry }: Props) => {
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl">
-        <DialogHeader>
-          <DialogTitle>تفاصيل القيد المحاسبي</DialogTitle>
-        </DialogHeader>
-
+    <>
+      <ResponsiveDialog 
+        open={open} 
+        onOpenChange={onOpenChange}
+        title="تفاصيل القيد المحاسبي"
+        size="xl"
+      >
         <div className="space-y-4" id="print-content">
           <div className="grid grid-cols-2 gap-4 p-4 bg-accent/20 rounded-lg print:bg-white print:border print:border-gray-300">
             <div>
@@ -203,11 +199,11 @@ const ViewJournalEntryDialog = ({ open, onOpenChange, entry }: Props) => {
           {entry.status === "draft" && (
             <Button onClick={handlePost} disabled={postEntryMutation.isPending}>
               <CheckCircle className="h-4 w-4 ml-2" />
-              {postEntryMutation.isPending ? "جاري الترحيل..." : "ترحيل القيد"}
+              ترحيل القيد
             </Button>
           )}
         </DialogFooter>
-      </DialogContent>
+      </ResponsiveDialog>
 
       <ApprovalDialog
         open={isApprovalDialogOpen}
@@ -215,7 +211,7 @@ const ViewJournalEntryDialog = ({ open, onOpenChange, entry }: Props) => {
         journalEntryId={entry.id}
         entryNumber={entry.entry_number}
       />
-    </Dialog>
+    </>
   );
 };
 

@@ -1,13 +1,8 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
+import { DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -62,11 +57,12 @@ const ApprovalDialog = ({ open, onOpenChange, journalEntryId, entryNumber }: Pro
   });
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>الموافقة على القيد المحاسبي</DialogTitle>
-        </DialogHeader>
+    <ResponsiveDialog 
+      open={open} 
+      onOpenChange={onOpenChange}
+      title="الموافقة على القيد المحاسبي"
+      size="md"
+    >
 
         <div className="space-y-4">
           <div className="p-4 bg-accent/20 rounded-lg">
@@ -120,8 +116,7 @@ const ApprovalDialog = ({ open, onOpenChange, journalEntryId, entryNumber }: Pro
             موافقة
           </Button>
         </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    </ResponsiveDialog>
   );
 };
 

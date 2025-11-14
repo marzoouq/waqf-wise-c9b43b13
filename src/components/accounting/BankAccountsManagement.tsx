@@ -5,13 +5,8 @@ import { Plus, Pencil, Trash2, Building2 } from "lucide-react";
 import { useBankAccounts } from "@/hooks/useBankAccounts";
 import { useAccounts } from "@/hooks/useAccounts";
 import { LoadingState } from "@/components/shared/LoadingState";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
+import { DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -173,13 +168,12 @@ export function BankAccountsManagement() {
         </CardContent>
       </Card>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>
-              {editingAccount ? "تعديل حساب بنكي" : "إضافة حساب بنكي جديد"}
-            </DialogTitle>
-          </DialogHeader>
+      <ResponsiveDialog 
+        open={dialogOpen} 
+        onOpenChange={setDialogOpen}
+        title={editingAccount ? "تعديل حساب بنكي" : "إضافة حساب بنكي جديد"}
+        size="lg"
+      >
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -278,8 +272,7 @@ export function BankAccountsManagement() {
               {editingAccount ? "تحديث" : "إضافة"}
             </Button>
           </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      </ResponsiveDialog>
     </>
   );
 }
