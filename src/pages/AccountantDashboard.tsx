@@ -73,30 +73,30 @@ const AccountantDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-6 md:p-8 lg:p-10 space-y-8">
+      <div className="container mx-auto p-3 sm:p-4 md:p-6 lg:p-8 space-y-4 sm:space-y-6 md:space-y-8">
         {/* Header */}
-        <header className="space-y-2">
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gradient-primary">
+        <header className="space-y-1 sm:space-y-2">
+          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gradient-primary break-words">
             لوحة المحاسب
           </h1>
-          <p className="text-muted-foreground text-sm md:text-base">
+          <p className="text-xs sm:text-sm md:text-base text-muted-foreground">
             إدارة القيود المحاسبية والموافقات
           </p>
         </header>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <Card className="shadow-soft border-warning/30">
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
+                <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
                   موافقات معلقة
                 </CardTitle>
-                <AlertCircle className="h-5 w-5 text-warning" />
+                <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-warning" />
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-warning">
+            <CardContent className="p-3 sm:p-6">
+              <div className="text-2xl sm:text-3xl font-bold text-warning">
                 {stats.pendingApprovals}
               </div>
             </CardContent>

@@ -104,13 +104,13 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-6 md:p-8 lg:p-10 space-y-8 md:space-y-10">
+      <div className="container mx-auto p-3 sm:p-4 md:p-6 lg:p-8 space-y-4 sm:space-y-6 md:space-y-8">
         {/* Header */}
-        <header className="space-y-2">
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gradient-primary">
+        <header className="space-y-1 sm:space-y-2">
+          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gradient-primary break-words">
             لوحة التحكم الرئيسية
           </h1>
-          <p className="text-muted-foreground text-sm md:text-base lg:text-lg">
+          <p className="text-xs sm:text-sm md:text-base text-muted-foreground">
             مرحباً بك في منصة إدارة الوقف الإلكترونية
           </p>
         </header>
@@ -131,13 +131,13 @@ const Dashboard = () => {
         <RevenueExpenseChart />
 
         {/* Charts Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
           <AccountDistributionChart />
           <BudgetComparisonChart />
         </div>
 
         {/* Three Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
           {/* Recent Journal Entries */}
           <RecentJournalEntries />
 

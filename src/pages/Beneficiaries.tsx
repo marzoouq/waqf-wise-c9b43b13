@@ -201,54 +201,57 @@ const Beneficiaries = () => {
 
         {/* Filters and Search */}
         <Card className="shadow-soft">
-          <CardContent className="pt-6">
-            <div className="flex flex-col md:flex-row gap-4">
+          <CardContent className="pt-3 sm:pt-6 p-3 sm:p-6">
+            <div className="flex flex-col gap-3 sm:gap-4">
               <div className="relative flex-1">
-                <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
                 <Input
-                  placeholder="البحث عن مستفيد (الاسم، رقم الهوية، العائلة...)"
+                  placeholder="البحث (الاسم، رقم الهوية، العائلة...)"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pr-10"
+                  className="pr-9 sm:pr-10 text-sm sm:text-base"
                 />
               </div>
-              <Button variant="outline" onClick={() => setAdvancedSearchOpen(true)} className="shadow-soft hover:shadow-medium transition-all duration-300 hover:bg-primary hover:text-primary-foreground border-primary/20">
-                <Filter className="ml-2 h-4 w-4 md:h-5 md:w-5" />
-                <span className="hidden md:inline">بحث متقدم</span>
-                <span className="md:hidden">بحث</span>
-              </Button>
-              {searches.length > 0 && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline">
-                      <Save className="ml-2 h-4 w-4" />
-                      عمليات بحث محفوظة
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    {searches.map((search) => (
-                      <DropdownMenuItem key={search.id} onClick={() => handleLoadSavedSearch(search)}>
-                        {search.is_favorite && <Star className="ml-2 h-3 w-3 fill-current" />}
-                        {search.name}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
-              <Button variant="outline" className="shadow-soft hover:shadow-medium transition-all duration-300 hover:bg-accent hover:text-accent-foreground border-accent/20">
-                <Download className="ml-2 h-4 w-4 md:h-5 md:w-5" />
-                <span className="hidden md:inline">تصدير البيانات</span>
-                <span className="md:hidden">تصدير</span>
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={() => setTribeManagementDialogOpen(true)}
-                className="shadow-soft hover:shadow-medium transition-all duration-300 hover:bg-primary hover:text-primary-foreground border-primary/20"
-              >
-                <Shield className="ml-2 h-4 w-4 md:h-5 md:w-5" />
-                <span className="hidden md:inline">إدارة القبائل</span>
-                <span className="md:hidden">القبائل</span>
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setAdvancedSearchOpen(true)} 
+                  className="flex-1 sm:flex-none gap-2 text-xs sm:text-sm" 
+                  size="sm"
+                >
+                  <Filter className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">بحث متقدم</span>
+                  <span className="sm:hidden">بحث</span>
+                </Button>
+                {searches.length > 0 && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+                        <Save className="h-3 w-3 sm:h-4 sm:w-4 ml-2" />
+                        عمليات بحث
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      {searches.map((search) => (
+                        <DropdownMenuItem key={search.id} onClick={() => handleLoadSavedSearch(search)}>
+                          {search.is_favorite && <Star className="ml-2 h-3 w-3 fill-current" />}
+                          {search.name}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+                <Button 
+                  variant="outline" 
+                  onClick={() => setTribeManagementDialogOpen(true)}
+                  className="flex-1 sm:flex-none gap-2 text-xs sm:text-sm"
+                  size="sm"
+                >
+                  <Shield className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">القبائل</span>
+                  <span className="sm:hidden">قبائل</span>
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
