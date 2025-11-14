@@ -8,25 +8,16 @@ import PropertiesPerformanceChart from "@/components/dashboard/nazer/PropertiesP
 import RevenueExpenseChart from "@/components/dashboard/RevenueExpenseChart";
 import BudgetComparisonChart from "@/components/dashboard/BudgetComparisonChart";
 
-export default function NazerDashboard() {
+import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
 
+export default function NazerDashboard() {
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-6 md:p-8 lg:p-10 space-y-8">
-        {/* Header */}
-        <header className="space-y-2">
-          <div className="flex items-center gap-3">
-            <Shield className="h-10 w-10 text-primary" />
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">
-                لوحة تحكم الناظر
-              </h1>
-              <p className="text-muted-foreground">
-                نظرة شاملة وتحكم كامل في جميع عمليات الوقف
-              </p>
-            </div>
-          </div>
-        </header>
+    <MobileOptimizedLayout>
+      <MobileOptimizedHeader
+        title="لوحة تحكم الناظر"
+        description="نظرة شاملة وتحكم كامل في جميع عمليات الوقف"
+        icon={<Shield className="h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 text-primary" />}
+      />
 
         {/* Pending Approvals Section */}
         <PendingApprovalsSection />
@@ -37,20 +28,19 @@ export default function NazerDashboard() {
         {/* Smart Alerts */}
         <SmartAlertsSection />
 
-        {/* Charts Grid */}
-        <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
-          <RevenueDistributionChart />
-          <PropertiesPerformanceChart />
-        </div>
-
-        <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
-          <RevenueExpenseChart />
-          <BudgetComparisonChart />
-        </div>
-
-        {/* Quick Actions */}
-        <QuickActionsGrid />
+      {/* Charts Grid */}
+      <div className="grid gap-3 sm:gap-4 md:gap-5 lg:gap-6 grid-cols-1 lg:grid-cols-2">
+        <RevenueDistributionChart />
+        <PropertiesPerformanceChart />
       </div>
-    </div>
+
+      <div className="grid gap-3 sm:gap-4 md:gap-5 lg:gap-6 grid-cols-1 lg:grid-cols-2">
+        <RevenueExpenseChart />
+        <BudgetComparisonChart />
+      </div>
+
+      {/* Quick Actions */}
+      <QuickActionsGrid />
+    </MobileOptimizedLayout>
   );
 }
