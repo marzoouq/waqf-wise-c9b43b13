@@ -65,7 +65,6 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
     setLoading(true);
 
     try {
-      // 1. إنشاء حساب في Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -91,7 +90,6 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
         return;
       }
 
-      // 2. تحديث بيانات المستفيد مباشرة
       const { error: updateError } = await supabase
         .from("beneficiaries")
         .update({
@@ -105,10 +103,8 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
 
       if (updateError) throw updateError;
 
-      // 3. إنشاء Profile و دور beneficiary
       if (authData.user) {
         try {
-          // إنشاء Profile
           await supabase.rpc('create_user_profile_and_role', {
             p_user_id: authData.user.id,
             p_full_name: beneficiary.full_name,
@@ -171,112 +167,116 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>
-            {beneficiary.can_login ? "تعطيل" : "تفعيل"} حساب المستفيد
-          </DialogTitle>
-        </DialogHeader>
-
-        {beneficiary.can_login ? (
-          <div className="space-y-4">
-            <Alert>
-              <AlertDescription>
-                هذا المستفيد لديه حساب نشط. يمكنك تعطيل الحساب لمنع الدخول.
-              </AlertDescription>
-            </Alert>
-            <div className="space-y-2">
-              <p className="text-sm"><strong>اسم المستخدم:</strong> {beneficiary.username}</p>
-              <p className="text-sm"><strong>البريد الإلكتروني:</strong> {beneficiary.email}</p>
-            </div>
+    <ResponsiveDialog 
+      open={open} 
+      onOpenChange={onOpenChange}
+      title={beneficiary.can_login ? "تعطيل تسجيل الدخول" : "تفعيل تسجيل الدخول"}
+      size="md"
+    >
+      {beneficiary.can_login ? (
+        <div className="space-y-4">
+          <Alert>
+            <AlertDescription>
+              هذا المستفيد لديه حساب نشط. يمكنك تعطيل الحساب لمنع الدخول.
+            </AlertDescription>
+          </Alert>
+          <div className="space-y-2">
+            <p className="text-sm"><strong>اسم المستخدم:</strong> {beneficiary.username}</p>
+            <p className="text-sm"><strong>البريد الإلكتروني:</strong> {beneficiary.email}</p>
           </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Alert>
-              <AlertDescription>
-                سيتم إنشاء حساب للمستفيد للدخول إلى لوحة التحكم الخاصة به
-              </AlertDescription>
-            </Alert>
-
-            <div className="space-y-2">
-              <Label htmlFor="username">
-                <User className="inline h-4 w-4 ml-1" />
-                اسم المستخدم *
-              </Label>
-              <Input
-                id="username"
-                value={formData.username}
-                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                placeholder="أدخل اسم المستخدم"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="email">
-                <Mail className="inline h-4 w-4 ml-1" />
-                البريد الإلكتروني *
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder="أدخل البريد الإلكتروني"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="password">
-                <Key className="inline h-4 w-4 ml-1" />
-                كلمة المرور *
-              </Label>
-              <Input
-                id="password"
-                type="password"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                placeholder="أدخل كلمة المرور (6 أحرف على الأقل)"
-                required
-                minLength={6}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">
-                <Key className="inline h-4 w-4 ml-1" />
-                تأكيد كلمة المرور *
-              </Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                value={formData.confirmPassword}
-                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                placeholder="أعد إدخال كلمة المرور"
-                required
-                minLength={6}
-              />
-            </div>
-          </form>
-        )}
-
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
-            إلغاء
-          </Button>
-          {beneficiary.can_login ? (
-            <Button variant="destructive" onClick={handleDisable} disabled={loading}>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              إلغاء
+            </Button>
+            <Button 
+              type="button"
+              variant="destructive" 
+              onClick={handleDisable} 
+              disabled={loading}
+            >
               {loading ? "جاري التعطيل..." : "تعطيل الحساب"}
             </Button>
-          ) : (
-            <Button onClick={handleSubmit} disabled={loading}>
+          </DialogFooter>
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <Alert>
+            <AlertDescription>
+              سيتم إنشاء حساب للمستفيد للدخول إلى لوحة التحكم الخاصة به
+            </AlertDescription>
+          </Alert>
+
+          <div className="space-y-2">
+            <Label htmlFor="username">
+              <User className="inline h-4 w-4 ml-1" />
+              اسم المستخدم *
+            </Label>
+            <Input
+              id="username"
+              value={formData.username}
+              onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+              placeholder="أدخل اسم المستخدم"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="email">
+              <Mail className="inline h-4 w-4 ml-1" />
+              البريد الإلكتروني *
+            </Label>
+            <Input
+              id="email"
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              placeholder="أدخل البريد الإلكتروني"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="password">
+              <Key className="inline h-4 w-4 ml-1" />
+              كلمة المرور *
+            </Label>
+            <Input
+              id="password"
+              type="password"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              placeholder="أدخل كلمة المرور (6 أحرف على الأقل)"
+              required
+              minLength={6}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="confirmPassword">
+              <Key className="inline h-4 w-4 ml-1" />
+              تأكيد كلمة المرور *
+            </Label>
+            <Input
+              id="confirmPassword"
+              type="password"
+              value={formData.confirmPassword}
+              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+              placeholder="أعد إدخال كلمة المرور"
+              required
+              minLength={6}
+            />
+          </div>
+
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              إلغاء
+            </Button>
+            <Button type="submit" disabled={loading}>
               {loading ? "جاري التفعيل..." : "تفعيل الحساب"}
             </Button>
-          )}
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          </DialogFooter>
+        </form>
+      )}
+    </ResponsiveDialog>
   );
 }
