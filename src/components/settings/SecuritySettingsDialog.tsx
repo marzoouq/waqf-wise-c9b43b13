@@ -2,13 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -101,19 +95,14 @@ export function SecuritySettingsDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto" aria-describedby="security-description">
-        <DialogHeader>
-          <DialogTitle className="text-xl flex items-center gap-2">
-            <Shield className="h-5 w-5" />
-            الأمان والخصوصية
-          </DialogTitle>
-          <DialogDescription id="security-description">
-            إدارة كلمة المرور وإعدادات الأمان
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="space-y-6">
+    <ResponsiveDialog 
+      open={open} 
+      onOpenChange={onOpenChange}
+      title="الأمان والخصوصية"
+      description="إدارة كلمة المرور وإعدادات الأمان"
+      size="lg"
+    >
+      <div className="space-y-6">
           {/* تغيير كلمة المرور */}
           <Card>
             <CardContent className="pt-6">
@@ -215,12 +204,10 @@ export function SecuritySettingsDialog({
             </CardContent>
           </Card>
         </div>
-        
         <TwoFactorDialog 
           open={twoFactorDialogOpen}
           onOpenChange={setTwoFactorDialogOpen}
         />
-      </DialogContent>
-    </Dialog>
+    </ResponsiveDialog>
   );
 }

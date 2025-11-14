@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -83,13 +83,13 @@ export function LoanPaymentDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-xl">
-        <DialogHeader>
-          <DialogTitle>تسجيل دفعة للقرض {loanNumber}</DialogTitle>
-        </DialogHeader>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <ResponsiveDialog 
+      open={open} 
+      onOpenChange={onOpenChange}
+      title={`تسجيل دفعة للقرض ${loanNumber}`}
+      size="lg"
+    >
+      <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="installment">القسط (اختياري)</Label>
             <Select
@@ -221,11 +221,10 @@ export function LoanPaymentDialog({
               إلغاء
             </Button>
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? "جاري الحفظ..." : "تسجيل الدفعة"}
+            {isLoading ? "جاري الحفظ..." : "تسجيل الدفعة"}
             </Button>
           </div>
         </form>
-      </DialogContent>
-    </Dialog>
+    </ResponsiveDialog>
   );
 }

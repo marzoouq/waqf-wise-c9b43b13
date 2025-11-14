@@ -1,14 +1,8 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
+import { DialogFooter } from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -87,20 +81,14 @@ export function PropertyDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>
-            {property ? "تعديل بيانات العقار" : "إضافة عقار جديد"}
-          </DialogTitle>
-          <DialogDescription>
-            {property
-              ? "قم بتعديل بيانات العقار في النموذج أدناه"
-              : "قم بإدخال بيانات العقار في النموذج أدناه"}
-          </DialogDescription>
-        </DialogHeader>
-
-        <Form {...form}>
+    <ResponsiveDialog 
+      open={open} 
+      onOpenChange={onOpenChange}
+      title={property ? "تعديل بيانات العقار" : "إضافة عقار جديد"}
+      description={property ? "قم بتعديل بيانات العقار في النموذج أدناه" : "قم بإدخال بيانات العقار في النموذج أدناه"}
+      size="lg"
+    >
+      <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
             <FormField
               control={form.control}
@@ -256,7 +244,6 @@ export function PropertyDialog({
             </DialogFooter>
           </form>
         </Form>
-      </DialogContent>
-    </Dialog>
+    </ResponsiveDialog>
   );
 }

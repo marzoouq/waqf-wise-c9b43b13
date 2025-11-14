@@ -5,12 +5,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { z } from "zod";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import {
   Form,
   FormControl,
@@ -176,11 +171,12 @@ const AddAccountDialog = ({ open, onOpenChange, account, accounts }: Props) => {
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{account ? "تعديل حساب" : "إضافة حساب جديد"}</DialogTitle>
-        </DialogHeader>
+    <ResponsiveDialog 
+      open={open} 
+      onOpenChange={onOpenChange}
+      title={account ? "تعديل حساب" : "إضافة حساب جديد"}
+      size="lg"
+    >
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -364,13 +360,12 @@ const AddAccountDialog = ({ open, onOpenChange, account, accounts }: Props) => {
                 إلغاء
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "جاري الحفظ..." : account ? "حفظ التعديلات" : "إضافة"}
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+              {isSubmitting ? "جاري الحفظ..." : account ? "حفظ التعديلات" : "إضافة"}
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </ResponsiveDialog>
   );
 };
 

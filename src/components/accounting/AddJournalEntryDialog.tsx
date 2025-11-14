@@ -4,12 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import {
   Form,
   FormControl,
@@ -236,11 +231,12 @@ const AddJournalEntryDialog = ({ open, onOpenChange }: Props) => {
   const isBalanced = totalDebit === totalCredit && totalDebit > 0;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>إضافة قيد محاسبي جديد</DialogTitle>
-        </DialogHeader>
+    <ResponsiveDialog 
+      open={open} 
+      onOpenChange={onOpenChange}
+      title="إضافة قيد محاسبي جديد"
+      size="xl"
+    >
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -489,13 +485,12 @@ const AddJournalEntryDialog = ({ open, onOpenChange }: Props) => {
                 إلغاء
               </Button>
               <Button type="submit" disabled={mutation.isPending || !isBalanced}>
-                {mutation.isPending ? "جاري الحفظ..." : "حفظ القيد"}
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+              {mutation.isPending ? "جاري الحفظ..." : "حفظ القيد"}
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </ResponsiveDialog>
   );
 };
 

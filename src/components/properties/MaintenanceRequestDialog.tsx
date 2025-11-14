@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -97,16 +97,14 @@ export const MaintenanceRequestDialog = ({ open, onOpenChange, request }: Props)
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{request ? "تعديل طلب صيانة" : "إضافة طلب صيانة"}</DialogTitle>
-          <DialogDescription>
-            {request ? "تعديل بيانات طلب الصيانة" : "أدخل بيانات طلب الصيانة"}
-          </DialogDescription>
-        </DialogHeader>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <ResponsiveDialog 
+      open={open} 
+      onOpenChange={onOpenChange}
+      title={request ? "تعديل طلب صيانة" : "إضافة طلب صيانة"}
+      description={request ? "تعديل بيانات طلب الصيانة" : "أدخل بيانات طلب الصيانة"}
+      size="lg"
+    >
+      <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>العقار *</Label>
@@ -305,7 +303,6 @@ export const MaintenanceRequestDialog = ({ open, onOpenChange, request }: Props)
             </Button>
           </div>
         </form>
-      </DialogContent>
-    </Dialog>
+    </ResponsiveDialog>
   );
 };

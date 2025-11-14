@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { useLoanInstallments } from "@/hooks/useLoanInstallments";
@@ -46,18 +46,15 @@ export function InstallmentScheduleDialog({
   const totalRemaining = installments.reduce((sum, inst) => sum + inst.remaining_amount, 0);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
-            جدول أقساط القرض {loanNumber}
-          </DialogTitle>
-        </DialogHeader>
-
-        {isLoading ? (
-          <LoadingState />
-        ) : (
+    <ResponsiveDialog 
+      open={open} 
+      onOpenChange={onOpenChange}
+      title={`جدول أقساط القرض ${loanNumber}`}
+      size="xl"
+    >
+      {isLoading ? (
+        <LoadingState />
+      ) : (
           <div className="space-y-4">
             {/* Summary cards */}
             <div className="grid grid-cols-3 gap-4">
@@ -120,11 +117,10 @@ export function InstallmentScheduleDialog({
                     </TableRow>
                   ))}
                 </TableBody>
-              </Table>
-            </div>
+            </Table>
           </div>
-        )}
-      </DialogContent>
-    </Dialog>
+        </div>
+      )}
+    </ResponsiveDialog>
   );
 }
