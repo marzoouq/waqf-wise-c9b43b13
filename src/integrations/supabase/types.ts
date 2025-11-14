@@ -210,6 +210,45 @@ export type Database = {
         }
         Relationships: []
       }
+      backup_logs: {
+        Row: {
+          backup_type: string
+          completed_at: string | null
+          created_at: string | null
+          error_message: string | null
+          file_path: string | null
+          file_size: number | null
+          id: string
+          started_at: string | null
+          status: string
+          tables_included: string[] | null
+        }
+        Insert: {
+          backup_type: string
+          completed_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          file_path?: string | null
+          file_size?: number | null
+          id?: string
+          started_at?: string | null
+          status?: string
+          tables_included?: string[] | null
+        }
+        Update: {
+          backup_type?: string
+          completed_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          file_path?: string | null
+          file_size?: number | null
+          id?: string
+          started_at?: string | null
+          status?: string
+          tables_included?: string[] | null
+        }
+        Relationships: []
+      }
       bank_accounts: {
         Row: {
           account_id: string | null
@@ -363,6 +402,8 @@ export type Database = {
           address: string | null
           bank_account_number: string | null
           bank_name: string | null
+          beneficiary_number: string | null
+          can_login: boolean | null
           category: string
           city: string | null
           created_at: string
@@ -377,11 +418,15 @@ export type Database = {
           iban: string | null
           id: string
           is_head_of_family: boolean | null
+          last_login_at: string | null
+          last_notification_at: string | null
+          login_enabled_at: string | null
           marital_status: string | null
           monthly_income: number | null
           national_id: string
           nationality: string | null
           notes: string | null
+          notification_preferences: Json | null
           number_of_daughters: number | null
           number_of_sons: number | null
           number_of_wives: number | null
@@ -394,11 +439,14 @@ export type Database = {
           tribe: string | null
           updated_at: string
           user_id: string | null
+          username: string | null
         }
         Insert: {
           address?: string | null
           bank_account_number?: string | null
           bank_name?: string | null
+          beneficiary_number?: string | null
+          can_login?: boolean | null
           category: string
           city?: string | null
           created_at?: string
@@ -413,11 +461,15 @@ export type Database = {
           iban?: string | null
           id?: string
           is_head_of_family?: boolean | null
+          last_login_at?: string | null
+          last_notification_at?: string | null
+          login_enabled_at?: string | null
           marital_status?: string | null
           monthly_income?: number | null
           national_id: string
           nationality?: string | null
           notes?: string | null
+          notification_preferences?: Json | null
           number_of_daughters?: number | null
           number_of_sons?: number | null
           number_of_wives?: number | null
@@ -430,11 +482,14 @@ export type Database = {
           tribe?: string | null
           updated_at?: string
           user_id?: string | null
+          username?: string | null
         }
         Update: {
           address?: string | null
           bank_account_number?: string | null
           bank_name?: string | null
+          beneficiary_number?: string | null
+          can_login?: boolean | null
           category?: string
           city?: string | null
           created_at?: string
@@ -449,11 +504,15 @@ export type Database = {
           iban?: string | null
           id?: string
           is_head_of_family?: boolean | null
+          last_login_at?: string | null
+          last_notification_at?: string | null
+          login_enabled_at?: string | null
           marital_status?: string | null
           monthly_income?: number | null
           national_id?: string
           nationality?: string | null
           notes?: string | null
+          notification_preferences?: Json | null
           number_of_daughters?: number | null
           number_of_sons?: number | null
           number_of_wives?: number | null
@@ -466,6 +525,7 @@ export type Database = {
           tribe?: string | null
           updated_at?: string
           user_id?: string | null
+          username?: string | null
         }
         Relationships: [
           {
@@ -473,6 +533,13 @@ export type Database = {
             columns: ["parent_beneficiary_id"]
             isOneToOne: false
             referencedRelation: "beneficiaries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "beneficiaries_parent_beneficiary_id_fkey"
+            columns: ["parent_beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_statistics"
             referencedColumns: ["id"]
           },
         ]
@@ -523,6 +590,13 @@ export type Database = {
             columns: ["beneficiary_id"]
             isOneToOne: false
             referencedRelation: "beneficiaries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "beneficiary_activity_log_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_statistics"
             referencedColumns: ["id"]
           },
         ]
@@ -585,6 +659,13 @@ export type Database = {
             columns: ["beneficiary_id"]
             isOneToOne: false
             referencedRelation: "beneficiaries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "beneficiary_attachments_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_statistics"
             referencedColumns: ["id"]
           },
         ]
@@ -689,6 +770,13 @@ export type Database = {
             columns: ["beneficiary_id"]
             isOneToOne: false
             referencedRelation: "beneficiaries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "beneficiary_requests_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_statistics"
             referencedColumns: ["id"]
           },
           {
@@ -997,6 +1085,51 @@ export type Database = {
           },
         ]
       }
+      custom_reports: {
+        Row: {
+          configuration: Json
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          is_favorite: boolean | null
+          is_shared: boolean | null
+          last_run_at: string | null
+          name: string
+          report_type: string
+          run_count: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          configuration: Json
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_favorite?: boolean | null
+          is_shared?: boolean | null
+          last_run_at?: string | null
+          name: string
+          report_type: string
+          run_count?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          configuration?: Json
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_favorite?: boolean | null
+          is_shared?: boolean | null
+          last_run_at?: string | null
+          name?: string
+          report_type?: string
+          run_count?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       distribution_approvals: {
         Row: {
           approved_at: string | null
@@ -1177,6 +1310,13 @@ export type Database = {
             referencedRelation: "beneficiaries"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "families_head_of_family_id_fkey"
+            columns: ["head_of_family_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_statistics"
+            referencedColumns: ["id"]
+          },
         ]
       }
       family_members: {
@@ -1216,6 +1356,13 @@ export type Database = {
             columns: ["beneficiary_id"]
             isOneToOne: false
             referencedRelation: "beneficiaries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "family_members_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_statistics"
             referencedColumns: ["id"]
           },
           {
@@ -1738,6 +1885,13 @@ export type Database = {
             referencedRelation: "beneficiaries"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "loans_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_statistics"
+            referencedColumns: ["id"]
+          },
         ]
       }
       maintenance_requests: {
@@ -1876,9 +2030,67 @@ export type Database = {
         }
         Relationships: []
       }
+      ocr_processing_log: {
+        Row: {
+          attachment_id: string | null
+          completed_at: string | null
+          confidence_score: number | null
+          created_at: string | null
+          document_id: string | null
+          error_message: string | null
+          extracted_text: string | null
+          id: string
+          processed_by: string | null
+          processing_time_ms: number | null
+          status: string
+        }
+        Insert: {
+          attachment_id?: string | null
+          completed_at?: string | null
+          confidence_score?: number | null
+          created_at?: string | null
+          document_id?: string | null
+          error_message?: string | null
+          extracted_text?: string | null
+          id?: string
+          processed_by?: string | null
+          processing_time_ms?: number | null
+          status?: string
+        }
+        Update: {
+          attachment_id?: string | null
+          completed_at?: string | null
+          confidence_score?: number | null
+          created_at?: string | null
+          document_id?: string | null
+          error_message?: string | null
+          extracted_text?: string | null
+          id?: string
+          processed_by?: string | null
+          processing_time_ms?: number | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ocr_processing_log_attachment_id_fkey"
+            columns: ["attachment_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_attachments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ocr_processing_log_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payments: {
         Row: {
           amount: number
+          beneficiary_id: string | null
           created_at: string
           description: string
           id: string
@@ -1894,6 +2106,7 @@ export type Database = {
         }
         Insert: {
           amount: number
+          beneficiary_id?: string | null
           created_at?: string
           description: string
           id?: string
@@ -1909,6 +2122,7 @@ export type Database = {
         }
         Update: {
           amount?: number
+          beneficiary_id?: string | null
           created_at?: string
           description?: string
           id?: string
@@ -1923,6 +2137,20 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "payments_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_statistics"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "payments_journal_entry_id_fkey"
             columns: ["journal_entry_id"]
@@ -2026,6 +2254,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string | null
+          endpoint: string
+          id: string
+          is_active: boolean | null
+          last_used_at: string | null
+          p256dh: string
+          updated_at: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string | null
+          endpoint: string
+          id?: string
+          is_active?: boolean | null
+          last_used_at?: string | null
+          p256dh: string
+          updated_at?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string | null
+          endpoint?: string
+          id?: string
+          is_active?: boolean | null
+          last_used_at?: string | null
+          p256dh?: string
+          updated_at?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       rental_payments: {
         Row: {
@@ -2258,9 +2525,11 @@ export type Database = {
           description: string | null
           id: string
           is_favorite: boolean | null
+          is_shared: boolean | null
           last_used_at: string | null
           name: string
           search_criteria: Json
+          search_type: string | null
           updated_at: string | null
           usage_count: number | null
           user_id: string
@@ -2270,9 +2539,11 @@ export type Database = {
           description?: string | null
           id?: string
           is_favorite?: boolean | null
+          is_shared?: boolean | null
           last_used_at?: string | null
           name: string
           search_criteria: Json
+          search_type?: string | null
           updated_at?: string | null
           usage_count?: number | null
           user_id: string
@@ -2282,12 +2553,59 @@ export type Database = {
           description?: string | null
           id?: string
           is_favorite?: boolean | null
+          is_shared?: boolean | null
           last_used_at?: string | null
           name?: string
           search_criteria?: Json
+          search_type?: string | null
           updated_at?: string | null
           usage_count?: number | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      smart_alerts: {
+        Row: {
+          action_url: string | null
+          alert_type: string
+          created_at: string | null
+          data: Json | null
+          description: string
+          expires_at: string | null
+          id: string
+          is_dismissed: boolean | null
+          is_read: boolean | null
+          severity: string
+          title: string
+          triggered_at: string | null
+        }
+        Insert: {
+          action_url?: string | null
+          alert_type: string
+          created_at?: string | null
+          data?: Json | null
+          description: string
+          expires_at?: string | null
+          id?: string
+          is_dismissed?: boolean | null
+          is_read?: boolean | null
+          severity?: string
+          title: string
+          triggered_at?: string | null
+        }
+        Update: {
+          action_url?: string | null
+          alert_type?: string
+          created_at?: string | null
+          data?: Json | null
+          description?: string
+          expires_at?: string | null
+          id?: string
+          is_dismissed?: boolean | null
+          is_read?: boolean | null
+          severity?: string
+          title?: string
+          triggered_at?: string | null
         }
         Relationships: []
       }
@@ -2348,6 +2666,39 @@ export type Database = {
           status?: string
           task?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      two_factor_secrets: {
+        Row: {
+          backup_codes: string[]
+          created_at: string | null
+          enabled: boolean | null
+          id: string
+          secret: string
+          updated_at: string | null
+          user_id: string
+          verified_at: string | null
+        }
+        Insert: {
+          backup_codes: string[]
+          created_at?: string | null
+          enabled?: boolean | null
+          id?: string
+          secret: string
+          updated_at?: string | null
+          user_id: string
+          verified_at?: string | null
+        }
+        Update: {
+          backup_codes?: string[]
+          created_at?: string | null
+          enabled?: boolean | null
+          id?: string
+          secret?: string
+          updated_at?: string | null
+          user_id?: string
+          verified_at?: string | null
         }
         Relationships: []
       }
@@ -2428,7 +2779,22 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      beneficiary_statistics: {
+        Row: {
+          approved_requests: number | null
+          attachments_count: number | null
+          full_name: string | null
+          id: string | null
+          last_payment_date: string | null
+          last_request_date: string | null
+          payment_count: number | null
+          pending_requests: number | null
+          total_payments: number | null
+          total_requests: number | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       assign_user_role: {
@@ -2447,6 +2813,10 @@ export type Database = {
           p_term_months: number
         }
         Returns: undefined
+      }
+      calculate_monthly_payment: {
+        Args: { annual_rate: number; months: number; principal: number }
+        Returns: number
       }
       check_overdue_requests: { Args: never; Returns: undefined }
       create_auto_journal_entry: {
@@ -2480,6 +2850,9 @@ export type Database = {
         }
         Returns: undefined
       }
+      generate_beneficiary_number: { Args: never; Returns: string }
+      generate_smart_insights: { Args: never; Returns: undefined }
+      get_beneficiary_number: { Args: { ben_id: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -2498,6 +2871,10 @@ export type Database = {
         }[]
       }
       update_overdue_installments: { Args: never; Returns: undefined }
+      verify_2fa_code: {
+        Args: { p_code: string; p_user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       account_nature: "debit" | "credit"
