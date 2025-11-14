@@ -1,11 +1,5 @@
 import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
@@ -79,19 +73,14 @@ export function LanguageSettingsDialog({
   ];
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto" aria-describedby="language-description">
-        <DialogHeader>
-          <DialogTitle className="text-xl flex items-center gap-2">
-            <Globe className="h-5 w-5" />
-            اللغة والمنطقة
-          </DialogTitle>
-          <DialogDescription id="language-description">
-            إعدادات اللغة والمنطقة الزمنية والتنسيقات
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="space-y-6">
+    <ResponsiveDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title="اللغة والمنطقة"
+      description="إعدادات اللغة والمنطقة الزمنية والتنسيقات"
+      size="lg"
+    >
+      <div className="space-y-6">
           {/* اختيار اللغة */}
           <Card>
             <CardContent className="pt-6">
@@ -203,7 +192,6 @@ export function LanguageSettingsDialog({
             </CardContent>
           </Card>
         </div>
-      </DialogContent>
-    </Dialog>
+    </ResponsiveDialog>
   );
 }

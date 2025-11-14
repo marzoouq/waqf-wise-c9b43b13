@@ -1,11 +1,5 @@
 import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -59,16 +53,14 @@ export function InternalMessagesDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[700px] max-h-[80vh]">
-        <DialogHeader>
-          <DialogTitle>الرسائل الداخلية</DialogTitle>
-          <DialogDescription>
-            إدارة رسائلك مع الموظفين والإدارة
-          </DialogDescription>
-        </DialogHeader>
-
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+    <ResponsiveDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title="الرسائل الداخلية"
+      description="إدارة رسائلك مع الموظفين والإدارة"
+      size="lg"
+    >
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="inbox" className="gap-2">
               <Inbox className="h-4 w-4" />
@@ -186,7 +178,6 @@ export function InternalMessagesDialog({
             </div>
           </TabsContent>
         </Tabs>
-      </DialogContent>
-    </Dialog>
+    </ResponsiveDialog>
   );
 }

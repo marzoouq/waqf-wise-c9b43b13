@@ -1,11 +1,5 @@
 import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
@@ -49,27 +43,24 @@ export function NotificationsSettingsDialog({
 
   return (
     <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto" aria-describedby="notifications-description">
-          <DialogHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <DialogTitle className="text-xl">إعدادات الإشعارات</DialogTitle>
-                <DialogDescription id="notifications-description">
-                  تخصيص تفضيلات التنبيهات والإشعارات
-                </DialogDescription>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setPreviewOpen(true)}
-                className="gap-2"
-              >
-                <Eye className="h-4 w-4" />
-                معاينة
-              </Button>
-            </div>
-          </DialogHeader>
+      <ResponsiveDialog
+        open={open}
+        onOpenChange={onOpenChange}
+        title="إعدادات الإشعارات"
+        description="تخصيص تفضيلات التنبيهات والإشعارات"
+        size="lg"
+      >
+        <div className="flex justify-end mb-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPreviewOpen(true)}
+            className="gap-2"
+          >
+            <Eye className="h-4 w-4" />
+            معاينة
+          </Button>
+        </div>
 
         <div className="space-y-6">
           {/* قنوات الإشعارات */}
@@ -184,14 +175,13 @@ export function NotificationsSettingsDialog({
             </CardContent>
           </Card>
         </div>
-      </DialogContent>
-    </Dialog>
+      </ResponsiveDialog>
 
-    <NotificationsPreviewDialog
-      open={previewOpen}
-      onOpenChange={setPreviewOpen}
-      settings={settings}
-    />
+      <NotificationsPreviewDialog
+        open={previewOpen}
+        onOpenChange={setPreviewOpen}
+        settings={settings}
+      />
     </>
   );
 }

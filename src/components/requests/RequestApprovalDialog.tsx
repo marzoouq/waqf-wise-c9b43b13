@@ -1,11 +1,5 @@
 import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
@@ -100,16 +94,14 @@ export function RequestApprovalDialog({
   const canApprove = currentLevel <= 3;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
-        <DialogHeader>
-          <DialogTitle>مسار موافقات الطلب</DialogTitle>
-          <DialogDescription>
-            {requestType} - {requestDescription}
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="space-y-4">
+    <ResponsiveDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title="مسار موافقات الطلب"
+      description={`${requestType} - ${requestDescription}`}
+      size="lg"
+    >
+      <div className="space-y-4">
           {/* مستويات الموافقة */}
           {APPROVAL_LEVELS.map((levelInfo) => {
             const approval = approvals.find(a => a.level === levelInfo.level);
@@ -190,7 +182,6 @@ export function RequestApprovalDialog({
             </Card>
           )}
         </div>
-      </DialogContent>
-    </Dialog>
+    </ResponsiveDialog>
   );
 }
