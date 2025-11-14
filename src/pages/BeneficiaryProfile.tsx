@@ -8,6 +8,11 @@ import { LoadingState } from '@/components/shared/LoadingState';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { ProfileHeader } from '@/components/beneficiary/ProfileHeader';
 import { ProfileStats } from '@/components/beneficiary/ProfileStats';
+import { ProfileTimeline } from '@/components/beneficiary/ProfileTimeline';
+import { ProfilePaymentsHistory } from '@/components/beneficiary/ProfilePaymentsHistory';
+import { ProfileRequestsHistory } from '@/components/beneficiary/ProfileRequestsHistory';
+import { ProfileFamilyTree } from '@/components/beneficiary/ProfileFamilyTree';
+import { ProfileDocumentsGallery } from '@/components/beneficiary/ProfileDocumentsGallery';
 import BeneficiaryDialog from '@/components/beneficiaries/BeneficiaryDialog';
 
 export default function BeneficiaryProfile() {
@@ -15,7 +20,7 @@ export default function BeneficiaryProfile() {
   const navigate = useNavigate();
   const { beneficiaries, isLoading } = useBeneficiaries();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('timeline');
 
   const beneficiary = beneficiaries.find(b => b.id === id);
 
@@ -98,28 +103,32 @@ export default function BeneficiaryProfile() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 print:hidden">
-            <TabsTrigger value="overview">نظرة عامة</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-5 print:hidden">
+            <TabsTrigger value="timeline">الخط الزمني</TabsTrigger>
+            <TabsTrigger value="payments">المدفوعات</TabsTrigger>
+            <TabsTrigger value="requests">الطلبات</TabsTrigger>
             <TabsTrigger value="family">العائلة</TabsTrigger>
             <TabsTrigger value="documents">المستندات</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="overview">
-            <div className="text-center py-12 text-muted-foreground">
-              قريباً: الخط الزمني للأحداث
-            </div>
+          <TabsContent value="timeline">
+            <ProfileTimeline beneficiaryId={beneficiary.id} />
+          </TabsContent>
+
+          <TabsContent value="payments">
+            <ProfilePaymentsHistory beneficiaryId={beneficiary.id} />
+          </TabsContent>
+
+          <TabsContent value="requests">
+            <ProfileRequestsHistory beneficiaryId={beneficiary.id} />
           </TabsContent>
 
           <TabsContent value="family">
-            <div className="text-center py-12 text-muted-foreground">
-              قريباً: معلومات العائلة
-            </div>
+            <ProfileFamilyTree beneficiaryId={beneficiary.id} />
           </TabsContent>
 
           <TabsContent value="documents">
-            <div className="text-center py-12 text-muted-foreground">
-              قريباً: المستندات والمرفقات
-            </div>
+            <ProfileDocumentsGallery beneficiaryId={beneficiary.id} />
           </TabsContent>
         </Tabs>
       </div>
