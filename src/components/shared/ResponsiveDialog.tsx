@@ -5,6 +5,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from '@/components/ui/dialog';
 import {
   Drawer,
@@ -104,3 +105,8 @@ export function ResponsiveFormDialog({
     </ResponsiveDialog>
   );
 }
+
+/**
+ * إعادة تصدير DialogFooter للاستخدام المباشر
+ */
+export { DialogFooter };

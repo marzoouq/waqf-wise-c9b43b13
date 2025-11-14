@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
-import { DialogFooter } from "@/components/ui/dialog";
+import { ResponsiveDialog, DialogFooter } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";

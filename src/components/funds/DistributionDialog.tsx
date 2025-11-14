@@ -2,8 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
-import { DialogFooter } from "@/components/ui/dialog";
+import { ResponsiveDialog, DialogFooter } from "@/components/shared/ResponsiveDialog";
 import {
   Form,
   FormControl,
