@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -59,13 +59,13 @@ export function AdvancedSearchDialog({ open, onOpenChange, onSearch }: AdvancedS
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>البحث المتقدم</DialogTitle>
-        </DialogHeader>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
+    <ResponsiveDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title="البحث المتقدم"
+      size="xl"
+    >
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
           {/* الاسم الكامل */}
           <div className="space-y-2">
             <Label htmlFor="fullName">الاسم الكامل</Label>
@@ -220,7 +220,7 @@ export function AdvancedSearchDialog({ open, onOpenChange, onSearch }: AdvancedS
           </div>
         </div>
 
-        <DialogFooter className="gap-2">
+        <div className="flex justify-end gap-2 pt-4">
           <Button variant="outline" onClick={handleClear}>
             <X className="ml-2 h-4 w-4" />
             مسح
@@ -233,7 +233,7 @@ export function AdvancedSearchDialog({ open, onOpenChange, onSearch }: AdvancedS
             <Search className="ml-2 h-4 w-4" />
             بحث
           </Button>
-        </DialogFooter>
+        </div>
 
         {showSaveDialog && (
           <div className="mt-4 p-4 border rounded-lg space-y-3">
@@ -250,7 +250,6 @@ export function AdvancedSearchDialog({ open, onOpenChange, onSearch }: AdvancedS
             </div>
           </div>
         )}
-      </DialogContent>
-    </Dialog>
+    </ResponsiveDialog>
   );
 }

@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { useBeneficiaryActivityLog } from "@/hooks/useBeneficiaryActivityLog";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
@@ -51,13 +51,13 @@ export function ActivityLogDialog({ open, onOpenChange, beneficiaryId, beneficia
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh]">
-        <DialogHeader>
-          <DialogTitle>سجل النشاط: {beneficiaryName}</DialogTitle>
-        </DialogHeader>
-
-        <ScrollArea className="h-[600px] pr-4">
+    <ResponsiveDialog 
+      open={open} 
+      onOpenChange={onOpenChange}
+      title={`سجل النشاط: ${beneficiaryName}`}
+      size="xl"
+    >
+      <ScrollArea className="h-[600px] pr-4">
           {isLoading ? (
             <div className="text-center py-8">جاري التحميل...</div>
           ) : activities.length === 0 ? (
@@ -96,9 +96,8 @@ export function ActivityLogDialog({ open, onOpenChange, beneficiaryId, beneficia
                 </div>
               ))}
             </div>
-          )}
-        </ScrollArea>
-      </DialogContent>
-    </Dialog>
+        )}
+      </ScrollArea>
+    </ResponsiveDialog>
   );
 }

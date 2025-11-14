@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Bell, Mail, MessageSquare, AlertCircle, CheckCircle, Info } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
@@ -54,19 +54,14 @@ export function NotificationsPreviewDialog({
   ];
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Bell className="h-5 w-5" />
-            معاينة الإشعارات
-          </DialogTitle>
-          <DialogDescription>
-            معاينة كيف ستظهر الإشعارات بناءً على الإعدادات الحالية
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="space-y-4 mt-4">
+    <ResponsiveDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title="معاينة الإشعارات"
+      description="معاينة كيف ستظهر الإشعارات بناءً على الإعدادات الحالية"
+      size="lg"
+    >
+      <div className="space-y-4 mt-4">
           {/* Channels Status */}
           <Card className="p-4 bg-muted/50">
             <h3 className="font-semibold mb-3">القنوات المفعلة:</h3>
@@ -143,7 +138,6 @@ export function NotificationsPreviewDialog({
             </div>
           </Card>
         </div>
-      </DialogContent>
-    </Dialog>
+    </ResponsiveDialog>
   );
 }

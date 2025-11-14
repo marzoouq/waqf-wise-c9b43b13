@@ -1,12 +1,5 @@
 import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -91,19 +84,14 @@ export const TribeManagementDialog = ({
 
   return (
     <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-primary" />
-              إدارة القبائل
-            </DialogTitle>
-            <DialogDescription>
-              إضافة وتعديل قائمة القبائل في النظام
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4">
+      <ResponsiveDialog
+        open={open}
+        onOpenChange={onOpenChange}
+        title="إدارة القبائل"
+        description="إضافة وتعديل قائمة القبائل في النظام"
+        size="xl"
+      >
+        <div className="space-y-4">
             {/* Add/Edit Form */}
             {editMode && (
               <div className="bg-muted/50 rounded-lg p-4 space-y-3">
@@ -233,13 +221,12 @@ export const TribeManagementDialog = ({
             )}
           </div>
 
-          <DialogFooter>
+          <div className="flex justify-end pt-4">
             <Button variant="outline" onClick={() => onOpenChange(false)}>
               إغلاق
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </div>
+      </ResponsiveDialog>
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

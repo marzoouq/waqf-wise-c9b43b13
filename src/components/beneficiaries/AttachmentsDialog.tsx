@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -64,13 +64,13 @@ export function AttachmentsDialog({ open, onOpenChange, beneficiaryId, beneficia
 
   return (
     <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>مرفقات ومستندات: {beneficiaryName}</DialogTitle>
-          </DialogHeader>
-
-          <div className="space-y-4">
+      <ResponsiveDialog 
+        open={open} 
+        onOpenChange={onOpenChange}
+        title={`مرفقات ومستندات: ${beneficiaryName}`}
+        size="xl"
+      >
+        <div className="space-y-4">
             <Button onClick={() => setShowUploadForm(!showUploadForm)} className="w-full">
               <Upload className="ml-2 h-4 w-4" />
               {showUploadForm ? "إخفاء نموذج الرفع" : "رفع مرفق جديد"}
@@ -183,8 +183,7 @@ export function AttachmentsDialog({ open, onOpenChange, beneficiaryId, beneficia
               </div>
             )}
           </div>
-        </DialogContent>
-      </Dialog>
+      </ResponsiveDialog>
 
       <AlertDialog open={!!deleteConfirm} onOpenChange={() => setDeleteConfirm(null)}>
         <AlertDialogContent>
