@@ -8,6 +8,7 @@ import { DatabaseSettingsDialog } from "@/components/settings/DatabaseSettingsDi
 import { AppearanceSettingsDialog } from "@/components/settings/AppearanceSettingsDialog";
 import { LanguageSettingsDialog } from "@/components/settings/LanguageSettingsDialog";
 import { SystemSettingsDialog } from "@/components/settings/SystemSettingsDialog";
+import { PushNotificationsSettings } from "@/components/settings/PushNotificationsSettings";
 import { useToast } from "@/hooks/use-toast";
 
 const Settings = () => {
@@ -198,6 +199,8 @@ const Settings = () => {
           onOpenChange={setSystemSettingsDialogOpen}
         />
       </div>
+
+      <PushNotificationsSettings />
     </div>
   );
 };
