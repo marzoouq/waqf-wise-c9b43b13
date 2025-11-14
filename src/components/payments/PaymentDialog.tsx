@@ -1,14 +1,8 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
+import { DialogFooter } from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -83,18 +77,13 @@ export function PaymentDialog({
   const paymentType = form.watch("payment_type");
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>
-            {payment ? "تعديل السند" : "إضافة سند جديد"}
-          </DialogTitle>
-          <DialogDescription>
-            {payment
-              ? "قم بتعديل بيانات السند في النموذج أدناه"
-              : "قم بإدخال بيانات السند في النموذج أدناه"}
-          </DialogDescription>
-        </DialogHeader>
+    <ResponsiveDialog 
+      open={open} 
+      onOpenChange={onOpenChange}
+      title={payment ? "تعديل السند" : "إضافة سند جديد"}
+      description={payment ? "قم بتعديل بيانات السند في النموذج أدناه" : "قم بإدخال بيانات السند في النموذج أدناه"}
+      size="lg"
+    >
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
@@ -279,7 +268,6 @@ export function PaymentDialog({
             </DialogFooter>
           </form>
         </Form>
-      </DialogContent>
-    </Dialog>
+    </ResponsiveDialog>
   );
 }

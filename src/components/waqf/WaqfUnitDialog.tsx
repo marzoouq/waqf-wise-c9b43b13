@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -82,15 +82,13 @@ export function WaqfUnitDialog({ open, onOpenChange, waqfUnit }: WaqfUnitDialogP
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>
-            {waqfUnit ? "تعديل قلم وقف" : "إضافة قلم وقف جديد"}
-          </DialogTitle>
-        </DialogHeader>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <ResponsiveDialog 
+      open={open} 
+      onOpenChange={onOpenChange}
+      title={waqfUnit ? "تعديل قلم وقف" : "إضافة قلم وقف جديد"}
+      size="lg"
+    >
+      <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="name">اسم القلم *</Label>
@@ -265,11 +263,10 @@ export function WaqfUnitDialog({ open, onOpenChange, waqfUnit }: WaqfUnitDialogP
               إلغاء
             </Button>
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? "جاري الحفظ..." : waqfUnit ? "تحديث" : "إضافة"}
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+            {isLoading ? "جاري الحفظ..." : waqfUnit ? "تحديث" : "إضافة"}
+          </Button>
+        </div>
+      </form>
+    </ResponsiveDialog>
   );
 }
