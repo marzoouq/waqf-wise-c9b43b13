@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRequestComments } from "@/hooks/useRequestComments";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -43,16 +43,13 @@ export function RequestCommentsDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[80vh]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <MessageSquare className="h-5 w-5" />
-            تعليقات الطلب {requestNumber}
-          </DialogTitle>
-        </DialogHeader>
-
-        <div className="space-y-4">
+    <ResponsiveDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title={`تعليقات الطلب ${requestNumber}`}
+      size="xl"
+    >
+      <div className="space-y-4">
           {/* نموذج إضافة تعليق جديد */}
           <form onSubmit={handleSubmit} className="space-y-3">
             <div>
@@ -147,7 +144,6 @@ export function RequestCommentsDialog({
             )}
           </ScrollArea>
         </div>
-      </DialogContent>
-    </Dialog>
+    </ResponsiveDialog>
   );
 }

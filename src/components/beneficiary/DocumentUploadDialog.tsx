@@ -1,11 +1,5 @@
 import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -86,16 +80,14 @@ export function DocumentUploadDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>رفع مستند</DialogTitle>
-          <DialogDescription>
-            قم برفع المستندات المطلوبة لطلبك
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="space-y-4">
+    <ResponsiveDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title="رفع مستند"
+      description="قم برفع المستندات المطلوبة لطلبك"
+      size="md"
+    >
+      <div className="space-y-4">
           <div>
             <Label>نوع المستند *</Label>
             <Select value={fileType} onValueChange={setFileType}>
@@ -177,7 +169,6 @@ export function DocumentUploadDialog({
             </Button>
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+    </ResponsiveDialog>
   );
 }
