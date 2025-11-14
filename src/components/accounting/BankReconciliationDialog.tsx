@@ -174,7 +174,6 @@ export function BankReconciliationDialog({ open, onOpenChange }: BankReconciliat
             </div>
           </div>
         )}
-      </DialogContent>
-    </Dialog>
+    </ResponsiveDialog>
   );
 }
