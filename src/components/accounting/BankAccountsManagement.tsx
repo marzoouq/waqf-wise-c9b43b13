@@ -5,8 +5,7 @@ import { Plus, Pencil, Trash2, Building2 } from "lucide-react";
 import { useBankAccounts } from "@/hooks/useBankAccounts";
 import { useAccounts } from "@/hooks/useAccounts";
 import { LoadingState } from "@/components/shared/LoadingState";
-import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
-import { DialogFooter } from "@/components/ui/dialog";
+import { ResponsiveDialog, DialogFooter } from "@/components/shared/ResponsiveDialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
