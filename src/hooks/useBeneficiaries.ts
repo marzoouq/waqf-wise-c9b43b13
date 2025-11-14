@@ -1,12 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { useUnifiedErrorHandler } from "@/hooks/useUnifiedErrorHandler";
+import { executeMutation } from "@/lib/mutationHelpers";
 import { useActivities } from "@/hooks/useActivities";
 import { useAuth } from "@/hooks/useAuth";
 import { Beneficiary } from "@/types/beneficiary";
 
 export function useBeneficiaries() {
-  const { toast } = useToast();
+  const { handleError, showSuccess } = useUnifiedErrorHandler();
   const queryClient = useQueryClient();
   const { addActivity } = useActivities();
   const { user } = useAuth();
@@ -31,14 +32,19 @@ export function useBeneficiaries() {
 
   const addBeneficiary = useMutation({
     mutationFn: async (beneficiary: Omit<Beneficiary, "id" | "created_at" | "updated_at">) => {
-      const { data, error } = await supabase
-        .from("beneficiaries")
-        .insert([beneficiary])
-        .select()
-        .single();
+      return executeMutation(
+        async () => {
+          const { data, error } = await supabase
+            .from("beneficiaries")
+            .insert([beneficiary])
+            .select()
+            .single();
 
-      if (error) throw error;
-      return data;
+          if (error) throw error;
+          return data;
+        },
+        'add_beneficiary'
+      );
     },
     onSuccess: async (data) => {
       queryClient.invalidateQueries({ queryKey: ["beneficiaries"] });
@@ -50,34 +56,33 @@ export function useBeneficiaries() {
           user_name: user?.email || 'النظام',
         });
       } catch (error) {
+        // تسجيل فقط دون إيقاف العملية
         console.error("Error adding activity:", error);
       }
       
-      toast({
-        title: "تمت الإضافة بنجاح",
-        description: "تم إضافة المستفيد الجديد بنجاح",
-      });
+      showSuccess("تمت الإضافة بنجاح", "تم إضافة المستفيد الجديد بنجاح");
     },
     onError: (error: any) => {
-      toast({
-        title: "خطأ في الإضافة",
-        description: error.message || "حدث خطأ أثناء إضافة المستفيد",
-        variant: "destructive",
-      });
+      handleError(error, { operation: 'add_beneficiary', component: 'Beneficiaries' });
     },
   });
 
   const updateBeneficiary = useMutation({
     mutationFn: async ({ id, ...updates }: Partial<Beneficiary> & { id: string }) => {
-      const { data, error } = await supabase
-        .from("beneficiaries")
-        .update(updates)
-        .eq("id", id)
-        .select()
-        .single();
+      return executeMutation(
+        async () => {
+          const { data, error } = await supabase
+            .from("beneficiaries")
+            .update(updates)
+            .eq("id", id)
+            .select()
+            .single();
 
-      if (error) throw error;
-      return data;
+          if (error) throw error;
+          return data;
+        },
+        'update_beneficiary'
+      );
     },
     onSuccess: async (data) => {
       queryClient.invalidateQueries({ queryKey: ["beneficiaries"] });
@@ -92,42 +97,33 @@ export function useBeneficiaries() {
         console.error("Error adding activity:", error);
       }
       
-      toast({
-        title: "تم التحديث بنجاح",
-        description: "تم تحديث بيانات المستفيد بنجاح",
-      });
+      showSuccess("تم التحديث بنجاح", "تم تحديث بيانات المستفيد بنجاح");
     },
     onError: (error: any) => {
-      toast({
-        title: "خطأ في التحديث",
-        description: error.message || "حدث خطأ أثناء تحديث المستفيد",
-        variant: "destructive",
-      });
+      handleError(error, { operation: 'update_beneficiary', component: 'Beneficiaries' });
     },
   });
 
   const deleteBeneficiary = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from("beneficiaries")
-        .delete()
-        .eq("id", id);
+      return executeMutation(
+        async () => {
+          const { error } = await supabase
+            .from("beneficiaries")
+            .delete()
+            .eq("id", id);
 
-      if (error) throw error;
+          if (error) throw error;
+        },
+        'delete_beneficiary'
+      );
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["beneficiaries"] });
-      toast({
-        title: "تم الحذف بنجاح",
-        description: "تم حذف المستفيد بنجاح",
-      });
+      showSuccess("تم الحذف بنجاح", "تم حذف المستفيد بنجاح");
     },
     onError: (error: any) => {
-      toast({
-        title: "خطأ في الحذف",
-        description: error.message || "حدث خطأ أثناء حذف المستفيد",
-        variant: "destructive",
-      });
+      handleError(error, { operation: 'delete_beneficiary', component: 'Beneficiaries' });
     },
   });
 
