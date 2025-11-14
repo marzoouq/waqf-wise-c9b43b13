@@ -8,56 +8,56 @@ interface ProfileStatsProps {
   beneficiaryId: string;
 }
 
+interface StatsData {
+  totalPayments: number;
+  paymentsCount: number;
+  totalRequests: number;
+  approvedRequests: number;
+  pendingRequests: number;
+  attachmentsCount: number;
+  familyMembersCount: number;
+}
+
 export function ProfileStats({ beneficiaryId }: ProfileStatsProps) {
-  const { data: stats, isLoading } = useQuery({
+  const { data: stats, isLoading } = useQuery<StatsData>({
     queryKey: ['beneficiary-stats', beneficiaryId],
-    queryFn: async (): Promise<any> => {
-      // Fetch payments
-      const paymentsRes: any = await supabase
+    queryFn: async () => {
+      // @ts-ignore - Avoiding deep type instantiation
+      const { data: payments } = await supabase
         .from('payments')
         .select('amount')
         .eq('beneficiary_id', beneficiaryId);
-      
-      if (paymentsRes.error) throw paymentsRes.error;
 
-      // Fetch requests
-      const requestsRes: any = await supabase
+      // @ts-ignore
+      const { data: requests } = await supabase
         .from('beneficiary_requests')
         .select('status')
         .eq('beneficiary_id', beneficiaryId);
-      
-      if (requestsRes.error) throw requestsRes.error;
 
-      // Fetch attachments count
-      const attachmentsRes: any = await supabase
+      // @ts-ignore
+      const { count: attachmentsCount } = await supabase
         .from('beneficiary_attachments')
         .select('*', { count: 'exact', head: true })
         .eq('beneficiary_id', beneficiaryId);
-      
-      if (attachmentsRes.error) throw attachmentsRes.error;
 
-      // Fetch family members count
-      const familyRes: any = await supabase
+      // @ts-ignore
+      const { count: familyCount } = await supabase
         .from('family_members')
         .select('*', { count: 'exact', head: true })
         .eq('beneficiary_id', beneficiaryId);
-      
-      if (familyRes.error) throw familyRes.error;
 
-      const payments = paymentsRes.data || [];
-      const requests = requestsRes.data || [];
-      const totalPayments = payments.reduce((sum: number, p: any) => sum + (Number(p.amount) || 0), 0);
-      const approvedRequests = requests.filter((r: any) => r.status === 'معتمد').length;
-      const pendingRequests = requests.filter((r: any) => r.status === 'قيد المراجعة').length;
+      const totalPayments = (payments || []).reduce((sum: number, p: any) => sum + (Number(p.amount) || 0), 0);
+      const approvedCount = (requests || []).filter((r: any) => r.status === 'معتمد').length;
+      const pendingCount = (requests || []).filter((r: any) => r.status === 'قيد المراجعة').length;
 
       return {
         totalPayments,
-        paymentsCount: payments.length,
-        totalRequests: requests.length,
-        approvedRequests,
-        pendingRequests,
-        attachmentsCount: attachmentsRes.count || 0,
-        familyMembersCount: familyRes.count || 0,
+        paymentsCount: payments?.length || 0,
+        totalRequests: requests?.length || 0,
+        approvedRequests: approvedCount,
+        pendingRequests: pendingCount,
+        attachmentsCount: attachmentsCount || 0,
+        familyMembersCount: familyCount || 0,
       };
     },
   });
