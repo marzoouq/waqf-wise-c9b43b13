@@ -110,13 +110,13 @@ export function useAuth() {
 
       // التحقق من 2FA إن كان مفعلاً
       if (data.user) {
-        const { data: profile } = await supabase
-          .from("profiles" as any)
-          .select("two_factor_enabled, two_factor_secret, backup_codes")
+        const { data: twoFactorData } = await supabase
+          .from("two_factor_secrets")
+          .select("enabled, secret, backup_codes")
           .eq("user_id", data.user.id)
           .maybeSingle();
 
-        if ((profile as any)?.two_factor_enabled) {
+        if (twoFactorData?.enabled) {
           if (!twoFactorCode) {
             return { 
               data: null, 
@@ -125,8 +125,8 @@ export function useAuth() {
             };
           }
 
-          const isValidCode = await verify2FACode((profile as any).two_factor_secret, twoFactorCode);
-          const isBackupCode = (profile as any).backup_codes?.includes(twoFactorCode);
+          const isValidCode = await verify2FACode(twoFactorData.secret, twoFactorCode);
+          const isBackupCode = twoFactorData.backup_codes?.includes(twoFactorCode);
 
           if (!isValidCode && !isBackupCode) {
             throw new Error('رمز المصادقة الثنائية غير صحيح');
@@ -134,9 +134,9 @@ export function useAuth() {
 
           if (isBackupCode) {
             await supabase
-              .from("profiles" as any)
+              .from("two_factor_secrets")
               .update({
-                backup_codes: (profile as any).backup_codes.filter((c: string) => c !== twoFactorCode)
+                backup_codes: twoFactorData.backup_codes.filter((c: string) => c !== twoFactorCode)
               })
               .eq("user_id", data.user.id);
           }

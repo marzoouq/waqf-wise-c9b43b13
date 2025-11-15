@@ -7,7 +7,7 @@ import { Shield, Key, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/hooks/useProfile";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 
 interface TwoFactorDialogProps {
   open: boolean;
@@ -24,7 +24,22 @@ export const TwoFactorDialog = ({ open, onOpenChange }: TwoFactorDialogProps) =>
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   
-  const twoFactorEnabled = (profile as any)?.two_factor_enabled || false;
+  // Query two_factor_secrets table to check if 2FA is enabled
+  const { data: twoFactorData } = useQuery({
+    queryKey: ["two-factor-status", profile?.user_id],
+    queryFn: async () => {
+      if (!profile?.user_id) return null;
+      const { data } = await supabase
+        .from("two_factor_secrets")
+        .select("enabled, secret, backup_codes")
+        .eq("user_id", profile.user_id)
+        .maybeSingle();
+      return data;
+    },
+    enabled: !!profile?.user_id,
+  });
+
+  const twoFactorEnabled = twoFactorData?.enabled || false;
 
   const generateSecret = () => {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
@@ -71,18 +86,20 @@ export const TwoFactorDialog = ({ open, onOpenChange }: TwoFactorDialogProps) =>
 
     setIsLoading(true);
     try {
+      // Insert or update in two_factor_secrets table
       const { error } = await supabase
-        .from("profiles" as any)
-        .update({
-          two_factor_enabled: true,
-          two_factor_secret: secret,
+        .from("two_factor_secrets")
+        .upsert({
+          user_id: profile?.user_id,
+          secret: secret,
           backup_codes: backupCodes,
-        })
-        .eq("user_id", profile?.user_id);
+          enabled: true,
+        });
 
       if (error) throw error;
 
       await queryClient.invalidateQueries({ queryKey: ["profile"] });
+      await queryClient.invalidateQueries({ queryKey: ["two-factor-status"] });
       toast.success("تم تفعيل المصادقة الثنائية بنجاح");
       onOpenChange(false);
       setStep("enable");
@@ -98,18 +115,18 @@ export const TwoFactorDialog = ({ open, onOpenChange }: TwoFactorDialogProps) =>
   const handleDisable2FA = async () => {
     setIsLoading(true);
     try {
+      // Update two_factor_secrets table
       const { error } = await supabase
-        .from("profiles" as any)
+        .from("two_factor_secrets")
         .update({
-          two_factor_enabled: false,
-          two_factor_secret: null,
-          backup_codes: null,
+          enabled: false,
         })
         .eq("user_id", profile?.user_id);
 
       if (error) throw error;
 
       await queryClient.invalidateQueries({ queryKey: ["profile"] });
+      await queryClient.invalidateQueries({ queryKey: ["two-factor-status"] });
       toast.success("تم إلغاء تفعيل المصادقة الثنائية");
       onOpenChange(false);
     } catch (error) {
