@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, XCircle, Clock, Receipt, CreditCard } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { useState } from "react";
@@ -12,7 +13,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { PaymentForApproval, PaymentApprovalRow, calculateProgress, getNextPendingApproval, StatusConfigMap } from "@/types/approvals";
+import { PaymentForApproval, PaymentApprovalRow, calculateProgress, getNextPendingApproval, StatusConfigMap, BadgeVariant } from "@/types/approvals";
 
 export function PaymentApprovalsTab() {
   const { toast } = useToast();
@@ -28,16 +29,17 @@ export function PaymentApprovalsTab() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("payments")
-        .select("*")
+        .select(`
+          *,
+          beneficiaries(full_name, national_id),
+          payment_approvals(*)
+        `)
         .eq("status", "pending")
-        .order("payment_date", { ascending: false });
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
       
-      return (data || []).map(payment => ({
-        ...payment,
-        payment_approvals: []
-      })) as unknown as PaymentForApproval[];
+      return (data || []) as unknown as PaymentForApproval[];
     },
   });
 

@@ -94,6 +94,42 @@ export type Database = {
         }
         Relationships: []
       }
+      approval_history: {
+        Row: {
+          action: string
+          approval_id: string
+          approval_type: string
+          created_at: string
+          id: string
+          notes: string | null
+          performed_by: string | null
+          performed_by_name: string | null
+          reference_id: string
+        }
+        Insert: {
+          action: string
+          approval_id: string
+          approval_type: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          performed_by?: string | null
+          performed_by_name?: string | null
+          reference_id: string
+        }
+        Update: {
+          action?: string
+          approval_id?: string
+          approval_type?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          performed_by?: string | null
+          performed_by_name?: string | null
+          reference_id?: string
+        }
+        Relationships: []
+      }
       approval_stats: {
         Row: {
           approved_count: number | null
@@ -1806,6 +1842,50 @@ export type Database = {
         }
         Relationships: []
       }
+      loan_approvals: {
+        Row: {
+          approved_at: string | null
+          approver_id: string | null
+          approver_name: string
+          created_at: string
+          id: string
+          level: number
+          loan_id: string
+          notes: string | null
+          status: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approver_id?: string | null
+          approver_name: string
+          created_at?: string
+          id?: string
+          level: number
+          loan_id: string
+          notes?: string | null
+          status?: string
+        }
+        Update: {
+          approved_at?: string | null
+          approver_id?: string | null
+          approver_name?: string
+          created_at?: string
+          id?: string
+          level?: number
+          loan_id?: string
+          notes?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loan_approvals_loan_id_fkey"
+            columns: ["loan_id"]
+            isOneToOne: false
+            referencedRelation: "loans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       loan_installments: {
         Row: {
           created_at: string
@@ -2272,6 +2352,50 @@ export type Database = {
           vat_registration_number?: string
         }
         Relationships: []
+      }
+      payment_approvals: {
+        Row: {
+          approved_at: string | null
+          approver_id: string | null
+          approver_name: string
+          created_at: string
+          id: string
+          level: number
+          notes: string | null
+          payment_id: string
+          status: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approver_id?: string | null
+          approver_name: string
+          created_at?: string
+          id?: string
+          level: number
+          notes?: string | null
+          payment_id: string
+          status?: string
+        }
+        Update: {
+          approved_at?: string | null
+          approver_id?: string | null
+          approver_name?: string
+          created_at?: string
+          id?: string
+          level?: number
+          notes?: string | null
+          payment_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_approvals_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       payments: {
         Row: {

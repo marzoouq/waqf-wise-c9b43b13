@@ -17,9 +17,8 @@ import {
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { FileText, Printer } from "lucide-react";
-import { GeneralLedgerEntry } from "@/types/supabase-helpers";
-import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
 import { AccountRow, GeneralLedgerEntry } from "@/types/supabase-helpers";
+import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
 
 const GeneralLedgerReport = () => {
   const [selectedAccountId, setSelectedAccountId] = useState<string>("");
@@ -71,21 +70,19 @@ const GeneralLedgerReport = () => {
       if (error) throw error;
 
       let balance = 0;
-      const processedData: GeneralLedgerEntry[] = data.map((line: {
-        debit_amount: number;
-        credit_amount: number;
-        journal_entry: { entry_number: string; entry_date: string; description: string };
-      }) => {
+      const processedData: GeneralLedgerEntry[] = data.map((line: any, index: number) => {
         const debit = Number(line.debit_amount);
         const credit = Number(line.credit_amount);
         balance += debit - credit;
         return {
+          id: line.id || `line-${index}`,
           entry_date: line.journal_entry.entry_date,
           entry_number: line.journal_entry.entry_number,
-          description: line.journal_entry.description,
+          description: line.description || line.journal_entry.description,
           debit_amount: debit,
           credit_amount: credit,
           balance,
+          journal_entry: line.journal_entry
         };
       });
 

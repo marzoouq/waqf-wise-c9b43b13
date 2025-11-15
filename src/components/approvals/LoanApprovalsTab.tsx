@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, XCircle, Clock, Eye, DollarSign } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { useState } from "react";
@@ -12,7 +13,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { LoanForApproval, calculateProgress, getNextPendingApproval, StatusConfigMap } from "@/types/approvals";
+import { LoanForApproval, calculateProgress, getNextPendingApproval, StatusConfigMap, BadgeVariant } from "@/types/approvals";
 
 export function LoanApprovalsTab() {
   const { toast } = useToast();
@@ -90,8 +91,9 @@ export function LoanApprovalsTab() {
 
         if (allApproved && loan) {
           // إنشاء القيد المحاسبي
-          await supabase.rpc("create_auto_journal_entry_for_loan", {
-            p_loan_id: loanId,
+          await supabase.rpc("create_auto_journal_entry", {
+            p_trigger_event: 'loan_approved',
+            p_reference_id: loanId,
             p_amount: loan.loan_amount,
             p_description: `صرف قرض ${loan.loan_number} - ${(loan.beneficiaries as { full_name: string }).full_name}`,
             p_transaction_date: new Date().toISOString().split('T')[0]
