@@ -1,13 +1,16 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Wallet, TrendingUp, TrendingDown, DollarSign, Receipt } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { useCashierStats } from "@/hooks/useCashierStats";
 import { LoadingState } from "@/components/shared/LoadingState";
+import { AddReceiptDialog } from "@/components/payments/AddReceiptDialog";
+import { AddVoucherDialog } from "@/components/payments/AddVoucherDialog";
 
 export default function CashierDashboard() {
-  const navigate = useNavigate();
   const { data: stats, isLoading } = useCashierStats();
+  const [isReceiptDialogOpen, setIsReceiptDialogOpen] = useState(false);
+  const [isVoucherDialogOpen, setIsVoucherDialogOpen] = useState(false);
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل بيانات أمين الصندوق..." />;
@@ -90,15 +93,15 @@ export default function CashierDashboard() {
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
-              <Button className="h-24 flex flex-col gap-2" onClick={() => navigate('/payments')}>
+              <Button className="h-24 flex flex-col gap-2" onClick={() => setIsReceiptDialogOpen(true)}>
                 <Receipt className="h-6 w-6" />
                 <span>سند قبض جديد</span>
               </Button>
-              <Button variant="outline" className="h-24 flex flex-col gap-2" onClick={() => navigate('/payments')}>
+              <Button variant="outline" className="h-24 flex flex-col gap-2" onClick={() => setIsVoucherDialogOpen(true)}>
                 <TrendingDown className="h-6 w-6" />
                 <span>سند صرف جديد</span>
               </Button>
-              <Button variant="outline" className="h-24 flex flex-col gap-2" onClick={() => navigate('/payments')}>
+              <Button variant="outline" className="h-24 flex flex-col gap-2" onClick={() => window.open('/accounting?tab=ledger', '_blank')}>
                 <DollarSign className="h-6 w-6" />
                 <span>عرض كشف الصندوق</span>
               </Button>
@@ -106,6 +109,10 @@ export default function CashierDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Dialogs */}
+      <AddReceiptDialog open={isReceiptDialogOpen} onOpenChange={setIsReceiptDialogOpen} />
+      <AddVoucherDialog open={isVoucherDialogOpen} onOpenChange={setIsVoucherDialogOpen} />
     </div>
   );
 }

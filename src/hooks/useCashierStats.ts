@@ -27,14 +27,13 @@ export function useCashierStats() {
         0
       ) || 0;
 
-      // مقبوضات اليوم من جدول payments (نحتاج لإنشاء جدول payments)
-      // مؤقتاً سنستخدم journal_entries
+      // مقبوضات اليوم من جدول journal_entries
       const { data: receipts, error: receiptsError } = await supabase
         .from('journal_entries')
         .select('*, journal_entry_lines(debit_amount, credit_amount)')
         .eq('entry_date', today)
         .eq('status', 'posted')
-        .contains('reference_type', 'payment_receipt');
+        .eq('reference_type', 'payment_receipt');
 
       if (receiptsError) throw receiptsError;
 
@@ -52,7 +51,7 @@ export function useCashierStats() {
         .select('*, journal_entry_lines(debit_amount, credit_amount)')
         .eq('entry_date', today)
         .eq('status', 'posted')
-        .contains('reference_type', 'payment_voucher');
+        .eq('reference_type', 'payment_voucher');
 
       if (paymentsError) throw paymentsError;
 
@@ -79,6 +78,6 @@ export function useCashierStats() {
         pendingTransactions: pendingCount || 0,
       };
     },
-    refetchInterval: 30000, // تحديث كل 30 ثانية
+    refetchInterval: 60000, // تحديث كل دقيقة
   });
 }
