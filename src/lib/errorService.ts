@@ -4,6 +4,7 @@
  */
 
 import { PostgrestError } from '@supabase/supabase-js';
+import { isError, hasProperty, isString, isDefined } from './typeGuards';
 
 export interface ErrorContext {
   operation?: string;
