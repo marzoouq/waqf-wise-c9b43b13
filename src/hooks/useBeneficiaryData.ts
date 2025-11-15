@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Beneficiary } from "@/types/beneficiary";
 import { fetchFromTable } from "@/utils/supabaseHelpers";
+import { getErrorMessage } from "@/lib/errorService";
 
 interface Payment {
   id: string;
@@ -31,7 +32,7 @@ export const useBeneficiaryData = (userId?: string) => {
         if (beneficiaryResult.error) {
           toast({
             title: "خطأ في تحميل البيانات",
-            description: beneficiaryResult.error.message,
+            description: getErrorMessage(beneficiaryResult.error),
             variant: "destructive",
           });
           setLoading(false);

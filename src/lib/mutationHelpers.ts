@@ -5,8 +5,9 @@
 
 import { UseMutationOptions } from '@tanstack/react-query';
 import { logError } from './errorService';
+import type { AppError } from '@/types/errors';
 
-export interface MutationHandlers<TData = any, TError = any, TVariables = any> {
+export interface MutationHandlers<TData = unknown, TError = AppError, TVariables = unknown> {
   onSuccess?: (data: TData, variables: TVariables) => void | Promise<void>;
   onError?: (error: TError, variables: TVariables) => void;
   successMessage?: string;

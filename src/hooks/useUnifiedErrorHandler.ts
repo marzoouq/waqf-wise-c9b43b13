@@ -75,7 +75,7 @@ export function useUnifiedErrorHandler() {
    * معالجة أخطاء المصادقة
    */
   const handleAuthError = useCallback(
-    (error: any, context?: ErrorContext) => {
+    (error: unknown, context?: ErrorContext) => {
       logError(error, { ...context, component: 'Auth' });
 
       const authErrors: Record<string, string> = {
@@ -86,7 +86,8 @@ export function useUnifiedErrorHandler() {
         'weak_password': 'كلمة المرور ضعيفة جداً',
       };
 
-      const message = authErrors[error.message] || 'حدث خطأ في المصادقة';
+      const errorMessage = getErrorMessage(error);
+      const message = authErrors[errorMessage] || 'حدث خطأ في المصادقة';
 
       toast({
         title: 'خطأ في تسجيل الدخول',

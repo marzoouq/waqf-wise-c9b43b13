@@ -1,6 +1,10 @@
-// مساعدات Supabase لتجنب Type instantiation issues
+/**
+ * مساعدات Supabase لتجنب Type instantiation issues
+ * ملاحظة: استخدام any هنا مقصود لتجنب مشاكل TypeScript العميقة
+ */
 
 import { supabase } from "@/integrations/supabase/client";
+import type { AppError } from "@/types/errors";
 
 /**
  * Helper function to fetch data from Supabase without type complexity
@@ -14,7 +18,7 @@ export async function fetchFromTable<T>(
     limit?: number;
     single?: boolean;
   } = {}
-): Promise<{ data: T | T[] | null; error: any }> {
+): Promise<{ data: T | T[] | null; error: AppError | null }> {
   try {
     // استخدام any لتجنب "Type instantiation is excessively deep"
     const client: any = supabase;
@@ -74,7 +78,7 @@ export async function fetchFromTable<T>(
 export async function insertIntoTable<T>(
   tableName: string,
   data: any
-): Promise<{ data: T | null; error: any }> {
+): Promise<{ data: T | null; error: AppError | null }> {
   try {
     const client: any = supabase;
     const query: any = client.from(tableName).insert([data]).select().single();
@@ -92,7 +96,7 @@ export async function updateInTable<T>(
   tableName: string,
   id: string,
   updates: any
-): Promise<{ data: T | null; error: any }> {
+): Promise<{ data: T | null; error: AppError | null }> {
   try {
     const client: any = supabase;
     const query: any = client
@@ -114,7 +118,7 @@ export async function updateInTable<T>(
 export async function deleteFromTable(
   tableName: string,
   id: string
-): Promise<{ error: any }> {
+): Promise<{ error: AppError | null }> {
   try {
     const client: any = supabase;
     const query: any = client.from(tableName).delete().eq('id', id);
