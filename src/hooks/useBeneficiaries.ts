@@ -5,6 +5,7 @@ import { executeMutation } from "@/lib/mutationHelpers";
 import { useActivities } from "@/hooks/useActivities";
 import { useAuth } from "@/hooks/useAuth";
 import { Beneficiary } from "@/types/beneficiary";
+import { logger } from "@/lib/logger";
 
 export function useBeneficiaries() {
   const { handleError, showSuccess } = useUnifiedErrorHandler();
@@ -58,7 +59,7 @@ export function useBeneficiaries() {
         });
       } catch (error) {
         // تسجيل فقط دون إيقاف العملية
-        console.error("Error adding activity:", error);
+        logger.error(error, { context: 'add_beneficiary_activity', severity: 'low' });
       }
       
       showSuccess("تمت الإضافة بنجاح", "تم إضافة المستفيد الجديد بنجاح");
@@ -96,7 +97,7 @@ export function useBeneficiaries() {
           user_name: user?.email || 'النظام',
         });
       } catch (error) {
-        console.error("Error adding activity:", error);
+        logger.error(error, { context: 'update_beneficiary_activity', severity: 'low' });
       }
       
       showSuccess("تم التحديث بنجاح", "تم تحديث بيانات المستفيد بنجاح");

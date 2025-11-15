@@ -87,7 +87,7 @@ export const ZATCAQRCode = ({ data, size = 256, className }: ZATCAQRCodeProps) =
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col items-center gap-4">
-        <div className="p-4 bg-white rounded-lg border-2 border-border">
+        <div className="p-4 bg-background rounded-lg border-2 border-border">
           <canvas ref={canvasRef} />
         </div>
 
