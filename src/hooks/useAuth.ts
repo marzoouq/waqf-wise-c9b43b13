@@ -99,7 +99,7 @@ export function useAuth() {
     }
   };
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string, twoFactorCode?: string) => {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -108,13 +108,48 @@ export function useAuth() {
 
       if (error) throw error;
 
+      // التحقق من 2FA إن كان مفعلاً
+      if (data.user) {
+        const { data: profile } = await supabase
+          .from("profiles" as any)
+          .select("two_factor_enabled, two_factor_secret, backup_codes")
+          .eq("user_id", data.user.id)
+          .single();
+
+        if ((profile as any)?.two_factor_enabled) {
+          if (!twoFactorCode) {
+            return { 
+              data: null, 
+              error: null, 
+              requires2FA: true 
+            };
+          }
+
+          const isValidCode = await verify2FACode((profile as any).two_factor_secret, twoFactorCode);
+          const isBackupCode = (profile as any).backup_codes?.includes(twoFactorCode);
+
+          if (!isValidCode && !isBackupCode) {
+            throw new Error('رمز المصادقة الثنائية غير صحيح');
+          }
+
+          if (isBackupCode) {
+            await supabase
+              .from("profiles" as any)
+              .update({
+                backup_codes: (profile as any).backup_codes.filter((c: string) => c !== twoFactorCode)
+              })
+              .eq("user_id", data.user.id);
+          }
+        }
+      }
+
       toast({
         title: "تم تسجيل الدخول بنجاح",
         description: "مرحباً بك",
       });
 
       navigate('/');
-      return { data, error: null };
+      return { data, error: null, requires2FA: false };
     } catch (error: any) {
       let errorMessage = "حدث خطأ أثناء تسجيل الدخول";
       
@@ -176,6 +211,16 @@ export function useAuth() {
       });
       return { error };
     }
+  };
+
+  // التحقق من رمز 2FA (محاكاة TOTP)
+  const verify2FACode = async (secret: string, code: string): Promise<boolean> => {
+    // في الإنتاج، يجب استخدام مكتبة TOTP فعلية
+    // هذه محاكاة بسيطة للتوضيح
+    if (code.length === 6 && /^\d+$/.test(code)) {
+      return true; // في الإنتاج، يجب التحقق الفعلي من TOTP
+    }
+    return false;
   };
 
   return {

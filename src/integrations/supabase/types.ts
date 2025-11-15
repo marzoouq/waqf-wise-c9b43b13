@@ -1085,6 +1085,45 @@ export type Database = {
           },
         ]
       }
+      custom_report_templates: {
+        Row: {
+          configuration: Json
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          is_favorite: boolean | null
+          is_public: boolean | null
+          name: string
+          report_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          configuration: Json
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_favorite?: boolean | null
+          is_public?: boolean | null
+          name: string
+          report_type: string
+          updated_at?: string | null
+        }
+        Update: {
+          configuration?: Json
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_favorite?: boolean | null
+          is_public?: boolean | null
+          name?: string
+          report_type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       custom_reports: {
         Row: {
           configuration: Json
@@ -1703,6 +1742,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      leaked_password_checks: {
+        Row: {
+          checked_at: string | null
+          created_at: string | null
+          id: string
+          is_leaked: boolean | null
+          password_hash: string
+          user_id: string | null
+        }
+        Insert: {
+          checked_at?: string | null
+          created_at?: string | null
+          id?: string
+          is_leaked?: boolean | null
+          password_hash: string
+          user_id?: string | null
+        }
+        Update: {
+          checked_at?: string | null
+          created_at?: string | null
+          id?: string
+          is_leaked?: boolean | null
+          password_hash?: string
+          user_id?: string | null
+        }
+        Relationships: []
       }
       loan_installments: {
         Row: {
@@ -2564,6 +2630,36 @@ export type Database = {
         }
         Relationships: []
       }
+      search_history: {
+        Row: {
+          created_at: string | null
+          filters: Json | null
+          id: string
+          results_count: number | null
+          search_query: string
+          search_type: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          filters?: Json | null
+          id?: string
+          results_count?: number | null
+          search_query: string
+          search_type: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          filters?: Json | null
+          id?: string
+          results_count?: number | null
+          search_query?: string
+          search_type?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       smart_alerts: {
         Row: {
           action_url: string | null
@@ -2666,6 +2762,36 @@ export type Database = {
           status?: string
           task?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      translations: {
+        Row: {
+          ar: string
+          created_at: string | null
+          en: string | null
+          fr: string | null
+          id: string
+          key: string
+          updated_at: string | null
+        }
+        Insert: {
+          ar: string
+          created_at?: string | null
+          en?: string | null
+          fr?: string | null
+          id?: string
+          key: string
+          updated_at?: string | null
+        }
+        Update: {
+          ar?: string
+          created_at?: string | null
+          en?: string | null
+          fr?: string | null
+          id?: string
+          key?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
