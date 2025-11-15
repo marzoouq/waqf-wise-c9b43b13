@@ -244,108 +244,31 @@ All colors MUST be HSL.
   }
 }
 
-/* Print Styles */
 @media print {
-  /* 1. إخفاء كل شيء أولاً */
-  body * {
-    visibility: hidden !important;
+  @page {
+    size: A4;
+    margin: 10mm;
   }
-  
-  /* 2. إظهار محتوى الفاتورة فقط */
-  #invoice-print-content,
-  #invoice-print-content * {
-    visibility: visible !important;
+
+  body {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
   }
-  
-  /* 3. إلغاء display: none بقوة للعناصر المخفية */
-  #invoice-print-content .hidden,
-  #invoice-print-content [class*="hidden"] {
-    display: block !important;
-    visibility: visible !important;
-  }
-  
-  /* 4. تطبيق print:block بقوة */
-  #invoice-print-content .print\:block {
-    display: block !important;
-    visibility: visible !important;
-  }
-  
-  /* 5. إخفاء العناصر مع print:hidden */
-  #invoice-print-content .print\:hidden {
+
+  .print\:hidden {
     display: none !important;
-    visibility: hidden !important;
   }
-  
-  /* 6. جعل النصوص سوداء */
-  #invoice-print-content * {
-    color: black !important;
+
+  .print\:block {
+    display: block !important;
   }
-  
-  /* 7. الحفاظ على لون primary للعناوين */
-  #invoice-print-content h1,
-  #invoice-print-content h2,
-  #invoice-print-content h3,
-  #invoice-print-content .text-primary,
-  #invoice-print-content [class*="text-primary"] {
-    color: hsl(150 45% 35%) !important;
+
+  /* إخفاء العناصر غير الضرورية */
+  header, nav, .sidebar, button:not(.print\:block), 
+  .no-print, [data-sidebar], [role="navigation"] {
+    display: none !important;
   }
-  
-  /* 8. الحفاظ على الألوان لـ print:text-* classes */
-  #invoice-print-content [class*="print:text-black"] {
-    color: black !important;
-  }
-  
-  #invoice-print-content [class*="print:text-gray-700"] {
-    color: rgb(55, 65, 81) !important;
-  }
-  
-  #invoice-print-content [class*="print:text-gray-600"] {
-    color: rgb(75, 85, 99) !important;
-  }
-  
-  #invoice-print-content [class*="print:text-gray-500"] {
-    color: rgb(107, 114, 128) !important;
-  }
-  
-  /* 9. تطبيق display الصحيح للجداول */
-  #invoice-print-content table {
-    display: table !important;
-    width: 100% !important;
-    border-collapse: collapse !important;
-  }
-  
-  #invoice-print-content thead {
-    display: table-header-group !important;
-  }
-  
-  #invoice-print-content tbody {
-    display: table-row-group !important;
-  }
-  
-  #invoice-print-content tr {
-    display: table-row !important;
-    page-break-inside: avoid !important;
-  }
-  
-  #invoice-print-content th,
-  #invoice-print-content td {
-    display: table-cell !important;
-    border: 1px solid #333 !important;
-    padding: 8px !important;
-  }
-  
-  /* 10. تطبيق الخلفيات والحدود */
-  #invoice-print-content [class*="print:bg-white"] {
-    background-color: white !important;
-  }
-  
-  #invoice-print-content [class*="print:bg-gray-50"] {
-    background-color: rgb(249, 250, 251) !important;
-  }
-  
-  #invoice-print-content [class*="print:border"] {
-    border-style: solid !important;
-  }
+}
   
   #invoice-print-content [class*="print:border-2"] {
     border-width: 2px !important;

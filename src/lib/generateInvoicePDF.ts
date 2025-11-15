@@ -3,6 +3,16 @@ import "jspdf-autotable";
 import { formatZATCACurrency, formatVATNumber } from "./zatca";
 import type { OrganizationSettings } from "@/hooks/useOrganizationSettings";
 
+// Type definitions for jspdf-autotable
+declare module "jspdf" {
+  interface jsPDF {
+    lastAutoTable: {
+      finalY: number;
+    };
+    autoTable: (options: any) => jsPDF;
+  }
+}
+
 interface Invoice {
   id: string;
   invoice_number: string;

@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Plus, Eye, FileText } from "lucide-react";
 import { AddInvoiceDialog } from "@/components/invoices/AddInvoiceDialog";
 import { ViewInvoiceDialog } from "@/components/invoices/ViewInvoiceDialog";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
@@ -17,6 +16,7 @@ import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { Pagination } from "@/components/ui/pagination";
 import { useInvoices } from "@/hooks/useInvoices";
+import InvoiceStatusBadge from "@/components/invoices/InvoiceStatusBadge";
 
 type Invoice = {
   id: string;
@@ -46,17 +46,6 @@ const Invoices = () => {
   }, [invoices, currentPage]);
 
   const totalPages = Math.ceil((invoices?.length || 0) / ITEMS_PER_PAGE);
-
-  const getStatusBadge = useCallback((status: string) => {
-    const variants: Record<string, { label: string; variant: any }> = {
-      draft: { label: "مسودة", variant: "secondary" },
-      sent: { label: "مرسلة", variant: "default" },
-      paid: { label: "مدفوعة", variant: "default" },
-      cancelled: { label: "ملغاة", variant: "destructive" },
-    };
-    const config = variants[status] || { label: status, variant: "outline" };
-    return <Badge variant={config.variant}>{config.label}</Badge>;
-  }, []);
 
   if (isLoading) {
     return (
@@ -135,7 +124,7 @@ const Invoices = () => {
                     <TableCell className="text-center font-mono text-sm font-semibold">
                       {Number(invoice.total_amount).toFixed(2)}
                     </TableCell>
-                    <TableCell>{getStatusBadge(invoice.status)}</TableCell>
+                    <TableCell><InvoiceStatusBadge status={invoice.status} /></TableCell>
                     <TableCell>
                       <div className="flex gap-2 justify-end">
                         <Button 
