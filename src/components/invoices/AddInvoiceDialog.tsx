@@ -19,11 +19,14 @@ import { useOrganizationSettings } from "@/hooks/useOrganizationSettings";
 import { validateZATCAInvoice, formatValidationErrors } from "@/lib/validateZATCAInvoice";
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { commonValidation } from "@/lib/validationSchemas";
 
 const invoiceSchema = z.object({
-  invoice_date: z.string().min(1, { message: "تاريخ الفاتورة مطلوب" }),
+  invoice_date: commonValidation.dateString("تاريخ الفاتورة غير صحيح"),
   invoice_time: z.string().optional(),
-  due_date: z.string().optional(),
+  due_date: z.string().optional().refine((val) => !val || /^\d{4}-\d{2}-\d{2}$/.test(val), {
+    message: "تاريخ الاستحقاق غير صحيح"
+  }),
   customer_name: z.string().min(3, { message: "اسم العميل مطلوب (3 حروف على الأقل)" }),
   customer_email: z.string().email({ message: "البريد الإلكتروني غير صحيح" }).optional().or(z.literal("")),
   customer_phone: z.string().optional(),

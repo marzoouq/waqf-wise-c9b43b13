@@ -8,12 +8,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UserPlus } from "lucide-react";
+import { commonValidation } from "@/lib/validationSchemas";
 
 const addFamilyMemberSchema = z.object({
   member_name: z.string().min(3, "الاسم يجب أن يكون 3 أحرف على الأقل"),
   relationship: z.string().min(1, "نوع القرابة مطلوب"),
   national_id: z.string().min(10, "رقم الهوية يجب أن يكون 10 أرقام"),
-  date_of_birth: z.string().min(1, "تاريخ الميلاد مطلوب"),
+  date_of_birth: commonValidation.dateString("تاريخ الميلاد غير صحيح"),
   gender: z.string().min(1, "الجنس مطلوب"),
   reason: z.string().min(10, "يجب ذكر سبب الإضافة"),
   description: z.string().min(20, "يجب إضافة وصف تفصيلي"),
