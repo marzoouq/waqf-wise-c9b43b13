@@ -198,6 +198,10 @@ export interface ExportOptions {
   dateFormat?: string;
 }
 
+// Bank statements and transactions
+export type BankStatementRow = Tables['bank_statements']['Row'];
+export type BankTransactionRow = Tables['bank_transactions']['Row'];
+
 // Accounting specific types
 export interface AccountWithBalance extends AccountRow {
   balance?: number;
@@ -217,12 +221,19 @@ export interface TrialBalanceRow {
 }
 
 export interface GeneralLedgerEntry {
+  id: string;
   entry_date: string;
   entry_number: string;
   description: string;
   debit_amount: number;
   credit_amount: number;
   balance: number;
+  journal_entry?: {
+    id?: string;
+    entry_number: string;
+    entry_date: string;
+    description: string;
+  };
 }
 
 export interface BankReconciliationItem {

@@ -87,6 +87,8 @@ export interface PaymentForApproval {
   amount: number;
   payment_type: string;
   payment_method: string;
+  payment_date: string;
+  payer_name: string;
   description: string;
   status: string;
   beneficiary_id: string;
@@ -248,6 +250,7 @@ export function areAllApprovalsCompleted(approvals: BaseApproval[]): boolean {
 
 // أنواع إضافية للمكونات
 export type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
+export type LucideIcon = React.ComponentType<{ className?: string }>;
 
 export interface JournalApproval {
   id: string;
