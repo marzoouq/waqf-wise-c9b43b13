@@ -1,5 +1,6 @@
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import QRCode from "qrcode";
 import { formatZATCACurrency, formatVATNumber } from "./zatca";
 import type { OrganizationSettings } from "@/hooks/useOrganizationSettings";
 
@@ -283,15 +284,37 @@ export const generateInvoicePDF = async (
 
   // QR Code (إذا كان موجوداً)
   if (invoice.qr_code_data) {
-    // يمكن إضافة QR Code باستخدام مكتبة خارجية
-    doc.setFontSize(8);
-    doc.text("رمز الاستجابة السريعة - QR Code", margin, yPos);
-    yPos += 5;
-    doc.text(
-      "(يرجى مسح الرمز للتحقق من الفاتورة)",
-      margin,
-      yPos
-    );
+    try {
+      const qrCodeDataUrl = await QRCode.toDataURL(invoice.qr_code_data, {
+        width: 150,
+        margin: 1,
+        color: {
+          dark: "#000000",
+          light: "#FFFFFF",
+        },
+      });
+
+      // إضافة عنوان QR Code
+      doc.setFontSize(10);
+      doc.setFont(undefined, "bold");
+      doc.text("رمز الاستجابة السريعة - QR Code", margin, yPos);
+      yPos += 7;
+
+      // إضافة صورة QR Code
+      doc.addImage(qrCodeDataUrl, "PNG", margin, yPos, 40, 40);
+      
+      doc.setFontSize(8);
+      doc.setFont(undefined, "normal");
+      doc.text(
+        "(امسح الرمز للتحقق من صحة الفاتورة)",
+        margin + 45,
+        yPos + 20
+      );
+      
+      yPos += 45;
+    } catch (error) {
+      console.error("Error generating QR code:", error);
+    }
   }
 
   // التذييل
