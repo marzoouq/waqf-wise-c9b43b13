@@ -196,8 +196,9 @@ const AddJournalEntryDialog = ({ open, onOpenChange }: Props) => {
         { account_id: "", description: "", debit_amount: 0, credit_amount: 0 },
       ]);
     },
-    onError: (error: any) => {
-      toast.error("حدث خطأ: " + error.message);
+    onError: (error) => {
+      const errorMessage = error instanceof Error ? error.message : "حدث خطأ";
+      toast.error("حدث خطأ: " + errorMessage);
     },
   });
 
@@ -222,7 +223,7 @@ const AddJournalEntryDialog = ({ open, onOpenChange }: Props) => {
     }
   };
 
-  const updateLine = (index: number, field: keyof EntryLine, value: any) => {
+  const updateLine = (index: number, field: keyof EntryLine, value: string | number) => {
     const newLines = [...lines];
     newLines[index] = { ...newLines[index], [field]: value };
     setLines(newLines);

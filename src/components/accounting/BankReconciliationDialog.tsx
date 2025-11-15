@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, XCircle, Upload } from "lucide-react";
-import { format } from "date-fns";
+import { BankStatementRow } from "@/types/supabase-helpers";
 import { ar } from "date-fns/locale";
 
 interface BankReconciliationDialogProps {
@@ -146,7 +146,7 @@ export function BankReconciliationDialog({ open, onOpenChange }: BankReconciliat
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {statements.map((statement: any) => (
+                  {statements.map((statement) => (
                     <TableRow key={statement.id}>
                       <TableCell>
                         {format(new Date(statement.statement_date), "dd/MM/yyyy", { locale: ar })}

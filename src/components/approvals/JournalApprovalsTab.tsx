@@ -8,12 +8,14 @@ import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { useState } from "react";
 import ViewJournalEntryDialog from "@/components/accounting/ViewJournalEntryDialog";
+import { JournalApproval, StatusConfigMap, BadgeVariant, JournalEntryWithLines } from "@/types/approvals";
+import { LucideIcon } from "lucide-react";
 
 export function JournalApprovalsTab() {
-  const [selectedEntry, setSelectedEntry] = useState<any>(null);
+  const [selectedEntry, setSelectedEntry] = useState<JournalEntryWithLines | null>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
 
-  const { data: approvals, isLoading } = useQuery({
+  const { data: approvals, isLoading } = useQuery<JournalApproval[]>({
     queryKey: ["journal_approvals"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -31,12 +33,12 @@ export function JournalApprovalsTab() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data;
+      return data as unknown as JournalApproval[];
     },
   });
 
   const getStatusBadge = (status: string) => {
-    const config: Record<string, { label: string; variant: any; icon: any }> = {
+    const config: Record<string, { label: string; variant: BadgeVariant; icon: LucideIcon }> = {
       pending: { label: "قيد المراجعة", variant: "secondary", icon: Clock },
       approved: { label: "موافق عليه", variant: "default", icon: CheckCircle },
       rejected: { label: "مرفوض", variant: "destructive", icon: XCircle },
@@ -62,7 +64,7 @@ export function JournalApprovalsTab() {
   return (
     <>
       <div className="space-y-4">
-        {approvals?.map((approval: any) => (
+        {approvals?.map((approval) => (
           <Card key={approval.id}>
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -102,8 +104,10 @@ export function JournalApprovalsTab() {
                   variant="outline"
                   size="sm"
                   onClick={() => {
-                    setSelectedEntry(approval.journal_entry);
-                    setIsViewDialogOpen(true);
+                    if (approval.journal_entry) {
+                      setSelectedEntry(approval.journal_entry as JournalEntryWithLines);
+                      setIsViewDialogOpen(true);
+                    }
                   }}
                 >
                   <Eye className="h-4 w-4 ml-1" />

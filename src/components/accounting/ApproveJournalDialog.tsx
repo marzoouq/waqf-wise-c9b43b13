@@ -7,11 +7,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { CheckCircle, XCircle } from "lucide-react";
+import { JournalApproval } from "@/types/approvals";
 
 interface ApproveJournalDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  approval: any;
+  approval: JournalApproval | null;
 }
 
 export function ApproveJournalDialog({ open, onOpenChange, approval }: ApproveJournalDialogProps) {
@@ -57,10 +58,11 @@ export function ApproveJournalDialog({ open, onOpenChange, approval }: ApproveJo
       
       onOpenChange(false);
       setNotes("");
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "حدث خطأ أثناء الموافقة";
       toast({
         title: "خطأ",
-        description: error.message || "حدث خطأ أثناء الموافقة",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -113,10 +115,11 @@ export function ApproveJournalDialog({ open, onOpenChange, approval }: ApproveJo
       
       onOpenChange(false);
       setNotes("");
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "حدث خطأ أثناء الرفض";
       toast({
         title: "خطأ",
-        description: error.message || "حدث خطأ أثناء الرفض",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

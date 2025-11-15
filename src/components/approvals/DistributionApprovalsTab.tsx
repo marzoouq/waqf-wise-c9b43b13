@@ -11,7 +11,7 @@ import { ApprovalFlowDialog } from "@/components/funds/ApprovalFlowDialog";
 import { DistributionForApproval, calculateProgress, StatusConfigMap } from "@/types/approvals";
 
 export function DistributionApprovalsTab() {
-  const [selectedDistribution, setSelectedDistribution] = useState<any>(null);
+  const [selectedDistribution, setSelectedDistribution] = useState<DistributionForApproval | null>(null);
   const [isFlowDialogOpen, setIsFlowDialogOpen] = useState(false);
 
   const { data: distributions, isLoading } = useQuery<DistributionForApproval[]>({
@@ -46,7 +46,7 @@ export function DistributionApprovalsTab() {
     );
   };
 
-  const getApprovalProgress = (approvals: any[]) => {
+  const getApprovalProgress = (approvals: Array<{ status: string }> | undefined) => {
     const total = 3;
     const approved = approvals?.filter((a) => a.status === "موافق").length || 0;
     return `${approved}/${total}`;
@@ -63,7 +63,7 @@ export function DistributionApprovalsTab() {
   return (
     <>
       <div className="space-y-4">
-        {distributions?.map((dist: any) => (
+        {distributions?.map((dist) => (
           <Card key={dist.id}>
             <CardHeader>
               <div className="flex items-center justify-between">

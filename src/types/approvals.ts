@@ -245,3 +245,43 @@ export function areAllApprovalsCompleted(approvals: BaseApproval[]): boolean {
     a.status === 'مرفوض'
   );
 }
+
+// أنواع إضافية للمكونات
+export type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
+
+export interface JournalApproval {
+  id: string;
+  journal_entry_id: string;
+  approver_name: string;
+  status: string;
+  notes: string | null;
+  created_at: string;
+  approved_at: string | null;
+  journal_entry?: {
+    id: string;
+    entry_number: string;
+    entry_date: string;
+    description: string;
+    status: string;
+    posted_at?: string | null;
+  };
+}
+
+export interface JournalEntryWithLines {
+  id: string;
+  entry_number: string;
+  entry_date: string;
+  description: string;
+  status: string;
+  posted_at: string | null;
+  journal_entry_lines?: {
+    id: string;
+    account: {
+      code: string;
+      name_ar: string;
+    };
+    debit_amount: number;
+    credit_amount: number;
+    description: string;
+  }[];
+}

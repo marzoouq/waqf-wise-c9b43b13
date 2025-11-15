@@ -51,7 +51,7 @@ export function PaymentApprovalsTab() {
       const status = action === "approve" ? "موافق" : "مرفوض";
       
       const { error } = await supabase
-        .from("payment_approvals" as any)
+        .from("payment_approvals")
         .update({
           status,
           notes,
@@ -63,7 +63,7 @@ export function PaymentApprovalsTab() {
       if (error) throw error;
 
       // سجل في تاريخ الموافقات
-      await supabase.from("approval_history" as any).insert({
+      await supabase.from("approval_history").insert({
         approval_type: "payment",
         approval_id: approvalId,
         reference_id: paymentId,
@@ -86,16 +86,17 @@ export function PaymentApprovalsTab() {
       setSelectedPayment(null);
       setApprovalNotes("");
     },
-    onError: (error: any) => {
+    onError: (error) => {
+      const errorMessage = error instanceof Error ? error.message : "حدث خطأ في العملية";
       toast({
         title: "خطأ في العملية",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive"
       });
     }
   });
 
-  const handleApprovalClick = (payment: any, action: "approve" | "reject") => {
+  const handleApprovalClick = (payment: PaymentForApproval, action: "approve" | "reject") => {
     setSelectedPayment(payment);
     setApprovalAction(action);
     setIsDialogOpen(true);
@@ -105,7 +106,7 @@ export function PaymentApprovalsTab() {
     if (!selectedPayment) return;
 
     const pendingApproval = selectedPayment.payment_approvals?.find(
-      (a: any) => a.status === "معلق"
+      (a) => a.status === "معلق"
     );
 
     if (!pendingApproval) {
@@ -138,7 +139,7 @@ export function PaymentApprovalsTab() {
   };
 
   const getStatusBadge = (status: string) => {
-    const config: Record<string, { label: string; variant: any; icon: any }> = {
+    const config: Record<string, { label: string; variant: BadgeVariant; icon: LucideIcon }> = {
       "pending": { label: "معلق", variant: "secondary", icon: Clock },
       "completed": { label: "مكتمل", variant: "default", icon: CheckCircle },
       "cancelled": { label: "ملغي", variant: "destructive", icon: XCircle },
@@ -170,9 +171,9 @@ export function PaymentApprovalsTab() {
   return (
     <>
       <div className="space-y-4">
-        {payments?.map((payment: any) => {
+        {payments?.map((payment) => {
           const pendingApproval = payment.payment_approvals?.find(
-            (a: any) => a.status === "معلق"
+            (a) => a.status === "معلق"
           );
           const canApprove = pendingApproval !== undefined;
           const Icon = getPaymentTypeIcon(payment.payment_type);
@@ -227,7 +228,7 @@ export function PaymentApprovalsTab() {
                   <div className="mt-4 pt-4 border-t">
                     <p className="text-sm font-semibold mb-2">مستويات الموافقة:</p>
                     <div className="flex gap-2">
-                      {payment.payment_approvals.map((approval: any) => (
+                      {payment.payment_approvals.map((approval) => (
                         <Badge
                           key={approval.id}
                           variant={
