@@ -1,22 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { Database } from '@/integrations/supabase/types';
 
-export interface ReportTemplate {
-  id: string;
-  name: string;
-  description: string | null;
-  report_type: string;
-  configuration: any;
-  created_by: string | null;
-  is_public: boolean;
-  is_favorite: boolean;
-  created_at: string;
-  updated_at: string;
-}
+type Json = Database['public']['Tables']['custom_report_templates']['Row']['configuration'];
 
 export interface ReportConfig {
-  filters?: any;
+  filters?: Record<string, unknown>;
   columns?: string[];
   groupBy?: string;
   sortBy?: string;
@@ -25,6 +15,19 @@ export interface ReportConfig {
     start: string;
     end: string;
   };
+}
+
+export interface ReportTemplate {
+  id: string;
+  name: string;
+  description: string | null;
+  report_type: string;
+  configuration: Json;
+  created_by: string | null;
+  is_public: boolean;
+  is_favorite: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 /**

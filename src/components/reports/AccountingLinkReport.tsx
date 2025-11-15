@@ -11,15 +11,65 @@ import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import { 
+  PaymentRow, 
+  JournalEntryRow, 
+  InvoiceRow, 
+  DistributionRow,
+  ContractRow 
+} from "@/types/supabase-helpers";
+
+interface OperationRecord {
+  id: string;
+  type: string;
+  number: string;
+  description: string;
+  amount: number;
+  date: string;
+  journalEntry?: string;
+  journalEntryId?: string | null;
+}
+
+interface PaymentWithJournal extends PaymentRow {
+  journal_entries?: JournalEntryRow;
+}
+
+interface RentalPaymentWithRelations {
+  id: string;
+  payment_number: string;
+  amount_paid: number;
+  payment_date: string;
+  journal_entry_id: string | null;
+  journal_entries?: JournalEntryRow;
+  contracts?: Pick<ContractRow, 'contract_number'>;
+}
+
+interface InvoiceWithJournal extends InvoiceRow {
+  journal_entries?: JournalEntryRow;
+}
+
+interface DistributionWithJournal extends DistributionRow {
+  journal_entries?: JournalEntryRow;
+}
+
+interface MaintenanceRequestWithJournal {
+  id: string;
+  title?: string;
+  description?: string;
+  actual_cost?: number;
+  completed_date?: string;
+  journal_entry_id: string | null;
+  journal_entries?: JournalEntryRow;
+}
 
 export function AccountingLinkReport() {
   const [activeTab, setActiveTab] = useState("linked");
 
   // جلب العمليات المالية المرتبطة بالقيود
-  const { data: linkedOperations = [], isLoading: isLoadingLinked } = useQuery({
+  const { data: linkedOperations = [], isLoading: isLoadingLinked } = useQuery<OperationRecord[]>({
     queryKey: ["accounting-link", "linked"],
     queryFn: async () => {
-      const operations = [];
+      const operations: OperationRecord[] = [];
 
       // سندات القبض والصرف
       const { data: payments } = await supabase
@@ -28,11 +78,11 @@ export function AccountingLinkReport() {
         .not("journal_entry_id", "is", null);
       
       if (payments) {
-        operations.push(...payments.map(p => ({
+        operations.push(...(payments as PaymentWithJournal[]).map(p => ({
           id: p.id,
           type: "سند",
           number: p.payment_number,
-          description: p.description,
+          description: p.description || '',
           amount: p.amount,
           date: p.payment_date,
           journalEntry: p.journal_entries?.entry_number,
@@ -47,11 +97,11 @@ export function AccountingLinkReport() {
         .not("journal_entry_id", "is", null);
       
       if (rentals) {
-        operations.push(...rentals.map(r => ({
+        operations.push(...(rentals as RentalPaymentWithRelations[]).map(r => ({
           id: r.id,
           type: "إيجار",
           number: r.payment_number,
-          description: `دفعة إيجار - عقد ${r.contracts?.contract_number}`,
+          description: `دفعة إيجار - عقد ${r.contracts?.contract_number || ''}`,
           amount: r.amount_paid,
           date: r.payment_date,
           journalEntry: r.journal_entries?.entry_number,
@@ -66,7 +116,7 @@ export function AccountingLinkReport() {
         .not("journal_entry_id", "is", null);
       
       if (invoices) {
-        operations.push(...invoices.map(i => ({
+        operations.push(...(invoices as InvoiceWithJournal[]).map(i => ({
           id: i.id,
           type: "فاتورة",
           number: i.invoice_number,
@@ -85,7 +135,7 @@ export function AccountingLinkReport() {
         .not("journal_entry_id", "is", null);
       
       if (distributions) {
-        operations.push(...distributions.map(d => ({
+        operations.push(...(distributions as DistributionWithJournal[]).map(d => ({
           id: d.id,
           type: "توزيع",
           number: d.month,
@@ -104,13 +154,13 @@ export function AccountingLinkReport() {
         .not("journal_entry_id", "is", null);
       
       if (maintenance) {
-        operations.push(...maintenance.map(m => ({
+        operations.push(...(maintenance as MaintenanceRequestWithJournal[]).map(m => ({
           id: m.id,
           type: "صيانة",
-          number: m.request_number,
-          description: m.title,
+          number: m.title || m.id.substring(0, 8),
+          description: m.description || m.title || '',
           amount: m.actual_cost || 0,
-          date: m.completed_date,
+          date: m.completed_date || new Date().toISOString(),
           journalEntry: m.journal_entries?.entry_number,
           journalEntryId: m.journal_entry_id,
         })));
