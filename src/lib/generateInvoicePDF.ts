@@ -323,43 +323,57 @@ export const generateInvoicePDF = async (
     yPos += noteLines.length * 5 + 10;
   }
 
-  // QR Code (إذا كان موجوداً) - تحسين التنسيق
+  // QR Code (إذا كان موجوداً) - تحسين التنسيق وإبراز كامل
   if (invoice.qr_code_data) {
     try {
+      // التحقق من المساحة المتبقية في الصفحة
+      if (yPos + 70 > pageHeight - 30) {
+        // إضافة صفحة جديدة إذا لم يكن هناك مساحة كافية
+        doc.addPage();
+        yPos = margin + 10;
+      }
+
       const qrCodeDataUrl = await QRCode.toDataURL(invoice.qr_code_data, {
-        width: 200,
-        margin: 2,
+        width: 250,
+        margin: 1,
         color: {
           dark: "#000000",
           light: "#FFFFFF",
         },
       });
 
-      // صندوق QR Code
-      doc.setDrawColor(lightGray[0], lightGray[1], lightGray[2]);
+      // صندوق QR Code أوسع وأطول
+      const qrBoxWidth = 60;
+      const qrBoxHeight = 70;
+      const qrImageSize = 50;
+      
+      doc.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+      doc.setLineWidth(0.5);
       doc.setFillColor(255, 255, 255);
-      doc.rect(margin, yPos, 50, 55, "FD");
+      doc.rect(margin, yPos, qrBoxWidth, qrBoxHeight, "FD");
 
       // عنوان QR Code
-      doc.setFontSize(9);
+      doc.setFontSize(10);
       doc.setFont("Amiri", "bold");
       doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-      doc.text("رمز التحقق", margin + 25, yPos + 5, { align: "center" });
+      doc.text("رمز التحقق ZATCA", margin + qrBoxWidth / 2, yPos + 6, { align: "center" });
       
-      // إضافة صورة QR Code
-      doc.addImage(qrCodeDataUrl, "PNG", margin + 5, yPos + 8, 40, 40);
+      // إضافة صورة QR Code - في المنتصف تماماً
+      const qrX = margin + (qrBoxWidth - qrImageSize) / 2;
+      const qrY = yPos + 10;
+      doc.addImage(qrCodeDataUrl, "PNG", qrX, qrY, qrImageSize, qrImageSize);
       
       doc.setFontSize(7);
       doc.setFont("Amiri", "normal");
       doc.setTextColor(100, 100, 100);
       doc.text(
-        "امسح للتحقق من الفاتورة",
-        margin + 25,
-        yPos + 53,
-        { align: "center" }
+        "امسح الرمز للتحقق من صحة الفاتورة",
+        margin + qrBoxWidth / 2,
+        yPos + qrBoxHeight - 4,
+        { align: "center", maxWidth: qrBoxWidth - 4 }
       );
       
-      yPos += 60;
+      yPos += qrBoxHeight + 5;
     } catch (error) {
       console.error("Error generating QR code:", error);
     }
