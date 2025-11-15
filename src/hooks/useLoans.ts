@@ -91,9 +91,10 @@ export function useLoans(beneficiaryId?: string) {
           approved_by: user?.id,
         }])
         .select()
-        .single();
+        .maybeSingle();
 
       if (loanError) throw loanError;
+      if (!loanData) throw new Error("فشل في إضافة القرض");
 
       // Calculate installment schedule
       const { error: scheduleError } = await supabase.rpc('calculate_loan_schedule', {
@@ -160,9 +161,10 @@ export function useLoans(beneficiaryId?: string) {
         .update(updates)
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error("فشل في تحديث القرض");
       return data;
     },
     onSuccess: async (data) => {

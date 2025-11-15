@@ -91,9 +91,10 @@ export function useInvoices() {
         .from("invoices")
         .insert([invoiceData.invoice])
         .select()
-        .single();
+        .maybeSingle();
 
       if (invoiceError) throw invoiceError;
+      if (!invoiceRecord) throw new Error("فشل في إنشاء الفاتورة");
 
       // إضافة بنود الفاتورة
       if (invoiceData.lines && invoiceData.lines.length > 0) {
@@ -157,16 +158,17 @@ export function useInvoices() {
         .from("invoices")
         .select("status, total_amount")
         .eq("id", id)
-        .single();
+        .maybeSingle();
 
       const { data: invoiceData, error: invoiceError } = await supabase
         .from("invoices")
         .update(invoice)
         .eq("id", id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (invoiceError) throw invoiceError;
+      if (!invoiceData) throw new Error("فشل في تحديث الفاتورة");
 
       // إذا تم تحديث البنود
       if (lines && lines.length > 0) {

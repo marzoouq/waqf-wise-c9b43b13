@@ -65,9 +65,10 @@ export function useFunds() {
         .from("funds")
         .insert([fund])
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error("فشل في إضافة الصندوق");
       return data;
     },
     onSuccess: () => {
@@ -93,9 +94,10 @@ export function useFunds() {
         .update(updates)
         .eq("id", id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error("فشل في تحديث الصندوق");
       return data;
     },
     onSuccess: () => {

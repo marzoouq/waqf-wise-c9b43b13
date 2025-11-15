@@ -27,7 +27,7 @@ export const ViewInvoiceDialog = ({ invoiceId, open, onOpenChange }: ViewInvoice
         .from("invoices")
         .select("*")
         .eq("id", invoiceId)
-        .single();
+        .maybeSingle();
       if (error) throw error;
       return data;
     },
