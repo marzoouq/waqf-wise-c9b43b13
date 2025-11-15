@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useRateLimit } from '@/hooks/useRateLimit';
+import { useLeakedPassword } from '@/hooks/useLeakedPassword';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Building2, Loader2 } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Building2, Loader2, AlertTriangle } from 'lucide-react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -38,8 +40,10 @@ type SignUpFormData = z.infer<typeof signUpSchema>;
 
 export default function Auth() {
   const [isLoading, setIsLoading] = useState(false);
+  const [passwordWarning, setPasswordWarning] = useState<string | null>(null);
   const { signIn, signUp, user } = useAuth();
   const { checkLoginRateLimit, logLoginAttempt } = useRateLimit();
+  const { checkPasswordQuick } = useLeakedPassword();
   const navigate = useNavigate();
 
   const signInForm = useForm<SignInFormData>({
@@ -91,12 +95,34 @@ export default function Auth() {
 
   const handleSignUp = async (data: SignUpFormData) => {
     setIsLoading(true);
-    const { error } = await signUp(data.email, data.password, data.fullName);
-    setIsLoading(false);
+    setPasswordWarning(null);
     
-    if (!error) {
-      // Switch to sign in tab after successful signup
-      signUpForm.reset();
+    try {
+      // فحص كلمة المرور المسربة
+      const isLeaked = await checkPasswordQuick(data.password);
+      
+      if (isLeaked) {
+        setPasswordWarning('⚠️ تحذير: هذه الكلمة موجودة في قواعد البيانات المسربة! يُنصح بشدة باستخدام كلمة مرور أخرى.');
+        setIsLoading(false);
+        
+        toast.error('كلمة المرور غير آمنة', {
+          description: 'الرجاء استخدام كلمة مرور أخرى لم يتم اختراقها من قبل'
+        });
+        return;
+      }
+      
+      const { error } = await signUp(data.email, data.password, data.fullName);
+      setIsLoading(false);
+      
+      if (!error) {
+        // Switch to sign in tab after successful signup
+        signUpForm.reset();
+        setPasswordWarning(null);
+      }
+    } catch (error) {
+      console.error('Sign up error:', error);
+      setIsLoading(false);
+      toast.error('حدث خطأ غير متوقع');
     }
   };
 
@@ -237,6 +263,13 @@ export default function Auth() {
                     </p>
                   )}
                 </div>
+
+                {passwordWarning && (
+                  <Alert variant="destructive">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertDescription>{passwordWarning}</AlertDescription>
+                  </Alert>
+                )}
 
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? (
