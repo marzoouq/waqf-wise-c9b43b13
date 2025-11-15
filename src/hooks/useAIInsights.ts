@@ -31,9 +31,9 @@ export function useAIInsights() {
   });
 
   const generateInsightsMutation = useMutation({
-    mutationFn: async (type: 'beneficiaries' | 'properties' | 'financial' | 'general') => {
+    mutationFn: async (reportType: 'beneficiaries' | 'properties' | 'financial' | 'loans') => {
       const { data, error } = await supabase.functions.invoke('generate-ai-insights', {
-        body: { type },
+        body: { reportType },
       });
 
       if (error) throw error;

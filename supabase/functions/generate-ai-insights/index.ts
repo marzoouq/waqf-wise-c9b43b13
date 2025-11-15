@@ -55,35 +55,53 @@ serve(async (req) => {
         data = [];
     }
 
+    // تقليل حجم البيانات للإرسال للـ AI
+    const summaryData = data ? JSON.stringify(data.slice(0, 5)) : '[]';
+    
+    // التحقق من وجود API Key
+    const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
+    if (!lovableApiKey) {
+      console.error('LOVABLE_API_KEY is not set');
+      throw new Error('API Key not configured');
+    }
+
+    console.log('Calling Lovable AI API...');
+    
     // استخدام AI لتحليل البيانات
     const aiResponse = await fetch('https://api.lovable.app/v1/ai/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${Deno.env.get('LOVABLE_API_KEY')}`,
+        'Authorization': `Bearer ${lovableApiKey}`,
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-pro',
+        model: 'google/gemini-2.5-flash',
         messages: [
           {
             role: 'system',
-            content: 'أنت محلل بيانات خبير في إدارة الأوقاف. قم بتحليل البيانات المقدمة وقدم رؤى قيمة، اتجاهات، توصيات، وتنبؤات. استخدم اللغة العربية واجعل التحليل واضحاً ومفيداً للإدارة.'
+            content: 'أنت محلل بيانات خبير في إدارة الأوقاف. قم بتحليل البيانات المقدمة وقدم رؤى قيمة، اتجاهات، وتوصيات عملية. استخدم اللغة العربية واجعل التحليل واضحاً ومختصراً.'
           },
           {
             role: 'user',
-            content: `قم بتحليل هذه البيانات الخاصة بـ ${reportType}:\n\n${JSON.stringify(data, null, 2)}\n\nقدم تحليلاً شاملاً يتضمن:\n1. الملخص التنفيذي\n2. الاتجاهات الرئيسية\n3. النقاط القوية والضعف\n4. التوصيات\n5. التنبؤات (إن أمكن)`
+            content: `قم بتحليل هذه البيانات الخاصة بـ ${reportType}:\n\nعدد السجلات: ${data?.length || 0}\nعينة من البيانات:\n${summaryData}\n\nقدم تحليلاً مختصراً (500 كلمة كحد أقصى) يتضمن:\n1. الملخص التنفيذي\n2. الاتجاهات الرئيسية\n3. التوصيات العملية`
           }
         ],
-        max_tokens: 4000,
+        max_tokens: 2000,
       }),
     });
 
+    console.log('AI Response status:', aiResponse.status);
+    
     if (!aiResponse.ok) {
-      throw new Error('AI analysis failed');
+      const errorText = await aiResponse.text();
+      console.error('AI API Error:', errorText);
+      throw new Error(`AI analysis failed: ${aiResponse.status} - ${errorText}`);
     }
 
     const aiData = await aiResponse.json();
-    const analysis = aiData.choices[0]?.message?.content || '';
+    console.log('AI Response received');
+    
+    const analysis = aiData.choices?.[0]?.message?.content || 'لم يتم إنشاء تحليل';
 
     // حفظ التقرير
     const { data: report } = await supabase
