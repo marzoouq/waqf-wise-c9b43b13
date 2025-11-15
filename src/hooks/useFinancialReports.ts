@@ -1,5 +1,22 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { JournalEntryLineRow, AccountRow } from "@/types/supabase-helpers";
+
+// أنواع محددة للاستعلامات
+interface JournalEntryLineWithAccount {
+  account_id: string;
+  debit_amount: number;
+  credit_amount: number;
+  accounts: {
+    code: string;
+    name_ar: string;
+    account_type: string;
+  };
+  journal_entries: {
+    status: string;
+    fiscal_year_id: string;
+  };
+}
 
 export interface TrialBalanceAccount {
   account_id: string;
@@ -77,7 +94,7 @@ export function useFinancialReports(fiscalYearId?: string) {
       // Aggregate by account
       const accountsMap = new Map<string, TrialBalanceAccount>();
 
-      data.forEach((line: any) => {
+      data.forEach((line: JournalEntryLineWithAccount) => {
         const accountId = line.account_id;
         if (!accountsMap.has(accountId)) {
           accountsMap.set(accountId, {
@@ -117,8 +134,8 @@ export function useFinancialReports(fiscalYearId?: string) {
       for (const account of accounts.data) {
         try {
           const { data } = await supabase
-            .rpc("calculate_account_balance" as any, { account_uuid: account.id });
-          balances.set(account.id, (data as number) || 0);
+            .rpc("calculate_account_balance", { account_uuid: account.id }) as { data: number | null };
+          balances.set(account.id, data || 0);
         } catch (error) {
           balances.set(account.id, 0);
         }
@@ -175,8 +192,8 @@ export function useFinancialReports(fiscalYearId?: string) {
       for (const account of accounts.data) {
         try {
           const { data } = await supabase
-            .rpc("calculate_account_balance" as any, { account_uuid: account.id });
-          balances.set(account.id, (data as number) || 0);
+            .rpc("calculate_account_balance", { account_uuid: account.id }) as { data: number | null };
+          balances.set(account.id, data || 0);
         } catch (error) {
           balances.set(account.id, 0);
         }
