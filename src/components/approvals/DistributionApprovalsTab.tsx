@@ -8,12 +8,13 @@ import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { useState } from "react";
 import { ApprovalFlowDialog } from "@/components/funds/ApprovalFlowDialog";
+import { DistributionForApproval, calculateProgress, StatusConfigMap } from "@/types/approvals";
 
 export function DistributionApprovalsTab() {
   const [selectedDistribution, setSelectedDistribution] = useState<any>(null);
   const [isFlowDialogOpen, setIsFlowDialogOpen] = useState(false);
 
-  const { data: distributions, isLoading } = useQuery({
+  const { data: distributions, isLoading } = useQuery<DistributionForApproval[]>({
     queryKey: ["distributions_with_approvals"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -25,12 +26,12 @@ export function DistributionApprovalsTab() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data;
+      return data as unknown as DistributionForApproval[];
     },
   });
 
   const getStatusBadge = (status: string) => {
-    const config: Record<string, { label: string; variant: any; icon: any }> = {
+    const config: StatusConfigMap = {
       "معلق": { label: "معلق", variant: "secondary", icon: Clock },
       "معتمد": { label: "معتمد", variant: "default", icon: CheckCircle },
       "مرفوض": { label: "مرفوض", variant: "destructive", icon: XCircle },

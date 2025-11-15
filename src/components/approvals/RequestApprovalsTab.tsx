@@ -7,28 +7,30 @@ import { CheckCircle, XCircle, Clock, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { useState } from "react";
+import { RequestWithBeneficiary, StatusConfigMap } from "@/types/approvals";
 
 export function RequestApprovalsTab() {
-  const { data: requests, isLoading } = useQuery({
+  const [selectedRequest, setSelectedRequest] = useState<RequestWithBeneficiary | null>(null);
+
+  const { data: requests, isLoading } = useQuery<RequestWithBeneficiary[]>({
     queryKey: ["requests_with_approvals"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("beneficiary_requests")
         .select(`
           *,
-          beneficiaries(full_name),
-          request_types(name_ar),
-          request_approvals(*)
+          beneficiaries(full_name, national_id),
+          request_types(name_ar, name)
         `)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data;
+      return data as unknown as RequestWithBeneficiary[];
     },
   });
 
   const getStatusBadge = (status: string) => {
-    const config: Record<string, { label: string; variant: any; icon: any }> = {
+    const config: StatusConfigMap = {
       "قيد المراجعة": { label: "قيد المراجعة", variant: "secondary", icon: Clock },
       "موافق عليه": { label: "موافق عليه", variant: "default", icon: CheckCircle },
       "مرفوض": { label: "مرفوض", variant: "destructive", icon: XCircle },
@@ -59,7 +61,7 @@ export function RequestApprovalsTab() {
 
   return (
     <div className="space-y-4">
-      {requests?.map((request: any) => (
+      {requests?.map((request: RequestWithBeneficiary) => (
         <Card key={request.id}>
           <CardHeader>
             <div className="flex items-center justify-between">
@@ -83,12 +85,10 @@ export function RequestApprovalsTab() {
                   {format(new Date(request.submitted_at), "dd MMM yyyy", { locale: ar })}
                 </p>
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground">تقدم الموافقات</p>
-                <p className="text-lg font-semibold">
-                  {getApprovalProgress(request.request_approvals)}
-                </p>
-              </div>
+            <div>
+              <p className="text-sm text-muted-foreground">تقدم الموافقات</p>
+              <p className="text-lg font-semibold">قيد المعالجة</p>
+            </div>
             </div>
             <div className="mt-4">
               <p className="text-sm text-muted-foreground mb-1">الوصف:</p>
