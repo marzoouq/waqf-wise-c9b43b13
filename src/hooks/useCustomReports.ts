@@ -153,26 +153,25 @@ export function useCustomReports() {
 
   // تنفيذ التقرير
   const executeReport = async (template: ReportTemplate) => {
-    // هنا يتم تنفيذ التقرير بناءً على الإعدادات
     const config = template.configuration as ReportConfig;
     
     // مثال: جلب بيانات المستفيدين
     if (template.report_type === 'beneficiaries') {
-      let query = (supabase as any).from('beneficiaries').select('*');
+      let queryBuilder: any = supabase.from('beneficiaries').select('*');
       
       if (config.filters) {
         Object.entries(config.filters).forEach(([key, value]) => {
-          if (value) {
-            query = query.eq(key, value);
+          if (value !== null && value !== undefined) {
+            queryBuilder = queryBuilder.eq(key, value);
           }
         });
       }
       
       if (config.sortBy) {
-        query = query.order(config.sortBy, { ascending: config.sortOrder === 'asc' });
+        queryBuilder = queryBuilder.order(config.sortBy, { ascending: config.sortOrder === 'asc' });
       }
       
-      const { data, error } = await query;
+      const { data, error } = await queryBuilder;
       
       if (error) throw error;
       return data;
