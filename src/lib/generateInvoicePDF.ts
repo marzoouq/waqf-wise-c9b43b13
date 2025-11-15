@@ -3,6 +3,7 @@ import autoTable from "jspdf-autotable";
 import QRCode from "qrcode";
 import { formatZATCACurrency, formatVATNumber } from "./zatca";
 import type { OrganizationSettings } from "@/hooks/useOrganizationSettings";
+import { loadAmiriFonts } from "./fonts/loadArabicFonts";
 
 interface Invoice {
   id: string;
@@ -40,11 +41,24 @@ export const generateInvoicePDF = async (
   orgSettings: OrganizationSettings | null
 ) => {
   try {
+    // تحميل الخطوط العربية
+    const { regular: amiriRegular, bold: amiriBold } = await loadAmiriFonts();
+    
     const doc = new jsPDF({
       orientation: "portrait",
       unit: "mm",
       format: "a4",
     });
+
+    // تسجيل الخطوط العربية في jsPDF
+    doc.addFileToVFS("Amiri-Regular.ttf", amiriRegular);
+    doc.addFont("Amiri-Regular.ttf", "Amiri", "normal");
+    
+    doc.addFileToVFS("Amiri-Bold.ttf", amiriBold);
+    doc.addFont("Amiri-Bold.ttf", "Amiri", "bold");
+    
+    // تعيين الخط الافتراضي
+    doc.setFont("Amiri", "normal");
 
     const pageWidth = doc.internal.pageSize.width;
     const pageHeight = doc.internal.pageSize.height;
@@ -63,7 +77,9 @@ export const generateInvoicePDF = async (
   // عنوان الفاتورة
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(24);
+  doc.setFont("Amiri", "bold");
   doc.text("فاتورة ضريبية", pageWidth / 2, 20, { align: "center" });
+  doc.setFont("Amiri", "normal");
   doc.text("Tax Invoice", pageWidth / 2, 30, { align: "center" });
 
   // رقم الفاتورة والتاريخ
@@ -88,9 +104,9 @@ export const generateInvoicePDF = async (
 
   // البائع (يسار)
   const sellerX = margin;
-  doc.setFont(undefined, "bold");
+  doc.setFont("Amiri", "bold");
   doc.text("معلومات البائع", sellerX, yPos);
-  doc.setFont(undefined, "normal");
+  doc.setFont("Amiri", "normal");
   doc.setFontSize(9);
 
   if (orgSettings) {
@@ -121,10 +137,10 @@ export const generateInvoicePDF = async (
   // المشتري (يمين)
   yPos = 60;
   const buyerX = pageWidth - margin;
-  doc.setFont(undefined, "bold");
+  doc.setFont("Amiri", "bold");
   doc.setFontSize(11);
   doc.text("معلومات المشتري", buyerX, yPos, { align: "right" });
-  doc.setFont(undefined, "normal");
+  doc.setFont("Amiri", "normal");
   doc.setFontSize(9);
 
   yPos += 6;
@@ -194,7 +210,7 @@ export const generateInvoicePDF = async (
     body: tableData,
     theme: "grid",
     styles: {
-      font: "helvetica",
+      font: "Amiri",
       fontSize: 9,
       cellPadding: 3,
     },
@@ -202,6 +218,7 @@ export const generateInvoicePDF = async (
       fillColor: [primaryColor[0], primaryColor[1], primaryColor[2]],
       textColor: [255, 255, 255],
       fontStyle: "bold",
+      font: "Amiri",
       halign: "center",
     },
     columnStyles: {
@@ -251,7 +268,7 @@ export const generateInvoicePDF = async (
   doc.line(summaryX + 5, yPos, summaryX + summaryWidth - 5, yPos);
 
   yPos += 6;
-  doc.setFont(undefined, "bold");
+  doc.setFont("Amiri", "bold");
   doc.setFontSize(11);
   doc.text("الإجمالي (شامل ض.ق.م):", summaryX + 5, yPos);
   doc.text(
@@ -265,7 +282,7 @@ export const generateInvoicePDF = async (
 
   // الملاحظات
   if (invoice.notes) {
-    doc.setFont(undefined, "normal");
+    doc.setFont("Amiri", "normal");
     doc.setFontSize(9);
     doc.text("ملاحظات:", margin, yPos);
     yPos += 5;
@@ -287,7 +304,7 @@ export const generateInvoicePDF = async (
 
       // إضافة عنوان QR Code
       doc.setFontSize(10);
-      doc.setFont(undefined, "bold");
+      doc.setFont("Amiri", "bold");
       doc.text("رمز الاستجابة السريعة - QR Code", margin, yPos);
       yPos += 7;
 
@@ -295,7 +312,7 @@ export const generateInvoicePDF = async (
       doc.addImage(qrCodeDataUrl, "PNG", margin, yPos, 40, 40);
       
       doc.setFontSize(8);
-      doc.setFont(undefined, "normal");
+      doc.setFont("Amiri", "normal");
       doc.text(
         "(امسح الرمز للتحقق من صحة الفاتورة)",
         margin + 45,
