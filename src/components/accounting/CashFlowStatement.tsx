@@ -54,27 +54,27 @@ export function CashFlowStatement() {
 
   return (
     <Card className="print:shadow-none">
-      <CardHeader className="flex flex-row items-center justify-between print:border-b">
+      <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 print:border-b p-3 sm:p-4 md:p-6">
         <div>
-          <CardTitle className="text-2xl">قائمة التدفقات النقدية</CardTitle>
+          <CardTitle className="text-xl sm:text-2xl md:text-2xl">قائمة التدفقات النقدية</CardTitle>
           <p className="text-sm text-muted-foreground mt-1">
             من {format(new Date(latestFlow.period_start), "dd MMMM yyyy", { locale: ar })} إلى{" "}
             {format(new Date(latestFlow.period_end), "dd MMMM yyyy", { locale: ar })}
           </p>
         </div>
-        <div className="flex gap-2 print:hidden">
-          <Button variant="outline" size="sm" onClick={handlePrint}>
-            <Printer className="h-4 w-4 ml-2" />
+        <div className="flex gap-2 print:hidden flex-wrap">
+          <Button variant="outline" size="sm" onClick={handlePrint} className="text-xs sm:text-sm">
+            <Printer className="h-3 w-3 sm:h-4 sm:w-4 ml-2" />
             طباعة
           </Button>
-          <Button variant="outline" size="sm" onClick={handleExport}>
-            <FileDown className="h-4 w-4 ml-2" />
+          <Button variant="outline" size="sm" onClick={handleExport} className="text-xs sm:text-sm">
+            <FileDown className="h-3 w-3 sm:h-4 sm:w-4 ml-2" />
             تصدير PDF
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="p-6">
-        <div className="space-y-6">
+      <CardContent className="p-3 sm:p-4 md:p-6">
+        <div className="space-y-4 sm:space-y-6">
           {/* التدفقات النقدية من الأنشطة التشغيلية */}
           <div className="border rounded-lg p-4 bg-card">
             <div className="flex items-center gap-2 mb-4">

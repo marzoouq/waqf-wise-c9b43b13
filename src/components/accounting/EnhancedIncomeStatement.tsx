@@ -26,27 +26,27 @@ export function EnhancedIncomeStatement() {
 
   return (
     <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
+      <CardHeader className="p-3 sm:p-4 md:p-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
-            <CardTitle className="text-2xl">قائمة الدخل</CardTitle>
+            <CardTitle className="text-xl sm:text-2xl md:text-2xl">قائمة الدخل</CardTitle>
             <p className="text-sm text-muted-foreground mt-1">
               للفترة المنتهية في: {format(new Date(), "dd MMMM yyyy", { locale: ar })}
             </p>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm">
-              <Printer className="ml-2 h-4 w-4" />
+          <div className="flex gap-2 flex-wrap">
+            <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+              <Printer className="ml-2 h-3 w-3 sm:h-4 sm:w-4" />
               طباعة
             </Button>
-            <Button variant="outline" size="sm">
-              <Download className="ml-2 h-4 w-4" />
+            <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+              <Download className="ml-2 h-3 w-3 sm:h-4 sm:w-4" />
               تصدير PDF
             </Button>
           </div>
         </div>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4 sm:space-y-6 p-3 sm:p-4 md:p-6">
         {/* Revenue Section */}
         <div className="space-y-4">
           <h3 className="text-lg font-bold border-r-4 border-green-500 pr-3 flex items-center gap-2">

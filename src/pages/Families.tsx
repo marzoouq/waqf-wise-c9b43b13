@@ -35,6 +35,8 @@ import {
 import FamilyDialog from '@/components/families/FamilyDialog';
 import { Family } from '@/types';
 import { toast } from 'sonner';
+import { ScrollableTableWrapper } from '@/components/shared/ScrollableTableWrapper';
+import { MobileScrollHint } from '@/components/shared/MobileScrollHint';
 
 const Families = () => {
   const navigate = useNavigate();
