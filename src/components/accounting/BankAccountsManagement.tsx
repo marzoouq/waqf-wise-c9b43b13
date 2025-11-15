@@ -26,12 +26,14 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 
+import { BankAccountRow } from "@/types/supabase-helpers";
+
 export function BankAccountsManagement() {
   const { bankAccounts, isLoading, addBankAccount, updateBankAccount, deleteBankAccount } =
     useBankAccounts();
   const { accounts } = useAccounts();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingAccount, setEditingAccount] = useState<any>(null);
+  const [editingAccount, setEditingAccount] = useState<BankAccountRow | null>(null);
   const [formData, setFormData] = useState({
     account_id: "",
     bank_name: "",
@@ -49,10 +51,19 @@ export function BankAccountsManagement() {
     return <LoadingState message="جاري تحميل الحسابات البنكية..." />;
   }
 
-  const handleOpenDialog = (account?: any) => {
+  const handleOpenDialog = (account?: BankAccountRow) => {
     if (account) {
       setEditingAccount(account);
-      setFormData(account);
+      setFormData({
+        account_id: account.account_id || "",
+        bank_name: account.bank_name,
+        account_number: account.account_number,
+        iban: account.iban || "",
+        swift_code: account.swift_code || "",
+        currency: account.currency,
+        current_balance: account.current_balance,
+        is_active: account.is_active,
+      });
     } else {
       setEditingAccount(null);
       setFormData({
@@ -141,7 +152,7 @@ export function BankAccountsManagement() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleOpenDialog(account)}
+                        onClick={() => handleOpenDialog(account as BankAccountRow)}
                       >
                         <Pencil className="h-4 w-4" />
                       </Button>

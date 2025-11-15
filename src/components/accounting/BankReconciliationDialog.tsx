@@ -17,12 +17,14 @@ interface BankReconciliationDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
+import { BankAccountRow } from "@/types/supabase-helpers";
+
 export function BankReconciliationDialog({ open, onOpenChange }: BankReconciliationDialogProps) {
   const { statements, transactions, createStatement, addTransaction, matchTransaction, reconcileStatement } = useBankReconciliation();
   const { bankAccounts, isLoading: loadingBankAccounts } = useBankAccounts();
   
   const [step, setStep] = useState<"select" | "import" | "match">("select");
-  const [selectedStatement, setSelectedStatement] = useState<any>(null);
+  const [selectedStatement, setSelectedStatement] = useState<{ id: string; bank_account_id: string } | null>(null);
   
   const [newStatement, setNewStatement] = useState({
     bank_account_id: "",
@@ -49,7 +51,7 @@ export function BankReconciliationDialog({ open, onOpenChange }: BankReconciliat
     onOpenChange(false);
   };
 
-  const handleImportTransactions = async (csvData: any[]) => {
+  const handleImportTransactions = async (csvData: Array<{ date: string; description: string; reference: string; amount: string; type: string }>) => {
     for (const row of csvData) {
       await addTransaction({
         bank_statement_id: selectedStatement.id,
@@ -88,7 +90,7 @@ export function BankReconciliationDialog({ open, onOpenChange }: BankReconciliat
                     <SelectValue placeholder="اختر الحساب البنكي" />
                   </SelectTrigger>
                   <SelectContent>
-                    {bankAccounts.map((account) => (
+                    {bankAccounts.map((account: BankAccountRow) => (
                       <SelectItem key={account.id} value={account.id}>
                         {account.bank_name} - {account.account_number}
                       </SelectItem>

@@ -26,18 +26,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 
-type Account = {
-  id: string;
-  code: string;
-  name_ar: string;
-  name_en: string | null;
-  parent_id: string | null;
-  account_type: string;
-  account_nature: string;
-  description: string | null;
-  is_active: boolean;
-  is_header: boolean;
-};
+import { AccountRow } from "@/types/supabase-helpers";
 
 const accountSchema = z.object({
   code: z.string()
@@ -62,14 +51,14 @@ const accountSchema = z.object({
 
 type FormData = z.infer<typeof accountSchema>;
 
-type Props = {
+interface AddAccountDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  account?: Account | null;
-  accounts: Account[];
-};
+  account?: AccountRow | null;
+  accounts: AccountRow[];
+}
 
-const AddAccountDialog = ({ open, onOpenChange, account, accounts }: Props) => {
+const AddAccountDialog = ({ open, onOpenChange, account, accounts }: AddAccountDialogProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
 

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAccounts, Account } from "@/hooks/useAccounts";
+import { useAccounts } from "@/hooks/useAccounts";
 import { ChevronDown, ChevronLeft, Plus, Edit, TrendingUp, TrendingDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -7,12 +7,13 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import AddAccountDialog from "./AddAccountDialog";
+import { AccountRow, AccountWithBalance } from "@/types/supabase-helpers";
 
 interface AccountNodeProps {
-  account: Account & { children?: Account[] };
+  account: AccountWithBalance;
   level: number;
-  onEdit?: (account: Account) => void;
-  onAddChild?: (parentAccount: Account) => void;
+  onEdit?: (account: AccountRow) => void;
+  onAddChild?: (parentAccount: AccountRow) => void;
 }
 
 function AccountNode({ account, level, onEdit, onAddChild }: AccountNodeProps) {
@@ -143,7 +144,7 @@ export function EnhancedAccountsTree() {
   const { accountTree, accounts, isLoading } = useAccounts();
   const [searchTerm, setSearchTerm] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
+  const [selectedAccount, setSelectedAccount] = useState<AccountRow | null>(null);
 
   if (isLoading) {
     return <div className="text-center py-8">جاري التحميل...</div>;

@@ -8,6 +8,7 @@ import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
 import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
+import { TrialBalanceRow } from "@/types/supabase-helpers";
 
 export function TrialBalanceReport() {
   const { trialBalance, isLoading } = useFinancialReports();
@@ -63,7 +64,7 @@ export function TrialBalanceReport() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {trialBalance.map((account) => (
+              {trialBalance.map((account: TrialBalanceRow) => (
                 <TableRow key={account.account_id}>
                   <TableCell className="font-mono text-xs sm:text-sm">{account.code}</TableCell>
                   <TableCell className="text-xs sm:text-sm">{account.name}</TableCell>

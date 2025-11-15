@@ -19,6 +19,7 @@ import { ar } from "date-fns/locale";
 import { FileText, Printer } from "lucide-react";
 import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
 import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
+import { AccountRow, GeneralLedgerEntry } from "@/types/supabase-helpers";
 
 const GeneralLedgerReport = () => {
   const [selectedAccountId, setSelectedAccountId] = useState<string>("");
@@ -70,12 +71,20 @@ const GeneralLedgerReport = () => {
       if (error) throw error;
 
       let balance = 0;
-      const processedData = data.map((line: any) => {
+      const processedData: GeneralLedgerEntry[] = data.map((line: {
+        debit_amount: number;
+        credit_amount: number;
+        journal_entry: { entry_number: string; entry_date: string; description: string };
+      }) => {
         const debit = Number(line.debit_amount);
         const credit = Number(line.credit_amount);
         balance += debit - credit;
         return {
-          ...line,
+          entry_date: line.journal_entry.entry_date,
+          entry_number: line.journal_entry.entry_number,
+          description: line.journal_entry.description,
+          debit_amount: debit,
+          credit_amount: credit,
           balance,
         };
       });
@@ -85,7 +94,7 @@ const GeneralLedgerReport = () => {
     enabled: !!selectedAccountId,
   });
 
-  const selectedAccount = accounts?.find((acc) => acc.id === selectedAccountId);
+  const selectedAccount = accounts?.find((acc: AccountRow) => acc.id === selectedAccountId);
 
   const handlePrint = () => {
     window.print();
@@ -109,7 +118,7 @@ const GeneralLedgerReport = () => {
                   <SelectValue placeholder="اختر الحساب" />
                 </SelectTrigger>
                 <SelectContent>
-                  {accounts?.map((account) => (
+                  {accounts?.map((account: AccountRow) => (
                     <SelectItem key={account.id} value={account.id}>
                       {account.code} - {account.name_ar}
                     </SelectItem>
