@@ -35,6 +35,7 @@ const Dashboard = () => {
   const { activities, isLoading: activitiesLoading } = useActivities();
   const { tasks, isLoading: tasksLoading } = useTasks();
   const queryClient = useQueryClient();
+  const [isRedirecting, setIsRedirecting] = useState(false);
   
   // Real-time subscriptions for activities and tasks
   useEffect(() => {
@@ -77,28 +78,33 @@ const Dashboard = () => {
   }, []);
 
   // NOW we can do conditional returns after all hooks are called
-  if (roleLoading || activitiesLoading || tasksLoading) {
+  if (roleLoading || activitiesLoading || tasksLoading || isRedirecting) {
     return <LoadingState message="جاري تحميل لوحة التحكم..." />;
   }
 
-  // التوجيه حسب الدور
-  if (isBeneficiary) {
+  // التوجيه حسب الدور - مع state management
+  if (isBeneficiary && !isRedirecting) {
+    setIsRedirecting(true);
     return <Navigate to="/beneficiary-dashboard" replace />;
   }
 
-  if (isAccountant) {
+  if (isAccountant && !isRedirecting) {
+    setIsRedirecting(true);
     return <Navigate to="/accountant-dashboard" replace />;
   }
 
-  if (isNazer) {
+  if (isNazer && !isRedirecting) {
+    setIsRedirecting(true);
     return <Navigate to="/nazer-dashboard" replace />;
   }
 
-  if (isCashier) {
+  if (isCashier && !isRedirecting) {
+    setIsRedirecting(true);
     return <Navigate to="/cashier-dashboard" replace />;
   }
 
-  if (isArchivist) {
+  if (isArchivist && !isRedirecting) {
+    setIsRedirecting(true);
     return <Navigate to="/archivist-dashboard" replace />;
   }
 

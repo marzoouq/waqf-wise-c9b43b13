@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,8 +9,11 @@ import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import AccountingStats from "@/components/dashboard/AccountingStats";
 import RecentJournalEntries from "@/components/dashboard/RecentJournalEntries";
+import { ApproveJournalDialog } from "@/components/accounting/ApproveJournalDialog";
 
 const AccountantDashboard = () => {
+  const [selectedApproval, setSelectedApproval] = useState<any>(null);
+  const [isApprovalDialogOpen, setIsApprovalDialogOpen] = useState(false);
   // Fetch pending approvals
   const { data: pendingApprovals = [], isLoading: approvalsLoading } = useQuery({
     queryKey: ["pending_approvals"],
@@ -43,12 +47,31 @@ const AccountantDashboard = () => {
     },
   });
 
-  // Calculate stats
-  const stats = {
-    pendingApprovals: pendingApprovals.length,
-    draftEntries: recentEntries.filter(e => e.status === 'draft').length,
-    postedEntries: recentEntries.filter(e => e.status === 'posted').length,
-    cancelledEntries: recentEntries.filter(e => e.status === 'cancelled').length,
+  // Calculate accurate stats from all data
+  const { data: allStats } = useQuery({
+    queryKey: ["accountant_all_stats"],
+    queryFn: async () => {
+      const [approvalsRes, draftRes, postedRes, cancelledRes] = await Promise.all([
+        supabase.from('approvals').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+        supabase.from('journal_entries').select('*', { count: 'exact', head: true }).eq('status', 'draft'),
+        supabase.from('journal_entries').select('*', { count: 'exact', head: true }).eq('status', 'posted'),
+        supabase.from('journal_entries').select('*', { count: 'exact', head: true }).eq('status', 'cancelled'),
+      ]);
+      
+      return {
+        pendingApprovals: approvalsRes.count || 0,
+        draftEntries: draftRes.count || 0,
+        postedEntries: postedRes.count || 0,
+        cancelledEntries: cancelledRes.count || 0,
+      };
+    },
+  });
+
+  const stats = allStats || {
+    pendingApprovals: 0,
+    draftEntries: 0,
+    postedEntries: 0,
+    cancelledEntries: 0,
   };
 
   const getStatusBadge = (status: string) => {
@@ -192,11 +215,15 @@ const AccountantDashboard = () => {
                           طلب المراجعة: {new Date(approval.created_at).toLocaleDateString("ar-SA")}
                         </p>
                         <div className="flex gap-2">
-                          <Button size="sm" variant="default">
-                            موافقة
-                          </Button>
-                          <Button size="sm" variant="destructive">
-                            رفض
+                          <Button 
+                            size="sm" 
+                            variant="default"
+                            onClick={() => {
+                              setSelectedApproval(approval);
+                              setIsApprovalDialogOpen(true);
+                            }}
+                          >
+                            مراجعة
                           </Button>
                         </div>
                       </div>
@@ -250,6 +277,13 @@ const AccountantDashboard = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Approval Dialog */}
+      <ApproveJournalDialog 
+        open={isApprovalDialogOpen} 
+        onOpenChange={setIsApprovalDialogOpen}
+        approval={selectedApproval}
+      />
     </div>
   );
 };
