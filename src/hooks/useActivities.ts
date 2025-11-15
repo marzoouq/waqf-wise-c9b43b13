@@ -20,7 +20,7 @@ export function useActivities() {
     queryKey: ["activities"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("activities")
+        .from("recent_activities")
         .select("*")
         .order("timestamp", { ascending: false })
         .limit(10);
