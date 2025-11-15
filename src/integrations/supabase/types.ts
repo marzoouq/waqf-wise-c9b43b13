@@ -1272,6 +1272,7 @@ export type Database = {
           created_at: string
           description: string | null
           file_size: string
+          file_size_bytes: number | null
           file_type: string
           folder_id: string | null
           id: string
@@ -1283,6 +1284,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           file_size: string
+          file_size_bytes?: number | null
           file_type: string
           folder_id?: string | null
           id?: string
@@ -1294,6 +1296,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           file_size?: string
+          file_size_bytes?: number | null
           file_type?: string
           folder_id?: string | null
           id?: string
@@ -2285,6 +2288,7 @@ export type Database = {
           payment_number: string
           payment_type: string
           reference_number: string | null
+          status: string | null
           updated_at: string
         }
         Insert: {
@@ -2301,6 +2305,7 @@ export type Database = {
           payment_number: string
           payment_type: string
           reference_number?: string | null
+          status?: string | null
           updated_at?: string
         }
         Update: {
@@ -2317,6 +2322,7 @@ export type Database = {
           payment_number?: string
           payment_type?: string
           reference_number?: string | null
+          status?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -2677,6 +2683,8 @@ export type Database = {
           id: string
           is_active: boolean | null
           name: string
+          name_ar: string
+          name_en: string | null
           requires_approval: boolean | null
           sla_hours: number | null
         }
@@ -2687,6 +2695,8 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           name: string
+          name_ar: string
+          name_en?: string | null
           requires_approval?: boolean | null
           sla_hours?: number | null
         }
@@ -2697,6 +2707,8 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           name?: string
+          name_ar?: string
+          name_en?: string | null
           requires_approval?: boolean | null
           sla_hours?: number | null
         }
@@ -3149,6 +3161,10 @@ export type Database = {
       }
       notify_contract_expiring: { Args: never; Returns: undefined }
       notify_rental_payment_due: { Args: never; Returns: undefined }
+      payment_requires_approval: {
+        Args: { p_amount: number }
+        Returns: boolean
+      }
       setup_demo_accounts: {
         Args: never
         Returns: {
