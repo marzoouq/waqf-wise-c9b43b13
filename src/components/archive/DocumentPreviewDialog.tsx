@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Download, X, FileText, Image as ImageIcon } from "lucide-react";
 import { useState } from "react";
@@ -144,9 +144,9 @@ export function DocumentPreviewDialog({
               </Button>
             </div>
           </div>
-          <p className="text-sm text-muted-foreground mt-2">
+          <DialogDescription className="text-sm text-muted-foreground mt-2">
             {document.name} • {document.file_type}
-          </p>
+          </DialogDescription>
         </DialogHeader>
 
         <div className="mt-4">{getPreviewContent()}</div>

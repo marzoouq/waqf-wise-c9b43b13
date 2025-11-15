@@ -35,7 +35,7 @@ export function ResponsiveDialog({
   open,
   onOpenChange,
   title,
-  description,
+  description = ' ',
   children,
   className,
   size = 'md',
@@ -56,7 +56,7 @@ export function ResponsiveDialog({
         <DialogContent className={cn(sizeClasses[size], 'max-h-[90vh] overflow-y-auto', className)}>
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
-            {description && <DialogDescription>{description}</DialogDescription>}
+            <DialogDescription>{description}</DialogDescription>
           </DialogHeader>
           {children}
         </DialogContent>
@@ -70,7 +70,7 @@ export function ResponsiveDialog({
         <div className="overflow-y-auto px-4 pb-4">
           <DrawerHeader className="text-right px-0">
             <DrawerTitle>{title}</DrawerTitle>
-            {description && <DrawerDescription>{description}</DrawerDescription>}
+            <DrawerDescription>{description}</DrawerDescription>
           </DrawerHeader>
           {children}
         </div>
