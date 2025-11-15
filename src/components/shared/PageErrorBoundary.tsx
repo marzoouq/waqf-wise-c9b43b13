@@ -2,6 +2,7 @@ import { Component, ErrorInfo, ReactNode } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, RefreshCw, Home } from "lucide-react";
+import { logger } from "@/lib/logger";
 
 interface Props {
   children: ReactNode;
@@ -29,7 +30,11 @@ export class PageErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error(`Error in ${this.props.pageName || 'page'}:`, error, errorInfo);
+    logger.error(error, { 
+      context: `page_error_boundary_${this.props.pageName || 'unknown'}`, 
+      severity: 'high',
+      metadata: { errorInfo, pageName: this.props.pageName }
+    });
   }
 
   private handleReset = () => {

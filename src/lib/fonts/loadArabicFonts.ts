@@ -1,6 +1,8 @@
 // تحميل الخطوط العربية من CDN وتحويلها إلى Base64
 // يتم التخزين المؤقت لتحسين الأداء
 
+import { logger } from '@/lib/logger';
+
 interface FontCache {
   regular: string | null;
   bold: string | null;
@@ -33,7 +35,7 @@ async function fetchFontAsBase64(url: string): Promise<string> {
     
     return btoa(binary);
   } catch (error) {
-    console.error('Error loading font:', error);
+    logger.error(error, { context: 'load_font', severity: 'high' });
     throw error;
   }
 }

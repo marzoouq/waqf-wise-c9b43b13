@@ -4,6 +4,7 @@ import QRCode from "qrcode";
 import { formatZATCACurrency, formatVATNumber } from "./zatca";
 import type { OrganizationSettings } from "@/hooks/useOrganizationSettings";
 import { loadAmiriFonts } from "./fonts/loadArabicFonts";
+import { logger } from "./logger";
 
 interface Invoice {
   id: string;
@@ -349,7 +350,7 @@ export const generateInvoicePDF = async (
         { align: "center", maxWidth: qrBoxWidth - 4 }
       );
     } catch (error) {
-      console.error("Error generating QR code:", error);
+      logger.error(error, { context: 'generate_qr_code', severity: 'low' });
     }
   }
 
@@ -426,7 +427,7 @@ export const generateInvoicePDF = async (
     // حفظ الملف
     doc.save(`Invoice-${invoice.invoice_number}.pdf`);
   } catch (error) {
-    console.error("Error in generateInvoicePDF:", error);
+    logger.error(error, { context: 'generate_invoice_pdf', severity: 'high' });
     throw new Error("فشل في إنشاء ملف PDF: " + (error instanceof Error ? error.message : "خطأ غير معروف"));
   }
 };

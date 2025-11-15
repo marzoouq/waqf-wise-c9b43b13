@@ -20,6 +20,7 @@ import { StatCard } from "@/components/dashboard/DashboardStats";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { Pagination } from "@/components/ui/pagination";
+import { logger } from "@/lib/logger";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -124,7 +125,7 @@ const Payments = () => {
 
       setDialogOpen(false);
     } catch (error) {
-      console.error("Error saving payment:", error);
+      logger.error(error, { context: 'save_payment', severity: 'medium' });
     }
   };
 

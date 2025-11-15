@@ -12,6 +12,7 @@ import { LoadingState, CardLoadingSkeleton } from "@/components/shared/LoadingSt
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
 import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
+import { logger } from "@/lib/logger";
 
 const Funds = () => {
   const [distributionDialogOpen, setDistributionDialogOpen] = useState(false);
@@ -45,7 +46,7 @@ const Funds = () => {
 
       setDistributionDialogOpen(false);
     } catch (error) {
-      console.error("Error creating distribution:", error);
+      logger.error(error, { context: 'create_distribution', severity: 'medium' });
     }
   };
 
