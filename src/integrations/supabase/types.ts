@@ -3069,6 +3069,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      calculate_account_balance: {
+        Args: { account_uuid: string }
+        Returns: number
+      }
       calculate_loan_schedule: {
         Args: {
           p_interest_rate: number
