@@ -15,7 +15,7 @@ const RequestsStats = () => {
           <Skeleton className="h-6 w-40" />
           <Skeleton className="h-5 w-20" />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[...Array(6)].map((_, i) => (
             <Card key={i} className="shadow-soft">
               <CardHeader className="pb-3">
@@ -108,14 +108,14 @@ const RequestsStats = () => {
         </button>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-stretch">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
             <Card
               key={stat.title}
-              className={`shadow-soft hover:shadow-lg transition-all duration-300 cursor-pointer group animate-fade-in ${
-                stat.urgent ? 'ring-2 ring-destructive/20' : ''
+              className={`shadow-soft hover:shadow-lg transition-all duration-300 cursor-pointer group animate-fade-in flex flex-col ${
+                stat.urgent ? 'ring-2 ring-destructive/50' : ''
               }`}
               style={{ animationDelay: `${index * 50}ms` }}
               onClick={() => navigate('/requests')}
@@ -132,7 +132,7 @@ const RequestsStats = () => {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="flex-1">
                 <div className={`text-3xl font-bold ${stat.color} mb-2`}>
                   {stat.value}
                 </div>
