@@ -94,11 +94,11 @@ export default function RevenueDistributionChart() {
         <ResponsiveContainer width="100%" height={350}>
           <PieChart>
             <Pie
-              data={data}
+              data={data as any}
               cx="50%"
               cy="50%"
               labelLine={false}
-              label={({ name, percentage }) => `${name}: ${percentage.toFixed(1)}%`}
+              label={({ name, percent }: any) => `${name}: ${(percent * 100).toFixed(1)}%`}
               outerRadius={100}
               fill="#8884d8"
               dataKey="value"
