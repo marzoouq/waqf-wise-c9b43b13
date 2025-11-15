@@ -12,10 +12,11 @@ import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
+import { commonValidation } from "@/lib/validationSchemas";
 
 const receiptSchema = z.object({
   payment_number: z.string().min(1, { message: "رقم السند مطلوب" }),
-  payment_date: z.string().min(1, { message: "التاريخ مطلوب" }),
+  payment_date: commonValidation.dateString("التاريخ غير صحيح"),
   amount: z.coerce.number().min(0.01, { message: "المبلغ يجب أن يكون أكبر من صفر" }),
   payment_method: z.enum(["cash", "bank_transfer", "cheque", "card"], {
     required_error: "طريقة الدفع مطلوبة",

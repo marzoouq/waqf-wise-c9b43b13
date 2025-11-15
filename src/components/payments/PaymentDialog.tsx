@@ -21,13 +21,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { format } from "date-fns";
+import { commonValidation } from "@/lib/validationSchemas";
 
 const paymentSchema = z.object({
   payment_type: z.enum(["receipt", "payment"], {
     required_error: "نوع السند مطلوب",
   }),
   payment_number: z.string().min(1, { message: "رقم السند مطلوب" }),
-  payment_date: z.string().min(1, { message: "التاريخ مطلوب" }),
+  payment_date: commonValidation.dateString("التاريخ غير صحيح"),
   amount: z.coerce.number().min(0.01, { message: "المبلغ يجب أن يكون أكبر من صفر" }),
   payment_method: z.enum(["cash", "bank_transfer", "cheque", "card"], {
     required_error: "طريقة الدفع مطلوبة",
