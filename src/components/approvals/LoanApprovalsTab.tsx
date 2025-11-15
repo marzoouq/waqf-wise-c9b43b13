@@ -12,17 +12,18 @@ import { useAuth } from "@/hooks/useAuth";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { LoanForApproval, calculateProgress, getNextPendingApproval, StatusConfigMap } from "@/types/approvals";
 
 export function LoanApprovalsTab() {
   const { toast } = useToast();
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [selectedLoan, setSelectedLoan] = useState<any>(null);
+  const [selectedLoan, setSelectedLoan] = useState<LoanForApproval | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [approvalNotes, setApprovalNotes] = useState("");
   const [approvalAction, setApprovalAction] = useState<"approve" | "reject">("approve");
 
-  const { data: loans, isLoading } = useQuery({
+  const { data: loans, isLoading } = useQuery<LoanForApproval[]>({
     queryKey: ["loans_with_approvals"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -36,7 +37,7 @@ export function LoanApprovalsTab() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data;
+      return data as unknown as LoanForApproval[];
     },
   });
 
@@ -183,10 +184,8 @@ export function LoanApprovalsTab() {
   return (
     <>
       <div className="space-y-4">
-        {loans?.map((loan: any) => {
-          const pendingApproval = loan.loan_approvals?.find(
-            (a: any) => a.status === "معلق"
-          );
+        {loans?.map((loan: LoanForApproval) => {
+          const pendingApproval = getNextPendingApproval(loan.loan_approvals);
           const canApprove = pendingApproval !== undefined;
 
           return (

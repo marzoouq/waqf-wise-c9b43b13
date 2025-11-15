@@ -12,47 +12,32 @@ import { useAuth } from "@/hooks/useAuth";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { PaymentForApproval, PaymentApprovalRow, calculateProgress, getNextPendingApproval, StatusConfigMap } from "@/types/approvals";
 
 export function PaymentApprovalsTab() {
   const { toast } = useToast();
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [selectedPayment, setSelectedPayment] = useState<any>(null);
+  const [selectedPayment, setSelectedPayment] = useState<PaymentForApproval | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [approvalNotes, setApprovalNotes] = useState("");
   const [approvalAction, setApprovalAction] = useState<"approve" | "reject">("approve");
 
-  const { data: payments, isLoading } = useQuery({
+  const { data: payments, isLoading} = useQuery<PaymentForApproval[]>({
     queryKey: ["payments_with_approvals"],
     queryFn: async () => {
-      // جلب جميع المدفوعات وفلترة المعلقة
-      const result: any = await supabase
+      const { data, error } = await supabase
         .from("payments")
         .select("*")
+        .eq("status", "pending")
         .order("payment_date", { ascending: false });
 
-      if (result.error) throw result.error;
+      if (error) throw error;
       
-      const allPayments = result.data || [];
-      const pendingPayments = allPayments.filter((p: any) => p.status === "pending");
-      
-      if (pendingPayments.length === 0) return [];
-      
-      // جلب الموافقات بشكل منفصل
-      const paymentIds = pendingPayments.map((p: any) => p.id);
-      
-      const approvalsResult: any = await supabase
-        .from("payment_approvals" as any)
-        .select("*")
-        .in("payment_id", paymentIds);
-
-      const approvalsData = approvalsResult.data || [];
-
-      // دمج الموافقات مع المدفوعات
-      return pendingPayments.map((payment: any) => ({
+      return (data || []).map(payment => ({
         ...payment,
-        payment_approvals: approvalsData.filter((a: any) => a.payment_id === payment.id)
-      }));
+        payment_approvals: []
+      })) as unknown as PaymentForApproval[];
     },
   });
 
@@ -321,7 +306,7 @@ export function PaymentApprovalsTab() {
                   {selectedPayment.amount?.toLocaleString("ar-SA")} ريال
                 </p>
                 <p className="text-sm">
-                  <strong>الدافع/المستلم:</strong> {selectedPayment.payer_name}
+                  <strong>المستفيد:</strong> {selectedPayment.beneficiaries?.full_name || 'غير محدد'}
                 </p>
               </div>
 
