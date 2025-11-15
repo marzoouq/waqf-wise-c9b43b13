@@ -141,8 +141,9 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'react-vendor': ['react', 'react-dom', 'react-router-dom', 'react-is'],
           'supabase': ['@supabase/supabase-js'],
+          'charts': ['recharts'],
           'ui': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu']
         }
       }
