@@ -2,10 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
-import { Printer, Download } from "lucide-react";
+import { Printer, Download, Loader2 } from "lucide-react";
 import EnhancedInvoiceView from "./EnhancedInvoiceView";
 import { useOrganizationSettings } from "@/hooks/useOrganizationSettings";
 import { generateInvoicePDF } from "@/lib/generateInvoicePDF";
+import { toast } from "sonner";
+import { useState } from "react";
 
 interface ViewInvoiceDialogProps {
   invoiceId: string | null;
@@ -15,6 +17,7 @@ interface ViewInvoiceDialogProps {
 
 export const ViewInvoiceDialog = ({ invoiceId, open, onOpenChange }: ViewInvoiceDialogProps) => {
   const { settings: orgSettings } = useOrganizationSettings();
+  const [isExporting, setIsExporting] = useState(false);
   
   const { data: invoice, isLoading: invoiceLoading } = useQuery({
     queryKey: ["invoice", invoiceId],
@@ -46,10 +49,35 @@ export const ViewInvoiceDialog = ({ invoiceId, open, onOpenChange }: ViewInvoice
     enabled: !!invoiceId,
   });
 
-  const handlePrint = () => window.print();
+  const handlePrint = () => {
+    const printContent = document.getElementById('invoice-content');
+    if (!printContent) {
+      toast.error("لم يتم العثور على محتوى الفاتورة");
+      return;
+    }
+    
+    // إضافة كلاس خاص للطباعة
+    document.body.classList.add('printing-invoice');
+    
+    // تأخير بسيط لضمان تطبيق الأنماط
+    setTimeout(() => {
+      window.print();
+      document.body.classList.remove('printing-invoice');
+    }, 100);
+  };
+  
   const handleDownloadPDF = async () => {
     if (invoice && invoiceLines) {
-      await generateInvoicePDF(invoice, invoiceLines, orgSettings);
+      setIsExporting(true);
+      try {
+        await generateInvoicePDF(invoice, invoiceLines, orgSettings);
+        toast.success("تم تصدير الفاتورة بنجاح");
+      } catch (error) {
+        console.error("Error generating PDF:", error);
+        toast.error("حدث خطأ أثناء تصدير الفاتورة");
+      } finally {
+        setIsExporting(false);
+      }
     }
   };
 
@@ -73,12 +101,18 @@ export const ViewInvoiceDialog = ({ invoiceId, open, onOpenChange }: ViewInvoice
             <Printer className="h-4 w-4 ml-2" />
             طباعة
           </Button>
-          <Button variant="outline" size="sm" onClick={handleDownloadPDF}>
-            <Download className="h-4 w-4 ml-2" />
-            تصدير PDF
+          <Button variant="outline" size="sm" onClick={handleDownloadPDF} disabled={isExporting}>
+            {isExporting ? (
+              <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+            ) : (
+              <Download className="h-4 w-4 ml-2" />
+            )}
+            {isExporting ? "جاري التصدير..." : "تصدير PDF"}
           </Button>
         </div>
-        <EnhancedInvoiceView invoice={invoice} lines={invoiceLines || []} orgSettings={orgSettings} />
+        <div id="invoice-content">
+          <EnhancedInvoiceView invoice={invoice} lines={invoiceLines || []} orgSettings={orgSettings} />
+        </div>
       </div>
     </ResponsiveDialog>
   );

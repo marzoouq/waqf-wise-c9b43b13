@@ -49,25 +49,26 @@ export const generateInvoicePDF = async (
   lines: InvoiceLine[],
   orgSettings: OrganizationSettings | null
 ) => {
-  const doc = new jsPDF({
-    orientation: "portrait",
-    unit: "mm",
-    format: "a4",
-  });
+  try {
+    const doc = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4",
+    });
 
-  const pageWidth = doc.internal.pageSize.width;
-  const pageHeight = doc.internal.pageSize.height;
-  const margin = 15;
-  let yPos = margin;
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+    const margin = 15;
+    let yPos = margin;
 
-  // ألوان
-  const primaryColor: [number, number, number] = [41, 128, 185]; // أزرق
-  const secondaryColor: [number, number, number] = [52, 73, 94]; // رمادي غامق
-  const lightGray: [number, number, number] = [236, 240, 241];
+    // ألوان
+    const primaryColor: [number, number, number] = [41, 128, 185]; // أزرق
+    const secondaryColor: [number, number, number] = [52, 73, 94]; // رمادي غامق
+    const lightGray: [number, number, number] = [236, 240, 241];
 
-  // خلفية الهيدر
-  doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-  doc.rect(0, 0, pageWidth, 50, "F");
+    // خلفية الهيدر
+    doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+    doc.rect(0, 0, pageWidth, 50, "F");
 
   // عنوان الفاتورة
   doc.setTextColor(255, 255, 255);
@@ -341,6 +342,10 @@ export const generateInvoicePDF = async (
     );
   }
 
-  // حفظ الملف
-  doc.save(`Invoice-${invoice.invoice_number}.pdf`);
+    // حفظ الملف
+    doc.save(`Invoice-${invoice.invoice_number}.pdf`);
+  } catch (error) {
+    console.error("Error in generateInvoicePDF:", error);
+    throw new Error("فشل في إنشاء ملف PDF: " + (error instanceof Error ? error.message : "خطأ غير معروف"));
+  }
 };
