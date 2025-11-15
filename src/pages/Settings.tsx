@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { User, Bell, Shield, Database, Palette, Globe, Settings as SettingsIcon } from "lucide-react";
+import { User, Bell, Shield, Database, Palette, Globe, Settings as SettingsIcon, Building2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProfileDialog } from "@/components/settings/ProfileDialog";
 import { NotificationsSettingsDialog } from "@/components/settings/NotificationsSettingsDialog";
@@ -8,6 +8,7 @@ import { DatabaseSettingsDialog } from "@/components/settings/DatabaseSettingsDi
 import { AppearanceSettingsDialog } from "@/components/settings/AppearanceSettingsDialog";
 import { LanguageSettingsDialog } from "@/components/settings/LanguageSettingsDialog";
 import { SystemSettingsDialog } from "@/components/settings/SystemSettingsDialog";
+import OrganizationSettingsDialog from "@/components/settings/OrganizationSettingsDialog";
 import { PushNotificationsSettings } from "@/components/settings/PushNotificationsSettings";
 import { LeakedPasswordCheck } from "@/components/settings/LeakedPasswordCheck";
 import { LanguageSelector } from "@/components/settings/LanguageSelector";
@@ -22,6 +23,7 @@ const Settings = () => {
   const [appearanceDialogOpen, setAppearanceDialogOpen] = useState(false);
   const [languageDialogOpen, setLanguageDialogOpen] = useState(false);
   const [systemSettingsDialogOpen, setSystemSettingsDialogOpen] = useState(false);
+  const [organizationDialogOpen, setOrganizationDialogOpen] = useState(false);
 
   const handleSectionClick = (sectionTitle: string) => {
     switch (sectionTitle) {
@@ -46,6 +48,9 @@ const Settings = () => {
       case "إعدادات النظام":
         setSystemSettingsDialogOpen(true);
         break;
+      case "إعدادات المنشأة":
+        setOrganizationDialogOpen(true);
+        break;
       default:
         toast({
           title: `إعدادات ${sectionTitle}`,
@@ -57,48 +62,55 @@ const Settings = () => {
   const settingsSections = [
     {
       id: 1,
-      title: "الملف الشخصي",
-      description: "إدارة معلومات الحساب والبيانات الشخصية",
-      icon: User,
+      title: "إعدادات المنشأة",
+      description: "معلومات المنشأة للفواتير الضريبية",
+      icon: Building2,
       color: "bg-primary/10 text-primary",
     },
     {
       id: 2,
-      title: "الإشعارات",
-      description: "تخصيص إعدادات التنبيهات والإشعارات",
-      icon: Bell,
+      title: "الملف الشخصي",
+      description: "إدارة معلومات الحساب والبيانات الشخصية",
+      icon: User,
       color: "bg-success/10 text-success",
     },
     {
       id: 3,
-      title: "الأمان والخصوصية",
-      description: "إدارة كلمة المرور والمصادقة الثنائية",
-      icon: Shield,
+      title: "الإشعارات",
+      description: "تخصيص إعدادات التنبيهات والإشعارات",
+      icon: Bell,
       color: "bg-warning/10 text-warning",
     },
     {
       id: 4,
+      title: "الأمان والخصوصية",
+      description: "إدارة كلمة المرور والمصادقة الثنائية",
+      icon: Shield,
+      color: "bg-destructive/10 text-destructive",
+    },
+    {
+      id: 5,
       title: "قاعدة البيانات",
       description: "إعدادات النسخ الاحتياطي والاستعادة",
       icon: Database,
       color: "bg-accent/10 text-accent",
     },
     {
-      id: 5,
+      id: 6,
       title: "المظهر",
       description: "تخصيص الألوان والثيم",
       icon: Palette,
       color: "bg-primary/10 text-primary",
     },
     {
-      id: 6,
+      id: 7,
       title: "اللغة والمنطقة",
       description: "إعدادات اللغة والمنطقة الزمنية",
       icon: Globe,
       color: "bg-success/10 text-success",
     },
     {
-      id: 7,
+      id: 8,
       title: "إعدادات النظام",
       description: "إدارة الإعدادات العامة والمتقدمة",
       icon: SettingsIcon,
@@ -211,6 +223,10 @@ const Settings = () => {
         <SystemSettingsDialog
           open={systemSettingsDialogOpen}
           onOpenChange={setSystemSettingsDialogOpen}
+        />
+        <OrganizationSettingsDialog
+          open={organizationDialogOpen}
+          onOpenChange={setOrganizationDialogOpen}
         />
       </div>
 

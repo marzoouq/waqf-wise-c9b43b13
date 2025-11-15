@@ -1539,6 +1539,9 @@ export type Database = {
           line_number: number
           line_total: number
           quantity: number
+          subtotal: number | null
+          tax_amount: number | null
+          tax_rate: number | null
           unit_price: number
         }
         Insert: {
@@ -1550,6 +1553,9 @@ export type Database = {
           line_number: number
           line_total?: number
           quantity?: number
+          subtotal?: number | null
+          tax_amount?: number | null
+          tax_rate?: number | null
           unit_price?: number
         }
         Update: {
@@ -1561,6 +1567,9 @@ export type Database = {
           line_number?: number
           line_total?: number
           quantity?: number
+          subtotal?: number | null
+          tax_amount?: number | null
+          tax_rate?: number | null
           unit_price?: number
         }
         Relationships: [
@@ -1584,54 +1593,75 @@ export type Database = {
         Row: {
           created_at: string
           customer_address: string | null
+          customer_city: string | null
+          customer_commercial_registration: string | null
           customer_email: string | null
           customer_name: string
           customer_phone: string | null
+          customer_vat_number: string | null
           due_date: string | null
           id: string
           invoice_date: string
+          invoice_hash: string | null
           invoice_number: string
+          invoice_time: string | null
           journal_entry_id: string | null
           notes: string | null
+          qr_code_data: string | null
           status: string
           subtotal: number
           tax_amount: number
+          tax_rate: number | null
           total_amount: number
           updated_at: string
         }
         Insert: {
           created_at?: string
           customer_address?: string | null
+          customer_city?: string | null
+          customer_commercial_registration?: string | null
           customer_email?: string | null
           customer_name: string
           customer_phone?: string | null
+          customer_vat_number?: string | null
           due_date?: string | null
           id?: string
           invoice_date: string
+          invoice_hash?: string | null
           invoice_number: string
+          invoice_time?: string | null
           journal_entry_id?: string | null
           notes?: string | null
+          qr_code_data?: string | null
           status?: string
           subtotal?: number
           tax_amount?: number
+          tax_rate?: number | null
           total_amount?: number
           updated_at?: string
         }
         Update: {
           created_at?: string
           customer_address?: string | null
+          customer_city?: string | null
+          customer_commercial_registration?: string | null
           customer_email?: string | null
           customer_name?: string
           customer_phone?: string | null
+          customer_vat_number?: string | null
           due_date?: string | null
           id?: string
           invoice_date?: string
+          invoice_hash?: string | null
           invoice_number?: string
+          invoice_time?: string | null
           journal_entry_id?: string | null
           notes?: string | null
+          qr_code_data?: string | null
           status?: string
           subtotal?: number
           tax_amount?: number
+          tax_rate?: number | null
           total_amount?: number
           updated_at?: string
         }
@@ -2155,6 +2185,60 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      organization_settings: {
+        Row: {
+          address_ar: string
+          address_en: string | null
+          city: string
+          commercial_registration_number: string
+          country: string | null
+          created_at: string | null
+          email: string | null
+          id: string
+          logo_url: string | null
+          organization_name_ar: string
+          organization_name_en: string | null
+          phone: string | null
+          postal_code: string | null
+          updated_at: string | null
+          vat_registration_number: string
+        }
+        Insert: {
+          address_ar: string
+          address_en?: string | null
+          city: string
+          commercial_registration_number: string
+          country?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          logo_url?: string | null
+          organization_name_ar: string
+          organization_name_en?: string | null
+          phone?: string | null
+          postal_code?: string | null
+          updated_at?: string | null
+          vat_registration_number: string
+        }
+        Update: {
+          address_ar?: string
+          address_en?: string | null
+          city?: string
+          commercial_registration_number?: string
+          country?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          logo_url?: string | null
+          organization_name_ar?: string
+          organization_name_en?: string | null
+          phone?: string | null
+          postal_code?: string | null
+          updated_at?: string | null
+          vat_registration_number?: string
+        }
+        Relationships: []
       }
       payments: {
         Row: {
