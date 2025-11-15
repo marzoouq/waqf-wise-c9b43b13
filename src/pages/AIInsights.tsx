@@ -68,7 +68,7 @@ export default function AIInsights() {
             icon={Sparkles}
             action={{
               label: "توليد رؤى",
-              onClick: () => generateInsights('general'),
+              onClick: () => generateInsights('beneficiaries'),
             }}
           />
         ) : (
