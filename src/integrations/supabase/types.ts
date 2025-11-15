@@ -1993,6 +1993,36 @@ export type Database = {
           },
         ]
       }
+      login_attempts: {
+        Row: {
+          attempted_at: string
+          created_at: string | null
+          email: string
+          id: string
+          ip_address: string
+          success: boolean
+          user_agent: string | null
+        }
+        Insert: {
+          attempted_at?: string
+          created_at?: string | null
+          email: string
+          id?: string
+          ip_address: string
+          success?: boolean
+          user_agent?: string | null
+        }
+        Update: {
+          attempted_at?: string
+          created_at?: string | null
+          email?: string
+          id?: string
+          ip_address?: string
+          success?: boolean
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       maintenance_requests: {
         Row: {
           actual_cost: number | null
@@ -3020,6 +3050,16 @@ export type Database = {
         }
         Relationships: []
       }
+      recent_activities: {
+        Row: {
+          action: string | null
+          created_at: string | null
+          id: string | null
+          timestamp: string | null
+          user_name: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       assign_user_role: {
@@ -3044,6 +3084,15 @@ export type Database = {
         Returns: number
       }
       check_overdue_requests: { Args: never; Returns: undefined }
+      check_rate_limit: {
+        Args: {
+          p_email: string
+          p_ip_address: string
+          p_max_attempts?: number
+          p_time_window_minutes?: number
+        }
+        Returns: boolean
+      }
       create_auto_journal_entry: {
         Args: {
           p_amount: number
@@ -3084,6 +3133,15 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      log_login_attempt: {
+        Args: {
+          p_email: string
+          p_ip_address: string
+          p_success: boolean
+          p_user_agent?: string
+        }
+        Returns: undefined
       }
       notify_contract_expiring: { Args: never; Returns: undefined }
       notify_rental_payment_due: { Args: never; Returns: undefined }
