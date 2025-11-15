@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
+import { QUERY_CONFIG } from "@/lib/queryOptimization";
 
 export interface LoanInstallment {
   id: string;
@@ -63,6 +64,7 @@ export function useLoanInstallments(loanId?: string) {
       return data as LoanInstallment[];
     },
     enabled: !!loanId,
+    ...QUERY_CONFIG.LOANS,
   });
 
   // Update installment mutation (for marking as paid)

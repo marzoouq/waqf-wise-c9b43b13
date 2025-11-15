@@ -89,6 +89,13 @@ export const QUERY_CONFIG = {
     refetchOnWindowFocus: true,
     retry: 2,
   },
+  LOANS: {
+    staleTime: CACHE_TIMES.STANDARD,
+    cacheTime: CACHE_TIMES.STANDARD * 2,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    retry: 2,
+  },
 } as const;
 
 /**
