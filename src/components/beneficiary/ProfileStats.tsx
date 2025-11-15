@@ -22,25 +22,21 @@ export function ProfileStats({ beneficiaryId }: ProfileStatsProps) {
   const { data: stats, isLoading } = useQuery<StatsData>({
     queryKey: ['beneficiary-stats', beneficiaryId],
     queryFn: async () => {
-      // @ts-ignore - Avoiding deep type instantiation
       const { data: payments } = await supabase
         .from('payments')
         .select('amount')
         .eq('beneficiary_id', beneficiaryId);
 
-      // @ts-ignore
       const { data: requests } = await supabase
         .from('beneficiary_requests')
         .select('status')
         .eq('beneficiary_id', beneficiaryId);
 
-      // @ts-ignore
       const { count: attachmentsCount } = await supabase
         .from('beneficiary_attachments')
         .select('*', { count: 'exact', head: true })
         .eq('beneficiary_id', beneficiaryId);
 
-      // @ts-ignore
       const { count: familyCount } = await supabase
         .from('family_members')
         .select('*', { count: 'exact', head: true })

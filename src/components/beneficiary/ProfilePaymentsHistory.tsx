@@ -15,7 +15,6 @@ export function ProfilePaymentsHistory({ beneficiaryId }: ProfilePaymentsHistory
   const { data: payments, isLoading } = useQuery({
     queryKey: ['beneficiary-payments', beneficiaryId],
     queryFn: async () => {
-      // @ts-ignore
       const { data, error } = await supabase
         .from('payments')
         .select('*')
