@@ -10,6 +10,8 @@ import { useCustomReports } from '@/hooks/useCustomReports';
 import { Plus, Save, Play, Trash2, Star } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { logger } from '@/lib/logger';
+import { ReportTemplate } from '@/hooks/useCustomReports';
+import { Json } from '@/integrations/supabase/types';
 
 export const ReportBuilder = () => {
   const { templates, isLoading, createTemplate, deleteTemplate, toggleFavorite, executeReport } = useCustomReports();
@@ -18,7 +20,7 @@ export const ReportBuilder = () => {
   const [reportDescription, setReportDescription] = useState('');
   const [reportType, setReportType] = useState('beneficiaries');
   const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
-  const [filters, setFilters] = useState<any>({});
+  const [filters, setFilters] = useState<Record<string, unknown>>({});
 
   const reportTypes = [
     { value: 'beneficiaries', label: 'المستفيدون' },
@@ -57,7 +59,7 @@ export const ReportBuilder = () => {
       configuration: {
         columns: selectedColumns,
         filters,
-      },
+      } as Json,
       is_public: false,
       is_favorite: false,
     });
@@ -69,7 +71,7 @@ export const ReportBuilder = () => {
     setFilters({});
   };
 
-  const handleExecuteReport = async (template: any) => {
+  const handleExecuteReport = async (template: ReportTemplate) => {
     try {
       const results = await executeReport(template);
       // يمكن عرض النتائج في modal أو تصديرها

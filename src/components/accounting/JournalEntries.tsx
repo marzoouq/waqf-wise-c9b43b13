@@ -21,6 +21,7 @@ import AddJournalEntryDialog from "./AddJournalEntryDialog";
 import ViewJournalEntryDialog from "./ViewJournalEntryDialog";
 import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
 import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
+import { BadgeVariant } from "@/types/approvals";
 
 type JournalEntry = {
   id: string;
@@ -76,7 +77,7 @@ const JournalEntries = () => {
   }, [allEntries, searchQuery, statusFilter, dateFrom, dateTo]);
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, { label: string; variant: any }> = {
+    const variants: Record<string, { label: string; variant: BadgeVariant }> = {
       draft: { label: "مسودة", variant: "secondary" },
       posted: { label: "مرحّل", variant: "default" },
       cancelled: { label: "ملغى", variant: "destructive" },

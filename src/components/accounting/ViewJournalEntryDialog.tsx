@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/table";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import { BadgeVariant, JournalEntryWithLines } from "@/types/approvals";
 
 type JournalEntry = {
   id: string;
@@ -95,7 +96,7 @@ const ViewJournalEntryDialog = ({ open, onOpenChange, entry }: Props) => {
   };
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, { label: string; variant: any }> = {
+    const variants: Record<string, { label: string; variant: BadgeVariant }> = {
       draft: { label: "مسودة", variant: "secondary" },
       posted: { label: "مرحّل", variant: "default" },
       cancelled: { label: "ملغى", variant: "destructive" },
@@ -152,7 +153,7 @@ const ViewJournalEntryDialog = ({ open, onOpenChange, entry }: Props) => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {lines?.map((line: any) => (
+              {lines?.map((line) => (
                 <TableRow key={line.id}>
                   <TableCell>
                     <div className="font-mono text-sm">{line.account.code}</div>

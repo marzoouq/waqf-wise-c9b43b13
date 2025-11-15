@@ -195,8 +195,8 @@ export function EnhancedAccountsTree() {
       <AddAccountDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
-        account={selectedAccount as any}
-        accounts={accounts as any[]}
+        account={selectedAccount || undefined}
+        accounts={accounts}
       />
     </>
   );

@@ -51,7 +51,7 @@ export function LoanApprovalsTab() {
       const status = action === "approve" ? "موافق" : "مرفوض";
       
       const { error } = await supabase
-        .from("loan_approvals" as any)
+        .from("loan_approvals")
         .update({
           status,
           notes,
@@ -63,7 +63,7 @@ export function LoanApprovalsTab() {
       if (error) throw error;
 
       // سجل في تاريخ الموافقات
-      await supabase.from("approval_history" as any).insert({
+      await supabase.from("approval_history").insert({
         approval_type: "loan",
         approval_id: approvalId,
         reference_id: loanId,
@@ -82,18 +82,18 @@ export function LoanApprovalsTab() {
           .single();
 
         const { data: allApprovals } = await supabase
-          .from("loan_approvals" as any)
+          .from("loan_approvals")
           .select("status")
           .eq("loan_id", loanId);
 
-        const allApproved = allApprovals?.every((a: any) => a.status === "موافق");
+        const allApproved = allApprovals?.every((a) => a.status === "موافق");
 
         if (allApproved && loan) {
           // إنشاء القيد المحاسبي
-          await supabase.rpc("create_auto_journal_entry_for_loan" as any, {
+          await supabase.rpc("create_auto_journal_entry_for_loan", {
             p_loan_id: loanId,
             p_amount: loan.loan_amount,
-            p_description: `صرف قرض ${loan.loan_number} - ${(loan.beneficiaries as any).full_name}`,
+            p_description: `صرف قرض ${loan.loan_number} - ${(loan.beneficiaries as { full_name: string }).full_name}`,
             p_transaction_date: new Date().toISOString().split('T')[0]
           });
         }
@@ -113,16 +113,17 @@ export function LoanApprovalsTab() {
       setSelectedLoan(null);
       setApprovalNotes("");
     },
-    onError: (error: any) => {
+    onError: (error) => {
+      const errorMessage = error instanceof Error ? error.message : "حدث خطأ في العملية";
       toast({
         title: "خطأ في العملية",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive"
       });
     }
   });
 
-  const handleApprovalClick = (loan: any, action: "approve" | "reject") => {
+  const handleApprovalClick = (loan: LoanForApproval, action: "approve" | "reject") => {
     setSelectedLoan(loan);
     setApprovalAction(action);
     setIsDialogOpen(true);
@@ -132,7 +133,7 @@ export function LoanApprovalsTab() {
     if (!selectedLoan) return;
 
     const pendingApproval = selectedLoan.loan_approvals?.find(
-      (a: any) => a.status === "معلق"
+      (a) => a.status === "معلق"
     );
 
     if (!pendingApproval) {
@@ -152,7 +153,7 @@ export function LoanApprovalsTab() {
   };
 
   const getStatusBadge = (status: string) => {
-    const config: Record<string, { label: string; variant: any; icon: any }> = {
+    const config: Record<string, { label: string; variant: BadgeVariant; icon: LucideIcon }> = {
       "pending": { label: "معلق", variant: "secondary", icon: Clock },
       "active": { label: "نشط", variant: "default", icon: CheckCircle },
       "cancelled": { label: "ملغي", variant: "destructive", icon: XCircle },
@@ -229,7 +230,7 @@ export function LoanApprovalsTab() {
                 <div className="mt-4 pt-4 border-t">
                   <p className="text-sm font-semibold mb-2">مستويات الموافقة:</p>
                   <div className="flex gap-2">
-                    {loan.loan_approvals?.map((approval: any) => (
+                    {loan.loan_approvals?.map((approval) => (
                       <Badge
                         key={approval.id}
                         variant={

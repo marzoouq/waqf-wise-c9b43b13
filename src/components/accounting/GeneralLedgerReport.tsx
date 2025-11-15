@@ -17,7 +17,7 @@ import {
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { FileText, Printer } from "lucide-react";
-import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
+import { GeneralLedgerEntry } from "@/types/supabase-helpers";
 import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
 import { AccountRow, GeneralLedgerEntry } from "@/types/supabase-helpers";
 
@@ -196,7 +196,7 @@ const GeneralLedgerReport = () => {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  ledgerData.map((line: any) => (
+                  ledgerData.map((line) => (
                     <TableRow key={line.id}>
                       <TableCell className="text-sm">
                         {format(new Date(line.journal_entry.entry_date), "dd/MM/yyyy")}

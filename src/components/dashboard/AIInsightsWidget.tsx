@@ -1,11 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, TrendingUp, AlertTriangle, Lightbulb, ArrowLeft } from "lucide-react";
+import { Sparkles, TrendingUp, AlertTriangle, Lightbulb, ArrowLeft, LucideIcon } from "lucide-react";
 import { useAIInsights } from "@/hooks/useAIInsights";
 import { useNavigate } from "react-router-dom";
 
-const categoryIcons: Record<string, any> = {
+const categoryIcons: Record<string, LucideIcon> = {
   prediction: TrendingUp,
   recommendation: Lightbulb,
   anomaly: AlertTriangle,

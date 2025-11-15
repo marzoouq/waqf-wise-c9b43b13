@@ -45,7 +45,7 @@ export function RequestApprovalsTab() {
     );
   };
 
-  const getApprovalProgress = (approvals: any[]) => {
+  const getApprovalProgress = (approvals: { status: string }[] | undefined) => {
     const total = 3;
     const approved = approvals?.filter((a) => a.status === "موافق").length || 0;
     return `${approved}/${total}`;
@@ -61,7 +61,7 @@ export function RequestApprovalsTab() {
 
   return (
     <div className="space-y-4">
-      {requests?.map((request: RequestWithBeneficiary) => (
+      {requests?.map((request) => (
         <Card key={request.id}>
           <CardHeader>
             <div className="flex items-center justify-between">
