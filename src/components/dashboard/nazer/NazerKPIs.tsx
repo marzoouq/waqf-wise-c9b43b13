@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   Building2, 
@@ -10,224 +9,37 @@ import {
   Wallet,
   PieChart
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-
-interface KPIData {
-  totalAssets: number;
-  totalRevenue: number;
-  activeBeneficiaries: number;
-  activeProperties: number;
-  occupiedProperties: number;
-  pendingLoans: number;
-  availableBudget: number;
-  monthlyReturn: number;
-}
+import { useNazerKPIs } from "@/hooks/useNazerKPIs";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 export default function NazerKPIs() {
-  const [data, setData] = useState<KPIData>({
-    totalAssets: 0,
-    totalRevenue: 0,
-    activeBeneficiaries: 0,
-    activeProperties: 0,
-    occupiedProperties: 0,
-    pendingLoans: 0,
-    availableBudget: 0,
-    monthlyReturn: 0
-  });
-  const [isLoading, setIsLoading] = useState(true);
+  const { data, isLoading, isError, error } = useNazerKPIs();
 
-  useEffect(() => {
-    fetchKPIs();
-
-    // Real-time updates
-    const channel = supabase
-      .channel('nazer-kpis')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'journal_entry_lines' }, fetchKPIs)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'beneficiaries' }, fetchKPIs)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'properties' }, fetchKPIs)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'loans' }, fetchKPIs)
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
-
-  const fetchKPIs = async () => {
-    try {
-      setIsLoading(true);
-
-      // جلب الأصول الكلية
-      const { data: accountsData, error: accountsError } = await supabase
-        .from('journal_entry_lines')
-        .select('debit_amount, credit_amount, accounts(account_type, account_nature)');
-
-      if (accountsError) throw accountsError;
-
-    let totalAssets = 0;
-    let totalRevenue = 0;
-
-    if (accountsData) {
-      accountsData.forEach(line => {
-        if (line.accounts?.account_type === 'asset') {
-          totalAssets += (line.debit_amount || 0) - (line.credit_amount || 0);
-        } else if (line.accounts?.account_type === 'revenue') {
-          totalRevenue += (line.credit_amount || 0) - (line.debit_amount || 0);
-        }
-      });
-    }
-
-    // جلب المستفيدين النشطين
-    const { count: beneficiariesCount } = await supabase
-      .from('beneficiaries')
-      .select('*', { count: 'exact', head: true })
-      .eq('status', 'نشط');
-
-    // جلب العقارات
-    const { count: propertiesCount } = await supabase
-      .from('properties')
-      .select('*', { count: 'exact', head: true })
-      .eq('status', 'نشط');
-
-    const { count: occupiedCount } = await supabase
-      .from('contracts')
-      .select('*', { count: 'exact', head: true })
-      .eq('status', 'نشط');
-
-    // جلب القروض المستحقة
-    const { count: loansCount } = await supabase
-      .from('loans')
-      .select('*', { count: 'exact', head: true })
-      .in('status', ['active', 'defaulted']);
-
-    // جلب الحسابات البنكية
-    const { data: bankAccounts } = await supabase
-      .from('bank_accounts')
-      .select('current_balance')
-      .eq('is_active', true);
-
-    const availableBudget = bankAccounts?.reduce((sum, acc) => sum + (acc.current_balance || 0), 0) || 0;
-
-    // حساب العائد الشهري (الإيرادات الشهرية)
-    const currentMonth = new Date().getMonth() + 1;
-    const currentYear = new Date().getFullYear();
-    
-    const { data: monthlyData } = await supabase
-      .from('journal_entry_lines')
-      .select('credit_amount, debit_amount, journal_entries!inner(entry_date), accounts!inner(account_type)')
-      .eq('accounts.account_type', 'revenue')
-      .gte('journal_entries.entry_date', `${currentYear}-${String(currentMonth).padStart(2, '0')}-01`);
-
-      const monthlyReturn = monthlyData?.reduce((sum, line) => 
-        sum + ((line.credit_amount || 0) - (line.debit_amount || 0)), 0) || 0;
-
-      const kpiData = {
-        totalAssets,
-        totalRevenue,
-        activeBeneficiaries: beneficiariesCount || 0,
-        activeProperties: propertiesCount || 0,
-        occupiedProperties: occupiedCount || 0,
-        pendingLoans: loansCount || 0,
-        availableBudget,
-        monthlyReturn
-      };
-
-      console.log('✅ KPIs fetched:', kpiData);
-      setData(kpiData);
-    } catch (error) {
-      console.error('Error fetching KPIs:', error);
-      // Keep default values on error
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const kpis = [
-    {
-      title: "إجمالي الأصول",
-      value: data.totalAssets,
-      icon: Building2,
-      color: "text-primary",
-      bgColor: "bg-primary/10",
-      format: "currency"
-    },
-    {
-      title: "العوائد الشهرية",
-      value: data.monthlyReturn,
-      icon: TrendingUp,
-      color: "text-primary",
-      bgColor: "bg-primary/10",
-      format: "currency"
-    },
-    {
-      title: "المستفيدون النشطون",
-      value: data.activeBeneficiaries,
-      icon: Users,
-      color: "text-primary",
-      bgColor: "bg-primary/10",
-      format: "number"
-    },
-    {
-      title: "الميزانية المتاحة",
-      value: data.availableBudget,
-      icon: Wallet,
-      color: "text-primary",
-      bgColor: "bg-primary/10",
-      format: "currency"
-    },
-    {
-      title: "العقارات النشطة",
-      value: data.activeProperties,
-      icon: Home,
-      color: "text-primary",
-      bgColor: "bg-primary/10",
-      format: "number"
-    },
-    {
-      title: "العقارات المؤجرة",
-      value: data.occupiedProperties,
-      icon: Building2,
-      color: "text-primary",
-      bgColor: "bg-primary/10",
-      format: "number"
-    },
-    {
-      title: "القروض المستحقة",
-      value: data.pendingLoans,
-      icon: CreditCard,
-      color: "text-destructive",
-      bgColor: "bg-destructive/10",
-      format: "number"
-    },
-    {
-      title: "إجمالي الإيرادات",
-      value: data.totalRevenue,
-      icon: PieChart,
-      color: "text-emerald-600",
-      bgColor: "bg-emerald-50",
-      format: "currency"
-    }
-  ];
-
-  const formatValue = (value: number, format: string) => {
-    if (format === "currency") {
-      return `${value.toLocaleString('ar-SA')} ر.س`;
-    }
-    return value.toLocaleString('ar-SA');
-  };
-
-  if (isLoading) {
+  if (isError) {
     return (
-      <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+      <Alert variant="destructive" className="mb-6">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          حدث خطأ في جلب البيانات: {error instanceof Error ? error.message : 'خطأ غير معروف'}
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  if (isLoading || !data) {
+    return (
+      <div className="grid gap-3 sm:gap-4 md:gap-5 lg:gap-6 grid-cols-2 lg:grid-cols-4 mb-6">
         {[...Array(8)].map((_, i) => (
-          <Card key={`kpi-skeleton-${i}`} className="animate-pulse">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <div className="h-4 bg-muted rounded w-1/2"></div>
-              <div className="h-10 w-10 bg-muted rounded-full"></div>
+          <Card key={i}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-8 w-8 rounded-full" />
             </CardHeader>
             <CardContent>
-              <div className="h-8 bg-muted rounded w-3/4 mb-2"></div>
-              <div className="h-3 bg-muted rounded w-1/2"></div>
+              <Skeleton className="h-8 w-full mb-1" />
+              <Skeleton className="h-3 w-20" />
             </CardContent>
           </Card>
         ))}
@@ -235,24 +47,93 @@ export default function NazerKPIs() {
     );
   }
 
+  const kpiCards = [
+    {
+      title: "إجمالي الأصول",
+      value: data.totalAssets,
+      icon: Building2,
+      color: "text-blue-600 dark:text-blue-400",
+      bgColor: "bg-blue-50 dark:bg-blue-950",
+      description: "قيمة الأصول الكلية"
+    },
+    {
+      title: "إجمالي الإيرادات",
+      value: data.totalRevenue,
+      icon: TrendingUp,
+      color: "text-green-600 dark:text-green-400",
+      bgColor: "bg-green-50 dark:bg-green-950",
+      description: "الإيرادات المحققة"
+    },
+    {
+      title: "المستفيدون النشطون",
+      value: data.activeBeneficiaries,
+      icon: Users,
+      color: "text-purple-600 dark:text-purple-400",
+      bgColor: "bg-purple-50 dark:bg-purple-950",
+      description: "عدد المستفيدين"
+    },
+    {
+      title: "العقارات النشطة",
+      value: data.activeProperties,
+      icon: Home,
+      color: "text-orange-600 dark:text-orange-400",
+      bgColor: "bg-orange-50 dark:bg-orange-950",
+      description: "العقارات المسجلة"
+    },
+    {
+      title: "العقارات المؤجرة",
+      value: data.occupiedProperties,
+      icon: Building2,
+      color: "text-cyan-600 dark:text-cyan-400",
+      bgColor: "bg-cyan-50 dark:bg-cyan-950",
+      description: "عقود الإيجار النشطة"
+    },
+    {
+      title: "القروض المستحقة",
+      value: data.pendingLoans,
+      icon: CreditCard,
+      color: "text-red-600 dark:text-red-400",
+      bgColor: "bg-red-50 dark:bg-red-950",
+      description: "القروض النشطة"
+    },
+    {
+      title: "الميزانية المتاحة",
+      value: data.availableBudget,
+      icon: Wallet,
+      color: "text-emerald-600 dark:text-emerald-400",
+      bgColor: "bg-emerald-50 dark:bg-emerald-950",
+      description: "الأرصدة البنكية"
+    },
+    {
+      title: "العائد الشهري",
+      value: data.monthlyReturn,
+      icon: PieChart,
+      color: "text-indigo-600 dark:text-indigo-400",
+      bgColor: "bg-indigo-50 dark:bg-indigo-950",
+      description: "إيرادات الشهر الحالي"
+    }
+  ];
+
   return (
-    <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
-      {kpis.map((kpi) => (
-        <Card key={`kpi-${kpi.title}`} className="hover:shadow-lg transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
+    <div className="grid gap-3 sm:gap-4 md:gap-5 lg:gap-6 grid-cols-2 lg:grid-cols-4 mb-6">
+      {kpiCards.map((kpi, index) => (
+        <Card key={index} className="hover:shadow-md transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               {kpi.title}
             </CardTitle>
-            <div className={`${kpi.bgColor} p-2 rounded-full`}>
-              <kpi.icon className={`h-5 w-5 ${kpi.color}`} />
+            <div className={`p-2 rounded-lg ${kpi.bgColor}`}>
+              <kpi.icon className={`h-4 w-4 ${kpi.color}`} />
             </div>
           </CardHeader>
           <CardContent>
-            <div className={`text-2xl font-bold ${kpi.color}`}>
-              {formatValue(kpi.value, kpi.format)}
+            <div className="text-2xl font-bold">
+              {typeof kpi.value === 'number' && kpi.value >= 1000 
+                ? kpi.value.toLocaleString('ar-SA')
+                : kpi.value}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              حتى اليوم
+              {kpi.description}
             </p>
           </CardContent>
         </Card>

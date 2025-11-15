@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,281 +7,130 @@ import {
   DollarSign, 
   FileWarning,
   Home,
-  Clock
+  Clock,
+  AlertCircle
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { useSmartAlerts } from "@/hooks/useSmartAlerts";
 import { useNavigate } from "react-router-dom";
-import { format, differenceInDays } from "date-fns";
+import { format } from "date-fns";
 import { ar } from "date-fns/locale";
-
-interface Alert {
-  id: string;
-  type: 'contract_expiring' | 'rent_overdue' | 'loan_due' | 'request_overdue';
-  title: string;
-  description: string;
-  severity: 'high' | 'medium' | 'low';
-  date: Date;
-  actionUrl: string;
-}
+import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function SmartAlertsSection() {
   const navigate = useNavigate();
-  const [alerts, setAlerts] = useState<Alert[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: alerts = [], isLoading, isError, error } = useSmartAlerts();
 
-  useEffect(() => {
-    fetchAlerts();
-
-    const channel = supabase
-      .channel('nazer-alerts')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'contracts' }, fetchAlerts)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'rental_payments' }, fetchAlerts)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'loans' }, fetchAlerts)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'beneficiary_requests' }, fetchAlerts)
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
-
-  const fetchAlerts = async () => {
-    try {
-      setIsLoading(true);
-      const allAlerts: Alert[] = [];
-      const today = new Date();
-
-      // 1. عقود قرب الانتهاء (محسّن)
-      const { data: expiringContracts, error: contractsError } = await supabase
-        .from('contracts')
-        .select(`
-          id,
-          contract_number,
-          tenant_name,
-          end_date,
-          properties(name)
-        `)
-        .eq('status', 'نشط')
-        .gte('end_date', format(today, 'yyyy-MM-dd'))
-        .lte('end_date', format(new Date(today.getTime() + 60 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd'))
-        .limit(10);  // فقط أول 10 عقود
-
-      if (contractsError) throw contractsError;
-
-    if (expiringContracts) {
-      expiringContracts.forEach(contract => {
-        const daysRemaining = differenceInDays(new Date(contract.end_date), today);
-        allAlerts.push({
-          id: contract.id,
-          type: 'contract_expiring',
-          title: `عقد ${contract.contract_number} قارب الانتهاء`,
-          description: `عقد ${contract.tenant_name} - ${contract.properties?.name} ينتهي خلال ${daysRemaining} يوم`,
-          severity: daysRemaining <= 30 ? 'high' : 'medium',
-          date: new Date(contract.end_date),
-          actionUrl: '/properties?tab=contracts'
-        });
-      });
-    }
-
-    // 2. إيجارات متأخرة (محسّن)
-    const { data: overduePayments } = await supabase
-      .from('rental_payments')
-      .select(`
-        id,
-        payment_number,
-        amount_due,
-        due_date,
-        contracts(
-          tenant_name,
-          properties(name)
-        )
-      `)
-      .eq('status', 'متأخر')
-      .limit(10);  // فقط أول 10 متأخرات
-
-    if (overduePayments) {
-      overduePayments.forEach(payment => {
-        const daysOverdue = differenceInDays(today, new Date(payment.due_date));
-        allAlerts.push({
-          id: payment.id,
-          type: 'rent_overdue',
-          title: `دفعة إيجار متأخرة - ${payment.payment_number}`,
-          description: `${payment.contracts?.tenant_name} - متأخر ${daysOverdue} يوم - ${payment.amount_due.toLocaleString('ar-SA')} ر.س`,
-          severity: daysOverdue > 30 ? 'high' : 'medium',
-          date: new Date(payment.due_date),
-          actionUrl: '/properties?tab=payments'
-        });
-      });
-    }
-
-    // 3. قروض مستحقة (محسّن)
-    const { data: dueInstallments } = await supabase
-      .from('loan_installments')
-      .select(`
-        id,
-        installment_number,
-        due_date,
-        total_amount,
-        loans(
-          loan_number,
-          beneficiaries(full_name)
-        )
-      `)
-      .in('status', ['pending', 'overdue'])
-      .lte('due_date', format(new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd'))
-      .limit(10);  // فقط أول 10 أقساط
-
-    if (dueInstallments) {
-      dueInstallments.forEach((installment: any) => {
-        const daysUntilDue = differenceInDays(new Date(installment.due_date), today);
-        allAlerts.push({
-          id: installment.id,
-          type: 'loan_due',
-          title: `قسط قرض ${installment.loans?.loan_number || ''} مستحق`,
-          description: `${installment.loans?.beneficiaries?.full_name || ''} - قسط رقم ${installment.installment_number} - ${installment.total_amount.toLocaleString('ar-SA')} ر.س`,
-          severity: daysUntilDue < 0 ? 'high' : 'medium',
-          date: new Date(installment.due_date),
-          actionUrl: '/loans'
-        });
-      });
-    }
-
-    // 4. طلبات متأخرة عن SLA
-    const { data: overdueRequests } = await supabase
-      .from('beneficiary_requests')
-      .select('*, beneficiaries(full_name)')
-      .eq('is_overdue', true)
-      .in('status', ['قيد المراجعة', 'قيد المعالجة']);
-
-    if (overdueRequests) {
-      overdueRequests.forEach(request => {
-        allAlerts.push({
-          id: request.id,
-          type: 'request_overdue',
-          title: `طلب ${request.request_number || ''} متأخر`,
-          description: `${request.beneficiaries?.full_name || ''} - تجاوز SLA المحدد`,
-          severity: 'high',
-          date: new Date(request.sla_due_at),
-          actionUrl: '/requests'
-        });
-      });
-    }
-
-      // ترتيب حسب الخطورة والتاريخ
-      allAlerts.sort((a, b) => {
-        const severityOrder = { high: 0, medium: 1, low: 2 };
-        if (severityOrder[a.severity] !== severityOrder[b.severity]) {
-          return severityOrder[a.severity] - severityOrder[b.severity];
-        }
-        return a.date.getTime() - b.date.getTime();
-      });
-
-      console.log('✅ Alerts fetched:', allAlerts.length);
-      setAlerts(allAlerts);
-    } catch (error) {
-      console.error('Error fetching alerts:', error);
-      setAlerts([]);
-    } finally {
-      setIsLoading(false);
+  const getAlertIcon = (type: string) => {
+    switch (type) {
+      case 'contract_expiring': return Calendar;
+      case 'rent_overdue': return DollarSign;
+      case 'loan_due': return FileWarning;
+      case 'request_overdue': return Clock;
+      default: return AlertTriangle;
     }
   };
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'high': return 'destructive' as const;
-      case 'medium': return 'default' as const;
-      default: return 'secondary' as const;
+      case 'high': return 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-200 border-red-200 dark:border-red-800';
+      case 'medium': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-200 border-yellow-200 dark:border-yellow-800';
+      case 'low': return 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-200 border-blue-200 dark:border-blue-800';
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-700';
     }
   };
 
-  const getAlertIcon = (type: string) => {
-    switch (type) {
-      case 'contract_expiring': return <Calendar className="h-5 w-5" />;
-      case 'rent_overdue': return <DollarSign className="h-5 w-5" />;
-      case 'loan_due': return <FileWarning className="h-5 w-5" />;
-      case 'request_overdue': return <Clock className="h-5 w-5" />;
-      default: return <AlertTriangle className="h-5 w-5" />;
-    }
-  };
+  if (isError) {
+    return (
+      <Alert variant="destructive" className="mb-6">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          حدث خطأ في جلب التنبيهات الذكية: {error instanceof Error ? error.message : 'خطأ غير معروف'}
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   if (isLoading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 animate-pulse" />
-            جاري تحميل التنبيهات...
-          </CardTitle>
+      <Card className="mb-6">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-6 w-40" />
+          </div>
         </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="flex items-start gap-3">
+                <Skeleton className="h-10 w-10 rounded-full" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-3 w-2/3" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
       </Card>
     );
   }
 
-  if (alerts.length === 0) {
+  if (!alerts || alerts.length === 0) {
     return (
-      <Card className="border-success bg-success/5">
+      <Card className="mb-6">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-success">
-            <Home className="h-5 w-5" />
-            لا توجد تنبيهات
+          <CardTitle className="flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5" />
+            التنبيهات الذكية
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground text-center">
-            جميع الأمور تسير بشكل طبيعي ✨
-          </p>
+          <div className="text-center py-8 text-muted-foreground">
+            <AlertTriangle className="h-12 w-12 mx-auto mb-3 opacity-50" />
+            <p>لا توجد تنبيهات حاليًا</p>
+          </div>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="mb-6">
+      <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2">
-          <AlertTriangle className="h-5 w-5 text-warning" />
-          التنبيهات الذكية ({alerts.length})
+          <AlertTriangle className="h-5 w-5" />
+          التنبيهات الذكية
+          <Badge variant="secondary">{alerts.length}</Badge>
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          {alerts.slice(0, 5).map((alert) => (
-            <div
-              key={alert.id}
-              className="flex items-center gap-4 p-4 bg-background rounded-lg border hover:border-primary transition-colors"
-            >
-              <div className="flex-shrink-0">
-                {getAlertIcon(alert.type)}
-              </div>
-
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <h4 className="font-medium truncate">{alert.title}</h4>
-                  <Badge variant={getSeverityColor(alert.severity)}>
-                    {alert.severity === 'high' ? 'عاجل' : alert.severity === 'medium' ? 'مهم' : 'عادي'}
-                  </Badge>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  {alert.description}
-                </p>
-              </div>
-
-              <Button
-                size="sm"
-                variant="outline"
+          {alerts.map((alert) => {
+            const Icon = getAlertIcon(alert.type);
+            return (
+              <div 
+                key={alert.id}
+                className={`flex items-start gap-3 p-3 rounded-lg border ${getSeverityColor(alert.severity)} cursor-pointer hover:opacity-80 transition-opacity`}
                 onClick={() => navigate(alert.actionUrl)}
               >
-                معالجة
-              </Button>
-            </div>
-          ))}
+                <div className="p-2 rounded-full bg-white/50 dark:bg-black/20">
+                  <Icon className="h-5 w-5" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h4 className="font-medium text-sm">{alert.title}</h4>
+                  </div>
+                  <p className="text-sm opacity-90 mb-2">{alert.description}</p>
+                  <div className="flex items-center gap-2 text-xs opacity-75">
+                    <Calendar className="h-3 w-3" />
+                    <span>{format(alert.date, 'dd MMMM yyyy', { locale: ar })}</span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
-
-        {alerts.length > 5 && (
-          <p className="text-sm text-muted-foreground text-center mt-4">
-            وهناك {alerts.length - 5} تنبيه آخر
-          </p>
-        )}
       </CardContent>
     </Card>
   );

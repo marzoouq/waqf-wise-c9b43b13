@@ -1,232 +1,112 @@
-import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Clock, FileText, TrendingUp, DollarSign, AlertCircle } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { usePendingApprovals } from "@/hooks/usePendingApprovals";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
-
-interface PendingApproval {
-  id: string;
-  type: 'distribution' | 'request' | 'journal' | 'payment';
-  title: string;
-  amount?: number;
-  date: Date;
-  priority: 'high' | 'medium' | 'low';
-  description: string;
-}
+import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function PendingApprovalsSection() {
   const navigate = useNavigate();
-  const [approvals, setApprovals] = useState<PendingApproval[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: approvals = [], isLoading, isError, error } = usePendingApprovals();
 
-  useEffect(() => {
-    fetchPendingApprovals();
-    
-    // Real-time subscription
-    const channel = supabase
-      .channel('nazer-approvals')
-      .on('postgres_changes', { 
-        event: '*', 
-        schema: 'public', 
-        table: 'distribution_approvals',
-        filter: 'level=eq.3'
-      }, fetchPendingApprovals)
-      .on('postgres_changes', { 
-        event: '*', 
-        schema: 'public', 
-        table: 'request_approvals',
-        filter: 'level=eq.3'
-      }, fetchPendingApprovals)
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
-
-  const fetchPendingApprovals = async () => {
-    try {
-      setIsLoading(true);
-      const allApprovals: PendingApproval[] = [];
-
-      // جلب موافقات التوزيعات (محسّن)
-      const { data: distApprovals, error: distError } = await supabase
-        .from('distribution_approvals')
-        .select(`
-          id,
-          created_at,
-          distributions(
-            month,
-            total_amount,
-            beneficiaries_count
-          )
-        `)
-        .eq('status', 'معلق')
-        .eq('level', 3)
-        .limit(10);  // فقط آخر 10 موافقات
-
-      if (distError) throw distError;
-
-    if (distApprovals) {
-      distApprovals.forEach(app => {
-        if (app.distributions) {
-          allApprovals.push({
-            id: app.id,
-            type: 'distribution',
-            title: `توزيع ${app.distributions.month}`,
-            amount: app.distributions.total_amount,
-            date: new Date(app.created_at),
-            priority: 'high',
-            description: `توزيع لـ ${app.distributions.beneficiaries_count} مستفيد`
-          });
-        }
-      });
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case 'distribution': return TrendingUp;
+      case 'request': return FileText;
+      case 'journal': return FileText;
+      case 'payment': return DollarSign;
+      default: return FileText;
     }
+  };
 
-      // جلب موافقات الطلبات (محسّن)
-      const { data: reqApprovals, error: reqError } = await supabase
-        .from('request_approvals')
-        .select(`
-          id,
-          created_at,
-          beneficiary_requests(
-            request_number,
-            amount,
-            priority,
-            beneficiaries(full_name)
-          )
-        `)
-        .eq('status', 'معلق')
-        .eq('level', 3)
-        .limit(10);  // فقط آخر 10 موافقات
-
-      if (reqError) throw reqError;
-
-    if (reqApprovals) {
-      reqApprovals.forEach(app => {
-        if (app.beneficiary_requests && app.beneficiary_requests.beneficiaries) {
-          allApprovals.push({
-            id: app.id,
-            type: 'request',
-            title: `طلب ${app.beneficiary_requests.request_number || ''}`,
-            amount: app.beneficiary_requests.amount,
-            date: new Date(app.created_at),
-            priority: app.beneficiary_requests.priority === 'عاجلة' ? 'high' : 'medium',
-            description: `من ${app.beneficiary_requests.beneficiaries.full_name}`
-          });
-        }
-      });
-    }
-
-      // جلب القيود المحاسبية المعلقة (محسّن)
-      const { data: journalApprovals, error: journalError } = await supabase
-        .from('approvals')
-        .select(`
-          id,
-          created_at,
-          journal_entries(
-            entry_number,
-            description
-          )
-        `)
-        .eq('status', 'pending')
-        .limit(10);  // فقط آخر 10 موافقات
-
-      if (journalError) throw journalError;
-
-      if (journalApprovals) {
-        journalApprovals.forEach(app => {
-          if (app.journal_entries) {
-            allApprovals.push({
-              id: app.id,
-              type: 'journal',
-              title: `قيد ${app.journal_entries.entry_number}`,
-              date: new Date(app.created_at),
-              priority: 'medium',
-              description: app.journal_entries.description
-            });
-          }
-        });
-      }
-
-      // ترتيب حسب الأولوية والتاريخ
-      allApprovals.sort((a, b) => {
-        const priorityOrder = { high: 0, medium: 1, low: 2 };
-        if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
-          return priorityOrder[a.priority] - priorityOrder[b.priority];
-        }
-        return b.date.getTime() - a.date.getTime();
-      });
-
-      console.log('✅ Fetched approvals:', allApprovals.length);
-      setApprovals(allApprovals);
-    } catch (error) {
-      console.error('Error fetching approvals:', error);
-      setApprovals([]);
-    } finally {
-      setIsLoading(false);
+  const getTypeColor = (type: string) => {
+    switch (type) {
+      case 'distribution': return 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-200';
+      case 'request': return 'bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-200';
+      case 'journal': return 'bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-200';
+      case 'payment': return 'bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-200';
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return 'destructive' as const;
-      case 'medium': return 'default' as const;
-      default: return 'secondary' as const;
+      case 'high': return 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-200';
+      case 'medium': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-200';
+      case 'low': return 'bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-200';
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
     }
   };
 
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case 'distribution': return <TrendingUp className="h-5 w-5" />;
-      case 'request': return <FileText className="h-5 w-5" />;
-      case 'journal': return <DollarSign className="h-5 w-5" />;
-      default: return <AlertCircle className="h-5 w-5" />;
-    }
-  };
+  if (isError) {
+    return (
+      <Alert variant="destructive" className="mb-6">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          حدث خطأ في جلب الموافقات المعلقة: {error instanceof Error ? error.message : 'خطأ غير معروف'}
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   if (isLoading) {
     return (
-      <Card className="border-warning bg-warning/5">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-warning">
-            <Clock className="h-5 w-5 animate-spin" />
-            جاري تحميل الموافقات...
-          </CardTitle>
+      <Card className="mb-6">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-6 w-40" />
+            <Skeleton className="h-9 w-32" />
+          </div>
         </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="flex items-center space-x-4 space-x-reverse">
+                <Skeleton className="h-12 w-12 rounded-lg" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-3 w-2/3" />
+                </div>
+                <Skeleton className="h-8 w-20" />
+              </div>
+            ))}
+          </div>
+        </CardContent>
       </Card>
     );
   }
 
-  if (approvals.length === 0) {
+  if (!approvals || approvals.length === 0) {
     return (
-      <Card className="border-success bg-success/5">
+      <Card className="mb-6">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-success">
+          <CardTitle className="flex items-center gap-2">
             <Clock className="h-5 w-5" />
-            لا توجد موافقات معلقة
+            الموافقات المعلقة
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground text-center">
-            جميع الموافقات تمت معالجتها 🎉
-          </p>
+          <div className="text-center py-8 text-muted-foreground">
+            <FileText className="h-12 w-12 mx-auto mb-3 opacity-50" />
+            <p>لا توجد موافقات معلقة</p>
+          </div>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card className="border-warning bg-warning/5">
-      <CardHeader>
+    <Card className="mb-6">
+      <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2 text-warning">
+          <CardTitle className="flex items-center gap-2">
             <Clock className="h-5 w-5" />
-            موافقات معلقة تحتاج لاعتمادك ({approvals.length})
+            الموافقات المعلقة
+            <Badge variant="secondary">{approvals.length}</Badge>
           </CardTitle>
           <Button 
             variant="outline" 
@@ -239,54 +119,38 @@ export default function PendingApprovalsSection() {
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          {approvals.slice(0, 5).map((approval) => (
-            <div 
-              key={approval.id} 
-              className="flex items-center gap-4 p-4 bg-background rounded-lg border hover:border-primary transition-colors"
-            >
-              <div className="flex-shrink-0">
-                {getTypeIcon(approval.type)}
-              </div>
-              
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <h4 className="font-medium truncate">{approval.title}</h4>
-                  <Badge variant={getPriorityColor(approval.priority)}>
-                    {approval.priority === 'high' ? 'عاجل' : approval.priority === 'medium' ? 'متوسط' : 'عادي'}
-                  </Badge>
-                </div>
-                <p className="text-sm text-muted-foreground truncate">
-                  {approval.description}
-                </p>
-                {approval.amount && (
-                  <p className="text-sm font-medium text-primary mt-1">
-                    المبلغ: {approval.amount.toLocaleString('ar-SA')} ر.س
-                  </p>
-                )}
-                <p className="text-xs text-muted-foreground mt-1">
-                  {format(approval.date, 'dd MMMM yyyy - hh:mm a', { locale: ar })}
-                </p>
-              </div>
-
-              <Button 
-                size="sm"
+          {approvals.map((approval) => {
+            const Icon = getTypeIcon(approval.type);
+            return (
+              <div 
+                key={approval.id}
+                className="flex items-center gap-4 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors cursor-pointer"
                 onClick={() => navigate('/approvals')}
               >
-                مراجعة
-              </Button>
-            </div>
-          ))}
+                <div className={`p-3 rounded-lg ${getTypeColor(approval.type)}`}>
+                  <Icon className="h-5 w-5" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h4 className="font-medium text-sm truncate">{approval.title}</h4>
+                    <Badge className={getPriorityColor(approval.priority)} variant="secondary">
+                      {approval.priority === 'high' ? 'عاجل' : approval.priority === 'medium' ? 'متوسط' : 'عادي'}
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground truncate">{approval.description}</p>
+                  <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                    <span>{format(approval.date, 'dd MMM yyyy', { locale: ar })}</span>
+                    {approval.amount && (
+                      <span className="font-medium">
+                        {approval.amount.toLocaleString('ar-SA')} ر.س
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
-
-        {approvals.length > 5 && (
-          <Button 
-            variant="outline" 
-            className="w-full mt-4"
-            onClick={() => navigate('/approvals')}
-          >
-            عرض جميع الموافقات ({approvals.length})
-          </Button>
-        )}
       </CardContent>
     </Card>
   );
