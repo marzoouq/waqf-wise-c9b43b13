@@ -4,6 +4,7 @@ import { Download, X, FileText, Image as ImageIcon } from "lucide-react";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { logger } from "@/lib/logger";
 
 interface DocumentPreviewDialogProps {
   open: boolean;
@@ -51,7 +52,7 @@ export function DocumentPreviewDialog({
 
       toast.success('تم تحميل الملف بنجاح');
     } catch (error: any) {
-      console.error('Error downloading file:', error);
+      logger.error(error, { context: 'download_document', severity: 'medium' });
       toast.error('فشل تحميل الملف');
     } finally {
       setLoading(false);

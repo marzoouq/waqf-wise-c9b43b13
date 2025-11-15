@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useTasks } from '@/hooks/useTasks';
 import type { BeneficiaryRequest, RequestType } from '@/types';
+import { logger } from '@/lib/logger';
 
 // ===========================
 // Request Types Hook
@@ -116,7 +117,7 @@ export const useRequests = (beneficiaryId?: string) => {
             status: 'pending',
           });
         } catch (error) {
-          console.error("Error adding task:", error);
+          logger.error(error, { context: 'add_request_task', severity: 'low' });
         }
       }
       

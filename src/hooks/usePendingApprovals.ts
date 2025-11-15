@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";
+import { logger } from "@/lib/logger";
 
 export interface PendingApproval {
   id: string;
@@ -130,7 +131,7 @@ export function usePendingApprovals() {
           })
           .slice(0, 6);
       } catch (error) {
-        console.error('Error fetching pending approvals:', error);
+        logger.error(error, { context: 'fetch_pending_approvals', severity: 'medium' });
         throw error;
       }
     },

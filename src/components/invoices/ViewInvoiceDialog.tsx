@@ -8,6 +8,7 @@ import { useOrganizationSettings } from "@/hooks/useOrganizationSettings";
 import { generateInvoicePDF } from "@/lib/generateInvoicePDF";
 import { toast } from "sonner";
 import { useState } from "react";
+import { logger } from "@/lib/logger";
 
 interface ViewInvoiceDialogProps {
   invoiceId: string | null;
@@ -68,7 +69,7 @@ export const ViewInvoiceDialog = ({ invoiceId, open, onOpenChange }: ViewInvoice
         await generateInvoicePDF(invoice, invoiceLines, orgSettings);
         toast.success("تم تصدير الفاتورة بنجاح");
       } catch (error) {
-        console.error("Error generating PDF:", error);
+        logger.error(error, { context: 'generate_invoice_pdf', severity: 'medium' });
         toast.error("حدث خطأ أثناء تصدير الفاتورة");
       } finally {
         setIsExporting(false);

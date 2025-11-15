@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 interface AIInsight {
   id: string;
@@ -47,7 +48,7 @@ export function useAIInsights() {
       });
     },
     onError: (error) => {
-      console.error('Error generating insights:', error);
+      logger.error(error, { context: 'generate_ai_insights', severity: 'medium' });
       toast({
         title: 'خطأ',
         description: 'فشل توليد الرؤى الذكية',

@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format, differenceInDays } from "date-fns";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";
+import { logger } from "@/lib/logger";
 
 export interface SmartAlert {
   id: string;
@@ -143,7 +144,7 @@ export function useSmartAlerts() {
           })
           .slice(0, 6);
       } catch (error) {
-        console.error('Error fetching smart alerts:', error);
+        logger.error(error, { context: 'fetch_smart_alerts', severity: 'medium' });
         throw error;
       }
     },

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { logger } from "@/lib/logger";
 
 export interface Tribe {
   id: string;
@@ -46,7 +47,7 @@ export const useAddTribe = () => {
     },
     onError: (error) => {
       toast.error("حدث خطأ أثناء إضافة القبيلة");
-      console.error("Error adding tribe:", error);
+      logger.error(error, { context: 'add_tribe', severity: 'medium' });
     },
   });
 };
@@ -72,7 +73,7 @@ export const useUpdateTribe = () => {
     },
     onError: (error) => {
       toast.error("حدث خطأ أثناء تحديث القبيلة");
-      console.error("Error updating tribe:", error);
+      logger.error(error, { context: 'update_tribe', severity: 'medium' });
     },
   });
 };
@@ -95,7 +96,7 @@ export const useDeleteTribe = () => {
     },
     onError: (error) => {
       toast.error("حدث خطأ أثناء حذف القبيلة");
-      console.error("Error deleting tribe:", error);
+      logger.error(error, { context: 'delete_tribe', severity: 'medium' });
     },
   });
 };

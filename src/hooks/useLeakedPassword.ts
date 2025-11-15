@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 /**
  * تحويل string إلى SHA-1 hash باستخدام Web Crypto API
@@ -40,7 +41,7 @@ export function useLeakedPassword() {
       const response = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`);
       
       if (!response.ok) {
-        console.error('Failed to check password');
+        logger.error(new Error('Failed to check password'), { context: 'leaked_password_api', severity: 'medium' });
         return false;
       }
 
@@ -65,7 +66,7 @@ export function useLeakedPassword() {
 
       return isLeaked;
     } catch (error) {
-      console.error('Error checking password:', error);
+      logger.error(error, { context: 'check_leaked_password', severity: 'medium' });
       return false;
     } finally {
       setIsChecking(false);
@@ -99,7 +100,7 @@ export function useLeakedPassword() {
         return hashSuffix === suffix;
       });
     } catch (error) {
-      console.error('Error checking password:', error);
+      logger.error(error, { context: 'check_leaked_password_quick', severity: 'low' });
       return false;
     }
   };
