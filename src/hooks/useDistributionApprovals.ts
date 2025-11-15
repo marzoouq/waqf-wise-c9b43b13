@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
+import { logger } from "@/lib/logger";
 
 export interface DistributionApproval {
   id: string;
@@ -76,7 +77,7 @@ export function useDistributionApprovals(distributionId?: string) {
         .maybeSingle();
 
       if (checkError) {
-        console.error("Error checking existing approval:", checkError);
+        logger.error(checkError, { context: 'distribution_approval_check', severity: 'low' });
       }
 
       // إذا كانت موجودة، نقوم بالتحديث بدلاً من الإدراج

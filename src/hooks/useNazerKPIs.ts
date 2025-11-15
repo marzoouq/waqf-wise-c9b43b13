@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";
+import { logger } from "@/lib/logger";
 
 export interface NazerKPIData {
   totalAssets: number;
@@ -98,7 +99,7 @@ export function useNazerKPIs() {
           monthlyReturn
         };
       } catch (error) {
-        console.error('Error fetching Nazer KPIs:', error);
+        logger.error(error, { context: 'fetch_nazer_kpis', severity: 'high' });
         throw error;
       }
     },

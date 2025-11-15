@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Key, Mail, User } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { logger } from "@/lib/logger";
 
 interface EnableLoginDialogProps {
   open: boolean;
@@ -111,7 +112,7 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
             p_role: 'beneficiary'
           });
         } catch (roleError) {
-          console.error("Profile/Role creation error:", roleError);
+          logger.error(roleError, { context: 'create_beneficiary_profile', severity: 'low' });
         }
       }
 
@@ -123,7 +124,7 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
       onSuccess?.();
       onOpenChange(false);
     } catch (error: any) {
-      console.error("Error enabling login:", error);
+      logger.error(error, { context: 'enable_beneficiary_login', severity: 'high' });
       toast({
         title: "خطأ في التفعيل",
         description: error.message || "حدث خطأ أثناء تفعيل الحساب",

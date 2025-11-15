@@ -9,6 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useCustomReports } from '@/hooks/useCustomReports';
 import { Plus, Save, Play, Trash2, Star } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
+import { logger } from '@/lib/logger';
 
 export const ReportBuilder = () => {
   const { templates, isLoading, createTemplate, deleteTemplate, toggleFavorite, executeReport } = useCustomReports();
@@ -71,10 +72,10 @@ export const ReportBuilder = () => {
   const handleExecuteReport = async (template: any) => {
     try {
       const results = await executeReport(template);
-      console.log('Report results:', results);
       // يمكن عرض النتائج في modal أو تصديرها
+      logger.info('Report executed successfully', { context: 'report_builder' });
     } catch (error) {
-      console.error('Error executing report:', error);
+      logger.error(error, { context: 'execute_report', severity: 'medium' });
     }
   };
 

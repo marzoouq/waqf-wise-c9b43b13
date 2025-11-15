@@ -13,6 +13,7 @@ import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import { logger } from "@/lib/logger";
 
 interface LoanDialogProps {
   open: boolean;
@@ -72,7 +73,7 @@ export function LoanDialog({ open, onOpenChange, loan }: LoanDialogProps) {
       });
       setStartDate(new Date());
     } catch (error) {
-      console.error("Error submitting loan:", error);
+      logger.error(error, { context: 'submit_loan', severity: 'medium' });
     } finally {
       setIsLoading(false);
     }

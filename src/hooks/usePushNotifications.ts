@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { toast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 interface PushSubscription {
   endpoint: string;
@@ -54,7 +55,7 @@ export function usePushNotifications() {
         return false;
       }
     } catch (error) {
-      console.error('Error requesting permission:', error);
+      logger.error(error, { context: 'push_notification_permission', severity: 'low' });
       return false;
     }
   };
@@ -109,7 +110,7 @@ export function usePushNotifications() {
         description: 'سيتم إرسال الإشعارات الفورية إليك',
       });
     } catch (error) {
-      console.error('Error subscribing:', error);
+      logger.error(error, { context: 'push_notification_subscribe', severity: 'medium' });
       toast({
         title: 'خطأ',
         description: 'فشل الاشتراك في الإشعارات',
@@ -146,7 +147,7 @@ export function usePushNotifications() {
         description: 'تم إلغاء الاشتراك في الإشعارات الفورية',
       });
     } catch (error) {
-      console.error('Error unsubscribing:', error);
+      logger.error(error, { context: 'push_notification_unsubscribe', severity: 'medium' });
       toast({
         title: 'خطأ',
         description: 'فشل إلغاء الاشتراك',

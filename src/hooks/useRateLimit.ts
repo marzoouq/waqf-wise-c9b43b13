@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 interface RateLimitResult {
   allowed: boolean;
@@ -34,7 +35,7 @@ export function useRateLimit() {
       });
 
       if (error) {
-        console.error('Rate limit check error:', error);
+        logger.error(error, { context: 'rate_limit_check', severity: 'medium' });
         return { allowed: true }; // في حالة الخطأ، نسمح بالمحاولة
       }
 
@@ -44,7 +45,7 @@ export function useRateLimit() {
         resetTime: data ? undefined : new Date(Date.now() + timeWindowMinutes * 60000),
       };
     } catch (error) {
-      console.error('Rate limit error:', error);
+      logger.error(error, { context: 'rate_limit_general', severity: 'medium' });
       return { allowed: true };
     } finally {
       setIsChecking(false);
@@ -64,7 +65,7 @@ export function useRateLimit() {
         p_success: success,
       });
     } catch (error) {
-      console.error('Error logging login attempt:', error);
+      logger.error(error, { context: 'log_login_attempt', severity: 'low' });
     }
   };
 

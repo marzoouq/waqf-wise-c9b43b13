@@ -30,7 +30,7 @@ export function CashFlowStatement() {
 
   const handleExport = () => {
     // تصدير إلى PDF
-    console.log("Export to PDF");
+    // TODO: Implement PDF export
   };
 
   if (!latestFlow) {

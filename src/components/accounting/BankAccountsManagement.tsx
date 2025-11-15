@@ -5,6 +5,7 @@ import { Plus, Pencil, Trash2, Building2 } from "lucide-react";
 import { useBankAccounts } from "@/hooks/useBankAccounts";
 import { useAccounts } from "@/hooks/useAccounts";
 import { LoadingState } from "@/components/shared/LoadingState";
+import { logger } from "@/lib/logger";
 import { ResponsiveDialog, DialogFooter } from "@/components/shared/ResponsiveDialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -77,7 +78,7 @@ export function BankAccountsManagement() {
       }
       setDialogOpen(false);
     } catch (error) {
-      console.error("Error saving bank account:", error);
+      logger.error(error, { context: 'save_bank_account', severity: 'medium' });
     }
   };
 

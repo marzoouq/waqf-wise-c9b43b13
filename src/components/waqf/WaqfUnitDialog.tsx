@@ -13,6 +13,7 @@ import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
+import { logger } from "@/lib/logger";
 
 interface WaqfUnitDialogProps {
   open: boolean;
@@ -75,7 +76,7 @@ export function WaqfUnitDialog({ open, onOpenChange, waqfUnit }: WaqfUnitDialogP
       });
       setAcquisitionDate(undefined);
     } catch (error) {
-      console.error("Error submitting waqf unit:", error);
+      logger.error(error, { context: 'submit_waqf_unit', severity: 'medium' });
     } finally {
       setIsLoading(false);
     }
