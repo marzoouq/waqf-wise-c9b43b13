@@ -20,6 +20,7 @@ export type Database = {
           account_type: Database["public"]["Enums"]["account_type"]
           code: string
           created_at: string
+          current_balance: number | null
           description: string | null
           id: string
           is_active: boolean
@@ -34,6 +35,7 @@ export type Database = {
           account_type: Database["public"]["Enums"]["account_type"]
           code: string
           created_at?: string
+          current_balance?: number | null
           description?: string | null
           id?: string
           is_active?: boolean
@@ -48,6 +50,7 @@ export type Database = {
           account_type?: Database["public"]["Enums"]["account_type"]
           code?: string
           created_at?: string
+          current_balance?: number | null
           description?: string | null
           id?: string
           is_active?: boolean
