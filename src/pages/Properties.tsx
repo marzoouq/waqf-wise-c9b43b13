@@ -14,6 +14,7 @@ import { MaintenanceTab } from "@/components/properties/tabs/MaintenanceTab";
 import { useProperties } from "@/hooks/useProperties";
 import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
 import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
+import { logger } from "@/lib/logger";
 
 const Properties = () => {
   const { addProperty, updateProperty } = useProperties();
@@ -39,7 +40,7 @@ const Properties = () => {
       setPropertyDialogOpen(false);
       setSelectedProperty(null);
     } catch (error) {
-      console.error("Error saving property:", error);
+      logger.error(error, { context: 'save_property', severity: 'medium' });
     }
   };
 

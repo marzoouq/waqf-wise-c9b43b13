@@ -14,6 +14,7 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 const signInSchema = z.object({
   email: z.string().email('البريد الإلكتروني غير صحيح'),
@@ -87,7 +88,7 @@ export default function Auth() {
         navigate('/', { replace: true });
       }
     } catch (error) {
-      console.error('Sign in error:', error);
+      logger.error(error, { context: 'sign_in', severity: 'medium' });
       setIsLoading(false);
       toast.error('حدث خطأ غير متوقع');
     }
@@ -120,7 +121,7 @@ export default function Auth() {
         setPasswordWarning(null);
       }
     } catch (error) {
-      console.error('Sign up error:', error);
+      logger.error(error, { context: 'sign_up', severity: 'medium' });
       setIsLoading(false);
       toast.error('حدث خطأ غير متوقع');
     }

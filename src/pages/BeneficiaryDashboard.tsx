@@ -22,6 +22,7 @@ import { BeneficiaryCertificate } from "@/components/beneficiary/BeneficiaryCert
 import { InternalMessagesDialog } from "@/components/messages/InternalMessagesDialog";
 import { useToast } from "@/hooks/use-toast";
 import { Beneficiary } from "@/types/beneficiary";
+import { logger } from "@/lib/logger";
 
 interface Request {
   id: string;
@@ -125,7 +126,7 @@ const BeneficiaryDashboard = () => {
       });
       setActiveRequestTab("view");
     } catch (error) {
-      console.error("Error submitting emergency request:", error);
+      logger.error(error, { context: 'submit_emergency_request', severity: 'medium' });
     }
   };
 
@@ -144,7 +145,7 @@ const BeneficiaryDashboard = () => {
       });
       setActiveRequestTab("view");
     } catch (error) {
-      console.error("Error submitting loan request:", error);
+      logger.error(error, { context: 'submit_loan_request', severity: 'medium' });
     }
   };
 
@@ -160,7 +161,7 @@ const BeneficiaryDashboard = () => {
       });
       setActiveRequestTab("view");
     } catch (error) {
-      console.error("Error submitting data update request:", error);
+      logger.error(error, { context: 'submit_data_update_request', severity: 'medium' });
     }
   };
 
@@ -176,7 +177,7 @@ const BeneficiaryDashboard = () => {
       });
       setActiveRequestTab("view");
     } catch (error) {
-      console.error("Error submitting add family member request:", error);
+      logger.error(error, { context: 'submit_add_family_member_request', severity: 'medium' });
     }
   };
 
