@@ -99,12 +99,17 @@ const AccountantDashboard = () => {
       <div className="container mx-auto p-3 sm:p-4 md:p-6 lg:p-8 space-y-4 sm:space-y-6 md:space-y-8">
         {/* Header */}
         <header className="space-y-1 sm:space-y-2">
-          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gradient-primary break-words">
-            لوحة المحاسب
-          </h1>
-          <p className="text-xs sm:text-sm md:text-base text-muted-foreground">
-            إدارة القيود المحاسبية والموافقات
-          </p>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <FileText className="h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 text-blue-600" />
+            <div>
+              <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gradient-primary">
+                لوحة تحكم المحاسب
+              </h1>
+              <p className="text-xs sm:text-sm md:text-base text-muted-foreground">
+                إدارة القيود المحاسبية والموافقات
+              </p>
+            </div>
+          </div>
         </header>
 
         {/* Quick Stats */}
