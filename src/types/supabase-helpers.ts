@@ -197,3 +197,40 @@ export interface ExportOptions {
   includeHeaders?: boolean;
   dateFormat?: string;
 }
+
+// Accounting specific types
+export interface AccountWithBalance extends AccountRow {
+  balance?: number;
+  children?: AccountWithBalance[];
+  allows_transactions?: boolean;
+  is_system_account?: boolean;
+}
+
+export interface TrialBalanceRow {
+  account_id: string;
+  code: string;
+  name: string;
+  account_type: string;
+  debit: number;
+  credit: number;
+  balance: number;
+}
+
+export interface GeneralLedgerEntry {
+  entry_date: string;
+  entry_number: string;
+  description: string;
+  debit_amount: number;
+  credit_amount: number;
+  balance: number;
+}
+
+export interface BankReconciliationItem {
+  id: string;
+  date: string;
+  description: string;
+  amount: number;
+  type: 'debit' | 'credit';
+  matched: boolean;
+  reference?: string;
+}

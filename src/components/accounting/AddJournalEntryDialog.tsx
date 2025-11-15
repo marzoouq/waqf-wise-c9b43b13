@@ -57,6 +57,8 @@ type Props = {
   onOpenChange: (open: boolean) => void;
 };
 
+import { AccountRow } from "@/types/supabase-helpers";
+
 const AddJournalEntryDialog = ({ open, onOpenChange }: Props) => {
   const queryClient = useQueryClient();
   const [lines, setLines] = useState<EntryLine[]>([
