@@ -113,7 +113,7 @@ const ViewJournalEntryDialog = ({ open, onOpenChange, entry }: Props) => {
         size="xl"
       >
         <div className="space-y-4" id="print-content">
-          <div className="grid grid-cols-2 gap-4 p-4 bg-accent/20 rounded-lg print:bg-white print:border print:border-gray-300">
+          <div className="grid grid-cols-2 gap-4 p-4 bg-accent/20 rounded-lg print:bg-background print:border print:border-border">
             <div>
               <div className="text-sm text-muted-foreground">رقم القيد</div>
               <div className="font-mono font-semibold">{entry.entry_number}</div>

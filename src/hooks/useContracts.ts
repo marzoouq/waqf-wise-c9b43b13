@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { logger } from "@/lib/logger";
 
 export interface Contract {
   id: string;
@@ -69,12 +70,12 @@ export const useContracts = () => {
       });
     },
     onError: (error) => {
+      logger.error(error, { context: 'add_contract', severity: 'medium' });
       toast({
         title: "خطأ",
         description: "حدث خطأ أثناء إضافة العقد",
         variant: "destructive",
       });
-      console.error("Error adding contract:", error);
     },
   });
 
@@ -98,12 +99,12 @@ export const useContracts = () => {
       });
     },
     onError: (error) => {
+      logger.error(error, { context: 'update_contract', severity: 'medium' });
       toast({
         title: "خطأ",
         description: "حدث خطأ أثناء تحديث العقد",
         variant: "destructive",
       });
-      console.error("Error updating contract:", error);
     },
   });
 
@@ -124,12 +125,12 @@ export const useContracts = () => {
       });
     },
     onError: (error) => {
+      logger.error(error, { context: 'delete_contract', severity: 'high' });
       toast({
         title: "خطأ",
         description: "حدث خطأ أثناء حذف العقد",
         variant: "destructive",
       });
-      console.error("Error deleting contract:", error);
     },
   });
 

@@ -114,7 +114,7 @@ export default function SmartAlertsSection() {
                 className={`flex items-start gap-3 p-3 rounded-lg border ${getSeverityColor(alert.severity)} cursor-pointer hover:opacity-80 transition-opacity`}
                 onClick={() => navigate(alert.actionUrl)}
               >
-                <div className="p-2 rounded-full bg-white/50 dark:bg-black/20">
+                <div className="p-2 rounded-full bg-background/50">
                   <Icon className="h-5 w-5" />
                 </div>
                 <div className="flex-1 min-w-0">
