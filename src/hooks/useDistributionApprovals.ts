@@ -67,6 +67,38 @@ export function useDistributionApprovals(distributionId?: string) {
 
   const addApproval = useMutation({
     mutationFn: async (approval: Omit<DistributionApproval, "id" | "created_at" | "updated_at">) => {
+      // التحقق من وجود موافقة سابقة بنفس المستوى
+      const { data: existing, error: checkError } = await supabase
+        .from("distribution_approvals")
+        .select("id")
+        .eq("distribution_id", approval.distribution_id)
+        .eq("level", approval.level)
+        .maybeSingle();
+
+      if (checkError) {
+        console.error("Error checking existing approval:", checkError);
+      }
+
+      // إذا كانت موجودة، نقوم بالتحديث بدلاً من الإدراج
+      if (existing && existing.id) {
+        const { data, error } = await supabase
+          .from("distribution_approvals")
+          .update({
+            status: approval.status,
+            notes: approval.notes,
+            approved_at: approval.approved_at,
+            approver_id: approval.approver_id,
+            approver_name: approval.approver_name,
+          })
+          .eq("id", existing.id)
+          .select()
+          .single();
+
+        if (error) throw error;
+        return data;
+      }
+
+      // إذا لم تكن موجودة، نقوم بالإدراج
       const { data, error } = await supabase
         .from("distribution_approvals")
         .insert([approval])
