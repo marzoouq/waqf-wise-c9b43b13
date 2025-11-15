@@ -78,6 +78,8 @@ export function useCashierStats() {
         pendingTransactions: pendingCount || 0,
       };
     },
+    staleTime: 30000, // 30 ثانية
     refetchInterval: 60000, // تحديث كل دقيقة
+    refetchOnWindowFocus: true,
   });
 }
