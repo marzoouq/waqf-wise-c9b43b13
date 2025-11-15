@@ -47,6 +47,13 @@ export const QUERY_CONFIG = {
     refetchOnWindowFocus: true,
     retry: 2,
   },
+  ADMIN_KPIS: {
+    staleTime: CACHE_TIMES.STANDARD,
+    cacheTime: CACHE_TIMES.STANDARD * 2,
+    refetchInterval: 30000, // 30 seconds
+    refetchOnWindowFocus: true,
+    retry: 2,
+  },
   APPROVALS: {
     staleTime: CACHE_TIMES.DYNAMIC,
     cacheTime: CACHE_TIMES.DYNAMIC * 2,
@@ -67,6 +74,20 @@ export const QUERY_CONFIG = {
     refetchInterval: 60000, // 1 minute
     refetchOnWindowFocus: false,
     retry: 1,
+  },
+  ACTIVITIES: {
+    staleTime: CACHE_TIMES.DYNAMIC,
+    cacheTime: CACHE_TIMES.DYNAMIC * 2,
+    refetchInterval: 20000, // 20 seconds
+    refetchOnWindowFocus: true,
+    retry: 2,
+  },
+  TASKS: {
+    staleTime: CACHE_TIMES.DYNAMIC,
+    cacheTime: CACHE_TIMES.DYNAMIC * 2,
+    refetchInterval: 20000, // 20 seconds
+    refetchOnWindowFocus: true,
+    retry: 2,
   },
 } as const;
 
