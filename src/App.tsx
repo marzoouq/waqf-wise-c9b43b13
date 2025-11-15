@@ -10,9 +10,12 @@ import { LoadingState } from "./components/shared/LoadingState";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { usePWAUpdate } from "./lib/pwa";
 
-// Lazy load React Query DevTools (TanStack recommended pattern)
+// Import DevTools configuration
+import { DEVTOOLS_CONFIG } from "./lib/devtools";
+
+// Lazy load React Query DevTools (TanStack v5 pattern)
 const ReactQueryDevtools =
-  import.meta.env.DEV
+  DEVTOOLS_CONFIG.enabled
     ? lazy(() =>
         import("@tanstack/react-query-devtools").then((d) => ({
           default: d.ReactQueryDevtools,
@@ -258,12 +261,11 @@ const App = () => {
         </BrowserRouter>
       </TooltipProvider>
       
-        {/* React Query DevTools - Lazy loaded, only in development */}
-        {import.meta.env.DEV && ReactQueryDevtools && (
+        {/* React Query DevTools - مفعّل على كامل التطبيق في بيئة التطوير */}
+        {DEVTOOLS_CONFIG.enabled && ReactQueryDevtools && (
           <Suspense fallback={null}>
             <ReactQueryDevtools 
-              initialIsOpen={false}
-              buttonPosition="bottom-right"
+              initialIsOpen={DEVTOOLS_CONFIG.initialIsOpen}
             />
           </Suspense>
         )}
