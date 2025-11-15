@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { JournalEntryLineRow, AccountRow } from "@/types/supabase-helpers";
 import {
   AreaChart,
   Area,
@@ -12,6 +13,13 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
+
+interface JournalLineWithRelations extends JournalEntryLineRow {
+  journal_entries: {
+    entry_date: string;
+  };
+  accounts: AccountRow;
+}
 
 interface MonthlyData {
   month: string;
@@ -49,7 +57,7 @@ const RevenueExpenseChart = () => {
       // Group by month
       const monthlyMap = new Map<string, { revenue: number; expense: number }>();
 
-      entries?.forEach((line: any) => {
+      (entries as JournalLineWithRelations[] | null)?.forEach((line) => {
         const date = new Date(line.journal_entries.entry_date);
         const monthKey = date.toLocaleDateString('ar-SA', { year: 'numeric', month: 'short' });
         

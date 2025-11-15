@@ -7,6 +7,7 @@ import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { exportToExcel, exportToPDF } from "@/lib/exportHelpers";
 import { useToast } from "@/hooks/use-toast";
+import { PropertyRow, ContractRow } from "@/types/supabase-helpers";
 import {
   Table,
   TableBody,
@@ -17,10 +18,14 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 
+interface PropertyWithContracts extends PropertyRow {
+  contracts?: ContractRow[];
+}
+
 export function PropertiesReports() {
   const { toast } = useToast();
 
-  const { data: properties = [], isLoading } = useQuery({
+  const { data: properties = [], isLoading } = useQuery<PropertyWithContracts[]>({
     queryKey: ["properties-report"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -38,16 +43,14 @@ export function PropertiesReports() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data;
+      return data as PropertyWithContracts[];
     },
   });
 
   const handleExportPDF = () => {
     const headers = ["اسم العقار", "الموقع", "نوع العقار", "الحالة", "الإيجار الشهري"];
     const data = properties.map((p) => {
-      const activeContract = p.contracts?.find(
-        (c: { status: string }) => c.status === "نشط"
-      );
+      const activeContract = p.contracts?.find((c) => c.status === "نشط");
       return [
         p.name,
         p.location,
@@ -69,9 +72,7 @@ export function PropertiesReports() {
 
   const handleExportExcel = () => {
     const data = properties.map((p) => {
-      const activeContract = p.contracts?.find(
-        (c: { status: string }) => c.status === "نشط"
-      );
+      const activeContract = p.contracts?.find((c) => c.status === "نشط");
       return {
         "اسم العقار": p.name,
         الموقع: p.location,
@@ -108,9 +109,7 @@ export function PropertiesReports() {
   }
 
   const totalRent = properties.reduce((sum, p) => {
-    const activeContract = p.contracts?.find(
-      (c: { status: string; monthly_rent: number }) => c.status === "نشط"
-    );
+    const activeContract = p.contracts?.find((c) => c.status === "نشط");
     return sum + (activeContract ? Number(activeContract.monthly_rent) : 0);
   }, 0);
 
