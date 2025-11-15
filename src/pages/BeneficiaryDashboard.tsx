@@ -422,7 +422,7 @@ const BeneficiaryDashboard = () => {
               <TabsContent value="statement">
                 <AccountStatementView
                   beneficiaryName={beneficiary?.full_name || ""}
-                  beneficiaryId={beneficiary?.id || ""}
+                  beneficiaryId={beneficiary?.beneficiary_number || beneficiary?.id || ""}
                   payments={payments.map(p => ({
                     id: p.id,
                     date: p.payment_date,
@@ -437,7 +437,7 @@ const BeneficiaryDashboard = () => {
               <TabsContent value="certificate">
                 <BeneficiaryCertificate
                   beneficiaryName={beneficiary?.full_name || ""}
-                  beneficiaryId={beneficiary?.id || ""}
+                  beneficiaryId={beneficiary?.beneficiary_number || beneficiary?.id || ""}
                   nationalId={beneficiary?.national_id || ""}
                   category={beneficiary?.category || ""}
                   registrationDate={beneficiary?.created_at || ""}
