@@ -36,7 +36,6 @@ export function ProfileTimeline({ beneficiaryId }: ProfileTimelineProps) {
       const timelineEvents: TimelineEvent[] = [];
 
       // جلب المدفوعات
-      // @ts-ignore
       const { data: payments } = await supabase
         .from('payments')
         .select('*')

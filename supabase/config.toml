@@ -6,7 +6,19 @@ verify_jwt = true
 [functions.daily-notifications]
 verify_jwt = true
 
+[functions.daily-notifications-full]
+verify_jwt = true
+
 [functions.generate-smart-alerts]
+verify_jwt = true
+
+[functions.generate-ai-insights]
+verify_jwt = true
+
+[functions.enhanced-backup]
+verify_jwt = true
+
+[functions.daily-backup]
 verify_jwt = true
 
 [functions.send-push-notification]
