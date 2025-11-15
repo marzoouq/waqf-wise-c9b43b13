@@ -12,8 +12,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
-import { Plus, Trash2, Loader2 } from "lucide-react";
+import { Plus, Trash2, Loader2, AlertCircle } from "lucide-react";
 import { format } from "date-fns";
+import { generateZATCAQRData, formatZATCACurrency, validateVATNumber } from "@/lib/zatca";
+import { useOrganizationSettings } from "@/hooks/useOrganizationSettings";
+import { validateZATCAInvoice, formatValidationErrors } from "@/lib/validateZATCAInvoice";
+import { Card, CardContent } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const invoiceSchema = z.object({
   invoice_date: z.string().min(1, { message: "تاريخ الفاتورة مطلوب" }),
@@ -58,6 +63,7 @@ export const AddInvoiceDialog = ({ open, onOpenChange }: AddInvoiceDialogProps) 
     tax_rate: 15,
   });
   const queryClient = useQueryClient();
+  const { settings: orgSettings } = useOrganizationSettings();
 
   const form = useForm<InvoiceFormData>({
     resolver: zodResolver(invoiceSchema),
@@ -162,6 +168,45 @@ export const AddInvoiceDialog = ({ open, onOpenChange }: AddInvoiceDialogProps) 
         throw new Error("يجب إضافة بند واحد على الأقل");
       }
 
+      // التحقق من صحة البيانات
+      const validationResult = validateZATCAInvoice({
+        invoice_number: nextInvoiceNumber!,
+        invoice_date: data.invoice_date,
+        seller_vat_number: orgSettings?.vat_registration_number || "",
+        customer_name: data.customer_name,
+        lines: lines.map(line => ({
+          description: line.description,
+          quantity: line.quantity,
+          unit_price: line.unit_price,
+          tax_rate: line.tax_rate,
+        })),
+        subtotal,
+        tax_amount: taxAmount,
+        total_amount: totalAmount,
+      });
+
+      if (!validationResult.isValid) {
+        throw new Error(formatValidationErrors(validationResult));
+      }
+
+      // توليد QR Code
+      let qrCodeData = null;
+      if (orgSettings) {
+        const invoiceDate = new Date(data.invoice_date);
+        if (data.invoice_time) {
+          const [hours, minutes] = data.invoice_time.split(':');
+          invoiceDate.setHours(parseInt(hours), parseInt(minutes));
+        }
+        
+        qrCodeData = generateZATCAQRData({
+          sellerName: orgSettings.organization_name_ar,
+          sellerVatNumber: orgSettings.vat_registration_number,
+          invoiceDate: invoiceDate.toISOString(),
+          invoiceTotal: formatZATCACurrency(totalAmount),
+          vatTotal: formatZATCACurrency(taxAmount),
+        });
+      }
+
       const { data: invoice, error: invoiceError } = await supabase
         .from("invoices")
         .insert({
@@ -178,8 +223,10 @@ export const AddInvoiceDialog = ({ open, onOpenChange }: AddInvoiceDialogProps) 
           customer_commercial_registration: data.customer_commercial_registration || null,
           subtotal,
           tax_amount: taxAmount,
+          tax_rate: 15,
           total_amount: totalAmount,
           notes: data.notes || null,
+          qr_code_data: qrCodeData,
           status: "draft",
         })
         .select()
@@ -222,6 +269,18 @@ export const AddInvoiceDialog = ({ open, onOpenChange }: AddInvoiceDialogProps) 
   });
 
   const onSubmit = (data: InvoiceFormData) => {
+    // التحقق من بيانات المنشأة
+    if (!orgSettings) {
+      toast.error("يجب تعيين بيانات المنشأة أولاً من صفحة الإعدادات");
+      return;
+    }
+
+    // التحقق من صحة الرقم الضريبي للعميل إذا وُجد
+    if (data.customer_vat_number && !validateVATNumber(data.customer_vat_number)) {
+      toast.error("الرقم الضريبي للعميل غير صحيح (يجب أن يكون 15 رقم ويبدأ بـ 3)");
+      return;
+    }
+
     createInvoiceMutation.mutate(data);
   };
 
@@ -234,6 +293,21 @@ export const AddInvoiceDialog = ({ open, onOpenChange }: AddInvoiceDialogProps) 
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          {!orgSettings && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                لم يتم تعيين بيانات المنشأة. يرجى إضافة بيانات المنشأة من صفحة الإعدادات أولاً.
+              </AlertDescription>
+            </Alert>
+          )}
+
+          <div className="bg-muted/50 p-4 rounded-lg">
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-muted-foreground">رقم الفاتورة التالي</span>
+              <span className="font-bold text-primary">{nextInvoiceNumber || "..."}</span>
+            </div>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <FormField
               control={form.control}
@@ -438,57 +512,67 @@ export const AddInvoiceDialog = ({ open, onOpenChange }: AddInvoiceDialogProps) 
             </div>
 
             {lines.length > 0 && (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>الوصف</TableHead>
-                    <TableHead>الكمية</TableHead>
-                    <TableHead>السعر</TableHead>
-                    <TableHead>ض.ق.م %</TableHead>
-                    <TableHead>المجموع</TableHead>
-                    <TableHead></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {lines.map((line) => (
-                    <TableRow key={line.id}>
-                      <TableCell>{line.description}</TableCell>
-                      <TableCell>{line.quantity}</TableCell>
-                      <TableCell>{line.unit_price.toFixed(2)}</TableCell>
-                      <TableCell>{line.tax_rate}%</TableCell>
-                      <TableCell>{line.line_total.toFixed(2)}</TableCell>
-                      <TableCell>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => removeLine(line.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
+              <>
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-muted">
+                      <TableHead className="text-right">الوصف</TableHead>
+                      <TableHead className="text-center">الكمية</TableHead>
+                      <TableHead className="text-right">السعر</TableHead>
+                      <TableHead className="text-center">ض.ق.م %</TableHead>
+                      <TableHead className="text-right">المجموع الفرعي</TableHead>
+                      <TableHead className="text-right">قيمة الضريبة</TableHead>
+                      <TableHead className="text-right font-bold">الإجمالي</TableHead>
+                      <TableHead className="text-center"></TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
+                  </TableHeader>
+                  <TableBody>
+                    {lines.map((line) => (
+                      <TableRow key={line.id}>
+                        <TableCell>{line.description}</TableCell>
+                        <TableCell className="text-center">{line.quantity}</TableCell>
+                        <TableCell className="text-right font-mono">{line.unit_price.toFixed(2)}</TableCell>
+                        <TableCell className="text-center font-semibold">{line.tax_rate}%</TableCell>
+                        <TableCell className="text-right font-mono">{line.subtotal.toFixed(2)}</TableCell>
+                        <TableCell className="text-right font-mono">{line.tax_amount.toFixed(2)}</TableCell>
+                        <TableCell className="text-right font-mono font-bold">{line.line_total.toFixed(2)}</TableCell>
+                        <TableCell className="text-center">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => removeLine(line.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
 
-            <div className="flex justify-end space-y-2">
-              <div className="w-64">
-                <div className="flex justify-between">
-                  <span>المجموع الفرعي:</span>
-                  <span>{subtotal.toFixed(2)} ر.س</span>
+                <div className="flex justify-end mt-6">
+                  <Card className="w-full md:w-96">
+                    <CardContent className="pt-6 space-y-3">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">المجموع (غير شامل ض.ق.م):</span>
+                        <span className="font-mono font-semibold">{formatZATCACurrency(subtotal)} ريال</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">ضريبة القيمة المضافة (15%):</span>
+                        <span className="font-mono font-semibold">{formatZATCACurrency(taxAmount)} ريال</span>
+                      </div>
+                      <div className="border-t pt-3">
+                        <div className="flex justify-between text-lg font-bold">
+                          <span>الإجمالي (شامل ض.ق.م):</span>
+                          <span className="font-mono text-primary">{formatZATCACurrency(totalAmount)} ريال</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
-                <div className="flex justify-between">
-                  <span>ضريبة القيمة المضافة (15%):</span>
-                  <span>{taxAmount.toFixed(2)} ر.س</span>
-                </div>
-                <div className="flex justify-between font-bold text-lg">
-                  <span>الإجمالي:</span>
-                  <span>{totalAmount.toFixed(2)} ر.س</span>
-                </div>
-              </div>
-            </div>
+              </>
+            )}
           </div>
 
           <div className="flex justify-end gap-2">
