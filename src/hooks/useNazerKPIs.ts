@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { CACHE_TIMES } from "@/lib/queryOptimization";
+import { QUERY_CONFIG } from "@/lib/queryOptimization";
 
 export interface NazerKPIData {
   totalAssets: number;
@@ -102,8 +102,6 @@ export function useNazerKPIs() {
         throw error;
       }
     },
-    staleTime: CACHE_TIMES.STANDARD,
-    refetchInterval: 30000, // Refetch every 30 seconds
-    retry: 2,
+    ...QUERY_CONFIG.DASHBOARD_KPIS,
   });
 }

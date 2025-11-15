@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format, differenceInDays } from "date-fns";
-import { CACHE_TIMES } from "@/lib/queryOptimization";
+import { QUERY_CONFIG } from "@/lib/queryOptimization";
 
 export interface SmartAlert {
   id: string;
@@ -147,8 +147,6 @@ export function useSmartAlerts() {
         throw error;
       }
     },
-    staleTime: CACHE_TIMES.DYNAMIC,
-    refetchInterval: 15000, // Refetch every 15 seconds
-    retry: 2,
+    ...QUERY_CONFIG.ALERTS,
   });
 }

@@ -27,13 +27,47 @@ export const PAGINATION = {
 } as const;
 
 /**
- * Cache times for different data types
+ * Cache times for different data types (in milliseconds)
  */
 export const CACHE_TIMES = {
   STATIC: 60 * 60 * 1000,      // 1 hour - for rarely changing data
   STANDARD: 5 * 60 * 1000,     // 5 minutes - for standard data
   DYNAMIC: 1 * 60 * 1000,      // 1 minute - for frequently changing data
   REALTIME: 0,                 // No cache - for real-time data
+} as const;
+
+/**
+ * Query configuration presets
+ */
+export const QUERY_CONFIG = {
+  DASHBOARD_KPIS: {
+    staleTime: CACHE_TIMES.STANDARD,
+    cacheTime: CACHE_TIMES.STANDARD * 2,
+    refetchInterval: 30000, // 30 seconds
+    refetchOnWindowFocus: true,
+    retry: 2,
+  },
+  APPROVALS: {
+    staleTime: CACHE_TIMES.DYNAMIC,
+    cacheTime: CACHE_TIMES.DYNAMIC * 2,
+    refetchInterval: 10000, // 10 seconds
+    refetchOnWindowFocus: true,
+    retry: 2,
+  },
+  ALERTS: {
+    staleTime: CACHE_TIMES.DYNAMIC,
+    cacheTime: CACHE_TIMES.DYNAMIC * 2,
+    refetchInterval: 15000, // 15 seconds
+    refetchOnWindowFocus: true,
+    retry: 2,
+  },
+  CHARTS: {
+    staleTime: CACHE_TIMES.STANDARD,
+    cacheTime: CACHE_TIMES.STANDARD * 2,
+    refetchInterval: 60000, // 1 minute
+    refetchOnWindowFocus: false,
+    retry: 1,
+  },
 } as const;
 
 /**
