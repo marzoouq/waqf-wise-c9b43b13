@@ -6,6 +6,7 @@ import { useAuth } from "./useAuth";
 import { useJournalEntries } from "./useJournalEntries";
 import { useEffect } from "react";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";
+import { logger } from "@/lib/logger";
 
 export interface LoanPayment {
   id: string;
@@ -126,9 +127,9 @@ export function useLoanPayments(loanId?: string) {
             .from('loan_payments')
             .update({ journal_entry_id: entryId })
             .eq('id', paymentData.id);
-        } catch (error) {
-          console.error('Error creating journal entry:', error);
-        }
+          } catch (error) {
+            logger.error(error, { context: 'loan_payment_journal_entry', severity: 'medium' });
+          }
       }
 
       return paymentData;

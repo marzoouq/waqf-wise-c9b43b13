@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { logger } from "@/lib/logger";
 
 export interface BankStatement {
   id: string;
@@ -53,7 +54,7 @@ export function useBankReconciliation() {
         if (error) throw error;
         return data as any[];
       } catch (error) {
-        console.error("Error fetching statements:", error);
+        logger.error(error, { context: 'fetch_bank_statements', severity: 'low' });
         return [];
       }
     },
@@ -71,7 +72,7 @@ export function useBankReconciliation() {
         if (error) throw error;
         return data as any[];
       } catch (error) {
-        console.error("Error fetching transactions:", error);
+        logger.error(error, { context: 'fetch_bank_transactions', severity: 'low' });
         return [];
       }
     },

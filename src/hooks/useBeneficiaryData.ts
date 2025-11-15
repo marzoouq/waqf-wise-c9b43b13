@@ -3,6 +3,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Beneficiary } from "@/types/beneficiary";
 import { fetchFromTable } from "@/utils/supabaseHelpers";
 import { getErrorMessage } from "@/lib/errorService";
+import { logger } from "@/lib/logger";
 
 interface Payment {
   id: string;
@@ -64,7 +65,7 @@ export const useBeneficiaryData = (userId?: string) => {
 
         setLoading(false);
       } catch (error) {
-        console.error("Error loading beneficiary data:", error);
+        logger.error(error, { context: 'load_beneficiary_data', severity: 'medium' });
         toast({
           title: "خطأ في تحميل البيانات",
           description: "حدث خطأ غير متوقع",
