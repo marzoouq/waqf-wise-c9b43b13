@@ -10,6 +10,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { LoadingState, CardLoadingSkeleton } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
+import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
 
 const Funds = () => {
   const [distributionDialogOpen, setDistributionDialogOpen] = useState(false);
@@ -68,10 +70,10 @@ const Funds = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gradient-primary">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gradient-primary">
               الأموال والمصارف
             </h1>
-            <p className="text-muted-foreground mt-1 text-sm md:text-base">
+            <p className="text-muted-foreground mt-1 text-xs sm:text-sm md:text-base">
               إدارة أقلام الوقف وتوزيع الغلة
             </p>
           </div>
@@ -95,7 +97,7 @@ const Funds = () => {
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
           <Card className="shadow-soft">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground">

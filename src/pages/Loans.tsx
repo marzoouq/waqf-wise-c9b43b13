@@ -14,6 +14,8 @@ import { InstallmentScheduleDialog } from "@/components/loans/InstallmentSchedul
 import { LoanPaymentDialog } from "@/components/loans/LoanPaymentDialog";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
+import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
 
 export default function Loans() {
   const { loans, isLoading } = useLoans();
@@ -69,31 +71,31 @@ export default function Loans() {
   }
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-4 sm:space-y-6 p-3 sm:p-4 md:p-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">إدارة القروض</h1>
-          <p className="text-muted-foreground mt-2">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">إدارة القروض</h1>
+          <p className="text-muted-foreground mt-1 sm:mt-2 text-xs sm:text-sm">
             إدارة ومتابعة القروض والأقساط
           </p>
         </div>
-        <Button onClick={() => setIsDialogOpen(true)} className="gap-2">
+        <Button onClick={() => setIsDialogOpen(true)} className="gap-2 w-full sm:w-auto">
           <Plus className="h-4 w-4" />
           إضافة قرض جديد
         </Button>
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <DollarSign className="h-5 w-5 text-primary" />
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
+        <Card className="p-3 sm:p-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg shrink-0">
+              <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
             </div>
-            <div>
-              <p className="text-sm text-muted-foreground">إجمالي القروض</p>
-              <p className="text-2xl font-bold">{stats.total}</p>
+            <div className="min-w-0">
+              <p className="text-xs sm:text-sm text-muted-foreground truncate">إجمالي القروض</p>
+              <p className="text-lg sm:text-xl md:text-2xl font-bold">{stats.total}</p>
             </div>
           </div>
         </Card>
@@ -185,79 +187,82 @@ export default function Loans() {
         />
       ) : (
         <Card>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="text-right">رقم القرض</TableHead>
-                <TableHead className="text-right">المستفيد</TableHead>
-                <TableHead className="text-right">المبلغ</TableHead>
-                <TableHead className="text-right">الفائدة</TableHead>
-                <TableHead className="text-right">المدة</TableHead>
-                <TableHead className="text-right">القسط الشهري</TableHead>
-                <TableHead className="text-right">تاريخ البداية</TableHead>
-                <TableHead className="text-right">الحالة</TableHead>
-                <TableHead className="text-right">الإجراءات</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredLoans.map((loan) => (
-                <TableRow key={loan.id}>
-                  <TableCell className="font-medium">{loan.loan_number}</TableCell>
-                  <TableCell>
-                    <div>
-                      <p className="font-medium">{loan.beneficiary?.full_name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {loan.beneficiary?.national_id}
-                      </p>
-                    </div>
-                  </TableCell>
-                  <TableCell className="font-semibold">
-                    {loan.loan_amount.toLocaleString('ar-SA')} ريال
-                  </TableCell>
-                  <TableCell>{loan.interest_rate}%</TableCell>
-                  <TableCell>{loan.term_months} شهر</TableCell>
-                  <TableCell className="font-semibold">
-                    {loan.monthly_installment?.toLocaleString('ar-SA') || 0} ريال
-                  </TableCell>
-                  <TableCell>
-                    {format(new Date(loan.start_date), "dd/MM/yyyy", {
-                      locale: ar,
-                    })}
-                  </TableCell>
-                  <TableCell>{getStatusBadge(loan.status)}</TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setSelectedLoan(loan);
-                          setIsScheduleDialogOpen(true);
-                        }}
-                        className="gap-1"
-                      >
-                        <Calendar className="h-3 w-3" />
-                        الأقساط
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setSelectedLoan(loan);
-                          setIsPaymentDialogOpen(true);
-                        }}
-                        className="gap-1"
-                        disabled={loan.status === "paid" || loan.status === "cancelled"}
-                      >
-                        <Receipt className="h-3 w-3" />
-                        دفعة
-                      </Button>
-                    </div>
-                  </TableCell>
+          <ScrollableTableWrapper>
+            <MobileScrollHint />
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">رقم القرض</TableHead>
+                  <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">المستفيد</TableHead>
+                  <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">المبلغ</TableHead>
+                  <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">الفائدة</TableHead>
+                  <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">المدة</TableHead>
+                  <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">القسط الشهري</TableHead>
+                  <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">تاريخ البداية</TableHead>
+                  <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">الحالة</TableHead>
+                  <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">الإجراءات</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {filteredLoans.map((loan) => (
+                  <TableRow key={loan.id}>
+                    <TableCell className="font-medium text-xs sm:text-sm">{loan.loan_number}</TableCell>
+                    <TableCell className="text-xs sm:text-sm">
+                      <div>
+                        <p className="font-medium">{loan.beneficiary?.full_name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {loan.beneficiary?.national_id}
+                        </p>
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-semibold text-xs sm:text-sm whitespace-nowrap">
+                      {loan.loan_amount.toLocaleString('ar-SA')} ريال
+                    </TableCell>
+                    <TableCell className="text-xs sm:text-sm">{loan.interest_rate}%</TableCell>
+                    <TableCell className="text-xs sm:text-sm whitespace-nowrap">{loan.term_months} شهر</TableCell>
+                    <TableCell className="font-semibold text-xs sm:text-sm whitespace-nowrap">
+                      {loan.monthly_installment?.toLocaleString('ar-SA') || 0} ريال
+                    </TableCell>
+                    <TableCell className="text-xs sm:text-sm">
+                      {format(new Date(loan.start_date), "dd/MM/yyyy", {
+                        locale: ar,
+                      })}
+                    </TableCell>
+                    <TableCell>{getStatusBadge(loan.status)}</TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedLoan(loan);
+                            setIsScheduleDialogOpen(true);
+                          }}
+                          className="gap-1 text-xs"
+                        >
+                          <Calendar className="h-3 w-3" />
+                          الأقساط
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedLoan(loan);
+                            setIsPaymentDialogOpen(true);
+                          }}
+                          className="gap-1 text-xs"
+                          disabled={loan.status === "paid" || loan.status === "cancelled"}
+                        >
+                          <Receipt className="h-3 w-3" />
+                          دفعة
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </ScrollableTableWrapper>
         </Card>
       )}
 

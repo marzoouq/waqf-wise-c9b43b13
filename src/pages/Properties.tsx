@@ -12,6 +12,8 @@ import { ContractsTab } from "@/components/properties/tabs/ContractsTab";
 import { PaymentsTab } from "@/components/properties/tabs/PaymentsTab";
 import { MaintenanceTab } from "@/components/properties/tabs/MaintenanceTab";
 import { useProperties } from "@/hooks/useProperties";
+import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
+import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
 
 const Properties = () => {
   const { addProperty, updateProperty } = useProperties();
@@ -98,10 +100,10 @@ const Properties = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gradient-primary">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gradient-primary">
               إدارة العقارات والعقود
             </h1>
-            <p className="text-muted-foreground mt-1 text-sm md:text-base">
+            <p className="text-muted-foreground mt-1 text-xs sm:text-sm md:text-base">
               إدارة شاملة للعقارات، العقود، الإيجارات والصيانة
             </p>
           </div>

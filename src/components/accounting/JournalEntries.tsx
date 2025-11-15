@@ -19,6 +19,8 @@ import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import AddJournalEntryDialog from "./AddJournalEntryDialog";
 import ViewJournalEntryDialog from "./ViewJournalEntryDialog";
+import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
+import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
 
 type JournalEntry = {
   id: string;

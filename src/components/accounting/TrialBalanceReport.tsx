@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Download, Printer } from "lucide-react";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
+import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
 
 export function TrialBalanceReport() {
   const { trialBalance, isLoading } = useFinancialReports();
@@ -48,54 +50,57 @@ export function TrialBalanceReport() {
         </div>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-muted/50">
-              <TableHead className="text-right">رمز الحساب</TableHead>
-              <TableHead className="text-right">اسم الحساب</TableHead>
-              <TableHead className="text-left">مدين</TableHead>
-              <TableHead className="text-left">دائن</TableHead>
-              <TableHead className="text-left">الرصيد</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {trialBalance.map((account) => (
-              <TableRow key={account.account_id}>
-                <TableCell className="font-mono text-sm">{account.code}</TableCell>
-                <TableCell>{account.name}</TableCell>
-                <TableCell className="text-left font-mono">
-                  {account.debit > 0 ? formatNumber(account.debit) : "-"}
-                </TableCell>
-                <TableCell className="text-left font-mono">
-                  {account.credit > 0 ? formatNumber(account.credit) : "-"}
-                </TableCell>
-                <TableCell className="text-left font-mono font-semibold">
-                  <span className={account.balance > 0 ? "text-green-600" : account.balance < 0 ? "text-red-600" : ""}>
-                    {formatNumber(account.balance)}
-                  </span>
+        <ScrollableTableWrapper>
+          <MobileScrollHint />
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted/50">
+                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">رمز الحساب</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">اسم الحساب</TableHead>
+                <TableHead className="text-left text-xs sm:text-sm whitespace-nowrap">مدين</TableHead>
+                <TableHead className="text-left text-xs sm:text-sm whitespace-nowrap">دائن</TableHead>
+                <TableHead className="text-left text-xs sm:text-sm whitespace-nowrap">الرصيد</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {trialBalance.map((account) => (
+                <TableRow key={account.account_id}>
+                  <TableCell className="font-mono text-xs sm:text-sm">{account.code}</TableCell>
+                  <TableCell className="text-xs sm:text-sm">{account.name}</TableCell>
+                  <TableCell className="text-left font-mono text-xs sm:text-sm whitespace-nowrap">
+                    {account.debit > 0 ? formatNumber(account.debit) : "-"}
+                  </TableCell>
+                  <TableCell className="text-left font-mono text-xs sm:text-sm whitespace-nowrap">
+                    {account.credit > 0 ? formatNumber(account.credit) : "-"}
+                  </TableCell>
+                  <TableCell className="text-left font-mono font-semibold text-xs sm:text-sm whitespace-nowrap">
+                    <span className={account.balance > 0 ? "text-green-600" : account.balance < 0 ? "text-red-600" : ""}>
+                      {formatNumber(account.balance)}
+                    </span>
+                  </TableCell>
+                </TableRow>
+              ))}
+              
+              {/* Total Row */}
+              <TableRow className="bg-primary/10 font-bold">
+                <TableCell colSpan={2} className="text-right text-xs sm:text-sm">الإجمالي</TableCell>
+                <TableCell className="text-left font-mono text-xs sm:text-sm whitespace-nowrap">{formatNumber(totalDebit)}</TableCell>
+                <TableCell className="text-left font-mono text-xs sm:text-sm whitespace-nowrap">{formatNumber(totalCredit)}</TableCell>
+                <TableCell className="text-left font-mono text-xs sm:text-sm">
+                  {difference < 0.01 ? (
+                    <Badge variant="default" className="gap-1 text-xs">
+                      متوازن
+                    </Badge>
+                  ) : (
+                    <Badge variant="destructive" className="gap-1 text-xs">
+                      فرق: {formatNumber(difference)}
+                    </Badge>
+                  )}
                 </TableCell>
               </TableRow>
-            ))}
-            
-            {/* Total Row */}
-            <TableRow className="bg-primary/10 font-bold">
-              <TableCell colSpan={2} className="text-right">الإجمالي</TableCell>
-              <TableCell className="text-left font-mono">{formatNumber(totalDebit)}</TableCell>
-              <TableCell className="text-left font-mono">{formatNumber(totalCredit)}</TableCell>
-              <TableCell className="text-left font-mono">
-                {difference < 0.01 ? (
-                  <Badge variant="default" className="gap-1">
-                    متوازن
-                  </Badge>
-                ) : (
-                  <Badge variant="destructive" className="gap-1">
-                    فرق: {formatNumber(difference)}
-                  </Badge>
-                )}
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
+            </TableBody>
+          </Table>
+        </ScrollableTableWrapper>
       </CardContent>
     </Card>
   );
