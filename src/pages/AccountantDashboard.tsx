@@ -1,19 +1,51 @@
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { FileText, DollarSign, AlertCircle, CheckCircle, XCircle } from "lucide-react";
-import { LoadingState } from "@/components/shared/LoadingState";
-import { EmptyState } from "@/components/shared/EmptyState";
-import AccountingStats from "@/components/dashboard/AccountingStats";
-import RecentJournalEntries from "@/components/dashboard/RecentJournalEntries";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Skeleton } from "@/components/ui/skeleton";
+import { FileText, DollarSign, AlertCircle, CheckCircle, XCircle, TrendingUp, FileCheck, FileClock } from "lucide-react";
+import { useAccountantKPIs } from "@/hooks/useAccountantKPIs";
 import { ApproveJournalDialog } from "@/components/accounting/ApproveJournalDialog";
+
+// Lazy load components
+const AccountingStats = lazy(() => import("@/components/dashboard/AccountingStats"));
+const RecentJournalEntries = lazy(() => import("@/components/dashboard/RecentJournalEntries"));
+
+// Skeleton loaders
+const StatsSkeleton = () => (
+  <div className="grid gap-4 sm:gap-5 md:gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
+    {[1, 2, 3, 4].map((i) => (
+      <Card key={i}>
+        <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-4 w-4 rounded-full" />
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-8 w-20 mb-2" />
+          <Skeleton className="h-3 w-32" />
+        </CardContent>
+      </Card>
+    ))}
+  </div>
+);
+
+const TableSkeleton = () => (
+  <div className="space-y-3">
+    {[1, 2, 3].map((i) => (
+      <Skeleton key={i} className="h-20 w-full" />
+    ))}
+  </div>
+);
 
 const AccountantDashboard = () => {
   const [selectedApproval, setSelectedApproval] = useState<any>(null);
   const [isApprovalDialogOpen, setIsApprovalDialogOpen] = useState(false);
+  
+  const { data: kpis, isLoading: kpisLoading } = useAccountantKPIs();
+
   // Fetch pending approvals
   const { data: pendingApprovals = [], isLoading: approvalsLoading } = useQuery({
     queryKey: ["pending_approvals"],
@@ -25,20 +57,6 @@ const AccountantDashboard = () => {
           journal_entry:journal_entries(*)
         `)
         .eq("status", "pending")
-        .order("created_at", { ascending: false });
-      
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  // Fetch recent journal entries
-  const { data: recentEntries = [], isLoading: entriesLoading } = useQuery({
-    queryKey: ["recent_entries_accountant"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("journal_entries")
-        .select("*")
         .order("created_at", { ascending: false })
         .limit(10);
       
@@ -46,33 +64,6 @@ const AccountantDashboard = () => {
       return data;
     },
   });
-
-  // Calculate accurate stats from all data
-  const { data: allStats } = useQuery({
-    queryKey: ["accountant_all_stats"],
-    queryFn: async () => {
-      const [approvalsRes, draftRes, postedRes, cancelledRes] = await Promise.all([
-        supabase.from('approvals').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
-        supabase.from('journal_entries').select('*', { count: 'exact', head: true }).eq('status', 'draft'),
-        supabase.from('journal_entries').select('*', { count: 'exact', head: true }).eq('status', 'posted'),
-        supabase.from('journal_entries').select('*', { count: 'exact', head: true }).eq('status', 'cancelled'),
-      ]);
-      
-      return {
-        pendingApprovals: approvalsRes.count || 0,
-        draftEntries: draftRes.count || 0,
-        postedEntries: postedRes.count || 0,
-        cancelledEntries: cancelledRes.count || 0,
-      };
-    },
-  });
-
-  const stats = allStats || {
-    pendingApprovals: 0,
-    draftEntries: 0,
-    postedEntries: 0,
-    cancelledEntries: 0,
-  };
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { label: string; variant: any; icon: any }> = {
@@ -90,193 +81,197 @@ const AccountantDashboard = () => {
     );
   };
 
-  if (approvalsLoading || entriesLoading) {
-    return <LoadingState message="جاري تحميل لوحة المحاسب..." />;
-  }
-
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto p-3 sm:p-4 md:p-6 lg:p-8 space-y-4 sm:space-y-6 md:space-y-8">
         {/* Header */}
         <header className="space-y-1 sm:space-y-2">
           <div className="flex items-center gap-2 sm:gap-3">
-            <FileText className="h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 text-blue-600" />
+            <DollarSign className="h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 text-emerald-600" />
             <div>
               <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gradient-primary">
                 لوحة تحكم المحاسب
               </h1>
               <p className="text-xs sm:text-sm md:text-base text-muted-foreground">
-                إدارة القيود المحاسبية والموافقات
+                إدارة القيود المحاسبية والموافقات المالية
               </p>
             </div>
           </div>
         </header>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          <Card className="shadow-soft border-warning/30">
-            <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
-                  موافقات معلقة
-                </CardTitle>
-                <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-warning" />
-              </div>
-            </CardHeader>
-            <CardContent className="p-3 sm:p-6">
-              <div className="text-2xl sm:text-3xl font-bold text-warning">
-                {stats.pendingApprovals}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-soft">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  قيود مسودة
-                </CardTitle>
-                <FileText className="h-5 w-5 text-muted-foreground" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-muted-foreground">
-                {stats.draftEntries}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-soft border-success/30">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  قيود مرحّلة
-                </CardTitle>
-                <CheckCircle className="h-5 w-5 text-success" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-success">
-                {stats.postedEntries}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-soft border-destructive/30">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  قيود ملغاة
-                </CardTitle>
-                <XCircle className="h-5 w-5 text-destructive" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-destructive">
-                {stats.cancelledEntries}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Accounting Stats */}
-        <AccountingStats />
-
-        {/* Two Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Pending Approvals */}
-          <Card className="shadow-soft">
-            <CardHeader>
-              <CardTitle className="text-xl font-bold">الموافقات المعلقة</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {pendingApprovals.length === 0 ? (
-                <EmptyState
-                  icon={CheckCircle}
-                  title="لا توجد موافقات معلقة"
-                  description="جميع القيود تمت مراجعتها"
-                  className="py-8"
-                />
-              ) : (
-                <div className="space-y-4">
-                  {pendingApprovals.map((approval: any) => (
-                    <div
-                      key={approval.id}
-                      className="p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors"
-                    >
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <p className="font-mono font-medium text-sm">
-                            {approval.journal_entry?.entry_number}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            {approval.journal_entry?.description}
-                          </p>
-                        </div>
-                        {getStatusBadge(approval.status)}
-                      </div>
-                      <div className="flex items-center justify-between mt-3">
-                        <p className="text-xs text-muted-foreground">
-                          طلب المراجعة: {new Date(approval.created_at).toLocaleDateString("ar-SA")}
-                        </p>
-                        <div className="flex gap-2">
-                          <Button 
-                            size="sm" 
-                            variant="default"
-                            onClick={() => {
-                              setSelectedApproval(approval);
-                              setIsApprovalDialogOpen(true);
-                            }}
-                          >
-                            مراجعة
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+        {/* Statistics Cards */}
+        {kpisLoading ? (
+          <StatsSkeleton />
+        ) : (
+          <div className="grid gap-4 sm:gap-5 md:gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
+            <Card className="group hover:shadow-lg hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-amber-500">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-xs sm:text-sm font-medium">موافقات معلقة</CardTitle>
+                <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 text-amber-500 group-hover:scale-110 transition-transform" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-lg sm:text-xl md:text-2xl font-bold text-amber-600">
+                  {kpis?.pendingApprovals || 0}
                 </div>
-              )}
-            </CardContent>
-          </Card>
+                <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">تحتاج مراجعة</p>
+              </CardContent>
+            </Card>
 
-          {/* Recent Journal Entries */}
-          <RecentJournalEntries />
-        </div>
+            <Card className="group hover:shadow-lg hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-blue-500">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-xs sm:text-sm font-medium">قيود مسودة</CardTitle>
+                <FileClock className="h-3 w-3 sm:h-4 sm:w-4 text-blue-500 group-hover:scale-110 transition-transform" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-lg sm:text-xl md:text-2xl font-bold text-blue-600">
+                  {kpis?.draftEntries || 0}
+                </div>
+                <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">غير مرحّلة</p>
+              </CardContent>
+            </Card>
+
+            <Card className="group hover:shadow-lg hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-green-500">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-xs sm:text-sm font-medium">قيود مرحّلة</CardTitle>
+                <FileCheck className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 group-hover:scale-110 transition-transform" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-lg sm:text-xl md:text-2xl font-bold text-green-600">
+                  {kpis?.postedEntries || 0}
+                </div>
+                <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">معتمدة ومرحّلة</p>
+              </CardContent>
+            </Card>
+
+            <Card className="group hover:shadow-lg hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-purple-500">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-xs sm:text-sm font-medium">قيود اليوم</CardTitle>
+                <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-purple-500 group-hover:scale-110 transition-transform" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-lg sm:text-xl md:text-2xl font-bold text-purple-600">
+                  {kpis?.todayEntries || 0}
+                </div>
+                <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">قيود جديدة اليوم</p>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Tabs for organized view */}
+        <Tabs defaultValue="overview" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="overview">نظرة عامة</TabsTrigger>
+            <TabsTrigger value="approvals">الموافقات</TabsTrigger>
+            <TabsTrigger value="entries">القيود الأخيرة</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview" className="space-y-4">
+            <Suspense fallback={<TableSkeleton />}>
+              <AccountingStats />
+            </Suspense>
+          </TabsContent>
+
+          <TabsContent value="approvals" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <AlertCircle className="h-5 w-5 text-amber-500" />
+                  الموافقات المعلقة
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {approvalsLoading ? (
+                  <TableSkeleton />
+                ) : pendingApprovals.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <CheckCircle className="h-12 w-12 mx-auto mb-3 text-green-500" />
+                    <p>لا توجد موافقات معلقة</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {pendingApprovals.map((approval: any) => (
+                      <div
+                        key={approval.id}
+                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                      >
+                        <div className="flex-1 space-y-1">
+                          <div className="flex items-center gap-2">
+                            <FileText className="h-4 w-4 text-muted-foreground" />
+                            <p className="font-medium">
+                              {approval.journal_entry?.entry_number || 'قيد محاسبي'}
+                            </p>
+                            {getStatusBadge(approval.status)}
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            {approval.journal_entry?.description || 'لا يوجد وصف'}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            المراجع: {approval.approver_name}
+                          </p>
+                        </div>
+                        <Button
+                          size="sm"
+                          onClick={() => {
+                            setSelectedApproval(approval);
+                            setIsApprovalDialogOpen(true);
+                          }}
+                        >
+                          مراجعة
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="entries" className="space-y-4">
+            <Suspense fallback={<TableSkeleton />}>
+              <RecentJournalEntries />
+            </Suspense>
+          </TabsContent>
+        </Tabs>
 
         {/* Quick Actions */}
-        <Card className="shadow-soft bg-gradient-to-br from-primary/5 to-accent/5 border-primary/10">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-lg md:text-xl font-bold">الإجراءات السريعة</CardTitle>
+            <CardTitle>إجراءات سريعة</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-              <Button
-                variant="outline"
-                className="h-auto py-4 flex-col gap-2 hover:bg-primary hover:text-primary-foreground"
+            <div className="grid gap-3 sm:gap-4 grid-cols-2 md:grid-cols-4">
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => window.location.href = '/accounting'}
               >
-                <FileText className="h-5 w-5" />
-                <span className="text-sm">قيد جديد</span>
+                <FileText className="h-4 w-4 ml-2" />
+                قيد جديد
               </Button>
-              <Button
-                variant="outline"
-                className="h-auto py-4 flex-col gap-2 hover:bg-primary hover:text-primary-foreground"
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => window.location.href = '/reports'}
               >
-                <DollarSign className="h-5 w-5" />
-                <span className="text-sm">سند جديد</span>
+                <FileCheck className="h-4 w-4 ml-2" />
+                التقارير المالية
               </Button>
-              <Button
-                variant="outline"
-                className="h-auto py-4 flex-col gap-2 hover:bg-primary hover:text-primary-foreground"
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => window.location.href = '/approvals'}
               >
-                <AlertCircle className="h-5 w-5" />
-                <span className="text-sm">مراجعة الموافقات</span>
+                <AlertCircle className="h-4 w-4 ml-2" />
+                كل الموافقات
               </Button>
-              <Button
-                variant="outline"
-                className="h-auto py-4 flex-col gap-2 hover:bg-primary hover:text-primary-foreground"
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => window.location.href = '/accounting'}
               >
-                <FileText className="h-5 w-5" />
-                <span className="text-sm">التقارير</span>
+                <DollarSign className="h-4 w-4 ml-2" />
+                شجرة الحسابات
               </Button>
             </div>
           </CardContent>
@@ -284,11 +279,13 @@ const AccountantDashboard = () => {
       </div>
 
       {/* Approval Dialog */}
-      <ApproveJournalDialog 
-        open={isApprovalDialogOpen} 
-        onOpenChange={setIsApprovalDialogOpen}
-        approval={selectedApproval}
-      />
+      {selectedApproval && (
+        <ApproveJournalDialog
+          open={isApprovalDialogOpen}
+          onOpenChange={setIsApprovalDialogOpen}
+          approval={selectedApproval}
+        />
+      )}
     </div>
   );
 };
