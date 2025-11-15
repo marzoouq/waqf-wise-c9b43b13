@@ -8,16 +8,22 @@ export interface Invoice {
   id: string;
   invoice_number: string;
   invoice_date: string;
+  invoice_time?: string;
   due_date?: string;
   customer_name: string;
   customer_email?: string;
   customer_phone?: string;
   customer_address?: string;
+  customer_city?: string;
+  customer_vat_number?: string;
+  customer_commercial_registration?: string;
   subtotal: number;
   tax_amount: number;
+  tax_rate?: number;
   total_amount: number;
   status: string;
   notes?: string;
+  qr_code_data?: string;
   journal_entry_id?: string;
   created_at: string;
   updated_at: string;
@@ -30,6 +36,9 @@ export interface InvoiceLine {
   description: string;
   quantity: number;
   unit_price: number;
+  subtotal: number;
+  tax_rate: number;
+  tax_amount: number;
   line_total: number;
   account_id?: string;
 }
