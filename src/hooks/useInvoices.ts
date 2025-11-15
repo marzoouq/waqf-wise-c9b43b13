@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useJournalEntries } from "./useJournalEntries";
 import { useEffect } from "react";
+import { logger } from "@/lib/logger";
 
 export interface Invoice {
   id: string;
@@ -121,7 +122,7 @@ export function useInvoices() {
             invoiceRecord.invoice_date
           );
         } catch (journalError) {
-          console.error("Error creating journal entry:", journalError);
+          logger.error(journalError, { context: 'invoice_journal_entry', severity: 'medium' });
         }
       }
 
@@ -210,7 +211,7 @@ export function useInvoices() {
             .update({ journal_entry_id: entryId })
             .eq("id", id);
         } catch (journalError) {
-          console.error("Error creating journal entry:", journalError);
+          logger.error(journalError, { context: 'update_invoice_journal_entry', severity: 'medium' });
         }
       }
 
@@ -225,7 +226,7 @@ export function useInvoices() {
             new Date().toISOString().split('T')[0]
           );
         } catch (journalError) {
-          console.error("Error creating payment journal entry:", journalError);
+          logger.error(journalError, { context: 'invoice_payment_journal_entry', severity: 'medium' });
         }
       }
 

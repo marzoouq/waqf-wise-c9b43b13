@@ -5,6 +5,7 @@ import { useJournalEntries } from "./useJournalEntries";
 import { useActivities } from "@/hooks/useActivities";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
+import { logger } from "@/lib/logger";
 
 export interface Distribution {
   id: string;
@@ -85,7 +86,7 @@ export function useDistributions() {
           user_name: user?.email || 'النظام',
         });
       } catch (error) {
-        console.error("Error adding activity:", error);
+        logger.error(error, { context: 'add_distribution_activity', severity: 'low' });
       }
       
       toast({
@@ -131,7 +132,7 @@ export function useDistributions() {
               .eq("id", id);
           }
         } catch (journalError) {
-          console.error("Error creating journal entry:", journalError);
+          logger.error(journalError, { context: 'distribution_journal_entry', severity: 'medium' });
         }
       }
 

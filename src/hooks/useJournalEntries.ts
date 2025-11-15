@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useActivities } from "@/hooks/useActivities";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
+import { logger } from "@/lib/logger";
 
 export interface JournalEntry {
   id: string;
@@ -128,7 +129,7 @@ export function useJournalEntries() {
           user_name: user?.email || 'النظام',
         });
       } catch (error) {
-        console.error("Error adding activity:", error);
+        logger.error(error, { context: 'journal_entry_activity', severity: 'low' });
       }
       
       toast({
@@ -195,7 +196,7 @@ export function useJournalEntries() {
       queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
       return data;
     } catch (error) {
-      console.error("Error creating auto entry:", error);
+      logger.error(error, { context: 'create_auto_entry', severity: 'high' });
       throw error;
     }
   };

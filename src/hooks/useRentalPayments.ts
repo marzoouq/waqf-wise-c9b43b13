@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { useJournalEntries } from "./useJournalEntries";
 import { useEffect } from "react";
+import { logger } from "@/lib/logger";
 
 export interface RentalPayment {
   id: string;
@@ -109,7 +110,7 @@ export const useRentalPayments = (contractId?: string) => {
             data.payment_date
           );
         } catch (journalError) {
-          console.error("Error creating journal entry:", journalError);
+          logger.error(journalError, { context: 'rental_payment_journal_entry', severity: 'medium' });
         }
       }
 
@@ -129,7 +130,7 @@ export const useRentalPayments = (contractId?: string) => {
         description: "حدث خطأ أثناء إضافة الدفعة",
         variant: "destructive",
       });
-      console.error("Error adding payment:", error);
+      logger.error(error, { context: 'add_rental_payment', severity: 'medium' });
     },
   });
 
@@ -172,7 +173,7 @@ export const useRentalPayments = (contractId?: string) => {
             data.payment_date
           );
         } catch (journalError) {
-          console.error("Error creating journal entry:", journalError);
+          logger.error(journalError, { context: 'update_rental_payment_journal', severity: 'medium' });
         }
       }
 
@@ -192,7 +193,7 @@ export const useRentalPayments = (contractId?: string) => {
         description: "حدث خطأ أثناء تحديث الدفعة",
         variant: "destructive",
       });
-      console.error("Error updating payment:", error);
+      logger.error(error, { context: 'update_rental_payment', severity: 'medium' });
     },
   });
 

@@ -4,6 +4,7 @@ import { toast } from "@/hooks/use-toast";
 import { useJournalEntries } from "./useJournalEntries";
 import { useTasks } from "@/hooks/useTasks";
 import { useEffect } from "react";
+import { logger } from "@/lib/logger";
 
 export interface MaintenanceRequest {
   id: string;
@@ -99,7 +100,7 @@ export const useMaintenanceRequests = () => {
             status: 'pending',
           });
         } catch (error) {
-          console.error("Error adding task:", error);
+          logger.error(error, { context: 'maintenance_task', severity: 'low' });
         }
       }
       
@@ -114,7 +115,7 @@ export const useMaintenanceRequests = () => {
         description: "حدث خطأ أثناء إضافة الطلب",
         variant: "destructive",
       });
-      console.error("Error adding maintenance request:", error);
+      logger.error(error, { context: 'add_maintenance_request', severity: 'medium' });
     },
   });
 
@@ -153,9 +154,9 @@ export const useMaintenanceRequests = () => {
             `مصروف صيانة - ${data.request_number} - ${data.title}`,
             completedDate
           );
-        } catch (journalError) {
-          console.error("Error creating journal entry:", journalError);
-        }
+          } catch (journalError) {
+            logger.error(journalError, { context: 'maintenance_journal_entry', severity: 'medium' });
+          }
       }
 
       return data;
@@ -174,7 +175,7 @@ export const useMaintenanceRequests = () => {
         description: "حدث خطأ أثناء تحديث الطلب",
         variant: "destructive",
       });
-      console.error("Error updating maintenance request:", error);
+      logger.error(error, { context: 'update_maintenance_request', severity: 'medium' });
     },
   });
 

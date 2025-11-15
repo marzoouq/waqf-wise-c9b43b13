@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/hooks/useProfile";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { logger } from "@/lib/logger";
 
 interface TwoFactorDialogProps {
   open: boolean;
@@ -72,7 +73,7 @@ export const TwoFactorDialog = ({ open, onOpenChange }: TwoFactorDialogProps) =>
       toast.success("تم إنشاء رمز المصادقة الثنائية");
     } catch (error) {
       toast.error("حدث خطأ أثناء تفعيل المصادقة الثنائية");
-      console.error(error);
+      logger.error(error, { context: 'enable_2fa', severity: 'medium' });
     } finally {
       setIsLoading(false);
     }
@@ -106,7 +107,7 @@ export const TwoFactorDialog = ({ open, onOpenChange }: TwoFactorDialogProps) =>
       setCode("");
     } catch (error) {
       toast.error("حدث خطأ أثناء التحقق من الرمز");
-      console.error(error);
+      logger.error(error, { context: 'verify_2fa_code', severity: 'medium' });
     } finally {
       setIsLoading(false);
     }
@@ -131,7 +132,7 @@ export const TwoFactorDialog = ({ open, onOpenChange }: TwoFactorDialogProps) =>
       onOpenChange(false);
     } catch (error) {
       toast.error("حدث خطأ أثناء إلغاء التفعيل");
-      console.error(error);
+      logger.error(error, { context: 'disable_2fa', severity: 'medium' });
     } finally {
       setIsLoading(false);
     }
