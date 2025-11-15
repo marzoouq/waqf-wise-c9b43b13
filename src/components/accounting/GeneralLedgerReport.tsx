@@ -17,6 +17,8 @@ import {
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { FileText, Printer } from "lucide-react";
+import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
+import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
 
 const GeneralLedgerReport = () => {
   const [selectedAccountId, setSelectedAccountId] = useState<string>("");

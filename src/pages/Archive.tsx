@@ -14,6 +14,8 @@ import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
+import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
 
 const Archive = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -66,10 +68,10 @@ const Archive = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gradient-primary">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gradient-primary">
               الأرشيف الإلكتروني
             </h1>
-            <p className="text-muted-foreground mt-1 text-sm md:text-base">
+            <p className="text-muted-foreground mt-1 text-xs sm:text-sm md:text-base">
               إدارة وأرشفة المستندات والملفات
             </p>
           </div>
