@@ -246,13 +246,14 @@ All colors MUST be HSL.
 
 @media print {
   @page {
-    size: A4;
-    margin: 10mm;
+    size: A4 portrait;
+    margin: 1cm;
   }
 
   body {
-    print-color-adjust: exact;
-    -webkit-print-color-adjust: exact;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
   }
 
   .print\:hidden {
@@ -268,7 +269,6 @@ All colors MUST be HSL.
   .no-print, [data-sidebar], [role="navigation"] {
     display: none !important;
   }
-}
   
   #invoice-print-content [class*="print:border-2"] {
     border-width: 2px !important;
@@ -282,7 +282,6 @@ All colors MUST be HSL.
     background-color: hsla(150, 45%, 35%, 0.2) !important;
   }
   
-  /* 11. وضع محتوى الفاتورة في أعلى الصفحة */
   #invoice-print-content {
     position: absolute !important;
     left: 0 !important;
@@ -292,22 +291,8 @@ All colors MUST be HSL.
     padding: 20px !important;
   }
   
-  /* 12. إزالة الظلال */
   * {
     box-shadow: none !important;
     text-shadow: none !important;
-  }
-  
-  /* 13. إعدادات الصفحة */
-  @page {
-    margin: 1cm;
-    size: A4 portrait;
-  }
-  
-  /* 14. تأكيد طباعة الألوان */
-  * {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-    color-adjust: exact !important;
   }
 }
