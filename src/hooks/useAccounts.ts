@@ -2,28 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { logger } from "@/lib/logger";
-
-export interface Account {
-  id: string;
-  code: string;
-  name_ar: string;
-  name_en?: string;
-  account_type: string;
-  account_nature: string;
-  account_level: number;
-  parent_id?: string;
-  is_header: boolean;
-  is_active: boolean;
-  is_system_account: boolean;
-  allows_transactions: boolean;
-  account_path?: string;
-  opening_balance: number;
-  current_balance: number;
-  sort_order: number;
-  description?: string;
-  created_at: string;
-  updated_at: string;
-}
+import { AccountRow, AccountWithBalance } from "@/types/supabase-helpers";
 
 export function useAccounts() {
   const { toast } = useToast();
@@ -38,7 +17,7 @@ export function useAccounts() {
         .order("code", { ascending: true });
 
       if (error) throw error;
-      return data as Account[];
+      return data as AccountRow[];
     },
   });
 
@@ -111,13 +90,19 @@ export function useAccounts() {
   };
 
   // Build tree structure
-  const buildAccountTree = () => {
-    const accountMap = new Map<string, Account & { children?: Account[] }>();
-    const rootAccounts: (Account & { children?: Account[] })[] = [];
+  const buildAccountTree = (): AccountWithBalance[] => {
+    const accountMap = new Map<string, AccountWithBalance>();
+    const rootAccounts: AccountWithBalance[] = [];
 
     // Create map
     accounts.forEach((account) => {
-      accountMap.set(account.id, { ...account, children: [] });
+      accountMap.set(account.id, { 
+        ...account, 
+        balance: account.current_balance || 0,
+        children: [],
+        allows_transactions: !account.is_header,
+        is_system_account: false
+      });
     });
 
     // Build tree
@@ -125,11 +110,11 @@ export function useAccounts() {
       const node = accountMap.get(account.id);
       if (account.parent_id) {
         const parent = accountMap.get(account.parent_id);
-        if (parent) {
-          parent.children!.push(node!);
+        if (parent && node) {
+          parent.children!.push(node);
         }
       } else {
-        rootAccounts.push(node!);
+        if (node) rootAccounts.push(node);
       }
     });
 
