@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import MainLayout from "./components/layout/MainLayout";
 import { GlobalErrorBoundary } from "./components/shared/GlobalErrorBoundary";
@@ -102,33 +102,150 @@ const App = () => {
                   <ProtectedRoute>
                     <MainLayout>
               <Routes>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/beneficiary-dashboard" element={<BeneficiaryDashboard />} />
-                <Route path="/accountant-dashboard" element={<AccountantDashboard />} />
-                <Route path="/nazer-dashboard" element={<NazerDashboard />} />
-                <Route path="/cashier-dashboard" element={<CashierDashboard />} />
-                <Route path="/archivist-dashboard" element={<ArchivistDashboard />} />
-                <Route path="/users" element={<Users />} />
-                <Route path="/beneficiaries" element={<Beneficiaries />} />
-                <Route path="/beneficiaries/:id" element={<BeneficiaryProfile />} />
-                <Route path="/families" element={<Families />} />
-                <Route path="/properties" element={<Properties />} />
-                <Route path="/funds" element={<Funds />} />
-                <Route path="/archive" element={<Archive />} />
-                <Route path="/accounting" element={<Accounting />} />
-            <Route path="/invoices" element={<Invoices />} />
-            <Route path="/approvals" element={<Approvals />} />
-            <Route path="/payments" element={<Payments />} />
-            <Route path="/loans" element={<Loans />} />
-                <Route path="/waqf-units" element={<WaqfUnits />} />
-                <Route path="/reports" element={<Reports />} />
-                <Route path="/report-builder" element={<ReportBuilder />} />
-                <Route path="/settings" element={<Settings />} />
-                <Route path="/notifications" element={<Notifications />} />
-                <Route path="/requests" element={<Requests />} />
-                <Route path="/staff/requests" element={<StaffRequests />} />
-                <Route path="/audit-logs" element={<AuditLogs />} />
-                <Route path="/ai-insights" element={<AIInsights />} />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          
+          {/* لوحات التحكم المحمية حسب الأدوار */}
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route 
+            path="/nazer-dashboard" 
+            element={
+              <ProtectedRoute requiredRole="nazer">
+                <NazerDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/accountant-dashboard" 
+            element={
+              <ProtectedRoute requiredRole="accountant">
+                <AccountantDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/cashier-dashboard" 
+            element={
+              <ProtectedRoute requiredRole="cashier">
+                <CashierDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/archivist-dashboard" 
+            element={
+              <ProtectedRoute requiredRole="archivist">
+                <ArchivistDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/beneficiary-dashboard" 
+            element={
+              <ProtectedRoute requiredRole="beneficiary">
+                <BeneficiaryDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* الصفحات المحمية بصلاحيات متعددة */}
+          <Route 
+            path="/users" 
+            element={
+              <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+                <Users />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/beneficiaries" 
+            element={
+              <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+                <Beneficiaries />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/beneficiaries/:id" 
+            element={
+              <ProtectedRoute requiredRoles={["admin", "nazer", "accountant", "beneficiary"]}>
+                <BeneficiaryProfile />
+              </ProtectedRoute>
+            } 
+          />
+          <Route path="/families" element={<Families />} />
+          <Route 
+            path="/properties" 
+            element={
+              <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+                <Properties />
+              </ProtectedRoute>
+            } 
+          />
+          <Route path="/funds" element={<Funds />} />
+          <Route 
+            path="/archive" 
+            element={
+              <ProtectedRoute requiredRoles={["admin", "nazer", "archivist"]}>
+                <Archive />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/accounting" 
+            element={
+              <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+                <Accounting />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/invoices" 
+            element={
+              <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+                <Invoices />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/approvals" 
+            element={
+              <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+                <Approvals />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/payments" 
+            element={
+              <ProtectedRoute requiredRoles={["admin", "nazer", "accountant", "cashier", "beneficiary"]}>
+                <Payments />
+              </ProtectedRoute>
+            } 
+          />
+          <Route path="/loans" element={<Loans />} />
+          <Route path="/waqf-units" element={<WaqfUnits />} />
+          <Route path="/reports" element={<Reports />} />
+          <Route path="/report-builder" element={<ReportBuilder />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/notifications" element={<Notifications />} />
+          <Route path="/requests" element={<Requests />} />
+          <Route path="/staff/requests" element={<StaffRequests />} />
+          <Route 
+            path="/audit-logs" 
+            element={
+              <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+                <AuditLogs />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/ai-insights" 
+            element={
+              <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+                <AIInsights />
+              </ProtectedRoute>
+            } 
+          />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
