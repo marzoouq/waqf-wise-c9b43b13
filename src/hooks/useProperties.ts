@@ -44,9 +44,10 @@ export function useProperties() {
         .from("properties")
         .insert([property])
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error("فشل في إضافة العقار");
       return data;
     },
     onSuccess: async (data) => {
@@ -83,9 +84,10 @@ export function useProperties() {
         .update(updates)
         .eq("id", id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error("فشل في تحديث العقار");
       return data;
     },
     onSuccess: () => {

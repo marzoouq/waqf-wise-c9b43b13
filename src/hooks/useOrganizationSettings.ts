@@ -33,9 +33,9 @@ export const useOrganizationSettings = () => {
         .select("*")
         .order("created_at", { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') throw error;
+      if (error) throw error;
       return data as OrganizationSettings | null;
     },
   });
@@ -50,7 +50,7 @@ export const useOrganizationSettings = () => {
           .update({ ...values, updated_at: new Date().toISOString() })
           .eq("id", settings.id)
           .select()
-          .single();
+          .maybeSingle();
 
         if (error) throw error;
         return data;
@@ -60,7 +60,7 @@ export const useOrganizationSettings = () => {
           .from("organization_settings")
           .insert(values)
           .select()
-          .single();
+          .maybeSingle();
 
         if (error) throw error;
         return data;

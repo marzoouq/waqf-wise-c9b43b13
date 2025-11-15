@@ -38,9 +38,10 @@ export function useBeneficiaries() {
             .from("beneficiaries")
             .insert([beneficiary])
             .select()
-            .single();
+            .maybeSingle();
 
           if (error) throw error;
+          if (!data) throw new Error("فشل في إضافة المستفيد");
           return data;
         },
         'add_beneficiary'
@@ -76,9 +77,10 @@ export function useBeneficiaries() {
             .update(updates)
             .eq("id", id)
             .select()
-            .single();
+            .maybeSingle();
 
           if (error) throw error;
+          if (!data) throw new Error("فشل في تحديث بيانات المستفيد");
           return data;
         },
         'update_beneficiary'

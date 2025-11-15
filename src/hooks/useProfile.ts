@@ -30,9 +30,9 @@ export function useProfile() {
         .from("profiles")
         .select("*")
         .eq("user_id", user.id)
-        .single();
+        .maybeSingle();
 
-      if (error && error.code !== "PGRST116") throw error; // Ignore not found
+      if (error) throw error;
       
       return data as Profile | null;
     },
@@ -48,9 +48,10 @@ export function useProfile() {
         .from("profiles")
         .upsert([{ ...profileData, user_id: user.id }], { onConflict: "user_id" })
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error("فشل في تحديث الملف الشخصي");
       return data;
     },
     onSuccess: () => {

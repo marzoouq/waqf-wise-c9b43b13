@@ -114,7 +114,7 @@ export function useAuth() {
           .from("profiles" as any)
           .select("two_factor_enabled, two_factor_secret, backup_codes")
           .eq("user_id", data.user.id)
-          .single();
+          .maybeSingle();
 
         if ((profile as any)?.two_factor_enabled) {
           if (!twoFactorCode) {
