@@ -3,6 +3,7 @@ import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { logger } from '@/lib/logger';
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
@@ -45,7 +46,7 @@ export function useAuth() {
         .update({ last_login_at: new Date().toISOString() })
         .eq("user_id", userId);
     } catch (error) {
-      console.error("Error updating last activity:", error);
+      logger.error(error, { context: 'updateLastActivity', userId });
     }
   };
 
@@ -79,7 +80,7 @@ export function useAuth() {
         );
 
         if (profileError) {
-          console.error('Error creating profile:', profileError);
+          logger.error(profileError, { context: 'signUp - createProfile', userId: data.user.id });
         }
       }
 
@@ -89,10 +90,12 @@ export function useAuth() {
       });
 
       return { data, error: null };
-    } catch (error: any) {
+    } catch (error) {
+      logger.error(error, { context: 'signUp', severity: 'high' });
+      const message = error instanceof Error ? error.message : 'حدث خطأ غير معروف';
       toast({
         title: "خطأ في إنشاء الحساب",
-        description: error.message || "حدث خطأ أثناء إنشاء الحساب",
+        description: message,
         variant: "destructive",
       });
       return { data: null, error };
@@ -150,13 +153,16 @@ export function useAuth() {
 
       navigate('/');
       return { data, error: null, requires2FA: false };
-    } catch (error: any) {
+    } catch (error) {
+      logger.error(error, { context: 'signIn', severity: 'medium' });
       let errorMessage = "حدث خطأ أثناء تسجيل الدخول";
       
-      if (error.message.includes("Invalid login credentials")) {
-        errorMessage = "البريد الإلكتروني أو كلمة المرور غير صحيحة";
-      } else if (error.message.includes("Email not confirmed")) {
-        errorMessage = "يرجى تأكيد بريدك الإلكتروني أولاً";
+      if (error instanceof Error) {
+        if (error.message.includes("Invalid login credentials")) {
+          errorMessage = "البريد الإلكتروني أو كلمة المرور غير صحيحة";
+        } else if (error.message.includes("Email not confirmed")) {
+          errorMessage = "يرجى تأكيد بريدك الإلكتروني أولاً";
+        }
       }
 
       toast({
@@ -179,10 +185,12 @@ export function useAuth() {
       });
 
       navigate('/auth');
-    } catch (error: any) {
+    } catch (error) {
+      logger.error(error, { context: 'signOut' });
+      const message = error instanceof Error ? error.message : 'حدث خطأ أثناء تسجيل الخروج';
       toast({
         title: "خطأ في تسجيل الخروج",
-        description: error.message || "حدث خطأ أثناء تسجيل الخروج",
+        description: message,
         variant: "destructive",
       });
     }
@@ -203,10 +211,12 @@ export function useAuth() {
         description: "يرجى التحقق من بريدك الإلكتروني",
       });
       return { error: null };
-    } catch (error: any) {
+    } catch (error) {
+      logger.error(error, { context: 'resetPassword' });
+      const message = error instanceof Error ? error.message : 'حدث خطأ';
       toast({
         title: "خطأ",
-        description: error.message || "حدث خطأ",
+        description: message,
         variant: "destructive",
       });
       return { error };
