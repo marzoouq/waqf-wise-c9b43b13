@@ -10,6 +10,7 @@ import {
 import { Card } from '@/components/ui/card';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { cn } from '@/lib/utils';
+import { ScrollableTableWrapper } from './ScrollableTableWrapper';
 
 interface Column {
   key: string;
@@ -92,40 +93,42 @@ export function ResponsiveTable({
 
   // عرض Table على الشاشات الكبيرة أو عند تعطيل card view
   return (
-    <div className="rounded-md border overflow-x-auto">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            {columns
-              .filter(col => !col.mobileHidden || !isMobile)
-              .map((col) => (
-                <TableHead key={col.key} className={col.className}>
-                  {col.label}
-                </TableHead>
-              ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {data.map((row, index) => {
-            const rowId = (row as any).id || `row-${index}`;
-            return (
-              <TableRow
-                key={rowId}
-                className={cn(onRowClick && 'cursor-pointer')}
-                onClick={() => onRowClick?.(row)}
-              >
-                {columns
-                  .filter(col => !col.mobileHidden || !isMobile)
-                  .map((col) => (
-                    <TableCell key={col.key} className={col.className}>
-                      {col.render ? col.render(row[col.key], row) : row[col.key]}
-                    </TableCell>
-                  ))}
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-    </div>
+    <ScrollableTableWrapper showScrollIndicator={isMobile}>
+      <div className="rounded-md border min-w-max">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              {columns
+                .filter(col => !col.mobileHidden || !isMobile)
+                .map((col) => (
+                  <TableHead key={col.key} className={col.className}>
+                    {col.label}
+                  </TableHead>
+                ))}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {data.map((row, index) => {
+              const rowId = (row as any).id || `row-${index}`;
+              return (
+                <TableRow
+                  key={rowId}
+                  className={cn(onRowClick && 'cursor-pointer')}
+                  onClick={() => onRowClick?.(row)}
+                >
+                  {columns
+                    .filter(col => !col.mobileHidden || !isMobile)
+                    .map((col) => (
+                      <TableCell key={col.key} className={col.className}>
+                        {col.render ? col.render(row[col.key], row) : row[col.key]}
+                      </TableCell>
+                    ))}
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </div>
+    </ScrollableTableWrapper>
   );
 }

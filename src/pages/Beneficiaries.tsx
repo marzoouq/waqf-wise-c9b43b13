@@ -31,6 +31,8 @@ import { EnableLoginDialog } from "@/components/beneficiaries/EnableLoginDialog"
 import { TribeManagementDialog } from "@/components/beneficiaries/TribeManagementDialog";
 import { Pagination } from "@/components/ui/pagination";
 import { useNavigate } from "react-router-dom";
+import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
+import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -325,22 +327,24 @@ const Beneficiaries = () => {
             <CardTitle className="text-lg md:text-xl">قائمة المستفيدين</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-muted/30">
-                    <TableHead className="text-right font-semibold">رقم المستفيد</TableHead>
-                    <TableHead className="text-right font-semibold">الاسم</TableHead>
-                    <TableHead className="text-right font-semibold hidden md:table-cell">رقم الهوية</TableHead>
-                    <TableHead className="text-right font-semibold hidden lg:table-cell">العائلة</TableHead>
-                    <TableHead className="text-right font-semibold hidden lg:table-cell">الفئة</TableHead>
-                    <TableHead className="text-right font-semibold">الحالة</TableHead>
-                    <TableHead className="text-right font-semibold hidden md:table-cell">رقم الهاتف</TableHead>
-                    <TableHead className="text-right font-semibold hidden lg:table-cell">إجمالي المدفوعات</TableHead>
-                    <TableHead className="text-right font-semibold">الإجراءات</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
+            <MobileScrollHint />
+            <ScrollableTableWrapper>
+              <div className="min-w-max">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-muted/30">
+                      <TableHead className="text-right font-semibold whitespace-nowrap">رقم المستفيد</TableHead>
+                      <TableHead className="text-right font-semibold whitespace-nowrap">الاسم</TableHead>
+                      <TableHead className="text-right font-semibold whitespace-nowrap">رقم الهوية</TableHead>
+                      <TableHead className="text-right font-semibold whitespace-nowrap">العائلة</TableHead>
+                      <TableHead className="text-right font-semibold whitespace-nowrap">الفئة</TableHead>
+                      <TableHead className="text-right font-semibold whitespace-nowrap">الحالة</TableHead>
+                      <TableHead className="text-right font-semibold whitespace-nowrap">رقم الهاتف</TableHead>
+                      <TableHead className="text-right font-semibold whitespace-nowrap">إجمالي المدفوعات</TableHead>
+                      <TableHead className="text-right font-semibold whitespace-nowrap">الإجراءات</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
                   {isLoading ? (
                     <TableRow>
                       <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
@@ -452,7 +456,9 @@ const Beneficiaries = () => {
                 </TableBody>
               </Table>
             </div>
-            {totalPages > 1 && (
+          </ScrollableTableWrapper>
+          {totalPages > 1 && (
+            <div className="p-4 border-t">
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
@@ -460,8 +466,9 @@ const Beneficiaries = () => {
                 itemsPerPage={ITEMS_PER_PAGE}
                 totalItems={filteredBeneficiaries.length}
               />
-            )}
-          </CardContent>
+            </div>
+          )}
+        </CardContent>
         </Card>
 
         {/* Beneficiary Dialog */}
