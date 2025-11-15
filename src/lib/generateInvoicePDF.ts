@@ -251,12 +251,12 @@ export const generateInvoicePDF = async (
 
   yPos = (doc as any).lastAutoTable.finalY + 15;
 
-  // الملخص المالي - صندوق أوسع وأكثر تنظيماً
+  // الملخص المالي والـ QR Code في نفس المستوى
   const summaryWidth = 75;
   const summaryX = pageWidth - margin - summaryWidth;
   const summaryStartY = yPos;
 
-  // رسم الصندوق بحدود
+  // رسم صندوق الإجمالي
   doc.setFillColor(lightGray[0], lightGray[1], lightGray[2]);
   doc.rect(summaryX, yPos, summaryWidth, 35, "F");
   doc.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2]);
@@ -267,44 +267,93 @@ export const generateInvoicePDF = async (
   doc.setFont("Amiri", "normal");
   doc.setFontSize(9);
 
-  yPos += 8;
-  doc.text("المجموع (غير شامل ض.ق.م):", summaryX + 5, yPos);
+  let summaryYPos = yPos + 8;
+  doc.text("المجموع (غير شامل ض.ق.م):", summaryX + 5, summaryYPos);
   doc.text(
     `${formatZATCACurrency(invoice.subtotal)} ريال`,
     summaryX + summaryWidth - 5,
-    yPos,
+    summaryYPos,
     { align: "right" }
   );
 
-  yPos += 8;
-  doc.text("ضريبة القيمة المضافة (15%):", summaryX + 5, yPos);
+  summaryYPos += 8;
+  doc.text("ضريبة القيمة المضافة (15%):", summaryX + 5, summaryYPos);
   doc.text(
     `${formatZATCACurrency(invoice.tax_amount)} ريال`,
     summaryX + summaryWidth - 5,
-    yPos,
+    summaryYPos,
     { align: "right" }
   );
 
   // خط فاصل
-  yPos += 3;
+  summaryYPos += 3;
   doc.setDrawColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
   doc.setLineWidth(0.3);
-  doc.line(summaryX + 5, yPos, summaryX + summaryWidth - 5, yPos);
+  doc.line(summaryX + 5, summaryYPos, summaryX + summaryWidth - 5, summaryYPos);
 
   // الإجمالي النهائي
-  yPos += 7;
+  summaryYPos += 7;
   doc.setFont("Amiri", "bold");
   doc.setFontSize(12);
   doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-  doc.text("الإجمالي الكلي:", summaryX + 5, yPos);
+  doc.text("الإجمالي الكلي:", summaryX + 5, summaryYPos);
   doc.text(
     `${formatZATCACurrency(invoice.total_amount)} ريال`,
     summaryX + summaryWidth - 5,
-    yPos,
+    summaryYPos,
     { align: "right" }
   );
 
-  yPos = summaryStartY + 40;
+  // QR Code بجانب صندوق الإجمالي (على اليسار)
+  if (invoice.qr_code_data) {
+    try {
+      const qrCodeDataUrl = await QRCode.toDataURL(invoice.qr_code_data, {
+        width: 250,
+        margin: 1,
+        color: {
+          dark: "#000000",
+          light: "#FFFFFF",
+        },
+      });
+
+      // صندوق QR Code
+      const qrBoxWidth = 60;
+      const qrBoxHeight = 70;
+      const qrImageSize = 50;
+      const qrBoxX = margin;
+      const qrBoxY = summaryStartY;
+      
+      doc.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+      doc.setLineWidth(0.5);
+      doc.setFillColor(255, 255, 255);
+      doc.rect(qrBoxX, qrBoxY, qrBoxWidth, qrBoxHeight, "FD");
+
+      // عنوان QR Code
+      doc.setFontSize(10);
+      doc.setFont("Amiri", "bold");
+      doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+      doc.text("رمز التحقق ZATCA", qrBoxX + qrBoxWidth / 2, qrBoxY + 6, { align: "center" });
+      
+      // إضافة صورة QR Code
+      const qrX = qrBoxX + (qrBoxWidth - qrImageSize) / 2;
+      const qrY = qrBoxY + 10;
+      doc.addImage(qrCodeDataUrl, "PNG", qrX, qrY, qrImageSize, qrImageSize);
+      
+      doc.setFontSize(7);
+      doc.setFont("Amiri", "normal");
+      doc.setTextColor(100, 100, 100);
+      doc.text(
+        "امسح للتحقق من الفاتورة",
+        qrBoxX + qrBoxWidth / 2,
+        qrBoxY + qrBoxHeight - 4,
+        { align: "center", maxWidth: qrBoxWidth - 4 }
+      );
+    } catch (error) {
+      console.error("Error generating QR code:", error);
+    }
+  }
+
+  yPos = summaryStartY + Math.max(35, 70) + 10;
 
   // الملاحظات - تحسين التنسيق
   if (invoice.notes) {
@@ -321,62 +370,6 @@ export const generateInvoicePDF = async (
     const noteLines = doc.splitTextToSize(invoice.notes, pageWidth - 2 * margin - 10);
     doc.text(noteLines, margin + 5, yPos);
     yPos += noteLines.length * 5 + 10;
-  }
-
-  // QR Code (إذا كان موجوداً) - تحسين التنسيق وإبراز كامل
-  if (invoice.qr_code_data) {
-    try {
-      // التحقق من المساحة المتبقية في الصفحة
-      if (yPos + 70 > pageHeight - 30) {
-        // إضافة صفحة جديدة إذا لم يكن هناك مساحة كافية
-        doc.addPage();
-        yPos = margin + 10;
-      }
-
-      const qrCodeDataUrl = await QRCode.toDataURL(invoice.qr_code_data, {
-        width: 250,
-        margin: 1,
-        color: {
-          dark: "#000000",
-          light: "#FFFFFF",
-        },
-      });
-
-      // صندوق QR Code أوسع وأطول
-      const qrBoxWidth = 60;
-      const qrBoxHeight = 70;
-      const qrImageSize = 50;
-      
-      doc.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-      doc.setLineWidth(0.5);
-      doc.setFillColor(255, 255, 255);
-      doc.rect(margin, yPos, qrBoxWidth, qrBoxHeight, "FD");
-
-      // عنوان QR Code
-      doc.setFontSize(10);
-      doc.setFont("Amiri", "bold");
-      doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-      doc.text("رمز التحقق ZATCA", margin + qrBoxWidth / 2, yPos + 6, { align: "center" });
-      
-      // إضافة صورة QR Code - في المنتصف تماماً
-      const qrX = margin + (qrBoxWidth - qrImageSize) / 2;
-      const qrY = yPos + 10;
-      doc.addImage(qrCodeDataUrl, "PNG", qrX, qrY, qrImageSize, qrImageSize);
-      
-      doc.setFontSize(7);
-      doc.setFont("Amiri", "normal");
-      doc.setTextColor(100, 100, 100);
-      doc.text(
-        "امسح الرمز للتحقق من صحة الفاتورة",
-        margin + qrBoxWidth / 2,
-        yPos + qrBoxHeight - 4,
-        { align: "center", maxWidth: qrBoxWidth - 4 }
-      );
-      
-      yPos += qrBoxHeight + 5;
-    } catch (error) {
-      console.error("Error generating QR code:", error);
-    }
   }
 
   // التذييل المحسن
