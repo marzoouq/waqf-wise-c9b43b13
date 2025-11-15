@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isValid, parseISO } from "date-fns";
 import { VALIDATION } from "./constants";
 
 // Common validation rules
@@ -34,6 +35,21 @@ export const commonValidation = {
   
   date: (message: string) =>
     z.date({ required_error: message }),
+  
+  dateString: (message: string = "التاريخ غير صحيح") =>
+    z.string()
+      .min(1, { message: "التاريخ مطلوب" })
+      .refine(
+        (dateStr) => {
+          try {
+            const date = parseISO(dateStr);
+            return isValid(date);
+          } catch {
+            return false;
+          }
+        },
+        { message }
+      ),
   
   positiveInteger: (message: string) =>
     z.number().int().positive({ message }),
