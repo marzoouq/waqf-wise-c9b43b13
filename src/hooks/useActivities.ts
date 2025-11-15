@@ -1,7 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { TOAST_MESSAGES, QUERY_STALE_TIME } from "@/lib/constants";
+import { TOAST_MESSAGES } from "@/lib/constants";
+import { QUERY_CONFIG } from "@/lib/queryOptimization";
 
 export interface Activity {
   id: string;
@@ -27,7 +28,7 @@ export function useActivities() {
       if (error) throw error;
       return data as Activity[];
     },
-    staleTime: QUERY_STALE_TIME.DEFAULT,
+    ...QUERY_CONFIG.ACTIVITIES,
   });
 
   const addActivity = useMutation({

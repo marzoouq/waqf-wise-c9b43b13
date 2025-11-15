@@ -1,85 +1,91 @@
-import { memo } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { FileText, CheckCircle2, FileEdit, XCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, CheckCircle, FileX, PenSquare } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useAccountingStats } from "@/hooks/useAccountingStats";
 
-const AccountingStats = memo(() => {
-  const { data: stats } = useQuery({
-    queryKey: ["accounting_stats"],
-    queryFn: async () => {
-      // Optimized: Select only status field
-      const { data: entries, error } = await supabase
-        .from("journal_entries")
-        .select("status");
-      
-      if (error) throw error;
+const AccountingStats = () => {
+  const { data, isLoading } = useAccountingStats();
 
-      const totalEntries = entries?.length || 0;
-      const draftEntries = entries?.filter((e) => e.status === "draft").length || 0;
-      const postedEntries = entries?.filter((e) => e.status === "posted").length || 0;
-      const cancelledEntries = entries?.filter((e) => e.status === "cancelled").length || 0;
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {[1, 2, 3, 4].map((i) => (
+          <Card key={`skeleton-${i}`} className="shadow-soft">
+            <CardHeader className="pb-3">
+              <Skeleton className="h-4 w-32" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-8 w-20 mb-2" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
 
-      return {
-        totalEntries,
-        draftEntries,
-        postedEntries,
-        cancelledEntries,
-      };
-    },
-    staleTime: 3 * 60 * 1000, // 3 minutes cache
-  });
+  if (!data) return null;
 
   const statCards = [
     {
       title: "إجمالي القيود",
-      value: stats?.totalEntries || 0,
+      value: data.totalEntries,
       icon: FileText,
       color: "text-primary",
       bgColor: "bg-primary/10",
     },
     {
       title: "القيود المرحّلة",
-      value: stats?.postedEntries || 0,
-      icon: CheckCircle,
-      color: "text-green-600",
-      bgColor: "bg-green-100 dark:bg-green-900/20",
+      value: data.postedEntries,
+      icon: CheckCircle2,
+      color: "text-success",
+      bgColor: "bg-success/10",
     },
     {
-      title: "القيود المسودة",
-      value: stats?.draftEntries || 0,
-      icon: PenSquare,
-      color: "text-yellow-600",
-      bgColor: "bg-yellow-100 dark:bg-yellow-900/20",
+      title: "مسودات",
+      value: data.draftEntries,
+      icon: FileEdit,
+      color: "text-warning",
+      bgColor: "bg-warning/10",
     },
     {
-      title: "القيود الملغاة",
-      value: stats?.cancelledEntries || 0,
-      icon: FileX,
-      color: "text-red-600",
-      bgColor: "bg-red-100 dark:bg-red-900/20",
+      title: "ملغية",
+      value: data.cancelledEntries,
+      icon: XCircle,
+      color: "text-destructive",
+      bgColor: "bg-destructive/10",
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      {statCards.map((stat) => (
-        <Card key={`accounting-${stat.title}`} className="shadow-soft">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-            <div className={`p-2 rounded-lg ${stat.bgColor}`}>
-              <stat.icon className={`h-4 w-4 ${stat.color}`} />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stat.value}</div>
-          </CardContent>
-        </Card>
-      ))}
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {statCards.map((stat, index) => {
+        const Icon = stat.icon;
+        return (
+          <Card
+            key={index}
+            className="shadow-soft hover:shadow-lg transition-all duration-300 cursor-pointer group animate-fade-in"
+            style={{ animationDelay: `${index * 50}ms` }}
+          >
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  {stat.title}
+                </CardTitle>
+                <div className={`p-2 rounded-lg ${stat.bgColor} group-hover:scale-110 transition-transform duration-300`}>
+                  <Icon className={`h-5 w-5 ${stat.color}`} />
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className={`text-3xl font-bold ${stat.color}`}>
+                {stat.value}
+              </div>
+            </CardContent>
+          </Card>
+        );
+      })}
     </div>
   );
-});
-
-AccountingStats.displayName = "AccountingStats";
+};
 
 export default AccountingStats;
