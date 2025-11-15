@@ -26,24 +26,11 @@ export function useArchiveStats() {
       // Fetch documents for size calculation and this month count
       const { data: documents } = await supabase
         .from("documents")
-        .select("file_size, created_at");
+        .select("file_size_bytes, created_at") as any;
 
-      // Calculate total size (convert from string to bytes and sum)
-      let totalBytes = 0;
-      if (documents) {
-        documents.forEach((doc) => {
-          const size = doc.file_size;
-          // Parse size string (e.g., "2.4 MB", "856 KB")
-          const match = size.match(/^([\d.]+)\s*(KB|MB|GB)$/i);
-          if (match) {
-            const value = parseFloat(match[1]);
-            const unit = match[2].toUpperCase();
-            if (unit === "KB") totalBytes += value * 1024;
-            else if (unit === "MB") totalBytes += value * 1024 * 1024;
-            else if (unit === "GB") totalBytes += value * 1024 * 1024 * 1024;
-          }
-        });
-      }
+      // Calculate total size from file_size_bytes
+      const totalBytes = documents?.reduce((sum: number, doc: any) => 
+        sum + (doc.file_size_bytes || 0), 0) || 0;
 
       // Convert bytes to human-readable format
       const formatBytes = (bytes: number): string => {
@@ -60,7 +47,7 @@ export function useArchiveStats() {
       startOfMonth.setHours(0, 0, 0, 0);
 
       const thisMonthDocs = documents?.filter(
-        (doc) => new Date(doc.created_at) >= startOfMonth
+        (doc: any) => new Date(doc.created_at) >= startOfMonth
       ).length || 0;
 
       const stats: ArchiveStats = {

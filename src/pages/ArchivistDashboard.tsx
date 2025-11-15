@@ -26,6 +26,8 @@ export default function ArchivistDashboard() {
   });
   const [recentDocuments, setRecentDocuments] = useState<RecentDocument[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
   useEffect(() => {
     fetchArchiveData();
@@ -50,18 +52,10 @@ export default function ArchivistDashboard() {
       doc.uploaded_at.startsWith(today)
     ).length || 0;
 
-    // حساب الحجم الكلي
-    const totalSize = documents?.reduce((sum, doc) => {
-      const sizeMatch = doc.file_size?.match(/(\d+\.?\d*)\s*(KB|MB|GB)/i);
-      if (sizeMatch) {
-        const size = parseFloat(sizeMatch[1]);
-        const unit = sizeMatch[2].toUpperCase();
-        if (unit === 'KB') return sum + size / 1024;
-        if (unit === 'GB') return sum + size * 1024;
-        return sum + size;
-      }
-      return sum;
-    }, 0) || 0;
+    // حساب الحجم الكلي من file_size_bytes
+    const totalBytes = documents?.reduce((sum, doc: any) => 
+      sum + (doc.file_size_bytes || 0), 0) || 0;
+    const totalSize = totalBytes / (1024 * 1024); // تحويل إلى MB
 
     setArchiveStats({
       totalFolders: foldersCount || 0,
@@ -71,11 +65,17 @@ export default function ArchivistDashboard() {
     });
 
     // جلب آخر المستندات
-    const { data: recent } = await supabase
+    let query = supabase
       .from('documents')
       .select('*, folders(name)')
-      .order('uploaded_at', { ascending: false })
-      .limit(10);
+      .order('uploaded_at', { ascending: false });
+
+    // تطبيق الفلاتر
+    if (selectedCategory !== 'all') {
+      query = query.eq('category', selectedCategory);
+    }
+
+    const { data: recent } = await query.limit(10);
 
     setRecentDocuments(recent || []);
     setIsLoading(false);
@@ -189,7 +189,11 @@ export default function ArchivistDashboard() {
                           <Clock className="h-3 w-3" />
                           {format(new Date(doc.uploaded_at), 'dd/MM/yyyy', { locale: ar })}
                         </span>
-                        <span>{doc.file_size}</span>
+                        <span>
+                          {(doc as any).file_size_bytes 
+                            ? `${((doc as any).file_size_bytes / (1024 * 1024)).toFixed(2)} MB`
+                            : doc.file_size}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -198,6 +202,41 @@ export default function ArchivistDashboard() {
                   </span>
                 </div>
               ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Filters */}
+        <Card>
+          <CardHeader>
+            <CardTitle>البحث والفلترة</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
+              <div className="relative">
+                <Search className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="البحث في المستندات..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pr-10 pl-4 py-2 border rounded-md"
+                />
+              </div>
+              <select
+                value={selectedCategory}
+                onChange={(e) => {
+                  setSelectedCategory(e.target.value);
+                  fetchArchiveData();
+                }}
+                className="w-full px-4 py-2 border rounded-md"
+              >
+                <option value="all">جميع الفئات</option>
+                <option value="عقود">عقود</option>
+                <option value="فواتير">فواتير</option>
+                <option value="مستندات">مستندات</option>
+                <option value="صور">صور</option>
+              </select>
             </div>
           </CardContent>
         </Card>
