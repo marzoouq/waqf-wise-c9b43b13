@@ -35,7 +35,6 @@ const Dashboard = () => {
   const { activities, isLoading: activitiesLoading } = useActivities();
   const { tasks, isLoading: tasksLoading } = useTasks();
   const queryClient = useQueryClient();
-  const [isRedirecting, setIsRedirecting] = useState(false);
   
   // Real-time subscriptions for activities and tasks
   useEffect(() => {
@@ -77,215 +76,200 @@ const Dashboard = () => {
     return "bg-muted text-muted-foreground border border-border";
   }, []);
 
+  // التوجيه حسب الدور - استخدام useEffect لتجنب تحديث الـstate أثناء الـrender
+  useEffect(() => {
+    if (isBeneficiary) {
+      navigate("/beneficiary-dashboard", { replace: true });
+    } else if (isAccountant) {
+      navigate("/accountant-dashboard", { replace: true });
+    } else if (isNazer) {
+      navigate("/nazer-dashboard", { replace: true });
+    } else if (isCashier) {
+      navigate("/cashier-dashboard", { replace: true });
+    } else if (isArchivist) {
+      navigate("/archivist-dashboard", { replace: true });
+    }
+  }, [isBeneficiary, isAccountant, isNazer, isCashier, isArchivist, navigate]);
+
   // NOW we can do conditional returns after all hooks are called
-  if (roleLoading || activitiesLoading || tasksLoading || isRedirecting) {
+  if (roleLoading || activitiesLoading || tasksLoading) {
     return <LoadingState message="جاري تحميل لوحة التحكم..." />;
   }
 
-  // التوجيه حسب الدور - مع state management
-  if (isBeneficiary && !isRedirecting) {
-    setIsRedirecting(true);
-    return <Navigate to="/beneficiary-dashboard" replace />;
-  }
-
-  if (isAccountant && !isRedirecting) {
-    setIsRedirecting(true);
-    return <Navigate to="/accountant-dashboard" replace />;
-  }
-
-  if (isNazer && !isRedirecting) {
-    setIsRedirecting(true);
-    return <Navigate to="/nazer-dashboard" replace />;
-  }
-
-  if (isCashier && !isRedirecting) {
-    setIsRedirecting(true);
-    return <Navigate to="/cashier-dashboard" replace />;
-  }
-
-  if (isArchivist && !isRedirecting) {
-    setIsRedirecting(true);
-    return <Navigate to="/archivist-dashboard" replace />;
-  }
-
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-3 sm:p-4 md:p-6 lg:p-8 space-y-4 sm:space-y-6 md:space-y-8">
+    <div className="min-h-screen bg-background px-3 py-4 sm:px-4 sm:py-5 md:px-6 md:py-6 lg:px-8 lg:py-8">
+      <div className="container mx-auto max-w-7xl space-y-4 sm:space-y-5 md:space-y-6">
         {/* Header */}
-        <header className="space-y-1 sm:space-y-2">
-          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gradient-primary break-words">
+        <header className="space-y-2">
+          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gradient-primary">
             لوحة التحكم الرئيسية
           </h1>
           <p className="text-xs sm:text-sm md:text-base text-muted-foreground">
-            مرحباً بك في منصة إدارة الوقف الإلكترونية
+            نظرة شاملة على جميع أنشطة النظام
           </p>
         </header>
 
-        {/* Financial Stats */}
-        <FinancialStats />
-
-        {/* Families Stats */}
-        <FamiliesStats />
-
-        {/* Requests Stats */}
-        <RequestsStats />
-
-        {/* Accounting Stats */}
-        <AccountingStats />
-
-        {/* Revenue & Expense Chart */}
-        <RevenueExpenseChart />
-
-        {/* Charts Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
-          <AccountDistributionChart />
-          <BudgetComparisonChart />
+        {/* Stats Grid */}
+        <div className="grid gap-3 sm:gap-4 md:gap-5 lg:gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
+          <FinancialStats />
+          <FamiliesStats />
+          <RequestsStats />
+          <AccountingStats />
         </div>
 
-        {/* Three Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
-          {/* Recent Journal Entries */}
-          <RecentJournalEntries />
+        {/* Charts Grid */}
+        <div className="grid gap-3 sm:gap-4 md:gap-5 lg:gap-6 grid-cols-1 lg:grid-cols-2">
+          <RevenueExpenseChart />
+          <AccountDistributionChart />
+        </div>
 
+        <div className="grid gap-3 sm:gap-4 md:gap-5 lg:gap-6 grid-cols-1 lg:grid-cols-2">
+          <BudgetComparisonChart />
+          <RecentJournalEntries />
+        </div>
+
+        {/* Activity & Tasks Grid */}
+        <div className="grid gap-3 sm:gap-4 md:gap-5 lg:gap-6 grid-cols-1 lg:grid-cols-2">
           {/* Recent Activities */}
           <Card className="shadow-soft">
-            <CardHeader>
-              <CardTitle className="text-xl font-bold">النشاطات الأخيرة</CardTitle>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                الأنشطة الأخيرة
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              {activities.length === 0 ? (
-                <EmptyState
-                  icon={FileText}
-                  title="لا توجد نشاطات"
-                  description="ستظهر هنا أحدث النشاطات في النظام"
-                  className="py-8"
-                />
-              ) : (
-                <div className="space-y-4">
-                  {activities.map((activity) => (
+              {activities.length > 0 ? (
+                <div className="space-y-2 sm:space-y-3">
+                  {activities.slice(0, 5).map((activity) => (
                     <div
                       key={activity.id}
-                      className="flex items-start gap-4 pb-4 border-b border-border last:border-0 last:pb-0"
+                      className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-all duration-200"
                     >
-                      <div className="p-2 bg-primary/10 rounded-full">
-                        <div className="h-2 w-2 bg-primary rounded-full"></div>
-                      </div>
-                      <div className="flex-1 space-y-1">
-                        <p className="text-sm font-medium text-foreground">
-                          {activity.action}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs sm:text-sm font-medium line-clamp-2">{activity.action}</p>
+                        <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
+                          {activity.user_name} • {new Date(activity.timestamp).toLocaleString('ar-SA', { 
+                            month: 'short', 
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
                         </p>
-                        <p className="text-xs text-muted-foreground">
-                          بواسطة {activity.user_name}
-                        </p>
                       </div>
-                      <span className="text-xs text-muted-foreground whitespace-nowrap">
-                        {new Date(activity.timestamp).toLocaleDateString("ar-SA")}
-                      </span>
                     </div>
                   ))}
                 </div>
+              ) : (
+                <EmptyState
+                  icon={AlertCircle}
+                  title="لا توجد أنشطة"
+                  description="سيتم عرض الأنشطة الأخيرة هنا"
+                />
               )}
             </CardContent>
           </Card>
 
           {/* Pending Tasks */}
           <Card className="shadow-soft">
-            <CardHeader>
-              <CardTitle className="text-xl font-bold">المهام المعلقة</CardTitle>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <ClipboardList className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                المهام المعلقة
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              {tasks.length === 0 ? (
-                <EmptyState
-                  icon={AlertCircle}
-                  title="لا توجد مهام"
-                  description="ستظهر هنا المهام المعلقة التي تحتاج إلى إجراء"
-                  className="py-8"
-                />
-              ) : (
-                <div className="space-y-4">
+              {tasks.length > 0 ? (
+                <div className="space-y-2 sm:space-y-3">
                   {tasks.map((task) => (
                     <div
                       key={task.id}
-                      className="flex items-start gap-4 pb-4 border-b border-border last:border-0 last:pb-0"
+                      className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-all duration-200"
                     >
-                      <AlertCircle className="h-5 w-5 text-warning mt-0.5" />
-                      <div className="flex-1 space-y-1">
-                        <p className="text-sm font-medium text-foreground">
-                          {task.task}
-                        </p>
-                        <span
-                          className={`inline-block text-xs px-2.5 py-1 rounded-full font-medium ${getPriorityBadgeClasses(task.priority)}`}
-                        >
-                          الأولوية: {task.priority}
-                        </span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs sm:text-sm font-medium line-clamp-2">{task.task}</p>
+                        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-1.5 sm:mt-2">
+                          <span className={`inline-flex items-center px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs rounded-full ${getPriorityBadgeClasses(task.priority)}`}>
+                            {task.priority}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   ))}
                 </div>
+              ) : (
+                <EmptyState
+                  icon={AlertCircle}
+                  title="لا توجد مهام"
+                  description="ستظهر هنا المهام المعلقة التي تحتاج إلى إجراء"
+                />
               )}
             </CardContent>
           </Card>
         </div>
 
         {/* Quick Actions */}
-        <Card className="shadow-soft bg-gradient-to-br from-primary/5 to-accent/5 border-primary/10">
-          <CardHeader>
-            <CardTitle className="text-lg md:text-xl font-bold">الإجراءات السريعة</CardTitle>
+        <Card className="shadow-soft">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <Plus className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+              إجراءات سريعة
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
+            <div className="grid gap-2 sm:gap-3 md:gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
               <Button
+                variant="outline"
+                className="h-auto py-3 sm:py-4 px-2 sm:px-3 flex-col gap-1.5 sm:gap-2 hover:bg-primary/5 hover:border-primary transition-all duration-200"
                 onClick={() => setIsBeneficiaryDialogOpen(true)}
-                variant="outline"
-                className="group h-auto p-3 md:p-4 bg-card hover:bg-primary rounded-lg shadow-soft hover:shadow-medium transition-all duration-300 text-right border border-transparent hover:border-primary flex flex-col items-start"
               >
-                <Users className="h-5 w-5 md:h-6 md:w-6 mb-2 text-primary group-hover:text-primary-foreground transition-colors" />
-                <span className="font-medium text-xs md:text-sm text-foreground group-hover:text-primary-foreground transition-colors">إضافة مستفيد</span>
-              </Button>
-              
-              <Button
-                onClick={() => navigate('/families')}
-                variant="outline"
-                className="group h-auto p-3 md:p-4 bg-card hover:bg-primary rounded-lg shadow-soft hover:shadow-medium transition-all duration-300 text-right border border-transparent hover:border-primary flex flex-col items-start"
-              >
-                <UsersRound className="h-5 w-5 md:h-6 md:w-6 mb-2 text-primary group-hover:text-primary-foreground transition-colors" />
-                <span className="font-medium text-xs md:text-sm text-foreground group-hover:text-primary-foreground transition-colors">إدارة العائلات</span>
+                <Users className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                <span className="text-[10px] sm:text-xs">إضافة مستفيد</span>
               </Button>
 
               <Button
-                onClick={() => navigate('/requests')}
                 variant="outline"
-                className="group h-auto p-3 md:p-4 bg-card hover:bg-primary rounded-lg shadow-soft hover:shadow-medium transition-all duration-300 text-right border border-transparent hover:border-primary flex flex-col items-start"
+                className="h-auto py-3 sm:py-4 px-2 sm:px-3 flex-col gap-1.5 sm:gap-2 hover:bg-primary/5 hover:border-primary transition-all duration-200"
+                onClick={() => navigate("/families")}
               >
-                <ClipboardList className="h-5 w-5 md:h-6 md:w-6 mb-2 text-primary group-hover:text-primary-foreground transition-colors" />
-                <span className="font-medium text-xs md:text-sm text-foreground group-hover:text-primary-foreground transition-colors">عرض الطلبات</span>
+                <UsersRound className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                <span className="text-[10px] sm:text-xs">إدارة العائلات</span>
               </Button>
-              
+
               <Button
+                variant="outline"
+                className="h-auto py-3 sm:py-4 px-2 sm:px-3 flex-col gap-1.5 sm:gap-2 hover:bg-primary/5 hover:border-primary transition-all duration-200"
+                onClick={() => navigate("/requests")}
+              >
+                <ClipboardList className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                <span className="text-[10px] sm:text-xs">الطلبات</span>
+              </Button>
+
+              <Button
+                variant="outline"
+                className="h-auto py-3 sm:py-4 px-2 sm:px-3 flex-col gap-1.5 sm:gap-2 hover:bg-primary/5 hover:border-primary transition-all duration-200"
                 onClick={() => setIsPropertyDialogOpen(true)}
-                variant="outline"
-                className="group h-auto p-3 md:p-4 bg-card hover:bg-primary rounded-lg shadow-soft hover:shadow-medium transition-all duration-300 text-right border border-transparent hover:border-primary flex flex-col items-start"
               >
-                <Building2 className="h-5 w-5 md:h-6 md:w-6 mb-2 text-primary group-hover:text-primary-foreground transition-colors" />
-                <span className="font-medium text-xs md:text-sm text-foreground group-hover:text-primary-foreground transition-colors">إضافة عقار</span>
+                <Building2 className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                <span className="text-[10px] sm:text-xs">إضافة عقار</span>
               </Button>
-              
+
               <Button
+                variant="outline"
+                className="h-auto py-3 sm:py-4 px-2 sm:px-3 flex-col gap-1.5 sm:gap-2 hover:bg-primary/5 hover:border-primary transition-all duration-200"
                 onClick={() => setIsDistributionDialogOpen(true)}
-                variant="outline"
-                className="group h-auto p-3 md:p-4 bg-card hover:bg-primary rounded-lg shadow-soft hover:shadow-medium transition-all duration-300 text-right border border-transparent hover:border-primary flex flex-col items-start"
               >
-                <Wallet className="h-5 w-5 md:h-6 md:w-6 mb-2 text-primary group-hover:text-primary-foreground transition-colors" />
-                <span className="font-medium text-xs md:text-sm text-foreground group-hover:text-primary-foreground transition-colors">توزيع الغلة</span>
+                <Wallet className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                <span className="text-[10px] sm:text-xs">توزيع غلة</span>
               </Button>
-              
+
               <Button
-                onClick={() => navigate('/reports')}
                 variant="outline"
-                className="group h-auto p-3 md:p-4 bg-card hover:bg-primary rounded-lg shadow-soft hover:shadow-medium transition-all duration-300 text-right border border-transparent hover:border-primary flex flex-col items-start"
+                className="h-auto py-3 sm:py-4 px-2 sm:px-3 flex-col gap-1.5 sm:gap-2 hover:bg-primary/5 hover:border-primary transition-all duration-200"
+                onClick={() => navigate("/reports")}
               >
-                <FileText className="h-5 w-5 md:h-6 md:w-6 mb-2 text-primary group-hover:text-primary-foreground transition-colors" />
-                <span className="font-medium text-xs md:text-sm text-foreground group-hover:text-primary-foreground transition-colors">إنشاء تقرير</span>
+                <FileText className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                <span className="text-[10px] sm:text-xs">التقارير</span>
               </Button>
             </div>
           </CardContent>
