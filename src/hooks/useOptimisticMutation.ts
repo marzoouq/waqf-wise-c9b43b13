@@ -1,11 +1,14 @@
 import { useMutation, useQueryClient, UseMutationOptions } from '@tanstack/react-query';
 import { useToast } from './use-toast';
 
-interface OptimisticMutationOptions<TData, TVariables> extends Omit<UseMutationOptions<TData, Error, TVariables>, 'onMutate' | 'onError' | 'onSettled'> {
+type OptimisticContext = { previousData: any };
+
+interface OptimisticMutationOptions<TData, TVariables> extends Omit<UseMutationOptions<TData, Error, TVariables, OptimisticContext>, 'onMutate' | 'onError' | 'onSettled' | 'onSuccess'> {
   queryKey: any[];
   updateCache?: (oldData: any, variables: TVariables) => any;
   successMessage?: string;
   errorMessage?: string;
+  onSuccess?: (data: TData, variables: TVariables, context: OptimisticContext) => void;
 }
 
 /**
@@ -24,7 +27,7 @@ export function useOptimisticMutation<TData = unknown, TVariables = void>({
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  return useMutation<TData, Error, TVariables>({
+  return useMutation<TData, Error, TVariables, OptimisticContext>({
     mutationFn,
     
     // قبل إرسال الطلب
@@ -53,12 +56,12 @@ export function useOptimisticMutation<TData = unknown, TVariables = void>({
       }
       
       if (onSuccess) {
-        onSuccess(data, variables, context as any);
+        onSuccess(data, variables, context);
       }
     },
 
     // في حالة الفشل
-    onError: (error, variables, context: any) => {
+    onError: (error, variables, context) => {
       // الرجوع للبيانات القديمة
       if (context?.previousData) {
         queryClient.setQueryData(queryKey, context.previousData);
