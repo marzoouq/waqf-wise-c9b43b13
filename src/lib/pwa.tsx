@@ -22,9 +22,10 @@ export function usePWAUpdate() {
           if (newWorker) {
             newWorker.addEventListener('statechange', () => {
               if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                const version = import.meta.env.VITE_APP_VERSION || '2.1.0';
                 toast({
                   title: "⬆️ تحديث متوفر",
-                  description: "إصدار جديد من التطبيق متاح الآن (v2.0.0)",
+                  description: `إصدار جديد من التطبيق متاح الآن (v${version})`,
                   action: (
                     <button 
                       onClick={() => {

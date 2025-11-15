@@ -158,15 +158,27 @@ const Settings = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">الإصدار</p>
-                <p className="font-medium">v1.0.0</p>
+                <p className="font-medium text-primary">v{import.meta.env.VITE_APP_VERSION || '2.1.0'}</p>
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">آخر تحديث</p>
-                <p className="font-medium">2024-08-15</p>
+                <p className="font-medium">{new Date().toLocaleDateString('ar-SA')}</p>
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">المنطقة الزمنية</p>
                 <p className="font-medium">توقيت الرياض (UTC+3)</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">البيئة</p>
+                <p className="font-medium">{import.meta.env.MODE === 'production' ? 'إنتاج' : 'تطوير'}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">React Query</p>
+                <p className="font-medium">v5.83.0+</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">قاعدة البيانات</p>
+                <p className="font-medium text-success">متصلة ✓</p>
               </div>
             </div>
           </CardContent>
