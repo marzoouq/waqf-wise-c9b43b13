@@ -5,6 +5,7 @@ import { useActivities } from "./useActivities";
 import { useAuth } from "./useAuth";
 import { useJournalEntries } from "./useJournalEntries";
 import { useEffect } from "react";
+import { QUERY_CONFIG } from "@/lib/queryOptimization";
 
 export interface LoanPayment {
   id: string;
@@ -67,6 +68,7 @@ export function useLoanPayments(loanId?: string) {
       return data as LoanPayment[];
     },
     enabled: !!loanId,
+    ...QUERY_CONFIG.LOANS,
   });
 
   // Add payment mutation

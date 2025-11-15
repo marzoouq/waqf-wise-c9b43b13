@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useActivities } from "./useActivities";
 import { useAuth } from "./useAuth";
 import { useEffect } from "react";
+import { QUERY_CONFIG } from "@/lib/queryOptimization";
 
 export interface Loan {
   id: string;
@@ -78,6 +79,7 @@ export function useLoans(beneficiaryId?: string) {
       if (error) throw error;
       return data as Loan[];
     },
+    ...QUERY_CONFIG.LOANS,
   });
 
   // Add loan mutation
