@@ -220,15 +220,15 @@ const Requests = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-right">رقم الطلب</TableHead>
-                    <TableHead className="text-right">المستفيد</TableHead>
-                    <TableHead className="text-right">نوع الطلب</TableHead>
-                    <TableHead className="text-right">الوصف</TableHead>
-                    <TableHead className="text-right">المبلغ</TableHead>
-                    <TableHead className="text-right">الحالة</TableHead>
-                    <TableHead className="text-right">الأولوية</TableHead>
-                    <TableHead className="text-right">تاريخ التقديم</TableHead>
-                    <TableHead className="text-right">الإجراءات</TableHead>
+                    <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">رقم الطلب</TableHead>
+                    <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">المستفيد</TableHead>
+                    <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">نوع الطلب</TableHead>
+                    <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">الوصف</TableHead>
+                    <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">المبلغ</TableHead>
+                    <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">الحالة</TableHead>
+                    <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">الأولوية</TableHead>
+                    <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">تاريخ التقديم</TableHead>
+                    <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">الإجراءات</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -239,27 +239,27 @@ const Requests = () => {
                         request.is_overdue ? 'bg-destructive/5' : ''
                       }`}
                     >
-                      <TableCell className="font-mono font-medium">
+                      <TableCell className="font-mono font-medium text-xs sm:text-sm">
                         {request.request_number}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-xs sm:text-sm">
                         {(request.beneficiary as any)?.full_name || '-'}
                       </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">
+                      <TableCell className="text-xs sm:text-sm">
+                        <Badge variant="outline" className="text-xs">
                           {(request.request_type as any)?.name || '-'}
                         </Badge>
                       </TableCell>
-                      <TableCell className="max-w-xs truncate">
+                      <TableCell className="max-w-xs truncate text-xs sm:text-sm">
                         {request.description}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-xs sm:text-sm">
                         {request.amount > 0
                           ? `${request.amount.toLocaleString('ar-SA')} ريال`
                           : '-'}
                       </TableCell>
-                      <TableCell>{getStatusBadge(request.status)}</TableCell>
-                      <TableCell>
+                      <TableCell className="text-xs sm:text-sm">{getStatusBadge(request.status)}</TableCell>
+                      <TableCell className="text-xs sm:text-sm">
                         <Badge
                           variant={
                             request.priority === 'عاجل'
@@ -268,15 +268,16 @@ const Requests = () => {
                               ? 'default'
                               : 'secondary'
                           }
+                          className="text-xs"
                         >
                           {request.priority}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-muted-foreground">
+                      <TableCell className="text-muted-foreground text-xs sm:text-sm">
                         {new Date(request.submitted_at).toLocaleDateString('ar-SA')}
                       </TableCell>
                       <TableCell>
-                        <div className="flex gap-2">
+                        <div className="flex gap-1 sm:gap-2 flex-wrap">
                           <Button
                             size="sm"
                             variant="outline"
@@ -284,9 +285,11 @@ const Requests = () => {
                               setSelectedRequest(request);
                               setApprovalDialogOpen(true);
                             }}
+                            className="text-xs"
                           >
-                            <GitBranch className="h-4 w-4 ml-2" />
-                            مسار الموافقات
+                            <GitBranch className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
+                            <span className="hidden sm:inline">مسار الموافقات</span>
+                            <span className="sm:hidden">موافقات</span>
                           </Button>
                           <Button
                             size="sm"
@@ -295,9 +298,11 @@ const Requests = () => {
                               setSelectedRequest(request);
                               setCommentsDialogOpen(true);
                             }}
+                            className="text-xs"
                           >
-                            <MessageSquare className="h-4 w-4 ml-2" />
-                            التعليقات
+                            <MessageSquare className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
+                            <span className="hidden sm:inline">التعليقات</span>
+                            <span className="sm:hidden">تعليق</span>
                           </Button>
                         </div>
                       </TableCell>
