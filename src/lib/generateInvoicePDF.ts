@@ -1,18 +1,8 @@
 import jsPDF from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 import QRCode from "qrcode";
 import { formatZATCACurrency, formatVATNumber } from "./zatca";
 import type { OrganizationSettings } from "@/hooks/useOrganizationSettings";
-
-// Type definitions for jspdf-autotable
-declare module "jspdf" {
-  interface jsPDF {
-    lastAutoTable: {
-      finalY: number;
-    };
-    autoTable: (options: any) => jsPDF;
-  }
-}
 
 interface Invoice {
   id: string;
@@ -198,7 +188,7 @@ export const generateInvoicePDF = async (
     line.description,
   ]);
 
-  (doc as any).autoTable({
+  autoTable(doc, {
     startY: yPos,
     head: tableHeaders,
     body: tableData,

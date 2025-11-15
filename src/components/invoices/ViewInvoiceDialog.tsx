@@ -50,20 +50,15 @@ export const ViewInvoiceDialog = ({ invoiceId, open, onOpenChange }: ViewInvoice
   });
 
   const handlePrint = () => {
-    const printContent = document.getElementById('invoice-content');
-    if (!printContent) {
+    // الحصول على محتوى الفاتورة
+    const invoiceContent = document.querySelector('#invoice-content');
+    if (!invoiceContent) {
       toast.error("لم يتم العثور على محتوى الفاتورة");
       return;
     }
-    
-    // إضافة كلاس خاص للطباعة
-    document.body.classList.add('printing-invoice');
-    
-    // تأخير بسيط لضمان تطبيق الأنماط
-    setTimeout(() => {
-      window.print();
-      document.body.classList.remove('printing-invoice');
-    }, 100);
+
+    // طباعة مباشرة
+    window.print();
   };
   
   const handleDownloadPDF = async () => {
