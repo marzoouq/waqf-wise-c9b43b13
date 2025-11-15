@@ -26,28 +26,28 @@ export function EnhancedBalanceSheet() {
 
   return (
     <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
+      <CardHeader className="p-3 sm:p-4 md:p-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
-            <CardTitle className="text-2xl">قائمة المركز المالي</CardTitle>
+            <CardTitle className="text-xl sm:text-2xl md:text-2xl">قائمة المركز المالي</CardTitle>
             <p className="text-sm text-muted-foreground mt-1">
               كما في: {format(new Date(), "dd MMMM yyyy", { locale: ar })}
             </p>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm">
-              <Printer className="ml-2 h-4 w-4" />
+          <div className="flex gap-2 flex-wrap">
+            <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+              <Printer className="ml-2 h-3 w-3 sm:h-4 sm:w-4" />
               طباعة
             </Button>
-            <Button variant="outline" size="sm">
-              <Download className="ml-2 h-4 w-4" />
+            <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+              <Download className="ml-2 h-3 w-3 sm:h-4 sm:w-4" />
               تصدير PDF
             </Button>
           </div>
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <CardContent className="p-3 sm:p-4 md:p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
           {/* Assets Section */}
           <div className="space-y-4">
             <h3 className="text-lg font-bold border-b-2 border-blue-500 pb-2">الأصول</h3>
