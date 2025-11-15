@@ -2827,7 +2827,11 @@ export type Database = {
       }
       tasks: {
         Row: {
+          assigned_to: string | null
           created_at: string
+          created_by: string | null
+          description: string | null
+          due_date: string | null
           id: string
           priority: string
           status: string
@@ -2835,7 +2839,11 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          assigned_to?: string | null
           created_at?: string
+          created_by?: string | null
+          description?: string | null
+          due_date?: string | null
           id?: string
           priority: string
           status?: string
@@ -2843,7 +2851,11 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          assigned_to?: string | null
           created_at?: string
+          created_by?: string | null
+          description?: string | null
+          due_date?: string | null
           id?: string
           priority?: string
           status?: string
