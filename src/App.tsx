@@ -49,6 +49,7 @@ const Families = lazy(() => import("./pages/Families"));
 const Users = lazy(() => import("./pages/Users"));
 const AuditLogs = lazy(() => import("./pages/AuditLogs"));
 const AIInsights = lazy(() => import("./pages/AIInsights"));
+const ReportBuilder = lazy(() => import("./pages/ReportBuilder"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Configure QueryClient with optimized defaults and error handling
@@ -119,8 +120,9 @@ const App = () => {
             <Route path="/approvals" element={<Approvals />} />
             <Route path="/payments" element={<Payments />} />
             <Route path="/loans" element={<Loans />} />
-            <Route path="/waqf-units" element={<WaqfUnits />} />
+                <Route path="/waqf-units" element={<WaqfUnits />} />
                 <Route path="/reports" element={<Reports />} />
+                <Route path="/report-builder" element={<ReportBuilder />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/notifications" element={<Notifications />} />
                 <Route path="/requests" element={<Requests />} />

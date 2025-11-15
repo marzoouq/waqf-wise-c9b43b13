@@ -9,6 +9,8 @@ import { AppearanceSettingsDialog } from "@/components/settings/AppearanceSettin
 import { LanguageSettingsDialog } from "@/components/settings/LanguageSettingsDialog";
 import { SystemSettingsDialog } from "@/components/settings/SystemSettingsDialog";
 import { PushNotificationsSettings } from "@/components/settings/PushNotificationsSettings";
+import { LeakedPasswordCheck } from "@/components/settings/LeakedPasswordCheck";
+import { LanguageSelector } from "@/components/settings/LanguageSelector";
 import { useToast } from "@/hooks/use-toast";
 
 const Settings = () => {
@@ -200,7 +202,12 @@ const Settings = () => {
         />
       </div>
 
-      <PushNotificationsSettings />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <PushNotificationsSettings />
+        <LeakedPasswordCheck />
+      </div>
+
+      <LanguageSelector />
     </div>
   );
 };
