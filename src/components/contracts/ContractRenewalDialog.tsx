@@ -5,6 +5,7 @@ import * as z from "zod";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -128,6 +129,9 @@ export function ContractRenewalDialog({
             <TrendingUp className="h-5 w-5 text-primary" />
             تجديد العقد
           </DialogTitle>
+          <DialogDescription>
+            املأ البيانات التالية لإنشاء طلب تجديد العقد مع تحديد الإيجار الجديد
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>

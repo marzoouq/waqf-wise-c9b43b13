@@ -4,6 +4,7 @@ import { ar } from 'date-fns/locale';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -80,9 +81,9 @@ export function TicketDetailsDialog({
               <div className="flex items-center justify-between">
                 <div>
                   <DialogTitle className="text-2xl">{ticket.subject}</DialogTitle>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <DialogDescription className="mt-1">
                     التذكرة #{ticket.ticket_number}
-                  </p>
+                  </DialogDescription>
                 </div>
                 <Badge className={statusColors[ticket.status as keyof typeof statusColors]}>
                   {statusLabels[ticket.status as keyof typeof statusLabels]}

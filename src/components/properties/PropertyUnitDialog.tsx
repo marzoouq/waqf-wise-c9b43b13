@@ -5,6 +5,7 @@ import * as z from "zod";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -168,6 +169,9 @@ export function PropertyUnitDialog({
           <DialogTitle>
             {unit ? "تعديل وحدة" : "إضافة وحدة جديدة"}
           </DialogTitle>
+          <DialogDescription>
+            {unit ? "تعديل بيانات الوحدة العقارية" : "إضافة وحدة عقارية جديدة إلى العقار"}
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
