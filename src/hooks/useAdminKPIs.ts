@@ -1,21 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";
-
-export interface AdminKPI {
-  totalBeneficiaries: number;
-  activeBeneficiaries: number;
-  totalFamilies: number;
-  totalProperties: number;
-  occupiedProperties: number;
-  totalFunds: number;
-  activeFunds: number;
-  pendingRequests: number;
-  overdueRequests: number;
-  totalRevenue: number;
-  totalExpenses: number;
-  netIncome: number;
-}
+import type { AdminKPI, FinancialLine } from "@/types/admin";
 
 export function useAdminKPIs() {
   return useQuery({
@@ -71,7 +57,7 @@ export function useAdminKPIs() {
       let totalRevenue = 0;
       let totalExpenses = 0;
 
-      financialData.data?.forEach((line: any) => {
+      financialData.data?.forEach((line: FinancialLine) => {
         const accountType = line.accounts?.account_type;
         const accountNature = line.accounts?.account_nature;
         const debit = Number(line.debit_amount || 0);

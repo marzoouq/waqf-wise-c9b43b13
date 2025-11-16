@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { createMutationErrorHandler } from "@/lib/errorHandling";
 
 export interface CashFlow {
   id: string;
@@ -124,7 +125,7 @@ interface CashFlowLine {
         .lt("journal_entries.entry_date", periodStart)
         .eq("accounts.code", "1.1.1");
 
-      const openingCash = openingCashData?.reduce((sum: number, line: any) => {
+      const openingCash = openingCashData?.reduce((sum: number, line: CashFlowLine) => {
         return sum + (line.debit_amount - line.credit_amount);
       }, 0) || 0;
 
@@ -158,13 +159,10 @@ interface CashFlowLine {
         description: "تم حساب قائمة التدفقات النقدية",
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: "خطأ في الحساب",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
+    onError: createMutationErrorHandler({
+      context: 'calculate_cash_flow',
+      toastTitle: 'خطأ في الحساب',
+    }),
   });
 
   return {

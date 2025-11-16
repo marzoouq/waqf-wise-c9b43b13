@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { QUERY_KEYS, TOAST_MESSAGES, QUERY_STALE_TIME } from "@/lib/constants";
+import { createMutationErrorHandler } from "@/lib/errorHandling";
 
 export interface Folder {
   id: string;
@@ -48,13 +49,10 @@ export function useFolders() {
         description: "تم إنشاء المجلد بنجاح",
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: TOAST_MESSAGES.ERROR.ADD,
-        description: error.message || "حدث خطأ أثناء إنشاء المجلد",
-        variant: "destructive",
-      });
-    },
+    onError: createMutationErrorHandler({
+      context: 'add_folder',
+      toastTitle: TOAST_MESSAGES.ERROR.ADD,
+    }),
   });
 
   const updateFolder = useMutation({
@@ -76,13 +74,10 @@ export function useFolders() {
         description: "تم تحديث المجلد بنجاح",
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: TOAST_MESSAGES.ERROR.UPDATE,
-        description: error.message || "حدث خطأ أثناء تحديث المجلد",
-        variant: "destructive",
-      });
-    },
+    onError: createMutationErrorHandler({
+      context: 'update_folder',
+      toastTitle: TOAST_MESSAGES.ERROR.UPDATE,
+    }),
   });
 
   return {

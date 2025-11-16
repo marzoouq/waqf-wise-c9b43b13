@@ -5,6 +5,7 @@ import { useJournalEntries } from "./useJournalEntries";
 import { useEffect } from "react";
 import { logger } from "@/lib/logger";
 import { paymentRequiresApproval } from "@/lib/supabase-wrappers";
+import { createMutationErrorHandler } from "@/lib/errorHandling";
 
 export interface Payment {
   id: string;
@@ -128,13 +129,10 @@ export function usePayments() {
         description: "تم إضافة السند وإنشاء القيد المحاسبي",
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: "خطأ في الإضافة",
-        description: error.message || "حدث خطأ أثناء إضافة السند",
-        variant: "destructive",
-      });
-    },
+    onError: createMutationErrorHandler({
+      context: 'add_payment',
+      toastTitle: 'خطأ في الإضافة',
+    }),
   });
 
   const updatePayment = useMutation({
@@ -186,13 +184,10 @@ export function usePayments() {
         description: "تم تحديث بيانات السند بنجاح",
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: "خطأ في التحديث",
-        description: error.message || "حدث خطأ أثناء تحديث السند",
-        variant: "destructive",
-      });
-    },
+    onError: createMutationErrorHandler({
+      context: 'update_payment',
+      toastTitle: 'خطأ في التحديث',
+    }),
   });
 
   const deletePayment = useMutation({
@@ -208,13 +203,10 @@ export function usePayments() {
         description: "تم حذف السند بنجاح",
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: "خطأ في الحذف",
-        description: error.message || "حدث خطأ أثناء حذف السند",
-        variant: "destructive",
-      });
-    },
+    onError: createMutationErrorHandler({
+      context: 'delete_payment',
+      toastTitle: 'خطأ في الحذف',
+    }),
   });
 
   return {

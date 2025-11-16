@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { QUERY_KEYS, TOAST_MESSAGES, QUERY_STALE_TIME } from "@/lib/constants";
 import { useEffect } from "react";
+import { createMutationErrorHandler } from "@/lib/errorHandling";
 
 export interface Fund {
   id: string;
@@ -78,13 +79,10 @@ export function useFunds() {
         description: "تم إضافة الصندوق بنجاح",
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: TOAST_MESSAGES.ERROR.ADD,
-        description: error.message || "حدث خطأ أثناء إضافة الصندوق",
-        variant: "destructive",
-      });
-    },
+    onError: createMutationErrorHandler({
+      context: 'add_fund',
+      toastTitle: TOAST_MESSAGES.ERROR.ADD,
+    }),
   });
 
   const updateFund = useMutation({
@@ -107,13 +105,10 @@ export function useFunds() {
         description: "تم تحديث الصندوق بنجاح",
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: TOAST_MESSAGES.ERROR.UPDATE,
-        description: error.message || "حدث خطأ أثناء تحديث الصندوق",
-        variant: "destructive",
-      });
-    },
+    onError: createMutationErrorHandler({
+      context: 'update_fund',
+      toastTitle: TOAST_MESSAGES.ERROR.UPDATE,
+    }),
   });
 
   return {
