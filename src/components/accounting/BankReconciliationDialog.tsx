@@ -114,8 +114,8 @@ export function BankReconciliationDialog({ open, onOpenChange }: BankReconciliat
                 <Input
                   type="number"
                   step="0.01"
-                  value={newStatement.opening_balance}
-                  onChange={(e) => setNewStatement({ ...newStatement, opening_balance: parseFloat(e.target.value) })}
+                  value={newStatement.opening_balance || 0}
+                  onChange={(e) => setNewStatement({ ...newStatement, opening_balance: parseFloat(e.target.value) || 0 })}
                 />
               </div>
 
@@ -124,8 +124,8 @@ export function BankReconciliationDialog({ open, onOpenChange }: BankReconciliat
                 <Input
                   type="number"
                   step="0.01"
-                  value={newStatement.closing_balance}
-                  onChange={(e) => setNewStatement({ ...newStatement, closing_balance: parseFloat(e.target.value) })}
+                  value={newStatement.closing_balance || 0}
+                  onChange={(e) => setNewStatement({ ...newStatement, closing_balance: parseFloat(e.target.value) || 0 })}
                 />
               </div>
             </div>
