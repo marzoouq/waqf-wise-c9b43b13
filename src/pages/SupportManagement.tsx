@@ -33,6 +33,7 @@ import { ar } from 'date-fns/locale';
 import { LoadingState } from '@/components/shared/LoadingState';
 import type { SupportFilters } from '@/types/support';
 import { Database } from '@/integrations/supabase/types';
+import { cleanFilters } from '@/utils/cleanFilters';
 
 type SupportTicket = Database['public']['Tables']['support_tickets']['Row'];
 
@@ -55,7 +56,7 @@ export default function SupportManagement() {
   const [filters, setFilters] = useState<SupportFilters>({});
   const [settingsOpen, setSettingsOpen] = useState(false);
 
-  const { tickets, isLoading } = useSupportTickets(filters);
+  const { tickets, isLoading } = useSupportTickets(cleanFilters(filters));
   const { overviewStats, overdueTickets, recentTickets, overviewLoading } = useSupportStats();
 
   const handleFilterChange = (key: keyof SupportFilters, value: string | string[] | undefined) => {

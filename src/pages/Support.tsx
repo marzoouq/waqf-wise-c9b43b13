@@ -29,6 +29,7 @@ import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import type { SupportFilters } from '@/types/support';
 import { Database } from '@/integrations/supabase/types';
+import { cleanFilters } from '@/utils/cleanFilters';
 
 type SupportTicket = Database['public']['Tables']['support_tickets']['Row'];
 
@@ -59,15 +60,7 @@ export default function Support() {
   const [articleSearch, setArticleSearch] = useState('');
   const [faqSearch, setFaqSearch] = useState('');
 
-  // تنظيف الـ filters من القيم الفارغة لتوحيد query keys
-  const cleanFilters: SupportFilters = {};
-  Object.entries(filters).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== '' && (Array.isArray(value) ? value.length > 0 : true)) {
-      (cleanFilters as any)[key] = value;
-    }
-  });
-
-  const { tickets, isLoading: ticketsLoading } = useSupportTickets(Object.keys(cleanFilters).length > 0 ? cleanFilters : undefined);
+  const { tickets, isLoading: ticketsLoading } = useSupportTickets(cleanFilters(filters));
   const { 
     articles, 
     faqs, 
