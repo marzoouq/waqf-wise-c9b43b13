@@ -14,20 +14,17 @@ import { LoansAgingReport } from "@/components/reports/LoansAgingReport";
 import { MaintenanceCostReport } from "@/components/reports/MaintenanceCostReport";
 import { FundsPerformanceReport } from "@/components/reports/FundsPerformanceReport";
 import { BarChart3, Calendar, Settings, Users, Building2, FileText, DollarSign } from "lucide-react";
+import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 
 const Reports = () => {
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-6 md:p-8 lg:p-10 space-y-6">
-        <div>
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gradient-primary">
-            التقارير والإحصائيات
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            تقارير تحليلية شاملة ومتقدمة
-          </p>
-        </div>
+    <MobileOptimizedLayout>
+      <MobileOptimizedHeader
+        title="التقارير والإحصائيات"
+        description="تقارير تحليلية شاملة ومتقدمة"
+        icon={<BarChart3 className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
+      />
 
         <Tabs defaultValue="dashboard" className="space-y-6">
           <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-1">
@@ -135,8 +132,7 @@ const Reports = () => {
             </Tabs>
           </TabsContent>
         </Tabs>
-      </div>
-    </div>
+    </MobileOptimizedLayout>
   );
 };
 

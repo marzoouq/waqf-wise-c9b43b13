@@ -21,6 +21,7 @@ import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { Pagination } from "@/components/ui/pagination";
 import { logger } from "@/lib/logger";
+import { MobileOptimizedLayout, MobileOptimizedHeader, MobileOptimizedGrid } from "@/components/layout/MobileOptimizedLayout";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -153,26 +154,19 @@ const Payments = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-6 md:p-8 lg:p-10 space-y-6 md:space-y-8">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gradient-primary">
-              إدارة المدفوعات
-            </h1>
-            <p className="text-muted-foreground mt-1 text-sm md:text-base">
-              سندات القبض والصرف والمدفوعات
-            </p>
-          </div>
-          <Button
-            className="bg-primary hover:bg-primary-hover text-primary-foreground shadow-soft w-full md:w-auto"
-            onClick={handleAddPayment}
-          >
-            <Plus className="ml-2 h-4 w-4 md:h-5 md:w-5" />
-            <span className="text-sm md:text-base">إضافة سند جديد</span>
+    <MobileOptimizedLayout>
+      <MobileOptimizedHeader
+        title="المدفوعات والمقبوضات"
+        description="إدارة سندات القبض والصرف"
+        icon={<Receipt className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
+        actions={
+          <Button onClick={handleAddPayment} size="sm">
+            <Plus className="h-4 w-4 sm:h-5 sm:w-5 ml-2" />
+            <span className="hidden sm:inline">سند جديد</span>
+            <span className="sm:hidden">جديد</span>
           </Button>
-        </div>
+        }
+      />
 
         {/* Search */}
         <Card className="shadow-soft">
@@ -190,7 +184,7 @@ const Payments = () => {
         </Card>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <MobileOptimizedGrid cols={4}>
           {stats.map((stat) => (
             <StatCard
               key={stat.label}
@@ -200,7 +194,7 @@ const Payments = () => {
               color={stat.color}
             />
           ))}
-        </div>
+        </MobileOptimizedGrid>
 
         {/* Payments Table */}
         <Card className="shadow-soft">
@@ -319,8 +313,7 @@ const Payments = () => {
           payment={selectedPayment}
           onSave={handleSavePayment}
         />
-      </div>
-    </div>
+    </MobileOptimizedLayout>
   );
 };
 

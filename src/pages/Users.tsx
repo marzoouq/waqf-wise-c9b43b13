@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 
 interface UserProfile {
   id: string;
@@ -387,8 +388,7 @@ const Users = () => {
             </Button>
           </div>
         </ResponsiveDialog>
-      </div>
-    </div>
+    </MobileOptimizedLayout>
   );
 };
 

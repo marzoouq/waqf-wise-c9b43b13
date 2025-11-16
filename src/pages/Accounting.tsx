@@ -19,6 +19,7 @@ import { BankAccountsManagement } from "@/components/accounting/BankAccountsMana
 import { CashFlowStatement } from "@/components/accounting/CashFlowStatement";
 import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/shared/LoadingState";
+import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 
 const Accounting = () => {
   const [activeTab, setActiveTab] = useState("accounts");
@@ -67,19 +68,19 @@ const Accounting = () => {
   }), []);
 
   return (
-    <div className="container mx-auto p-6 md:p-8 lg:p-10 space-y-6 md:space-y-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold">النظام المحاسبي</h1>
-          <p className="text-sm sm:text-base text-muted-foreground mt-1">
-            إدارة الحسابات والقيود المحاسبية والميزانيات
-          </p>
-        </div>
-        <Button onClick={() => setBankDialogOpen(true)} variant="outline">
-          <Building2 className="ml-2 h-4 w-4" />
-          التسوية البنكية
-        </Button>
-      </div>
+    <MobileOptimizedLayout>
+      <MobileOptimizedHeader
+        title="النظام المحاسبي"
+        description="إدارة الحسابات والقيود المحاسبية والميزانيات"
+        icon={<BookOpen className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
+        actions={
+          <Button onClick={() => setBankDialogOpen(true)} variant="outline" size="sm">
+            <Building2 className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
+            <span className="hidden sm:inline">التسوية البنكية</span>
+            <span className="sm:hidden">التسوية</span>
+          </Button>
+        }
+      />
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 h-auto gap-1">
@@ -132,7 +133,7 @@ const Accounting = () => {
         open={bankDialogOpen}
         onOpenChange={setBankDialogOpen}
       />
-    </div>
+    </MobileOptimizedLayout>
   );
 };
 
