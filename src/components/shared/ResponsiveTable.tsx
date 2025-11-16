@@ -11,36 +11,20 @@ import { Card } from '@/components/ui/card';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { cn } from '@/lib/utils';
 import { ScrollableTableWrapper } from './ScrollableTableWrapper';
-
-interface Column {
-  key: string;
-  label: string;
-  render?: (value: any, row: any) => ReactNode;
-  className?: string;
-  mobileHidden?: boolean; // إخفاء العمود على الجوال
-}
-
-interface ResponsiveTableProps {
-  columns: Column[];
-  data: any[];
-  emptyMessage?: string;
-  onRowClick?: (row: any) => void;
-  mobileCardView?: boolean; // عرض البيانات كـ cards على الجوال
-  mobileCardRender?: (row: any) => ReactNode;
-}
+import { TableRow as TableRowType, TableColumn, ResponsiveTableProps } from '@/types/table';
 
 /**
- * جدول محسّن للجوال
+ * جدول محسّن للجوال مع دعم Generic Types
  * يمكن عرضه كـ cards على الجوال أو جدول قابل للتمرير
  */
-export function ResponsiveTable({
+export function ResponsiveTable<T extends TableRowType = TableRowType>({
   columns,
   data,
   emptyMessage = 'لا توجد بيانات',
   onRowClick,
   mobileCardView = true,
   mobileCardRender,
-}: ResponsiveTableProps) {
+}: ResponsiveTableProps<T>) {
   const isMobile = useMediaQuery('(max-width: 640px)');
 
   if (data.length === 0) {
@@ -72,16 +56,19 @@ export function ResponsiveTable({
                 <div className="space-y-1.5 sm:space-y-2">
                   {columns
                     .filter(col => !col.mobileHidden)
-                    .map((col) => (
-                      <div key={col.key} className="flex justify-between items-start gap-2">
-                        <span className="text-xs sm:text-sm text-muted-foreground font-medium min-w-[80px] sm:min-w-[100px]">
-                          {col.label}:
-                        </span>
-                        <span className="text-xs sm:text-sm flex-1 text-left">
-                          {col.render ? col.render(row[col.key], row) : row[col.key]}
-                        </span>
-                      </div>
-                    ))}
+                    .map((col) => {
+                      const value = col.render ? col.render(row[col.key], row) : String(row[col.key] ?? '');
+                      return (
+                        <div key={col.key} className="flex justify-between items-start gap-2">
+                          <span className="text-xs sm:text-sm text-muted-foreground font-medium min-w-[80px] sm:min-w-[100px]">
+                            {col.label}:
+                          </span>
+                          <span className="text-xs sm:text-sm flex-1 text-left">
+                            {value}
+                          </span>
+                        </div>
+                      );
+                    })}
                 </div>
               )}
             </Card>
@@ -118,11 +105,14 @@ export function ResponsiveTable({
                 >
                   {columns
                     .filter(col => !col.mobileHidden || !isMobile)
-                    .map((col) => (
-                      <TableCell key={col.key} className={col.className}>
-                        {col.render ? col.render(row[col.key], row) : row[col.key]}
-                      </TableCell>
-                    ))}
+                    .map((col) => {
+                      const value = col.render ? col.render(row[col.key], row) : String(row[col.key] ?? '');
+                      return (
+                        <TableCell key={col.key} className={col.className}>
+                          {value}
+                        </TableCell>
+                      );
+                    })}
                 </TableRow>
               );
             })}

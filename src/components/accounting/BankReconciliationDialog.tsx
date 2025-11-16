@@ -55,7 +55,7 @@ export function BankReconciliationDialog({ open, onOpenChange }: BankReconciliat
   const handleImportTransactions = async (csvData: Array<{ date: string; description: string; reference: string; amount: string; type: string }>) => {
     for (const row of csvData) {
       await addTransaction({
-        bank_statement_id: selectedStatement.id,
+        statement_id: selectedStatement.id,
         transaction_date: row.date,
         description: row.description,
         reference_number: row.reference,

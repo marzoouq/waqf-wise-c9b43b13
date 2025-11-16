@@ -5,19 +5,17 @@ import { Search, Users, Building2, FileText, DollarSign, Calendar, Archive, Tren
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
+import {
+  SearchResult,
+  BeneficiarySearchResult,
+  PropertySearchResult,
+  LoanSearchResult,
+  DocumentSearchResult
+} from '@/types/search';
 
 interface GlobalSearchProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-}
-
-interface SearchResult {
-  id: string;
-  type: 'beneficiary' | 'property' | 'loan' | 'contract' | 'document' | 'distribution';
-  title: string;
-  subtitle?: string;
-  url: string;
-  icon: any;
 }
 
 export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
@@ -50,7 +48,7 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
       
       const { data, error } = await supabase
         .from('properties')
-        .select('id, name, location, property_type')
+        .select('id, name, location, status')
         .or(`name.ilike.%${searchQuery}%,location.ilike.%${searchQuery}%`)
         .limit(5);
       
@@ -68,7 +66,7 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
       
       const { data, error } = await supabase
         .from('loans')
-        .select('id, loan_number, amount, beneficiaries(full_name)')
+        .select('id, loan_number, loan_amount, beneficiaries(full_name)')
         .or(`loan_number.ilike.%${searchQuery}%`)
         .limit(5);
       
@@ -101,7 +99,7 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
     const results: SearchResult[] = [];
 
     // إضافة المستفيدين
-    beneficiaries.forEach((b: any) => {
+    beneficiaries.forEach((b: BeneficiarySearchResult) => {
       results.push({
         id: b.id,
         type: 'beneficiary',
@@ -113,31 +111,31 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
     });
 
     // إضافة العقارات
-    properties.forEach((p: any) => {
+    properties.forEach((p: PropertySearchResult) => {
       results.push({
         id: p.id,
         type: 'property',
         title: p.name,
-        subtitle: `${p.property_type} - ${p.location}`,
+        subtitle: p.location,
         url: `/properties`,
         icon: Building2,
       });
     });
 
     // إضافة القروض
-    loans.forEach((l: any) => {
+    loans.forEach((l: LoanSearchResult) => {
       results.push({
         id: l.id,
         type: 'loan',
         title: l.loan_number,
-        subtitle: `${l.amount?.toLocaleString('ar-SA')} ر.س - ${l.beneficiaries?.full_name || 'غير معروف'}`,
+        subtitle: `${l.loan_amount?.toLocaleString('ar-SA')} ر.س - ${l.beneficiaries?.full_name || 'غير معروف'}`,
         url: `/loans`,
         icon: DollarSign,
       });
     });
 
     // إضافة المستندات
-    documents.forEach((d: any) => {
+    documents.forEach((d: DocumentSearchResult) => {
       results.push({
         id: d.id,
         type: 'document',
