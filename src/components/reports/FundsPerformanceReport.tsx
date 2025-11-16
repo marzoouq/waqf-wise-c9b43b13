@@ -69,7 +69,7 @@ export function FundsPerformanceReport() {
         acc[fund.category].value += fund.spent_amount;
         acc[fund.category].count += 1;
         return acc;
-      }, {} as Record<string, any>);
+      }, {} as Record<string, { name: string; value: number; count: number }>);
 
       return Object.values(categories);
     },

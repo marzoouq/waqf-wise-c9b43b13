@@ -16,6 +16,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 
+interface SimulationResults {
+  total: number;
+  maintenance: number;
+  reserve: number;
+  distribution: number;
+  perBeneficiary: number;
+  beneficiaries: number;
+}
+
 const simulationSchema = z.object({
   availableAmount: z.coerce
     .number()
@@ -41,7 +50,7 @@ interface SimulationDialogProps {
 }
 
 export function SimulationDialog({ open, onOpenChange }: SimulationDialogProps) {
-  const [results, setResults] = useState<any>(null);
+  const [results, setResults] = useState<SimulationResults | null>(null);
 
   const form = useForm<SimulationFormValues>({
     resolver: zodResolver(simulationSchema),

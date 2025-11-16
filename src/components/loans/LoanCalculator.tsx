@@ -14,11 +14,19 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+interface LoanScheduleItem {
+  month: number;
+  payment: number;
+  principal: number;
+  interest: number;
+  balance: number;
+}
+
 export function LoanCalculator() {
   const [principal, setPrincipal] = useState<number>(100000);
   const [rate, setRate] = useState<number>(0);
   const [months, setMonths] = useState<number>(12);
-  const [schedule, setSchedule] = useState<any[]>([]);
+  const [schedule, setSchedule] = useState<LoanScheduleItem[]>([]);
 
   const calculateLoan = () => {
     let monthlyPayment: number;

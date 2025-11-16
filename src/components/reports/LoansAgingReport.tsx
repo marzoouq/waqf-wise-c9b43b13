@@ -106,7 +106,7 @@ export function LoansAgingReport() {
         acc[loan.aging_category].count += 1;
         acc[loan.aging_category].amount += loan.remaining_balance;
         return acc;
-      }, {} as Record<string, any>);
+      }, {} as Record<string, { category: string; count: number; amount: number }>);
 
       return Object.values(categories);
     },

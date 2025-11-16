@@ -36,6 +36,12 @@ import {
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ar } from "date-fns/locale";
+import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
+import { Database } from '@/integrations/supabase/types';
+
+type BeneficiaryRequest = Database['public']['Tables']['beneficiary_requests']['Row'] & {
+  beneficiary?: { full_name?: string };
+};
 
 export default function StaffRequests() {
   const { requests, isLoading } = useRequests();
@@ -43,7 +49,7 @@ export default function StaffRequests() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [typeFilter, setTypeFilter] = useState<string>("all");
-  const [selectedRequest, setSelectedRequest] = useState<any>(null);
+  const [selectedRequest, setSelectedRequest] = useState<BeneficiaryRequest | null>(null);
   const [approvalDialogOpen, setApprovalDialogOpen] = useState(false);
   const [commentsDialogOpen, setCommentsDialogOpen] = useState(false);
 
