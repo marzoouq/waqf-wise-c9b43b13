@@ -15,7 +15,7 @@ export function TypingIndicator() {
             <div className="w-2.5 h-2.5 bg-primary rounded-full animate-bounce [animation-delay:0.2s]" />
             <div className="w-2.5 h-2.5 bg-primary rounded-full animate-bounce [animation-delay:0.4s]" />
           </div>
-          <span className="text-xs text-muted-foreground mr-2">المساعد يكتب...</span>
+          <span className="text-sm sm:text-base text-muted-foreground mr-2">المساعد يكتب...</span>
         </div>
       </div>
     </div>

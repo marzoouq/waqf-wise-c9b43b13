@@ -50,11 +50,11 @@ export function MobileOptimizedHeader({
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <h1 className="text-xl font-bold sm:text-2xl md:text-3xl lg:text-4xl text-foreground break-words">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground break-words">
               {title}
             </h1>
             {description && (
-              <p className="text-xs sm:text-sm md:text-base text-muted-foreground mt-1">
+              <p className="text-sm sm:text-base text-muted-foreground mt-1">
                 {description}
               </p>
             )}
