@@ -26,6 +26,7 @@ import {
 } from '@/components/ui/select';
 import { ScrollableTableWrapper } from '@/components/shared/ScrollableTableWrapper';
 import { MobileScrollHint } from '@/components/shared/MobileScrollHint';
+import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
 
 const Requests = () => {
   const { requests, isLoading } = useRequests();

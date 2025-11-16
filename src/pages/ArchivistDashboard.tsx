@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";
+import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 
 // Skeleton loaders
 const StatsSkeleton = () => (
@@ -110,8 +111,7 @@ export default function ArchivistDashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-3 sm:p-4 md:p-6 lg:p-8 space-y-4 sm:space-y-6 md:space-y-8">
+    <MobileOptimizedLayout>
         {/* Header */}
         <header className="space-y-1 sm:space-y-2">
           <div className="flex items-center gap-2 sm:gap-3">
@@ -127,11 +127,11 @@ export default function ArchivistDashboard() {
           </div>
         </header>
 
-        {/* Statistics Cards */}
-        {statsLoading ? (
-          <StatsSkeleton />
-        ) : (
-          <div className="grid gap-4 sm:gap-5 md:gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
+      {/* Statistics Cards */}
+      {statsLoading ? (
+        <StatsSkeleton />
+      ) : (
+        <div className="grid gap-3 sm:gap-4 md:gap-5 lg:gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
             <Card className="group hover:shadow-lg hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-teal-500">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-xs sm:text-sm font-medium">المجلدات</CardTitle>
@@ -299,7 +299,6 @@ export default function ArchivistDashboard() {
             </div>
           </CardContent>
         </Card>
-      </div>
-    </div>
+    </MobileOptimizedLayout>
   );
 }

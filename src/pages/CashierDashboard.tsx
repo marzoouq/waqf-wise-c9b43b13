@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { AddReceiptDialog } from "@/components/payments/AddReceiptDialog";
 import { AddVoucherDialog } from "@/components/payments/AddVoucherDialog";
+import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 
 // Lazy load heavy components
 const RecentJournalEntries = lazy(() => import("@/components/dashboard/RecentJournalEntries"));
@@ -22,21 +23,12 @@ export default function CashierDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background px-3 py-4 sm:px-4 sm:py-5 md:px-6 md:py-6 lg:px-8 lg:py-8">
-      <div className="container mx-auto max-w-7xl space-y-4 sm:space-y-5 md:space-y-6">
-        <header className="space-y-1 sm:space-y-2">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <Wallet className="h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 text-orange-600" />
-            <div>
-              <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gradient-primary">
-                لوحة تحكم أمين الصندوق
-              </h1>
-              <p className="text-xs sm:text-sm md:text-base text-muted-foreground">
-                إدارة المدفوعات والمقبوضات اليومية
-              </p>
-            </div>
-          </div>
-        </header>
+    <MobileOptimizedLayout>
+      <MobileOptimizedHeader
+        title="لوحة تحكم أمين الصندوق"
+        description="إدارة المدفوعات والمقبوضات اليومية"
+        icon={<Wallet className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-orange-600" />}
+      />
 
         {/* KPI Cards */}
         <div className="grid gap-3 sm:gap-4 md:gap-5 lg:gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
@@ -213,7 +205,6 @@ export default function CashierDashboard() {
             </Suspense>
           </TabsContent>
         </Tabs>
-      </div>
 
       {/* Dialogs */}
       <AddReceiptDialog 
@@ -224,6 +215,6 @@ export default function CashierDashboard() {
         open={isVoucherDialogOpen} 
         onOpenChange={setIsVoucherDialogOpen} 
       />
-    </div>
+    </MobileOptimizedLayout>
   );
 }

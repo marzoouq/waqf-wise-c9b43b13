@@ -33,6 +33,7 @@ import { Pagination } from "@/components/ui/pagination";
 import { useNavigate } from "react-router-dom";
 import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
 import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
+import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 
 const ITEMS_PER_PAGE = 20;
 

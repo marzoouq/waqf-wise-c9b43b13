@@ -37,6 +37,7 @@ import { Family } from '@/types';
 import { toast } from 'sonner';
 import { ScrollableTableWrapper } from '@/components/shared/ScrollableTableWrapper';
 import { MobileScrollHint } from '@/components/shared/MobileScrollHint';
+import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
 
 const Families = () => {
   const navigate = useNavigate();
