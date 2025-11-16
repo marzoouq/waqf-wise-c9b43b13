@@ -2949,6 +2949,45 @@ export type Database = {
         }
         Relationships: []
       }
+      scheduled_reports: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          frequency: string
+          id: string
+          is_active: boolean | null
+          name: string
+          next_run: string
+          recipients: string[]
+          report_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          frequency: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          next_run: string
+          recipients: string[]
+          report_type: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          frequency?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          next_run?: string
+          recipients?: string[]
+          report_type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       search_history: {
         Row: {
           created_at: string | null
