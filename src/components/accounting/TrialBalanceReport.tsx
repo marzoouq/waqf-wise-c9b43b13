@@ -8,10 +8,19 @@ import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
 import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
-import { TrialBalanceRow } from "@/types/supabase-helpers";
+
+interface TrialBalanceAccount {
+  account_id: string;
+  code: string;
+  name: string;
+  debit: number;
+  credit: number;
+  balance: number;
+}
 
 export function TrialBalanceReport() {
   const { trialBalance, isLoading } = useFinancialReports();
+  const accounts = trialBalance as TrialBalanceAccount[];
 
   const formatNumber = (num: number) => {
     return new Intl.NumberFormat('ar-SA', {
@@ -20,8 +29,8 @@ export function TrialBalanceReport() {
     }).format(Math.abs(num));
   };
 
-  const totalDebit = trialBalance.reduce((sum, acc) => sum + acc.debit, 0);
-  const totalCredit = trialBalance.reduce((sum, acc) => sum + acc.credit, 0);
+  const totalDebit = accounts.reduce((sum, acc) => sum + acc.debit, 0);
+  const totalCredit = accounts.reduce((sum, acc) => sum + acc.credit, 0);
   const difference = Math.abs(totalDebit - totalCredit);
 
   if (isLoading) {
@@ -64,7 +73,7 @@ export function TrialBalanceReport() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {trialBalance.map((account: TrialBalanceRow) => (
+              {accounts.map(account => (
                 <TableRow key={account.account_id}>
                   <TableCell className="font-mono text-xs sm:text-sm">{account.code}</TableCell>
                   <TableCell className="text-xs sm:text-sm">{account.name}</TableCell>

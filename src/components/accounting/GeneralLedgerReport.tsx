@@ -14,11 +14,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
 import { FileText, Printer } from "lucide-react";
-import { AccountRow, GeneralLedgerEntry } from "@/types/supabase-helpers";
-import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
+import { GeneralLedgerEntry } from "@/types/supabase-helpers";
+import { format } from "date-fns";
 
 const GeneralLedgerReport = () => {
   const [selectedAccountId, setSelectedAccountId] = useState<string>("");
@@ -97,7 +95,7 @@ const GeneralLedgerReport = () => {
     enabled: !!selectedAccountId,
   });
 
-  const selectedAccount = accounts?.find((acc: AccountRow) => acc.id === selectedAccountId);
+  const selectedAccount = accounts?.find(acc => acc.id === selectedAccountId);
 
   const handlePrint = () => {
     window.print();
@@ -119,9 +117,9 @@ const GeneralLedgerReport = () => {
               <Select value={selectedAccountId} onValueChange={setSelectedAccountId}>
                 <SelectTrigger>
                   <SelectValue placeholder="اختر الحساب" />
-                </SelectTrigger>
-                <SelectContent>
-                  {accounts?.map((account: AccountRow) => (
+                  </SelectTrigger>
+                  <SelectContent>
+                    {accounts?.map(account => (
                     <SelectItem key={account.id} value={account.id}>
                       {account.code} - {account.name_ar}
                     </SelectItem>

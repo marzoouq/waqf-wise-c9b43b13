@@ -87,11 +87,11 @@ function AccountNode({ account, level, onEdit, onAddChild }: AccountNodeProps) {
         <div className="flex items-center gap-2">
           <span className={cn(
             "font-mono text-sm font-medium min-w-[120px] text-left",
-            account.current_balance > 0 ? "text-success" : account.current_balance < 0 ? "text-destructive" : "text-muted-foreground"
+            (account.current_balance ?? 0) > 0 ? "text-success" : (account.current_balance ?? 0) < 0 ? "text-destructive" : "text-muted-foreground"
           )}>
-            {formatBalance(account.current_balance)}
-            {account.current_balance > 0 && <TrendingUp className="inline h-3 w-3 mr-1" />}
-            {account.current_balance < 0 && <TrendingDown className="inline h-3 w-3 mr-1" />}
+            {formatBalance(account.current_balance ?? 0)}
+            {(account.current_balance ?? 0) > 0 && <TrendingUp className="inline h-3 w-3 mr-1" />}
+            {(account.current_balance ?? 0) < 0 && <TrendingDown className="inline h-3 w-3 mr-1" />}
           </span>
 
             <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">

@@ -11,7 +11,6 @@ import { toast } from "sonner";
 
 export function CashFlowStatement() {
   const { cashFlows, isLoading } = useCashFlows();
-  const [selectedPeriod, setSelectedPeriod] = useState<string | null>(null);
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل قائمة التدفقات النقدية..." />;
