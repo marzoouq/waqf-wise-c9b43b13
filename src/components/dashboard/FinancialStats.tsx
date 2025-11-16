@@ -17,15 +17,15 @@ const FinancialStats = () => {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
         {[1, 2, 3, 4, 5, 6].map((i) => (
           <Card key={`skeleton-${i}`}>
             <CardHeader className="pb-2">
-              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-3 sm:h-4 w-24 sm:w-32" />
             </CardHeader>
             <CardContent>
-              <Skeleton className="h-8 w-40 mb-2" />
-              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-6 sm:h-8 w-32 sm:w-40 mb-1 sm:mb-2" />
+              <Skeleton className="h-3 sm:h-4 w-20 sm:w-24" />
             </CardContent>
           </Card>
         ))}
