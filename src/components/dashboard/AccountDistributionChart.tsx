@@ -9,6 +9,7 @@ interface AccountData {
   name: string;
   value: number;
   count: number;
+  [key: string]: string | number;
 }
 
 const COLORS = [
@@ -105,11 +106,15 @@ const AccountDistributionChart = () => {
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>
             <Pie
-              data={data as any}
+              data={data}
               cx="50%"
               cy="50%"
               labelLine={false}
-              label={({ name, percent }: any) => `${name} ${(percent * 100).toFixed(0)}%`}
+              label={(props) => {
+                const name = props.name || '';
+                const percent = props.percent || 0;
+                return `${name} ${(percent * 100).toFixed(0)}%`;
+              }}
               outerRadius={80}
               fill="#8884d8"
               dataKey="value"

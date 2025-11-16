@@ -13,7 +13,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { LoanForApproval, calculateProgress, getNextPendingApproval, StatusConfigMap, BadgeVariant } from "@/types/approvals";
+import { LoanForApproval, LoanApprovalRow, calculateProgress, getNextPendingApproval, StatusConfigMap, BadgeVariant } from "@/types/approvals";
 
 export function LoanApprovalsTab() {
   const { toast } = useToast();
@@ -170,7 +170,7 @@ export function LoanApprovalsTab() {
     );
   };
 
-  const getApprovalProgress = (approvals: any[]) => {
+  const getApprovalProgress = (approvals: Pick<LoanApprovalRow, 'status'>[]) => {
     const total = 3;
     const approved = approvals?.filter((a) => a.status === "موافق").length || 0;
     return `${approved}/${total}`;
