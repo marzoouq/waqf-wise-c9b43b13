@@ -31,7 +31,7 @@ export function useRealtimeNotifications() {
           queryClient.invalidateQueries({ queryKey: ['notifications'] });
           
           // عرض toast notification
-          const notification = payload.new as any;
+          const notification = payload.new as NotificationRow;
           toast({
             title: notification.title,
             description: notification.message,
@@ -87,7 +87,7 @@ export function useRealtimeNotifications() {
         (payload) => {
           queryClient.invalidateQueries({ queryKey: ['internal-messages'] });
           
-          const message = payload.new as any;
+          const message = payload.new as InternalMessageRow;
           toast({
             title: '📨 رسالة جديدة',
             description: `من: ${message.sender_name || 'الإدارة'}`,

@@ -25,7 +25,7 @@ export function useCashFlows(fiscalYearId?: string) {
     queryKey: ["cash_flows", fiscalYearId],
     queryFn: async () => {
       let query = supabase
-        .from("cash_flows" as any)
+        .from("cash_flows")
         .select("*")
         .order("period_start", { ascending: false });
 
@@ -36,7 +36,7 @@ export function useCashFlows(fiscalYearId?: string) {
       const { data, error } = await query;
 
       if (error) throw error;
-      return (data || []) as any as CashFlow[];
+      return (data || []) as CashFlow[];
     },
   });
 
@@ -108,7 +108,7 @@ export function useCashFlows(fiscalYearId?: string) {
 
       // حفظ النتائج
       const { data, error } = await supabase
-        .from("cash_flows" as any)
+        .from("cash_flows")
         .insert([{
           fiscal_year_id: fiscalYearId,
           period_start: periodStart,

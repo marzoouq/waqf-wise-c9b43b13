@@ -50,7 +50,7 @@ export function useRequestApprovals(requestId?: string) {
     queryKey: ["request_approvals", requestId],
     queryFn: async () => {
       let query = supabase
-        .from("request_approvals" as any)
+        .from("request_approvals")
         .select("*")
         .order("level", { ascending: true });
 
@@ -70,7 +70,7 @@ export function useRequestApprovals(requestId?: string) {
     mutationFn: async (approval: Omit<RequestApproval, "id" | "created_at" | "updated_at">) => {
       // التحقق من وجود موافقة سابقة بنفس المستوى
       const { data: existing, error: checkError } = await supabase
-        .from("request_approvals" as any)
+        .from("request_approvals")
         .select("id")
         .eq("request_id", approval.request_id)
         .eq("level", approval.level)
@@ -91,7 +91,7 @@ export function useRequestApprovals(requestId?: string) {
             approver_id: approval.approver_id,
             approver_name: approval.approver_name,
           })
-          .eq("id", (existing as any).id)
+          .eq("id", existing.id)
           .select()
           .single();
 
@@ -101,8 +101,8 @@ export function useRequestApprovals(requestId?: string) {
 
       // إذا لم تكن موجودة، نقوم بالإدراج
       const { data, error } = await supabase
-        .from("request_approvals" as any)
-        .insert([approval as any])
+        .from("request_approvals")
+        .insert([approval])
         .select()
         .single();
 
@@ -129,8 +129,8 @@ export function useRequestApprovals(requestId?: string) {
   const updateApproval = useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<RequestApproval> }) => {
       const { data, error } = await supabase
-        .from("request_approvals" as any)
-        .update(updates as any)
+        .from("request_approvals")
+        .update(updates)
         .eq("id", id)
         .select()
         .single();

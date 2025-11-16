@@ -66,7 +66,7 @@ export function usePayments() {
     mutationFn: async (payment: Omit<Payment, "id" | "created_at" | "updated_at">) => {
       // التحقق من حاجة المدفوعة للموافقة
       const { data: requiresApproval } = await supabase.rpc(
-        'payment_requires_approval' as any,
+        'payment_requires_approval' as never,
         { p_amount: payment.amount }
       );
 
@@ -87,7 +87,7 @@ export function usePayments() {
           { level: 2, approver_name: 'المدير' }
         ];
 
-        await supabase.from('payment_approvals' as any).insert(
+        await supabase.from('payment_approvals').insert(
           approvals.map(approval => ({
             payment_id: data.id,
             ...approval,

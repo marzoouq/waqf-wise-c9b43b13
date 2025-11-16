@@ -49,7 +49,7 @@ export function useInternalMessages() {
     queryKey: ["internal_messages", "inbox", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("internal_messages" as any)
+        .from("internal_messages")
         .select("*")
         .eq("receiver_id", user?.id)
         .order("created_at", { ascending: false });
@@ -65,7 +65,7 @@ export function useInternalMessages() {
     queryKey: ["internal_messages", "sent", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("internal_messages" as any)
+        .from("internal_messages")
         .select("*")
         .eq("sender_id", user?.id)
         .order("created_at", { ascending: false });
@@ -80,8 +80,8 @@ export function useInternalMessages() {
   const sendMessage = useMutation({
     mutationFn: async (message: Omit<InternalMessage, "id" | "created_at" | "is_read" | "read_at">) => {
       const { data, error } = await supabase
-        .from("internal_messages" as any)
-        .insert([message as any])
+        .from("internal_messages")
+        .insert([message])
         .select()
         .single();
 
@@ -108,8 +108,8 @@ export function useInternalMessages() {
   const markAsRead = useMutation({
     mutationFn: async (messageId: string) => {
       const { data, error } = await supabase
-        .from("internal_messages" as any)
-        .update({ is_read: true, read_at: new Date().toISOString() } as any)
+        .from("internal_messages")
+        .update({ is_read: true, read_at: new Date().toISOString() })
         .eq("id", messageId)
         .select()
         .single();

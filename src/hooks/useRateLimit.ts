@@ -27,7 +27,7 @@ export function useRateLimit() {
     try {
       const ipAddress = await getClientIP();
       
-      const { data, error } = await (supabase as any).rpc('check_rate_limit', {
+      const { data, error } = await supabase.rpc('check_rate_limit' as never, {
         p_email: email,
         p_ip_address: ipAddress,
         p_max_attempts: maxAttempts,
@@ -59,7 +59,7 @@ export function useRateLimit() {
     try {
       const ipAddress = await getClientIP();
       
-      await (supabase as any).rpc('log_login_attempt', {
+      await supabase.rpc('log_login_attempt' as never, {
         p_email: email,
         p_ip_address: ipAddress,
         p_success: success,
