@@ -107,11 +107,11 @@ const RevenueExpenseChart = () => {
 
   return (
     <Card className="col-span-full shadow-soft">
-      <CardHeader>
-        <CardTitle className="text-xl font-bold">الإيرادات والمصروفات الشهرية</CardTitle>
+      <CardHeader className="pb-2 sm:pb-4">
+        <CardTitle className="text-sm sm:text-base md:text-xl font-bold">الإيرادات والمصروفات الشهرية</CardTitle>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={300}>
+        <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 200 : 300}>
           <AreaChart data={data}>
             <defs>
               <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
@@ -127,11 +127,15 @@ const RevenueExpenseChart = () => {
             <XAxis 
               dataKey="month" 
               stroke="hsl(var(--muted-foreground))"
-              style={{ fontSize: '12px' }}
+              style={{ fontSize: window.innerWidth < 640 ? '9px' : '12px' }}
+              angle={window.innerWidth < 640 ? -45 : 0}
+              textAnchor={window.innerWidth < 640 ? "end" : "middle"}
+              height={window.innerWidth < 640 ? 60 : 30}
             />
             <YAxis 
               stroke="hsl(var(--muted-foreground))"
-              style={{ fontSize: '12px' }}
+              style={{ fontSize: window.innerWidth < 640 ? '9px' : '12px' }}
+              width={window.innerWidth < 640 ? 40 : 60}
               tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`}
             />
             <Tooltip

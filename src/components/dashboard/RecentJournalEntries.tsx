@@ -52,8 +52,8 @@ const RecentJournalEntries = memo(() => {
 
   return (
     <Card className="shadow-soft">
-      <CardHeader>
-        <CardTitle className="text-xl font-bold">آخر القيود المحاسبية</CardTitle>
+      <CardHeader className="pb-2 sm:pb-4">
+        <CardTitle className="text-sm sm:text-base md:text-xl font-bold">آخر القيود المحاسبية</CardTitle>
       </CardHeader>
       <CardContent>
         {!entries || entries.length === 0 ? (
@@ -62,26 +62,26 @@ const RecentJournalEntries = memo(() => {
             <p>لا توجد قيود محاسبية بعد</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {entries.map((entry) => (
               <div
                 key={entry.id}
-                className="flex items-start gap-4 pb-4 border-b border-border last:border-0 last:pb-0"
+                className="flex items-start gap-2 sm:gap-4 pb-3 sm:pb-4 border-b border-border last:border-0 last:pb-0"
               >
-                <div className="p-2 bg-primary/10 rounded-lg">
-                  <FileText className="h-4 w-4 text-primary" />
+                <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg flex-shrink-0">
+                  <FileText className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
                 </div>
-                <div className="flex-1 space-y-1">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-mono font-medium">
+                <div className="flex-1 space-y-0.5 sm:space-y-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-xs sm:text-sm font-mono font-medium truncate">
                       {entry.entry_number}
                     </p>
                     {getStatusBadge(entry.status)}
                   </div>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">
                     {entry.description}
                   </p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">
                     {format(new Date(entry.entry_date), "dd MMMM yyyy", {
                       locale: ar,
                     })}
