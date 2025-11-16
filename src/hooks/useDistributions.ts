@@ -6,6 +6,7 @@ import { useActivities } from "@/hooks/useActivities";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
 import { logger } from "@/lib/logger";
+import { createMutationErrorHandler } from "@/lib/errorHandling";
 
 export interface Distribution {
   id: string;
@@ -94,13 +95,10 @@ export function useDistributions() {
         description: "تم إنشاء التوزيع وإنشاء القيد المحاسبي",
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: "خطأ في الإنشاء",
-        description: error.message || "حدث خطأ أثناء إنشاء التوزيع",
-        variant: "destructive",
-      });
-    },
+    onError: createMutationErrorHandler({
+      context: 'add_distribution',
+      toastTitle: 'خطأ في الإنشاء',
+    }),
   });
 
   const updateDistribution = useMutation({
@@ -147,13 +145,10 @@ export function useDistributions() {
         description: "تم تحديث التوزيع بنجاح",
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: "خطأ في التحديث",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
+    onError: createMutationErrorHandler({
+      context: 'update_distribution',
+      toastTitle: 'خطأ في التحديث',
+    }),
   });
 
   const simulateDistribution = async (totalAmount: number, beneficiariesCount: number) => {

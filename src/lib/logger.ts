@@ -20,15 +20,31 @@ class Logger {
   /**
    * تسجيل خطأ
    */
-  error(error: AppError, options?: LogOptions): void {
+  error(error: unknown, options?: LogOptions): void {
+    // تحويل error إلى AppError
+    const appError = this.toAppError(error);
+    
     // تسجيل في errorService
-    logError(error, {
+    logError(appError, {
       operation: options?.context,
       userId: options?.userId,
       metadata: options?.metadata,
     });
+  }
 
-    // Logging يتم في errorService
+  /**
+   * تحويل unknown error إلى AppError
+   */
+  private toAppError(error: unknown): AppError {
+    if (error instanceof Error) {
+      return error;
+    }
+    
+    if (typeof error === 'string') {
+      return new Error(error);
+    }
+    
+    return new Error('Unknown error occurred');
   }
 
   /**

@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { TOAST_MESSAGES } from "@/lib/constants";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";
+import { createMutationErrorHandler } from "@/lib/errorHandling";
 
 export interface Activity {
   id: string;
@@ -45,13 +46,10 @@ export function useActivities() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["activities"] });
     },
-    onError: (error: any) => {
-      toast({
-        title: TOAST_MESSAGES.ERROR.ADD,
-        description: error.message || "حدث خطأ أثناء إضافة النشاط",
-        variant: "destructive",
-      });
-    },
+    onError: createMutationErrorHandler({
+      context: 'add_activity',
+      toastTitle: TOAST_MESSAGES.ERROR.ADD,
+    }),
   });
 
   return {
