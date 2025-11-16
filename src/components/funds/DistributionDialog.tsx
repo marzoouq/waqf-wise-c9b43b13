@@ -27,6 +27,16 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Eye, Calculator } from "lucide-react";
 import { useDistributions } from "@/hooks/useDistributions";
 
+interface LocalSimulationResult {
+  totalAmount: number;
+  beneficiariesCount: number;
+  perBeneficiary: number;
+  distribution: Array<{
+    beneficiaryNumber: number;
+    amount: number;
+  }>;
+}
+
 const distributionSchema = z.object({
   month: z.string().min(1, { message: "الشهر الهجري مطلوب" }),
   totalAmount: z.coerce
@@ -54,7 +64,7 @@ export function DistributionDialog({
   const { toast } = useToast();
   const { simulateDistribution } = useDistributions();
   const [showSimulation, setShowSimulation] = useState(false);
-  const [simulationResult, setSimulationResult] = useState<any>(null);
+  const [simulationResult, setSimulationResult] = useState<LocalSimulationResult | null>(null);
 
   const form = useForm<DistributionFormValues>({
     resolver: zodResolver(distributionSchema),
@@ -215,7 +225,7 @@ export function DistributionDialog({
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {simulationResult.distribution.map((item: { beneficiaryNumber: string; amount: number }) => (
+                        {simulationResult.distribution.map((item: { beneficiaryNumber: number; amount: number }) => (
                           <TableRow key={item.beneficiaryNumber}>
                             <TableCell>مستفيد {item.beneficiaryNumber}</TableCell>
                             <TableCell className="text-left">{item.amount.toFixed(2)} ر.س</TableCell>

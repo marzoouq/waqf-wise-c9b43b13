@@ -32,7 +32,7 @@ const Payments = () => {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedPayment, setSelectedPayment] = useState<any>(null);
+  const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
 
   const { payments, isLoading, addPayment, updatePayment, deletePayment } = usePayments();

@@ -5,8 +5,9 @@ import { Sparkles, TrendingUp, AlertTriangle, Lightbulb, X, RefreshCw } from "lu
 import { useAIInsights } from "@/hooks/useAIInsights";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EnhancedEmptyState } from "@/components/shared/EnhancedEmptyState";
+import type { LucideIcon } from "lucide-react";
 
-const categoryIcons: Record<string, any> = {
+const categoryIcons: Record<string, LucideIcon> = {
   prediction: TrendingUp,
   recommendation: Lightbulb,
   anomaly: AlertTriangle,

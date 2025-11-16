@@ -21,12 +21,14 @@ import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapp
 import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 
+type Document = Database['public']['Tables']['documents']['Row'];
+
 const Archive = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [folderDialogOpen, setFolderDialogOpen] = useState(false);
   const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
-  const [selectedDocument, setSelectedDocument] = useState<any>(null);
+  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
 
   const { documents, isLoading: documentsLoading, addDocument } = useDocuments();
   const { folders, isLoading: foldersLoading, addFolder } = useFolders();
@@ -244,7 +246,7 @@ const Archive = () => {
         <DocumentPreviewDialog
           open={previewDialogOpen}
           onOpenChange={setPreviewDialogOpen}
-          document={selectedDocument}
+          document={selectedDocument as any}
         />
       </div>
     </MobileOptimizedLayout>

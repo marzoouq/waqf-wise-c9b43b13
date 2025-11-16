@@ -29,7 +29,7 @@ const uploadSchema = z.object({
     .max(100, { message: "اسم المستند يجب ألا يتجاوز 100 حرف" }),
   category: z.string().min(1, { message: "الفئة مطلوبة" }),
   description: z.string().optional(),
-  file: z.any().refine((file) => file?.length > 0, "الملف مطلوب"),
+  file: z.instanceof(FileList).refine((files) => files?.length > 0, "الملف مطلوب"),
 });
 
 type UploadFormValues = z.infer<typeof uploadSchema>;

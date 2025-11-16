@@ -7,6 +7,14 @@ import { CheckCircle2, XCircle, Clock, Users } from "lucide-react";
 import type { GovernanceDecision } from "@/types/governance";
 import { LoadingState } from "@/components/shared/LoadingState";
 
+interface EligibleVoter {
+  id: string;
+  name: string;
+  type: 'board_member' | 'beneficiary' | 'nazer';
+  hasVoted?: boolean;
+  vote?: 'approve' | 'reject' | 'abstain';
+}
+
 interface EligibleVotersListProps {
   decision: GovernanceDecision;
 }
@@ -15,7 +23,7 @@ export function EligibleVotersList({ decision }: EligibleVotersListProps) {
   const { data: voters = [], isLoading } = useQuery({
     queryKey: ["eligible-voters", decision.id],
     queryFn: async () => {
-      let eligibleVoters: any[] = [];
+      let eligibleVoters: EligibleVoter[] = [];
 
       // حسب نوع المصوتين
       switch (decision.voting_participants_type) {
@@ -27,11 +35,11 @@ export function EligibleVotersList({ decision }: EligibleVotersListProps) {
             .in("role", ["admin", "nazer"]);
           
           if (boardUsers) {
-            eligibleVoters = boardUsers.map(u => ({
-              id: u.user_id,
-              name: 'عضو مجلس',
-              type: 'board_member'
-            }));
+          eligibleVoters = boardUsers.map(u => ({
+            id: u.user_id,
+            name: 'عضو مجلس',
+            type: 'board_member' as const
+          }));
           }
           break;
 
@@ -44,7 +52,7 @@ export function EligibleVotersList({ decision }: EligibleVotersListProps) {
           eligibleVoters = beneficiaries?.map(b => ({
             id: b.user_id,
             name: b.full_name,
-            type: 'beneficiary'
+            type: 'beneficiary' as const
           })) || [];
           break;
 
@@ -63,12 +71,12 @@ export function EligibleVotersList({ decision }: EligibleVotersListProps) {
             ...(boardUsers2?.map(u => ({
               id: u.user_id,
               name: 'عضو مجلس',
-              type: 'board_member'
+              type: 'board_member' as const
             })) || []),
             ...(beneficiaries2?.map(b => ({
               id: b.user_id,
               name: b.full_name,
-              type: 'beneficiary'
+              type: 'beneficiary' as const
             })) || [])
           ];
           break;
@@ -89,7 +97,7 @@ export function EligibleVotersList({ decision }: EligibleVotersListProps) {
             eligibleVoters = [{
               id: nazerUser.user_id,
               name: 'الناظر',
-              type: 'nazer'
+              type: 'nazer' as const
             }];
           }
           break;

@@ -84,7 +84,8 @@ export function DistributionSimulator() {
     const availableForDistribution = totalAmount - deductionsAmount;
 
     // تجميع المستفيدين حسب الفئة
-    const categoryGroups: Record<string, any[]> = {};
+    interface Beneficiary { id: string; full_name: string; category: string; status: string; }
+    const categoryGroups: Record<string, Beneficiary[]> = {};
     activeBeneficiaries.forEach(b => {
       if (!categoryGroups[b.category]) {
         categoryGroups[b.category] = [];

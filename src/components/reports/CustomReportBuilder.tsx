@@ -25,6 +25,8 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import type { CustomReportFilter } from "@/types/reports";
+import type { Json } from "@/integrations/supabase/types";
 
 export function CustomReportBuilder() {
   const { toast } = useToast();
@@ -32,7 +34,7 @@ export function CustomReportBuilder() {
   const [reportDescription, setReportDescription] = useState("");
   const [reportType, setReportType] = useState<string>("");
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
-  const [filters, setFilters] = useState<any[]>([]);
+  const [filters, setFilters] = useState<CustomReportFilter[]>([]);
   const [groupBy, setGroupBy] = useState<string>("");
   const [sortBy, setSortBy] = useState<string>("");
 
@@ -101,7 +103,7 @@ export function CustomReportBuilder() {
           name: reportName,
           description: reportDescription,
           report_type: reportType,
-          configuration,
+          configuration: configuration as unknown as Json,
           is_public: false,
         }]);
 
@@ -295,7 +297,7 @@ export function CustomReportBuilder() {
                       <div className="space-y-2">
                         <Label>القيمة</Label>
                         <Input
-                          value={filter.value}
+                          value={String(filter.value)}
                           onChange={(e) => updateFilter(index, "value", e.target.value)}
                           placeholder="القيمة"
                         />
