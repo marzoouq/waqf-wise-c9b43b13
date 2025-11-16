@@ -186,7 +186,7 @@ export const useRequests = (beneficiaryId?: string) => {
       decision_notes?: string;
       rejection_reason?: string;
     }) => {
-      const updates: any = {
+      const updates: Record<string, string | undefined> = {
         status,
         decision_notes,
         rejection_reason,

@@ -160,7 +160,7 @@ export function useCustomReports() {
     
     // مثال: جلب بيانات المستفيدين
     if (template.report_type === 'beneficiaries') {
-      let queryBuilder: any = supabase.from('beneficiaries').select('*');
+      let queryBuilder = supabase.from('beneficiaries').select('*');
       
       if (config.filters) {
         Object.entries(config.filters).forEach(([key, value]) => {

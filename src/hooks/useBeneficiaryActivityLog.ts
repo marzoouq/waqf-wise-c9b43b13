@@ -1,13 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
 
 export interface BeneficiaryActivity {
   id: string;
   beneficiary_id: string;
   action_type: string;
   action_description: string;
-  old_values?: any;
-  new_values?: any;
+  old_values?: Json;
+  new_values?: Json;
   performed_by?: string;
   performed_by_name?: string;
   ip_address?: string;

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import type { Json } from '@/integrations/supabase/types';
 
 export interface DashboardWidget {
   id: string;
@@ -56,7 +57,7 @@ export function useSaveDashboardConfig() {
         .from('dashboard_configurations')
         .insert({
           dashboard_name: config.dashboard_name,
-          layout_config: config.layout_config as any,
+          layout_config: config.layout_config as unknown as Json,
           is_default: config.is_default,
           is_shared: config.is_shared,
           user_id: user?.id,
@@ -82,7 +83,7 @@ export function useUpdateDashboardConfig() {
 
   return useMutation({
     mutationFn: async ({ id, config }: { id: string; config: Partial<DashboardConfig> }) => {
-      const updateData: any = {};
+      const updateData: Record<string, unknown> = {};
       if (config.dashboard_name) updateData.dashboard_name = config.dashboard_name;
       if (config.layout_config) updateData.layout_config = config.layout_config;
       if (config.is_default !== undefined) updateData.is_default = config.is_default;

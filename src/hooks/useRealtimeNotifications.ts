@@ -3,6 +3,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
+import type { RealtimeNotification } from '@/types/notifications';
+import type { InternalMessage } from '@/types/messages';
 
 /**
  * Hook للاستماع للإشعارات في الوقت الفعلي
@@ -31,7 +33,7 @@ export function useRealtimeNotifications() {
           queryClient.invalidateQueries({ queryKey: ['notifications'] });
           
           // عرض toast notification
-          const notification = payload.new as any;
+          const notification = payload.new as RealtimeNotification;
           toast({
             title: notification.title,
             description: notification.message,
@@ -87,10 +89,10 @@ export function useRealtimeNotifications() {
         (payload) => {
           queryClient.invalidateQueries({ queryKey: ['internal-messages'] });
           
-          const message = payload.new as any;
+          const message = payload.new as InternalMessage;
           toast({
             title: '📨 رسالة جديدة',
-            description: `من: ${message.sender_name || 'الإدارة'}`,
+            description: `من: ${message.sender_id || 'الإدارة'}`,
           });
         }
       )

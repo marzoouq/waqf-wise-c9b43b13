@@ -73,7 +73,8 @@ export function useAdvancedSearch(searchType: string) {
     columns: string = '*',
     customFilters?: SearchFilters
   ): Promise<unknown[]> => {
-    let dbQuery = (supabase as any).from(tableName).select(columns);
+    // @ts-expect-error - Dynamic table name
+    let dbQuery = supabase.from(tableName).select(columns);
 
     const searchFilters = customFilters || filters;
 

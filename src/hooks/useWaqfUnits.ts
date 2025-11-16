@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useActivities } from "./useActivities";
 import { useAuth } from "./useAuth";
 import { useEffect } from "react";
+import type { Json } from '@/integrations/supabase/types';
 
 export interface WaqfUnit {
   id: string;
@@ -16,7 +17,7 @@ export interface WaqfUnit {
   acquisition_value?: number;
   current_value?: number;
   annual_return?: number;
-  documents?: any;
+  documents?: Json;
   is_active: boolean;
   notes?: string;
   created_at: string;
