@@ -7,6 +7,7 @@ import { PropertyDialog } from "@/components/properties/PropertyDialog";
 import { ContractDialog } from "@/components/properties/ContractDialog";
 import { RentalPaymentDialog } from "@/components/properties/RentalPaymentDialog";
 import { MaintenanceRequestDialog } from "@/components/properties/MaintenanceRequestDialog";
+import { PropertyUnitsManagement } from "@/components/properties/PropertyUnitsManagement";
 import { PropertiesTab } from "@/components/properties/tabs/PropertiesTab";
 import { ContractsTab } from "@/components/properties/tabs/ContractsTab";
 import { PaymentsTab } from "@/components/properties/tabs/PaymentsTab";
@@ -115,10 +116,14 @@ const Properties = () => {
         <Card className="shadow-soft">
           <CardContent className="pt-6">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-4 mb-6">
+              <TabsList className="grid w-full grid-cols-5 mb-6">
                 <TabsTrigger value="properties" className="gap-2">
                   <Building className="h-4 w-4" />
                   <span className="hidden md:inline">العقارات</span>
+                </TabsTrigger>
+                <TabsTrigger value="units" className="gap-2">
+                  <Building className="h-4 w-4" />
+                  <span className="hidden md:inline">الوحدات</span>
                 </TabsTrigger>
                 <TabsTrigger value="contracts" className="gap-2">
                   <FileText className="h-4 w-4" />
@@ -141,6 +146,10 @@ const Properties = () => {
                     setPropertyDialogOpen(true);
                   }}
                 />
+              </TabsContent>
+
+              <TabsContent value="units">
+                <PropertyUnitsManagement />
               </TabsContent>
 
               <TabsContent value="contracts">

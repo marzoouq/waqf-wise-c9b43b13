@@ -33,15 +33,30 @@ import { EnhancedEmptyState } from "@/components/shared/EnhancedEmptyState";
 import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
 
 interface PropertyUnitsManagementProps {
-  propertyId: string;
+  propertyId?: string;
 }
 
-export function PropertyUnitsManagement({ propertyId }: PropertyUnitsManagementProps) {
+export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManagementProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedUnit, setSelectedUnit] = useState<any | undefined>();
   
   const { units, isLoading } = usePropertyUnits(propertyId);
+
+  // Show message if no propertyId selected
+  if (!propertyId) {
+    return (
+      <Card>
+        <CardContent className="py-12">
+          <EnhancedEmptyState
+            icon={Building2}
+            title="إدارة الوحدات العقارية"
+            description="حدد عقاراً من تبويب العقارات لإدارة وحداته"
+          />
+        </CardContent>
+      </Card>
+    );
+  }
 
   const filteredUnits = (units as any[]).filter(unit =>
     unit.unit_number.toLowerCase().includes(searchQuery.toLowerCase()) ||

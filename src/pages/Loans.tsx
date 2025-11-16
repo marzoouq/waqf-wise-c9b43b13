@@ -25,6 +25,7 @@ import {
   XCircle,
   Calendar,
   Percent,
+  Calculator,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
