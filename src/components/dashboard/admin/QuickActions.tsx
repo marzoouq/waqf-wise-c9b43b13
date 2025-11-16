@@ -69,27 +69,26 @@ export const QuickActions = ({
 
   return (
     <Card className="shadow-soft">
-      <CardHeader>
-        <CardTitle>إجراءات سريعة</CardTitle>
+      <CardHeader className="pb-2 sm:pb-3 md:pb-4">
+        <CardTitle className="text-sm sm:text-base md:text-lg">إجراءات سريعة</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-2 sm:gap-3 md:gap-4">
           {actions.map((action, index) => {
             const Icon = action.icon;
             return (
               <Button
                 key={index}
                 variant="outline"
-                className="h-auto p-4 flex flex-col items-center gap-3 hover:scale-105 transition-transform animate-fade-in"
-                style={{ animationDelay: `${index * 50}ms` }}
+                className="h-auto p-2 sm:p-3 md:p-4 flex flex-col items-center gap-1.5 sm:gap-2 md:gap-3 hover:scale-105 transition-transform"
                 onClick={action.onClick}
               >
-                <div className={`p-3 rounded-lg ${action.bgColor}`}>
-                  <Icon className={`h-6 w-6 ${action.color}`} />
+                <div className={`p-1.5 sm:p-2 md:p-3 rounded-lg ${action.bgColor}`}>
+                  <Icon className={`h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 ${action.color}`} />
                 </div>
                 <div className="text-center">
-                  <div className="font-medium text-sm">{action.label}</div>
-                  <div className="text-xs text-muted-foreground mt-1">
+                  <div className="font-medium text-[10px] sm:text-xs md:text-sm line-clamp-1">{action.label}</div>
+                  <div className="text-[9px] sm:text-[10px] md:text-xs text-muted-foreground mt-0.5 sm:mt-1 line-clamp-1">
                     {action.description}
                   </div>
                 </div>
