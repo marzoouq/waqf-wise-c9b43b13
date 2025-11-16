@@ -25,19 +25,19 @@ export function useBankAccounts() {
     queryKey: ["bank_accounts"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("bank_accounts" as any)
+        .from("bank_accounts")
         .select("*")
         .order("bank_name", { ascending: true });
 
       if (error) throw error;
-      return (data || []) as any as BankAccount[];
+      return (data || []) as BankAccount[];
     },
   });
 
   const addBankAccount = useMutation({
     mutationFn: async (bankAccount: Omit<BankAccount, "id" | "created_at" | "updated_at">) => {
       const { data, error } = await supabase
-        .from("bank_accounts" as any)
+        .from("bank_accounts")
         .insert([bankAccount])
         .select()
         .single();
@@ -64,7 +64,7 @@ export function useBankAccounts() {
   const updateBankAccount = useMutation({
     mutationFn: async ({ id, ...updates }: Partial<BankAccount> & { id: string }) => {
       const { data, error } = await supabase
-        .from("bank_accounts" as any)
+        .from("bank_accounts")
         .update(updates)
         .eq("id", id)
         .select()

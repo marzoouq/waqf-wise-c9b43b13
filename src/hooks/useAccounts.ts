@@ -79,7 +79,7 @@ export function useAccounts() {
   const calculateBalance = async (accountId: string): Promise<number> => {
     try {
       const { data, error } = await supabase
-        .rpc("calculate_account_balance" as any, { account_uuid: accountId });
+        .rpc("calculate_account_balance" as never, { account_uuid: accountId } as never);
 
       if (error) throw error;
       return (data as number) || 0;
