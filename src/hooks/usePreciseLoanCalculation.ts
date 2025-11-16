@@ -18,7 +18,7 @@ export function usePreciseLoanCalculation() {
 
   const calculateSchedule = useMutation({
     mutationFn: async (params: LoanCalculationParams) => {
-      const { data, error } = await (supabase as any).rpc('calculate_precise_loan_schedule', {
+      const { data, error } = await supabase.rpc('calculate_precise_loan_schedule' as never, {
         p_loan_id: params.loanId,
         p_principal: params.principal,
         p_interest_rate: params.interestRate,

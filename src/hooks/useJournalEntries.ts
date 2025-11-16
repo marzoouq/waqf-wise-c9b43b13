@@ -183,7 +183,7 @@ export function useJournalEntries() {
     entryDate?: string
   ) => {
     try {
-      const { data, error } = await supabase.rpc("create_auto_journal_entry" as any, {
+      const { data, error } = await supabase.rpc("create_auto_journal_entry" as never, {
         p_trigger_event: triggerEvent,
         p_reference_id: referenceId,
         p_amount: amount,

@@ -117,7 +117,7 @@ export function useLoans(beneficiaryId?: string) {
       ];
 
       const { error: approvalsError } = await supabase
-        .from('loan_approvals' as any)
+        .from('loan_approvals')
         .insert(
           approvals.map(approval => ({
             loan_id: loanData.id,

@@ -40,7 +40,7 @@ export function useBankReconciliation() {
     queryFn: async () => {
       try {
         const { data, error } = await supabase
-          .from("bank_statements" as any)
+          .from("bank_statements")
           .select(`
             *,
             bank_accounts!inner (
@@ -52,7 +52,7 @@ export function useBankReconciliation() {
           .order("statement_date", { ascending: false });
 
         if (error) throw error;
-        return data as any[];
+        return data as BankStatementRow[];
       } catch (error) {
         logger.error(error, { context: 'fetch_bank_statements', severity: 'low' });
         return [];
@@ -65,12 +65,12 @@ export function useBankReconciliation() {
     queryFn: async () => {
       try {
         const { data, error } = await supabase
-          .from("bank_transactions" as any)
+          .from("bank_transactions")
           .select("*")
           .order("transaction_date", { ascending: false });
 
         if (error) throw error;
-        return data as any[];
+        return data as BankTransactionRow[];
       } catch (error) {
         logger.error(error, { context: 'fetch_bank_transactions', severity: 'low' });
         return [];
@@ -81,7 +81,7 @@ export function useBankReconciliation() {
   const createStatement = useMutation({
     mutationFn: async (statement: any) => {
       const { data, error } = await supabase
-        .from("bank_statements" as any)
+        .from("bank_statements")
         .insert([statement])
         .select()
         .single();
@@ -108,7 +108,7 @@ export function useBankReconciliation() {
   const addTransaction = useMutation({
     mutationFn: async (transaction: any) => {
       const { data, error } = await supabase
-        .from("bank_transactions" as any)
+        .from("bank_transactions")
         .insert([transaction])
         .select()
         .single();
@@ -141,7 +141,7 @@ export function useBankReconciliation() {
       journalEntryId: string;
     }) => {
       const { data, error } = await supabase
-        .from("bank_transactions" as any)
+        .from("bank_transactions")
         .update({
           is_matched: true,
           matched_journal_entry_id: journalEntryId,
@@ -172,7 +172,7 @@ export function useBankReconciliation() {
   const reconcileStatement = useMutation({
     mutationFn: async (statementId: string) => {
       const { data, error } = await supabase
-        .from("bank_statements" as any)
+        .from("bank_statements")
         .update({
           status: 'reconciled',
           reconciled_at: new Date().toISOString(),

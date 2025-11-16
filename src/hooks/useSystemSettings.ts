@@ -21,7 +21,7 @@ export function useSystemSettings() {
     queryKey: ["system_settings"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("system_settings" as any)
+        .from("system_settings")
         .select("*")
         .order("setting_key");
 
@@ -33,7 +33,7 @@ export function useSystemSettings() {
   const updateSetting = useMutation({
     mutationFn: async ({ key, value }: { key: string; value: string }) => {
       const { error } = await supabase
-        .from("system_settings" as any)
+        .from("system_settings")
         .update({ setting_value: value, updated_at: new Date().toISOString() })
         .eq("setting_key", key);
 

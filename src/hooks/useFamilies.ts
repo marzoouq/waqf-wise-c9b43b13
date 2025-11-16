@@ -17,7 +17,7 @@ export const useFamilies = () => {
     queryKey: ['families'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('families' as any)
+        .from('families')
         .select(`
           *,
           head_of_family:beneficiaries!families_head_of_family_id_fkey(
@@ -37,8 +37,8 @@ export const useFamilies = () => {
   const addFamily = useMutation({
     mutationFn: async (newFamily: Omit<Family, 'id' | 'created_at' | 'updated_at' | 'total_members'>) => {
       const { data, error } = await supabase
-        .from('families' as any)
-        .insert(newFamily as any)
+        .from('families')
+        .insert(newFamily)
         .select()
         .single();
 
@@ -136,7 +136,7 @@ export const useFamilyMembers = (familyId?: string) => {
       if (!familyId) return [];
 
       const { data, error } = await supabase
-        .from('family_members' as any)
+        .from('family_members')
         .select(`
           *,
           beneficiary:beneficiaries(
@@ -161,8 +161,8 @@ export const useFamilyMembers = (familyId?: string) => {
   const addMember = useMutation({
     mutationFn: async (newMember: Omit<FamilyMember, 'id' | 'created_at' | 'updated_at'>) => {
       const { data, error } = await supabase
-        .from('family_members' as any)
-        .insert(newMember as any)
+        .from('family_members')
+        .insert(newMember)
         .select()
         .single();
 
@@ -190,8 +190,8 @@ export const useFamilyMembers = (familyId?: string) => {
   const updateMember = useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<FamilyMember> }) => {
       const { data, error } = await supabase
-        .from('family_members' as any)
-        .update(updates as any)
+        .from('family_members')
+        .update(updates)
         .eq('id', id)
         .select()
         .single();
@@ -219,7 +219,7 @@ export const useFamilyMembers = (familyId?: string) => {
   const removeMember = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
-        .from('family_members' as any)
+        .from('family_members')
         .delete()
         .eq('id', id);
 
