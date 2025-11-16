@@ -3,22 +3,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Bot, Send, Loader2, Trash2, Sparkles } from "lucide-react";
+import { Bot, Send, Loader2, Sparkles } from "lucide-react";
 import { useChatbot } from "@/hooks/useChatbot";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
 import { cn } from "@/lib/utils";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { MessageBubble } from "./MessageBubble";
+import { ChatbotActions } from "./ChatbotActions";
+import { WelcomeMessage } from "./WelcomeMessage";
 
 export function ChatbotInterface() {
   const { conversations, quickReplies, isLoading, isTyping, sendMessage, clearConversations, hasConversations } = useChatbot();
@@ -54,13 +44,6 @@ export function ChatbotInterface() {
     }
   };
 
-  const handleClearHistory = async () => {
-    try {
-      await clearConversations();
-    } catch (error) {
-      console.error('Error clearing history:', error);
-    }
-  };
 
   return (
     <Card className="w-full h-[calc(100vh-12rem)] flex flex-col shadow-xl border-border/50 bg-card">
@@ -81,33 +64,11 @@ export function ChatbotInterface() {
             </div>
           </CardTitle>
           
-          {hasConversations && (
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  className="text-primary-foreground hover:bg-primary-foreground/10"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>مسح سجل المحادثات</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    هل أنت متأكد من رغبتك في حذف جميع المحادثات؟ لا يمكن التراجع عن هذا الإجراء.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>إلغاء</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleClearHistory}>
-                    مسح
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          )}
+          <ChatbotActions
+            conversations={conversations}
+            onClearHistory={clearConversations}
+            hasConversations={hasConversations}
+          />
         </div>
       </CardHeader>
 
@@ -116,68 +77,16 @@ export function ChatbotInterface() {
         <ScrollArea ref={scrollRef} className="flex-1 p-4">
           <div className="space-y-4 pb-4">
             {/* رسالة ترحيبية */}
-            {conversations.length === 0 && !isLoading && (
-              <div className="flex justify-center items-center h-full">
-                <div className="text-center max-w-md space-y-4">
-                  <div className="p-4 bg-primary/10 rounded-full w-20 h-20 mx-auto flex items-center justify-center">
-                    <Bot className="h-10 w-10 text-primary" />
-                  </div>
-                  <div className="space-y-2">
-                    <h3 className="text-xl font-semibold text-foreground">
-                      مرحباً بك! 👋
-                    </h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      أنا مساعدك الذكي لإدارة الوقف. يمكنني مساعدتك في تحليل البيانات المالية،
-                      متابعة المستفيدين، إدارة العقارات، والإجابة على استفساراتك.
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      اختر أحد الأزرار أدناه أو اكتب سؤالك مباشرة
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
+            {conversations.length === 0 && !isLoading && <WelcomeMessage />}
 
             {/* الرسائل */}
             {conversations.map((msg) => (
-              <div
+              <MessageBubble
                 key={msg.id}
-                className={cn(
-                  "flex gap-2 items-start",
-                  msg.message_type === "user" ? "justify-end" : "justify-start"
-                )}
-              >
-                {msg.message_type === "bot" && (
-                  <div className="p-2 bg-primary/10 rounded-full mt-1 flex-shrink-0">
-                    <Bot className="h-4 w-4 text-primary" />
-                  </div>
-                )}
-                
-                <div
-                  className={cn(
-                    "rounded-2xl p-4 max-w-[85%] break-words shadow-sm",
-                    msg.message_type === "user"
-                      ? "bg-primary text-primary-foreground rounded-br-sm"
-                      : "bg-card border border-border rounded-bl-sm"
-                  )}
-                >
-                  <p className="text-sm whitespace-pre-wrap leading-relaxed">{msg.message}</p>
-                  <span className={cn(
-                    "text-xs mt-2 block",
-                    msg.message_type === "user" 
-                      ? "text-primary-foreground/70" 
-                      : "text-muted-foreground"
-                  )}>
-                    {format(new Date(msg.created_at), "HH:mm", { locale: ar })}
-                  </span>
-                </div>
-
-                {msg.message_type === "user" && (
-                  <div className="p-2 bg-primary/10 rounded-full mt-1 flex-shrink-0">
-                    <div className="h-4 w-4 rounded-full bg-primary" />
-                  </div>
-                )}
-              </div>
+                message={msg.message}
+                messageType={msg.message_type}
+                createdAt={msg.created_at}
+              />
             ))}
 
             {/* مؤشر "الروبوت يكتب..." */}

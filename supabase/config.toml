@@ -29,3 +29,6 @@ verify_jwt = true
 
 [functions.check-leaked-password]
 verify_jwt = true
+
+[functions.chatbot]
+verify_jwt = true
