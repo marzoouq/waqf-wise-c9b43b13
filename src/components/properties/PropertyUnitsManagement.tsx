@@ -175,27 +175,27 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>رقم الوحدة</TableHead>
-                    <TableHead>الاسم</TableHead>
-                    <TableHead>النوع</TableHead>
-                    <TableHead>الطابق</TableHead>
-                    <TableHead>المساحة</TableHead>
-                    <TableHead>الغرف</TableHead>
-                    <TableHead>الإيجار</TableHead>
-                    <TableHead>الحالة</TableHead>
-                    <TableHead className="text-center">الإجراءات</TableHead>
+                    <TableHead className="text-xs sm:text-sm">رقم الوحدة</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden lg:table-cell">الاسم</TableHead>
+                    <TableHead className="text-xs sm:text-sm">النوع</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden md:table-cell">الطابق</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden lg:table-cell">المساحة</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden lg:table-cell">الغرف</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden md:table-cell">الإيجار</TableHead>
+                    <TableHead className="text-xs sm:text-sm">الحالة</TableHead>
+                    <TableHead className="text-center text-xs sm:text-sm">الإجراءات</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredUnits.map((unit) => (
                     <TableRow key={unit.id}>
-                      <TableCell className="font-medium">{unit.unit_number}</TableCell>
-                      <TableCell>{unit.unit_name || '-'}</TableCell>
-                      <TableCell>
+                      <TableCell className="font-medium text-xs sm:text-sm">{unit.unit_number}</TableCell>
+                      <TableCell className="text-xs sm:text-sm hidden lg:table-cell">{unit.unit_name || '-'}</TableCell>
+                      <TableCell className="text-xs sm:text-sm">
                         <Badge variant="outline">{unit.unit_type}</Badge>
                       </TableCell>
-                      <TableCell>{unit.floor_number || '-'}</TableCell>
-                      <TableCell>
+                      <TableCell className="text-xs sm:text-sm hidden md:table-cell">{unit.floor_number || '-'}</TableCell>
+                      <TableCell className="text-xs sm:text-sm hidden lg:table-cell">
                         {unit.area ? (
                           <span className="flex items-center gap-1">
                             <Maximize2 className="h-3 w-3" />
@@ -203,8 +203,8 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
                           </span>
                         ) : '-'}
                       </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2 text-xs">
+                      <TableCell className="text-xs sm:text-sm hidden lg:table-cell">
+                        <div className="flex items-center gap-2">
                           <span className="flex items-center gap-1">
                             <BedDouble className="h-3 w-3" />
                             {unit.rooms}
@@ -221,14 +221,14 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
                           )}
                         </div>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-xs sm:text-sm hidden md:table-cell whitespace-nowrap">
                         {unit.monthly_rent ? (
                           <span className="font-medium">
                             {unit.monthly_rent.toLocaleString()} ر.س
                           </span>
                         ) : '-'}
                       </TableCell>
-                      <TableCell>{getStatusBadge(unit.status)}</TableCell>
+                      <TableCell className="text-xs sm:text-sm">{getStatusBadge(unit.status)}</TableCell>
                       <TableCell>
                         <div className="flex items-center justify-center gap-2">
                           <Button 
@@ -236,7 +236,7 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
                             size="sm"
                             onClick={() => handleEdit(unit)}
                           >
-                            <Edit className="h-4 w-4" />
+                            <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
                           </Button>
                         </div>
                       </TableCell>

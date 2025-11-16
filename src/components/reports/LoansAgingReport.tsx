@@ -201,31 +201,31 @@ export function LoansAgingReport() {
           <CardTitle>تفاصيل القروض حسب أيام التأخير</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="rounded-lg border">
+          <div className="rounded-lg border overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>رقم القرض</TableHead>
-                  <TableHead>المستفيد</TableHead>
-                  <TableHead>المبلغ الأصلي</TableHead>
-                  <TableHead>المتبقي</TableHead>
-                  <TableHead>أيام التأخير</TableHead>
-                  <TableHead>الفئة</TableHead>
+                  <TableHead className="text-xs sm:text-sm whitespace-nowrap">رقم القرض</TableHead>
+                  <TableHead className="text-xs sm:text-sm">المستفيد</TableHead>
+                  <TableHead className="text-xs sm:text-sm whitespace-nowrap hidden md:table-cell">المبلغ الأصلي</TableHead>
+                  <TableHead className="text-xs sm:text-sm whitespace-nowrap">المتبقي</TableHead>
+                  <TableHead className="text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">أيام التأخير</TableHead>
+                  <TableHead className="text-xs sm:text-sm">الفئة</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {agingData?.map((loan) => (
                   <TableRow key={loan.loan_id}>
-                    <TableCell className="font-medium">{loan.loan_number}</TableCell>
-                    <TableCell>{loan.beneficiary_name}</TableCell>
-                    <TableCell>{loan.principal_amount.toLocaleString('ar-SA')} ريال</TableCell>
-                    <TableCell className="font-bold">{loan.remaining_balance.toLocaleString('ar-SA')} ريال</TableCell>
-                    <TableCell>
+                    <TableCell className="font-medium text-xs sm:text-sm whitespace-nowrap">{loan.loan_number}</TableCell>
+                    <TableCell className="text-xs sm:text-sm">{loan.beneficiary_name}</TableCell>
+                    <TableCell className="text-xs sm:text-sm whitespace-nowrap hidden md:table-cell">{loan.principal_amount.toLocaleString('ar-SA')} ريال</TableCell>
+                    <TableCell className="font-bold text-xs sm:text-sm whitespace-nowrap">{loan.remaining_balance.toLocaleString('ar-SA')} ريال</TableCell>
+                    <TableCell className="text-xs sm:text-sm hidden lg:table-cell">
                       <Badge variant={loan.days_overdue > 60 ? 'destructive' : loan.days_overdue > 30 ? 'default' : 'secondary'}>
                         {loan.days_overdue} يوم
                       </Badge>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-xs sm:text-sm">
                       <Badge variant={
                         loan.aging_category.includes('خطير') ? 'destructive' :
                         loan.aging_category.includes('متأخر جداً') ? 'destructive' :

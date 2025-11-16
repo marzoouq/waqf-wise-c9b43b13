@@ -272,77 +272,81 @@ export function AccountingLinkReport() {
             </TabsList>
 
             <TabsContent value="linked" className="space-y-4">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>النوع</TableHead>
-                    <TableHead>الرقم</TableHead>
-                    <TableHead>الوصف</TableHead>
-                    <TableHead>المبلغ</TableHead>
-                    <TableHead>التاريخ</TableHead>
-                    <TableHead>رقم القيد</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {linkedOperations.map((op) => (
-                    <TableRow key={`${op.type}-${op.id}`}>
-                      <TableCell>
-                        <Badge variant="outline">{op.type}</Badge>
-                      </TableCell>
-                      <TableCell className="font-mono">{op.number}</TableCell>
-                      <TableCell>{op.description}</TableCell>
-                      <TableCell className="font-semibold">
-                        {op.amount.toLocaleString()} ر.س
-                      </TableCell>
-                      <TableCell>
-                        {format(new Date(op.date), "dd MMM yyyy", { locale: ar })}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <FileText className="h-4 w-4 text-muted-foreground" />
-                          <span className="font-mono text-sm">{op.journalEntry}</span>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TabsContent>
-
-            <TabsContent value="unlinked" className="space-y-4">
-              {unlinkedOperations.length > 0 ? (
+              <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>النوع</TableHead>
-                      <TableHead>الرقم</TableHead>
-                      <TableHead>الوصف</TableHead>
-                      <TableHead>المبلغ</TableHead>
-                      <TableHead>التاريخ</TableHead>
-                      <TableHead>السبب</TableHead>
+                      <TableHead className="text-xs sm:text-sm">النوع</TableHead>
+                      <TableHead className="text-xs sm:text-sm whitespace-nowrap">الرقم</TableHead>
+                      <TableHead className="text-xs sm:text-sm hidden md:table-cell">الوصف</TableHead>
+                      <TableHead className="text-xs sm:text-sm whitespace-nowrap">المبلغ</TableHead>
+                      <TableHead className="text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">التاريخ</TableHead>
+                      <TableHead className="text-xs sm:text-sm whitespace-nowrap">رقم القيد</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {unlinkedOperations.map((op) => (
+                    {linkedOperations.map((op) => (
                       <TableRow key={`${op.type}-${op.id}`}>
-                        <TableCell>
+                        <TableCell className="text-xs sm:text-sm">
                           <Badge variant="outline">{op.type}</Badge>
                         </TableCell>
-                        <TableCell className="font-mono">{op.number}</TableCell>
-                        <TableCell>{op.description}</TableCell>
-                        <TableCell className="font-semibold">
+                        <TableCell className="font-mono text-xs sm:text-sm whitespace-nowrap">{op.number}</TableCell>
+                        <TableCell className="text-xs sm:text-sm hidden md:table-cell">{op.description}</TableCell>
+                        <TableCell className="font-semibold text-xs sm:text-sm whitespace-nowrap">
                           {op.amount.toLocaleString()} ر.س
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">
                           {format(new Date(op.date), "dd MMM yyyy", { locale: ar })}
                         </TableCell>
-                        <TableCell className="text-muted-foreground text-sm">
-                          {op.reason}
+                        <TableCell className="text-xs sm:text-sm">
+                          <div className="flex items-center gap-2">
+                            <FileText className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
+                            <span className="font-mono text-xs sm:text-sm">{op.journalEntry}</span>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="unlinked" className="space-y-4">
+              {unlinkedOperations.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-xs sm:text-sm">النوع</TableHead>
+                        <TableHead className="text-xs sm:text-sm whitespace-nowrap">الرقم</TableHead>
+                        <TableHead className="text-xs sm:text-sm hidden md:table-cell">الوصف</TableHead>
+                        <TableHead className="text-xs sm:text-sm whitespace-nowrap">المبلغ</TableHead>
+                        <TableHead className="text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">التاريخ</TableHead>
+                        <TableHead className="text-xs sm:text-sm">السبب</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {unlinkedOperations.map((op) => (
+                        <TableRow key={`${op.type}-${op.id}`}>
+                          <TableCell className="text-xs sm:text-sm">
+                            <Badge variant="outline">{op.type}</Badge>
+                          </TableCell>
+                          <TableCell className="font-mono text-xs sm:text-sm whitespace-nowrap">{op.number}</TableCell>
+                          <TableCell className="text-xs sm:text-sm hidden md:table-cell">{op.description}</TableCell>
+                          <TableCell className="font-semibold text-xs sm:text-sm whitespace-nowrap">
+                            {op.amount.toLocaleString()} ر.س
+                          </TableCell>
+                          <TableCell className="text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">
+                            {format(new Date(op.date), "dd MMM yyyy", { locale: ar })}
+                          </TableCell>
+                          <TableCell className="text-muted-foreground text-xs sm:text-sm">
+                            {op.reason}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               ) : (
                 <Card className="bg-green-50 dark:bg-green-900/10 border-green-200">
                   <CardContent className="p-6 text-center">
