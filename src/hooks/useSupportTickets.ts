@@ -72,19 +72,15 @@ export function useSupportTickets(filters?: SupportFilters) {
         description: input.description,
         category: input.category,
         priority: input.priority,
-        source: 'portal',
+        source: 'portal' as const,
+        ...(input.beneficiary_id && { beneficiary_id: input.beneficiary_id }),
+        ...(input.tags && { tags: input.tags }),
       };
-
-      if (input.beneficiary_id) {
-        insertData.beneficiary_id = input.beneficiary_id;
-      }
-      if (input.tags) {
-        insertData.tags = input.tags;
-      }
 
       const { data, error } = await supabase
         .from('support_tickets')
-        .insert(insertData)
+        // @ts-expect-error - Spread object to array insert
+        .insert([insertData])
         .select()
         .single();
 

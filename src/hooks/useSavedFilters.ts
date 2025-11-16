@@ -18,7 +18,6 @@ interface SavedFilter {
  * Hook لإدارة الفلاتر المحفوظة
  */
 export function useSavedFilters(filterType: string) {
-  const { toast } = useToast();
   const queryClient = useQueryClient();
 
   // جلب الفلاتر المحفوظة

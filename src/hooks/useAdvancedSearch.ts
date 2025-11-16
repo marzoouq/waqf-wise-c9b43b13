@@ -90,11 +90,12 @@ export function useAdvancedSearch(searchType: string) {
     Object.entries(searchFilters).forEach(([key, value]) => {
       if (value !== null && value !== undefined && value !== '') {
         if (Array.isArray(value)) {
+          // @ts-expect-error - Dynamic column filtering
           dbQuery = dbQuery.in(key, value);
-        } else if (typeof value === 'object' && 'gte' in value && 'lte' in value) {
-          dbQuery = dbQuery.gte(key, value.gte).lte(key, value.lte);
+        } else if (typeof value === 'object' && value && 'gte' in value && 'lte' in value) {
+          dbQuery = dbQuery.gte(key, value.gte as string).lte(key, value.lte as string);
         } else {
-          dbQuery = dbQuery.eq(key, value);
+          dbQuery = dbQuery.eq(key, value as string);
         }
       }
     });
