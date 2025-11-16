@@ -16,6 +16,18 @@ export default {
       fontFamily: {
         sans: ['Cairo', 'system-ui', 'sans-serif'],
       },
+      fontSize: {
+        'xs': ['0.75rem', { lineHeight: '1.5' }],      // 12px - للنصوص الصغيرة جداً
+        'sm': ['0.875rem', { lineHeight: '1.5' }],     // 14px - للنصوص الصغيرة
+        'base': ['1rem', { lineHeight: '1.6' }],       // 16px - النص الأساسي
+        'lg': ['1.125rem', { lineHeight: '1.6' }],     // 18px - نصوص أكبر قليلاً
+        'xl': ['1.25rem', { lineHeight: '1.5' }],      // 20px - عناوين صغيرة
+        '2xl': ['1.5rem', { lineHeight: '1.4' }],      // 24px - عناوين متوسطة
+        '3xl': ['1.875rem', { lineHeight: '1.3' }],    // 30px - عناوين كبيرة
+        '4xl': ['2.25rem', { lineHeight: '1.2' }],     // 36px - عناوين رئيسية
+        '5xl': ['3rem', { lineHeight: '1.1' }],        // 48px - عناوين كبيرة جداً
+        '6xl': ['3.75rem', { lineHeight: '1' }],       // 60px - عناوين ضخمة
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

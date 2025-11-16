@@ -33,7 +33,7 @@ export default function InvoiceStatusBadge({ status }: InvoiceStatusBadgeProps) 
   const config = getStatusConfig(status);
 
   return (
-    <Badge variant={config.variant} className={`font-arabic ${config.className || ""}`}>
+    <Badge variant={config.variant} className={`font-arabic text-sm sm:text-base ${config.className || ""}`}>
       {config.label}
     </Badge>
   );

@@ -14,14 +14,14 @@ export const StatCard = memo(({ label, value, icon: Icon, color }: StatCardProps
     <Card className="shadow-soft">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-sm font-medium text-muted-foreground">
+          <CardTitle className="text-sm sm:text-base font-medium text-muted-foreground">
             {label}
           </CardTitle>
-          <Icon className={`h-5 w-5 ${color}`} />
+          <Icon className={`h-5 w-5 sm:h-6 sm:w-6 ${color}`} />
         </div>
       </CardHeader>
       <CardContent>
-        <div className={`text-3xl font-bold ${color}`}>
+        <div className={`text-2xl sm:text-3xl md:text-4xl font-bold ${color}`}>
           {value}
         </div>
       </CardContent>
