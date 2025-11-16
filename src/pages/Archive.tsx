@@ -28,7 +28,7 @@ const Archive = () => {
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [folderDialogOpen, setFolderDialogOpen] = useState(false);
   const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
-  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
+  const [selectedDocument, setSelectedDocument] = useState<(Document & { file_path: string }) | null>(null);
 
   const { documents, isLoading: documentsLoading, addDocument } = useDocuments();
   const { folders, isLoading: foldersLoading, addFolder } = useFolders();
@@ -58,8 +58,13 @@ const Archive = () => {
     setFolderDialogOpen(false);
   };
 
-  const handlePreviewDocument = (document: Database['public']['Tables']['documents']['Row']) => {
-    setSelectedDocument(document);
+  const handlePreviewDocument = (doc: Database['public']['Tables']['documents']['Row']) => {
+    // إنشاء file_path من البيانات المتاحة (استخدام id كـ placeholder)
+    const documentForPreview = {
+      ...doc,
+      file_path: `/documents/${doc.id}`, // placeholder path
+    };
+    setSelectedDocument(documentForPreview);
     setPreviewDialogOpen(true);
   };
 
@@ -243,11 +248,11 @@ const Archive = () => {
           onCreate={handleCreateFolder}
         />
 
-        <DocumentPreviewDialog
-          open={previewDialogOpen}
-          onOpenChange={setPreviewDialogOpen}
-          document={selectedDocument as any}
-        />
+      <DocumentPreviewDialog
+        open={previewDialogOpen}
+        onOpenChange={setPreviewDialogOpen}
+        document={selectedDocument}
+      />
       </div>
     </MobileOptimizedLayout>
   );

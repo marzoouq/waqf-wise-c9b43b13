@@ -37,8 +37,8 @@ import { Database } from '@/integrations/supabase/types';
 type SupportTicket = Database['public']['Tables']['support_tickets']['Row'];
 
 type TicketWithRelations = SupportTicket & {
-  beneficiary?: unknown;
-  user?: unknown;
+  beneficiary?: { full_name?: string };
+  user?: { email?: string };
 };
 
 const statusLabels = {

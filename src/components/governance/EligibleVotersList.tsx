@@ -16,7 +16,12 @@ interface EligibleVoter {
 }
 
 interface EligibleVotersListProps {
-  decision: GovernanceDecision;
+  decision: { 
+    id: string; 
+    voting_participants_type: string; 
+    custom_voters?: EligibleVoter[];
+    [key: string]: unknown;
+  };
 }
 
 export function EligibleVotersList({ decision }: EligibleVotersListProps) {

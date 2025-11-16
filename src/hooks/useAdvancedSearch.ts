@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 interface SearchFilters {
-  [key: string]: any;
+  [key: string]: string | number | boolean | null | undefined | { gte: string; lte: string } | string[];
 }
 
 interface SearchHistoryItem {

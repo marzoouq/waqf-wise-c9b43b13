@@ -27,11 +27,7 @@ import {
 import { ScrollableTableWrapper } from '@/components/shared/ScrollableTableWrapper';
 import { MobileScrollHint } from '@/components/shared/MobileScrollHint';
 import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
-import { Database } from '@/integrations/supabase/types';
-
-type BeneficiaryRequest = Database['public']['Tables']['beneficiary_requests']['Row'] & {
-  beneficiary?: { full_name: string };
-};
+import type { BeneficiaryRequest } from '@/types/index';
 
 const Requests = () => {
   const { requests, isLoading } = useRequests();
