@@ -1,6 +1,8 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useGovernanceDecisions } from "@/hooks/useGovernanceDecisions";
+import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
   DialogContent,
@@ -28,7 +30,6 @@ import {
   UserCog,
   User
 } from "lucide-react";
-import { useGovernanceDecisions } from "@/hooks/useGovernanceDecisions";
 
 const decisionSchema = z.object({
   decision_title: z.string().min(5, "العنوان قصير جداً"),
@@ -60,6 +61,7 @@ export function CreateDecisionDialog({
   meetingId 
 }: CreateDecisionDialogProps) {
   const { createDecision } = useGovernanceDecisions();
+  const { toast } = useToast();
 
   const form = useForm<DecisionFormData>({
     resolver: zodResolver(decisionSchema),
@@ -71,24 +73,32 @@ export function CreateDecisionDialog({
   });
 
   const onSubmit = async (data: DecisionFormData) => {
-    const decisionNumber = `D-${Date.now()}`;
-    const decisionDate = new Date().toISOString().split('T')[0];
-    
-    await createDecision({
-      decision_number: decisionNumber,
-      decision_date: decisionDate,
-      decision_title: data.decision_title,
-      decision_text: data.decision_text,
-      decision_type: data.decision_type,
-      voting_participants_type: data.voting_participants_type,
-      pass_threshold: data.pass_threshold,
-      board_id: boardId || null,
-      meeting_id: meetingId || null,
-      requires_voting: data.voting_participants_type !== 'nazer_only',
-    });
-    
-    onOpenChange(false);
-    form.reset();
+    try {
+      const decisionNumber = `D-${Date.now().toString().slice(-6)}`;
+      const decisionDate = new Date().toISOString().split('T')[0];
+      
+      await createDecision({
+        decision_number: decisionNumber,
+        decision_date: decisionDate,
+        decision_title: data.decision_title,
+        decision_text: data.decision_text,
+        decision_type: data.decision_type,
+        voting_participants_type: data.voting_participants_type,
+        pass_threshold: data.pass_threshold,
+        board_id: boardId || null,
+        meeting_id: meetingId || null,
+        requires_voting: data.voting_participants_type !== 'nazer_only',
+      });
+      
+      onOpenChange(false);
+      form.reset();
+    } catch (error) {
+      toast({
+        title: "خطأ",
+        description: "حدث خطأ أثناء إنشاء القرار",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
