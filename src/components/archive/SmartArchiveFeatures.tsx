@@ -49,11 +49,12 @@ export function SmartArchiveFeatures() {
         title: "اكتمل المسح الضوئي",
         description: "تم استخراج النص من جميع المستندات",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'فشل معالجة المستند';
       toast({
         variant: "destructive",
         title: "حدث خطأ",
-        description: error.message,
+        description: errorMessage,
       });
     } finally {
       setIsProcessing(false);
@@ -83,11 +84,12 @@ export function SmartArchiveFeatures() {
         title: "نتائج البحث",
         description: `تم العثور على ${data.length} مستند`,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'فشل البحث الذكي';
       toast({
         variant: "destructive",
         title: "حدث خطأ",
-        description: error.message,
+        description: errorMessage,
       });
     }
   };

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Database } from "@/integrations/supabase/types";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -65,7 +66,7 @@ export const TribeManagementDialog = ({
     setSelectedTribeId(null);
   };
 
-  const handleEdit = (tribe: any) => {
+  const handleEdit = (tribe: Database['public']['Tables']['tribes']['Row']) => {
     setEditMode("edit");
     setSelectedTribeId(tribe.id);
     setFormData({

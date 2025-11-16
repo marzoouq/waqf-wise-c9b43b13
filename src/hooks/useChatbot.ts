@@ -18,6 +18,8 @@ export interface QuickReply {
   prompt: string;
   category: string;
   order_index: number;
+  created_at: string;
+  is_active: boolean;
 }
 
 export interface QuickAction {

@@ -60,7 +60,7 @@ export function getErrorMessage(error: unknown): string {
   }
 
   if (typeof error === 'object' && error !== null) {
-    const err = error as any;
+    const err = error as { code?: string; message?: string; details?: string };
     
     // Supabase errors
     if ('code' in err && err.code) {
@@ -95,7 +95,7 @@ export function getErrorTitle(error: unknown, context?: ErrorContext): string {
     return 'خطأ في النظام';
   }
 
-  const err = error as any;
+  const err = error as { code?: string; message?: string };
   if (err?.code === '42501') {
     return 'خطأ في الصلاحيات';
   }
@@ -109,7 +109,7 @@ export function getErrorTitle(error: unknown, context?: ErrorContext): string {
 export function getErrorType(error: unknown): 'network' | 'auth' | 'database' | 'validation' | 'unknown' {
   if (!error) return 'unknown';
 
-  const err = error as any;
+  const err = error as { code?: string; message?: string };
   
   // Network errors
   if (err?.message?.includes('network') || err?.message?.includes('fetch')) {

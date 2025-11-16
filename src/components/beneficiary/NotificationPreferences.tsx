@@ -40,10 +40,11 @@ export function NotificationPreferences({
         title: "تم الحفظ",
         description: "تم حفظ إعدادات الإشعارات بنجاح",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'فشل حفظ التفضيلات';
       toast({
         title: "خطأ",
-        description: error.message || "حدث خطأ أثناء الحفظ",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

@@ -123,11 +123,12 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
 
       onSuccess?.();
       onOpenChange(false);
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error(error, { context: 'enable_beneficiary_login', severity: 'high' });
+      const errorMessage = error instanceof Error ? error.message : 'حدث خطأ أثناء تفعيل الحساب';
       toast({
         title: "خطأ في التفعيل",
-        description: error.message || "حدث خطأ أثناء تفعيل الحساب",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -155,10 +156,11 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
 
       onSuccess?.();
       onOpenChange(false);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'فشل تفعيل تسجيل الدخول';
       toast({
         title: "خطأ",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

@@ -108,11 +108,12 @@ export function ContractRenewalDialog({
       queryClient.invalidateQueries({ queryKey: ["contract-renewals"] });
       onOpenChange(false);
       form.reset();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'فشل تجديد العقد';
       toast({
         variant: "destructive",
         title: "حدث خطأ",
-        description: error.message,
+        description: errorMessage,
       });
     } finally {
       setIsSubmitting(false);

@@ -1,10 +1,11 @@
 export interface Tribe {
   id: string;
   name: string;
-  description?: string;
+  description: string;
   total_families: number;
   total_beneficiaries: number;
   created_at: string;
+  updated_at: string;
 }
 
 export interface TribeInsert {

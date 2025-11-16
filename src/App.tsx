@@ -72,11 +72,12 @@ const queryClient = new QueryClient({
       refetchOnMount: false, // Prevent unnecessary refetches on mount
       structuralSharing: true, // Optimize performance
       networkMode: 'online', // Handle connection state
-      retry: (failureCount, error: any) => {
+      retry: (failureCount, error: unknown) => {
+        const errorObj = error && typeof error === 'object' ? error as { status?: number; message?: string } : {};
         // لا تعيد المحاولة على أخطاء 404 أو 403
-        if (error?.status === 404 || error?.status === 403) return false;
+        if (errorObj.status === 404 || errorObj.status === 403) return false;
         // لا تعيد المحاولة على أخطاء المصادقة
-        if (error?.message?.includes('auth') || error?.message?.includes('credentials')) return false;
+        if (errorObj.message?.includes('auth') || errorObj.message?.includes('credentials')) return false;
         // أعد المحاولة 3 مرات للأخطاء الأخرى
         return failureCount < 3;
       },

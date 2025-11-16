@@ -70,7 +70,7 @@ export function CustomReportBuilder() {
     setFilters(filters.filter((_, i) => i !== index));
   };
 
-  const updateFilter = (index: number, key: string, value: any) => {
+  const updateFilter = (index: number, key: string, value: string | number | boolean) => {
     const newFilters = [...filters];
     newFilters[index] = { ...newFilters[index], [key]: value };
     setFilters(newFilters);
@@ -120,11 +120,12 @@ export function CustomReportBuilder() {
       setFilters([]);
       setGroupBy("");
       setSortBy("");
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'حدث خطأ أثناء الحفظ';
       toast({
         variant: "destructive",
         title: "حدث خطأ",
-        description: error.message,
+        description: errorMessage,
       });
     }
   };

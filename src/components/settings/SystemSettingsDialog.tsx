@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Database } from "@/integrations/supabase/types";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -80,10 +81,11 @@ export function SystemSettingsDialog({ open, onOpenChange }: SystemSettingsDialo
         title: "تم الحفظ",
         description: "تم حفظ الإعدادات بنجاح",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'حدث خطأ أثناء حفظ الإعدادات';
       toast({
         title: "خطأ",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -111,7 +113,7 @@ export function SystemSettingsDialog({ open, onOpenChange }: SystemSettingsDialo
     return settings.filter(s => s.category === category);
   };
 
-  const renderSetting = (setting: any) => {
+  const renderSetting = (setting: Database['public']['Tables']['system_settings']['Row']) => {
     const value = editedSettings[setting.setting_key] || setting.setting_value;
     const hasChanged = value !== setting.setting_value;
 

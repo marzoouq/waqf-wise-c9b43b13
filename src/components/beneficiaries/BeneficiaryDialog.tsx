@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { Database } from "@/integrations/supabase/types";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import {
   Form,
@@ -129,7 +130,7 @@ interface BeneficiaryDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   beneficiary?: Beneficiary | null;
-  onSave: (data: any) => void;
+  onSave: (data: Database['public']['Tables']['beneficiaries']['Insert']) => void;
 }
 
 const BeneficiaryDialog = ({

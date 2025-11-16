@@ -34,10 +34,11 @@ export function DatabaseSettingsDialog({
         });
         setIsExporting(false);
       }, 2000);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'حدث خطأ أثناء تصدير البيانات';
       toast({
         title: "خطأ",
-        description: "حدث خطأ أثناء تصدير البيانات",
+        description: errorMessage,
         variant: "destructive",
       });
       setIsExporting(false);
