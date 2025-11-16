@@ -159,10 +159,10 @@ export const useFamilyMembers = (familyId?: string) => {
 
   // Add family member
   const addMember = useMutation({
-    mutationFn: async (newMember: Omit<FamilyMember, 'id' | 'created_at' | 'updated_at'>) => {
+    mutationFn: async (newMember: Omit<FamilyMember, 'id' | 'created_at' | 'updated_at'> & { relationship_to_head: string }) => {
       const { data, error } = await supabase
         .from('family_members')
-        .insert(newMember)
+        .insert([newMember])
         .select()
         .single();
 

@@ -16,13 +16,13 @@ export const useTribes = () => {
   return useQuery({
     queryKey: ["tribes"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("tribes")
         .select("*")
         .order("name");
 
       if (error) throw error;
-      return data as unknown as Tribe[];
+      return data as Tribe[];
     },
   });
 };
@@ -32,7 +32,7 @@ export const useAddTribe = () => {
 
   return useMutation({
     mutationFn: async (tribe: Omit<Tribe, "id" | "total_families" | "total_beneficiaries" | "created_at">) => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("tribes")
         .insert([tribe])
         .select()
@@ -57,7 +57,7 @@ export const useUpdateTribe = () => {
 
   return useMutation({
     mutationFn: async ({ id, ...updates }: Partial<Tribe> & { id: string }) => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("tribes")
         .update(updates)
         .eq("id", id)
@@ -83,7 +83,7 @@ export const useDeleteTribe = () => {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("tribes")
         .delete()
         .eq("id", id);

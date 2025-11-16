@@ -2,6 +2,9 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { logger } from "@/lib/logger";
+import { Database } from "@/integrations/supabase/types";
+
+type Tables = Database['public']['Tables'];
 
 export interface BankStatement {
   id: string;
@@ -52,7 +55,13 @@ export function useBankReconciliation() {
           .order("statement_date", { ascending: false });
 
         if (error) throw error;
-        return data as BankStatementRow[];
+        return data as unknown as (Tables['bank_statements']['Row'] & {
+          bank_accounts: {
+            bank_name: string;
+            account_number: string;
+            accounts: { code: string; name_ar: string; } | null;
+          };
+        })[];
       } catch (error) {
         logger.error(error, { context: 'fetch_bank_statements', severity: 'low' });
         return [];
@@ -70,7 +79,7 @@ export function useBankReconciliation() {
           .order("transaction_date", { ascending: false });
 
         if (error) throw error;
-        return data as BankTransactionRow[];
+        return data as unknown as Tables['bank_transactions']['Row'][];
       } catch (error) {
         logger.error(error, { context: 'fetch_bank_transactions', severity: 'low' });
         return [];
