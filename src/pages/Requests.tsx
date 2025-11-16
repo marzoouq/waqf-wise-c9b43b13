@@ -39,7 +39,8 @@ const Requests = () => {
     const matchesSearch = 
       request.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
       request.request_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (request.beneficiary as any)?.full_name.toLowerCase().includes(searchQuery.toLowerCase());
+      (request.beneficiary && 'full_name' in request.beneficiary && 
+        request.beneficiary.full_name.toLowerCase().includes(searchQuery.toLowerCase()));
 
     const matchesStatus = statusFilter === 'all' || request.status === statusFilter;
 
@@ -243,11 +244,15 @@ const Requests = () => {
                         {request.request_number}
                       </TableCell>
                       <TableCell className="text-xs sm:text-sm">
-                        {(request.beneficiary as any)?.full_name || '-'}
+                        {request.beneficiary && 'full_name' in request.beneficiary 
+                          ? request.beneficiary.full_name 
+                          : '-'}
                       </TableCell>
                       <TableCell className="text-xs sm:text-sm">
                         <Badge variant="outline" className="text-xs">
-                          {(request.request_type as any)?.name || '-'}
+                          {request.request_type && 'name' in request.request_type 
+                            ? request.request_type.name 
+                            : '-'}
                         </Badge>
                       </TableCell>
                       <TableCell className="max-w-xs truncate text-xs sm:text-sm">
@@ -322,7 +327,9 @@ const Requests = () => {
             open={approvalDialogOpen}
             onOpenChange={setApprovalDialogOpen}
             requestId={selectedRequest.id}
-            requestType={(selectedRequest.request_type as any)?.name || "طلب"}
+            requestType={selectedRequest.request_type && 'name' in selectedRequest.request_type 
+              ? selectedRequest.request_type.name 
+              : "طلب"}
             requestDescription={selectedRequest.description}
           />
           <RequestCommentsDialog

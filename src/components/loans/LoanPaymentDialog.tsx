@@ -154,7 +154,7 @@ export function LoanPaymentDialog({
                 onValueChange={(value) =>
                   setFormData({
                     ...formData,
-                    payment_method: value as any,
+                    payment_method: value as "bank_transfer" | "card" | "cash" | "cheque",
                   })
                 }
               >

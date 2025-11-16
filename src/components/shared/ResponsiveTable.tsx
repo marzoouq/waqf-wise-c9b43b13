@@ -56,7 +56,7 @@ export function ResponsiveTable({
     return (
       <div className="space-y-3">
         {data.map((row, index) => {
-          const rowId = (row as any).id || `row-${index}`;
+          const rowId = row.id || `row-${index}`;
           return (
             <Card
               key={rowId}
@@ -109,7 +109,7 @@ export function ResponsiveTable({
           </TableHeader>
           <TableBody>
             {data.map((row, index) => {
-              const rowId = (row as any).id || `row-${index}`;
+              const rowId = row.id || `row-${index}`;
               return (
                 <TableRow
                   key={rowId}

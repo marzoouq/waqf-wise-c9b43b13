@@ -138,7 +138,6 @@ export function CashFlowStatement() {
         description: `تم حفظ الملف: ${filename}`,
       });
     } catch (error) {
-      console.error("Error exporting PDF:", error);
       toast.error("حدث خطأ أثناء تصدير PDF", {
         description: "الرجاء المحاولة مرة أخرى",
       });
