@@ -20,10 +20,18 @@ export interface QuickReply {
   order_index: number;
 }
 
+export interface QuickAction {
+  label: string;
+  icon: string;
+  link: string;
+  count?: number;
+}
+
 export function useChatbot() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isTyping, setIsTyping] = useState(false);
+  const [quickActions, setQuickActions] = useState<QuickAction[]>([]);
 
   // جلب معرف المستخدم الحالي
   const { data: session } = useQuery({
@@ -96,6 +104,11 @@ export function useChatbot() {
       if (error) throw error;
       if (!data.success) throw new Error(data.error || 'فشل في الحصول على الرد');
       
+      // تحديث الإجراءات السريعة
+      if (data.quickActions && data.quickActions.length > 0) {
+        setQuickActions(data.quickActions);
+      }
+      
       return data;
     },
     onSuccess: () => {
@@ -144,6 +157,7 @@ export function useChatbot() {
   return {
     conversations,
     quickReplies,
+    quickActions,
     isLoading,
     isTyping,
     sendMessage: sendMessage.mutateAsync,

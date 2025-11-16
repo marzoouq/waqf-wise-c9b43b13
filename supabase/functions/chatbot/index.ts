@@ -21,38 +21,54 @@ serve(async (req) => {
 
     console.log('📨 Chatbot request:', { message, userId, quickReplyId });
 
-    // جلب البيانات السياقية حسب نوع السؤال
+    // جلب البيانات السياقية الشاملة
     let contextData: any = {};
-    
-    // البحث في نوع الاستفسار
     const messageText = message.toLowerCase();
     
+    // جلب بيانات المستفيدين
     if (quickReplyId === 'balance' || messageText.includes('رصيد') || messageText.includes('مستفيد')) {
       const { data: beneficiaries, count } = await supabase
         .from('beneficiaries')
-        .select('status, category, monthly_income', { count: 'exact' })
-        .eq('status', 'active')
+        .select('id, full_name, status, category, monthly_income, city, tribe', { count: 'exact' })
         .limit(100);
+      
+      const activeCount = beneficiaries?.filter(b => b.status === 'active').length || 0;
+      const inactiveCount = beneficiaries?.filter(b => b.status === 'inactive').length || 0;
+      const categories = beneficiaries?.reduce((acc: any, b) => {
+        acc[b.category] = (acc[b.category] || 0) + 1;
+        return acc;
+      }, {});
+      
+      const cities = beneficiaries?.reduce((acc: any, b) => {
+        if (b.city) acc[b.city] = (acc[b.city] || 0) + 1;
+        return acc;
+      }, {});
       
       contextData.beneficiaries = {
         total: count || 0,
-        active: beneficiaries?.filter(b => b.status === 'active').length || 0,
-        categories: beneficiaries?.reduce((acc: any, b) => {
-          acc[b.category] = (acc[b.category] || 0) + 1;
-          return acc;
-        }, {})
+        active: activeCount,
+        inactive: inactiveCount,
+        categories,
+        cities,
+        topCategories: Object.entries(categories || {})
+          .sort(([,a]: any, [,b]: any) => b - a)
+          .slice(0, 5),
+        directLink: '/beneficiaries'
       };
     }
     
-    if (quickReplyId === 'reports' || messageText.includes('تقرير') || messageText.includes('مالي')) {
+    // جلب التقارير المالية الشاملة
+    if (quickReplyId === 'reports' || messageText.includes('تقرير') || messageText.includes('مالي') || messageText.includes('محاسب')) {
       const { data: entries } = await supabase
         .from('journal_entries')
-        .select('entry_date, reference, status, journal_entry_lines(debit_amount, credit_amount)')
+        .select('id, entry_date, entry_number, reference, status, journal_entry_lines(debit_amount, credit_amount)')
         .order('entry_date', { ascending: false })
-        .limit(20);
+        .limit(50);
       
       let totalDebits = 0;
       let totalCredits = 0;
+      const postedEntries = entries?.filter(e => e.status === 'posted').length || 0;
+      const draftEntries = entries?.filter(e => e.status === 'draft').length || 0;
       
       entries?.forEach(entry => {
         entry.journal_entry_lines?.forEach((line: any) => {
@@ -61,65 +77,252 @@ serve(async (req) => {
         });
       });
       
+      // جلب الحسابات
+      const { data: accounts, count: accountsCount } = await supabase
+        .from('accounts')
+        .select('account_type, current_balance', { count: 'exact' })
+        .eq('is_active', true);
+      
+      const accountsByType = accounts?.reduce((acc: any, a) => {
+        acc[a.account_type] = (acc[a.account_type] || 0) + 1;
+        return acc;
+      }, {});
+      
       contextData.financial = {
         recentEntries: entries?.length || 0,
-        totalDebits,
-        totalCredits,
-        balance: totalDebits - totalCredits
+        postedEntries,
+        draftEntries,
+        totalDebits: Math.round(totalDebits),
+        totalCredits: Math.round(totalCredits),
+        balance: Math.round(totalDebits - totalCredits),
+        accountsCount: accountsCount || 0,
+        accountsByType,
+        directLink: '/accounting'
       };
     }
     
-    if (quickReplyId === 'properties' || messageText.includes('عقار') || messageText.includes('إيجار')) {
+    // جلب بيانات العقارات والإيجارات
+    if (quickReplyId === 'properties' || messageText.includes('عقار') || messageText.includes('إيجار') || messageText.includes('عقد')) {
       const { data: properties, count } = await supabase
         .from('properties')
-        .select('status, property_type, contracts(status, monthly_rent)', { count: 'exact' });
+        .select('id, name, status, property_type, contracts(id, status, monthly_rent, start_date, end_date)', { count: 'exact' });
       
       const occupied = properties?.filter(p => p.status === 'occupied').length || 0;
       const vacant = properties?.filter(p => p.status === 'vacant').length || 0;
-      const totalRent = properties?.reduce((sum, p) => {
-        const activeContract = p.contracts?.find((c: any) => c.status === 'active');
-        return sum + (activeContract?.monthly_rent || 0);
-      }, 0) || 0;
+      const maintenance = properties?.filter(p => p.status === 'maintenance').length || 0;
+      
+      let totalRent = 0;
+      let activeContracts = 0;
+      let expiringContracts = 0;
+      const today = new Date();
+      const thirtyDaysFromNow = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
+      
+      properties?.forEach(p => {
+        const activeContract = p.contracts?.find((c: any) => c.status === 'نشط' || c.status === 'active');
+        if (activeContract) {
+          totalRent += activeContract.monthly_rent || 0;
+          activeContracts++;
+          
+          const endDate = new Date(activeContract.end_date);
+          if (endDate <= thirtyDaysFromNow && endDate >= today) {
+            expiringContracts++;
+          }
+        }
+      });
+      
+      // أنواع العقارات
+      const propertyTypes = properties?.reduce((acc: any, p) => {
+        acc[p.property_type] = (acc[p.property_type] || 0) + 1;
+        return acc;
+      }, {});
       
       contextData.properties = {
         total: count || 0,
         occupied,
         vacant,
-        monthlyRentIncome: totalRent
+        maintenance,
+        monthlyRentIncome: Math.round(totalRent),
+        activeContracts,
+        expiringContracts,
+        propertyTypes,
+        occupancyRate: count ? Math.round((occupied / count) * 100) : 0,
+        directLink: '/properties'
       };
     }
     
-    if (quickReplyId === 'requests' || messageText.includes('طلب')) {
-      const { data: requests, count } = await supabase
+    // جلب بيانات الطلبات الشاملة
+    if (quickReplyId === 'requests' || messageText.includes('طلب') || messageText.includes('فزعة')) {
+      const { data: allRequests } = await supabase
         .from('beneficiary_requests')
-        .select('status, priority, request_type_id, amount', { count: 'exact' })
-        .eq('status', 'pending');
+        .select('id, status, priority, request_type_id, amount, created_at, is_overdue')
+        .order('created_at', { ascending: false })
+        .limit(100);
       
-      const highPriority = requests?.filter(r => r.priority === 'high').length || 0;
-      const totalAmount = requests?.reduce((sum, r) => sum + (r.amount || 0), 0) || 0;
+      const pending = allRequests?.filter(r => r.status === 'قيد المراجعة').length || 0;
+      const approved = allRequests?.filter(r => r.status === 'موافق عليه').length || 0;
+      const rejected = allRequests?.filter(r => r.status === 'مرفوض').length || 0;
+      const highPriority = allRequests?.filter(r => r.priority === 'high').length || 0;
+      const overdue = allRequests?.filter(r => r.is_overdue).length || 0;
+      
+      const totalAmount = allRequests?.reduce((sum, r) => sum + (r.amount || 0), 0) || 0;
+      const pendingAmount = allRequests
+        ?.filter(r => r.status === 'قيد المراجعة')
+        ?.reduce((sum, r) => sum + (r.amount || 0), 0) || 0;
+      
+      // جلب أنواع الطلبات
+      const { data: requestTypes } = await supabase
+        .from('request_types')
+        .select('id, name_ar');
+      
+      const requestsByType = allRequests?.reduce((acc: any, r) => {
+        const type = requestTypes?.find(rt => rt.id === r.request_type_id);
+        const typeName = type?.name_ar || 'غير محدد';
+        acc[typeName] = (acc[typeName] || 0) + 1;
+        return acc;
+      }, {});
       
       contextData.requests = {
-        pending: count || 0,
+        total: allRequests?.length || 0,
+        pending,
+        approved,
+        rejected,
         highPriority,
-        totalAmount
+        overdue,
+        totalAmount: Math.round(totalAmount),
+        pendingAmount: Math.round(pendingAmount),
+        requestsByType,
+        approvalRate: allRequests?.length ? Math.round((approved / allRequests.length) * 100) : 0,
+        directLink: '/requests'
       };
     }
     
-    if (quickReplyId === 'distributions' || messageText.includes('توزيع')) {
-      const { data: distributions } = await supabase
+    // جلب بيانات التوزيعات الشاملة
+    if (quickReplyId === 'distributions' || messageText.includes('توزيع') || messageText.includes('صرف')) {
+      const { data: distributions, count } = await supabase
         .from('distributions')
-        .select('distribution_date, total_amount, beneficiaries_count, status')
+        .select('id, distribution_date, total_amount, beneficiaries_count, status, month, notes', { count: 'exact' })
         .order('distribution_date', { ascending: false })
-        .limit(10);
+        .limit(50);
+      
+      const approved = distributions?.filter(d => d.status === 'معتمد').length || 0;
+      const pending = distributions?.filter(d => d.status === 'قيد المراجعة').length || 0;
+      const draft = distributions?.filter(d => d.status === 'مسودة').length || 0;
+      
+      const totalDistributed = distributions
+        ?.filter(d => d.status === 'معتمد')
+        ?.reduce((sum, d) => sum + (d.total_amount || 0), 0) || 0;
+      
+      const totalBeneficiaries = distributions
+        ?.filter(d => d.status === 'معتمد')
+        ?.reduce((sum, d) => sum + (d.beneficiaries_count || 0), 0) || 0;
+      
+      const avgPerBeneficiary = totalBeneficiaries > 0 
+        ? Math.round(totalDistributed / totalBeneficiaries) 
+        : 0;
+      
+      // جلب بيانات الموافقات
+      const { data: approvals } = await supabase
+        .from('distribution_approvals')
+        .select('status')
+        .in('distribution_id', distributions?.map(d => d.id) || []);
+      
+      const pendingApprovals = approvals?.filter(a => a.status === 'قيد المراجعة').length || 0;
       
       contextData.distributions = {
+        total: count || 0,
+        approved,
+        pending,
+        draft,
+        totalDistributed: Math.round(totalDistributed),
+        totalBeneficiaries,
+        avgPerBeneficiary,
+        pendingApprovals,
         recent: distributions?.slice(0, 5).map(d => ({
           date: d.distribution_date,
-          amount: d.total_amount,
+          amount: Math.round(d.total_amount),
           beneficiaries: d.beneficiaries_count,
-          status: d.status
+          status: d.status,
+          month: d.month
         })),
-        totalDistributions: distributions?.length || 0
+        directLink: '/funds'
+      };
+    }
+    
+    // جلب بيانات القروض
+    if (messageText.includes('قرض') || messageText.includes('قروض')) {
+      const { data: loans, count } = await supabase
+        .from('loans')
+        .select('id, loan_amount, status, interest_rate, term_months')
+        .limit(100);
+      
+      const active = loans?.filter(l => l.status === 'active').length || 0;
+      const paid = loans?.filter(l => l.status === 'paid').length || 0;
+      const defaulted = loans?.filter(l => l.status === 'defaulted').length || 0;
+      
+      const totalLoaned = loans?.reduce((sum, l) => sum + (l.loan_amount || 0), 0) || 0;
+      
+      contextData.loans = {
+        total: count || 0,
+        active,
+        paid,
+        defaulted,
+        totalLoaned: Math.round(totalLoaned),
+        defaultRate: count ? Math.round((defaulted / count) * 100) : 0,
+        directLink: '/loans'
+      };
+    }
+    
+    // جلب بيانات العائلات
+    if (messageText.includes('عائلة') || messageText.includes('عائلات')) {
+      const { data: families, count } = await supabase
+        .from('families')
+        .select('id, family_name, status, total_members, tribe')
+        .limit(100);
+      
+      const active = families?.filter(f => f.status === 'نشط').length || 0;
+      const totalMembers = families?.reduce((sum, f) => sum + (f.total_members || 0), 0) || 0;
+      const avgMembersPerFamily = count ? Math.round(totalMembers / count) : 0;
+      
+      const tribes = families?.reduce((acc: any, f) => {
+        if (f.tribe) acc[f.tribe] = (acc[f.tribe] || 0) + 1;
+        return acc;
+      }, {});
+      
+      contextData.families = {
+        total: count || 0,
+        active,
+        totalMembers,
+        avgMembersPerFamily,
+        tribes,
+        directLink: '/families'
+      };
+    }
+    
+    // جلب بيانات الفواتير
+    if (messageText.includes('فاتورة') || messageText.includes('فواتير')) {
+      const { data: invoices, count } = await supabase
+        .from('invoices')
+        .select('id, invoice_number, total_amount, status, due_date')
+        .limit(100);
+      
+      const paid = invoices?.filter(i => i.status === 'paid').length || 0;
+      const pending = invoices?.filter(i => i.status === 'pending').length || 0;
+      const overdue = invoices?.filter(i => i.status === 'overdue').length || 0;
+      
+      const totalAmount = invoices?.reduce((sum, i) => sum + (i.total_amount || 0), 0) || 0;
+      const paidAmount = invoices
+        ?.filter(i => i.status === 'paid')
+        ?.reduce((sum, i) => sum + (i.total_amount || 0), 0) || 0;
+      
+      contextData.invoices = {
+        total: count || 0,
+        paid,
+        pending,
+        overdue,
+        totalAmount: Math.round(totalAmount),
+        paidAmount: Math.round(paidAmount),
+        collectionRate: totalAmount ? Math.round((paidAmount / totalAmount) * 100) : 0,
+        directLink: '/invoices'
       };
     }
 
@@ -129,22 +332,43 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    // إعداد System Prompt
+  // إعداد System Prompt المحسّن
     const systemPrompt = `أنت مساعد ذكي متخصص في إدارة الأوقاف الإسلامية. 
 مهمتك مساعدة الإدارة والموظفين في:
-- تحليل البيانات المالية والإحصائية بدقة
-- الإجابة على الأسئلة حول المستفيدين والعقارات والطلبات
+- تحليل البيانات المالية والإحصائية بدقة عالية
+- الإجابة على الأسئلة حول المستفيدين والعقارات والطلبات والتوزيعات
 - تقديم توصيات عملية ومدروسة بناءً على البيانات المتاحة
-- مساعدة في اتخاذ القرارات الإدارية
+- مساعدة في اتخاذ القرارات الإدارية والتشغيلية
 
-قواعد مهمة:
+قواعد التفاعل:
 1. استخدم اللغة العربية الفصحى بأسلوب واضح ومباشر
-2. كن مختصراً ومفيداً (150-250 كلمة كحد أقصى)
-3. قدم الأرقام والإحصائيات بتنسيق واضح
-4. استخدم الإيموجي بشكل مناسب ولكن لا تكثر منها
-5. إذا لم تكن لديك بيانات كافية، أخبر المستخدم بذلك بوضوح ولا تخمن
+2. كن مختصراً ومفيداً (200-300 كلمة كحد أقصى)
+3. قدم الأرقام والإحصائيات بتنسيق واضح مع مقارنات مفيدة
+4. استخدم الإيموجي بشكل مناسب (واحد أو اثنين فقط)
+5. إذا لم تكن لديك بيانات كافية، أخبر المستخدم بذلك بوضوح
 6. قدم معلومات دقيقة فقط بناءً على البيانات المتوفرة
-7. نسق الأرقام المالية بشكل واضح (استخدم الفواصل)`;
+7. نسق الأرقام المالية بوضوح (مثال: 50,000 ريال)
+
+قواعد العرض المحسّنة:
+- عند ذكر قسم معين، اذكر الرابط المباشر له في نهاية الإجابة
+- استخدم تنسيق Markdown للعناوين والقوائم
+- قدم ملخص سريع في بداية الإجابة
+- اختم بتوصية عملية أو خطوة تالية مقترحة
+- عند توفر directLink في البيانات، اذكره في نهاية الرد بصيغة:
+  "🔗 **للوصول المباشر**: [اضغط هنا للذهاب إلى {القسم}]({الرابط})"
+
+مثال على التنسيق الجيد:
+### 📊 ملخص سريع
+- إجمالي المستفيدين: 250 مستفيد
+- المستفيدون النشطون: 230 (92%)
+
+### 📈 التفاصيل
+(تفاصيل إضافية...)
+
+### 💡 توصية
+يُنصح بمراجعة حالات المستفيدين غير النشطين...
+
+🔗 **للوصول المباشر**: [اذهب إلى صفحة المستفيدين](/beneficiaries)`;
 
     console.log('🤖 Sending to AI with context:', Object.keys(contextData));
 
@@ -210,8 +434,42 @@ serve(async (req) => {
           hasFinancialData: !!contextData.financial,
           propertiesCount: contextData.properties?.total || 0,
           pendingRequestsCount: contextData.requests?.pending || 0,
-          recentDistributions: contextData.distributions?.totalDistributions || 0,
-        }
+          recentDistributions: contextData.distributions?.total || 0,
+          loansCount: contextData.loans?.total || 0,
+          familiesCount: contextData.families?.total || 0,
+          invoicesCount: contextData.invoices?.total || 0,
+        },
+        quickActions: [
+          contextData.beneficiaries?.directLink && {
+            label: 'المستفيدون',
+            icon: '👥',
+            link: contextData.beneficiaries.directLink,
+            count: contextData.beneficiaries.total
+          },
+          contextData.properties?.directLink && {
+            label: 'العقارات',
+            icon: '🏢',
+            link: contextData.properties.directLink,
+            count: contextData.properties.total
+          },
+          contextData.requests?.directLink && {
+            label: 'الطلبات',
+            icon: '📋',
+            link: contextData.requests.directLink,
+            count: contextData.requests.pending
+          },
+          contextData.financial?.directLink && {
+            label: 'المحاسبة',
+            icon: '💰',
+            link: contextData.financial.directLink
+          },
+          contextData.distributions?.directLink && {
+            label: 'التوزيعات',
+            icon: '📊',
+            link: contextData.distributions.directLink,
+            count: contextData.distributions.total
+          },
+        ].filter(Boolean)
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
