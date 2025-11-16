@@ -22,6 +22,31 @@ import {
   HandCoins,
   Sparkles,
   Bot,
+  Vote,
+} from "lucide-react";
+import {
+  LayoutDashboard,
+  Users,
+  Building2,
+  Wallet,
+  FileText,
+  Calculator,
+  BarChart3,
+  Settings,
+  Receipt,
+  CheckSquare,
+  CreditCard,
+  UsersRound,
+  ClipboardList,
+  Shield,
+  Archive,
+  Bell,
+  FolderOpen,
+  ChevronDown,
+  DollarSign,
+  HandCoins,
+  Sparkles,
+  Bot,
 } from "lucide-react";
 import {
   Sidebar,
@@ -104,6 +129,7 @@ const menuGroups = [
       { icon: Sparkles, label: "الرؤى الذكية", path: "/ai-insights", roles: ["admin", "nazer"] },
       { icon: Bot, label: "المساعد الذكي", path: "/chatbot", roles: ["all"], badge: "جديد" },
       { icon: Shield, label: "سجل العمليات", path: "/audit-logs", roles: ["admin", "nazer"] },
+      { icon: Vote, label: "القرارات والتصويت", path: "/governance/decisions", roles: ["admin", "nazer"], badge: "جديد" },
     ]
   },
   {

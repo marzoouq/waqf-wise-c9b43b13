@@ -40,6 +40,17 @@ const organizationSchema = z.object({
   phone: z.string().optional(),
   email: z.string().email("البريد الإلكتروني غير صحيح").optional().or(z.literal("")),
   logo_url: z.string().optional(),
+  
+  governance_type: z.enum(['nazer_only', 'nazer_with_board']).default('nazer_only'),
+  nazer_name: z.string().optional(),
+  nazer_title: z.string().optional(),
+  nazer_appointment_date: z.string().optional(),
+  nazer_contact_phone: z.string().optional(),
+  nazer_contact_email: z.string().email().optional().or(z.literal("")),
+  waqf_type: z.enum(['ذري', 'خيري', 'مشترك']).optional(),
+  waqf_establishment_date: z.string().optional(),
+  waqf_registration_number: z.string().optional(),
+  waqf_deed_url: z.string().optional(),
 });
 
 type OrganizationFormData = z.infer<typeof organizationSchema>;
