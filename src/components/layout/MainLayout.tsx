@@ -4,6 +4,7 @@ import AppSidebar from "./AppSidebar";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { Menu, LogOut } from "lucide-react";
 import { NotificationsBell } from "./NotificationsBell";
+import { FloatingChatButton } from "@/components/chatbot/FloatingChatButton";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
@@ -115,6 +116,9 @@ const MainLayout = ({ children }: MainLayoutProps) => {
               {children}
             </div>
           </SidebarInset>
+          
+          {/* Floating Chat Button - يظهر في جميع الصفحات */}
+          <FloatingChatButton />
         </div>
       </SidebarProvider>
     </div>
