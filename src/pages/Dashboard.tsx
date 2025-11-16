@@ -3,6 +3,7 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart3, Users, Bell } from "lucide-react";
+import { ChatbotQuickCard } from "@/components/dashboard/ChatbotQuickCard";
 import BeneficiaryDialog from "@/components/beneficiaries/BeneficiaryDialog";
 import { PropertyDialog } from "@/components/properties/PropertyDialog";
 import { DistributionDialog } from "@/components/funds/DistributionDialog";
@@ -92,6 +93,13 @@ const Dashboard = () => {
         <p className="text-muted-foreground">
           نظرة شاملة على جميع عمليات الوقف
         </p>
+      </div>
+
+      {/* Chatbot Quick Access Card */}
+      <div className="mb-8">
+        <Suspense fallback={<ChartSkeleton />}>
+          <ChatbotQuickCard />
+        </Suspense>
       </div>
 
       {/* Tabs Navigation */}
