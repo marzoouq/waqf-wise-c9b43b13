@@ -21,6 +21,7 @@ import {
   DollarSign,
   HandCoins,
   Sparkles,
+  Bot,
 } from "lucide-react";
 import {
   Sidebar,
@@ -101,6 +102,7 @@ const menuGroups = [
       { icon: BarChart3, label: "التقارير", path: "/reports", roles: ["all"] },
       { icon: FileText, label: "منشئ التقارير", path: "/report-builder", roles: ["admin", "accountant", "nazer"] },
       { icon: Sparkles, label: "الرؤى الذكية", path: "/ai-insights", roles: ["admin", "nazer"] },
+      { icon: Bot, label: "المساعد الذكي", path: "/chatbot", roles: ["all"], badge: "جديد" },
       { icon: Shield, label: "سجل العمليات", path: "/audit-logs", roles: ["admin", "nazer"] },
     ]
   },
