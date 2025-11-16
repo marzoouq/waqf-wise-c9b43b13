@@ -12,7 +12,16 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useSupportTicket } from '@/hooks/useSupportTickets';
+import { useSupportTickets } from '@/hooks/useSupportTickets';
+
+// Custom hook to get single ticket
+function useSupportTicket(ticketId: string) {
+  const { tickets, isLoading } = useSupportTickets({ search: ticketId });
+  return {
+    data: tickets?.find((t: any) => t.id === ticketId),
+    isLoading,
+  };
+}
 import { useTicketComments } from '@/hooks/useTicketComments';
 import { Clock, User, MessageSquare, Send } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
