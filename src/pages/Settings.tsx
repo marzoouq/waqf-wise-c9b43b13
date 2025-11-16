@@ -13,6 +13,7 @@ import { PushNotificationsSettings } from "@/components/settings/PushNotificatio
 import { LeakedPasswordCheck } from "@/components/settings/LeakedPasswordCheck";
 import { LanguageSelector } from "@/components/settings/LanguageSelector";
 import { useToast } from "@/hooks/use-toast";
+import { MobileOptimizedLayout, MobileOptimizedHeader, MobileOptimizedGrid } from "@/components/layout/MobileOptimizedLayout";
 
 const Settings = () => {
   const { toast } = useToast();
@@ -119,28 +120,24 @@ const Settings = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-6 md:p-8 lg:p-10 space-y-6 md:space-y-8">
-        {/* Header */}
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gradient-primary">
-            الإعدادات
-          </h1>
-          <p className="text-muted-foreground mt-1 text-sm md:text-base">
-            إدارة إعدادات النظام والتفضيلات الشخصية
-          </p>
-        </div>
+    <MobileOptimizedLayout>
+      <MobileOptimizedHeader
+        title="الإعدادات"
+        description="إدارة إعدادات النظام والتفضيلات الشخصية"
+        icon={<SettingsIcon className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
+        actions={<LanguageSelector />}
+      />
 
-        {/* Settings Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-          {settingsSections.map((section) => {
-            const Icon = section.icon;
-            return (
-              <Card
-                key={section.id}
-                onClick={() => handleSectionClick(section.title)}
-                className="shadow-soft hover:shadow-medium transition-all duration-300 cursor-pointer group"
-              >
+      {/* Settings Grid */}
+      <MobileOptimizedGrid cols={3}>
+        {settingsSections.map((section) => {
+          const Icon = section.icon;
+          return (
+            <Card
+              key={section.id}
+              onClick={() => handleSectionClick(section.title)}
+              className="shadow-soft hover:shadow-medium transition-all duration-300 cursor-pointer group"
+            >
                 <CardHeader>
                   <div className="flex items-start gap-4">
                     <div className={`p-3 rounded-lg ${section.color} flex-shrink-0`}>
@@ -159,9 +156,9 @@ const Settings = () => {
               </Card>
             );
           })}
-        </div>
+      </MobileOptimizedGrid>
 
-        {/* System Info */}
+      {/* System Info */}
         <Card className="shadow-soft">
           <CardHeader>
             <CardTitle className="text-lg md:text-xl">معلومات النظام</CardTitle>
@@ -228,15 +225,12 @@ const Settings = () => {
           open={organizationDialogOpen}
           onOpenChange={setOrganizationDialogOpen}
         />
-      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <PushNotificationsSettings />
         <LeakedPasswordCheck />
       </div>
-
-      <LanguageSelector />
-    </div>
+    </MobileOptimizedLayout>
   );
 };
 

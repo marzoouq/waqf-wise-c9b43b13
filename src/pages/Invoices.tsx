@@ -17,6 +17,7 @@ import { ar } from "date-fns/locale";
 import { Pagination } from "@/components/ui/pagination";
 import { useInvoices } from "@/hooks/useInvoices";
 import InvoiceStatusBadge from "@/components/invoices/InvoiceStatusBadge";
+import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 
 type Invoice = {
   id: string;
@@ -61,20 +62,19 @@ const Invoices = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-6 md:p-8 space-y-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gradient-primary">
-              الفواتير
-            </h1>
-            <p className="text-muted-foreground mt-1">إدارة الفواتير والمقبوضات</p>
-          </div>
-          <Button size="sm" className="w-full sm:w-auto" onClick={() => setAddDialogOpen(true)}>
-            <Plus className="h-4 w-4 ml-2" />
-            فاتورة جديدة
+    <MobileOptimizedLayout>
+      <MobileOptimizedHeader
+        title="الفواتير"
+        description="إدارة الفواتير والمقبوضات"
+        icon={<FileText className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
+        actions={
+          <Button size="sm" onClick={() => setAddDialogOpen(true)}>
+            <Plus className="h-4 w-4 sm:h-5 sm:w-5 ml-2" />
+            <span className="hidden sm:inline">فاتورة جديدة</span>
+            <span className="sm:hidden">جديد</span>
           </Button>
-        </div>
+        }
+      />
 
         <div className="border rounded-lg overflow-x-auto">
           <Table>
@@ -162,8 +162,7 @@ const Invoices = () => {
           open={viewDialogOpen} 
           onOpenChange={setViewDialogOpen} 
         />
-      </div>
-    </div>
+    </MobileOptimizedLayout>
   );
 };
 
