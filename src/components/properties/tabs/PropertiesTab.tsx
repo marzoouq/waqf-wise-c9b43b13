@@ -6,9 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { StatCard } from "@/components/dashboard/DashboardStats";
+import { type Property } from "@/hooks/useProperties";
 
 interface Props {
-  onEdit: (property: any) => void;
+  onEdit: (property: Property) => void;
 }
 
 export const PropertiesTab = ({ onEdit }: Props) => {

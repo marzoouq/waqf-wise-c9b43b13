@@ -12,7 +12,10 @@ import { PropertiesTab } from "@/components/properties/tabs/PropertiesTab";
 import { ContractsTab } from "@/components/properties/tabs/ContractsTab";
 import { PaymentsTab } from "@/components/properties/tabs/PaymentsTab";
 import { MaintenanceTab } from "@/components/properties/tabs/MaintenanceTab";
-import { useProperties } from "@/hooks/useProperties";
+import { useProperties, type Property } from "@/hooks/useProperties";
+import { type Contract } from "@/hooks/useContracts";
+import { type RentalPayment } from "@/hooks/useRentalPayments";
+import { type MaintenanceRequest } from "@/hooks/useMaintenanceRequests";
 import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
 import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
 import { logger } from "@/lib/logger";
@@ -26,12 +29,12 @@ const Properties = () => {
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [maintenanceDialogOpen, setMaintenanceDialogOpen] = useState(false);
   
-  const [selectedProperty, setSelectedProperty] = useState<any>(null);
-  const [selectedContract, setSelectedContract] = useState<any>(null);
-  const [selectedPayment, setSelectedPayment] = useState<any>(null);
-  const [selectedMaintenance, setSelectedMaintenance] = useState<any>(null);
+  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+  const [selectedContract, setSelectedContract] = useState<Contract | null>(null);
+  const [selectedPayment, setSelectedPayment] = useState<RentalPayment | null>(null);
+  const [selectedMaintenance, setSelectedMaintenance] = useState<MaintenanceRequest | null>(null);
 
-  const handlePropertySave = async (data: any) => {
+  const handlePropertySave = async (data: Omit<Property, 'id' | 'created_at' | 'updated_at'>) => {
     try {
       if (selectedProperty) {
         await updateProperty({ id: selectedProperty.id, ...data });

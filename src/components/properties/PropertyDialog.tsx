@@ -21,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { type Property } from "@/hooks/useProperties";
 
 const propertySchema = z.object({
   name: z
@@ -48,7 +49,7 @@ type PropertyFormValues = z.infer<typeof propertySchema>;
 interface PropertyDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  property?: any;
+  property?: Property;
   onSave: (data: PropertyFormValues) => void;
 }
 

@@ -8,9 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import { type Contract } from "@/hooks/useContracts";
 
 interface Props {
-  onEdit: (contract: any) => void;
+  onEdit: (contract: Contract) => void;
 }
 
 export const ContractsTab = ({ onEdit }: Props) => {
