@@ -8,9 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import { type MaintenanceRequest } from "@/hooks/useMaintenanceRequests";
 
 interface Props {
-  onEdit: (request: any) => void;
+  onEdit: (request: MaintenanceRequest) => void;
 }
 
 export const MaintenanceTab = ({ onEdit }: Props) => {

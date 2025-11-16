@@ -30,6 +30,9 @@ import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
+import type { Database } from "@/integrations/supabase/types";
+
+type PropertyUnit = Database['public']['Tables']['property_units']['Row'];
 
 const formSchema = z.object({
   unit_number: z.string().min(1, "رقم الوحدة مطلوب"),
@@ -53,7 +56,7 @@ interface PropertyUnitDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   propertyId: string;
-  unit?: any;
+  unit?: PropertyUnit;
 }
 
 export function PropertyUnitDialog({
@@ -101,7 +104,7 @@ export function PropertyUnitDialog({
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
     try {
-      const data: any = {
+      const data = {
         property_id: propertyId,
         unit_number: values.unit_number,
         unit_name: values.unit_name || null,
@@ -146,11 +149,12 @@ export function PropertyUnitDialog({
       queryClient.invalidateQueries({ queryKey: ["property-units", propertyId] });
       onOpenChange(false);
       form.reset();
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "حدث خطأ غير متوقع";
       toast({
         variant: "destructive",
         title: "حدث خطأ",
-        description: error.message,
+        description: errorMessage,
       });
     } finally {
       setIsSubmitting(false);

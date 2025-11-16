@@ -58,7 +58,7 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
     );
   }
 
-  const filteredUnits = (units as any[]).filter(unit =>
+  const filteredUnits = (units || []).filter(unit =>
     unit.unit_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
     unit.unit_name?.toLowerCase().includes(searchQuery.toLowerCase())
   );

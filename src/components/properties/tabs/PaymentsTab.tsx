@@ -8,9 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import { type RentalPayment } from "@/hooks/useRentalPayments";
 
 interface Props {
-  onEdit: (payment: any) => void;
+  onEdit: (payment: RentalPayment) => void;
 }
 
 export const PaymentsTab = ({ onEdit }: Props) => {
