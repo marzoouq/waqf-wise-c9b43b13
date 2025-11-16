@@ -1,9 +1,10 @@
-import { useState, useMemo } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Search, FolderOpen, FileText, Download, Upload, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { UploadDocumentDialog } from "@/components/archive/UploadDocumentDialog";
 import { CreateFolderDialog } from "@/components/archive/CreateFolderDialog";
 import { DocumentPreviewDialog } from "@/components/archive/DocumentPreviewDialog";
+import { SmartArchiveFeatures } from "@/components/archive/SmartArchiveFeatures";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -64,20 +65,28 @@ const Archive = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-6 md:p-8 lg:p-10 space-y-6 md:space-y-8">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gradient-primary">
-              الأرشيف الإلكتروني
-            </h1>
-            <p className="text-muted-foreground mt-1 text-xs sm:text-sm md:text-base">
-              إدارة وأرشفة المستندات والملفات
-            </p>
-          </div>
-          <Button 
-            className="bg-primary hover:bg-primary-hover text-primary-foreground shadow-soft w-full md:w-auto"
+    <MobileOptimizedLayout>
+      <MobileOptimizedHeader
+        title="الأرشيف الإلكتروني"
+        description="إدارة وأرشفة المستندات والملفات"
+        icon={<FolderOpen className="h-8 w-8 text-primary" />}
+        actions={
+          <Button onClick={() => setUploadDialogOpen(true)}>
+            <Upload className="h-4 w-4 ml-2" />
+            رفع مستند
+          </Button>
+        }
+      />
+
+      <Tabs defaultValue="documents" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="documents">المستندات</TabsTrigger>
+          <TabsTrigger value="smart">الميزات الذكية</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="documents" className="space-y-4">{/* المحتوى الحالي */}</TabsContent>
+        <TabsContent value="smart"><SmartArchiveFeatures /></TabsContent>
+      </Tabs>
             onClick={() => setUploadDialogOpen(true)}
           >
             <Upload className="ml-2 h-4 w-4 md:h-5 md:w-5" />
