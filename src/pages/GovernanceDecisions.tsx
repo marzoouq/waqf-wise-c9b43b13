@@ -13,13 +13,13 @@ export default function GovernanceDecisions() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const { decisions, isLoading } = useGovernanceDecisions();
 
-  const activeDecisions = decisions.filter(d => 
+  const activeDecisions = (decisions as any[]).filter(d => 
     d.decision_status === 'قيد التصويت' || d.decision_status === 'قيد التنفيذ'
   );
-  const completedDecisions = decisions.filter(d => 
+  const completedDecisions = (decisions as any[]).filter(d => 
     d.decision_status === 'معتمد' || d.decision_status === 'منفذ'
   );
-  const rejectedDecisions = decisions.filter(d => 
+  const rejectedDecisions = (decisions as any[]).filter(d => 
     d.decision_status === 'مرفوض' || d.decision_status === 'ملغي'
   );
 
