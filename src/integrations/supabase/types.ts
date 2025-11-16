@@ -1833,6 +1833,754 @@ export type Database = {
           },
         ]
       }
+      governance_board_members: {
+        Row: {
+          attendance_mandatory: boolean | null
+          board_id: string | null
+          created_at: string | null
+          email: string | null
+          end_date: string | null
+          expertise_areas: string[] | null
+          id: string
+          is_active: boolean | null
+          join_date: string
+          member_name: string
+          member_title: string | null
+          membership_type: string
+          notes: string | null
+          phone: string | null
+          position: string
+          qualifications: string | null
+          updated_at: string | null
+          user_id: string | null
+          voting_rights: boolean | null
+        }
+        Insert: {
+          attendance_mandatory?: boolean | null
+          board_id?: string | null
+          created_at?: string | null
+          email?: string | null
+          end_date?: string | null
+          expertise_areas?: string[] | null
+          id?: string
+          is_active?: boolean | null
+          join_date: string
+          member_name: string
+          member_title?: string | null
+          membership_type: string
+          notes?: string | null
+          phone?: string | null
+          position: string
+          qualifications?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          voting_rights?: boolean | null
+        }
+        Update: {
+          attendance_mandatory?: boolean | null
+          board_id?: string | null
+          created_at?: string | null
+          email?: string | null
+          end_date?: string | null
+          expertise_areas?: string[] | null
+          id?: string
+          is_active?: boolean | null
+          join_date?: string
+          member_name?: string
+          member_title?: string | null
+          membership_type?: string
+          notes?: string | null
+          phone?: string | null
+          position?: string
+          qualifications?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          voting_rights?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "governance_board_members_board_id_fkey"
+            columns: ["board_id"]
+            isOneToOne: false
+            referencedRelation: "governance_boards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      governance_boards: {
+        Row: {
+          board_code: string
+          board_name_ar: string
+          board_type: string
+          chairman_name: string
+          created_at: string | null
+          decision_authority: string | null
+          description: string | null
+          dissolution_date: string | null
+          established_date: string | null
+          id: string
+          meeting_frequency: string | null
+          quorum_requirement: number | null
+          responsibilities: string[] | null
+          secretary_name: string | null
+          status: string | null
+          updated_at: string | null
+          vice_chairman_name: string | null
+          voting_rules: Json | null
+        }
+        Insert: {
+          board_code: string
+          board_name_ar: string
+          board_type: string
+          chairman_name: string
+          created_at?: string | null
+          decision_authority?: string | null
+          description?: string | null
+          dissolution_date?: string | null
+          established_date?: string | null
+          id?: string
+          meeting_frequency?: string | null
+          quorum_requirement?: number | null
+          responsibilities?: string[] | null
+          secretary_name?: string | null
+          status?: string | null
+          updated_at?: string | null
+          vice_chairman_name?: string | null
+          voting_rules?: Json | null
+        }
+        Update: {
+          board_code?: string
+          board_name_ar?: string
+          board_type?: string
+          chairman_name?: string
+          created_at?: string | null
+          decision_authority?: string | null
+          description?: string | null
+          dissolution_date?: string | null
+          established_date?: string | null
+          id?: string
+          meeting_frequency?: string | null
+          quorum_requirement?: number | null
+          responsibilities?: string[] | null
+          secretary_name?: string | null
+          status?: string | null
+          updated_at?: string | null
+          vice_chairman_name?: string | null
+          voting_rules?: Json | null
+        }
+        Relationships: []
+      }
+      governance_decisions: {
+        Row: {
+          attachments: string[] | null
+          board_id: string | null
+          created_at: string | null
+          custom_voters: Json | null
+          decision_date: string
+          decision_number: string
+          decision_status: string | null
+          decision_text: string
+          decision_title: string
+          decision_type: string
+          id: string
+          implementation_deadline: string | null
+          implementation_notes: string | null
+          implementation_plan: string | null
+          implementation_progress: number | null
+          implemented_at: string | null
+          meeting_id: string | null
+          notes: string | null
+          pass_threshold: number | null
+          requires_voting: boolean | null
+          responsible_person_name: string | null
+          total_votes: number | null
+          updated_at: string | null
+          votes_abstain: number | null
+          votes_against: number | null
+          votes_for: number | null
+          voting_completed: boolean | null
+          voting_method: string | null
+          voting_participants_type: string
+          voting_quorum: number | null
+        }
+        Insert: {
+          attachments?: string[] | null
+          board_id?: string | null
+          created_at?: string | null
+          custom_voters?: Json | null
+          decision_date: string
+          decision_number: string
+          decision_status?: string | null
+          decision_text: string
+          decision_title: string
+          decision_type: string
+          id?: string
+          implementation_deadline?: string | null
+          implementation_notes?: string | null
+          implementation_plan?: string | null
+          implementation_progress?: number | null
+          implemented_at?: string | null
+          meeting_id?: string | null
+          notes?: string | null
+          pass_threshold?: number | null
+          requires_voting?: boolean | null
+          responsible_person_name?: string | null
+          total_votes?: number | null
+          updated_at?: string | null
+          votes_abstain?: number | null
+          votes_against?: number | null
+          votes_for?: number | null
+          voting_completed?: boolean | null
+          voting_method?: string | null
+          voting_participants_type?: string
+          voting_quorum?: number | null
+        }
+        Update: {
+          attachments?: string[] | null
+          board_id?: string | null
+          created_at?: string | null
+          custom_voters?: Json | null
+          decision_date?: string
+          decision_number?: string
+          decision_status?: string | null
+          decision_text?: string
+          decision_title?: string
+          decision_type?: string
+          id?: string
+          implementation_deadline?: string | null
+          implementation_notes?: string | null
+          implementation_plan?: string | null
+          implementation_progress?: number | null
+          implemented_at?: string | null
+          meeting_id?: string | null
+          notes?: string | null
+          pass_threshold?: number | null
+          requires_voting?: boolean | null
+          responsible_person_name?: string | null
+          total_votes?: number | null
+          updated_at?: string | null
+          votes_abstain?: number | null
+          votes_against?: number | null
+          votes_for?: number | null
+          voting_completed?: boolean | null
+          voting_method?: string | null
+          voting_participants_type?: string
+          voting_quorum?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "governance_decisions_board_id_fkey"
+            columns: ["board_id"]
+            isOneToOne: false
+            referencedRelation: "governance_boards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "governance_decisions_meeting_id_fkey"
+            columns: ["meeting_id"]
+            isOneToOne: false
+            referencedRelation: "governance_meetings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      governance_disclosures: {
+        Row: {
+          attachments: string[] | null
+          content: string
+          created_at: string | null
+          disclosure_category: string | null
+          disclosure_date: string
+          disclosure_summary: string | null
+          disclosure_title: string
+          disclosure_type: string
+          document_url: string | null
+          downloads_count: number | null
+          id: string
+          is_mandatory: boolean | null
+          is_public: boolean | null
+          publication_channels: string[] | null
+          published_at: string | null
+          related_decision_id: string | null
+          related_policy_id: string | null
+          reporting_period_end: string | null
+          reporting_period_start: string | null
+          status: string | null
+          target_audience: string
+          updated_at: string | null
+          views_count: number | null
+        }
+        Insert: {
+          attachments?: string[] | null
+          content: string
+          created_at?: string | null
+          disclosure_category?: string | null
+          disclosure_date: string
+          disclosure_summary?: string | null
+          disclosure_title: string
+          disclosure_type: string
+          document_url?: string | null
+          downloads_count?: number | null
+          id?: string
+          is_mandatory?: boolean | null
+          is_public?: boolean | null
+          publication_channels?: string[] | null
+          published_at?: string | null
+          related_decision_id?: string | null
+          related_policy_id?: string | null
+          reporting_period_end?: string | null
+          reporting_period_start?: string | null
+          status?: string | null
+          target_audience: string
+          updated_at?: string | null
+          views_count?: number | null
+        }
+        Update: {
+          attachments?: string[] | null
+          content?: string
+          created_at?: string | null
+          disclosure_category?: string | null
+          disclosure_date?: string
+          disclosure_summary?: string | null
+          disclosure_title?: string
+          disclosure_type?: string
+          document_url?: string | null
+          downloads_count?: number | null
+          id?: string
+          is_mandatory?: boolean | null
+          is_public?: boolean | null
+          publication_channels?: string[] | null
+          published_at?: string | null
+          related_decision_id?: string | null
+          related_policy_id?: string | null
+          reporting_period_end?: string | null
+          reporting_period_start?: string | null
+          status?: string | null
+          target_audience?: string
+          updated_at?: string | null
+          views_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "governance_disclosures_related_decision_id_fkey"
+            columns: ["related_decision_id"]
+            isOneToOne: false
+            referencedRelation: "governance_decisions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "governance_disclosures_related_policy_id_fkey"
+            columns: ["related_policy_id"]
+            isOneToOne: false
+            referencedRelation: "governance_policies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      governance_meeting_attendance: {
+        Row: {
+          arrival_time: string | null
+          attendance_status: string
+          contribution_notes: string | null
+          created_at: string | null
+          departure_time: string | null
+          excuse_accepted: boolean | null
+          excuse_reason: string | null
+          id: string
+          meeting_id: string | null
+          member_id: string | null
+          member_name: string
+          notes: string | null
+          participated: boolean | null
+        }
+        Insert: {
+          arrival_time?: string | null
+          attendance_status: string
+          contribution_notes?: string | null
+          created_at?: string | null
+          departure_time?: string | null
+          excuse_accepted?: boolean | null
+          excuse_reason?: string | null
+          id?: string
+          meeting_id?: string | null
+          member_id?: string | null
+          member_name: string
+          notes?: string | null
+          participated?: boolean | null
+        }
+        Update: {
+          arrival_time?: string | null
+          attendance_status?: string
+          contribution_notes?: string | null
+          created_at?: string | null
+          departure_time?: string | null
+          excuse_accepted?: boolean | null
+          excuse_reason?: string | null
+          id?: string
+          meeting_id?: string | null
+          member_id?: string | null
+          member_name?: string
+          notes?: string | null
+          participated?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "governance_meeting_attendance_meeting_id_fkey"
+            columns: ["meeting_id"]
+            isOneToOne: false
+            referencedRelation: "governance_meetings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "governance_meeting_attendance_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "governance_board_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      governance_meetings: {
+        Row: {
+          actual_end_time: string | null
+          actual_start_time: string | null
+          agenda: Json
+          agenda_items_count: number | null
+          attendance_percentage: number | null
+          attendees_count: number | null
+          board_id: string | null
+          cancellation_reason: string | null
+          created_at: string | null
+          decisions_count: number | null
+          duration_minutes: number | null
+          id: string
+          is_virtual: boolean | null
+          location: string | null
+          meeting_number: string
+          meeting_title: string
+          meeting_type: string
+          minutes: string | null
+          minutes_approved: boolean | null
+          minutes_approved_at: string | null
+          minutes_document_url: string | null
+          quorum_met: boolean | null
+          scheduled_date: string
+          status: string | null
+          updated_at: string | null
+          virtual_link: string | null
+        }
+        Insert: {
+          actual_end_time?: string | null
+          actual_start_time?: string | null
+          agenda: Json
+          agenda_items_count?: number | null
+          attendance_percentage?: number | null
+          attendees_count?: number | null
+          board_id?: string | null
+          cancellation_reason?: string | null
+          created_at?: string | null
+          decisions_count?: number | null
+          duration_minutes?: number | null
+          id?: string
+          is_virtual?: boolean | null
+          location?: string | null
+          meeting_number: string
+          meeting_title: string
+          meeting_type: string
+          minutes?: string | null
+          minutes_approved?: boolean | null
+          minutes_approved_at?: string | null
+          minutes_document_url?: string | null
+          quorum_met?: boolean | null
+          scheduled_date: string
+          status?: string | null
+          updated_at?: string | null
+          virtual_link?: string | null
+        }
+        Update: {
+          actual_end_time?: string | null
+          actual_start_time?: string | null
+          agenda?: Json
+          agenda_items_count?: number | null
+          attendance_percentage?: number | null
+          attendees_count?: number | null
+          board_id?: string | null
+          cancellation_reason?: string | null
+          created_at?: string | null
+          decisions_count?: number | null
+          duration_minutes?: number | null
+          id?: string
+          is_virtual?: boolean | null
+          location?: string | null
+          meeting_number?: string
+          meeting_title?: string
+          meeting_type?: string
+          minutes?: string | null
+          minutes_approved?: boolean | null
+          minutes_approved_at?: string | null
+          minutes_document_url?: string | null
+          quorum_met?: boolean | null
+          scheduled_date?: string
+          status?: string | null
+          updated_at?: string | null
+          virtual_link?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "governance_meetings_board_id_fkey"
+            columns: ["board_id"]
+            isOneToOne: false
+            referencedRelation: "governance_boards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      governance_policies: {
+        Row: {
+          approval_notes: string | null
+          approved_at: string | null
+          approved_by: string | null
+          beneficiary_eligibility: Json | null
+          category: string
+          created_at: string | null
+          description: string | null
+          distribution_rules: Json | null
+          effective_date: string
+          expiry_date: string | null
+          id: string
+          objectives: string | null
+          parent_policy_id: string | null
+          policy_code: string
+          policy_document_url: string | null
+          policy_name_ar: string
+          policy_name_en: string | null
+          policy_type: string
+          review_date: string | null
+          scope: string | null
+          status: string | null
+          updated_at: string | null
+          version: number | null
+          waqf_conditions: Json | null
+        }
+        Insert: {
+          approval_notes?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          beneficiary_eligibility?: Json | null
+          category: string
+          created_at?: string | null
+          description?: string | null
+          distribution_rules?: Json | null
+          effective_date: string
+          expiry_date?: string | null
+          id?: string
+          objectives?: string | null
+          parent_policy_id?: string | null
+          policy_code: string
+          policy_document_url?: string | null
+          policy_name_ar: string
+          policy_name_en?: string | null
+          policy_type: string
+          review_date?: string | null
+          scope?: string | null
+          status?: string | null
+          updated_at?: string | null
+          version?: number | null
+          waqf_conditions?: Json | null
+        }
+        Update: {
+          approval_notes?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          beneficiary_eligibility?: Json | null
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          distribution_rules?: Json | null
+          effective_date?: string
+          expiry_date?: string | null
+          id?: string
+          objectives?: string | null
+          parent_policy_id?: string | null
+          policy_code?: string
+          policy_document_url?: string | null
+          policy_name_ar?: string
+          policy_name_en?: string | null
+          policy_type?: string
+          review_date?: string | null
+          scope?: string | null
+          status?: string | null
+          updated_at?: string | null
+          version?: number | null
+          waqf_conditions?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "governance_policies_parent_policy_id_fkey"
+            columns: ["parent_policy_id"]
+            isOneToOne: false
+            referencedRelation: "governance_policies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      governance_risks: {
+        Row: {
+          control_effectiveness: string | null
+          created_at: string | null
+          current_controls: string | null
+          id: string
+          impact: string
+          impact_score: number | null
+          last_review_date: string | null
+          likelihood: string
+          likelihood_score: number | null
+          mitigation_actions: Json | null
+          mitigation_plan: string | null
+          next_review_date: string
+          potential_impact: string | null
+          residual_risk_score: number | null
+          review_frequency: string
+          risk_category: string
+          risk_code: string
+          risk_description: string
+          risk_level: string | null
+          risk_owner_name: string
+          risk_score: number | null
+          risk_subcategory: string | null
+          risk_title: string
+          status: string | null
+          trigger_events: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          control_effectiveness?: string | null
+          created_at?: string | null
+          current_controls?: string | null
+          id?: string
+          impact: string
+          impact_score?: number | null
+          last_review_date?: string | null
+          likelihood: string
+          likelihood_score?: number | null
+          mitigation_actions?: Json | null
+          mitigation_plan?: string | null
+          next_review_date: string
+          potential_impact?: string | null
+          residual_risk_score?: number | null
+          review_frequency: string
+          risk_category: string
+          risk_code: string
+          risk_description: string
+          risk_level?: string | null
+          risk_owner_name: string
+          risk_score?: number | null
+          risk_subcategory?: string | null
+          risk_title: string
+          status?: string | null
+          trigger_events?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          control_effectiveness?: string | null
+          created_at?: string | null
+          current_controls?: string | null
+          id?: string
+          impact?: string
+          impact_score?: number | null
+          last_review_date?: string | null
+          likelihood?: string
+          likelihood_score?: number | null
+          mitigation_actions?: Json | null
+          mitigation_plan?: string | null
+          next_review_date?: string
+          potential_impact?: string | null
+          residual_risk_score?: number | null
+          review_frequency?: string
+          risk_category?: string
+          risk_code?: string
+          risk_description?: string
+          risk_level?: string | null
+          risk_owner_name?: string
+          risk_score?: number | null
+          risk_subcategory?: string | null
+          risk_title?: string
+          status?: string | null
+          trigger_events?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      governance_votes: {
+        Row: {
+          beneficiary_id: string | null
+          created_at: string | null
+          decision_id: string | null
+          id: string
+          ip_address: string | null
+          is_secret: boolean | null
+          user_agent: string | null
+          vote: string
+          vote_reason: string | null
+          voted_at: string | null
+          voter_id: string | null
+          voter_name: string
+          voter_type: string
+        }
+        Insert: {
+          beneficiary_id?: string | null
+          created_at?: string | null
+          decision_id?: string | null
+          id?: string
+          ip_address?: string | null
+          is_secret?: boolean | null
+          user_agent?: string | null
+          vote: string
+          vote_reason?: string | null
+          voted_at?: string | null
+          voter_id?: string | null
+          voter_name: string
+          voter_type: string
+        }
+        Update: {
+          beneficiary_id?: string | null
+          created_at?: string | null
+          decision_id?: string | null
+          id?: string
+          ip_address?: string | null
+          is_secret?: boolean | null
+          user_agent?: string | null
+          vote?: string
+          vote_reason?: string | null
+          voted_at?: string | null
+          voter_id?: string | null
+          voter_name?: string
+          voter_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "governance_votes_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "governance_votes_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_statistics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "governance_votes_decision_id_fkey"
+            columns: ["decision_id"]
+            isOneToOne: false
+            referencedRelation: "governance_decisions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invoice_lines: {
         Row: {
           account_id: string | null
@@ -2761,14 +3509,24 @@ export type Database = {
           country: string | null
           created_at: string | null
           email: string | null
+          governance_type: string | null
           id: string
           logo_url: string | null
+          nazer_appointment_date: string | null
+          nazer_contact_email: string | null
+          nazer_contact_phone: string | null
+          nazer_name: string | null
+          nazer_title: string | null
           organization_name_ar: string
           organization_name_en: string | null
           phone: string | null
           postal_code: string | null
           updated_at: string | null
           vat_registration_number: string
+          waqf_deed_url: string | null
+          waqf_establishment_date: string | null
+          waqf_registration_number: string | null
+          waqf_type: string | null
         }
         Insert: {
           address_ar: string
@@ -2778,14 +3536,24 @@ export type Database = {
           country?: string | null
           created_at?: string | null
           email?: string | null
+          governance_type?: string | null
           id?: string
           logo_url?: string | null
+          nazer_appointment_date?: string | null
+          nazer_contact_email?: string | null
+          nazer_contact_phone?: string | null
+          nazer_name?: string | null
+          nazer_title?: string | null
           organization_name_ar: string
           organization_name_en?: string | null
           phone?: string | null
           postal_code?: string | null
           updated_at?: string | null
           vat_registration_number: string
+          waqf_deed_url?: string | null
+          waqf_establishment_date?: string | null
+          waqf_registration_number?: string | null
+          waqf_type?: string | null
         }
         Update: {
           address_ar?: string
@@ -2795,14 +3563,24 @@ export type Database = {
           country?: string | null
           created_at?: string | null
           email?: string | null
+          governance_type?: string | null
           id?: string
           logo_url?: string | null
+          nazer_appointment_date?: string | null
+          nazer_contact_email?: string | null
+          nazer_contact_phone?: string | null
+          nazer_name?: string | null
+          nazer_title?: string | null
           organization_name_ar?: string
           organization_name_en?: string | null
           phone?: string | null
           postal_code?: string | null
           updated_at?: string | null
           vat_registration_number?: string
+          waqf_deed_url?: string | null
+          waqf_establishment_date?: string | null
+          waqf_registration_number?: string | null
+          waqf_type?: string | null
         }
         Relationships: []
       }
@@ -2926,6 +3704,53 @@ export type Database = {
           },
         ]
       }
+      policy_reviews: {
+        Row: {
+          action_required: boolean | null
+          created_at: string | null
+          findings: string | null
+          id: string
+          next_review_date: string | null
+          policy_id: string | null
+          recommendations: string | null
+          review_date: string
+          review_type: string | null
+          reviewer_name: string
+        }
+        Insert: {
+          action_required?: boolean | null
+          created_at?: string | null
+          findings?: string | null
+          id?: string
+          next_review_date?: string | null
+          policy_id?: string | null
+          recommendations?: string | null
+          review_date: string
+          review_type?: string | null
+          reviewer_name: string
+        }
+        Update: {
+          action_required?: boolean | null
+          created_at?: string | null
+          findings?: string | null
+          id?: string
+          next_review_date?: string | null
+          policy_id?: string | null
+          recommendations?: string | null
+          review_date?: string
+          review_type?: string | null
+          reviewer_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "policy_reviews_policy_id_fkey"
+            columns: ["policy_id"]
+            isOneToOne: false
+            referencedRelation: "governance_policies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -2970,42 +3795,54 @@ export type Database = {
       }
       properties: {
         Row: {
+          available_units: number | null
           created_at: string
           description: string | null
           id: string
           location: string
           monthly_revenue: number
           name: string
+          occupancy_percentage: number | null
           occupied: number
+          occupied_units: number | null
           status: string
+          total_units: number | null
           type: string
           units: number
           updated_at: string
           waqf_unit_id: string | null
         }
         Insert: {
+          available_units?: number | null
           created_at?: string
           description?: string | null
           id?: string
           location: string
           monthly_revenue?: number
           name: string
+          occupancy_percentage?: number | null
           occupied?: number
+          occupied_units?: number | null
           status: string
+          total_units?: number | null
           type: string
           units?: number
           updated_at?: string
           waqf_unit_id?: string | null
         }
         Update: {
+          available_units?: number | null
           created_at?: string
           description?: string | null
           id?: string
           location?: string
           monthly_revenue?: number
           name?: string
+          occupancy_percentage?: number | null
           occupied?: number
+          occupied_units?: number | null
           status?: string
+          total_units?: number | null
           type?: string
           units?: number
           updated_at?: string
@@ -3017,6 +3854,137 @@ export type Database = {
             columns: ["waqf_unit_id"]
             isOneToOne: false
             referencedRelation: "waqf_units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      property_units: {
+        Row: {
+          amenities: Json | null
+          annual_rent: number | null
+          area: number | null
+          bathrooms: number | null
+          created_at: string | null
+          current_contract_id: string | null
+          current_tenant_id: string | null
+          description: string | null
+          estimated_value: number | null
+          floor_number: number | null
+          furnishing_status: string | null
+          has_kitchen: boolean | null
+          has_parking: boolean | null
+          id: string
+          images: string[] | null
+          last_maintenance_date: string | null
+          lease_end_date: string | null
+          lease_start_date: string | null
+          monthly_rent: number | null
+          next_maintenance_date: string | null
+          notes: string | null
+          occupancy_status: string | null
+          parking_spaces: number | null
+          property_id: string | null
+          rooms: number | null
+          status: string | null
+          unit_name: string | null
+          unit_number: string
+          unit_type: string
+          updated_at: string | null
+          utilities_included: string[] | null
+        }
+        Insert: {
+          amenities?: Json | null
+          annual_rent?: number | null
+          area?: number | null
+          bathrooms?: number | null
+          created_at?: string | null
+          current_contract_id?: string | null
+          current_tenant_id?: string | null
+          description?: string | null
+          estimated_value?: number | null
+          floor_number?: number | null
+          furnishing_status?: string | null
+          has_kitchen?: boolean | null
+          has_parking?: boolean | null
+          id?: string
+          images?: string[] | null
+          last_maintenance_date?: string | null
+          lease_end_date?: string | null
+          lease_start_date?: string | null
+          monthly_rent?: number | null
+          next_maintenance_date?: string | null
+          notes?: string | null
+          occupancy_status?: string | null
+          parking_spaces?: number | null
+          property_id?: string | null
+          rooms?: number | null
+          status?: string | null
+          unit_name?: string | null
+          unit_number: string
+          unit_type: string
+          updated_at?: string | null
+          utilities_included?: string[] | null
+        }
+        Update: {
+          amenities?: Json | null
+          annual_rent?: number | null
+          area?: number | null
+          bathrooms?: number | null
+          created_at?: string | null
+          current_contract_id?: string | null
+          current_tenant_id?: string | null
+          description?: string | null
+          estimated_value?: number | null
+          floor_number?: number | null
+          furnishing_status?: string | null
+          has_kitchen?: boolean | null
+          has_parking?: boolean | null
+          id?: string
+          images?: string[] | null
+          last_maintenance_date?: string | null
+          lease_end_date?: string | null
+          lease_start_date?: string | null
+          monthly_rent?: number | null
+          next_maintenance_date?: string | null
+          notes?: string | null
+          occupancy_status?: string | null
+          parking_spaces?: number | null
+          property_id?: string | null
+          rooms?: number | null
+          status?: string | null
+          unit_name?: string | null
+          unit_number?: string
+          unit_type?: string
+          updated_at?: string | null
+          utilities_included?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_units_current_contract_id_fkey"
+            columns: ["current_contract_id"]
+            isOneToOne: false
+            referencedRelation: "contracts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "property_units_current_tenant_id_fkey"
+            columns: ["current_tenant_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "property_units_current_tenant_id_fkey"
+            columns: ["current_tenant_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_statistics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "property_units_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
             referencedColumns: ["id"]
           },
         ]
@@ -3326,6 +4294,53 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      risk_assessments: {
+        Row: {
+          assessment_date: string
+          assessor_name: string
+          created_at: string | null
+          findings: string | null
+          id: string
+          impact_score: number | null
+          likelihood_score: number | null
+          overall_score: number | null
+          recommendations: string | null
+          risk_id: string | null
+        }
+        Insert: {
+          assessment_date: string
+          assessor_name: string
+          created_at?: string | null
+          findings?: string | null
+          id?: string
+          impact_score?: number | null
+          likelihood_score?: number | null
+          overall_score?: number | null
+          recommendations?: string | null
+          risk_id?: string | null
+        }
+        Update: {
+          assessment_date?: string
+          assessor_name?: string
+          created_at?: string | null
+          findings?: string | null
+          id?: string
+          impact_score?: number | null
+          likelihood_score?: number | null
+          overall_score?: number | null
+          recommendations?: string | null
+          risk_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "risk_assessments_risk_id_fkey"
+            columns: ["risk_id"]
+            isOneToOne: false
+            referencedRelation: "governance_risks"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       saved_filters: {
         Row: {
@@ -4255,6 +5270,104 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      voting_delegations: {
+        Row: {
+          created_at: string | null
+          decision_id: string | null
+          delegate_id: string | null
+          delegate_name: string
+          delegated_at: string | null
+          delegation_reason: string | null
+          delegator_id: string | null
+          delegator_name: string
+          id: string
+          is_active: boolean | null
+        }
+        Insert: {
+          created_at?: string | null
+          decision_id?: string | null
+          delegate_id?: string | null
+          delegate_name: string
+          delegated_at?: string | null
+          delegation_reason?: string | null
+          delegator_id?: string | null
+          delegator_name: string
+          id?: string
+          is_active?: boolean | null
+        }
+        Update: {
+          created_at?: string | null
+          decision_id?: string | null
+          delegate_id?: string | null
+          delegate_name?: string
+          delegated_at?: string | null
+          delegation_reason?: string | null
+          delegator_id?: string | null
+          delegator_name?: string
+          id?: string
+          is_active?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "voting_delegations_decision_id_fkey"
+            columns: ["decision_id"]
+            isOneToOne: false
+            referencedRelation: "governance_decisions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      waqf_nazers: {
+        Row: {
+          address: string | null
+          appointment_date: string
+          appointment_decree: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          is_primary: boolean | null
+          national_id: string | null
+          nazer_name: string
+          nazer_title: string | null
+          notes: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          address?: string | null
+          appointment_date: string
+          appointment_decree?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_primary?: boolean | null
+          national_id?: string | null
+          nazer_name: string
+          nazer_title?: string | null
+          notes?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          address?: string | null
+          appointment_date?: string
+          appointment_decree?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_primary?: boolean | null
+          national_id?: string | null
+          nazer_name?: string
+          nazer_title?: string | null
+          notes?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }

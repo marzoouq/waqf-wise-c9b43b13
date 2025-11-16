@@ -16,6 +16,21 @@ export interface OrganizationSettings {
   phone: string | null;
   email: string | null;
   logo_url: string | null;
+  
+  // جديد: نوع إدارة الوقف
+  governance_type?: 'nazer_only' | 'nazer_with_board';
+  nazer_name?: string | null;
+  nazer_title?: string | null;
+  nazer_appointment_date?: string | null;
+  nazer_contact_phone?: string | null;
+  nazer_contact_email?: string | null;
+  
+  // جديد: معلومات الوقف
+  waqf_type?: string | null;
+  waqf_establishment_date?: string | null;
+  waqf_registration_number?: string | null;
+  waqf_deed_url?: string | null;
+  
   created_at: string;
   updated_at: string;
 }
