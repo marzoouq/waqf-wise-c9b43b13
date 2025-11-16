@@ -22,7 +22,7 @@ export function useRequestComments(requestId?: string) {
   const queryClient = useQueryClient();
 
   const { data: comments = [], isLoading } = useQuery({
-    queryKey: ["request-comments", requestId],
+    queryKey: ["request-comments", requestId || undefined],
     queryFn: async () => {
       if (!requestId) return [];
       

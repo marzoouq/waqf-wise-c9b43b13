@@ -63,6 +63,9 @@ const queryClient = new QueryClient({
       gcTime: 10 * 60 * 1000, // 10 minutes - cache retention (was cacheTime)
       refetchOnWindowFocus: false, // Prevent unnecessary refetches
       refetchOnReconnect: true, // Refetch on reconnect
+      refetchOnMount: false, // Prevent unnecessary refetches on mount
+      structuralSharing: true, // Optimize performance
+      networkMode: 'online', // Handle connection state
       retry: (failureCount, error: any) => {
         // لا تعيد المحاولة على أخطاء 404 أو 403
         if (error?.status === 404 || error?.status === 403) return false;

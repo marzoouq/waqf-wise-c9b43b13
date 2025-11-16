@@ -46,32 +46,32 @@ export function useInternalMessages() {
 
   // جلب الرسائل الواردة
   const { data: inboxMessages = [], isLoading: isLoadingInbox } = useQuery({
-    queryKey: ["internal_messages", "inbox", user?.id],
+    queryKey: ["internal_messages", "inbox", user?.id || undefined],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
-        .from("internal_messages")
+      const { data, error } = await supabase
+        .from("internal_messages" as any)
         .select("*")
         .eq("receiver_id", user?.id)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as InternalMessage[];
+      return data as unknown as InternalMessage[];
     },
     enabled: !!user?.id,
   });
 
   // جلب الرسائل المرسلة
   const { data: sentMessages = [], isLoading: isLoadingSent } = useQuery({
-    queryKey: ["internal_messages", "sent", user?.id],
+    queryKey: ["internal_messages", "sent", user?.id || undefined],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
-        .from("internal_messages")
+      const { data, error } = await supabase
+        .from("internal_messages" as any)
         .select("*")
         .eq("sender_id", user?.id)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as InternalMessage[];
+      return data as unknown as InternalMessage[];
     },
     enabled: !!user?.id,
   });
@@ -79,8 +79,8 @@ export function useInternalMessages() {
   // إرسال رسالة
   const sendMessage = useMutation({
     mutationFn: async (message: Omit<InternalMessage, "id" | "created_at" | "is_read" | "read_at">) => {
-      const { data, error } = await (supabase as any)
-        .from("internal_messages")
+      const { data, error } = await supabase
+        .from("internal_messages" as any)
         .insert([message])
         .select()
         .single();
@@ -107,8 +107,8 @@ export function useInternalMessages() {
   // تعليم رسالة كمقروءة
   const markAsRead = useMutation({
     mutationFn: async (messageId: string) => {
-      const { data, error } = await (supabase as any)
-        .from("internal_messages")
+      const { data, error } = await supabase
+        .from("internal_messages" as any)
         .update({ is_read: true, read_at: new Date().toISOString() })
         .eq("id", messageId)
         .select()

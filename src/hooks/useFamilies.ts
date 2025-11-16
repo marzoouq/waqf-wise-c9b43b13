@@ -131,7 +131,7 @@ export const useFamilyMembers = (familyId?: string) => {
 
   // Fetch family members
   const { data: members = [], isLoading } = useQuery({
-    queryKey: ['family-members', familyId],
+    queryKey: ['family-members', familyId || undefined],
     queryFn: async () => {
       if (!familyId) return [];
 

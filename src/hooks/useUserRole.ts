@@ -9,7 +9,7 @@ export function useUserRole() {
   const { user } = useAuth();
 
   const { data: roles = [], isLoading, refetch } = useQuery({
-    queryKey: ["user-roles", user?.id],
+    queryKey: ["user-roles", user?.id || undefined],
     queryFn: async () => {
       if (!user) return [];
 
