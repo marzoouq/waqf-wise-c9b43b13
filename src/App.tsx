@@ -38,8 +38,6 @@ const Funds = lazy(() => import("./pages/Funds"));
 const Archive = lazy(() => import("./pages/Archive"));
 const Accounting = lazy(() => import("./pages/Accounting"));
 const Reports = lazy(() => import("./pages/Reports"));
-const ReportBuilder = lazy(() => import("./pages/ReportBuilder"));
-const ReportsDashboard = lazy(() => import("./pages/ReportsDashboard"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Invoices = lazy(() => import("./pages/Invoices"));
 const Approvals = lazy(() => import("./pages/Approvals"));
@@ -237,9 +235,7 @@ const App = () => {
           />
           <Route path="/loans" element={<Loans />} />
           <Route path="/waqf-units" element={<WaqfUnits />} />
-            <Route path="/reports" element={<Reports />} />
-            <Route path="/report-builder" element={<ReportBuilder />} />
-            <Route path="/reports-dashboard" element={<ReportsDashboard />} />
+          <Route path="/reports" element={<Reports />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/requests" element={<Requests />} />
