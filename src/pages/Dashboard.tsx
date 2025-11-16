@@ -9,6 +9,7 @@ import { PropertyDialog } from "@/components/properties/PropertyDialog";
 import { DistributionDialog } from "@/components/funds/DistributionDialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 
 // Lazy load heavy components
 const AdminKPIs = lazy(() => import("@/components/dashboard/admin/AdminKPIs").then(m => ({ default: m.AdminKPIs })));
@@ -26,15 +27,15 @@ const RecentJournalEntries = lazy(() => import("@/components/dashboard/RecentJou
 
 // Skeleton components
 const KPISkeleton = () => (
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-4 sm:mb-6 md:mb-8">
     {[...Array(8)].map((_, i) => (
       <Card key={i} className="shadow-soft">
-        <CardHeader className="pb-3">
-          <Skeleton className="h-4 w-32" />
+        <CardHeader className="pb-2 sm:pb-3">
+          <Skeleton className="h-3 sm:h-4 w-24 sm:w-32" />
         </CardHeader>
         <CardContent>
-          <Skeleton className="h-8 w-24 mb-2" />
-          <Skeleton className="h-3 w-20" />
+          <Skeleton className="h-6 sm:h-8 w-20 sm:w-24 mb-1 sm:mb-2" />
+          <Skeleton className="h-2 sm:h-3 w-16 sm:w-20" />
         </CardContent>
       </Card>
     ))}
@@ -43,11 +44,11 @@ const KPISkeleton = () => (
 
 const ChartSkeleton = () => (
   <Card className="shadow-soft">
-    <CardHeader>
-      <Skeleton className="h-6 w-40" />
+    <CardHeader className="pb-2 sm:pb-4">
+      <Skeleton className="h-4 sm:h-6 w-32 sm:w-40" />
     </CardHeader>
     <CardContent>
-      <Skeleton className="h-[300px] w-full" />
+      <Skeleton className="h-[200px] sm:h-[250px] md:h-[300px] w-full" />
     </CardContent>
   </Card>
 );
@@ -77,71 +78,67 @@ const Dashboard = () => {
 
   if (roleLoading) {
     return (
-      <div className="container mx-auto py-8 px-4">
+      <MobileOptimizedLayout>
         <KPISkeleton />
-      </div>
+      </MobileOptimizedLayout>
     );
   }
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      {/* Header */}
-      <div className="mb-8 animate-fade-in">
-        <h1 className="text-4xl font-bold text-foreground mb-2">
-          لوحة تحكم المشرف
-        </h1>
-        <p className="text-muted-foreground">
-          نظرة شاملة على جميع عمليات الوقف
-        </p>
-      </div>
+    <MobileOptimizedLayout>
+      <MobileOptimizedHeader
+        title="لوحة تحكم المشرف"
+        description="نظرة شاملة على جميع عمليات الوقف"
+        icon={<BarChart3 className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
+      />
 
       {/* Chatbot Quick Access Card */}
-      <div className="mb-8">
+      <div className="mb-4 sm:mb-6 md:mb-8">
         <Suspense fallback={<ChartSkeleton />}>
           <ChatbotQuickCard />
         </Suspense>
       </div>
 
       {/* Tabs Navigation */}
-      <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 mb-8 h-auto p-1 bg-muted/50">
+      <Tabs defaultValue="overview" className="w-full space-y-4 sm:space-y-5 md:space-y-6">
+        <TabsList className="w-full grid grid-cols-2 sm:grid-cols-4 gap-1 sm:gap-2 bg-muted/50 p-1">
           <TabsTrigger 
             value="overview" 
-            className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm py-3"
+            className="gap-1 sm:gap-2 text-xs sm:text-sm py-2 sm:py-3 data-[state=active]:bg-background data-[state=active]:shadow-sm"
           >
-            <BarChart3 className="h-4 w-4" />
-            <span className="hidden sm:inline">نظرة عامة</span>
+            <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span>نظرة عامة</span>
           </TabsTrigger>
           <TabsTrigger 
             value="financial" 
-            className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm py-3"
+            className="gap-1 sm:gap-2 text-xs sm:text-sm py-2 sm:py-3 data-[state=active]:bg-background data-[state=active]:shadow-sm"
           >
-            <BarChart3 className="h-4 w-4" />
-            <span className="hidden sm:inline">المالية</span>
+            <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span>المالية</span>
           </TabsTrigger>
           <TabsTrigger 
             value="beneficiaries" 
-            className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm py-3"
+            className="gap-1 sm:gap-2 text-xs sm:text-sm py-2 sm:py-3 data-[state=active]:bg-background data-[state=active]:shadow-sm"
           >
-            <Users className="h-4 w-4" />
-            <span className="hidden sm:inline">المستفيدون</span>
+            <Users className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span>المستفيدون</span>
           </TabsTrigger>
           <TabsTrigger 
             value="activities" 
-            className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm py-3"
+            className="gap-1 sm:gap-2 text-xs sm:text-sm py-2 sm:py-3 data-[state=active]:bg-background data-[state=active]:shadow-sm"
           >
-            <Bell className="h-4 w-4" />
-            <span className="hidden sm:inline">النشاطات</span>
+            <Bell className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span>النشاطات</span>
           </TabsTrigger>
         </TabsList>
 
         {/* Overview Tab */}
-        <TabsContent value="overview" className="space-y-8 animate-fade-in">
+        <TabsContent value="overview" className="space-y-4 sm:space-y-5 md:space-y-6">
           <Suspense fallback={<KPISkeleton />}>
             <AdminKPIs />
           </Suspense>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
             <Suspense fallback={<ChartSkeleton />}>
               <RevenueExpenseChart />
             </Suspense>
@@ -150,7 +147,7 @@ const Dashboard = () => {
             </Suspense>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
             <Suspense fallback={<ChartSkeleton />}>
               <AdminActivities />
             </Suspense>
@@ -169,7 +166,7 @@ const Dashboard = () => {
         </TabsContent>
 
         {/* Financial Tab */}
-        <TabsContent value="financial" className="space-y-8 animate-fade-in">
+        <TabsContent value="financial" className="space-y-4 sm:space-y-5 md:space-y-6">
           <Suspense fallback={<KPISkeleton />}>
             <FinancialStats />
           </Suspense>
@@ -178,7 +175,7 @@ const Dashboard = () => {
             <AccountingStats />
           </Suspense>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
             <Suspense fallback={<ChartSkeleton />}>
               <RevenueExpenseChart />
             </Suspense>
@@ -193,8 +190,8 @@ const Dashboard = () => {
         </TabsContent>
 
         {/* Beneficiaries Tab */}
-        <TabsContent value="beneficiaries" className="space-y-8 animate-fade-in">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <TabsContent value="beneficiaries" className="space-y-4 sm:space-y-5 md:space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
             <Suspense fallback={<ChartSkeleton />}>
               <FamiliesStats />
             </Suspense>
@@ -213,8 +210,8 @@ const Dashboard = () => {
         </TabsContent>
 
         {/* Activities Tab */}
-        <TabsContent value="activities" className="space-y-8 animate-fade-in">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <TabsContent value="activities" className="space-y-4 sm:space-y-5 md:space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
             <Suspense fallback={<ChartSkeleton />}>
               <AdminActivities />
             </Suspense>
@@ -241,7 +238,7 @@ const Dashboard = () => {
         onOpenChange={setIsDistributionDialogOpen}
         onDistribute={() => setIsDistributionDialogOpen(false)}
       />
-    </div>
+    </MobileOptimizedLayout>
   );
 };
 
