@@ -54,14 +54,14 @@ export function ResponsiveTable({
   // عرض Cards على الجوال
   if (isMobile && mobileCardView) {
     return (
-      <div className="space-y-3">
+      <div className="space-y-2 sm:space-y-3">
         {data.map((row, index) => {
           const rowId = row.id || `row-${index}`;
           return (
             <Card
               key={rowId}
               className={cn(
-                'p-4 space-y-2',
+                'p-3 sm:p-4 space-y-1.5 sm:space-y-2',
                 onRowClick && 'cursor-pointer hover:bg-muted/50 transition-colors'
               )}
               onClick={() => onRowClick?.(row)}
@@ -69,15 +69,15 @@ export function ResponsiveTable({
               {mobileCardRender ? (
                 mobileCardRender(row)
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-1.5 sm:space-y-2">
                   {columns
                     .filter(col => !col.mobileHidden)
                     .map((col) => (
                       <div key={col.key} className="flex justify-between items-start gap-2">
-                        <span className="text-sm text-muted-foreground font-medium min-w-[100px]">
+                        <span className="text-xs sm:text-sm text-muted-foreground font-medium min-w-[80px] sm:min-w-[100px]">
                           {col.label}:
                         </span>
-                        <span className="text-sm flex-1 text-left">
+                        <span className="text-xs sm:text-sm flex-1 text-left">
                           {col.render ? col.render(row[col.key], row) : row[col.key]}
                         </span>
                       </div>

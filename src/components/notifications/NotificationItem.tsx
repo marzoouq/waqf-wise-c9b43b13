@@ -13,17 +13,17 @@ interface NotificationItemProps {
 const getNotificationIcon = (type: Notification["type"]) => {
   switch (type) {
     case "approval":
-      return <CheckCircle className="w-5 h-5 text-green-600" />;
+      return <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />;
     case "payment":
-      return <DollarSign className="w-5 h-5 text-blue-600" />;
+      return <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />;
     case "journal_entry":
-      return <FileText className="w-5 h-5 text-purple-600" />;
+      return <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />;
     case "distribution":
-      return <Users className="w-5 h-5 text-orange-600" />;
+      return <Users className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600" />;
     case "system":
-      return <AlertCircle className="w-5 h-5 text-yellow-600" />;
+      return <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-600" />;
     default:
-      return <Bell className="w-5 h-5 text-gray-600" />;
+      return <Bell className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />;
   }
 };
 
@@ -56,30 +56,30 @@ export const NotificationItem = ({ notification, onMarkAsRead, onClick }: Notifi
     <div
       onClick={handleClick}
       className={cn(
-        "p-4 hover:bg-accent cursor-pointer transition-colors border-b last:border-b-0",
+        "p-3 sm:p-4 hover:bg-accent cursor-pointer transition-colors border-b last:border-b-0",
         !notification.is_read && "bg-accent/50"
       )}
     >
-      <div className="flex gap-3">
-        <div className={cn("p-2 rounded-full h-fit", getNotificationBg(notification.type))}>
+      <div className="flex gap-2 sm:gap-3">
+        <div className={cn("p-1.5 sm:p-2 rounded-full h-fit", getNotificationBg(notification.type))}>
           {getNotificationIcon(notification.type)}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <h4 className={cn(
-              "text-sm font-medium",
+              "text-xs sm:text-sm font-medium",
               !notification.is_read && "font-semibold"
             )}>
               {notification.title}
             </h4>
             {!notification.is_read && (
-              <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-1" />
+              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary rounded-full flex-shrink-0 mt-1" />
             )}
           </div>
-          <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 sm:mt-1 line-clamp-2">
             {notification.message}
           </p>
-          <p className="text-xs text-muted-foreground mt-2">
+          <p className="text-[10px] sm:text-xs text-muted-foreground mt-1 sm:mt-2">
             {formatDistanceToNow(new Date(notification.created_at), {
               addSuffix: true,
               locale: ar,
