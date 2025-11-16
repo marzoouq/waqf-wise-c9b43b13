@@ -8,7 +8,7 @@ import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { useState } from "react";
 import ViewJournalEntryDialog from "@/components/accounting/ViewJournalEntryDialog";
-import { JournalApproval, StatusConfigMap, BadgeVariant, JournalEntryWithLines } from "@/types/approvals";
+import { JournalApproval, BadgeVariant, JournalEntryWithLines } from "@/types/approvals";
 import { LucideIcon } from "lucide-react";
 
 export function JournalApprovalsTab() {
@@ -83,7 +83,7 @@ export function JournalApprovalsTab() {
                 <div>
                   <p className="text-sm text-muted-foreground">تاريخ القيد</p>
                   <p className="text-base">
-                    {format(new Date(approval.journal_entry?.entry_date), "dd MMM yyyy", {
+                    {approval.journal_entry?.entry_date && format(new Date(approval.journal_entry.entry_date), "dd MMM yyyy", {
                       locale: ar,
                     })}
                   </p>
