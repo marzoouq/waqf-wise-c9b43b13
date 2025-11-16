@@ -53,6 +53,9 @@ const Users = lazy(() => import("./pages/Users"));
 const AuditLogs = lazy(() => import("./pages/AuditLogs"));
 const AIInsights = lazy(() => import("./pages/AIInsights"));
 const Chatbot = lazy(() => import("./pages/Chatbot"));
+const Support = lazy(() => import("./pages/Support"));
+const SupportManagement = lazy(() => import("./pages/SupportManagement"));
+const AdvancedSettings = lazy(() => import("./pages/AdvancedSettings"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Configure QueryClient with optimized defaults and error handling
@@ -257,6 +260,23 @@ const App = () => {
             } 
           />
           <Route path="/chatbot" element={<Chatbot />} />
+          <Route path="/support" element={<Support />} />
+          <Route 
+            path="/support-management" 
+            element={
+              <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+                <SupportManagement />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/advanced-settings" 
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdvancedSettings />
+              </ProtectedRoute>
+            } 
+          />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
