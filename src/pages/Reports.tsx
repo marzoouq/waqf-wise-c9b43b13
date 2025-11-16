@@ -6,6 +6,10 @@ import { EnhancedBalanceSheet } from "@/components/accounting/EnhancedBalanceShe
 import { TrialBalanceReport } from "@/components/accounting/TrialBalanceReport";
 import { CashFlowStatement } from "@/components/accounting/CashFlowStatement";
 import { AccountingLinkReport } from "@/components/reports/AccountingLinkReport";
+import { DistributionAnalysisReport } from "@/components/reports/DistributionAnalysisReport";
+import { LoansAgingReport } from "@/components/reports/LoansAgingReport";
+import { MaintenanceCostReport } from "@/components/reports/MaintenanceCostReport";
+import { FundsPerformanceReport } from "@/components/reports/FundsPerformanceReport";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, FileText } from "lucide-react";
@@ -86,13 +90,17 @@ const Reports = () => {
         </div>
 
         <Tabs defaultValue="trial-balance" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-6">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 lg:grid-cols-10 gap-1">
             <TabsTrigger value="trial-balance">ميزان المراجعة</TabsTrigger>
-            <TabsTrigger value="balance-sheet">الميزانية العمومية</TabsTrigger>
+            <TabsTrigger value="balance-sheet">الميزانية</TabsTrigger>
             <TabsTrigger value="income">قائمة الدخل</TabsTrigger>
-            <TabsTrigger value="cash-flow">التدفقات النقدية</TabsTrigger>
+            <TabsTrigger value="cash-flow">التدفقات</TabsTrigger>
             <TabsTrigger value="accounting-link">الربط المحاسبي</TabsTrigger>
             <TabsTrigger value="distributions">التوزيعات</TabsTrigger>
+            <TabsTrigger value="distribution-analysis">تحليل التوزيعات</TabsTrigger>
+            <TabsTrigger value="loans-aging">أعمار الديون</TabsTrigger>
+            <TabsTrigger value="maintenance">تكاليف الصيانة</TabsTrigger>
+            <TabsTrigger value="funds-performance">أداء المصارف</TabsTrigger>
           </TabsList>
 
           <TabsContent value="trial-balance" className="space-y-4">
@@ -208,6 +216,22 @@ const Reports = () => {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="distribution-analysis">
+            <DistributionAnalysisReport />
+          </TabsContent>
+
+          <TabsContent value="loans-aging">
+            <LoansAgingReport />
+          </TabsContent>
+
+          <TabsContent value="maintenance">
+            <MaintenanceCostReport />
+          </TabsContent>
+
+          <TabsContent value="funds-performance">
+            <FundsPerformanceReport />
           </TabsContent>
         </Tabs>
       </div>
