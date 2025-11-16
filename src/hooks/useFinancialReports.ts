@@ -62,58 +62,50 @@ export interface IncomeStatementData {
 }
 
 export function useFinancialReports(fiscalYearId?: string) {
-  // Trial Balance
+  // Trial Balance - حساب الأرصدة المجمعة
   const { data: trialBalance = [], isLoading: isLoadingTrial } = useQuery({
     queryKey: ["trial_balance", fiscalYearId || undefined],
     queryFn: async () => {
-      const query = supabase
-        .from("journal_entry_lines")
-        .select(`
-          account_id,
-          debit_amount,
-          credit_amount,
-          accounts!inner (
-            code,
-            name_ar,
-            account_type
-          ),
-          journal_entries!inner (
-            status,
-            fiscal_year_id
-          )
-        `)
-        .eq("journal_entries.status", "posted");
+      // جلب جميع الحسابات النشطة
+      const { data: accounts, error: accountsError } = await supabase
+        .from("accounts")
+        .select("id, code, name_ar, account_nature, current_balance")
+        .eq("is_active", true)
+        .eq("is_header", false)
+        .order("code");
 
-      if (fiscalYearId) {
-        query.eq("journal_entries.fiscal_year_id", fiscalYearId);
-      }
+      if (accountsError) throw accountsError;
 
-      const { data, error } = await query;
-      if (error) throw error;
+      // حساب الرصيد لكل حساب
+      const trialBalanceData: TrialBalanceAccount[] = await Promise.all(
+        (accounts || []).map(async (acc) => {
+          try {
+            const { data: balance } = await supabase
+              .rpc("calculate_account_balance", { account_uuid: acc.id });
+            
+            const balanceValue = Number(balance || 0);
+            return {
+              account_id: acc.id,
+              code: acc.code,
+              name: acc.name_ar,
+              debit: balanceValue > 0 ? balanceValue : 0,
+              credit: balanceValue < 0 ? -balanceValue : 0,
+              balance: balanceValue,
+            };
+          } catch {
+            return {
+              account_id: acc.id,
+              code: acc.code,
+              name: acc.name_ar,
+              debit: 0,
+              credit: 0,
+              balance: 0,
+            };
+          }
+        })
+      );
 
-      // Aggregate by account
-      const accountsMap = new Map<string, TrialBalanceAccount>();
-
-      data.forEach((line: JournalEntryLineWithAccount) => {
-        const accountId = line.account_id;
-        if (!accountsMap.has(accountId)) {
-          accountsMap.set(accountId, {
-            account_id: accountId,
-            code: line.accounts.code,
-            name: line.accounts.name_ar,
-            debit: 0,
-            credit: 0,
-            balance: 0,
-          });
-        }
-
-        const account = accountsMap.get(accountId)!;
-        account.debit += Number(line.debit_amount);
-        account.credit += Number(line.credit_amount);
-        account.balance = account.debit - account.credit;
-      });
-
-      return Array.from(accountsMap.values()).sort((a, b) => a.code.localeCompare(b.code));
+      return trialBalanceData.filter(a => a.debit > 0 || a.credit > 0);
     },
     enabled: true,
   });
