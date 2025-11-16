@@ -59,7 +59,15 @@ export default function Support() {
   const [articleSearch, setArticleSearch] = useState('');
   const [faqSearch, setFaqSearch] = useState('');
 
-  const { tickets, isLoading: ticketsLoading } = useSupportTickets(filters);
+  // تنظيف الـ filters من القيم الفارغة لتوحيد query keys
+  const cleanFilters: SupportFilters = {};
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '' && (Array.isArray(value) ? value.length > 0 : true)) {
+      (cleanFilters as any)[key] = value;
+    }
+  });
+
+  const { tickets, isLoading: ticketsLoading } = useSupportTickets(Object.keys(cleanFilters).length > 0 ? cleanFilters : undefined);
   const { 
     articles, 
     faqs, 
