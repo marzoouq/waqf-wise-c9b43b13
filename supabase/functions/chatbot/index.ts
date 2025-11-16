@@ -22,7 +22,108 @@ serve(async (req) => {
     console.log('📨 Chatbot request:', { message, userId, quickReplyId });
 
     // جلب البيانات السياقية الشاملة
-    let contextData: any = {};
+    interface ContextData {
+      beneficiaries?: {
+        total: number;
+        active: number;
+        inactive: number;
+        categories: Record<string, number>;
+        cities: Record<string, number>;
+        topCategories: [string, number][];
+        directLink: string;
+      };
+      financial?: {
+        recentEntries: number;
+        postedEntries: number;
+        draftEntries: number;
+        totalDebits: number;
+        totalCredits: number;
+        balance: number;
+        accountsCount: number;
+        accountsByType?: Record<string, number>;
+        directLink: string;
+      };
+      properties?: {
+        total: number;
+        occupied: number;
+        vacant: number;
+        maintenance: number;
+        monthlyRentIncome: number;
+        activeContracts: number;
+        expiringContracts: number;
+        propertyTypes?: Record<string, number>;
+        occupancyRate: number;
+        directLink: string;
+      };
+      loans?: {
+        total: number;
+        active: number;
+        paid: number;
+        defaulted: number;
+        totalLoaned: number;
+        defaultRate: number;
+        directLink: string;
+      };
+      requests?: {
+        total: number;
+        pending: number;
+        approved: number;
+        rejected: number;
+        highPriority: number;
+        overdue: number;
+        totalAmount: number;
+        pendingAmount: number;
+        requestsByType?: Record<string, number>;
+        approvalRate: number;
+        directLink: string;
+      };
+      distributions?: {
+        total: number;
+        approved: number;
+        pending: number;
+        draft: number;
+        totalDistributed: number;
+        totalBeneficiaries: number;
+        avgPerBeneficiary: number;
+        pendingApprovals: number;
+        recent?: Array<{
+          date: string;
+          amount: number;
+          beneficiaries: number;
+          status: string;
+          month: string;
+        }>;
+        directLink: string;
+      };
+      support?: {
+        total: number;
+        open: number;
+        inProgress: number;
+        resolved: number;
+        avgResponseTime: number;
+        directLink: string;
+      };
+      families?: {
+        total: number;
+        active: number;
+        totalMembers: number;
+        avgMembersPerFamily: number;
+        tribes: Record<string, number>;
+        directLink: string;
+      };
+      invoices?: {
+        total: number;
+        paid: number;
+        pending: number;
+        overdue: number;
+        totalAmount: number;
+        paidAmount: number;
+        collectionRate: number;
+        directLink: string;
+      };
+    }
+    
+    const contextData: ContextData = {};
     const messageText = message.toLowerCase();
     
     // جلب بيانات المستفيدين
@@ -34,15 +135,15 @@ serve(async (req) => {
       
       const activeCount = beneficiaries?.filter(b => b.status === 'active').length || 0;
       const inactiveCount = beneficiaries?.filter(b => b.status === 'inactive').length || 0;
-      const categories = beneficiaries?.reduce((acc: any, b) => {
+      const categories = beneficiaries?.reduce((acc: Record<string, number>, b) => {
         acc[b.category] = (acc[b.category] || 0) + 1;
         return acc;
-      }, {});
+      }, {}) || {};
       
-      const cities = beneficiaries?.reduce((acc: any, b) => {
+      const cities = beneficiaries?.reduce((acc: Record<string, number>, b) => {
         if (b.city) acc[b.city] = (acc[b.city] || 0) + 1;
         return acc;
-      }, {});
+      }, {}) || {};
       
       contextData.beneficiaries = {
         total: count || 0,
@@ -50,9 +151,9 @@ serve(async (req) => {
         inactive: inactiveCount,
         categories,
         cities,
-        topCategories: Object.entries(categories || {})
-          .sort(([,a]: any, [,b]: any) => b - a)
-          .slice(0, 5),
+        topCategories: Object.entries(categories)
+          .sort(([, a], [, b]) => (b as number) - (a as number))
+          .slice(0, 5) as [string, number][],
         directLink: '/beneficiaries'
       };
     }
@@ -71,7 +172,7 @@ serve(async (req) => {
       const draftEntries = entries?.filter(e => e.status === 'draft').length || 0;
       
       entries?.forEach(entry => {
-        entry.journal_entry_lines?.forEach((line: any) => {
+        entry.journal_entry_lines?.forEach((line: { debit_amount?: number; credit_amount?: number }) => {
           totalDebits += line.debit_amount || 0;
           totalCredits += line.credit_amount || 0;
         });
@@ -83,10 +184,10 @@ serve(async (req) => {
         .select('account_type, current_balance', { count: 'exact' })
         .eq('is_active', true);
       
-      const accountsByType = accounts?.reduce((acc: any, a) => {
+      const accountsByType = accounts?.reduce((acc: Record<string, number>, a) => {
         acc[a.account_type] = (acc[a.account_type] || 0) + 1;
         return acc;
-      }, {});
+      }, {}) || {};
       
       contextData.financial = {
         recentEntries: entries?.length || 0,
@@ -118,7 +219,7 @@ serve(async (req) => {
       const thirtyDaysFromNow = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
       
       properties?.forEach(p => {
-        const activeContract = p.contracts?.find((c: any) => c.status === 'نشط' || c.status === 'active');
+        const activeContract = p.contracts?.find((c: { status: string; monthly_rent?: number; end_date: string }) => c.status === 'نشط' || c.status === 'active');
         if (activeContract) {
           totalRent += activeContract.monthly_rent || 0;
           activeContracts++;
@@ -131,10 +232,10 @@ serve(async (req) => {
       });
       
       // أنواع العقارات
-      const propertyTypes = properties?.reduce((acc: any, p) => {
+      const propertyTypes = properties?.reduce((acc: Record<string, number>, p) => {
         acc[p.property_type] = (acc[p.property_type] || 0) + 1;
         return acc;
-      }, {});
+      }, {}) || {};
       
       contextData.properties = {
         total: count || 0,
@@ -174,12 +275,12 @@ serve(async (req) => {
         .from('request_types')
         .select('id, name_ar');
       
-      const requestsByType = allRequests?.reduce((acc: any, r) => {
+      const requestsByType = allRequests?.reduce((acc: Record<string, number>, r) => {
         const type = requestTypes?.find(rt => rt.id === r.request_type_id);
         const typeName = type?.name_ar || 'غير محدد';
         acc[typeName] = (acc[typeName] || 0) + 1;
         return acc;
-      }, {});
+      }, {}) || {};
       
       contextData.requests = {
         total: allRequests?.length || 0,
@@ -283,10 +384,10 @@ serve(async (req) => {
       const totalMembers = families?.reduce((sum, f) => sum + (f.total_members || 0), 0) || 0;
       const avgMembersPerFamily = count ? Math.round(totalMembers / count) : 0;
       
-      const tribes = families?.reduce((acc: any, f) => {
+      const tribes = families?.reduce((acc: Record<string, number>, f) => {
         if (f.tribe) acc[f.tribe] = (acc[f.tribe] || 0) + 1;
         return acc;
-      }, {});
+      }, {}) || {};
       
       contextData.families = {
         total: count || 0,
