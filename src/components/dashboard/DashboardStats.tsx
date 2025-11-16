@@ -12,16 +12,16 @@ interface StatCardProps {
 export const StatCard = memo(({ label, value, icon: Icon, color }: StatCardProps) => {
   return (
     <Card className="shadow-soft">
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-2 sm:pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-sm sm:text-base font-medium text-muted-foreground">
+          <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
             {label}
           </CardTitle>
-          <Icon className={`h-5 w-5 sm:h-6 sm:w-6 ${color}`} />
+          <Icon className={`h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 ${color}`} />
         </div>
       </CardHeader>
       <CardContent>
-        <div className={`text-2xl sm:text-3xl md:text-4xl font-bold ${color}`}>
+        <div className={`text-lg sm:text-xl md:text-2xl font-bold ${color}`}>
           {value}
         </div>
       </CardContent>
