@@ -127,12 +127,12 @@ const Beneficiaries = () => {
     setDialogOpen(true);
   }, []);
 
-  const handleEditBeneficiary = useCallback((beneficiary: any) => {
+  const handleEditBeneficiary = useCallback((beneficiary: Beneficiary) => {
     setSelectedBeneficiary(beneficiary);
     setDialogOpen(true);
   }, []);
 
-  const handleSaveBeneficiary = async (data: any) => {
+  const handleSaveBeneficiary = async (data: Omit<Beneficiary, 'id' | 'created_at' | 'updated_at'>) => {
     try {
       if (selectedBeneficiary) {
         await updateBeneficiary({ id: selectedBeneficiary.id, ...data });
@@ -156,26 +156,26 @@ const Beneficiaries = () => {
     setCurrentPage(1);
   };
 
-  const handleViewProfile = (beneficiary: any) => {
+  const handleViewProfile = (beneficiary: Beneficiary) => {
     navigate(`/beneficiaries/${beneficiary.id}`);
   };
 
-  const handleViewAttachments = (beneficiary: any) => {
+  const handleViewAttachments = (beneficiary: Beneficiary) => {
     setSelectedBeneficiary(beneficiary);
     setAttachmentsDialogOpen(true);
   };
 
-  const handleViewActivity = (beneficiary: any) => {
+  const handleViewActivity = (beneficiary: Beneficiary) => {
     setSelectedBeneficiary(beneficiary);
     setActivityLogDialogOpen(true);
   };
 
-  const handleLoadSavedSearch = (search: any) => {
-    setAdvancedCriteria(search.search_criteria);
+  const handleLoadSavedSearch = (search: { search_criteria: unknown }) => {
+    setAdvancedCriteria(search.search_criteria as SearchCriteria);
     setCurrentPage(1);
   };
 
-  const handleEnableLogin = (beneficiary: any) => {
+  const handleEnableLogin = (beneficiary: Beneficiary) => {
     setSelectedBeneficiary(beneficiary);
     setEnableLoginDialogOpen(true);
   };

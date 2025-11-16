@@ -14,6 +14,9 @@ import { useNavigate } from "react-router-dom";
 import { useGovernanceDecisions } from "@/hooks/useGovernanceDecisions";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Database } from '@/integrations/supabase/types';
+
+type GovernanceDecision = Database['public']['Tables']['governance_decisions']['Row'];
 
 export function GovernanceSection() {
   const navigate = useNavigate();
@@ -107,7 +110,7 @@ export function GovernanceSection() {
             </div>
           ) : (
             <div className="space-y-2">
-              {recentDecisions.map((decision: any) => (
+              {(recentDecisions as GovernanceDecision[]).map((decision) => (
                 <div 
                   key={decision.id}
                   className="flex items-start justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors cursor-pointer"

@@ -56,13 +56,13 @@ export default function ArchivistDashboard() {
         supabase.from('documents').select('uploaded_at, file_size')
       ]);
 
-      const todayUploads = allDocsRes.data?.filter((doc: any) => 
-        doc.uploaded_at.startsWith(today)
+      const todayUploads = allDocsRes.data?.filter((doc) => 
+        doc.uploaded_at?.startsWith(today)
       ).length || 0;
 
       // حساب المساحة من file_size (نص مثل "1.5 MB")
       let totalMB = 0;
-      allDocsRes.data?.forEach((doc: any) => {
+      allDocsRes.data?.forEach((doc) => {
         if (doc.file_size) {
           const match = doc.file_size.match(/(\d+\.?\d*)/);
           if (match) {
@@ -240,7 +240,7 @@ export default function ArchivistDashboard() {
               </div>
             ) : (
               <div className="space-y-2">
-                {recentDocuments.map((doc: any) => (
+                {recentDocuments.map((doc) => (
                   <div
                     key={doc.id}
                     className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"

@@ -28,6 +28,10 @@ import {
 } from '@/hooks/useScheduledReports';
 import { useCustomReports } from '@/hooks/useCustomReports';
 import { Calendar, Clock, Mail, Play, Trash2, Plus } from 'lucide-react';
+import { Database } from '@/integrations/supabase/types';
+
+type ScheduledReport = Database['public']['Tables']['scheduled_reports']['Row'];
+type ReportTemplate = Database['public']['Tables']['custom_report_templates']['Row'];
 import { LoadingState } from '@/components/shared/LoadingState';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
@@ -96,7 +100,7 @@ export function ScheduledReportsManager() {
 
       <div className="grid gap-4">
         {scheduledReports && scheduledReports.length > 0 ? (
-          scheduledReports.map((report: any) => (
+          scheduledReports.map((report) => (
             <Card key={report.id}>
               <CardHeader>
                 <div className="flex items-start justify-between">
@@ -198,7 +202,7 @@ export function ScheduledReportsManager() {
                   <SelectValue placeholder="اختر قالب التقرير" />
                 </SelectTrigger>
                 <SelectContent>
-                  {templates?.map((template: any) => (
+                  {(templates as ReportTemplate[])?.map((template) => (
                     <SelectItem key={template.id} value={template.id}>
                       {template.name}
                     </SelectItem>
@@ -209,7 +213,7 @@ export function ScheduledReportsManager() {
 
             <div className="space-y-2">
               <Label>التكرار</Label>
-              <Select value={scheduleType} onValueChange={(v: any) => setScheduleType(v)}>
+              <Select value={scheduleType} onValueChange={(v) => setScheduleType(v as 'daily' | 'weekly' | 'monthly')}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -232,7 +236,7 @@ export function ScheduledReportsManager() {
 
             <div className="space-y-2">
               <Label>طريقة التسليم</Label>
-              <Select value={deliveryMethod} onValueChange={(v: any) => setDeliveryMethod(v)}>
+              <Select value={deliveryMethod} onValueChange={(v) => setDeliveryMethod(v as 'email' | 'storage' | 'both')}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>

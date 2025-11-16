@@ -181,7 +181,7 @@ const AccountantDashboard = () => {
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {pendingApprovals.map((approval: any) => (
+                    {pendingApprovals.map((approval) => (
                       <div
                         key={approval.id}
                         className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"

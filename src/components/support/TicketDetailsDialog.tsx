@@ -18,7 +18,7 @@ import { useSupportTickets } from '@/hooks/useSupportTickets';
 function useSupportTicket(ticketId: string) {
   const { tickets, isLoading } = useSupportTickets({ search: ticketId });
   return {
-    data: tickets?.find((t: any) => t.id === ticketId),
+    data: tickets?.find((t) => t.id === ticketId),
     isLoading,
   };
 }

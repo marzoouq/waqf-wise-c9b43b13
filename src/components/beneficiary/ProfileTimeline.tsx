@@ -14,6 +14,11 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
+import { Database } from '@/integrations/supabase/types';
+
+type BeneficiaryRequest = Database['public']['Tables']['beneficiary_requests']['Row'] & {
+  request_types?: { name: string } | null;
+};
 
 interface ProfileTimelineProps {
   beneficiaryId: string;
@@ -65,7 +70,7 @@ export function ProfileTimeline({ beneficiaryId }: ProfileTimelineProps) {
         .limit(10);
 
       if (requests) {
-        requests.forEach((request: any) => {
+        (requests as BeneficiaryRequest[]).forEach((request) => {
           timelineEvents.push({
             id: request.id,
             type: 'request',

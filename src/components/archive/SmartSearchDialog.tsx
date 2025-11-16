@@ -9,6 +9,19 @@ import { useSmartSearch, useDocumentTags } from '@/hooks/useDocumentTags';
 import { Search, Tag, FileText, Sparkles } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
 
+interface SearchResult {
+  id: string;
+  name?: string;
+  description?: string;
+  extracted_text?: string;
+  tag_name?: string;
+  confidence_score?: number;
+  documents?: {
+    name?: string;
+    description?: string | null;
+  };
+}
+
 interface SmartSearchDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -82,7 +95,7 @@ export function SmartSearchDialog({ open, onOpenChange }: SmartSearchDialogProps
 
             {smartSearch.data && smartSearch.data.length > 0 && (
               <div className="space-y-2 max-h-96 overflow-y-auto">
-                {smartSearch.data.map((result: any) => (
+                {(smartSearch.data as SearchResult[]).map((result) => (
                   <Card key={result.id} className="p-4">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
