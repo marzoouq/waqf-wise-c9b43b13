@@ -86,49 +86,49 @@ export const ContractsTab = ({ onEdit }: Props) => {
       ) : filteredContracts.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground">لا توجد عقود</div>
       ) : (
-        <div className="border rounded-lg overflow-hidden">
+        <div className="border rounded-lg overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="text-right">رقم العقد</TableHead>
-                <TableHead className="text-right">العقار</TableHead>
-                <TableHead className="text-right">المستأجر</TableHead>
-                <TableHead className="text-right">النوع</TableHead>
-                <TableHead className="text-right">تاريخ البداية</TableHead>
-                <TableHead className="text-right">تاريخ النهاية</TableHead>
-                <TableHead className="text-right">الإيجار الشهري</TableHead>
-                <TableHead className="text-right">الحالة</TableHead>
-                <TableHead className="text-right">الإجراءات</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">رقم العقد</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">العقار</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">المستأجر</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden md:table-cell">النوع</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">تاريخ البداية</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">تاريخ النهاية</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">الإيجار الشهري</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">الحالة</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">الإجراءات</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredContracts.map((contract) => (
                 <TableRow key={contract.id}>
-                  <TableCell className="font-medium">{contract.contract_number}</TableCell>
-                  <TableCell>{contract.properties?.name || '-'}</TableCell>
-                  <TableCell>{contract.tenant_name}</TableCell>
-                  <TableCell>{contract.contract_type}</TableCell>
-                  <TableCell>
+                  <TableCell className="font-medium text-xs sm:text-sm whitespace-nowrap">{contract.contract_number}</TableCell>
+                  <TableCell className="text-xs sm:text-sm hidden lg:table-cell">{contract.properties?.name || '-'}</TableCell>
+                  <TableCell className="text-xs sm:text-sm">{contract.tenant_name}</TableCell>
+                  <TableCell className="text-xs sm:text-sm hidden md:table-cell">{contract.contract_type}</TableCell>
+                  <TableCell className="text-xs sm:text-sm hidden lg:table-cell whitespace-nowrap">
                     {format(new Date(contract.start_date), 'yyyy/MM/dd', { locale: ar })}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-xs sm:text-sm hidden lg:table-cell whitespace-nowrap">
                     {format(new Date(contract.end_date), 'yyyy/MM/dd', { locale: ar })}
                   </TableCell>
-                  <TableCell className="font-bold text-primary">
+                  <TableCell className="font-bold text-primary text-xs sm:text-sm whitespace-nowrap">
                     {Number(contract.monthly_rent).toLocaleString()} ر.س
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-xs sm:text-sm">
                     <Badge className={getStatusBadge(contract.status)}>
                       {contract.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-xs sm:text-sm">
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => onEdit(contract)}
                     >
-                      <Edit className="h-4 w-4" />
+                      <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
                     </Button>
                   </TableCell>
                 </TableRow>

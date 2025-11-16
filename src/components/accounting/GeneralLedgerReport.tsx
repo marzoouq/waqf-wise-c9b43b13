@@ -183,12 +183,12 @@ const GeneralLedgerReport = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>التاريخ</TableHead>
-                  <TableHead>رقم القيد</TableHead>
-                  <TableHead>البيان</TableHead>
-                  <TableHead className="text-center">مدين</TableHead>
-                  <TableHead className="text-center">دائن</TableHead>
-                  <TableHead className="text-center">الرصيد</TableHead>
+                  <TableHead className="text-xs sm:text-sm">التاريخ</TableHead>
+                  <TableHead className="text-xs sm:text-sm hidden lg:table-cell">رقم القيد</TableHead>
+                  <TableHead className="text-xs sm:text-sm hidden md:table-cell">البيان</TableHead>
+                  <TableHead className="text-center text-xs sm:text-sm">مدين</TableHead>
+                  <TableHead className="text-center text-xs sm:text-sm">دائن</TableHead>
+                  <TableHead className="text-center text-xs sm:text-sm">الرصيد</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -201,21 +201,21 @@ const GeneralLedgerReport = () => {
                 ) : (
                   ledgerData.map((line) => (
                     <TableRow key={line.id}>
-                      <TableCell className="text-sm">
+                      <TableCell className="text-xs sm:text-sm whitespace-nowrap">
                         {format(new Date(line.journal_entry.entry_date), "dd/MM/yyyy")}
                       </TableCell>
-                      <TableCell className="font-mono text-sm">
+                      <TableCell className="font-mono text-xs sm:text-sm hidden lg:table-cell">
                         {line.journal_entry.entry_number}
                       </TableCell>
-                      <TableCell className="text-sm">
+                      <TableCell className="text-xs sm:text-sm hidden md:table-cell">
                         {line.description || line.journal_entry.description}
                       </TableCell>
-                      <TableCell className="text-center font-mono text-sm">
+                      <TableCell className="text-center font-mono text-xs sm:text-sm">
                         {Number(line.debit_amount) > 0
                           ? Number(line.debit_amount).toFixed(2)
                           : "-"}
                       </TableCell>
-                      <TableCell className="text-center font-mono text-sm">
+                      <TableCell className="text-center font-mono text-xs sm:text-sm">
                         {Number(line.credit_amount) > 0
                           ? Number(line.credit_amount).toFixed(2)
                           : "-"}

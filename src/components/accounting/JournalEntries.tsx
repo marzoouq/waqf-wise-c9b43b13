@@ -153,12 +153,12 @@ const JournalEntries = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>رقم القيد</TableHead>
-              <TableHead>التاريخ</TableHead>
-              <TableHead className="hidden sm:table-cell">البيان</TableHead>
-              <TableHead>الحالة</TableHead>
-              <TableHead className="hidden md:table-cell">تاريخ الترحيل</TableHead>
-              <TableHead className="text-left">الإجراءات</TableHead>
+              <TableHead className="text-xs sm:text-sm">رقم القيد</TableHead>
+              <TableHead className="text-xs sm:text-sm hidden lg:table-cell">التاريخ</TableHead>
+              <TableHead className="hidden md:table-cell text-xs sm:text-sm">البيان</TableHead>
+              <TableHead className="text-xs sm:text-sm">الحالة</TableHead>
+              <TableHead className="hidden lg:table-cell text-xs sm:text-sm">تاريخ الترحيل</TableHead>
+              <TableHead className="text-left text-xs sm:text-sm">الإجراءات</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -171,22 +171,22 @@ const JournalEntries = () => {
             ) : (
               entries?.map((entry) => (
                 <TableRow key={entry.id}>
-                  <TableCell className="font-mono text-sm">{entry.entry_number}</TableCell>
-                  <TableCell className="text-sm">
+                  <TableCell className="font-mono text-xs sm:text-sm">{entry.entry_number}</TableCell>
+                  <TableCell className="text-xs sm:text-sm hidden lg:table-cell whitespace-nowrap">
                     {format(new Date(entry.entry_date), "dd MMM yyyy", {
                       locale: ar,
                     })}
                   </TableCell>
-                  <TableCell className="hidden sm:table-cell">{entry.description}</TableCell>
-                  <TableCell>{getStatusBadge(entry.status)}</TableCell>
-                  <TableCell className="hidden md:table-cell text-sm">
+                  <TableCell className="hidden md:table-cell text-xs sm:text-sm">{entry.description}</TableCell>
+                  <TableCell className="text-xs sm:text-sm">{getStatusBadge(entry.status)}</TableCell>
+                  <TableCell className="hidden lg:table-cell text-xs sm:text-sm whitespace-nowrap">
                     {entry.posted_at
                       ? format(new Date(entry.posted_at), "dd MMM yyyy", {
                           locale: ar,
                         })
                       : "-"}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-xs sm:text-sm">
                     <div className="flex gap-2 justify-end">
                       <Button
                         variant="ghost"
@@ -196,7 +196,7 @@ const JournalEntries = () => {
                           setIsViewDialogOpen(true);
                         }}
                       >
-                        <Eye className="h-4 w-4" />
+                        <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
                       </Button>
                     </div>
                   </TableCell>
