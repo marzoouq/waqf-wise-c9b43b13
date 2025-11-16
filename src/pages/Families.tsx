@@ -215,40 +215,41 @@ const Families = () => {
               }
             />
           ) : (
-            <div className="rounded-md border">
+            <div className="rounded-md border overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-right">اسم العائلة</TableHead>
-                    <TableHead className="text-right">رب الأسرة</TableHead>
-                    <TableHead className="text-right">القبيلة</TableHead>
-                    <TableHead className="text-right">عدد الأفراد</TableHead>
-                    <TableHead className="text-right">الحالة</TableHead>
-                    <TableHead className="text-right">تاريخ التسجيل</TableHead>
-                    <TableHead className="text-right w-[100px]">الإجراءات</TableHead>
+                    <TableHead className="text-right whitespace-nowrap">اسم العائلة</TableHead>
+                    <TableHead className="text-right whitespace-nowrap">رب الأسرة</TableHead>
+                    <TableHead className="text-right whitespace-nowrap hidden md:table-cell">القبيلة</TableHead>
+                    <TableHead className="text-right whitespace-nowrap">عدد الأفراد</TableHead>
+                    <TableHead className="text-right whitespace-nowrap hidden lg:table-cell">الحالة</TableHead>
+                    <TableHead className="text-right whitespace-nowrap hidden lg:table-cell">تاريخ التسجيل</TableHead>
+                    <TableHead className="text-right whitespace-nowrap w-[100px]">الإجراءات</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredFamilies.map((family) => (
                     <TableRow key={family.id} className="hover:bg-muted/50">
-                      <TableCell className="font-medium">{family.family_name}</TableCell>
-                      <TableCell>
+                      <TableCell className="font-medium text-xs sm:text-sm">{family.family_name}</TableCell>
+                      <TableCell className="text-xs sm:text-sm">
                         {(family as FamilyWithHead).head_of_family?.full_name || '-'}
                       </TableCell>
-                      <TableCell>{family.tribe || '-'}</TableCell>
+                      <TableCell className="hidden md:table-cell text-xs sm:text-sm">{family.tribe || '-'}</TableCell>
                       <TableCell>
-                        <Badge variant="secondary">
+                        <Badge variant="secondary" className="text-xs whitespace-nowrap">
                           {family.total_members} أفراد
                         </Badge>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="hidden lg:table-cell">
                         <Badge
                           variant={family.status === 'نشط' ? 'default' : 'secondary'}
+                          className="text-xs whitespace-nowrap"
                         >
                           {family.status}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-muted-foreground">
+                      <TableCell className="hidden lg:table-cell text-muted-foreground text-xs sm:text-sm whitespace-nowrap">
                         {new Date(family.created_at).toLocaleDateString('ar-SA')}
                       </TableCell>
                       <TableCell>

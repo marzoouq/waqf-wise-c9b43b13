@@ -272,21 +272,21 @@ const Users = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="text-right">الاسم</TableHead>
-                      <TableHead className="text-right">البريد الإلكتروني</TableHead>
-                      <TableHead className="text-right">الهاتف</TableHead>
-                      <TableHead className="text-right">الأدوار</TableHead>
-                      <TableHead className="text-right">الحالة</TableHead>
-                      <TableHead className="text-right">آخر تسجيل دخول</TableHead>
-                      <TableHead className="text-right">الإجراءات</TableHead>
+                      <TableHead className="text-right whitespace-nowrap">الاسم</TableHead>
+                      <TableHead className="text-right whitespace-nowrap">البريد الإلكتروني</TableHead>
+                      <TableHead className="text-right whitespace-nowrap hidden md:table-cell">الهاتف</TableHead>
+                      <TableHead className="text-right whitespace-nowrap">الأدوار</TableHead>
+                      <TableHead className="text-right whitespace-nowrap hidden lg:table-cell">الحالة</TableHead>
+                      <TableHead className="text-right whitespace-nowrap hidden lg:table-cell">آخر تسجيل دخول</TableHead>
+                      <TableHead className="text-right whitespace-nowrap">الإجراءات</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredUsers.map((user) => (
                       <TableRow key={user.id}>
-                        <TableCell className="font-medium">{user.full_name}</TableCell>
-                        <TableCell>{user.email}</TableCell>
-                        <TableCell>{user.phone || "-"}</TableCell>
+                        <TableCell className="font-medium text-xs sm:text-sm">{user.full_name}</TableCell>
+                        <TableCell className="text-xs sm:text-sm">{user.email}</TableCell>
+                        <TableCell className="hidden md:table-cell text-xs sm:text-sm">{user.phone || "-"}</TableCell>
                         <TableCell>
                           <div className="flex flex-wrap gap-1">
                             {user.user_roles?.map((roleObj, idx) => {
@@ -295,7 +295,7 @@ const Users = () => {
                                 <Badge
                                   key={idx}
                                   variant="outline"
-                                  className={roleColors[role]}
+                                  className={roleColors[role] + " text-xs whitespace-nowrap"}
                                 >
                                   {roleLabels[role]}
                                 </Badge>
@@ -303,7 +303,7 @@ const Users = () => {
                             })}
                           </div>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="hidden lg:table-cell">
                           <div className="flex items-center gap-2">
                             <Switch
                               checked={user.is_active}

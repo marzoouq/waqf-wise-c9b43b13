@@ -209,14 +209,14 @@ const Payments = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>رقم السند</TableHead>
-                    <TableHead>النوع</TableHead>
-                    <TableHead>التاريخ</TableHead>
-                    <TableHead>الاسم</TableHead>
-                    <TableHead>المبلغ</TableHead>
-                    <TableHead>الطريقة</TableHead>
-                    <TableHead>البيان</TableHead>
-                    <TableHead className="text-left">الإجراءات</TableHead>
+                    <TableHead className="whitespace-nowrap">رقم السند</TableHead>
+                    <TableHead className="whitespace-nowrap">النوع</TableHead>
+                    <TableHead className="whitespace-nowrap hidden md:table-cell">التاريخ</TableHead>
+                    <TableHead className="whitespace-nowrap">الاسم</TableHead>
+                    <TableHead className="whitespace-nowrap">المبلغ</TableHead>
+                    <TableHead className="whitespace-nowrap hidden lg:table-cell">الطريقة</TableHead>
+                    <TableHead className="whitespace-nowrap hidden lg:table-cell">البيان</TableHead>
+                    <TableHead className="text-left whitespace-nowrap">الإجراءات</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -237,33 +237,33 @@ const Payments = () => {
                   ) : (
                     paginatedPayments.map((payment) => (
                       <TableRow key={payment.id}>
-                        <TableCell className="font-medium">
+                        <TableCell className="font-medium text-xs sm:text-sm whitespace-nowrap">
                           {payment.payment_number}
                         </TableCell>
                         <TableCell>
                           <Badge
                             className={
                               payment.payment_type === "receipt"
-                                ? "bg-success/10 text-success"
-                                : "bg-destructive/10 text-destructive"
+                                ? "bg-success/10 text-success text-xs"
+                                : "bg-destructive/10 text-destructive text-xs"
                             }
                           >
                             {payment.payment_type === "receipt" ? "قبض" : "صرف"}
                           </Badge>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="hidden md:table-cell text-xs sm:text-sm whitespace-nowrap">
                           {format(new Date(payment.payment_date), "dd MMM yyyy", {
                             locale: ar,
                           })}
                         </TableCell>
-                        <TableCell>{payment.payer_name}</TableCell>
-                        <TableCell className="font-bold">
+                        <TableCell className="text-xs sm:text-sm">{payment.payer_name}</TableCell>
+                        <TableCell className="font-bold text-xs sm:text-sm whitespace-nowrap">
                           {Number(payment.amount).toLocaleString()} ر.س
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="hidden lg:table-cell text-xs sm:text-sm">
                           {getPaymentMethodLabel(payment.payment_method)}
                         </TableCell>
-                        <TableCell className="max-w-[200px] truncate">
+                        <TableCell className="hidden lg:table-cell max-w-[200px] truncate text-xs sm:text-sm">
                           {payment.description}
                         </TableCell>
                         <TableCell>

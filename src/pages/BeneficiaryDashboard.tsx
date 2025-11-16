@@ -467,19 +467,19 @@ const BeneficiaryDashboard = () => {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b">
-                      <th className="text-right py-3 px-4">رقم السند</th>
-                      <th className="text-right py-3 px-4">التاريخ</th>
-                      <th className="text-right py-3 px-4">المبلغ</th>
-                      <th className="text-right py-3 px-4">الوصف</th>
+                      <th className="text-right py-3 px-4 text-xs sm:text-sm whitespace-nowrap">رقم السند</th>
+                      <th className="text-right py-3 px-4 text-xs sm:text-sm whitespace-nowrap hidden md:table-cell">التاريخ</th>
+                      <th className="text-right py-3 px-4 text-xs sm:text-sm whitespace-nowrap">المبلغ</th>
+                      <th className="text-right py-3 px-4 text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">الوصف</th>
                     </tr>
                   </thead>
                   <tbody>
                     {payments.map((payment) => (
                       <tr key={payment.id} className="border-b hover:bg-muted/50">
-                        <td className="py-3 px-4">{payment.payment_number}</td>
-                        <td className="py-3 px-4">{new Date(payment.payment_date).toLocaleDateString("ar-SA")}</td>
-                        <td className="py-3 px-4 font-semibold text-primary">{Number(payment.amount).toLocaleString("ar-SA")} ر.س</td>
-                        <td className="py-3 px-4">{payment.description}</td>
+                        <td className="py-3 px-4 text-xs sm:text-sm">{payment.payment_number}</td>
+                        <td className="py-3 px-4 text-xs sm:text-sm hidden md:table-cell whitespace-nowrap">{new Date(payment.payment_date).toLocaleDateString("ar-SA")}</td>
+                        <td className="py-3 px-4 font-bold text-xs sm:text-sm whitespace-nowrap">{Number(payment.amount).toLocaleString()} ر.س</td>
+                        <td className="py-3 px-4 text-xs sm:text-sm hidden lg:table-cell">{payment.description}</td>
                       </tr>
                     ))}
                   </tbody>
