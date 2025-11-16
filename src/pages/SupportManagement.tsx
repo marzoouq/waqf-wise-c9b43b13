@@ -299,14 +299,136 @@ export default function SupportManagement() {
         </TabsContent>
 
         {/* التحليلات */}
-        <TabsContent value="analytics">
+        <TabsContent value="analytics" className="space-y-6">
+          <div className="grid gap-4 md:grid-cols-2">
+            {/* معدل الحل */}
+            <Card>
+              <CardHeader>
+                <CardTitle>معدل الحل</CardTitle>
+                <CardDescription>
+                  نسبة التذاكر المحلولة من الإجمالي
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center gap-2">
+                  <div className="text-3xl font-bold">
+                    {overviewStats?.ticketsByStatus ? 
+                      (() => {
+                        const resolved = Number(overviewStats.ticketsByStatus.resolved || 0);
+                        const closed = Number(overviewStats.ticketsByStatus.closed || 0);
+                        const total = Object.values(overviewStats.ticketsByStatus).reduce((a: any, b: any) => Number(a) + Number(b), 0);
+                        return Number(total) > 0 ? `${Math.round(((resolved + closed) / Number(total)) * 100)}%` : '0%';
+                      })() : 
+                      '0%'}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* متوسط التقييم */}
+            <Card>
+              <CardHeader>
+                <CardTitle>متوسط رضا العملاء</CardTitle>
+                <CardDescription>
+                  من 5 نجوم
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center gap-2">
+                  <div className="text-3xl font-bold">
+                    {overviewStats?.avgSatisfaction ? 
+                      overviewStats.avgSatisfaction.toFixed(1) : 
+                      '0.0'}
+                  </div>
+                  <Star className="h-6 w-6 text-yellow-500 fill-yellow-500" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* توزيع التذاكر حسب الفئة */}
           <Card>
             <CardHeader>
-              <CardTitle>التحليلات والإحصائيات</CardTitle>
+              <CardTitle>توزيع التذاكر حسب الفئة</CardTitle>
               <CardDescription>
-                قريباً - تحليلات متقدمة لأداء الدعم الفني
+                عدد التذاكر في كل فئة
               </CardDescription>
             </CardHeader>
+            <CardContent>
+              {overviewStats?.ticketsByCategory ? (
+                <div className="space-y-3">
+                  {Object.entries(overviewStats.ticketsByCategory).map(([category, count]: [string, any]) => {
+                    const maxCount = Math.max(...Object.values(overviewStats.ticketsByCategory).map((v: any) => Number(v)));
+                    const percentage = maxCount > 0 ? (Number(count) / maxCount) * 100 : 0;
+                    return (
+                      <div key={category} className="flex items-center justify-between">
+                        <span className="text-sm font-medium">{category}</span>
+                        <div className="flex items-center gap-2">
+                          <div className="w-32 bg-muted rounded-full h-2">
+                            <div 
+                              className="bg-primary h-2 rounded-full"
+                              style={{ width: `${percentage}%` }}
+                            />
+                          </div>
+                          <span className="text-sm text-muted-foreground w-8 text-left">
+                            {count}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="text-center text-muted-foreground py-8">
+                  لا توجد بيانات
+                </p>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* توزيع التذاكر حسب الأولوية */}
+          <Card>
+            <CardHeader>
+              <CardTitle>توزيع التذاكر حسب الأولوية</CardTitle>
+              <CardDescription>
+                عدد التذاكر في كل مستوى أولوية
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {overviewStats?.ticketsByPriority ? (
+                <div className="space-y-3">
+                  {Object.entries(overviewStats.ticketsByPriority).map(([priority, count]: [string, any]) => {
+                    const maxCount = Math.max(...Object.values(overviewStats.ticketsByPriority).map((v: any) => Number(v)));
+                    const percentage = maxCount > 0 ? (Number(count) / maxCount) * 100 : 0;
+                    return (
+                      <div key={priority} className="flex items-center justify-between">
+                        <span className="text-sm font-medium">{priority}</span>
+                        <div className="flex items-center gap-2">
+                          <div className="w-32 bg-muted rounded-full h-2">
+                            <div 
+                              className="h-2 rounded-full"
+                              style={{
+                                width: `${percentage}%`,
+                                backgroundColor: priority === 'عاجلة' ? 'hsl(var(--destructive))' : 
+                                               priority === 'عالية' ? 'hsl(var(--warning))' : 
+                                               'hsl(var(--primary))'
+                              }}
+                            />
+                          </div>
+                          <span className="text-sm text-muted-foreground w-8 text-left">
+                            {count}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="text-center text-muted-foreground py-8">
+                  لا توجد بيانات
+                </p>
+              )}
+            </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
