@@ -87,7 +87,8 @@ export const paginatedListStrategy = {
   gcTime: 30 * 60 * 1000, // 30 دقيقة
   refetchOnMount: false,
   refetchOnWindowFocus: false,
-  keepPreviousData: true,
+  // React Query v5: keepPreviousData removed, use placeholderData instead
+  placeholderData: (previousData: any) => previousData,
 };
 
 /**
