@@ -3,16 +3,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { QUERY_KEYS, TOAST_MESSAGES, QUERY_STALE_TIME } from "@/lib/constants";
 import { createMutationErrorHandler } from "@/lib/errorHandling";
+import { Database } from "@/integrations/supabase/types";
 
 export interface Document {
   id: string;
   name: string;
-  description: string;
+  description: string | null;
   file_type: string;
   file_size: string;
-  file_size_bytes: number;
+  file_size_bytes: number | null;
   category: string;
-  folder_id: string;
+  folder_id: string | null;
   uploaded_at: string;
   created_at: string;
 }
@@ -36,7 +37,7 @@ export function useDocuments() {
   });
 
   const addDocument = useMutation({
-    mutationFn: async (document: Omit<Document, "id" | "created_at" | "uploaded_at">) => {
+    mutationFn: async (document: Omit<Database['public']['Tables']['documents']['Insert'], 'id' | 'created_at'>) => {
       const { data, error } = await supabase
         .from("documents")
         .insert([document])
