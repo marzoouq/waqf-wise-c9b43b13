@@ -81,9 +81,9 @@ export function useRequestApprovals(requestId?: string) {
       }
 
       // إذا كانت موجودة، نقوم بالتحديث بدلاً من الإدراج
-      if (existing && (existing as any).id) {
-        const { data, error } = await supabase
-          .from("request_approvals" as any)
+      if (existing && typeof existing === 'object' && 'id' in existing) {
+        const { data, error } = await (supabase as any)
+          .from("request_approvals")
           .update({
             status: approval.status,
             notes: approval.notes,

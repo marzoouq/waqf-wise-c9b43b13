@@ -26,10 +26,10 @@ export function useArchiveStats() {
       // Fetch documents for size calculation and this month count
       const { data: documents } = await supabase
         .from("documents")
-        .select("file_size_bytes, created_at") as any;
+        .select("file_size_bytes, created_at");
 
       // Calculate total size from file_size_bytes
-      const totalBytes = documents?.reduce((sum: number, doc: any) => 
+      const totalBytes = documents?.reduce((sum: number, doc: { file_size_bytes?: number }) =>
         sum + (doc.file_size_bytes || 0), 0) || 0;
 
       // Convert bytes to human-readable format

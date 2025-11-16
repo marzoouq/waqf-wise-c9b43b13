@@ -38,10 +38,10 @@ export function useCashierStats() {
       if (receiptsError) throw receiptsError;
 
       const todayReceipts = receipts?.reduce((sum, entry) => {
-        const debitTotal = (entry.journal_entry_lines as any[])?.reduce(
-          (s, line) => s + Number(line.debit_amount || 0),
+        const debitTotal = (Array.isArray(entry.journal_entry_lines) ? entry.journal_entry_lines : []).reduce(
+          (s: number, line: { debit_amount?: number }) => s + Number(line.debit_amount || 0),
           0
-        ) || 0;
+        );
         return sum + debitTotal;
       }, 0) || 0;
 
@@ -56,10 +56,10 @@ export function useCashierStats() {
       if (paymentsError) throw paymentsError;
 
       const todayPayments = payments?.reduce((sum, entry) => {
-        const creditTotal = (entry.journal_entry_lines as any[])?.reduce(
-          (s, line) => s + Number(line.credit_amount || 0),
+        const creditTotal = (Array.isArray(entry.journal_entry_lines) ? entry.journal_entry_lines : []).reduce(
+          (s: number, line: { credit_amount?: number }) => s + Number(line.credit_amount || 0),
           0
-        ) || 0;
+        );
         return sum + creditTotal;
       }, 0) || 0;
 
