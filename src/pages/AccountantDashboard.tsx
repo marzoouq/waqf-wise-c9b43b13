@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { FileText, DollarSign, AlertCircle, CheckCircle, XCircle, TrendingUp, FileCheck, FileClock } from "lucide-react";
 import { useAccountantKPIs } from "@/hooks/useAccountantKPIs";
 import { ApproveJournalDialog } from "@/components/accounting/ApproveJournalDialog";
+import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 
 // Lazy load components
 const AccountingStats = lazy(() => import("@/components/dashboard/AccountingStats"));
@@ -16,16 +17,16 @@ const RecentJournalEntries = lazy(() => import("@/components/dashboard/RecentJou
 
 // Skeleton loaders
 const StatsSkeleton = () => (
-  <div className="grid gap-4 sm:gap-5 md:gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
+  <div className="grid gap-3 sm:gap-4 md:gap-5 lg:gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
     {[1, 2, 3, 4].map((i) => (
       <Card key={i}>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <Skeleton className="h-4 w-24" />
-          <Skeleton className="h-4 w-4 rounded-full" />
+          <Skeleton className="h-3 sm:h-4 w-20 sm:w-24" />
+          <Skeleton className="h-3 w-3 sm:h-4 sm:w-4 rounded-full" />
         </CardHeader>
         <CardContent>
-          <Skeleton className="h-8 w-20 mb-2" />
-          <Skeleton className="h-3 w-32" />
+          <Skeleton className="h-6 sm:h-7 md:h-8 w-16 sm:w-20 mb-1 sm:mb-2" />
+          <Skeleton className="h-2 sm:h-3 w-24 sm:w-32" />
         </CardContent>
       </Card>
     ))}
@@ -33,9 +34,9 @@ const StatsSkeleton = () => (
 );
 
 const TableSkeleton = () => (
-  <div className="space-y-3">
+  <div className="space-y-2 sm:space-y-3">
     {[1, 2, 3].map((i) => (
-      <Skeleton key={i} className="h-20 w-full" />
+      <Skeleton key={i} className="h-16 sm:h-20 w-full" />
     ))}
   </div>
 );
@@ -82,28 +83,18 @@ const AccountantDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-3 sm:p-4 md:p-6 lg:p-8 space-y-4 sm:space-y-6 md:space-y-8">
-        {/* Header */}
-        <header className="space-y-1 sm:space-y-2">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <DollarSign className="h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 text-emerald-600" />
-            <div>
-              <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gradient-primary">
-                لوحة تحكم المحاسب
-              </h1>
-              <p className="text-xs sm:text-sm md:text-base text-muted-foreground">
-                إدارة القيود المحاسبية والموافقات المالية
-              </p>
-            </div>
-          </div>
-        </header>
+    <MobileOptimizedLayout>
+      <MobileOptimizedHeader
+        title="لوحة تحكم المحاسب"
+        description="إدارة القيود المحاسبية والموافقات المالية"
+        icon={<DollarSign className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-emerald-600" />}
+      />
 
-        {/* Statistics Cards */}
-        {kpisLoading ? (
-          <StatsSkeleton />
-        ) : (
-          <div className="grid gap-4 sm:gap-5 md:gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
+      {/* Statistics Cards */}
+      {kpisLoading ? (
+        <StatsSkeleton />
+      ) : (
+        <div className="grid gap-3 sm:gap-4 md:gap-5 lg:gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
             <Card className="group hover:shadow-lg hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-amber-500">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-xs sm:text-sm font-medium">موافقات معلقة</CardTitle>
@@ -231,52 +222,65 @@ const AccountantDashboard = () => {
             <Suspense fallback={<TableSkeleton />}>
               <RecentJournalEntries />
             </Suspense>
-          </TabsContent>
-        </Tabs>
+        </TabsContent>
 
-        {/* Quick Actions */}
-        <Card>
-          <CardHeader>
-            <CardTitle>إجراءات سريعة</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-3 sm:gap-4 grid-cols-2 md:grid-cols-4">
-              <Button 
-                variant="outline" 
-                className="w-full"
-                onClick={() => window.location.href = '/accounting'}
-              >
-                <FileText className="h-4 w-4 ml-2" />
-                قيد جديد
-              </Button>
-              <Button 
-                variant="outline" 
-                className="w-full"
-                onClick={() => window.location.href = '/reports'}
-              >
-                <FileCheck className="h-4 w-4 ml-2" />
-                التقارير المالية
-              </Button>
-              <Button 
-                variant="outline" 
-                className="w-full"
-                onClick={() => window.location.href = '/approvals'}
-              >
-                <AlertCircle className="h-4 w-4 ml-2" />
-                كل الموافقات
-              </Button>
-              <Button 
-                variant="outline" 
-                className="w-full"
-                onClick={() => window.location.href = '/accounting'}
-              >
-                <DollarSign className="h-4 w-4 ml-2" />
-                شجرة الحسابات
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+        {/* Quick Actions - Inside Stats Tab */}
+        <TabsContent value="stats" className="space-y-3 sm:space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>الإحصائيات المحاسبية</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Suspense fallback={<TableSkeleton />}>
+                <AccountingStats />
+              </Suspense>
+            </CardContent>
+          </Card>
+
+          {/* Quick Actions */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm sm:text-base">إجراءات سريعة</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-2 sm:gap-3 grid-cols-2 md:grid-cols-4">
+                <Button 
+                  variant="outline" 
+                  className="w-full text-xs sm:text-sm"
+                  onClick={() => window.location.href = '/accounting'}
+                >
+                  <FileText className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
+                  قيد جديد
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full text-xs sm:text-sm"
+                  onClick={() => window.location.href = '/reports'}
+                >
+                  <FileCheck className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
+                  التقارير
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full text-xs sm:text-sm"
+                  onClick={() => window.location.href = '/approvals'}
+                >
+                  <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
+                  الموافقات
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full text-xs sm:text-sm"
+                  onClick={() => window.location.href = '/accounting'}
+                >
+                  <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
+                  الحسابات
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
       {/* Approval Dialog */}
       {selectedApproval && (
@@ -286,7 +290,7 @@ const AccountantDashboard = () => {
           approval={selectedApproval}
         />
       )}
-    </div>
+    </MobileOptimizedLayout>
   );
 };
 

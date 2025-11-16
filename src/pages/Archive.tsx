@@ -16,6 +16,7 @@ import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
 import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
+import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 
 const Archive = () => {
   const [searchQuery, setSearchQuery] = useState("");

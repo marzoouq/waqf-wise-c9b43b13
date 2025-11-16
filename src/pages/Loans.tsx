@@ -37,6 +37,7 @@ import {
 import { LoanDialog } from "@/components/loans/LoanDialog";
 import { InstallmentScheduleDialog } from "@/components/loans/InstallmentScheduleDialog";
 import { LoanPaymentDialog } from "@/components/loans/LoanPaymentDialog";
+import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 
 // Skeleton loaders
 const StatsSkeleton = () => (
