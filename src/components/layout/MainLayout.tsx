@@ -1,10 +1,11 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 // ⚠️ IMPORTANT: Always import from AppSidebar.tsx (not Sidebar.tsx)
 import AppSidebar from "./AppSidebar";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
-import { Menu, LogOut } from "lucide-react";
+import { Menu, LogOut, Search } from "lucide-react";
 import { NotificationsBell } from "./NotificationsBell";
 import { FloatingChatButton } from "@/components/chatbot/FloatingChatButton";
+import { GlobalSearch } from "@/components/shared/GlobalSearch";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
@@ -25,6 +26,7 @@ interface MainLayoutProps {
 const MainLayout = ({ children }: MainLayoutProps) => {
   const { user, signOut } = useAuth();
   const { profile } = useProfile();
+  const [searchOpen, setSearchOpen] = useState(false);
   
   const displayName = profile?.full_name || user?.user_metadata?.full_name || 'مستخدم';
   const displayEmail = profile?.email || user?.email || '';
@@ -45,6 +47,14 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                   منصة الوقف
                 </h1>
               </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSearchOpen(true)}
+                className="gap-2"
+              >
+                <Search className="h-4 w-4" />
+              </Button>
               <NotificationsBell />
               
               {/* User Menu - Mobile */}
@@ -83,6 +93,18 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                 
                 {/* User Menu - Desktop */}
                 <div className="flex items-center gap-3">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSearchOpen(true)}
+                    className="gap-2"
+                  >
+                    <Search className="h-4 w-4" />
+                    <span className="hidden md:inline">بحث</span>
+                    <kbd className="hidden md:inline pointer-events-none h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 ml-2">
+                      <span className="text-xs">Ctrl+K</span>
+                    </kbd>
+                  </Button>
                   <NotificationsBell />
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -120,6 +142,9 @@ const MainLayout = ({ children }: MainLayoutProps) => {
           {/* Floating Chat Button - يظهر في جميع الصفحات */}
           <FloatingChatButton />
         </div>
+        
+        {/* Global Search */}
+        <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
       </SidebarProvider>
     </div>
   );

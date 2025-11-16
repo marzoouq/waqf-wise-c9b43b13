@@ -2904,6 +2904,39 @@ export type Database = {
         }
         Relationships: []
       }
+      saved_filters: {
+        Row: {
+          created_at: string | null
+          filter_criteria: Json
+          filter_type: string
+          id: string
+          is_favorite: boolean | null
+          name: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          filter_criteria: Json
+          filter_type: string
+          id?: string
+          is_favorite?: boolean | null
+          name: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          filter_criteria?: Json
+          filter_type?: string
+          id?: string
+          is_favorite?: boolean | null
+          name?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       saved_searches: {
         Row: {
           created_at: string | null
