@@ -34,7 +34,7 @@ export function ChatbotInterface({ compact = false }: ChatbotInterfaceProps) {
       await sendMessage({ message: messageToSend });
       setMessage("");
     } catch (error) {
-      console.error('Error sending message:', error);
+      // Error handled by useChatbot hook
     }
   };
 
@@ -45,7 +45,7 @@ export function ChatbotInterface({ compact = false }: ChatbotInterfaceProps) {
         quickReplyId: reply.id 
       });
     } catch (error) {
-      console.error('Error sending quick reply:', error);
+      // Error handled by useChatbot hook
     }
   };
 

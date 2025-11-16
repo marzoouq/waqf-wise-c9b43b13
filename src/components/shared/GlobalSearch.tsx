@@ -164,7 +164,7 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
         results_count: resultsCount,
       });
     } catch (error) {
-      console.error('Error saving search history:', error);
+      // Silent fail - search history is not critical
     }
   };
 

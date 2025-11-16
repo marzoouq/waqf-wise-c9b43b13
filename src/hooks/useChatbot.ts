@@ -117,7 +117,6 @@ export function useChatbot() {
     },
     onError: (error: any) => {
       setIsTyping(false);
-      console.error('Chatbot error:', error);
       toast({
         title: "خطأ في الإرسال",
         description: error.message || "حدث خطأ أثناء إرسال الرسالة",
