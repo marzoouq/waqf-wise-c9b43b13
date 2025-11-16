@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -106,6 +107,9 @@ export function CreateDecisionDialog({
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>إنشاء قرار جديد</DialogTitle>
+          <DialogDescription>
+            املأ تفاصيل القرار وحدد المشاركين في التصويت ونسبة القبول المطلوبة
+          </DialogDescription>
         </DialogHeader>
         
         <Form {...form}>

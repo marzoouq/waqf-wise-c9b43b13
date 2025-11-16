@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -49,6 +49,9 @@ export function SmartSearchDialog({ open, onOpenChange }: SmartSearchDialogProps
             <Sparkles className="h-5 w-5" />
             البحث الذكي في الأرشيف
           </DialogTitle>
+          <DialogDescription>
+            ابحث في المستندات باستخدام البحث الذكي في النصوص والوسوم والمحتوى
+          </DialogDescription>
         </DialogHeader>
 
         <Tabs value={searchType} onValueChange={(v) => setSearchType(v as 'text' | 'tags' | 'ocr')} className="w-full">
