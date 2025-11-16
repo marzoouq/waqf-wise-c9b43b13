@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { Bell, Check, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 export function PushNotificationsSetup() {
   const [isSupported, setIsSupported] = useState(false);
@@ -53,7 +54,7 @@ export function PushNotificationsSetup() {
         toast.error('تم رفض إذن الإشعارات');
       }
     } catch (error) {
-      console.error('Error enabling push notifications:', error);
+      logger.error(error as Error, { context: 'PushNotifications.enable' });
       toast.error('فشل تفعيل الإشعارات الفورية');
     }
   };
@@ -71,7 +72,7 @@ export function PushNotificationsSetup() {
       setIsEnabled(false);
       toast.success('تم إيقاف الإشعارات الفورية');
     } catch (error) {
-      console.error('Error disabling push notifications:', error);
+      logger.error(error as Error, { context: 'PushNotifications.disable' });
       toast.error('فشل إيقاف الإشعارات الفورية');
     }
   };
