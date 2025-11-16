@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Bot, X, Maximize2, Minimize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { ChatbotInterface } from "./ChatbotInterface";
 import { cn } from "@/lib/utils";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -55,6 +56,13 @@ export function FloatingChatButton() {
               : "max-w-4xl h-[85vh]"
           )}
         >
+          <VisuallyHidden>
+            <DialogTitle>المساعد الذكي</DialogTitle>
+            <DialogDescription>
+              محادثة مع المساعد الذكي لإدارة الوقف
+            </DialogDescription>
+          </VisuallyHidden>
+          
           {/* شريط الأدوات */}
           <div className="flex items-center justify-between p-3 border-b bg-muted/30">
             <div className="flex items-center gap-2">
