@@ -288,6 +288,51 @@ export type Database = {
         }
         Relationships: []
       }
+      backup_schedules: {
+        Row: {
+          backup_type: string
+          created_at: string | null
+          frequency: string
+          id: string
+          include_storage: boolean | null
+          is_active: boolean | null
+          last_backup_at: string | null
+          next_backup_at: string | null
+          retention_days: number | null
+          schedule_name: string
+          tables_included: string[]
+          updated_at: string | null
+        }
+        Insert: {
+          backup_type: string
+          created_at?: string | null
+          frequency: string
+          id?: string
+          include_storage?: boolean | null
+          is_active?: boolean | null
+          last_backup_at?: string | null
+          next_backup_at?: string | null
+          retention_days?: number | null
+          schedule_name: string
+          tables_included: string[]
+          updated_at?: string | null
+        }
+        Update: {
+          backup_type?: string
+          created_at?: string | null
+          frequency?: string
+          id?: string
+          include_storage?: boolean | null
+          is_active?: boolean | null
+          last_backup_at?: string | null
+          next_backup_at?: string | null
+          retention_days?: number | null
+          schedule_name?: string
+          tables_included?: string[]
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       bank_accounts: {
         Row: {
           account_id: string | null
@@ -1190,6 +1235,48 @@ export type Database = {
           },
         ]
       }
+      custom_kpis: {
+        Row: {
+          calculation_formula: Json
+          created_at: string | null
+          created_by: string | null
+          display_format: string | null
+          id: string
+          is_active: boolean | null
+          kpi_name: string
+          kpi_type: string
+          target_value: number | null
+          unit: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          calculation_formula: Json
+          created_at?: string | null
+          created_by?: string | null
+          display_format?: string | null
+          id?: string
+          is_active?: boolean | null
+          kpi_name: string
+          kpi_type: string
+          target_value?: number | null
+          unit?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          calculation_formula?: Json
+          created_at?: string | null
+          created_by?: string | null
+          display_format?: string | null
+          id?: string
+          is_active?: boolean | null
+          kpi_name?: string
+          kpi_type?: string
+          target_value?: number | null
+          unit?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       custom_report_templates: {
         Row: {
           configuration: Json
@@ -1271,6 +1358,39 @@ export type Database = {
           report_type?: string
           run_count?: number | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      dashboard_configurations: {
+        Row: {
+          created_at: string | null
+          dashboard_name: string
+          id: string
+          is_default: boolean | null
+          is_shared: boolean | null
+          layout_config: Json
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          dashboard_name: string
+          id?: string
+          is_default?: boolean | null
+          is_shared?: boolean | null
+          layout_config: Json
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          dashboard_name?: string
+          id?: string
+          is_default?: boolean | null
+          is_shared?: boolean | null
+          layout_config?: Json
+          updated_at?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -1364,6 +1484,85 @@ export type Database = {
             columns: ["journal_entry_id"]
             isOneToOne: false
             referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      document_ocr_content: {
+        Row: {
+          confidence_score: number | null
+          document_id: string
+          extracted_at: string | null
+          extracted_text: string | null
+          id: string
+          language: string | null
+          metadata: Json | null
+          page_number: number | null
+        }
+        Insert: {
+          confidence_score?: number | null
+          document_id: string
+          extracted_at?: string | null
+          extracted_text?: string | null
+          id?: string
+          language?: string | null
+          metadata?: Json | null
+          page_number?: number | null
+        }
+        Update: {
+          confidence_score?: number | null
+          document_id?: string
+          extracted_at?: string | null
+          extracted_text?: string | null
+          id?: string
+          language?: string | null
+          metadata?: Json | null
+          page_number?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_ocr_content_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      document_tags: {
+        Row: {
+          confidence_score: number | null
+          created_at: string | null
+          created_by: string | null
+          document_id: string
+          id: string
+          tag_name: string
+          tag_type: string
+        }
+        Insert: {
+          confidence_score?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          document_id: string
+          id?: string
+          tag_name: string
+          tag_type: string
+        }
+        Update: {
+          confidence_score?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          document_id?: string
+          id?: string
+          tag_name?: string
+          tag_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_tags_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
             referencedColumns: ["id"]
           },
         ]
@@ -2368,6 +2567,92 @@ export type Database = {
           },
         ]
       }
+      notification_logs: {
+        Row: {
+          channel: string
+          created_at: string | null
+          delivered_at: string | null
+          error_message: string | null
+          id: string
+          metadata: Json | null
+          notification_id: string | null
+          notification_type: string
+          sent_at: string | null
+          status: string | null
+          user_id: string | null
+        }
+        Insert: {
+          channel: string
+          created_at?: string | null
+          delivered_at?: string | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          notification_id?: string | null
+          notification_type: string
+          sent_at?: string | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          channel?: string
+          created_at?: string | null
+          delivered_at?: string | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          notification_id?: string | null
+          notification_type?: string
+          sent_at?: string | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_logs_notification_id_fkey"
+            columns: ["notification_id"]
+            isOneToOne: false
+            referencedRelation: "notifications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notification_templates: {
+        Row: {
+          body_template: string
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          subject: string | null
+          template_name: string
+          template_type: string
+          updated_at: string | null
+          variables: Json | null
+        }
+        Insert: {
+          body_template: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          subject?: string | null
+          template_name: string
+          template_type: string
+          updated_at?: string | null
+          variables?: Json | null
+        }
+        Update: {
+          body_template?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          subject?: string | null
+          template_name?: string
+          template_type?: string
+          updated_at?: string | null
+          variables?: Json | null
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           action_url: string | null
@@ -3006,6 +3291,42 @@ export type Database = {
         }
         Relationships: []
       }
+      retention_policies: {
+        Row: {
+          archive_before_delete: boolean | null
+          auto_delete: boolean | null
+          created_at: string | null
+          document_type: string
+          id: string
+          is_active: boolean | null
+          policy_name: string
+          retention_days: number
+          updated_at: string | null
+        }
+        Insert: {
+          archive_before_delete?: boolean | null
+          auto_delete?: boolean | null
+          created_at?: string | null
+          document_type: string
+          id?: string
+          is_active?: boolean | null
+          policy_name: string
+          retention_days: number
+          updated_at?: string | null
+        }
+        Update: {
+          archive_before_delete?: boolean | null
+          auto_delete?: boolean | null
+          created_at?: string | null
+          document_type?: string
+          id?: string
+          is_active?: boolean | null
+          policy_name?: string
+          retention_days?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       saved_filters: {
         Row: {
           created_at: string | null
@@ -3083,6 +3404,59 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      scheduled_report_jobs: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          cron_expression: string | null
+          delivery_method: string | null
+          id: string
+          is_active: boolean | null
+          last_run_at: string | null
+          next_run_at: string | null
+          recipients: Json
+          report_template_id: string | null
+          schedule_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          cron_expression?: string | null
+          delivery_method?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_run_at?: string | null
+          next_run_at?: string | null
+          recipients: Json
+          report_template_id?: string | null
+          schedule_type: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          cron_expression?: string | null
+          delivery_method?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_run_at?: string | null
+          next_run_at?: string | null
+          recipients?: Json
+          report_template_id?: string | null
+          schedule_type?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scheduled_report_jobs_report_template_id_fkey"
+            columns: ["report_template_id"]
+            isOneToOne: false
+            referencedRelation: "custom_report_templates"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       scheduled_reports: {
         Row: {
