@@ -42,56 +42,56 @@ export const CACHE_TIMES = {
 export const QUERY_CONFIG = {
   DASHBOARD_KPIS: {
     staleTime: CACHE_TIMES.STANDARD,
-    cacheTime: CACHE_TIMES.STANDARD * 2,
+    gcTime: CACHE_TIMES.STANDARD * 2, // Changed from cacheTime to gcTime (React Query v5)
     refetchInterval: 30000, // 30 seconds
     refetchOnWindowFocus: true,
     retry: 2,
   },
   ADMIN_KPIS: {
     staleTime: CACHE_TIMES.STANDARD,
-    cacheTime: CACHE_TIMES.STANDARD * 2,
+    gcTime: CACHE_TIMES.STANDARD * 2, // Changed from cacheTime to gcTime (React Query v5)
     refetchInterval: 30000, // 30 seconds
     refetchOnWindowFocus: true,
     retry: 2,
   },
   APPROVALS: {
     staleTime: CACHE_TIMES.DYNAMIC,
-    cacheTime: CACHE_TIMES.DYNAMIC * 2,
+    gcTime: CACHE_TIMES.DYNAMIC * 2, // Changed from cacheTime to gcTime (React Query v5)
     refetchInterval: 10000, // 10 seconds
     refetchOnWindowFocus: true,
     retry: 2,
   },
   ALERTS: {
     staleTime: CACHE_TIMES.DYNAMIC,
-    cacheTime: CACHE_TIMES.DYNAMIC * 2,
+    gcTime: CACHE_TIMES.DYNAMIC * 2, // Changed from cacheTime to gcTime (React Query v5)
     refetchInterval: 15000, // 15 seconds
     refetchOnWindowFocus: true,
     retry: 2,
   },
   CHARTS: {
     staleTime: CACHE_TIMES.STANDARD,
-    cacheTime: CACHE_TIMES.STANDARD * 2,
+    gcTime: CACHE_TIMES.STANDARD * 2, // Changed from cacheTime to gcTime (React Query v5)
     refetchInterval: 60000, // 1 minute
     refetchOnWindowFocus: false,
     retry: 1,
   },
   ACTIVITIES: {
     staleTime: CACHE_TIMES.DYNAMIC,
-    cacheTime: CACHE_TIMES.DYNAMIC * 2,
+    gcTime: CACHE_TIMES.DYNAMIC * 2, // Changed from cacheTime to gcTime (React Query v5)
     refetchInterval: 20000, // 20 seconds
     refetchOnWindowFocus: true,
     retry: 2,
   },
   TASKS: {
     staleTime: CACHE_TIMES.DYNAMIC,
-    cacheTime: CACHE_TIMES.DYNAMIC * 2,
+    gcTime: CACHE_TIMES.DYNAMIC * 2, // Changed from cacheTime to gcTime (React Query v5)
     refetchInterval: 20000, // 20 seconds
     refetchOnWindowFocus: true,
     retry: 2,
   },
   LOANS: {
     staleTime: CACHE_TIMES.STANDARD,
-    cacheTime: CACHE_TIMES.STANDARD * 2,
+    gcTime: CACHE_TIMES.STANDARD * 2, // Changed from cacheTime to gcTime (React Query v5)
     refetchOnWindowFocus: false,
     refetchOnMount: false,
     retry: 2,
