@@ -80,7 +80,12 @@ export function useCashFlows(fiscalYearId?: string) {
 
       if (opError) throw opError;
 
-      const operating = operatingData?.reduce((sum: number, line: any) => {
+interface CashFlowLine {
+  debit_amount: number;
+  credit_amount: number;
+}
+
+      const operating = operatingData?.reduce((sum: number, line: CashFlowLine) => {
         return sum + (line.debit_amount - line.credit_amount);
       }, 0) || 0;
 
@@ -94,7 +99,7 @@ export function useCashFlows(fiscalYearId?: string) {
 
       if (invError) throw invError;
 
-      const investing = investingData?.reduce((sum: number, line: any) => {
+      const investing = investingData?.reduce((sum: number, line: CashFlowLine) => {
         return sum + (line.debit_amount - line.credit_amount);
       }, 0) || 0;
 
@@ -108,7 +113,7 @@ export function useCashFlows(fiscalYearId?: string) {
 
       if (finError) throw finError;
 
-      const financing = financingData?.reduce((sum: number, line: any) => {
+      const financing = financingData?.reduce((sum: number, line: CashFlowLine) => {
         return sum + (line.debit_amount - line.credit_amount);
       }, 0) || 0;
 

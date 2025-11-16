@@ -64,7 +64,7 @@ export function useBeneficiaries() {
       
       showSuccess("تمت الإضافة بنجاح", "تم إضافة المستفيد الجديد بنجاح");
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       handleError(error, { operation: 'add_beneficiary', component: 'Beneficiaries' });
     },
   });
@@ -102,7 +102,7 @@ export function useBeneficiaries() {
       
       showSuccess("تم التحديث بنجاح", "تم تحديث بيانات المستفيد بنجاح");
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       handleError(error, { operation: 'update_beneficiary', component: 'Beneficiaries' });
     },
   });
@@ -125,7 +125,7 @@ export function useBeneficiaries() {
       queryClient.invalidateQueries({ queryKey: ["beneficiaries"] });
       showSuccess("تم الحذف بنجاح", "تم حذف المستفيد بنجاح");
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       handleError(error, { operation: 'delete_beneficiary', component: 'Beneficiaries' });
     },
   });

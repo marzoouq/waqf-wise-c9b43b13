@@ -38,21 +38,22 @@ export const NotificationsBell = () => {
     
     const channel = supabase
       .channel('new-notifications')
-      .on('postgres_changes' as any, {
+      .on('postgres_changes', {
         event: 'INSERT',
         schema: 'public',
         table: 'notifications',
         filter: `user_id=eq.${user.id}`
-      }, (payload: any) => {
+      }, (payload: unknown) => {
         // إظهار toast للإشعار الجديد
-        const newNotification = payload.new as RealtimeNotification;
+        const typedPayload = payload as NotificationPayload;
+        const newNotification = typedPayload.new;
         toast.info(newNotification.title, {
           description: newNotification.message,
         });
         
         queryClient.invalidateQueries({ queryKey: ["notifications"] });
       })
-      .on('postgres_changes' as any, {
+      .on('postgres_changes', {
         event: 'UPDATE',
         schema: 'public',
         table: 'notifications',

@@ -4,7 +4,7 @@
 
 import { getErrorMessage } from '@/types/errors';
 import { logger } from './logger';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 export interface ErrorHandlerOptions {
   context?: string;
@@ -32,10 +32,8 @@ export function handleError(error: unknown, options: ErrorHandlerOptions = {}) {
   
   // إظهار Toast إذا لزم الأمر
   if (showToast) {
-    toast({
-      title: toastTitle,
+    toast.error(toastTitle, {
       description: message,
-      variant: 'destructive',
     });
   }
   

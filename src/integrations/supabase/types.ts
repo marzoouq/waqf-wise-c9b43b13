@@ -5219,6 +5219,36 @@ export type Database = {
         }
         Relationships: []
       }
+      tribes: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          total_beneficiaries: number | null
+          total_families: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          total_beneficiaries?: number | null
+          total_families?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          total_beneficiaries?: number | null
+          total_families?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       two_factor_secrets: {
         Row: {
           backup_codes: string[]
