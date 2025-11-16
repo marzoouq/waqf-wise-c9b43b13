@@ -934,6 +934,72 @@ export type Database = {
           },
         ]
       }
+      chatbot_conversations: {
+        Row: {
+          context: Json | null
+          created_at: string | null
+          id: string
+          message: string
+          message_type: string
+          quick_reply_id: string | null
+          response: string | null
+          user_id: string | null
+        }
+        Insert: {
+          context?: Json | null
+          created_at?: string | null
+          id?: string
+          message: string
+          message_type: string
+          quick_reply_id?: string | null
+          response?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          context?: Json | null
+          created_at?: string | null
+          id?: string
+          message?: string
+          message_type?: string
+          quick_reply_id?: string | null
+          response?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      chatbot_quick_replies: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          order_index: number | null
+          prompt: string
+          text: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          icon?: string | null
+          id: string
+          is_active?: boolean | null
+          order_index?: number | null
+          prompt: string
+          text: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          order_index?: number | null
+          prompt?: string
+          text?: string
+        }
+        Relationships: []
+      }
       contract_attachments: {
         Row: {
           contract_id: string
