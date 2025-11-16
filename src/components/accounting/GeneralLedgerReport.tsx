@@ -40,7 +40,7 @@ const GeneralLedgerReport = () => {
   });
 
   const { data: ledgerData, isLoading } = useQuery({
-    queryKey: ["general_ledger", selectedAccountId, dateFrom, dateTo],
+    queryKey: ["general_ledger", selectedAccountId, dateFrom || undefined, dateTo || undefined],
     queryFn: async () => {
       if (!selectedAccountId) return null;
 
