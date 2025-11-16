@@ -517,7 +517,7 @@ const BeneficiaryDashboard = () => {
           />
         )}
       </div>
-    </div>
+    </MobileOptimizedLayout>
   );
 };
 
