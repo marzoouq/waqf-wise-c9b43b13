@@ -1,4 +1,4 @@
-import { Shield, LayoutDashboard, TrendingUp, Building2, Bell } from "lucide-react";
+import { Shield, LayoutDashboard, TrendingUp, Building2, Bell, Vote } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -13,6 +13,7 @@ import PropertiesPerformanceChart from "@/components/dashboard/nazer/PropertiesP
 import RevenueExpenseChart from "@/components/dashboard/RevenueExpenseChart";
 import BudgetComparisonChart from "@/components/dashboard/BudgetComparisonChart";
 import { AIInsightsWidget } from "@/components/dashboard/AIInsightsWidget";
+import { GovernanceSection } from "@/components/governance/GovernanceSection";
 
 const ChartSkeleton = () => (
   <Card>
@@ -55,13 +56,20 @@ export default function NazerDashboard() {
         />
 
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-grid h-auto p-1 bg-muted/50">
+          <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-grid h-auto p-1 bg-muted/50">
             <TabsTrigger 
               value="overview" 
               className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
             >
               <LayoutDashboard className="h-4 w-4" />
               <span className="hidden sm:inline">نظرة عامة</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="governance" 
+              className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
+            >
+              <Vote className="h-4 w-4" />
+              <span className="hidden sm:inline">الحوكمة</span>
             </TabsTrigger>
             <TabsTrigger 
               value="financial" 
@@ -104,6 +112,26 @@ export default function NazerDashboard() {
             <Suspense fallback={<ChartSkeleton />}>
               <AIInsightsWidget />
             </Suspense>
+
+            <Suspense fallback={<ChartSkeleton />}>
+              <QuickActionsGrid />
+            </Suspense>
+          </TabsContent>
+
+          {/* Governance Tab */}
+          <TabsContent value="governance" className="space-y-6 mt-6">
+            <Suspense fallback={<SectionSkeleton />}>
+              <GovernanceSection />
+            </Suspense>
+
+            <div className="grid gap-6 lg:grid-cols-2">
+              <Suspense fallback={<ChartSkeleton />}>
+                <PendingApprovalsSection />
+              </Suspense>
+              <Suspense fallback={<ChartSkeleton />}>
+                <SmartAlertsSection />
+              </Suspense>
+            </div>
 
             <Suspense fallback={<ChartSkeleton />}>
               <QuickActionsGrid />

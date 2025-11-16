@@ -39,6 +39,7 @@ export const BeneficiaryProfile = lazy(() => import('./pages/BeneficiaryProfile'
 // Governance pages
 export const GovernanceDecisions = lazy(() => import('./pages/GovernanceDecisions'));
 export const DecisionDetails = lazy(() => import('./pages/DecisionDetails'));
+export const PropertyUnits = lazy(() => import('./pages/PropertyUnits'));
 
 // Auth
 export const Auth = lazy(() => import('./pages/Auth'));
