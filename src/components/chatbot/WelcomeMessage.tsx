@@ -1,75 +1,130 @@
-import { Bot, Sparkles, Database, Building2, Users, BarChart3 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Bot, Sparkles, MessageSquare, BarChart3, TrendingUp, Zap, Shield, Clock } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 export function WelcomeMessage() {
   const features = [
-    { icon: Database, text: "تحليل البيانات المالية", color: "text-blue-500" },
-    { icon: Users, text: "معلومات المستفيدين", color: "text-green-500" },
-    { icon: Building2, text: "إدارة العقارات", color: "text-orange-500" },
-    { icon: BarChart3, text: "التقارير والإحصائيات", color: "text-purple-500" },
+    {
+      icon: <BarChart3 className="h-5 w-5" />,
+      title: "تحليل البيانات",
+      description: "احصل على تحليلات فورية للبيانات المالية والإحصائية",
+      color: "from-blue-500 to-cyan-500"
+    },
+    {
+      icon: <MessageSquare className="h-5 w-5" />,
+      title: "إجابات ذكية",
+      description: "اسأل عن المستفيدين، العقارات، والطلبات",
+      color: "from-purple-500 to-pink-500"
+    },
+    {
+      icon: <TrendingUp className="h-5 w-5" />,
+      title: "توصيات عملية",
+      description: "احصل على توصيات مدروسة بناءً على البيانات",
+      color: "from-green-500 to-emerald-500"
+    },
+    {
+      icon: <Zap className="h-5 w-5" />,
+      title: "استجابة فورية",
+      description: "ردود سريعة ودقيقة في ثوانٍ معدودة",
+      color: "from-yellow-500 to-orange-500"
+    },
+    {
+      icon: <Shield className="h-5 w-5" />,
+      title: "آمن ومحمي",
+      description: "بياناتك محمية بأعلى معايير الأمان",
+      color: "from-red-500 to-rose-500"
+    },
+    {
+      icon: <Clock className="h-5 w-5" />,
+      title: "متاح دائماً",
+      description: "خدمة على مدار الساعة لمساعدتك",
+      color: "from-indigo-500 to-blue-500"
+    }
   ];
 
   return (
-    <div className="flex justify-center items-center h-full p-6">
-      <div className="text-center max-w-2xl space-y-6">
-        {/* الشعار */}
-        <div className="relative mx-auto w-24 h-24">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5 rounded-full animate-pulse" />
-          <div className="absolute inset-2 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center shadow-lg">
-            <Bot className="h-12 w-12 text-primary-foreground" />
-          </div>
-          <Sparkles className="absolute -top-1 -right-1 h-6 w-6 text-yellow-500 animate-pulse" />
+    <div className="flex flex-col items-center justify-center h-full p-8 text-center space-y-8 animate-in fade-in duration-700">
+      <div className="relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/50 to-primary blur-3xl rounded-full animate-pulse" />
+        <div className="relative bg-gradient-to-br from-primary via-primary/90 to-primary/80 p-8 rounded-full shadow-2xl ring-4 ring-primary/20 animate-in zoom-in duration-500">
+          <Bot className="h-20 w-20 text-primary-foreground animate-bounce" />
         </div>
-
-        {/* العنوان */}
-        <div className="space-y-3">
-          <h2 className="text-3xl font-bold text-foreground">
-            مرحباً بك في المساعد الذكي! 👋
-          </h2>
-          <p className="text-lg text-muted-foreground leading-relaxed">
-            أنا مساعدك الذكي لإدارة الوقف، مدعوم بتقنية الذكاء الاصطناعي المتقدمة.
-            يمكنني مساعدتك في:
-          </p>
+        <div className="absolute -top-2 -right-2">
+          <Sparkles className="h-6 w-6 text-yellow-400 animate-pulse" />
         </div>
-
-        {/* المميزات */}
-        <div className="grid grid-cols-2 gap-4 mt-6">
-          {features.map((feature, index) => {
-            const Icon = feature.icon;
-            return (
-              <Card key={index} className="border-border/50 hover:border-primary/50 transition-colors">
-                <CardContent className="p-4 flex items-center gap-3">
-                  <div className={cn("p-2 rounded-lg bg-muted", feature.color)}>
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <span className="text-sm font-medium text-foreground">
-                    {feature.text}
-                  </span>
-                </CardContent>
-              </Card>
-            );
-          })}
+        <div className="absolute -bottom-2 -left-2">
+          <Sparkles className="h-5 w-5 text-blue-400 animate-pulse" />
         </div>
-
-        {/* تعليمات الاستخدام */}
-        <div className="bg-muted/50 border border-border/50 rounded-lg p-4 space-y-2">
-          <p className="text-sm font-medium text-foreground">💡 كيف تستخدمني؟</p>
-          <ul className="text-xs text-muted-foreground space-y-1 text-right">
-            <li>• استخدم <strong>الردود السريعة</strong> للحصول على معلومات فورية</li>
-            <li>• اكتب <strong>أسئلتك</strong> مباشرة للحصول على إجابات مخصصة</li>
-            <li>• يمكنني تحليل <strong>البيانات الحقيقية</strong> من قاعدة البيانات</li>
-          </ul>
+      </div>
+      
+      <div className="space-y-4 max-w-2xl">
+        <div className="flex items-center justify-center gap-2 animate-in slide-in-from-top duration-500">
+          <Sparkles className="h-6 w-6 text-primary animate-pulse" />
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
+            مرحباً بك في المساعد الذكي
+          </h1>
+          <Sparkles className="h-6 w-6 text-primary animate-pulse" />
         </div>
-
-        {/* دعوة للعمل */}
-        <p className="text-sm text-muted-foreground animate-pulse">
-          ✨ ابدأ بالضغط على أحد الأزرار أدناه أو اكتب سؤالك
+        <p className="text-muted-foreground text-lg animate-in slide-in-from-bottom duration-500 delay-150">
+          أنا هنا لمساعدتك في إدارة الوقف بذكاء وفعالية 🚀
         </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-5xl">
+        {features.map((feature, index) => (
+          <Card
+            key={index}
+            className={cn(
+              "p-6 border-2 border-primary/20 bg-gradient-to-br from-background to-muted/50",
+              "hover:border-primary/40 hover:shadow-2xl transition-all duration-300",
+              "hover:scale-105 hover:-translate-y-1 cursor-pointer group",
+              "animate-in fade-in slide-in-from-bottom duration-500"
+            )}
+            style={{ animationDelay: `${index * 100}ms` }}
+          >
+            <div className="flex flex-col items-center text-center space-y-3">
+              <div className={cn(
+                "p-4 rounded-2xl bg-gradient-to-br",
+                feature.color,
+                "text-white shadow-lg group-hover:scale-110 transition-transform duration-300"
+              )}>
+                {feature.icon}
+              </div>
+              <h3 className="font-bold text-foreground group-hover:text-primary transition-colors">
+                {feature.title}
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {feature.description}
+              </p>
+            </div>
+          </Card>
+        ))}
+      </div>
+
+      <div className="bg-gradient-to-br from-muted/80 to-muted/50 rounded-2xl p-8 max-w-2xl border-2 border-border/50 shadow-lg animate-in slide-in-from-bottom duration-500 delay-300">
+        <p className="text-base text-muted-foreground mb-4 flex items-center justify-center gap-2">
+          <Sparkles className="h-5 w-5 text-primary" />
+          <strong className="text-foreground text-lg">نصائح للاستخدام الأمثل</strong>
+        </p>
+        <ul className="text-sm text-muted-foreground space-y-3 text-right">
+          <li className="flex items-start gap-3">
+            <span className="text-primary font-bold">•</span>
+            <span>استخدم الأزرار السريعة أسفل للبدء الفوري</span>
+          </li>
+          <li className="flex items-start gap-3">
+            <span className="text-primary font-bold">•</span>
+            <span>اسأل أسئلة واضحة ومحددة للحصول على إجابات دقيقة</span>
+          </li>
+          <li className="flex items-start gap-3">
+            <span className="text-primary font-bold">•</span>
+            <span>يمكنك طلب تقارير وإحصائيات تفصيلية في أي وقت</span>
+          </li>
+          <li className="flex items-start gap-3">
+            <span className="text-primary font-bold">•</span>
+            <span>المساعد الذكي يتعلم من تفاعلاتك لتحسين الخدمة</span>
+          </li>
+        </ul>
       </div>
     </div>
   );
-}
-
-function cn(...classes: (string | boolean | undefined)[]) {
-  return classes.filter(Boolean).join(" ");
 }
