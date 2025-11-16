@@ -204,23 +204,19 @@ const Users = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-6 md:p-8 lg:p-10 space-y-6">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gradient-primary">
-              إدارة المستخدمين والصلاحيات
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              إدارة شاملة لمستخدمي النظام وصلاحياتهم
-            </p>
-          </div>
-          <Button onClick={exportUsers} variant="outline" className="gap-2">
-            <Download className="h-4 w-4" />
-            تصدير ({filteredUsers.length})
+    <MobileOptimizedLayout>
+      <MobileOptimizedHeader
+        title="إدارة المستخدمين"
+        description="إدارة المستخدمين والأدوار والصلاحيات"
+        icon={<Shield className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
+        actions={
+          <Button onClick={exportUsers} variant="outline" size="sm">
+            <Download className="h-4 w-4 sm:h-5 sm:w-5 ml-2" />
+            <span className="hidden sm:inline">تصدير ({filteredUsers.length})</span>
+            <span className="sm:hidden">تصدير</span>
           </Button>
-        </div>
+        }
+      />
 
         {/* Filters */}
         <Card>
