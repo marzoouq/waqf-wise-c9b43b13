@@ -23,7 +23,15 @@ const Funds = () => {
   const { funds, isLoading: fundsLoading } = useFunds();
   const { createAutoEntry } = useJournalEntries();
 
-  const handleDistribute = async (data: any) => {
+  const handleDistribute = async (data: {
+    month: string;
+    totalAmount: number;
+    waqfUnit: string;
+    beneficiaryIds: string[];
+    nazerFee?: number;
+    maintenanceFee?: number;
+    investmentFee?: number;
+  }) => {
     try {
       const dbData = {
         month: `${data.month} 1446`,

@@ -7,13 +7,18 @@ import { LoadingState } from '@/components/shared/LoadingState';
 import { FileText, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
+import { Database } from '@/integrations/supabase/types';
+
+type BeneficiaryRequest = Database['public']['Tables']['beneficiary_requests']['Row'] & {
+  request_types?: { name: string; description: string | null } | null;
+};
 
 interface ProfileRequestsHistoryProps {
   beneficiaryId: string;
 }
 
 export function ProfileRequestsHistory({ beneficiaryId }: ProfileRequestsHistoryProps) {
-  const { data: requests, isLoading } = useQuery({
+  const { data: requests, isLoading } = useQuery<BeneficiaryRequest[]>({
     queryKey: ['beneficiary-requests', beneficiaryId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -26,7 +31,7 @@ export function ProfileRequestsHistory({ beneficiaryId }: ProfileRequestsHistory
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data || [];
+      return (data || []) as BeneficiaryRequest[];
     },
     staleTime: 60 * 1000,
   });
@@ -125,7 +130,7 @@ export function ProfileRequestsHistory({ beneficiaryId }: ProfileRequestsHistory
             </div>
           ) : (
             <div className="space-y-3">
-              {requests.map((request: any) => (
+              {requests.map((request) => (
                 <div
                   key={request.id}
                   className="flex flex-col gap-3 p-4 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors"

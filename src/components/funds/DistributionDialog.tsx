@@ -215,7 +215,7 @@ export function DistributionDialog({
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {simulationResult.distribution.map((item: any) => (
+                        {simulationResult.distribution.map((item: { beneficiaryNumber: string; amount: number }) => (
                           <TableRow key={item.beneficiaryNumber}>
                             <TableCell>مستفيد {item.beneficiaryNumber}</TableCell>
                             <TableCell className="text-left">{item.amount.toFixed(2)} ر.س</TableCell>

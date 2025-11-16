@@ -5,10 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Database } from '@/integrations/supabase/types';
+
+type Json = Database['public']['Tables']['search_history']['Row']['filters'];
 
 interface RecentSearchesProps {
   searchType: string;
-  onSelectSearch: (query: string, filters?: any) => void;
+  onSelectSearch: (query: string, filters?: Json) => void;
 }
 
 export function RecentSearches({ searchType, onSelectSearch }: RecentSearchesProps) {
@@ -88,7 +91,7 @@ export function RecentSearches({ searchType, onSelectSearch }: RecentSearchesPro
       <CardContent>
         <ScrollArea className="h-[200px]">
           <div className="space-y-2">
-            {recentSearches.map((search: any) => (
+            {recentSearches.map((search) => (
               <div
                 key={search.id}
                 className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors group"

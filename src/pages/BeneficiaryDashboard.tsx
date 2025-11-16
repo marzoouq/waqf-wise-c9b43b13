@@ -78,15 +78,15 @@ const BeneficiaryDashboard = () => {
     fetchRequests();
   }, [user?.id, beneficiary?.id]);
 
-  // Create request mutation
+import { Database } from '@/integrations/supabase/types';
+
+// ... existing imports
+
   const createRequestMutation = useMutation({
-    mutationFn: async (newRequest: any) => {
+    mutationFn: async (newRequest: Record<string, unknown>) => {
       const { data, error } = await supabase
         .from("beneficiary_requests")
-        .insert({
-          ...newRequest,
-          submitted_at: new Date().toISOString(),
-        })
+        .insert(newRequest)
         .select()
         .single();
 
@@ -116,14 +116,13 @@ const BeneficiaryDashboard = () => {
     averagePayment: payments.length > 0 ? payments.reduce((sum, p) => sum + Number(p.amount), 0) / payments.length : 0,
   };
 
-  const handleEmergencyRequest = async (data: any) => {
+  const handleEmergencyRequest = async (data: Record<string, unknown>) => {
     try {
       await createRequestMutation.mutateAsync({
         beneficiary_id: beneficiary?.id || "",
         request_type_id: "emergency",
-        description: data.description,
-        amount: data.amount,
-        emergency_reason: data.emergency_reason,
+        description: (data.description as string) || (data.emergency_reason as string),
+        amount: data.amount as number,
         priority: "عاجل",
         status: "قيد المراجعة",
       });
@@ -133,7 +132,7 @@ const BeneficiaryDashboard = () => {
     }
   };
 
-  const handleLoanRequest = async (data: any) => {
+  const handleLoanRequest = async (data: { description: string; amount: number; term_months: number }) => {
     try {
       await createRequestMutation.mutateAsync({
         beneficiary_id: beneficiary?.id || "",
@@ -152,7 +151,7 @@ const BeneficiaryDashboard = () => {
     }
   };
 
-  const handleDataUpdate = async (data: any) => {
+  const handleDataUpdate = async (data: Record<string, unknown>) => {
     try {
       await createRequestMutation.mutateAsync({
         beneficiary_id: beneficiary?.id || "",
@@ -168,7 +167,7 @@ const BeneficiaryDashboard = () => {
     }
   };
 
-  const handleAddFamilyMember = async (data: any) => {
+  const handleAddFamilyMember = async (data: Record<string, unknown>) => {
     try {
       await createRequestMutation.mutateAsync({
         beneficiary_id: beneficiary?.id || "",

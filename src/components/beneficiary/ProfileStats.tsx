@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DollarSign, FileText, Users, TrendingUp, Calendar, CheckCircle } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
+import { Database } from '@/integrations/supabase/types';
 
 interface ProfileStatsProps {
   beneficiaryId: string;
@@ -42,9 +43,9 @@ export function ProfileStats({ beneficiaryId }: ProfileStatsProps) {
         .select('*', { count: 'exact', head: true })
         .eq('beneficiary_id', beneficiaryId);
 
-      const totalPayments = (payments || []).reduce((sum: number, p: any) => sum + (Number(p.amount) || 0), 0);
-      const approvedCount = (requests || []).filter((r: any) => r.status === 'معتمد').length;
-      const pendingCount = (requests || []).filter((r: any) => r.status === 'قيد المراجعة').length;
+      const totalPayments = (payments || []).reduce((sum: number, p) => sum + (Number(p.amount) || 0), 0);
+      const approvedCount = (requests || []).filter((r) => r.status === 'معتمد').length;
+      const pendingCount = (requests || []).filter((r) => r.status === 'قيد المراجعة').length;
 
       return {
         totalPayments,

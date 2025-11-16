@@ -96,9 +96,9 @@ export function MaintenanceCostReport() {
         acc[category].totalCost += cost;
         acc[category].count += 1;
         return acc;
-      }, {} as Record<string, any>);
+      }, {} as Record<string, { type: string; totalCost: number; count: number }>);
 
-      return Object.values(typeData).map((item: any) => ({
+      return Object.values(typeData).map((item) => ({
         name: item.type,
         value: item.totalCost,
         count: item.count

@@ -38,10 +38,10 @@ export function DistributionAnalysisReport() {
         acc[month].beneficiariesCount += dist.beneficiaries_count;
         acc[month].distributionsCount += 1;
         return acc;
-      }, {} as Record<string, any>);
+      }, {} as Record<string, { month: string; totalAmount: number; beneficiariesCount: number; distributionsCount: number; avgPerBeneficiary: number }>);
 
       // حساب المتوسط لكل مستفيد
-      const result = Object.values(monthlyData).map((item: any) => ({
+      const result = Object.values(monthlyData).map((item) => ({
         ...item,
         avgPerBeneficiary: item.totalAmount / item.beneficiariesCount
       }));
