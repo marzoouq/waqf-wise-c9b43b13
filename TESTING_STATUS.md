@@ -130,17 +130,27 @@
 ## 🚀 التشغيل
 
 ```bash
-# E2E Tests (12 رحلة)
+# E2E Tests (12 رحلة) ✅
 npm run e2e
 npm run e2e:ui
 
-# Integration Tests (15 سيناريو)
+# Integration Tests (15 سيناريو) ✅
 npm run test src/__tests__/integration/
 
-# Unit Tests (قريباً)
+# Unit Tests (قيد التطوير) 🔄
 npm run test
 npm run test:coverage
+
+# تقارير
+npx playwright show-report  # E2E Report
+npm run test:coverage       # Coverage Report
 ```
+
+## 📚 الوثائق الكاملة
+
+- [📖 دليل الاختبار الشامل](./src/__tests__/README.md)
+- [🚀 دليل التشغيل السريع](./RUN_TESTS.md)
+- [✅ قائمة التحقق](./TESTING_CHECKLIST.md)
 
 ## 📊 التغطية
 
