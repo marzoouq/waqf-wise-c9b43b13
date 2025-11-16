@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';
+import type { Json } from '@/integrations/supabase/types';
 
 interface AIInsight {
   id: string;
@@ -9,7 +10,7 @@ interface AIInsight {
   description: string;
   alert_type: string;
   severity: string;
-  data: any;
+  data: Json;
   created_at: string;
   is_dismissed: boolean;
 }

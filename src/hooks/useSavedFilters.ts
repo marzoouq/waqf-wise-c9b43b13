@@ -1,12 +1,14 @@
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from './use-toast';
+import { toast } from 'sonner';
+import type { Json } from '@/integrations/supabase/types';
 
 interface SavedFilter {
   id: string;
   name: string;
   filter_type: string;
-  filter_criteria: any;
+  filter_criteria: Json;
   is_favorite: boolean;
   created_at: string;
   updated_at: string;
@@ -45,7 +47,7 @@ export function useSavedFilters(filterType: string) {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('saved_filters')
         .insert({
           user_id: user.id,
@@ -55,21 +57,13 @@ export function useSavedFilters(filterType: string) {
         .single();
 
       if (error) throw error;
-      return data;
+      toast.success('تم الحفظ', { description: 'تم حفظ الفلتر بنجاح' });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['saved-filters', filterType] });
-      toast({
-        title: 'تم الحفظ',
-        description: 'تم حفظ الفلتر بنجاح',
-      });
     },
     onError: () => {
-      toast({
-        title: 'خطأ',
-        description: 'فشل حفظ الفلتر',
-        variant: 'destructive',
-      });
+      toast.error('خطأ', { description: 'فشل حفظ الفلتر' });
     },
   });
 
@@ -82,13 +76,10 @@ export function useSavedFilters(filterType: string) {
         .eq('id', id);
 
       if (error) throw error;
+      toast.success('تم التحديث', { description: 'تم تحديث الفلتر بنجاح' });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['saved-filters', filterType] });
-      toast({
-        title: 'تم التحديث',
-        description: 'تم تحديث الفلتر بنجاح',
-      });
     },
   });
 
@@ -101,13 +92,10 @@ export function useSavedFilters(filterType: string) {
         .eq('id', id);
 
       if (error) throw error;
+      toast.success('تم الحذف', { description: 'تم حذف الفلتر بنجاح' });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['saved-filters', filterType] });
-      toast({
-        title: 'تم الحذف',
-        description: 'تم حذف الفلتر بنجاح',
-      });
     },
   });
 

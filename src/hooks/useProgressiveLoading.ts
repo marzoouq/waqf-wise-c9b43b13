@@ -1,13 +1,14 @@
 import { useCallback } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import type { Json } from '@/integrations/supabase/types';
 
 interface ProgressiveLoadingOptions {
   table: string;
   pageSize?: number;
   orderBy?: string;
   orderDirection?: 'asc' | 'desc';
-  filters?: Record<string, any>;
+  filters?: Record<string, Json>;
 }
 
 /**
@@ -42,8 +43,9 @@ export const useProgressiveLoading = <T = any>({
       const to = from + pageSize - 1;
 
       // استعلام مبسط بدون أنواع معقدة
+      // @ts-expect-error - Dynamic table name
       const { data: result, error: queryError, count } = await supabase
-        .from(table as any)
+        .from(table)
         .select('*', { count: 'exact' })
         .range(from, to)
         .order(orderBy, { ascending: orderDirection === 'asc' });

@@ -111,7 +111,7 @@ export function useKnowledgeBase() {
 
       const { error } = await supabase
         .from('kb_articles')
-        .update({ [column]: ((current as any)?.[column] || 0) + 1 })
+        .update({ [column]: ((current?.[column] as number) || 0) + 1 })
         .eq('id', id);
 
       if (error) throw error;

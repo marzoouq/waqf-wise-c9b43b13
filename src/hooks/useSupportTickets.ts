@@ -67,7 +67,7 @@ export function useSupportTickets(filters?: SupportFilters) {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('يجب تسجيل الدخول');
 
-      const insertData: any = {
+      const insertData = {
         subject: input.subject,
         description: input.description,
         category: input.category,

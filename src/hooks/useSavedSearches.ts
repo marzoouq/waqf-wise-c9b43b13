@@ -2,13 +2,14 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { createMutationErrorHandler } from "@/lib/errorHandling";
+import type { Json } from '@/integrations/supabase/types';
 
 export interface SavedSearch {
   id: string;
   user_id: string;
   name: string;
   description?: string;
-  search_criteria: any;
+  search_criteria: Json;
   is_favorite: boolean;
   usage_count: number;
   last_used_at?: string;
