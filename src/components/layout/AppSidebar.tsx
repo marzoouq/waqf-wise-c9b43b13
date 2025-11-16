@@ -23,6 +23,9 @@ import {
   Sparkles,
   Bot,
   Vote,
+  MessageSquare,
+  Headphones,
+  BookOpen,
 } from "lucide-react";
 import {
   Sidebar,
@@ -105,7 +108,18 @@ const menuGroups = [
       { icon: Sparkles, label: "الرؤى الذكية", path: "/ai-insights", roles: ["admin", "nazer"] },
       { icon: Bot, label: "المساعد الذكي", path: "/chatbot", roles: ["all"], badge: "جديد" },
       { icon: Shield, label: "سجل العمليات", path: "/audit-logs", roles: ["admin", "nazer"] },
-      { icon: Vote, label: "القرارات والتصويت", path: "/governance/decisions", roles: ["admin", "nazer"], badge: "جديد" },
+      { icon: Vote, label: "الحوكمة والقرارات", path: "/governance/decisions", roles: ["admin", "nazer"], badge: "جديد" },
+    ]
+  },
+  {
+    id: "support",
+    label: "الدعم والمساعدة",
+    icon: Headphones,
+    roles: ["all"],
+    subItems: [
+      { icon: MessageSquare, label: "تذاكر الدعم", path: "/support", roles: ["all"] },
+      { icon: Headphones, label: "إدارة التذاكر", path: "/support-management", roles: ["admin", "nazer"] },
+      { icon: BookOpen, label: "قاعدة المعرفة", path: "/support#knowledge", roles: ["all"], badge: "قريباً" },
     ]
   },
   {
