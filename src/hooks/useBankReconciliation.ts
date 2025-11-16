@@ -3,6 +3,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { logger } from "@/lib/logger";
 import { Database } from "@/integrations/supabase/types";
+import { 
+  BankStatementInsert, 
+  BankStatementUpdate,
+  BankTransactionInsert,
+  BankTransactionUpdate,
+  BankTransactionMatch 
+} from "@/types/banking";
+import { getErrorMessage } from "@/types/errors";
 
 type Tables = Database['public']['Tables'];
 
@@ -88,7 +96,7 @@ export function useBankReconciliation() {
   });
 
   const createStatement = useMutation({
-    mutationFn: async (statement: any) => {
+    mutationFn: async (statement: BankStatementInsert) => {
       const { data, error } = await supabase
         .from("bank_statements")
         .insert([statement])
@@ -105,17 +113,17 @@ export function useBankReconciliation() {
         description: "تم إنشاء كشف الحساب بنجاح",
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       toast({
         title: "خطأ",
-        description: error.message,
+        description: getErrorMessage(error),
         variant: "destructive",
       });
     },
   });
 
   const addTransaction = useMutation({
-    mutationFn: async (transaction: any) => {
+    mutationFn: async (transaction: BankTransactionInsert) => {
       const { data, error } = await supabase
         .from("bank_transactions")
         .insert([transaction])
@@ -132,10 +140,10 @@ export function useBankReconciliation() {
         description: "تم إضافة الحركة بنجاح",
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       toast({
         title: "خطأ",
-        description: error.message,
+        description: getErrorMessage(error),
         variant: "destructive",
       });
     },
@@ -143,19 +151,16 @@ export function useBankReconciliation() {
 
   const matchTransaction = useMutation({
     mutationFn: async ({
-      transactionId,
-      journalEntryId,
-    }: {
-      transactionId: string;
-      journalEntryId: string;
-    }) => {
+      transaction_id,
+      journal_entry_id,
+    }: BankTransactionMatch) => {
       const { data, error } = await supabase
         .from("bank_transactions")
         .update({
           is_matched: true,
-          matched_journal_entry_id: journalEntryId,
+          journal_entry_id: journal_entry_id,
         })
-        .eq("id", transactionId)
+        .eq("id", transaction_id)
         .select()
         .single();
 
@@ -169,10 +174,10 @@ export function useBankReconciliation() {
         description: "تمت مطابقة الحركة بنجاح",
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       toast({
         title: "خطأ",
-        description: error.message,
+        description: getErrorMessage(error),
         variant: "destructive",
       });
     },
@@ -200,10 +205,10 @@ export function useBankReconciliation() {
         description: "تمت تسوية كشف الحساب بنجاح",
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       toast({
         title: "خطأ",
-        description: error.message,
+        description: getErrorMessage(error),
         variant: "destructive",
       });
     },

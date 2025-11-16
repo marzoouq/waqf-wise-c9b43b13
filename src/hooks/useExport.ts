@@ -1,6 +1,15 @@
 import { useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { exportToPDF, exportToExcel } from "@/lib/exportHelpers";
+import { 
+  PDFTableData, 
+  ExcelRowData, 
+  BeneficiaryExport,
+  PropertyExport,
+  PaymentExport,
+  InvoiceExport 
+} from "@/types/export";
+import { getErrorMessage } from "@/types/errors";
 
 interface ExportOptions {
   format: "pdf" | "excel";
@@ -11,12 +20,12 @@ interface PDFExportOptions extends ExportOptions {
   format: "pdf";
   title: string;
   headers: string[];
-  data: any[][];
+  data: PDFTableData;
 }
 
 interface ExcelExportOptions extends ExportOptions {
   format: "excel";
-  data: any[];
+  data: ExcelRowData[];
   sheetName?: string;
 }
 
@@ -37,10 +46,10 @@ export function useExport() {
         title: "تم التصدير بنجاح",
         description: `تم تصدير البيانات إلى ${options.format === "pdf" ? "PDF" : "Excel"}`,
       });
-    } catch (error) {
+    } catch (error: unknown) {
       toast({
         title: "خطأ في التصدير",
-        description: "حدث خطأ أثناء تصدير البيانات",
+        description: getErrorMessage(error),
         variant: "destructive",
       });
     }
@@ -50,7 +59,7 @@ export function useExport() {
 }
 
 // Helper functions to format data for export
-export function formatBeneficiariesForExport(beneficiaries: any[]) {
+export function formatBeneficiariesForExport(beneficiaries: BeneficiaryExport[]): ExcelRowData[] {
   return beneficiaries.map((b) => ({
     "الاسم الكامل": b.full_name,
     "رقم الهوية": b.national_id,
@@ -62,31 +71,31 @@ export function formatBeneficiariesForExport(beneficiaries: any[]) {
   }));
 }
 
-export function formatPropertiesForExport(properties: any[]) {
+export function formatPropertiesForExport(properties: PropertyExport[]): ExcelRowData[] {
   return properties.map((p) => ({
-    "اسم العقار": p.name,
-    "النوع": p.type,
+    "اسم العقار": p.property_name,
+    "النوع": p.property_type,
     "الموقع": p.location,
-    "عدد الوحدات": p.units,
-    "المؤجرة": p.occupied,
-    "الإيرادات الشهرية": p.monthly_revenue,
+    "المساحة": p.area || "-",
+    "القيمة المقدرة": p.estimated_value || "-",
+    "الإيرادات السنوية": p.annual_revenue || "-",
     "الحالة": p.status,
   }));
 }
 
-export function formatPaymentsForExport(payments: any[]) {
+export function formatPaymentsForExport(payments: PaymentExport[]): ExcelRowData[] {
   return payments.map((p) => ({
     "رقم السند": p.payment_number,
     "التاريخ": p.payment_date,
-    "النوع": p.payment_type === "receipt" ? "قبض" : "صرف",
     "المبلغ": p.amount,
-    "طريقة الدفع": p.payment_method,
-    "الدافع": p.payer_name,
-    "البيان": p.description,
+    "طريقة الدفع": p.payment_method || "-",
+    "اسم المستفيد": p.beneficiary_name || "-",
+    "البيان": p.description || "-",
+    "الحالة": p.status,
   }));
 }
 
-export function formatInvoicesForExport(invoices: any[]) {
+export function formatInvoicesForExport(invoices: InvoiceExport[]): ExcelRowData[] {
   return invoices.map((i) => ({
     "رقم الفاتورة": i.invoice_number,
     "التاريخ": i.invoice_date,
