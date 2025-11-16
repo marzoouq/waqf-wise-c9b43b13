@@ -111,24 +111,25 @@ const BudgetComparisonChart = () => {
 
   return (
     <Card className="shadow-soft">
-      <CardHeader>
-        <CardTitle className="text-xl font-bold">مقارنة الميزانيات (المخطط مقابل الفعلي)</CardTitle>
+      <CardHeader className="pb-2 sm:pb-4">
+        <CardTitle className="text-sm sm:text-base md:text-xl font-bold">مقارنة الميزانيات</CardTitle>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={300}>
+        <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 200 : 300}>
           <BarChart data={data}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
             <XAxis 
               dataKey="account" 
               stroke="hsl(var(--muted-foreground))"
-              style={{ fontSize: '11px' }}
+              style={{ fontSize: window.innerWidth < 640 ? '8px' : '11px' }}
               angle={-45}
               textAnchor="end"
-              height={80}
+              height={window.innerWidth < 640 ? 60 : 80}
             />
             <YAxis 
               stroke="hsl(var(--muted-foreground))"
-              style={{ fontSize: '12px' }}
+              style={{ fontSize: window.innerWidth < 640 ? '9px' : '12px' }}
+              width={window.innerWidth < 640 ? 35 : 60}
               tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`}
             />
             <Tooltip

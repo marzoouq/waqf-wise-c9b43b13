@@ -57,27 +57,26 @@ const AccountingStats = () => {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 md:gap-6">
       {statCards.map((stat, index) => {
         const Icon = stat.icon;
         return (
           <Card
             key={index}
-            className="shadow-soft hover:shadow-lg transition-all duration-300 cursor-pointer group animate-fade-in"
-            style={{ animationDelay: `${index * 50}ms` }}
+            className="shadow-soft hover:shadow-lg transition-all duration-300 cursor-pointer group"
           >
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-2 sm:pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
+                <CardTitle className="text-[10px] sm:text-xs md:text-sm font-medium text-muted-foreground line-clamp-1">
                   {stat.title}
                 </CardTitle>
-                <div className={`p-2 rounded-lg ${stat.bgColor} group-hover:scale-110 transition-transform duration-300`}>
-                  <Icon className={`h-5 w-5 ${stat.color}`} />
+                <div className={`p-1 sm:p-1.5 md:p-2 rounded-lg ${stat.bgColor} group-hover:scale-110 transition-transform duration-300 flex-shrink-0`}>
+                  <Icon className={`h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 ${stat.color}`} />
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className={`text-3xl font-bold ${stat.color}`}>
+            <CardContent className="pb-2 sm:pb-4">
+              <div className={`text-lg sm:text-2xl md:text-3xl font-bold ${stat.color}`}>
                 {stat.value}
               </div>
             </CardContent>
