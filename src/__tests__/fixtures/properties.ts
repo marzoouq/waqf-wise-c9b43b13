@@ -15,6 +15,10 @@ export const mockProperty = (overrides?: Partial<Property>): Property => ({
   created_at: '2025-01-01T00:00:00.000Z',
   updated_at: '2025-01-01T00:00:00.000Z',
   waqf_unit_id: null,
+  total_units: 1,
+  occupied_units: 1,
+  available_units: 0,
+  occupancy_percentage: 100,
   ...overrides,
 });
 
