@@ -9,9 +9,10 @@ import { cn } from "@/lib/utils";
 import { MessageBubble } from "./MessageBubble";
 import { ChatbotActions } from "./ChatbotActions";
 import { WelcomeMessage } from "./WelcomeMessage";
+import { QuickActionsBar } from "./QuickActionsBar";
 
 export function ChatbotInterface() {
-  const { conversations, quickReplies, isLoading, isTyping, sendMessage, clearConversations, hasConversations } = useChatbot();
+  const { conversations, quickReplies, quickActions, isLoading, isTyping, sendMessage, clearConversations, hasConversations } = useChatbot();
   const [message, setMessage] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -113,6 +114,13 @@ export function ChatbotInterface() {
             <div ref={messagesEndRef} />
           </div>
         </ScrollArea>
+
+        {/* شريط الإجراءات السريعة */}
+        {quickActions.length > 0 && (
+          <div className="px-4 pt-4">
+            <QuickActionsBar actions={quickActions} />
+          </div>
+        )}
 
         {/* الردود السريعة المحسّنة */}
         {quickReplies.length > 0 && (
