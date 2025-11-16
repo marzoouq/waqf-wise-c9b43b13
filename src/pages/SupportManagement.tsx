@@ -15,6 +15,9 @@ import {
 import { useSupportTickets } from '@/hooks/useSupportTickets';
 import { useSupportStats } from '@/hooks/useSupportStats';
 import { TicketDetailsDialog } from '@/components/support/TicketDetailsDialog';
+import { AgentPerformanceReport } from '@/components/support/AgentPerformanceReport';
+import { AssignmentSettingsDialog } from '@/components/support/AssignmentSettingsDialog';
+import { AgentAvailabilityCard } from '@/components/support/AgentAvailabilityCard';
 import { 
   MessageSquare, 
   Clock, 
@@ -23,6 +26,7 @@ import {
   TrendingUp,
   Users,
   Star,
+  Settings,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
@@ -41,6 +45,7 @@ const statusLabels = {
 export default function SupportManagement() {
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
   const [filters, setFilters] = useState<SupportFilters>({});
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const { tickets, isLoading } = useSupportTickets(filters);
   const { overviewStats, overdueTickets, recentTickets, overviewLoading } = useSupportStats();
@@ -52,15 +57,24 @@ export default function SupportManagement() {
   return (
     <MainLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">إدارة الدعم الفني</h1>
-          <p className="text-muted-foreground">لوحة تحكم شاملة لإدارة التذاكر والدعم الفني</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">إدارة الدعم الفني</h1>
+            <p className="text-muted-foreground">لوحة تحكم شاملة لإدارة التذاكر والدعم الفني</p>
+          </div>
+          <Button variant="outline" onClick={() => setSettingsOpen(true)}>
+            <Settings className="h-4 w-4 ml-2" />
+            إعدادات التعيين
+          </Button>
         </div>
+      <AgentAvailabilityCard />
+
       <Tabs defaultValue="overview" className="space-y-6">
         <TabsList>
           <TabsTrigger value="overview">نظرة عامة</TabsTrigger>
           <TabsTrigger value="tickets">جميع التذاكر</TabsTrigger>
           <TabsTrigger value="analytics">التحليلات</TabsTrigger>
+          <TabsTrigger value="performance">أداء الموظفين</TabsTrigger>
         </TabsList>
 
         {/* نظرة عامة */}
@@ -431,12 +445,22 @@ export default function SupportManagement() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        {/* تبويب أداء الموظفين */}
+        <TabsContent value="performance" className="space-y-6">
+          <AgentPerformanceReport />
+        </TabsContent>
       </Tabs>
 
         <TicketDetailsDialog
           ticketId={selectedTicketId}
           open={!!selectedTicketId}
           onOpenChange={(open) => !open && setSelectedTicketId(null)}
+        />
+
+        <AssignmentSettingsDialog
+          open={settingsOpen}
+          onOpenChange={setSettingsOpen}
         />
       </div>
     </MainLayout>

@@ -3198,6 +3198,188 @@ export type Database = {
         }
         Relationships: []
       }
+      support_agent_availability: {
+        Row: {
+          created_at: string | null
+          current_load: number | null
+          id: string
+          is_available: boolean | null
+          max_capacity: number | null
+          priority_level: number | null
+          skills: string[] | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          current_load?: number | null
+          id?: string
+          is_available?: boolean | null
+          max_capacity?: number | null
+          priority_level?: number | null
+          skills?: string[] | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          current_load?: number | null
+          id?: string
+          is_available?: boolean | null
+          max_capacity?: number | null
+          priority_level?: number | null
+          skills?: string[] | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      support_agent_stats: {
+        Row: {
+          avg_resolution_minutes: number | null
+          avg_response_minutes: number | null
+          created_at: string | null
+          customer_satisfaction_avg: number | null
+          date: string | null
+          id: string
+          total_assigned: number | null
+          total_closed: number | null
+          total_resolved: number | null
+          user_id: string | null
+        }
+        Insert: {
+          avg_resolution_minutes?: number | null
+          avg_response_minutes?: number | null
+          created_at?: string | null
+          customer_satisfaction_avg?: number | null
+          date?: string | null
+          id?: string
+          total_assigned?: number | null
+          total_closed?: number | null
+          total_resolved?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          avg_resolution_minutes?: number | null
+          avg_response_minutes?: number | null
+          created_at?: string | null
+          customer_satisfaction_avg?: number | null
+          date?: string | null
+          id?: string
+          total_assigned?: number | null
+          total_closed?: number | null
+          total_resolved?: number | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      support_assignment_settings: {
+        Row: {
+          assignment_type: string
+          auto_assign: boolean | null
+          consider_availability: boolean | null
+          created_at: string | null
+          id: string
+          max_tickets_per_agent: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          assignment_type?: string
+          auto_assign?: boolean | null
+          consider_availability?: boolean | null
+          created_at?: string | null
+          id?: string
+          max_tickets_per_agent?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          assignment_type?: string
+          auto_assign?: boolean | null
+          consider_availability?: boolean | null
+          created_at?: string | null
+          id?: string
+          max_tickets_per_agent?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      support_escalations: {
+        Row: {
+          created_at: string | null
+          escalated_from: string | null
+          escalated_to: string | null
+          escalation_level: number | null
+          escalation_reason: string
+          id: string
+          resolved: boolean | null
+          resolved_at: string | null
+          ticket_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          escalated_from?: string | null
+          escalated_to?: string | null
+          escalation_level?: number | null
+          escalation_reason: string
+          id?: string
+          resolved?: boolean | null
+          resolved_at?: string | null
+          ticket_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          escalated_from?: string | null
+          escalated_to?: string | null
+          escalation_level?: number | null
+          escalation_reason?: string
+          id?: string
+          resolved?: boolean | null
+          resolved_at?: string | null
+          ticket_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_escalations_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "support_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_notification_templates: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          message_ar: string
+          notification_type: string | null
+          template_key: string
+          title_ar: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          message_ar: string
+          notification_type?: string | null
+          template_key: string
+          title_ar: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          message_ar?: string
+          notification_type?: string | null
+          template_key?: string
+          title_ar?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       support_statistics: {
         Row: {
           active_agents: number | null
@@ -3443,15 +3625,18 @@ export type Database = {
           assigned_at: string | null
           assigned_by: string | null
           assigned_to: string | null
+          auto_assigned: boolean | null
           beneficiary_id: string | null
           category: string
           closed_at: string | null
           created_at: string
           description: string
+          escalation_count: number | null
           first_response_at: string | null
           id: string
           is_overdue: boolean | null
           last_activity_at: string | null
+          last_escalated_at: string | null
           metadata: Json | null
           priority: string
           reopened_count: number | null
@@ -3470,15 +3655,18 @@ export type Database = {
           assigned_at?: string | null
           assigned_by?: string | null
           assigned_to?: string | null
+          auto_assigned?: boolean | null
           beneficiary_id?: string | null
           category: string
           closed_at?: string | null
           created_at?: string
           description: string
+          escalation_count?: number | null
           first_response_at?: string | null
           id?: string
           is_overdue?: boolean | null
           last_activity_at?: string | null
+          last_escalated_at?: string | null
           metadata?: Json | null
           priority?: string
           reopened_count?: number | null
@@ -3497,15 +3685,18 @@ export type Database = {
           assigned_at?: string | null
           assigned_by?: string | null
           assigned_to?: string | null
+          auto_assigned?: boolean | null
           beneficiary_id?: string | null
           category?: string
           closed_at?: string | null
           created_at?: string
           description?: string
+          escalation_count?: number | null
           first_response_at?: string | null
           id?: string
           is_overdue?: boolean | null
           last_activity_at?: string | null
+          last_escalated_at?: string | null
           metadata?: Json | null
           priority?: string
           reopened_count?: number | null
@@ -3784,6 +3975,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      auto_escalate_overdue_tickets: { Args: never; Returns: undefined }
       calculate_account_balance: {
         Args: { account_uuid: string }
         Returns: number
