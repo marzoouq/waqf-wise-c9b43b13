@@ -97,51 +97,51 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
       ) : filteredRequests.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground">لا توجد طلبات صيانة</div>
       ) : (
-        <div className="border rounded-lg overflow-hidden">
+        <div className="border rounded-lg overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="text-right">رقم الطلب</TableHead>
-                <TableHead className="text-right">العقار</TableHead>
-                <TableHead className="text-right">العنوان</TableHead>
-                <TableHead className="text-right">الفئة</TableHead>
-                <TableHead className="text-right">الأولوية</TableHead>
-                <TableHead className="text-right">التاريخ</TableHead>
-                <TableHead className="text-right">التكلفة</TableHead>
-                <TableHead className="text-right">الحالة</TableHead>
-                <TableHead className="text-right">الإجراءات</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">رقم الطلب</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">العقار</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">العنوان</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden md:table-cell">الفئة</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">الأولوية</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">التاريخ</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden md:table-cell">التكلفة</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">الحالة</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">الإجراءات</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredRequests.map((request) => (
                 <TableRow key={request.id}>
-                  <TableCell className="font-medium">{request.request_number}</TableCell>
-                  <TableCell>{request.properties?.name || '-'}</TableCell>
-                  <TableCell>{request.title}</TableCell>
-                  <TableCell>{request.category}</TableCell>
-                  <TableCell>
+                  <TableCell className="font-medium text-xs sm:text-sm whitespace-nowrap">{request.request_number}</TableCell>
+                  <TableCell className="text-xs sm:text-sm hidden lg:table-cell">{request.properties?.name || '-'}</TableCell>
+                  <TableCell className="text-xs sm:text-sm">{request.title}</TableCell>
+                  <TableCell className="text-xs sm:text-sm hidden md:table-cell">{request.category}</TableCell>
+                  <TableCell className="text-xs sm:text-sm hidden lg:table-cell">
                     <Badge className={getPriorityBadge(request.priority)}>
                       {request.priority}
                     </Badge>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-xs sm:text-sm hidden lg:table-cell whitespace-nowrap">
                     {format(new Date(request.requested_date), 'yyyy/MM/dd', { locale: ar })}
                   </TableCell>
-                  <TableCell className="font-medium">
+                  <TableCell className="font-medium text-xs sm:text-sm whitespace-nowrap hidden md:table-cell">
                     {(Number(request.actual_cost || request.estimated_cost || 0)).toLocaleString()} ر.س
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-xs sm:text-sm">
                     <Badge className={getStatusBadge(request.status)}>
                       {request.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-xs sm:text-sm">
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => onEdit(request)}
                     >
-                      <Edit className="h-4 w-4" />
+                      <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
                     </Button>
                   </TableCell>
                 </TableRow>

@@ -123,26 +123,26 @@ export function BankAccountsManagement() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>اسم البنك</TableHead>
-                <TableHead>رقم الحساب</TableHead>
-                <TableHead>IBAN</TableHead>
-                <TableHead>العملة</TableHead>
-                <TableHead>الرصيد الحالي</TableHead>
-                <TableHead>الحالة</TableHead>
-                <TableHead>الإجراءات</TableHead>
+                <TableHead className="text-xs sm:text-sm">اسم البنك</TableHead>
+                <TableHead className="text-xs sm:text-sm">رقم الحساب</TableHead>
+                <TableHead className="text-xs sm:text-sm hidden lg:table-cell">IBAN</TableHead>
+                <TableHead className="text-xs sm:text-sm hidden md:table-cell">العملة</TableHead>
+                <TableHead className="text-xs sm:text-sm">الرصيد الحالي</TableHead>
+                <TableHead className="text-xs sm:text-sm hidden md:table-cell">الحالة</TableHead>
+                <TableHead className="text-xs sm:text-sm">الإجراءات</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {bankAccounts.map((account) => (
                 <TableRow key={account.id}>
-                  <TableCell className="font-medium">{account.bank_name}</TableCell>
-                  <TableCell>{account.account_number}</TableCell>
-                  <TableCell className="font-mono text-sm">{account.iban || "-"}</TableCell>
-                  <TableCell>{account.currency}</TableCell>
-                  <TableCell className="font-semibold">
+                  <TableCell className="font-medium text-xs sm:text-sm">{account.bank_name}</TableCell>
+                  <TableCell className="text-xs sm:text-sm">{account.account_number}</TableCell>
+                  <TableCell className="font-mono text-xs sm:text-sm hidden lg:table-cell">{account.iban || "-"}</TableCell>
+                  <TableCell className="text-xs sm:text-sm hidden md:table-cell">{account.currency}</TableCell>
+                  <TableCell className="font-semibold text-xs sm:text-sm">
                     {formatCurrency(account.current_balance)}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-xs sm:text-sm hidden md:table-cell">
                     <Badge variant={account.is_active ? "default" : "secondary"}>
                       {account.is_active ? "نشط" : "غير نشط"}
                     </Badge>

@@ -87,51 +87,51 @@ export const PaymentsTab = ({ onEdit }: Props) => {
       ) : filteredPayments.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground">لا توجد دفعات</div>
       ) : (
-        <div className="border rounded-lg overflow-hidden">
+        <div className="border rounded-lg overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="text-right">رقم الدفعة</TableHead>
-                <TableHead className="text-right">العقد</TableHead>
-                <TableHead className="text-right">المستأجر</TableHead>
-                <TableHead className="text-right">تاريخ الاستحقاق</TableHead>
-                <TableHead className="text-right">المبلغ المستحق</TableHead>
-                <TableHead className="text-right">المبلغ المدفوع</TableHead>
-                <TableHead className="text-right">المتبقي</TableHead>
-                <TableHead className="text-right">الحالة</TableHead>
-                <TableHead className="text-right">الإجراءات</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">رقم الدفعة</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">العقد</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden md:table-cell">المستأجر</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">تاريخ الاستحقاق</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden md:table-cell">المبلغ المستحق</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">المبلغ المدفوع</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">المتبقي</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">الحالة</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">الإجراءات</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredPayments.map((payment) => (
                 <TableRow key={payment.id}>
-                  <TableCell className="font-medium">{payment.payment_number}</TableCell>
-                  <TableCell>{payment.contracts?.contract_number || '-'}</TableCell>
-                  <TableCell>{payment.contracts?.tenant_name || '-'}</TableCell>
-                  <TableCell>
+                  <TableCell className="font-medium text-xs sm:text-sm whitespace-nowrap">{payment.payment_number}</TableCell>
+                  <TableCell className="text-xs sm:text-sm hidden lg:table-cell">{payment.contracts?.contract_number || '-'}</TableCell>
+                  <TableCell className="text-xs sm:text-sm hidden md:table-cell">{payment.contracts?.tenant_name || '-'}</TableCell>
+                  <TableCell className="text-xs sm:text-sm hidden lg:table-cell whitespace-nowrap">
                     {format(new Date(payment.due_date), 'yyyy/MM/dd', { locale: ar })}
                   </TableCell>
-                  <TableCell className="font-medium">
+                  <TableCell className="font-medium text-xs sm:text-sm whitespace-nowrap hidden md:table-cell">
                     {Number(payment.amount_due).toLocaleString()} ر.س
                   </TableCell>
-                  <TableCell className="font-bold text-success">
+                  <TableCell className="font-bold text-success text-xs sm:text-sm whitespace-nowrap">
                     {Number(payment.amount_paid).toLocaleString()} ر.س
                   </TableCell>
-                  <TableCell className="font-bold text-warning">
+                  <TableCell className="font-bold text-warning text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">
                     {(Number(payment.amount_due) - Number(payment.amount_paid)).toLocaleString()} ر.س
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-xs sm:text-sm">
                     <Badge className={getStatusBadge(payment.status)}>
                       {payment.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-xs sm:text-sm">
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => onEdit(payment)}
                     >
-                      <Edit className="h-4 w-4" />
+                      <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
                     </Button>
                   </TableCell>
                 </TableRow>
