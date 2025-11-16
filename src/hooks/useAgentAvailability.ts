@@ -49,11 +49,19 @@ export function useUpdateAvailability() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('غير مصرح');
 
-      const updates: any = {};
+      interface AvailabilityUpdate {
+        is_available?: boolean;
+        max_capacity?: number;
+        skills?: string[];
+        updated_at: string;
+      }
+
+      const updates: AvailabilityUpdate = {
+        updated_at: new Date().toISOString()
+      };
       if (isAvailable !== undefined) updates.is_available = isAvailable;
       if (maxCapacity !== undefined) updates.max_capacity = maxCapacity;
       if (skills !== undefined) updates.skills = skills;
-      updates.updated_at = new Date().toISOString();
 
       const { data, error } = await supabase
         .from('support_agent_availability')

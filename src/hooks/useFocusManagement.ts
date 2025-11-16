@@ -90,7 +90,7 @@ export function useFocusTrap(
 /**
  * Hook للتركيز التلقائي على أول حقل خطأ في النموذج
  */
-export function useFocusOnError(errors: Record<string, any>) {
+export function useFocusOnError(errors: Record<string, unknown>) {
   useEffect(() => {
     const firstErrorKey = Object.keys(errors)[0];
     if (firstErrorKey) {

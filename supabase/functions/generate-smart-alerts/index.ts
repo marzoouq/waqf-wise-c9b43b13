@@ -12,7 +12,7 @@ interface SmartAlert {
   title: string;
   description: string;
   action_url: string;
-  data: any;
+  data: Record<string, unknown>;
 }
 
 serve(async (req) => {

@@ -40,7 +40,7 @@ serve(async (req) => {
       'audit_logs',
     ];
 
-    const backup: Record<string, any[]> = {};
+    const backup: Record<string, unknown[]> = {};
     const errors: string[] = [];
 
     // نسخ كل جدول

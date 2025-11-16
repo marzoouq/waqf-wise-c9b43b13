@@ -55,7 +55,7 @@ serve(async (req) => {
         'notifications',
       ];
 
-      const backupData: any = {};
+      const backupData: Record<string, unknown[]> = {};
       let totalRecords = 0;
 
       // نسخ كل جدول
