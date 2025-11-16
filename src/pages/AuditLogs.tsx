@@ -215,56 +215,58 @@ const AuditLogs = () => {
             description="لم يتم العثور على أي عمليات بناءً على الفلاتر المحددة"
           />
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>التاريخ والوقت</TableHead>
-                <TableHead>المستخدم</TableHead>
-                <TableHead>نوع العملية</TableHead>
-                <TableHead>الجدول</TableHead>
-                <TableHead>الوصف</TableHead>
-                <TableHead>الخطورة</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {logs.map((log) => {
-                const SeverityIcon = severityConfig[log.severity].icon;
-                return (
-                  <TableRow key={log.id}>
-                    <TableCell className="font-mono text-sm">
-                      {format(new Date(log.created_at), "yyyy-MM-dd HH:mm:ss", {
-                        locale: ar,
-                      })}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex flex-col">
-                        <span className="font-medium">{log.user_email || "غير معروف"}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">
-                        {actionTypeLabels[log.action_type] || log.action_type}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="secondary">
-                        {tableNameLabels[log.table_name || ""] || log.table_name}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="max-w-md truncate">
-                      {log.description}
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={severityConfig[log.severity].color}>
-                        <SeverityIcon className="h-3 w-3 ml-1" />
-                        {severityConfig[log.severity].label}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="whitespace-nowrap">التاريخ والوقت</TableHead>
+                  <TableHead className="whitespace-nowrap">المستخدم</TableHead>
+                  <TableHead className="whitespace-nowrap">نوع العملية</TableHead>
+                  <TableHead className="whitespace-nowrap hidden md:table-cell">الجدول</TableHead>
+                  <TableHead className="whitespace-nowrap hidden lg:table-cell">الوصف</TableHead>
+                  <TableHead className="whitespace-nowrap">الخطورة</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {logs.map((log) => {
+                  const SeverityIcon = severityConfig[log.severity].icon;
+                  return (
+                    <TableRow key={log.id}>
+                      <TableCell className="font-mono text-xs sm:text-sm whitespace-nowrap">
+                        {format(new Date(log.created_at), "yyyy-MM-dd HH:mm", {
+                          locale: ar,
+                        })}
+                      </TableCell>
+                      <TableCell className="min-w-[120px]">
+                        <div className="flex flex-col">
+                          <span className="font-medium text-xs sm:text-sm truncate">{log.user_email || "غير معروف"}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="text-xs whitespace-nowrap">
+                          {actionTypeLabels[log.action_type] || log.action_type}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        <Badge variant="secondary" className="text-xs whitespace-nowrap">
+                          {tableNameLabels[log.table_name || ""] || log.table_name}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="hidden lg:table-cell max-w-md truncate text-xs sm:text-sm">
+                        {log.description}
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={severityConfig[log.severity].color + " text-xs whitespace-nowrap"}>
+                          <SeverityIcon className="h-3 w-3 ml-1" />
+                          {severityConfig[log.severity].label}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
         )}
       </Card>
     </div>

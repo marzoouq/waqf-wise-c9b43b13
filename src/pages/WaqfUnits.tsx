@@ -170,74 +170,77 @@ export default function WaqfUnits() {
         />
       ) : (
         <Card>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="text-right">الكود</TableHead>
-                <TableHead className="text-right">الاسم</TableHead>
-                <TableHead className="text-right">النوع</TableHead>
-                <TableHead className="text-right">الموقع</TableHead>
-                <TableHead className="text-right">قيمة الاستحواذ</TableHead>
-                <TableHead className="text-right">القيمة الحالية</TableHead>
-                <TableHead className="text-right">العائد السنوي</TableHead>
-                <TableHead className="text-right">تاريخ الاستحواذ</TableHead>
-                <TableHead className="text-right">الحالة</TableHead>
-                <TableHead className="text-right">الإجراءات</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredUnits.map((unit) => (
-                <TableRow key={unit.id}>
-                  <TableCell className="font-medium">{unit.code}</TableCell>
-                  <TableCell>
-                    <div>
-                      <p className="font-medium">{unit.name}</p>
-                      {unit.description && (
-                        <p className="text-sm text-muted-foreground">
-                          {unit.description}
-                        </p>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>{getTypeBadge(unit.waqf_type)}</TableCell>
-                  <TableCell>{unit.location || "-"}</TableCell>
-                  <TableCell className="font-semibold">
-                    {unit.acquisition_value?.toLocaleString('ar-SA') || 0} ريال
-                  </TableCell>
-                  <TableCell className="font-semibold text-primary">
-                    {unit.current_value?.toLocaleString('ar-SA') || 0} ريال
-                  </TableCell>
-                  <TableCell className="font-semibold text-success">
-                    {unit.annual_return?.toLocaleString('ar-SA') || 0} ريال
-                  </TableCell>
-                  <TableCell>
-                    {unit.acquisition_date
-                      ? format(new Date(unit.acquisition_date), "dd/MM/yyyy", {
-                          locale: ar,
-                        })
-                      : "-"}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={unit.is_active ? "outline" : "secondary"}>
-                      {unit.is_active ? "نشط" : "غير نشط"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setSelectedUnit(unit);
-                        setIsDialogOpen(true);
-                      }}
-                    >
-                      تعديل
-                    </Button>
-                  </TableCell>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-right whitespace-nowrap">الكود</TableHead>
+                  <TableHead className="text-right whitespace-nowrap">الاسم</TableHead>
+                  <TableHead className="text-right whitespace-nowrap">النوع</TableHead>
+                  <TableHead className="text-right whitespace-nowrap hidden md:table-cell">الموقع</TableHead>
+                  <TableHead className="text-right whitespace-nowrap hidden lg:table-cell">قيمة الاستحواذ</TableHead>
+                  <TableHead className="text-right whitespace-nowrap">القيمة الحالية</TableHead>
+                  <TableHead className="text-right whitespace-nowrap hidden md:table-cell">العائد السنوي</TableHead>
+                  <TableHead className="text-right whitespace-nowrap hidden lg:table-cell">تاريخ الاستحواذ</TableHead>
+                  <TableHead className="text-right whitespace-nowrap">الحالة</TableHead>
+                  <TableHead className="text-right whitespace-nowrap">الإجراءات</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {filteredUnits.map((unit) => (
+                  <TableRow key={unit.id}>
+                    <TableCell className="font-medium text-xs sm:text-sm">{unit.code}</TableCell>
+                    <TableCell className="min-w-[150px]">
+                      <div>
+                        <p className="font-medium text-xs sm:text-sm">{unit.name}</p>
+                        {unit.description && (
+                          <p className="text-xs text-muted-foreground truncate max-w-[200px]">
+                            {unit.description}
+                          </p>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>{getTypeBadge(unit.waqf_type)}</TableCell>
+                    <TableCell className="hidden md:table-cell text-xs sm:text-sm">{unit.location || "-"}</TableCell>
+                    <TableCell className="hidden lg:table-cell font-semibold text-xs sm:text-sm whitespace-nowrap">
+                      {unit.acquisition_value?.toLocaleString('ar-SA') || 0} ريال
+                    </TableCell>
+                    <TableCell className="font-semibold text-primary text-xs sm:text-sm whitespace-nowrap">
+                      {unit.current_value?.toLocaleString('ar-SA') || 0} ريال
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell font-semibold text-success text-xs sm:text-sm whitespace-nowrap">
+                      {unit.annual_return?.toLocaleString('ar-SA') || 0} ريال
+                    </TableCell>
+                    <TableCell className="hidden lg:table-cell text-xs sm:text-sm whitespace-nowrap">
+                      {unit.acquisition_date
+                        ? format(new Date(unit.acquisition_date), "dd/MM/yyyy", {
+                            locale: ar,
+                          })
+                        : "-"}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={unit.is_active ? "outline" : "secondary"} className="text-xs whitespace-nowrap">
+                        {unit.is_active ? "نشط" : "غير نشط"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedUnit(unit);
+                          setIsDialogOpen(true);
+                        }}
+                        className="text-xs sm:text-sm"
+                      >
+                        تعديل
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </Card>
       )}
 

@@ -221,18 +221,18 @@ const Requests = () => {
               }
             />
           ) : (
-            <div className="rounded-md border">
+            <div className="rounded-md border overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">رقم الطلب</TableHead>
                     <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">المستفيد</TableHead>
-                    <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">نوع الطلب</TableHead>
-                    <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">الوصف</TableHead>
-                    <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">المبلغ</TableHead>
+                    <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden md:table-cell">نوع الطلب</TableHead>
+                    <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">الوصف</TableHead>
+                    <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden md:table-cell">المبلغ</TableHead>
                     <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">الحالة</TableHead>
-                    <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">الأولوية</TableHead>
-                    <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">تاريخ التقديم</TableHead>
+                    <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">الأولوية</TableHead>
+                    <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">تاريخ التقديم</TableHead>
                     <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">الإجراءات</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -252,23 +252,23 @@ const Requests = () => {
                           ? request.beneficiary.full_name 
                           : '-'}
                       </TableCell>
-                      <TableCell className="text-xs sm:text-sm">
-                        <Badge variant="outline" className="text-xs">
+                      <TableCell className="text-xs sm:text-sm hidden md:table-cell">
+                        <Badge variant="outline" className="text-xs whitespace-nowrap">
                           {request.request_type && 'name' in request.request_type 
                             ? request.request_type.name 
                             : '-'}
                         </Badge>
                       </TableCell>
-                      <TableCell className="max-w-xs truncate text-xs sm:text-sm">
+                      <TableCell className="max-w-xs truncate text-xs sm:text-sm hidden lg:table-cell">
                         {request.description}
                       </TableCell>
-                      <TableCell className="text-xs sm:text-sm">
+                      <TableCell className="text-xs sm:text-sm hidden md:table-cell whitespace-nowrap">
                         {request.amount > 0
                           ? `${request.amount.toLocaleString('ar-SA')} ريال`
                           : '-'}
                       </TableCell>
                       <TableCell className="text-xs sm:text-sm">{getStatusBadge(request.status)}</TableCell>
-                      <TableCell className="text-xs sm:text-sm">
+                      <TableCell className="text-xs sm:text-sm hidden lg:table-cell">
                         <Badge
                           variant={
                             request.priority === 'عاجل'
@@ -277,12 +277,12 @@ const Requests = () => {
                               ? 'default'
                               : 'secondary'
                           }
-                          className="text-xs"
+                          className="text-xs whitespace-nowrap"
                         >
                           {request.priority}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-muted-foreground text-xs sm:text-sm">
+                      <TableCell className="text-muted-foreground text-xs sm:text-sm hidden lg:table-cell whitespace-nowrap">
                         {new Date(request.submitted_at).toLocaleDateString('ar-SA')}
                       </TableCell>
                       <TableCell>
