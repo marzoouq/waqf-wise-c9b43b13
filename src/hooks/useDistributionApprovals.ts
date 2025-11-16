@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
 import { logger } from "@/lib/logger";
+import { createMutationErrorHandler } from "@/lib/errorHandling";
 
 export interface DistributionApproval {
   id: string;
@@ -117,13 +118,10 @@ export function useDistributionApprovals(distributionId?: string) {
         description: "تم تسجيل الموافقة على التوزيع",
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: "خطأ في الموافقة",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
+    onError: createMutationErrorHandler({
+      context: 'approve_distribution',
+      toastTitle: 'خطأ في الموافقة',
+    }),
   });
 
   const updateApproval = useMutation({
@@ -146,13 +144,10 @@ export function useDistributionApprovals(distributionId?: string) {
         description: "تم تحديث حالة الموافقة",
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: "خطأ في التحديث",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
+    onError: createMutationErrorHandler({
+      context: 'update_distribution_approval',
+      toastTitle: 'خطأ في التحديث',
+    }),
   });
 
   const checkAllApproved = () => {

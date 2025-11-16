@@ -7,6 +7,8 @@ import { useEffect } from "react";
 import { logger } from "@/lib/logger";
 import { createAutoJournalEntry as createAutoJournalEntryWrapper } from "@/lib/supabase-wrappers";
 import { createAutoJournalEntry } from "@/lib/supabase-wrappers";
+import { createMutationErrorHandler } from "@/lib/errorHandling";
+import type { JournalEntryInsert, JournalLineInsert } from "@/types/accounting";
 
 export interface JournalEntry {
   id: string;
@@ -87,8 +89,8 @@ export function useJournalEntries() {
       entry,
       lines,
     }: {
-      entry: any;
-      lines: any[];
+      entry: JournalEntryInsert;
+      lines: JournalLineInsert[];
     }) => {
       // Validate balanced entry
       const totalDebit = lines.reduce((sum, line) => sum + line.debit_amount, 0);
@@ -139,13 +141,9 @@ export function useJournalEntries() {
         description: "تم إنشاء القيد بنجاح",
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: "خطأ",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
+    onError: createMutationErrorHandler({
+      context: 'create_journal_entry',
+    }),
   });
 
   const postEntry = useMutation({
@@ -168,13 +166,10 @@ export function useJournalEntries() {
         description: "تم ترحيل القيد بنجاح",
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: "خطأ",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
+    onError: createMutationErrorHandler({
+      context: 'post_journal_entry',
+      toastTitle: 'خطأ في الترحيل',
+    }),
   });
 
   const createAutoEntry = async (

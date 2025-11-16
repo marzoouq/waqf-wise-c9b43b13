@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { QUERY_KEYS, TOAST_MESSAGES, QUERY_STALE_TIME } from "@/lib/constants";
+import { createMutationErrorHandler } from "@/lib/errorHandling";
 
 export interface Document {
   id: string;
@@ -52,13 +53,10 @@ export function useDocuments() {
         description: "تم رفع المستند بنجاح",
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: TOAST_MESSAGES.ERROR.ADD,
-        description: error.message || "حدث خطأ أثناء رفع المستند",
-        variant: "destructive",
-      });
-    },
+    onError: createMutationErrorHandler({
+      context: 'add_document',
+      toastTitle: TOAST_MESSAGES.ERROR.ADD,
+    }),
   });
 
   const updateDocument = useMutation({
@@ -80,13 +78,10 @@ export function useDocuments() {
         description: "تم تحديث المستند بنجاح",
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: TOAST_MESSAGES.ERROR.UPDATE,
-        description: error.message || "حدث خطأ أثناء تحديث المستند",
-        variant: "destructive",
-      });
-    },
+    onError: createMutationErrorHandler({
+      context: 'update_document',
+      toastTitle: TOAST_MESSAGES.ERROR.UPDATE,
+    }),
   });
 
   return {

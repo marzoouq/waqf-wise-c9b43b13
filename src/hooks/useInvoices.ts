@@ -4,6 +4,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useJournalEntries } from "./useJournalEntries";
 import { useEffect } from "react";
 import { logger } from "@/lib/logger";
+import { createMutationErrorHandler } from "@/lib/errorHandling";
+import type { InvoiceWithLines, InvoiceLineInsert } from "@/types/invoices";
 
 export interface Invoice {
   id: string;
@@ -86,7 +88,7 @@ export function useInvoices() {
   });
 
   const addInvoice = useMutation({
-    mutationFn: async (invoiceData: any) => {
+    mutationFn: async (invoiceData: InvoiceWithLines) => {
       // إنشاء الفاتورة
       const { data: invoiceRecord, error: invoiceError } = await supabase
         .from("invoices")
@@ -99,7 +101,7 @@ export function useInvoices() {
 
       // إضافة بنود الفاتورة
       if (invoiceData.lines && invoiceData.lines.length > 0) {
-        const linesWithInvoiceId = invoiceData.lines.map((line: any) => ({
+        const linesWithInvoiceId = invoiceData.lines.map((line: InvoiceLineInsert) => ({
           ...line,
           invoice_id: invoiceRecord.id,
         }));
@@ -136,13 +138,10 @@ export function useInvoices() {
         description: "تم إنشاء الفاتورة والقيد المحاسبي",
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: "خطأ في الإنشاء",
-        description: error.message || "حدث خطأ أثناء إنشاء الفاتورة",
-        variant: "destructive",
-      });
-    },
+    onError: createMutationErrorHandler({
+      context: 'add_invoice',
+      toastTitle: 'خطأ في الإنشاء',
+    }),
   });
 
   const updateInvoice = useMutation({
@@ -240,13 +239,10 @@ export function useInvoices() {
         description: "تم تحديث الفاتورة بنجاح",
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: "خطأ في التحديث",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
+    onError: createMutationErrorHandler({
+      context: 'add_invoice',
+      toastTitle: 'خطأ في الإنشاء',
+    }),
   });
 
   return {

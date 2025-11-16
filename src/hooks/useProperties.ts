@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useActivities } from "@/hooks/useActivities";
 import { useAuth } from "@/hooks/useAuth";
 import { logger } from "@/lib/logger";
+import { createMutationErrorHandler } from "@/lib/errorHandling";
 
 export interface Property {
   id: string;
@@ -69,13 +70,10 @@ export function useProperties() {
         description: "تم إضافة العقار الجديد بنجاح",
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: "خطأ في الإضافة",
-        description: error.message || "حدث خطأ أثناء إضافة العقار",
-        variant: "destructive",
-      });
-    },
+    onError: createMutationErrorHandler({
+      context: 'add_property',
+      toastTitle: 'خطأ في الإضافة',
+    }),
   });
 
   const updateProperty = useMutation({
@@ -98,13 +96,10 @@ export function useProperties() {
         description: "تم تحديث بيانات العقار بنجاح",
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: "خطأ في التحديث",
-        description: error.message || "حدث خطأ أثناء تحديث العقار",
-        variant: "destructive",
-      });
-    },
+    onError: createMutationErrorHandler({
+      context: 'update_property',
+      toastTitle: 'خطأ في التحديث',
+    }),
   });
 
   const deleteProperty = useMutation({
@@ -123,13 +118,10 @@ export function useProperties() {
         description: "تم حذف العقار بنجاح",
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: "خطأ في الحذف",
-        description: error.message || "حدث خطأ أثناء حذف العقار",
-        variant: "destructive",
-      });
-    },
+    onError: createMutationErrorHandler({
+      context: 'delete_property',
+      toastTitle: 'خطأ في الحذف',
+    }),
   });
 
   return {
