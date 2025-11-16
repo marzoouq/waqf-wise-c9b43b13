@@ -95,7 +95,7 @@ const Families = () => {
         }
       });
     } else {
-      addFamily.mutate(data as any, {
+      addFamily.mutate(data as Omit<Family, "created_at" | "id" | "total_members" | "updated_at">, {
         onSuccess: () => {
           toast.success('تم إضافة العائلة بنجاح');
           setDialogOpen(false);

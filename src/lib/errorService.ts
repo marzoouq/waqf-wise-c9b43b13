@@ -155,18 +155,7 @@ export function logError(error: unknown, context?: ErrorContext): void {
     userAgent: navigator.userAgent,
   };
 
-  // Console logging في التطوير
-  if (import.meta.env.DEV) {
-    console.group('🔴 Error Log');
-    console.error('Error:', error);
-    console.log('Context:', context);
-    console.log('Message:', errorLog.message);
-    console.log('Timestamp:', errorLog.timestamp);
-    if (errorLog.stack) {
-      console.log('Stack:', errorLog.stack);
-    }
-    console.groupEnd();
-  }
+  // Logging يتم في localStorage فقط
 
   // في الإنتاج، يمكن إرسال الأخطاء لخدمة مثل Sentry
   // if (window.Sentry) {
@@ -182,8 +171,8 @@ export function logError(error: unknown, context?: ErrorContext): void {
       logs.shift();
     }
     localStorage.setItem('error_logs', JSON.stringify(logs));
-  } catch (e) {
-    console.error('Failed to save error log:', e);
+  } catch {
+    // فشل في حفظ سجل الأخطاء
   }
 }
 

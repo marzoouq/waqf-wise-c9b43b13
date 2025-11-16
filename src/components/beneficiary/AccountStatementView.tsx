@@ -71,7 +71,7 @@ export function AccountStatementView({
     });
 
     // Footer
-    const finalY = (doc as any).lastAutoTable.finalY || 80;
+    const finalY = (doc as any).lastAutoTable?.finalY ?? 80;
     doc.setFontSize(10);
     doc.text(
       `تاريخ الإصدار: ${format(new Date(), "dd MMMM yyyy - HH:mm", { locale: ar })}`,

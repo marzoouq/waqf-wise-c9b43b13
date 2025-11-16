@@ -70,7 +70,7 @@ export function ActivityLogDialog({ open, onOpenChange, beneficiaryId, beneficia
                 <div key={activity.id} className="border-r-4 border-primary/20 pr-4 pb-4">
                   <div className="flex items-start gap-3">
                     <div className="mt-1">
-                      <Badge variant={getActionColor(activity.action_type) as any} className="gap-1">
+                      <Badge variant={getActionColor(activity.action_type)} className="gap-1">
                         {getActionIcon(activity.action_type)}
                       </Badge>
                     </div>

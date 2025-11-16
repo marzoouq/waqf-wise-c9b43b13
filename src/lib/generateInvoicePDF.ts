@@ -250,7 +250,7 @@ export const generateInvoicePDF = async (
     margin: { left: margin, right: margin },
   });
 
-  yPos = (doc as any).lastAutoTable.finalY + 15;
+  yPos = (doc as any).lastAutoTable?.finalY ? (doc as any).lastAutoTable.finalY + 15 : yPos;
 
   // الملخص المالي والـ QR Code في نفس المستوى
   const summaryWidth = 75;

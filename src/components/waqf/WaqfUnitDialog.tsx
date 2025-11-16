@@ -57,7 +57,7 @@ export function WaqfUnitDialog({ open, onOpenChange, waqfUnit }: WaqfUnitDialogP
       if (waqfUnit?.id) {
         await updateWaqfUnit({ id: waqfUnit.id, ...data });
       } else {
-        await addWaqfUnit(data as any);
+        await addWaqfUnit(data);
       }
 
       onOpenChange(false);
@@ -108,7 +108,7 @@ export function WaqfUnitDialog({ open, onOpenChange, waqfUnit }: WaqfUnitDialogP
               <Select
                 value={formData.waqf_type}
                 onValueChange={(value) =>
-                  setFormData({ ...formData, waqf_type: value as any })
+                  setFormData({ ...formData, waqf_type: value as "أسهم" | "عقار" | "مشروع" | "نقدي" })
                 }
               >
                 <SelectTrigger>

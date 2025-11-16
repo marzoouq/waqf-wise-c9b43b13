@@ -117,7 +117,7 @@ const BeneficiaryDashboard = () => {
     try {
       await createRequestMutation.mutateAsync({
         beneficiary_id: beneficiary?.id || "",
-        request_type_id: "emergency" as any,
+        request_type_id: "emergency",
         description: data.description,
         amount: data.amount,
         emergency_reason: data.emergency_reason,
@@ -134,7 +134,7 @@ const BeneficiaryDashboard = () => {
     try {
       await createRequestMutation.mutateAsync({
         beneficiary_id: beneficiary?.id || "",
-        request_type_id: "loan" as any,
+        request_type_id: "loan",
         description: `طلب قرض: ${data.description}`,
         amount: data.loan_amount,
         loan_amount: data.loan_amount,
@@ -153,7 +153,7 @@ const BeneficiaryDashboard = () => {
     try {
       await createRequestMutation.mutateAsync({
         beneficiary_id: beneficiary?.id || "",
-        request_type_id: "data-update" as any,
+        request_type_id: "data-update",
         description: `طلب تحديث ${data.update_type}: ${data.description}`,
         new_data: JSON.stringify(data),
         priority: "عادية",
@@ -169,7 +169,7 @@ const BeneficiaryDashboard = () => {
     try {
       await createRequestMutation.mutateAsync({
         beneficiary_id: beneficiary?.id || "",
-        request_type_id: "add-family-member" as any,
+        request_type_id: "add-family-member",
         description: `طلب إضافة فرد: ${data.member_name} (${data.relationship})`,
         new_data: JSON.stringify(data),
         priority: "عادية",

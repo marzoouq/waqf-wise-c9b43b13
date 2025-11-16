@@ -56,7 +56,7 @@ export function LoanDialog({ open, onOpenChange, loan }: LoanDialogProps) {
       if (loan?.id) {
         await updateLoan({ id: loan.id, ...data });
       } else {
-        await addLoan(data as any);
+        await addLoan(data);
       }
       
       onOpenChange(false);
@@ -194,7 +194,7 @@ export function LoanDialog({ open, onOpenChange, loan }: LoanDialogProps) {
               <Select
                 value={formData.status}
                 onValueChange={(value) =>
-                  setFormData({ ...formData, status: value as any })
+                  setFormData({ ...formData, status: value as "active" | "cancelled" | "defaulted" | "paid" })
                 }
               >
                 <SelectTrigger>

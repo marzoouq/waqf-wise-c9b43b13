@@ -28,42 +28,28 @@ class Logger {
       metadata: options?.metadata,
     });
 
-    // في التطوير: عرض في Console
-    if (import.meta.env.DEV) {
-      console.group(`🔴 Error ${options?.context ? `[${options.context}]` : ''}`);
-      console.error(error);
-      if (options?.metadata) {
-        console.log('Metadata:', options.metadata);
-      }
-      console.groupEnd();
-    }
+    // Logging يتم في errorService
   }
 
   /**
    * تسجيل تحذير
    */
   warn(message: string, options?: LogOptions): void {
-    if (import.meta.env.DEV) {
-      console.warn(`⚠️ ${options?.context ? `[${options.context}]` : ''} ${message}`);
-    }
+    // يمكن إضافة logging للتحذيرات لاحقاً
   }
 
   /**
    * تسجيل معلومة
    */
   info(message: string, options?: LogOptions): void {
-    if (import.meta.env.DEV) {
-      console.log(`ℹ️ ${options?.context ? `[${options.context}]` : ''} ${message}`);
-    }
+    // يمكن إضافة logging للمعلومات لاحقاً
   }
 
   /**
    * تسجيل debug
    */
   debug(message: string, data?: unknown): void {
-    if (import.meta.env.DEV) {
-      console.debug(`🐛 ${message}`, data);
-    }
+    // يمكن إضافة logging للتصحيح لاحقاً
   }
 }
 
