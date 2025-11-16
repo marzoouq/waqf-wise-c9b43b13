@@ -1,3 +1,4 @@
+import { useState, useMemo } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Search, FolderOpen, FileText, Download, Upload, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -32,7 +33,6 @@ const Archive = () => {
 
   const isLoading = documentsLoading || foldersLoading || statsLoading;
 
-  // Filter documents based on search query
   const filteredDocuments = useMemo(() => {
     if (!searchQuery.trim()) return documents;
     
@@ -78,214 +78,155 @@ const Archive = () => {
         }
       />
 
-      <Tabs defaultValue="documents" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="documents">المستندات</TabsTrigger>
-          <TabsTrigger value="smart">الميزات الذكية</TabsTrigger>
-        </TabsList>
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">إجمالي المستندات</CardTitle>
+              <FileText className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats?.totalDocuments || 0}</div>
+            </CardContent>
+          </Card>
 
-        <TabsContent value="documents" className="space-y-4">{/* المحتوى الحالي */}</TabsContent>
-        <TabsContent value="smart"><SmartArchiveFeatures /></TabsContent>
-      </Tabs>
-            onClick={() => setUploadDialogOpen(true)}
-          >
-            <Upload className="ml-2 h-4 w-4 md:h-5 md:w-5" />
-            <span className="text-sm md:text-base">رفع مستند</span>
-          </Button>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">المجلدات</CardTitle>
+              <FolderOpen className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats?.totalFolders || 0}</div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">الحجم الإجمالي</CardTitle>
+              <Download className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats?.totalSize || '0 B'}</div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">هذا الشهر</CardTitle>
+              <Upload className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats?.thisMonthAdditions || 0}</div>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Search */}
-        <Card className="shadow-soft">
-          <CardContent className="pt-6">
+        <Tabs defaultValue="documents" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="documents">
+              <FileText className="h-4 w-4 ml-2" />
+              المستندات
+            </TabsTrigger>
+            <TabsTrigger value="smart">
+              <Search className="h-4 w-4 ml-2" />
+              الميزات الذكية
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="documents" className="space-y-4">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button onClick={() => setUploadDialogOpen(true)} className="flex-1 sm:flex-none">
+                <Upload className="ml-2 h-4 w-4" />
+                رفع مستند
+              </Button>
+              <Button onClick={() => setFolderDialogOpen(true)} variant="outline" className="flex-1 sm:flex-none">
+                <Plus className="ml-2 h-4 w-4" />
+                إنشاء مجلد
+              </Button>
+            </div>
+
             <div className="relative">
-              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="البحث في الأرشيف (اسم الملف، المستفيد، نوع المستند...)"
+                placeholder="البحث في المستندات..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pr-10"
               />
             </div>
-          </CardContent>
-        </Card>
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="shadow-soft">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                إجمالي المستندات
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-primary">{stats.totalDocuments}</div>
-            </CardContent>
-          </Card>
-          <Card className="shadow-soft">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                المجلدات
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-success">{stats.totalFolders}</div>
-            </CardContent>
-          </Card>
-          <Card className="shadow-soft">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                الحجم الكلي
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-warning">{stats.totalSize}</div>
-            </CardContent>
-          </Card>
-          <Card className="shadow-soft">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                مضاف هذا الشهر
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-accent">{stats.thisMonthAdditions}</div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Folders */}
-        <Card className="shadow-soft">
-          <CardHeader>
-            <div className="flex justify-between items-center">
-              <CardTitle className="text-xl font-bold">المجلدات الرئيسية</CardTitle>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setFolderDialogOpen(true)}
-              >
-                <Plus className="ml-2 h-4 w-4" />
-                مجلد جديد
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {folders.length === 0 ? (
-              <EmptyState
-                icon={FolderOpen}
-                title="لا توجد مجلدات"
-                description="ابدأ بإنشاء مجلد جديد لتنظيم مستنداتك"
-                actionLabel="إنشاء مجلد"
-                onAction={() => setFolderDialogOpen(true)}
-              />
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {folders.map((folder, index) => {
-                  const colors = [
-                    "bg-primary/10 text-primary",
-                    "bg-success/10 text-success",
-                    "bg-warning/10 text-warning",
-                    "bg-accent/10 text-accent",
-                  ];
-                  const color = colors[index % colors.length];
-                  
-                  return (
-                    <div
-                      key={folder.id}
-                      className="p-4 rounded-lg border border-border hover:border-primary hover:shadow-soft transition-all duration-300 cursor-pointer group"
-                    >
-                      <div className={`w-12 h-12 rounded-lg ${color} flex items-center justify-center mb-3`}>
-                        <FolderOpen className="h-6 w-6" />
-                      </div>
-                      <h3 className="font-medium text-foreground group-hover:text-primary transition-colors mb-2">
-                        {folder.name}
-                      </h3>
-                      <div className="flex justify-between text-sm text-muted-foreground">
-                        <span>{folder.files_count} ملف</span>
-                      </div>
-                      {folder.description && (
-                        <p className="text-xs text-muted-foreground mt-2 line-clamp-2">
-                          {folder.description}
-                        </p>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Recent Files */}
-        <Card className="shadow-soft">
-          <CardHeader>
-            <CardTitle className="text-xl font-bold">المستندات الأخيرة</CardTitle>
-          </CardHeader>
-          <CardContent>
             {filteredDocuments.length === 0 ? (
               <EmptyState
                 icon={FileText}
-                title={searchQuery ? "لا توجد نتائج" : "لا توجد مستندات"}
-                description={
-                  searchQuery
-                    ? "جرب استخدام كلمات بحث أخرى"
-                    : "ابدأ برفع أول مستند"
-                }
-                actionLabel={searchQuery ? undefined : "رفع مستند"}
-                onAction={searchQuery ? undefined : () => setUploadDialogOpen(true)}
+                title="لا توجد مستندات"
+                description="ابدأ برفع المستندات لإدارتها وأرشفتها"
+                actionLabel="رفع مستند جديد"
+                onAction={() => setUploadDialogOpen(true)}
               />
             ) : (
-              <div className="space-y-3">
-                {filteredDocuments.slice(0, 10).map((file) => (
-                  <div
-                    key={file.id}
-                    className="flex items-center justify-between p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors group cursor-pointer"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="p-2 rounded-lg bg-primary/10 text-primary">
-                        <FileText className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <h4 className="font-medium text-foreground group-hover:text-primary transition-colors">
-                          {file.name}
-                        </h4>
-                        <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1">
-                          <span>
-                            {format(new Date(file.uploaded_at), "dd MMM yyyy", { locale: ar })}
-                          </span>
-                          <span>•</span>
-                          <Badge variant="outline" className="text-xs">
-                            {file.category}
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="text-left ml-4">
-                        <div className="text-sm font-medium">{file.file_type}</div>
-                        <div className="text-xs text-muted-foreground">{file.file_size}</div>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handlePreviewDocument(file)}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <Download className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <ScrollableTableWrapper>
+                <MobileScrollHint />
+                <div className="rounded-md border">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b bg-muted/50">
+                        <th className="p-3 text-right text-sm font-medium">اسم المستند</th>
+                        <th className="p-3 text-right text-sm font-medium hidden md:table-cell">الفئة</th>
+                        <th className="p-3 text-right text-sm font-medium hidden lg:table-cell">الحجم</th>
+                        <th className="p-3 text-right text-sm font-medium hidden lg:table-cell">تاريخ الرفع</th>
+                        <th className="p-3 text-center text-sm font-medium">الإجراءات</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredDocuments.map((doc) => (
+                        <tr key={doc.id} className="border-b hover:bg-muted/50 transition-colors">
+                          <td className="p-3">
+                            <div className="flex items-center gap-2">
+                              <FileText className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                              <span className="truncate">{doc.name}</span>
+                            </div>
+                          </td>
+                          <td className="p-3 hidden md:table-cell">
+                            <Badge variant="outline">{doc.category}</Badge>
+                          </td>
+                          <td className="p-3 hidden lg:table-cell text-muted-foreground text-sm">
+                            {doc.file_size || '-'}
+                          </td>
+                          <td className="p-3 hidden lg:table-cell text-muted-foreground text-sm">
+                            {format(new Date(doc.created_at), 'dd/MM/yyyy', { locale: ar })}
+                          </td>
+                          <td className="p-3">
+                            <div className="flex justify-center gap-2">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handlePreviewDocument(doc)}
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                disabled
+                                title="وظيفة التنزيل قيد التطوير"
+                              >
+                                <Download className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </ScrollableTableWrapper>
             )}
-          </CardContent>
-        </Card>
+          </TabsContent>
+
+          <TabsContent value="smart">
+            <SmartArchiveFeatures />
+          </TabsContent>
+        </Tabs>
 
         <UploadDocumentDialog
           open={uploadDialogOpen}
@@ -305,7 +246,7 @@ const Archive = () => {
           document={selectedDocument}
         />
       </div>
-    </div>
+    </MobileOptimizedLayout>
   );
 };
 

@@ -18,7 +18,6 @@ import { BarChart3, Calendar, Settings, Users, Building2, FileText, DollarSign, 
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 
 const Reports = () => {
-
   return (
     <MobileOptimizedLayout>
       <MobileOptimizedHeader
@@ -27,6 +26,7 @@ const Reports = () => {
         icon={<BarChart3 className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
       />
 
+      <div className="space-y-6">
         <Tabs defaultValue="dashboard" className="space-y-6">
           <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-1">
             <TabsTrigger value="dashboard" className="gap-2">
@@ -62,15 +62,6 @@ const Reports = () => {
               التحليلات
             </TabsTrigger>
           </TabsList>
-            <TabsTrigger value="financial" className="gap-2">
-              <DollarSign className="h-4 w-4" />
-              المالية
-            </TabsTrigger>
-            <TabsTrigger value="analysis" className="gap-2">
-              <FileText className="h-4 w-4" />
-              التحليلات
-            </TabsTrigger>
-          </TabsList>
 
           <TabsContent value="dashboard">
             <InteractiveDashboard />
@@ -96,43 +87,43 @@ const Reports = () => {
             <PropertiesReports />
           </TabsContent>
 
-          <TabsContent value="financial" className="space-y-4">
-            <Tabs defaultValue="trial-balance">
-              <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 gap-1">
-                <TabsTrigger value="trial-balance">ميزان المراجعة</TabsTrigger>
-                <TabsTrigger value="balance-sheet">الميزانية</TabsTrigger>
+          <TabsContent value="financial" className="space-y-6">
+            <Tabs defaultValue="income" className="space-y-4">
+              <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
                 <TabsTrigger value="income">قائمة الدخل</TabsTrigger>
-                <TabsTrigger value="cash-flow">التدفقات</TabsTrigger>
+                <TabsTrigger value="balance">الميزانية</TabsTrigger>
+                <TabsTrigger value="trial">ميزان المراجعة</TabsTrigger>
+                <TabsTrigger value="cashflow">التدفقات النقدية</TabsTrigger>
               </TabsList>
-
-              <TabsContent value="trial-balance">
-                <TrialBalanceReport />
-              </TabsContent>
-
-              <TabsContent value="balance-sheet">
-                <EnhancedBalanceSheet />
-              </TabsContent>
 
               <TabsContent value="income">
                 <EnhancedIncomeStatement />
               </TabsContent>
 
-              <TabsContent value="cash-flow">
+              <TabsContent value="balance">
+                <EnhancedBalanceSheet />
+              </TabsContent>
+
+              <TabsContent value="trial">
+                <TrialBalanceReport />
+              </TabsContent>
+
+              <TabsContent value="cashflow">
                 <CashFlowStatement />
               </TabsContent>
             </Tabs>
           </TabsContent>
 
-          <TabsContent value="analysis" className="space-y-4">
-            <Tabs defaultValue="accounting-link">
-              <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 gap-1">
-                <TabsTrigger value="accounting-link">الربط المحاسبي</TabsTrigger>
+          <TabsContent value="analysis" className="space-y-6">
+            <Tabs defaultValue="accounting" className="space-y-4">
+              <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
+                <TabsTrigger value="accounting">الربط المحاسبي</TabsTrigger>
                 <TabsTrigger value="distributions">تحليل التوزيعات</TabsTrigger>
                 <TabsTrigger value="loans">أعمار الديون</TabsTrigger>
-                <TabsTrigger value="funds">أداء المصارف</TabsTrigger>
+                <TabsTrigger value="maintenance">تكاليف الصيانة</TabsTrigger>
               </TabsList>
 
-              <TabsContent value="accounting-link">
+              <TabsContent value="accounting">
                 <AccountingLinkReport />
               </TabsContent>
 
@@ -144,12 +135,15 @@ const Reports = () => {
                 <LoansAgingReport />
               </TabsContent>
 
-              <TabsContent value="funds">
-                <FundsPerformanceReport />
+              <TabsContent value="maintenance">
+                <MaintenanceCostReport />
               </TabsContent>
             </Tabs>
+
+            <FundsPerformanceReport />
           </TabsContent>
         </Tabs>
+      </div>
     </MobileOptimizedLayout>
   );
 };
