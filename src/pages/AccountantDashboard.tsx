@@ -41,8 +41,33 @@ const TableSkeleton = () => (
   </div>
 );
 
+interface JournalApproval {
+  id: string;
+  journal_entry_id: string;
+  approver_name: string;
+  status: string;
+  notes: string | null;
+  created_at: string;
+  approved_at: string | null;
+  updated_at: string;
+  journal_entry: {
+    id: string;
+    entry_number: string;
+    entry_date: string;
+    description: string;
+    status: string;
+    reference_type: string;
+    reference_id: string;
+    fiscal_year_id: string;
+    posted_at: string | null;
+    created_at: string;
+    created_by: string | null;
+    updated_at: string;
+  };
+}
+
 const AccountantDashboard = () => {
-  const [selectedApproval, setSelectedApproval] = useState<any>(null);
+  const [selectedApproval, setSelectedApproval] = useState<JournalApproval | null>(null);
   const [isApprovalDialogOpen, setIsApprovalDialogOpen] = useState(false);
   
   const { data: kpis, isLoading: kpisLoading } = useAccountantKPIs();
@@ -68,7 +93,8 @@ const AccountantDashboard = () => {
 
   const getStatusBadge = (status: string) => {
     type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
-    const variants: Record<string, { label: string; variant: BadgeVariant; icon: React.ComponentType<any> }> = {
+    type IconComponent = React.ComponentType<{ className?: string }>;
+    const variants: Record<string, { label: string; variant: BadgeVariant; icon: IconComponent }> = {
       pending: { label: "قيد المراجعة", variant: "secondary", icon: AlertCircle },
       approved: { label: "موافق عليه", variant: "default", icon: CheckCircle },
       rejected: { label: "مرفوض", variant: "destructive", icon: XCircle },

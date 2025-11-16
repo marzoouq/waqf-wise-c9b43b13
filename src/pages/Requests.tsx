@@ -60,7 +60,8 @@ const Requests = () => {
 
   const getStatusBadge = (status: string) => {
     type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
-    const variants: Record<string, { variant: BadgeVariant; icon: React.ComponentType<any> }> = {
+    type IconComponent = React.ComponentType<{ className?: string }>;
+    const variants: Record<string, { variant: BadgeVariant; icon: IconComponent }> = {
       'معلق': { variant: 'secondary', icon: Clock },
       'قيد المعالجة': { variant: 'default', icon: AlertCircle },
       'قيد المراجعة': { variant: 'default', icon: AlertCircle },

@@ -35,7 +35,7 @@ export interface GovernanceDecision {
   
   requires_voting: boolean;
   voting_participants_type: VotingParticipantsType;
-  custom_voters?: CustomVoter[] | any;
+  custom_voters?: CustomVoter[];
   voting_method: string;
   voting_quorum?: number;
   pass_threshold: number;

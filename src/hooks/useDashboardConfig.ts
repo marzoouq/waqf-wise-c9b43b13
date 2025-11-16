@@ -9,7 +9,7 @@ export interface DashboardWidget {
   title: string;
   size: 'small' | 'medium' | 'large';
   position: { x: number; y: number };
-  config: Record<string, any>;
+  config: Record<string, unknown>;
 }
 
 export interface DashboardConfig {
