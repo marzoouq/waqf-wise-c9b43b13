@@ -92,19 +92,110 @@ export type DistributionWithJournal = DistributionRow & {
 
 // المدفوعات
 export type PaymentRow = Tables['payments']['Row'];
+export type PaymentApprovalRow = Tables['payment_approvals']['Row'];
 
 export type PaymentWithBeneficiary = PaymentRow & {
   beneficiaries: BeneficiaryRow;
 };
 
+export type PaymentWithApprovals = PaymentRow & {
+  beneficiaries: BeneficiaryRow;
+  payment_approvals: PaymentApprovalRow[];
+};
+
+// الطلبات (Requests)
+export type RequestRow = Tables['beneficiary_requests']['Row'];
+export type RequestTypeRow = Tables['request_types']['Row'];
+export type RequestApprovalRow = Tables['request_approvals']['Row'];
+
+export type RequestWithBeneficiary = RequestRow & {
+  beneficiaries: BeneficiaryRow;
+  request_types?: RequestTypeRow;
+};
+
+export type RequestWithApprovals = RequestRow & {
+  beneficiaries: BeneficiaryRow;
+  request_types?: RequestTypeRow;
+  request_approvals: RequestApprovalRow[];
+};
+
+// القروض مع الموافقات
+export type LoanApprovalRow = Tables['loan_approvals']['Row'];
+
+export type LoanWithApprovals = LoanRow & {
+  beneficiaries: BeneficiaryRow;
+  loan_approvals: LoanApprovalRow[];
+};
+
+// العائلات
+export type FamilyRow = Tables['families']['Row'];
+export type FamilyMemberRow = Tables['family_members']['Row'];
+
+export type FamilyWithMembers = FamilyRow & {
+  family_members: (FamilyMemberRow & {
+    beneficiaries: BeneficiaryRow;
+  })[];
+};
+
+export type FamilyWithHead = FamilyRow & {
+  head_of_family?: BeneficiaryRow;
+};
+
+// القبائل
+export type TribeRow = {
+  id: string;
+  name: string;
+  description?: string;
+  created_at: string;
+  updated_at: string;
+};
+
+// الحسابات البنكية والتسويات
+export type BankAccountRow = Tables['bank_accounts']['Row'];
+export type BankStatementRow = Tables['bank_statements']['Row'];
+export type BankTransactionRow = Tables['bank_transactions']['Row'];
+
+export type BankStatementWithTransactions = BankStatementRow & {
+  bank_transactions: BankTransactionRow[];
+};
+
+export type BankTransactionWithStatement = BankTransactionRow & {
+  bank_statements: BankStatementRow;
+};
+
+// التدفقات النقدية
+export type CashFlowRow = Tables['cash_flows']['Row'];
+
+export type CashFlowWithFiscalYear = CashFlowRow & {
+  fiscal_years: Tables['fiscal_years']['Row'];
+};
+
+// الرسائل الداخلية
+export type InternalMessageRow = {
+  id: string;
+  sender_id: string;
+  recipient_id: string;
+  subject: string;
+  message: string;
+  is_read: boolean;
+  read_at: string | null;
+  created_at: string;
+};
+
+// إعدادات النظام
+export type SystemSettingRow = {
+  id: string;
+  key: string;
+  value: string;
+  description?: string;
+  updated_at: string;
+};
+
 // الفواتير
 export type InvoiceRow = Tables['invoices']['Row'];
 
-// الحسابات البنكية
-export type BankAccountRow = Tables['bank_accounts']['Row'];
-
-export type BankAccountWithAccount = BankAccountRow & {
-  accounts?: AccountRow;
+export type InvoiceWithLines = InvoiceRow & {
+  invoice_lines: Tables['invoice_lines']['Row'][];
 };
 
 // التقارير المخصصة
@@ -162,19 +253,6 @@ export interface FinancialStats {
   overdue_receivables: number;
 }
 
-// أنواع للطلبات
-export type RequestRow = Tables['beneficiary_requests']['Row'];
-export type RequestTypeRow = Tables['request_types']['Row'];
-
-export type RequestWithType = RequestRow & {
-  request_types: RequestTypeRow;
-};
-
-export type RequestWithBeneficiary = RequestRow & {
-  beneficiaries: BeneficiaryRow;
-  request_types: RequestTypeRow;
-};
-
 // أنواع مساعدة للفورمات
 export interface FormError {
   field: string;
@@ -197,10 +275,6 @@ export interface ExportOptions {
   includeHeaders?: boolean;
   dateFormat?: string;
 }
-
-// Bank statements and transactions
-export type BankStatementRow = Tables['bank_statements']['Row'];
-export type BankTransactionRow = Tables['bank_transactions']['Row'];
 
 // Accounting specific types
 export interface AccountWithBalance extends AccountRow {
