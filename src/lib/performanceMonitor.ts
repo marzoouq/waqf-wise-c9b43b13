@@ -100,6 +100,63 @@ class PerformanceMonitor {
 
     console.groupEnd();
   }
+
+  /**
+   * قياس مقاييس تحميل الصفحة بالتفصيل
+   */
+  logPageLoadMetrics(): void {
+    if (typeof window === 'undefined') return;
+
+    const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+    
+    if (!navigation) {
+      console.warn('Navigation timing not available');
+      return;
+    }
+
+    const metrics = {
+      'DNS Lookup': Math.round(navigation.domainLookupEnd - navigation.domainLookupStart),
+      'TCP Connection': Math.round(navigation.connectEnd - navigation.connectStart),
+      'Request Time': Math.round(navigation.responseEnd - navigation.requestStart),
+      'Response Time': Math.round(navigation.responseEnd - navigation.responseStart),
+      'DOM Processing': Math.round(navigation.domContentLoadedEventEnd - navigation.responseEnd),
+      'Load Complete': Math.round(navigation.loadEventEnd - navigation.fetchStart),
+      'DOM Interactive': Math.round(navigation.domInteractive - navigation.fetchStart),
+      'DOM Content Loaded': Math.round(navigation.domContentLoadedEventEnd - navigation.fetchStart),
+    };
+
+    console.group('🚀 Page Load Metrics');
+    Object.entries(metrics).forEach(([key, value]) => {
+      const color = value < 100 ? '🟢' : value < 500 ? '🟡' : '🔴';
+      console.log(`${color} ${key}: ${value}ms`);
+    });
+    console.groupEnd();
+  }
+
+  /**
+   * قياس First Contentful Paint و Largest Contentful Paint
+   */
+  logWebVitals(): void {
+    if (typeof window === 'undefined') return;
+
+    try {
+      // First Contentful Paint
+      const fcpEntry = performance.getEntriesByName('first-contentful-paint')[0] as PerformanceEntry;
+      if (fcpEntry) {
+        console.log(`🎨 First Contentful Paint: ${Math.round(fcpEntry.startTime)}ms`);
+      }
+
+      // Largest Contentful Paint
+      const observer = new PerformanceObserver((list) => {
+        const entries = list.getEntries();
+        const lastEntry = entries[entries.length - 1] as any;
+        console.log(`🖼️ Largest Contentful Paint: ${Math.round(lastEntry.startTime)}ms`);
+      });
+      observer.observe({ entryTypes: ['largest-contentful-paint'] });
+    } catch (error) {
+      console.warn('Web Vitals not available:', error);
+    }
+  }
 }
 
 export const performanceMonitor = new PerformanceMonitor();
