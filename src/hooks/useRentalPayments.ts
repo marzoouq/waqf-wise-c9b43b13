@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { createMutationErrorHandler } from "@/lib/errorHandling";
+import type { RentalPaymentInsert, RentalPaymentUpdate } from "@/types/payments";
 import { useJournalEntries } from "./useJournalEntries";
 import { useEffect } from "react";
 import { logger } from "@/lib/logger";
@@ -83,10 +85,11 @@ export const useRentalPayments = (contractId?: string) => {
   });
 
   const addPayment = useMutation({
-    mutationFn: async (payment: any) => {
+    mutationFn: async (payment: Omit<RentalPaymentInsert, 'payment_number'>) => {
+      const paymentNumber = `RP-${Date.now().toString().slice(-8)}`;
       const { data, error } = await supabase
         .from("rental_payments")
-        .insert([payment])
+        .insert([{ ...payment, payment_number: paymentNumber }])
         .select(`
           *,
           contracts(
@@ -124,14 +127,7 @@ export const useRentalPayments = (contractId?: string) => {
         description: "تم إضافة الدفعة وإنشاء القيد المحاسبي",
       });
     },
-    onError: (error) => {
-      toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء إضافة الدفعة",
-        variant: "destructive",
-      });
-      logger.error(error, { context: 'add_rental_payment', severity: 'medium' });
-    },
+    onError: createMutationErrorHandler({ context: 'add_rental_payment' }),
   });
 
   const updatePayment = useMutation({

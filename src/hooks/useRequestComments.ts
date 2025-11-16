@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { TOAST_MESSAGES, QUERY_STALE_TIME } from "@/lib/constants";
+import { createMutationErrorHandler } from "@/lib/errorHandling";
 
 export interface RequestComment {
   id: string;
@@ -91,13 +92,10 @@ export function useRequestComments(requestId?: string) {
         description: "تم إضافة التعليق بنجاح",
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: TOAST_MESSAGES.ERROR.ADD,
-        description: error.message || "حدث خطأ أثناء إضافة التعليق",
-        variant: "destructive",
-      });
-    },
+    onError: createMutationErrorHandler({ 
+      context: 'add_request_comment',
+      toastTitle: TOAST_MESSAGES.ERROR.ADD
+    }),
   });
 
   const updateComment = useMutation({
@@ -119,13 +117,10 @@ export function useRequestComments(requestId?: string) {
         description: "تم تحديث التعليق بنجاح",
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: TOAST_MESSAGES.ERROR.UPDATE,
-        description: error.message || "حدث خطأ أثناء تحديث التعليق",
-        variant: "destructive",
-      });
-    },
+    onError: createMutationErrorHandler({ 
+      context: 'update_request_comment',
+      toastTitle: TOAST_MESSAGES.ERROR.UPDATE
+    }),
   });
 
   const deleteComment = useMutation({
@@ -144,13 +139,10 @@ export function useRequestComments(requestId?: string) {
         description: "تم حذف التعليق بنجاح",
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: TOAST_MESSAGES.ERROR.DELETE,
-        description: error.message || "حدث خطأ أثناء حذف التعليق",
-        variant: "destructive",
-      });
-    },
+    onError: createMutationErrorHandler({ 
+      context: 'delete_request_comment',
+      toastTitle: TOAST_MESSAGES.ERROR.DELETE
+    }),
   });
 
   return {

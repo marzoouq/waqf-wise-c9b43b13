@@ -47,7 +47,7 @@ export function useArchiveStats() {
       startOfMonth.setHours(0, 0, 0, 0);
 
       const thisMonthDocs = documents?.filter(
-        (doc: any) => new Date(doc.created_at) >= startOfMonth
+        (doc) => new Date(doc.created_at) >= startOfMonth
       ).length || 0;
 
       const stats: ArchiveStats = {

@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import type { FinancialLine } from "@/types/admin";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";
 
 export interface FinancialData {
@@ -36,7 +37,7 @@ export function useFinancialData() {
       let totalRevenue = 0;
       let totalExpenses = 0;
 
-      entries?.forEach((line: any) => {
+      entries?.forEach((line: FinancialLine) => {
         const accountType = line.accounts?.account_type;
         const accountNature = line.accounts?.account_nature;
         const debit = Number(line.debit_amount || 0);
