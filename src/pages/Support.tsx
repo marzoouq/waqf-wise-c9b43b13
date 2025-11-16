@@ -25,6 +25,9 @@ import { LoadingState } from '@/components/shared/LoadingState';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import type { SupportFilters } from '@/types/support';
+import { Database } from '@/integrations/supabase/types';
+
+type SupportTicket = Database['public']['Tables']['support_tickets']['Row'];
 
 const statusLabels = {
   open: 'مفتوحة',
@@ -111,7 +114,7 @@ export default function Support() {
                     <LoadingState message="جاري تحميل التذاكر..." />
                   ) : tickets && tickets.length > 0 ? (
                     <div className="space-y-2">
-                      {tickets.map((ticket: any) => (
+                      {tickets.map((ticket) => (
                         <div
                           key={ticket.id}
                           className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors"

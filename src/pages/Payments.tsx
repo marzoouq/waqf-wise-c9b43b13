@@ -22,6 +22,9 @@ import { ar } from "date-fns/locale";
 import { Pagination } from "@/components/ui/pagination";
 import { logger } from "@/lib/logger";
 import { MobileOptimizedLayout, MobileOptimizedHeader, MobileOptimizedGrid } from "@/components/layout/MobileOptimizedLayout";
+import { Database } from '@/integrations/supabase/types';
+
+type Payment = Database['public']['Tables']['payments']['Row'];
 
 const ITEMS_PER_PAGE = 20;
 
@@ -97,20 +100,20 @@ const Payments = () => {
     setDialogOpen(true);
   }, []);
 
-  const handleEditPayment = useCallback((payment: any) => {
+  const handleEditPayment = useCallback((payment: Payment) => {
     setSelectedPayment(payment);
     setDialogOpen(true);
   }, []);
 
-  const handleSavePayment = async (data: any) => {
+  const handleSavePayment = async (data: Record<string, unknown>) => {
     try {
       let paymentId: string;
       
       if (selectedPayment) {
-        await updatePayment({ id: selectedPayment.id, ...data });
+        await updatePayment({ id: selectedPayment.id, ...data } as Parameters<typeof updatePayment>[0]);
         paymentId = selectedPayment.id;
       } else {
-        const result = await addPayment(data);
+        const result = await addPayment(data as Parameters<typeof addPayment>[0]);
         paymentId = result.id;
       }
 
@@ -120,8 +123,8 @@ const Payments = () => {
         triggerEvent,
         paymentId,
         Number(data.amount),
-        data.description,
-        data.payment_date
+        data.description as string,
+        data.payment_date as string
       );
 
       setDialogOpen(false);
@@ -136,7 +139,7 @@ const Payments = () => {
     }
   }, [deletePayment]);
 
-  const handlePrint = (payment: any) => {
+  const handlePrint = (payment: Partial<Payment>) => {
     toast({
       title: "قريباً",
       description: "سيتم إضافة وظيفة الطباعة قريباً",
@@ -275,10 +278,10 @@ const Payments = () => {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => handleEditPayment(payment)}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
+                            onClick={() => handleEditPayment(payment as Payment)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
                             <Button
                               variant="ghost"
                               size="sm"
