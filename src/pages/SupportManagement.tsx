@@ -50,10 +50,12 @@ export default function SupportManagement() {
   };
 
   return (
-    <MainLayout
-      title="إدارة الدعم الفني"
-      description="لوحة تحكم شاملة لإدارة التذاكر والدعم الفني"
-    >
+    <MainLayout>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold">إدارة الدعم الفني</h1>
+          <p className="text-muted-foreground">لوحة تحكم شاملة لإدارة التذاكر والدعم الفني</p>
+        </div>
       <Tabs defaultValue="overview" className="space-y-6">
         <TabsList>
           <TabsTrigger value="overview">نظرة عامة</TabsTrigger>
@@ -195,27 +197,105 @@ export default function SupportManagement() {
                             <p className="text-sm text-muted-foreground">
                               {(ticket as any).beneficiary?.full_name || (ticket as any).user?.email}
                             </p>
+                          </div>
+                          <div className="text-left space-y-2">
+                            <Badge>
+                              {statusLabels[ticket.status as keyof typeof statusLabels]}
+                            </Badge>
+                            <p className="text-xs text-muted-foreground">
+                              {format(new Date(ticket.created_at), 'PP', { locale: ar })}
+                            </p>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-8">
+                        <p className="text-muted-foreground">لا توجد تذاكر</p>
                       </div>
-                      <div className="text-left space-y-2">
-                        <Badge>
-                          {statusLabels[ticket.status as keyof typeof statusLabels]}
-                        </Badge>
-                        <p className="text-xs text-muted-foreground">
-                          {format(new Date(ticket.created_at), 'PP', { locale: ar })}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <Card>
-              <CardContent className="text-center py-8">
-                <p className="text-muted-foreground">لا توجد تذاكر</p>
-              </CardContent>
-            </Card>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </>
           )}
+        </TabsContent>
+
+        {/* جميع التذاكر */}
+        <TabsContent value="tickets" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>جميع التذاكر</CardTitle>
+              <CardDescription>
+                قائمة شاملة بجميع تذاكر الدعم الفني
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {/* الفلاتر */}
+                <div className="grid gap-4 md:grid-cols-4">
+                  <Input
+                    placeholder="البحث..."
+                    value={filters.search || ''}
+                    onChange={(e) => handleFilterChange('search', e.target.value)}
+                  />
+                  <Select
+                    value={filters.status?.[0] || 'all'}
+                    onValueChange={(value) => 
+                      handleFilterChange('status', value === 'all' ? [] : [value])
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="الحالة" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">الكل</SelectItem>
+                      <SelectItem value="open">مفتوحة</SelectItem>
+                      <SelectItem value="in_progress">قيد المعالجة</SelectItem>
+                      <SelectItem value="resolved">تم الحل</SelectItem>
+                      <SelectItem value="closed">مغلقة</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* قائمة التذاكر */}
+                {isLoading ? (
+                  <LoadingState message="جاري تحميل التذاكر..." />
+                ) : tickets && tickets.length > 0 ? (
+                  <div className="space-y-2">
+                    {tickets.map((ticket: any) => (
+                      <div
+                        key={ticket.id}
+                        className="flex items-center justify-between p-4 border rounded-lg cursor-pointer hover:bg-muted/50"
+                        onClick={() => setSelectedTicketId(ticket.id)}
+                      >
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <p className="font-medium">{ticket.subject}</p>
+                            <Badge variant="outline">#{ticket.ticket_number}</Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            {(ticket as any).beneficiary?.full_name || (ticket as any).user?.email}
+                          </p>
+                        </div>
+                        <div className="text-left space-y-2">
+                          <Badge>
+                            {statusLabels[ticket.status as keyof typeof statusLabels]}
+                          </Badge>
+                          <p className="text-xs text-muted-foreground">
+                            {format(new Date(ticket.created_at), 'PP', { locale: ar })}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground">لا توجد تذاكر</p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* التحليلات */}
@@ -231,11 +311,12 @@ export default function SupportManagement() {
         </TabsContent>
       </Tabs>
 
-      <TicketDetailsDialog
-        ticketId={selectedTicketId}
-        open={!!selectedTicketId}
-        onOpenChange={(open) => !open && setSelectedTicketId(null)}
-      />
+        <TicketDetailsDialog
+          ticketId={selectedTicketId}
+          open={!!selectedTicketId}
+          onOpenChange={(open) => !open && setSelectedTicketId(null)}
+        />
+      </div>
     </MainLayout>
   );
 }
