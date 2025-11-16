@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
@@ -7,14 +7,16 @@ import { VotingInterface } from "@/components/governance/VotingInterface";
 import { EligibleVotersList } from "@/components/governance/EligibleVotersList";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, User, FileText } from "lucide-react";
+import { Calendar, User, FileText, ArrowRight } from "lucide-react";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import type { GovernanceDecision } from "@/types/governance";
 
 export default function DecisionDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const { data: decision, isLoading } = useQuery({
     queryKey: ["governance-decision", id],
@@ -26,7 +28,7 @@ export default function DecisionDetails() {
         .single();
       
       if (error) throw error;
-      return data as GovernanceDecision;
+      return data as any;
     },
     enabled: !!id,
   });
@@ -36,7 +38,15 @@ export default function DecisionDetails() {
   if (!decision) {
     return (
       <MobileOptimizedLayout>
-        <MobileOptimizedHeader title="خطأ" showBack />
+        <MobileOptimizedHeader 
+          title="خطأ"
+          actions={
+            <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+              <ArrowRight className="h-4 w-4 ml-2" />
+              رجوع
+            </Button>
+          }
+        />
         <div className="p-4 text-center"><p className="text-muted-foreground">القرار غير موجود</p></div>
       </MobileOptimizedLayout>
     );
@@ -53,7 +63,15 @@ export default function DecisionDetails() {
 
   return (
     <MobileOptimizedLayout>
-      <MobileOptimizedHeader title="تفاصيل القرار" showBack />
+      <MobileOptimizedHeader 
+        title="تفاصيل القرار"
+        actions={
+          <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+            <ArrowRight className="h-4 w-4 ml-2" />
+            رجوع
+          </Button>
+        }
+      />
       <div className="p-4 space-y-4">
         <Card>
           <CardHeader>
@@ -102,7 +120,15 @@ export default function DecisionDetails() {
           </TabsList>
           <TabsContent value="voting" className="mt-4">
             {decision.requires_voting ? (
-              <VotingInterface decision={decision} canVote={true} />
+              <VotingInterface 
+                decisionId={decision.id}
+                canVote={true}
+                votingCompleted={decision.voting_completed}
+                votesFor={decision.votes_for}
+                votesAgainst={decision.votes_against}
+                votesAbstain={decision.votes_abstain}
+                totalVotes={decision.total_votes}
+              />
             ) : (
               <Card><CardContent className="py-8 text-center"><p className="text-muted-foreground">هذا قرار مباشر من الناظر ولا يحتاج إلى تصويت</p></CardContent></Card>
             )}

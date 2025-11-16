@@ -31,11 +31,11 @@ export interface GovernanceDecision {
   decision_date: string;
   decision_title: string;
   decision_text: string;
-  decision_type: 'قرار' | 'توصية' | 'تكليف';
+  decision_type: string;
   
   requires_voting: boolean;
   voting_participants_type: VotingParticipantsType;
-  custom_voters?: CustomVoter[];
+  custom_voters?: CustomVoter[] | any;
   voting_method: string;
   voting_quorum?: number;
   pass_threshold: number;
