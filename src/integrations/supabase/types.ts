@@ -1881,6 +1881,108 @@ export type Database = {
           },
         ]
       }
+      kb_articles: {
+        Row: {
+          author_id: string | null
+          category: string
+          content: string
+          created_at: string
+          helpful_count: number | null
+          id: string
+          is_featured: boolean | null
+          metadata: Json | null
+          not_helpful_count: number | null
+          published_at: string | null
+          slug: string | null
+          sort_order: number | null
+          status: string
+          summary: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+          views_count: number | null
+        }
+        Insert: {
+          author_id?: string | null
+          category: string
+          content: string
+          created_at?: string
+          helpful_count?: number | null
+          id?: string
+          is_featured?: boolean | null
+          metadata?: Json | null
+          not_helpful_count?: number | null
+          published_at?: string | null
+          slug?: string | null
+          sort_order?: number | null
+          status?: string
+          summary?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          views_count?: number | null
+        }
+        Update: {
+          author_id?: string | null
+          category?: string
+          content?: string
+          created_at?: string
+          helpful_count?: number | null
+          id?: string
+          is_featured?: boolean | null
+          metadata?: Json | null
+          not_helpful_count?: number | null
+          published_at?: string | null
+          slug?: string | null
+          sort_order?: number | null
+          status?: string
+          summary?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          views_count?: number | null
+        }
+        Relationships: []
+      }
+      kb_faqs: {
+        Row: {
+          answer: string
+          category: string
+          created_at: string
+          helpful_count: number | null
+          id: string
+          is_active: boolean | null
+          question: string
+          sort_order: number | null
+          updated_at: string
+          views_count: number | null
+        }
+        Insert: {
+          answer: string
+          category: string
+          created_at?: string
+          helpful_count?: number | null
+          id?: string
+          is_active?: boolean | null
+          question: string
+          sort_order?: number | null
+          updated_at?: string
+          views_count?: number | null
+        }
+        Update: {
+          answer?: string
+          category?: string
+          created_at?: string
+          helpful_count?: number | null
+          id?: string
+          is_active?: boolean | null
+          question?: string
+          sort_order?: number | null
+          updated_at?: string
+          views_count?: number | null
+        }
+        Relationships: []
+      }
       leaked_password_checks: {
         Row: {
           checked_at: string | null
@@ -3095,6 +3197,345 @@ export type Database = {
           triggered_at?: string | null
         }
         Relationships: []
+      }
+      support_statistics: {
+        Row: {
+          active_agents: number | null
+          avg_first_response_minutes: number | null
+          avg_rating: number | null
+          avg_resolution_minutes: number | null
+          closed_tickets: number | null
+          created_at: string
+          date: string
+          id: string
+          new_tickets: number | null
+          reopened_tickets: number | null
+          resolved_tickets: number | null
+          sla_compliance_rate: number | null
+          total_ratings: number | null
+          total_responses: number | null
+          total_tickets: number | null
+        }
+        Insert: {
+          active_agents?: number | null
+          avg_first_response_minutes?: number | null
+          avg_rating?: number | null
+          avg_resolution_minutes?: number | null
+          closed_tickets?: number | null
+          created_at?: string
+          date: string
+          id?: string
+          new_tickets?: number | null
+          reopened_tickets?: number | null
+          resolved_tickets?: number | null
+          sla_compliance_rate?: number | null
+          total_ratings?: number | null
+          total_responses?: number | null
+          total_tickets?: number | null
+        }
+        Update: {
+          active_agents?: number | null
+          avg_first_response_minutes?: number | null
+          avg_rating?: number | null
+          avg_resolution_minutes?: number | null
+          closed_tickets?: number | null
+          created_at?: string
+          date?: string
+          id?: string
+          new_tickets?: number | null
+          reopened_tickets?: number | null
+          resolved_tickets?: number | null
+          sla_compliance_rate?: number | null
+          total_ratings?: number | null
+          total_responses?: number | null
+          total_tickets?: number | null
+        }
+        Relationships: []
+      }
+      support_ticket_attachments: {
+        Row: {
+          comment_id: string | null
+          file_name: string
+          file_path: string
+          file_size: number
+          file_type: string
+          id: string
+          mime_type: string | null
+          ticket_id: string
+          uploaded_at: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          comment_id?: string | null
+          file_name: string
+          file_path: string
+          file_size: number
+          file_type: string
+          id?: string
+          mime_type?: string | null
+          ticket_id: string
+          uploaded_at?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          comment_id?: string | null
+          file_name?: string
+          file_path?: string
+          file_size?: number
+          file_type?: string
+          id?: string
+          mime_type?: string | null
+          ticket_id?: string
+          uploaded_at?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_ticket_attachments_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "support_ticket_comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "support_ticket_attachments_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "support_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_ticket_comments: {
+        Row: {
+          comment: string
+          created_at: string
+          edited_at: string | null
+          id: string
+          is_internal: boolean | null
+          is_solution: boolean | null
+          metadata: Json | null
+          ticket_id: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          comment: string
+          created_at?: string
+          edited_at?: string | null
+          id?: string
+          is_internal?: boolean | null
+          is_solution?: boolean | null
+          metadata?: Json | null
+          ticket_id: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          comment?: string
+          created_at?: string
+          edited_at?: string | null
+          id?: string
+          is_internal?: boolean | null
+          is_solution?: boolean | null
+          metadata?: Json | null
+          ticket_id?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_ticket_comments_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "support_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_ticket_history: {
+        Row: {
+          change_reason: string | null
+          changed_at: string
+          changed_by: string | null
+          field_name: string
+          id: string
+          new_value: string | null
+          old_value: string | null
+          ticket_id: string
+        }
+        Insert: {
+          change_reason?: string | null
+          changed_at?: string
+          changed_by?: string | null
+          field_name: string
+          id?: string
+          new_value?: string | null
+          old_value?: string | null
+          ticket_id: string
+        }
+        Update: {
+          change_reason?: string | null
+          changed_at?: string
+          changed_by?: string | null
+          field_name?: string
+          id?: string
+          new_value?: string | null
+          old_value?: string | null
+          ticket_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_ticket_history_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "support_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_ticket_ratings: {
+        Row: {
+          feedback: string | null
+          id: string
+          rated_at: string
+          rated_by: string | null
+          rating: number
+          response_speed_rating: number | null
+          solution_quality_rating: number | null
+          staff_friendliness_rating: number | null
+          ticket_id: string
+        }
+        Insert: {
+          feedback?: string | null
+          id?: string
+          rated_at?: string
+          rated_by?: string | null
+          rating: number
+          response_speed_rating?: number | null
+          solution_quality_rating?: number | null
+          staff_friendliness_rating?: number | null
+          ticket_id: string
+        }
+        Update: {
+          feedback?: string | null
+          id?: string
+          rated_at?: string
+          rated_by?: string | null
+          rating?: number
+          response_speed_rating?: number | null
+          solution_quality_rating?: number | null
+          staff_friendliness_rating?: number | null
+          ticket_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_ticket_ratings_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: true
+            referencedRelation: "support_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_tickets: {
+        Row: {
+          assigned_at: string | null
+          assigned_by: string | null
+          assigned_to: string | null
+          beneficiary_id: string | null
+          category: string
+          closed_at: string | null
+          created_at: string
+          description: string
+          first_response_at: string | null
+          id: string
+          is_overdue: boolean | null
+          last_activity_at: string | null
+          metadata: Json | null
+          priority: string
+          reopened_count: number | null
+          resolved_at: string | null
+          response_count: number | null
+          sla_due_at: string | null
+          source: string
+          status: string
+          subject: string
+          tags: string[] | null
+          ticket_number: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          assigned_to?: string | null
+          beneficiary_id?: string | null
+          category: string
+          closed_at?: string | null
+          created_at?: string
+          description: string
+          first_response_at?: string | null
+          id?: string
+          is_overdue?: boolean | null
+          last_activity_at?: string | null
+          metadata?: Json | null
+          priority?: string
+          reopened_count?: number | null
+          resolved_at?: string | null
+          response_count?: number | null
+          sla_due_at?: string | null
+          source?: string
+          status?: string
+          subject: string
+          tags?: string[] | null
+          ticket_number: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          assigned_to?: string | null
+          beneficiary_id?: string | null
+          category?: string
+          closed_at?: string | null
+          created_at?: string
+          description?: string
+          first_response_at?: string | null
+          id?: string
+          is_overdue?: boolean | null
+          last_activity_at?: string | null
+          metadata?: Json | null
+          priority?: string
+          reopened_count?: number | null
+          resolved_at?: string | null
+          response_count?: number | null
+          sla_due_at?: string | null
+          source?: string
+          status?: string
+          subject?: string
+          tags?: string[] | null
+          ticket_number?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_tickets_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "support_tickets_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_statistics"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       system_settings: {
         Row: {
