@@ -34,7 +34,7 @@ const ArchivistDashboard = lazy(() => import("./pages/ArchivistDashboard"));
 const Beneficiaries = lazy(() => import("./pages/Beneficiaries"));
 const BeneficiaryProfile = lazy(() => import("./pages/BeneficiaryProfile"));
 const Properties = lazy(() => import("./pages/Properties"));
-const PropertyUnits = lazy(() => import("./pages/PropertyUnits"));
+// PropertyUnits page removed - integrated into Properties page
 const Funds = lazy(() => import("./pages/Funds"));
 const Archive = lazy(() => import("./pages/Archive"));
 const Accounting = lazy(() => import("./pages/Accounting"));
@@ -195,14 +195,6 @@ const App = () => {
             element={
               <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
                 <Properties />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/properties/:propertyId/units" 
-            element={
-              <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
-                <PropertyUnits />
               </ProtectedRoute>
             } 
           />
