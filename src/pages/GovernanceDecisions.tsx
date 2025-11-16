@@ -8,18 +8,23 @@ import { DecisionCard } from "@/components/governance/DecisionCard";
 import { useGovernanceDecisions } from "@/hooks/useGovernanceDecisions";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EnhancedEmptyState } from "@/components/shared/EnhancedEmptyState";
+import { Database } from "@/integrations/supabase/types";
+
+type GovernanceDecisionRow = Database['public']['Tables']['governance_decisions']['Row'];
 
 export default function GovernanceDecisions() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const { decisions, isLoading } = useGovernanceDecisions();
 
-  const activeDecisions = (decisions as any[]).filter(d => 
+  const typedDecisions = decisions as GovernanceDecisionRow[];
+  
+  const activeDecisions = typedDecisions.filter(d => 
     d.decision_status === 'قيد التصويت' || d.decision_status === 'قيد التنفيذ'
   );
-  const completedDecisions = (decisions as any[]).filter(d => 
+  const completedDecisions = typedDecisions.filter(d => 
     d.decision_status === 'معتمد' || d.decision_status === 'منفذ'
   );
-  const rejectedDecisions = (decisions as any[]).filter(d => 
+  const rejectedDecisions = typedDecisions.filter(d => 
     d.decision_status === 'مرفوض' || d.decision_status === 'ملغي'
   );
 
@@ -60,7 +65,7 @@ export default function GovernanceDecisions() {
               {activeDecisions.length === 0 ? (
                 <EnhancedEmptyState icon={Vote} title="لا توجد قرارات نشطة" description="القرارات النشطة ستظهر هنا" />
               ) : (
-                activeDecisions.map(decision => <DecisionCard key={decision.id} decision={decision} />)
+                activeDecisions.map(decision => <DecisionCard key={decision.id} decision={decision as any} />)
               )}
             </TabsContent>
             
@@ -68,7 +73,7 @@ export default function GovernanceDecisions() {
               {completedDecisions.length === 0 ? (
                 <EnhancedEmptyState icon={Vote} title="لا توجد قرارات منفذة" description="القرارات المنفذة ستظهر هنا" />
               ) : (
-                completedDecisions.map(decision => <DecisionCard key={decision.id} decision={decision} />)
+                completedDecisions.map(decision => <DecisionCard key={decision.id} decision={decision as any} />)
               )}
             </TabsContent>
             
@@ -76,7 +81,7 @@ export default function GovernanceDecisions() {
               {rejectedDecisions.length === 0 ? (
                 <EnhancedEmptyState icon={Vote} title="لا توجد قرارات مرفوضة" description="القرارات المرفوضة ستظهر هنا" />
               ) : (
-                rejectedDecisions.map(decision => <DecisionCard key={decision.id} decision={decision} />)
+                rejectedDecisions.map(decision => <DecisionCard key={decision.id} decision={decision as any} />)
               )}
             </TabsContent>
           </Tabs>

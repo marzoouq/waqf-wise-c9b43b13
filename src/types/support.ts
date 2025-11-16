@@ -4,6 +4,31 @@ export type TicketStatus = 'open' | 'in_progress' | 'waiting_customer' | 'resolv
 export type TicketSource = 'portal' | 'email' | 'phone' | 'chatbot';
 export type ArticleStatus = 'draft' | 'published' | 'archived';
 
+// Metadata interfaces
+export interface TicketMetadata {
+  browser?: string;
+  os?: string;
+  ip_address?: string;
+  user_agent?: string;
+  referrer?: string;
+  custom_fields?: Record<string, unknown>;
+}
+
+export interface CommentMetadata {
+  edited?: boolean;
+  edit_count?: number;
+  attachments_count?: number;
+  [key: string]: unknown;
+}
+
+export interface ArticleMetadata {
+  seo_title?: string;
+  seo_description?: string;
+  author_name?: string;
+  related_articles?: string[];
+  [key: string]: unknown;
+}
+
 export interface SupportTicket {
   id: string;
   ticket_number: string;
@@ -30,7 +55,7 @@ export interface SupportTicket {
   
   source: TicketSource;
   tags: string[] | null;
-  metadata: any;
+  metadata: TicketMetadata | null;
   
   response_count: number;
   reopened_count: number;
@@ -47,7 +72,7 @@ export interface TicketComment {
   created_at: string;
   updated_at: string;
   edited_at: string | null;
-  metadata: any;
+  metadata: CommentMetadata | null;
 }
 
 export interface TicketAttachment {
@@ -104,7 +129,7 @@ export interface KBArticle {
   not_helpful_count: number;
   slug: string | null;
   sort_order: number;
-  metadata: any;
+  metadata: ArticleMetadata | null;
 }
 
 export interface KBFAQ {

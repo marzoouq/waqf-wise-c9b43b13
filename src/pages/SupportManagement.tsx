@@ -36,6 +36,11 @@ import { Database } from '@/integrations/supabase/types';
 
 type SupportTicket = Database['public']['Tables']['support_tickets']['Row'];
 
+type TicketWithRelations = SupportTicket & {
+  beneficiary?: unknown;
+  user?: unknown;
+};
+
 const statusLabels = {
   open: 'مفتوحة',
   in_progress: 'قيد المعالجة',
@@ -203,28 +208,31 @@ export default function SupportManagement() {
                 <CardContent>
                   <div className="space-y-2">
                     {recentTickets && recentTickets.length > 0 ? (
-                      recentTickets.slice(0, 5).map((ticket) => (
-                        <div
-                          key={ticket.id}
-                          className="flex items-center justify-between p-3 bg-muted/50 rounded-lg cursor-pointer hover:bg-muted"
-                          onClick={() => setSelectedTicketId(ticket.id)}
-                        >
-                          <div className="flex-1">
-                            <p className="font-medium">{ticket.subject}</p>
-                            <p className="text-sm text-muted-foreground">
-                              {(ticket as any).beneficiary?.full_name || (ticket as any).user?.email}
-                            </p>
+                      recentTickets.slice(0, 5).map((ticket) => {
+                        const ticketWithRelations = ticket as TicketWithRelations;
+                        return (
+                          <div
+                            key={ticket.id}
+                            className="flex items-center justify-between p-3 bg-muted/50 rounded-lg cursor-pointer hover:bg-muted"
+                            onClick={() => setSelectedTicketId(ticket.id)}
+                          >
+                            <div className="flex-1">
+                              <p className="font-medium">{ticket.subject}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {(ticketWithRelations.beneficiary as any)?.full_name || (ticketWithRelations.user as any)?.email}
+                              </p>
+                            </div>
+                            <div className="text-left space-y-2">
+                              <Badge>
+                                {statusLabels[ticket.status as keyof typeof statusLabels]}
+                              </Badge>
+                              <p className="text-xs text-muted-foreground">
+                                {format(new Date(ticket.created_at), 'PP', { locale: ar })}
+                              </p>
+                            </div>
                           </div>
-                          <div className="text-left space-y-2">
-                            <Badge>
-                              {statusLabels[ticket.status as keyof typeof statusLabels]}
-                            </Badge>
-                            <p className="text-xs text-muted-foreground">
-                              {format(new Date(ticket.created_at), 'PP', { locale: ar })}
-                            </p>
-                          </div>
-                        </div>
-                      ))
+                        );
+                      })
                     ) : (
                       <div className="text-center py-8">
                         <p className="text-muted-foreground">لا توجد تذاكر</p>
@@ -275,37 +283,40 @@ export default function SupportManagement() {
                 </div>
 
                 {/* قائمة التذاكر */}
-                {isLoading ? (
-                  <LoadingState message="جاري تحميل التذاكر..." />
-                ) : tickets && tickets.length > 0 ? (
-                  <div className="space-y-2">
-                    {tickets.map((ticket) => (
-                      <div
-                        key={ticket.id}
-                        className="flex items-center justify-between p-4 border rounded-lg cursor-pointer hover:bg-muted/50"
-                        onClick={() => setSelectedTicketId(ticket.id)}
-                      >
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <p className="font-medium">{ticket.subject}</p>
-                            <Badge variant="outline">#{ticket.ticket_number}</Badge>
+                  {isLoading ? (
+                    <LoadingState message="جاري تحميل التذاكر..." />
+                  ) : tickets && tickets.length > 0 ? (
+                    <div className="space-y-2">
+                      {tickets.map((ticket) => {
+                        const ticketWithRelations = ticket as TicketWithRelations;
+                        return (
+                          <div
+                            key={ticket.id}
+                            className="flex items-center justify-between p-4 border rounded-lg cursor-pointer hover:bg-muted/50"
+                            onClick={() => setSelectedTicketId(ticket.id)}
+                          >
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                              <p className="font-medium">{ticket.subject}</p>
+                                <Badge variant="outline">#{ticket.ticket_number}</Badge>
+                              </div>
+                              <p className="text-sm text-muted-foreground">
+                                {(ticketWithRelations.beneficiary as any)?.full_name || (ticketWithRelations.user as any)?.email}
+                              </p>
+                            </div>
+                            <div className="text-left space-y-2">
+                              <Badge>
+                                {statusLabels[ticket.status as keyof typeof statusLabels]}
+                              </Badge>
+                              <p className="text-xs text-muted-foreground">
+                                {format(new Date(ticket.created_at), 'PP', { locale: ar })}
+                              </p>
+                            </div>
                           </div>
-                          <p className="text-sm text-muted-foreground">
-                            {(ticket as any).beneficiary?.full_name || (ticket as any).user?.email}
-                          </p>
-                        </div>
-                        <div className="text-left space-y-2">
-                          <Badge>
-                            {statusLabels[ticket.status as keyof typeof statusLabels]}
-                          </Badge>
-                          <p className="text-xs text-muted-foreground">
-                            {format(new Date(ticket.created_at), 'PP', { locale: ar })}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
+                        );
+                      })}
+                    </div>
+                  ) : (
                   <div className="text-center py-8">
                     <p className="text-muted-foreground">لا توجد تذاكر</p>
                   </div>

@@ -13,6 +13,9 @@ import { Calendar, User, FileText, ArrowRight } from "lucide-react";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import type { GovernanceDecision } from "@/types/governance";
+import { Database } from "@/integrations/supabase/types";
+
+type GovernanceDecisionRow = Database['public']['Tables']['governance_decisions']['Row'];
 
 export default function DecisionDetails() {
   const { id } = useParams();
@@ -28,7 +31,7 @@ export default function DecisionDetails() {
         .single();
       
       if (error) throw error;
-      return data as any;
+      return data as GovernanceDecisionRow;
     },
     enabled: !!id,
   });
@@ -134,7 +137,7 @@ export default function DecisionDetails() {
             )}
           </TabsContent>
           <TabsContent value="voters" className="mt-4">
-            <EligibleVotersList decision={decision} />
+            <EligibleVotersList decision={decision as any} />
           </TabsContent>
         </Tabs>
       </div>

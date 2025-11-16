@@ -67,12 +67,13 @@ const AccountantDashboard = () => {
   });
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, { label: string; variant: any; icon: any }> = {
+    type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
+    const variants: Record<string, { label: string; variant: BadgeVariant; icon: React.ComponentType<any> }> = {
       pending: { label: "قيد المراجعة", variant: "secondary", icon: AlertCircle },
       approved: { label: "موافق عليه", variant: "default", icon: CheckCircle },
       rejected: { label: "مرفوض", variant: "destructive", icon: XCircle },
     };
-    const config = variants[status] || { label: status, variant: "outline", icon: FileText };
+    const config = variants[status] || { label: status, variant: "outline" as BadgeVariant, icon: FileText };
     const Icon = config.icon;
     return (
       <Badge variant={config.variant} className="gap-1">
