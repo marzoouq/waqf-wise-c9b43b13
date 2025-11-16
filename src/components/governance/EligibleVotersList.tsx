@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { CheckCircle2, XCircle, Clock, Users } from "lucide-react";
 import type { GovernanceDecision } from "@/types/governance";
 import { LoadingState } from "@/components/shared/LoadingState";
+import { Json } from "@/integrations/supabase/types";
 
 interface EligibleVoter {
   id: string;
@@ -19,7 +20,7 @@ interface EligibleVotersListProps {
   decision: { 
     id: string; 
     voting_participants_type: string; 
-    custom_voters?: EligibleVoter[];
+    custom_voters?: Json | null;
     [key: string]: unknown;
   };
 }
@@ -87,7 +88,8 @@ export function EligibleVotersList({ decision }: EligibleVotersListProps) {
           break;
 
         case 'custom':
-          eligibleVoters = decision.custom_voters || [];
+          // Type assertion for custom_voters from Json to EligibleVoter[]
+          eligibleVoters = (decision.custom_voters as unknown as EligibleVoter[] | null) || [];
           break;
 
         case 'nazer_only':

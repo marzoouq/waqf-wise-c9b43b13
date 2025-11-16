@@ -135,7 +135,7 @@ export async function prefetchNextPage<T>(
  */
 export function createOptimisticUpdate<T>(
   queryClient: QueryClient,
-  queryKey: any[],
+  queryKey: readonly unknown[],
   updater: (old: T | undefined) => T
 ) {
   return {
