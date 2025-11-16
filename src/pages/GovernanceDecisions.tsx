@@ -9,6 +9,7 @@ import { useGovernanceDecisions } from "@/hooks/useGovernanceDecisions";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EnhancedEmptyState } from "@/components/shared/EnhancedEmptyState";
 import { Database } from "@/integrations/supabase/types";
+import type { GovernanceDecision } from "@/types/governance";
 
 type GovernanceDecisionRow = Database['public']['Tables']['governance_decisions']['Row'];
 
@@ -65,7 +66,7 @@ export default function GovernanceDecisions() {
               {activeDecisions.length === 0 ? (
                 <EnhancedEmptyState icon={Vote} title="لا توجد قرارات نشطة" description="القرارات النشطة ستظهر هنا" />
               ) : (
-                activeDecisions.map(decision => <DecisionCard key={decision.id} decision={decision as any} />)
+                activeDecisions.map(decision => <DecisionCard key={decision.id} decision={decision as unknown as GovernanceDecision} />)
               )}
             </TabsContent>
             
@@ -73,7 +74,7 @@ export default function GovernanceDecisions() {
               {completedDecisions.length === 0 ? (
                 <EnhancedEmptyState icon={Vote} title="لا توجد قرارات منفذة" description="القرارات المنفذة ستظهر هنا" />
               ) : (
-                completedDecisions.map(decision => <DecisionCard key={decision.id} decision={decision as any} />)
+                completedDecisions.map(decision => <DecisionCard key={decision.id} decision={decision as unknown as GovernanceDecision} />)
               )}
             </TabsContent>
             
@@ -81,7 +82,7 @@ export default function GovernanceDecisions() {
               {rejectedDecisions.length === 0 ? (
                 <EnhancedEmptyState icon={Vote} title="لا توجد قرارات مرفوضة" description="القرارات المرفوضة ستظهر هنا" />
               ) : (
-                rejectedDecisions.map(decision => <DecisionCard key={decision.id} decision={decision as any} />)
+                rejectedDecisions.map(decision => <DecisionCard key={decision.id} decision={decision as unknown as GovernanceDecision} />)
               )}
             </TabsContent>
           </Tabs>

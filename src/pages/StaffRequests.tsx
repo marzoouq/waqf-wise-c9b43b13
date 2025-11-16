@@ -37,11 +37,7 @@ import {
 import { formatDistanceToNow } from "date-fns";
 import { ar } from "date-fns/locale";
 import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
-import { Database } from '@/integrations/supabase/types';
-
-type BeneficiaryRequest = Database['public']['Tables']['beneficiary_requests']['Row'] & {
-  beneficiary?: { full_name?: string };
-};
+import type { BeneficiaryRequest } from '@/types/index';
 
 export default function StaffRequests() {
   const { requests, isLoading } = useRequests();

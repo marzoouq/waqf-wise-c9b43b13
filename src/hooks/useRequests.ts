@@ -48,13 +48,8 @@ export const useRequests = (beneficiaryId?: string) => {
         .from('beneficiary_requests')
         .select(`
           *,
-          request_type:request_types(*),
-          beneficiary:beneficiaries(
-            id,
-            full_name,
-            national_id,
-            phone
-          )
+          request_type:request_types(name, icon),
+          beneficiary:beneficiaries(full_name)
         `)
         .order('submitted_at', { ascending: false });
 
@@ -65,7 +60,7 @@ export const useRequests = (beneficiaryId?: string) => {
       const { data, error } = await query;
 
       if (error) throw error;
-      return data as unknown as BeneficiaryRequest[];
+      return data as BeneficiaryRequest[];
     },
   });
 
@@ -78,14 +73,14 @@ export const useRequests = (beneficiaryId?: string) => {
           .from('beneficiary_requests')
           .select(`
             *,
-            request_type:request_types(*),
-            beneficiary:beneficiaries(*)
+            request_type:request_types(name, icon),
+            beneficiary:beneficiaries(full_name)
           `)
           .eq('id', requestId)
           .maybeSingle();
 
         if (error) throw error;
-        return data as unknown as BeneficiaryRequest | null;
+        return data as BeneficiaryRequest | null;
       },
       enabled: !!requestId,
     });

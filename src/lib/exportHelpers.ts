@@ -12,7 +12,7 @@ const configureArabicPDF = (doc: jsPDF) => {
 export const exportToPDF = (
   title: string,
   headers: string[],
-  data: any[][],
+  data: (string | number | boolean | null | undefined)[][],
   filename: string
 ) => {
   const doc = new jsPDF();
@@ -53,7 +53,7 @@ export const exportToPDF = (
 };
 
 export const exportToExcel = (
-  data: any[],
+  data: Record<string, unknown>[],
   filename: string,
   sheetName: string = "Sheet1"
 ) => {
@@ -65,12 +65,13 @@ export const exportToExcel = (
   const maxWidth = data.reduce((acc, row) => {
     Object.keys(row).forEach((key) => {
       const value = String(row[key] || "");
-      acc[key] = Math.max(acc[key] || 10, value.length);
+      const currentMax = typeof acc[key] === 'number' ? acc[key] as number : 10;
+      acc[key] = Math.max(currentMax, value.length);
     });
     return acc;
   }, {} as Record<string, number>);
 
-  worksheet["!cols"] = Object.values(maxWidth).map((w: number) => ({ wch: w + 2 }));
+  worksheet["!cols"] = Object.values(maxWidth).map((w) => ({ wch: (w as number) + 2 }));
 
   XLSX.writeFile(workbook, `${filename}.xlsx`);
 };

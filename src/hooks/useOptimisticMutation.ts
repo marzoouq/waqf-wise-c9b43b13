@@ -1,21 +1,21 @@
-import { useMutation, useQueryClient, UseMutationOptions } from '@tanstack/react-query';
+import { useMutation, useQueryClient, UseMutationOptions, QueryKey } from '@tanstack/react-query';
 import { useToast } from './use-toast';
 
-type OptimisticContext = { previousData: any };
+type OptimisticContext<TCacheData = unknown> = { previousData: TCacheData };
 
-interface OptimisticMutationOptions<TData, TVariables> extends Omit<UseMutationOptions<TData, Error, TVariables, OptimisticContext>, 'onMutate' | 'onError' | 'onSettled' | 'onSuccess'> {
-  queryKey: any[];
-  updateCache?: (oldData: any, variables: TVariables) => any;
+interface OptimisticMutationOptions<TData, TVariables, TCacheData = unknown> extends Omit<UseMutationOptions<TData, Error, TVariables, OptimisticContext<TCacheData>>, 'onMutate' | 'onError' | 'onSettled' | 'onSuccess'> {
+  queryKey: QueryKey;
+  updateCache?: (oldData: TCacheData, variables: TVariables) => TCacheData;
   successMessage?: string;
   errorMessage?: string;
-  onSuccess?: (data: TData, variables: TVariables, context: OptimisticContext) => void;
+  onSuccess?: (data: TData, variables: TVariables, context: OptimisticContext<TCacheData>) => void;
 }
 
 /**
  * Hook للتحديثات التفاؤلية (Optimistic Updates)
  * يحدث الـ UI فوراً قبل إرسال الطلب للسيرفر
  */
-export function useOptimisticMutation<TData = unknown, TVariables = void>({
+export function useOptimisticMutation<TData = unknown, TVariables = void, TCacheData = unknown>({
   queryKey,
   updateCache,
   successMessage,
@@ -23,11 +23,11 @@ export function useOptimisticMutation<TData = unknown, TVariables = void>({
   mutationFn,
   onSuccess,
   ...options
-}: OptimisticMutationOptions<TData, TVariables>) {
+}: OptimisticMutationOptions<TData, TVariables, TCacheData>) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  return useMutation<TData, Error, TVariables, OptimisticContext>({
+  return useMutation<TData, Error, TVariables, OptimisticContext<TCacheData>>({
     mutationFn,
     
     // قبل إرسال الطلب
@@ -36,14 +36,14 @@ export function useOptimisticMutation<TData = unknown, TVariables = void>({
       await queryClient.cancelQueries({ queryKey });
 
       // حفظ البيانات القديمة للرجوع إليها في حالة الفشل
-      const previousData = queryClient.getQueryData(queryKey);
+      const previousData = queryClient.getQueryData<TCacheData>(queryKey);
 
       // تحديث الـ cache بالبيانات الجديدة (Optimistic)
       if (updateCache && previousData) {
-        queryClient.setQueryData(queryKey, (old: TData) => updateCache(old, variables));
+        queryClient.setQueryData(queryKey, updateCache(previousData, variables));
       }
 
-      return { previousData };
+      return { previousData: previousData as TCacheData };
     },
 
     // في حالة النجاح

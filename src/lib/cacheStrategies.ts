@@ -119,7 +119,7 @@ export function setupSmartCacheCleanup(queryClient: QueryClient) {
  */
 export async function prefetchNextPage<T>(
   queryClient: QueryClient,
-  queryKey: any[],
+  queryKey: readonly unknown[],
   fetchFn: () => Promise<T>
 ) {
   await queryClient.prefetchQuery({

@@ -14,6 +14,7 @@ interface DocumentPreviewDialogProps {
     name: string;
     file_type: string;
     file_path: string;
+    [key: string]: unknown;
   } | null;
 }
 
