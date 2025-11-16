@@ -72,7 +72,7 @@ export function useAdvancedSearch(searchType: string) {
     tableName: string,
     columns: string = '*',
     customFilters?: SearchFilters
-  ): Promise<any[]> => {
+  ): Promise<unknown[]> => {
     let dbQuery = (supabase as any).from(tableName).select(columns);
 
     const searchFilters = customFilters || filters;
