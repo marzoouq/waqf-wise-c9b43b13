@@ -115,11 +115,12 @@ export function useChatbot() {
       setIsTyping(false);
       queryClient.invalidateQueries({ queryKey: ["chatbot_conversations"] });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       setIsTyping(false);
+      const errorMessage = error instanceof Error ? error.message : "حدث خطأ أثناء إرسال الرسالة";
       toast({
         title: "خطأ في الإرسال",
-        description: error.message || "حدث خطأ أثناء إرسال الرسالة",
+        description: errorMessage,
         variant: "destructive",
       });
     },
@@ -144,10 +145,11 @@ export function useChatbot() {
         description: "تم مسح سجل المحادثات بنجاح",
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      const errorMessage = error instanceof Error ? error.message : "فشل في مسح سجل المحادثات";
       toast({
         title: "خطأ",
-        description: error.message || "فشل في مسح سجل المحادثات",
+        description: errorMessage,
         variant: "destructive",
       });
     },

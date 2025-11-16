@@ -15,7 +15,7 @@ export function useSupportStats() {
         .from('support_tickets')
         .select('status')
         .then(result => {
-          const statusCounts = result.data?.reduce((acc: any, ticket: any) => {
+          const statusCounts = result.data?.reduce((acc: Record<string, number>, ticket: { status: string }) => {
             acc[ticket.status] = (acc[ticket.status] || 0) + 1;
             return acc;
           }, {}) || {};
@@ -28,7 +28,7 @@ export function useSupportStats() {
         .from('support_tickets')
         .select('category')
         .then(result => {
-          const categoryCounts = result.data?.reduce((acc: any, ticket: any) => {
+          const categoryCounts = result.data?.reduce((acc: Record<string, number>, ticket: { category: string }) => {
             acc[ticket.category] = (acc[ticket.category] || 0) + 1;
             return acc;
           }, {}) || {};
@@ -41,7 +41,7 @@ export function useSupportStats() {
         .from('support_tickets')
         .select('priority')
         .then(result => {
-          const priorityCounts = result.data?.reduce((acc: any, ticket: any) => {
+          const priorityCounts = result.data?.reduce((acc: Record<string, number>, ticket: { priority: string }) => {
             acc[ticket.priority] = (acc[ticket.priority] || 0) + 1;
             return acc;
           }, {}) || {};

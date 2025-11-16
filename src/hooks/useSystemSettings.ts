@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { createMutationErrorHandler } from "@/lib/errorHandling";
 
 export interface SystemSetting {
   id: string;
@@ -46,13 +47,10 @@ export function useSystemSettings() {
         description: "تم تحديث الإعداد بنجاح",
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: "خطأ",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
+    onError: createMutationErrorHandler({ 
+      context: 'update_system_settings',
+      toastTitle: "خطأ"
+    }),
   });
 
   const getSetting = (key: string): string | undefined => {

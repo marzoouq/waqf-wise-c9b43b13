@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { createMutationErrorHandler } from "@/lib/errorHandling";
 
 export interface SavedSearch {
   id: string;
@@ -56,13 +57,10 @@ export function useSavedSearches() {
         description: "تم حفظ البحث بنجاح",
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: "خطأ في الحفظ",
-        description: error.message || "حدث خطأ أثناء حفظ البحث",
-        variant: "destructive",
-      });
-    },
+    onError: createMutationErrorHandler({ 
+      context: 'save_search',
+      toastTitle: "خطأ في الحفظ"
+    }),
   });
 
   const deleteSearch = useMutation({
@@ -81,13 +79,10 @@ export function useSavedSearches() {
         description: "تم حذف البحث المحفوظ بنجاح",
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: "خطأ في الحذف",
-        description: error.message || "حدث خطأ أثناء حذف البحث",
-        variant: "destructive",
-      });
-    },
+    onError: createMutationErrorHandler({ 
+      context: 'delete_search',
+      toastTitle: "خطأ في الحذف"
+    }),
   });
 
   const updateUsage = useMutation({

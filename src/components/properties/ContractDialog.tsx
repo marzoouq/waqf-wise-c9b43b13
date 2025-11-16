@@ -20,6 +20,7 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
   const { properties } = useProperties();
 
   const [formData, setFormData] = useState({
+    contract_number: "",
     property_id: "",
     tenant_name: "",
     tenant_phone: "",
@@ -41,6 +42,7 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
   useEffect(() => {
     if (contract) {
       setFormData({
+        contract_number: contract.contract_number,
         property_id: contract.property_id,
         tenant_name: contract.tenant_name,
         tenant_phone: contract.tenant_phone,
@@ -58,6 +60,11 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
         terms_and_conditions: contract.terms_and_conditions || "",
         notes: contract.notes || "",
       });
+    } else {
+      // Generate contract number for new contracts
+      const date = new Date();
+      const contractNumber = `C-${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}-${Date.now().toString().slice(-4)}`;
+      setFormData(prev => ({ ...prev, contract_number: contractNumber }));
     }
   }, [contract]);
 
@@ -81,7 +88,10 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
   };
 
   const resetForm = () => {
+    const date = new Date();
+    const contractNumber = `C-${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}-${Date.now().toString().slice(-4)}`;
     setFormData({
+      contract_number: contractNumber,
       property_id: "",
       tenant_name: "",
       tenant_phone: "",

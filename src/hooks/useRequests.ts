@@ -4,6 +4,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useTasks } from '@/hooks/useTasks';
 import type { BeneficiaryRequest, RequestType } from '@/types';
 import { logger } from '@/lib/logger';
+import { createMutationErrorHandler } from '@/lib/errorHandling';
 
 // ===========================
 // Request Types Hook
@@ -103,9 +104,9 @@ export const useRequests = (beneficiaryId?: string) => {
         .single();
 
       if (error) throw error;
-      return data;
+      return data as unknown as BeneficiaryRequest;
     },
-    onSuccess: async (data: any) => {
+    onSuccess: async (data: BeneficiaryRequest) => {
       queryClient.invalidateQueries({ queryKey: ['requests'] });
       
       // إنشاء مهمة للمراجعة
@@ -126,13 +127,7 @@ export const useRequests = (beneficiaryId?: string) => {
         description: 'تم إرسال الطلب بنجاح',
       });
     },
-    onError: (error: Error) => {
-      toast({
-        title: 'خطأ',
-        description: error.message,
-        variant: 'destructive',
-      });
-    },
+    onError: createMutationErrorHandler({ context: 'add_request' }),
   });
 
   // Update request
@@ -155,13 +150,7 @@ export const useRequests = (beneficiaryId?: string) => {
         description: 'تم تحديث الطلب بنجاح',
       });
     },
-    onError: (error: Error) => {
-      toast({
-        title: 'خطأ',
-        description: error.message,
-        variant: 'destructive',
-      });
-    },
+    onError: createMutationErrorHandler({ context: 'update_request' }),
   });
 
   // Delete request
@@ -181,13 +170,7 @@ export const useRequests = (beneficiaryId?: string) => {
         description: 'تم حذف الطلب بنجاح',
       });
     },
-    onError: (error: Error) => {
-      toast({
-        title: 'خطأ',
-        description: error.message,
-        variant: 'destructive',
-      });
-    },
+    onError: createMutationErrorHandler({ context: 'delete_request' }),
   });
 
   // Approve/Reject request

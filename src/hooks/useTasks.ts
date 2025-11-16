@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { TOAST_MESSAGES } from "@/lib/constants";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";
+import { createMutationErrorHandler } from "@/lib/errorHandling";
 
 export interface Task {
   id: string;
@@ -51,13 +52,10 @@ export function useTasks() {
         description: "تم إضافة المهمة بنجاح",
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: TOAST_MESSAGES.ERROR.ADD,
-        description: error.message || "حدث خطأ أثناء إضافة المهمة",
-        variant: "destructive",
-      });
-    },
+    onError: createMutationErrorHandler({ 
+      context: 'add_task',
+      toastTitle: TOAST_MESSAGES.ERROR.ADD
+    }),
   });
 
   const updateTask = useMutation({
@@ -79,13 +77,10 @@ export function useTasks() {
         description: "تم تحديث المهمة بنجاح",
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: TOAST_MESSAGES.ERROR.UPDATE,
-        description: error.message || "حدث خطأ أثناء تحديث المهمة",
-        variant: "destructive",
-      });
-    },
+    onError: createMutationErrorHandler({ 
+      context: 'update_task',
+      toastTitle: TOAST_MESSAGES.ERROR.UPDATE
+    }),
   });
 
   return {

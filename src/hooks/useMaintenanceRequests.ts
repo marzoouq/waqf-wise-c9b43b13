@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { createMutationErrorHandler } from "@/lib/errorHandling";
+import type { MaintenanceRequestInsert, MaintenanceRequestUpdate } from "@/types/maintenance";
 import { useJournalEntries } from "./useJournalEntries";
 import { useTasks } from "@/hooks/useTasks";
 import { useEffect } from "react";
@@ -78,10 +80,11 @@ export const useMaintenanceRequests = () => {
   });
 
   const addRequest = useMutation({
-    mutationFn: async (request: any) => {
+    mutationFn: async (request: Omit<MaintenanceRequestInsert, 'request_number'>) => {
+      const requestNumber = `MR-${Date.now().toString().slice(-8)}`;
       const { data, error } = await supabase
         .from("maintenance_requests")
-        .insert([request])
+        .insert([{ ...request, request_number: requestNumber }])
         .select()
         .single();
 
@@ -109,14 +112,7 @@ export const useMaintenanceRequests = () => {
         description: "تم إضافة طلب الصيانة بنجاح",
       });
     },
-    onError: (error) => {
-      toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء إضافة الطلب",
-        variant: "destructive",
-      });
-      logger.error(error, { context: 'add_maintenance_request', severity: 'medium' });
-    },
+    onError: createMutationErrorHandler({ context: 'add_maintenance_request' }),
   });
 
   const updateRequest = useMutation({

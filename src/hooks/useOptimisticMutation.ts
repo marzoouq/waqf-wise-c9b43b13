@@ -40,7 +40,7 @@ export function useOptimisticMutation<TData = unknown, TVariables = void>({
 
       // تحديث الـ cache بالبيانات الجديدة (Optimistic)
       if (updateCache && previousData) {
-        queryClient.setQueryData(queryKey, (old: any) => updateCache(old, variables));
+        queryClient.setQueryData(queryKey, (old: TData) => updateCache(old, variables));
       }
 
       return { previousData };

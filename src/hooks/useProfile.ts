@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { TOAST_MESSAGES, QUERY_STALE_TIME } from "@/lib/constants";
 import { useAuth } from "./useAuth";
+import { createMutationErrorHandler } from "@/lib/errorHandling";
 
 export interface Profile {
   id: string;
@@ -61,13 +62,10 @@ export function useProfile() {
         description: "تم تحديث الملف الشخصي بنجاح",
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: TOAST_MESSAGES.ERROR.UPDATE,
-        description: error.message || "حدث خطأ أثناء تحديث الملف الشخصي",
-        variant: "destructive",
-      });
-    },
+    onError: createMutationErrorHandler({ 
+      context: 'update_profile',
+      toastTitle: TOAST_MESSAGES.ERROR.UPDATE
+    }),
   });
 
   return {
