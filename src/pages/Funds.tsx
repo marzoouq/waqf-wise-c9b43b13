@@ -23,23 +23,16 @@ const Funds = () => {
   const { funds, isLoading: fundsLoading } = useFunds();
   const { createAutoEntry } = useJournalEntries();
 
-  const handleDistribute = async (data: {
-    month: string;
-    totalAmount: number;
-    waqfUnit: string;
-    beneficiaryIds: string[];
-    nazerFee?: number;
-    maintenanceFee?: number;
-    investmentFee?: number;
-  }) => {
+  const handleDistribute = async (data: Record<string, unknown>) => {
     try {
       const dbData = {
         month: `${data.month} 1446`,
-        total_amount: data.totalAmount,
-        beneficiaries_count: data.beneficiaries,
+        total_amount: data.totalAmount as number,
+        waqf_unit_id: data.waqfUnit as string,
+        beneficiaries_count: (data.beneficiaryIds as string[])?.length || 0,
         status: "معلق",
         distribution_date: new Date().toISOString().split('T')[0],
-        notes: data.notes || null,
+        notes: (data.notes as string) || null,
       };
       
       const result = await addDistribution(dbData);
@@ -49,7 +42,7 @@ const Funds = () => {
         'distribution_created',
         result.id,
         Number(data.totalAmount),
-        `توزيع ${data.month} - ${data.beneficiaries} مستفيد`,
+        `توزيع ${data.month} - ${(data.beneficiaryIds as string[])?.length || 0} مستفيد`,
         dbData.distribution_date
       );
 

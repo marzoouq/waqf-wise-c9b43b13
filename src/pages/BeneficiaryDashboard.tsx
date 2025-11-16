@@ -26,6 +26,7 @@ import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layou
 import { useToast } from "@/hooks/use-toast";
 import { Beneficiary } from "@/types/beneficiary";
 import { logger } from "@/lib/logger";
+import { Database } from '@/integrations/supabase/types';
 
 interface Request {
   id: string;
@@ -78,12 +79,9 @@ const BeneficiaryDashboard = () => {
     fetchRequests();
   }, [user?.id, beneficiary?.id]);
 
-import { Database } from '@/integrations/supabase/types';
-
-// ... existing imports
-
+  // Create request mutation
   const createRequestMutation = useMutation({
-    mutationFn: async (newRequest: Record<string, unknown>) => {
+    mutationFn: async (newRequest: Database['public']['Tables']['beneficiary_requests']['Insert']) => {
       const { data, error } = await supabase
         .from("beneficiary_requests")
         .insert(newRequest)
@@ -132,16 +130,13 @@ import { Database } from '@/integrations/supabase/types';
     }
   };
 
-  const handleLoanRequest = async (data: { description: string; amount: number; term_months: number }) => {
+  const handleLoanRequest = async (data: Record<string, unknown>) => {
     try {
       await createRequestMutation.mutateAsync({
         beneficiary_id: beneficiary?.id || "",
         request_type_id: "loan",
-        description: `طلب قرض: ${data.description}`,
-        amount: data.loan_amount,
-        loan_amount: data.loan_amount,
-        loan_term_months: data.loan_term_months,
-        loan_reason: data.loan_reason,
+        description: (data.description as string) || `طلب قرض بمبلغ ${data.amount}`,
+        amount: (data.amount as number) || (data.loan_amount as number),
         priority: "عادية",
         status: "قيد المراجعة",
       });
@@ -156,8 +151,7 @@ import { Database } from '@/integrations/supabase/types';
       await createRequestMutation.mutateAsync({
         beneficiary_id: beneficiary?.id || "",
         request_type_id: "data-update",
-        description: `طلب تحديث ${data.update_type}: ${data.description}`,
-        new_data: JSON.stringify(data),
+        description: `طلب تحديث البيانات: ${JSON.stringify(data)}`,
         priority: "عادية",
         status: "قيد المراجعة",
       });
@@ -172,8 +166,7 @@ import { Database } from '@/integrations/supabase/types';
       await createRequestMutation.mutateAsync({
         beneficiary_id: beneficiary?.id || "",
         request_type_id: "add-family-member",
-        description: `طلب إضافة فرد: ${data.member_name} (${data.relationship})`,
-        new_data: JSON.stringify(data),
+        description: `طلب إضافة فرد جديد للعائلة: ${JSON.stringify(data)}`,
         priority: "عادية",
         status: "قيد المراجعة",
       });

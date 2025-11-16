@@ -32,6 +32,9 @@ import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import { LoadingState } from '@/components/shared/LoadingState';
 import type { SupportFilters } from '@/types/support';
+import { Database } from '@/integrations/supabase/types';
+
+type SupportTicket = Database['public']['Tables']['support_tickets']['Row'];
 
 const statusLabels = {
   open: 'مفتوحة',
@@ -50,7 +53,7 @@ export default function SupportManagement() {
   const { tickets, isLoading } = useSupportTickets(filters);
   const { overviewStats, overdueTickets, recentTickets, overviewLoading } = useSupportStats();
 
-  const handleFilterChange = (key: keyof SupportFilters, value: any) => {
+  const handleFilterChange = (key: keyof SupportFilters, value: string | string[] | undefined) => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
 
@@ -169,7 +172,7 @@ export default function SupportManagement() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
-                      {overdueTickets.slice(0, 5).map((ticket: any) => (
+                      {overdueTickets.slice(0, 5).map((ticket) => (
                         <div
                           key={ticket.id}
                           className="flex items-center justify-between p-3 bg-muted/50 rounded-lg cursor-pointer hover:bg-muted"
@@ -200,7 +203,7 @@ export default function SupportManagement() {
                 <CardContent>
                   <div className="space-y-2">
                     {recentTickets && recentTickets.length > 0 ? (
-                      recentTickets.slice(0, 5).map((ticket: any) => (
+                      recentTickets.slice(0, 5).map((ticket) => (
                         <div
                           key={ticket.id}
                           className="flex items-center justify-between p-3 bg-muted/50 rounded-lg cursor-pointer hover:bg-muted"
@@ -276,7 +279,7 @@ export default function SupportManagement() {
                   <LoadingState message="جاري تحميل التذاكر..." />
                 ) : tickets && tickets.length > 0 ? (
                   <div className="space-y-2">
-                    {tickets.map((ticket: any) => (
+                    {tickets.map((ticket) => (
                       <div
                         key={ticket.id}
                         className="flex items-center justify-between p-4 border rounded-lg cursor-pointer hover:bg-muted/50"
@@ -330,7 +333,7 @@ export default function SupportManagement() {
                       (() => {
                         const resolved = Number(overviewStats.ticketsByStatus.resolved || 0);
                         const closed = Number(overviewStats.ticketsByStatus.closed || 0);
-                        const total = Object.values(overviewStats.ticketsByStatus).reduce((a: any, b: any) => Number(a) + Number(b), 0);
+                        const total = Object.values(overviewStats.ticketsByStatus).reduce((a, b) => Number(a) + Number(b), 0);
                         return Number(total) > 0 ? `${Math.round(((resolved + closed) / Number(total)) * 100)}%` : '0%';
                       })() : 
                       '0%'}
@@ -371,8 +374,8 @@ export default function SupportManagement() {
             <CardContent>
               {overviewStats?.ticketsByCategory ? (
                 <div className="space-y-3">
-                  {Object.entries(overviewStats.ticketsByCategory).map(([category, count]: [string, any]) => {
-                    const maxCount = Math.max(...Object.values(overviewStats.ticketsByCategory).map((v: any) => Number(v)));
+                  {Object.entries(overviewStats.ticketsByCategory).map(([category, count]) => {
+                    const maxCount = Math.max(...Object.values(overviewStats.ticketsByCategory).map((v) => Number(v)));
                     const percentage = maxCount > 0 ? (Number(count) / maxCount) * 100 : 0;
                     return (
                       <div key={category} className="flex items-center justify-between">
@@ -411,8 +414,8 @@ export default function SupportManagement() {
             <CardContent>
               {overviewStats?.ticketsByPriority ? (
                 <div className="space-y-3">
-                  {Object.entries(overviewStats.ticketsByPriority).map(([priority, count]: [string, any]) => {
-                    const maxCount = Math.max(...Object.values(overviewStats.ticketsByPriority).map((v: any) => Number(v)));
+                  {Object.entries(overviewStats.ticketsByPriority).map(([priority, count]) => {
+                    const maxCount = Math.max(...Object.values(overviewStats.ticketsByPriority).map((v) => Number(v)));
                     const percentage = maxCount > 0 ? (Number(count) / maxCount) * 100 : 0;
                     return (
                       <div key={priority} className="flex items-center justify-between">
