@@ -62,7 +62,8 @@ export function AccountStatementView({
       payment.status,
     ]);
 
-    (doc as any).autoTable({
+    // @ts-expect-error - jspdf-autotable types
+    doc.autoTable({
       startY: 80,
       head: [["التاريخ", "النوع", "الوصف", "المبلغ", "الحالة"]],
       body: tableData,
@@ -71,7 +72,8 @@ export function AccountStatementView({
     });
 
     // Footer
-    const finalY = (doc as any).lastAutoTable?.finalY ?? 80;
+    // @ts-expect-error - jspdf-autotable types
+    const finalY = doc.lastAutoTable?.finalY ?? 80;
     doc.setFontSize(10);
     doc.text(
       `تاريخ الإصدار: ${format(new Date(), "dd MMMM yyyy - HH:mm", { locale: ar })}`,

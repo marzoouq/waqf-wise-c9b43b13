@@ -38,7 +38,7 @@ export function SmartSearchDialog({ open, onOpenChange }: SmartSearchDialogProps
           </DialogTitle>
         </DialogHeader>
 
-        <Tabs value={searchType} onValueChange={(v) => setSearchType(v as any)} className="w-full">
+        <Tabs value={searchType} onValueChange={(v) => setSearchType(v as 'text' | 'tags' | 'ocr')} className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="text" className="flex items-center gap-2">
               <FileText className="h-4 w-4" />

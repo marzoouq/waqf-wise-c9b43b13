@@ -79,7 +79,7 @@ export function LoansAgingReport() {
           return {
             loan_id: loan.id,
             loan_number: loan.loan_number,
-            beneficiary_name: (loan.beneficiaries as any).full_name,
+            beneficiary_name: loan.beneficiaries?.full_name || 'غير محدد',
             principal_amount: Number(loan.loan_amount),
             total_paid: totalPaid,
             remaining_balance: remainingBalance,

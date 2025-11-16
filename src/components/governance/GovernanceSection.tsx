@@ -20,11 +20,11 @@ export function GovernanceSection() {
   const { decisions, isLoading } = useGovernanceDecisions();
 
   // حساب إحصائيات سريعة
-  const activeDecisions = (decisions as any[]).filter(d => 
+  const activeDecisions = decisions.filter(d => 
     d.decision_status === 'قيد التصويت'
   ).length;
   
-  const pendingVotes = (decisions as any[]).filter(d => 
+  const pendingVotes = decisions.filter(d => 
     d.decision_status === 'قيد التصويت' && !d.voting_completed
   ).length;
 

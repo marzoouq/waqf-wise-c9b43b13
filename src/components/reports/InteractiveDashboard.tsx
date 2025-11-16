@@ -135,7 +135,7 @@ export function InteractiveDashboard() {
             </SelectContent>
           </Select>
 
-          <Select value={chartType} onValueChange={(v) => setChartType(v as any)}>
+          <Select value={chartType} onValueChange={(v) => setChartType(v as 'bar' | 'line' | 'pie')}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="نوع الرسم" />
             </SelectTrigger>
