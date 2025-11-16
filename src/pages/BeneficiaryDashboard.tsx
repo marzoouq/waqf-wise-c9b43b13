@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { DollarSign, FileText, Calendar, TrendingUp, MessageSquare, AlertCircle, Wallet, Upload, UserCog, UserPlus } from "lucide-react";
+import { DollarSign, FileText, Calendar, TrendingUp, MessageSquare, AlertCircle, Wallet, Upload, UserCog, UserPlus, Bell } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { useAuth } from "@/hooks/useAuth";
@@ -20,6 +20,9 @@ import { useBeneficiaryAttachments } from "@/hooks/useBeneficiaryAttachments";
 import { AccountStatementView } from "@/components/beneficiary/AccountStatementView";
 import { BeneficiaryCertificate } from "@/components/beneficiary/BeneficiaryCertificate";
 import { InternalMessagesDialog } from "@/components/messages/InternalMessagesDialog";
+import { QuickActionsCard } from "@/components/beneficiary/QuickActionsCard";
+import { NotificationsCard } from "@/components/beneficiary/NotificationsCard";
+import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
 import { useToast } from "@/hooks/use-toast";
 import { Beneficiary } from "@/types/beneficiary";
 import { logger } from "@/lib/logger";
@@ -216,75 +219,92 @@ const BeneficiaryDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-3 md:p-6 space-y-4 md:space-y-8">
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-xl md:text-3xl font-bold text-gradient-primary">مرحباً، {beneficiary.full_name}</h1>
-              {beneficiary.beneficiary_number && (
-                <Badge variant="secondary" className="text-xs md:text-sm whitespace-nowrap">
-                  {beneficiary.beneficiary_number}
-                </Badge>
-              )}
-            </div>
-            <p className="text-sm md:text-base text-muted-foreground">عرض المدفوعات والتقارير الشخصية</p>
-          </div>
-          <Button onClick={() => setMessagesDialogOpen(true)} variant="outline" size="sm" className="w-full md:w-auto">
-            <MessageSquare className="h-4 w-4 ml-2" />
-            الرسائل
-          </Button>
-        </header>
+    <MobileOptimizedLayout>
+      <div className="space-y-4">
+        <MobileOptimizedHeader
+          title={`مرحباً، ${beneficiary.full_name}`}
+          description="لوحة التحكم الشخصية"
+          actions={
+            <Button onClick={() => setMessagesDialogOpen(true)} variant="outline" size="sm">
+              <MessageSquare className="h-4 w-4 ml-2" />
+              الرسائل
+            </Button>
+          }
+        />
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+        {/* الإحصائيات السريعة */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <Card>
-            <CardHeader className="pb-2 md:pb-3">
+            <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-xs md:text-sm">إجمالي المدفوعات</CardTitle>
-                <DollarSign className="h-4 w-4 md:h-5 md:w-5 text-primary" />
+                <DollarSign className="h-4 w-4 text-primary" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-lg md:text-2xl font-bold text-primary">{stats.totalPayments.toLocaleString("ar-SA")} ر.س</div>
+              <div className="text-lg md:text-2xl font-bold text-primary">
+                {stats.totalPayments.toLocaleString("ar-SA")} ر.س
+              </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader className="pb-2 md:pb-3">
+            <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-xs md:text-sm">عدد المدفوعات</CardTitle>
-                <FileText className="h-4 w-4 md:h-5 md:w-5 text-success" />
+                <FileText className="h-4 w-4 text-green-600" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-lg md:text-2xl font-bold text-success">{stats.paymentsCount}</div>
+              <div className="text-lg md:text-2xl font-bold text-green-600">
+                {stats.paymentsCount}
+              </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader className="pb-2 md:pb-3">
+            <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-xs md:text-sm">آخر دفعة</CardTitle>
-                <Calendar className="h-4 w-4 md:h-5 md:w-5 text-accent" />
+                <Calendar className="h-4 w-4 text-blue-600" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-sm md:text-lg font-bold text-accent">{stats.lastPaymentDate}</div>
+              <div className="text-sm md:text-lg font-bold text-blue-600">
+                {stats.lastPaymentDate}
+              </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader className="pb-2 md:pb-3">
+            <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-xs md:text-sm">متوسط الدفعة</CardTitle>
-                <TrendingUp className="h-4 w-4 md:h-5 md:w-5 text-warning" />
+                <TrendingUp className="h-4 w-4 text-amber-600" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-lg md:text-2xl font-bold text-warning">{stats.averagePayment.toLocaleString("ar-SA", { maximumFractionDigits: 0 })} ر.س</div>
+              <div className="text-lg md:text-2xl font-bold text-amber-600">
+                {stats.averagePayment.toLocaleString("ar-SA")} ر.س
+              </div>
             </CardContent>
           </Card>
         </div>
+
+        {/* الإجراءات السريعة */}
+        <QuickActionsCard
+          onEmergencyRequest={() => setActiveRequestTab("emergency")}
+          onLoanRequest={() => setActiveRequestTab("loan")}
+          onDataUpdate={() => setActiveRequestTab("data-update")}
+          onAddFamily={() => setActiveRequestTab("add-family")}
+          onUploadDocument={() => setUploadDialogOpen(true)}
+          onMessages={() => setMessagesDialogOpen(true)}
+        />
+
+        {/* الإشعارات */}
+        <NotificationsCard />
+
+        {/* الطلبات والخدمات */}
 
         <Card>
           <CardHeader>
