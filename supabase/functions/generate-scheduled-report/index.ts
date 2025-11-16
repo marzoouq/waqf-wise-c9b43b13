@@ -42,7 +42,17 @@ serve(async (req) => {
         console.log(`Processing job: ${job.id}`);
 
         // تنفيذ التقرير بناءً على نوعه
-        let reportData: any = {};
+        interface ReportData {
+          transactions?: unknown[] | null;
+          beneficiaries?: unknown[] | null;
+          properties?: unknown[] | null;
+          summary: {
+            count?: number;
+            total?: number;
+          };
+        }
+        
+        let reportData: ReportData = { summary: {} };
         const template = job.report_template;
 
         if (template.report_type === 'financial') {
@@ -77,7 +87,13 @@ serve(async (req) => {
         };
 
         // إرسال التقرير للمستلمين
-        const recipients = job.recipients as any[];
+        interface Recipient {
+          user_id: string;
+          email: string;
+          name?: string;
+        }
+        
+        const recipients = (job.recipients || []) as Recipient[];
         for (const recipient of recipients) {
           if (job.delivery_method === 'email' || job.delivery_method === 'both') {
             // إرسال بريد إلكتروني
