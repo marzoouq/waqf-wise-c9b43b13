@@ -25,6 +25,7 @@ export interface SearchCriteria {
   priorityLevel?: string;
   gender?: string;
   maritalStatus?: string;
+  [key: string]: string | undefined;
 }
 
 export function AdvancedSearchDialog({ open, onOpenChange, onSearch }: AdvancedSearchDialogProps) {

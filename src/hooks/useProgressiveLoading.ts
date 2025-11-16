@@ -22,7 +22,7 @@ interface ProgressiveLoadingOptions {
  *   orderBy: 'created_at',
  * });
  */
-export const useProgressiveLoading = <T = any>({
+export const useProgressiveLoading = <T = unknown>({
   table,
   pageSize = 20,
   orderBy = 'created_at',
@@ -43,17 +43,18 @@ export const useProgressiveLoading = <T = any>({
       const to = from + pageSize - 1;
 
       // استعلام مبسط بدون أنواع معقدة
-      // @ts-expect-error - Dynamic table name
-      const { data: result, error: queryError, count } = await supabase
-        .from(table)
+      const query = supabase
+        .from(table as 'beneficiaries')
         .select('*', { count: 'exact' })
         .range(from, to)
         .order(orderBy, { ascending: orderDirection === 'asc' });
 
+      const { data: result, error: queryError, count } = await query;
+
       if (queryError) throw queryError;
 
       return {
-        data: (result || []) as T[],
+        data: (result || []) as unknown as T[],
         nextPage: (pageParam + 1) * pageSize < (count || 0) ? pageParam + 1 : undefined,
         count: count || 0,
       };

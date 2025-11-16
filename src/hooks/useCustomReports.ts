@@ -165,6 +165,7 @@ export function useCustomReports() {
       if (config.filters) {
         Object.entries(config.filters).forEach(([key, value]) => {
           if (value !== null && value !== undefined) {
+            // @ts-expect-error - Dynamic filter application
             queryBuilder = queryBuilder.eq(key, value);
           }
         });
