@@ -65,8 +65,8 @@ export function usePayments() {
   const addPayment = useMutation({
     mutationFn: async (payment: Omit<Payment, "id" | "created_at" | "updated_at">) => {
       // التحقق من حاجة المدفوعة للموافقة
-      const { data: requiresApproval } = await supabase.rpc(
-        'payment_requires_approval' as never,
+      const { data: requiresApproval } = await (supabase.rpc as any)(
+        'payment_requires_approval',
         { p_amount: payment.amount }
       );
 

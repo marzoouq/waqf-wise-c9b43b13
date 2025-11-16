@@ -48,14 +48,14 @@ export function useInternalMessages() {
   const { data: inboxMessages = [], isLoading: isLoadingInbox } = useQuery({
     queryKey: ["internal_messages", "inbox", user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("internal_messages")
         .select("*")
         .eq("receiver_id", user?.id)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as unknown as InternalMessage[];
+      return data as InternalMessage[];
     },
     enabled: !!user?.id,
   });
@@ -64,14 +64,14 @@ export function useInternalMessages() {
   const { data: sentMessages = [], isLoading: isLoadingSent } = useQuery({
     queryKey: ["internal_messages", "sent", user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("internal_messages")
         .select("*")
         .eq("sender_id", user?.id)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as unknown as InternalMessage[];
+      return data as InternalMessage[];
     },
     enabled: !!user?.id,
   });
@@ -79,7 +79,7 @@ export function useInternalMessages() {
   // إرسال رسالة
   const sendMessage = useMutation({
     mutationFn: async (message: Omit<InternalMessage, "id" | "created_at" | "is_read" | "read_at">) => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("internal_messages")
         .insert([message])
         .select()
@@ -107,7 +107,7 @@ export function useInternalMessages() {
   // تعليم رسالة كمقروءة
   const markAsRead = useMutation({
     mutationFn: async (messageId: string) => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("internal_messages")
         .update({ is_read: true, read_at: new Date().toISOString() })
         .eq("id", messageId)
