@@ -244,31 +244,31 @@ export function MaintenanceCostReport() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="rounded-lg border">
+          <div className="rounded-lg border overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>العقار</TableHead>
-                  <TableHead>التكلفة الإجمالية</TableHead>
-                  <TableHead>المكتمل</TableHead>
-                  <TableHead>المعلق</TableHead>
-                  <TableHead>متوسط التكلفة</TableHead>
+                  <TableHead className="text-xs sm:text-sm">العقار</TableHead>
+                  <TableHead className="text-xs sm:text-sm whitespace-nowrap">التكلفة الإجمالية</TableHead>
+                  <TableHead className="text-xs sm:text-sm hidden md:table-cell">المكتمل</TableHead>
+                  <TableHead className="text-xs sm:text-sm hidden md:table-cell">المعلق</TableHead>
+                  <TableHead className="text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">متوسط التكلفة</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {maintenanceData?.map((maintenance) => (
                   <TableRow key={maintenance.property_id}>
-                    <TableCell className="font-medium">{maintenance.property_name}</TableCell>
-                    <TableCell className="font-bold">
+                    <TableCell className="font-medium text-xs sm:text-sm">{maintenance.property_name}</TableCell>
+                    <TableCell className="font-bold text-xs sm:text-sm whitespace-nowrap">
                       {maintenance.total_cost.toLocaleString('ar-SA')} ريال
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-xs sm:text-sm hidden md:table-cell">
                       <Badge variant="secondary">{maintenance.completed_count}</Badge>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-xs sm:text-sm hidden md:table-cell">
                       <Badge variant="outline">{maintenance.pending_count}</Badge>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">
                       {maintenance.avg_cost.toLocaleString('ar-SA')} ريال
                     </TableCell>
                   </TableRow>
