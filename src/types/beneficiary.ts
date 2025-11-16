@@ -1,5 +1,17 @@
 import { Database } from "@/integrations/supabase/types";
 
+// Notification preferences interface
+export interface NotificationPreferences {
+  [key: string]: boolean | undefined;
+  email?: boolean;
+  sms?: boolean;
+  push?: boolean;
+  whatsapp?: boolean;
+  payment_alerts?: boolean;
+  request_updates?: boolean;
+  general_announcements?: boolean;
+}
+
 // Full Beneficiary interface for application use
 export interface Beneficiary {
   id: string;
@@ -38,7 +50,7 @@ export interface Beneficiary {
   number_of_wives: number | null;
   employment_status: string | null;
   housing_type: string | null;
-  notification_preferences: any;
+  notification_preferences: NotificationPreferences | null;
   last_notification_at: string | null;
   beneficiary_number: string | null;
   created_at: string;

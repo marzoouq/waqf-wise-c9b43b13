@@ -99,7 +99,8 @@ export default function Loans() {
   };
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, { variant: any; icon: any; label: string }> = {
+    type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
+    const variants: Record<string, { variant: BadgeVariant; icon: React.ComponentType<any>; label: string }> = {
       pending: {
         variant: "secondary",
         icon: Clock,

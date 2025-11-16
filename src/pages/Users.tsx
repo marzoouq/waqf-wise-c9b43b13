@@ -17,6 +17,9 @@ import { Switch } from "@/components/ui/switch";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
+import { Database } from "@/integrations/supabase/types";
+
+type AppRole = Database['public']['Enums']['app_role'];
 
 interface UserProfile {
   id: string;
@@ -30,8 +33,6 @@ interface UserProfile {
   created_at: string;
   user_roles?: Array<{ role: string }>;
 }
-
-type AppRole = "nazer" | "admin" | "accountant" | "cashier" | "archivist" | "beneficiary" | "user";
 
 const roleLabels: Record<AppRole, string> = {
   nazer: "الناظر",
@@ -146,7 +147,7 @@ const Users = () => {
       // إضافة الأدوار الجديدة
       const rolesToInsert = roles.map(role => ({ 
         user_id: userId, 
-        role: role as any 
+        role: role
       }));
 
       const { error } = await supabase

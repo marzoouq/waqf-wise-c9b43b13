@@ -22,6 +22,9 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { format } from "date-fns";
 import { commonValidation } from "@/lib/validationSchemas";
+import { Database } from "@/integrations/supabase/types";
+
+type Payment = Database['public']['Tables']['payments']['Row'];
 
 const paymentSchema = z.object({
   payment_type: z.enum(["receipt", "payment"], {
@@ -44,7 +47,7 @@ type PaymentFormValues = z.infer<typeof paymentSchema>;
 interface PaymentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  payment?: any;
+  payment?: Payment | null;
   onSave: (data: PaymentFormValues) => Promise<void>;
 }
 
@@ -57,11 +60,11 @@ export function PaymentDialog({
   const form = useForm<PaymentFormValues>({
     resolver: zodResolver(paymentSchema),
     defaultValues: {
-      payment_type: payment?.payment_type || "receipt",
+      payment_type: (payment?.payment_type as "receipt" | "payment") || "receipt",
       payment_number: payment?.payment_number || "",
       payment_date: payment?.payment_date || format(new Date(), "yyyy-MM-dd"),
       amount: payment?.amount || 0,
-      payment_method: payment?.payment_method || "cash",
+      payment_method: (payment?.payment_method as "cash" | "bank_transfer" | "cheque" | "card") || "cash",
       payer_name: payment?.payer_name || "",
       reference_number: payment?.reference_number || "",
       description: payment?.description || "",

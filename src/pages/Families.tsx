@@ -35,6 +35,13 @@ import {
 import FamilyDialog from '@/components/families/FamilyDialog';
 import { Family } from '@/types';
 import { toast } from 'sonner';
+import { Database } from '@/integrations/supabase/types';
+
+type FamilyWithHead = Family & {
+  head_of_family?: {
+    full_name: string;
+  };
+};
 import { ScrollableTableWrapper } from '@/components/shared/ScrollableTableWrapper';
 import { MobileScrollHint } from '@/components/shared/MobileScrollHint';
 import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
@@ -226,7 +233,7 @@ const Families = () => {
                     <TableRow key={family.id} className="hover:bg-muted/50">
                       <TableCell className="font-medium">{family.family_name}</TableCell>
                       <TableCell>
-                        {(family as any).head_of_family?.full_name || '-'}
+                        {(family as FamilyWithHead).head_of_family?.full_name || '-'}
                       </TableCell>
                       <TableCell>{family.tribe || '-'}</TableCell>
                       <TableCell>
