@@ -8,7 +8,8 @@ import { useBankAccounts } from "@/hooks/useBankAccounts";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, XCircle, Upload } from "lucide-react";
+import { BankStatementRow } from "@/types/supabase-helpers";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 
@@ -20,8 +21,11 @@ interface BankReconciliationDialogProps {
 import { BankAccountRow } from "@/types/supabase-helpers";
 
 export function BankReconciliationDialog({ open, onOpenChange }: BankReconciliationDialogProps) {
-  const { createStatement } = useBankReconciliation();
+  const { statements, transactions, createStatement, addTransaction, matchTransaction, reconcileStatement } = useBankReconciliation();
   const { bankAccounts, isLoading: loadingBankAccounts } = useBankAccounts();
+  
+  const [step, setStep] = useState<"select" | "import" | "match">("select");
+  const [selectedStatement, setSelectedStatement] = useState<{ id: string; bank_account_id: string } | null>(null);
   
   const [newStatement, setNewStatement] = useState({
     bank_account_id: "",
@@ -48,6 +52,20 @@ export function BankReconciliationDialog({ open, onOpenChange }: BankReconciliat
     onOpenChange(false);
   };
 
+  const handleImportTransactions = async (csvData: Array<{ date: string; description: string; reference: string; amount: string; type: string }>) => {
+    for (const row of csvData) {
+      await addTransaction({
+        statement_id: selectedStatement.id,
+        transaction_date: row.date,
+        description: row.description,
+        reference_number: row.reference,
+        amount: parseFloat(row.amount),
+        transaction_type: row.type,
+        is_matched: false,
+      });
+    }
+    setStep("match");
+  };
 
   return (
     <ResponsiveDialog 
@@ -115,6 +133,48 @@ export function BankReconciliationDialog({ open, onOpenChange }: BankReconciliat
             <Button onClick={handleCreateStatement} className="w-full">
               إنشاء كشف الحساب
             </Button>
+
+            <div className="pt-6">
+              <h3 className="text-lg font-semibold mb-4">كشوف الحساب السابقة</h3>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>التاريخ</TableHead>
+                    <TableHead>الحساب</TableHead>
+                    <TableHead>الرصيد الافتتاحي</TableHead>
+                    <TableHead>الرصيد الختامي</TableHead>
+                    <TableHead>الحالة</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {statements.map((statement) => (
+                    <TableRow key={statement.id}>
+                      <TableCell>
+                        {format(new Date(statement.statement_date), "dd/MM/yyyy", { locale: ar })}
+                      </TableCell>
+                      <TableCell>
+                        {statement.bank_accounts?.bank_name} - {statement.bank_accounts?.account_number}
+                      </TableCell>
+                      <TableCell>{statement.opening_balance.toLocaleString('ar-SA')}</TableCell>
+                      <TableCell>{statement.closing_balance.toLocaleString('ar-SA')}</TableCell>
+                      <TableCell>
+                        {statement.status === 'reconciled' ? (
+                          <Badge variant="default" className="gap-1">
+                            <CheckCircle className="h-3 w-3" />
+                            مسوى
+                          </Badge>
+                        ) : (
+                          <Badge variant="secondary" className="gap-1">
+                            <XCircle className="h-3 w-3" />
+                            غير مسوى
+                          </Badge>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </div>
         )}
     </ResponsiveDialog>

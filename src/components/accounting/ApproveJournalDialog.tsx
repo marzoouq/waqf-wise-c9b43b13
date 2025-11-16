@@ -22,8 +22,6 @@ export function ApproveJournalDialog({ open, onOpenChange, approval }: ApproveJo
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleApprove = async () => {
-    if (!approval) return;
-    
     try {
       setIsSubmitting(true);
 
@@ -73,8 +71,6 @@ export function ApproveJournalDialog({ open, onOpenChange, approval }: ApproveJo
   };
 
   const handleReject = async () => {
-    if (!approval) return;
-    
     if (!notes.trim()) {
       toast({
         title: "خطأ",
