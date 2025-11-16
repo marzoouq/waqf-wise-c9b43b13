@@ -1,41 +1,82 @@
-import { useState, useEffect } from "react";
+import { useCallback } from 'react';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+
+interface ProgressiveLoadingOptions {
+  table: string;
+  pageSize?: number;
+  orderBy?: string;
+  orderDirection?: 'asc' | 'desc';
+  filters?: Record<string, any>;
+}
 
 /**
- * Progressive Loading Hook
- * Loads large datasets incrementally to improve perceived performance
- * @param data - Array of data to load progressively
- * @param batchSize - Number of items to load per batch (default: 20)
- * @returns Object with displayedData and isLoading state
+ * Hook محسّن للتحميل التدريجي (Progressive Loading)
+ * يستخدم Infinite Query لتحميل البيانات على دفعات
+ * 
+ * @example
+ * const { data, loadMore, hasMore, isLoading } = useProgressiveLoading({
+ *   table: 'beneficiaries',
+ *   pageSize: 20,
+ *   orderBy: 'created_at',
+ * });
  */
-export function useProgressiveLoading<T>(
-  data: T[] | undefined,
-  batchSize: number = 20
-) {
-  const [displayedData, setDisplayedData] = useState<T[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+export const useProgressiveLoading = <T = any>({
+  table,
+  pageSize = 20,
+  orderBy = 'created_at',
+  orderDirection = 'desc',
+  filters = {},
+}: ProgressiveLoadingOptions) => {
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    error,
+  } = useInfiniteQuery({
+    queryKey: [table, 'progressive', filters, orderBy, orderDirection],
+    queryFn: async ({ pageParam = 0 }) => {
+      const from = pageParam * pageSize;
+      const to = from + pageSize - 1;
 
-  useEffect(() => {
-    if (!data) return;
+      // استعلام مبسط بدون أنواع معقدة
+      const { data: result, error: queryError, count } = await supabase
+        .from(table as any)
+        .select('*', { count: 'exact' })
+        .range(from, to)
+        .order(orderBy, { ascending: orderDirection === 'asc' });
 
-    let currentIndex = 0;
-    setDisplayedData([]);
-    setIsLoading(true);
+      if (queryError) throw queryError;
 
-    const loadBatch = () => {
-      const nextBatch = data.slice(currentIndex, currentIndex + batchSize);
-      setDisplayedData(prev => [...prev, ...nextBatch]);
-      currentIndex += batchSize;
+      return {
+        data: (result || []) as T[],
+        nextPage: (pageParam + 1) * pageSize < (count || 0) ? pageParam + 1 : undefined,
+        count: count || 0,
+      };
+    },
+    getNextPageParam: (lastPage) => lastPage.nextPage,
+    initialPageParam: 0,
+  });
 
-      if (currentIndex < data.length) {
-        // Load next batch after a short delay
-        setTimeout(loadBatch, 50);
-      } else {
-        setIsLoading(false);
-      }
-    };
+  const loadMore = useCallback(() => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
-    loadBatch();
-  }, [data, batchSize]);
+  // تجميع البيانات من جميع الصفحات
+  const allData = data?.pages.flatMap((page) => page.data) ?? [];
+  const totalCount = data?.pages[0]?.count ?? 0;
 
-  return { displayedData, isLoading };
-}
+  return {
+    data: allData,
+    totalCount,
+    loadMore,
+    hasMore: hasNextPage,
+    isLoading,
+    isFetchingNextPage,
+    error,
+  };
+};
