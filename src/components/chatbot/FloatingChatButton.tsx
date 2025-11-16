@@ -107,8 +107,8 @@ export function FloatingChatButton() {
           </div>
 
           {/* واجهة الشات */}
-          <div className="h-[calc(100%-60px)]">
-            <ChatbotInterface />
+          <div className="h-[calc(100%-60px)] flex flex-col">
+            <ChatbotInterface compact />
           </div>
         </DialogContent>
       </Dialog>

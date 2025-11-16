@@ -11,7 +11,11 @@ import { ChatbotActions } from "./ChatbotActions";
 import { WelcomeMessage } from "./WelcomeMessage";
 import { QuickActionsBar } from "./QuickActionsBar";
 
-export function ChatbotInterface() {
+interface ChatbotInterfaceProps {
+  compact?: boolean;
+}
+
+export function ChatbotInterface({ compact = false }: ChatbotInterfaceProps) {
   const { conversations, quickReplies, quickActions, isLoading, isTyping, sendMessage, clearConversations, hasConversations } = useChatbot();
   const [message, setMessage] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -46,34 +50,44 @@ export function ChatbotInterface() {
   };
 
 
-  return (
-    <Card className="w-full h-[calc(100vh-12rem)] flex flex-col shadow-xl border-border/50 bg-card">
-      <CardHeader className="bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground border-b">
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-3">
-            <div className="p-2 bg-primary-foreground/10 rounded-lg backdrop-blur-sm">
-              <Bot className="h-6 w-6" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                مساعد الوقف الذكي
-                <Sparkles className="h-4 w-4 animate-pulse" />
-              </div>
-              <p className="text-xs font-normal text-primary-foreground/80 mt-1">
-                مدعوم بتقنية الذكاء الاصطناعي
-              </p>
-            </div>
-          </CardTitle>
-          
-          <ChatbotActions
-            conversations={conversations}
-            onClearHistory={clearConversations}
-            hasConversations={hasConversations}
-          />
-        </div>
-      </CardHeader>
+  const containerClass = compact 
+    ? "w-full h-full flex flex-col bg-transparent" 
+    : "w-full h-[calc(100vh-12rem)] flex flex-col shadow-xl border-border/50 bg-card";
 
-      <CardContent className="flex-1 flex flex-col p-0 bg-muted/30">
+  const Container = compact ? 'div' : Card;
+  const Header = compact ? 'div' : CardHeader;
+  const Content = compact ? 'div' : CardContent;
+
+  return (
+    <Container className={containerClass}>
+      {!compact && (
+        <Header className="bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground border-b">
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-3">
+              <div className="p-2 bg-primary-foreground/10 rounded-lg backdrop-blur-sm">
+                <Bot className="h-6 w-6" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  مساعد الوقف الذكي
+                  <Sparkles className="h-4 w-4 animate-pulse" />
+                </div>
+                <p className="text-xs font-normal text-primary-foreground/80 mt-1">
+                  مدعوم بتقنية الذكاء الاصطناعي
+                </p>
+              </div>
+            </CardTitle>
+            
+            <ChatbotActions
+              conversations={conversations}
+              onClearHistory={clearConversations}
+              hasConversations={hasConversations}
+            />
+          </div>
+        </Header>
+      )}
+
+      <Content className="flex-1 flex flex-col p-0 bg-muted/30">
         {/* منطقة الرسائل */}
         <ScrollArea ref={scrollRef} className="flex-1 p-4">
           <div className="space-y-4 pb-4">
@@ -179,7 +193,7 @@ export function ChatbotInterface() {
             اضغط Enter للإرسال • يعمل بتقنية الذكاء الاصطناعي 🤖
           </p>
         </div>
-      </CardContent>
-    </Card>
+      </Content>
+    </Container>
   );
 }
