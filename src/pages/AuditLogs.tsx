@@ -24,6 +24,7 @@ import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { cleanFilters } from '@/utils/cleanFilters';
 
 const AuditLogs = () => {
   const [filters, setFilters] = useState({
@@ -34,7 +35,7 @@ const AuditLogs = () => {
     endDate: "",
   });
 
-  const { data: logs, isLoading } = useAuditLogs(filters);
+  const { data: logs, isLoading } = useAuditLogs(cleanFilters(filters));
 
   const exportLogs = () => {
     if (!logs || logs.length === 0) {
