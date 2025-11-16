@@ -71,13 +71,7 @@ export default function Support() {
   return (
     <MainLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">الدعم الفني</h1>
-            <p className="text-muted-foreground">
-              مركز الدعم والمساعدة
-            </p>
-          </div>
+        <div className="flex items-center justify-end">
           <Button onClick={() => setCreateDialogOpen(true)}>
             <Plus className="h-4 w-4 ml-2" />
             تذكرة جديدة

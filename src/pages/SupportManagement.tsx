@@ -65,17 +65,14 @@ export default function SupportManagement() {
   return (
     <MainLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">إدارة الدعم الفني</h1>
-            <p className="text-muted-foreground">لوحة تحكم شاملة لإدارة التذاكر والدعم الفني</p>
-          </div>
+        <div className="flex items-center justify-end">
           <Button variant="outline" onClick={() => setSettingsOpen(true)}>
             <Settings className="h-4 w-4 ml-2" />
             إعدادات التعيين
           </Button>
         </div>
-      <AgentAvailabilityCard />
+        
+        <AgentAvailabilityCard />
 
       <Tabs defaultValue="overview" className="space-y-6">
         <TabsList>
