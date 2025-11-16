@@ -89,15 +89,23 @@ export function ChatbotInterface() {
               />
             ))}
 
-            {/* مؤشر "الروبوت يكتب..." */}
+            {/* مؤشر الكتابة المحسّن */}
             {isTyping && (
-              <div className="flex gap-2 items-start justify-start">
-                <div className="p-2 bg-primary/10 rounded-full mt-1">
-                  <Bot className="h-4 w-4 text-primary" />
+              <div className="flex gap-3 justify-start mb-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg animate-pulse">
+                    <Bot className="h-5 w-5 text-primary-foreground" />
+                  </div>
                 </div>
-                <div className="bg-card border border-border rounded-2xl rounded-bl-sm p-4 max-w-[85%] flex items-center gap-3 shadow-sm">
-                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                  <span className="text-sm text-muted-foreground">يكتب الرد...</span>
+                <div className="bg-gradient-to-br from-muted to-muted/80 rounded-2xl rounded-bl-sm px-6 py-4 shadow-sm border border-border/50">
+                  <div className="flex items-center gap-2">
+                    <div className="flex gap-1.5">
+                      <div className="w-2.5 h-2.5 bg-primary rounded-full animate-bounce" />
+                      <div className="w-2.5 h-2.5 bg-primary rounded-full animate-bounce [animation-delay:0.2s]" />
+                      <div className="w-2.5 h-2.5 bg-primary rounded-full animate-bounce [animation-delay:0.4s]" />
+                    </div>
+                    <span className="text-xs text-muted-foreground mr-2">المساعد يكتب...</span>
+                  </div>
                 </div>
               </div>
             )}
@@ -106,59 +114,61 @@ export function ChatbotInterface() {
           </div>
         </ScrollArea>
 
-        {/* الردود السريعة */}
+        {/* الردود السريعة المحسّنة */}
         {quickReplies.length > 0 && (
-          <div className="p-4 border-t border-border bg-card/50 backdrop-blur-sm">
-            <p className="text-xs text-muted-foreground mb-3 font-medium">ردود سريعة:</p>
+          <div className="px-6 py-4 border-t bg-gradient-to-br from-muted/50 to-muted/30 backdrop-blur-sm">
+            <div className="flex items-center gap-2 mb-3">
+              <Sparkles className="h-4 w-4 text-primary animate-pulse" />
+              <p className="text-sm font-semibold text-foreground">اختصارات ذكية:</p>
+            </div>
             <div className="flex flex-wrap gap-2">
-              {quickReplies.map((reply) => (
-                <Button
+              {quickReplies.map((reply, index) => (
+                <button
                   key={reply.id}
-                  variant="outline"
-                  size="sm"
                   onClick={() => handleQuickReply(reply)}
                   disabled={isTyping}
-                  className="text-xs hover:bg-primary hover:text-primary-foreground transition-colors border-border/50"
+                  className="group px-4 py-2.5 text-sm rounded-xl bg-gradient-to-br from-background to-background/80 hover:from-primary hover:to-primary/90 hover:text-primary-foreground transition-all duration-300 border-2 border-border hover:border-primary shadow-sm hover:shadow-lg hover:scale-105 animate-in fade-in slide-in-from-bottom-2 duration-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{ animationDelay: `${index * 50}ms` }}
                 >
-                  <span className="mr-1">{reply.icon}</span>
+                  <span className="ml-2 group-hover:scale-110 inline-block transition-transform">{reply.icon}</span>
                   {reply.text}
-                </Button>
+                </button>
               ))}
             </div>
           </div>
         )}
 
-        {/* حقل الإدخال */}
-        <div className="p-4 border-t border-border bg-background">
+        {/* حقل الإدخال المحسّن */}
+        <div className="p-6 border-t bg-gradient-to-br from-background to-muted/20 backdrop-blur-sm">
           <form 
             onSubmit={(e) => {
               e.preventDefault();
               handleSendMessage();
             }}
-            className="flex gap-2"
+            className="flex gap-3"
           >
             <Input
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="اكتب رسالتك هنا..."
+              placeholder="✨ اكتب سؤالك هنا وسأساعدك فوراً..."
               disabled={isTyping}
-              className="flex-1 bg-muted/50 border-border/50 focus-visible:ring-primary"
+              className="flex-1 h-12 px-5 text-base rounded-xl border-2 border-border/50 focus:border-primary bg-background/80 backdrop-blur-sm shadow-sm transition-all duration-300 focus:shadow-lg"
             />
             <Button
               type="submit"
               disabled={isTyping || !message.trim()}
               size="icon"
-              className="flex-shrink-0"
+              className="h-12 w-12 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 bg-gradient-to-br from-primary to-primary/90"
             >
               {isTyping ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
-                <Send className="h-4 w-4" />
+                <Send className="h-5 w-5" />
               )}
             </Button>
           </form>
-          <p className="text-xs text-muted-foreground mt-2 text-center">
-            اضغط Enter للإرسال
+          <p className="text-xs text-muted-foreground mt-3 text-center">
+            اضغط Enter للإرسال • يعمل بتقنية الذكاء الاصطناعي 🤖
           </p>
         </div>
       </CardContent>

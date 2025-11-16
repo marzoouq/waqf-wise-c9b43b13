@@ -24,23 +24,25 @@ export function FloatingChatButton() {
 
   return (
     <>
-      {/* الزر العائم */}
+      {/* الزر العائم المحسّن */}
       <Button
         onClick={() => setIsOpen(true)}
         className={cn(
-          "fixed bottom-6 left-6 h-14 w-14 rounded-full shadow-2xl z-50",
-          "bg-gradient-to-br from-primary to-primary/80",
-          "hover:scale-110 transition-all duration-300",
-          "border-2 border-primary-foreground/20",
-          "group"
+          "fixed bottom-6 left-6 h-16 w-16 rounded-full shadow-2xl z-50",
+          "bg-gradient-to-br from-primary via-primary/90 to-primary/80",
+          "hover:scale-110 hover:rotate-12 transition-all duration-300",
+          "border-4 border-primary-foreground/30",
+          "ring-4 ring-primary/20 ring-offset-2",
+          "group animate-bounce hover:animate-none"
         )}
         size="icon"
       >
-        <Bot className="h-6 w-6 group-hover:animate-pulse" />
-        <span className="absolute -top-1 -right-1 flex h-3 w-3">
+        <Bot className="h-7 w-7 group-hover:animate-pulse text-primary-foreground" />
+        <span className="absolute -top-2 -right-2 flex h-4 w-4">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+          <span className="relative inline-flex rounded-full h-4 w-4 bg-green-500 border-2 border-white shadow-lg"></span>
         </span>
+        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary to-primary/50 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-300" />
       </Button>
 
       {/* نافذة الشات */}
