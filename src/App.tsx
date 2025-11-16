@@ -38,6 +38,8 @@ const Funds = lazy(() => import("./pages/Funds"));
 const Archive = lazy(() => import("./pages/Archive"));
 const Accounting = lazy(() => import("./pages/Accounting"));
 const Reports = lazy(() => import("./pages/Reports"));
+const ReportBuilder = lazy(() => import("./pages/ReportBuilder"));
+const ReportsDashboard = lazy(() => import("./pages/ReportsDashboard"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Invoices = lazy(() => import("./pages/Invoices"));
 const Approvals = lazy(() => import("./pages/Approvals"));
@@ -52,7 +54,6 @@ const Families = lazy(() => import("./pages/Families"));
 const Users = lazy(() => import("./pages/Users"));
 const AuditLogs = lazy(() => import("./pages/AuditLogs"));
 const AIInsights = lazy(() => import("./pages/AIInsights"));
-const ReportBuilder = lazy(() => import("./pages/ReportBuilder"));
 const Chatbot = lazy(() => import("./pages/Chatbot"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -236,8 +237,9 @@ const App = () => {
           />
           <Route path="/loans" element={<Loans />} />
           <Route path="/waqf-units" element={<WaqfUnits />} />
-          <Route path="/reports" element={<Reports />} />
-          <Route path="/report-builder" element={<ReportBuilder />} />
+            <Route path="/reports" element={<Reports />} />
+            <Route path="/report-builder" element={<ReportBuilder />} />
+            <Route path="/reports-dashboard" element={<ReportsDashboard />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/requests" element={<Requests />} />
