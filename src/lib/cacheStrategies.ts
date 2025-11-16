@@ -88,7 +88,7 @@ export const paginatedListStrategy = {
   refetchOnMount: false,
   refetchOnWindowFocus: false,
   // React Query v5: keepPreviousData removed, use placeholderData instead
-  placeholderData: (previousData: any) => previousData,
+  placeholderData: (previousData: unknown) => previousData,
 };
 
 /**
@@ -147,9 +147,9 @@ export function createOptimisticUpdate<T>(
       
       return { previousData };
     },
-    onError: (_err: any, _variables: any, context: any) => {
-      if (context?.previousData) {
-        queryClient.setQueryData(queryKey, context.previousData);
+    onError: (_err: unknown, _variables: unknown, context: unknown) => {
+      if (context && typeof context === 'object' && 'previousData' in context) {
+        queryClient.setQueryData(queryKey, (context as { previousData: T }).previousData);
       }
     },
     onSettled: () => {

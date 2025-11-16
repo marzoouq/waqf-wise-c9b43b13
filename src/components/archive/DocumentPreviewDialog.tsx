@@ -51,7 +51,7 @@ export function DocumentPreviewDialog({
       URL.revokeObjectURL(url);
 
       toast.success('تم تحميل الملف بنجاح');
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error(error, { context: 'download_document', severity: 'medium' });
       toast.error('فشل تحميل الملف');
     } finally {

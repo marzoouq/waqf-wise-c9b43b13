@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { Database } from "@/integrations/supabase/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Search, FolderOpen, FileText, Download, Upload, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -45,17 +46,17 @@ const Archive = () => {
     );
   }, [documents, searchQuery]);
 
-  const handleUploadDocument = async (data: any) => {
+  const handleUploadDocument = async (data: Omit<Database['public']['Tables']['documents']['Insert'], 'id' | 'created_at'>) => {
     await addDocument(data);
     setUploadDialogOpen(false);
   };
 
-  const handleCreateFolder = async (data: any) => {
+  const handleCreateFolder = async (data: Database['public']['Tables']['folders']['Insert']) => {
     await addFolder(data);
     setFolderDialogOpen(false);
   };
 
-  const handlePreviewDocument = (document: any) => {
+  const handlePreviewDocument = (document: Database['public']['Tables']['documents']['Row']) => {
     setSelectedDocument(document);
     setPreviewDialogOpen(true);
   };

@@ -7,11 +7,12 @@ import { createMutationErrorHandler } from "@/lib/errorHandling";
 export interface Document {
   id: string;
   name: string;
-  description?: string;
+  description: string;
   file_type: string;
   file_size: string;
+  file_size_bytes: number;
   category: string;
-  folder_id?: string;
+  folder_id: string;
   uploaded_at: string;
   created_at: string;
 }

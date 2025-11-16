@@ -18,7 +18,7 @@ export const DEVTOOLS_CONFIG = {
 // إضافة أدوات تحكم في console للمطورين
 if (import.meta.env.DEV) {
   // دالة لفتح/إغلاق DevTools
-  (window as any).toggleQueryDevtools = () => {
+  (window as Window & { toggleQueryDevtools?: () => void }).toggleQueryDevtools = () => {
     console.log('💡 React Query DevTools مفعّل');
     console.log('📊 يمكنك مراقبة:');
     console.log('  • جميع الـ Queries (استعلامات البيانات)');
@@ -30,7 +30,7 @@ if (import.meta.env.DEV) {
   };
   
   // دالة لعرض معلومات QueryClient
-  (window as any).getQueryClientInfo = () => {
+  (window as Window & { getQueryClientInfo?: () => void }).getQueryClientInfo = () => {
     console.log('📊 معلومات QueryClient:');
     console.log('  • staleTime: 5 دقائق');
     console.log('  • gcTime: 10 دقائق');
@@ -40,7 +40,7 @@ if (import.meta.env.DEV) {
   };
   
   // دالة لعرض جميع الـ queries النشطة
-  (window as any).showActiveQueries = () => {
+  (window as Window & { showActiveQueries?: () => void }).showActiveQueries = () => {
     console.log('🔄 للاطلاع على الـ queries النشطة، افتح React Query DevTools');
   };
   

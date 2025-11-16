@@ -78,10 +78,11 @@ export function AddReceiptDialog({ open, onOpenChange }: AddReceiptDialogProps) 
       
       form.reset();
       onOpenChange(false);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'فشل إضافة سند القبض';
       toast({
         title: "خطأ",
-        description: error.message || "حدث خطأ أثناء الحفظ",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

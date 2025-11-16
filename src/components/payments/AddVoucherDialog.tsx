@@ -78,10 +78,11 @@ export function AddVoucherDialog({ open, onOpenChange }: AddVoucherDialogProps) 
       
       form.reset();
       onOpenChange(false);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'فشل إضافة سند الصرف';
       toast({
         title: "خطأ",
-        description: error.message || "حدث خطأ أثناء الحفظ",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

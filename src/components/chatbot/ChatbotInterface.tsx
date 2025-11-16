@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { Database } from "@/integrations/supabase/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,7 +39,7 @@ export function ChatbotInterface({ compact = false }: ChatbotInterfaceProps) {
     }
   };
 
-  const handleQuickReply = async (reply: any) => {
+  const handleQuickReply = async (reply: Database['public']['Tables']['chatbot_quick_replies']['Row']) => {
     try {
       await sendMessage({ 
         message: reply.prompt, 
