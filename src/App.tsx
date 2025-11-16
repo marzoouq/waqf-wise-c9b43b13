@@ -56,6 +56,8 @@ const Chatbot = lazy(() => import("./pages/Chatbot"));
 const Support = lazy(() => import("./pages/Support"));
 const SupportManagement = lazy(() => import("./pages/SupportManagement"));
 const AdvancedSettings = lazy(() => import("./pages/AdvancedSettings"));
+const GovernanceDecisions = lazy(() => import("./pages/GovernanceDecisions"));
+const DecisionDetails = lazy(() => import("./pages/DecisionDetails"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Configure QueryClient with optimized defaults and error handling
@@ -277,6 +279,42 @@ const App = () => {
               </ProtectedRoute>
             } 
           />
+                {/* Governance Routes */}
+                <Route 
+                  path="/governance/decisions" 
+                  element={
+                    <ProtectedRoute requiredRoles={["admin", "nazer", "beneficiary"]}>
+                      <GovernanceDecisions />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/governance/decisions/:id" 
+                  element={
+                    <ProtectedRoute requiredRoles={["admin", "nazer", "beneficiary"]}>
+                      <DecisionDetails />
+                    </ProtectedRoute>
+                  } 
+                />
+                
+                {/* Governance */}
+                <Route 
+                  path="/governance/decisions" 
+                  element={
+                    <ProtectedRoute requiredRoles={["admin", "nazer", "beneficiary"]}>
+                      <GovernanceDecisions />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/governance/decisions/:id" 
+                  element={
+                    <ProtectedRoute requiredRoles={["admin", "nazer", "beneficiary"]}>
+                      <DecisionDetails />
+                    </ProtectedRoute>
+                  } 
+                />
+                
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
