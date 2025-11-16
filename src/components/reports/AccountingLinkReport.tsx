@@ -217,7 +217,17 @@ export function AccountingLinkReport() {
       op.journalEntry || "-",
     ]);
 
-    (doc as any).autoTable({
+    interface AutoTableDoc extends jsPDF {
+      autoTable: (options: {
+        head: string[][];
+        body: string[][];
+        startY: number;
+        styles: { font: string; halign: string };
+        headStyles: { fillColor: number[] };
+      }) => void;
+    }
+
+    (doc as AutoTableDoc).autoTable({
       head: [["النوع", "الرقم", "الوصف", "المبلغ", "التاريخ", "رقم القيد"]],
       body: tableData,
       startY: 40,

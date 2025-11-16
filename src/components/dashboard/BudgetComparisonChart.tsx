@@ -57,7 +57,16 @@ const BudgetComparisonChart = () => {
 
       if (error) throw error;
 
-      const chartData: BudgetComparison[] = budgets?.map((budget: any) => ({
+      interface BudgetData {
+        accounts: {
+          name_ar: string;
+        };
+        budgeted_amount: number;
+        actual_amount: number;
+        variance_amount: number;
+      }
+
+      const chartData: BudgetComparison[] = budgets?.map((budget: BudgetData) => ({
         account: budget.accounts.name_ar.substring(0, 15) + '...',
         budgeted: Number(budget.budgeted_amount || 0),
         actual: Number(budget.actual_amount || 0),

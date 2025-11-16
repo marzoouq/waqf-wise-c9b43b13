@@ -37,7 +37,7 @@ const RequestsStats = () => {
   const approvedRequests = requests.filter(r => r.status === 'موافق');
   const rejectedRequests = requests.filter(r => r.status === 'مرفوض');
   const needsApproval = requests.filter(r => 
-    r.status === 'قيد المراجعة' && (r.request_type as any)?.requires_approval
+    r.status === 'قيد المراجعة'
   );
 
   const sevenDaysAgo = new Date();

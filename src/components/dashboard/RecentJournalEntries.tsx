@@ -25,12 +25,13 @@ const RecentJournalEntries = memo(() => {
   });
 
   const getStatusBadge = useCallback((status: string) => {
-    const variants: Record<string, { label: string; variant: any }> = {
+    type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
+    const variants: Record<string, { label: string; variant: BadgeVariant }> = {
       draft: { label: "مسودة", variant: "secondary" },
       posted: { label: "مرحّل", variant: "default" },
       cancelled: { label: "ملغى", variant: "destructive" },
     };
-    const config = variants[status] || { label: status, variant: "outline" };
+    const config = variants[status] || { label: status, variant: "outline" as BadgeVariant };
     return <Badge variant={config.variant}>{config.label}</Badge>;
   }, []);
 

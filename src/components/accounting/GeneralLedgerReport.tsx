@@ -70,7 +70,8 @@ const GeneralLedgerReport = () => {
       if (error) throw error;
 
       let balance = 0;
-      const processedData: GeneralLedgerEntry[] = data.map((line: any, index: number) => {
+      
+      const processedData: GeneralLedgerEntry[] = data.map((line, index: number) => {
         const debit = Number(line.debit_amount);
         const credit = Number(line.credit_amount);
         balance += debit - credit;
@@ -82,7 +83,12 @@ const GeneralLedgerReport = () => {
           debit_amount: debit,
           credit_amount: credit,
           balance,
-          journal_entry: line.journal_entry
+          journal_entry: {
+            id: line.journal_entry_id,
+            entry_number: line.journal_entry.entry_number,
+            entry_date: line.journal_entry.entry_date,
+            description: line.journal_entry.description
+          }
         };
       });
 

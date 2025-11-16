@@ -49,7 +49,12 @@ export default function PropertiesPerformanceChart() {
 
         // حساب الإيرادات من الدفعات
         if (contract.rental_payments) {
-          contract.rental_payments.forEach((payment: any) => {
+          interface RentalPayment {
+            amount_paid: number;
+            status: string;
+          }
+          
+          contract.rental_payments.forEach((payment: RentalPayment) => {
             propertyStats[propertyName].revenue += payment.amount_paid || 0;
             
             if (payment.status === 'مدفوع') {
@@ -109,7 +114,7 @@ export default function PropertiesPerformanceChart() {
             />
             <YAxis />
             <Tooltip 
-              formatter={(value: any) => `${value.toLocaleString('ar-SA')} ر.س`}
+              formatter={(value: number) => `${value.toLocaleString('ar-SA')} ر.س`}
             />
             <Legend />
             <Bar dataKey="الإيرادات الكلية" fill="#8b5cf6" />

@@ -156,7 +156,7 @@ export function PaymentApprovalsTab() {
     );
   };
 
-  const getApprovalProgress = (approvals: any[]) => {
+  const getApprovalProgress = (approvals: PaymentApprovalRow[]) => {
     const total = 2;
     const approved = approvals?.filter((a) => a.status === "موافق").length || 0;
     return `${approved}/${total}`;

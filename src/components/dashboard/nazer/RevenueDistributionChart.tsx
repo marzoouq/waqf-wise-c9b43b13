@@ -94,11 +94,15 @@ export default function RevenueDistributionChart() {
         <ResponsiveContainer width="100%" height={350}>
           <PieChart>
             <Pie
-              data={data as any}
+              data={data}
               cx="50%"
               cy="50%"
               labelLine={false}
-              label={({ name, percent }: any) => `${name}: ${(percent * 100).toFixed(1)}%`}
+              label={(props) => {
+                const name = props.name || '';
+                const percent = props.percent || 0;
+                return `${name}: ${(percent * 100).toFixed(1)}%`;
+              }}
               outerRadius={100}
               fill="#8884d8"
               dataKey="value"
@@ -108,7 +112,7 @@ export default function RevenueDistributionChart() {
               ))}
             </Pie>
             <Tooltip
-              formatter={(value: any) => `${value.toLocaleString('ar-SA')} ر.س`}
+              formatter={(value: number) => `${value.toLocaleString('ar-SA')} ر.س`}
             />
             <Legend />
           </PieChart>

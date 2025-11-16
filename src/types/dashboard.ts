@@ -16,6 +16,7 @@ export interface RevenueDistribution {
   name: string;
   value: number;
   percentage: number;
+  [key: string]: string | number;
 }
 
 export interface PendingApproval {
