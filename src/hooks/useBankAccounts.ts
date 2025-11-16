@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { deleteFromTable } from "@/utils/supabaseHelpers";
+import { createMutationErrorHandler } from "@/lib/errorHandling";
 
 export interface BankAccount {
   id: string;
@@ -52,13 +53,10 @@ export function useBankAccounts() {
         description: "تم إضافة الحساب البنكي بنجاح",
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: "خطأ في الإضافة",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
+    onError: createMutationErrorHandler({
+      context: 'add_bank_account',
+      toastTitle: 'خطأ في الإضافة',
+    }),
   });
 
   const updateBankAccount = useMutation({
@@ -80,13 +78,10 @@ export function useBankAccounts() {
         description: "تم تحديث الحساب البنكي بنجاح",
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: "خطأ في التحديث",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
+    onError: createMutationErrorHandler({
+      context: 'update_bank_account',
+      toastTitle: 'خطأ في التحديث',
+    }),
   });
 
   const deleteBankAccount = useMutation({
@@ -103,13 +98,10 @@ export function useBankAccounts() {
         description: "تم حذف الحساب البنكي بنجاح",
       });
     },
-    onError: (error: any) => {
-      toast({
-        title: "خطأ في الحذف",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
+    onError: createMutationErrorHandler({
+      context: 'delete_bank_account',
+      toastTitle: 'خطأ في الحذف',
+    }),
   });
 
   return {

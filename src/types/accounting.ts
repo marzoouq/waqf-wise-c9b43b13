@@ -110,3 +110,56 @@ export interface Approval {
   created_at: string;
   updated_at: string;
 }
+
+// Insert types for mutations
+export interface AccountInsert {
+  code: string;
+  name_ar: string;
+  name_en?: string;
+  account_type: AccountType;
+  account_nature: AccountNature;
+  parent_id?: string;
+  is_header: boolean;
+  is_active?: boolean;
+  description?: string;
+}
+
+export interface AccountUpdate {
+  code?: string;
+  name_ar?: string;
+  name_en?: string;
+  account_type?: AccountType;
+  account_nature?: AccountNature;
+  parent_id?: string;
+  is_header?: boolean;
+  is_active?: boolean;
+  description?: string;
+}
+
+export interface JournalEntryInsert {
+  entry_number: string;
+  entry_date: string;
+  fiscal_year_id: string;
+  description: string;
+  reference_type?: string;
+  reference_id?: string;
+  status?: EntryStatus;
+  created_by?: string;
+}
+
+export interface JournalLineInsert {
+  account_id: string;
+  line_number: number;
+  debit_amount: number;
+  credit_amount: number;
+  description?: string;
+}
+
+export interface JournalLineData {
+  debit_amount: number;
+  credit_amount: number;
+  accounts: {
+    account_type: string;
+    code: string;
+  };
+}

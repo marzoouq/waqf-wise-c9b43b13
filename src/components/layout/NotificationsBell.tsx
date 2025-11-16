@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { toast } from "sonner";
+import { RealtimeNotification, NotificationPayload } from "@/types/notifications";
 
 export const NotificationsBell = () => {
   const navigate = useNavigate();
@@ -37,21 +38,21 @@ export const NotificationsBell = () => {
     
     const channel = supabase
       .channel('new-notifications')
-      .on('postgres_changes', {
+      .on('postgres_changes' as any, {
         event: 'INSERT',
         schema: 'public',
         table: 'notifications',
         filter: `user_id=eq.${user.id}`
-      }, (payload) => {
+      }, (payload: any) => {
         // إظهار toast للإشعار الجديد
-        const newNotification = payload.new as any;
+        const newNotification = payload.new as RealtimeNotification;
         toast.info(newNotification.title, {
           description: newNotification.message,
         });
         
         queryClient.invalidateQueries({ queryKey: ["notifications"] });
       })
-      .on('postgres_changes', {
+      .on('postgres_changes' as any, {
         event: 'UPDATE',
         schema: 'public',
         table: 'notifications',
@@ -66,7 +67,7 @@ export const NotificationsBell = () => {
     };
   }, [user?.id, queryClient]);
 
-  const handleNotificationClick = (notification: any) => {
+  const handleNotificationClick = (notification: RealtimeNotification) => {
     if (notification.action_url) {
       navigate(notification.action_url);
     }

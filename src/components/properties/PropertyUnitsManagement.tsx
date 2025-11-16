@@ -31,6 +31,9 @@ import { PropertyUnitDialog } from "./PropertyUnitDialog";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EnhancedEmptyState } from "@/components/shared/EnhancedEmptyState";
 import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
+import type { Database } from "@/integrations/supabase/types";
+
+type DbPropertyUnit = Database['public']['Tables']['property_units']['Row'];
 
 interface PropertyUnitsManagementProps {
   propertyId?: string;
@@ -39,7 +42,7 @@ interface PropertyUnitsManagementProps {
 export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManagementProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedUnit, setSelectedUnit] = useState<any | undefined>();
+  const [selectedUnit, setSelectedUnit] = useState<DbPropertyUnit | undefined>();
   
   const { units, isLoading } = usePropertyUnits(propertyId);
 
@@ -63,7 +66,7 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
     unit.unit_name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleEdit = (unit: any) => {
+  const handleEdit = (unit: DbPropertyUnit) => {
     setSelectedUnit(unit);
     setDialogOpen(true);
   };
@@ -125,7 +128,7 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
                 <Building2 className="h-4 w-4 text-primary" />
                 <span className="text-xs text-muted-foreground">إجمالي</span>
               </div>
-              <p className="text-xl font-bold">{(units as any[]).length}</p>
+              <p className="text-xl font-bold">{units.length}</p>
             </div>
             <div className="bg-green-50 rounded-lg p-3 border border-green-200">
               <div className="flex items-center gap-2 mb-1">
@@ -133,7 +136,7 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
                 <span className="text-xs text-muted-foreground">متاح</span>
               </div>
               <p className="text-xl font-bold">
-                {(units as any[]).filter(u => u.status === 'متاح').length}
+                {units.filter(u => u.status === 'متاح').length}
               </p>
             </div>
             <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
@@ -142,7 +145,7 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
                 <span className="text-xs text-muted-foreground">مشغول</span>
               </div>
               <p className="text-xl font-bold">
-                {(units as any[]).filter(u => u.occupancy_status === 'مشغول').length}
+                {units.filter(u => u.occupancy_status === 'مشغول').length}
               </p>
             </div>
             <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
@@ -151,7 +154,7 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
                 <span className="text-xs text-muted-foreground">صيانة</span>
               </div>
               <p className="text-xl font-bold">
-                {(units as any[]).filter(u => u.status === 'صيانة').length}
+                {units.filter(u => u.status === 'صيانة').length}
               </p>
             </div>
           </div>

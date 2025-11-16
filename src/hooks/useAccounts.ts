@@ -3,6 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { logger } from "@/lib/logger";
 import { AccountRow, AccountWithBalance } from "@/types/supabase-helpers";
+import { AccountInsert, AccountUpdate } from "@/types/accounting";
+import { getErrorMessage } from "@/types/errors";
 
 export function useAccounts() {
   const { toast } = useToast();
@@ -22,7 +24,7 @@ export function useAccounts() {
   });
 
   const addAccount = useMutation({
-    mutationFn: async (account: any) => {
+    mutationFn: async (account: AccountInsert) => {
       const { data, error } = await supabase
         .from("accounts")
         .insert([account])
@@ -39,17 +41,19 @@ export function useAccounts() {
         description: "تم إضافة الحساب بنجاح",
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      const message = getErrorMessage(error);
+      logger.error(error, { context: 'add_account', severity: 'medium' });
       toast({
         title: "خطأ",
-        description: error.message,
+        description: message,
         variant: "destructive",
       });
     },
   });
 
   const updateAccount = useMutation({
-    mutationFn: async ({ id, ...updates }: any) => {
+    mutationFn: async ({ id, ...updates }: AccountUpdate & { id: string }) => {
       const { data, error } = await supabase
         .from("accounts")
         .update(updates)
@@ -67,10 +71,12 @@ export function useAccounts() {
         description: "تم تحديث الحساب بنجاح",
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      const message = getErrorMessage(error);
+      logger.error(error, { context: 'update_account', severity: 'medium' });
       toast({
         title: "خطأ",
-        description: error.message,
+        description: message,
         variant: "destructive",
       });
     },
@@ -79,11 +85,11 @@ export function useAccounts() {
   const calculateBalance = async (accountId: string): Promise<number> => {
     try {
       const { data, error } = await supabase
-        .rpc("calculate_account_balance" as never, { account_uuid: accountId } as never);
+        .rpc("calculate_account_balance", { account_uuid: accountId });
 
       if (error) throw error;
       return (data as number) || 0;
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(error, { context: 'calculate_account_balance', severity: 'medium' });
       return 0;
     }
