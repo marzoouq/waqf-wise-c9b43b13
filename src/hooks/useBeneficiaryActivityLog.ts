@@ -17,7 +17,7 @@ export interface BeneficiaryActivity {
 
 export function useBeneficiaryActivityLog(beneficiaryId?: string) {
   const { data: activities = [], isLoading } = useQuery({
-    queryKey: ["beneficiary-activity-log", beneficiaryId],
+    queryKey: ["beneficiary-activity-log", beneficiaryId || undefined],
     queryFn: async () => {
       let query = supabase
         .from("beneficiary_activity_log")

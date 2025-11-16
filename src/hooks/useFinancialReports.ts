@@ -64,7 +64,7 @@ export interface IncomeStatementData {
 export function useFinancialReports(fiscalYearId?: string) {
   // Trial Balance
   const { data: trialBalance = [], isLoading: isLoadingTrial } = useQuery({
-    queryKey: ["trial_balance", fiscalYearId],
+    queryKey: ["trial_balance", fiscalYearId || undefined],
     queryFn: async () => {
       const query = supabase
         .from("journal_entry_lines")
@@ -120,7 +120,7 @@ export function useFinancialReports(fiscalYearId?: string) {
 
   // Balance Sheet
   const { data: balanceSheet, isLoading: isLoadingBalance } = useQuery({
-    queryKey: ["balance_sheet", fiscalYearId],
+    queryKey: ["balance_sheet", fiscalYearId || undefined],
     queryFn: async () => {
       const accounts = await supabase
         .from("accounts")
@@ -178,7 +178,7 @@ export function useFinancialReports(fiscalYearId?: string) {
 
   // Income Statement
   const { data: incomeStatement, isLoading: isLoadingIncome } = useQuery({
-    queryKey: ["income_statement", fiscalYearId],
+    queryKey: ["income_statement", fiscalYearId || undefined],
     queryFn: async () => {
       const accounts = await supabase
         .from("accounts")

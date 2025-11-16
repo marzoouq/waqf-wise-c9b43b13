@@ -22,7 +22,7 @@ export function useCashFlows(fiscalYearId?: string) {
   const queryClient = useQueryClient();
 
   const { data: cashFlows = [], isLoading } = useQuery({
-    queryKey: ["cash_flows", fiscalYearId],
+    queryKey: ["cash_flows", fiscalYearId || undefined],
     queryFn: async () => {
       let query = supabase
         .from("cash_flows")

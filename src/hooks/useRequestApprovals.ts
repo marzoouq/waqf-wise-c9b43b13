@@ -47,7 +47,7 @@ export function useRequestApprovals(requestId?: string) {
   }, [queryClient]);
 
   const { data: approvals = [], isLoading } = useQuery({
-    queryKey: ["request_approvals", requestId],
+    queryKey: ["request_approvals", requestId || undefined],
     queryFn: async () => {
       let query = supabase
         .from("request_approvals")
@@ -82,7 +82,7 @@ export function useRequestApprovals(requestId?: string) {
 
       // إذا كانت موجودة، نقوم بالتحديث بدلاً من الإدراج
       if (existing && typeof existing === 'object' && 'id' in existing) {
-        const { data, error } = await (supabase as any)
+        const { data, error } = await supabase
           .from("request_approvals")
           .update({
             status: approval.status,

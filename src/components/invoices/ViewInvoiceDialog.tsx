@@ -21,7 +21,7 @@ export const ViewInvoiceDialog = ({ invoiceId, open, onOpenChange }: ViewInvoice
   const [isExporting, setIsExporting] = useState(false);
   
   const { data: invoice, isLoading: invoiceLoading } = useQuery({
-    queryKey: ["invoice", invoiceId],
+    queryKey: ["invoice", invoiceId || undefined],
     queryFn: async () => {
       if (!invoiceId) return null;
       const { data, error } = await supabase
@@ -36,7 +36,7 @@ export const ViewInvoiceDialog = ({ invoiceId, open, onOpenChange }: ViewInvoice
   });
 
   const { data: invoiceLines, isLoading: linesLoading } = useQuery({
-    queryKey: ["invoice-lines", invoiceId],
+    queryKey: ["invoice-lines", invoiceId || undefined],
     queryFn: async () => {
       if (!invoiceId) return [];
       const { data, error } = await supabase
