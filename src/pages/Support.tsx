@@ -8,19 +8,22 @@ import { Input } from '@/components/ui/input';
 import { 
   Ticket, 
   Plus,
-  Search,
-  Star,
   Clock,
   CheckCircle,
+  MessageSquare,
   BookOpen,
   HelpCircle,
-  MessageSquare
+  Star
 } from 'lucide-react';
 import { useSupportTickets } from '@/hooks/useSupportTickets';
 import { useKnowledgeBase } from '@/hooks/useKnowledgeBase';
 import { CreateTicketDialog } from '@/components/support/CreateTicketDialog';
 import { TicketDetailsDialog } from '@/components/support/TicketDetailsDialog';
 import { TicketRatingDialog } from '@/components/support/TicketRatingDialog';
+import { KnowledgeBaseArticleCard } from '@/components/support/KnowledgeBaseArticleCard';
+import { ArticleViewDialog } from '@/components/support/ArticleViewDialog';
+import { FAQAccordion } from '@/components/support/FAQAccordion';
+import { KnowledgeBaseSearch } from '@/components/support/KnowledgeBaseSearch';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
@@ -51,12 +54,20 @@ export default function Support() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
   const [ratingTicketId, setRatingTicketId] = useState<string | null>(null);
+  const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
   const [filters, setFilters] = useState<SupportFilters>({});
   const [articleSearch, setArticleSearch] = useState('');
   const [faqSearch, setFaqSearch] = useState('');
 
   const { tickets, isLoading: ticketsLoading } = useSupportTickets(filters);
-  const { articles, faqs, articlesLoading, faqsLoading } = useKnowledgeBase();
+  const { 
+    articles, 
+    faqs, 
+    articlesLoading, 
+    faqsLoading, 
+    incrementViews,
+    rateArticle 
+  } = useKnowledgeBase();
 
   const filteredArticles = articles?.filter(article => 
     article.title.toLowerCase().includes(articleSearch.toLowerCase()) ||
@@ -188,44 +199,30 @@ export default function Support() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="relative">
-                    <Search className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="البحث في المقالات..."
-                      value={articleSearch}
-                      onChange={(e) => setArticleSearch(e.target.value)}
-                      className="pr-10"
-                    />
-                  </div>
+                  <KnowledgeBaseSearch
+                    value={articleSearch}
+                    onChange={setArticleSearch}
+                    placeholder="ابحث في المقالات..."
+                  />
 
                   {articlesLoading ? (
                     <LoadingState message="جاري تحميل المقالات..." />
                   ) : filteredArticles && filteredArticles.length > 0 ? (
-                    <div className="grid gap-4 md:grid-cols-2">
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                       {filteredArticles.map((article) => (
-                        <Card key={article.id} className="hover:shadow-md transition-shadow cursor-pointer">
-                          <CardHeader>
-                            <CardTitle className="text-lg">{article.title}</CardTitle>
-                            {article.summary && (
-                              <CardDescription>{article.summary}</CardDescription>
-                            )}
-                          </CardHeader>
-                          <CardContent>
-                            <div className="flex items-center justify-between text-sm text-muted-foreground">
-                              <span>{article.category}</span>
-                              <div className="flex items-center gap-2">
-                                <CheckCircle className="h-4 w-4 text-green-500" />
-                                <span>{article.helpful_count} مفيد</span>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
+                        <KnowledgeBaseArticleCard
+                          key={article.id}
+                          article={article}
+                          onView={(id) => setSelectedArticleId(id)}
+                        />
                       ))}
                     </div>
                   ) : (
                     <div className="text-center py-12">
                       <BookOpen className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                      <p className="text-muted-foreground">لا توجد مقالات</p>
+                      <p className="text-muted-foreground">
+                        {articleSearch ? 'لم يتم العثور على مقالات' : 'لا توجد مقالات متاحة'}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -246,45 +243,27 @@ export default function Support() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="relative">
-                    <Search className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="البحث في الأسئلة..."
-                      value={faqSearch}
-                      onChange={(e) => setFaqSearch(e.target.value)}
-                      className="pr-10"
-                    />
-                  </div>
+                  <KnowledgeBaseSearch
+                    value={faqSearch}
+                    onChange={setFaqSearch}
+                    placeholder="ابحث في الأسئلة الشائعة..."
+                  />
 
                   {faqsLoading ? (
                     <LoadingState message="جاري تحميل الأسئلة..." />
                   ) : filteredFaqs && filteredFaqs.length > 0 ? (
-                    <div className="space-y-3">
-                      {filteredFaqs.map((faq) => (
-                        <Card key={faq.id}>
-                          <CardHeader>
-                            <CardTitle className="text-base flex items-start gap-2">
-                              <HelpCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                              {faq.question}
-                            </CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            <p className="text-sm text-muted-foreground">{faq.answer}</p>
-                            <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
-                              <span>{faq.category}</span>
-                              <span className="flex items-center gap-1">
-                                <CheckCircle className="h-3 w-3 text-green-500" />
-                                {faq.helpful_count} مفيد
-                              </span>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
+                    <FAQAccordion 
+                      faqs={filteredFaqs} 
+                      onRate={(id) => {
+                        incrementViews.mutate({ id, type: 'faq' });
+                      }}
+                    />
                   ) : (
                     <div className="text-center py-12">
                       <HelpCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                      <p className="text-muted-foreground">لا توجد أسئلة شائعة</p>
+                      <p className="text-muted-foreground">
+                        {faqSearch ? 'لم يتم العثور على أسئلة' : 'لا توجد أسئلة شائعة'}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -308,6 +287,13 @@ export default function Support() {
           ticketId={ratingTicketId}
           open={!!ratingTicketId}
           onOpenChange={(open) => !open && setRatingTicketId(null)}
+        />
+
+        <ArticleViewDialog
+          articleId={selectedArticleId}
+          open={!!selectedArticleId}
+          onOpenChange={(open) => !open && setSelectedArticleId(null)}
+          onRate={(id, helpful) => rateArticle.mutate({ id, helpful })}
         />
       </div>
     </MainLayout>
