@@ -28,10 +28,10 @@ export function NotificationPreferences({
     setSaving(true);
     try {
       const { error } = await supabase
-        .from("beneficiaries" as any)
+        .from("beneficiaries")
         .update({
           notification_preferences: preferences,
-        } as any)
+        })
         .eq("id", beneficiaryId);
 
       if (error) throw error;

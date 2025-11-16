@@ -42,8 +42,8 @@ export function MaintenanceCostReport() {
 
       // تجميع البيانات حسب العقار
       const propertyData = requests.reduce((acc, req) => {
-        const propertyId = (req.properties as any).id;
-        const propertyName = (req.properties as any).name;
+        const propertyId = req.properties.id;
+        const propertyName = req.properties.name;
         
         if (!acc[propertyId]) {
           acc[propertyId] = {

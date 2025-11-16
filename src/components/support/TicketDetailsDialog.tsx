@@ -107,7 +107,7 @@ export function TicketDetailsDialog({
                   <div>
                     <p className="text-sm text-muted-foreground">المستخدم</p>
                     <p className="text-sm font-medium">
-                      {(ticket as any).beneficiary?.full_name || (ticket as any).user?.email || 'غير محدد'}
+                      {ticket.beneficiary_id || 'غير محدد'}
                     </p>
                   </div>
                 </div>
@@ -140,7 +140,7 @@ export function TicketDetailsDialog({
                         >
                           <div className="flex items-center justify-between text-sm">
                             <span className="font-medium">
-                              {(comment as any).user?.email || 'مستخدم'}
+                              {comment.user_id || 'مستخدم'}
                             </span>
                             <span className="text-muted-foreground">
                               {format(new Date(comment.created_at), 'PPp', { locale: ar })}
