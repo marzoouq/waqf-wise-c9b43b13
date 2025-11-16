@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from './use-toast';
+import { calculatePreciseLoanSchedule } from '@/lib/supabase-wrappers';
 
 interface LoanCalculationParams {
   loanId: string;
@@ -18,16 +18,16 @@ export function usePreciseLoanCalculation() {
 
   const calculateSchedule = useMutation({
     mutationFn: async (params: LoanCalculationParams) => {
-      const { data, error } = await (supabase.rpc as any)('calculate_precise_loan_schedule', {
-        p_loan_id: params.loanId,
-        p_principal: params.principal,
-        p_interest_rate: params.interestRate,
-        p_term_months: params.termMonths,
-        p_start_date: params.startDate.toISOString().split('T')[0],
+      const result = await calculatePreciseLoanSchedule({
+        loanId: params.loanId,
+        principal: params.principal,
+        interestRate: params.interestRate,
+        termMonths: params.termMonths,
+        startDate: params.startDate.toISOString().split('T')[0],
       });
 
-      if (error) throw error;
-      return data;
+      if (result.error) throw result.error;
+      return result.data;
     },
     onSuccess: () => {
       toast({

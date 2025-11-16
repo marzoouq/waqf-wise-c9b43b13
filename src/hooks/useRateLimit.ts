@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
+import { checkRateLimit, logLoginAttempt as logLoginAttemptWrapper } from '@/lib/supabase-wrappers';
 
 interface RateLimitResult {
   allowed: boolean;
@@ -18,31 +18,29 @@ export function useRateLimit() {
    * التحقق من إمكانية تسجيل الدخول
    */
   const checkLoginRateLimit = async (
-    email: string,
+    userId: string,
     maxAttempts: number = 5,
     timeWindowMinutes: number = 15
   ): Promise<RateLimitResult> => {
     setIsChecking(true);
     
     try {
-      const ipAddress = await getClientIP();
-      
-      const { data, error } = await (supabase.rpc as any)('check_rate_limit', {
-        p_email: email,
-        p_ip_address: ipAddress,
-        p_max_attempts: maxAttempts,
-        p_time_window_minutes: timeWindowMinutes,
+      const result = await checkRateLimit({
+        userId,
+        actionType: 'login',
+        limit: maxAttempts,
+        windowMinutes: timeWindowMinutes,
       });
 
-      if (error) {
-        logger.error(error, { context: 'rate_limit_check', severity: 'medium' });
+      if (result.error) {
+        logger.error(result.error, { context: 'rate_limit_check', severity: 'medium' });
         return { allowed: true }; // في حالة الخطأ، نسمح بالمحاولة
       }
 
       return {
-        allowed: data as boolean,
-        remainingAttempts: data ? undefined : 0,
-        resetTime: data ? undefined : new Date(Date.now() + timeWindowMinutes * 60000),
+        allowed: result.data || false,
+        remainingAttempts: result.data ? undefined : 0,
+        resetTime: result.data ? undefined : new Date(Date.now() + timeWindowMinutes * 60000),
       };
     } catch (error) {
       logger.error(error, { context: 'rate_limit_general', severity: 'medium' });
@@ -55,14 +53,15 @@ export function useRateLimit() {
   /**
    * تسجيل محاولة تسجيل دخول
    */
-  const logLoginAttempt = async (email: string, success: boolean): Promise<void> => {
+  const logLoginAttempt = async (userId: string, success: boolean): Promise<void> => {
     try {
       const ipAddress = await getClientIP();
       
-      await (supabase.rpc as any)('log_login_attempt', {
-        p_email: email,
-        p_ip_address: ipAddress,
-        p_success: success,
+      await logLoginAttemptWrapper({
+        userId,
+        success,
+        ipAddress,
+        userAgent: navigator.userAgent,
       });
     } catch (error) {
       logger.error(error, { context: 'log_login_attempt', severity: 'low' });

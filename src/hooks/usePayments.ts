@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useJournalEntries } from "./useJournalEntries";
 import { useEffect } from "react";
 import { logger } from "@/lib/logger";
+import { paymentRequiresApproval } from "@/lib/supabase-wrappers";
 
 export interface Payment {
   id: string;
@@ -65,10 +66,8 @@ export function usePayments() {
   const addPayment = useMutation({
     mutationFn: async (payment: Omit<Payment, "id" | "created_at" | "updated_at">) => {
       // التحقق من حاجة المدفوعة للموافقة
-      const { data: requiresApproval } = await (supabase.rpc as any)(
-        'payment_requires_approval',
-        { p_amount: payment.amount }
-      );
+      const result = await paymentRequiresApproval(payment.amount);
+      const requiresApproval = result.data || false;
 
       const paymentStatus = requiresApproval ? 'pending' : 'completed';
 

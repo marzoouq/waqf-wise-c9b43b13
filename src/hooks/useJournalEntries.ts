@@ -5,6 +5,8 @@ import { useActivities } from "@/hooks/useActivities";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
 import { logger } from "@/lib/logger";
+import { createAutoJournalEntry as createAutoJournalEntryWrapper } from "@/lib/supabase-wrappers";
+import { createAutoJournalEntry } from "@/lib/supabase-wrappers";
 
 export interface JournalEntry {
   id: string;
@@ -183,18 +185,18 @@ export function useJournalEntries() {
     entryDate?: string
   ) => {
     try {
-      const { data, error } = await (supabase.rpc as any)("create_auto_journal_entry", {
-        p_trigger_event: triggerEvent,
-        p_reference_id: referenceId,
-        p_amount: amount,
-        p_description: description,
-        p_entry_date: entryDate || new Date().toISOString().split("T")[0],
+      const result = await createAutoJournalEntryWrapper({
+        triggerEvent,
+        referenceId,
+        amount,
+        description,
+        transactionDate: entryDate,
       });
 
-      if (error) throw error;
+      if (result.error) throw result.error;
       
       queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
-      return data;
+      return result.data?.id;
     } catch (error) {
       logger.error(error, { context: 'create_auto_entry', severity: 'high' });
       throw error;
