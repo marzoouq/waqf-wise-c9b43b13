@@ -137,7 +137,7 @@ export default function DecisionDetails() {
             )}
           </TabsContent>
           <TabsContent value="voters" className="mt-4">
-            <EligibleVotersList decision={decision as any} />
+            <EligibleVotersList decision={decision} />
           </TabsContent>
         </Tabs>
       </div>

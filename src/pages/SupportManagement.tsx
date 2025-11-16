@@ -219,7 +219,7 @@ export default function SupportManagement() {
                             <div className="flex-1">
                               <p className="font-medium">{ticket.subject}</p>
                               <p className="text-sm text-muted-foreground">
-                                {(ticketWithRelations.beneficiary as any)?.full_name || (ticketWithRelations.user as any)?.email}
+                                {ticketWithRelations.beneficiary?.full_name || ticketWithRelations.user?.email}
                               </p>
                             </div>
                             <div className="text-left space-y-2">
@@ -301,7 +301,7 @@ export default function SupportManagement() {
                                 <Badge variant="outline">#{ticket.ticket_number}</Badge>
                               </div>
                               <p className="text-sm text-muted-foreground">
-                                {(ticketWithRelations.beneficiary as any)?.full_name || (ticketWithRelations.user as any)?.email}
+                                {ticketWithRelations.beneficiary?.full_name || ticketWithRelations.user?.email}
                               </p>
                             </div>
                             <div className="text-left space-y-2">
