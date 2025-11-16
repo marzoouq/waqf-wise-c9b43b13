@@ -280,34 +280,34 @@ export default function Loans() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>رقم القرض</TableHead>
-                    <TableHead>المستفيد</TableHead>
-                    <TableHead>مبلغ القرض</TableHead>
-                    <TableHead>نسبة الفائدة</TableHead>
-                    <TableHead>المدة</TableHead>
-                    <TableHead>القسط الشهري</TableHead>
-                    <TableHead>تاريخ البداية</TableHead>
-                    <TableHead>الحالة</TableHead>
-                    <TableHead>الإجراءات</TableHead>
+                    <TableHead className="text-xs sm:text-sm">رقم القرض</TableHead>
+                    <TableHead className="text-xs sm:text-sm">المستفيد</TableHead>
+                    <TableHead className="text-xs sm:text-sm">مبلغ القرض</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden lg:table-cell">نسبة الفائدة</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden lg:table-cell">المدة</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden md:table-cell">القسط الشهري</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden lg:table-cell">تاريخ البداية</TableHead>
+                    <TableHead className="text-xs sm:text-sm">الحالة</TableHead>
+                    <TableHead className="text-xs sm:text-sm">الإجراءات</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredLoans.map((loan: Loan) => (
                     <TableRow key={loan.id} className="hover:bg-muted/50">
-                      <TableCell className="font-medium">
+                      <TableCell className="font-medium text-xs sm:text-sm">
                         {loan.loan_number}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-xs sm:text-sm">
                         <div>
                           <div className="font-medium">
                             {loan.beneficiary?.full_name}
                           </div>
-                          <div className="text-sm text-muted-foreground">
+                          <div className="text-xs text-muted-foreground">
                             {loan.beneficiary?.national_id}
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-xs sm:text-sm">
                         <div className="flex items-center gap-1">
                           <DollarSign className="h-3 w-3 text-muted-foreground" />
                           <span className="font-semibold">
@@ -315,27 +315,27 @@ export default function Loans() {
                           </span>
                         </div>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-xs sm:text-sm hidden lg:table-cell">
                         <div className="flex items-center gap-1">
                           <Percent className="h-3 w-3 text-muted-foreground" />
                           <span>{loan.interest_rate}%</span>
                         </div>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-xs sm:text-sm hidden lg:table-cell">
                         <div className="flex items-center gap-1">
                           <Calendar className="h-3 w-3 text-muted-foreground" />
                           <span>{loan.term_months} شهر</span>
                         </div>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-xs sm:text-sm hidden md:table-cell">
                         <span className="font-semibold text-primary">
                           {loan.monthly_installment.toLocaleString("ar-SA")}
                         </span>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-xs sm:text-sm hidden lg:table-cell">
                         {new Date(loan.start_date).toLocaleDateString("ar-SA")}
                       </TableCell>
-                      <TableCell>{getStatusBadge(loan.status)}</TableCell>
+                      <TableCell className="text-xs sm:text-sm">{getStatusBadge(loan.status)}</TableCell>
                       <TableCell>
                         <div className="flex gap-2">
                           <Button

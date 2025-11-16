@@ -240,37 +240,38 @@ export default function StaffRequests() {
               icon={FileText}
             />
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>رقم الطلب</TableHead>
-                  <TableHead>المستفيد</TableHead>
-                  <TableHead>نوع الطلب</TableHead>
-                  <TableHead>الوصف</TableHead>
-                  <TableHead>الحالة</TableHead>
-                  <TableHead>الأولوية</TableHead>
-                  <TableHead>تاريخ الإنشاء</TableHead>
-                  <TableHead>SLA</TableHead>
-                  <TableHead className="text-center">الإجراءات</TableHead>
-                </TableRow>
-              </TableHeader>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-xs sm:text-sm">رقم الطلب</TableHead>
+                    <TableHead className="text-xs sm:text-sm">المستفيد</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden lg:table-cell">نوع الطلب</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden md:table-cell">الوصف</TableHead>
+                    <TableHead className="text-xs sm:text-sm">الحالة</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden lg:table-cell">الأولوية</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden lg:table-cell">تاريخ الإنشاء</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden md:table-cell">SLA</TableHead>
+                    <TableHead className="text-center text-xs sm:text-sm">الإجراءات</TableHead>
+                  </TableRow>
+                </TableHeader>
               <TableBody>
                 {filteredRequests?.map((request) => (
                   <TableRow key={request.id}>
-                    <TableCell className="font-medium">
+                    <TableCell className="font-medium text-xs sm:text-sm whitespace-nowrap">
                       {request.request_number}
                     </TableCell>
-                    <TableCell>{request.beneficiary?.full_name}</TableCell>
-                    <TableCell>
+                    <TableCell className="text-xs sm:text-sm">{request.beneficiary?.full_name}</TableCell>
+                    <TableCell className="text-xs sm:text-sm hidden lg:table-cell">
                       {requestTypes?.find((t) => t.id === request.request_type_id)?.name}
                     </TableCell>
-                    <TableCell className="max-w-xs truncate">
+                    <TableCell className="max-w-xs truncate text-xs sm:text-sm hidden md:table-cell">
                       {request.description}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-xs sm:text-sm">
                       {getStatusBadge(request.status, request.is_overdue)}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-xs sm:text-sm hidden lg:table-cell">
                       <Badge
                         variant={
                           request.priority === "عاجلة"
@@ -283,13 +284,13 @@ export default function StaffRequests() {
                         {request.priority}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
+                    <TableCell className="text-xs text-muted-foreground hidden lg:table-cell">
                       {formatDistanceToNow(new Date(request.submitted_at), {
                         addSuffix: true,
                         locale: ar,
                       })}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-xs sm:text-sm hidden md:table-cell">
                       {request.sla_due_at && (
                         <span
                           className={`text-xs ${
@@ -333,6 +334,7 @@ export default function StaffRequests() {
                 ))}
               </TableBody>
             </Table>
+            </div>
           )}
         </CardContent>
       </Card>
