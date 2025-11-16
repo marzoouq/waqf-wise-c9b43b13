@@ -80,12 +80,12 @@ const Invoices = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>رقم الفاتورة</TableHead>
-                <TableHead>التاريخ</TableHead>
-                <TableHead className="hidden sm:table-cell">العميل</TableHead>
-                <TableHead className="text-center">المبلغ</TableHead>
-                <TableHead>الحالة</TableHead>
-                <TableHead className="text-left">الإجراءات</TableHead>
+                <TableHead className="text-xs sm:text-sm">رقم الفاتورة</TableHead>
+                <TableHead className="text-xs sm:text-sm hidden md:table-cell">التاريخ</TableHead>
+                <TableHead className="text-xs sm:text-sm hidden lg:table-cell">العميل</TableHead>
+                <TableHead className="text-center text-xs sm:text-sm">المبلغ</TableHead>
+                <TableHead className="text-xs sm:text-sm">الحالة</TableHead>
+                <TableHead className="text-left text-xs sm:text-sm">الإجراءات</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -110,24 +110,24 @@ const Invoices = () => {
               ) : (
                 paginatedInvoices.map((invoice) => (
                   <TableRow key={invoice.id}>
-                    <TableCell className="font-mono text-sm font-semibold">
+                    <TableCell className="font-mono text-xs sm:text-sm font-semibold">
                       {invoice.invoice_number}
                     </TableCell>
-                    <TableCell className="text-sm">
+                    <TableCell className="text-xs sm:text-sm hidden md:table-cell">
                       {format(new Date(invoice.invoice_date), "dd MMM yyyy", {
                         locale: ar,
                       })}
                     </TableCell>
-                    <TableCell className="hidden sm:table-cell">
+                    <TableCell className="text-xs sm:text-sm hidden lg:table-cell">
                       {invoice.customer_name}
                     </TableCell>
-                    <TableCell className="text-center font-mono text-sm font-semibold">
+                    <TableCell className="text-center font-mono text-xs sm:text-sm font-semibold">
                       {Number(invoice.total_amount).toFixed(2)}
                     </TableCell>
-                    <TableCell><InvoiceStatusBadge status={invoice.status} /></TableCell>
-                    <TableCell>
-                      <div className="flex gap-2 justify-end">
-                        <Button 
+                    <TableCell className="text-xs sm:text-sm"><InvoiceStatusBadge status={invoice.status} /></TableCell>
+                        <TableCell className="text-xs sm:text-sm">
+                          <div className="flex gap-2 justify-end">
+                            <Button 
                           variant="ghost" 
                           size="sm"
                           onClick={() => {
