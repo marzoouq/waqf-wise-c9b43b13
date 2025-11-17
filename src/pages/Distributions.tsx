@@ -9,7 +9,8 @@ import { useDistributions } from "@/hooks/useDistributions";
 import { DistributionSettingsDialog } from "@/components/distributions/DistributionSettingsDialog";
 import { DistributionDetailsDialog } from "@/components/distributions/DistributionDetailsDialog";
 import { ApprovalWorkflowDialog } from "@/components/distributions/ApprovalWorkflowDialog";
-import { Eye, Loader2, TrendingUp, Users, DollarSign, CheckSquare } from "lucide-react";
+import { DistributionSimulator } from "@/components/distributions/DistributionSimulator";
+import { Eye, Loader2, TrendingUp, Users, DollarSign, CheckSquare, Calculator } from "lucide-react";
 import { Distribution } from "@/hooks/useDistributions";
 import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
 import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
@@ -20,6 +21,7 @@ export default function Distributions() {
   const [selectedDistribution, setSelectedDistribution] = useState<Distribution | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [approvalOpen, setApprovalOpen] = useState(false);
+  const [simulatorOpen, setSimulatorOpen] = useState(false);
   const [generating, setGenerating] = useState(false);
   
   const [newDistribution, setNewDistribution] = useState({
@@ -64,7 +66,15 @@ export default function Distributions() {
       <MobileOptimizedHeader
         title="التوزيعات"
         description="إدارة توزيعات الوقف"
-        actions={<DistributionSettingsDialog />}
+        actions={
+          <div className="flex gap-2">
+            <Button onClick={() => setSimulatorOpen(true)} size="sm" variant="outline" className="gap-2">
+              <Calculator className="h-4 w-4" />
+              <span className="hidden sm:inline">محاكاة</span>
+            </Button>
+            <DistributionSettingsDialog />
+          </div>
+        }
       />
 
       {/* إحصائيات سريعة */}
@@ -259,6 +269,21 @@ export default function Distributions() {
         open={approvalOpen}
         onOpenChange={setApprovalOpen}
       />
+
+      {/* محاكي التوزيع */}
+      {simulatorOpen && (
+        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm">
+          <div className="fixed left-1/2 top-1/2 z-50 w-full max-w-6xl -translate-x-1/2 -translate-y-1/2 border bg-background p-6 shadow-lg sm:rounded-lg max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">محاكي التوزيع</h2>
+              <Button variant="ghost" size="sm" onClick={() => setSimulatorOpen(false)}>
+                ✕
+              </Button>
+            </div>
+            <DistributionSimulator />
+          </div>
+        </div>
+      )}
     </MobileOptimizedLayout>
   );
 }
