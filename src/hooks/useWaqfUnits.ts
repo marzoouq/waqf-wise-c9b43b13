@@ -5,6 +5,7 @@ import { useActivities } from "./useActivities";
 import { useAuth } from "./useAuth";
 import { useEffect } from "react";
 import type { Json } from '@/integrations/supabase/types';
+import { logger } from "@/lib/logger";
 
 export interface WaqfUnit {
   id: string;
@@ -111,12 +112,14 @@ export function useWaqfUnits() {
       if (error) throw error;
       return data;
     },
-    onSuccess: async (data) => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['waqf_units'] });
       
-      await addActivity({
+      addActivity({
         action: `تم إضافة قلم وقف جديد: ${data.name} (${data.code})`,
         user_name: user?.user_metadata?.full_name || 'مستخدم',
+      }).catch((error) => {
+        logger.error(error, { context: 'add_waqf_unit_activity', severity: 'low' });
       });
 
       toast({
@@ -146,12 +149,14 @@ export function useWaqfUnits() {
       if (error) throw error;
       return data;
     },
-    onSuccess: async (data) => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['waqf_units'] });
       
-      await addActivity({
+      addActivity({
         action: `تم تحديث قلم الوقف: ${data.name} (${data.code})`,
         user_name: user?.user_metadata?.full_name || 'مستخدم',
+      }).catch((error) => {
+        logger.error(error, { context: 'update_waqf_unit_activity', severity: 'low' });
       });
 
       toast({
@@ -177,12 +182,14 @@ export function useWaqfUnits() {
 
       if (error) throw error;
     },
-    onSuccess: async () => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['waqf_units'] });
       
-      await addActivity({
+      addActivity({
         action: 'تم حذف قلم وقف',
         user_name: user?.user_metadata?.full_name || 'مستخدم',
+      }).catch((error) => {
+        logger.error(error, { context: 'delete_waqf_unit_activity', severity: 'low' });
       });
 
       toast({

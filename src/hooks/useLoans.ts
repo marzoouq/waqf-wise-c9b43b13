@@ -5,6 +5,7 @@ import { useActivities } from "./useActivities";
 import { useAuth } from "./useAuth";
 import { useEffect } from "react";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";
+import { logger } from "@/lib/logger";
 
 export interface Loan {
   id: string;
@@ -132,13 +133,15 @@ export function useLoans(beneficiaryId?: string) {
 
       return loanData;
     },
-    onSuccess: async (data) => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['loans'] });
       queryClient.invalidateQueries({ queryKey: ['loan_installments'] });
       
-      await addActivity({
+      addActivity({
         action: `تم إضافة قرض جديد: ${data.loan_number}`,
         user_name: user?.user_metadata?.full_name || 'مستخدم',
+      }).catch((error) => {
+        logger.error(error, { context: 'add_loan_activity', severity: 'low' });
       });
 
       toast({
@@ -169,12 +172,14 @@ export function useLoans(beneficiaryId?: string) {
       if (!data) throw new Error("فشل في تحديث القرض");
       return data;
     },
-    onSuccess: async (data) => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['loans'] });
       
-      await addActivity({
+      addActivity({
         action: `تم تحديث القرض: ${data.loan_number}`,
         user_name: user?.user_metadata?.full_name || 'مستخدم',
+      }).catch((error) => {
+        logger.error(error, { context: 'update_loan_activity', severity: 'low' });
       });
 
       toast({
@@ -200,12 +205,14 @@ export function useLoans(beneficiaryId?: string) {
 
       if (error) throw error;
     },
-    onSuccess: async () => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['loans'] });
       
-      await addActivity({
+      addActivity({
         action: 'تم حذف قرض',
         user_name: user?.user_metadata?.full_name || 'مستخدم',
+      }).catch((error) => {
+        logger.error(error, { context: 'delete_loan_activity', severity: 'low' });
       });
 
       toast({

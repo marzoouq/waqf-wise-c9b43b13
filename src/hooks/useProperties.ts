@@ -52,18 +52,16 @@ export function useProperties() {
       if (!data) throw new Error("فشل في إضافة العقار");
       return data;
     },
-    onSuccess: async (data) => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["properties"] });
       
       // إضافة نشاط
-      try {
-        await addActivity({
-          action: `تم إضافة عقار جديد: ${data.name}`,
-          user_name: user?.email || 'النظام',
-        });
-      } catch (error) {
+      addActivity({
+        action: `تم إضافة عقار جديد: ${data.name}`,
+        user_name: user?.email || 'النظام',
+      }).catch((error) => {
         logger.error(error, { context: 'property_activity', severity: 'low' });
-      }
+      });
       
       toast({
         title: "تمت الإضافة بنجاح",

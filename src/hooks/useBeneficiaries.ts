@@ -48,19 +48,16 @@ export function useBeneficiaries() {
         'add_beneficiary'
       );
     },
-    onSuccess: async (data) => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["beneficiaries"] });
       
       // إضافة نشاط
-      try {
-        await addActivity({
-          action: `تم إضافة مستفيد جديد: ${data.full_name}`,
-          user_name: user?.email || 'النظام',
-        });
-      } catch (error) {
-        // تسجيل فقط دون إيقاف العملية
+      addActivity({
+        action: `تم إضافة مستفيد جديد: ${data.full_name}`,
+        user_name: user?.email || 'النظام',
+      }).catch((error) => {
         logger.error(error, { context: 'add_beneficiary_activity', severity: 'low' });
-      }
+      });
       
       showSuccess("تمت الإضافة بنجاح", "تم إضافة المستفيد الجديد بنجاح");
     },
@@ -87,18 +84,16 @@ export function useBeneficiaries() {
         'update_beneficiary'
       );
     },
-    onSuccess: async (data) => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["beneficiaries"] });
       
       // إضافة نشاط
-      try {
-        await addActivity({
-          action: `تم تحديث بيانات المستفيد: ${data.full_name}`,
-          user_name: user?.email || 'النظام',
-        });
-      } catch (error) {
+      addActivity({
+        action: `تم تحديث بيانات المستفيد: ${data.full_name}`,
+        user_name: user?.email || 'النظام',
+      }).catch((error) => {
         logger.error(error, { context: 'update_beneficiary_activity', severity: 'low' });
-      }
+      });
       
       showSuccess("تم التحديث بنجاح", "تم تحديث بيانات المستفيد بنجاح");
     },

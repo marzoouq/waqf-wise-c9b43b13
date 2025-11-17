@@ -134,15 +134,17 @@ export function useLoanPayments(loanId?: string) {
 
       return paymentData;
     },
-    onSuccess: async (data) => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['loan_payments'] });
       queryClient.invalidateQueries({ queryKey: ['loan_installments'] });
       queryClient.invalidateQueries({ queryKey: ['loans'] });
       queryClient.invalidateQueries({ queryKey: ['journal_entries'] });
       
-      await addActivity({
+      addActivity({
         action: `تم تسجيل دفعة قرض: ${data.payment_number}`,
         user_name: user?.user_metadata?.full_name || 'مستخدم',
+      }).catch((error) => {
+        logger.error(error, { context: 'loan_payment_activity', severity: 'low' });
       });
 
       toast({
