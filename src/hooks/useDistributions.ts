@@ -15,6 +15,16 @@ export interface Distribution {
   beneficiaries_count: number;
   status: string;
   distribution_date: string;
+  distribution_type?: string;
+  period_start?: string;
+  period_end?: string;
+  total_revenues?: number;
+  total_expenses?: number;
+  net_revenues?: number;
+  nazer_share?: number;
+  waqif_charity?: number;
+  waqf_corpus?: number;
+  distributable_amount?: number;
   notes?: string;
   journal_entry_id?: string;
   created_at: string;
@@ -151,18 +161,36 @@ export function useDistributions() {
     }),
   });
 
-  const simulateDistribution = async (totalAmount: number, beneficiariesCount: number) => {
-    // محاكاة توزيع بسيط: تقسيم المبلغ بالتساوي
-    const perBeneficiary = totalAmount / beneficiariesCount;
-    return {
-      totalAmount,
-      beneficiariesCount,
-      perBeneficiary,
-      distribution: Array.from({ length: Math.min(beneficiariesCount, 10) }, (_, i) => ({
-        beneficiaryNumber: i + 1,
-        amount: perBeneficiary,
-      })),
-    };
+  const generateDistribution = async (periodStart: string, periodEnd: string, waqfCorpusPercentage: number = 0) => {
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-distribution-summary", {
+        body: {
+          period_start: periodStart,
+          period_end: periodEnd,
+          distribution_type: 'شهري',
+          waqf_corpus_percentage: waqfCorpusPercentage,
+        },
+      });
+
+      if (error) throw error;
+      
+      queryClient.invalidateQueries({ queryKey: ["distributions"] });
+      queryClient.invalidateQueries({ queryKey: ["distribution-details"] });
+      
+      toast({
+        title: "تم إنشاء التوزيع بنجاح",
+        description: `تم توزيع ${data.summary.distributable_amount} ريال على ${data.summary.beneficiaries_count} مستفيد`,
+      });
+
+      return data;
+    } catch (error: any) {
+      toast({
+        title: "خطأ في إنشاء التوزيع",
+        description: error.message || "حدث خطأ أثناء إنشاء التوزيع",
+        variant: "destructive",
+      });
+      throw error;
+    }
   };
 
   return {
@@ -170,6 +198,6 @@ export function useDistributions() {
     isLoading,
     addDistribution: addDistribution.mutateAsync,
     updateDistribution: updateDistribution.mutateAsync,
-    simulateDistribution,
+    generateDistribution,
   };
 }
