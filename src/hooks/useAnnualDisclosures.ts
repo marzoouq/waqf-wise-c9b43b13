@@ -112,25 +112,37 @@ export function useAnnualDisclosures() {
 
   const publishDisclosure = useMutation({
     mutationFn: async (disclosureId: string) => {
+      const { data: userData } = await supabase.auth.getUser();
+      
       const { data, error } = await supabase
         .from("annual_disclosures")
         .update({
           status: "published",
           published_at: new Date().toISOString(),
-          published_by: (await supabase.auth.getUser()).data.user?.id,
+          published_by: userData.user?.id,
         })
         .eq("id", disclosureId)
         .select()
         .single();
 
       if (error) throw error;
+      
+      // إرسال إشعارات للمستفيدين
+      try {
+        await supabase.functions.invoke('notify-disclosure-published', {
+          body: { disclosure_id: disclosureId }
+        });
+      } catch (err) {
+        logger.error(err, { context: 'notify_disclosure_published' });
+      }
+      
       return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["annual-disclosures"] });
       toast({
         title: "تم نشر الإفصاح",
-        description: "أصبح الإفصاح متاحاً للمستفيدين",
+        description: "أصبح الإفصاح متاحاً للمستفيدين وتم إرسال الإشعارات",
       });
     },
     onError: (error: any) => {
