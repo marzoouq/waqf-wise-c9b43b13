@@ -36,7 +36,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
     };
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  async componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     logger.error(error, { 
       context: 'global_error_boundary', 
       severity: 'critical',
@@ -48,9 +48,33 @@ export class GlobalErrorBoundary extends Component<Props, State> {
       errorCount: prevState.errorCount + 1,
     }));
 
-    // يمكن إرسال الخطأ لخدمة المراقبة
-    // logErrorToService(error, errorInfo);
+    // إرسال إشعار للدعم الفني تلقائياً
+    await this.notifySupportTeam(error, errorInfo);
   }
+
+  notifySupportTeam = async (error: Error, errorInfo: ErrorInfo) => {
+    try {
+      const { supabase } = await import('@/integrations/supabase/client');
+      
+      // تسجيل الخطأ في جدول error_logs أو إرسال إشعار
+      await supabase.from('audit_logs').insert({
+        action_type: 'critical_error',
+        severity: 'critical',
+        description: `خطأ حرج في التطبيق: ${error.message}`,
+        table_name: 'application_errors',
+        new_values: {
+          error: error.toString(),
+          stack: error.stack,
+          componentStack: errorInfo.componentStack,
+          url: window.location.href,
+          userAgent: navigator.userAgent,
+          timestamp: new Date().toISOString(),
+        }
+      });
+    } catch (notifyError) {
+      console.error('فشل إرسال إشعار للدعم:', notifyError);
+    }
+  };
 
   handleReset = () => {
     this.setState({
@@ -58,6 +82,16 @@ export class GlobalErrorBoundary extends Component<Props, State> {
       error: null,
       errorInfo: null,
     });
+  };
+
+  handleHardRefresh = () => {
+    // مسح الـ cache وإعادة تحميل الصفحة
+    if ('caches' in window) {
+      caches.keys().then((names) => {
+        names.forEach((name) => caches.delete(name));
+      });
+    }
+    window.location.reload();
   };
 
   handleGoHome = () => {
@@ -74,8 +108,13 @@ export class GlobalErrorBoundary extends Component<Props, State> {
                 <AlertTriangle className="w-6 h-6 text-destructive" />
               </div>
               <CardTitle className="text-2xl">حدث خطأ غير متوقع</CardTitle>
-              <CardDescription>
-                نعتذر عن هذا الخطأ. فريقنا تم إشعاره تلقائياً وسنعمل على حله في أقرب وقت.
+              <CardDescription className="space-y-2">
+                <p>نعتذر عن هذا الخطأ. تم إرسال تقرير تلقائي لفريق الدعم الفني.</p>
+                {this.state.error?.message?.includes('Failed to fetch') && (
+                  <p className="text-amber-600 dark:text-amber-400 font-medium">
+                    يبدو أن هناك مشكلة في تحميل أحد مكونات الصفحة. جرب مسح ذاكرة التخزين المؤقت.
+                  </p>
+                )}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -114,15 +153,26 @@ export class GlobalErrorBoundary extends Component<Props, State> {
               )}
 
               {/* أزرار الإجراءات */}
-              <div className="flex gap-3 justify-center pt-4">
-                <Button onClick={this.handleReset} variant="default" size="lg">
-                  <RefreshCcw className="w-4 h-4 ml-2" />
-                  إعادة المحاولة
-                </Button>
-                <Button onClick={this.handleGoHome} variant="outline" size="lg">
-                  <Home className="w-4 h-4 ml-2" />
-                  العودة للرئيسية
-                </Button>
+              <div className="flex flex-col gap-3">
+                {this.state.error?.message?.includes('Failed to fetch') && (
+                  <Button 
+                    onClick={this.handleHardRefresh} 
+                    className="w-full gap-2 bg-amber-600 hover:bg-amber-700 text-white"
+                  >
+                    <RefreshCcw className="w-4 h-4" />
+                    مسح ذاكرة التخزين وإعادة التحميل
+                  </Button>
+                )}
+                <div className="flex gap-3 justify-center pt-2">
+                  <Button onClick={this.handleReset} variant="default" size="lg">
+                    <RefreshCcw className="w-4 h-4 ml-2" />
+                    إعادة المحاولة
+                  </Button>
+                  <Button onClick={this.handleGoHome} variant="outline" size="lg">
+                    <Home className="w-4 h-4 ml-2" />
+                    العودة للرئيسية
+                  </Button>
+                </div>
               </div>
 
               {/* معلومات التواصل */}
