@@ -2,8 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { ResponsiveDialog, DialogFooter } from "@/components/shared/ResponsiveDialog";
-import { DialogDescription } from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import {
   Form,
   FormControl,
@@ -43,10 +42,10 @@ interface CreateDistributionDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export function CreateDistributionDialog({
+export const CreateDistributionDialog = ({
   open,
   onOpenChange,
-}: CreateDistributionDialogProps) {
+}: CreateDistributionDialogProps) => {
   const { toast } = useToast();
   const { beneficiaries, isLoading: loadingBeneficiaries } = useBeneficiaries();
   const { generateDistribution } = useDistributions();
@@ -134,6 +133,7 @@ export function CreateDistributionDialog({
       onOpenChange={onOpenChange}
       title="إنشاء توزيع جديد"
       description="قم بتعبئة بيانات التوزيع واختيار المستفيدين المراد إشعارهم"
+      size="xl"
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
@@ -336,7 +336,7 @@ export function CreateDistributionDialog({
             </CardContent>
           </Card>
 
-          <DialogFooter>
+          <div className="flex justify-end gap-3">
             <Button
               type="button"
               variant="outline"
@@ -355,9 +355,9 @@ export function CreateDistributionDialog({
                 "إنشاء التوزيع"
               )}
             </Button>
-          </DialogFooter>
+          </div>
         </form>
       </Form>
     </ResponsiveDialog>
   );
-}
+};
