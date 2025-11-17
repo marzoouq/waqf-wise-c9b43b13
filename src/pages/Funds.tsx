@@ -10,6 +10,7 @@ import { useFunds } from "@/hooks/useFunds";
 import { useJournalEntries } from "@/hooks/useJournalEntries";
 import { logger } from "@/lib/logger";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
+import { AnnualDisclosureTab } from "@/components/funds/tabs/AnnualDisclosureTab";
 import { OverviewTab } from "@/components/funds/tabs/OverviewTab";
 import { FundsTab } from "@/components/funds/tabs/FundsTab";
 import { DistributionsTab } from "@/components/funds/tabs/DistributionsTab";
@@ -95,10 +96,11 @@ const Funds = () => {
       />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 mb-6">
+        <TabsList className="grid w-full grid-cols-4 mb-6">
           <TabsTrigger value="overview" className="text-xs sm:text-sm">نظرة عامة</TabsTrigger>
           <TabsTrigger value="funds" className="text-xs sm:text-sm">أقلام الوقف</TabsTrigger>
           <TabsTrigger value="distributions" className="text-xs sm:text-sm">التوزيعات</TabsTrigger>
+          <TabsTrigger value="disclosure" className="text-xs sm:text-sm">الإفصاح السنوي</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -111,6 +113,10 @@ const Funds = () => {
 
         <TabsContent value="distributions" className="space-y-6">
           <DistributionsTab />
+        </TabsContent>
+
+        <TabsContent value="disclosure" className="space-y-6">
+          <AnnualDisclosureTab />
         </TabsContent>
       </Tabs>
 
