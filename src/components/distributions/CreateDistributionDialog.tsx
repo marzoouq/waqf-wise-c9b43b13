@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -29,6 +29,9 @@ import { useToast } from "@/hooks/use-toast";
 const distributionSchema = z.object({
   period_start: z.string().min(1, "تاريخ البداية مطلوب"),
   period_end: z.string().min(1, "تاريخ النهاية مطلوب"),
+  waqf_name: z.string().min(1, "اسم الوقف مطلوب"),
+  nazer_percentage: z.coerce.number().min(0).max(100, "النسبة لا يمكن أن تتجاوز 100%"),
+  charity_percentage: z.coerce.number().min(0).max(100, "النسبة لا يمكن أن تتجاوز 100%"),
   waqf_corpus_percentage: z.coerce.number().min(0, "النسبة لا يمكن أن تكون سالبة").max(100, "النسبة لا يمكن أن تتجاوز 100%"),
   notes: z.string().optional(),
   notify_beneficiaries: z.boolean().default(true),
@@ -57,6 +60,9 @@ export const CreateDistributionDialog = ({
     defaultValues: {
       period_start: "",
       period_end: "",
+      waqf_name: "",
+      nazer_percentage: 10,
+      charity_percentage: 5,
       waqf_corpus_percentage: 0,
       notes: "",
       notify_beneficiaries: true,
@@ -127,6 +133,17 @@ export const CreateDistributionDialog = ({
 
   const activeBeneficiaries = beneficiaries.filter(b => b.status === 'نشط');
 
+  // حساب إحصائيات المستفيدين المحددين
+  const selectedStats = useMemo(() => {
+    const selected = beneficiaries.filter(b => selectedBeneficiaries.includes(b.id));
+    return {
+      sons: selected.reduce((sum, b) => sum + (b.number_of_sons || 0), 0),
+      daughters: selected.reduce((sum, b) => sum + (b.number_of_daughters || 0), 0),
+      wives: selected.reduce((sum, b) => sum + (b.number_of_wives || 0), 0),
+      total: selected.length,
+    };
+  }, [beneficiaries, selectedBeneficiaries]);
+
   return (
     <ResponsiveDialog
       open={open}
@@ -178,26 +195,85 @@ export const CreateDistributionDialog = ({
 
               <FormField
                 control={form.control}
-                name="waqf_corpus_percentage"
+                name="waqf_name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>نسبة رأس مال الوقف (%)</FormLabel>
+                    <FormLabel>اسم الوقف</FormLabel>
                     <FormControl>
                       <Input
-                        type="number"
-                        min="0"
-                        max="100"
-                        step="0.1"
+                        placeholder="مثال: وقف آل فلان الخيري"
                         {...field}
                       />
                     </FormControl>
-                    <FormDescription>
-                      نسبة المبلغ المخصص لرأس مال الوقف من صافي الإيرادات
-                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <FormField
+                  control={form.control}
+                  name="nazer_percentage"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>نسبة الناظر (%)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="0"
+                          max="100"
+                          step="0.1"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>حصة الناظر من الغلة</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="charity_percentage"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>نسبة صدقة الواقف (%)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="0"
+                          max="100"
+                          step="0.1"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>حصة الصدقة</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="waqf_corpus_percentage"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>نسبة رأس مال الوقف (%)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="0"
+                          max="100"
+                          step="0.1"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>رقبة الوقف</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               <FormField
                 control={form.control}
@@ -225,10 +301,19 @@ export const CreateDistributionDialog = ({
           {/* اختيار المستفيدين */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <Users className="h-4 w-4" />
-                اختيار المستفيدين ({selectedBeneficiaries.length} محدد)
-              </CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  اختيار المستفيدين ({selectedBeneficiaries.length} محدد)
+                </CardTitle>
+                {selectedStats.total > 0 && (
+                  <div className="flex gap-2 text-xs">
+                    <Badge variant="outline">{selectedStats.sons} ابن</Badge>
+                    <Badge variant="outline">{selectedStats.daughters} بنت</Badge>
+                    <Badge variant="outline">{selectedStats.wives} زوجة</Badge>
+                  </div>
+                )}
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">

@@ -94,6 +94,119 @@ export type Database = {
         }
         Relationships: []
       }
+      annual_disclosures: {
+        Row: {
+          administrative_expenses: number | null
+          bank_statement_url: string | null
+          beneficiaries_details: Json | null
+          charity_percentage: number
+          charity_share: number
+          closing_balance: number | null
+          corpus_percentage: number
+          corpus_share: number
+          created_at: string | null
+          daughters_count: number
+          development_expenses: number | null
+          disclosure_date: string
+          expenses_breakdown: Json | null
+          fiscal_year_id: string | null
+          id: string
+          maintenance_expenses: number | null
+          nazer_percentage: number
+          nazer_share: number
+          net_income: number
+          opening_balance: number | null
+          other_expenses: number | null
+          published_at: string | null
+          published_by: string | null
+          sons_count: number
+          status: string | null
+          total_beneficiaries: number
+          total_expenses: number
+          total_revenues: number
+          updated_at: string | null
+          waqf_name: string
+          wives_count: number
+          year: number
+        }
+        Insert: {
+          administrative_expenses?: number | null
+          bank_statement_url?: string | null
+          beneficiaries_details?: Json | null
+          charity_percentage?: number
+          charity_share?: number
+          closing_balance?: number | null
+          corpus_percentage?: number
+          corpus_share?: number
+          created_at?: string | null
+          daughters_count?: number
+          development_expenses?: number | null
+          disclosure_date?: string
+          expenses_breakdown?: Json | null
+          fiscal_year_id?: string | null
+          id?: string
+          maintenance_expenses?: number | null
+          nazer_percentage?: number
+          nazer_share?: number
+          net_income?: number
+          opening_balance?: number | null
+          other_expenses?: number | null
+          published_at?: string | null
+          published_by?: string | null
+          sons_count?: number
+          status?: string | null
+          total_beneficiaries?: number
+          total_expenses?: number
+          total_revenues?: number
+          updated_at?: string | null
+          waqf_name: string
+          wives_count?: number
+          year: number
+        }
+        Update: {
+          administrative_expenses?: number | null
+          bank_statement_url?: string | null
+          beneficiaries_details?: Json | null
+          charity_percentage?: number
+          charity_share?: number
+          closing_balance?: number | null
+          corpus_percentage?: number
+          corpus_share?: number
+          created_at?: string | null
+          daughters_count?: number
+          development_expenses?: number | null
+          disclosure_date?: string
+          expenses_breakdown?: Json | null
+          fiscal_year_id?: string | null
+          id?: string
+          maintenance_expenses?: number | null
+          nazer_percentage?: number
+          nazer_share?: number
+          net_income?: number
+          opening_balance?: number | null
+          other_expenses?: number | null
+          published_at?: string | null
+          published_by?: string | null
+          sons_count?: number
+          status?: string | null
+          total_beneficiaries?: number
+          total_expenses?: number
+          total_revenues?: number
+          updated_at?: string | null
+          waqf_name?: string
+          wives_count?: number
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "annual_disclosures_fiscal_year_id_fkey"
+            columns: ["fiscal_year_id"]
+            isOneToOne: false
+            referencedRelation: "fiscal_years"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       approval_history: {
         Row: {
           action: string
@@ -1397,6 +1510,64 @@ export type Database = {
         }
         Relationships: []
       }
+      disclosure_beneficiaries: {
+        Row: {
+          allocated_amount: number
+          beneficiary_id: string | null
+          beneficiary_name: string
+          beneficiary_type: string
+          created_at: string | null
+          disclosure_id: string | null
+          id: string
+          payments_count: number | null
+          relationship: string | null
+        }
+        Insert: {
+          allocated_amount?: number
+          beneficiary_id?: string | null
+          beneficiary_name: string
+          beneficiary_type: string
+          created_at?: string | null
+          disclosure_id?: string | null
+          id?: string
+          payments_count?: number | null
+          relationship?: string | null
+        }
+        Update: {
+          allocated_amount?: number
+          beneficiary_id?: string | null
+          beneficiary_name?: string
+          beneficiary_type?: string
+          created_at?: string | null
+          disclosure_id?: string | null
+          id?: string
+          payments_count?: number | null
+          relationship?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "disclosure_beneficiaries_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "disclosure_beneficiaries_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_statistics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "disclosure_beneficiaries_disclosure_id_fkey"
+            columns: ["disclosure_id"]
+            isOneToOne: false
+            referencedRelation: "annual_disclosures"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       distribution_approvals: {
         Row: {
           approved_at: string | null
@@ -1510,70 +1681,97 @@ export type Database = {
       }
       distributions: {
         Row: {
+          bank_statement_ref: string | null
           beneficiaries_count: number
+          charity_percentage: number | null
+          corpus_percentage: number | null
           created_at: string
+          daughters_count: number | null
           distributable_amount: number | null
           distribution_date: string
           distribution_type: string | null
+          expenses_amount: number | null
           id: string
           journal_entry_id: string | null
           month: string
+          nazer_percentage: number | null
           nazer_share: number | null
           net_revenues: number | null
           notes: string | null
           period_end: string | null
           period_start: string | null
+          sons_count: number | null
           status: string
           total_amount: number
           total_expenses: number | null
           total_revenues: number | null
           updated_at: string
           waqf_corpus: number | null
+          waqf_name: string | null
           waqif_charity: number | null
+          wives_count: number | null
         }
         Insert: {
+          bank_statement_ref?: string | null
           beneficiaries_count: number
+          charity_percentage?: number | null
+          corpus_percentage?: number | null
           created_at?: string
+          daughters_count?: number | null
           distributable_amount?: number | null
           distribution_date: string
           distribution_type?: string | null
+          expenses_amount?: number | null
           id?: string
           journal_entry_id?: string | null
           month: string
+          nazer_percentage?: number | null
           nazer_share?: number | null
           net_revenues?: number | null
           notes?: string | null
           period_end?: string | null
           period_start?: string | null
+          sons_count?: number | null
           status?: string
           total_amount: number
           total_expenses?: number | null
           total_revenues?: number | null
           updated_at?: string
           waqf_corpus?: number | null
+          waqf_name?: string | null
           waqif_charity?: number | null
+          wives_count?: number | null
         }
         Update: {
+          bank_statement_ref?: string | null
           beneficiaries_count?: number
+          charity_percentage?: number | null
+          corpus_percentage?: number | null
           created_at?: string
+          daughters_count?: number | null
           distributable_amount?: number | null
           distribution_date?: string
           distribution_type?: string | null
+          expenses_amount?: number | null
           id?: string
           journal_entry_id?: string | null
           month?: string
+          nazer_percentage?: number | null
           nazer_share?: number | null
           net_revenues?: number | null
           notes?: string | null
           period_end?: string | null
           period_start?: string | null
+          sons_count?: number | null
           status?: string
           total_amount?: number
           total_expenses?: number | null
           total_revenues?: number | null
           updated_at?: string
           waqf_corpus?: number | null
+          waqf_name?: string | null
           waqif_charity?: number | null
+          wives_count?: number | null
         }
         Relationships: [
           {
@@ -5770,6 +5968,10 @@ export type Database = {
           p_user_id: string
         }
         Returns: undefined
+      }
+      generate_annual_disclosure: {
+        Args: { p_waqf_name: string; p_year: number }
+        Returns: string
       }
       generate_beneficiary_number: { Args: never; Returns: string }
       generate_smart_insights: { Args: never; Returns: undefined }
