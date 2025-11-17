@@ -101,20 +101,18 @@ export const useRequests = (beneficiaryId?: string) => {
       if (error) throw error;
       return data as unknown as BeneficiaryRequest;
     },
-    onSuccess: async (data: BeneficiaryRequest) => {
+    onSuccess: (data: BeneficiaryRequest) => {
       queryClient.invalidateQueries({ queryKey: ['requests'] });
       
       // إنشاء مهمة للمراجعة
       if (data?.status === 'قيد المراجعة') {
-        try {
-          await addTask({
-            task: `مراجعة طلب رقم ${data.request_number || 'جديد'}`,
-            priority: data.priority === 'عاجلة' ? 'عالية' : 'متوسطة',
-            status: 'pending',
-          });
-        } catch (error) {
+        addTask({
+          task: `مراجعة طلب رقم ${data.request_number || 'جديد'}`,
+          priority: data.priority === 'عاجلة' ? 'عالية' : 'متوسطة',
+          status: 'pending',
+        }).catch((error) => {
           logger.error(error, { context: 'add_request_task', severity: 'low' });
-        }
+        });
       }
       
       toast({

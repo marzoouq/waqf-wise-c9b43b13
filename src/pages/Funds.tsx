@@ -21,7 +21,7 @@ const Funds = () => {
   const [simulationDialogOpen, setSimulationDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
 
-  const { distributions, isLoading: distributionsLoading, addDistribution } = useDistributions();
+  const { distributions, isLoading: distributionsLoading, addDistributionAsync } = useDistributions();
   const { funds, isLoading: fundsLoading } = useFunds();
   const { createAutoEntry } = useJournalEntries();
 
@@ -37,7 +37,7 @@ const Funds = () => {
         notes: (data.notes as string) || null,
       };
       
-      const result = await addDistribution(dbData);
+      const result = await addDistributionAsync(dbData);
 
       await createAutoEntry(
         'distribution_created',

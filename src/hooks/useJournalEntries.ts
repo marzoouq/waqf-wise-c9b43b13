@@ -123,18 +123,16 @@ export function useJournalEntries() {
 
       return entryData;
     },
-    onSuccess: async (data) => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
       
       // إضافة نشاط
-      try {
-        await addActivity({
-          action: `تم إنشاء قيد محاسبي: ${data.entry_number}`,
-          user_name: user?.email || 'النظام',
-        });
-      } catch (error) {
+      addActivity({
+        action: `تم إنشاء قيد محاسبي: ${data.entry_number}`,
+        user_name: user?.email || 'النظام',
+      }).catch((error) => {
         logger.error(error, { context: 'journal_entry_activity', severity: 'low' });
-      }
+      });
       
       toast({
         title: "تم الإنشاء",

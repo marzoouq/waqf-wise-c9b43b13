@@ -91,20 +91,18 @@ export const useMaintenanceRequests = () => {
       if (error) throw error;
       return data;
     },
-    onSuccess: async (data) => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["maintenance_requests"] });
       
       // إنشاء مهمة إذا كانت مجدولة
       if (data.scheduled_date) {
-        try {
-          await addTask({
-            task: `صيانة مجدولة - ${data.title}`,
-            priority: data.priority === 'عاجلة' ? 'عالية' : 'متوسطة',
-            status: 'pending',
-          });
-        } catch (error) {
+        addTask({
+          task: `صيانة مجدولة - ${data.title}`,
+          priority: data.priority === 'عاجلة' ? 'عالية' : 'متوسطة',
+          status: 'pending',
+        }).catch((error) => {
           logger.error(error, { context: 'maintenance_task', severity: 'low' });
-        }
+        });
       }
       
       toast({

@@ -85,20 +85,18 @@ export function useDistributions() {
       if (error) throw error;
       return data;
     },
-    onSuccess: async (data) => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["distributions"] });
       queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
       queryClient.invalidateQueries({ queryKey: ["funds"] });
       
       // إضافة نشاط
-      try {
-        await addActivity({
-          action: `تم إنشاء توزيع جديد لشهر ${data.month} بمبلغ ${data.total_amount} ريال`,
-          user_name: user?.email || 'النظام',
-        });
-      } catch (error) {
+      addActivity({
+        action: `تم إنشاء توزيع جديد لشهر ${data.month} بمبلغ ${data.total_amount} ريال`,
+        user_name: user?.email || 'النظام',
+      }).catch((error) => {
         logger.error(error, { context: 'add_distribution_activity', severity: 'low' });
-      }
+      });
       
       toast({
         title: "تم إنشاء التوزيع بنجاح",
@@ -146,7 +144,7 @@ export function useDistributions() {
 
       return data;
     },
-    onSuccess: async (data) => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["distributions"] });
       queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
       
@@ -196,8 +194,10 @@ export function useDistributions() {
   return {
     distributions,
     isLoading,
-    addDistribution: addDistribution.mutateAsync,
-    updateDistribution: updateDistribution.mutateAsync,
+    addDistribution: addDistribution.mutate,
+    addDistributionAsync: addDistribution.mutateAsync,
+    updateDistribution: updateDistribution.mutate,
+    updateDistributionAsync: updateDistribution.mutateAsync,
     generateDistribution,
   };
 }

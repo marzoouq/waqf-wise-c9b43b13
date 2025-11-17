@@ -114,7 +114,9 @@ export function useFunds() {
   return {
     funds,
     isLoading,
-    addFund: addFund.mutateAsync,
-    updateFund: updateFund.mutateAsync,
+    addFund: addFund.mutate,
+    addFundAsync: addFund.mutateAsync,
+    updateFund: updateFund.mutate,
+    updateFundAsync: updateFund.mutateAsync,
   };
 }
