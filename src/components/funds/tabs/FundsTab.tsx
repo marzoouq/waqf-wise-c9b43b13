@@ -7,9 +7,7 @@ import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { Wallet } from "lucide-react";
-import { Database } from "@/integrations/supabase/types";
-
-type Fund = Database['public']['Tables']['funds']['Row'];
+import { Fund } from "@/hooks/useFunds";
 
 interface FundsTabProps {
   funds: Fund[];
