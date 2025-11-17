@@ -18,12 +18,15 @@ import {
 import { useAnnualDisclosures, useDisclosureBeneficiaries } from "@/hooks/useAnnualDisclosures";
 import { GenerateDisclosureDialog } from "@/components/distributions/GenerateDisclosureDialog";
 import { ViewDisclosureDialog } from "@/components/distributions/ViewDisclosureDialog";
+import { generateDisclosurePDF } from "@/lib/generateDisclosurePDF";
+import { supabase } from "@/integrations/supabase/client";
 
 export function AnnualDisclosureTab() {
-  const { disclosures, currentYearDisclosure, isLoading } = useAnnualDisclosures();
+  const { disclosures, currentYearDisclosure, isLoading, publishDisclosure } = useAnnualDisclosures();
   const [selectedDisclosure, setSelectedDisclosure] = useState<any>(null);
   const [viewOpen, setViewOpen] = useState(false);
   const [generateOpen, setGenerateOpen] = useState(false);
+  const [publishing, setPublishing] = useState(false);
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, "default" | "secondary" | "outline"> = {
@@ -37,6 +40,29 @@ export function AnnualDisclosureTab() {
       archived: "مؤرشف",
     };
     return <Badge variant={variants[status] || "secondary"}>{labels[status] || status}</Badge>;
+  };
+
+  const handlePublish = async (disclosureId: string) => {
+    setPublishing(true);
+    try {
+      await publishDisclosure(disclosureId);
+    } finally {
+      setPublishing(false);
+    }
+  };
+
+  const handleExportPDF = async (disclosure: any) => {
+    try {
+      // جلب المستفيدين إذا كانوا متوفرين
+      const { data: beneficiaries } = await supabase
+        .from("disclosure_beneficiaries")
+        .select("*")
+        .eq("disclosure_id", disclosure.id);
+      
+      await generateDisclosurePDF(disclosure, beneficiaries || []);
+    } catch (error) {
+      console.error("Error exporting PDF:", error);
+    }
   };
 
   return (
@@ -152,13 +178,22 @@ export function AnnualDisclosureTab() {
               </Button>
               
               {currentYearDisclosure.status === 'draft' && (
-                <Button variant="outline" className="gap-2">
+                <Button 
+                  variant="outline" 
+                  className="gap-2"
+                  onClick={() => handlePublish(currentYearDisclosure.id)}
+                  disabled={publishing}
+                >
                   <FileCheck className="h-4 w-4" />
-                  نشر الإفصاح
+                  {publishing ? "جاري النشر..." : "نشر الإفصاح"}
                 </Button>
               )}
               
-              <Button variant="outline" className="gap-2">
+              <Button 
+                variant="outline" 
+                className="gap-2"
+                onClick={() => handleExportPDF(currentYearDisclosure)}
+              >
                 <Download className="h-4 w-4" />
                 تصدير PDF
               </Button>
