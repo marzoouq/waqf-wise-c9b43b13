@@ -33,6 +33,7 @@ export const mockBeneficiary = (overrides?: Partial<Beneficiary>): Beneficiary =
   notes: null,
   tags: ['أولوية عالية', 'أسرة كبيرة'],
   beneficiary_number: 'BEN-2025-001',
+  beneficiary_type: 'ولد',
   can_login: false,
   username: null,
   user_id: null,

@@ -487,6 +487,7 @@ export type Database = {
           bank_account_number: string | null
           bank_name: string | null
           beneficiary_number: string | null
+          beneficiary_type: string | null
           can_login: boolean | null
           category: string
           city: string | null
@@ -530,6 +531,7 @@ export type Database = {
           bank_account_number?: string | null
           bank_name?: string | null
           beneficiary_number?: string | null
+          beneficiary_type?: string | null
           can_login?: boolean | null
           category: string
           city?: string | null
@@ -573,6 +575,7 @@ export type Database = {
           bank_account_number?: string | null
           bank_name?: string | null
           beneficiary_number?: string | null
+          beneficiary_type?: string | null
           can_login?: boolean | null
           category?: string
           city?: string | null
@@ -1441,42 +1444,136 @@ export type Database = {
           },
         ]
       }
+      distribution_details: {
+        Row: {
+          allocated_amount: number
+          beneficiary_id: string
+          beneficiary_type: string | null
+          created_at: string | null
+          distribution_id: string
+          id: string
+          notes: string | null
+          payment_date: string | null
+          payment_reference: string | null
+          payment_status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          allocated_amount?: number
+          beneficiary_id: string
+          beneficiary_type?: string | null
+          created_at?: string | null
+          distribution_id: string
+          id?: string
+          notes?: string | null
+          payment_date?: string | null
+          payment_reference?: string | null
+          payment_status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          allocated_amount?: number
+          beneficiary_id?: string
+          beneficiary_type?: string | null
+          created_at?: string | null
+          distribution_id?: string
+          id?: string
+          notes?: string | null
+          payment_date?: string | null
+          payment_reference?: string | null
+          payment_status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "distribution_details_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "distribution_details_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_statistics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "distribution_details_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "distributions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       distributions: {
         Row: {
           beneficiaries_count: number
           created_at: string
+          distributable_amount: number | null
           distribution_date: string
+          distribution_type: string | null
           id: string
           journal_entry_id: string | null
           month: string
+          nazer_share: number | null
+          net_revenues: number | null
           notes: string | null
+          period_end: string | null
+          period_start: string | null
           status: string
           total_amount: number
+          total_expenses: number | null
+          total_revenues: number | null
           updated_at: string
+          waqf_corpus: number | null
+          waqif_charity: number | null
         }
         Insert: {
           beneficiaries_count: number
           created_at?: string
+          distributable_amount?: number | null
           distribution_date: string
+          distribution_type?: string | null
           id?: string
           journal_entry_id?: string | null
           month: string
+          nazer_share?: number | null
+          net_revenues?: number | null
           notes?: string | null
+          period_end?: string | null
+          period_start?: string | null
           status?: string
           total_amount: number
+          total_expenses?: number | null
+          total_revenues?: number | null
           updated_at?: string
+          waqf_corpus?: number | null
+          waqif_charity?: number | null
         }
         Update: {
           beneficiaries_count?: number
           created_at?: string
+          distributable_amount?: number | null
           distribution_date?: string
+          distribution_type?: string | null
           id?: string
           journal_entry_id?: string | null
           month?: string
+          nazer_share?: number | null
+          net_revenues?: number | null
           notes?: string | null
+          period_end?: string | null
+          period_start?: string | null
           status?: string
           total_amount?: number
+          total_expenses?: number | null
+          total_revenues?: number | null
           updated_at?: string
+          waqf_corpus?: number | null
+          waqif_charity?: number | null
         }
         Relationships: [
           {
@@ -5403,6 +5500,71 @@ export type Database = {
             columns: ["decision_id"]
             isOneToOne: false
             referencedRelation: "governance_decisions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      waqf_distribution_settings: {
+        Row: {
+          auto_distribution: boolean | null
+          created_at: string | null
+          distribution_day_of_month: number | null
+          distribution_frequency: string | null
+          distribution_months: number[] | null
+          distribution_rule: string | null
+          id: string
+          is_active: boolean | null
+          nazer_percentage: number | null
+          notify_beneficiaries: boolean | null
+          notify_nazer: boolean | null
+          updated_at: string | null
+          waqf_corpus_percentage: number | null
+          waqf_unit_id: string | null
+          waqif_charity_percentage: number | null
+          wives_share_ratio: number | null
+        }
+        Insert: {
+          auto_distribution?: boolean | null
+          created_at?: string | null
+          distribution_day_of_month?: number | null
+          distribution_frequency?: string | null
+          distribution_months?: number[] | null
+          distribution_rule?: string | null
+          id?: string
+          is_active?: boolean | null
+          nazer_percentage?: number | null
+          notify_beneficiaries?: boolean | null
+          notify_nazer?: boolean | null
+          updated_at?: string | null
+          waqf_corpus_percentage?: number | null
+          waqf_unit_id?: string | null
+          waqif_charity_percentage?: number | null
+          wives_share_ratio?: number | null
+        }
+        Update: {
+          auto_distribution?: boolean | null
+          created_at?: string | null
+          distribution_day_of_month?: number | null
+          distribution_frequency?: string | null
+          distribution_months?: number[] | null
+          distribution_rule?: string | null
+          id?: string
+          is_active?: boolean | null
+          nazer_percentage?: number | null
+          notify_beneficiaries?: boolean | null
+          notify_nazer?: boolean | null
+          updated_at?: string | null
+          waqf_corpus_percentage?: number | null
+          waqf_unit_id?: string | null
+          waqif_charity_percentage?: number | null
+          wives_share_ratio?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "waqf_distribution_settings_waqf_unit_id_fkey"
+            columns: ["waqf_unit_id"]
+            isOneToOne: false
+            referencedRelation: "waqf_units"
             referencedColumns: ["id"]
           },
         ]
