@@ -72,8 +72,7 @@ const menuGroups = [
       { icon: ClipboardList, label: "الطلبات", path: "/requests", roles: ["admin", "accountant", "nazer"] },
       { icon: CheckSquare, label: "إدارة الطلبات", path: "/staff/requests", roles: ["admin", "accountant", "nazer"] },
       { icon: Building2, label: "أقلام الوقف", path: "/waqf-units", roles: ["admin", "accountant", "nazer"] },
-      { icon: Wallet, label: "الأموال والمصارف", path: "/funds", roles: ["admin", "accountant", "nazer"] },
-      { icon: HandCoins, label: "التوزيعات", path: "/distributions", roles: ["admin", "accountant", "nazer"], badge: "جديد" },
+      { icon: Wallet, label: "الأموال والتوزيعات", path: "/funds", roles: ["admin", "accountant", "nazer"] },
     ]
   },
   {
