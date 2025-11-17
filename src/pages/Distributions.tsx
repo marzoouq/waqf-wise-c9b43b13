@@ -1,5 +1,4 @@
 import { useState } from "react";
-import MainLayout from "@/components/layout/MainLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +10,8 @@ import { DistributionSettingsDialog } from "@/components/distributions/Distribut
 import { DistributionDetailsDialog } from "@/components/distributions/DistributionDetailsDialog";
 import { Plus, Eye, Loader2, TrendingUp, Users, DollarSign } from "lucide-react";
 import { Distribution } from "@/hooks/useDistributions";
+import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
+import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
 
 export default function Distributions() {
   const { distributions, isLoading, generateDistribution } = useDistributions();
@@ -56,12 +57,16 @@ export default function Distributions() {
   const totalBeneficiaries = distributions.reduce((sum, d) => sum + d.beneficiaries_count, 0);
 
   return (
-    <MainLayout>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto p-6 md:p-8 lg:p-10 space-y-6 md:space-y-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold">التوزيعات</h1>
-            <p className="text-muted-foreground">إدارة توزيعات الوقف</p>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gradient-primary">
+              التوزيعات
+            </h1>
+            <p className="text-muted-foreground mt-1 text-xs sm:text-sm md:text-base">
+              إدارة توزيعات الوقف
+            </p>
           </div>
           <DistributionSettingsDialog />
         </div>
@@ -223,6 +228,6 @@ export default function Distributions() {
           onOpenChange={setDetailsOpen}
         />
       </div>
-    </MainLayout>
+    </div>
   );
 }
