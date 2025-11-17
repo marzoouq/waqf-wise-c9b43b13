@@ -183,38 +183,63 @@ export const ViewDisclosureDialog = ({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-4 border rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <Crown className="h-4 w-4 text-amber-600" />
-                  <p className="text-sm font-medium">حصة الناظر</p>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <div className="p-4 border rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Crown className="h-4 w-4 text-amber-600" />
+                    <p className="text-sm font-medium">حصة الناظر</p>
+                  </div>
+                  <p className="text-xl font-bold mb-1">
+                    {disclosure.nazer_share.toLocaleString()} ر.س
+                  </p>
+                  <Badge variant="outline">{disclosure.nazer_percentage}%</Badge>
                 </div>
-                <p className="text-xl font-bold mb-1">
-                  {disclosure.nazer_share.toLocaleString()} ر.س
-                </p>
-                <Badge variant="outline">{disclosure.nazer_percentage}%</Badge>
+
+                <div className="p-4 border rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Heart className="h-4 w-4 text-pink-600" />
+                    <p className="text-sm font-medium">صدقة الواقف</p>
+                  </div>
+                  <p className="text-xl font-bold mb-1">
+                    {disclosure.charity_share.toLocaleString()} ر.س
+                  </p>
+                  <Badge variant="outline">{disclosure.charity_percentage}%</Badge>
+                </div>
+
+                <div className="p-4 border rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Building className="h-4 w-4 text-blue-600" />
+                    <p className="text-sm font-medium">رقبة الوقف</p>
+                  </div>
+                  <p className="text-xl font-bold mb-1">
+                    {disclosure.corpus_share.toLocaleString()} ر.س
+                  </p>
+                  <Badge variant="outline">{disclosure.corpus_percentage}%</Badge>
+                </div>
               </div>
 
-              <div className="p-4 border rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <Heart className="h-4 w-4 text-pink-600" />
-                  <p className="text-sm font-medium">صدقة الواقف</p>
-                </div>
-                <p className="text-xl font-bold mb-1">
-                  {disclosure.charity_share.toLocaleString()} ر.س
-                </p>
-                <Badge variant="outline">{disclosure.charity_percentage}%</Badge>
-              </div>
-
-              <div className="p-4 border rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <Building className="h-4 w-4 text-purple-600" />
-                  <p className="text-sm font-medium">رأس مال الوقف</p>
-                </div>
-                <p className="text-xl font-bold mb-1">
-                  {disclosure.corpus_share.toLocaleString()} ر.س
-                </p>
-                <Badge variant="outline">{disclosure.corpus_percentage}%</Badge>
+              <div>
+                <h4 className="text-sm font-medium mb-4 text-center">التوزيع النسبي</h4>
+                <ResponsiveContainer width="100%" height={250}>
+                  <PieChart>
+                    <Pie
+                      data={distributionData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                      outerRadius={80}
+                      dataKey="value"
+                    >
+                      {distributionData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(value: number) => value.toLocaleString()} />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
               </div>
             </div>
           </CardContent>
@@ -230,160 +255,158 @@ export const ViewDisclosureDialog = ({
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="text-center p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
-                <p className="text-3xl font-bold text-blue-600">{disclosure.sons_count}</p>
-                <p className="text-sm text-muted-foreground mt-1">الأبناء</p>
+              <div className="p-4 text-center border rounded-lg">
+                <Users className="h-8 w-8 mx-auto mb-2 text-primary" />
+                <p className="text-2xl font-bold">{disclosure.total_beneficiaries}</p>
+                <p className="text-sm text-muted-foreground">إجمالي المستفيدين</p>
               </div>
               
-              <div className="text-center p-4 bg-pink-50 dark:bg-pink-950 rounded-lg">
-                <p className="text-3xl font-bold text-pink-600">{disclosure.daughters_count}</p>
-                <p className="text-sm text-muted-foreground mt-1">البنات</p>
+              <div className="p-4 text-center border rounded-lg">
+                <Users className="h-8 w-8 mx-auto mb-2 text-blue-600" />
+                <p className="text-2xl font-bold">{disclosure.sons_count}</p>
+                <p className="text-sm text-muted-foreground">الأبناء</p>
               </div>
               
-              <div className="text-center p-4 bg-purple-50 dark:bg-purple-950 rounded-lg">
-                <p className="text-3xl font-bold text-purple-600">{disclosure.wives_count}</p>
-                <p className="text-sm text-muted-foreground mt-1">الزوجات</p>
+              <div className="p-4 text-center border rounded-lg">
+                <Users className="h-8 w-8 mx-auto mb-2 text-pink-600" />
+                <p className="text-2xl font-bold">{disclosure.daughters_count}</p>
+                <p className="text-sm text-muted-foreground">البنات</p>
               </div>
               
-              <div className="text-center p-4 bg-green-50 dark:bg-green-950 rounded-lg">
-                <p className="text-3xl font-bold text-green-600">{disclosure.total_beneficiaries}</p>
-                <p className="text-sm text-muted-foreground mt-1">الإجمالي</p>
+              <div className="p-4 text-center border rounded-lg">
+                <Users className="h-8 w-8 mx-auto mb-2 text-purple-600" />
+                <p className="text-2xl font-bold">{disclosure.wives_count}</p>
+                <p className="text-sm text-muted-foreground">الزوجات</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* قائمة المستفيدين التفصيلية */}
-        <Card>
-          <CardHeader>
-            <CardTitle>قائمة المستفيدين والمستحقات</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ScrollArea className="h-[400px]">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>#</TableHead>
-                    <TableHead>الاسم</TableHead>
-                    <TableHead>النوع</TableHead>
-                    <TableHead>العلاقة</TableHead>
-                    <TableHead>المبلغ المخصص</TableHead>
-                    <TableHead>عدد الدفعات</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {isLoading ? (
-                    <TableRow>
-                      <TableCell colSpan={6} className="text-center">
-                        جاري التحميل...
-                      </TableCell>
-                    </TableRow>
-                  ) : beneficiaries.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={6} className="text-center text-muted-foreground">
-                        لا توجد بيانات مستفيدين
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    beneficiaries.map((beneficiary, index) => (
-                      <TableRow key={beneficiary.id}>
-                        <TableCell>{index + 1}</TableCell>
-                        <TableCell className="font-medium">{beneficiary.beneficiary_name}</TableCell>
-                        <TableCell>
-                          <Badge variant="outline">{beneficiary.beneficiary_type}</Badge>
-                        </TableCell>
-                        <TableCell>{beneficiary.relationship || '-'}</TableCell>
-                        <TableCell className="font-bold text-green-600">
-                          {beneficiary.allocated_amount.toLocaleString()} ر.س
-                        </TableCell>
-                        <TableCell>{beneficiary.payments_count}</TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </ScrollArea>
-          </CardContent>
-        </Card>
-
-        {/* كشف الحساب البنكي */}
-        {(disclosure.opening_balance || disclosure.closing_balance) && (
+        {/* تفاصيل المصروفات */}
+        {expensesData.length > 0 && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Building className="h-5 w-5" />
-                كشف الحساب البنكي
+                <DollarSign className="h-5 w-5" />
+                تفاصيل المصروفات
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 border rounded-lg">
-                  <p className="text-sm text-muted-foreground mb-1">الرصيد الافتتاحي</p>
-                  <p className="text-2xl font-bold">
-                    {disclosure.opening_balance?.toLocaleString() || 0} ر.س
-                  </p>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-2 gap-3">
+                  {disclosure.maintenance_expenses && disclosure.maintenance_expenses > 0 && (
+                    <div className="p-3 bg-orange-50 dark:bg-orange-950 rounded-lg border border-orange-200">
+                      <p className="text-xs text-orange-600 mb-1">مصروفات الصيانة</p>
+                      <p className="text-lg font-bold text-orange-700">
+                        {disclosure.maintenance_expenses.toLocaleString()}
+                      </p>
+                    </div>
+                  )}
+                  
+                  {disclosure.administrative_expenses && disclosure.administrative_expenses > 0 && (
+                    <div className="p-3 bg-cyan-50 dark:bg-cyan-950 rounded-lg border border-cyan-200">
+                      <p className="text-xs text-cyan-600 mb-1">مصروفات إدارية</p>
+                      <p className="text-lg font-bold text-cyan-700">
+                        {disclosure.administrative_expenses.toLocaleString()}
+                      </p>
+                    </div>
+                  )}
+                  
+                  {disclosure.development_expenses && disclosure.development_expenses > 0 && (
+                    <div className="p-3 bg-violet-50 dark:bg-violet-950 rounded-lg border border-violet-200">
+                      <p className="text-xs text-violet-600 mb-1">مصروفات التطوير</p>
+                      <p className="text-lg font-bold text-violet-700">
+                        {disclosure.development_expenses.toLocaleString()}
+                      </p>
+                    </div>
+                  )}
+                  
+                  {disclosure.other_expenses && disclosure.other_expenses > 0 && (
+                    <div className="p-3 bg-pink-50 dark:bg-pink-950 rounded-lg border border-pink-200">
+                      <p className="text-xs text-pink-600 mb-1">مصروفات أخرى</p>
+                      <p className="text-lg font-bold text-pink-700">
+                        {disclosure.other_expenses.toLocaleString()}
+                      </p>
+                    </div>
+                  )}
                 </div>
-                
-                <div className="p-4 border rounded-lg">
-                  <p className="text-sm text-muted-foreground mb-1">الرصيد الختامي</p>
-                  <p className="text-2xl font-bold">
-                    {disclosure.closing_balance?.toLocaleString() || 0} ر.س
-                  </p>
+
+                <div>
+                  <h4 className="text-sm font-medium mb-4 text-center">توزيع المصروفات</h4>
+                  <ResponsiveContainer width="100%" height={200}>
+                    <PieChart>
+                      <Pie
+                        data={expensesData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                        outerRadius={80}
+                        dataKey="value"
+                      >
+                        {expensesData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={(value: number) => value.toLocaleString()} />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
                 </div>
               </div>
             </CardContent>
           </Card>
         )}
 
-        {/* المصروفات التفصيلية */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              تفصيل المصروفات
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
-                <span className="text-sm">مصروفات الصيانة</span>
-                <span className="font-bold">{disclosure.maintenance_expenses?.toLocaleString() || 0} ر.س</span>
-              </div>
-              
-              <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
-                <span className="text-sm">مصروفات إدارية</span>
-                <span className="font-bold">{disclosure.administrative_expenses?.toLocaleString() || 0} ر.س</span>
-              </div>
-              
-              <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
-                <span className="text-sm">مصروفات التطوير</span>
-                <span className="font-bold">{disclosure.development_expenses?.toLocaleString() || 0} ر.س</span>
-              </div>
-              
-              <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
-                <span className="text-sm">مصروفات أخرى</span>
-                <span className="font-bold">{disclosure.other_expenses?.toLocaleString() || 0} ر.س</span>
-              </div>
-              
-              <Separator />
-              
-              <div className="flex justify-between items-center p-3 bg-primary/10 rounded-lg">
-                <span className="text-sm font-bold">إجمالي المصروفات</span>
-                <span className="text-lg font-bold text-red-600">
-                  {disclosure.total_expenses.toLocaleString()} ر.س
-                </span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* ملاحظة الشفافية */}
-        <div className="p-4 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
-          <p className="text-sm text-blue-800 dark:text-blue-200">
-            📊 <strong>ملاحظة:</strong> هذا الإفصاح يعرض جميع المعلومات المالية والتوزيعات بشفافية كاملة.
-            تم إعداده بناءً على البيانات المحاسبية المعتمدة والتوزيعات المنفذة خلال السنة المالية {disclosure.year}.
-          </p>
-        </div>
+        {/* قائمة المستفيدين التفصيلية */}
+        {beneficiaries.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                قائمة المستفيدين التفصيلية ({beneficiaries.length} مستفيد)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-[400px]">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>الاسم</TableHead>
+                      <TableHead>النوع</TableHead>
+                      <TableHead>العلاقة</TableHead>
+                      <TableHead>المبلغ المخصص</TableHead>
+                      <TableHead>عدد الدفعات</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {isLoading ? (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center">
+                          جاري التحميل...
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      beneficiaries.map((ben) => (
+                        <TableRow key={ben.id}>
+                          <TableCell className="font-medium">{ben.beneficiary_name}</TableCell>
+                          <TableCell>
+                            <Badge variant="outline">{ben.beneficiary_type}</Badge>
+                          </TableCell>
+                          <TableCell>{ben.relationship || '-'}</TableCell>
+                          <TableCell className="font-semibold">
+                            {ben.allocated_amount.toLocaleString()} ر.س
+                          </TableCell>
+                          <TableCell>{ben.payments_count}</TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </ResponsiveDialog>
   );
