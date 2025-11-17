@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
+import { DialogDescription } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,7 +42,12 @@ interface SimulationResult {
   net_amount: number;
 }
 
-export function DistributionSimulator() {
+interface DistributionSimulatorProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export function DistributionSimulator({ open, onOpenChange }: DistributionSimulatorProps) {
   const { toast } = useToast();
   const { beneficiaries } = useBeneficiaries();
   const [totalAmount, setTotalAmount] = useState<number>(100000);
@@ -143,14 +150,20 @@ export function DistributionSimulator() {
   const totalNetDistributed = results.reduce((sum, r) => sum + r.net_amount, 0);
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calculator className="h-5 w-5 text-primary" />
-            محاكاة توزيع الغلة
-          </CardTitle>
-        </CardHeader>
+    <ResponsiveDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title="محاكاة توزيع الغلة"
+      description="قم بتعديل المبالغ والنسب لمحاكاة توزيع الغلة على المستفيدين"
+    >
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Calculator className="h-5 w-5 text-primary" />
+              إعدادات المحاكاة
+            </CardTitle>
+          </CardHeader>
         <CardContent className="space-y-6">
           {/* إدخال البيانات */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -294,5 +307,6 @@ export function DistributionSimulator() {
         </CardContent>
       </Card>
     </div>
+    </ResponsiveDialog>
   );
 }
