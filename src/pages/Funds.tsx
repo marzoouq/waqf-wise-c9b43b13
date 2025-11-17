@@ -14,6 +14,7 @@ import { AnnualDisclosureTab } from "@/components/funds/tabs/AnnualDisclosureTab
 import { OverviewTab } from "@/components/funds/tabs/OverviewTab";
 import { FundsTab } from "@/components/funds/tabs/FundsTab";
 import { DistributionsTab } from "@/components/funds/tabs/DistributionsTab";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 
 const Funds = () => {
   const [distributionDialogOpen, setDistributionDialogOpen] = useState(false);
@@ -67,71 +68,73 @@ const Funds = () => {
   }, [funds]);
 
   return (
-    <MobileOptimizedLayout>
-      <MobileOptimizedHeader
-        title="الأموال والتوزيعات"
-        description="إدارة أقلام الوقف وتوزيع الغلة"
-        actions={
-          <div className="flex flex-col md:flex-row gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setSimulationDialogOpen(true)}
-              className="gap-2"
-            >
-              <PieChart className="h-4 w-4" />
-              <span className="hidden sm:inline">محاكاة</span>
-            </Button>
-            <Button
-              size="sm"
-              onClick={() => setDistributionDialogOpen(true)}
-              className="gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              <span className="hidden sm:inline">توزيع جديد</span>
-            </Button>
-            <DistributionSettingsDialog />
-          </div>
-        }
-      />
+    <PageErrorBoundary pageName="صفحة الأموال والتوزيعات">
+      <MobileOptimizedLayout>
+        <MobileOptimizedHeader
+          title="الأموال والتوزيعات"
+          description="إدارة أقلام الوقف وتوزيع الغلة"
+          actions={
+            <div className="flex flex-col md:flex-row gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSimulationDialogOpen(true)}
+                className="gap-2"
+              >
+                <PieChart className="h-4 w-4" />
+                <span className="hidden sm:inline">محاكاة</span>
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => setDistributionDialogOpen(true)}
+                className="gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                <span className="hidden sm:inline">توزيع جديد</span>
+              </Button>
+              <DistributionSettingsDialog />
+            </div>
+          }
+        />
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4 mb-6">
-          <TabsTrigger value="overview" className="text-xs sm:text-sm">نظرة عامة</TabsTrigger>
-          <TabsTrigger value="funds" className="text-xs sm:text-sm">أقلام الوقف</TabsTrigger>
-          <TabsTrigger value="distributions" className="text-xs sm:text-sm">التوزيعات</TabsTrigger>
-          <TabsTrigger value="disclosure" className="text-xs sm:text-sm">الإفصاح السنوي</TabsTrigger>
-        </TabsList>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-4 mb-6">
+            <TabsTrigger value="overview" className="text-xs sm:text-sm">نظرة عامة</TabsTrigger>
+            <TabsTrigger value="funds" className="text-xs sm:text-sm">أقلام الوقف</TabsTrigger>
+            <TabsTrigger value="distributions" className="text-xs sm:text-sm">التوزيعات</TabsTrigger>
+            <TabsTrigger value="disclosure" className="text-xs sm:text-sm">الإفصاح السنوي</TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="overview" className="space-y-6">
-          <OverviewTab summaryStats={summaryStats} distributions={distributions} />
-        </TabsContent>
+          <TabsContent value="overview" className="space-y-6">
+            <OverviewTab summaryStats={summaryStats} distributions={distributions} />
+          </TabsContent>
 
-        <TabsContent value="funds" className="space-y-6">
-          <FundsTab funds={funds} isLoading={fundsLoading} />
-        </TabsContent>
+          <TabsContent value="funds" className="space-y-6">
+            <FundsTab funds={funds} isLoading={fundsLoading} />
+          </TabsContent>
 
-        <TabsContent value="distributions" className="space-y-6">
-          <DistributionsTab />
-        </TabsContent>
+          <TabsContent value="distributions" className="space-y-6">
+            <DistributionsTab />
+          </TabsContent>
 
-        <TabsContent value="disclosure" className="space-y-6">
-          <AnnualDisclosureTab />
-        </TabsContent>
-      </Tabs>
+          <TabsContent value="disclosure" className="space-y-6">
+            <AnnualDisclosureTab />
+          </TabsContent>
+        </Tabs>
 
-      {/* Dialogs */}
-      <DistributionDialog
-        open={distributionDialogOpen}
-        onOpenChange={setDistributionDialogOpen}
-        onDistribute={handleDistribute}
-      />
+        {/* Dialogs */}
+        <DistributionDialog
+          open={distributionDialogOpen}
+          onOpenChange={setDistributionDialogOpen}
+          onDistribute={handleDistribute}
+        />
 
-      <SimulationDialog
-        open={simulationDialogOpen}
-        onOpenChange={setSimulationDialogOpen}
-      />
-    </MobileOptimizedLayout>
+        <SimulationDialog
+          open={simulationDialogOpen}
+          onOpenChange={setSimulationDialogOpen}
+        />
+      </MobileOptimizedLayout>
+    </PageErrorBoundary>
   );
 };
 

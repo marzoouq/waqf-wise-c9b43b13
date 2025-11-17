@@ -5914,6 +5914,23 @@ export type Database = {
         Args: { account_uuid: string }
         Returns: number
       }
+      calculate_disclosure_balances: {
+        Args: {
+          p_fiscal_year_id: string
+          p_period_end: string
+          p_period_start: string
+        }
+        Returns: {
+          administrative_expenses: number
+          closing_balance: number
+          development_expenses: number
+          maintenance_expenses: number
+          opening_balance: number
+          other_expenses: number
+          total_expenses: number
+          total_revenues: number
+        }[]
+      }
       calculate_loan_schedule: {
         Args: {
           p_interest_rate: number
