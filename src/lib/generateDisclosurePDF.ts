@@ -1,6 +1,10 @@
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { AnnualDisclosure } from "@/hooks/useAnnualDisclosures";
+import { logger } from "@/lib/logger";
+import { Database } from "@/integrations/supabase/types";
+
+type DisclosureBeneficiary = Database['public']['Tables']['disclosure_beneficiaries']['Row'];
 
 // Load Arabic font
 const loadArabicFont = async (doc: jsPDF) => {
@@ -21,13 +25,16 @@ const loadArabicFont = async (doc: jsPDF) => {
       });
     }
   } catch (error) {
-    console.error("Failed to load Arabic font:", error);
+    logger.error(error, { 
+      context: 'load_arabic_font_pdf', 
+      severity: 'low'
+    });
   }
 };
 
 export const generateDisclosurePDF = async (
   disclosure: AnnualDisclosure,
-  beneficiaries: any[] = []
+  beneficiaries: DisclosureBeneficiary[] = []
 ) => {
   const doc = new jsPDF();
   

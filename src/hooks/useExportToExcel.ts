@@ -1,6 +1,11 @@
 import { useCallback } from "react";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
+import { Database } from "@/integrations/supabase/types";
+import { logger } from "@/lib/logger";
+
+type AnnualDisclosure = Database['public']['Tables']['annual_disclosures']['Row'];
+type DisclosureBeneficiary = Database['public']['Tables']['disclosure_beneficiaries']['Row'];
 
 export interface ExcelExportOptions {
   filename: string;
@@ -33,7 +38,10 @@ export function useExportToExcel() {
         description: `تم تصدير البيانات إلى ${options.filename}`,
       });
     } catch (error) {
-      console.error('Excel export error:', error);
+      logger.error(error, { 
+        context: 'export_to_excel', 
+        severity: 'low'
+      });
       toast.error("فشل التصدير", {
         description: "حدث خطأ أثناء تصدير البيانات إلى Excel",
       });
@@ -44,7 +52,7 @@ export function useExportToExcel() {
 }
 
 // دالة مساعدة لتنسيق بيانات الإفصاح السنوي
-export function formatDisclosureForExcel(disclosure: any) {
+export function formatDisclosureForExcel(disclosure: AnnualDisclosure) {
   return {
     'السنة المالية': disclosure.year,
     'اسم الوقف': disclosure.waqf_name,
@@ -67,13 +75,12 @@ export function formatDisclosureForExcel(disclosure: any) {
 }
 
 // دالة مساعدة لتنسيق بيانات المستفيدين في الإفصاح
-export function formatDisclosureBeneficiariesForExcel(beneficiaries: any[]) {
+export function formatDisclosureBeneficiariesForExcel(beneficiaries: DisclosureBeneficiary[]) {
   return beneficiaries.map(b => ({
     'اسم المستفيد': b.beneficiary_name || '',
     'النوع': b.beneficiary_type || '',
-    'المبلغ المستحق': b.entitled_amount?.toLocaleString() || '0',
-    'المبلغ المدفوع': b.paid_amount?.toLocaleString() || '0',
-    'الحالة': b.status || '',
-    'ملاحظات': b.notes || '',
+    'المبلغ المخصص': b.allocated_amount?.toLocaleString() || '0',
+    'عدد المدفوعات': b.payments_count || 0,
+    'العلاقة': b.relationship || '',
   }));
 }

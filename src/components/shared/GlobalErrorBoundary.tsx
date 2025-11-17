@@ -71,9 +71,12 @@ export class GlobalErrorBoundary extends Component<Props, State> {
           timestamp: new Date().toISOString(),
         }
       });
-    } catch (notifyError) {
-      console.error('فشل إرسال إشعار للدعم:', notifyError);
-    }
+      } catch (notifyError) {
+        logger.error(notifyError, { 
+          context: 'notify_support_team_failed', 
+          severity: 'low'
+        });
+      }
   };
 
   handleReset = () => {
