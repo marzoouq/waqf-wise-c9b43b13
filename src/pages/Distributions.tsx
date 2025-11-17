@@ -8,7 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { useDistributions } from "@/hooks/useDistributions";
 import { DistributionSettingsDialog } from "@/components/distributions/DistributionSettingsDialog";
 import { DistributionDetailsDialog } from "@/components/distributions/DistributionDetailsDialog";
-import { Eye, Loader2, TrendingUp, Users, DollarSign } from "lucide-react";
+import { ApprovalWorkflowDialog } from "@/components/distributions/ApprovalWorkflowDialog";
+import { Eye, Loader2, TrendingUp, Users, DollarSign, CheckSquare } from "lucide-react";
 import { Distribution } from "@/hooks/useDistributions";
 import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
 import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
@@ -18,6 +19,7 @@ export default function Distributions() {
   const { distributions, isLoading, generateDistribution } = useDistributions();
   const [selectedDistribution, setSelectedDistribution] = useState<Distribution | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [approvalOpen, setApprovalOpen] = useState(false);
   const [generating, setGenerating] = useState(false);
   
   const [newDistribution, setNewDistribution] = useState({
@@ -209,17 +211,32 @@ export default function Distributions() {
                           {new Date(distribution.distribution_date).toLocaleDateString('ar-SA')}
                         </TableCell>
                         <TableCell>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => {
-                              setSelectedDistribution(distribution);
-                              setDetailsOpen(true);
-                            }}
-                            className="h-8 w-8 p-0"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
+                          <div className="flex gap-1">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => {
+                                setSelectedDistribution(distribution);
+                                setDetailsOpen(true);
+                              }}
+                              className="h-8 w-8 p-0"
+                              title="عرض التفاصيل"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => {
+                                setSelectedDistribution(distribution);
+                                setApprovalOpen(true);
+                              }}
+                              className="h-8 w-8 p-0"
+                              title="الموافقات"
+                            >
+                              <CheckSquare className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -235,6 +252,12 @@ export default function Distributions() {
         distribution={selectedDistribution}
         open={detailsOpen}
         onOpenChange={setDetailsOpen}
+      />
+      
+      <ApprovalWorkflowDialog
+        distribution={selectedDistribution}
+        open={approvalOpen}
+        onOpenChange={setApprovalOpen}
       />
     </MobileOptimizedLayout>
   );
