@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { useBeneficiaryProfile } from "@/hooks/useBeneficiaryProfile";
 import { useRealtimeNotifications } from "@/hooks/useRealtimeNotifications";
+import { useDisclosureNotifications } from "@/hooks/useDisclosureNotifications";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -22,6 +23,7 @@ import { BeneficiaryCertificate } from "@/components/beneficiary/BeneficiaryCert
 import { InternalMessagesDialog } from "@/components/messages/InternalMessagesDialog";
 import { QuickActionsCard } from "@/components/beneficiary/QuickActionsCard";
 import { NotificationsCard } from "@/components/beneficiary/NotificationsCard";
+import { AnnualDisclosureCard } from "@/components/beneficiary/AnnualDisclosureCard";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
 import { useToast } from "@/hooks/use-toast";
 import { Beneficiary } from "@/types/beneficiary";
@@ -52,6 +54,7 @@ const BeneficiaryDashboard = () => {
   
   // تفعيل الإشعارات في الوقت الفعلي
   useRealtimeNotifications();
+  useDisclosureNotifications();
   
   const [requests, setRequests] = useState<Request[]>([]);
   const [messagesDialogOpen, setMessagesDialogOpen] = useState(false);
@@ -295,6 +298,9 @@ const BeneficiaryDashboard = () => {
 
         {/* الإشعارات */}
         <NotificationsCard />
+
+        {/* الإفصاح السنوي */}
+        <AnnualDisclosureCard />
 
         {/* الطلبات والخدمات */}
 
