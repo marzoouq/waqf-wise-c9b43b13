@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { useDistributionDetails } from "@/hooks/useDistributionDetails";
@@ -32,6 +32,9 @@ export function DistributionDetailsDialog({
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>تفاصيل التوزيع - {distribution?.month}</DialogTitle>
+          <DialogDescription>
+            عرض كامل تفاصيل المستفيدين والمبالغ المخصصة لهم في هذا التوزيع
+          </DialogDescription>
         </DialogHeader>
 
         {distribution && (

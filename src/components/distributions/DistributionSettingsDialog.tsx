@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -44,6 +44,9 @@ export function DistributionSettingsDialog() {
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>إعدادات التوزيع</DialogTitle>
+          <DialogDescription>
+            إدارة نسب الاستقطاع وقواعد التوزيع الافتراضية
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">
