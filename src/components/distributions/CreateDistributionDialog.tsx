@@ -25,6 +25,7 @@ import { Loader2, Calculator, Users, Bell } from "lucide-react";
 import { useBeneficiaries } from "@/hooks/useBeneficiaries";
 import { useDistributions } from "@/hooks/useDistributions";
 import { useToast } from "@/hooks/use-toast";
+import { useDistributionSettings } from "@/hooks/useDistributionSettings";
 
 const distributionSchema = z.object({
   period_start: z.string().min(1, "تاريخ البداية مطلوب"),
@@ -52,8 +53,18 @@ export const CreateDistributionDialog = ({
   const { toast } = useToast();
   const { beneficiaries, isLoading: loadingBeneficiaries } = useBeneficiaries();
   const { generateDistribution } = useDistributions();
+  const { settings } = useDistributionSettings();
   const [creating, setCreating] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
+
+  // حساب النسب تلقائياً من الإعدادات
+  useMemo(() => {
+    if (settings && open) {
+      form.setValue("nazer_percentage", settings.nazer_percentage || 10);
+      form.setValue("charity_percentage", settings.waqif_charity_percentage || 5);
+      form.setValue("waqf_corpus_percentage", settings.waqf_corpus_percentage || 0);
+    }
+  }, [settings, open]);
 
   const form = useForm<DistributionFormValues>({
     resolver: zodResolver(distributionSchema),
