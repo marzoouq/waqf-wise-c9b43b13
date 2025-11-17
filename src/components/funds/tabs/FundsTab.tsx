@@ -7,9 +7,12 @@ import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { Wallet } from "lucide-react";
+import { Database } from "@/integrations/supabase/types";
+
+type Fund = Database['public']['Tables']['funds']['Row'];
 
 interface FundsTabProps {
-  funds: any[];
+  funds: Fund[];
   isLoading: boolean;
 }
 
@@ -55,7 +58,7 @@ export function FundsTab({ funds, isLoading }: FundsTabProps) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {funds.map((fund: any) => {
+              {funds.map((fund) => {
                 const remaining = Number(fund.allocated_amount) - Number(fund.spent_amount);
                 const percentage = (Number(fund.spent_amount) / Number(fund.allocated_amount)) * 100;
 

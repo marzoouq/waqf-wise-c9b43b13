@@ -1,6 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, DollarSign, Users, PieChart } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { Database } from "@/integrations/supabase/types";
+
+type Distribution = Database['public']['Tables']['distributions']['Row'];
 
 interface OverviewTabProps {
   summaryStats: {
@@ -9,7 +12,7 @@ interface OverviewTabProps {
     totalAvailable: number;
     activeBeneficiaries: number;
   };
-  distributions: any[];
+  distributions: Distribution[];
 }
 
 export function OverviewTab({ summaryStats, distributions }: OverviewTabProps) {
