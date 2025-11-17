@@ -62,7 +62,6 @@ export function DistributionDialog({
   onDistribute,
 }: DistributionDialogProps) {
   const { toast } = useToast();
-  const { simulateDistribution } = useDistributions();
   const [showSimulation, setShowSimulation] = useState(false);
   const [simulationResult, setSimulationResult] = useState<LocalSimulationResult | null>(null);
 
@@ -94,7 +93,17 @@ export function DistributionDialog({
   const handleSimulate = async () => {
     const values = form.getValues();
     if (values.totalAmount > 0 && values.beneficiaries > 0) {
-      const result = await simulateDistribution(values.totalAmount, values.beneficiaries);
+      // محاكاة توزيع بسيط
+      const perBeneficiary = values.totalAmount / values.beneficiaries;
+      const result: LocalSimulationResult = {
+        totalAmount: values.totalAmount,
+        beneficiariesCount: values.beneficiaries,
+        perBeneficiary,
+        distribution: Array.from({ length: Math.min(values.beneficiaries, 10) }, (_, i) => ({
+          beneficiaryNumber: i + 1,
+          amount: perBeneficiary,
+        })),
+      };
       setSimulationResult(result);
       setShowSimulation(true);
     }
