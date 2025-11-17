@@ -13,10 +13,12 @@ import {
   Building,
   PiggyBank,
   Heart,
-  Crown
+  Crown,
+  PieChart as PieChartIcon
 } from "lucide-react";
 import { useDisclosureBeneficiaries } from "@/hooks/useAnnualDisclosures";
 import { AnnualDisclosure } from "@/hooks/useAnnualDisclosures";
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 
 interface ViewDisclosureDialogProps {
   open: boolean;
@@ -32,6 +34,26 @@ export const ViewDisclosureDialog = ({
   const { beneficiaries, isLoading } = useDisclosureBeneficiaries(disclosure?.id);
 
   if (!disclosure) return null;
+
+  // بيانات الرسوم البيانية
+  const distributionData = [
+    { name: 'حصة الناظر', value: disclosure.nazer_share, color: 'hsl(var(--chart-1))' },
+    { name: 'صدقة الواقف', value: disclosure.charity_share, color: 'hsl(var(--chart-2))' },
+    { name: 'رقبة الوقف', value: disclosure.corpus_share, color: 'hsl(var(--chart-3))' },
+  ];
+
+  const expensesData = [
+    { name: 'صيانة', value: disclosure.maintenance_expenses || 0, color: 'hsl(var(--chart-4))' },
+    { name: 'إدارية', value: disclosure.administrative_expenses || 0, color: 'hsl(var(--chart-5))' },
+    { name: 'تطوير', value: disclosure.development_expenses || 0, color: 'hsl(var(--chart-1))' },
+    { name: 'أخرى', value: disclosure.other_expenses || 0, color: 'hsl(var(--chart-2))' },
+  ].filter(item => item.value > 0);
+
+  const beneficiariesData = [
+    { name: 'أبناء', value: disclosure.sons_count, color: 'hsl(var(--primary))' },
+    { name: 'بنات', value: disclosure.daughters_count, color: 'hsl(var(--secondary))' },
+    { name: 'زوجات', value: disclosure.wives_count, color: 'hsl(var(--accent))' },
+  ].filter(item => item.value > 0);
 
   return (
     <ResponsiveDialog
@@ -81,6 +103,73 @@ export const ViewDisclosureDialog = ({
                   {disclosure.net_income.toLocaleString()} ر.س
                 </p>
               </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* رسوم بيانية تفاعلية */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <PieChartIcon className="h-5 w-5" />
+              التحليل المالي التفاعلي
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <h4 className="text-sm font-medium mb-4 text-center">الإيرادات مقابل المصروفات</h4>
+                <ResponsiveContainer width="100%" height={200}>
+                  <PieChart>
+                    <Pie
+                      data={[
+                        { name: 'الإيرادات', value: disclosure.total_revenues, color: 'hsl(var(--success))' },
+                        { name: 'المصروفات', value: disclosure.total_expenses, color: 'hsl(var(--destructive))' },
+                      ]}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                      outerRadius={80}
+                      dataKey="value"
+                    >
+                      {[
+                        { name: 'الإيرادات', value: disclosure.total_revenues, color: 'hsl(var(--success))' },
+                        { name: 'المصروفات', value: disclosure.total_expenses, color: 'hsl(var(--destructive))' },
+                      ].map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(value: number) => value.toLocaleString()} />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+
+              {beneficiariesData.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-medium mb-4 text-center">توزيع المستفيدين</h4>
+                  <ResponsiveContainer width="100%" height={200}>
+                    <PieChart>
+                      <Pie
+                        data={beneficiariesData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                        outerRadius={80}
+                        dataKey="value"
+                      >
+                        {beneficiariesData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
 import { Separator } from "@/components/ui/separator";
@@ -13,13 +14,16 @@ import {
   Eye,
   FileCheck,
   Download,
-  Calendar
+  Calendar,
+  BarChart3,
+  TrendingDown,
 } from "lucide-react";
-import { useAnnualDisclosures, useDisclosureBeneficiaries } from "@/hooks/useAnnualDisclosures";
+import { useAnnualDisclosures } from "@/hooks/useAnnualDisclosures";
 import { GenerateDisclosureDialog } from "@/components/distributions/GenerateDisclosureDialog";
 import { ViewDisclosureDialog } from "@/components/distributions/ViewDisclosureDialog";
 import { generateDisclosurePDF } from "@/lib/generateDisclosurePDF";
 import { supabase } from "@/integrations/supabase/client";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from "recharts";
 
 export function AnnualDisclosureTab() {
   const { disclosures, currentYearDisclosure, isLoading, publishDisclosure } = useAnnualDisclosures();
@@ -27,6 +31,15 @@ export function AnnualDisclosureTab() {
   const [viewOpen, setViewOpen] = useState(false);
   const [generateOpen, setGenerateOpen] = useState(false);
   const [publishing, setPublishing] = useState(false);
+
+  // بيانات المقارنة السنوية
+  const comparisonData = disclosures.slice(0, 5).reverse().map(d => ({
+    year: d.year.toString(),
+    revenues: d.total_revenues,
+    expenses: d.total_expenses,
+    netIncome: d.net_income,
+    beneficiaries: d.total_beneficiaries,
+  }));
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, "default" | "secondary" | "outline"> = {
@@ -67,7 +80,15 @@ export function AnnualDisclosureTab() {
 
   return (
     <div className="space-y-6">
-      {/* الإفصاح للسنة الحالية */}
+      <Tabs defaultValue="current" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="current">الإفصاح الحالي</TabsTrigger>
+          <TabsTrigger value="history">السجل التاريخي</TabsTrigger>
+          <TabsTrigger value="comparison">المقارنات السنوية</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="current" className="space-y-6">
+          {/* الإفصاح للسنة الحالية */}
       {currentYearDisclosure && (
         <Card className="border-primary">
           <CardHeader>
