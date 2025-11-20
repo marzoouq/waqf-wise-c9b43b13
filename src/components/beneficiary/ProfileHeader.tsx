@@ -64,9 +64,16 @@ export function ProfileHeader({ beneficiary }: ProfileHeaderProps) {
             {/* Name & Badges */}
             <div>
               <div className="flex items-start justify-between gap-4 mb-2">
-                <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-                  {beneficiary.full_name}
-                </h1>
+                <div>
+                  <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+                    {beneficiary.full_name}
+                  </h1>
+                  {beneficiary.beneficiary_number && (
+                    <p className="text-sm text-muted-foreground mt-1">
+                      رقم العضوية: <span className="font-mono font-semibold text-primary">{beneficiary.beneficiary_number}</span>
+                    </p>
+                  )}
+                </div>
                 <div className="flex gap-2">
                   {beneficiary.can_login && (
                     <Badge variant="outline" className="gap-1">

@@ -218,7 +218,7 @@ const BeneficiaryDashboard = () => {
       <div className="space-y-4">
         <MobileOptimizedHeader
           title={`مرحباً، ${beneficiary.full_name}`}
-          description="لوحة التحكم الشخصية"
+          description={beneficiary.beneficiary_number ? `رقم العضوية: ${beneficiary.beneficiary_number}` : "لوحة التحكم الشخصية"}
           actions={
             <Button onClick={() => setMessagesDialogOpen(true)} variant="outline" size="sm">
               <MessageSquare className="h-4 w-4 ml-2" />
