@@ -49,6 +49,11 @@ const beneficiarySchema = z.object({
     .string()
     .min(1, { message: "الرجاء اختيار فئة المستفيد" }),
   
+  beneficiaryType: z
+    .string()
+    .optional()
+    .or(z.literal("")),
+  
   relationship: z
     .string()
     .optional()
@@ -115,6 +120,7 @@ interface Beneficiary {
   national_id: string;
   family_name?: string;
   category: string;
+  beneficiary_type?: string;
   relationship?: string;
   phone: string;
   email?: string;
@@ -148,6 +154,7 @@ const BeneficiaryDialog = ({
       nationalId: "",
       familyName: "",
       category: "",
+      beneficiaryType: "",
       relationship: "",
       phone: "",
       email: "",
@@ -167,6 +174,7 @@ const BeneficiaryDialog = ({
         nationalId: beneficiary.national_id,
         familyName: beneficiary.family_name || "",
         category: beneficiary.category,
+        beneficiaryType: beneficiary.beneficiary_type || "",
         relationship: beneficiary.relationship || "",
         phone: beneficiary.phone,
         email: beneficiary.email || "",
@@ -183,6 +191,7 @@ const BeneficiaryDialog = ({
         nationalId: "",
         familyName: "",
         category: "",
+        beneficiaryType: "",
         relationship: "",
         phone: "",
         email: "",
@@ -203,6 +212,7 @@ const BeneficiaryDialog = ({
       phone: data.phone,
       email: data.email || null,
       category: data.category,
+      beneficiary_type: data.beneficiaryType || null,
       family_name: data.familyName || null,
       relationship: data.relationship || null,
       number_of_sons: data.numberOfSons || 0,
@@ -383,24 +393,56 @@ const BeneficiaryDialog = ({
 
                 <FormField
                   control={form.control}
-                  name="relationship"
+                  name="beneficiaryType"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-sm font-medium">
-                        صلة القرابة
+                        نوع المستفيد
                       </FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="مثال: ابن، زوجة، أخ"
-                          {...field}
-                          className="text-right"
-                        />
-                      </FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="text-right">
+                            <SelectValue placeholder="اختر نوع المستفيد" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="ولد">ولد</SelectItem>
+                          <SelectItem value="بنت">بنت</SelectItem>
+                          <SelectItem value="زوجة">زوجة</SelectItem>
+                          <SelectItem value="واقف">واقف</SelectItem>
+                          <SelectItem value="حفيد">حفيد</SelectItem>
+                          <SelectItem value="حفيدة">حفيدة</SelectItem>
+                          <SelectItem value="ناظر">ناظر</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
+
+              <FormField
+                control={form.control}
+                name="relationship"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">
+                      صلة القرابة
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="مثال: ابن، زوجة، أخ"
+                        {...field}
+                        className="text-right"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
 
             {/* Family Information Section */}
