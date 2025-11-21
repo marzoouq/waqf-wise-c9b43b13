@@ -46,11 +46,12 @@ export function useAdminKPIs() {
       const totalFunds = fundsData.count || 0;
       const activeFunds = fundsData.data?.filter(f => f.is_active).length || 0;
 
-      // Calculate requests
-      const pendingRequests = requestsData.data?.filter(r => r.status === "معلق").length || 0;
+      // Calculate requests (including both "معلق" and "قيد المراجعة")
+      const pendingStatuses = ["معلق", "قيد المراجعة", "مقدم"];
+      const pendingRequests = requestsData.data?.filter(r => pendingStatuses.includes(r.status || "")).length || 0;
       const now = new Date();
       const overdueRequests = requestsData.data?.filter(r => 
-        r.status === "معلق" && r.sla_due_at && new Date(r.sla_due_at) < now
+        pendingStatuses.includes(r.status || "") && r.sla_due_at && new Date(r.sla_due_at) < now
       ).length || 0;
 
       // Calculate financial data

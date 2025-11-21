@@ -6015,6 +6015,8 @@ export type Database = {
         Args: { p_amount: number }
         Returns: boolean
       }
+      seed_demo_data: { Args: never; Returns: Json }
+      seed_journal_entries: { Args: never; Returns: Json }
       setup_demo_accounts: {
         Args: never
         Returns: {
