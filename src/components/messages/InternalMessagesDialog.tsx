@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { Separator } from "@/components/ui/separator";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface InternalMessagesDialogProps {
   open: boolean;
@@ -23,6 +26,7 @@ export function InternalMessagesDialog({
   onOpenChange,
 }: InternalMessagesDialogProps) {
   const { user } = useAuth();
+  const { toast } = useToast();
   const { inboxMessages, sentMessages, sendMessage, markAsRead, unreadCount } = useInternalMessages();
   const [activeTab, setActiveTab] = useState("inbox");
   const [replyToMessage, setReplyToMessage] = useState<typeof inboxMessages[0] | null>(null);
@@ -31,6 +35,61 @@ export function InternalMessagesDialog({
     subject: "",
     body: "",
   });
+  const [recipients, setRecipients] = useState<Array<{ id: string; name: string; role: string }>>([]);
+  const [loadingRecipients, setLoadingRecipients] = useState(false);
+
+  // جلب قائمة المستخدمين (الموظفين والإداريين)
+  useEffect(() => {
+    const fetchRecipients = async () => {
+      setLoadingRecipients(true);
+      try {
+        // جلب المستخدمين مع أدوارهم (غير المستفيدين)
+        const { data: userRoles, error: rolesError } = await supabase
+          .from('user_roles')
+          .select('user_id, role')
+          .neq('role', 'beneficiary');
+
+        if (rolesError) throw rolesError;
+
+        if (userRoles && userRoles.length > 0) {
+          const userIds = userRoles.map(ur => ur.user_id);
+          
+          // جلب بيانات المستخدمين
+          const { data: profiles, error: profilesError } = await supabase
+            .from('profiles')
+            .select('user_id, full_name')
+            .in('user_id', userIds);
+
+          if (profilesError) throw profilesError;
+
+          // دمج البيانات
+          const recipientsList = profiles?.map(profile => {
+            const userRole = userRoles.find(ur => ur.user_id === profile.user_id);
+            return {
+              id: profile.user_id,
+              name: profile.full_name || 'مستخدم',
+              role: userRole?.role || 'user'
+            };
+          }) || [];
+
+          setRecipients(recipientsList);
+        }
+      } catch (error) {
+        console.error('Error fetching recipients:', error);
+        toast({
+          title: "خطأ في تحميل المستلمين",
+          description: "حدث خطأ أثناء تحميل قائمة المستلمين",
+          variant: "destructive"
+        });
+      } finally {
+        setLoadingRecipients(false);
+      }
+    };
+
+    if (open) {
+      fetchRecipients();
+    }
+  }, [open, toast]);
 
   const handleReplyToMessage = (message: typeof inboxMessages[0]) => {
     setReplyToMessage(message);
@@ -194,6 +253,27 @@ export function InternalMessagesDialog({
               </Card>
             )}
             <div className="space-y-3">
+              {!replyToMessage && (
+                <div>
+                  <label className="text-sm font-medium mb-1 block">إلى</label>
+                  <Select
+                    value={newMessage.receiver_id}
+                    onValueChange={(value) => setNewMessage({ ...newMessage, receiver_id: value })}
+                    disabled={loadingRecipients}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={loadingRecipients ? "جاري التحميل..." : "اختر المستلم"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {recipients.map((recipient) => (
+                        <SelectItem key={recipient.id} value={recipient.id}>
+                          {recipient.name} ({recipient.role})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
               <div>
                 <label className="text-sm font-medium mb-1 block">الموضوع</label>
                 <Input
