@@ -28,8 +28,14 @@ export function ProtectedRoute({ children, requiredRole, requiredRoles }: Protec
       console.log('ProtectedRoute - Required role:', requiredRole);
       console.log('ProtectedRoute - Required roles:', requiredRoles);
       
+      // ✅ Wait if user exists but roles are still empty (still loading)
+      if (roles.length === 0 && !roleLoading) {
+        console.log('⏳ Waiting for roles to load...');
+        return;
+      }
+      
       if (requiredRole && !roles.includes(requiredRole)) {
-        console.log('Access denied - missing required role:', requiredRole);
+        console.log('❌ Access denied - missing required role:', requiredRole);
         navigate('/', { replace: true });
         return;
       }
@@ -37,17 +43,18 @@ export function ProtectedRoute({ children, requiredRole, requiredRoles }: Protec
       if (requiredRoles && requiredRoles.length > 0) {
         const hasAnyRole = requiredRoles.some(role => roles.includes(role));
         if (!hasAnyRole) {
-          console.log('Access denied - missing any of required roles:', requiredRoles);
+          console.log('❌ Access denied - missing any of required roles:', requiredRoles);
           navigate('/', { replace: true });
           return;
         }
       }
       
-      console.log('Access granted ✓');
+      console.log('✅ Access granted');
     }
   }, [user, authLoading, roleLoading, requiredRole, requiredRoles, roles, navigate]);
 
-  if (authLoading || roleLoading) {
+  // Show loading when auth is loading OR when user exists but roles are loading
+  if (authLoading || (user && roleLoading)) {
     return <LoadingState fullScreen />;
   }
 
