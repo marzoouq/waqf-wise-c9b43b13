@@ -31,6 +31,7 @@ import { EnableLoginDialog } from "@/components/beneficiaries/EnableLoginDialog"
 import { TribeManagementDialog } from "@/components/beneficiaries/TribeManagementDialog";
 import { BeneficiariesPrintButton } from "@/components/beneficiaries/BeneficiariesPrintButton";
 import { BeneficiariesImporter } from "@/components/beneficiaries/BeneficiariesImporter";
+import { CreateBeneficiaryAccountsButton } from "@/components/beneficiaries/CreateBeneficiaryAccountsButton";
 import { Pagination } from "@/components/ui/pagination";
 import { useNavigate } from "react-router-dom";
 import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
@@ -196,6 +197,7 @@ const Beneficiaries = () => {
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
+            <CreateBeneficiaryAccountsButton />
             <BeneficiariesPrintButton beneficiaries={filteredBeneficiaries} />
             <BeneficiariesImporter onSuccess={() => queryClient.invalidateQueries({ queryKey: ['beneficiaries'] })} />
             <Button 
