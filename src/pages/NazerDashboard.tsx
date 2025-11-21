@@ -1,9 +1,11 @@
-import { Shield, LayoutDashboard, TrendingUp, Building2, Bell, Vote } from "lucide-react";
+import { Shield, LayoutDashboard, TrendingUp, Building2, Bell, Vote, Mail } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
+import { Button } from "@/components/ui/button";
+import { AdminSendMessageDialog } from "@/components/messages/AdminSendMessageDialog";
 import PendingApprovalsSection from "@/components/dashboard/nazer/PendingApprovalsSection";
 import NazerKPIs from "@/components/dashboard/nazer/NazerKPIs";
 import SmartAlertsSection from "@/components/dashboard/nazer/SmartAlertsSection";
@@ -46,14 +48,22 @@ const SectionSkeleton = () => (
 );
 
 export default function NazerDashboard() {
+  const [messageDialogOpen, setMessageDialogOpen] = useState(false);
+
   return (
     <MobileOptimizedLayout>
       <div className="space-y-6">
-        <MobileOptimizedHeader
-          title="لوحة تحكم الناظر"
-          description="نظرة شاملة على جميع عمليات الوقف"
-          icon={<Shield className="h-8 w-8 text-primary" />}
-        />
+        <div className="flex items-center justify-between">
+          <MobileOptimizedHeader
+            title="لوحة تحكم الناظر"
+            description="نظرة شاملة على جميع عمليات الوقف"
+            icon={<Shield className="h-8 w-8 text-primary" />}
+          />
+          <Button onClick={() => setMessageDialogOpen(true)} className="gap-2">
+            <Mail className="h-4 w-4" />
+            <span className="hidden sm:inline">إرسال رسالة</span>
+          </Button>
+        </div>
 
         <Tabs defaultValue="overview" className="w-full">
           <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-grid h-auto p-1 bg-muted/50">
@@ -189,6 +199,11 @@ export default function NazerDashboard() {
           </TabsContent>
         </Tabs>
       </div>
+
+      <AdminSendMessageDialog
+        open={messageDialogOpen}
+        onOpenChange={setMessageDialogOpen}
+      />
     </MobileOptimizedLayout>
   );
 }
