@@ -24,11 +24,13 @@ import { InternalMessagesDialog } from "@/components/messages/InternalMessagesDi
 import { QuickActionsCard } from "@/components/beneficiary/QuickActionsCard";
 import { NotificationsCard } from "@/components/beneficiary/NotificationsCard";
 import { AnnualDisclosureCard } from "@/components/beneficiary/AnnualDisclosureCard";
+import { FinancialTransparencyTab } from "@/components/beneficiary/FinancialTransparencyTab";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
 import { useToast } from "@/hooks/use-toast";
 import { Beneficiary } from "@/types/beneficiary";
 import { logger } from "@/lib/logger";
 import { Database } from '@/integrations/supabase/types';
+import { Eye } from "lucide-react";
 
 interface Request {
   id: string;
@@ -302,35 +304,34 @@ const BeneficiaryDashboard = () => {
         {/* الإفصاح السنوي */}
         <AnnualDisclosureCard />
 
-        {/* الطلبات والخدمات */}
-
+        {/* التبويبات الرئيسية */}
         <Card>
-          <CardHeader>
-            <CardTitle>الخدمات والطلبات</CardTitle>
-          </CardHeader>
-          <CardContent>
+          <CardContent className="p-0">
             <Tabs value={activeRequestTab} onValueChange={setActiveRequestTab}>
-              <TabsList className="grid w-full grid-cols-5 text-xs md:text-sm h-auto">
-                <TabsTrigger value="view" className="px-2 py-2">السجل</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2 md:grid-cols-6 text-xs md:text-sm h-auto rounded-b-none">
+                <TabsTrigger value="view" className="px-2 py-2">
+                  <FileText className="h-3 w-3 md:h-4 md:w-4 ml-1 md:ml-2" />
+                  السجل
+                </TabsTrigger>
+                <TabsTrigger value="transparency" className="px-2 py-2">
+                  <Eye className="h-3 w-3 md:h-4 md:w-4 ml-1 md:ml-2" />
+                  الشفافية
+                </TabsTrigger>
                 <TabsTrigger value="emergency" className="px-2 py-2">
                   <AlertCircle className="h-3 w-3 md:h-4 md:w-4 ml-1 md:ml-2" />
-                  <span className="hidden sm:inline">فزعة</span>
-                  <span className="sm:hidden">فزعة</span>
+                  فزعة
                 </TabsTrigger>
                 <TabsTrigger value="loan" className="px-2 py-2">
                   <Wallet className="h-3 w-3 md:h-4 md:w-4 ml-1 md:ml-2" />
-                  <span className="hidden sm:inline">قرض</span>
-                  <span className="sm:hidden">قرض</span>
+                  قرض
                 </TabsTrigger>
                 <TabsTrigger value="update" className="px-2 py-2">
                   <UserCog className="h-3 w-3 md:h-4 md:w-4 ml-1 md:ml-2" />
-                  <span className="hidden sm:inline">تحديث</span>
-                  <span className="sm:hidden">تحديث</span>
+                  تحديث
                 </TabsTrigger>
                 <TabsTrigger value="family" className="px-2 py-2">
                   <UserPlus className="h-3 w-3 md:h-4 md:w-4 ml-1 md:ml-2" />
-                  <span className="hidden sm:inline">عائلة</span>
-                  <span className="sm:hidden">عائلة</span>
+                  عائلة
                 </TabsTrigger>
               </TabsList>
 
@@ -388,15 +389,19 @@ const BeneficiaryDashboard = () => {
                 )}
               </TabsContent>
 
-              <TabsContent value="emergency">
+              <TabsContent value="transparency" className="p-6">
+                <FinancialTransparencyTab />
+              </TabsContent>
+
+              <TabsContent value="emergency" className="p-6">
                 <EmergencyRequestForm onSubmit={handleEmergencyRequest} />
               </TabsContent>
 
-              <TabsContent value="loan">
+              <TabsContent value="loan" className="p-6">
                 <LoanRequestForm onSubmit={handleLoanRequest} />
               </TabsContent>
 
-              <TabsContent value="update">
+              <TabsContent value="update" className="p-6">
                 <DataUpdateForm
                   onSubmit={handleDataUpdate}
                   isLoading={createRequestMutation.isPending}
@@ -411,7 +416,7 @@ const BeneficiaryDashboard = () => {
                 />
               </TabsContent>
 
-              <TabsContent value="family">
+              <TabsContent value="family" className="p-6">
                 <AddFamilyMemberForm
                   onSubmit={handleAddFamilyMember}
                   isLoading={createRequestMutation.isPending}

@@ -5,9 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Key, Mail, User } from "lucide-react";
+import { Key, Mail, User, Info } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { logger } from "@/lib/logger";
+import { nationalIdToEmail, generateTempPassword } from "@/lib/beneficiaryAuth";
 
 interface EnableLoginDialogProps {
   open: boolean;
@@ -15,6 +16,7 @@ interface EnableLoginDialogProps {
   beneficiary: {
     id: string;
     full_name: string;
+    national_id: string;
     email?: string;
     username?: string;
     can_login?: boolean;
@@ -25,11 +27,16 @@ interface EnableLoginDialogProps {
 export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }: EnableLoginDialogProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  
+  // توليد البريد وكلمة المرور تلقائياً من رقم الهوية
+  const autoEmail = nationalIdToEmail(beneficiary.national_id);
+  const tempPassword = generateTempPassword(beneficiary.national_id);
+  
   const [formData, setFormData] = useState({
-    username: beneficiary.username || "",
-    email: beneficiary.email || "",
-    password: "",
-    confirmPassword: "",
+    username: beneficiary.username || beneficiary.national_id,
+    email: beneficiary.email || autoEmail,
+    password: tempPassword,
+    confirmPassword: tempPassword,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -203,8 +210,18 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
           <Alert>
+            <Info className="h-4 w-4" />
             <AlertDescription>
-              سيتم إنشاء حساب للمستفيد للدخول إلى لوحة التحكم الخاصة به
+              سيتم إنشاء حساب تلقائي باستخدام رقم الهوية الوطنية
+            </AlertDescription>
+          </Alert>
+          
+          <Alert className="bg-primary/5 border-primary/20">
+            <AlertDescription className="space-y-1">
+              <p className="font-semibold">معلومات الدخول المؤقتة:</p>
+              <p className="text-sm">• رقم الهوية: <code className="bg-background px-2 py-0.5 rounded">{beneficiary.national_id}</code></p>
+              <p className="text-sm">• كلمة المرور: <code className="bg-background px-2 py-0.5 rounded">{tempPassword}</code></p>
+              <p className="text-xs text-muted-foreground mt-2">سيُطلب من المستفيد تغيير كلمة المرور عند أول دخول</p>
             </AlertDescription>
           </Alert>
 

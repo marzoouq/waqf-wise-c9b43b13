@@ -9,12 +9,13 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Building2, Loader2, AlertTriangle } from 'lucide-react';
+import { Building2, Loader2, AlertTriangle, Users } from 'lucide-react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
+import { nationalIdToEmail } from '@/lib/beneficiaryAuth';
 
 const signInSchema = z.object({
   email: z.string().email('البريد الإلكتروني غير صحيح'),
@@ -36,8 +37,16 @@ const signUpSchema = z.object({
   path: ["confirmPassword"],
 });
 
+const beneficiarySignInSchema = z.object({
+  nationalId: z.string()
+    .length(10, 'رقم الهوية يجب أن يكون 10 أرقام')
+    .regex(/^\d{10}$/, 'رقم الهوية يجب أن يحتوي على أرقام فقط'),
+  password: z.string().min(6, 'كلمة المرور يجب أن تكون 6 أحرف على الأقل'),
+});
+
 type SignInFormData = z.infer<typeof signInSchema>;
 type SignUpFormData = z.infer<typeof signUpSchema>;
+type BeneficiarySignInFormData = z.infer<typeof beneficiarySignInSchema>;
 
 export default function Auth() {
   const [isLoading, setIsLoading] = useState(false);
@@ -53,6 +62,10 @@ export default function Auth() {
 
   const signUpForm = useForm<SignUpFormData>({
     resolver: zodResolver(signUpSchema),
+  });
+
+  const beneficiarySignInForm = useForm<BeneficiarySignInFormData>({
+    resolver: zodResolver(beneficiarySignInSchema),
   });
 
   // Redirect if already authenticated
@@ -127,6 +140,27 @@ export default function Auth() {
     }
   };
 
+  const handleBeneficiarySignIn = async (data: BeneficiarySignInFormData) => {
+    setIsLoading(true);
+    
+    try {
+      // تحويل رقم الهوية إلى بريد إلكتروني داخلي
+      const email = nationalIdToEmail(data.nationalId);
+      
+      const { error } = await signIn(email, data.password);
+      
+      setIsLoading(false);
+      
+      if (!error) {
+        navigate('/beneficiary-dashboard', { replace: true });
+      }
+    } catch (error) {
+      logger.error(error, { context: 'beneficiary_sign_in', severity: 'medium' });
+      setIsLoading(false);
+      toast.error('حدث خطأ غير متوقع');
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/5 p-4">
       <div className="w-full max-w-4xl space-y-6">
@@ -147,8 +181,12 @@ export default function Auth() {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="signin" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">تسجيل الدخول</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="signin">الإداريون</TabsTrigger>
+              <TabsTrigger value="beneficiary">
+                <Users className="h-4 w-4 ml-2" />
+                المستفيدون
+              </TabsTrigger>
               <TabsTrigger value="signup">إنشاء حساب</TabsTrigger>
             </TabsList>
 
@@ -194,6 +232,66 @@ export default function Auth() {
                     </>
                   ) : (
                     'تسجيل الدخول'
+                  )}
+                </Button>
+              </form>
+            </TabsContent>
+
+            <TabsContent value="beneficiary" className="space-y-4">
+              <Alert>
+                <AlertDescription className="text-center">
+                  <Users className="h-5 w-5 mx-auto mb-2 text-primary" />
+                  دخول المستفيدين من الفئة الأولى
+                </AlertDescription>
+              </Alert>
+              
+              <form onSubmit={beneficiarySignInForm.handleSubmit(handleBeneficiarySignIn)} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="beneficiary-national-id">رقم الهوية الوطنية (10 أرقام)</Label>
+                  <Input
+                    id="beneficiary-national-id"
+                    type="text"
+                    maxLength={10}
+                    pattern="\d{10}"
+                    placeholder="1014548257"
+                    dir="ltr"
+                    {...beneficiarySignInForm.register('nationalId')}
+                    disabled={isLoading}
+                  />
+                  {beneficiarySignInForm.formState.errors.nationalId && (
+                    <p className="text-sm text-destructive">
+                      {beneficiarySignInForm.formState.errors.nationalId.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="beneficiary-password">كلمة المرور</Label>
+                  <Input
+                    id="beneficiary-password"
+                    type="password"
+                    placeholder="••••••••"
+                    {...beneficiarySignInForm.register('password')}
+                    disabled={isLoading}
+                  />
+                  {beneficiarySignInForm.formState.errors.password && (
+                    <p className="text-sm text-destructive">
+                      {beneficiarySignInForm.formState.errors.password.message}
+                    </p>
+                  )}
+                  <p className="text-xs text-muted-foreground">
+                    كلمة المرور المؤقتة: رقم الهوية@Waqf
+                  </p>
+                </div>
+
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                      جاري تسجيل الدخول...
+                    </>
+                  ) : (
+                    'دخول المستفيدين'
                   )}
                 </Button>
               </form>
