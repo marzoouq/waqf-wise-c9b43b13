@@ -12,7 +12,7 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children, requiredRole, requiredRoles }: ProtectedRouteProps) {
   const { user, loading: authLoading } = useAuth();
-  const { hasRole, isLoading: roleLoading } = useUserRole();
+  const { roles, isLoading: roleLoading } = useUserRole();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,18 +24,18 @@ export function ProtectedRoute({ children, requiredRole, requiredRoles }: Protec
   // Check role permissions after loading
   useEffect(() => {
     if (!authLoading && !roleLoading && user) {
-      if (requiredRole && !hasRole(requiredRole)) {
+      if (requiredRole && !roles.includes(requiredRole)) {
         navigate('/', { replace: true });
       }
 
       if (requiredRoles && requiredRoles.length > 0) {
-        const hasAnyRole = requiredRoles.some(role => hasRole(role));
+        const hasAnyRole = requiredRoles.some(role => roles.includes(role));
         if (!hasAnyRole) {
           navigate('/', { replace: true });
         }
       }
     }
-  }, [user, authLoading, roleLoading, requiredRole, requiredRoles, hasRole, navigate]);
+  }, [user, authLoading, roleLoading, requiredRole, requiredRoles, roles, navigate]);
 
   if (authLoading || roleLoading) {
     return <LoadingState fullScreen />;
