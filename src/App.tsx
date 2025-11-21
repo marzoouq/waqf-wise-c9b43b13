@@ -60,6 +60,7 @@ const Chatbot = lazy(() => import("./pages/Chatbot"));
 const Support = lazy(() => import("./pages/Support"));
 const SupportManagement = lazy(() => import("./pages/SupportManagement"));
 const SystemErrorLogs = lazy(() => import("./pages/SystemErrorLogs"));
+const SystemMonitoring = lazy(() => import("./pages/SystemMonitoring"));
 const AdvancedSettings = lazy(() => import("./pages/AdvancedSettings"));
 const GovernanceDecisions = lazy(() => import("./pages/GovernanceDecisions"));
 const DecisionDetails = lazy(() => import("./pages/DecisionDetails"));
@@ -336,6 +337,16 @@ const App = () => {
                   element={
                     <ProtectedRoute requiredRoles={["admin", "nazer", "beneficiary"]}>
                       <DecisionDetails />
+                    </ProtectedRoute>
+                  } 
+                />
+                
+                {/* System Monitoring */}
+                <Route 
+                  path="/system-monitoring" 
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <SystemMonitoring />
                     </ProtectedRoute>
                   } 
                 />
