@@ -8,8 +8,10 @@ import {
   UserPlus,
   FileCheck,
   Bell,
-  Calendar
+  Calendar,
+  HelpCircle
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface QuickActionsCardProps {
   onEmergencyRequest: () => void;
@@ -28,6 +30,8 @@ export function QuickActionsCard({
   onUploadDocument,
   onMessages,
 }: QuickActionsCardProps) {
+  const navigate = useNavigate();
+  
   const actions = [
     {
       icon: DollarSign,
@@ -76,6 +80,14 @@ export function QuickActionsCard({
       onClick: onMessages,
       color: "text-indigo-600",
       bg: "bg-indigo-50 hover:bg-indigo-100",
+    },
+    {
+      icon: HelpCircle,
+      label: "الدعم الفني",
+      description: "المساعدة والأسئلة الشائعة",
+      onClick: () => navigate("/beneficiary-support"),
+      color: "text-orange-600",
+      bg: "bg-orange-50 hover:bg-orange-100",
     },
   ];
 

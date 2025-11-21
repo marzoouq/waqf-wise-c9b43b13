@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { StatsCard } from "./StatsCard";
-import { Building2, Home, TrendingUp, DollarSign, Package } from "lucide-react";
+import { Building2, Home, TrendingUp, DollarSign, Package, MapPin } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -91,40 +91,54 @@ export function PropertyStatsCards() {
         />
       </div>
 
-      {/* نظرة سريعة على العقارات */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Package className="h-5 w-5" />
+      {/* نظرة سريعة على العقارات - تصميم محسّن */}
+      <Card className="border-primary/20">
+        <CardHeader className="bg-gradient-to-br from-primary/5 to-background pb-3">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Package className="h-5 w-5 text-primary" />
             نظرة سريعة على العقارات
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-4">
           {properties && properties.length > 0 ? (
-            <div className="space-y-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {properties.map((property) => (
-                <div
+                <Card
                   key={property.id}
-                  className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 bg-muted/50 rounded-lg gap-2"
+                  className="overflow-hidden border-l-4 border-l-primary hover:shadow-md transition-shadow"
                 >
-                  <div className="flex-1">
-                    <p className="font-medium">{property.name}</p>
-                    <p className="text-sm text-muted-foreground">{property.location}</p>
-                  </div>
-                  <div className="flex gap-2 flex-wrap">
-                    <Badge variant="outline">{property.total_units || 0} وحدة</Badge>
-                    <Badge className="bg-green-500/10 text-green-700 border-green-200">
-                      {property.occupied_units || 0} مشغول
-                    </Badge>
-                    <Badge variant="secondary">
-                      {(property.total_units || 0) - (property.occupied_units || 0)} شاغر
-                    </Badge>
-                  </div>
-                </div>
+                  <CardContent className="p-4">
+                    <div className="space-y-3">
+                      <div>
+                        <h4 className="font-semibold text-base">{property.name}</h4>
+                        <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
+                          <MapPin className="h-3 w-3" />
+                          {property.location}
+                        </p>
+                      </div>
+                      <div className="flex items-center justify-between pt-2 border-t">
+                        <div className="flex gap-2 flex-wrap">
+                          <Badge variant="outline" className="text-xs">
+                            {property.total_units || 0} وحدة
+                          </Badge>
+                          <Badge className="bg-green-500/10 text-green-700 border-green-200 text-xs">
+                            {property.occupied_units || 0} مشغول
+                          </Badge>
+                          <Badge variant="secondary" className="text-xs">
+                            {(property.total_units || 0) - (property.occupied_units || 0)} شاغر
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           ) : (
-            <p className="text-center text-muted-foreground py-4">لا توجد عقارات متاحة</p>
+            <div className="text-center py-8">
+              <Package className="h-12 w-12 text-muted-foreground/50 mx-auto mb-3" />
+              <p className="text-muted-foreground">لا توجد عقارات متاحة</p>
+            </div>
           )}
         </CardContent>
       </Card>

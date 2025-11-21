@@ -17,7 +17,11 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import * as XLSX from "xlsx";
 
-export function ReportsMenu() {
+interface ReportsMenuProps {
+  type?: "beneficiary" | "waqf";
+}
+
+export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
   const { toast } = useToast();
   const { user } = useAuth();
   const { beneficiary, payments } = useBeneficiaryProfile(user?.id);
@@ -195,38 +199,63 @@ export function ReportsMenu() {
     }
   };
 
+  // تقارير المستفيد
+  const beneficiaryReports = (
+    <>
+      <Button variant="outline" onClick={exportPaymentsPDF} className="justify-start">
+        <FileText className="ml-2 h-4 w-4" />
+        تقرير المدفوعات (PDF)
+      </Button>
+      <Button variant="outline" onClick={exportAccountStatement} className="justify-start">
+        <Receipt className="ml-2 h-4 w-4" />
+        كشف الحساب (PDF)
+      </Button>
+    </>
+  );
+
+  // تقارير الوقف
+  const waqfReports = (
+    <>
+      <Button variant="outline" onClick={exportAnnualDisclosure} className="justify-start">
+        <FileSpreadsheet className="ml-2 h-4 w-4" />
+        الإفصاح السنوي (PDF)
+      </Button>
+      <Button variant="outline" onClick={exportPropertiesExcel} className="justify-start">
+        <Building2 className="ml-2 h-4 w-4" />
+        تقرير العقارات (Excel)
+      </Button>
+    </>
+  );
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Download className="h-5 w-5" />
-          التقارير والمستندات
-        </CardTitle>
-        <CardDescription>تحميل التقارير الجاهزة بصيغ مختلفة</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <Button variant="outline" onClick={exportPaymentsPDF} className="justify-start">
-            <FileText className="ml-2 h-4 w-4" />
-            تقرير المدفوعات (PDF)
-          </Button>
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      {/* تقارير المستفيد */}
+      <Card>
+        <CardHeader className="bg-gradient-to-br from-primary/5 to-background">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Download className="h-5 w-5 text-primary" />
+            تقاريري الشخصية
+          </CardTitle>
+          <CardDescription>التقارير الخاصة بحسابك ومدفوعاتك</CardDescription>
+        </CardHeader>
+        <CardContent className="pt-4">
+          <div className="grid grid-cols-1 gap-3">{beneficiaryReports}</div>
+        </CardContent>
+      </Card>
 
-          <Button variant="outline" onClick={exportAnnualDisclosure} className="justify-start">
-            <FileSpreadsheet className="ml-2 h-4 w-4" />
-            الإفصاح السنوي (PDF)
-          </Button>
-
-          <Button variant="outline" onClick={exportPropertiesExcel} className="justify-start">
-            <Building2 className="ml-2 h-4 w-4" />
-            تقرير العقارات (Excel)
-          </Button>
-
-          <Button variant="outline" onClick={exportAccountStatement} className="justify-start">
-            <Receipt className="ml-2 h-4 w-4" />
-            كشف الحساب (PDF)
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+      {/* تقارير الوقف */}
+      <Card>
+        <CardHeader className="bg-gradient-to-br from-green-500/5 to-background">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <FileSpreadsheet className="h-5 w-5 text-green-600" />
+            تقارير الوقف
+          </CardTitle>
+          <CardDescription>الإفصاحات المالية وتقارير العقارات</CardDescription>
+        </CardHeader>
+        <CardContent className="pt-4">
+          <div className="grid grid-cols-1 gap-3">{waqfReports}</div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
