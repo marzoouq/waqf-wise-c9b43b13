@@ -10,6 +10,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { logger } from "@/lib/logger";
 import { nationalIdToEmail, generateTempPassword } from "@/lib/beneficiaryAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ResetPasswordDialog } from "./ResetPasswordDialog";
 
 interface EnableLoginDialogProps {
   open: boolean;
@@ -30,6 +31,7 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [hasExistingAuth, setHasExistingAuth] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
   
   // توليد البريد وكلمة المرور تلقائياً من رقم الهوية
   const autoEmail = nationalIdToEmail(beneficiary.national_id);
@@ -186,60 +188,7 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
     }
   };
 
-  // إعادة تعيين كلمة المرور
-  const handleResetPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (formData.password !== formData.confirmPassword) {
-      toast({
-        title: "خطأ في كلمة المرور",
-        description: "كلمات المرور غير متطابقة",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      toast({
-        title: "خطأ في كلمة المرور",
-        description: "كلمة المرور يجب أن تكون 6 أحرف على الأقل",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      if (!beneficiary.email) {
-        throw new Error("البريد الإلكتروني غير موجود");
-      }
-
-      // إرسال رابط إعادة تعيين كلمة المرور
-      const { error } = await supabase.auth.resetPasswordForEmail(beneficiary.email, {
-        redirectTo: `${window.location.origin}/auth?mode=reset-password`,
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "تم الإرسال",
-        description: "تم إرسال رابط إعادة تعيين كلمة المرور إلى البريد الإلكتروني",
-      });
-
-      onOpenChange(false);
-    } catch (error: unknown) {
-      logger.error(error, { context: 'reset_beneficiary_password', severity: 'medium' });
-      const errorMessage = error instanceof Error ? error.message : 'حدث خطأ أثناء إعادة التعيين';
-      toast({
-        title: "خطأ",
-        description: errorMessage,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  // تم نقل وظيفة إعادة تعيين كلمة المرور إلى ResetPasswordDialog
 
   const handleDisable = async () => {
     setLoading(true);
@@ -274,68 +223,56 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
   };
 
   return (
-    <ResponsiveDialog 
-      open={open} 
-      onOpenChange={onOpenChange}
-      title={beneficiary.can_login ? "إدارة حساب المستفيد" : "تفعيل حساب المستفيد"}
-      size="md"
-    >
-      {beneficiary.can_login ? (
-        <Tabs defaultValue="info" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="info">معلومات الحساب</TabsTrigger>
-            <TabsTrigger value="password">إعادة تعيين كلمة المرور</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="info" className="space-y-4 mt-4">
+    <>
+      <ResponsiveDialog 
+        open={open} 
+        onOpenChange={onOpenChange}
+        title={beneficiary.can_login ? "إدارة حساب المستفيد" : "تفعيل حساب المستفيد"}
+        size="md"
+      >
+        {beneficiary.can_login ? (
+          <div className="space-y-4">
             <Alert>
               <AlertDescription>
-                هذا المستفيد لديه حساب نشط. يمكنك تعطيل الحساب لمنع الدخول مؤقتاً.
+                هذا المستفيد لديه حساب نشط. يمكنك إعادة تعيين كلمة المرور أو تعطيل الحساب.
               </AlertDescription>
             </Alert>
-            <div className="space-y-2">
-              <p className="text-sm"><strong>اسم المستخدم:</strong> {beneficiary.username}</p>
-              <p className="text-sm"><strong>البريد الإلكتروني:</strong> {beneficiary.email}</p>
+            
+            <div className="space-y-2 p-4 bg-muted/50 rounded-lg">
+              <p className="text-sm"><strong>اسم المستخدم:</strong> {beneficiary.username || 'غير محدد'}</p>
+              <p className="text-sm"><strong>رقم الهوية:</strong> {beneficiary.national_id}</p>
+              {beneficiary.email && (
+                <p className="text-sm"><strong>البريد الإلكتروني:</strong> {beneficiary.email}</p>
+              )}
             </div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            
+            <DialogFooter className="flex-col sm:flex-row gap-2">
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="w-full sm:w-auto">
                 إلغاء
+              </Button>
+              <Button 
+                type="button"
+                variant="secondary"
+                onClick={() => {
+                  onOpenChange(false);
+                  setShowResetPassword(true);
+                }}
+                className="w-full sm:w-auto"
+              >
+                <Key className="ml-2 h-4 w-4" />
+                إعادة تعيين كلمة المرور
               </Button>
               <Button 
                 type="button"
                 variant="destructive" 
                 onClick={handleDisable} 
                 disabled={loading}
+                className="w-full sm:w-auto"
               >
                 {loading ? "جاري التعطيل..." : "تعطيل الحساب"}
               </Button>
             </DialogFooter>
-          </TabsContent>
-
-          <TabsContent value="password" className="space-y-4 mt-4">
-            <Alert>
-              <RefreshCw className="h-4 w-4" />
-              <AlertDescription>
-                سيتم إرسال رابط إعادة تعيين كلمة المرور إلى البريد الإلكتروني المسجل.
-              </AlertDescription>
-            </Alert>
-            
-            <form onSubmit={handleResetPassword} className="space-y-4">
-              <div className="space-y-2">
-                <p className="text-sm">البريد الإلكتروني: <strong>{beneficiary.email}</strong></p>
-              </div>
-              
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                  إلغاء
-                </Button>
-                <Button type="submit" disabled={loading}>
-                  {loading ? "جاري الإرسال..." : "إرسال رابط إعادة التعيين"}
-                </Button>
-              </DialogFooter>
-            </form>
-          </TabsContent>
-        </Tabs>
+          </div>
       ) : hasExistingAuth ? (
         // حساب معطل لكن user_id موجود
         <div className="space-y-4">
@@ -454,6 +391,14 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
           </DialogFooter>
         </form>
       )}
-    </ResponsiveDialog>
+      </ResponsiveDialog>
+      
+      <ResetPasswordDialog
+        open={showResetPassword}
+        onOpenChange={setShowResetPassword}
+        beneficiary={beneficiary}
+        onSuccess={onSuccess}
+      />
+    </>
   );
 }
