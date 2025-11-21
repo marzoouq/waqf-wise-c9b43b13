@@ -10,6 +10,7 @@ import { GlobalErrorBoundary } from "./components/shared/GlobalErrorBoundary";
 import { LoadingState } from "./components/shared/LoadingState";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { usePWAUpdate } from "./lib/pwa";
+import "@/lib/errorTracking";
 
 // Import DevTools configuration
 import { DEVTOOLS_CONFIG } from "./lib/devtools";
@@ -58,6 +59,7 @@ const AIInsights = lazy(() => import("./pages/AIInsights"));
 const Chatbot = lazy(() => import("./pages/Chatbot"));
 const Support = lazy(() => import("./pages/Support"));
 const SupportManagement = lazy(() => import("./pages/SupportManagement"));
+const SystemErrorLogs = lazy(() => import("./pages/SystemErrorLogs"));
 const AdvancedSettings = lazy(() => import("./pages/AdvancedSettings"));
 const GovernanceDecisions = lazy(() => import("./pages/GovernanceDecisions"));
 const DecisionDetails = lazy(() => import("./pages/DecisionDetails"));
@@ -287,6 +289,14 @@ const App = () => {
             } 
           />
           <Route 
+            path="/system-errors" 
+            element={
+              <ProtectedRoute requiredRoles={["admin"]}>
+                <SystemErrorLogs />
+              </ProtectedRoute>
+            } 
+          />
+          <Route
             path="/advanced-settings" 
             element={
               <ProtectedRoute requiredRole="admin">

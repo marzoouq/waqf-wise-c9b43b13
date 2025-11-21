@@ -21,6 +21,7 @@ import { NotificationsBell } from "@/components/beneficiary/NotificationsBell";
 import { PropertyStatsCards } from "@/components/beneficiary/PropertyStatsCards";
 import { ReportsMenu } from "@/components/beneficiary/ReportsMenu";
 import { ReportsExplanationCard } from "@/components/beneficiary/ReportsExplanationCard";
+import { ErrorReportingGuide } from "@/components/beneficiary/ErrorReportingGuide";
 import { ActivityTimeline } from "@/components/beneficiary/ActivityTimeline";
 import { YearlyComparison } from "@/components/beneficiary/YearlyComparison";
 import { ChatbotQuickCard } from "@/components/dashboard/ChatbotQuickCard";
@@ -319,6 +320,9 @@ const BeneficiaryDashboard = () => {
 
             {/* شرح نظام التقارير */}
             <ReportsExplanationCard />
+
+            {/* شرح نظام الحماية والإشعارات */}
+            <ErrorReportingGuide />
 
             {/* التقارير المفصلة */}
             <ReportsMenu type="beneficiary" />

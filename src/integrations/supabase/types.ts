@@ -5522,6 +5522,105 @@ export type Database = {
           },
         ]
       }
+      system_alerts: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          alert_type: string
+          created_at: string | null
+          description: string
+          id: string
+          occurrence_count: number | null
+          related_error_type: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string
+          status: string | null
+          title: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          alert_type: string
+          created_at?: string | null
+          description: string
+          id?: string
+          occurrence_count?: number | null
+          related_error_type?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity: string
+          status?: string | null
+          title: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          alert_type?: string
+          created_at?: string | null
+          description?: string
+          id?: string
+          occurrence_count?: number | null
+          related_error_type?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          status?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
+      system_error_logs: {
+        Row: {
+          additional_data: Json | null
+          created_at: string | null
+          error_message: string
+          error_stack: string | null
+          error_type: string
+          id: string
+          resolution_notes: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string
+          status: string | null
+          url: string
+          user_agent: string
+          user_id: string | null
+        }
+        Insert: {
+          additional_data?: Json | null
+          created_at?: string | null
+          error_message: string
+          error_stack?: string | null
+          error_type: string
+          id?: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity: string
+          status?: string | null
+          url: string
+          user_agent: string
+          user_id?: string | null
+        }
+        Update: {
+          additional_data?: Json | null
+          created_at?: string | null
+          error_message?: string
+          error_stack?: string | null
+          error_type?: string
+          id?: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          status?: string | null
+          url?: string
+          user_agent?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       system_settings: {
         Row: {
           category: string | null
@@ -6055,6 +6154,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      cleanup_old_error_logs: { Args: never; Returns: undefined }
       create_auto_journal_entry: {
         Args: {
           p_amount: number
