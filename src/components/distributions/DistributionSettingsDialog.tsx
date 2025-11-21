@@ -5,7 +5,9 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Settings } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Settings, Info } from "lucide-react";
 import { useDistributionSettings } from "@/hooks/useDistributionSettings";
 
 export function DistributionSettingsDialog() {
@@ -15,9 +17,11 @@ export function DistributionSettingsDialog() {
   const [formData, setFormData] = useState({
     distribution_frequency: settings?.distribution_frequency || "شهري",
     distribution_rule: settings?.distribution_rule || "شرعي",
+    maintenance_percentage: settings?.maintenance_percentage || 5,
     nazer_percentage: settings?.nazer_percentage || 10,
     waqif_charity_percentage: settings?.waqif_charity_percentage || 5,
     waqf_corpus_percentage: settings?.waqf_corpus_percentage || 0,
+    reserve_percentage: settings?.reserve_percentage || 0,
     wives_share_ratio: settings?.wives_share_ratio || 12.5,
     auto_distribution: settings?.auto_distribution || false,
     distribution_day_of_month: settings?.distribution_day_of_month || 1,
@@ -28,10 +32,17 @@ export function DistributionSettingsDialog() {
   const handleSubmit = async () => {
     await updateSettings({
       ...formData,
+      calculation_order: 'تسلسلي',
       is_active: true as true,
     });
     setOpen(false);
   };
+
+  const totalPercentages = 
+    formData.maintenance_percentage +
+    formData.nazer_percentage +
+    formData.waqif_charity_percentage +
+    formData.reserve_percentage;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -45,7 +56,7 @@ export function DistributionSettingsDialog() {
         <DialogHeader>
           <DialogTitle>إعدادات التوزيع</DialogTitle>
           <DialogDescription>
-            إدارة نسب الاستقطاع وقواعد التوزيع الافتراضية
+            إدارة نسب الاستقطاع وقواعد التوزيع الافتراضية (حساب تسلسلي شرعي)
           </DialogDescription>
         </DialogHeader>
 
@@ -69,6 +80,105 @@ export function DistributionSettingsDialog() {
             </Select>
           </div>
 
+          {/* Sharia Compliant Order Alert */}
+          <Alert className="bg-blue-50 border-blue-200">
+            <Info className="h-4 w-4 text-blue-600" />
+            <AlertDescription className="text-blue-800 text-sm">
+              <strong>الترتيب الشرعي للاستقطاعات:</strong>
+              <ol className="list-decimal mr-6 mt-2 space-y-1 text-xs">
+                <li>الصيانة والعمارة (حفظ أصل الوقف) - أولوية</li>
+                <li>نسبة الناظر (من الباقي)</li>
+                <li>صدقة الواقف (من الباقي)</li>
+                <li>المستفيدون (الباقي)</li>
+              </ol>
+            </AlertDescription>
+          </Alert>
+
+          {/* Maintenance Percentage - Priority 1 */}
+          <div className="rounded-lg border-2 border-green-300 bg-green-50 p-4 space-y-2">
+            <Label className="text-green-800 font-bold flex items-center gap-2">
+              <Badge variant="secondary" className="bg-green-600 text-white">1</Badge>
+              نسبة الصيانة والعمارة
+            </Label>
+            <Input
+              type="number"
+              step="0.5"
+              value={formData.maintenance_percentage}
+              onChange={(e) => setFormData({ ...formData, maintenance_percentage: parseFloat(e.target.value) })}
+              min="0"
+              max="20"
+            />
+            <p className="text-xs text-green-700">
+              أول ما يُخرج من الغلة لحفظ عين الوقف
+            </p>
+          </div>
+
+          {/* Nazer Percentage - Priority 2 */}
+          <div className="rounded-lg border-2 border-blue-300 bg-blue-50 p-4 space-y-2">
+            <Label className="text-blue-800 font-bold flex items-center gap-2">
+              <Badge variant="secondary" className="bg-blue-600 text-white">2</Badge>
+              نسبة الناظر
+            </Label>
+            <Input
+              type="number"
+              step="0.1"
+              value={formData.nazer_percentage}
+              onChange={(e) => setFormData({ ...formData, nazer_percentage: parseFloat(e.target.value) })}
+              min="0"
+              max="15"
+            />
+            <p className="text-xs text-blue-700">
+              تُحسب من الباقي بعد الصيانة
+            </p>
+          </div>
+
+          {/* Waqif Charity Percentage - Priority 3 */}
+          <div className="rounded-lg border-2 border-purple-300 bg-purple-50 p-4 space-y-2">
+            <Label className="text-purple-800 font-bold flex items-center gap-2">
+              <Badge variant="secondary" className="bg-purple-600 text-white">3</Badge>
+              صدقة الواقف
+            </Label>
+            <Input
+              type="number"
+              step="0.1"
+              value={formData.waqif_charity_percentage}
+              onChange={(e) => setFormData({ ...formData, waqif_charity_percentage: parseFloat(e.target.value) })}
+              min="0"
+              max="10"
+            />
+            <p className="text-xs text-purple-700">
+              تُحسب من الباقي بعد الناظر
+            </p>
+          </div>
+
+          {/* Reserve Percentage - Optional */}
+          <div className="rounded-lg border border-gray-300 bg-gray-50 p-4 space-y-2">
+            <Label className="text-gray-700 flex items-center gap-2">
+              <Info className="h-4 w-4" />
+              احتياطي إضافي (اختياري)
+            </Label>
+            <Input
+              type="number"
+              step="0.5"
+              value={formData.reserve_percentage}
+              onChange={(e) => setFormData({ ...formData, reserve_percentage: parseFloat(e.target.value) })}
+              min="0"
+              max="10"
+            />
+            <p className="text-xs text-gray-600">
+              للطوارئ والمشاريع المستقبلية، يُحسب من الباقي
+            </p>
+          </div>
+
+          {/* Total Percentages Warning */}
+          {totalPercentages > 50 && (
+            <Alert variant="destructive">
+              <AlertDescription>
+                مجموع النسب ({totalPercentages}%) مرتفع جداً! يجب ألا يتجاوز 50%
+              </AlertDescription>
+            </Alert>
+          )}
+
           {/* قاعدة التوزيع */}
           <div className="space-y-2">
             <Label>قاعدة التوزيع</Label>
@@ -85,39 +195,6 @@ export function DistributionSettingsDialog() {
                 <SelectItem value="مخصص">مخصص</SelectItem>
               </SelectContent>
             </Select>
-          </div>
-
-          {/* نسبة الناظر */}
-          <div className="space-y-2">
-            <Label>نسبة الناظر (%)</Label>
-            <Input
-              type="number"
-              step="0.1"
-              value={formData.nazer_percentage}
-              onChange={(e) => setFormData({ ...formData, nazer_percentage: parseFloat(e.target.value) })}
-            />
-          </div>
-
-          {/* نسبة صدقة الواقف */}
-          <div className="space-y-2">
-            <Label>نسبة صدقة الواقف (%)</Label>
-            <Input
-              type="number"
-              step="0.1"
-              value={formData.waqif_charity_percentage}
-              onChange={(e) => setFormData({ ...formData, waqif_charity_percentage: parseFloat(e.target.value) })}
-            />
-          </div>
-
-          {/* نسبة رقبة الوقف */}
-          <div className="space-y-2">
-            <Label>نسبة رقبة الوقف (%)</Label>
-            <Input
-              type="number"
-              step="0.1"
-              value={formData.waqf_corpus_percentage}
-              onChange={(e) => setFormData({ ...formData, waqf_corpus_percentage: parseFloat(e.target.value) })}
-            />
           </div>
 
           {/* نسبة الزوجات */}
@@ -175,7 +252,7 @@ export function DistributionSettingsDialog() {
           <Button variant="outline" onClick={() => setOpen(false)}>
             إلغاء
           </Button>
-          <Button onClick={handleSubmit}>
+          <Button onClick={handleSubmit} disabled={totalPercentages > 50}>
             حفظ الإعدادات
           </Button>
         </div>

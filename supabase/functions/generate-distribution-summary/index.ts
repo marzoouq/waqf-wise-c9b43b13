@@ -7,9 +7,12 @@ const corsHeaders = {
 };
 
 interface DistributionSettings {
+  maintenance_percentage: number;
   nazer_percentage: number;
   waqif_charity_percentage: number;
   waqf_corpus_percentage: number;
+  reserve_percentage: number;
+  calculation_order: string;
   wives_share_ratio: number;
   distribution_rule: string;
 }
@@ -78,17 +81,56 @@ serve(async (req) => {
       throw new Error('لا يوجد صافي إيرادات للتوزيع');
     }
 
-    // 5. حساب الاستقطاعات (من صافي الإيرادات)
-    const nazerShare = netRevenues * (settings.nazer_percentage / 100);
-    const waqifCharity = netRevenues * (settings.waqif_charity_percentage / 100);
-    const waqfCorpus = netRevenues * (waqf_corpus_percentage / 100);
+    // 5. الحساب التسلسلي حسب الأحكام الشرعية
+    let remainingAmount = netRevenues;
+
+    // 1️⃣ الصيانة والعمارة (أول ما يُخرج)
+    const maintenanceAmount = remainingAmount * ((settings.maintenance_percentage || 0) / 100);
+    remainingAmount -= maintenanceAmount;
+    console.log(`🔧 Maintenance (${settings.maintenance_percentage}%): ${maintenanceAmount} SAR | Remaining: ${remainingAmount}`);
+
+    // 2️⃣ نسبة الناظر (من الباقي)
+    const nazerShare = remainingAmount * ((settings.nazer_percentage || 0) / 100);
+    remainingAmount -= nazerShare;
+    console.log(`👤 Nazer (${settings.nazer_percentage}%): ${nazerShare} SAR | Remaining: ${remainingAmount}`);
+
+    // 3️⃣ صدقة الواقف (من الباقي)
+    const waqifCharity = remainingAmount * ((settings.waqif_charity_percentage || 0) / 100);
+    remainingAmount -= waqifCharity;
+    console.log(`💝 Waqif Charity (${settings.waqif_charity_percentage}%): ${waqifCharity} SAR | Remaining: ${remainingAmount}`);
+
+    // 4️⃣ الاحتياطي (اختياري، من الباقي)
+    const reserveAmount = settings.reserve_percentage 
+      ? remainingAmount * ((settings.reserve_percentage || 0) / 100)
+      : 0;
+    remainingAmount -= reserveAmount;
+    console.log(`🏦 Reserve (${settings.reserve_percentage || 0}%): ${reserveAmount} SAR | Remaining: ${remainingAmount}`);
+
+    const waqfCorpus = 0; // Not used in sequential calculation
+
+    // Validation
+    const totalPercentages = 
+      (settings.maintenance_percentage || 0) +
+      (settings.nazer_percentage || 0) +
+      (settings.waqif_charity_percentage || 0) +
+      (settings.reserve_percentage || 0);
+
+    if (totalPercentages > 50) {
+      throw new Error(
+        `مجموع النسب (${totalPercentages}%) مرتفع جداً. يجب ألا يتجاوز 50% لضمان نصيب معقول للمستفيدين.`
+      );
+    }
+
+    if ((settings.maintenance_percentage || 0) === 0) {
+      console.warn('⚠️ تحذير: نسبة الصيانة 0% - قد يؤثر على حفظ أصل الوقف');
+    }
 
     console.log(`👤 Nazer Share (${settings.nazer_percentage}%): ${nazerShare} SAR`);
     console.log(`💝 Waqif Charity (${settings.waqif_charity_percentage}%): ${waqifCharity} SAR`);
-    console.log(`🏛️ Waqf Corpus (${waqf_corpus_percentage}%): ${waqfCorpus} SAR`);
+    console.log(`🔧 Maintenance (${settings.maintenance_percentage}%): ${maintenanceAmount} SAR`);
 
     // 6. المبلغ المتاح للتوزيع
-    const distributableAmount = netRevenues - nazerShare - waqifCharity - waqfCorpus;
+    const distributableAmount = remainingAmount;
     console.log(`📦 Distributable Amount: ${distributableAmount} SAR`);
 
     // 7. جلب المستفيدين النشطين
@@ -178,13 +220,22 @@ serve(async (req) => {
         total_revenues: totalRevenues,
         total_expenses: totalExpenses,
         net_revenues: netRevenues,
+        maintenance_amount: maintenanceAmount,
         nazer_share: nazerShare,
+        nazer_percentage: settings.nazer_percentage || 0,
         waqif_charity: waqifCharity,
+        charity_percentage: settings.waqif_charity_percentage || 0,
         waqf_corpus: waqfCorpus,
+        corpus_percentage: waqf_corpus_percentage,
+        reserve_amount: reserveAmount,
         distributable_amount: distributableAmount,
         total_amount: distributableAmount,
         beneficiaries_count: beneficiaries.length,
-        status: 'مسودة'
+        sons_count: sons.length,
+        daughters_count: daughters.length,
+        wives_count: wives.length,
+        status: 'مسودة',
+        calculation_notes: 'حساب تسلسلي شرعي: صيانة ← ناظر ← صدقة ← احتياطي ← مستفيدين',
       })
       .select()
       .single();
@@ -210,6 +261,25 @@ serve(async (req) => {
 
     console.log(`✅ ${detailsToInsert.length} distribution details saved`);
 
+    // 12. إنشاء سجلات الاحتياطيات
+    if (maintenanceAmount > 0) {
+      await supabase.from('waqf_reserves').insert({
+        reserve_type: 'صيانة',
+        distribution_id: distribution.id,
+        amount: maintenanceAmount,
+        current_balance: maintenanceAmount,
+      });
+    }
+
+    if (reserveAmount > 0) {
+      await supabase.from('waqf_reserves').insert({
+        reserve_type: 'احتياطي',
+        distribution_id: distribution.id,
+        amount: reserveAmount,
+        current_balance: reserveAmount,
+      });
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
@@ -219,9 +289,11 @@ serve(async (req) => {
           total_revenues: totalRevenues,
           total_expenses: totalExpenses,
           net_revenues: netRevenues,
+          maintenance_amount: maintenanceAmount,
           nazer_share: nazerShare,
           waqif_charity: waqifCharity,
           waqf_corpus: waqfCorpus,
+          reserve_amount: reserveAmount,
           distributable_amount: distributableAmount,
           beneficiaries_count: beneficiaries.length
         }
