@@ -42,7 +42,7 @@ export function DistributionPieChart() {
         .select("allocated_amount, beneficiary_type")
         .eq("distribution_id", latestDistribution.id);
 
-      if (!detailsError && details) {
+      if (!detailsError && details && details.length > 0) {
         const typeData: { [key: string]: number } = {};
         
         details.forEach((detail) => {
@@ -50,18 +50,24 @@ export function DistributionPieChart() {
           if (!typeData[type]) {
             typeData[type] = 0;
           }
-          typeData[type] += Number(detail.allocated_amount);
+          typeData[type] += Number(detail.allocated_amount || 0);
         });
 
         const total = Object.values(typeData).reduce((sum, val) => sum + val, 0);
 
-        const chartData: ChartDataItem[] = Object.entries(typeData).map(([name, value]) => ({
-          name,
-          value: Math.round(value),
-          percentage: Math.round((value / total) * 100),
-        }));
+        if (total > 0) {
+          const chartData: ChartDataItem[] = Object.entries(typeData).map(([name, value]) => ({
+            name,
+            value: Math.round(value),
+            percentage: Math.round((value / total) * 100),
+          }));
 
-        setData(chartData);
+          setData(chartData);
+        } else {
+          setData([]);
+        }
+      } else {
+        setData([]);
       }
       setLoading(false);
     };

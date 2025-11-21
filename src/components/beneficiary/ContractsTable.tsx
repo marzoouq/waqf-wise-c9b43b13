@@ -33,10 +33,10 @@ export function ContractsTable() {
             <TableRow key={contract.id}>
               <TableCell className="font-medium">{contract.contract_number}</TableCell>
               <TableCell>{contract.tenant_name}</TableCell>
-              <TableCell>{contract.properties?.name || '-'}</TableCell>
+              <TableCell>{contract.properties?.name ?? 'غير محدد'}</TableCell>
               <TableCell>{new Date(contract.start_date).toLocaleDateString('ar-SA')}</TableCell>
               <TableCell>{new Date(contract.end_date).toLocaleDateString('ar-SA')}</TableCell>
-              <TableCell className="font-bold">{contract.monthly_rent.toLocaleString()} ر.س</TableCell>
+              <TableCell className="font-bold">{(contract.monthly_rent || 0).toLocaleString()} ر.س</TableCell>
               <TableCell>
                 <Badge variant={contract.status === 'نشط' ? 'default' : 'secondary'}>
                   {contract.status}

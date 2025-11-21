@@ -25,9 +25,8 @@ export function usePropertyUnits(propertyId?: string) {
       
       const { data, error } = await query;
       if (error) throw error;
-      return data;
+      return data || [];
     },
-    enabled: !!propertyId,
   });
 
   const addUnit = useMutation({

@@ -46,7 +46,7 @@ export function BeneficiariesImporter({ onSuccess }: BeneficiariesImporterProps)
         const errors: string[] = [];
         const validData: ImportRow[] = [];
 
-        jsonData.forEach((row: any, index) => {
+        jsonData.forEach((row: Record<string, unknown>, index) => {
           try {
             const validated = importSchema.parse({
               full_name: row['الاسم الكامل'] || row['full_name'],

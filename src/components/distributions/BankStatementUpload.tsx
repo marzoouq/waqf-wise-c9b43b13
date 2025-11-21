@@ -82,16 +82,17 @@ export function BankStatementUpload({ disclosureId, onUploadComplete }: BankStat
       });
 
       onUploadComplete?.(publicUrl);
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error(error, { 
         context: 'upload_bank_statement', 
         severity: 'medium',
         metadata: { disclosureId }
       });
       setUploadStatus("error");
+      const errorMessage = error instanceof Error ? error.message : "حدث خطأ أثناء رفع كشف الحساب";
       toast({
         title: "فشل الرفع",
-        description: error.message || "حدث خطأ أثناء رفع كشف الحساب",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

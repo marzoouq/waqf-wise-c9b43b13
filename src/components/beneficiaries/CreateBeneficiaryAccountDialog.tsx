@@ -99,10 +99,11 @@ export function CreateBeneficiaryAccountDialog({
 
         onSuccess?.();
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "حدث خطأ أثناء إنشاء الحساب";
       toast({
         title: "خطأ",
-        description: error.message || "حدث خطأ أثناء إنشاء الحساب",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
