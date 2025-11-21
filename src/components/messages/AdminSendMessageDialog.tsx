@@ -118,7 +118,6 @@ export function AdminSendMessageDialog({
       setIsBroadcast(false);
       onOpenChange(false);
     } catch (error) {
-      console.error("Error sending messages:", error);
       toast({
         title: "خطأ في الإرسال",
         description: "حدث خطأ أثناء إرسال الرسائل",
