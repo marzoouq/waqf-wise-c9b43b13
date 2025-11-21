@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { logger } from "@/lib/logger";
+import { getErrorMessage } from "@/types/errors";
 import type { Database } from "@/integrations/supabase/types";
 
 type DbAnnualDisclosure = Database['public']['Tables']['annual_disclosures']['Row'];
@@ -71,11 +72,11 @@ export function useAnnualDisclosures() {
         description: "تم توليد الإفصاح السنوي بنجاح",
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       logger.error(error, { context: "generate_annual_disclosure" });
       toast({
         title: "خطأ في إنشاء الإفصاح",
-        description: error.message,
+        description: getErrorMessage(error),
         variant: "destructive",
       });
     },
@@ -116,11 +117,11 @@ export function useAnnualDisclosures() {
         description: "أصبح الإفصاح متاحاً للمستفيدين وتم إرسال الإشعارات",
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       logger.error(error, { context: "publish_disclosure" });
       toast({
         title: "خطأ في النشر",
-        description: error.message,
+        description: getErrorMessage(error),
         variant: "destructive",
       });
     },

@@ -11,21 +11,21 @@ import {
   DollarSign,
   Calendar
 } from "lucide-react";
-import { useAnnualDisclosures } from "@/hooks/useAnnualDisclosures";
+import { useAnnualDisclosures, AnnualDisclosure } from "@/hooks/useAnnualDisclosures";
 import { ViewDisclosureDialog } from "@/components/distributions/ViewDisclosureDialog";
 import { generateDisclosurePDF } from "@/lib/generateDisclosurePDF";
 import { supabase } from "@/integrations/supabase/client";
 
 export const AnnualDisclosureCard = () => {
   const { disclosures, isLoading } = useAnnualDisclosures();
-  const [selectedDisclosure, setSelectedDisclosure] = useState<any>(null);
+  const [selectedDisclosure, setSelectedDisclosure] = useState<AnnualDisclosure | null>(null);
   const [viewOpen, setViewOpen] = useState(false);
 
   // عرض الإفصاحات المنشورة فقط
   const publishedDisclosures = disclosures.filter(d => d.status === 'published');
   const latestDisclosure = publishedDisclosures[0];
 
-  const handleExportPDF = async (disclosure: any) => {
+  const handleExportPDF = async (disclosure: AnnualDisclosure) => {
     try {
       const { data: beneficiaries } = await supabase
         .from("disclosure_beneficiaries")

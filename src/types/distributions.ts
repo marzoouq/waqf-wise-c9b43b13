@@ -33,6 +33,13 @@ export interface DistributionDetail {
   notes?: string;
   created_at: string;
   updated_at: string;
+  beneficiaries?: {
+    id: string;
+    full_name: string;
+    beneficiary_type?: string;
+    iban?: string;
+    bank_name?: string;
+  };
 }
 
 export interface DistributionSummary {

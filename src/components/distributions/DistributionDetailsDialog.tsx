@@ -96,7 +96,7 @@ export function DistributionDetailsDialog({
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {details.map((detail: any) => (
+                      {details.map((detail) => (
                         <TableRow key={detail.id}>
                           <TableCell className="font-medium">
                             {detail.beneficiaries?.full_name}
