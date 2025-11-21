@@ -29,6 +29,8 @@ import { AttachmentsDialog } from "@/components/beneficiaries/AttachmentsDialog"
 import { ActivityLogDialog } from "@/components/beneficiaries/ActivityLogDialog";
 import { EnableLoginDialog } from "@/components/beneficiaries/EnableLoginDialog";
 import { TribeManagementDialog } from "@/components/beneficiaries/TribeManagementDialog";
+import { BeneficiariesPrintButton } from "@/components/beneficiaries/BeneficiariesPrintButton";
+import { BeneficiariesImporter } from "@/components/beneficiaries/BeneficiariesImporter";
 import { Pagination } from "@/components/ui/pagination";
 import { useNavigate } from "react-router-dom";
 import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
@@ -193,13 +195,18 @@ const Beneficiaries = () => {
               إدارة بيانات الأفراد المستفيدين من الوقف
             </p>
           </div>
-          <Button 
-            className="bg-primary hover:bg-primary-hover text-primary-foreground shadow-soft hover:shadow-medium transition-all duration-300 w-full md:w-auto"
-            onClick={handleAddBeneficiary}
-          >
-            <Plus className="ml-2 h-4 w-4 md:h-5 md:w-5" />
-            <span className="text-sm md:text-base">إضافة مستفيد جديد</span>
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <BeneficiariesPrintButton beneficiaries={filteredBeneficiaries} />
+            <BeneficiariesImporter onSuccess={() => queryClient.invalidateQueries({ queryKey: ['beneficiaries'] })} />
+            <Button 
+              className="bg-primary hover:bg-primary-hover text-primary-foreground shadow-soft hover:shadow-medium transition-all duration-300"
+              onClick={handleAddBeneficiary}
+              size="sm"
+            >
+              <Plus className="ml-2 h-4 w-4" />
+              إضافة مستفيد
+            </Button>
+          </div>
         </div>
 
         {/* Filters and Search */}
