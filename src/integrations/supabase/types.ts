@@ -94,6 +94,120 @@ export type Database = {
         }
         Relationships: []
       }
+      alert_escalations: {
+        Row: {
+          acknowledged_at: string | null
+          alert_id: string | null
+          created_at: string | null
+          error_log_id: string | null
+          escalated_from_user_id: string | null
+          escalated_to_user_id: string
+          escalation_level: number | null
+          escalation_reason: string | null
+          id: string
+          resolved_at: string | null
+          status: string | null
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          alert_id?: string | null
+          created_at?: string | null
+          error_log_id?: string | null
+          escalated_from_user_id?: string | null
+          escalated_to_user_id: string
+          escalation_level?: number | null
+          escalation_reason?: string | null
+          id?: string
+          resolved_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          acknowledged_at?: string | null
+          alert_id?: string | null
+          created_at?: string | null
+          error_log_id?: string | null
+          escalated_from_user_id?: string | null
+          escalated_to_user_id?: string
+          escalation_level?: number | null
+          escalation_reason?: string | null
+          id?: string
+          resolved_at?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alert_escalations_alert_id_fkey"
+            columns: ["alert_id"]
+            isOneToOne: false
+            referencedRelation: "system_alerts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alert_escalations_error_log_id_fkey"
+            columns: ["error_log_id"]
+            isOneToOne: false
+            referencedRelation: "system_error_logs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      alert_rules: {
+        Row: {
+          auto_escalate: boolean | null
+          auto_fix_attempts: number | null
+          auto_fix_strategy: string | null
+          created_at: string | null
+          description: string | null
+          error_type_pattern: string | null
+          escalation_delay_minutes: number | null
+          id: string
+          is_active: boolean | null
+          min_severity: string | null
+          notify_roles: string[] | null
+          occurrence_threshold: number | null
+          priority: number | null
+          rule_name: string
+          time_window_minutes: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          auto_escalate?: boolean | null
+          auto_fix_attempts?: number | null
+          auto_fix_strategy?: string | null
+          created_at?: string | null
+          description?: string | null
+          error_type_pattern?: string | null
+          escalation_delay_minutes?: number | null
+          id?: string
+          is_active?: boolean | null
+          min_severity?: string | null
+          notify_roles?: string[] | null
+          occurrence_threshold?: number | null
+          priority?: number | null
+          rule_name: string
+          time_window_minutes?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          auto_escalate?: boolean | null
+          auto_fix_attempts?: number | null
+          auto_fix_strategy?: string | null
+          created_at?: string | null
+          description?: string | null
+          error_type_pattern?: string | null
+          escalation_delay_minutes?: number | null
+          id?: string
+          is_active?: boolean | null
+          min_severity?: string | null
+          notify_roles?: string[] | null
+          occurrence_threshold?: number | null
+          priority?: number | null
+          rule_name?: string
+          time_window_minutes?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       annual_disclosures: {
         Row: {
           administrative_expenses: number | null
@@ -361,6 +475,66 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      auto_fix_attempts: {
+        Row: {
+          alert_rule_id: string | null
+          attempt_number: number | null
+          completed_at: string | null
+          created_at: string | null
+          error_log_id: string | null
+          error_message: string | null
+          fix_strategy: string
+          id: string
+          max_attempts: number | null
+          result: string | null
+          started_at: string | null
+          status: string | null
+        }
+        Insert: {
+          alert_rule_id?: string | null
+          attempt_number?: number | null
+          completed_at?: string | null
+          created_at?: string | null
+          error_log_id?: string | null
+          error_message?: string | null
+          fix_strategy: string
+          id?: string
+          max_attempts?: number | null
+          result?: string | null
+          started_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          alert_rule_id?: string | null
+          attempt_number?: number | null
+          completed_at?: string | null
+          created_at?: string | null
+          error_log_id?: string | null
+          error_message?: string | null
+          fix_strategy?: string
+          id?: string
+          max_attempts?: number | null
+          result?: string | null
+          started_at?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auto_fix_attempts_alert_rule_id_fkey"
+            columns: ["alert_rule_id"]
+            isOneToOne: false
+            referencedRelation: "alert_rules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "auto_fix_attempts_error_log_id_fkey"
+            columns: ["error_log_id"]
+            isOneToOne: false
+            referencedRelation: "system_error_logs"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       backup_logs: {
         Row: {
@@ -3726,6 +3900,69 @@ export type Database = {
           },
         ]
       }
+      notification_preferences: {
+        Row: {
+          auto_escalate_after_minutes: number | null
+          created_at: string | null
+          enable_email: boolean | null
+          enable_in_app: boolean | null
+          enable_push: boolean | null
+          enable_sms: boolean | null
+          escalate_to_user_id: string | null
+          id: string
+          notify_critical: boolean | null
+          notify_high: boolean | null
+          notify_low: boolean | null
+          notify_medium: boolean | null
+          role: string
+          updated_at: string | null
+          user_id: string
+          work_days: number[] | null
+          work_hours_end: string | null
+          work_hours_start: string | null
+        }
+        Insert: {
+          auto_escalate_after_minutes?: number | null
+          created_at?: string | null
+          enable_email?: boolean | null
+          enable_in_app?: boolean | null
+          enable_push?: boolean | null
+          enable_sms?: boolean | null
+          escalate_to_user_id?: string | null
+          id?: string
+          notify_critical?: boolean | null
+          notify_high?: boolean | null
+          notify_low?: boolean | null
+          notify_medium?: boolean | null
+          role: string
+          updated_at?: string | null
+          user_id: string
+          work_days?: number[] | null
+          work_hours_end?: string | null
+          work_hours_start?: string | null
+        }
+        Update: {
+          auto_escalate_after_minutes?: number | null
+          created_at?: string | null
+          enable_email?: boolean | null
+          enable_in_app?: boolean | null
+          enable_push?: boolean | null
+          enable_sms?: boolean | null
+          escalate_to_user_id?: string | null
+          id?: string
+          notify_critical?: boolean | null
+          notify_high?: boolean | null
+          notify_low?: boolean | null
+          notify_medium?: boolean | null
+          role?: string
+          updated_at?: string | null
+          user_id?: string
+          work_days?: number[] | null
+          work_hours_end?: string | null
+          work_hours_start?: string | null
+        }
+        Relationships: []
+      }
       notification_templates: {
         Row: {
           body_template: string
@@ -4064,6 +4301,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      performance_metrics: {
+        Row: {
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          metric_name: string
+          metric_type: string
+          recorded_at: string | null
+          session_id: string | null
+          unit: string | null
+          url: string | null
+          user_id: string | null
+          value: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          metric_name: string
+          metric_type: string
+          recorded_at?: string | null
+          session_id?: string | null
+          unit?: string | null
+          url?: string | null
+          user_id?: string | null
+          value: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          metric_name?: string
+          metric_type?: string
+          recorded_at?: string | null
+          session_id?: string | null
+          unit?: string | null
+          url?: string | null
+          user_id?: string | null
+          value?: number
+        }
+        Relationships: []
       }
       policy_reviews: {
         Row: {
@@ -5618,6 +5897,42 @@ export type Database = {
           url?: string
           user_agent?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      system_health_checks: {
+        Row: {
+          check_name: string
+          check_type: string
+          checked_at: string | null
+          created_at: string | null
+          details: Json | null
+          error_message: string | null
+          id: string
+          response_time_ms: number | null
+          status: string
+        }
+        Insert: {
+          check_name: string
+          check_type: string
+          checked_at?: string | null
+          created_at?: string | null
+          details?: Json | null
+          error_message?: string | null
+          id?: string
+          response_time_ms?: number | null
+          status: string
+        }
+        Update: {
+          check_name?: string
+          check_type?: string
+          checked_at?: string | null
+          created_at?: string | null
+          details?: Json | null
+          error_message?: string | null
+          id?: string
+          response_time_ms?: number | null
+          status?: string
         }
         Relationships: []
       }

@@ -15,10 +15,60 @@ class ErrorTracker {
   private static instance: ErrorTracker;
   private errorQueue: ErrorReport[] = [];
   private isProcessing = false;
+  private failedAttempts = 0;
+  private maxFailedAttempts = 5;
+  private backoffDelay = 1000; // البدء بثانية واحدة
+  private readonly LOCAL_STORAGE_KEY = 'pending_error_reports';
+  private circuitBreakerOpen = false;
+  private circuitBreakerResetTime: number | null = null;
 
   private constructor() {
     this.setupGlobalHandlers();
     this.setupPerformanceMonitoring();
+    this.loadPendingErrors();
+    this.setupCircuitBreakerCheck();
+  }
+  
+  private loadPendingErrors() {
+    // تحميل الأخطاء المعلقة من localStorage
+    try {
+      const pending = localStorage.getItem(this.LOCAL_STORAGE_KEY);
+      if (pending) {
+        const errors = JSON.parse(pending) as ErrorReport[];
+        this.errorQueue.push(...errors);
+        console.log(`📥 Loaded ${errors.length} pending errors from local storage`);
+      }
+    } catch (error) {
+      console.error('Failed to load pending errors:', error);
+    }
+  }
+
+  private savePendingErrors() {
+    // حفظ الأخطاء المعلقة في localStorage كنسخة احتياطية
+    try {
+      if (this.errorQueue.length > 0) {
+        localStorage.setItem(this.LOCAL_STORAGE_KEY, JSON.stringify(this.errorQueue));
+      } else {
+        localStorage.removeItem(this.LOCAL_STORAGE_KEY);
+      }
+    } catch (error) {
+      console.error('Failed to save pending errors:', error);
+    }
+  }
+
+  private setupCircuitBreakerCheck() {
+    // فحص Circuit Breaker كل 30 ثانية
+    setInterval(() => {
+      if (this.circuitBreakerOpen && this.circuitBreakerResetTime) {
+        if (Date.now() >= this.circuitBreakerResetTime) {
+          console.log('🔄 Circuit breaker reset - attempting to reconnect');
+          this.circuitBreakerOpen = false;
+          this.failedAttempts = 0;
+          this.backoffDelay = 1000;
+          this.processQueue(); // محاولة معالجة القائمة
+        }
+      }
+    }, 30000);
   }
 
   static getInstance(): ErrorTracker {
@@ -61,10 +111,17 @@ class ErrorTracker {
     // مراقبة أخطاء الشبكة
     const originalFetch = window.fetch;
     window.fetch = async (...args) => {
+      const requestUrl = typeof args[0] === 'string' ? args[0] : args[0]?.toString() || 'unknown';
+      
+      // تجاهل طلبات log-error لتجنب الحلقة اللانهائية
+      if (requestUrl.includes('log-error')) {
+        return originalFetch(...args);
+      }
+      
       try {
         const response = await originalFetch(...args);
         
-        // تسجيل الأخطاء من الاستجابات
+        // تسجيل الأخطاء من الاستجابات (فقط 5xx errors)
         if (!response.ok && response.status >= 500) {
           this.trackError({
             error_type: 'network_error',
@@ -73,7 +130,7 @@ class ErrorTracker {
             url: window.location.href,
             user_agent: navigator.userAgent,
             additional_data: {
-              request_url: args[0],
+              request_url: requestUrl,
               status: response.status,
             },
           });
@@ -81,6 +138,7 @@ class ErrorTracker {
         
         return response;
       } catch (error) {
+        // تسجيل أخطاء الشبكة الفعلية
         this.trackError({
           error_type: 'network_error',
           error_message: error instanceof Error ? error.message : String(error),
@@ -88,7 +146,7 @@ class ErrorTracker {
           url: window.location.href,
           user_agent: navigator.userAgent,
           additional_data: {
-            request_url: args[0],
+            request_url: requestUrl,
           },
         });
         throw error;
@@ -200,7 +258,9 @@ class ErrorTracker {
   }
 
   private async processQueue() {
-    if (this.isProcessing || this.errorQueue.length === 0) return;
+    if (this.isProcessing || this.errorQueue.length === 0 || this.circuitBreakerOpen) {
+      return;
+    }
 
     this.isProcessing = true;
 
@@ -208,17 +268,50 @@ class ErrorTracker {
       const report = this.errorQueue.shift()!;
       
       try {
-        await supabase.functions.invoke('log-error', {
+        const { data, error } = await supabase.functions.invoke('log-error', {
           body: report,
         });
+        
+        if (error) throw error;
+        
+        // نجحت العملية - إعادة تعيين العدادات
+        this.failedAttempts = 0;
+        this.backoffDelay = 1000;
+        
+        console.log('✅ Error reported successfully');
+        
       } catch (error) {
-        console.error('Failed to send error report:', error);
-        // إعادة المحاولة لاحقاً
-        this.errorQueue.push(report);
+        console.error('❌ Failed to send error report:', error);
+        
+        this.failedAttempts++;
+        
+        // إعادة الخطأ للقائمة
+        this.errorQueue.unshift(report);
+        
+        // تطبيق استراتيجية Exponential Backoff
+        if (this.failedAttempts >= this.maxFailedAttempts) {
+          // فتح Circuit Breaker
+          this.circuitBreakerOpen = true;
+          this.circuitBreakerResetTime = Date.now() + 60000; // إعادة المحاولة بعد دقيقة
+          console.warn(`🔴 Circuit breaker opened. Will retry after 1 minute. Queue size: ${this.errorQueue.length}`);
+          
+          // حفظ الأخطاء المعلقة في localStorage
+          this.savePendingErrors();
+        } else {
+          // زيادة وقت الانتظار
+          this.backoffDelay = Math.min(this.backoffDelay * 2, 30000); // أقصى 30 ثانية
+          console.warn(`⏳ Backing off for ${this.backoffDelay}ms. Attempt ${this.failedAttempts}/${this.maxFailedAttempts}`);
+          
+          // إعادة المحاولة بعد التأخير
+          setTimeout(() => this.processQueue(), this.backoffDelay);
+        }
+        
         break;
       }
     }
-
+    
+    // حفظ الحالة
+    this.savePendingErrors();
     this.isProcessing = false;
   }
 
