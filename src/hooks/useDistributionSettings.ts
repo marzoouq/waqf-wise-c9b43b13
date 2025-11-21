@@ -22,7 +22,7 @@ export function useDistributionSettings() {
   });
 
   const updateSettings = useMutation({
-    mutationFn: async (updates: Partial<WaqfDistributionSettings>) => {
+    mutationFn: async (updates: Partial<WaqfDistributionSettings> & { calculation_order?: string }) => {
       if (settings?.id) {
         const { data, error } = await supabase
           .from("waqf_distribution_settings")

@@ -9,9 +9,12 @@ export interface WaqfDistributionSettings {
   distribution_months: number[];
   auto_distribution: boolean;
   distribution_day_of_month: number;
+  maintenance_percentage: number;
   nazer_percentage: number;
   waqif_charity_percentage: number;
   waqf_corpus_percentage: number;
+  reserve_percentage: number;
+  calculation_order: string;
   distribution_rule: 'شرعي' | 'متساوي' | 'مخصص';
   wives_share_ratio: number;
   notify_beneficiaries: boolean;
@@ -46,9 +49,11 @@ export interface DistributionSummary {
   total_revenues: number;
   total_expenses: number;
   net_revenues: number;
+  maintenance_amount: number;
   nazer_share: number;
   waqif_charity: number;
   waqf_corpus: number;
+  reserve_amount: number;
   distributable_amount: number;
   beneficiaries_count: number;
 }

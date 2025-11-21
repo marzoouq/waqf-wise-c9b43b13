@@ -1683,6 +1683,7 @@ export type Database = {
         Row: {
           bank_statement_ref: string | null
           beneficiaries_count: number
+          calculation_notes: string | null
           charity_percentage: number | null
           corpus_percentage: number | null
           created_at: string
@@ -1693,6 +1694,7 @@ export type Database = {
           expenses_amount: number | null
           id: string
           journal_entry_id: string | null
+          maintenance_amount: number | null
           month: string
           nazer_percentage: number | null
           nazer_share: number | null
@@ -1700,6 +1702,7 @@ export type Database = {
           notes: string | null
           period_end: string | null
           period_start: string | null
+          reserve_amount: number | null
           sons_count: number | null
           status: string
           total_amount: number
@@ -1714,6 +1717,7 @@ export type Database = {
         Insert: {
           bank_statement_ref?: string | null
           beneficiaries_count: number
+          calculation_notes?: string | null
           charity_percentage?: number | null
           corpus_percentage?: number | null
           created_at?: string
@@ -1724,6 +1728,7 @@ export type Database = {
           expenses_amount?: number | null
           id?: string
           journal_entry_id?: string | null
+          maintenance_amount?: number | null
           month: string
           nazer_percentage?: number | null
           nazer_share?: number | null
@@ -1731,6 +1736,7 @@ export type Database = {
           notes?: string | null
           period_end?: string | null
           period_start?: string | null
+          reserve_amount?: number | null
           sons_count?: number | null
           status?: string
           total_amount: number
@@ -1745,6 +1751,7 @@ export type Database = {
         Update: {
           bank_statement_ref?: string | null
           beneficiaries_count?: number
+          calculation_notes?: string | null
           charity_percentage?: number | null
           corpus_percentage?: number | null
           created_at?: string
@@ -1755,6 +1762,7 @@ export type Database = {
           expenses_amount?: number | null
           id?: string
           journal_entry_id?: string | null
+          maintenance_amount?: number | null
           month?: string
           nazer_percentage?: number | null
           nazer_share?: number | null
@@ -1762,6 +1770,7 @@ export type Database = {
           notes?: string | null
           period_end?: string | null
           period_start?: string | null
+          reserve_amount?: number | null
           sons_count?: number | null
           status?: string
           total_amount?: number
@@ -4611,6 +4620,50 @@ export type Database = {
         }
         Relationships: []
       }
+      reserve_transactions: {
+        Row: {
+          amount: number
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          reference_number: string | null
+          reserve_id: string | null
+          transaction_date: string | null
+          transaction_type: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          reference_number?: string | null
+          reserve_id?: string | null
+          transaction_date?: string | null
+          transaction_type: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          reference_number?: string | null
+          reserve_id?: string | null
+          transaction_date?: string | null
+          transaction_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reserve_transactions_reserve_id_fkey"
+            columns: ["reserve_id"]
+            isOneToOne: false
+            referencedRelation: "waqf_reserves"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       retention_policies: {
         Row: {
           archive_before_delete: boolean | null
@@ -5705,6 +5758,7 @@ export type Database = {
       waqf_distribution_settings: {
         Row: {
           auto_distribution: boolean | null
+          calculation_order: string | null
           created_at: string | null
           distribution_day_of_month: number | null
           distribution_frequency: string | null
@@ -5712,9 +5766,11 @@ export type Database = {
           distribution_rule: string | null
           id: string
           is_active: boolean | null
+          maintenance_percentage: number | null
           nazer_percentage: number | null
           notify_beneficiaries: boolean | null
           notify_nazer: boolean | null
+          reserve_percentage: number | null
           updated_at: string | null
           waqf_corpus_percentage: number | null
           waqf_unit_id: string | null
@@ -5723,6 +5779,7 @@ export type Database = {
         }
         Insert: {
           auto_distribution?: boolean | null
+          calculation_order?: string | null
           created_at?: string | null
           distribution_day_of_month?: number | null
           distribution_frequency?: string | null
@@ -5730,9 +5787,11 @@ export type Database = {
           distribution_rule?: string | null
           id?: string
           is_active?: boolean | null
+          maintenance_percentage?: number | null
           nazer_percentage?: number | null
           notify_beneficiaries?: boolean | null
           notify_nazer?: boolean | null
+          reserve_percentage?: number | null
           updated_at?: string | null
           waqf_corpus_percentage?: number | null
           waqf_unit_id?: string | null
@@ -5741,6 +5800,7 @@ export type Database = {
         }
         Update: {
           auto_distribution?: boolean | null
+          calculation_order?: string | null
           created_at?: string | null
           distribution_day_of_month?: number | null
           distribution_frequency?: string | null
@@ -5748,9 +5808,11 @@ export type Database = {
           distribution_rule?: string | null
           id?: string
           is_active?: boolean | null
+          maintenance_percentage?: number | null
           nazer_percentage?: number | null
           notify_beneficiaries?: boolean | null
           notify_nazer?: boolean | null
+          reserve_percentage?: number | null
           updated_at?: string | null
           waqf_corpus_percentage?: number | null
           waqf_unit_id?: string | null
@@ -5817,6 +5879,44 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      waqf_reserves: {
+        Row: {
+          amount: number
+          created_at: string | null
+          current_balance: number
+          distribution_id: string | null
+          id: string
+          reserve_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          amount?: number
+          created_at?: string | null
+          current_balance?: number
+          distribution_id?: string | null
+          id?: string
+          reserve_type: string
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          current_balance?: number
+          distribution_id?: string | null
+          id?: string
+          reserve_type?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "waqf_reserves_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "distributions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       waqf_units: {
         Row: {
