@@ -28,6 +28,7 @@ const ReactQueryDevtools =
 const Auth = lazy(() => import("./pages/Auth"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const BeneficiaryDashboard = lazy(() => import("./pages/BeneficiaryDashboard"));
+const BeneficiarySupport = lazy(() => import("./pages/BeneficiarySupport"));
 const AccountantDashboard = lazy(() => import("./pages/AccountantDashboard"));
 const NazerDashboard = lazy(() => import("./pages/NazerDashboard"));
 const CashierDashboard = lazy(() => import("./pages/CashierDashboard"));
@@ -121,6 +122,14 @@ const App = () => {
                   element={
                     <ProtectedRoute requiredRole="beneficiary">
                       <BeneficiaryDashboard />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/beneficiary-support" 
+                  element={
+                    <ProtectedRoute requiredRole="beneficiary">
+                      <BeneficiarySupport />
                     </ProtectedRoute>
                   } 
                 />
