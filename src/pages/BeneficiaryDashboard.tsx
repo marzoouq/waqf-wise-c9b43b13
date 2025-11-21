@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { DollarSign, FileText, Calendar, TrendingUp, MessageSquare, AlertCircle, Wallet, Upload, UserCog, UserPlus, Bell } from "lucide-react";
+import { DollarSign, FileText, Calendar, TrendingUp, MessageSquare, AlertCircle, Wallet, Upload, UserCog, UserPlus, Bell, Lock } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { useAuth } from "@/hooks/useAuth";
@@ -25,6 +25,7 @@ import { QuickActionsCard } from "@/components/beneficiary/QuickActionsCard";
 import { NotificationsCard } from "@/components/beneficiary/NotificationsCard";
 import { AnnualDisclosureCard } from "@/components/beneficiary/AnnualDisclosureCard";
 import { FinancialTransparencyTab } from "@/components/beneficiary/FinancialTransparencyTab";
+import { ChangePasswordDialog } from "@/components/beneficiary/ChangePasswordDialog";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
 import { useToast } from "@/hooks/use-toast";
 import { Beneficiary } from "@/types/beneficiary";
@@ -63,6 +64,7 @@ const BeneficiaryDashboard = () => {
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [selectedRequestId, setSelectedRequestId] = useState<string>();
   const [activeRequestTab, setActiveRequestTab] = useState("view");
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   
   const { attachments } = useBeneficiaryAttachments(beneficiary?.id);
 
@@ -222,10 +224,16 @@ const BeneficiaryDashboard = () => {
           title={`مرحباً، ${beneficiary.full_name}`}
           description={beneficiary.beneficiary_number ? `رقم العضوية: ${beneficiary.beneficiary_number}` : "لوحة التحكم الشخصية"}
           actions={
-            <Button onClick={() => setMessagesDialogOpen(true)} variant="outline" size="sm">
-              <MessageSquare className="h-4 w-4 ml-2" />
-              الرسائل
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={() => setChangePasswordOpen(true)} variant="outline" size="sm">
+                <Lock className="h-4 w-4 ml-2" />
+                تغيير كلمة المرور
+              </Button>
+              <Button onClick={() => setMessagesDialogOpen(true)} variant="outline" size="sm">
+                <MessageSquare className="h-4 w-4 ml-2" />
+                الرسائل
+              </Button>
+            </div>
           }
         />
 
@@ -504,6 +512,10 @@ const BeneficiaryDashboard = () => {
         <InternalMessagesDialog
           open={messagesDialogOpen}
           onOpenChange={setMessagesDialogOpen}
+        />
+        <ChangePasswordDialog
+          open={changePasswordOpen}
+          onOpenChange={setChangePasswordOpen}
         />
         {beneficiary && (
           <DocumentUploadDialog
