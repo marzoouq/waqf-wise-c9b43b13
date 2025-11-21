@@ -18,6 +18,12 @@ import { StatsCard } from "@/components/beneficiary/StatsCard";
 import { QuickActionsCard } from "@/components/beneficiary/QuickActionsCard";
 import { NotificationsCard } from "@/components/beneficiary/NotificationsCard";
 import { AnnualDisclosureCard } from "@/components/beneficiary/AnnualDisclosureCard";
+import { PropertyStatsCards } from "@/components/beneficiary/PropertyStatsCards";
+import { ReportsMenu } from "@/components/beneficiary/ReportsMenu";
+import { ActivityTimeline } from "@/components/beneficiary/ActivityTimeline";
+import { InteractiveCalendar } from "@/components/beneficiary/InteractiveCalendar";
+import { YearlyComparison } from "@/components/beneficiary/YearlyComparison";
+import { FAQSection } from "@/components/beneficiary/FAQSection";
 import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
 import { InternalMessagesDialog } from "@/components/messages/InternalMessagesDialog";
 import { ChangePasswordDialog } from "@/components/beneficiary/ChangePasswordDialog";
@@ -276,6 +282,10 @@ const BeneficiaryDashboard = () => {
 
           {/* نظرة عامة */}
           <TabsContent value="overview" className="space-y-6">
+            {/* إحصائيات العقارات */}
+            <PropertyStatsCards />
+
+            {/* الإجراءات السريعة */}
             <QuickActionsCard
               onEmergencyRequest={() => {
                 setActiveTab("services");
@@ -296,8 +306,27 @@ const BeneficiaryDashboard = () => {
               onUploadDocument={() => setDocumentUploadOpen(true)}
               onMessages={() => setMessagesOpen(true)}
             />
+
+            {/* الإشعارات */}
             <NotificationsCard />
+
+            {/* التقويم والمواعيد */}
+            <InteractiveCalendar beneficiaryId={beneficiary.id} />
+
+            {/* الإفصاح السنوي */}
             <AnnualDisclosureCard />
+
+            {/* التقارير الجاهزة */}
+            <ReportsMenu />
+
+            {/* سجل النشاط */}
+            <ActivityTimeline beneficiaryId={beneficiary.id} />
+
+            {/* المقارنة السنوية */}
+            <YearlyComparison beneficiaryId={beneficiary.id} />
+
+            {/* الأسئلة الشائعة */}
+            <FAQSection />
           </TabsContent>
 
           {/* الشفافية المالية */}

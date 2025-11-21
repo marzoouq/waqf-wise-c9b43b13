@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { lazy, Suspense } from "react";
+import { ThemeProvider } from "next-themes";
 import MainLayout from "./components/layout/MainLayout";
 import { GlobalErrorBoundary } from "./components/shared/GlobalErrorBoundary";
 import { LoadingState } from "./components/shared/LoadingState";
@@ -98,15 +99,16 @@ const App = () => {
   return (
     <GlobalErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter
-            future={{
-              v7_startTransition: true,
-              v7_relativeSplatPath: true,
-            }}
-          >
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter
+              future={{
+                v7_startTransition: true,
+                v7_relativeSplatPath: true,
+              }}
+            >
             <Suspense fallback={<LoadingState size="lg" fullScreen />}>
               <Routes>
                 {/* Public routes */}
@@ -330,15 +332,16 @@ const App = () => {
           </Suspense>
         </BrowserRouter>
       </TooltipProvider>
-      
-        {/* React Query DevTools - مفعّل على كامل التطبيق في بيئة التطوير */}
-        {DEVTOOLS_CONFIG.enabled && ReactQueryDevtools && (
-          <Suspense fallback={null}>
-            <ReactQueryDevtools 
-              initialIsOpen={DEVTOOLS_CONFIG.initialIsOpen}
-            />
-          </Suspense>
-        )}
+        
+          {/* React Query DevTools - مفعّل على كامل التطبيق في بيئة التطوير */}
+          {DEVTOOLS_CONFIG.enabled && ReactQueryDevtools && (
+            <Suspense fallback={null}>
+              <ReactQueryDevtools 
+                initialIsOpen={DEVTOOLS_CONFIG.initialIsOpen}
+              />
+            </Suspense>
+          )}
+        </ThemeProvider>
       </QueryClientProvider>
     </GlobalErrorBoundary>
   );
