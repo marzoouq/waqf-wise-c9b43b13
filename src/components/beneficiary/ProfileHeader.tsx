@@ -1,16 +1,36 @@
-import { User, Phone, Mail, MapPin, Calendar, Shield } from 'lucide-react';
+import { useState } from 'react';
+import { User, Phone, Mail, MapPin, Calendar, Shield, Edit2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Beneficiary } from '@/types/beneficiary';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
+import { EditPhoneDialog } from './EditPhoneDialog';
+import { useAuth } from '@/hooks/useAuth';
+import { useUserRole } from '@/hooks/useUserRole';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface ProfileHeaderProps {
   beneficiary: Beneficiary;
 }
 
 export function ProfileHeader({ beneficiary }: ProfileHeaderProps) {
+  const { user } = useAuth();
+  const { isBeneficiary } = useUserRole();
+  const queryClient = useQueryClient();
+  const [editPhoneOpen, setEditPhoneOpen] = useState(false);
+  
+  // Check if current user is the beneficiary owner
+  const isOwner = user?.id === beneficiary.user_id;
+  const canEditPhone = isBeneficiary && isOwner;
+
+  const handlePhoneUpdateSuccess = () => {
+    queryClient.invalidateQueries({ queryKey: ["beneficiaries"] });
+    queryClient.invalidateQueries({ queryKey: ["beneficiary-profile"] });
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'نشط':
@@ -109,6 +129,17 @@ export function ProfileHeader({ beneficiary }: ProfileHeaderProps) {
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Phone className="h-4 w-4" />
                 <span dir="ltr">{beneficiary.phone}</span>
+                {canEditPhone && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setEditPhoneOpen(true)}
+                    className="h-6 px-2 text-xs gap-1 mr-2"
+                  >
+                    <Edit2 className="h-3 w-3" />
+                    تعديل
+                  </Button>
+                )}
               </div>
 
               {beneficiary.email && (
@@ -147,6 +178,15 @@ export function ProfileHeader({ beneficiary }: ProfileHeaderProps) {
           </div>
         </div>
       </CardContent>
+      
+      {/* Edit Phone Dialog */}
+      <EditPhoneDialog
+        open={editPhoneOpen}
+        onOpenChange={setEditPhoneOpen}
+        beneficiaryId={beneficiary.id}
+        currentPhone={beneficiary.phone}
+        onSuccess={handlePhoneUpdateSuccess}
+      />
     </Card>
   );
 }
