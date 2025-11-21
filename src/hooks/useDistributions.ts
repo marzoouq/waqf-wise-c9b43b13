@@ -181,10 +181,11 @@ export function useDistributions() {
       });
 
       return data;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "حدث خطأ أثناء إنشاء التوزيع";
       toast({
         title: "خطأ في إنشاء التوزيع",
-        description: error.message || "حدث خطأ أثناء إنشاء التوزيع",
+        description: errorMessage,
         variant: "destructive",
       });
       throw error;

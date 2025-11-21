@@ -42,11 +42,15 @@ export function MonthlyRevenueChart() {
           .map(([month, revenue]) => ({
             month,
             revenue: Math.round(revenue),
-          }))
-          .reverse()
-          .slice(-12); // آخر 12 شهر
-
-        setData(chartData);
+          }));
+        
+        // حماية من المصفوفات الفارغة
+        if (chartData.length > 0) {
+          const sortedData = [...chartData].reverse().slice(-12);
+          setData(sortedData);
+        } else {
+          setData([]);
+        }
       }
       setLoading(false);
     };

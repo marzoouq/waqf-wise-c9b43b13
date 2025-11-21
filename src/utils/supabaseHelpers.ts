@@ -13,15 +13,16 @@ export async function fetchFromTable<T>(
   tableName: string,
   options: {
     select?: string;
-    filters?: Array<{ column: string; operator: string; value: any }>;
+    filters?: Array<{ column: string; operator: string; value: unknown }>;
     order?: { column: string; ascending?: boolean };
     limit?: number;
     single?: boolean;
   } = {}
 ): Promise<{ data: T | T[] | null; error: AppError | null }> {
   try {
-    // استخدام any لتجنب "Type instantiation is excessively deep"
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const client: any = supabase;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let query: any = client.from(tableName);
 
     // Select
@@ -65,6 +66,7 @@ export async function fetchFromTable<T>(
       query = query.maybeSingle();
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const result: any = await query;
     return { data: result.data, error: result.error };
   } catch (error) {
@@ -77,11 +79,14 @@ export async function fetchFromTable<T>(
  */
 export async function insertIntoTable<T>(
   tableName: string,
-  data: any
+  data: Record<string, unknown>
 ): Promise<{ data: T | null; error: AppError | null }> {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const client: any = supabase;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const query: any = client.from(tableName).insert([data]).select().single();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const result: any = await query;
     return { data: result.data, error: result.error };
   } catch (error) {
@@ -95,16 +100,19 @@ export async function insertIntoTable<T>(
 export async function updateInTable<T>(
   tableName: string,
   id: string,
-  updates: any
+  updates: Record<string, unknown>
 ): Promise<{ data: T | null; error: AppError | null }> {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const client: any = supabase;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const query: any = client
       .from(tableName)
       .update(updates)
       .eq('id', id)
       .select()
       .single();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const result: any = await query;
     return { data: result.data, error: result.error };
   } catch (error) {
@@ -120,8 +128,11 @@ export async function deleteFromTable(
   id: string
 ): Promise<{ error: AppError | null }> {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const client: any = supabase;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const query: any = client.from(tableName).delete().eq('id', id);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const result: any = await query;
     return { error: result.error };
   } catch (error) {

@@ -2,41 +2,12 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { logger } from "@/lib/logger";
+import type { Database } from "@/integrations/supabase/types";
 
-export interface AnnualDisclosure {
-  id: string;
-  fiscal_year_id?: string;
-  year: number;
-  waqf_name: string;
-  disclosure_date: string;
-  total_revenues: number;
-  total_expenses: number;
-  net_income: number;
-  nazer_share: number;
-  nazer_percentage: number;
-  charity_share: number;
-  charity_percentage: number;
-  corpus_share: number;
-  corpus_percentage: number;
-  total_beneficiaries: number;
-  sons_count: number;
-  daughters_count: number;
-  wives_count: number;
-  maintenance_expenses?: number;
-  administrative_expenses?: number;
-  development_expenses?: number;
-  other_expenses?: number;
-  opening_balance?: number;
-  closing_balance?: number;
-  bank_statement_url?: string;
-  beneficiaries_details?: any;
-  expenses_breakdown?: any;
-  status: 'draft' | 'published' | 'archived';
-  published_at?: string;
-  published_by?: string;
-  created_at: string;
-  updated_at: string;
-}
+type DbAnnualDisclosure = Database['public']['Tables']['annual_disclosures']['Row'];
+type DbAnnualDisclosureInsert = Database['public']['Tables']['annual_disclosures']['Insert'];
+
+export type AnnualDisclosure = DbAnnualDisclosure;
 
 export interface DisclosureBeneficiary {
   id: string;
@@ -63,7 +34,7 @@ export function useAnnualDisclosures() {
         .order("year", { ascending: false });
 
       if (error) throw error;
-      return data as AnnualDisclosure[];
+      return (data || []) as AnnualDisclosure[];
     },
   });
 
@@ -78,7 +49,7 @@ export function useAnnualDisclosures() {
         .maybeSingle();
 
       if (error) throw error;
-      return data as AnnualDisclosure | null;
+      return (data || null) as AnnualDisclosure | null;
     },
   });
 

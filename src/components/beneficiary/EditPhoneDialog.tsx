@@ -52,10 +52,11 @@ export function EditPhoneDialog({ open, onOpenChange, beneficiaryId, currentPhon
 
       onOpenChange(false);
       onSuccess?.();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "حدث خطأ أثناء تحديث رقم الجوال";
       toast({
         title: "خطأ",
-        description: error.message || "حدث خطأ أثناء تحديث رقم الجوال",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
