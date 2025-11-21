@@ -8,12 +8,13 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Search, UserPlus, Shield, Edit, Trash2, CheckCircle, XCircle, Download } from "lucide-react";
+import { Search, UserPlus, Shield, Edit, Trash2, CheckCircle, XCircle, Download, Key, AlertCircle } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
@@ -62,6 +63,9 @@ const Users = () => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
   const [selectedRoles, setSelectedRoles] = useState<AppRole[]>([]);
+  const [resetPasswordDialogOpen, setResetPasswordDialogOpen] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [selectedUserForReset, setSelectedUserForReset] = useState<UserProfile | null>(null);
 
   // Export users to CSV
   const exportUsers = () => {
@@ -136,6 +140,34 @@ const Users = () => {
         description: "تم تحديث حالة المستخدم بنجاح",
       });
     },
+  });
+
+  // Reset user password
+  const resetPasswordMutation = useMutation({
+    mutationFn: async ({ userId, password }: { userId: string; password: string }) => {
+      const { data, error } = await supabase.functions.invoke('reset-user-password', {
+        body: { user_id: userId, new_password: password }
+      });
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      setResetPasswordDialogOpen(false);
+      setNewPassword("");
+      setSelectedUserForReset(null);
+      toast({
+        title: "تم التحديث",
+        description: "تم تعيين كلمة المرور الجديدة بنجاح",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "خطأ",
+        description: error.message || "فشل تحديث كلمة المرور",
+        variant: "destructive",
+      });
+    }
   });
 
   // Update user roles
@@ -327,13 +359,27 @@ const Users = () => {
                             : "-"}
                         </TableCell>
                         <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEditRoles(user)}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
+                          <div className="flex gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEditRoles(user)}
+                              title="تعديل الأدوار"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setSelectedUserForReset(user);
+                                setResetPasswordDialogOpen(true);
+                              }}
+                              title="تعيين كلمة مرور مؤقتة"
+                            >
+                              <Key className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -382,6 +428,66 @@ const Users = () => {
               disabled={selectedRoles.length === 0}
             >
               حفظ التغييرات
+            </Button>
+          </div>
+        </ResponsiveDialog>
+
+        {/* Reset Password Dialog */}
+        <ResponsiveDialog 
+          open={resetPasswordDialogOpen} 
+          onOpenChange={setResetPasswordDialogOpen}
+          title="تعيين كلمة مرور مؤقتة"
+          description={`تعيين كلمة مرور جديدة للمستخدم: ${selectedUserForReset?.full_name}`}
+          size="sm"
+        >
+          <div className="space-y-4">
+            <Alert className="border-warning/50 bg-warning/10">
+              <AlertCircle className="h-4 w-4 text-warning" />
+              <AlertTitle>تنبيه أمني</AlertTitle>
+              <AlertDescription>
+                سيتم إرسال إشعار للمستخدم بتغيير كلمة المرور. يُنصح بإخباره شخصياً.
+              </AlertDescription>
+            </Alert>
+
+            <div className="space-y-2">
+              <Label htmlFor="newPassword">كلمة المرور الجديدة *</Label>
+              <Input
+                id="newPassword"
+                type="text"
+                placeholder="أدخل كلمة المرور المؤقتة (8 أحرف على الأقل)"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="text-left"
+                dir="ltr"
+              />
+              <p className="text-xs text-muted-foreground">
+                مثال: User@123456
+              </p>
+            </div>
+          </div>
+
+          <div className="flex gap-2 justify-end mt-4">
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setResetPasswordDialogOpen(false);
+                setNewPassword("");
+              }}
+            >
+              إلغاء
+            </Button>
+            <Button
+              onClick={() => {
+                if (selectedUserForReset) {
+                  resetPasswordMutation.mutate({
+                    userId: selectedUserForReset.user_id,
+                    password: newPassword
+                  });
+                }
+              }}
+              disabled={newPassword.length < 8 || resetPasswordMutation.isPending}
+            >
+              {resetPasswordMutation.isPending ? "جاري التحديث..." : "تعيين كلمة المرور"}
             </Button>
           </div>
         </ResponsiveDialog>
