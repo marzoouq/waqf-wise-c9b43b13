@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { Bell, Clock, Calendar } from "lucide-react";
+import { Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -9,47 +8,15 @@ import {
 } from "@/components/ui/popover";
 import { useNotifications } from "@/hooks/useNotifications";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { formatDistanceToNow, format } from "date-fns";
+import { formatDistanceToNow } from "date-fns";
 import { ar } from "date-fns/locale";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function NotificationsBell() {
-  const [currentTime, setCurrentTime] = useState(new Date());
-
-  // تحديث الوقت كل ثانية
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
   const { notifications, isLoading, unreadCount, markAsRead, markAllAsRead } = useNotifications();
 
   return (
-    <div className="flex items-center gap-2 md:gap-4">
-      {/* التاريخ والوقت */}
-      <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-muted/50 rounded-lg">
-        <Calendar className="h-4 w-4 text-primary" />
-        <span className="text-xs font-medium">
-          {format(currentTime, "d MMM yyyy", { locale: ar })}
-        </span>
-        <Clock className="h-4 w-4 text-primary mr-2" />
-        <span className="text-xs font-mono font-semibold">
-          {format(currentTime, "HH:mm:ss")}
-        </span>
-      </div>
-
-      {/* التاريخ والوقت للموبايل */}
-      <div className="sm:hidden flex items-center gap-1.5 px-2 py-1 bg-muted/50 rounded-lg">
-        <Clock className="h-3.5 w-3.5 text-primary" />
-        <span className="text-xs font-mono font-semibold">
-          {format(currentTime, "HH:mm")}
-        </span>
-      </div>
-
-      {/* زر الإشعارات */}
-      <Popover>
+    <Popover>
       <PopoverTrigger asChild>
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="h-5 w-5" />
@@ -126,6 +93,5 @@ export function NotificationsBell() {
         </ScrollArea>
       </PopoverContent>
     </Popover>
-    </div>
   );
 }

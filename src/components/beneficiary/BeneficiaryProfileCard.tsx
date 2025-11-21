@@ -1,8 +1,9 @@
+import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Phone, Mail, MapPin, Calendar, MessageSquare, Lock } from "lucide-react";
+import { Phone, Mail, MapPin, Calendar, MessageSquare, Lock, Clock } from "lucide-react";
 import { Beneficiary } from "@/types/beneficiary";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
@@ -19,6 +20,17 @@ export function BeneficiaryProfileCard({
   onMessages, 
   onChangePassword 
 }: BeneficiaryProfileCardProps) {
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // تحديث الوقت كل ثانية
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
   const getInitials = (name: string) => {
     const names = name.split(" ");
     if (names.length >= 2) {
@@ -63,6 +75,27 @@ export function BeneficiaryProfileCard({
 
           {/* Main Info */}
           <div className="flex-1 text-center md:text-right space-y-3">
+            {/* التاريخ والوقت */}
+            <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
+              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-muted/50 rounded-lg">
+                <Calendar className="h-4 w-4 text-primary" />
+                <span className="text-xs font-medium">
+                  {format(currentTime, "d MMM yyyy", { locale: ar })}
+                </span>
+                <Clock className="h-4 w-4 text-primary mr-2" />
+                <span className="text-xs font-mono font-semibold">
+                  {format(currentTime, "HH:mm:ss")}
+                </span>
+              </div>
+
+              {/* التاريخ والوقت للموبايل */}
+              <div className="sm:hidden flex items-center gap-1.5 px-2 py-1 bg-muted/50 rounded-lg">
+                <Clock className="h-3.5 w-3.5 text-primary" />
+                <span className="text-xs font-mono font-semibold">
+                  {format(currentTime, "HH:mm")}
+                </span>
+              </div>
+            </div>
             {/* Name */}
             <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-l from-primary to-primary/70 bg-clip-text text-transparent">
               {beneficiary.full_name}
