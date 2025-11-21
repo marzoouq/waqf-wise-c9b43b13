@@ -8,25 +8,39 @@ export type AppRole = "nazer" | "admin" | "accountant" | "cashier" | "archivist"
 export function useUserRole() {
   const { user } = useAuth();
 
-  const { data: roles = [], isLoading, refetch } = useQuery({
+  const { data: roles = [], isLoading, isFetching, refetch } = useQuery({
     queryKey: ["user-roles", user?.id || undefined],
     queryFn: async () => {
-      if (!user) return [];
+      if (!user) {
+        console.log('👤 useUserRole: No user yet');
+        return [];
+      }
+
+      console.log('👤 useUserRole: Fetching roles for user:', user.email);
 
       // Get current authenticated user's ID
       const { data: { user: authUser } } = await supabase.auth.getUser();
-      if (!authUser) return [];
+      if (!authUser) {
+        console.log('❌ useUserRole: No authenticated user');
+        return [];
+      }
 
       const { data, error } = await supabase
         .from("user_roles")
         .select("role")
         .eq("user_id", authUser.id);
 
-      if (error) return [];
+      if (error) {
+        console.error('❌ useUserRole: Error fetching roles:', error);
+        return [];
+      }
       
+      console.log('✅ useUserRole: Roles loaded:', data);
       return (data || []).map(r => r.role as AppRole);
     },
     enabled: !!user,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000,
   });
 
   // Real-time subscription
@@ -57,6 +71,9 @@ export function useUserRole() {
   const hasRole = (role: AppRole) => roles.includes(role);
   const primaryRole = roles[0] || "user";
 
+  // More accurate loading state
+  const isLoadingRoles = isLoading || (!!user && isFetching);
+
   const isNazer = hasRole("nazer");
   const isAdmin = hasRole("admin");
   const isAccountant = hasRole("accountant");
@@ -68,7 +85,7 @@ export function useUserRole() {
   return {
     roles,
     primaryRole,
-    isLoading,
+    isLoading: isLoadingRoles,
     hasRole,
     isNazer,
     isAdmin,
