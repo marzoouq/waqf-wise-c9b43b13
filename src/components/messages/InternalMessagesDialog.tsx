@@ -6,11 +6,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Send, Mail, MailOpen, Inbox, SendIcon } from "lucide-react";
+import { Send, Mail, MailOpen, Inbox, SendIcon, Reply } from "lucide-react";
 import { useInternalMessages } from "@/hooks/useInternalMessages";
 import { useAuth } from "@/hooks/useAuth";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import { Separator } from "@/components/ui/separator";
 
 interface InternalMessagesDialogProps {
   open: boolean;
@@ -24,11 +25,22 @@ export function InternalMessagesDialog({
   const { user } = useAuth();
   const { inboxMessages, sentMessages, sendMessage, markAsRead, unreadCount } = useInternalMessages();
   const [activeTab, setActiveTab] = useState("inbox");
+  const [replyToMessage, setReplyToMessage] = useState<typeof inboxMessages[0] | null>(null);
   const [newMessage, setNewMessage] = useState({
     receiver_id: "",
     subject: "",
     body: "",
   });
+
+  const handleReplyToMessage = (message: typeof inboxMessages[0]) => {
+    setReplyToMessage(message);
+    setNewMessage({
+      receiver_id: message.sender_id,
+      subject: message.subject.startsWith("رد: ") ? message.subject : `رد: ${message.subject}`,
+      body: "",
+    });
+    setActiveTab("compose");
+  };
 
   const handleSendMessage = async () => {
     if (!newMessage.receiver_id || !newMessage.subject || !newMessage.body) {
@@ -43,6 +55,7 @@ export function InternalMessagesDialog({
     });
 
     setNewMessage({ receiver_id: "", subject: "", body: "" });
+    setReplyToMessage(null);
     setActiveTab("sent");
   };
 
@@ -89,8 +102,7 @@ export function InternalMessagesDialog({
               inboxMessages.map((message) => (
                 <Card 
                   key={message.id} 
-                  className={`cursor-pointer hover:bg-muted/50 ${!message.is_read ? 'border-primary' : ''}`}
-                  onClick={() => handleReadMessage(message.id, message.is_read)}
+                  className={!message.is_read ? 'border-primary' : ''}
                 >
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between mb-2">
@@ -104,9 +116,20 @@ export function InternalMessagesDialog({
                           {message.subject}
                         </h4>
                       </div>
-                      {!message.is_read && <Badge>جديد</Badge>}
+                      <div className="flex items-center gap-2">
+                        {!message.is_read && <Badge>جديد</Badge>}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleReplyToMessage(message)}
+                          className="gap-1"
+                        >
+                          <Reply className="h-3 w-3" />
+                          رد
+                        </Button>
+                      </div>
                     </div>
-                    <p className="text-sm text-muted-foreground mb-2">{message.body}</p>
+                    <p className="text-sm text-muted-foreground mb-2 whitespace-pre-wrap">{message.body}</p>
                     <p className="text-xs text-muted-foreground">
                       {format(new Date(message.created_at), "dd MMMM yyyy - HH:mm", { locale: ar })}
                     </p>
@@ -145,15 +168,32 @@ export function InternalMessagesDialog({
 
           {/* إنشاء رسالة جديدة */}
           <TabsContent value="compose" className="space-y-4">
+            {replyToMessage && (
+              <Card className="bg-muted/30">
+                <CardContent className="p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Reply className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm font-medium">رد على رسالة</span>
+                  </div>
+                  <div className="text-xs text-muted-foreground space-y-1">
+                    <p><strong>الموضوع:</strong> {replyToMessage.subject}</p>
+                    <p className="line-clamp-2"><strong>الرسالة الأصلية:</strong> {replyToMessage.body}</p>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => {
+                      setReplyToMessage(null);
+                      setNewMessage({ receiver_id: "", subject: "", body: "" });
+                    }}
+                    className="mt-2"
+                  >
+                    إلغاء الرد
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
             <div className="space-y-3">
-              <div>
-                <label className="text-sm font-medium mb-1 block">إلى (معرف المستلم)</label>
-                <Input
-                  placeholder="أدخل معرف المستلم"
-                  value={newMessage.receiver_id}
-                  onChange={(e) => setNewMessage({ ...newMessage, receiver_id: e.target.value })}
-                />
-              </div>
               <div>
                 <label className="text-sm font-medium mb-1 block">الموضوع</label>
                 <Input
@@ -168,10 +208,14 @@ export function InternalMessagesDialog({
                   placeholder="اكتب رسالتك هنا..."
                   value={newMessage.body}
                   onChange={(e) => setNewMessage({ ...newMessage, body: e.target.value })}
-                  rows={6}
+                  rows={8}
                 />
               </div>
-              <Button onClick={handleSendMessage} className="w-full">
+              <Button 
+                onClick={handleSendMessage} 
+                className="w-full"
+                disabled={!newMessage.receiver_id || !newMessage.subject || !newMessage.body}
+              >
                 <Send className="h-4 w-4 ml-2" />
                 إرسال الرسالة
               </Button>
