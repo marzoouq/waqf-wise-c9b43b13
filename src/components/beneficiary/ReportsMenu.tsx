@@ -227,23 +227,9 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
     </>
   );
 
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      {/* تقارير المستفيد */}
-      <Card>
-        <CardHeader className="bg-gradient-to-br from-primary/5 to-background">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <Download className="h-5 w-5 text-primary" />
-            تقاريري الشخصية
-          </CardTitle>
-          <CardDescription>التقارير الخاصة بحسابك ومدفوعاتك</CardDescription>
-        </CardHeader>
-        <CardContent className="pt-4">
-          <div className="grid grid-cols-1 gap-3">{beneficiaryReports}</div>
-        </CardContent>
-      </Card>
-
-      {/* تقارير الوقف */}
+  // عرض التقارير حسب النوع
+  if (type === "waqf") {
+    return (
       <Card>
         <CardHeader className="bg-gradient-to-br from-green-500/5 to-background">
           <CardTitle className="flex items-center gap-2 text-lg">
@@ -253,9 +239,24 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
           <CardDescription>الإفصاحات المالية وتقارير العقارات</CardDescription>
         </CardHeader>
         <CardContent className="pt-4">
-          <div className="grid grid-cols-1 gap-3">{waqfReports}</div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">{waqfReports}</div>
         </CardContent>
       </Card>
-    </div>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader className="bg-gradient-to-br from-primary/5 to-background">
+        <CardTitle className="flex items-center gap-2 text-lg">
+          <Download className="h-5 w-5 text-primary" />
+          تقاريري الشخصية
+        </CardTitle>
+        <CardDescription>التقارير الخاصة بحسابك ومدفوعاتك</CardDescription>
+      </CardHeader>
+      <CardContent className="pt-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">{beneficiaryReports}</div>
+      </CardContent>
+    </Card>
   );
 }

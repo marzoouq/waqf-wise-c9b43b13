@@ -16,8 +16,8 @@ import {
 import { BeneficiaryProfileCard } from "@/components/beneficiary/BeneficiaryProfileCard";
 import { StatsCard } from "@/components/beneficiary/StatsCard";
 import { QuickActionsCard } from "@/components/beneficiary/QuickActionsCard";
-import { NotificationsCard } from "@/components/beneficiary/NotificationsCard";
 import { AnnualDisclosureCard } from "@/components/beneficiary/AnnualDisclosureCard";
+import { NotificationsBell } from "@/components/beneficiary/NotificationsBell";
 import { PropertyStatsCards } from "@/components/beneficiary/PropertyStatsCards";
 import { ReportsMenu } from "@/components/beneficiary/ReportsMenu";
 import { ActivityTimeline } from "@/components/beneficiary/ActivityTimeline";
@@ -225,12 +225,17 @@ const BeneficiaryDashboard = () => {
   return (
     <MobileOptimizedLayout>
       <div className="space-y-6 pb-20">
-        {/* بطاقة المستفيد الاحترافية */}
-        <BeneficiaryProfileCard
-          beneficiary={beneficiary}
-          onMessages={() => setMessagesOpen(true)}
-          onChangePassword={() => setPasswordDialogOpen(true)}
-        />
+        {/* شريط الإشعارات في الأعلى */}
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex-1">
+            <BeneficiaryProfileCard
+              beneficiary={beneficiary}
+              onMessages={() => setMessagesOpen(true)}
+              onChangePassword={() => setPasswordDialogOpen(true)}
+            />
+          </div>
+          <NotificationsBell />
+        </div>
 
         {/* الإحصائيات المحسنة */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -310,8 +315,6 @@ const BeneficiaryDashboard = () => {
               onMessages={() => setMessagesOpen(true)}
             />
 
-            {/* الإشعارات */}
-            <NotificationsCard />
 
             {/* التقويم والمواعيد */}
             <InteractiveCalendar beneficiaryId={beneficiary.id} />
