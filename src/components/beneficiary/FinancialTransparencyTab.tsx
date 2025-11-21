@@ -1,7 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Building2, Home, FileText, TrendingUp, PieChart } from "lucide-react";
-import { PropertiesListView } from "./PropertiesListView";
-import { PropertyUnitsGrid } from "./PropertyUnitsGrid";
+import { Building2, FileText, TrendingUp, PieChart } from "lucide-react";
+import { PropertyAccordionView } from "./PropertyAccordionView";
 import { ContractsTable } from "./ContractsTable";
 import { MonthlyRevenueChart } from "./MonthlyRevenueChart";
 import { DistributionPieChart } from "./DistributionPieChart";
@@ -21,35 +20,19 @@ export function FinancialTransparencyTab() {
         </CardHeader>
       </Card>
 
-      {/* عقارات الوقف */}
+      {/* عقارات الوقف ووحداتها - نظام Accordion */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Building2 className="h-5 w-5 text-primary" />
-            عقارات الوقف
+            عقارات الوقف ووحداتها
           </CardTitle>
           <CardDescription>
-            جميع العقارات المسجلة باسم الوقف
+            انقر على أي عقار لعرض وحداته التفصيلية
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <PropertiesListView />
-        </CardContent>
-      </Card>
-
-      {/* الوحدات العقارية */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Home className="h-5 w-5 text-green-600" />
-            الوحدات العقارية
-          </CardTitle>
-          <CardDescription>
-            جميع الوحدات والشقق التابعة للعقارات
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <PropertyUnitsGrid />
+          <PropertyAccordionView />
         </CardContent>
       </Card>
 
