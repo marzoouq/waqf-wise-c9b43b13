@@ -1,37 +1,42 @@
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { useQueryClient, useMutation } from "@tanstack/react-query";
-import { useBeneficiaryProfile } from "@/hooks/useBeneficiaryProfile";
-import { useRealtimeNotifications } from "@/hooks/useRealtimeNotifications";
-import { useDisclosureNotifications } from "@/hooks/useDisclosureNotifications";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { DollarSign, FileText, Calendar, TrendingUp, MessageSquare, AlertCircle, Wallet, Upload, UserCog, UserPlus, Bell, Lock } from "lucide-react";
-import { LoadingState } from "@/components/shared/LoadingState";
-import { EmptyState } from "@/components/shared/EmptyState";
-import { useAuth } from "@/hooks/useAuth";
+import { 
+  User, 
+  FileText, 
+  DollarSign, 
+  Calendar,
+  TrendingUp,
+  LayoutDashboard,
+  Eye,
+  Briefcase
+} from "lucide-react";
+import { BeneficiaryProfileCard } from "@/components/beneficiary/BeneficiaryProfileCard";
+import { StatsCard } from "@/components/beneficiary/StatsCard";
+import { QuickActionsCard } from "@/components/beneficiary/QuickActionsCard";
+import { NotificationsCard } from "@/components/beneficiary/NotificationsCard";
+import { AnnualDisclosureCard } from "@/components/beneficiary/AnnualDisclosureCard";
+import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
+import { InternalMessagesDialog } from "@/components/messages/InternalMessagesDialog";
+import { ChangePasswordDialog } from "@/components/beneficiary/ChangePasswordDialog";
+import { DocumentUploadDialog } from "@/components/beneficiary/DocumentUploadDialog";
 import { EmergencyRequestForm } from "@/components/beneficiary/EmergencyRequestForm";
 import { LoanRequestForm } from "@/components/beneficiary/LoanRequestForm";
 import { DataUpdateForm } from "@/components/beneficiary/DataUpdateForm";
 import { AddFamilyMemberForm } from "@/components/beneficiary/AddFamilyMemberForm";
-import { DocumentUploadDialog } from "@/components/beneficiary/DocumentUploadDialog";
-import { useBeneficiaryAttachments } from "@/hooks/useBeneficiaryAttachments";
-import { AccountStatementView } from "@/components/beneficiary/AccountStatementView";
-import { BeneficiaryCertificate } from "@/components/beneficiary/BeneficiaryCertificate";
-import { InternalMessagesDialog } from "@/components/messages/InternalMessagesDialog";
-import { QuickActionsCard } from "@/components/beneficiary/QuickActionsCard";
-import { NotificationsCard } from "@/components/beneficiary/NotificationsCard";
-import { AnnualDisclosureCard } from "@/components/beneficiary/AnnualDisclosureCard";
 import { FinancialTransparencyTab } from "@/components/beneficiary/FinancialTransparencyTab";
-import { ChangePasswordDialog } from "@/components/beneficiary/ChangePasswordDialog";
-import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
+import { useBeneficiaryProfile } from "@/hooks/useBeneficiaryProfile";
+import { useBeneficiaryAttachments } from "@/hooks/useBeneficiaryAttachments";
+import { useAuth } from "@/hooks/useAuth";
+import { formatCurrency } from "@/lib/utils";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Beneficiary } from "@/types/beneficiary";
+import { LoadingState } from "@/components/shared/LoadingState";
+import { Badge } from "@/components/ui/badge";
 import { logger } from "@/lib/logger";
-import { Database } from '@/integrations/supabase/types';
-import { Eye } from "lucide-react";
 
 interface Request {
   id: string;
@@ -41,54 +46,40 @@ interface Request {
   created_at: string;
 }
 
-interface Payment {
-  id: string;
-  payment_number: string;
-  payment_date: string;
-  amount: number;
-  description: string;
-}
-
 const BeneficiaryDashboard = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { beneficiary, payments, loading } = useBeneficiaryProfile(user?.id);
-  
-  // تفعيل الإشعارات في الوقت الفعلي
-  useRealtimeNotifications();
-  useDisclosureNotifications();
-  
-  const [requests, setRequests] = useState<Request[]>([]);
-  const [messagesDialogOpen, setMessagesDialogOpen] = useState(false);
-  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
-  const [selectedRequestId, setSelectedRequestId] = useState<string>();
-  const [activeRequestTab, setActiveRequestTab] = useState("view");
-  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
-  
   const { attachments } = useBeneficiaryAttachments(beneficiary?.id);
 
-  useEffect(() => {
-    if (!user?.id || !beneficiary?.id) return;
+  const [messagesOpen, setMessagesOpen] = useState(false);
+  const [documentUploadOpen, setDocumentUploadOpen] = useState(false);
+  const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("overview");
+  const [servicesTab, setServicesTab] = useState("history");
 
-    const fetchRequests = async () => {
+  // جلب الطلبات
+  const { data: requests = [] } = useQuery({
+    queryKey: ["beneficiary-requests", beneficiary?.id],
+    queryFn: async () => {
+      if (!beneficiary?.id) return [];
+      
       const { data, error } = await supabase
         .from("beneficiary_requests")
         .select("id, description, status, amount, created_at")
         .eq("beneficiary_id", beneficiary.id)
-        .order("submitted_at", { ascending: false });
+        .order("created_at", { ascending: false });
       
-      if (!error && data) {
-        setRequests(data as Request[]);
-      }
-    };
-
-    fetchRequests();
-  }, [user?.id, beneficiary?.id]);
+      if (error) throw error;
+      return data as Request[];
+    },
+    enabled: !!beneficiary?.id,
+  });
 
   // Create request mutation
   const createRequestMutation = useMutation({
-    mutationFn: async (newRequest: Database['public']['Tables']['beneficiary_requests']['Insert']) => {
+    mutationFn: async (newRequest: any) => {
       const { data, error } = await supabase
         .from("beneficiary_requests")
         .insert(newRequest)
@@ -99,17 +90,18 @@ const BeneficiaryDashboard = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['requests'] });
+      queryClient.invalidateQueries({ queryKey: ["beneficiary-requests"] });
       toast({
-        title: 'تم بنجاح',
-        description: 'تم إرسال الطلب بنجاح',
+        title: "تم بنجاح",
+        description: "تم إرسال الطلب بنجاح",
       });
+      setServicesTab("history");
     },
     onError: (error: Error) => {
       toast({
-        title: 'خطأ',
-        description: error.message || 'حدث خطأ أثناء إرسال الطلب',
-        variant: 'destructive',
+        title: "خطأ",
+        description: error.message || "حدث خطأ أثناء إرسال الطلب",
+        variant: "destructive",
       });
     },
   });
@@ -117,8 +109,12 @@ const BeneficiaryDashboard = () => {
   const stats = {
     totalPayments: payments.reduce((sum, p) => sum + Number(p.amount), 0),
     paymentsCount: payments.length,
-    lastPaymentDate: payments.length > 0 ? new Date(payments[0].payment_date).toLocaleDateString("ar-SA") : "لا يوجد",
-    averagePayment: payments.length > 0 ? payments.reduce((sum, p) => sum + Number(p.amount), 0) / payments.length : 0,
+    lastPaymentDate: payments.length > 0 
+      ? new Date(payments[0].payment_date).toLocaleDateString("ar-SA") 
+      : "لا يوجد",
+    averagePayment: payments.length > 0 
+      ? payments.reduce((sum, p) => sum + Number(p.amount), 0) / payments.length 
+      : 0,
   };
 
   const handleEmergencyRequest = async (data: Record<string, unknown>) => {
@@ -131,9 +127,8 @@ const BeneficiaryDashboard = () => {
         priority: "عاجل",
         status: "قيد المراجعة",
       });
-      setActiveRequestTab("view");
     } catch (error) {
-      logger.error(error, { context: 'submit_emergency_request', severity: 'medium' });
+      logger.error(error, { context: "submit_emergency_request", severity: "medium" });
     }
   };
 
@@ -147,9 +142,8 @@ const BeneficiaryDashboard = () => {
         priority: "عادية",
         status: "قيد المراجعة",
       });
-      setActiveRequestTab("view");
     } catch (error) {
-      logger.error(error, { context: 'submit_loan_request', severity: 'medium' });
+      logger.error(error, { context: "submit_loan_request", severity: "medium" });
     }
   };
 
@@ -162,13 +156,12 @@ const BeneficiaryDashboard = () => {
         priority: "عادية",
         status: "قيد المراجعة",
       });
-      setActiveRequestTab("view");
     } catch (error) {
-      logger.error(error, { context: 'submit_data_update_request', severity: 'medium' });
+      logger.error(error, { context: "submit_data_update_request", severity: "medium" });
     }
   };
 
-  const handleAddFamilyMember = async (data: Record<string, unknown>) => {
+  const handleAddFamily = async (data: Record<string, unknown>) => {
     try {
       await createRequestMutation.mutateAsync({
         beneficiary_id: beneficiary?.id || "",
@@ -177,10 +170,14 @@ const BeneficiaryDashboard = () => {
         priority: "عادية",
         status: "قيد المراجعة",
       });
-      setActiveRequestTab("view");
     } catch (error) {
-      logger.error(error, { context: 'submit_add_family_member_request', severity: 'medium' });
+      logger.error(error, { context: "submit_add_family_member_request", severity: "medium" });
     }
+  };
+
+  const handleRequestSuccess = () => {
+    queryClient.invalidateQueries({ queryKey: ["beneficiary-requests"] });
+    setServicesTab("history");
   };
 
   if (loading) return <LoadingState message="جاري تحميل البيانات..." />;
@@ -190,7 +187,9 @@ const BeneficiaryDashboard = () => {
       <div className="min-h-screen bg-background flex items-center justify-center p-6">
         <Card className="max-w-md w-full">
           <CardHeader>
-            <CardTitle className="text-center text-destructive">لم يتم العثور على حساب مستفيد</CardTitle>
+            <CardTitle className="text-center text-destructive">
+              لم يتم العثور على حساب مستفيد
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="text-center text-muted-foreground">
@@ -219,318 +218,208 @@ const BeneficiaryDashboard = () => {
 
   return (
     <MobileOptimizedLayout>
-      <div className="space-y-4">
-        <MobileOptimizedHeader
-          title={`مرحباً، ${beneficiary.full_name}`}
-          description={beneficiary.beneficiary_number ? `رقم العضوية: ${beneficiary.beneficiary_number}` : "لوحة التحكم الشخصية"}
-          actions={
-            <div className="flex gap-2">
-              <Button onClick={() => setChangePasswordOpen(true)} variant="outline" size="sm">
-                <Lock className="h-4 w-4 ml-2" />
-                تغيير كلمة المرور
-              </Button>
-              <Button onClick={() => setMessagesDialogOpen(true)} variant="outline" size="sm">
-                <MessageSquare className="h-4 w-4 ml-2" />
-                الرسائل
-              </Button>
-            </div>
-          }
+      <div className="space-y-6 pb-20">
+        {/* بطاقة المستفيد الاحترافية */}
+        <BeneficiaryProfileCard
+          beneficiary={beneficiary}
+          onMessages={() => setMessagesOpen(true)}
+          onChangePassword={() => setPasswordDialogOpen(true)}
         />
 
-        {/* الإحصائيات السريعة */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <Card>
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-xs md:text-sm">إجمالي المدفوعات</CardTitle>
-                <DollarSign className="h-4 w-4 text-primary" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-lg md:text-2xl font-bold text-primary">
-                {stats.totalPayments.toLocaleString("ar-SA")} ر.س
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-xs md:text-sm">عدد المدفوعات</CardTitle>
-                <FileText className="h-4 w-4 text-green-600" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-lg md:text-2xl font-bold text-green-600">
-                {stats.paymentsCount}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-xs md:text-sm">آخر دفعة</CardTitle>
-                <Calendar className="h-4 w-4 text-blue-600" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-sm md:text-lg font-bold text-blue-600">
-                {stats.lastPaymentDate}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-xs md:text-sm">متوسط الدفعة</CardTitle>
-                <TrendingUp className="h-4 w-4 text-amber-600" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-lg md:text-2xl font-bold text-amber-600">
-                {stats.averagePayment.toLocaleString("ar-SA")} ر.س
-              </div>
-            </CardContent>
-          </Card>
+        {/* الإحصائيات المحسنة */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatsCard
+            title="إجمالي المدفوعات"
+            value={formatCurrency(stats.totalPayments)}
+            icon={DollarSign}
+            colorClass="text-primary"
+          />
+          <StatsCard
+            title="عدد المدفوعات"
+            value={stats.paymentsCount}
+            icon={FileText}
+            colorClass="text-green-600"
+          />
+          <StatsCard
+            title="آخر دفعة"
+            value={stats.lastPaymentDate}
+            icon={Calendar}
+            colorClass="text-blue-600"
+          />
+          <StatsCard
+            title="متوسط الدفعة"
+            value={formatCurrency(stats.averagePayment)}
+            icon={TrendingUp}
+            colorClass="text-amber-600"
+          />
         </div>
 
-        {/* الإجراءات السريعة */}
-        <QuickActionsCard
-          onEmergencyRequest={() => setActiveRequestTab("emergency")}
-          onLoanRequest={() => setActiveRequestTab("loan")}
-          onDataUpdate={() => setActiveRequestTab("data-update")}
-          onAddFamily={() => setActiveRequestTab("add-family")}
-          onUploadDocument={() => setUploadDialogOpen(true)}
-          onMessages={() => setMessagesDialogOpen(true)}
-        />
+        {/* التبويبات الرئيسية - 3 فقط */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+          <TabsList className="grid w-full grid-cols-3 h-12">
+            <TabsTrigger value="overview" className="text-sm gap-2">
+              <LayoutDashboard className="h-4 w-4" />
+              <span className="hidden sm:inline">نظرة عامة</span>
+              <span className="sm:hidden">عامة</span>
+            </TabsTrigger>
+            <TabsTrigger value="transparency" className="text-sm gap-2">
+              <Eye className="h-4 w-4" />
+              <span className="hidden sm:inline">الشفافية المالية</span>
+              <span className="sm:hidden">شفافية</span>
+            </TabsTrigger>
+            <TabsTrigger value="services" className="text-sm gap-2">
+              <Briefcase className="h-4 w-4" />
+              <span className="hidden sm:inline">الخدمات والطلبات</span>
+              <span className="sm:hidden">خدمات</span>
+            </TabsTrigger>
+          </TabsList>
 
-        {/* الإشعارات */}
-        <NotificationsCard />
+          {/* نظرة عامة */}
+          <TabsContent value="overview" className="space-y-6">
+            <QuickActionsCard
+              onEmergencyRequest={() => {
+                setActiveTab("services");
+                setServicesTab("emergency");
+              }}
+              onLoanRequest={() => {
+                setActiveTab("services");
+                setServicesTab("loan");
+              }}
+              onDataUpdate={() => {
+                setActiveTab("services");
+                setServicesTab("update");
+              }}
+              onAddFamily={() => {
+                setActiveTab("services");
+                setServicesTab("family");
+              }}
+              onUploadDocument={() => setDocumentUploadOpen(true)}
+              onMessages={() => setMessagesOpen(true)}
+            />
+            <NotificationsCard />
+            <AnnualDisclosureCard />
+          </TabsContent>
 
-        {/* الإفصاح السنوي */}
-        <AnnualDisclosureCard />
+          {/* الشفافية المالية */}
+          <TabsContent value="transparency">
+            <FinancialTransparencyTab />
+          </TabsContent>
 
-        {/* التبويبات الرئيسية */}
-        <Card>
-          <CardContent className="p-0">
-            <Tabs value={activeRequestTab} onValueChange={setActiveRequestTab}>
-              <TabsList className="grid w-full grid-cols-2 md:grid-cols-6 text-xs md:text-sm h-auto rounded-b-none">
-                <TabsTrigger value="view" className="px-2 py-2">
-                  <FileText className="h-3 w-3 md:h-4 md:w-4 ml-1 md:ml-2" />
-                  السجل
+          {/* الخدمات والطلبات */}
+          <TabsContent value="services">
+            <Tabs 
+              value={servicesTab} 
+              onValueChange={setServicesTab} 
+              orientation="vertical" 
+              className="flex flex-col md:flex-row gap-4"
+            >
+              <TabsList className="flex flex-row md:flex-col h-auto w-full md:w-48 gap-1 overflow-x-auto md:overflow-visible">
+                <TabsTrigger value="history" className="w-full justify-start whitespace-nowrap">
+                  <FileText className="h-4 w-4 ml-2" />
+                  سجل الطلبات
                 </TabsTrigger>
-                <TabsTrigger value="transparency" className="px-2 py-2">
-                  <Eye className="h-3 w-3 md:h-4 md:w-4 ml-1 md:ml-2" />
-                  الشفافية
+                <TabsTrigger value="emergency" className="w-full justify-start whitespace-nowrap">
+                  <DollarSign className="h-4 w-4 ml-2" />
+                  طلب فزعة
                 </TabsTrigger>
-                <TabsTrigger value="emergency" className="px-2 py-2">
-                  <AlertCircle className="h-3 w-3 md:h-4 md:w-4 ml-1 md:ml-2" />
-                  فزعة
+                <TabsTrigger value="loan" className="w-full justify-start whitespace-nowrap">
+                  <FileText className="h-4 w-4 ml-2" />
+                  طلب قرض
                 </TabsTrigger>
-                <TabsTrigger value="loan" className="px-2 py-2">
-                  <Wallet className="h-3 w-3 md:h-4 md:w-4 ml-1 md:ml-2" />
-                  قرض
+                <TabsTrigger value="update" className="w-full justify-start whitespace-nowrap">
+                  <User className="h-4 w-4 ml-2" />
+                  تحديث البيانات
                 </TabsTrigger>
-                <TabsTrigger value="update" className="px-2 py-2">
-                  <UserCog className="h-3 w-3 md:h-4 md:w-4 ml-1 md:ml-2" />
-                  تحديث
-                </TabsTrigger>
-                <TabsTrigger value="family" className="px-2 py-2">
-                  <UserPlus className="h-3 w-3 md:h-4 md:w-4 ml-1 md:ml-2" />
-                  عائلة
+                <TabsTrigger value="family" className="w-full justify-start whitespace-nowrap">
+                  <User className="h-4 w-4 ml-2" />
+                  إضافة فرد
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="view" className="space-y-4">
-                {requests.length === 0 ? (
-                  <EmptyState 
-                    icon={FileText} 
-                    title="لا توجد طلبات سابقة" 
-                    description="يمكنك تقديم طلب جديد من التبويبات أعلاه" 
-                  />
-                ) : (
-                  requests.map((request: Request) => (
-                    <Card key={request.id}>
-                      <CardContent className="p-4">
-                        <div className="flex items-start justify-between mb-2">
-                          <div className="flex-1">
-                            <h4 className="font-semibold">{request.description}</h4>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              {new Date(request.created_at).toLocaleDateString("ar-SA")}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Badge
-                              variant={
-                                request.status === "موافق"
-                                  ? "default"
-                                  : request.status === "مرفوض"
-                                  ? "destructive"
-                                  : "secondary"
-                              }
+              <div className="flex-1">
+                <TabsContent value="history">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>سجل الطلبات</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {requests.length === 0 ? (
+                        <p className="text-center text-muted-foreground py-8">
+                          لا توجد طلبات حالياً
+                        </p>
+                      ) : (
+                        <div className="space-y-4">
+                          {requests.map((request) => (
+                            <div 
+                              key={request.id} 
+                              className="flex flex-col md:flex-row md:items-center justify-between p-4 border rounded-lg gap-3"
                             >
-                              {request.status}
-                            </Badge>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => {
-                                setSelectedRequestId(request.id);
-                                setUploadDialogOpen(true);
-                              }}
-                            >
-                              <Upload className="h-4 w-4 ml-2" />
-                              رفع مستند
-                            </Button>
-                          </div>
+                              <div className="flex-1">
+                                <p className="font-medium">{request.description}</p>
+                                <p className="text-sm text-muted-foreground">
+                                  {new Date(request.created_at).toLocaleDateString("ar-SA")}
+                                </p>
+                                {request.amount && (
+                                  <p className="text-sm text-muted-foreground mt-1">
+                                    المبلغ: <span className="font-semibold">{formatCurrency(request.amount)}</span>
+                                  </p>
+                                )}
+                              </div>
+                              <Badge
+                                variant={
+                                  request.status === "موافق" 
+                                    ? "default" 
+                                    : request.status === "مرفوض" 
+                                    ? "destructive" 
+                                    : "secondary"
+                                }
+                              >
+                                {request.status}
+                              </Badge>
+                            </div>
+                          ))}
                         </div>
-                        {request.amount && (
-                          <p className="text-sm text-muted-foreground">
-                            المبلغ: <span className="font-semibold">{request.amount} ر.س</span>
-                          </p>
-                        )}
-                      </CardContent>
-                    </Card>
-                  ))
-                )}
-              </TabsContent>
+                      )}
+                    </CardContent>
+                  </Card>
+                </TabsContent>
 
-              <TabsContent value="transparency" className="p-6">
-                <FinancialTransparencyTab />
-              </TabsContent>
+                <TabsContent value="emergency">
+                  <EmergencyRequestForm onSubmit={handleEmergencyRequest} />
+                </TabsContent>
 
-              <TabsContent value="emergency" className="p-6">
-                <EmergencyRequestForm onSubmit={handleEmergencyRequest} />
-              </TabsContent>
+                <TabsContent value="loan">
+                  <LoanRequestForm onSubmit={handleLoanRequest} />
+                </TabsContent>
 
-              <TabsContent value="loan" className="p-6">
-                <LoanRequestForm onSubmit={handleLoanRequest} />
-              </TabsContent>
+                <TabsContent value="update">
+                  <DataUpdateForm 
+                    onSubmit={handleDataUpdate} 
+                    isLoading={createRequestMutation.isPending}
+                    currentData={{
+                      phone: beneficiary?.phone,
+                      email: beneficiary?.email || undefined,
+                      address: beneficiary?.address || undefined,
+                    }}
+                  />
+                </TabsContent>
 
-              <TabsContent value="update" className="p-6">
-                <DataUpdateForm
-                  onSubmit={handleDataUpdate}
-                  isLoading={createRequestMutation.isPending}
-                  currentData={{
-                    phone: beneficiary?.phone,
-                    email: beneficiary?.email || undefined,
-                    address: beneficiary?.address || undefined,
-                    bank_name: beneficiary?.bank_name || undefined,
-                    bank_account_number: beneficiary?.bank_account_number || undefined,
-                    iban: beneficiary?.iban || undefined,
-                  }}
-                />
-              </TabsContent>
-
-              <TabsContent value="family" className="p-6">
-                <AddFamilyMemberForm
-                  onSubmit={handleAddFamilyMember}
-                  isLoading={createRequestMutation.isPending}
-                />
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>المستندات والشهادات</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="statement" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="statement">كشف الحساب</TabsTrigger>
-                <TabsTrigger value="certificate">شهادة الاستحقاق</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="statement">
-                <AccountStatementView
-                  beneficiaryName={beneficiary?.full_name || ""}
-                  beneficiaryId={beneficiary?.beneficiary_number || beneficiary?.id || ""}
-                  payments={payments.map(p => ({
-                    id: p.id,
-                    date: p.payment_date,
-                    type: "دفعة",
-                    amount: Number(p.amount),
-                    description: p.description,
-                    status: "مكتمل",
-                  }))}
-                />
-              </TabsContent>
-
-              <TabsContent value="certificate">
-                <BeneficiaryCertificate
-                  beneficiaryName={beneficiary?.full_name || ""}
-                  beneficiaryId={beneficiary?.beneficiary_number || beneficiary?.id || ""}
-                  nationalId={beneficiary?.national_id || ""}
-                  category={beneficiary?.category || ""}
-                  registrationDate={beneficiary?.created_at || ""}
-                  status={beneficiary?.status || ""}
-                />
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>سجل المدفوعات</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {payments.length === 0 ? (
-              <EmptyState icon={FileText} title="لا توجد مدفوعات" description="لم يتم استلام أي مدفوعات بعد" />
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b">
-                      <th className="text-right py-3 px-4 text-xs sm:text-sm whitespace-nowrap">رقم السند</th>
-                      <th className="text-right py-3 px-4 text-xs sm:text-sm whitespace-nowrap hidden md:table-cell">التاريخ</th>
-                      <th className="text-right py-3 px-4 text-xs sm:text-sm whitespace-nowrap">المبلغ</th>
-                      <th className="text-right py-3 px-4 text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">الوصف</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {payments.map((payment) => (
-                      <tr key={payment.id} className="border-b hover:bg-muted/50">
-                        <td className="py-3 px-4 text-xs sm:text-sm">{payment.payment_number}</td>
-                        <td className="py-3 px-4 text-xs sm:text-sm hidden md:table-cell whitespace-nowrap">{new Date(payment.payment_date).toLocaleDateString("ar-SA")}</td>
-                        <td className="py-3 px-4 font-bold text-xs sm:text-sm whitespace-nowrap">{Number(payment.amount).toLocaleString()} ر.س</td>
-                        <td className="py-3 px-4 text-xs sm:text-sm hidden lg:table-cell">{payment.description}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <TabsContent value="family">
+                  <AddFamilyMemberForm onSubmit={handleAddFamily} />
+                </TabsContent>
               </div>
-            )}
-          </CardContent>
-        </Card>
+            </Tabs>
+          </TabsContent>
+        </Tabs>
 
         {/* Dialogs */}
-        <InternalMessagesDialog
-          open={messagesDialogOpen}
-          onOpenChange={setMessagesDialogOpen}
+        <InternalMessagesDialog open={messagesOpen} onOpenChange={setMessagesOpen} />
+        <ChangePasswordDialog open={passwordDialogOpen} onOpenChange={setPasswordDialogOpen} />
+        <DocumentUploadDialog 
+          open={documentUploadOpen} 
+          onOpenChange={setDocumentUploadOpen}
+          beneficiaryId={beneficiary.id}
         />
-        <ChangePasswordDialog
-          open={changePasswordOpen}
-          onOpenChange={setChangePasswordOpen}
-        />
-        {beneficiary && (
-          <DocumentUploadDialog
-            open={uploadDialogOpen}
-            onOpenChange={setUploadDialogOpen}
-            beneficiaryId={beneficiary.id}
-            requestId={selectedRequestId}
-            onUploadComplete={() => {
-              toast({
-                title: "تم الرفع",
-                description: "تم رفع المستند بنجاح",
-              });
-            }}
-          />
-        )}
       </div>
     </MobileOptimizedLayout>
   );
