@@ -4,6 +4,7 @@ import { PropertyAccordionView } from "./PropertyAccordionView";
 import { ContractsTable } from "./ContractsTable";
 import { MonthlyRevenueChart } from "./MonthlyRevenueChart";
 import { DistributionPieChart } from "./DistributionPieChart";
+import { ReportsMenu } from "./ReportsMenu";
 
 export function FinancialTransparencyTab() {
   return (
@@ -83,6 +84,9 @@ export function FinancialTransparencyTab() {
           <DistributionPieChart />
         </CardContent>
       </Card>
+
+      {/* تقارير الوقف */}
+      <ReportsMenu type="waqf" />
     </div>
   );
 }
