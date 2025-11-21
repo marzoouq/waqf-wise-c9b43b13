@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertTriangle, RefreshCcw, Home } from 'lucide-react';
 import { logger } from '@/lib/logger';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Props {
   children: ReactNode;
@@ -54,29 +55,29 @@ export class GlobalErrorBoundary extends Component<Props, State> {
 
   notifySupportTeam = async (error: Error, errorInfo: ErrorInfo) => {
     try {
-      const { supabase } = await import('@/integrations/supabase/client');
-      
-      // تسجيل الخطأ في جدول error_logs أو إرسال إشعار
-      await supabase.from('audit_logs').insert({
-        action_type: 'critical_error',
-        severity: 'critical',
-        description: `خطأ حرج في التطبيق: ${error.message}`,
-        table_name: 'application_errors',
-        new_values: {
-          error: error.toString(),
-          stack: error.stack,
-          componentStack: errorInfo.componentStack,
+      // استخدام نظام تسجيل الأخطاء الجديد
+      await supabase.functions.invoke('log-error', {
+        body: {
+          error_type: 'react_component_error',
+          error_message: error.message,
+          error_stack: error.stack,
+          severity: 'critical',
           url: window.location.href,
-          userAgent: navigator.userAgent,
-          timestamp: new Date().toISOString(),
-        }
+          user_agent: navigator.userAgent,
+          additional_data: {
+            component_stack: errorInfo.componentStack,
+            error_count: this.state.errorCount + 1,
+          },
+        },
       });
-      } catch (notifyError) {
-        logger.error(notifyError, { 
-          context: 'notify_support_team_failed', 
-          severity: 'low'
-        });
-      }
+      
+      logger.info('✅ Error logged to support team successfully');
+    } catch (notifyError) {
+      logger.error(notifyError, { 
+        context: 'notify_support_team_failed', 
+        severity: 'low'
+      });
+    }
   };
 
   handleReset = () => {
