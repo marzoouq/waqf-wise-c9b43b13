@@ -25,7 +25,8 @@ export function useBeneficiaries() {
       if (error) throw error;
       return { beneficiaries: (data || []) as Beneficiary[], totalCount: count || 0 };
     },
-    staleTime: 3 * 60 * 1000,
+    staleTime: 5 * 60 * 1000, // 5 minutes - improved caching
+    gcTime: 10 * 60 * 1000, // 10 minutes - garbage collection
   });
 
   const beneficiaries = beneficiariesData?.beneficiaries || [];

@@ -74,7 +74,7 @@ export function AnnualDisclosureTab() {
       
       await generateDisclosurePDF(disclosure, beneficiaries || []);
     } catch (error) {
-      console.error("Error exporting PDF:", error);
+      // Error already handled in generateDisclosurePDF
     }
   };
 

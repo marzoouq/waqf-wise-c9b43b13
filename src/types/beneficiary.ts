@@ -53,6 +53,7 @@ export interface Beneficiary {
   notification_preferences: NotificationPreferences | null;
   last_notification_at: string | null;
   beneficiary_number: string | null;
+  beneficiary_type: string | null;
   created_at: string;
   updated_at: string;
 }
