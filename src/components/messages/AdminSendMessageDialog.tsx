@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
 import { Send, Mail, Users } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useBeneficiaries } from "@/hooks/useBeneficiaries";
@@ -32,14 +33,14 @@ export function AdminSendMessageDialog({
     body: "",
   });
 
-  // فلترة المستفيدين الذين لديهم user_id فقط
-  const beneficiariesWithAccounts = beneficiaries.filter(b => b.user_id);
+  // فلترة المستفيدين الذين لديهم صلاحية تسجيل الدخول
+  const beneficiariesWithAccounts = beneficiaries.filter(b => b.can_login);
 
-  const handleToggleBeneficiary = (userId: string) => {
+  const handleToggleBeneficiary = (beneficiaryId: string) => {
     setSelectedBeneficiaries(prev =>
-      prev.includes(userId)
-        ? prev.filter(id => id !== userId)
-        : [...prev, userId]
+      prev.includes(beneficiaryId)
+        ? prev.filter(id => id !== beneficiaryId)
+        : [...prev, beneficiaryId]
     );
   };
 
@@ -47,7 +48,7 @@ export function AdminSendMessageDialog({
     if (selectedBeneficiaries.length === beneficiariesWithAccounts.length) {
       setSelectedBeneficiaries([]);
     } else {
-      setSelectedBeneficiaries(beneficiariesWithAccounts.map(b => b.user_id!));
+      setSelectedBeneficiaries(beneficiariesWithAccounts.map(b => b.id));
     }
   };
 
@@ -61,11 +62,11 @@ export function AdminSendMessageDialog({
       return;
     }
 
-    const recipients = isBroadcast
-      ? beneficiariesWithAccounts.map(b => b.user_id!)
-      : selectedBeneficiaries;
+    const recipientBeneficiaries = isBroadcast
+      ? beneficiariesWithAccounts
+      : beneficiariesWithAccounts.filter(b => selectedBeneficiaries.includes(b.id));
 
-    if (recipients.length === 0) {
+    if (recipientBeneficiaries.length === 0) {
       toast({
         title: "خطأ",
         description: "الرجاء اختيار مستفيد واحد على الأقل",
@@ -77,9 +78,22 @@ export function AdminSendMessageDialog({
     setIsLoading(true);
 
     try {
-      const messages = recipients.map(receiverId => ({
+      // فلترة المستفيدين الذين لديهم user_id فقط
+      const recipientsWithAccounts = recipientBeneficiaries.filter(b => b.user_id);
+      
+      if (recipientsWithAccounts.length === 0) {
+        toast({
+          title: "تنبيه",
+          description: "المستفيدون المحددون لم يتم تفعيل حساباتهم بعد. يرجى تفعيل تسجيل الدخول لهم أولاً من صفحة المستفيدين.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      const messages = recipientsWithAccounts.map(b => ({
         sender_id: user?.id || "",
-        receiver_id: receiverId,
+        receiver_id: b.user_id!,
         subject: message.subject,
         body: message.body,
       }));
@@ -90,9 +104,13 @@ export function AdminSendMessageDialog({
 
       if (error) throw error;
 
+      const skippedCount = recipientBeneficiaries.length - recipientsWithAccounts.length;
+      
       toast({
         title: "تم الإرسال بنجاح",
-        description: `تم إرسال الرسالة إلى ${recipients.length} مستفيد`,
+        description: skippedCount > 0 
+          ? `تم إرسال الرسالة إلى ${recipientsWithAccounts.length} مستفيد. تم تجاهل ${skippedCount} مستفيد لعدم تفعيل حساباتهم.`
+          : `تم إرسال الرسالة إلى ${recipientsWithAccounts.length} مستفيد`,
       });
 
       setMessage({ subject: "", body: "" });
@@ -169,14 +187,21 @@ export function AdminSendMessageDialog({
                   >
                     <Checkbox
                       id={beneficiary.id}
-                      checked={selectedBeneficiaries.includes(beneficiary.user_id!)}
-                      onCheckedChange={() => handleToggleBeneficiary(beneficiary.user_id!)}
+                      checked={selectedBeneficiaries.includes(beneficiary.id)}
+                      onCheckedChange={() => handleToggleBeneficiary(beneficiary.id)}
                     />
                     <label
                       htmlFor={beneficiary.id}
                       className="text-sm cursor-pointer flex-1"
                     >
-                      <div className="font-medium">{beneficiary.full_name}</div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{beneficiary.full_name}</span>
+                        {!beneficiary.user_id && (
+                          <Badge variant="outline" className="text-xs">
+                            لم يُفعّل
+                          </Badge>
+                        )}
+                      </div>
                       <div className="text-xs text-muted-foreground">
                         {beneficiary.beneficiary_number}
                       </div>
