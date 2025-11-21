@@ -2,8 +2,10 @@ import { lazy, Suspense, useState, useEffect } from "react";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart3, Users, Bell } from "lucide-react";
+import { BarChart3, Users, Bell, Mail } from "lucide-react";
 import { ChatbotQuickCard } from "@/components/dashboard/ChatbotQuickCard";
+import { Button } from "@/components/ui/button";
+import { AdminSendMessageDialog } from "@/components/messages/AdminSendMessageDialog";
 import BeneficiaryDialog from "@/components/beneficiaries/BeneficiaryDialog";
 import { PropertyDialog } from "@/components/properties/PropertyDialog";
 import { DistributionDialog } from "@/components/funds/DistributionDialog";
@@ -60,6 +62,7 @@ const Dashboard = () => {
   const [isBeneficiaryDialogOpen, setIsBeneficiaryDialogOpen] = useState(false);
   const [isPropertyDialogOpen, setIsPropertyDialogOpen] = useState(false);
   const [isDistributionDialogOpen, setIsDistributionDialogOpen] = useState(false);
+  const [messageDialogOpen, setMessageDialogOpen] = useState(false);
 
   // Role-based routing
   useEffect(() => {
@@ -86,11 +89,17 @@ const Dashboard = () => {
 
   return (
     <MobileOptimizedLayout>
-      <MobileOptimizedHeader
-        title="لوحة تحكم المشرف"
-        description="نظرة شاملة على جميع عمليات الوقف"
-        icon={<BarChart3 className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
-      />
+      <div className="flex items-center justify-between mb-4">
+        <MobileOptimizedHeader
+          title="لوحة تحكم المشرف"
+          description="نظرة شاملة على جميع عمليات الوقف"
+          icon={<BarChart3 className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
+        />
+        <Button onClick={() => setMessageDialogOpen(true)} className="gap-2">
+          <Mail className="h-4 w-4" />
+          <span className="hidden sm:inline">إرسال رسالة</span>
+        </Button>
+      </div>
 
       {/* Chatbot Quick Access Card */}
       <div className="mb-4 sm:mb-6 md:mb-8">
@@ -237,6 +246,10 @@ const Dashboard = () => {
         open={isDistributionDialogOpen}
         onOpenChange={setIsDistributionDialogOpen}
         onDistribute={() => setIsDistributionDialogOpen(false)}
+      />
+      <AdminSendMessageDialog
+        open={messageDialogOpen}
+        onOpenChange={setMessageDialogOpen}
       />
     </MobileOptimizedLayout>
   );
