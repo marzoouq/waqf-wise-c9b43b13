@@ -112,8 +112,18 @@ const App = () => {
                 {/* Public routes */}
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/install" element={<Install />} />
+                
+                {/* Beneficiary Dashboard - مستقل خارج MainLayout */}
+                <Route 
+                  path="/beneficiary-dashboard" 
+                  element={
+                    <ProtectedRoute requiredRole="beneficiary">
+                      <BeneficiaryDashboard />
+                    </ProtectedRoute>
+                  } 
+                />
               
-              {/* Protected routes */}
+              {/* Protected routes with MainLayout */}
               <Route
                 path="/*"
                 element={
@@ -153,14 +163,6 @@ const App = () => {
             element={
               <ProtectedRoute requiredRole="archivist">
                 <ArchivistDashboard />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/beneficiary-dashboard" 
-            element={
-              <ProtectedRoute requiredRole="beneficiary">
-                <BeneficiaryDashboard />
               </ProtectedRoute>
             } 
           />
