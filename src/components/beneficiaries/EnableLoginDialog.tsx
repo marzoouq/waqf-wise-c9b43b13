@@ -1,14 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ResponsiveDialog, DialogFooter } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Key, Mail, User, Info } from "lucide-react";
+import { Key, Mail, User, Info, RefreshCw } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { logger } from "@/lib/logger";
 import { nationalIdToEmail, generateTempPassword } from "@/lib/beneficiaryAuth";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface EnableLoginDialogProps {
   open: boolean;
@@ -20,6 +21,7 @@ interface EnableLoginDialogProps {
     email?: string;
     username?: string;
     can_login?: boolean;
+    user_id?: string;
   };
   onSuccess?: () => void;
 }
@@ -27,6 +29,7 @@ interface EnableLoginDialogProps {
 export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }: EnableLoginDialogProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [hasExistingAuth, setHasExistingAuth] = useState(false);
   
   // توليد البريد وكلمة المرور تلقائياً من رقم الهوية
   const autoEmail = nationalIdToEmail(beneficiary.national_id);
@@ -39,7 +42,47 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
     confirmPassword: tempPassword,
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // فحص وجود حساب مصادقة
+  useEffect(() => {
+    setHasExistingAuth(!!beneficiary.user_id);
+  }, [beneficiary.user_id]);
+
+  // تفعيل حساب موجود (user_id موجود)
+  const handleEnableExisting = async () => {
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from("beneficiaries")
+        .update({ 
+          can_login: true,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", beneficiary.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "تم التفعيل بنجاح",
+        description: `تم تفعيل حساب ${beneficiary.full_name}`,
+      });
+
+      onSuccess?.();
+      onOpenChange(false);
+    } catch (error: unknown) {
+      logger.error(error, { context: 'enable_existing_account', severity: 'high' });
+      const errorMessage = error instanceof Error ? error.message : 'حدث خطأ أثناء التفعيل';
+      toast({
+        title: "خطأ في التفعيل",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // إنشاء حساب جديد (user_id غير موجود)
+  const handleCreateNew = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.username || !formData.email || !formData.password) {
@@ -88,7 +131,7 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
         if (authError.message.includes("already registered")) {
           toast({
             title: "البريد الإلكتروني مستخدم",
-            description: "هذا البريد الإلكتروني مسجل بالفعل",
+            description: "هذا البريد الإلكتروني مسجل بالفعل. حاول استخدام بريد آخر.",
             variant: "destructive",
           });
         } else {
@@ -125,16 +168,71 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
 
       toast({
         title: "تم التفعيل بنجاح",
-        description: `تم تفعيل حساب ${beneficiary.full_name} بنجاح`,
+        description: `تم إنشاء حساب ${beneficiary.full_name} بنجاح`,
       });
 
       onSuccess?.();
       onOpenChange(false);
     } catch (error: unknown) {
-      logger.error(error, { context: 'enable_beneficiary_login', severity: 'high' });
-      const errorMessage = error instanceof Error ? error.message : 'حدث خطأ أثناء تفعيل الحساب';
+      logger.error(error, { context: 'create_beneficiary_account', severity: 'high' });
+      const errorMessage = error instanceof Error ? error.message : 'حدث خطأ أثناء إنشاء الحساب';
       toast({
-        title: "خطأ في التفعيل",
+        title: "خطأ في الإنشاء",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // إعادة تعيين كلمة المرور
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (formData.password !== formData.confirmPassword) {
+      toast({
+        title: "خطأ في كلمة المرور",
+        description: "كلمات المرور غير متطابقة",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      toast({
+        title: "خطأ في كلمة المرور",
+        description: "كلمة المرور يجب أن تكون 6 أحرف على الأقل",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      if (!beneficiary.email) {
+        throw new Error("البريد الإلكتروني غير موجود");
+      }
+
+      // إرسال رابط إعادة تعيين كلمة المرور
+      const { error } = await supabase.auth.resetPasswordForEmail(beneficiary.email, {
+        redirectTo: `${window.location.origin}/auth?mode=reset-password`,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "تم الإرسال",
+        description: "تم إرسال رابط إعادة تعيين كلمة المرور إلى البريد الإلكتروني",
+      });
+
+      onOpenChange(false);
+    } catch (error: unknown) {
+      logger.error(error, { context: 'reset_beneficiary_password', severity: 'medium' });
+      const errorMessage = error instanceof Error ? error.message : 'حدث خطأ أثناء إعادة التعيين';
+      toast({
+        title: "خطأ",
         description: errorMessage,
         variant: "destructive",
       });
@@ -179,40 +277,100 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
     <ResponsiveDialog 
       open={open} 
       onOpenChange={onOpenChange}
-      title={beneficiary.can_login ? "تعطيل تسجيل الدخول" : "تفعيل تسجيل الدخول"}
+      title={beneficiary.can_login ? "إدارة حساب المستفيد" : "تفعيل حساب المستفيد"}
       size="md"
     >
       {beneficiary.can_login ? (
+        <Tabs defaultValue="info" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="info">معلومات الحساب</TabsTrigger>
+            <TabsTrigger value="password">إعادة تعيين كلمة المرور</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="info" className="space-y-4 mt-4">
+            <Alert>
+              <AlertDescription>
+                هذا المستفيد لديه حساب نشط. يمكنك تعطيل الحساب لمنع الدخول مؤقتاً.
+              </AlertDescription>
+            </Alert>
+            <div className="space-y-2">
+              <p className="text-sm"><strong>اسم المستخدم:</strong> {beneficiary.username}</p>
+              <p className="text-sm"><strong>البريد الإلكتروني:</strong> {beneficiary.email}</p>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                إلغاء
+              </Button>
+              <Button 
+                type="button"
+                variant="destructive" 
+                onClick={handleDisable} 
+                disabled={loading}
+              >
+                {loading ? "جاري التعطيل..." : "تعطيل الحساب"}
+              </Button>
+            </DialogFooter>
+          </TabsContent>
+
+          <TabsContent value="password" className="space-y-4 mt-4">
+            <Alert>
+              <RefreshCw className="h-4 w-4" />
+              <AlertDescription>
+                سيتم إرسال رابط إعادة تعيين كلمة المرور إلى البريد الإلكتروني المسجل.
+              </AlertDescription>
+            </Alert>
+            
+            <form onSubmit={handleResetPassword} className="space-y-4">
+              <div className="space-y-2">
+                <p className="text-sm">البريد الإلكتروني: <strong>{beneficiary.email}</strong></p>
+              </div>
+              
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                  إلغاء
+                </Button>
+                <Button type="submit" disabled={loading}>
+                  {loading ? "جاري الإرسال..." : "إرسال رابط إعادة التعيين"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </TabsContent>
+        </Tabs>
+      ) : hasExistingAuth ? (
+        // حساب معطل لكن user_id موجود
         <div className="space-y-4">
-          <Alert>
-            <AlertDescription>
-              هذا المستفيد لديه حساب نشط. يمكنك تعطيل الحساب لمنع الدخول.
+          <Alert className="bg-orange-50 border-orange-200 dark:bg-orange-950 dark:border-orange-800">
+            <Info className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+            <AlertDescription className="text-orange-800 dark:text-orange-200">
+              هذا الحساب معطل مؤقتاً. البيانات والمعلومات محفوظة ويمكن تفعيله مباشرة.
             </AlertDescription>
           </Alert>
-          <div className="space-y-2">
-            <p className="text-sm"><strong>اسم المستخدم:</strong> {beneficiary.username}</p>
-            <p className="text-sm"><strong>البريد الإلكتروني:</strong> {beneficiary.email}</p>
+          
+          <div className="space-y-2 p-4 bg-muted/50 rounded-lg">
+            <p className="text-sm"><strong>اسم المستخدم:</strong> {beneficiary.username || 'غير محدد'}</p>
+            <p className="text-sm"><strong>البريد الإلكتروني:</strong> {beneficiary.email || 'غير محدد'}</p>
           </div>
+
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               إلغاء
             </Button>
             <Button 
               type="button"
-              variant="destructive" 
-              onClick={handleDisable} 
+              onClick={handleEnableExisting} 
               disabled={loading}
             >
-              {loading ? "جاري التعطيل..." : "تعطيل الحساب"}
+              {loading ? "جاري التفعيل..." : "تفعيل الحساب"}
             </Button>
           </DialogFooter>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-4">
+        // إنشاء حساب جديد
+        <form onSubmit={handleCreateNew} className="space-y-4">
           <Alert>
             <Info className="h-4 w-4" />
             <AlertDescription>
-              سيتم إنشاء حساب تلقائي باستخدام رقم الهوية الوطنية
+              سيتم إنشاء حساب جديد باستخدام المعلومات التالية
             </AlertDescription>
           </Alert>
           
@@ -291,7 +449,7 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
               إلغاء
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? "جاري التفعيل..." : "تفعيل الحساب"}
+              {loading ? "جاري الإنشاء..." : "إنشاء الحساب"}
             </Button>
           </DialogFooter>
         </form>
