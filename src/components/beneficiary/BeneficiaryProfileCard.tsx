@@ -8,6 +8,7 @@ import { Beneficiary } from "@/types/beneficiary";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { BeneficiarySettingsDropdown } from "./BeneficiarySettingsDropdown";
+import { NotificationsBell } from "./NotificationsBell";
 
 interface BeneficiaryProfileCardProps {
   beneficiary: Beneficiary;
@@ -75,26 +76,31 @@ export function BeneficiaryProfileCard({
 
           {/* Main Info */}
           <div className="flex-1 text-center md:text-right space-y-3">
-            {/* التاريخ والوقت */}
-            <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
-              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-muted/50 rounded-lg">
-                <Calendar className="h-4 w-4 text-primary" />
-                <span className="text-xs font-medium">
-                  {format(currentTime, "d MMM yyyy", { locale: ar })}
-                </span>
-                <Clock className="h-4 w-4 text-primary mr-2" />
-                <span className="text-xs font-mono font-semibold">
-                  {format(currentTime, "HH:mm:ss")}
-                </span>
-              </div>
+            {/* التاريخ والوقت والإشعارات */}
+            <div className="flex items-center justify-center md:justify-between gap-2 mb-2">
+              <div className="flex items-center gap-2">
+                <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-muted/50 rounded-lg">
+                  <Calendar className="h-4 w-4 text-primary" />
+                  <span className="text-xs font-medium">
+                    {format(currentTime, "d MMM yyyy", { locale: ar })}
+                  </span>
+                  <Clock className="h-4 w-4 text-primary mr-2" />
+                  <span className="text-xs font-mono font-semibold">
+                    {format(currentTime, "HH:mm:ss")}
+                  </span>
+                </div>
 
-              {/* التاريخ والوقت للموبايل */}
-              <div className="sm:hidden flex items-center gap-1.5 px-2 py-1 bg-muted/50 rounded-lg">
-                <Clock className="h-3.5 w-3.5 text-primary" />
-                <span className="text-xs font-mono font-semibold">
-                  {format(currentTime, "HH:mm")}
-                </span>
+                {/* التاريخ والوقت للموبايل */}
+                <div className="sm:hidden flex items-center gap-1.5 px-2 py-1 bg-muted/50 rounded-lg">
+                  <Clock className="h-3.5 w-3.5 text-primary" />
+                  <span className="text-xs font-mono font-semibold">
+                    {format(currentTime, "HH:mm")}
+                  </span>
+                </div>
               </div>
+              
+              {/* أيقونة الإشعارات */}
+              <NotificationsBell />
             </div>
             {/* Name */}
             <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-l from-primary to-primary/70 bg-clip-text text-transparent">
