@@ -19,7 +19,7 @@ import {
   TrendingDown,
   Plus,
 } from "lucide-react";
-import { useAnnualDisclosures } from "@/hooks/useAnnualDisclosures";
+import { useAnnualDisclosures, AnnualDisclosure } from "@/hooks/useAnnualDisclosures";
 import { GenerateDisclosureDialog } from "@/components/distributions/GenerateDisclosureDialog";
 import { ViewDisclosureDialog } from "@/components/distributions/ViewDisclosureDialog";
 import { generateDisclosurePDF } from "@/lib/generateDisclosurePDF";
@@ -28,7 +28,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 
 export function AnnualDisclosureTab() {
   const { disclosures, currentYearDisclosure, isLoading, publishDisclosure } = useAnnualDisclosures();
-  const [selectedDisclosure, setSelectedDisclosure] = useState<any>(null);
+  const [selectedDisclosure, setSelectedDisclosure] = useState<AnnualDisclosure | null>(null);
   const [viewOpen, setViewOpen] = useState(false);
   const [generateOpen, setGenerateOpen] = useState(false);
   const [publishing, setPublishing] = useState(false);
@@ -65,7 +65,7 @@ export function AnnualDisclosureTab() {
     }
   };
 
-  const handleExportPDF = async (disclosure: any) => {
+  const handleExportPDF = async (disclosure: AnnualDisclosure) => {
     try {
       const { data: beneficiaries } = await supabase
         .from("disclosure_beneficiaries")

@@ -55,7 +55,7 @@ export function DistributionSettingsDialog() {
             <Label>تكرار التوزيع</Label>
             <Select
               value={formData.distribution_frequency}
-              onValueChange={(value: any) => setFormData({ ...formData, distribution_frequency: value })}
+              onValueChange={(value) => setFormData({ ...formData, distribution_frequency: value as typeof formData.distribution_frequency })}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -74,7 +74,7 @@ export function DistributionSettingsDialog() {
             <Label>قاعدة التوزيع</Label>
             <Select
               value={formData.distribution_rule}
-              onValueChange={(value: any) => setFormData({ ...formData, distribution_rule: value })}
+              onValueChange={(value) => setFormData({ ...formData, distribution_rule: value as typeof formData.distribution_rule })}
             >
               <SelectTrigger>
                 <SelectValue />
