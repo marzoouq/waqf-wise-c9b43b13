@@ -20,8 +20,8 @@ import { AnnualDisclosureCard } from "@/components/beneficiary/AnnualDisclosureC
 import { NotificationsBell } from "@/components/beneficiary/NotificationsBell";
 import { PropertyStatsCards } from "@/components/beneficiary/PropertyStatsCards";
 import { ReportsMenu } from "@/components/beneficiary/ReportsMenu";
+import { ReportsExplanationCard } from "@/components/beneficiary/ReportsExplanationCard";
 import { ActivityTimeline } from "@/components/beneficiary/ActivityTimeline";
-import { InteractiveCalendar } from "@/components/beneficiary/InteractiveCalendar";
 import { YearlyComparison } from "@/components/beneficiary/YearlyComparison";
 import { ChatbotQuickCard } from "@/components/dashboard/ChatbotQuickCard";
 import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
@@ -316,11 +316,12 @@ const BeneficiaryDashboard = () => {
             />
 
 
-            {/* التقويم والمواعيد */}
-            <InteractiveCalendar beneficiaryId={beneficiary.id} />
 
             {/* الإفصاح السنوي */}
             <AnnualDisclosureCard />
+
+            {/* شرح نظام التقارير */}
+            <ReportsExplanationCard />
 
             {/* التقارير المفصلة */}
             <ReportsMenu type="beneficiary" />
