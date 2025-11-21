@@ -38,16 +38,18 @@ export function InternalMessagesDialog({
   const [recipients, setRecipients] = useState<Array<{ id: string; name: string; role: string }>>([]);
   const [loadingRecipients, setLoadingRecipients] = useState(false);
 
-  // جلب قائمة المستخدمين (الموظفين والإداريين)
+  // جلب قائمة المستخدمين الإداريين فقط (الناظر، المشرف، المحاسب، الصراف)
   useEffect(() => {
     const fetchRecipients = async () => {
       setLoadingRecipients(true);
       try {
-        // جلب المستخدمين مع أدوارهم (غير المستفيدين)
+        // جلب الأدوار الإدارية فقط
+        const adminRoles = ['admin', 'nazer', 'accountant', 'cashier'] as const;
+        
         const { data: userRoles, error: rolesError } = await supabase
           .from('user_roles')
           .select('user_id, role')
-          .neq('role', 'beneficiary');
+          .in('role', adminRoles);
 
         if (rolesError) throw rolesError;
 
@@ -62,13 +64,21 @@ export function InternalMessagesDialog({
 
           if (profilesError) throw profilesError;
 
-          // دمج البيانات
+          // دمج البيانات وترجمة الأدوار
+          const roleTranslations: Record<string, string> = {
+            'admin': 'مشرف',
+            'nazer': 'ناظر',
+            'accountant': 'محاسب',
+            'cashier': 'صراف'
+          };
+
           const recipientsList = profiles?.map(profile => {
             const userRole = userRoles.find(ur => ur.user_id === profile.user_id);
+            const roleName = userRole?.role || 'user';
             return {
               id: profile.user_id,
               name: profile.full_name || 'مستخدم',
-              role: userRole?.role || 'user'
+              role: roleTranslations[roleName] || roleName
             };
           }) || [];
 
