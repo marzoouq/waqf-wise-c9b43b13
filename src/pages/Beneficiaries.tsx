@@ -31,6 +31,8 @@ import { EnableLoginDialog } from "@/components/beneficiaries/EnableLoginDialog"
 import { TribeManagementDialog } from "@/components/beneficiaries/TribeManagementDialog";
 import { BeneficiariesPrintButton } from "@/components/beneficiaries/BeneficiariesPrintButton";
 import { BeneficiariesImporter } from "@/components/beneficiaries/BeneficiariesImporter";
+import { FamilyManagement } from "@/components/beneficiaries/FamilyManagement";
+import { BeneficiaryProfile } from "@/components/beneficiaries/BeneficiaryProfile";
 import { Pagination } from "@/components/ui/pagination";
 import { useNavigate } from "react-router-dom";
 import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
@@ -50,6 +52,8 @@ const Beneficiaries = () => {
   const [enableLoginDialogOpen, setEnableLoginDialogOpen] = useState(false);
   const [tribeManagementDialogOpen, setTribeManagementDialogOpen] = useState(false);
   const [selectedBeneficiary, setSelectedBeneficiary] = useState<Beneficiary | null>(null);
+  const [profileDialogOpen, setProfileDialogOpen] = useState(false);
+  const [showFamilyManagement, setShowFamilyManagement] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [advancedCriteria, setAdvancedCriteria] = useState<SearchCriteria>({});
 
@@ -159,7 +163,8 @@ const Beneficiaries = () => {
   };
 
   const handleViewProfile = (beneficiary: Beneficiary) => {
-    navigate(`/beneficiaries/${beneficiary.id}`);
+    setSelectedBeneficiary(beneficiary);
+    setProfileDialogOpen(true);
   };
 
   const handleViewAttachments = (beneficiary: Beneficiary) => {
@@ -196,6 +201,14 @@ const Beneficiaries = () => {
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
+            <Button 
+              variant="outline"
+              onClick={() => setShowFamilyManagement(!showFamilyManagement)}
+              size="sm"
+            >
+              <Users className="ml-2 h-4 w-4" />
+              {showFamilyManagement ? "المستفيدين" : "العائلات"}
+            </Button>
             <BeneficiariesPrintButton beneficiaries={filteredBeneficiaries} />
             <BeneficiariesImporter onSuccess={() => queryClient.invalidateQueries({ queryKey: ['beneficiaries'] })} />
             <Button 
@@ -210,8 +223,9 @@ const Beneficiaries = () => {
         </div>
 
         {/* Filters and Search */}
-        <Card className="shadow-soft">
-          <CardContent className="pt-3 sm:pt-6 p-3 sm:p-6">
+        {!showFamilyManagement && (
+          <Card className="shadow-soft">
+            <CardContent className="pt-3 sm:pt-6 p-3 sm:p-6">
             <div className="flex flex-col gap-3 sm:gap-4">
               <div className="relative flex-1">
                 <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
@@ -265,9 +279,15 @@ const Beneficiaries = () => {
             </div>
           </CardContent>
         </Card>
+        )}
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+        {/* Family Management View */}
+        {showFamilyManagement ? (
+          <FamilyManagement />
+        ) : (
+          <>
+            {/* Stats Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
           <Card className="shadow-soft hover:shadow-medium transition-all duration-300 border-l-4 border-l-primary">
             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
               <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground">
@@ -478,6 +498,8 @@ const Beneficiaries = () => {
           )}
         </CardContent>
         </Card>
+          </>
+        )}
 
         {/* Beneficiary Dialog */}
         <BeneficiaryDialog
@@ -516,6 +538,12 @@ const Beneficiaries = () => {
               onSuccess={() => {
                 queryClient.invalidateQueries({ queryKey: ["beneficiaries"] });
               }}
+            />
+            
+            <BeneficiaryProfile
+              beneficiaryId={selectedBeneficiary.id}
+              open={profileDialogOpen}
+              onOpenChange={setProfileDialogOpen}
             />
             
             <TribeManagementDialog
