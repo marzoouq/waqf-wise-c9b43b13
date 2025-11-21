@@ -6,6 +6,7 @@ import { Phone, Mail, MapPin, Calendar, MessageSquare, Lock } from "lucide-react
 import { Beneficiary } from "@/types/beneficiary";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import { BeneficiarySettingsDropdown } from "./BeneficiarySettingsDropdown";
 
 interface BeneficiaryProfileCardProps {
   beneficiary: Beneficiary;
@@ -113,6 +114,10 @@ export function BeneficiaryProfileCard({
 
             {/* Quick Actions */}
             <div className="flex flex-wrap gap-2 mt-4 justify-center md:justify-start">
+              <BeneficiarySettingsDropdown 
+                beneficiary={beneficiary} 
+                onChangePassword={onChangePassword} 
+              />
               <Button 
                 size="sm" 
                 onClick={onMessages}
@@ -120,15 +125,6 @@ export function BeneficiaryProfileCard({
               >
                 <MessageSquare className="h-4 w-4 ml-2" />
                 الرسائل
-              </Button>
-              <Button 
-                size="sm" 
-                variant="outline" 
-                onClick={onChangePassword}
-                className="shadow-sm hover:shadow-md transition-shadow"
-              >
-                <Lock className="h-4 w-4 ml-2" />
-                تغيير كلمة المرور
               </Button>
             </div>
           </div>
