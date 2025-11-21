@@ -287,9 +287,6 @@ const BeneficiaryDashboard = () => {
 
           {/* نظرة عامة */}
           <TabsContent value="overview" className="space-y-6">
-            {/* إحصائيات العقارات */}
-            <PropertyStatsCards />
-
             {/* المساعد الذكي */}
             <ChatbotQuickCard />
 

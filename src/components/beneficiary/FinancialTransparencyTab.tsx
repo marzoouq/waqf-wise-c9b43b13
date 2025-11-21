@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Building2, FileText, TrendingUp, PieChart } from "lucide-react";
 import { PropertyAccordionView } from "./PropertyAccordionView";
+import { PropertyStatsCards } from "./PropertyStatsCards";
 import { ContractsTable } from "./ContractsTable";
 import { MonthlyRevenueChart } from "./MonthlyRevenueChart";
 import { DistributionPieChart } from "./DistributionPieChart";
@@ -20,6 +21,9 @@ export function FinancialTransparencyTab() {
           </CardDescription>
         </CardHeader>
       </Card>
+
+      {/* إحصائيات العقارات */}
+      <PropertyStatsCards />
 
       {/* عقارات الوقف ووحداتها - نظام Accordion */}
       <Card>
