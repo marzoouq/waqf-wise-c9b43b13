@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   FileText,
   FileSpreadsheet,
@@ -8,6 +9,8 @@ import {
   ClipboardList,
   FileCheck,
   Download,
+  User,
+  Info,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,33 +36,67 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
       const doc = withAutoTable(baseDoc);
       
       // العنوان
-      baseDoc.setFontSize(16);
-      baseDoc.text("Payment Report / تقرير المدفوعات", 105, 20, { align: "center" });
+      baseDoc.setFontSize(18);
+      baseDoc.text("تقرير المدفوعات", 105, 20, { align: "center" });
       
-      baseDoc.setFontSize(12);
-      baseDoc.text(`Beneficiary / المستفيد: ${beneficiary?.full_name || ""}`, 20, 35);
-      baseDoc.text(`Date / التاريخ: ${new Date().toLocaleDateString("ar-SA")}`, 20, 45);
-      
-      // الجدول
-      const tableData = payments.map((payment) => [
-        payment.payment_number || "-",
-        new Date(payment.payment_date).toLocaleDateString("ar-SA"),
-        payment.amount.toLocaleString("ar-SA"),
-        payment.description || "-",
-      ]);
-      
-      doc.autoTable({
-        startY: 55,
-        head: [["#", "Date / التاريخ", "Amount / المبلغ", "Description / الوصف"]],
-        body: tableData,
-        styles: { font: "helvetica" },
-      });
-      
+      // معلومات المستفيد
+      baseDoc.setFontSize(11);
+      baseDoc.text(`الاسم: ${beneficiary?.full_name || ""}`, 20, 35);
+      baseDoc.text(`رقم الهوية: ${beneficiary?.national_id || ""}`, 20, 42);
+      baseDoc.text(`الجوال: ${beneficiary?.phone || ""}`, 20, 49);
+      baseDoc.text(`الفئة: ${beneficiary?.category || ""}`, 120, 35);
+      baseDoc.text(`الحالة: ${beneficiary?.status || ""}`, 120, 42);
+      baseDoc.text(`التاريخ: ${new Date().toLocaleDateString("ar-SA")}`, 120, 49);
+
+      // الملخص المالي إذا وُجدت مدفوعات
+      if (payments && payments.length > 0) {
+        const totalAmount = payments.reduce((sum, p) => sum + (p.amount || 0), 0);
+        const avgAmount = totalAmount / payments.length;
+
+        baseDoc.setFontSize(14);
+        baseDoc.text("الملخص المالي", 105, 60, { align: "center" });
+        baseDoc.setFontSize(11);
+        baseDoc.text(`إجمالي المدفوعات: ${totalAmount.toLocaleString("ar-SA")} ر.س`, 20, 68);
+        baseDoc.text(`عدد الدفعات: ${payments.length}`, 20, 75);
+        baseDoc.text(`متوسط الدفعة: ${avgAmount.toLocaleString("ar-SA")} ر.س`, 20, 82);
+
+        // جدول المدفوعات
+        const tableData = payments.map((payment) => [
+          payment.payment_number || "-",
+          new Date(payment.payment_date).toLocaleDateString("ar-SA"),
+          payment.amount.toLocaleString("ar-SA") + " ر.س",
+          payment.description || "-",
+        ]);
+
+        doc.autoTable({
+          head: [["رقم الدفعة", "التاريخ", "المبلغ", "الوصف"]],
+          body: tableData,
+          startY: 90,
+          styles: {
+            font: "helvetica",
+            fontSize: 9,
+            halign: "right",
+          },
+          headStyles: {
+            fillColor: [34, 139, 34],
+            textColor: [255, 255, 255],
+          },
+        });
+      } else {
+        // رسالة عدم وجود مدفوعات
+        baseDoc.setFontSize(12);
+        baseDoc.setTextColor(150, 150, 150);
+        baseDoc.text("لا توجد مدفوعات مسجلة حتى الآن", 105, 70, { align: "center" });
+        baseDoc.text("سيتم تحديث هذا التقرير عند إضافة مدفوعات جديدة", 105, 80, { align: "center" });
+      }
+
       baseDoc.save(`payments-report-${Date.now()}.pdf`);
-      
+
       toast({
         title: "تم التصدير",
-        description: "تم تصدير تقرير المدفوعات بنجاح",
+        description: payments && payments.length > 0 
+          ? "تم تصدير تقرير المدفوعات بنجاح"
+          : "تم إنشاء التقرير - لا توجد مدفوعات حالياً",
       });
     } catch (error) {
       toast({
@@ -124,30 +161,49 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
 
   const exportPropertiesExcel = async () => {
     try {
-      const { data: properties, error } = await supabase
+      const { data: properties } = await supabase
         .from("properties")
-        .select("name, location, total_units, occupied_units")
-        .eq("status", "نشط");
+        .select(`
+          *,
+          contracts:contracts(*)
+        `)
+        .order("name");
 
-      if (error) throw error;
+      if (!properties || properties.length === 0) {
+        toast({
+          title: "لا توجد بيانات",
+          description: "لا توجد عقارات لتصديرها",
+          variant: "destructive",
+        });
+        return;
+      }
 
-      const worksheet = XLSX.utils.json_to_sheet(
-        properties?.map((p) => ({
-          "اسم العقار": p.name,
-          "الموقع": p.location,
-          "إجمالي الوحدات": p.total_units,
-          "الوحدات المشغولة": p.occupied_units,
-          "الوحدات الشاغرة": (p.total_units || 0) - (p.occupied_units || 0),
-        })) || []
-      );
+      const data = properties.map((prop) => {
+        const activeContracts = (prop.contracts as any[])?.filter((c: any) => c.status === "نشط") || [];
+        const monthlyRent = activeContracts.reduce((sum, c) => sum + (c.monthly_rent || 0), 0);
+        
+        return {
+          "اسم العقار": prop.name,
+          "النوع": prop.type || "-",
+          "الموقع": prop.location || "-",
+          "إجمالي الوحدات": prop.total_units || 0,
+          "الوحدات المؤجرة": prop.occupied_units || 0,
+          "الوحدات الشاغرة": (prop.total_units || 0) - (prop.occupied_units || 0),
+          "الإيجار الشهري": monthlyRent,
+          "الإيجار السنوي": monthlyRent * 12,
+          "الحالة": prop.status || "نشط",
+        };
+      });
 
+      const worksheet = XLSX.utils.json_to_sheet(data);
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "العقارات");
+
       XLSX.writeFile(workbook, `properties-report-${Date.now()}.xlsx`);
 
       toast({
         title: "تم التصدير",
-        description: "تم تصدير تقرير العقارات بنجاح",
+        description: "تم تصدير تقرير العقارات إلى Excel بنجاح",
       });
     } catch (error) {
       toast({
@@ -163,36 +219,313 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
       const baseDoc = new jsPDF();
       const doc = withAutoTable(baseDoc);
       
-      baseDoc.setFontSize(16);
-      baseDoc.text("Account Statement / كشف الحساب", 105, 20, { align: "center" });
+      // العنوان
+      baseDoc.setFontSize(18);
+      baseDoc.text("كشف حساب المستفيد", 105, 20, { align: "center" });
+
+      // معلومات المستفيد الكاملة
+      baseDoc.setFontSize(11);
+      baseDoc.text(`الاسم: ${beneficiary?.full_name || ""}`, 20, 35);
+      baseDoc.text(`رقم الهوية: ${beneficiary?.national_id || ""}`, 20, 42);
+      baseDoc.text(`الجوال: ${beneficiary?.phone || ""}`, 20, 49);
+      baseDoc.text(`البريد: ${beneficiary?.email || "لا يوجد"}`, 20, 56);
       
-      baseDoc.setFontSize(12);
-      baseDoc.text(`Name / الاسم: ${beneficiary?.full_name || ""}`, 20, 35);
-      baseDoc.text(`ID / الرقم الوطني: ${beneficiary?.national_id || ""}`, 20, 45);
-      baseDoc.text(`Date / التاريخ: ${new Date().toLocaleDateString("ar-SA")}`, 20, 55);
-      
-      const totalPayments = payments.reduce((sum, p) => sum + p.amount, 0);
-      
-      baseDoc.setFontSize(14);
-      baseDoc.text(`Total / الإجمالي: ${totalPayments.toLocaleString("ar-SA")} ر.س`, 20, 70);
-      
-      const tableData = payments.map((payment) => [
-        new Date(payment.payment_date).toLocaleDateString("ar-SA"),
-        payment.description || "-",
-        payment.amount.toLocaleString("ar-SA"),
-      ]);
-      
-      doc.autoTable({
-        startY: 80,
-        head: [["Date / التاريخ", "Description / البيان", "Amount / المبلغ"]],
-        body: tableData,
-      });
-      
+      baseDoc.text(`الفئة: ${beneficiary?.category || ""}`, 120, 35);
+      baseDoc.text(`الحالة: ${beneficiary?.status || ""}`, 120, 42);
+      baseDoc.text(`البنك: ${beneficiary?.bank_name || "لا يوجد"}`, 120, 49);
+      baseDoc.text(`الآيبان: ${beneficiary?.iban || "لا يوجد"}`, 120, 56);
+
+      // الملخص المالي
+      if (payments && payments.length > 0) {
+        const totalAmount = payments.reduce((sum, p) => sum + (p.amount || 0), 0);
+        const avgAmount = totalAmount / payments.length;
+
+        baseDoc.setFontSize(14);
+        baseDoc.text("الملخص المالي", 105, 68, { align: "center" });
+        baseDoc.setFontSize(11);
+        baseDoc.text(`إجمالي المدفوعات: ${totalAmount.toLocaleString("ar-SA")} ر.س`, 20, 76);
+        baseDoc.text(`عدد الدفعات: ${payments.length}`, 20, 83);
+        baseDoc.text(`متوسط الدفعة: ${avgAmount.toLocaleString("ar-SA")} ر.س`, 20, 90);
+
+        // جدول المدفوعات
+        const tableData = payments.map((payment) => [
+          new Date(payment.payment_date).toLocaleDateString("ar-SA"),
+          payment.description || "-",
+          payment.amount.toLocaleString("ar-SA") + " ر.س",
+        ]);
+
+        doc.autoTable({
+          head: [["التاريخ", "الوصف", "المبلغ"]],
+          body: tableData,
+          startY: 98,
+          styles: {
+            font: "helvetica",
+            fontSize: 9,
+            halign: "right",
+          },
+          headStyles: {
+            fillColor: [34, 139, 34],
+            textColor: [255, 255, 255],
+          },
+        });
+
+        // الإجمالي النهائي
+        const finalY = doc.lastAutoTable?.finalY || 98;
+        baseDoc.setFontSize(12);
+        baseDoc.setFont("helvetica", "bold");
+        baseDoc.text(`الإجمالي الكلي: ${totalAmount.toLocaleString("ar-SA")} ر.س`, 20, finalY + 10);
+      } else {
+        // رسالة عدم وجود معاملات
+        baseDoc.setFontSize(12);
+        baseDoc.setTextColor(150, 150, 150);
+        baseDoc.text("لا توجد معاملات مالية مسجلة حتى الآن", 105, 75, { align: "center" });
+        baseDoc.text("سيتم تحديث الكشف عند إضافة معاملات جديدة", 105, 85, { align: "center" });
+      }
+
       baseDoc.save(`account-statement-${Date.now()}.pdf`);
-      
+
       toast({
         title: "تم التصدير",
-        description: "تم تصدير كشف الحساب بنجاح",
+        description: payments && payments.length > 0 
+          ? "تم تصدير كشف الحساب بنجاح"
+          : "تم إنشاء الكشف - لا توجد معاملات حالياً",
+      });
+    } catch (error) {
+      toast({
+        title: "خطأ",
+        description: "فشل تصدير التقرير",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const exportPersonalDataPDF = async () => {
+    try {
+      if (!beneficiary) {
+        toast({
+          title: "خطأ",
+          description: "لم يتم العثور على بيانات المستفيد",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const doc = new jsPDF();
+
+      // العنوان
+      doc.setFontSize(18);
+      doc.text("تقرير البيانات الشخصية", 105, 20, { align: "center" });
+      doc.setFontSize(10);
+      doc.text(`تاريخ التقرير: ${new Date().toLocaleDateString("ar-SA")}`, 105, 28, { align: "center" });
+
+      let yPos = 40;
+
+      // المعلومات الشخصية
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text("المعلومات الشخصية", 20, yPos);
+      yPos += 8;
+
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "normal");
+      doc.text(`الاسم الكامل: ${beneficiary.full_name}`, 25, yPos);
+      yPos += 7;
+      doc.text(`رقم الهوية الوطنية: ${beneficiary.national_id}`, 25, yPos);
+      yPos += 7;
+      doc.text(`الجنس: ${beneficiary.gender || "غير محدد"}`, 25, yPos);
+      yPos += 7;
+      doc.text(`تاريخ الميلاد: ${beneficiary.date_of_birth ? new Date(beneficiary.date_of_birth).toLocaleDateString("ar-SA") : "غير محدد"}`, 25, yPos);
+      yPos += 7;
+      doc.text(`الجنسية: ${beneficiary.nationality || "غير محددة"}`, 25, yPos);
+      yPos += 10;
+
+      // معلومات الاتصال
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text("معلومات الاتصال", 20, yPos);
+      yPos += 8;
+
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "normal");
+      doc.text(`رقم الجوال: ${beneficiary.phone}`, 25, yPos);
+      yPos += 7;
+      doc.text(`البريد الإلكتروني: ${beneficiary.email || "لا يوجد"}`, 25, yPos);
+      yPos += 7;
+      doc.text(`المدينة: ${beneficiary.city || "غير محددة"}`, 25, yPos);
+      yPos += 7;
+      doc.text(`العنوان: ${beneficiary.address || "غير محدد"}`, 25, yPos);
+      yPos += 10;
+
+      // المعلومات العائلية
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text("المعلومات العائلية", 20, yPos);
+      yPos += 8;
+
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "normal");
+      doc.text(`الحالة الاجتماعية: ${beneficiary.marital_status || "غير محددة"}`, 25, yPos);
+      yPos += 7;
+      doc.text(`عدد الأبناء: ${beneficiary.number_of_sons || 0}`, 25, yPos);
+      yPos += 7;
+      doc.text(`عدد البنات: ${beneficiary.number_of_daughters || 0}`, 25, yPos);
+      yPos += 7;
+      doc.text(`عدد الزوجات: ${beneficiary.number_of_wives || 0}`, 25, yPos);
+      yPos += 7;
+      doc.text(`حجم الأسرة: ${beneficiary.family_size || 0}`, 25, yPos);
+      yPos += 10;
+
+      // معلومات العمل والسكن
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text("معلومات العمل والسكن", 20, yPos);
+      yPos += 8;
+
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "normal");
+      doc.text(`الحالة الوظيفية: ${beneficiary.employment_status || "غير محددة"}`, 25, yPos);
+      yPos += 7;
+      doc.text(`الدخل الشهري: ${beneficiary.monthly_income ? beneficiary.monthly_income.toLocaleString("ar-SA") + " ر.س" : "غير محدد"}`, 25, yPos);
+      yPos += 7;
+      doc.text(`نوع السكن: ${beneficiary.housing_type || "غير محدد"}`, 25, yPos);
+      yPos += 10;
+
+      // معلومات الوقف
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text("معلومات الوقف", 20, yPos);
+      yPos += 8;
+
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "normal");
+      doc.text(`الفئة: ${beneficiary.category}`, 25, yPos);
+      yPos += 7;
+      doc.text(`القبيلة: ${beneficiary.tribe || "غير محددة"}`, 25, yPos);
+      yPos += 7;
+      doc.text(`الحالة: ${beneficiary.status}`, 25, yPos);
+      yPos += 7;
+      doc.text(`مستوى الأولوية: ${beneficiary.priority_level || "غير محدد"}`, 25, yPos);
+      yPos += 7;
+      doc.text(`تاريخ القيد: ${new Date(beneficiary.created_at).toLocaleDateString("ar-SA")}`, 25, yPos);
+      yPos += 10;
+
+      // المعلومات البنكية
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text("المعلومات البنكية", 20, yPos);
+      yPos += 8;
+
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "normal");
+      doc.text(`البنك: ${beneficiary.bank_name || "لم يتم التحديث"}`, 25, yPos);
+      yPos += 7;
+      doc.text(`رقم الحساب: ${beneficiary.bank_account_number || "لم يتم التحديث"}`, 25, yPos);
+      yPos += 7;
+      doc.text(`الآيبان: ${beneficiary.iban || "لم يتم التحديث"}`, 25, yPos);
+
+      // الملاحظات
+      if (beneficiary.notes) {
+        yPos += 10;
+        doc.setFontSize(14);
+        doc.setFont("helvetica", "bold");
+        doc.text("ملاحظات إدارية", 20, yPos);
+        yPos += 8;
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "normal");
+        const splitNotes = doc.splitTextToSize(beneficiary.notes, 170);
+        doc.text(splitNotes, 25, yPos);
+      }
+
+      doc.save(`personal-data-${beneficiary.full_name}-${Date.now()}.pdf`);
+
+      toast({
+        title: "تم التصدير",
+        description: "تم تصدير تقرير البيانات الشخصية بنجاح",
+      });
+    } catch (error) {
+      toast({
+        title: "خطأ",
+        description: "فشل تصدير التقرير",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const exportPropertiesReportPDF = async () => {
+    try {
+      const { data: properties } = await supabase
+        .from("properties")
+        .select(`
+          *,
+          contracts:contracts(*)
+        `)
+        .order("name");
+
+      if (!properties || properties.length === 0) {
+        toast({
+          title: "لا توجد بيانات",
+          description: "لا توجد عقارات لتصديرها",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const baseDoc = new jsPDF();
+      const doc = withAutoTable(baseDoc);
+
+      // العنوان
+      baseDoc.setFontSize(18);
+      baseDoc.text("تقرير العقارات والإيجارات", 105, 20, { align: "center" });
+      baseDoc.setFontSize(10);
+      baseDoc.text(`تاريخ التقرير: ${new Date().toLocaleDateString("ar-SA")}`, 105, 28, { align: "center" });
+
+      // حساب الإجماليات
+      const totalMonthlyRent = properties.reduce((sum, prop) => {
+        const activeContracts = (prop.contracts as any[])?.filter((c: any) => c.status === "نشط") || [];
+        return sum + activeContracts.reduce((cSum, c) => cSum + (c.monthly_rent || 0), 0);
+      }, 0);
+      const totalAnnualRent = totalMonthlyRent * 12;
+
+      // الملخص
+      baseDoc.setFontSize(12);
+      baseDoc.text(`عدد العقارات: ${properties.length}`, 20, 40);
+      baseDoc.text(`الإيجار الشهري: ${totalMonthlyRent.toLocaleString("ar-SA")} ر.س`, 20, 47);
+      baseDoc.text(`الإيجار السنوي: ${totalAnnualRent.toLocaleString("ar-SA")} ر.س`, 20, 54);
+
+      // جدول العقارات
+      const tableData = properties.map((prop) => {
+        const activeContracts = (prop.contracts as any[])?.filter((c: any) => c.status === "نشط") || [];
+        const monthlyRent = activeContracts.reduce((sum, c) => sum + (c.monthly_rent || 0), 0);
+        
+        return [
+          prop.name,
+          prop.type || "-",
+          `${prop.total_units || 0}`,
+          `${prop.occupied_units || 0}`,
+          `${monthlyRent.toLocaleString("ar-SA")} ر.س`,
+        ];
+      });
+
+      doc.autoTable({
+        head: [["اسم العقار", "النوع", "الوحدات", "المؤجرة", "الإيجار الشهري"]],
+        body: tableData,
+        startY: 65,
+        styles: {
+          font: "helvetica",
+          fontSize: 9,
+          halign: "right",
+        },
+        headStyles: {
+          fillColor: [34, 139, 34],
+          textColor: [255, 255, 255],
+        },
+      });
+
+      baseDoc.save(`properties-report-${Date.now()}.pdf`);
+
+      toast({
+        title: "تم التصدير",
+        description: "تم تصدير تقرير العقارات بنجاح",
       });
     } catch (error) {
       toast({
@@ -205,16 +538,63 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
 
   // تقارير المستفيد
   const beneficiaryReports = (
-    <>
-      <Button variant="outline" onClick={exportPaymentsPDF} className="justify-start">
-        <FileText className="ml-2 h-4 w-4" />
-        تقرير المدفوعات (PDF)
-      </Button>
-      <Button variant="outline" onClick={exportAccountStatement} className="justify-start">
-        <Receipt className="ml-2 h-4 w-4" />
-        كشف الحساب (PDF)
-      </Button>
-    </>
+    <div className="space-y-4">
+      <Alert>
+        <Info className="h-4 w-4" />
+        <AlertTitle>حالة البيانات</AlertTitle>
+        <AlertDescription>
+          التقارير الشخصية تعمل على البيانات الموجودة فعلياً. بعض التقارير قد تكون فارغة إذا لم يتم تسجيل مدفوعات بعد.
+        </AlertDescription>
+      </Alert>
+
+      <div className="space-y-2">
+        <p className="text-sm font-medium text-muted-foreground mb-2">التقارير الشخصية</p>
+        <Button
+          onClick={exportPersonalDataPDF}
+          className="w-full justify-start"
+          variant="outline"
+        >
+          <User className="ml-2 h-4 w-4" />
+          تقرير البيانات الشخصية (PDF)
+        </Button>
+        <Button
+          onClick={exportPaymentsPDF}
+          className="w-full justify-start"
+          variant="outline"
+        >
+          <FileText className="ml-2 h-4 w-4" />
+          تقرير المدفوعات (PDF)
+        </Button>
+        <Button
+          onClick={exportAccountStatement}
+          className="w-full justify-start"
+          variant="outline"
+        >
+          <Receipt className="ml-2 h-4 w-4" />
+          كشف الحساب (PDF)
+        </Button>
+      </div>
+
+      <div className="space-y-2">
+        <p className="text-sm font-medium text-muted-foreground mb-2">تقارير العقارات</p>
+        <Button
+          onClick={exportPropertiesReportPDF}
+          className="w-full justify-start"
+          variant="outline"
+        >
+          <Building2 className="ml-2 h-4 w-4" />
+          تقرير العقارات (PDF)
+        </Button>
+        <Button
+          onClick={exportPropertiesExcel}
+          className="w-full justify-start"
+          variant="outline"
+        >
+          <FileSpreadsheet className="ml-2 h-4 w-4" />
+          تقرير العقارات (Excel)
+        </Button>
+      </div>
+    </div>
   );
 
   // تقارير الوقف
