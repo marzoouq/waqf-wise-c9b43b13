@@ -54,9 +54,11 @@ type InvoiceLine = {
 interface AddInvoiceDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  isEdit?: boolean;
+  invoiceToEdit?: any;
 }
 
-export const AddInvoiceDialog = ({ open, onOpenChange }: AddInvoiceDialogProps) => {
+export const AddInvoiceDialog = ({ open, onOpenChange, isEdit = false, invoiceToEdit }: AddInvoiceDialogProps) => {
   const [lines, setLines] = useState<InvoiceLine[]>([]);
   const [newLine, setNewLine] = useState<Partial<InvoiceLine>>({
     account_id: "",
@@ -291,7 +293,7 @@ export const AddInvoiceDialog = ({ open, onOpenChange }: AddInvoiceDialogProps) 
     <ResponsiveDialog 
       open={open} 
       onOpenChange={onOpenChange}
-      title="إنشاء فاتورة جديدة"
+      title={isEdit ? "تعديل فاتورة" : "إنشاء فاتورة جديدة"}
       size="xl"
     >
       <Form {...form}>

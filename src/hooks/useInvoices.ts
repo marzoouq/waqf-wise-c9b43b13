@@ -245,10 +245,65 @@ export function useInvoices() {
     }),
   });
 
+  const deleteInvoice = useMutation({
+    mutationFn: async (invoiceId: string) => {
+      // التحقق من الحالة
+      const { data: invoice } = await supabase
+        .from("invoices")
+        .select("status, journal_entry_id")
+        .eq("id", invoiceId)
+        .maybeSingle();
+      
+      if (!invoice) throw new Error("الفاتورة غير موجودة");
+      
+      if (invoice.status === "paid") {
+        throw new Error("لا يمكن حذف فاتورة مدفوعة");
+      }
+      
+      // حذف البنود (cascade)
+      await supabase
+        .from("invoice_lines")
+        .delete()
+        .eq("invoice_id", invoiceId);
+      
+      // حذف القيد المحاسبي
+      if (invoice.journal_entry_id) {
+        await supabase
+          .from("journal_entries")
+          .delete()
+          .eq("id", invoice.journal_entry_id);
+      }
+      
+      // حذف الفاتورة
+      const { error } = await supabase
+        .from("invoices")
+        .delete()
+        .eq("id", invoiceId);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["invoices"] });
+      queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
+      toast({
+        title: "تم حذف الفاتورة بنجاح",
+        description: "تم حذف الفاتورة والقيد المحاسبي المرتبط بها",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        variant: "destructive",
+        title: "خطأ في الحذف",
+        description: error.message,
+      });
+    }
+  });
+
   return {
     invoices,
     isLoading,
     addInvoice: addInvoice.mutateAsync,
     updateInvoice: updateInvoice.mutateAsync,
+    deleteInvoice: deleteInvoice.mutateAsync,
   };
 }
