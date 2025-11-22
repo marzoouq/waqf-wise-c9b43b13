@@ -34,12 +34,12 @@ const Properties = () => {
   const [selectedPayment, setSelectedPayment] = useState<RentalPayment | null>(null);
   const [selectedMaintenance, setSelectedMaintenance] = useState<MaintenanceRequest | null>(null);
 
-  const handlePropertySave = async (data: any) => {
+  const handlePropertySave = async (data: Partial<Property>) => {
     try {
       if (selectedProperty) {
         await updateProperty({ id: selectedProperty.id, ...data });
       } else {
-        await addProperty(data);
+        await addProperty(data as Property);
       }
       setPropertyDialogOpen(false);
       setSelectedProperty(null);

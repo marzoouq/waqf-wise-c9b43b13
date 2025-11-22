@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { useContracts, Contract } from "@/hooks/useContracts";
 import { useProperties } from "@/hooks/useProperties";
+import { ContractWithUnitsCount } from "@/types/contracts";
 
 interface Props {
   open: boolean;
@@ -55,7 +56,7 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
         monthly_rent: contract.monthly_rent.toString(),
         security_deposit: contract.security_deposit?.toString() || "",
         payment_frequency: contract.payment_frequency,
-        units_count: (contract as any).units_count?.toString() || "1",
+        units_count: (contract as ContractWithUnitsCount).units_count?.toString() || "1",
         is_renewable: contract.is_renewable,
         auto_renew: contract.auto_renew,
         renewal_notice_days: contract.renewal_notice_days.toString(),

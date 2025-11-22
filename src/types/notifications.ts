@@ -27,3 +27,9 @@ export interface NotificationInsert {
   priority?: string;
   is_read?: boolean;
 }
+
+export interface NotificationPreferences {
+  email: boolean;
+  sms: boolean;
+  push: boolean;
+}

@@ -89,7 +89,7 @@ export function AdminAlertsPanel() {
   };
 
   const getSeverityBadge = (severity: string) => {
-    const variants: Record<string, string> = {
+    const variants: Record<string, "destructive" | "default" | "secondary"> = {
       critical: 'destructive',
       high: 'destructive',
       medium: 'default',
@@ -104,7 +104,7 @@ export function AdminAlertsPanel() {
     };
 
     return (
-      <Badge variant={variants[severity] as any}>
+      <Badge variant={variants[severity] || 'default'}>
         {labels[severity] || severity}
       </Badge>
     );

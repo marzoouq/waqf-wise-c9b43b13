@@ -161,10 +161,11 @@ const Users = () => {
         description: "تم تعيين كلمة المرور الجديدة بنجاح",
       });
     },
-    onError: (error: any) => {
+    onError: (error) => {
+      const errorMessage = error instanceof Error ? error.message : "فشل تحديث كلمة المرور";
       toast({
         title: "خطأ",
-        description: error.message || "فشل تحديث كلمة المرور",
+        description: errorMessage,
         variant: "destructive",
       });
     }

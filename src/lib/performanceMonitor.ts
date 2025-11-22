@@ -149,7 +149,7 @@ class PerformanceMonitor {
       // Largest Contentful Paint
       const observer = new PerformanceObserver((list) => {
         const entries = list.getEntries();
-        const lastEntry = entries[entries.length - 1] as any;
+        const lastEntry = entries[entries.length - 1] as PerformanceEntry & { startTime: number };
         console.log(`🖼️ Largest Contentful Paint: ${Math.round(lastEntry.startTime)}ms`);
       });
       observer.observe({ entryTypes: ['largest-contentful-paint'] });

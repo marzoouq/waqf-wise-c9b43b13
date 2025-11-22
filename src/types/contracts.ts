@@ -49,3 +49,13 @@ export interface ContractInsert {
   terms_and_conditions?: string;
   notes?: string;
 }
+
+export interface ContractWithUnitsCount extends Contract {
+  units_count?: number;
+}
+
+export interface ContractStatus {
+  status: string;
+  monthly_rent: number;
+  end_date?: string;
+}

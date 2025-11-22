@@ -99,10 +99,11 @@ export default function BeneficiarySupport() {
 
       setSubject("");
       setMessage("");
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "فشل إرسال الطلب";
       toast({
         title: "خطأ",
-        description: error.message || "فشل إرسال الطلب",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

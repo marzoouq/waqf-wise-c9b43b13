@@ -191,4 +191,5 @@ export interface SupportFilters {
   date_from?: string;
   date_to?: string;
   is_overdue?: boolean;
+  [key: string]: unknown;
 }
