@@ -24,7 +24,9 @@ export const RentalPaymentDialog = ({ open, onOpenChange, payment, contractId }:
     due_date: "",
     amount_due: "",
     amount_paid: "",
+    payment_date: "",
     payment_method: "",
+    status: "معلق",
     discount: "",
     receipt_number: "",
     notes: "",
@@ -37,7 +39,9 @@ export const RentalPaymentDialog = ({ open, onOpenChange, payment, contractId }:
         due_date: payment.due_date,
         amount_due: payment.amount_due.toString(),
         amount_paid: payment.amount_paid.toString(),
+        payment_date: payment.payment_date || "",
         payment_method: payment.payment_method || "",
+        status: payment.status || "معلق",
         discount: payment.discount.toString(),
         receipt_number: payment.receipt_number || "",
         notes: payment.notes || "",
@@ -50,12 +54,18 @@ export const RentalPaymentDialog = ({ open, onOpenChange, payment, contractId }:
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const paymentData = {
+    const paymentData: any = {
       ...formData,
       amount_due: parseFloat(formData.amount_due),
       amount_paid: parseFloat(formData.amount_paid) || 0,
       discount: parseFloat(formData.discount) || 0,
+      payment_date: formData.payment_date || null,
     };
+
+    // Auto-set status to "مدفوع" if payment is made
+    if (paymentData.amount_paid > 0 && paymentData.payment_date) {
+      paymentData.status = "مدفوع";
+    }
 
     if (payment) {
       updatePayment.mutate({ id: payment.id, ...paymentData });
@@ -72,7 +82,9 @@ export const RentalPaymentDialog = ({ open, onOpenChange, payment, contractId }:
       due_date: "",
       amount_due: "",
       amount_paid: "",
+      payment_date: "",
       payment_method: "",
+      status: "معلق",
       discount: "",
       receipt_number: "",
       notes: "",
@@ -88,6 +100,12 @@ export const RentalPaymentDialog = ({ open, onOpenChange, payment, contractId }:
       size="lg"
     >
       <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Info Alert */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800">
+            <div className="font-medium mb-1">💡 ملاحظة:</div>
+            <div>عند إدخال المبلغ المدفوع + تاريخ الدفع، ستتحول الحالة تلقائياً إلى "مدفوع"</div>
+          </div>
+
           {!contractId && (
             <div className="space-y-2">
               <Label>العقد *</Label>
@@ -129,6 +147,37 @@ export const RentalPaymentDialog = ({ open, onOpenChange, payment, contractId }:
                 value={formData.amount_due}
                 onChange={(e) => setFormData({ ...formData, amount_due: e.target.value })}
                 required
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>حالة الدفعة *</Label>
+              <Select
+                value={formData.status}
+                onValueChange={(value) => setFormData({ ...formData, status: value })}
+                required
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="اختر الحالة" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="معلق">معلق</SelectItem>
+                  <SelectItem value="تحت التحصيل">تحت التحصيل</SelectItem>
+                  <SelectItem value="مدفوع">مدفوع</SelectItem>
+                  <SelectItem value="متأخر">متأخر</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>تاريخ الدفع</Label>
+              <Input
+                type="date"
+                value={formData.payment_date}
+                onChange={(e) => setFormData({ ...formData, payment_date: e.target.value })}
+                placeholder="أدخل تاريخ الدفع عند الدفع"
               />
             </div>
           </div>
