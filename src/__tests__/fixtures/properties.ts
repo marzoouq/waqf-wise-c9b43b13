@@ -19,6 +19,10 @@ export const mockProperty = (overrides?: Partial<Property>): Property => ({
   occupied_units: 1,
   available_units: 0,
   occupancy_percentage: 100,
+  tax_percentage: 15,
+  shop_count: 0,
+  apartment_count: 0,
+  revenue_type: 'شهري',
   ...overrides,
 });
 

@@ -16,6 +16,10 @@ export interface Property {
   monthly_revenue: number;
   status: string;
   description?: string;
+  tax_percentage?: number;
+  shop_count?: number;
+  apartment_count?: number;
+  revenue_type?: 'شهري' | 'سنوي';
   created_at: string;
   updated_at: string;
 }
