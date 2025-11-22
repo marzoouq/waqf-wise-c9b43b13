@@ -1442,6 +1442,45 @@ export type Database = {
           },
         ]
       }
+      contract_units: {
+        Row: {
+          contract_id: string
+          created_at: string | null
+          id: string
+          property_unit_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          contract_id: string
+          created_at?: string | null
+          id?: string
+          property_unit_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          contract_id?: string
+          created_at?: string | null
+          id?: string
+          property_unit_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contract_units_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "contracts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contract_units_property_unit_id_fkey"
+            columns: ["property_unit_id"]
+            isOneToOne: false
+            referencedRelation: "property_units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contracts: {
         Row: {
           auto_renew: boolean | null
@@ -1465,6 +1504,7 @@ export type Database = {
           tenant_name: string
           tenant_phone: string
           terms_and_conditions: string | null
+          units_count: number | null
           updated_at: string
         }
         Insert: {
@@ -1489,6 +1529,7 @@ export type Database = {
           tenant_name: string
           tenant_phone: string
           terms_and_conditions?: string | null
+          units_count?: number | null
           updated_at?: string
         }
         Update: {
@@ -1513,6 +1554,7 @@ export type Database = {
           tenant_name?: string
           tenant_phone?: string
           terms_and_conditions?: string | null
+          units_count?: number | null
           updated_at?: string
         }
         Relationships: [

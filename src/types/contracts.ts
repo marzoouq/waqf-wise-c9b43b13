@@ -13,6 +13,7 @@ export interface Contract {
   security_deposit: number;
   payment_frequency: string;
   status: string;
+  units_count?: number;
   is_renewable: boolean;
   auto_renew: boolean;
   renewal_notice_days: number;
@@ -41,6 +42,7 @@ export interface ContractInsert {
   security_deposit?: number;
   payment_frequency: string;
   status?: string;
+  units_count?: number;
   is_renewable?: boolean;
   auto_renew?: boolean;
   renewal_notice_days?: number;
