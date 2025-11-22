@@ -56,7 +56,11 @@ const filterRelevantPayments = (payments: RentalPayment[], daysThreshold: number
   });
 };
 
-export const useRentalPayments = (contractId?: string, showAllPayments: boolean = false, daysThreshold: number = 90) => {
+export const useRentalPayments = (
+  contractId?: string, 
+  showAllPayments: boolean = false, 
+  daysThreshold: number = 90
+) => {
   const queryClient = useQueryClient();
   const { createAutoEntry } = useJournalEntries();
 
@@ -109,16 +113,23 @@ export const useRentalPayments = (contractId?: string, showAllPayments: boolean 
 
   // Apply filtering logic
   const payments = useMemo(
-    () => allPayments ? (showAllPayments ? allPayments : filterRelevantPayments(allPayments, daysThreshold)) : [],
+    () => {
+      if (!allPayments) return [];
+      return showAllPayments ? allPayments : filterRelevantPayments(allPayments, daysThreshold);
+    },
     [allPayments, showAllPayments, daysThreshold]
   );
 
   const hiddenPaymentsCount = useMemo(
-    () => (allPayments?.length || 0) - (payments?.length || 0),
+    () => {
+      if (!allPayments || !payments) return 0;
+      return allPayments.length - payments.length;
+    },
     [allPayments, payments]
   );
 
   const addPayment = useMutation({
+    mutationKey: ['add_rental_payment'],
     mutationFn: async (payment: Omit<RentalPaymentInsert, 'payment_number'>) => {
       const paymentNumber = `RP-${Date.now().toString().slice(-8)}`;
       const { data, error } = await supabase
@@ -165,6 +176,7 @@ export const useRentalPayments = (contractId?: string, showAllPayments: boolean 
   });
 
   const updatePayment = useMutation({
+    mutationKey: ['update_rental_payment'],
     mutationFn: async ({ id, ...payment }: Partial<RentalPayment> & { id: string }) => {
       // جلب البيانات القديمة
       const { data: oldData } = await supabase
