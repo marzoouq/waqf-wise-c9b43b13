@@ -22,11 +22,16 @@ export interface RentalPayment {
   receipt_number?: string;
   notes?: string;
   journal_entry_id?: string;
+  invoice_id?: string;
+  receipt_id?: string;
   created_at: string;
   updated_at: string;
   contracts?: {
     contract_number: string;
     tenant_name: string;
+    tenant_id_number?: string;
+    tenant_email?: string;
+    tenant_phone?: string;
     properties: {
       name: string;
     };
@@ -188,6 +193,9 @@ export const useRentalPayments = (
           contracts(
             contract_number,
             tenant_name,
+            tenant_id_number,
+            tenant_email,
+            tenant_phone,
             properties(name)
           )
         `)
@@ -195,18 +203,43 @@ export const useRentalPayments = (
 
       if (error) throw error;
 
-      // إنشاء قيد محاسبي تلقائي إذا تم الدفع
+      // إصدار فاتورة وسند قبض تلقائياً إذا تم الدفع
       if (data && data.amount_paid > 0 && data.payment_date) {
         try {
-          await createAutoEntry(
-            "rental_payment",
-            data.id,
-            data.amount_paid,
-            `إيراد إيجار - ${data.payment_number}`,
-            data.payment_date
+          const { data: result, error: rpcError } = await supabase.rpc(
+            'create_rental_invoice_and_receipt',
+            {
+              p_rental_payment_id: data.id,
+              p_contract_id: data.contract_id,
+              p_amount: data.amount_paid,
+              p_payment_date: data.payment_date,
+              p_payment_method: payment.payment_method || 'نقدي',
+              p_tenant_name: data.contracts?.tenant_name,
+              p_tenant_id: data.contracts?.tenant_id_number,
+              p_tenant_email: data.contracts?.tenant_email,
+              p_tenant_phone: data.contracts?.tenant_phone,
+              p_property_name: data.contracts?.properties?.name
+            }
           );
-        } catch (journalError) {
-          logger.error(journalError, { context: 'rental_payment_journal_entry', severity: 'medium' });
+
+          if (rpcError) {
+            logger.error(rpcError, { context: 'create_rental_invoice_receipt', severity: 'high' });
+            toast({
+              title: "تحذير",
+              description: "تم تسجيل الدفعة لكن فشل إصدار الفاتورة وسند القبض",
+              variant: "destructive",
+            });
+          } else if (result && result.length > 0 && result[0].success) {
+            logger.info('تم إصدار الفاتورة وسند القبض بنجاح', { 
+              context: 'rental_invoice_receipt_created',
+              metadata: {
+                invoice_id: result[0].invoice_id,
+                receipt_id: result[0].receipt_id
+              }
+            });
+          }
+        } catch (invoiceError) {
+          logger.error(invoiceError, { context: 'rental_invoice_generation', severity: 'high' });
         }
       }
 
@@ -229,7 +262,7 @@ export const useRentalPayments = (
       // جلب البيانات القديمة
       const { data: oldData } = await supabase
         .from("rental_payments")
-        .select("amount_paid, payment_date")
+        .select("amount_paid, payment_date, invoice_id, receipt_id, contract_id")
         .eq("id", id)
         .single();
 
@@ -242,6 +275,9 @@ export const useRentalPayments = (
           contracts(
             contract_number,
             tenant_name,
+            tenant_id_number,
+            tenant_email,
+            tenant_phone,
             properties(name)
           )
         `)
@@ -249,21 +285,46 @@ export const useRentalPayments = (
 
       if (error) throw error;
 
-      // إنشاء قيد محاسبي إذا تم الدفع لأول مرة أو تحديث المبلغ
+      // إصدار فاتورة وسند قبض إذا تم الدفع لأول مرة (ولم يتم إصدارهما من قبل)
       const isNewPayment = oldData && oldData.amount_paid === 0 && data.amount_paid > 0;
-      const isPaymentUpdate = oldData && data.amount_paid !== oldData.amount_paid && data.amount_paid > 0;
+      const hasNoInvoice = !oldData?.invoice_id && !oldData?.receipt_id;
 
-      if (data && (isNewPayment || isPaymentUpdate) && data.payment_date) {
+      if (data && isNewPayment && hasNoInvoice && data.payment_date) {
         try {
-          await createAutoEntry(
-            "rental_payment",
-            data.id,
-            data.amount_paid,
-            `إيراد إيجار - ${data.payment_number}`,
-            data.payment_date
+          const { data: result, error: rpcError } = await supabase.rpc(
+            'create_rental_invoice_and_receipt',
+            {
+              p_rental_payment_id: data.id,
+              p_contract_id: data.contract_id,
+              p_amount: data.amount_paid,
+              p_payment_date: data.payment_date,
+              p_payment_method: payment.payment_method || 'نقدي',
+              p_tenant_name: data.contracts?.tenant_name,
+              p_tenant_id: data.contracts?.tenant_id_number,
+              p_tenant_email: data.contracts?.tenant_email,
+              p_tenant_phone: data.contracts?.tenant_phone,
+              p_property_name: data.contracts?.properties?.name
+            }
           );
-        } catch (journalError) {
-          logger.error(journalError, { context: 'update_rental_payment_journal', severity: 'medium' });
+
+          if (rpcError) {
+            logger.error(rpcError, { context: 'update_rental_invoice_receipt', severity: 'high' });
+            toast({
+              title: "تحذير",
+              description: "تم تحديث الدفعة لكن فشل إصدار الفاتورة وسند القبض",
+              variant: "destructive",
+            });
+          } else if (result && result.length > 0 && result[0].success) {
+            logger.info('تم إصدار الفاتورة وسند القبض بنجاح', { 
+              context: 'update_rental_invoice_receipt_created',
+              metadata: {
+                invoice_id: result[0].invoice_id,
+                receipt_id: result[0].receipt_id
+              }
+            });
+          }
+        } catch (invoiceError) {
+          logger.error(invoiceError, { context: 'update_rental_invoice_generation', severity: 'high' });
         }
       }
 

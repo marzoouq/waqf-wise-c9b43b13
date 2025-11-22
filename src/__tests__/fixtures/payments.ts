@@ -15,6 +15,7 @@ export const mockPayment = (overrides?: Partial<Payment>): Payment => ({
   description: 'صرف مستحقات شهرية',
   status: 'completed',
   journal_entry_id: null,
+  rental_payment_id: null,
   created_at: '2025-01-15T00:00:00.000Z',
   updated_at: '2025-01-15T00:00:00.000Z',
   notes: null,

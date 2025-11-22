@@ -3597,6 +3597,7 @@ export type Database = {
           journal_entry_id: string | null
           notes: string | null
           qr_code_data: string | null
+          rental_payment_id: string | null
           status: string
           subtotal: number
           tax_amount: number
@@ -3622,6 +3623,7 @@ export type Database = {
           journal_entry_id?: string | null
           notes?: string | null
           qr_code_data?: string | null
+          rental_payment_id?: string | null
           status?: string
           subtotal?: number
           tax_amount?: number
@@ -3647,6 +3649,7 @@ export type Database = {
           journal_entry_id?: string | null
           notes?: string | null
           qr_code_data?: string | null
+          rental_payment_id?: string | null
           status?: string
           subtotal?: number
           tax_amount?: number
@@ -3660,6 +3663,13 @@ export type Database = {
             columns: ["journal_entry_id"]
             isOneToOne: false
             referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_rental_payment_id_fkey"
+            columns: ["rental_payment_id"]
+            isOneToOne: false
+            referencedRelation: "rental_payments"
             referencedColumns: ["id"]
           },
         ]
@@ -4643,6 +4653,7 @@ export type Database = {
           payment_number: string
           payment_type: string
           reference_number: string | null
+          rental_payment_id: string | null
           status: string | null
           updated_at: string
         }
@@ -4660,6 +4671,7 @@ export type Database = {
           payment_number: string
           payment_type: string
           reference_number?: string | null
+          rental_payment_id?: string | null
           status?: string | null
           updated_at?: string
         }
@@ -4677,6 +4689,7 @@ export type Database = {
           payment_number?: string
           payment_type?: string
           reference_number?: string | null
+          rental_payment_id?: string | null
           status?: string | null
           updated_at?: string
         }
@@ -4700,6 +4713,13 @@ export type Database = {
             columns: ["journal_entry_id"]
             isOneToOne: false
             referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_rental_payment_id_fkey"
+            columns: ["rental_payment_id"]
+            isOneToOne: false
+            referencedRelation: "rental_payments"
             referencedColumns: ["id"]
           },
         ]
@@ -5127,12 +5147,14 @@ export type Database = {
           discount: number | null
           due_date: string
           id: string
+          invoice_id: string | null
           journal_entry_id: string | null
           late_fee: number | null
           notes: string | null
           payment_date: string | null
           payment_method: string | null
           payment_number: string
+          receipt_id: string | null
           receipt_number: string | null
           status: string
           updated_at: string
@@ -5145,12 +5167,14 @@ export type Database = {
           discount?: number | null
           due_date: string
           id?: string
+          invoice_id?: string | null
           journal_entry_id?: string | null
           late_fee?: number | null
           notes?: string | null
           payment_date?: string | null
           payment_method?: string | null
           payment_number: string
+          receipt_id?: string | null
           receipt_number?: string | null
           status?: string
           updated_at?: string
@@ -5163,12 +5187,14 @@ export type Database = {
           discount?: number | null
           due_date?: string
           id?: string
+          invoice_id?: string | null
           journal_entry_id?: string | null
           late_fee?: number | null
           notes?: string | null
           payment_date?: string | null
           payment_method?: string | null
           payment_number?: string
+          receipt_id?: string | null
           receipt_number?: string | null
           status?: string
           updated_at?: string
@@ -5182,10 +5208,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "rental_payments_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "rental_payments_journal_entry_id_fkey"
             columns: ["journal_entry_id"]
             isOneToOne: false
             referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rental_payments_receipt_id_fkey"
+            columns: ["receipt_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
             referencedColumns: ["id"]
           },
         ]
@@ -7002,6 +7042,27 @@ export type Database = {
           p_user_id: string
         }
         Returns: string
+      }
+      create_rental_invoice_and_receipt: {
+        Args: {
+          p_amount: number
+          p_contract_id: string
+          p_payment_date: string
+          p_payment_method?: string
+          p_property_name?: string
+          p_rental_payment_id: string
+          p_tenant_email?: string
+          p_tenant_id?: string
+          p_tenant_name?: string
+          p_tenant_phone?: string
+        }
+        Returns: {
+          invoice_id: string
+          journal_entry_id: string
+          message: string
+          receipt_id: string
+          success: boolean
+        }[]
       }
       create_user_profile_and_role: {
         Args: {
