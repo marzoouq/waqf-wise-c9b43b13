@@ -6961,6 +6961,7 @@ export type Database = {
       }
       generate_beneficiary_number: { Args: never; Returns: string }
       generate_smart_insights: { Args: never; Returns: undefined }
+      get_admin_dashboard_kpis: { Args: never; Returns: Json }
       get_beneficiary_number: { Args: { ben_id: string }; Returns: string }
       has_role: {
         Args: {
