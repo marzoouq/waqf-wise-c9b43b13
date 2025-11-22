@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { logger } from '@/lib/logger';
+import { useLeakedPassword } from './useLeakedPassword';
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
@@ -11,6 +12,7 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { checkPasswordQuick } = useLeakedPassword();
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -53,6 +55,17 @@ export function useAuth() {
 
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
+      // التحقق من كلمة المرور المسربة
+      const isLeaked = await checkPasswordQuick(password);
+      if (isLeaked) {
+        toast({
+          title: "كلمة مرور غير آمنة",
+          description: "هذه الكلمة تم تسريبها في اختراقات سابقة. يرجى اختيار كلمة مرور أخرى.",
+          variant: "destructive",
+        });
+        return { data: null, error: new Error('Leaked password') };
+      }
+
       const redirectUrl = `${window.location.origin}/`;
       
       const { data, error } = await supabase.auth.signUp({

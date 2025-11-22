@@ -11,6 +11,7 @@ import { logger } from "@/lib/logger";
 import { nationalIdToEmail, generateTempPassword } from "@/lib/beneficiaryAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ResetPasswordDialog } from "./ResetPasswordDialog";
+import { useLeakedPassword } from "@/hooks/useLeakedPassword";
 
 interface EnableLoginDialogProps {
   open: boolean;
@@ -32,6 +33,7 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
   const [loading, setLoading] = useState(false);
   const [hasExistingAuth, setHasExistingAuth] = useState(false);
   const [showResetPassword, setShowResetPassword] = useState(false);
+  const { checkPasswordQuick } = useLeakedPassword();
   
   // توليد البريد وكلمة المرور تلقائياً من رقم الهوية
   const autoEmail = nationalIdToEmail(beneficiary.national_id);
@@ -117,6 +119,18 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
     setLoading(true);
 
     try {
+      // التحقق من كلمة المرور المسربة
+      const isLeaked = await checkPasswordQuick(formData.password);
+      if (isLeaked) {
+        toast({
+          title: "كلمة مرور غير آمنة",
+          description: "هذه الكلمة تم تسريبها في اختراقات سابقة. يرجى اختيار كلمة مرور أخرى.",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
