@@ -33,25 +33,31 @@ export interface RentalPayment {
   };
 }
 
-// Filter relevant payments based on days threshold
-const filterRelevantPayments = (payments: RentalPayment[], daysThreshold: number = 90) => {
-  const now = new Date();
-  const futureThreshold = new Date();
-  futureThreshold.setDate(futureThreshold.getDate() + daysThreshold);
+// Filter to show only relevant payments: paid, under collection, and overdue
+export const filterRelevantPayments = (
+  payments: RentalPayment[]
+): RentalPayment[] => {
+  const today = new Date();
 
-  return payments.filter(payment => {
+  return payments.filter((payment) => {
     const dueDate = new Date(payment.due_date);
     
-    // Show paid payments (historical record)
-    if (payment.payment_date) return true;
-    
+    // Always show paid payments
+    if (payment.status === 'مدفوع' || payment.payment_date) {
+      return true;
+    }
+
+    // Always show under collection payments
+    if (payment.status === 'تحت التحصيل') {
+      return true;
+    }
+
     // Show overdue payments
-    if (dueDate < now) return true;
-    
-    // Show payments due within threshold days
-    if (dueDate <= futureThreshold) return true;
-    
-    // Hide distant future payments
+    if (dueDate < today && payment.status !== 'مدفوع' && !payment.payment_date) {
+      return true;
+    }
+
+    // Hide all other pending payments
     return false;
   });
 };
@@ -153,23 +159,13 @@ export const useRentalPayments = (
     },
   });
 
-  // Apply filtering logic
+  // Apply filtering logic - always show only paid, under collection, and overdue
   const payments = useMemo(
     () => {
       if (!allPayments) return [];
-      
-      // If showing all payments without filters
-      if (showAllPayments) return allPayments;
-      
-      // If showing only next payment per contract (default)
-      if (showNextOnly) {
-        return filterNextPaymentPerContract(allPayments);
-      }
-      
-      // Otherwise use threshold filtering
-      return filterRelevantPayments(allPayments, daysThreshold);
+      return filterRelevantPayments(allPayments);
     },
-    [allPayments, showAllPayments, showNextOnly, daysThreshold]
+    [allPayments]
   );
 
   const hiddenPaymentsCount = useMemo(

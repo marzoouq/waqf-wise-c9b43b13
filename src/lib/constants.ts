@@ -28,6 +28,10 @@ export const PAYMENT_STATUS = {
   PENDING: "معلق",
   COMPLETED: "مكتمل",
   CANCELLED: "ملغي",
+  PAID: "مدفوع",
+  OVERDUE: "متأخر",
+  PARTIAL: "مدفوع جزئياً",
+  UNDER_COLLECTION: "تحت التحصيل",
 } as const;
 
 export const INVOICE_STATUS = {
