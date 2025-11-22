@@ -2,8 +2,8 @@
  * تنظيف الـ filters من القيم الفارغة لتوحيد query keys
  * يزيل القيم null, undefined, string فارغة, والمصفوفات الفارغة
  */
-export function cleanFilters<T extends Record<string, any>>(filters: T): Partial<T> | undefined {
-  const cleaned: Partial<T> = {};
+export function cleanFilters<T extends Record<string, unknown>>(filters: T): Record<string, unknown> | undefined {
+  const cleaned: Record<string, unknown> = {};
   
   Object.entries(filters).forEach(([key, value]) => {
     if (
@@ -12,7 +12,7 @@ export function cleanFilters<T extends Record<string, any>>(filters: T): Partial
       value !== '' && 
       (Array.isArray(value) ? value.length > 0 : true)
     ) {
-      (cleaned as any)[key] = value;
+      cleaned[key] = value;
     }
   });
 

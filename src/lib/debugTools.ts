@@ -121,7 +121,9 @@ export function initDebugTools() {
   };
 
   // إتاحته عالمياً
-  (window as any).waqfDebug = debugTools;
+  if (typeof window !== 'undefined') {
+    (window as Window & { waqfDebug?: DebugTools }).waqfDebug = debugTools;
+  }
 
   // تسجيل رسالة في Console
   if (import.meta.env.DEV) {

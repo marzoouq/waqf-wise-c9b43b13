@@ -85,7 +85,14 @@ const BeneficiaryDashboard = () => {
 
   // Create request mutation
   const createRequestMutation = useMutation({
-    mutationFn: async (newRequest: any) => {
+    mutationFn: async (newRequest: {
+      beneficiary_id: string;
+      request_type_id: string;
+      description: string;
+      amount?: number;
+      priority?: string;
+      status?: string;
+    }) => {
       const { data, error } = await supabase
         .from("beneficiary_requests")
         .insert(newRequest)

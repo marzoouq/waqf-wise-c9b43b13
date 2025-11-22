@@ -30,6 +30,7 @@ import { EditPhoneDialog } from "./EditPhoneDialog";
 import { NotificationPreferences } from "./NotificationPreferences";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Beneficiary } from "@/types/beneficiary";
+import { NotificationPreferences as NotificationPreferencesType } from "@/types/notifications";
 
 interface BeneficiarySettingsDropdownProps {
   beneficiary: Beneficiary;
@@ -137,7 +138,7 @@ export function BeneficiarySettingsDropdown({
           </DialogHeader>
           <NotificationPreferences
             beneficiaryId={beneficiary.id}
-            currentPreferences={beneficiary.notification_preferences as any}
+            currentPreferences={(beneficiary.notification_preferences as NotificationPreferencesType | null) || undefined}
           />
         </DialogContent>
       </Dialog>

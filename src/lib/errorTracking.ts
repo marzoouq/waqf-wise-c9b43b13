@@ -257,7 +257,8 @@ class ErrorTracker {
           body: report,
         });
         
-        const { data, error } = await Promise.race([invokePromise, timeoutPromise]) as any;
+        const result = await Promise.race([invokePromise, timeoutPromise]);
+        const { data, error } = result as { data: unknown; error: Error | null };
         
         if (error) throw error;
         

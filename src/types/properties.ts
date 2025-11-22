@@ -101,3 +101,7 @@ export interface ContractAttachment {
   uploaded_by: string | null;
   uploaded_at: string;
 }
+
+export interface PropertyWithContracts extends Property {
+  contracts?: Contract[];
+}

@@ -20,6 +20,7 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import * as XLSX from "xlsx";
 import { withAutoTable } from "@/types/pdf";
+import { Contract } from "@/hooks/useContracts";
 
 interface ReportsMenuProps {
   type?: "beneficiary" | "waqf";
@@ -179,16 +180,17 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
       }
 
       const data = properties.map((prop) => {
-        const activeContracts = (prop.contracts as any[])?.filter((c: any) => c.status === "نشط") || [];
+        const contracts = prop.contracts as unknown as Contract[];
+        const activeContracts = contracts?.filter((c) => c.status === "نشط") || [];
         const monthlyRent = activeContracts.reduce((sum, c) => sum + (c.monthly_rent || 0), 0);
         
         return {
           "اسم العقار": prop.name,
           "النوع": prop.type || "-",
           "الموقع": prop.location || "-",
-          "إجمالي الوحدات": prop.total_units || 0,
-          "الوحدات المؤجرة": prop.occupied_units || 0,
-          "الوحدات الشاغرة": (prop.total_units || 0) - (prop.occupied_units || 0),
+          "إجمالي الوحدات": prop.units || 0,
+          "الوحدات المؤجرة": prop.occupied || 0,
+          "الوحدات الشاغرة": (prop.units || 0) - (prop.occupied || 0),
           "الإيجار الشهري": monthlyRent,
           "الإيجار السنوي": monthlyRent * 12,
           "الحالة": prop.status || "نشط",
@@ -481,7 +483,8 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
 
       // حساب الإجماليات
       const totalMonthlyRent = properties.reduce((sum, prop) => {
-        const activeContracts = (prop.contracts as any[])?.filter((c: any) => c.status === "نشط") || [];
+        const contracts = prop.contracts as unknown as Contract[];
+        const activeContracts = contracts?.filter((c) => c.status === "نشط") || [];
         return sum + activeContracts.reduce((cSum, c) => cSum + (c.monthly_rent || 0), 0);
       }, 0);
       const totalAnnualRent = totalMonthlyRent * 12;
@@ -494,14 +497,15 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
 
       // جدول العقارات
       const tableData = properties.map((prop) => {
-        const activeContracts = (prop.contracts as any[])?.filter((c: any) => c.status === "نشط") || [];
+        const contracts = prop.contracts as unknown as Contract[];
+        const activeContracts = contracts?.filter((c) => c.status === "نشط") || [];
         const monthlyRent = activeContracts.reduce((sum, c) => sum + (c.monthly_rent || 0), 0);
         
         return [
           prop.name,
           prop.type || "-",
-          `${prop.total_units || 0}`,
-          `${prop.occupied_units || 0}`,
+          `${prop.units || 0}`,
+          `${prop.occupied || 0}`,
           `${monthlyRent.toLocaleString("ar-SA")} ر.س`,
         ];
       });

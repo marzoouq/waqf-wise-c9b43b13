@@ -20,6 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { formatDistanceToNow } from "date-fns";
 import { ar } from "date-fns/locale";
+import { SystemError, SystemAlert, AutoFixAttempt } from "@/types/monitoring";
 import { AdminAlertsPanel } from "@/components/system/AdminAlertsPanel";
 import { SelfHealingToolsPanel } from "@/components/system/SelfHealingToolsPanel";
 
@@ -243,7 +244,7 @@ export default function SystemMonitoring() {
                 </p>
               ) : (
                 <div className="space-y-3">
-                  {recentErrors.map((error: any) => (
+                  {recentErrors.map((error: SystemError) => (
                     <div
                       key={error.id}
                       className="flex items-start justify-between p-3 border rounded-lg"
@@ -300,7 +301,7 @@ export default function SystemMonitoring() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {activeAlerts.map((alert: any) => (
+                  {activeAlerts.map((alert: SystemAlert) => (
                     <div
                       key={alert.id}
                       className="flex items-start justify-between p-4 border rounded-lg bg-muted/30"
@@ -364,7 +365,7 @@ export default function SystemMonitoring() {
                 </p>
               ) : (
                 <div className="space-y-3">
-                  {fixAttempts.map((attempt: any) => (
+                  {fixAttempts.map((attempt: AutoFixAttempt) => (
                     <div
                       key={attempt.id}
                       className="flex items-center justify-between p-3 border rounded-lg"
