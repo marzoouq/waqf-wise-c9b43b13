@@ -6,6 +6,9 @@ import type { RentalPaymentInsert, RentalPaymentUpdate } from "@/types/payments"
 import { useJournalEntries } from "./useJournalEntries";
 import { useEffect, useMemo } from "react";
 import { logger } from "@/lib/logger";
+import { generateInvoicePDF } from "@/lib/generateInvoicePDF";
+import { generateReceiptPDF } from "@/lib/generateReceiptPDF";
+import { archiveDocument, pdfToBlob } from "@/lib/archiveDocument";
 
 export interface RentalPayment {
   id: string;
@@ -230,13 +233,79 @@ export const useRentalPayments = (
               variant: "destructive",
             });
           } else if (result && result.length > 0 && result[0].success) {
+            const { invoice_id, receipt_id } = result[0];
+            
             logger.info('تم إصدار الفاتورة وسند القبض بنجاح', { 
               context: 'rental_invoice_receipt_created',
-              metadata: {
-                invoice_id: result[0].invoice_id,
-                receipt_id: result[0].receipt_id
-              }
+              metadata: { invoice_id, receipt_id }
             });
+
+            // توليد وأرشفة PDF للفاتورة وسند القبض
+            try {
+              // جلب بيانات الفاتورة الكاملة مع البنود
+              const { data: invoiceData } = await supabase
+                .from('invoices')
+                .select('*, invoice_lines(*)')
+                .eq('id', invoice_id)
+                .single();
+
+              // جلب بيانات سند القبض
+              const { data: receiptData } = await supabase
+                .from('payments')
+                .select('*')
+                .eq('id', receipt_id)
+                .single();
+
+              // جلب إعدادات المنظمة
+              const { data: orgSettings } = await supabase
+                .from('organization_settings')
+                .select('*')
+                .single();
+
+              if (invoiceData && receiptData && orgSettings) {
+                // توليد PDF الفاتورة (بدون حفظ)
+                const jsPDF = (await import('jspdf')).default;
+                const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+                
+                // استخدام دالة generateInvoicePDF لكن بدون save
+                await generateInvoicePDF(invoiceData, invoiceData.invoice_lines || [], orgSettings as any);
+                
+                // توليد Blob من PDF
+                const invoiceBlob = doc.output('blob');
+
+                // أرشفة الفاتورة
+                await archiveDocument({
+                  fileBlob: invoiceBlob,
+                  fileName: `Invoice-${invoiceData.invoice_number}.pdf`,
+                  fileType: 'invoice',
+                  referenceId: invoice_id,
+                  referenceType: 'invoice',
+                  description: `فاتورة ${invoiceData.invoice_number} - ${data.contracts?.tenant_name}`
+                });
+
+                // توليد PDF سند القبض (بدون حفظ)
+                const receiptDoc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+                await generateReceiptPDF(receiptData, orgSettings as any);
+                const receiptBlob = receiptDoc.output('blob');
+
+                // أرشفة سند القبض
+                await archiveDocument({
+                  fileBlob: receiptBlob,
+                  fileName: `Receipt-${receiptData.payment_number}.pdf`,
+                  fileType: 'receipt',
+                  referenceId: receipt_id,
+                  referenceType: 'payment',
+                  description: `سند قبض ${receiptData.payment_number} - ${data.contracts?.tenant_name}`
+                });
+
+                logger.info('تم أرشفة الفاتورة وسند القبض بنجاح', {
+                  context: 'archive_rental_documents',
+                  metadata: { invoice_id, receipt_id }
+                });
+              }
+            } catch (archiveError) {
+              logger.error(archiveError, { context: 'archive_rental_documents', severity: 'medium' });
+            }
           }
         } catch (invoiceError) {
           logger.error(invoiceError, { context: 'rental_invoice_generation', severity: 'high' });
@@ -315,13 +384,66 @@ export const useRentalPayments = (
               variant: "destructive",
             });
           } else if (result && result.length > 0 && result[0].success) {
+            const { invoice_id, receipt_id } = result[0];
+            
             logger.info('تم إصدار الفاتورة وسند القبض بنجاح', { 
               context: 'update_rental_invoice_receipt_created',
-              metadata: {
-                invoice_id: result[0].invoice_id,
-                receipt_id: result[0].receipt_id
-              }
+              metadata: { invoice_id, receipt_id }
             });
+
+            // توليد وأرشفة PDF
+            try {
+              const { data: invoiceData } = await supabase
+                .from('invoices')
+                .select('*, invoice_lines(*)')
+                .eq('id', invoice_id)
+                .single();
+
+              const { data: receiptData } = await supabase
+                .from('payments')
+                .select('*')
+                .eq('id', receipt_id)
+                .single();
+
+              const { data: orgSettings } = await supabase
+                .from('organization_settings')
+                .select('*')
+                .single();
+
+              if (invoiceData && receiptData && orgSettings) {
+                const jsPDF = (await import('jspdf')).default;
+                const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+                
+                await generateInvoicePDF(invoiceData, invoiceData.invoice_lines || [], orgSettings as any);
+                const invoiceBlob = doc.output('blob');
+
+                await archiveDocument({
+                  fileBlob: invoiceBlob,
+                  fileName: `Invoice-${invoiceData.invoice_number}.pdf`,
+                  fileType: 'invoice',
+                  referenceId: invoice_id,
+                  referenceType: 'invoice',
+                  description: `فاتورة ${invoiceData.invoice_number} - ${data.contracts?.tenant_name}`
+                });
+
+                const receiptDoc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+                await generateReceiptPDF(receiptData, orgSettings as any);
+                const receiptBlob = receiptDoc.output('blob');
+
+                await archiveDocument({
+                  fileBlob: receiptBlob,
+                  fileName: `Receipt-${receiptData.payment_number}.pdf`,
+                  fileType: 'receipt',
+                  referenceId: receipt_id,
+                  referenceType: 'payment',
+                  description: `سند قبض ${receiptData.payment_number} - ${data.contracts?.tenant_name}`
+                });
+
+                logger.info('تم أرشفة الفاتورة وسند القبض بنجاح');
+              }
+            } catch (archiveError) {
+              logger.error(archiveError, { context: 'update_archive_rental_documents', severity: 'medium' });
+            }
           }
         } catch (invoiceError) {
           logger.error(invoiceError, { context: 'update_rental_invoice_generation', severity: 'high' });

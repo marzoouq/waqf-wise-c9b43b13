@@ -12,6 +12,8 @@ import { type RentalPayment } from "@/hooks/useRentalPayments";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { generateInvoicePDF } from "@/lib/generateInvoicePDF";
+import { generateReceiptPDF } from "@/lib/generateReceiptPDF";
 
 interface Props {
   onEdit: (payment: RentalPayment) => void;
@@ -49,13 +51,14 @@ export const PaymentsTab = ({ onEdit }: Props) => {
     }
 
     try {
-      const { data, error } = await supabase
+      // جلب بيانات الفاتورة الكاملة
+      const { data: invoiceData, error: invoiceError } = await supabase
         .from('invoices')
-        .select('*')
+        .select('*, invoice_lines(*)')
         .eq('id', payment.invoice_id)
         .single();
 
-      if (error || !data) {
+      if (invoiceError || !invoiceData) {
         toast({
           title: "خطأ",
           description: "فشل تحميل بيانات الفاتورة",
@@ -64,8 +67,36 @@ export const PaymentsTab = ({ onEdit }: Props) => {
         return;
       }
 
-      // فتح صفحة الفاتورة في نافذة جديدة
-      window.open(`/invoices?view=${data.id}`, '_blank');
+      // البحث عن المستند المؤرشف في Storage
+      const { data: documentData } = await supabase
+        .from('documents')
+        .select('*')
+        .eq('name', `Invoice-${invoiceData.invoice_number}.pdf`)
+        .single();
+
+      if (documentData) {
+        // فتح PDF من Storage
+        const { data: { publicUrl } } = supabase.storage
+          .from('documents')
+          .getPublicUrl(`invoices/${new Date(invoiceData.invoice_date).getFullYear()}/${new Date(invoiceData.invoice_date).getMonth() + 1}/Invoice-${invoiceData.invoice_number}.pdf`);
+        
+        window.open(publicUrl, '_blank');
+      } else {
+        // fallback: توليد PDF فوري
+        const { data: orgSettings } = await supabase
+          .from('organization_settings')
+          .select('*')
+          .single();
+
+        if (orgSettings) {
+          await generateInvoicePDF(invoiceData, invoiceData.invoice_lines || [], orgSettings as any);
+          
+          toast({
+            title: "تم التوليد",
+            description: "تم توليد الفاتورة وتحميلها",
+          });
+        }
+      }
     } catch (error) {
       toast({
         title: "خطأ",
@@ -86,13 +117,14 @@ export const PaymentsTab = ({ onEdit }: Props) => {
     }
 
     try {
-      const { data, error } = await supabase
+      // جلب بيانات سند القبض
+      const { data: receiptData, error: receiptError } = await supabase
         .from('payments')
         .select('*')
         .eq('id', payment.receipt_id)
         .single();
 
-      if (error || !data) {
+      if (receiptError || !receiptData) {
         toast({
           title: "خطأ",
           description: "فشل تحميل بيانات سند القبض",
@@ -101,11 +133,36 @@ export const PaymentsTab = ({ onEdit }: Props) => {
         return;
       }
 
-      // يمكن هنا توليد PDF لسند القبض أو فتح صفحة عرض
-      toast({
-        title: "سند القبض",
-        description: `رقم السند: ${data.payment_number}`,
-      });
+      // البحث عن المستند المؤرشف
+      const { data: documentData } = await supabase
+        .from('documents')
+        .select('*')
+        .eq('name', `Receipt-${receiptData.payment_number}.pdf`)
+        .single();
+
+      if (documentData) {
+        // فتح PDF من Storage
+        const { data: { publicUrl } } = supabase.storage
+          .from('documents')
+          .getPublicUrl(`receipts/${new Date(receiptData.payment_date).getFullYear()}/${new Date(receiptData.payment_date).getMonth() + 1}/Receipt-${receiptData.payment_number}.pdf`);
+        
+        window.open(publicUrl, '_blank');
+      } else {
+        // fallback: توليد PDF فوري
+        const { data: orgSettings } = await supabase
+          .from('organization_settings')
+          .select('*')
+          .single();
+
+        if (orgSettings) {
+          await generateReceiptPDF(receiptData, orgSettings as any);
+          
+          toast({
+            title: "تم التوليد",
+            description: "تم توليد سند القبض وتحميله",
+          });
+        }
+      }
     } catch (error) {
       toast({
         title: "خطأ",
