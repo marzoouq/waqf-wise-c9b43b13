@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Search, Wrench, Edit } from "lucide-react";
+import { Search, Wrench, Edit, Trash2, Printer } from "lucide-react";
 import { useMaintenanceRequests } from "@/hooks/useMaintenanceRequests";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -9,6 +9,8 @@ import { Card } from "@/components/ui/card";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { type MaintenanceRequest } from "@/hooks/useMaintenanceRequests";
+import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
+import { ExportButton } from "@/components/shared/ExportButton";
 
 interface Props {
   onEdit: (request: MaintenanceRequest) => void;
@@ -16,7 +18,25 @@ interface Props {
 
 export const MaintenanceTab = ({ onEdit }: Props) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const { requests, isLoading } = useMaintenanceRequests();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [requestToDelete, setRequestToDelete] = useState<MaintenanceRequest | null>(null);
+  const { requests, isLoading, deleteRequest } = useMaintenanceRequests();
+
+  const handleDeleteClick = (request: MaintenanceRequest) => {
+    if (request.status !== "جديد" && request.status !== "ملغي") {
+      return; // يمكن حذف فقط الطلبات الجديدة أو الملغاة
+    }
+    setRequestToDelete(request);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (requestToDelete) {
+      deleteRequest.mutate(requestToDelete.id);
+      setDeleteDialogOpen(false);
+      setRequestToDelete(null);
+    }
+  };
 
   const filteredRequests = useMemo(() => {
     if (!searchQuery) return requests;
@@ -136,13 +156,27 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-xs sm:text-sm">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onEdit(request)}
-                    >
-                      <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
-                    </Button>
+                    <div className="flex gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onEdit(request)}
+                        title="تعديل"
+                      >
+                        <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
+                      </Button>
+                      {(request.status === "جديد" || request.status === "ملغي") && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteClick(request)}
+                          title="حذف"
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                        </Button>
+                      )}
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
@@ -150,6 +184,16 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
           </Table>
         </div>
       )}
+
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleDeleteConfirm}
+        title="حذف طلب الصيانة"
+        description="هل أنت متأكد من حذف هذا الطلب؟"
+        itemName={requestToDelete ? `${requestToDelete.request_number} - ${requestToDelete.title}` : ""}
+        isLoading={deleteRequest.isPending}
+      />
     </div>
   );
 };
