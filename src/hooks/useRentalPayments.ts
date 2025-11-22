@@ -287,6 +287,34 @@ export const useRentalPayments = (
     },
   });
 
+  const deletePayment = useMutation({
+    mutationKey: ['delete_rental_payment'],
+    mutationFn: async (paymentId: string) => {
+      const { error } = await supabase
+        .from("rental_payments")
+        .delete()
+        .eq("id", paymentId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["rental_payments"] });
+      queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
+      toast({
+        title: "تم الحذف",
+        description: "تم حذف الدفعة بنجاح",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "خطأ",
+        description: "حدث خطأ أثناء حذف الدفعة",
+        variant: "destructive",
+      });
+      logger.error(error, { context: 'delete_rental_payment', severity: 'medium' });
+    },
+  });
+
   return {
     payments,
     allPayments,
@@ -294,5 +322,6 @@ export const useRentalPayments = (
     isLoading,
     addPayment,
     updatePayment,
+    deletePayment,
   };
 };

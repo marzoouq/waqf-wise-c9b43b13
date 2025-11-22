@@ -1,16 +1,15 @@
 import { useState, useMemo } from "react";
-import { Search, DollarSign, Edit, Eye, EyeOff } from "lucide-react";
+import { Search, DollarSign, Edit, Trash2 } from "lucide-react";
 import { useRentalPayments } from "@/hooks/useRentalPayments";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { type RentalPayment } from "@/hooks/useRentalPayments";
+import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 
 interface Props {
   onEdit: (payment: RentalPayment) => void;
@@ -18,8 +17,23 @@ interface Props {
 
 export const PaymentsTab = ({ onEdit }: Props) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [paymentToDelete, setPaymentToDelete] = useState<RentalPayment | null>(null);
   
-  const { payments, isLoading } = useRentalPayments();
+  const { payments, isLoading, deletePayment } = useRentalPayments();
+
+  const handleDeleteClick = (payment: RentalPayment) => {
+    setPaymentToDelete(payment);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (paymentToDelete) {
+      deletePayment.mutate(paymentToDelete.id);
+      setDeleteDialogOpen(false);
+      setPaymentToDelete(null);
+    }
+  };
 
   const filteredPayments = useMemo(() => {
     if (!searchQuery) return payments;
@@ -155,13 +169,25 @@ export const PaymentsTab = ({ onEdit }: Props) => {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-xs sm:text-sm">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onEdit(payment)}
-                    >
-                      <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
-                    </Button>
+                    <div className="flex gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onEdit(payment)}
+                        title="تعديل الدفعة"
+                      >
+                        <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteClick(payment)}
+                        title="حذف الدفعة"
+                        className="text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
@@ -169,6 +195,16 @@ export const PaymentsTab = ({ onEdit }: Props) => {
           </Table>
         </div>
       )}
+
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleDeleteConfirm}
+        title="حذف الدفعة"
+        description="هل أنت متأكد من حذف هذه الدفعة؟ سيتم حذف القيد المحاسبي المرتبط بها."
+        itemName={paymentToDelete ? `${paymentToDelete.payment_number} - ${paymentToDelete.amount_due} ر.س` : ""}
+        isLoading={deletePayment.isPending}
+      />
     </div>
   );
 };
