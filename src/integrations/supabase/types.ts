@@ -4629,6 +4629,42 @@ export type Database = {
           },
         ]
       }
+      protected_policies_log: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          id: string
+          last_verified_at: string | null
+          policy_description: string
+          policy_name: string
+          protection_level: string
+          table_name: string
+          verification_notes: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          last_verified_at?: string | null
+          policy_description: string
+          policy_name: string
+          protection_level: string
+          table_name: string
+          verification_notes?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          last_verified_at?: string | null
+          policy_description?: string
+          policy_name?: string
+          protection_level?: string
+          table_name?: string
+          verification_notes?: string | null
+        }
+        Relationships: []
+      }
       push_subscriptions: {
         Row: {
           auth: string
@@ -6513,6 +6549,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_first_degree_beneficiary: {
+        Args: { user_uuid: string }
         Returns: boolean
       }
       log_login_attempt: {
