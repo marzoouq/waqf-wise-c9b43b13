@@ -11,6 +11,7 @@ import { LoadingState } from "./components/shared/LoadingState";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { usePWAUpdate } from "./lib/pwa";
 import "@/lib/errorTracking";
+import "@/lib/selfHealing";
 
 // Import DevTools configuration
 import { DEVTOOLS_CONFIG } from "./lib/devtools";
@@ -61,6 +62,7 @@ const Support = lazy(() => import("./pages/Support"));
 const SupportManagement = lazy(() => import("./pages/SupportManagement"));
 const SystemErrorLogs = lazy(() => import("./pages/SystemErrorLogs"));
 const SystemMonitoring = lazy(() => import("./pages/SystemMonitoring"));
+const SystemTesting = lazy(() => import("./pages/SystemTesting"));
 const AdvancedSettings = lazy(() => import("./pages/AdvancedSettings"));
 const GovernanceDecisions = lazy(() => import("./pages/GovernanceDecisions"));
 const DecisionDetails = lazy(() => import("./pages/DecisionDetails"));
@@ -347,6 +349,16 @@ const App = () => {
                   element={
                     <ProtectedRoute requiredRole="admin">
                       <SystemMonitoring />
+                    </ProtectedRoute>
+                  } 
+                />
+                
+                {/* System Testing */}
+                <Route 
+                  path="/system-testing" 
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <SystemTesting />
                     </ProtectedRoute>
                   } 
                 />
