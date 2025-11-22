@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Eye, CheckSquare, Calculator, Plus } from "lucide-react";
+import { Eye, CheckSquare, Calculator, Plus, Trash2 } from "lucide-react";
 import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
 import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
 import { DistributionDetailsDialog } from "@/components/distributions/DistributionDetailsDialog";
@@ -11,14 +11,42 @@ import { ApprovalWorkflowDialog } from "@/components/distributions/ApprovalWorkf
 import { DistributionSimulator } from "@/components/distributions/DistributionSimulator";
 import { CreateDistributionDialog } from "@/components/distributions/CreateDistributionDialog";
 import { useDistributions, Distribution } from "@/hooks/useDistributions";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export function DistributionsTab() {
-  const { distributions, isLoading } = useDistributions();
+  const { distributions, isLoading, deleteDistribution } = useDistributions();
   const [selectedDistribution, setSelectedDistribution] = useState<Distribution | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [approvalOpen, setApprovalOpen] = useState(false);
   const [simulatorOpen, setSimulatorOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [distributionToDelete, setDistributionToDelete] = useState<Distribution | null>(null);
+
+  const handleDeleteClick = (distribution: Distribution) => {
+    if (distribution.status === "معتمد") {
+      return; // لا تفتح الحوار للتوزيعات المعتمدة
+    }
+    setDistributionToDelete(distribution);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (distributionToDelete) {
+      deleteDistribution(distributionToDelete.id);
+      setDeleteDialogOpen(false);
+      setDistributionToDelete(null);
+    }
+  };
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, "default" | "secondary" | "destructive"> = {
@@ -114,6 +142,17 @@ export function DistributionsTab() {
                             <CheckSquare className="h-3 w-3 sm:h-4 sm:w-4" />
                             <span className="hidden sm:inline">الموافقات</span>
                           </Button>
+                          {distribution.status !== "معتمد" && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDeleteClick(distribution)}
+                              className="gap-1 text-xs text-destructive hover:text-destructive"
+                            >
+                              <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                              <span className="hidden sm:inline">حذف</span>
+                            </Button>
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -146,6 +185,26 @@ export function DistributionsTab() {
         open={createOpen}
         onOpenChange={setCreateOpen}
       />
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
+            <AlertDialogDescription>
+              هل أنت متأكد من حذف التوزيع لشهر <span className="font-bold">{distributionToDelete?.month}</span> بمبلغ{" "}
+              <span className="font-bold">{distributionToDelete?.total_amount?.toLocaleString()} ر.س</span>؟
+              <br />
+              <span className="text-destructive">هذا الإجراء لا يمكن التراجع عنه.</span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>إلغاء</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              حذف
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

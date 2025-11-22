@@ -159,6 +159,53 @@ export function useDistributions() {
     }),
   });
 
+  const deleteDistribution = useMutation({
+    mutationFn: async (id: string) => {
+      // التحقق من حالة التوزيع قبل الحذف
+      const { data: distribution, error: fetchError } = await supabase
+        .from("distributions")
+        .select("status, month")
+        .eq("id", id)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      // منع حذف التوزيعات المعتمدة
+      if (distribution.status === "معتمد") {
+        throw new Error("لا يمكن حذف توزيع معتمد");
+      }
+
+      const { error } = await supabase
+        .from("distributions")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+      return distribution;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["distributions"] });
+      queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
+      queryClient.invalidateQueries({ queryKey: ["funds"] });
+      
+      addActivity({
+        action: `تم حذف التوزيع لشهر ${data.month}`,
+        user_name: user?.email || 'النظام',
+      }).catch((error) => {
+        logger.error(error, { context: 'delete_distribution_activity', severity: 'low' });
+      });
+      
+      toast({
+        title: "تم الحذف بنجاح",
+        description: "تم حذف التوزيع بنجاح",
+      });
+    },
+    onError: createMutationErrorHandler({
+      context: 'delete_distribution',
+      toastTitle: 'خطأ في الحذف',
+    }),
+  });
+
   const generateDistribution = async (periodStart: string, periodEnd: string, waqfCorpusPercentage: number = 0) => {
     try {
       const { data, error } = await supabase.functions.invoke("generate-distribution-summary", {
@@ -199,6 +246,8 @@ export function useDistributions() {
     addDistributionAsync: addDistribution.mutateAsync,
     updateDistribution: updateDistribution.mutate,
     updateDistributionAsync: updateDistribution.mutateAsync,
+    deleteDistribution: deleteDistribution.mutate,
+    deleteDistributionAsync: deleteDistribution.mutateAsync,
     generateDistribution,
   };
 }
