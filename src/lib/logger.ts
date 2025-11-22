@@ -13,6 +13,8 @@ export interface LogOptions {
   metadata?: Record<string, unknown>;
 }
 
+const IS_DEV = import.meta.env.DEV;
+
 /**
  * Logger موحد للتطبيق
  */
@@ -51,21 +53,49 @@ class Logger {
    * تسجيل تحذير
    */
   warn(message: string, options?: LogOptions): void {
-    // يمكن إضافة logging للتحذيرات لاحقاً
+    if (IS_DEV) {
+      console.warn(`⚠️ ${message}`, options?.metadata);
+    }
+    
+    // في الإنتاج، يمكن إرسال التحذيرات للسيرفر
+    if (!IS_DEV && options?.severity === 'high') {
+      this.sendToServer('warning', message, options);
+    }
   }
 
   /**
    * تسجيل معلومة
    */
   info(message: string, options?: LogOptions): void {
-    // يمكن إضافة logging للمعلومات لاحقاً
+    if (IS_DEV) {
+      console.info(`ℹ️ ${message}`, options?.metadata);
+    }
+    
+    // يمكن تفعيل info logging للإنتاج عند الحاجة
   }
 
   /**
    * تسجيل debug
    */
   debug(message: string, data?: unknown): void {
-    // يمكن إضافة logging للتصحيح لاحقاً
+    if (IS_DEV) {
+      console.debug(`🐛 ${message}`, data);
+    }
+  }
+
+  /**
+   * إرسال اللوج للسيرفر (للإنتاج)
+   */
+  private sendToServer(
+    level: string,
+    message: string,
+    options?: LogOptions
+  ): void {
+    // يمكن تفعيل هذا لإرسال اللوجات للسيرفر
+    // مثلاً باستخدام supabase.functions.invoke('log-message', { body: ... })
+    if (!IS_DEV) {
+      // TODO: Implement server-side logging when needed
+    }
   }
 }
 

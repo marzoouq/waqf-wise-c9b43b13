@@ -16,6 +16,7 @@ import { useAuth } from "@/hooks/useAuth";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import * as XLSX from "xlsx";
+import { withAutoTable } from "@/types/pdf";
 
 interface ReportsMenuProps {
   type?: "beneficiary" | "waqf";
@@ -28,15 +29,16 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
 
   const exportPaymentsPDF = async () => {
     try {
-      const doc = new jsPDF();
+      const baseDoc = new jsPDF();
+      const doc = withAutoTable(baseDoc);
       
       // العنوان
-      doc.setFontSize(16);
-      doc.text("Payment Report / تقرير المدفوعات", 105, 20, { align: "center" });
+      baseDoc.setFontSize(16);
+      baseDoc.text("Payment Report / تقرير المدفوعات", 105, 20, { align: "center" });
       
-      doc.setFontSize(12);
-      doc.text(`Beneficiary / المستفيد: ${beneficiary?.full_name || ""}`, 20, 35);
-      doc.text(`Date / التاريخ: ${new Date().toLocaleDateString("ar-SA")}`, 20, 45);
+      baseDoc.setFontSize(12);
+      baseDoc.text(`Beneficiary / المستفيد: ${beneficiary?.full_name || ""}`, 20, 35);
+      baseDoc.text(`Date / التاريخ: ${new Date().toLocaleDateString("ar-SA")}`, 20, 45);
       
       // الجدول
       const tableData = payments.map((payment) => [
@@ -46,14 +48,14 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
         payment.description || "-",
       ]);
       
-      (doc as any).autoTable({
+      doc.autoTable({
         startY: 55,
         head: [["#", "Date / التاريخ", "Amount / المبلغ", "Description / الوصف"]],
         body: tableData,
         styles: { font: "helvetica" },
       });
       
-      doc.save(`payments-report-${Date.now()}.pdf`);
+      baseDoc.save(`payments-report-${Date.now()}.pdf`);
       
       toast({
         title: "تم التصدير",
@@ -80,14 +82,15 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
 
       if (error) throw error;
 
-      const doc = new jsPDF();
+      const baseDoc = new jsPDF();
+      const doc = withAutoTable(baseDoc);
       
-      doc.setFontSize(18);
-      doc.text("Annual Disclosure / الإفصاح السنوي", 105, 20, { align: "center" });
+      baseDoc.setFontSize(18);
+      baseDoc.text("Annual Disclosure / الإفصاح السنوي", 105, 20, { align: "center" });
       
-      doc.setFontSize(12);
-      doc.text(`Year / السنة: ${disclosure.year}`, 20, 40);
-      doc.text(`Waqf / الوقف: ${disclosure.waqf_name}`, 20, 50);
+      baseDoc.setFontSize(12);
+      baseDoc.text(`Year / السنة: ${disclosure.year}`, 20, 40);
+      baseDoc.text(`Waqf / الوقف: ${disclosure.waqf_name}`, 20, 50);
       
       const financialData = [
         ["Total Revenue / إجمالي الإيرادات", disclosure.total_revenues.toLocaleString("ar-SA")],
@@ -98,13 +101,13 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
         ["Corpus Share / نصيب أصل الوقف", disclosure.corpus_share.toLocaleString("ar-SA")],
       ];
       
-      (doc as any).autoTable({
+      doc.autoTable({
         startY: 60,
         head: [["Item / البيان", "Amount / المبلغ (ر.س)"]],
         body: financialData,
       });
       
-      doc.save(`annual-disclosure-${disclosure.year}.pdf`);
+      baseDoc.save(`annual-disclosure-${disclosure.year}.pdf`);
       
       toast({
         title: "تم التصدير",
@@ -157,20 +160,21 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
 
   const exportAccountStatement = () => {
     try {
-      const doc = new jsPDF();
+      const baseDoc = new jsPDF();
+      const doc = withAutoTable(baseDoc);
       
-      doc.setFontSize(16);
-      doc.text("Account Statement / كشف الحساب", 105, 20, { align: "center" });
+      baseDoc.setFontSize(16);
+      baseDoc.text("Account Statement / كشف الحساب", 105, 20, { align: "center" });
       
-      doc.setFontSize(12);
-      doc.text(`Name / الاسم: ${beneficiary?.full_name || ""}`, 20, 35);
-      doc.text(`ID / الرقم الوطني: ${beneficiary?.national_id || ""}`, 20, 45);
-      doc.text(`Date / التاريخ: ${new Date().toLocaleDateString("ar-SA")}`, 20, 55);
+      baseDoc.setFontSize(12);
+      baseDoc.text(`Name / الاسم: ${beneficiary?.full_name || ""}`, 20, 35);
+      baseDoc.text(`ID / الرقم الوطني: ${beneficiary?.national_id || ""}`, 20, 45);
+      baseDoc.text(`Date / التاريخ: ${new Date().toLocaleDateString("ar-SA")}`, 20, 55);
       
       const totalPayments = payments.reduce((sum, p) => sum + p.amount, 0);
       
-      doc.setFontSize(14);
-      doc.text(`Total / الإجمالي: ${totalPayments.toLocaleString("ar-SA")} ر.س`, 20, 70);
+      baseDoc.setFontSize(14);
+      baseDoc.text(`Total / الإجمالي: ${totalPayments.toLocaleString("ar-SA")} ر.س`, 20, 70);
       
       const tableData = payments.map((payment) => [
         new Date(payment.payment_date).toLocaleDateString("ar-SA"),
@@ -178,13 +182,13 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
         payment.amount.toLocaleString("ar-SA"),
       ]);
       
-      (doc as any).autoTable({
+      doc.autoTable({
         startY: 80,
         head: [["Date / التاريخ", "Description / البيان", "Amount / المبلغ"]],
         body: tableData,
       });
       
-      doc.save(`account-statement-${Date.now()}.pdf`);
+      baseDoc.save(`account-statement-${Date.now()}.pdf`);
       
       toast({
         title: "تم التصدير",

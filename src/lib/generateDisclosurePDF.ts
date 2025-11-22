@@ -3,6 +3,7 @@ import "jspdf-autotable";
 import { AnnualDisclosure } from "@/hooks/useAnnualDisclosures";
 import { logger } from "@/lib/logger";
 import { Database } from "@/integrations/supabase/types";
+import { withAutoTable } from "@/types/pdf";
 
 type DisclosureBeneficiary = Database['public']['Tables']['disclosure_beneficiaries']['Row'];
 
@@ -36,9 +37,10 @@ export const generateDisclosurePDF = async (
   disclosure: AnnualDisclosure,
   beneficiaries: DisclosureBeneficiary[] = []
 ) => {
-  const doc = new jsPDF();
+  const baseDoc = new jsPDF();
+  const doc = withAutoTable(baseDoc);
   
-  await loadArabicFont(doc);
+  await loadArabicFont(baseDoc);
   
   // RTL support
   doc.setR2L(true);
@@ -70,7 +72,7 @@ export const generateDisclosurePDF = async (
     ["صافي الدخل", `${disclosure.net_income.toLocaleString()} ر.س`],
   ];
 
-  (doc as any).autoTable({
+  doc.autoTable({
     startY: yPos,
     head: [["البيان", "المبلغ"]],
     body: financialData,
@@ -85,7 +87,7 @@ export const generateDisclosurePDF = async (
     },
   });
 
-  yPos = (doc as any).lastAutoTable.finalY + 10;
+  yPos = doc.lastAutoTable.finalY + 10;
 
   // نسب التوزيع
   doc.text("نسب وحصص التوزيع", 200, yPos, { align: "right" });
@@ -97,7 +99,7 @@ export const generateDisclosurePDF = async (
     ["رأس مال الوقف", `${disclosure.corpus_share.toLocaleString()} ر.س`, `${disclosure.corpus_percentage}%`],
   ];
 
-  (doc as any).autoTable({
+  doc.autoTable({
     startY: yPos,
     head: [["النوع", "المبلغ", "النسبة"]],
     body: distributionData,
@@ -112,7 +114,7 @@ export const generateDisclosurePDF = async (
     },
   });
 
-  yPos = (doc as any).lastAutoTable.finalY + 10;
+  yPos = doc.lastAutoTable.finalY + 10;
 
   // إحصائيات المستفيدين
   doc.text("إحصائيات المستفيدين", 200, yPos, { align: "right" });
@@ -125,7 +127,7 @@ export const generateDisclosurePDF = async (
     ["الإجمالي", disclosure.total_beneficiaries.toString()],
   ];
 
-  (doc as any).autoTable({
+  doc.autoTable({
     startY: yPos,
     head: [["الفئة", "العدد"]],
     body: beneficiaryStats,
@@ -142,11 +144,11 @@ export const generateDisclosurePDF = async (
 
   // صفحة جديدة للمستفيدين إذا كانوا موجودين
   if (beneficiaries.length > 0) {
-    doc.addPage();
+    baseDoc.addPage();
     yPos = 20;
     
-    doc.setFontSize(14);
-    doc.text("قائمة المستفيدين وحصصهم", 200, yPos, { align: "right" });
+    baseDoc.setFontSize(14);
+    baseDoc.text("قائمة المستفيدين وحصصهم", 200, yPos, { align: "right" });
     yPos += 7;
 
     const beneficiariesData = beneficiaries.map(b => [
@@ -157,7 +159,7 @@ export const generateDisclosurePDF = async (
       b.payments_count.toString(),
     ]);
 
-    (doc as any).autoTable({
+    doc.autoTable({
       startY: yPos,
       head: [["الاسم", "النوع", "القرابة", "المبلغ المخصص", "عدد الدفعات"]],
       body: beneficiariesData,
@@ -176,11 +178,11 @@ export const generateDisclosurePDF = async (
   // المصروفات التفصيلية
   if (disclosure.maintenance_expenses || disclosure.administrative_expenses || 
       disclosure.development_expenses || disclosure.other_expenses) {
-    doc.addPage();
+    baseDoc.addPage();
     yPos = 20;
     
-    doc.setFontSize(14);
-    doc.text("تفصيل المصروفات", 200, yPos, { align: "right" });
+    baseDoc.setFontSize(14);
+    baseDoc.text("تفصيل المصروفات", 200, yPos, { align: "right" });
     yPos += 7;
 
     const expensesData = [];
@@ -197,7 +199,7 @@ export const generateDisclosurePDF = async (
       expensesData.push(["مصروفات أخرى", `${disclosure.other_expenses.toLocaleString()} ر.س`]);
     }
 
-    (doc as any).autoTable({
+    doc.autoTable({
       startY: yPos,
       head: [["نوع المصروف", "المبلغ"]],
       body: expensesData,
@@ -214,18 +216,18 @@ export const generateDisclosurePDF = async (
   }
 
   // التذييل
-  const pageCount = (doc as any).internal.getNumberOfPages();
+  const pageCount = baseDoc.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
-    doc.setPage(i);
-    doc.setFontSize(8);
-    doc.setTextColor(150, 150, 150);
-    doc.text(
+    baseDoc.setPage(i);
+    baseDoc.setFontSize(8);
+    baseDoc.setTextColor(150, 150, 150);
+    baseDoc.text(
       `تاريخ الإصدار: ${new Date().toLocaleDateString('ar-SA')}`,
       105,
       285,
       { align: "center" }
     );
-    doc.text(
+    baseDoc.text(
       `صفحة ${i} من ${pageCount}`,
       105,
       290,
@@ -234,5 +236,5 @@ export const generateDisclosurePDF = async (
   }
 
   // حفظ الملف
-  doc.save(`إفصاح-سنوي-${disclosure.year}-${disclosure.waqf_name}.pdf`);
+  baseDoc.save(`إفصاح-سنوي-${disclosure.year}-${disclosure.waqf_name}.pdf`);
 };

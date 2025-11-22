@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/tooltip';
 import { Activity, AlertTriangle, WifiOff, CheckCircle2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { debug } from '@/lib/debug';
 
 type HealthStatus = 'healthy' | 'degraded' | 'offline';
 
@@ -29,13 +30,13 @@ export function SystemHealthIndicator() {
 
     // الاستماع لحالة الشبكة
     const handleOnline = () => {
-      console.log('🌐 Network back online');
+      debug.network('Network back online');
       setStatus('healthy');
       checkHealth();
     };
 
     const handleOffline = () => {
-      console.warn('📡 Network offline');
+      debug.warn('Network offline');
       setStatus('offline');
     };
 
@@ -58,7 +59,7 @@ export function SystemHealthIndicator() {
         .limit(1);
 
       if (error) {
-        console.warn('Health check warning:', error);
+        debug.warn('Health check warning:', error);
         setStatus('degraded');
       } else {
         setStatus('healthy');
@@ -66,7 +67,7 @@ export function SystemHealthIndicator() {
 
       setLastCheck(new Date());
     } catch (error) {
-      console.error('Health check failed:', error);
+      debug.warn('Health check failed:', error);
       setStatus('degraded');
     }
   };

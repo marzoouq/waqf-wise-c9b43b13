@@ -15,6 +15,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Loader2, CheckCircle2, Copy, Eye, EyeOff, RefreshCw } from 'lucide-react';
 import { generateTempPassword } from '@/lib/beneficiaryAuth';
+import { debug } from '@/lib/debug';
 
 interface ResetPasswordDialogProps {
   open: boolean;
@@ -79,7 +80,7 @@ export function ResetPasswordDialog({
       );
 
       if (error) {
-        console.error('Error resetting password:', error);
+        debug.warn('Error resetting password:', error);
         toast.error('فشل إعادة تعيين كلمة المرور', {
           description: error.message || 'حدث خطأ غير متوقع',
         });
@@ -87,7 +88,7 @@ export function ResetPasswordDialog({
         return;
       }
 
-      console.log('Password reset successful:', data);
+      debug.log('Password reset successful:', data);
       toast.success('تم إعادة تعيين كلمة المرور بنجاح');
       setIsSuccess(true);
       
@@ -95,7 +96,7 @@ export function ResetPasswordDialog({
         onSuccess();
       }
     } catch (error) {
-      console.error('Error:', error);
+      debug.warn('Error:', error);
       toast.error('حدث خطأ غير متوقع');
     } finally {
       setIsLoading(false);
