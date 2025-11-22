@@ -47,7 +47,6 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { NotificationsBell } from "./NotificationsBell";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useMemo } from "react";
 
@@ -193,7 +192,6 @@ const AppSidebar = () => {
               </div>
             </div>
           )}
-          {!isCollapsed && <NotificationsBell />}
         </div>
       </SidebarHeader>
 
