@@ -5,6 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { logger } from '@/lib/logger';
 import { useLeakedPassword } from './useLeakedPassword';
+import { debug } from '@/lib/debug';
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
@@ -18,7 +19,7 @@ export function useAuth() {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        console.log('🔐 Auth event:', event, 'User:', session?.user?.email || 'none');
+        debug.auth('Auth event:', { event, email: session?.user?.email || 'none' });
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
