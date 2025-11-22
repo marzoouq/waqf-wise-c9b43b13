@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Filter, Clock, CheckCircle, XCircle, AlertCircle, GitBranch, MessageSquare } from 'lucide-react';
+import { Search, Filter, Clock, CheckCircle, XCircle, AlertCircle, GitBranch, MessageSquare, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,6 +9,7 @@ import { LoadingState } from '@/components/shared/LoadingState';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { RequestApprovalDialog } from '@/components/requests/RequestApprovalDialog';
 import { RequestCommentsDialog } from '@/components/requests/RequestCommentsDialog';
+import { DeleteConfirmDialog } from '@/components/shared/DeleteConfirmDialog';
 import {
   Table,
   TableBody,
@@ -30,12 +31,14 @@ import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layou
 import type { BeneficiaryRequest } from '@/types/index';
 
 const Requests = () => {
-  const { requests, isLoading } = useRequests();
+  const { requests, isLoading, deleteRequest } = useRequests();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedRequest, setSelectedRequest] = useState<BeneficiaryRequest | null>(null);
   const [approvalDialogOpen, setApprovalDialogOpen] = useState(false);
   const [commentsDialogOpen, setCommentsDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [requestToDelete, setRequestToDelete] = useState<BeneficiaryRequest | null>(null);
 
   const filteredRequests = requests.filter(request => {
     const matchesSearch = 
@@ -56,6 +59,19 @@ const Requests = () => {
     approved: requests.filter(r => r.status === 'موافق').length,
     rejected: requests.filter(r => r.status === 'مرفوض').length,
     overdue: requests.filter(r => r.is_overdue).length,
+  };
+
+  const handleDeleteClick = (request: BeneficiaryRequest) => {
+    setRequestToDelete(request);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (requestToDelete) {
+      deleteRequest.mutate(requestToDelete.id);
+      setDeleteDialogOpen(false);
+      setRequestToDelete(null);
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -313,6 +329,15 @@ const Requests = () => {
                             <span className="hidden sm:inline">التعليقات</span>
                             <span className="sm:hidden">تعليق</span>
                           </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleDeleteClick(request)}
+                            className="text-xs text-destructive hover:text-destructive"
+                          >
+                            <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
+                            <span className="hidden sm:inline">حذف</span>
+                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -344,6 +369,16 @@ const Requests = () => {
           />
         </>
       )}
+      
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleDeleteConfirm}
+        title="حذف الطلب"
+        description="هل أنت متأكد من حذف هذا الطلب؟"
+        itemName={requestToDelete ? `${requestToDelete.request_number} - ${requestToDelete.description}` : ""}
+        isLoading={deleteRequest.isPending}
+      />
     </div>
   );
 };

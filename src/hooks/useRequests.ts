@@ -216,13 +216,39 @@ export const useRequests = (beneficiaryId?: string) => {
     },
   });
 
+  // Delete request mutation
+  const deleteRequestMutation = useMutation({
+    mutationFn: async (requestId: string) => {
+      const { error } = await supabase
+        .from("beneficiary_requests")
+        .delete()
+        .eq("id", requestId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["requests"] });
+      toast({
+        title: "تم الحذف",
+        description: "تم حذف الطلب بنجاح",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "خطأ",
+        description: "فشل حذف الطلب",
+        variant: "destructive",
+      });
+    },
+  });
+
   return {
     requests,
     isLoading,
     getRequest,
     createRequest,
     updateRequest,
-    deleteRequest,
+    deleteRequest: deleteRequestMutation,
     reviewRequest,
   };
 };

@@ -19,6 +19,8 @@ import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { Database } from "@/integrations/supabase/types";
+import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
+import { useAuth } from "@/hooks/useAuth";
 
 type AppRole = Database['public']['Enums']['app_role'];
 
@@ -58,6 +60,7 @@ const roleColors: Record<AppRole, string> = {
 const Users = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user: currentUser } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -66,6 +69,8 @@ const Users = () => {
   const [resetPasswordDialogOpen, setResetPasswordDialogOpen] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [selectedUserForReset, setSelectedUserForReset] = useState<UserProfile | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<UserProfile | null>(null);
 
   // Export users to CSV
   const exportUsers = () => {
@@ -141,6 +146,69 @@ const Users = () => {
       });
     },
   });
+
+  // Delete user mutation
+  const deleteUserMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      // Delete user roles first
+      await supabase.from("user_roles").delete().eq("user_id", userId);
+      
+      // Delete profile
+      const { error } = await supabase
+        .from("profiles")
+        .delete()
+        .eq("user_id", userId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      setDeleteDialogOpen(false);
+      setUserToDelete(null);
+      toast({
+        title: "تم الحذف",
+        description: "تم حذف المستخدم بنجاح",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "خطأ",
+        description: "فشل حذف المستخدم",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleDeleteClick = (user: UserProfile) => {
+    // منع حذف المستخدم الحالي
+    if (user.user_id === currentUser?.id) {
+      toast({
+        title: "تحذير",
+        description: "لا يمكنك حذف حسابك الخاص",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // منع حذف الناظر
+    if (user.user_roles?.some(r => r.role === "nazer")) {
+      toast({
+        title: "تحذير",
+        description: "لا يمكن حذف حساب الناظر",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUserToDelete(user);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (userToDelete) {
+      deleteUserMutation.mutate(userToDelete.user_id);
+    }
+  };
 
   // Reset user password
   const resetPasswordMutation = useMutation({
@@ -380,6 +448,19 @@ const Users = () => {
                             >
                               <Key className="h-4 w-4" />
                             </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDeleteClick(user)}
+                              title="حذف المستخدم"
+                              className="text-destructive hover:text-destructive"
+                              disabled={
+                                user.user_id === currentUser?.id ||
+                                user.user_roles?.some(r => r.role === "nazer")
+                              }
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -492,6 +573,16 @@ const Users = () => {
             </Button>
           </div>
         </ResponsiveDialog>
+
+        <DeleteConfirmDialog
+          open={deleteDialogOpen}
+          onOpenChange={setDeleteDialogOpen}
+          onConfirm={handleDeleteConfirm}
+          title="حذف المستخدم"
+          description="هل أنت متأكد من حذف هذا المستخدم؟ سيتم حذف جميع البيانات المرتبطة به بشكل نهائي."
+          itemName={userToDelete ? `${userToDelete.full_name} (${userToDelete.email})` : ""}
+          isLoading={deleteUserMutation.isPending}
+        />
     </MobileOptimizedLayout>
   );
 };
