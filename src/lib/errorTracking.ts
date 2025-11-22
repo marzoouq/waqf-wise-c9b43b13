@@ -155,17 +155,18 @@ class ErrorTracker {
   }
 
   private setupPerformanceMonitoring() {
-    // مراقبة الأداء
+    // مراقبة الأداء - فقط للمشاكل الكبيرة
     if ('PerformanceObserver' in window) {
       try {
-        // مراقبة Long Tasks
+        // مراقبة Long Tasks - فقط للمهام الطويلة جداً
         const longTaskObserver = new PerformanceObserver((list) => {
           for (const entry of list.getEntries()) {
-            if (entry.duration > 100) {
+            // تسجيل فقط المهام الأطول من 500ms
+            if (entry.duration > 500) {
               this.trackError({
                 error_type: 'performance_issue',
                 error_message: `Long task detected: ${entry.duration.toFixed(2)}ms`,
-                severity: 'low',
+                severity: 'medium',
                 url: window.location.href,
                 user_agent: navigator.userAgent,
                 additional_data: {
@@ -178,15 +179,16 @@ class ErrorTracker {
         });
         longTaskObserver.observe({ entryTypes: ['longtask'] });
 
-        // مراقبة Layout Shifts
+        // مراقبة Layout Shifts - فقط للقيم الكبيرة
         const layoutShiftObserver = new PerformanceObserver((list) => {
           for (const entry of list.getEntries()) {
             const layoutShift = entry as any;
-            if (layoutShift.value > 0.1) {
+            // تسجيل فقط layout shifts أكبر من 0.25 (كبيرة)
+            if (layoutShift.value > 0.25) {
               this.trackError({
                 error_type: 'layout_shift',
                 error_message: `Cumulative Layout Shift: ${layoutShift.value.toFixed(3)}`,
-                severity: 'low',
+                severity: 'medium',
                 url: window.location.href,
                 user_agent: navigator.userAgent,
                 additional_data: {
@@ -268,9 +270,16 @@ class ErrorTracker {
       const report = this.errorQueue.shift()!;
       
       try {
-        const { data, error } = await supabase.functions.invoke('log-error', {
+        // إضافة timeout للطلب
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Request timeout')), 10000)
+        );
+        
+        const invokePromise = supabase.functions.invoke('log-error', {
           body: report,
         });
+        
+        const { data, error } = await Promise.race([invokePromise, timeoutPromise]) as any;
         
         if (error) throw error;
         
