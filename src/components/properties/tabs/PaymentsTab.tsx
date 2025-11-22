@@ -18,12 +18,17 @@ interface Props {
 
 export const PaymentsTab = ({ onEdit }: Props) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [showAllPayments, setShowAllPayments] = useState(false);
+  const [viewMode, setViewMode] = useState<'next-only' | 'threshold' | 'all'>('next-only');
   
   // Get days threshold from localStorage or use default 90 days
   const daysThreshold = parseInt(localStorage.getItem('paymentDaysThreshold') || '90');
   
-  const { payments, allPayments, hiddenPaymentsCount, isLoading } = useRentalPayments(undefined, showAllPayments, daysThreshold);
+  const { payments, allPayments, hiddenPaymentsCount, isLoading } = useRentalPayments(
+    undefined, 
+    viewMode === 'all',
+    daysThreshold,
+    viewMode === 'next-only'
+  );
 
   const filteredPayments = useMemo(() => {
     if (!searchQuery) return payments;
@@ -66,8 +71,8 @@ export const PaymentsTab = ({ onEdit }: Props) => {
 
   return (
     <div className="space-y-6">
-      {/* Search & Toggle */}
-      <div className="flex flex-col sm:flex-row gap-4">
+      {/* Search & Filter Options */}
+      <div className="flex flex-col gap-4">
         <div className="relative flex-1">
           <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input
@@ -77,17 +82,66 @@ export const PaymentsTab = ({ onEdit }: Props) => {
             className="pr-10"
           />
         </div>
-        <Card className="p-4 flex items-center gap-3 w-full sm:w-auto">
-          <Switch 
-            checked={showAllPayments}
-            onCheckedChange={setShowAllPayments}
-            id="show-all"
-          />
-          <Label htmlFor="show-all" className="cursor-pointer whitespace-nowrap flex items-center gap-2">
-            {showAllPayments ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-            عرض الدفعات البعيدة
-          </Label>
+        
+        {/* View Mode Options */}
+        <Card className="p-4">
+          <div className="space-y-3">
+            <div className="text-sm font-medium text-foreground">عرض الدفعات:</div>
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="viewMode"
+                  checked={viewMode === 'next-only'}
+                  onChange={() => setViewMode('next-only')}
+                  className="w-4 h-4"
+                />
+                <span className="text-sm">الدفعة القادمة فقط لكل عقد (موصى به)</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="viewMode"
+                  checked={viewMode === 'threshold'}
+                  onChange={() => setViewMode('threshold')}
+                  className="w-4 h-4"
+                />
+                <span className="text-sm">الدفعات القادمة خلال {daysThreshold} يوم</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="viewMode"
+                  checked={viewMode === 'all'}
+                  onChange={() => setViewMode('all')}
+                  className="w-4 h-4"
+                />
+                <span className="text-sm">جميع الدفعات (بدون فلترة)</span>
+              </label>
+            </div>
+          </div>
         </Card>
+
+        {/* Info Card */}
+        {viewMode === 'next-only' && hiddenPaymentsCount > 0 && (
+          <Card className="p-4 bg-primary/5 border-primary/20">
+            <div className="flex items-start gap-3">
+              <div className="text-primary mt-1">💡</div>
+              <div className="flex-1 space-y-1">
+                <div className="text-sm font-medium text-primary">نظام العرض الذكي</div>
+                <div className="text-xs text-muted-foreground">
+                  يتم عرض الدفعة القادمة فقط لكل عقد للتركيز على الأولويات
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  📋 عدد الدفعات المخفية: <span className="font-bold">{hiddenPaymentsCount}</span>
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  ⏰ ستظهر تلقائياً عند حلول موعدها أو بعد دفع الدفعة الحالية
+                </div>
+              </div>
+            </div>
+          </Card>
+        )}
       </div>
 
       {/* Stats */}
@@ -112,7 +166,7 @@ export const PaymentsTab = ({ onEdit }: Props) => {
           <div className="text-sm text-muted-foreground">دفعات متأخرة</div>
           <div className="text-2xl font-bold text-destructive">{overdue}</div>
         </Card>
-        {!showAllPayments && hiddenPaymentsCount > 0 && (
+        {viewMode !== 'all' && hiddenPaymentsCount > 0 && (
           <Card className="p-4 bg-muted/30">
             <div className="text-sm text-muted-foreground">دفعات مخفية</div>
             <div className="text-2xl font-bold text-muted-foreground">{hiddenPaymentsCount}</div>
