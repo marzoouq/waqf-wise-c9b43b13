@@ -38,18 +38,36 @@ export function InternalMessagesDialog({
   const [recipients, setRecipients] = useState<Array<{ id: string; name: string; role: string }>>([]);
   const [loadingRecipients, setLoadingRecipients] = useState(false);
 
-  // جلب قائمة المستخدمين الإداريين فقط (الناظر، المشرف، المحاسب، الصراف)
+  // جلب قائمة المستخدمين المتاحين للمراسلة
   useEffect(() => {
     const fetchRecipients = async () => {
       setLoadingRecipients(true);
       try {
-        // جلب الأدوار الإدارية فقط
-        const adminRoles = ['admin', 'nazer', 'accountant', 'cashier'] as const;
+        // جلب دور المستخدم الحالي
+        const { data: currentUserRole, error: currentRoleError } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user?.id)
+          .single();
+
+        if (currentRoleError) throw currentRoleError;
+
+        // تحديد الأدوار المتاحة للمراسلة بناءً على دور المستخدم
+        let allowedRoles: ('accountant' | 'admin' | 'archivist' | 'beneficiary' | 'cashier' | 'nazer' | 'user')[];
+        
+        if (currentUserRole?.role === 'beneficiary') {
+          // المستفيد يمكنه مراسلة الإداريين فقط
+          allowedRoles = ['admin', 'nazer', 'accountant', 'cashier'];
+        } else {
+          // الإداريون يمكنهم مراسلة الجميع
+          allowedRoles = ['admin', 'nazer', 'accountant', 'cashier', 'beneficiary', 'archivist'];
+        }
         
         const { data: userRoles, error: rolesError } = await supabase
           .from('user_roles')
           .select('user_id, role')
-          .in('role', adminRoles);
+          .in('role', allowedRoles)
+          .neq('user_id', user?.id); // استبعاد المستخدم الحالي
 
         if (rolesError) throw rolesError;
 
@@ -69,7 +87,9 @@ export function InternalMessagesDialog({
             'admin': 'مشرف',
             'nazer': 'ناظر',
             'accountant': 'محاسب',
-            'cashier': 'صراف'
+            'cashier': 'صراف',
+            'beneficiary': 'مستفيد',
+            'archivist': 'أرشيفي'
           };
 
           const recipientsList = profiles?.map(profile => {
@@ -96,10 +116,10 @@ export function InternalMessagesDialog({
       }
     };
 
-    if (open) {
+    if (open && user?.id) {
       fetchRecipients();
     }
-  }, [open, toast]);
+  }, [open, user?.id, toast]);
 
   const handleReplyToMessage = (message: typeof inboxMessages[0]) => {
     setReplyToMessage(message);
