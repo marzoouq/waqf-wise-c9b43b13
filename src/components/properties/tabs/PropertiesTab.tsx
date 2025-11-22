@@ -31,7 +31,7 @@ export const PropertiesTab = ({ onEdit }: Props) => {
   const stats = useMemo(() => {
     const totalUnits = properties?.reduce((sum, p) => sum + p.units, 0) || 0;
     const occupiedUnits = properties?.reduce((sum, p) => sum + p.occupied, 0) || 0;
-    const totalRevenue = properties?.reduce((sum, p) => sum + Number(p.monthly_revenue), 0) || 0;
+    const totalRevenue = properties?.reduce((sum, p) => sum + Number(p.monthly_revenue || 0), 0) || 0;
 
     return [
       {
@@ -53,7 +53,7 @@ export const PropertiesTab = ({ onEdit }: Props) => {
         color: "text-warning",
       },
       {
-        label: "الإيرادات الشهرية",
+        label: "الإيرادات السنوية",
         value: `${totalRevenue.toLocaleString()} ر.س`,
         icon: DollarSign,
         color: "text-accent",
@@ -151,9 +151,9 @@ export const PropertiesTab = ({ onEdit }: Props) => {
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">الإيراد الشهري:</span>
+                      <span className="text-muted-foreground">الإيراد السنوي:</span>
                       <span className="font-bold text-primary">
-                        {Number(property.monthly_revenue).toLocaleString()} ر.س
+                        {Number(property.monthly_revenue || 0).toLocaleString()} ر.س
                       </span>
                     </div>
                   </div>

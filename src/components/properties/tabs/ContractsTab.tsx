@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Search, FileText, Calendar, User, Edit, Eye } from "lucide-react";
+import { Search, FileText, Calendar, User, Edit, Eye, Trash2 } from "lucide-react";
 import { useContracts } from "@/hooks/useContracts";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -16,7 +16,13 @@ interface Props {
 
 export const ContractsTab = ({ onEdit }: Props) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const { contracts, isLoading } = useContracts();
+  const { contracts, isLoading, deleteContract } = useContracts();
+
+  const handleDelete = (id: string) => {
+    if (confirm("هل أنت متأكد من حذف هذا العقد؟ سيتم حذف جميع الدفعات المرتبطة به.")) {
+      deleteContract.mutateAsync(id);
+    }
+  };
 
   const filteredContracts = useMemo(() => {
     if (!searchQuery) return contracts;
@@ -73,9 +79,12 @@ export const ContractsTab = ({ onEdit }: Props) => {
           </div>
         </Card>
         <Card className="p-4">
-          <div className="text-sm text-muted-foreground">الإيرادات الشهرية</div>
+          <div className="text-sm text-muted-foreground">الإيرادات السنوية</div>
           <div className="text-2xl font-bold text-primary">
-            {(contracts?.reduce((sum, c) => sum + Number(c.monthly_rent), 0) || 0).toLocaleString()} ر.س
+            {(contracts?.reduce((sum, c) => {
+              const rent = Number(c.monthly_rent);
+              return sum + (c.payment_frequency === 'سنوي' ? rent : rent * 12);
+            }, 0) || 0).toLocaleString()} ر.س
           </div>
         </Card>
       </div>
@@ -123,13 +132,23 @@ export const ContractsTab = ({ onEdit }: Props) => {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-xs sm:text-sm">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onEdit(contract)}
-                    >
-                      <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onEdit(contract)}
+                      >
+                        <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                        onClick={() => handleDelete(contract.id)}
+                      >
+                        <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}

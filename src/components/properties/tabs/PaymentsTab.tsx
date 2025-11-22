@@ -29,15 +29,28 @@ export const PaymentsTab = ({ onEdit }: Props) => {
     ) || [];
   }, [payments, searchQuery]);
 
-  const getStatusBadge = (status: string) => {
-    const styles = {
-      "مدفوع": "bg-success/10 text-success",
-      "معلق": "bg-warning/10 text-warning",
-      "متأخر": "bg-destructive/10 text-destructive",
-      "مدفوع جزئياً": "bg-primary/10 text-primary",
-      "ملغي": "bg-muted text-muted-foreground",
-    };
-    return styles[status as keyof typeof styles] || "bg-muted";
+  const getPaymentStatus = (payment: RentalPayment) => {
+    const dueDate = new Date(payment.due_date);
+    const now = new Date();
+    const daysDiff = Math.ceil((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+
+    // إذا تم الدفع
+    if (payment.payment_date) {
+      return { status: "مدفوع", color: "bg-success/10 text-success" };
+    }
+
+    // إذا تأخر الدفع
+    if (daysDiff < 0) {
+      return { status: "متأخر", color: "bg-destructive/10 text-destructive" };
+    }
+
+    // إذا قريب من موعد الاستحقاق (خلال 30 يوم)
+    if (daysDiff <= 30 && daysDiff >= 0) {
+      return { status: "مستحق قريباً", color: "bg-warning/10 text-warning" };
+    }
+
+    // معلق (مستقبلي)
+    return { status: "معلق", color: "bg-muted/50 text-muted-foreground" };
   };
 
   const totalPaid = payments?.reduce((sum, p) => sum + Number(p.amount_paid), 0) || 0;
@@ -121,8 +134,8 @@ export const PaymentsTab = ({ onEdit }: Props) => {
                     {(Number(payment.amount_due) - Number(payment.amount_paid)).toLocaleString()} ر.س
                   </TableCell>
                   <TableCell className="text-xs sm:text-sm">
-                    <Badge className={getStatusBadge(payment.status)}>
-                      {payment.status}
+                    <Badge className={getPaymentStatus(payment).color}>
+                      {getPaymentStatus(payment).status}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-xs sm:text-sm">
