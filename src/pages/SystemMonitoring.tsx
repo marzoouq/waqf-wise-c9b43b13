@@ -21,6 +21,7 @@ import { LoadingState } from "@/components/shared/LoadingState";
 import { formatDistanceToNow } from "date-fns";
 import { ar } from "date-fns/locale";
 import { AdminAlertsPanel } from "@/components/system/AdminAlertsPanel";
+import { SelfHealingToolsPanel } from "@/components/system/SelfHealingToolsPanel";
 
 export default function SystemMonitoring() {
   const { toast } = useToast();
@@ -214,7 +215,7 @@ export default function SystemMonitoring() {
 
       {/* التبويبات الرئيسية */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="overview">نظرة عامة</TabsTrigger>
           <TabsTrigger value="alerts">
             التنبيهات
@@ -226,6 +227,7 @@ export default function SystemMonitoring() {
           </TabsTrigger>
           <TabsTrigger value="errors">الأخطاء</TabsTrigger>
           <TabsTrigger value="fixes">الإصلاح التلقائي</TabsTrigger>
+          <TabsTrigger value="tools">أدوات التحكم</TabsTrigger>
         </TabsList>
 
         {/* نظرة عامة */}
@@ -397,6 +399,11 @@ export default function SystemMonitoring() {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* أدوات التحكم المتقدمة */}
+        <TabsContent value="tools" className="space-y-4">
+          <SelfHealingToolsPanel />
         </TabsContent>
       </Tabs>
     </div>
