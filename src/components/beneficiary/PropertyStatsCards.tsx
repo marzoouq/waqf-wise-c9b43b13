@@ -18,9 +18,9 @@ export function PropertyStatsCards() {
           name,
           location,
           total_units,
-          occupied_units
+          occupied_units,
+          status
         `)
-        .eq("status", "نشط")
         .order("name");
 
       if (error) throw error;
@@ -33,8 +33,8 @@ export function PropertyStatsCards() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("contracts")
-        .select("id, monthly_rent")
-        .eq("status", "نشط");
+        .select("id, monthly_rent, status")
+        .in("status", ["نشط", "active"]);
 
       if (error) throw error;
       return data || [];
@@ -118,6 +118,12 @@ export function PropertyStatsCards() {
                       </div>
                       <div className="flex items-center justify-between pt-2 border-t">
                         <div className="flex gap-2 flex-wrap">
+                          <Badge 
+                            variant={property.status === 'مؤجر' ? 'default' : 'outline'} 
+                            className="text-xs"
+                          >
+                            {property.status || 'غير محدد'}
+                          </Badge>
                           <Badge variant="outline" className="text-xs">
                             {property.total_units || 0} وحدة
                           </Badge>
