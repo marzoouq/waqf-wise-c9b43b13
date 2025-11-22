@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import MainLayout from '@/components/layout/MainLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -81,8 +80,7 @@ export default function Support() {
   );
 
   return (
-    <MainLayout>
-      <div className="space-y-6">
+    <div className="space-y-6 p-6">
         <div className="flex items-center justify-end">
           <Button onClick={() => setCreateDialogOpen(true)}>
             <Plus className="h-4 w-4 ml-2" />
@@ -297,6 +295,5 @@ export default function Support() {
           onRate={(id, helpful) => rateArticle.mutate({ id, helpful })}
         />
       </div>
-    </MainLayout>
   );
 }
