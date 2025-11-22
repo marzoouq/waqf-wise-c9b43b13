@@ -85,6 +85,12 @@ const Properties = () => {
     };
 
     const button = buttons[activeTab as keyof typeof buttons];
+    
+    // إذا لم يكن هناك زر لهذا التبويب (مثل تبويب الوحدات)، لا نعرض شيء
+    if (!button) {
+      return null;
+    }
+    
     const Icon = button.icon;
 
     return (
