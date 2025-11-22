@@ -4,7 +4,7 @@ import { toast } from "@/hooks/use-toast";
 import { createMutationErrorHandler } from "@/lib/errorHandling";
 import type { RentalPaymentInsert, RentalPaymentUpdate } from "@/types/payments";
 import { useJournalEntries } from "./useJournalEntries";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { logger } from "@/lib/logger";
 
 export interface RentalPayment {
@@ -33,7 +33,30 @@ export interface RentalPayment {
   };
 }
 
-export const useRentalPayments = (contractId?: string) => {
+// Filter relevant payments based on days threshold
+const filterRelevantPayments = (payments: RentalPayment[], daysThreshold: number = 90) => {
+  const now = new Date();
+  const futureThreshold = new Date();
+  futureThreshold.setDate(futureThreshold.getDate() + daysThreshold);
+
+  return payments.filter(payment => {
+    const dueDate = new Date(payment.due_date);
+    
+    // Show paid payments (historical record)
+    if (payment.payment_date) return true;
+    
+    // Show overdue payments
+    if (dueDate < now) return true;
+    
+    // Show payments due within threshold days
+    if (dueDate <= futureThreshold) return true;
+    
+    // Hide distant future payments
+    return false;
+  });
+};
+
+export const useRentalPayments = (contractId?: string, showAllPayments: boolean = false, daysThreshold: number = 90) => {
   const queryClient = useQueryClient();
   const { createAutoEntry } = useJournalEntries();
 
@@ -59,7 +82,7 @@ export const useRentalPayments = (contractId?: string) => {
     };
   }, [queryClient]);
 
-  const { data: payments, isLoading } = useQuery({
+  const { data: allPayments, isLoading } = useQuery({
     queryKey: ["rental_payments", contractId || undefined],
     queryFn: async () => {
       let query = supabase
@@ -83,6 +106,17 @@ export const useRentalPayments = (contractId?: string) => {
       return data as RentalPayment[];
     },
   });
+
+  // Apply filtering logic
+  const payments = useMemo(
+    () => allPayments ? (showAllPayments ? allPayments : filterRelevantPayments(allPayments, daysThreshold)) : [],
+    [allPayments, showAllPayments, daysThreshold]
+  );
+
+  const hiddenPaymentsCount = useMemo(
+    () => (allPayments?.length || 0) - (payments?.length || 0),
+    [allPayments, payments]
+  );
 
   const addPayment = useMutation({
     mutationFn: async (payment: Omit<RentalPaymentInsert, 'payment_number'>) => {
@@ -195,6 +229,8 @@ export const useRentalPayments = (contractId?: string) => {
 
   return {
     payments,
+    allPayments,
+    hiddenPaymentsCount,
     isLoading,
     addPayment,
     updatePayment,

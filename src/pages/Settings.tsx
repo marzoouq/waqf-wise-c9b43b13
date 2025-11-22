@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { User, Bell, Shield, Database, Palette, Globe, Settings as SettingsIcon, Building2 } from "lucide-react";
+import { User, Bell, Shield, Database, Palette, Globe, Settings as SettingsIcon, Building2, Calendar } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProfileDialog } from "@/components/settings/ProfileDialog";
 import { NotificationsSettingsDialog } from "@/components/settings/NotificationsSettingsDialog";
@@ -8,6 +8,7 @@ import { DatabaseSettingsDialog } from "@/components/settings/DatabaseSettingsDi
 import { AppearanceSettingsDialog } from "@/components/settings/AppearanceSettingsDialog";
 import { LanguageSettingsDialog } from "@/components/settings/LanguageSettingsDialog";
 import { SystemSettingsDialog } from "@/components/settings/SystemSettingsDialog";
+import { PaymentSettingsDialog } from "@/components/settings/PaymentSettingsDialog";
 import OrganizationSettingsDialog from "@/components/settings/OrganizationSettingsDialog";
 import { PushNotificationsSettings } from "@/components/settings/PushNotificationsSettings";
 import { LeakedPasswordCheck } from "@/components/settings/LeakedPasswordCheck";
@@ -25,6 +26,7 @@ const Settings = () => {
   const [languageDialogOpen, setLanguageDialogOpen] = useState(false);
   const [systemSettingsDialogOpen, setSystemSettingsDialogOpen] = useState(false);
   const [organizationDialogOpen, setOrganizationDialogOpen] = useState(false);
+  const [paymentSettingsDialogOpen, setPaymentSettingsDialogOpen] = useState(false);
 
   const handleSectionClick = (sectionTitle: string) => {
     switch (sectionTitle) {
@@ -51,6 +53,9 @@ const Settings = () => {
         break;
       case "إعدادات المنشأة":
         setOrganizationDialogOpen(true);
+        break;
+      case "إعدادات الدفعات":
+        setPaymentSettingsDialogOpen(true);
         break;
       default:
         toast({
@@ -116,6 +121,13 @@ const Settings = () => {
       description: "إدارة الإعدادات العامة والمتقدمة",
       icon: SettingsIcon,
       color: "bg-indigo-500/10 text-indigo-500",
+    },
+    {
+      id: 9,
+      title: "إعدادات الدفعات",
+      description: "تخصيص عرض الدفعات والإيجارات",
+      icon: Calendar,
+      color: "bg-blue-500/10 text-blue-500",
     },
   ];
 
@@ -224,6 +236,10 @@ const Settings = () => {
         <OrganizationSettingsDialog
           open={organizationDialogOpen}
           onOpenChange={setOrganizationDialogOpen}
+        />
+        <PaymentSettingsDialog
+          open={paymentSettingsDialogOpen}
+          onOpenChange={setPaymentSettingsDialogOpen}
         />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
