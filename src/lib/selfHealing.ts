@@ -291,6 +291,11 @@ export class HealthMonitor {
         status: allHealthy ? 'healthy' : 'degraded',
         details: checks,
       });
+
+      // إنشاء تنبيه للمسؤولين عند فشل الفحص
+      if (!allHealthy) {
+        await this.createHealthAlert(checks);
+      }
     } catch (error) {
       console.error('Failed to log health check:', error);
     }
@@ -334,6 +339,51 @@ export class HealthMonitor {
         console.log('🌐 Network back online, resuming operations...');
         this.autoRecovery.syncPendingData();
       }, { once: true });
+    }
+  }
+
+  /**
+   * إنشاء تنبيه صحة النظام
+   */
+  private async createHealthAlert(checks: Record<string, boolean>): Promise<void> {
+    try {
+      const failedChecks = Object.entries(checks)
+        .filter(([_, status]) => !status)
+        .map(([name]) => name);
+
+      const { data: alert, error } = await supabase
+        .from('system_alerts')
+        .insert({
+          alert_type: 'health_check_failed',
+          severity: 'high',
+          title: 'فشل فحص صحة النظام',
+          description: `فشلت الفحوصات التالية: ${failedChecks.join(', ')}`,
+          source: 'health_monitor',
+          status: 'active',
+          metadata: { checks, failedChecks },
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Failed to create health alert:', error);
+        return;
+      }
+
+      // إشعار المسؤولين
+      await supabase.functions.invoke('notify-admins', {
+        body: {
+          alertId: alert.id,
+          severity: 'high',
+          title: 'فشل فحص صحة النظام',
+          description: `فشلت الفحوصات التالية: ${failedChecks.join(', ')}`,
+          alertType: 'health_check_failed',
+        },
+      });
+
+      console.log('✅ Health alert created and admins notified');
+    } catch (error) {
+      console.error('Error creating health alert:', error);
     }
   }
 }
