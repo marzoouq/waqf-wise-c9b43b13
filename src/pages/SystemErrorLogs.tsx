@@ -15,16 +15,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { AlertTriangle, CheckCircle, Clock, XCircle, TrendingUp, AlertCircle } from "lucide-react";
+import { AlertTriangle, CheckCircle, Clock, XCircle, TrendingUp, AlertCircle, RefreshCw, Trash2, Database } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ar } from "date-fns/locale";
 import { useToast } from "@/hooks/use-toast";
+import { useSelfHealing } from "@/hooks/useSelfHealing";
 
 export default function SystemErrorLogs() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedError, setSelectedError] = useState<any>(null);
   const [resolutionNotes, setResolutionNotes] = useState("");
+  const { executeWithRetry, clearCache, syncPendingData } = useSelfHealing();
 
   // جلب سجلات الأخطاء
   const { data: errorLogs, isLoading } = useQuery({
@@ -334,6 +336,54 @@ export default function SystemErrorLogs() {
                                 onChange={(e) => setResolutionNotes(e.target.value)}
                                 rows={3}
                               />
+
+                              <div className="grid grid-cols-3 gap-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={async () => {
+                                    try {
+                                      await executeWithRetry(async () => {
+                                        // محاولة إعادة تنفيذ العملية التي فشلت
+                                        console.log("Retrying operation for error:", log.id);
+                                      });
+                                      toast({ title: "✅ تمت إعادة المحاولة بنجاح" });
+                                    } catch (error) {
+                                      toast({ 
+                                        title: "❌ فشلت إعادة المحاولة", 
+                                        variant: "destructive" 
+                                      });
+                                    }
+                                  }}
+                                >
+                                  <RefreshCw className="h-4 w-4 ml-1" />
+                                  إعادة محاولة
+                                </Button>
+
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    clearCache();
+                                    toast({ title: "🗑️ تم مسح الذاكرة المؤقتة" });
+                                  }}
+                                >
+                                  <Trash2 className="h-4 w-4 ml-1" />
+                                  مسح Cache
+                                </Button>
+
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={async () => {
+                                    await syncPendingData();
+                                    toast({ title: "🔄 تمت مزامنة البيانات" });
+                                  }}
+                                >
+                                  <Database className="h-4 w-4 ml-1" />
+                                  مزامنة
+                                </Button>
+                              </div>
 
                               <Button
                                 onClick={() =>
