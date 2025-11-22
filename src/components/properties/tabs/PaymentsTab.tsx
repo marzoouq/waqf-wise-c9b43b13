@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Search, DollarSign, Edit, Trash2 } from "lucide-react";
+import { Search, Edit, Trash2, FileText, Receipt } from "lucide-react";
 import { useRentalPayments } from "@/hooks/useRentalPayments";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -10,6 +10,8 @@ import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { type RentalPayment } from "@/hooks/useRentalPayments";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Props {
   onEdit: (payment: RentalPayment) => void;
@@ -21,6 +23,7 @@ export const PaymentsTab = ({ onEdit }: Props) => {
   const [paymentToDelete, setPaymentToDelete] = useState<RentalPayment | null>(null);
   
   const { payments, isLoading, deletePayment } = useRentalPayments();
+  const { toast } = useToast();
 
   const handleDeleteClick = (payment: RentalPayment) => {
     setPaymentToDelete(payment);
@@ -32,6 +35,83 @@ export const PaymentsTab = ({ onEdit }: Props) => {
       deletePayment.mutate(paymentToDelete.id);
       setDeleteDialogOpen(false);
       setPaymentToDelete(null);
+    }
+  };
+
+  const handleViewInvoice = async (payment: RentalPayment) => {
+    if (!payment.invoice_id) {
+      toast({
+        title: "تنبيه",
+        description: "لم يتم إصدار فاتورة لهذه الدفعة بعد",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('invoices')
+        .select('*')
+        .eq('id', payment.invoice_id)
+        .single();
+
+      if (error || !data) {
+        toast({
+          title: "خطأ",
+          description: "فشل تحميل بيانات الفاتورة",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // فتح صفحة الفاتورة في نافذة جديدة
+      window.open(`/invoices?view=${data.id}`, '_blank');
+    } catch (error) {
+      toast({
+        title: "خطأ",
+        description: "حدث خطأ أثناء عرض الفاتورة",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleViewReceipt = async (payment: RentalPayment) => {
+    if (!payment.receipt_id) {
+      toast({
+        title: "تنبيه",
+        description: "لم يتم إصدار سند قبض لهذه الدفعة بعد",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('payments')
+        .select('*')
+        .eq('id', payment.receipt_id)
+        .single();
+
+      if (error || !data) {
+        toast({
+          title: "خطأ",
+          description: "فشل تحميل بيانات سند القبض",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // يمكن هنا توليد PDF لسند القبض أو فتح صفحة عرض
+      toast({
+        title: "سند القبض",
+        description: `رقم السند: ${data.payment_number}`,
+      });
+    } catch (error) {
+      toast({
+        title: "خطأ",
+        description: "حدث خطأ أثناء عرض سند القبض",
+        variant: "destructive"
+      });
     }
   };
 
@@ -170,6 +250,28 @@ export const PaymentsTab = ({ onEdit }: Props) => {
                   </TableCell>
                   <TableCell className="text-xs sm:text-sm">
                     <div className="flex gap-1">
+                      {payment.invoice_id && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleViewInvoice(payment)}
+                          title="عرض الفاتورة"
+                          className="text-blue-600 hover:text-blue-700"
+                        >
+                          <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
+                        </Button>
+                      )}
+                      {payment.receipt_id && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleViewReceipt(payment)}
+                          title="عرض سند القبض"
+                          className="text-green-600 hover:text-green-700"
+                        >
+                          <Receipt className="h-3 w-3 sm:h-4 sm:w-4" />
+                        </Button>
+                      )}
                       <Button
                         variant="ghost"
                         size="sm"
