@@ -26,6 +26,8 @@ import {
   MessageSquare,
   Headphones,
   BookOpen,
+  Activity,
+  AlertTriangle,
 } from "lucide-react";
 import {
   Sidebar,
@@ -118,6 +120,8 @@ const menuGroups = [
     subItems: [
       { icon: MessageSquare, label: "تذاكر الدعم", path: "/support", roles: ["all"] },
       { icon: Headphones, label: "إدارة التذاكر", path: "/support-management", roles: ["admin", "nazer"] },
+      { icon: Activity, label: "لوحة المراقبة", path: "/system-monitoring", roles: ["admin", "nazer"], badge: "متقدم" },
+      { icon: AlertTriangle, label: "سجلات الأخطاء", path: "/system-error-logs", roles: ["admin", "nazer"] },
       { icon: BookOpen, label: "قاعدة المعرفة", path: "/support#knowledge", roles: ["all"], badge: "قريباً" },
     ]
   },
