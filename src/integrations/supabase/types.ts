@@ -4795,6 +4795,7 @@ export type Database = {
       }
       properties: {
         Row: {
+          apartment_count: number | null
           available_units: number | null
           created_at: string
           description: string | null
@@ -4805,7 +4806,10 @@ export type Database = {
           occupancy_percentage: number | null
           occupied: number
           occupied_units: number | null
+          revenue_type: string | null
+          shop_count: number | null
           status: string
+          tax_percentage: number | null
           total_units: number | null
           type: string
           units: number
@@ -4813,6 +4817,7 @@ export type Database = {
           waqf_unit_id: string | null
         }
         Insert: {
+          apartment_count?: number | null
           available_units?: number | null
           created_at?: string
           description?: string | null
@@ -4823,7 +4828,10 @@ export type Database = {
           occupancy_percentage?: number | null
           occupied?: number
           occupied_units?: number | null
+          revenue_type?: string | null
+          shop_count?: number | null
           status: string
+          tax_percentage?: number | null
           total_units?: number | null
           type: string
           units?: number
@@ -4831,6 +4839,7 @@ export type Database = {
           waqf_unit_id?: string | null
         }
         Update: {
+          apartment_count?: number | null
           available_units?: number | null
           created_at?: string
           description?: string | null
@@ -4841,7 +4850,10 @@ export type Database = {
           occupancy_percentage?: number | null
           occupied?: number
           occupied_units?: number | null
+          revenue_type?: string | null
+          shop_count?: number | null
           status?: string
+          tax_percentage?: number | null
           total_units?: number | null
           type?: string
           units?: number

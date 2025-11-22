@@ -34,7 +34,7 @@ const Properties = () => {
   const [selectedPayment, setSelectedPayment] = useState<RentalPayment | null>(null);
   const [selectedMaintenance, setSelectedMaintenance] = useState<MaintenanceRequest | null>(null);
 
-  const handlePropertySave = async (data: Omit<Property, 'id' | 'created_at' | 'updated_at'>) => {
+  const handlePropertySave = async (data: any) => {
     try {
       if (selectedProperty) {
         await updateProperty({ id: selectedProperty.id, ...data });
