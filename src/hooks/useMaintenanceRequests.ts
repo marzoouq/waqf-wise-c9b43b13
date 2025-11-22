@@ -173,10 +173,37 @@ export const useMaintenanceRequests = () => {
     },
   });
 
+  const deleteRequest = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("maintenance_requests")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["maintenance_requests"] });
+      toast({
+        title: "تم الحذف",
+        description: "تم حذف طلب الصيانة بنجاح",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "خطأ",
+        description: "حدث خطأ أثناء حذف الطلب",
+        variant: "destructive",
+      });
+      logger.error(error, { context: 'delete_maintenance_request', severity: 'medium' });
+    },
+  });
+
   return {
     requests,
     isLoading,
     addRequest,
     updateRequest,
+    deleteRequest,
   };
 };

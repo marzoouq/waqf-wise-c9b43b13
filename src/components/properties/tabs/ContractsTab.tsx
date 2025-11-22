@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Search, FileText, Calendar, User, Edit, Eye, Trash2 } from "lucide-react";
+import { Search, FileText, Calendar, User, Edit, Eye, Trash2, Printer } from "lucide-react";
 import { useContracts } from "@/hooks/useContracts";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -9,6 +9,9 @@ import { Card } from "@/components/ui/card";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { type Contract } from "@/hooks/useContracts";
+import { ExportButton } from "@/components/shared/ExportButton";
+import { usePrint } from "@/hooks/usePrint";
+import { ContractPrintTemplate } from "@/components/contracts/ContractPrintTemplate";
 
 interface Props {
   onEdit: (contract: Contract) => void;
@@ -16,12 +19,22 @@ interface Props {
 
 export const ContractsTab = ({ onEdit }: Props) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [printContract, setPrintContract] = useState<Contract | null>(null);
   const { contracts, isLoading, deleteContract } = useContracts();
+  const { printWithData } = usePrint();
 
   const handleDelete = (id: string) => {
     if (confirm("هل أنت متأكد من حذف هذا العقد؟ سيتم حذف جميع الدفعات المرتبطة به.")) {
       deleteContract.mutateAsync(id);
     }
+  };
+
+  const handlePrintContract = (contract: Contract) => {
+    setPrintContract(contract);
+    setTimeout(() => {
+      printWithData(contract, (data) => <ContractPrintTemplate contract={data} />);
+      setPrintContract(null);
+    }, 100);
   };
 
   const filteredContracts = useMemo(() => {
@@ -36,6 +49,20 @@ export const ContractsTab = ({ onEdit }: Props) => {
     ) || [];
   }, [contracts, searchQuery]);
 
+  const exportData = filteredContracts.map(c => ({
+    'رقم العقد': c.contract_number,
+    'العقار': c.properties?.name || '-',
+    'المستأجر': c.tenant_name,
+    'رقم الهوية': c.tenant_id_number,
+    'الهاتف': c.tenant_phone,
+    'النوع': c.contract_type,
+    'تاريخ البداية': format(new Date(c.start_date), 'yyyy/MM/dd'),
+    'تاريخ النهاية': format(new Date(c.end_date), 'yyyy/MM/dd'),
+    'الإيجار الشهري': Number(c.monthly_rent).toLocaleString(),
+    'التأمين': Number(c.security_deposit || 0).toLocaleString(),
+    'الحالة': c.status,
+  }));
+
   const getStatusBadge = (status: string) => {
     const styles = {
       "نشط": "bg-success/10 text-success",
@@ -49,14 +76,22 @@ export const ContractsTab = ({ onEdit }: Props) => {
 
   return (
     <div className="space-y-6">
-      {/* Search */}
-      <div className="relative">
-        <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-        <Input
-          placeholder="البحث عن عقد..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pr-10"
+      {/* Search and Export */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+          <Input
+            placeholder="البحث عن عقد..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pr-10"
+          />
+        </div>
+        <ExportButton
+          data={exportData}
+          filename="العقود"
+          title="العقود"
+          headers={['رقم العقد', 'العقار', 'المستأجر', 'رقم الهوية', 'الهاتف', 'النوع', 'تاريخ البداية', 'تاريخ النهاية', 'الإيجار الشهري', 'التأمين', 'الحالة']}
         />
       </div>
 
@@ -132,11 +167,20 @@ export const ContractsTab = ({ onEdit }: Props) => {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-xs sm:text-sm">
-                    <div className="flex gap-2">
+                    <div className="flex gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handlePrintContract(contract)}
+                        title="طباعة"
+                      >
+                        <Printer className="h-3 w-3 sm:h-4 sm:w-4" />
+                      </Button>
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => onEdit(contract)}
+                        title="تعديل"
                       >
                         <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
                       </Button>
@@ -145,6 +189,7 @@ export const ContractsTab = ({ onEdit }: Props) => {
                         size="sm"
                         className="text-destructive hover:text-destructive hover:bg-destructive/10"
                         onClick={() => handleDelete(contract.id)}
+                        title="حذف"
                       >
                         <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                       </Button>

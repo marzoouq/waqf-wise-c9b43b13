@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAccounts } from "@/hooks/useAccounts";
-import { ChevronDown, ChevronLeft, Plus, Edit, TrendingUp, TrendingDown } from "lucide-react";
+import { ChevronDown, ChevronLeft, Plus, Edit, TrendingUp, TrendingDown, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -8,15 +8,17 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import AddAccountDialog from "./AddAccountDialog";
 import { AccountRow, AccountWithBalance } from "@/types/supabase-helpers";
+import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 
 interface AccountNodeProps {
   account: AccountWithBalance;
   level: number;
   onEdit?: (account: AccountRow) => void;
   onAddChild?: (parentAccount: AccountRow) => void;
+  onDelete?: (account: AccountRow) => void;
 }
 
-function AccountNode({ account, level, onEdit, onAddChild }: AccountNodeProps) {
+function AccountNode({ account, level, onEdit, onAddChild, onDelete }: AccountNodeProps) {
   const [isExpanded, setIsExpanded] = useState(level < 2);
   const hasChildren = account.children && account.children.length > 0;
 
@@ -96,16 +98,30 @@ function AccountNode({ account, level, onEdit, onAddChild }: AccountNodeProps) {
 
             <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
               {!account.is_system_account && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 w-7 p-0"
-                  onClick={() => {
-                    if (onEdit) onEdit(account);
-                  }}
-                >
-                  <Edit className="h-3 w-3" />
-                </Button>
+                <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 w-7 p-0"
+                    onClick={() => {
+                      if (onEdit) onEdit(account);
+                    }}
+                    title="تعديل"
+                  >
+                    <Edit className="h-3 w-3" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 w-7 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                    onClick={() => {
+                      if (onDelete) onDelete(account);
+                    }}
+                    title="حذف"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </Button>
+                </>
               )}
               {account.is_header && (
                 <Button
@@ -115,6 +131,7 @@ function AccountNode({ account, level, onEdit, onAddChild }: AccountNodeProps) {
                   onClick={() => {
                     if (onAddChild) onAddChild(account);
                   }}
+                  title="إضافة حساب فرعي"
                 >
                   <Plus className="h-3 w-3" />
                 </Button>
@@ -132,6 +149,7 @@ function AccountNode({ account, level, onEdit, onAddChild }: AccountNodeProps) {
               level={level + 1}
               onEdit={onEdit}
               onAddChild={onAddChild}
+              onDelete={onDelete}
             />
           ))}
         </div>
@@ -141,10 +159,29 @@ function AccountNode({ account, level, onEdit, onAddChild }: AccountNodeProps) {
 }
 
 export function EnhancedAccountsTree() {
-  const { accountTree, accounts, isLoading } = useAccounts();
+  const { accountTree, accounts, isLoading, deleteAccount } = useAccounts();
   const [searchTerm, setSearchTerm] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<AccountRow | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [accountToDelete, setAccountToDelete] = useState<AccountRow | null>(null);
+
+  const handleDeleteClick = (account: AccountRow) => {
+    setAccountToDelete(account);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (accountToDelete) {
+      try {
+        await deleteAccount(accountToDelete.id);
+        setDeleteDialogOpen(false);
+        setAccountToDelete(null);
+      } catch (error) {
+        // Error handled by hook
+      }
+    }
+  };
 
   if (isLoading) {
     return <div className="text-center py-8">جاري التحميل...</div>;
@@ -186,6 +223,7 @@ export function EnhancedAccountsTree() {
                   setSelectedAccount(acc);
                   setDialogOpen(true);
                 }}
+                onDelete={handleDeleteClick}
               />
             ))}
           </div>
@@ -197,6 +235,15 @@ export function EnhancedAccountsTree() {
         onOpenChange={setDialogOpen}
         account={selectedAccount || undefined}
         accounts={accounts}
+      />
+
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleDeleteConfirm}
+        title="حذف الحساب"
+        description="هل أنت متأكد من حذف هذا الحساب؟ لن يمكن استرجاعه بعد الحذف."
+        itemName={accountToDelete ? `${accountToDelete.code} - ${accountToDelete.name_ar}` : ""}
       />
     </>
   );

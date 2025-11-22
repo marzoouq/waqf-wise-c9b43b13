@@ -10,6 +10,8 @@ import { EmptyState } from '@/components/shared/EmptyState';
 import { RequestApprovalDialog } from '@/components/requests/RequestApprovalDialog';
 import { RequestCommentsDialog } from '@/components/requests/RequestCommentsDialog';
 import { DeleteConfirmDialog } from '@/components/shared/DeleteConfirmDialog';
+import { format } from 'date-fns';
+import { ar } from 'date-fns/locale';
 import {
   Table,
   TableBody,
@@ -113,6 +115,22 @@ const Requests = () => {
             عرض ومعالجة طلبات المستفيدين
           </p>
         </div>
+        {filteredRequests.length > 0 && (
+          <ExportButton
+            data={filteredRequests.map(r => ({
+              'رقم الطلب': r.request_number,
+              'المستفيد': r.beneficiary && 'full_name' in r.beneficiary ? r.beneficiary.full_name : '-',
+              'نوع الطلب': r.request_type?.name || '-',
+              'الوصف': r.description,
+              'المبلغ': r.amount ? `${r.amount.toLocaleString()} ر.س` : '-',
+              'الحالة': r.status,
+              'تاريخ التقديم': r.submitted_at ? format(new Date(r.submitted_at), 'yyyy/MM/dd', { locale: ar }) : '-',
+            }))}
+            filename="الطلبات"
+            title="تقرير الطلبات"
+            headers={['رقم الطلب', 'المستفيد', 'نوع الطلب', 'الوصف', 'المبلغ', 'الحالة', 'تاريخ التقديم']}
+          />
+        )}
       </div>
 
       {/* Stats Cards */}

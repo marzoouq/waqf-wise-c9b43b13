@@ -124,17 +124,17 @@ const Properties = () => {
             {activeTab === "properties" && properties && properties.length > 0 && (
               <ExportButton
                 data={properties.map(p => ({
-                  name: p.name,
-                  type: p.type,
-                  location: p.location,
-                  units: p.units || "-",
-                  occupied: p.occupied || "-",
-                  revenue: p.monthly_revenue || 0,
-                  status: p.status,
+                  'الاسم': p.name,
+                  'النوع': p.type,
+                  'الموقع': p.location,
+                  'عدد الوحدات': p.units || "-",
+                  'المؤجرة': p.occupied || "-",
+                  'الإيراد الشهري': p.monthly_revenue || 0,
+                  'الحالة': p.status,
                 }))}
                 filename="properties"
                 title="تقرير العقارات"
-                headers={["name", "type", "location", "units", "occupied", "revenue", "status"]}
+                headers={['الاسم', 'النوع', 'الموقع', 'عدد الوحدات', 'المؤجرة', 'الإيراد الشهري', 'الحالة']}
               />
             )}
             {getAddButton()}
