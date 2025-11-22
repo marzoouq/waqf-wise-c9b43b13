@@ -98,7 +98,6 @@ const Properties = () => {
         className="bg-primary hover:bg-primary-hover text-primary-foreground shadow-soft w-full md:w-auto"
         onClick={button.onClick}
       >
-        <Plus className="ml-2 h-4 w-4 md:h-5 md:w-5" />
         <Icon className="ml-2 h-4 w-4 md:h-5 md:w-5" />
         <span className="text-sm md:text-base">{button.label}</span>
       </Button>

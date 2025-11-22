@@ -10,6 +10,7 @@ import { GlobalErrorBoundary } from "./components/shared/GlobalErrorBoundary";
 import { LoadingState } from "./components/shared/LoadingState";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { usePWAUpdate } from "./lib/pwa";
+import { AutoFixExecutor } from "./components/system/AutoFixExecutor";
 import "@/lib/errorTracking";
 import "@/lib/selfHealing";
 
@@ -105,6 +106,7 @@ const App = () => {
   return (
     <GlobalErrorBoundary>
       <QueryClientProvider client={queryClient}>
+        <AutoFixExecutor />
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <TooltipProvider>
             <Toaster />
