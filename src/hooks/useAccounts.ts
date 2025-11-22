@@ -82,6 +82,62 @@ export function useAccounts() {
     },
   });
 
+  const deleteAccount = useMutation({
+    mutationFn: async (id: string) => {
+      // التحقق من عدم وجود معاملات
+      const { count: transactionsCount } = await supabase
+        .from("journal_entry_lines")
+        .select("*", { count: 'exact', head: true })
+        .eq("account_id", id);
+
+      if (transactionsCount && transactionsCount > 0) {
+        throw new Error("لا يمكن حذف حساب يحتوي على معاملات");
+      }
+
+      // التحقق من عدم كونه حساب رئيسي
+      const { data: account } = await supabase
+        .from("accounts")
+        .select("is_header, code")
+        .eq("id", id)
+        .single();
+
+      if (account?.is_header) {
+        throw new Error("لا يمكن حذف حساب رئيسي");
+      }
+
+      // منع حذف الحسابات النظامية (الأكواد من 1000 إلى 5999)
+      if (account?.code) {
+        const codeNum = parseInt(account.code);
+        if (codeNum >= 1000 && codeNum <= 5999) {
+          throw new Error("لا يمكن حذف الحسابات النظامية");
+        }
+      }
+
+      const { error } = await supabase
+        .from("accounts")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      toast({
+        title: "تم الحذف",
+        description: "تم حذف الحساب بنجاح",
+      });
+    },
+    onError: (error: unknown) => {
+      const message = getErrorMessage(error);
+      logger.error(error, { context: 'delete_account', severity: 'medium' });
+      toast({
+        title: "خطأ",
+        description: message,
+        variant: "destructive",
+      });
+    },
+  });
+
   const calculateBalance = async (accountId: string): Promise<number> => {
     try {
       const { data, error } = await supabase
@@ -133,6 +189,7 @@ export function useAccounts() {
     isLoading,
     addAccount: addAccount.mutateAsync,
     updateAccount: updateAccount.mutateAsync,
+    deleteAccount: deleteAccount.mutateAsync,
     calculateBalance,
   };
 }

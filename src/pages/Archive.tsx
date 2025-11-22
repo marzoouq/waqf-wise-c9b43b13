@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { Database } from "@/integrations/supabase/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Search, FolderOpen, FileText, Download, Upload, Eye } from "lucide-react";
+import { Plus, Search, FolderOpen, FileText, Download, Upload, Eye, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { UploadDocumentDialog } from "@/components/archive/UploadDocumentDialog";
 import { CreateFolderDialog } from "@/components/archive/CreateFolderDialog";
@@ -20,6 +20,7 @@ import { ar } from "date-fns/locale";
 import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
 import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
+import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 
 type Document = Database['public']['Tables']['documents']['Row'];
 
@@ -29,8 +30,10 @@ const Archive = () => {
   const [folderDialogOpen, setFolderDialogOpen] = useState(false);
   const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<(Document & { file_path: string }) | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [documentToDelete, setDocumentToDelete] = useState<Document | null>(null);
 
-  const { documents, isLoading: documentsLoading, addDocument } = useDocuments();
+  const { documents, isLoading: documentsLoading, addDocument, updateDocument, deleteDocument } = useDocuments();
   const { folders, isLoading: foldersLoading, addFolder } = useFolders();
   const { stats, isLoading: statsLoading } = useArchiveStats();
 
@@ -59,13 +62,25 @@ const Archive = () => {
   };
 
   const handlePreviewDocument = (doc: Database['public']['Tables']['documents']['Row']) => {
-    // إنشاء file_path من البيانات المتاحة (استخدام id كـ placeholder)
     const documentForPreview = {
       ...doc,
-      file_path: `/documents/${doc.id}`, // placeholder path
+      file_path: `/documents/${doc.id}`,
     };
     setSelectedDocument(documentForPreview);
     setPreviewDialogOpen(true);
+  };
+
+  const handleDeleteClick = (doc: Database['public']['Tables']['documents']['Row']) => {
+    setDocumentToDelete(doc);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (documentToDelete) {
+      await deleteDocument(documentToDelete.id);
+      setDeleteDialogOpen(false);
+      setDocumentToDelete(null);
+    }
   };
 
   if (isLoading) {
@@ -204,13 +219,23 @@ const Archive = () => {
                             {format(new Date(doc.created_at), 'dd/MM/yyyy', { locale: ar })}
                           </td>
                           <td className="p-3">
-                            <div className="flex justify-center gap-2">
+                            <div className="flex justify-center gap-1">
                               <Button
                                 size="sm"
                                 variant="ghost"
                                 onClick={() => handlePreviewDocument(doc)}
+                                title="عرض"
                               >
                                 <Eye className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleDeleteClick(doc)}
+                                className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                title="حذف"
+                              >
+                                <Trash2 className="h-4 w-4" />
                               </Button>
                               <Button
                                 size="sm"
@@ -252,6 +277,15 @@ const Archive = () => {
         open={previewDialogOpen}
         onOpenChange={setPreviewDialogOpen}
         document={selectedDocument}
+      />
+
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleDeleteConfirm}
+        title="حذف المستند"
+        description="هل أنت متأكد من حذف هذا المستند؟ لن يمكن استرجاعه بعد الحذف."
+        itemName={documentToDelete?.name || ""}
       />
       </div>
     </MobileOptimizedLayout>

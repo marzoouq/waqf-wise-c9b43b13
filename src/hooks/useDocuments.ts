@@ -86,10 +86,33 @@ export function useDocuments() {
     }),
   });
 
+  const deleteDocument = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("documents")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.DOCUMENTS] });
+      toast({
+        title: "تم الحذف",
+        description: "تم حذف المستند بنجاح",
+      });
+    },
+    onError: createMutationErrorHandler({
+      context: 'delete_document',
+      toastTitle: "خطأ في الحذف",
+    }),
+  });
+
   return {
     documents,
     isLoading,
     addDocument: addDocument.mutateAsync,
     updateDocument: updateDocument.mutateAsync,
+    deleteDocument: deleteDocument.mutateAsync,
   };
 }
