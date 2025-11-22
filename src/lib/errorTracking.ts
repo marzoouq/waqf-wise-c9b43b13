@@ -289,6 +289,11 @@ class ErrorTracker {
         
         console.log('✅ Error reported successfully');
         
+        // إنشاء تنبيه للمسؤولين عند الأخطاء الحرجة
+        if (report.severity === 'critical' || report.severity === 'high') {
+          await this.createSystemAlert(report);
+        }
+        
       } catch (error) {
         console.error('❌ Failed to send error report:', error);
         
@@ -322,6 +327,37 @@ class ErrorTracker {
     // حفظ الحالة
     this.savePendingErrors();
     this.isProcessing = false;
+  }
+
+  /**
+   * إنشاء تنبيه نظامي للمسؤولين
+   */
+  private async createSystemAlert(report: ErrorReport): Promise<void> {
+    try {
+      const { error } = await supabase.from('system_alerts').insert({
+        alert_type: report.error_type,
+        severity: report.severity,
+        title: `خطأ ${report.severity === 'critical' ? 'حرج' : 'عالي'}: ${report.error_type}`,
+        description: report.error_message,
+        source: 'error_tracking',
+        status: 'active',
+        metadata: {
+          url: report.url,
+          user_agent: report.user_agent,
+          user_id: report.user_id,
+          stack: report.error_stack,
+          additional_data: report.additional_data,
+        },
+      });
+
+      if (error) {
+        console.error('Failed to create system alert:', error);
+      } else {
+        console.log('✅ System alert created for admins');
+      }
+    } catch (error) {
+      console.error('Error creating system alert:', error);
+    }
   }
 
   // واجهة برمجية للتطبيق لتسجيل الأخطاء يدوياً

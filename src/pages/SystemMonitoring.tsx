@@ -20,6 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { formatDistanceToNow } from "date-fns";
 import { ar } from "date-fns/locale";
+import { AdminAlertsPanel } from "@/components/system/AdminAlertsPanel";
 
 export default function SystemMonitoring() {
   const { toast } = useToast();
@@ -207,6 +208,9 @@ export default function SystemMonitoring() {
           </CardContent>
         </Card>
       </div>
+
+      {/* لوحة تنبيهات المسؤولين */}
+      <AdminAlertsPanel />
 
       {/* التبويبات الرئيسية */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
