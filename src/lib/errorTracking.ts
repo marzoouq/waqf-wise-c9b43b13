@@ -170,56 +170,16 @@ class ErrorTracker {
   }
 
   private setupPerformanceMonitoring() {
-    // ⚠️ تعطيل Performance Monitoring المفرط - يسبب تسجيل أخطاء وهمية كثيرة
-    // يمكن تفعيله عند الحاجة للتشخيص فقط
+    // ⚠️ Performance Monitoring معطل حالياً لتقليل الضوضاء
+    // سيتم تفعيله فقط عند الحاجة للتشخيص
+    console.log('📊 Performance monitoring is currently disabled to reduce noise');
     
-    // مراقبة الأداء - معطلة مؤقتاً لتقليل الضوضاء
-    if (false && 'PerformanceObserver' in window) {
+    // يمكن إعادة تفعيله بتغيير false إلى true
+    if (false) {
       try {
-        // مراقبة Long Tasks - فقط للمهام الطويلة جداً (> 1000ms)
-        const longTaskObserver = new PerformanceObserver((list) => {
-          for (const entry of list.getEntries()) {
-            // تسجيل فقط المهام الأطول من 1 ثانية
-            if (entry.duration > 1000) {
-              this.trackError({
-                error_type: 'performance_issue',
-                error_message: `Critical long task: ${entry.duration.toFixed(2)}ms`,
-                severity: 'high',
-                url: window.location.href,
-                user_agent: navigator.userAgent,
-                additional_data: {
-                  duration: entry.duration,
-                  startTime: entry.startTime,
-                },
-              });
-            }
-          }
-        });
-        longTaskObserver.observe({ entryTypes: ['longtask'] });
-
-        // مراقبة Layout Shifts - فقط للقيم الكبيرة جداً (> 0.5)
-        const layoutShiftObserver = new PerformanceObserver((list) => {
-          for (const entry of list.getEntries()) {
-            const layoutShift = entry as any;
-            // تسجيل فقط layout shifts أكبر من 0.5 (كبيرة جداً)
-            if (layoutShift.value > 0.5) {
-              this.trackError({
-                error_type: 'layout_shift',
-                error_message: `Critical Layout Shift: ${layoutShift.value.toFixed(3)}`,
-                severity: 'high',
-                url: window.location.href,
-                user_agent: navigator.userAgent,
-                additional_data: {
-                  value: layoutShift.value,
-                  hadRecentInput: layoutShift.hadRecentInput,
-                },
-              });
-            }
-          }
-        });
-        layoutShiftObserver.observe({ entryTypes: ['layout-shift'] });
+        // الكود الأصلي معطل
       } catch (error) {
-        console.warn('Performance monitoring not fully supported', error);
+        console.error('Failed to setup performance monitoring:', error);
       }
     }
 
