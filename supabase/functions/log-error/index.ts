@@ -180,14 +180,18 @@ function shouldApplyRule(rule: any, errorReport: ErrorReport): boolean {
  */
 async function sendRoleNotifications(supabase: any, roles: string[], errorLog: any, alert: any) {
   try {
-    // جلب المستخدمين حسب الأدوار
+    // جلب المستخدمين حسب الأدوار (بدون فلتر is_active لأنه غير موجود في جدول user_roles)
     const { data: users, error: usersError } = await supabase
       .from('user_roles')
       .select('user_id, role')
-      .in('role', roles)
-      .eq('is_active', true);
+      .in('role', roles);
 
-    if (usersError || !users || users.length === 0) {
+    if (usersError) {
+      console.error('Error fetching users:', usersError);
+      return;
+    }
+
+    if (!users || users.length === 0) {
       console.log(`No users found for roles: ${roles.join(', ')}`);
       return;
     }
@@ -248,12 +252,11 @@ async function handleAutoEscalation(supabase: any, alertId: string, errorLogId: 
       return;
     }
 
-    // جلب المدراء (admin)
+    // جلب المدراء (admin) - بدون is_active
     const { data: admins } = await supabase
       .from('user_roles')
       .select('user_id')
-      .eq('role', 'admin')
-      .eq('is_active', true);
+      .eq('role', 'admin');
 
     if (!admins || admins.length === 0) {
       console.log('No admins found for escalation');

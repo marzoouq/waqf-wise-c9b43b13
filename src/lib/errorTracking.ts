@@ -108,13 +108,15 @@ class ErrorTracker {
       });
     });
 
-    // مراقبة أخطاء الشبكة
+    // مراقبة أخطاء الشبكة - محسّنة لتقليل التسجيل المكرر
     const originalFetch = window.fetch;
+    const recentErrors = new Map<string, number>(); // تتبع الأخطاء الأخيرة
+    
     window.fetch = async (...args) => {
       const requestUrl = typeof args[0] === 'string' ? args[0] : args[0]?.toString() || 'unknown';
       
-      // تجاهل طلبات log-error لتجنب الحلقة اللانهائية
-      if (requestUrl.includes('log-error')) {
+      // تجاهل طلبات log-error و analytics لتجنب الحلقة اللانهائية
+      if (requestUrl.includes('log-error') || requestUrl.includes('analytics')) {
         return originalFetch(...args);
       }
       
@@ -123,50 +125,66 @@ class ErrorTracker {
         
         // تسجيل الأخطاء من الاستجابات (فقط 5xx errors)
         if (!response.ok && response.status >= 500) {
-          this.trackError({
-            error_type: 'network_error',
-            error_message: `HTTP ${response.status}: ${response.statusText}`,
-            severity: 'medium',
-            url: window.location.href,
-            user_agent: navigator.userAgent,
-            additional_data: {
-              request_url: requestUrl,
-              status: response.status,
-            },
-          });
+          const errorKey = `${response.status}-${requestUrl}`;
+          const lastError = recentErrors.get(errorKey);
+          
+          // تسجيل فقط إذا مر 5 دقائق على آخر خطأ مشابه
+          if (!lastError || Date.now() - lastError > 5 * 60 * 1000) {
+            recentErrors.set(errorKey, Date.now());
+            this.trackError({
+              error_type: 'network_error',
+              error_message: `HTTP ${response.status}: ${response.statusText}`,
+              severity: 'medium',
+              url: window.location.href,
+              user_agent: navigator.userAgent,
+              additional_data: {
+                request_url: requestUrl,
+                status: response.status,
+              },
+            });
+          }
         }
         
         return response;
       } catch (error) {
-        // تسجيل أخطاء الشبكة الفعلية
-        this.trackError({
-          error_type: 'network_error',
-          error_message: error instanceof Error ? error.message : String(error),
-          severity: 'high',
-          url: window.location.href,
-          user_agent: navigator.userAgent,
-          additional_data: {
-            request_url: requestUrl,
-          },
-        });
+        const errorKey = `fetch-error-${requestUrl}`;
+        const lastError = recentErrors.get(errorKey);
+        
+        // تسجيل فقط إذا مر 2 دقيقة على آخر خطأ مشابه (أخطاء fetch متكررة)
+        if (!lastError || Date.now() - lastError > 2 * 60 * 1000) {
+          recentErrors.set(errorKey, Date.now());
+          this.trackError({
+            error_type: 'network_error',
+            error_message: error instanceof Error ? error.message : String(error),
+            severity: 'medium', // تخفيض من high إلى medium
+            url: window.location.href,
+            user_agent: navigator.userAgent,
+            additional_data: {
+              request_url: requestUrl,
+            },
+          });
+        }
         throw error;
       }
     };
   }
 
   private setupPerformanceMonitoring() {
-    // مراقبة الأداء - فقط للمشاكل الكبيرة
-    if ('PerformanceObserver' in window) {
+    // ⚠️ تعطيل Performance Monitoring المفرط - يسبب تسجيل أخطاء وهمية كثيرة
+    // يمكن تفعيله عند الحاجة للتشخيص فقط
+    
+    // مراقبة الأداء - معطلة مؤقتاً لتقليل الضوضاء
+    if (false && 'PerformanceObserver' in window) {
       try {
-        // مراقبة Long Tasks - فقط للمهام الطويلة جداً
+        // مراقبة Long Tasks - فقط للمهام الطويلة جداً (> 1000ms)
         const longTaskObserver = new PerformanceObserver((list) => {
           for (const entry of list.getEntries()) {
-            // تسجيل فقط المهام الأطول من 500ms
-            if (entry.duration > 500) {
+            // تسجيل فقط المهام الأطول من 1 ثانية
+            if (entry.duration > 1000) {
               this.trackError({
                 error_type: 'performance_issue',
-                error_message: `Long task detected: ${entry.duration.toFixed(2)}ms`,
-                severity: 'medium',
+                error_message: `Critical long task: ${entry.duration.toFixed(2)}ms`,
+                severity: 'high',
                 url: window.location.href,
                 user_agent: navigator.userAgent,
                 additional_data: {
@@ -179,16 +197,16 @@ class ErrorTracker {
         });
         longTaskObserver.observe({ entryTypes: ['longtask'] });
 
-        // مراقبة Layout Shifts - فقط للقيم الكبيرة
+        // مراقبة Layout Shifts - فقط للقيم الكبيرة جداً (> 0.5)
         const layoutShiftObserver = new PerformanceObserver((list) => {
           for (const entry of list.getEntries()) {
             const layoutShift = entry as any;
-            // تسجيل فقط layout shifts أكبر من 0.25 (كبيرة)
-            if (layoutShift.value > 0.25) {
+            // تسجيل فقط layout shifts أكبر من 0.5 (كبيرة جداً)
+            if (layoutShift.value > 0.5) {
               this.trackError({
                 error_type: 'layout_shift',
-                error_message: `Cumulative Layout Shift: ${layoutShift.value.toFixed(3)}`,
-                severity: 'medium',
+                error_message: `Critical Layout Shift: ${layoutShift.value.toFixed(3)}`,
+                severity: 'high',
                 url: window.location.href,
                 user_agent: navigator.userAgent,
                 additional_data: {
