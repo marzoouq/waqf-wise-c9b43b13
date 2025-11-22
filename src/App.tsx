@@ -299,6 +299,14 @@ const App = () => {
               </ProtectedRoute>
             } 
           />
+          <Route 
+            path="/system-error-logs" 
+            element={
+              <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+                <SystemErrorLogs />
+              </ProtectedRoute>
+            } 
+          />
           <Route
             path="/advanced-settings" 
             element={
@@ -347,7 +355,7 @@ const App = () => {
                 <Route 
                   path="/system-monitoring" 
                   element={
-                    <ProtectedRoute requiredRole="admin">
+                    <ProtectedRoute requiredRoles={["admin", "nazer"]}>
                       <SystemMonitoring />
                     </ProtectedRoute>
                   } 
