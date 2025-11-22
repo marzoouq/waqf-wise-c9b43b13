@@ -56,10 +56,52 @@ const filterRelevantPayments = (payments: RentalPayment[], daysThreshold: number
   });
 };
 
+// Filter to show only the next upcoming payment per contract
+const filterNextPaymentPerContract = (payments: RentalPayment[]) => {
+  const now = new Date();
+  
+  // Group payments by contract
+  const paymentsByContract = payments.reduce((acc, payment) => {
+    const contractId = payment.contract_id;
+    if (!acc[contractId]) {
+      acc[contractId] = [];
+    }
+    acc[contractId].push(payment);
+    return acc;
+  }, {} as Record<string, RentalPayment[]>);
+
+  // For each contract, keep paid, overdue, and only the next upcoming payment
+  const result: RentalPayment[] = [];
+  
+  Object.values(paymentsByContract).forEach((contractPayments) => {
+    // Sort by due date
+    const sorted = [...contractPayments].sort(
+      (a, b) => new Date(a.due_date).getTime() - new Date(b.due_date).getTime()
+    );
+
+    // Add paid payments
+    const paid = sorted.filter(p => p.payment_date);
+    result.push(...paid);
+
+    // Add overdue payments
+    const overdue = sorted.filter(p => !p.payment_date && new Date(p.due_date) < now);
+    result.push(...overdue);
+
+    // Find and add only the next upcoming payment
+    const upcoming = sorted.filter(p => !p.payment_date && new Date(p.due_date) >= now);
+    if (upcoming.length > 0) {
+      result.push(upcoming[0]); // Only the closest upcoming payment
+    }
+  });
+
+  return result;
+};
+
 export const useRentalPayments = (
   contractId?: string, 
   showAllPayments: boolean = false, 
-  daysThreshold: number = 90
+  daysThreshold: number = 90,
+  showNextOnly: boolean = true
 ) => {
   const queryClient = useQueryClient();
   const { createAutoEntry } = useJournalEntries();
@@ -115,9 +157,19 @@ export const useRentalPayments = (
   const payments = useMemo(
     () => {
       if (!allPayments) return [];
-      return showAllPayments ? allPayments : filterRelevantPayments(allPayments, daysThreshold);
+      
+      // If showing all payments without filters
+      if (showAllPayments) return allPayments;
+      
+      // If showing only next payment per contract (default)
+      if (showNextOnly) {
+        return filterNextPaymentPerContract(allPayments);
+      }
+      
+      // Otherwise use threshold filtering
+      return filterRelevantPayments(allPayments, daysThreshold);
     },
-    [allPayments, showAllPayments, daysThreshold]
+    [allPayments, showAllPayments, showNextOnly, daysThreshold]
   );
 
   const hiddenPaymentsCount = useMemo(
