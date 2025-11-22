@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { UserPlus, Copy, Eye, EyeOff } from "lucide-react";
 import { Beneficiary } from "@/types/beneficiary";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useLeakedPassword } from "@/hooks/useLeakedPassword";
 
 const accountSchema = z.object({
   password: z.string().min(8, "كلمة المرور يجب أن تكون 8 أحرف على الأقل"),
@@ -39,6 +40,7 @@ export function CreateBeneficiaryAccountDialog({
   const [isLoading, setIsLoading] = useState(false);
   const [createdAccount, setCreatedAccount] = useState<{ email: string; password: string } | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const { checkPasswordQuick, isChecking } = useLeakedPassword();
 
   const form = useForm<AccountFormValues>({
     resolver: zodResolver(accountSchema),
@@ -60,6 +62,18 @@ export function CreateBeneficiaryAccountDialog({
 
     setIsLoading(true);
     try {
+      // التحقق من كلمة المرور المسربة
+      const isLeaked = await checkPasswordQuick(data.password);
+      if (isLeaked) {
+        toast({
+          title: "كلمة مرور غير آمنة",
+          description: "هذه الكلمة تم تسريبها في اختراقات سابقة. يرجى اختيار كلمة مرور أخرى.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
       // Create auth account
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: beneficiary.email,
