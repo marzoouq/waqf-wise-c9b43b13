@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Eye, CheckSquare, Calculator, Plus, Trash2 } from "lucide-react";
+import { Eye, CheckSquare, Calculator, Plus, Trash2, Edit } from "lucide-react";
 import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
 import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
 import { DistributionDetailsDialog } from "@/components/distributions/DistributionDetailsDialog";
@@ -11,6 +11,9 @@ import { ApprovalWorkflowDialog } from "@/components/distributions/ApprovalWorkf
 import { DistributionSimulator } from "@/components/distributions/DistributionSimulator";
 import { CreateDistributionDialog } from "@/components/distributions/CreateDistributionDialog";
 import { useDistributions, Distribution } from "@/hooks/useDistributions";
+import { ExportButton } from "@/components/shared/ExportButton";
+import { format } from "date-fns";
+import { ar } from "date-fns/locale";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -62,6 +65,23 @@ export function DistributionsTab() {
     <div className="space-y-6">
       {/* أزرار الإجراءات */}
       <div className="flex flex-wrap gap-3 justify-end">
+        {distributions.length > 0 && (
+          <ExportButton
+            data={distributions.map(d => ({
+              'الشهر': d.month,
+              'إجمالي المبلغ': d.total_amount?.toLocaleString() || '0',
+              'عدد المستفيدين': d.beneficiaries_count,
+              'حصة الناظر': d.nazer_share?.toLocaleString() || '0',
+              'تاريخ التوزيع': format(new Date(d.distribution_date), 'yyyy/MM/dd', { locale: ar }),
+              'الحالة': d.status,
+            }))}
+            filename="التوزيعات"
+            title="تقرير التوزيعات"
+            headers={['الشهر', 'إجمالي المبلغ', 'عدد المستفيدين', 'حصة الناظر', 'تاريخ التوزيع', 'الحالة']}
+            variant="outline"
+            size="sm"
+          />
+        )}
         <Button onClick={() => setSimulatorOpen(true)} variant="outline" className="gap-2">
           <Calculator className="h-4 w-4" />
           محاكاة التوزيع

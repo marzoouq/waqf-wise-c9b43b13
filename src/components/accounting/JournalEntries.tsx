@@ -22,6 +22,7 @@ import ViewJournalEntryDialog from "./ViewJournalEntryDialog";
 import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
 import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
 import { BadgeVariant } from "@/types/approvals";
+import { ExportButton } from "@/components/shared/ExportButton";
 
 type JournalEntry = {
   id: string;
@@ -99,14 +100,32 @@ const JournalEntries = () => {
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <h2 className="text-xl sm:text-2xl font-bold">القيود المحاسبية</h2>
-        <Button 
-          onClick={() => setIsAddDialogOpen(true)}
-          size="sm"
-          className="w-full sm:w-auto"
-        >
-          <Plus className="h-4 w-4 ml-2" />
-          إضافة قيد جديد
-        </Button>
+        <div className="flex gap-2">
+          {entries.length > 0 && (
+            <ExportButton
+              data={entries.map(e => ({
+                'رقم القيد': e.entry_number,
+                'التاريخ': format(new Date(e.entry_date), 'yyyy/MM/dd', { locale: ar }),
+                'الوصف': e.description,
+                'الحالة': e.status === 'posted' ? 'مرحّل' : e.status === 'draft' ? 'مسودة' : 'ملغى',
+                'تاريخ الترحيل': e.posted_at ? format(new Date(e.posted_at), 'yyyy/MM/dd HH:mm', { locale: ar }) : '-',
+              }))}
+              filename="القيود_المحاسبية"
+              title="القيود المحاسبية"
+              headers={['رقم القيد', 'التاريخ', 'الوصف', 'الحالة', 'تاريخ الترحيل']}
+              variant="outline"
+              size="sm"
+            />
+          )}
+          <Button 
+            onClick={() => setIsAddDialogOpen(true)}
+            size="sm"
+            className="w-full sm:w-auto"
+          >
+            <Plus className="h-4 w-4 ml-2" />
+            إضافة قيد جديد
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}

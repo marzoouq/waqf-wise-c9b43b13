@@ -78,15 +78,37 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
 
   return (
     <div className="space-y-6">
-      {/* Search */}
-      <div className="relative">
-        <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-        <Input
-          placeholder="البحث عن طلب صيانة..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pr-10"
-        />
+      {/* Search and Export */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+          <Input
+            placeholder="البحث عن طلب صيانة..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pr-10"
+          />
+        </div>
+        {filteredRequests.length > 0 && (
+          <ExportButton
+            data={filteredRequests.map(r => ({
+              'رقم الطلب': r.request_number,
+              'العقار': r.properties?.name || '-',
+              'العنوان': r.title,
+              'الفئة': r.category,
+              'الأولوية': r.priority,
+              'التاريخ': format(new Date(r.requested_date), 'yyyy/MM/dd', { locale: ar }),
+              'التكلفة المقدرة': (r.estimated_cost || 0).toLocaleString(),
+              'التكلفة الفعلية': (r.actual_cost || 0).toLocaleString(),
+              'الحالة': r.status,
+            }))}
+            filename="طلبات_الصيانة"
+            title="طلبات الصيانة"
+            headers={['رقم الطلب', 'العقار', 'العنوان', 'الفئة', 'الأولوية', 'التاريخ', 'التكلفة المقدرة', 'التكلفة الفعلية', 'الحالة']}
+            variant="outline"
+            size="sm"
+          />
+        )}
       </div>
 
       {/* Stats */}

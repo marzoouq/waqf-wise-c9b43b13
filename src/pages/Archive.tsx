@@ -21,6 +21,7 @@ import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapp
 import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
+import { ExportButton } from "@/components/shared/ExportButton";
 
 type Document = Database['public']['Tables']['documents']['Row'];
 
@@ -166,6 +167,23 @@ const Archive = () => {
                 <Plus className="ml-2 h-4 w-4" />
                 إنشاء مجلد
               </Button>
+              {filteredDocuments.length > 0 && (
+                <ExportButton
+                  data={filteredDocuments.map(doc => ({
+                    'اسم المستند': doc.name,
+                    'الفئة': doc.category,
+                    'النوع': doc.file_type,
+                    'الحجم': doc.file_size || '-',
+                    'تاريخ الرفع': format(new Date(doc.uploaded_at), 'yyyy/MM/dd', { locale: ar }),
+                    'الوصف': doc.description || '-',
+                  }))}
+                  filename="المستندات"
+                  title="قائمة المستندات"
+                  headers={['اسم المستند', 'الفئة', 'النوع', 'الحجم', 'تاريخ الرفع', 'الوصف']}
+                  variant="outline"
+                  size="sm"
+                />
+              )}
             </div>
 
             <div className="relative">
