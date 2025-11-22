@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import AddAccountDialog from "./AddAccountDialog";
 import { AccountRow, AccountWithBalance } from "@/types/supabase-helpers";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
+import { ExportButton } from "@/components/shared/ExportButton";
 
 interface AccountNodeProps {
   account: AccountWithBalance;
@@ -183,6 +184,24 @@ export function EnhancedAccountsTree() {
     }
   };
 
+  const flattenAccounts = (accounts: AccountWithBalance[]): any[] => {
+    let result: any[] = [];
+    accounts.forEach(account => {
+      result.push({
+        'الكود': account.code,
+        'الاسم': account.name_ar,
+        'النوع': account.account_type,
+        'الطبيعة': account.account_nature === 'debit' ? 'مدين' : 'دائن',
+        'الرصيد': account.current_balance?.toLocaleString() || '0.00',
+        'الحالة': account.is_active ? 'نشط' : 'غير نشط',
+      });
+      if (account.children && account.children.length > 0) {
+        result = result.concat(flattenAccounts(account.children));
+      }
+    });
+    return result;
+  };
+
   if (isLoading) {
     return <div className="text-center py-8">جاري التحميل...</div>;
   }
@@ -193,13 +212,21 @@ export function EnhancedAccountsTree() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold">شجرة الحسابات</h2>
-            <Button onClick={() => {
-              setSelectedAccount(null);
-              setDialogOpen(true);
-            }}>
-              <Plus className="ml-2 h-4 w-4" />
-              إضافة حساب رئيسي
-            </Button>
+            <div className="flex gap-2">
+              <ExportButton
+                data={flattenAccounts(accountTree)}
+                filename="شجرة_الحسابات"
+                title="شجرة الحسابات"
+                headers={['الكود', 'الاسم', 'النوع', 'الطبيعة', 'الرصيد', 'الحالة']}
+              />
+              <Button onClick={() => {
+                setSelectedAccount(null);
+                setDialogOpen(true);
+              }}>
+                <Plus className="ml-2 h-4 w-4" />
+                إضافة حساب رئيسي
+              </Button>
+            </div>
           </div>
 
           <Input
