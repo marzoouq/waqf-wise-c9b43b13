@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { BeneficiaryProfileCard } from "@/components/beneficiary/BeneficiaryProfileCard";
 import { StatsCard } from "@/components/beneficiary/StatsCard";
+import { StatsCardSkeleton } from "@/components/beneficiary/StatsCardSkeleton";
 import { QuickActionsCard } from "@/components/beneficiary/QuickActionsCard";
 import { AnnualDisclosureCard } from "@/components/beneficiary/AnnualDisclosureCard";
 import { PropertyStatsCards } from "@/components/beneficiary/PropertyStatsCards";
@@ -111,9 +112,22 @@ const BeneficiaryDashboard = () => {
       setServicesTab("history");
     },
     onError: (error: Error) => {
+      const errorMessage = error.message || "حدث خطأ أثناء إرسال الطلب";
+      
+      // تحسين رسائل الخطأ للمستخدم
+      let userFriendlyMessage = errorMessage;
+      
+      if (errorMessage.includes("duplicate") || errorMessage.includes("unique")) {
+        userFriendlyMessage = "يوجد طلب مشابه قيد المعالجة بالفعل. يرجى الانتظار حتى يتم معالجته.";
+      } else if (errorMessage.includes("foreign key") || errorMessage.includes("not found")) {
+        userFriendlyMessage = "حدث خطأ في البيانات. يرجى المحاولة مرة أخرى أو التواصل مع الدعم.";
+      } else if (errorMessage.includes("network") || errorMessage.includes("fetch")) {
+        userFriendlyMessage = "مشكلة في الاتصال بالإنترنت. يرجى التحقق من الاتصال والمحاولة مرة أخرى.";
+      }
+      
       toast({
-        title: "خطأ",
-        description: error.message || "حدث خطأ أثناء إرسال الطلب",
+        title: "تعذر إرسال الطلب",
+        description: userFriendlyMessage,
         variant: "destructive",
       });
     },
@@ -241,30 +255,41 @@ const BeneficiaryDashboard = () => {
 
         {/* الإحصائيات المحسنة */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatsCard
-            title="إجمالي المدفوعات"
-            value={formatCurrency(stats.totalPayments)}
-            icon={DollarSign}
-            colorClass="text-primary"
-          />
-          <StatsCard
-            title="عدد المدفوعات"
-            value={stats.paymentsCount}
-            icon={FileText}
-            colorClass="text-green-600"
-          />
-          <StatsCard
-            title="آخر دفعة"
-            value={stats.lastPaymentDate}
-            icon={Calendar}
-            colorClass="text-blue-600"
-          />
-          <StatsCard
-            title="متوسط الدفعة"
-            value={formatCurrency(stats.averagePayment)}
-            icon={TrendingUp}
-            colorClass="text-amber-600"
-          />
+          {loading ? (
+            <>
+              <StatsCardSkeleton />
+              <StatsCardSkeleton />
+              <StatsCardSkeleton />
+              <StatsCardSkeleton />
+            </>
+          ) : (
+            <>
+              <StatsCard
+                title="إجمالي المدفوعات"
+                value={formatCurrency(stats.totalPayments)}
+                icon={DollarSign}
+                colorClass="text-primary"
+              />
+              <StatsCard
+                title="عدد المدفوعات"
+                value={stats.paymentsCount}
+                icon={FileText}
+                colorClass="text-green-600"
+              />
+              <StatsCard
+                title="آخر دفعة"
+                value={stats.lastPaymentDate}
+                icon={Calendar}
+                colorClass="text-blue-600"
+              />
+              <StatsCard
+                title="متوسط الدفعة"
+                value={formatCurrency(stats.averagePayment)}
+                icon={TrendingUp}
+                colorClass="text-amber-600"
+              />
+            </>
+          )}
         </div>
 
         {/* التبويبات الرئيسية - 3 فقط */}

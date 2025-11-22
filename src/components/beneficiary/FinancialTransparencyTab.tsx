@@ -6,8 +6,15 @@ import { ContractsTable } from "./ContractsTable";
 import { MonthlyRevenueChart } from "./MonthlyRevenueChart";
 import { DistributionPieChart } from "./DistributionPieChart";
 import { ReportsMenu } from "./ReportsMenu";
+import { EmptyPaymentsState } from "./EmptyPaymentsState";
+import { useBeneficiaryProfile } from "@/hooks/useBeneficiaryProfile";
+import { useAuth } from "@/hooks/useAuth";
 
 export function FinancialTransparencyTab() {
+  const { user } = useAuth();
+  const { payments } = useBeneficiaryProfile(user?.id);
+  const hasPayments = payments && payments.length > 0;
+
   return (
     <div className="space-y-6">
       <Card className="bg-primary/5 border-primary/20">
@@ -58,36 +65,42 @@ export function FinancialTransparencyTab() {
       </Card>
 
       {/* الإيرادات الشهرية */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-amber-600" />
-            الإيرادات الشهرية
-          </CardTitle>
-          <CardDescription>
-            تطور إيرادات الوقف خلال الأشهر الماضية
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <MonthlyRevenueChart />
-        </CardContent>
-      </Card>
+      {hasPayments ? (
+        <>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-amber-600" />
+                الإيرادات الشهرية
+              </CardTitle>
+              <CardDescription>
+                تطور إيرادات الوقف خلال الأشهر الماضية
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <MonthlyRevenueChart />
+            </CardContent>
+          </Card>
 
-      {/* نسب التوزيع */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <PieChart className="h-5 w-5 text-purple-600" />
-            نسب التوزيع بين المستفيدين
-          </CardTitle>
-          <CardDescription>
-            توزيع غلة الوقف حسب الفئات والأولويات
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <DistributionPieChart />
-        </CardContent>
-      </Card>
+          {/* نسب التوزيع */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <PieChart className="h-5 w-5 text-purple-600" />
+                نسب التوزيع بين المستفيدين
+              </CardTitle>
+              <CardDescription>
+                توزيع غلة الوقف حسب الفئات والأولويات
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <DistributionPieChart />
+            </CardContent>
+          </Card>
+        </>
+      ) : (
+        <EmptyPaymentsState />
+      )}
 
       {/* تقارير الوقف */}
       <ReportsMenu type="waqf" />
