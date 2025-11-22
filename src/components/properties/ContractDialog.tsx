@@ -32,6 +32,7 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
     monthly_rent: "",
     security_deposit: "",
     payment_frequency: "شهري",
+    units_count: "1",
     is_renewable: true,
     auto_renew: false,
     renewal_notice_days: "60",
@@ -54,6 +55,7 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
         monthly_rent: contract.monthly_rent.toString(),
         security_deposit: contract.security_deposit?.toString() || "",
         payment_frequency: contract.payment_frequency,
+        units_count: (contract as any).units_count?.toString() || "1",
         is_renewable: contract.is_renewable,
         auto_renew: contract.auto_renew,
         renewal_notice_days: contract.renewal_notice_days.toString(),
@@ -76,6 +78,7 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
       monthly_rent: parseFloat(formData.monthly_rent),
       security_deposit: parseFloat(formData.security_deposit) || 0,
       renewal_notice_days: parseInt(formData.renewal_notice_days),
+      units_count: parseInt(formData.units_count) || 1,
     };
 
     if (contract) {
@@ -103,6 +106,7 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
       monthly_rent: "",
       security_deposit: "",
       payment_frequency: "شهري",
+      units_count: "1",
       is_renewable: true,
       auto_renew: false,
       renewal_notice_days: "60",
@@ -222,7 +226,7 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-4 gap-4">
             <div className="space-y-2">
               <Label>الإيجار الشهري *</Label>
               <Input
@@ -241,6 +245,17 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
                 step="0.01"
                 value={formData.security_deposit}
                 onChange={(e) => setFormData({ ...formData, security_deposit: e.target.value })}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>عدد الوحدات *</Label>
+              <Input
+                type="number"
+                min="1"
+                value={formData.units_count}
+                onChange={(e) => setFormData({ ...formData, units_count: e.target.value })}
+                required
               />
             </div>
 

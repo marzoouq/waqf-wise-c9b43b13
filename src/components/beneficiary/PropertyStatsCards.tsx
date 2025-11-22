@@ -1,10 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { StatsCard } from "./StatsCard";
-import { Building2, Home, TrendingUp, DollarSign, Package, MapPin } from "lucide-react";
+import { Building2, Home, TrendingUp, DollarSign, Package, MapPin, ChevronDown } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { formatCurrency } from "@/lib/utils";
 
 export function PropertyStatsCards() {
@@ -101,45 +102,41 @@ export function PropertyStatsCards() {
         </CardHeader>
         <CardContent className="pt-4">
           {properties && properties.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <Accordion type="single" collapsible className="space-y-3">
               {properties.map((property) => (
-                <Card
+                <AccordionItem
                   key={property.id}
-                  className="overflow-hidden border-l-4 border-l-primary hover:shadow-md transition-shadow"
+                  value={property.id}
+                  className="border border-border/50 rounded-lg overflow-hidden"
                 >
-                  <CardContent className="p-4">
-                    <div className="space-y-3">
-                      <div>
+                  <AccordionTrigger className="px-4 hover:no-underline hover:bg-muted/50">
+                    <div className="flex items-center justify-between w-full pr-4">
+                      <div className="text-left">
                         <h4 className="font-semibold text-base">{property.name}</h4>
                         <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
                           <MapPin className="h-3 w-3" />
                           {property.location}
                         </p>
                       </div>
-                      <div className="flex items-center justify-between pt-2 border-t">
-                        <div className="flex gap-2 flex-wrap">
-                          <Badge 
-                            variant={property.status === 'مؤجر' ? 'default' : 'outline'} 
-                            className="text-xs"
-                          >
-                            {property.status || 'غير محدد'}
-                          </Badge>
-                          <Badge variant="outline" className="text-xs">
-                            {property.total_units || 0} وحدة
-                          </Badge>
-                          <Badge className="bg-green-500/10 text-green-700 border-green-200 text-xs">
-                            {property.occupied_units || 0} مشغول
-                          </Badge>
-                          <Badge variant="secondary" className="text-xs">
-                            {(property.total_units || 0) - (property.occupied_units || 0)} شاغر
-                          </Badge>
-                        </div>
+                      <div className="flex gap-2 flex-wrap">
+                        <Badge variant="outline" className="text-xs">
+                          {property.total_units || 0} وحدة
+                        </Badge>
+                        <Badge className="bg-green-500/10 text-green-700 border-green-200 text-xs">
+                          {property.occupied_units || 0} مشغول
+                        </Badge>
+                        <Badge variant="secondary" className="text-xs">
+                          {(property.total_units || 0) - (property.occupied_units || 0)} شاغر
+                        </Badge>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-4 pb-4">
+                    <PropertyUnitsDisplay propertyId={property.id} />
+                  </AccordionContent>
+                </AccordionItem>
               ))}
-            </div>
+            </Accordion>
           ) : (
             <div className="text-center py-8">
               <Package className="h-12 w-12 text-muted-foreground/50 mx-auto mb-3" />
@@ -148,6 +145,116 @@ export function PropertyStatsCards() {
           )}
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+// مكون فرعي لعرض وحدات العقار
+function PropertyUnitsDisplay({ propertyId }: { propertyId: string }) {
+  const { data: units, isLoading } = useQuery({
+    queryKey: ["property-units", propertyId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("property_units")
+        .select(`
+          id,
+          unit_number,
+          unit_type,
+          floor_number,
+          area,
+          annual_rent,
+          occupancy_status,
+          current_contract_id
+        `)
+        .eq("property_id", propertyId)
+        .order("unit_number");
+
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  const { data: contracts } = useQuery({
+    queryKey: ["property-contracts", propertyId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("contracts")
+        .select("id, tenant_name, monthly_rent")
+        .eq("property_id", propertyId)
+        .eq("status", "نشط");
+
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  if (isLoading) {
+    return (
+      <div className="space-y-2">
+        {[...Array(3)].map((_, i) => (
+          <Skeleton key={i} className="h-20" />
+        ))}
+      </div>
+    );
+  }
+
+  if (!units || units.length === 0) {
+    return (
+      <div className="text-center py-6 text-muted-foreground">
+        لا توجد وحدات مسجلة لهذا العقار
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-2">
+      {units.map((unit) => {
+        const contract = contracts?.find((c) => c.id === unit.current_contract_id);
+        const isOccupied = unit.occupancy_status === "مشغول";
+
+        return (
+          <Card
+            key={unit.id}
+            className={`border-l-4 ${
+              isOccupied ? "border-l-green-500" : "border-l-gray-300"
+            }`}
+          >
+            <CardContent className="p-3">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <h5 className="font-semibold text-sm">{unit.unit_number}</h5>
+                  <Badge
+                    variant={isOccupied ? "default" : "secondary"}
+                    className="text-xs"
+                  >
+                    {unit.occupancy_status}
+                  </Badge>
+                </div>
+                <div className="space-y-1 text-xs text-muted-foreground">
+                  <p>النوع: {unit.unit_type || "غير محدد"}</p>
+                  {unit.floor_number && <p>الطابق: {unit.floor_number}</p>}
+                  {unit.area && <p>المساحة: {unit.area} م²</p>}
+                  {unit.annual_rent && (
+                    <p className="text-primary font-medium">
+                      {formatCurrency(unit.annual_rent / 12)}/شهر
+                    </p>
+                  )}
+                  {contract && (
+                    <div className="pt-1 border-t mt-2">
+                      <p className="font-medium text-foreground">
+                        المستأجر: {contract.tenant_name}
+                      </p>
+                      <p className="text-green-600 font-medium">
+                        {formatCurrency(contract.monthly_rent)}/شهر
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        );
+      })}
     </div>
   );
 }
