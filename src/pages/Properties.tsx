@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Building, FileText, DollarSign, Wrench } from "lucide-react";
+import { Plus, Building, FileText, DollarSign, Wrench, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,9 +19,12 @@ import { type MaintenanceRequest } from "@/hooks/useMaintenanceRequests";
 import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
 import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
 import { logger } from "@/lib/logger";
+import { ExportButton } from "@/components/shared/ExportButton";
+import { usePrint } from "@/hooks/usePrint";
 
 const Properties = () => {
-  const { addProperty, updateProperty } = useProperties();
+  const { addProperty, updateProperty, properties } = useProperties();
+  const { print } = usePrint();
   
   const [activeTab, setActiveTab] = useState("properties");
   const [propertyDialogOpen, setPropertyDialogOpen] = useState(false);
@@ -117,7 +120,25 @@ const Properties = () => {
               إدارة شاملة للعقارات، العقود، الإيجارات والصيانة
             </p>
           </div>
-          {getAddButton()}
+          <div className="flex gap-2">
+            {activeTab === "properties" && properties && properties.length > 0 && (
+              <ExportButton
+                data={properties.map(p => ({
+                  name: p.name,
+                  type: p.type,
+                  location: p.location,
+                  units: p.units || "-",
+                  occupied: p.occupied || "-",
+                  revenue: p.monthly_revenue || 0,
+                  status: p.status,
+                }))}
+                filename="properties"
+                title="تقرير العقارات"
+                headers={["name", "type", "location", "units", "occupied", "revenue", "status"]}
+              />
+            )}
+            {getAddButton()}
+          </div>
         </div>
 
         {/* Tabs */}

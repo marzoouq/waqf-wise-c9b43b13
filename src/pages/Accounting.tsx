@@ -20,6 +20,8 @@ import { CashFlowStatement } from "@/components/accounting/CashFlowStatement";
 import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
+import { ExportButton } from "@/components/shared/ExportButton";
+import { useAccounts } from "@/hooks/useAccounts";
 
 const Accounting = () => {
   const [activeTab, setActiveTab] = useState("accounts");

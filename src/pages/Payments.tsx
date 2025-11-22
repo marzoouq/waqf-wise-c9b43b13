@@ -23,6 +23,9 @@ import { Pagination } from "@/components/ui/pagination";
 import { logger } from "@/lib/logger";
 import { MobileOptimizedLayout, MobileOptimizedHeader, MobileOptimizedGrid } from "@/components/layout/MobileOptimizedLayout";
 import { Database } from '@/integrations/supabase/types';
+import { ExportButton } from "@/components/shared/ExportButton";
+import { PaymentReceiptTemplate } from "@/components/payments/PaymentReceiptTemplate";
+import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 
 type Payment = Database['public']['Tables']['payments']['Row'];
 
@@ -34,6 +37,9 @@ const Payments = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [paymentToDelete, setPaymentToDelete] = useState<Payment | null>(null);
+  const [printPayment, setPrintPayment] = useState<Payment | null>(null);
 
   const { payments, isLoading, addPayment, updatePayment, deletePayment } = usePayments();
   const { createAutoEntry } = useJournalEntries();
@@ -133,6 +139,24 @@ const Payments = () => {
     }
   };
 
+  const handleDeleteClick = (payment: Payment) => {
+    setPaymentToDelete(payment);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (paymentToDelete) {
+      deletePayment(paymentToDelete.id);
+      setDeleteDialogOpen(false);
+      setPaymentToDelete(null);
+    }
+  };
+
+  const handlePrintReceipt = (payment: Payment) => {
+    setPrintPayment(payment);
+    setTimeout(() => window.print(), 100);
+  };
+
   const handleDeletePayment = useCallback(async (id: string) => {
     if (confirm("هل أنت متأكد من حذف هذا السند؟")) {
       await deletePayment(id);
@@ -140,10 +164,8 @@ const Payments = () => {
   }, [deletePayment]);
 
   const handlePrint = (payment: Partial<Payment>) => {
-    toast({
-      title: "قريباً",
-      description: "سيتم إضافة وظيفة الطباعة قريباً",
-    });
+    // استخدام الطباعة الفعلية
+    handlePrintReceipt(payment as Payment);
   };
 
   const getPaymentMethodLabel = (method: string) => {
@@ -285,8 +307,9 @@ const Payments = () => {
                             <Button
                               variant="ghost"
                               size="sm"
+                              onClick={() => handleDeleteClick(payment as Payment)}
                               className="text-destructive hover:text-destructive"
-                              onClick={() => handleDeletePayment(payment.id)}
+                              title="حذف السند"
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -316,6 +339,22 @@ const Payments = () => {
           payment={selectedPayment}
           onSave={handleSavePayment}
         />
+
+        <DeleteConfirmDialog
+          open={deleteDialogOpen}
+          onOpenChange={setDeleteDialogOpen}
+          onConfirm={handleDeleteConfirm}
+          title="حذف السند"
+          description="هل أنت متأكد من حذف هذا السند؟ سيتم حذف القيد المحاسبي المرتبط به."
+          itemName={paymentToDelete ? `${paymentToDelete.payment_number} - ${paymentToDelete.amount} ر.س` : ""}
+          isLoading={false}
+        />
+
+        {printPayment && (
+          <PaymentReceiptTemplate
+            payment={printPayment as any}
+          />
+        )}
     </MobileOptimizedLayout>
   );
 };

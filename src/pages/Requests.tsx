@@ -29,6 +29,8 @@ import { ScrollableTableWrapper } from '@/components/shared/ScrollableTableWrapp
 import { MobileScrollHint } from '@/components/shared/MobileScrollHint';
 import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
 import type { BeneficiaryRequest } from '@/types/index';
+import { ExportButton } from '@/components/shared/ExportButton';
+import { PrintButton } from '@/components/shared/PrintButton';
 
 const Requests = () => {
   const { requests, isLoading, deleteRequest } = useRequests();
