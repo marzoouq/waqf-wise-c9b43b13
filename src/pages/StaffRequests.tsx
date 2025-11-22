@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useRequests } from "@/hooks/useRequests";
 import { useRequestTypes } from "@/hooks/useRequests";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -49,28 +49,40 @@ export default function StaffRequests() {
   const [approvalDialogOpen, setApprovalDialogOpen] = useState(false);
   const [commentsDialogOpen, setCommentsDialogOpen] = useState(false);
 
-  const filteredRequests = requests?.filter((request) => {
-    const matchesSearch =
-      request.beneficiary?.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      request.request_number?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      request.description?.toLowerCase().includes(searchQuery.toLowerCase());
+  // تحسين الأداء: استخدام useMemo للفلترة
+  const filteredRequests = useMemo(() => {
+    if (!requests) return [];
+    
+    const lowerSearch = searchQuery.toLowerCase();
+    
+    return requests.filter((request) => {
+      const matchesSearch =
+        request.beneficiary?.full_name?.toLowerCase().includes(lowerSearch) ||
+        request.request_number?.toLowerCase().includes(lowerSearch) ||
+        request.description?.toLowerCase().includes(lowerSearch);
 
-    const matchesStatus = statusFilter === "all" || request.status === statusFilter;
-    const matchesType = typeFilter === "all" || request.request_type_id === typeFilter;
+      const matchesStatus = statusFilter === "all" || request.status === statusFilter;
+      const matchesType = typeFilter === "all" || request.request_type_id === typeFilter;
 
-    return matchesSearch && matchesStatus && matchesType;
-  });
+      return matchesSearch && matchesStatus && matchesType;
+    });
+  }, [requests, searchQuery, statusFilter, typeFilter]);
 
-  // إحصائيات
-  const stats = {
-    pending: requests?.filter((r) => r.status === "قيد المراجعة").length || 0,
-    inProgress: requests?.filter((r) => r.status === "قيد المعالجة").length || 0,
-    approved: requests?.filter((r) => r.status === "موافق عليه").length || 0,
-    rejected: requests?.filter((r) => r.status === "مرفوض").length || 0,
-    overdue: requests?.filter((r) => r.is_overdue).length || 0,
-  };
+  // تحسين الأداء: استخدام useMemo للإحصائيات
+  const stats = useMemo(() => {
+    if (!requests) return { pending: 0, inProgress: 0, approved: 0, rejected: 0, overdue: 0 };
+    
+    return {
+      pending: requests.filter((r) => r.status === "قيد المراجعة").length,
+      inProgress: requests.filter((r) => r.status === "قيد المعالجة").length,
+      approved: requests.filter((r) => r.status === "موافق عليه").length,
+      rejected: requests.filter((r) => r.status === "مرفوض").length,
+      overdue: requests.filter((r) => r.is_overdue).length,
+    };
+  }, [requests]);
 
-  const getStatusBadge = (status: string, isOverdue: boolean) => {
+  // تحسين الأداء: استخدام useCallback لـ handlers
+  const getStatusBadge = useCallback((status: string, isOverdue: boolean) => {
     if (isOverdue) {
       return (
         <Badge variant="destructive" className="gap-1">
@@ -112,7 +124,7 @@ export default function StaffRequests() {
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
-  };
+  }, []);
 
   if (isLoading) return <LoadingState />;
 
