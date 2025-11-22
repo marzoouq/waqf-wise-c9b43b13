@@ -1684,6 +1684,68 @@ export type Database = {
         }
         Relationships: []
       }
+      deleted_files_audit: {
+        Row: {
+          backup_location: string | null
+          can_restore: boolean | null
+          deleted_at: string | null
+          deleted_by: string | null
+          deletion_reason: string | null
+          file_category: string | null
+          file_name: string
+          file_path: string
+          file_size: number | null
+          id: string
+          metadata: Json | null
+          original_file_id: string
+          permanent_deletion_at: string | null
+          restore_until: string | null
+          retention_policy_id: string | null
+        }
+        Insert: {
+          backup_location?: string | null
+          can_restore?: boolean | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
+          file_category?: string | null
+          file_name: string
+          file_path: string
+          file_size?: number | null
+          id?: string
+          metadata?: Json | null
+          original_file_id: string
+          permanent_deletion_at?: string | null
+          restore_until?: string | null
+          retention_policy_id?: string | null
+        }
+        Update: {
+          backup_location?: string | null
+          can_restore?: boolean | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deletion_reason?: string | null
+          file_category?: string | null
+          file_name?: string
+          file_path?: string
+          file_size?: number | null
+          id?: string
+          metadata?: Json | null
+          original_file_id?: string
+          permanent_deletion_at?: string | null
+          restore_until?: string | null
+          retention_policy_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deleted_files_audit_retention_policy_id_fkey"
+            columns: ["retention_policy_id"]
+            isOneToOne: false
+            referencedRelation: "file_retention_policies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       disclosure_beneficiaries: {
         Row: {
           allocated_amount: number
@@ -2092,6 +2154,211 @@ export type Database = {
           },
         ]
       }
+      encrypted_data_registry: {
+        Row: {
+          access_count: number | null
+          column_name: string
+          encrypted_at: string | null
+          encryption_algorithm: string
+          encryption_key_id: string | null
+          id: string
+          is_decrypted: boolean | null
+          last_accessed_at: string | null
+          metadata: Json | null
+          record_id: string
+          table_name: string
+        }
+        Insert: {
+          access_count?: number | null
+          column_name: string
+          encrypted_at?: string | null
+          encryption_algorithm?: string
+          encryption_key_id?: string | null
+          id?: string
+          is_decrypted?: boolean | null
+          last_accessed_at?: string | null
+          metadata?: Json | null
+          record_id: string
+          table_name: string
+        }
+        Update: {
+          access_count?: number | null
+          column_name?: string
+          encrypted_at?: string | null
+          encryption_algorithm?: string
+          encryption_key_id?: string | null
+          id?: string
+          is_decrypted?: boolean | null
+          last_accessed_at?: string | null
+          metadata?: Json | null
+          record_id?: string
+          table_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "encrypted_data_registry_encryption_key_id_fkey"
+            columns: ["encryption_key_id"]
+            isOneToOne: false
+            referencedRelation: "encryption_keys"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      encrypted_files: {
+        Row: {
+          checksum: string
+          encrypted_file_path: string
+          encryption_iv: string
+          encryption_key_id: string | null
+          encryption_tag: string | null
+          expires_at: string | null
+          file_size: number
+          id: string
+          is_deleted: boolean | null
+          metadata: Json | null
+          mime_type: string | null
+          original_file_name: string
+          uploaded_at: string | null
+          uploaded_by: string | null
+        }
+        Insert: {
+          checksum: string
+          encrypted_file_path: string
+          encryption_iv: string
+          encryption_key_id?: string | null
+          encryption_tag?: string | null
+          expires_at?: string | null
+          file_size: number
+          id?: string
+          is_deleted?: boolean | null
+          metadata?: Json | null
+          mime_type?: string | null
+          original_file_name: string
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+        }
+        Update: {
+          checksum?: string
+          encrypted_file_path?: string
+          encryption_iv?: string
+          encryption_key_id?: string | null
+          encryption_tag?: string | null
+          expires_at?: string | null
+          file_size?: number
+          id?: string
+          is_deleted?: boolean | null
+          metadata?: Json | null
+          mime_type?: string | null
+          original_file_name?: string
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "encrypted_files_encryption_key_id_fkey"
+            columns: ["encryption_key_id"]
+            isOneToOne: false
+            referencedRelation: "encryption_keys"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      encryption_key_rotation_history: {
+        Row: {
+          affected_records_count: number | null
+          completed_at: string | null
+          error_message: string | null
+          id: string
+          metadata: Json | null
+          new_key_id: string | null
+          old_key_id: string | null
+          rotated_at: string | null
+          rotated_by: string | null
+          rotation_reason: string
+          status: string | null
+        }
+        Insert: {
+          affected_records_count?: number | null
+          completed_at?: string | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          new_key_id?: string | null
+          old_key_id?: string | null
+          rotated_at?: string | null
+          rotated_by?: string | null
+          rotation_reason: string
+          status?: string | null
+        }
+        Update: {
+          affected_records_count?: number | null
+          completed_at?: string | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          new_key_id?: string | null
+          old_key_id?: string | null
+          rotated_at?: string | null
+          rotated_by?: string | null
+          rotation_reason?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "encryption_key_rotation_history_new_key_id_fkey"
+            columns: ["new_key_id"]
+            isOneToOne: false
+            referencedRelation: "encryption_keys"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "encryption_key_rotation_history_old_key_id_fkey"
+            columns: ["old_key_id"]
+            isOneToOne: false
+            referencedRelation: "encryption_keys"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      encryption_keys: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          key_name: string
+          key_purpose: string
+          key_type: string
+          metadata: Json | null
+          rotated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          key_name: string
+          key_purpose: string
+          key_type: string
+          metadata?: Json | null
+          rotated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          key_name?: string
+          key_purpose?: string
+          key_type?: string
+          metadata?: Json | null
+          rotated_at?: string | null
+        }
+        Relationships: []
+      }
       families: {
         Row: {
           created_at: string | null
@@ -2197,6 +2464,99 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      file_deletion_requests: {
+        Row: {
+          completed_at: string | null
+          file_category: string
+          file_id: string
+          id: string
+          metadata: Json | null
+          priority: string | null
+          reason: string
+          requested_at: string | null
+          requested_by: string | null
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          file_category: string
+          file_id: string
+          id?: string
+          metadata?: Json | null
+          priority?: string | null
+          reason: string
+          requested_at?: string | null
+          requested_by?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          file_category?: string
+          file_id?: string
+          id?: string
+          metadata?: Json | null
+          priority?: string | null
+          reason?: string
+          requested_at?: string | null
+          requested_by?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
+      file_retention_policies: {
+        Row: {
+          approval_role: string | null
+          auto_delete: boolean | null
+          created_at: string | null
+          created_by: string | null
+          file_category: string
+          id: string
+          is_active: boolean | null
+          metadata: Json | null
+          policy_name: string
+          requires_approval: boolean | null
+          retention_days: number
+          updated_at: string | null
+        }
+        Insert: {
+          approval_role?: string | null
+          auto_delete?: boolean | null
+          created_at?: string | null
+          created_by?: string | null
+          file_category: string
+          id?: string
+          is_active?: boolean | null
+          metadata?: Json | null
+          policy_name: string
+          requires_approval?: boolean | null
+          retention_days: number
+          updated_at?: string | null
+        }
+        Update: {
+          approval_role?: string | null
+          auto_delete?: boolean | null
+          created_at?: string | null
+          created_by?: string | null
+          file_category?: string
+          id?: string
+          is_active?: boolean | null
+          metadata?: Json | null
+          policy_name?: string
+          requires_approval?: boolean | null
+          retention_days?: number
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       fiscal_years: {
         Row: {
@@ -5262,6 +5622,60 @@ export type Database = {
         }
         Relationships: []
       }
+      sensitive_data_access_log: {
+        Row: {
+          access_reason: string | null
+          access_type: string
+          accessed_at: string | null
+          column_name: string | null
+          denial_reason: string | null
+          id: string
+          ip_address: string | null
+          metadata: Json | null
+          record_id: string | null
+          session_id: string | null
+          table_name: string
+          user_agent: string | null
+          user_email: string | null
+          user_id: string | null
+          was_granted: boolean | null
+        }
+        Insert: {
+          access_reason?: string | null
+          access_type: string
+          accessed_at?: string | null
+          column_name?: string | null
+          denial_reason?: string | null
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          record_id?: string | null
+          session_id?: string | null
+          table_name: string
+          user_agent?: string | null
+          user_email?: string | null
+          user_id?: string | null
+          was_granted?: boolean | null
+        }
+        Update: {
+          access_reason?: string | null
+          access_type?: string
+          accessed_at?: string | null
+          column_name?: string | null
+          denial_reason?: string | null
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          record_id?: string | null
+          session_id?: string | null
+          table_name?: string
+          user_agent?: string | null
+          user_email?: string | null
+          user_id?: string | null
+          was_granted?: boolean | null
+        }
+        Relationships: []
+      }
       smart_alerts: {
         Row: {
           action_url: string | null
@@ -6495,6 +6909,10 @@ export type Database = {
         Args: { annual_rate: number; months: number; principal: number }
         Returns: number
       }
+      check_file_retention_eligibility: {
+        Args: { p_file_category: string; p_uploaded_at: string }
+        Returns: boolean
+      }
       check_overdue_requests: { Args: never; Returns: undefined }
       check_rate_limit: {
         Args: {
@@ -6561,6 +6979,16 @@ export type Database = {
           p_ip_address: string
           p_success: boolean
           p_user_agent?: string
+        }
+        Returns: undefined
+      }
+      log_sensitive_data_access: {
+        Args: {
+          p_access_reason?: string
+          p_access_type: string
+          p_column_name: string
+          p_record_id: string
+          p_table_name: string
         }
         Returns: undefined
       }

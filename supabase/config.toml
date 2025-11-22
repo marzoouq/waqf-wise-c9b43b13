@@ -38,3 +38,15 @@ verify_jwt = true
 
 [functions.chatbot]
 verify_jwt = true
+
+[functions.encrypt-file]
+verify_jwt = true
+
+[functions.decrypt-file]
+verify_jwt = true
+
+[functions.secure-delete-file]
+verify_jwt = true
+
+[functions.cleanup-old-files]
+verify_jwt = false
