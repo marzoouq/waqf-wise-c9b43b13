@@ -1,11 +1,13 @@
 import { useState, useMemo } from "react";
-import { Search, DollarSign, Edit } from "lucide-react";
+import { Search, DollarSign, Edit, Eye, EyeOff } from "lucide-react";
 import { useRentalPayments } from "@/hooks/useRentalPayments";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { type RentalPayment } from "@/hooks/useRentalPayments";
@@ -16,7 +18,12 @@ interface Props {
 
 export const PaymentsTab = ({ onEdit }: Props) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const { payments, isLoading } = useRentalPayments();
+  const [showAllPayments, setShowAllPayments] = useState(false);
+  
+  // Get days threshold from localStorage or use default 90 days
+  const daysThreshold = parseInt(localStorage.getItem('paymentDaysThreshold') || '90');
+  
+  const { payments, allPayments, hiddenPaymentsCount, isLoading } = useRentalPayments(undefined, showAllPayments, daysThreshold);
 
   const filteredPayments = useMemo(() => {
     if (!searchQuery) return payments;
@@ -59,21 +66,34 @@ export const PaymentsTab = ({ onEdit }: Props) => {
 
   return (
     <div className="space-y-6">
-      {/* Search */}
-      <div className="relative">
-        <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-        <Input
-          placeholder="البحث عن دفعة..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pr-10"
-        />
+      {/* Search & Toggle */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+          <Input
+            placeholder="البحث عن دفعة..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pr-10"
+          />
+        </div>
+        <Card className="p-4 flex items-center gap-3 w-full sm:w-auto">
+          <Switch 
+            checked={showAllPayments}
+            onCheckedChange={setShowAllPayments}
+            id="show-all"
+          />
+          <Label htmlFor="show-all" className="cursor-pointer whitespace-nowrap flex items-center gap-2">
+            {showAllPayments ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+            عرض الدفعات البعيدة
+          </Label>
+        </Card>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         <Card className="p-4">
-          <div className="text-sm text-muted-foreground">إجمالي الدفعات</div>
+          <div className="text-sm text-muted-foreground">الدفعات المرئية</div>
           <div className="text-2xl font-bold">{payments?.length || 0}</div>
         </Card>
         <Card className="p-4">
@@ -92,6 +112,13 @@ export const PaymentsTab = ({ onEdit }: Props) => {
           <div className="text-sm text-muted-foreground">دفعات متأخرة</div>
           <div className="text-2xl font-bold text-destructive">{overdue}</div>
         </Card>
+        {!showAllPayments && hiddenPaymentsCount > 0 && (
+          <Card className="p-4 bg-muted/30">
+            <div className="text-sm text-muted-foreground">دفعات مخفية</div>
+            <div className="text-2xl font-bold text-muted-foreground">{hiddenPaymentsCount}</div>
+            <div className="text-xs text-muted-foreground mt-1">ستظهر عند اقتراب موعدها</div>
+          </Card>
+        )}
       </div>
 
       {/* Payments Table */}
