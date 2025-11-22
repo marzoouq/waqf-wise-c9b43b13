@@ -6271,6 +6271,7 @@ export type Database = {
           created_at: string | null
           description: string
           id: string
+          metadata: Json | null
           occurrence_count: number | null
           related_error_type: string | null
           resolved_at: string | null
@@ -6286,6 +6287,7 @@ export type Database = {
           created_at?: string | null
           description: string
           id?: string
+          metadata?: Json | null
           occurrence_count?: number | null
           related_error_type?: string | null
           resolved_at?: string | null
@@ -6301,6 +6303,7 @@ export type Database = {
           created_at?: string | null
           description?: string
           id?: string
+          metadata?: Json | null
           occurrence_count?: number | null
           related_error_type?: string | null
           resolved_at?: string | null
