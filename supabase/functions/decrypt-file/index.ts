@@ -176,11 +176,33 @@ serve(async (req) => {
     );
   } catch (error) {
     console.error('❌ خطأ في فك تشفير الملف:', error);
-    const errorMessage = error instanceof Error ? error.message : 'خطأ غير معروف';
+    
+    // تسجيل تفاصيل كاملة للمطورين
+    console.error('Full error details:', {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString()
+    });
+    
+    // رسالة آمنة للعميل (لا تكشف تفاصيل داخلية)
+    let safeMessage = 'حدث خطأ أثناء فك تشفير الملف';
+    
+    if (error instanceof Error) {
+      if (error.message.includes('غير مصرح') || error.message.includes('صلاحية')) {
+        safeMessage = 'ليس لديك صلاحية للوصول لهذا الملف';
+      } else if (error.message.includes('غير موجود') || error.message.includes('not found')) {
+        safeMessage = 'الملف غير موجود';
+      } else if (error.message.includes('انتهت صلاحية')) {
+        safeMessage = 'انتهت صلاحية الملف';
+      } else if (error.message.includes('checksum')) {
+        safeMessage = 'فشل التحقق من سلامة الملف';
+      }
+    }
+    
     return new Response(
       JSON.stringify({ 
         success: false,
-        error: errorMessage 
+        error: safeMessage
       }),
       {
         status: 500,

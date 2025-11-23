@@ -1,10 +1,10 @@
 project_id = "zsacuvrcohmraoldilph"
 
 [functions.log-error]
-verify_jwt = false
+verify_jwt = true
 
 [functions.execute-auto-fix]
-verify_jwt = false
+verify_jwt = true
 
 [functions.admin-manage-beneficiary-password]
 verify_jwt = true

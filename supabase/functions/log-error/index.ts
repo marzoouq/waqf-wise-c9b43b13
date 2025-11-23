@@ -1,20 +1,24 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-interface ErrorReport {
-  error_type: string;
-  error_message: string;
-  error_stack?: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  url: string;
-  user_agent: string;
-  user_id?: string;
-  additional_data?: Record<string, any>;
-}
+// Schema للتحقق من صحة المدخلات
+const errorReportSchema = z.object({
+  error_type: z.string().min(1).max(100),
+  error_message: z.string().min(1).max(2000),
+  error_stack: z.string().max(10000).optional(),
+  severity: z.enum(['low', 'medium', 'high', 'critical']),
+  url: z.string().max(500),
+  user_agent: z.string().max(500),
+  user_id: z.string().uuid().optional(),
+  additional_data: z.record(z.unknown()).optional()
+});
+
+type ErrorReport = z.infer<typeof errorReportSchema>;
 
 Deno.serve(async (req) => {
   // Handle CORS preflight
@@ -23,12 +27,72 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const errorReport: ErrorReport = await req.json();
+    // 🔒 1. فحص المصادقة
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'غير مصرح' }), 
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
-    // إنشاء عميل Supabase
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'مصادقة غير صالحة' }), 
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // ✅ 2. التحقق من صحة المدخلات
+    let errorReport: ErrorReport;
+    try {
+      const rawData = await req.json();
+      errorReport = errorReportSchema.parse(rawData);
+    } catch (validationError) {
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'بيانات غير صالحة'
+        }), 
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // 🚦 3. Rate Limiting (100 خطأ في الساعة لكل مستخدم)
+    const oneHourAgo = new Date(Date.now() - 3600000).toISOString();
+    const { count } = await supabase
+      .from('system_error_logs')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .gte('created_at', oneHourAgo);
+
+    if (count && count >= 100) {
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'تم تجاوز الحد المسموح من الطلبات. يرجى المحاولة لاحقاً' 
+        }), 
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // 🧹 4. تنظيف رسائل الخطأ من HTML tags
+    errorReport.error_message = errorReport.error_message
+      .replace(/<[^>]*>/g, '')
+      .substring(0, 2000);
+
+    if (errorReport.error_stack) {
+      errorReport.error_stack = errorReport.error_stack.substring(0, 10000);
+    }
+
+    // إنشاء عميل Supabase (تم بالفعل في الأعلى)
 
     // تسجيل الخطأ في قاعدة البيانات
     const { data: errorLog, error: insertError } = await supabase
@@ -40,7 +104,7 @@ Deno.serve(async (req) => {
         severity: errorReport.severity,
         url: errorReport.url,
         user_agent: errorReport.user_agent,
-        user_id: errorReport.user_id,
+        user_id: user.id,
         additional_data: errorReport.additional_data,
         status: 'new',
       })
@@ -85,7 +149,7 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: 'حدث خطأ أثناء معالجة الطلب',
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

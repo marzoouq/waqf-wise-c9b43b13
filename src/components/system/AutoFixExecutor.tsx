@@ -14,10 +14,22 @@ export function AutoFixExecutor() {
     // تشغيل الإصلاح التلقائي كل 5 دقائق
     const executeAutoFix = async () => {
       try {
+        // 🔒 الحصول على session للمصادقة
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
+          productionLogger.warn('No session for auto-fix execution');
+          return;
+        }
+
         productionLogger.info('Executing auto-fix...');
         
+        // ✅ إضافة Authorization header
         const { data, error } = await supabase.functions.invoke('execute-auto-fix', {
           body: {},
+          headers: {
+            Authorization: `Bearer ${session.access_token}`
+          }
         });
 
         if (error) {
