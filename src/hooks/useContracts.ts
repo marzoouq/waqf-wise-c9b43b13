@@ -26,14 +26,38 @@ export const useContracts = () => {
   });
 
   const addContract = useMutation({
-    mutationFn: async (contract: ContractInsert) => {
+    mutationFn: async (contract: ContractInsert & { unit_ids?: string[] }) => {
+      const { unit_ids, ...contractData } = contract;
+      
       const { data, error } = await supabase
         .from("contracts")
-        .insert([contract])
+        .insert([contractData])
         .select()
         .single();
 
       if (error) throw error;
+
+      // ربط الوحدات بالعقد
+      if (data && unit_ids && unit_ids.length > 0) {
+        const contractUnits = unit_ids.map(unitId => ({
+          contract_id: data.id,
+          property_unit_id: unitId,
+        }));
+
+        const { error: unitsError } = await supabase
+          .from("contract_units")
+          .insert(contractUnits);
+
+        if (unitsError) {
+          logger.error(unitsError, { context: 'link_contract_units', severity: 'high' });
+          // لا نوقف العملية، العقد تم إنشاؤه بالفعل
+          toast({
+            title: "تحذير",
+            description: "تم إنشاء العقد لكن فشل في ربط بعض الوحدات",
+            variant: "destructive",
+          });
+        }
+      }
 
       // إنشاء جدول الدفعات تلقائياً
       if (data) {
@@ -58,7 +82,7 @@ export const useContracts = () => {
           if (result.success) {
             toast({
               title: "تم إضافة العقد بنجاح",
-              description: `تم إنشاء العقد مع ${result.payments_created || 0} دفعة`,
+              description: `تم إنشاء العقد مع ${result.payments_created || 0} دفعة وربط ${unit_ids?.length || 0} وحدة`,
             });
           }
         }
@@ -69,6 +93,8 @@ export const useContracts = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contracts"] });
       queryClient.invalidateQueries({ queryKey: ["rental_payments"] });
+      queryClient.invalidateQueries({ queryKey: ["property-units"] });
+      queryClient.invalidateQueries({ queryKey: ["properties"] });
     },
     onError: (error) => {
       logger.error(error, { context: 'add_contract', severity: 'medium' });
