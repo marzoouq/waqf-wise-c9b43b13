@@ -12,8 +12,30 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { useProfile } from "@/hooks/useProfile";
+import { useUserRole } from "@/hooks/useUserRole";
 import { useEffect } from "react";
+
+const ROLE_LABELS = {
+  admin: "المشرف",
+  nazer: "الناظر",
+  accountant: "المحاسب",
+  cashier: "موظف الصرف",
+  archivist: "الأرشيفي",
+  beneficiary: "مستفيد",
+  user: "مستخدم",
+};
+
+const ROLE_COLORS = {
+  admin: "bg-destructive text-destructive-foreground",
+  nazer: "bg-primary text-primary-foreground",
+  accountant: "bg-success text-success-foreground",
+  cashier: "bg-warning text-warning-foreground",
+  archivist: "bg-info text-info-foreground",
+  beneficiary: "bg-accent text-accent-foreground",
+  user: "bg-muted text-muted-foreground",
+};
 
 const profileSchema = z.object({
   fullName: z
@@ -40,6 +62,7 @@ interface ProfileDialogProps {
 
 export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
   const { profile, isLoading, upsertProfile } = useProfile();
+  const { roles } = useUserRole();
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -87,6 +110,22 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
     >
       <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+            {/* عرض الأدوار الحالية */}
+            <div className="p-4 bg-muted/50 rounded-lg border">
+              <p className="text-sm font-medium mb-2">الأدوار الحالية:</p>
+              <div className="flex flex-wrap gap-2">
+                {roles.length > 0 ? (
+                  roles.map((role) => (
+                    <Badge key={role} className={ROLE_COLORS[role]}>
+                      {ROLE_LABELS[role]}
+                    </Badge>
+                  ))
+                ) : (
+                  <span className="text-sm text-muted-foreground">لا توجد أدوار</span>
+                )}
+              </div>
+            </div>
+
             <FormField
               control={form.control}
               name="fullName"
