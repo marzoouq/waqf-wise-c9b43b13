@@ -17,29 +17,26 @@ interface DebugTools {
 }
 
 /**
- * عرض الأخطاء المسجلة
+ * عرض الأخطاء المسجلة (معطلة حالياً)
  */
 function viewErrors() {
-  const errors = getErrorLogs();
-  console.table(errors);
-  return errors;
+  console.log('⚠️ Error logs moved to unified system');
+  return [];
 }
 
 /**
- * مسح سجل الأخطاء
+ * مسح سجل الأخطاء (معطلة حالياً)
  */
 function clearErrors() {
-  clearErrorLogs();
-  console.log('✅ تم مسح جميع الأخطاء');
+  console.log('⚠️ Error logs moved to unified system');
 }
 
 /**
- * تصدير الأخطاء
+ * تصدير الأخطاء (معطلة حالياً)
  */
 function exportErrors() {
-  const exported = exportErrorLogs();
-  console.log('📤 الأخطاء المصدرة:', exported);
-  return exported;
+  console.log('⚠️ Error logs moved to unified system');
+  return '[]';
 }
 
 /**

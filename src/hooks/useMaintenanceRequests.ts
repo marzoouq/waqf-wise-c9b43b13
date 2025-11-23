@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { createMutationErrorHandler } from "@/lib/errorHandling";
+import { createMutationErrorHandler } from "@/lib/errors";
 import type { MaintenanceRequestInsert, MaintenanceRequestUpdate } from "@/types/maintenance";
 import { useJournalEntries } from "./useJournalEntries";
 import { useTasks } from "@/hooks/useTasks";

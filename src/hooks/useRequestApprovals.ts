@@ -4,7 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
 import { logger } from "@/lib/logger";
-import { createMutationErrorHandler } from "@/lib/errorHandling";
+import { createMutationErrorHandler } from "@/lib/errors";
 
 export interface RequestApproval {
   id: string;

@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import { logger } from "@/lib/logger";
 import { createAutoJournalEntry as createAutoJournalEntryWrapper } from "@/lib/supabase-wrappers";
 import { createAutoJournalEntry } from "@/lib/supabase-wrappers";
-import { createMutationErrorHandler } from "@/lib/errorHandling";
+import { createMutationErrorHandler } from "@/lib/errors";
 import type { JournalEntryInsert, JournalLineInsert } from "@/types/accounting";
 
 export interface JournalEntry {

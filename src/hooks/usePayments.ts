@@ -5,7 +5,7 @@ import { useJournalEntries } from "./useJournalEntries";
 import { useEffect } from "react";
 import { logger } from "@/lib/logger";
 import { paymentRequiresApproval } from "@/lib/supabase-wrappers";
-import { createMutationErrorHandler } from "@/lib/errorHandling";
+import { createMutationErrorHandler } from "@/lib/errors";
 
 export interface Payment {
   id: string;

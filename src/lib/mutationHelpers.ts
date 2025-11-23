@@ -4,7 +4,7 @@
  */
 
 import { UseMutationOptions } from '@tanstack/react-query';
-import { logError } from './errors';
+import { logError, handleError } from './errors';
 import type { AppError } from '@/types/errors';
 
 export interface MutationHandlers<TData = unknown, TError = AppError, TVariables = unknown> {
@@ -29,9 +29,8 @@ export function createMutationOptions<TData, TError, TVariables>(
     },
     onError: (error, variables, context) => {
       // تسجيل الخطأ
-      logError(error, {
-        operation: handlers.context || 'mutation',
-        metadata: { variables },
+      handleError(error, {
+        context: { operation: handlers.context || 'mutation', metadata: { variables } },
       });
 
       if (handlers.onError) {
@@ -51,7 +50,7 @@ export async function executeMutation<T>(
   try {
     return await operation();
   } catch (error) {
-    logError(error, { operation: context });
+    handleError(error, { context: { operation: context } });
     throw error;
   }
 }

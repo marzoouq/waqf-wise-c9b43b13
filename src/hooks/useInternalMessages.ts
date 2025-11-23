@@ -4,7 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
 import type { InternalMessage, InternalMessageInsert } from "@/types/messages";
-import { createMutationErrorHandler } from "@/lib/errorHandling";
+import { createMutationErrorHandler } from "@/lib/errors";
 
 export function useInternalMessages() {
   const { toast } = useToast();

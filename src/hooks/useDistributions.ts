@@ -6,7 +6,7 @@ import { useActivities } from "@/hooks/useActivities";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
 import { logger } from "@/lib/logger";
-import { createMutationErrorHandler } from "@/lib/errorHandling";
+import { createMutationErrorHandler } from "@/lib/errors";
 
 export interface Distribution {
   id: string;

@@ -4,7 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useJournalEntries } from "./useJournalEntries";
 import { useEffect } from "react";
 import { logger } from "@/lib/logger";
-import { createMutationErrorHandler } from "@/lib/errorHandling";
+import { createMutationErrorHandler } from "@/lib/errors";
 import type { InvoiceWithLines, InvoiceLineInsert } from "@/types/invoices";
 
 export interface Invoice {

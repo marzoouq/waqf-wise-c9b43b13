@@ -4,7 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useActivities } from "@/hooks/useActivities";
 import { useAuth } from "@/hooks/useAuth";
 import { logger } from "@/lib/logger";
-import { createMutationErrorHandler } from "@/lib/errorHandling";
+import { createMutationErrorHandler } from "@/lib/errors";
 
 export interface Property {
   id: string;
