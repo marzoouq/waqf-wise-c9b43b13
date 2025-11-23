@@ -52,7 +52,10 @@ verify_jwt = true
 verify_jwt = true
 
 [functions.cleanup-old-files]
-verify_jwt = false
+verify_jwt = true
 
 [functions.backfill-rental-documents]
-verify_jwt = false
+verify_jwt = true
+
+[functions.simulate-distribution]
+verify_jwt = true

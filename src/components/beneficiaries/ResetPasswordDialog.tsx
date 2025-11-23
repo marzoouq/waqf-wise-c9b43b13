@@ -14,7 +14,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Loader2, CheckCircle2, Copy, Eye, EyeOff, RefreshCw } from 'lucide-react';
-import { generateTempPassword } from '@/lib/beneficiaryAuth';
+import { generateSecurePassword } from '@/lib/beneficiaryAuth';
 import { debug } from '@/lib/debug';
 
 interface ResetPasswordDialogProps {
@@ -51,7 +51,7 @@ export function ResetPasswordDialog({
   };
 
   const useDefaultPassword = () => {
-    setNewPassword(generateTempPassword(beneficiary.national_id));
+    setNewPassword(generateSecurePassword());
   };
 
   const handleResetPassword = async () => {
@@ -185,9 +185,8 @@ export function ResetPasswordDialog({
                   disabled={isLoading}
                   className="text-primary hover:underline"
                 >
-                  استخدام كلمة المرور الافتراضية
+                  توليد كلمة مرور قوية تلقائياً
                 </button>
-                {' '}(رقم الهوية@Waqf)
               </p>
             </div>
           </div>

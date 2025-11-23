@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole, AppRole } from '@/hooks/useUserRole';
 import { LoadingState } from '@/components/shared/LoadingState';
-import { debug } from '@/lib/debug';
+import { logger } from '@/lib/logger';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -25,18 +25,12 @@ export function ProtectedRoute({ children, requiredRole, requiredRoles }: Protec
   // Check role permissions after loading
   useEffect(() => {
     if (!authLoading && !roleLoading && user) {
-      debug.roles('ProtectedRoute - User roles:', roles);
-      debug.roles('ProtectedRoute - Required role:', requiredRole);
-      debug.roles('ProtectedRoute - Required roles:', requiredRoles);
-      
-      // ✅ Wait if user exists but roles are still empty (still loading)
       if (roles.length === 0 && !roleLoading) {
-        debug.warn('Waiting for roles to load...');
         return;
       }
       
       if (requiredRole && !roles.includes(requiredRole)) {
-        debug.warn('Access denied - missing required role:', requiredRole);
+        logger.warn('Access denied', { userId: user.id, metadata: { requiredRole } });
         navigate('/', { replace: true });
         return;
       }
@@ -44,13 +38,11 @@ export function ProtectedRoute({ children, requiredRole, requiredRoles }: Protec
       if (requiredRoles && requiredRoles.length > 0) {
         const hasAnyRole = requiredRoles.some(role => roles.includes(role));
         if (!hasAnyRole) {
-          debug.warn('Access denied - missing any of required roles:', requiredRoles);
+          logger.warn('Access denied', { userId: user.id, metadata: { requiredRoles } });
           navigate('/', { replace: true });
           return;
         }
       }
-      
-      debug.roles('Access granted');
     }
   }, [user, authLoading, roleLoading, requiredRole, requiredRoles, roles, navigate]);
 
