@@ -8104,7 +8104,7 @@ export type Database = {
         Returns: number
       }
       calculate_occupied_units: {
-        Args: { property_id: string }
+        Args: { property_uuid: string }
         Returns: number
       }
       calculate_property_revenue: {
@@ -8123,6 +8123,10 @@ export type Database = {
           p_max_attempts?: number
           p_time_window_minutes?: number
         }
+        Returns: boolean
+      }
+      check_units_availability: {
+        Args: { unit_ids: string[] }
         Returns: boolean
       }
       cleanup_old_error_logs: { Args: never; Returns: undefined }

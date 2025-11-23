@@ -6,9 +6,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useContracts, Contract } from "@/hooks/useContracts";
 import { useProperties } from "@/hooks/useProperties";
+import { usePropertyUnits } from "@/hooks/usePropertyUnits";
 import { ContractWithUnitsCount } from "@/types/contracts";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "@/hooks/use-toast";
 
 interface Props {
   open: boolean;
@@ -19,6 +23,9 @@ interface Props {
 export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
   const { addContract, updateContract } = useContracts();
   const { properties } = useProperties();
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string>("");
+  const { units, isLoading: unitsLoading } = usePropertyUnits(selectedPropertyId);
+  const [selectedUnits, setSelectedUnits] = useState<string[]>([]);
 
   const [formData, setFormData] = useState({
     contract_number: "",
@@ -33,7 +40,6 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
     monthly_rent: "",
     security_deposit: "",
     payment_frequency: "شهري",
-    units_count: "1",
     is_renewable: true,
     auto_renew: false,
     renewal_notice_days: "60",
@@ -56,13 +62,13 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
         monthly_rent: contract.monthly_rent.toString(),
         security_deposit: contract.security_deposit?.toString() || "",
         payment_frequency: contract.payment_frequency,
-        units_count: (contract as ContractWithUnitsCount).units_count?.toString() || "1",
         is_renewable: contract.is_renewable,
         auto_renew: contract.auto_renew,
         renewal_notice_days: contract.renewal_notice_days.toString(),
         terms_and_conditions: contract.terms_and_conditions || "",
         notes: contract.notes || "",
       });
+      setSelectedPropertyId(contract.property_id);
     } else {
       // Generate contract number for new contracts
       const date = new Date();
@@ -71,7 +77,7 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
     }
   }, [contract]);
 
-  // ملء تلقائي للإيجار وعدد الوحدات عند اختيار العقار
+  // ملء تلقائي للإيجار عند اختيار العقار
   useEffect(() => {
     if (formData.property_id && !contract && properties) {
       const selectedProperty = properties.find(p => p.id === formData.property_id);
@@ -79,8 +85,9 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
         setFormData(prev => ({
           ...prev,
           monthly_rent: selectedProperty.monthly_revenue?.toString() || prev.monthly_rent,
-          units_count: selectedProperty.units?.toString() || prev.units_count,
         }));
+        setSelectedPropertyId(selectedProperty.id);
+        setSelectedUnits([]); // إعادة تعيين الوحدات المختارة
       }
     }
   }, [formData.property_id, properties, contract]);
@@ -88,12 +95,22 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!contract && selectedUnits.length === 0) {
+      toast({
+        title: "خطأ",
+        description: "يجب اختيار وحدة واحدة على الأقل",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const contractData = {
       ...formData,
       monthly_rent: parseFloat(formData.monthly_rent),
       security_deposit: parseFloat(formData.security_deposit) || 0,
       renewal_notice_days: parseInt(formData.renewal_notice_days),
-      units_count: parseInt(formData.units_count) || 1,
+      units_count: selectedUnits.length,
+      unit_ids: selectedUnits,
     };
 
     if (contract) {
@@ -121,13 +138,24 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
       monthly_rent: "",
       security_deposit: "",
       payment_frequency: "شهري",
-      units_count: "1",
       is_renewable: true,
       auto_renew: false,
       renewal_notice_days: "60",
       terms_and_conditions: "",
       notes: "",
     });
+    setSelectedUnits([]);
+    setSelectedPropertyId("");
+  };
+
+  const availableUnits = units?.filter(u => u.status === 'available') || [];
+  
+  const toggleUnit = (unitId: string) => {
+    setSelectedUnits(prev => 
+      prev.includes(unitId) 
+        ? prev.filter(id => id !== unitId)
+        : [...prev, unitId]
+    );
   };
 
   return (
@@ -142,7 +170,7 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
         {!contract && (
           <div className="bg-info/10 border border-info/30 rounded-lg p-3 text-sm mb-4">
             <p className="text-info-foreground">
-              💡 <strong>ملاحظة:</strong> سيتم ملء الإيجار الشهري وعدد الوحدات تلقائياً من بيانات العقار المحدد
+              💡 <strong>ملاحظة:</strong> اختر العقار أولاً لعرض الوحدات المتاحة للتأجير
             </p>
           </div>
         )}
@@ -249,7 +277,7 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label>الإيجار الشهري *</Label>
               <Input
@@ -277,17 +305,6 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
             </div>
 
             <div className="space-y-2">
-              <Label>عدد الوحدات *</Label>
-              <Input
-                type="number"
-                min="1"
-                value={formData.units_count}
-                onChange={(e) => setFormData({ ...formData, units_count: e.target.value })}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
               <Label>تكرار الدفع</Label>
               <Select
                 value={formData.payment_frequency}
@@ -310,6 +327,51 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
               </p>
             </div>
           </div>
+
+          {!contract && selectedPropertyId && (
+            <div className="space-y-3 border border-border rounded-lg p-4">
+              <Label className="text-base font-semibold">الوحدات المتاحة للتأجير *</Label>
+              {unitsLoading ? (
+                <p className="text-sm text-muted-foreground">جاري تحميل الوحدات...</p>
+              ) : availableUnits.length === 0 ? (
+                <div className="text-center py-6 text-muted-foreground">
+                  <p>لا توجد وحدات متاحة في هذا العقار</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-64 overflow-y-auto">
+                  {availableUnits.map((unit) => (
+                    <div
+                      key={unit.id}
+                      className={`flex items-start space-x-2 space-x-reverse p-3 rounded-lg border transition-colors cursor-pointer ${
+                        selectedUnits.includes(unit.id)
+                          ? 'bg-primary/10 border-primary'
+                          : 'hover:bg-muted border-border'
+                      }`}
+                      onClick={() => toggleUnit(unit.id)}
+                    >
+                      <Checkbox
+                        checked={selectedUnits.includes(unit.id)}
+                        onCheckedChange={() => toggleUnit(unit.id)}
+                      />
+                      <div className="flex-1">
+                        <p className="font-medium text-sm">{unit.unit_name}</p>
+                        <p className="text-xs text-muted-foreground">{unit.unit_number}</p>
+                        <div className="flex gap-1 mt-1">
+                          <Badge variant="outline" className="text-xs">{unit.unit_type}</Badge>
+                          {unit.floor_number && <Badge variant="secondary" className="text-xs">طابق {unit.floor_number}</Badge>}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {selectedUnits.length > 0 && (
+                <p className="text-sm text-muted-foreground">
+                  تم اختيار {selectedUnits.length} وحدة
+                </p>
+              )}
+            </div>
+          )}
 
           <div className="grid grid-cols-3 gap-4">
             <div className="flex items-center space-x-2 space-x-reverse">
