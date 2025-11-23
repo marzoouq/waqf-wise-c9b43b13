@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
 import { useRateLimit } from '@/hooks/useRateLimit';
 import { useLeakedPassword } from '@/hooks/useLeakedPassword';
 import { Button } from '@/components/ui/button';
@@ -162,7 +163,8 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/5 p-4">
+    <PageErrorBoundary pageName="تسجيل الدخول">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/5 p-4">
       <div className="w-full max-w-4xl space-y-6">
         {/* Main Login Card */}
         <Card className="shadow-strong">
@@ -386,6 +388,7 @@ export default function Auth() {
         </CardContent>
       </Card>
       </div>
-    </div>
+      </div>
+    </PageErrorBoundary>
   );
 }

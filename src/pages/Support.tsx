@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { 
@@ -80,7 +81,8 @@ export default function Support() {
   );
 
   return (
-    <div className="space-y-6 p-6">
+    <PageErrorBoundary pageName="الدعم الفني">
+      <div className="space-y-6 p-6">
         <div className="flex items-center justify-end">
           <Button onClick={() => setCreateDialogOpen(true)}>
             <Plus className="h-4 w-4 ml-2" />
@@ -295,5 +297,6 @@ export default function Support() {
           onRate={(id, helpful) => rateArticle.mutate({ id, helpful })}
         />
       </div>
+    </PageErrorBoundary>
   );
 }

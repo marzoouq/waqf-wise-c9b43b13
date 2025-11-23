@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -130,7 +131,8 @@ export default function SystemErrorLogs() {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <PageErrorBoundary pageName="سجلات الأخطاء">
+      <div className="container mx-auto p-6 space-y-6">
       <div>
         <h1 className="text-3xl font-bold">سجلات الأخطاء والتنبيهات</h1>
         <p className="text-muted-foreground">مراقبة وإدارة أخطاء النظام</p>
@@ -359,6 +361,7 @@ export default function SystemErrorLogs() {
           </Tabs>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </PageErrorBoundary>
   );
 }

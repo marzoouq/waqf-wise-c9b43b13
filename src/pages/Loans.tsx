@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LoanCalculator } from "@/components/loans/LoanCalculator";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -144,7 +145,8 @@ export default function Loans() {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6 animate-fade-in">
+    <PageErrorBoundary pageName="إدارة القروض">
+      <div className="container mx-auto p-6 space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
@@ -433,6 +435,7 @@ export default function Loans() {
           loanNumber={selectedLoan.loan_number}
         />
       )}
-    </div>
+      </div>
+    </PageErrorBoundary>
   );
 }

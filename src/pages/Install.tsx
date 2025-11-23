@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Smartphone, Download, CheckCircle, Globe } from 'lucide-react';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -40,7 +41,8 @@ const Install = () => {
   };
 
   return (
-    <div className="container max-w-4xl mx-auto p-6 space-y-6">
+    <PageErrorBoundary pageName="تثبيت التطبيق">
+      <div className="container max-w-4xl mx-auto p-6 space-y-6">
       <Card>
         <CardHeader>
           <CardTitle className="text-3xl">📱 ثبّت تطبيق الوقف</CardTitle>
@@ -116,7 +118,8 @@ const Install = () => {
           )}
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </PageErrorBoundary>
   );
 };
 

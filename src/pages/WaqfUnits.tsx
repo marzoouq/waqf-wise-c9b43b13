@@ -3,6 +3,7 @@ import { Plus, Search, Building2, DollarSign, TrendingUp, AlertCircle } from "lu
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -64,7 +65,8 @@ export default function WaqfUnits() {
   }
 
   return (
-    <div className="space-y-6 p-6">
+    <PageErrorBoundary pageName="أقلام الوقف">
+      <div className="space-y-6 p-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -253,6 +255,7 @@ export default function WaqfUnits() {
         }}
         waqfUnit={selectedUnit}
       />
-    </div>
+      </div>
+    </PageErrorBoundary>
   );
 }

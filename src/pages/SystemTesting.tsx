@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
 import {
   Play,
   CheckCircle2,
@@ -320,7 +321,8 @@ export default function SystemTesting() {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <PageErrorBoundary pageName="اختبار النظام">
+      <div className="container mx-auto p-6 space-y-6">
       {/* العنوان */}
       <div className="flex items-center justify-between">
         <div>
@@ -475,6 +477,7 @@ export default function SystemTesting() {
           </Card>
         </TabsContent>
       </Tabs>
-    </div>
+      </div>
+    </PageErrorBoundary>
   );
 }
