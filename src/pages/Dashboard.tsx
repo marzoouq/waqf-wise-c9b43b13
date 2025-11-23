@@ -27,6 +27,7 @@ const RevenueExpenseChart = lazy(() => import("@/components/dashboard/RevenueExp
 const AccountDistributionChart = lazy(() => import("@/components/dashboard/AccountDistributionChart"));
 const BudgetComparisonChart = lazy(() => import("@/components/dashboard/BudgetComparisonChart"));
 const RecentJournalEntries = lazy(() => import("@/components/dashboard/RecentJournalEntries"));
+const VouchersStatsCard = lazy(() => import("@/components/dashboard/VouchersStatsCard").then(m => ({ default: m.VouchersStatsCard })));
 
 // Skeleton components
 const KPISkeleton = () => (
@@ -182,9 +183,15 @@ const Dashboard = () => {
             <FinancialStats />
           </Suspense>
 
-          <Suspense fallback={<KPISkeleton />}>
-            <AccountingStats />
-          </Suspense>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
+            <Suspense fallback={<KPISkeleton />}>
+              <AccountingStats />
+            </Suspense>
+
+            <Suspense fallback={<KPISkeleton />}>
+              <VouchersStatsCard />
+            </Suspense>
+          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
             <Suspense fallback={<ChartSkeleton />}>

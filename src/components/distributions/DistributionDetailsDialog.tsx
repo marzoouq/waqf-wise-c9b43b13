@@ -1,9 +1,11 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { useDistributionDetails } from "@/hooks/useDistributionDetails";
 import { Distribution } from "@/hooks/useDistributions";
-import { Loader2 } from "lucide-react";
+import { DistributionVouchersTab } from "./DistributionVouchersTab";
+import { Loader2, Users, Receipt } from "lucide-react";
 
 interface DistributionDetailsDialogProps {
   distribution: Distribution | null;
@@ -33,7 +35,7 @@ export function DistributionDetailsDialog({
         <DialogHeader>
           <DialogTitle>تفاصيل التوزيع - {distribution?.month}</DialogTitle>
           <DialogDescription>
-            عرض كامل تفاصيل المستفيدين والمبالغ المخصصة لهم في هذا التوزيع
+            عرض كامل تفاصيل المستفيدين والمبالغ المخصصة وسندات الصرف
           </DialogDescription>
         </DialogHeader>
 
@@ -75,54 +77,70 @@ export function DistributionDetailsDialog({
               </div>
             </div>
 
-            {/* جدول المستفيدين */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4">توزيع المستفيدين</h3>
-              {isLoading ? (
-                <div className="flex items-center justify-center py-8">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                </div>
-              ) : (
-                <div className="border rounded-lg overflow-hidden">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>المستفيد</TableHead>
-                        <TableHead>النوع</TableHead>
-                        <TableHead>المبلغ المخصص</TableHead>
-                        <TableHead>حالة الدفع</TableHead>
-                        <TableHead>تاريخ الدفع</TableHead>
-                        <TableHead>البنك</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {details.map((detail) => (
-                        <TableRow key={detail.id}>
-                          <TableCell className="font-medium">
-                            {detail.beneficiaries?.full_name}
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="outline">{detail.beneficiary_type}</Badge>
-                          </TableCell>
-                          <TableCell className="font-semibold text-success">
-                            {detail.allocated_amount.toLocaleString()} ريال
-                          </TableCell>
-                          <TableCell>
-                            {getStatusBadge(detail.payment_status)}
-                          </TableCell>
-                          <TableCell>
-                            {detail.payment_date ? new Date(detail.payment_date).toLocaleDateString('ar-SA') : '-'}
-                          </TableCell>
-                          <TableCell className="text-sm text-muted-foreground">
-                            {detail.beneficiaries?.bank_name || '-'}
-                          </TableCell>
+            {/* Tabs للمستفيدين والسندات */}
+            <Tabs defaultValue="beneficiaries" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="beneficiaries">
+                  <Users className="ml-2 h-4 w-4" />
+                  المستفيدون
+                </TabsTrigger>
+                <TabsTrigger value="vouchers">
+                  <Receipt className="ml-2 h-4 w-4" />
+                  سندات الصرف
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="beneficiaries" className="space-y-4">
+                {isLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  </div>
+                ) : (
+                  <div className="border rounded-lg overflow-hidden">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>المستفيد</TableHead>
+                          <TableHead>النوع</TableHead>
+                          <TableHead>المبلغ المخصص</TableHead>
+                          <TableHead>حالة الدفع</TableHead>
+                          <TableHead>تاريخ الدفع</TableHead>
+                          <TableHead>البنك</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              )}
-            </div>
+                      </TableHeader>
+                      <TableBody>
+                        {details.map((detail) => (
+                          <TableRow key={detail.id}>
+                            <TableCell className="font-medium">
+                              {detail.beneficiaries?.full_name}
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant="outline">{detail.beneficiary_type}</Badge>
+                            </TableCell>
+                            <TableCell className="font-semibold text-success">
+                              {detail.allocated_amount.toLocaleString()} ريال
+                            </TableCell>
+                            <TableCell>
+                              {getStatusBadge(detail.payment_status)}
+                            </TableCell>
+                            <TableCell>
+                              {detail.payment_date ? new Date(detail.payment_date).toLocaleDateString('ar-SA') : '-'}
+                            </TableCell>
+                            <TableCell className="text-sm text-muted-foreground">
+                              {detail.beneficiaries?.bank_name || '-'}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </TabsContent>
+
+              <TabsContent value="vouchers">
+                <DistributionVouchersTab distributionId={distribution.id} />
+              </TabsContent>
+            </Tabs>
           </div>
         )}
       </DialogContent>
