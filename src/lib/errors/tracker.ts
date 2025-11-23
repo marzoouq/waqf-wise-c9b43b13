@@ -87,18 +87,19 @@ class ErrorTracker {
     window.addEventListener('error', (event) => {
       if (this.shouldIgnoreError(event.message)) return;
       
+      const additionalData: Record<string, unknown> = {};
+      if (event.filename) additionalData.filename = event.filename;
+      if (event.lineno) additionalData.lineno = event.lineno;
+      if (event.colno) additionalData.colno = event.colno;
+      
       this.trackError({
         error_type: 'uncaught_error',
-        error_message: event.message,
-        error_stack: event.error?.stack,
+        error_message: event.message || 'Unknown error',
+        error_stack: event.error?.stack || undefined,
         severity: 'high',
         url: window.location.href,
         user_agent: navigator.userAgent,
-        additional_data: {
-          filename: event.filename,
-          lineno: event.lineno,
-          colno: event.colno,
-        },
+        additional_data: Object.keys(additionalData).length > 0 ? additionalData : undefined,
       });
     });
 
@@ -109,8 +110,8 @@ class ErrorTracker {
 
       this.trackError({
         error_type: 'unhandled_promise_rejection',
-        error_message: message,
-        error_stack: event.reason?.stack,
+        error_message: message || 'Promise rejected',
+        error_stack: event.reason?.stack || undefined,
         severity: 'high',
         url: window.location.href,
         user_agent: navigator.userAgent,
@@ -192,7 +193,7 @@ class ErrorTracker {
       if (error) {
         this.trackError({
           error_type: 'health_check_failed',
-          error_message: 'Database connection check failed',
+          error_message: error.message || 'Database connection check failed',
           severity: 'critical',
           url: window.location.href,
           user_agent: navigator.userAgent,
@@ -204,7 +205,7 @@ class ErrorTracker {
     } catch (error) {
       this.trackError({
         error_type: 'health_check_error',
-        error_message: error instanceof Error ? error.message : String(error),
+        error_message: error instanceof Error ? error.message : String(error) || 'Health check failed',
         severity: 'critical',
         url: window.location.href,
         user_agent: navigator.userAgent,
@@ -241,6 +242,22 @@ class ErrorTracker {
     while (this.errorQueue.length > 0) {
       const report = this.errorQueue.shift()!;
       
+      // تنظيف البيانات قبل الإرسال
+      const cleanReport: ErrorReport = {
+        error_type: report.error_type || 'unknown_error',
+        error_message: report.error_message || 'No error message',
+        severity: report.severity,
+        url: report.url || window.location.href,
+        user_agent: report.user_agent || navigator.userAgent,
+      };
+      
+      // إضافة الحقول الاختيارية فقط إذا كانت موجودة
+      if (report.error_stack) cleanReport.error_stack = report.error_stack;
+      if (report.user_id) cleanReport.user_id = report.user_id;
+      if (report.additional_data && Object.keys(report.additional_data).length > 0) {
+        cleanReport.additional_data = report.additional_data;
+      }
+      
       try {
         // 🔒 الحصول على session للمصادقة
         const { data: { session } } = await supabase.auth.getSession();
@@ -255,9 +272,9 @@ class ErrorTracker {
           setTimeout(() => reject(new Error('Request timeout')), 10000)
         );
         
-        // ✅ إضافة Authorization header
+        // ✅ إرسال البيانات النظيفة
         const invokePromise = supabase.functions.invoke('log-error', {
-          body: report,
+          body: cleanReport,
           headers: {
             Authorization: `Bearer ${session.access_token}`
           }
@@ -332,11 +349,11 @@ class ErrorTracker {
   ) {
     await this.trackError({
       error_type: 'manual_log',
-      error_message: message,
+      error_message: message || 'Manual log entry',
       severity,
       url: window.location.href,
       user_agent: navigator.userAgent,
-      additional_data: additionalData,
+      additional_data: additionalData && Object.keys(additionalData).length > 0 ? additionalData : undefined,
     });
   }
 }
