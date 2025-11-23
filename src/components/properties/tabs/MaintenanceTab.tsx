@@ -1,7 +1,9 @@
 import { useState, useMemo } from "react";
-import { Search, Wrench, Edit, Trash2, Printer } from "lucide-react";
+import { Search, Wrench, Edit, Trash2, Printer, Calendar } from "lucide-react";
 import { useMaintenanceRequests } from "@/hooks/useMaintenanceRequests";
+import { useMaintenanceSchedules } from "@/hooks/useMaintenanceSchedules";
 import { Input } from "@/components/ui/input";
+import { MaintenanceScheduleCalendar } from "@/components/maintenance/MaintenanceScheduleCalendar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,6 +23,7 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [requestToDelete, setRequestToDelete] = useState<MaintenanceRequest | null>(null);
   const { requests, isLoading, deleteRequest } = useMaintenanceRequests();
+  const { schedules } = useMaintenanceSchedules();
 
   const handleDeleteClick = (request: MaintenanceRequest) => {
     if (request.status !== "جديد" && request.status !== "ملغي") {
@@ -78,6 +81,9 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
 
   return (
     <div className="space-y-6">
+      {/* Maintenance Schedule Calendar */}
+      <MaintenanceScheduleCalendar schedules={schedules} />
+
       {/* Search and Export */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">

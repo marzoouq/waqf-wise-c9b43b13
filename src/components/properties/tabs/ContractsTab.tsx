@@ -12,6 +12,8 @@ import { type Contract } from "@/hooks/useContracts";
 import { ExportButton } from "@/components/shared/ExportButton";
 import { usePrint } from "@/hooks/usePrint";
 import { ContractPrintTemplate } from "@/components/contracts/ContractPrintTemplate";
+import { ContractStatusBadge } from "@/components/contracts/ContractStatusBadge";
+import { ContractExpiryAlert } from "@/components/contracts/ContractExpiryAlert";
 
 interface Props {
   onEdit: (contract: Contract) => void;
@@ -76,6 +78,9 @@ export const ContractsTab = ({ onEdit }: Props) => {
 
   return (
     <div className="space-y-6">
+      {/* Contract Expiry Alerts */}
+      <ContractExpiryAlert contracts={contracts} />
+
       {/* Search and Export */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
@@ -162,9 +167,11 @@ export const ContractsTab = ({ onEdit }: Props) => {
                     {Number(contract.monthly_rent).toLocaleString()} ر.س
                   </TableCell>
                   <TableCell className="text-xs sm:text-sm">
-                    <Badge className={getStatusBadge(contract.status)}>
-                      {contract.status}
-                    </Badge>
+                    <ContractStatusBadge 
+                      startDate={contract.start_date}
+                      endDate={contract.end_date}
+                      status={contract.status}
+                    />
                   </TableCell>
                   <TableCell className="text-xs sm:text-sm">
                     <div className="flex gap-1">

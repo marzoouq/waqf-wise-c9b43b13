@@ -4582,6 +4582,171 @@ export type Database = {
           },
         ]
       }
+      maintenance_schedule_log: {
+        Row: {
+          actual_cost: number | null
+          completed_date: string | null
+          completion_notes: string | null
+          created_at: string | null
+          id: string
+          issues_found: string | null
+          maintenance_request_id: string | null
+          quality_rating: number | null
+          recommendations: string | null
+          schedule_id: string
+          scheduled_date: string
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          actual_cost?: number | null
+          completed_date?: string | null
+          completion_notes?: string | null
+          created_at?: string | null
+          id?: string
+          issues_found?: string | null
+          maintenance_request_id?: string | null
+          quality_rating?: number | null
+          recommendations?: string | null
+          schedule_id: string
+          scheduled_date: string
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          actual_cost?: number | null
+          completed_date?: string | null
+          completion_notes?: string | null
+          created_at?: string | null
+          id?: string
+          issues_found?: string | null
+          maintenance_request_id?: string | null
+          quality_rating?: number | null
+          recommendations?: string | null
+          schedule_id?: string
+          scheduled_date?: string
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_schedule_log_maintenance_request_id_fkey"
+            columns: ["maintenance_request_id"]
+            isOneToOne: false
+            referencedRelation: "maintenance_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_schedule_log_schedule_id_fkey"
+            columns: ["schedule_id"]
+            isOneToOne: false
+            referencedRelation: "maintenance_schedules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      maintenance_schedules: {
+        Row: {
+          assigned_contractor: string | null
+          average_actual_cost: number | null
+          category: string
+          checklist: Json | null
+          contractor_phone: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          end_date: string | null
+          estimated_cost: number | null
+          frequency: string
+          frequency_value: number
+          id: string
+          is_active: boolean | null
+          last_maintenance_date: string | null
+          maintenance_type: string
+          next_maintenance_date: string
+          notes: string | null
+          priority: string | null
+          property_id: string | null
+          property_unit_id: string | null
+          schedule_name: string
+          start_date: string
+          total_cost: number | null
+          total_maintenances: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          assigned_contractor?: string | null
+          average_actual_cost?: number | null
+          category: string
+          checklist?: Json | null
+          contractor_phone?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          end_date?: string | null
+          estimated_cost?: number | null
+          frequency: string
+          frequency_value?: number
+          id?: string
+          is_active?: boolean | null
+          last_maintenance_date?: string | null
+          maintenance_type: string
+          next_maintenance_date: string
+          notes?: string | null
+          priority?: string | null
+          property_id?: string | null
+          property_unit_id?: string | null
+          schedule_name: string
+          start_date: string
+          total_cost?: number | null
+          total_maintenances?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          assigned_contractor?: string | null
+          average_actual_cost?: number | null
+          category?: string
+          checklist?: Json | null
+          contractor_phone?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          end_date?: string | null
+          estimated_cost?: number | null
+          frequency?: string
+          frequency_value?: number
+          id?: string
+          is_active?: boolean | null
+          last_maintenance_date?: string | null
+          maintenance_type?: string
+          next_maintenance_date?: string
+          notes?: string | null
+          priority?: string | null
+          property_id?: string | null
+          property_unit_id?: string | null
+          schedule_name?: string
+          start_date?: string
+          total_cost?: number | null
+          total_maintenances?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_schedules_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_schedules_property_unit_id_fkey"
+            columns: ["property_unit_id"]
+            isOneToOne: false
+            referencedRelation: "property_units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notification_logs: {
         Row: {
           channel: string
@@ -5011,6 +5176,74 @@ export type Database = {
             columns: ["payment_id"]
             isOneToOne: false
             referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_reminders: {
+        Row: {
+          created_at: string | null
+          days_before_due: number | null
+          error_message: string | null
+          id: string
+          message_body: string | null
+          read_at: string | null
+          recipient_email: string | null
+          recipient_phone: string | null
+          reminder_date: string
+          reminder_type: string
+          rental_payment_id: string
+          retry_count: number | null
+          send_method: string[] | null
+          sent_at: string | null
+          status: string
+          subject: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          days_before_due?: number | null
+          error_message?: string | null
+          id?: string
+          message_body?: string | null
+          read_at?: string | null
+          recipient_email?: string | null
+          recipient_phone?: string | null
+          reminder_date: string
+          reminder_type: string
+          rental_payment_id: string
+          retry_count?: number | null
+          send_method?: string[] | null
+          sent_at?: string | null
+          status?: string
+          subject?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          days_before_due?: number | null
+          error_message?: string | null
+          id?: string
+          message_body?: string | null
+          read_at?: string | null
+          recipient_email?: string | null
+          recipient_phone?: string | null
+          reminder_date?: string
+          reminder_type?: string
+          rental_payment_id?: string
+          retry_count?: number | null
+          send_method?: string[] | null
+          sent_at?: string | null
+          status?: string
+          subject?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_reminders_rental_payment_id_fkey"
+            columns: ["rental_payment_id"]
+            isOneToOne: false
+            referencedRelation: "rental_payments"
             referencedColumns: ["id"]
           },
         ]
