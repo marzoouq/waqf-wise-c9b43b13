@@ -35,6 +35,7 @@ class ErrorTracker {
 
   private constructor() {
     this.setupGlobalHandlers();
+    this.cleanupOldAuthErrors(); // ✅ مسح أخطاء auth القديمة أولاً
     this.loadPendingErrors();
     this.setupCircuitBreakerCheck();
     this.setupHealthCheck();
@@ -47,8 +48,58 @@ class ErrorTracker {
     return ErrorTracker.instance;
   }
 
-  private shouldIgnoreError(message: string): boolean {
-    return IGNORE_ERROR_PATTERNS.some(pattern => pattern.test(message));
+  private shouldIgnoreError(message: string, additionalData?: any): boolean {
+    // فحص رسالة الخطأ الرئيسية
+    if (IGNORE_ERROR_PATTERNS.some(pattern => pattern.test(message))) {
+      return true;
+    }
+    
+    // فحص additional_data للتأكد من عدم تسجيل أخطاء auth
+    if (additionalData?.request_url) {
+      const url = additionalData.request_url.toString();
+      if (url.includes('/auth/v1/user') || 
+          url.includes('/auth/v1/session') ||
+          url.includes('/auth/v1/token')) {
+        return true;
+      }
+    }
+    
+    return false;
+  }
+
+  // ✅ مسح أخطاء auth القديمة من localStorage
+  private cleanupOldAuthErrors() {
+    try {
+      const pending = localStorage.getItem(this.LOCAL_STORAGE_KEY);
+      if (pending) {
+        const errors = JSON.parse(pending) as ErrorReport[];
+        const cleanedErrors = errors.filter(error => {
+          // إزالة جميع أخطاء auth
+          if (error.additional_data?.request_url) {
+            const url = error.additional_data.request_url.toString();
+            if (url.includes('/auth/v1/')) {
+              return false;
+            }
+          }
+          // إزالة "Failed to fetch" العامة
+          if (error.error_message === 'Failed to fetch') {
+            return false;
+          }
+          return true;
+        });
+        
+        if (cleanedErrors.length !== errors.length) {
+          if (cleanedErrors.length > 0) {
+            localStorage.setItem(this.LOCAL_STORAGE_KEY, JSON.stringify(cleanedErrors));
+          } else {
+            localStorage.removeItem(this.LOCAL_STORAGE_KEY);
+          }
+          productionLogger.info(`Cleaned ${errors.length - cleanedErrors.length} old auth errors from storage`);
+        }
+      }
+    } catch (error) {
+      productionLogger.error('Failed to cleanup old errors', error);
+    }
   }
 
   private loadPendingErrors() {
@@ -56,8 +107,32 @@ class ErrorTracker {
       const pending = localStorage.getItem(this.LOCAL_STORAGE_KEY);
       if (pending) {
         const errors = JSON.parse(pending) as ErrorReport[];
-        this.errorQueue.push(...errors);
-        productionLogger.info(`Loaded ${errors.length} pending errors from storage`);
+        
+        // ✅ تصفية الأخطاء: إزالة أخطاء auth القديمة
+        const filteredErrors = errors.filter(error => {
+          // تجاهل أخطاء auth/v1
+          if (error.additional_data?.request_url) {
+            const url = error.additional_data.request_url.toString();
+            if (url.includes('/auth/v1/')) {
+              return false; // تجاهل
+            }
+          }
+          
+          // تجاهل أخطاء "Failed to fetch"
+          if (error.error_message === 'Failed to fetch') {
+            return false;
+          }
+          
+          return true; // احتفظ بالخطأ
+        });
+        
+        if (filteredErrors.length > 0) {
+          this.errorQueue.push(...filteredErrors);
+          productionLogger.info(`Loaded ${filteredErrors.length} pending errors from storage (filtered ${errors.length - filteredErrors.length})`);
+        } else {
+          // مسح localStorage إذا كانت كل الأخطاء مُصفّاة
+          localStorage.removeItem(this.LOCAL_STORAGE_KEY);
+        }
       }
     } catch (error) {
       productionLogger.error('Failed to load pending errors', error);
@@ -93,12 +168,13 @@ class ErrorTracker {
   private setupGlobalHandlers() {
     // التقاط الأخطاء غير المعالجة
     window.addEventListener('error', (event) => {
-      if (this.shouldIgnoreError(event.message)) return;
-      
       const additionalData: Record<string, unknown> = {};
       if (event.filename) additionalData.filename = event.filename;
       if (event.lineno) additionalData.lineno = event.lineno;
       if (event.colno) additionalData.colno = event.colno;
+      
+      // ✅ تمرير additional_data للفحص
+      if (this.shouldIgnoreError(event.message, additionalData)) return;
       
       this.trackError({
         error_type: 'uncaught_error',
@@ -114,7 +190,13 @@ class ErrorTracker {
     // التقاط الوعود المرفوضة
     window.addEventListener('unhandledrejection', (event) => {
       const message = event.reason?.message || String(event.reason);
-      if (this.shouldIgnoreError(message)) return;
+      const additionalData = {
+        reason: event.reason,
+        stack: event.reason?.stack,
+      };
+      
+      // ✅ تمرير additional_data للفحص
+      if (this.shouldIgnoreError(message, additionalData)) return;
 
       this.trackError({
         error_type: 'unhandled_promise_rejection',
@@ -167,7 +249,13 @@ class ErrorTracker {
         return response;
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
-        if (this.shouldIgnoreError(errorMessage)) {
+        const additionalData = {
+          request_url: requestUrl,
+          error: errorMessage,
+        };
+        
+        // ✅ تمرير additional_data للفحص
+        if (this.shouldIgnoreError(errorMessage, additionalData)) {
           throw error;
         }
 
@@ -245,7 +333,8 @@ class ErrorTracker {
   }
 
   async trackError(report: ErrorReport) {
-    if (this.shouldIgnoreError(report.error_message)) {
+    // ✅ فحص الخطأ مع additional_data
+    if (this.shouldIgnoreError(report.error_message, report.additional_data)) {
       return;
     }
 
