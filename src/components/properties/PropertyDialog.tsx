@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useEffect } from "react";
 import { ResponsiveDialog, DialogFooter } from "@/components/shared/ResponsiveDialog";
 import {
   Form,
@@ -68,20 +69,55 @@ export function PropertyDialog({
   const form = useForm<PropertyFormValues>({
     resolver: zodResolver(propertySchema),
     defaultValues: {
-      name: property?.name || "",
-      type: property?.type || "",
-      location: property?.location || "",
-      units: property?.units || 1,
-      occupied: property?.occupied || 0,
-      monthly_revenue: property?.monthly_revenue || 0,
-      status: property?.status || "",
-      description: property?.description || "",
-      tax_percentage: property?.tax_percentage || 15,
-      shop_count: property?.shop_count || 0,
-      apartment_count: property?.apartment_count || 0,
-      revenue_type: property?.revenue_type || 'شهري',
+      name: "",
+      type: "",
+      location: "",
+      units: 1,
+      occupied: 0,
+      monthly_revenue: 0,
+      status: "",
+      description: "",
+      tax_percentage: 15,
+      shop_count: 0,
+      apartment_count: 0,
+      revenue_type: 'شهري',
     },
   });
+
+  // تحديث القيم عند تغيير property
+  useEffect(() => {
+    if (property) {
+      form.reset({
+        name: property.name || "",
+        type: property.type || "",
+        location: property.location || "",
+        units: property.units || 1,
+        occupied: property.occupied || 0,
+        monthly_revenue: property.monthly_revenue || 0,
+        status: property.status || "",
+        description: property.description || "",
+        tax_percentage: property.tax_percentage || 15,
+        shop_count: property.shop_count || 0,
+        apartment_count: property.apartment_count || 0,
+        revenue_type: property.revenue_type || 'شهري',
+      });
+    } else {
+      form.reset({
+        name: "",
+        type: "",
+        location: "",
+        units: 1,
+        occupied: 0,
+        monthly_revenue: 0,
+        status: "",
+        description: "",
+        tax_percentage: 15,
+        shop_count: 0,
+        apartment_count: 0,
+        revenue_type: 'شهري',
+      });
+    }
+  }, [property, form]);
 
   const handleSubmit = (data: PropertyFormValues) => {
     onSave(data);
@@ -119,7 +155,7 @@ export function PropertyDialog({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>نوع العقار *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="اختر نوع العقار" />
@@ -143,7 +179,7 @@ export function PropertyDialog({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>الحالة *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="اختر حالة العقار" />
@@ -256,7 +292,7 @@ export function PropertyDialog({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>نوع الإيراد *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="اختر نوع الإيراد" />
