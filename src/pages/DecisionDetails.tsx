@@ -57,12 +57,12 @@ export default function DecisionDetails() {
   }
 
   const statusColors: Record<string, string> = {
-    'قيد التصويت': 'bg-blue-500/10 text-blue-700 border-blue-200',
-    'معتمد': 'bg-green-500/10 text-green-700 border-green-200',
-    'مرفوض': 'bg-red-500/10 text-red-700 border-red-200',
-    'قيد التنفيذ': 'bg-amber-500/10 text-amber-700 border-amber-200',
-    'منفذ': 'bg-emerald-500/10 text-emerald-700 border-emerald-200',
-    'ملغي': 'bg-gray-500/10 text-gray-700 border-gray-200',
+    'قيد التصويت': 'bg-info-light text-info border-info/20',
+    'معتمد': 'bg-success-light text-success border-success/20',
+    'مرفوض': 'bg-destructive-light text-destructive border-destructive/20',
+    'قيد التنفيذ': 'bg-warning-light text-warning border-warning/20',
+    'منفذ': 'bg-success-light text-success border-success/20',
+    'ملغي': 'bg-muted text-muted-foreground border-border',
   };
 
   return (

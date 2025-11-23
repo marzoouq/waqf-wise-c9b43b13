@@ -224,7 +224,7 @@ export default function BankTransfers() {
           <CardContent>
             <div className="space-y-4">
               <div className="flex gap-3">
-                <AlertCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="h-5 w-5 text-info flex-shrink-0 mt-0.5" />
                 <div className="space-y-1">
                   <h4 className="font-semibold">CSV (الأكثر شيوعاً)</h4>
                   <p className="text-sm text-muted-foreground">
@@ -235,7 +235,7 @@ export default function BankTransfers() {
               </div>
 
               <div className="flex gap-3">
-                <AlertCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="h-5 w-5 text-info flex-shrink-0 mt-0.5" />
                 <div className="space-y-1">
                   <h4 className="font-semibold">MT940</h4>
                   <p className="text-sm text-muted-foreground">
@@ -245,7 +245,7 @@ export default function BankTransfers() {
               </div>
 
               <div className="flex gap-3">
-                <AlertCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="h-5 w-5 text-info flex-shrink-0 mt-0.5" />
                 <div className="space-y-1">
                   <h4 className="font-semibold">ISO20022 XML</h4>
                   <p className="text-sm text-muted-foreground">

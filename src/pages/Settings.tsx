@@ -128,7 +128,7 @@ const Settings = () => {
       title: "إعدادات الدفعات",
       description: "تخصيص عرض الدفعات والإيجارات",
       icon: Calendar,
-      color: "bg-blue-500/10 text-blue-500",
+      color: "bg-info-light text-info",
     },
   ];
 

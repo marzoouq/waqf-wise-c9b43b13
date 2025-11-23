@@ -52,7 +52,7 @@ const Install = () => {
         </CardHeader>
         <CardContent className="space-y-6">
           {isInstalled ? (
-            <div className="flex items-center gap-3 p-4 bg-green-50 dark:bg-green-950 text-green-800 dark:text-green-200 rounded-lg">
+            <div className="flex items-center gap-3 p-4 bg-success-light text-success rounded-lg">
               <CheckCircle className="w-6 h-6" />
               <span className="font-medium">التطبيق مثبت بالفعل! 🎉</span>
             </div>

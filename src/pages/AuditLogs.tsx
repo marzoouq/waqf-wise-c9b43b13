@@ -62,10 +62,10 @@ const AuditLogs = () => {
   };
 
   const severityConfig = {
-    info: { label: "معلومة", icon: Info, color: "bg-blue-500/10 text-blue-600" },
-    warning: { label: "تحذير", icon: AlertTriangle, color: "bg-yellow-500/10 text-yellow-600" },
-    error: { label: "خطأ", icon: AlertCircle, color: "bg-red-500/10 text-red-600" },
-    critical: { label: "حرج", icon: Shield, color: "bg-purple-500/10 text-purple-600" },
+    info: { label: "معلومة", icon: Info, color: "bg-info-light text-info" },
+    warning: { label: "تحذير", icon: AlertTriangle, color: "bg-warning-light text-warning" },
+    error: { label: "خطأ", icon: AlertCircle, color: "bg-destructive-light text-destructive" },
+    critical: { label: "حرج", icon: Shield, color: "bg-destructive-light text-destructive" },
   };
 
   const actionTypeLabels: Record<string, string> = {

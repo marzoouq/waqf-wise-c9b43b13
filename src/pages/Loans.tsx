@@ -214,8 +214,8 @@ export default function Loans() {
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 قروض نشطة
               </CardTitle>
-              <div className="h-8 w-8 rounded-lg bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
-                <TrendingUp className="h-4 w-4 text-blue-500" />
+              <div className="h-8 w-8 rounded-lg bg-info-light flex items-center justify-center group-hover:bg-info/20 transition-colors">
+                <TrendingUp className="h-4 w-4 text-info" />
               </div>
             </CardHeader>
             <CardContent>
@@ -229,8 +229,8 @@ export default function Loans() {
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 قروض مسددة
               </CardTitle>
-              <div className="h-8 w-8 rounded-lg bg-green-500/10 flex items-center justify-center group-hover:bg-green-500/20 transition-colors">
-                <CheckCircle className="h-4 w-4 text-green-500" />
+              <div className="h-8 w-8 rounded-lg bg-success-light flex items-center justify-center group-hover:bg-success/20 transition-colors">
+                <CheckCircle className="h-4 w-4 text-success" />
               </div>
             </CardHeader>
             <CardContent>

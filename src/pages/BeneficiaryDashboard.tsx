@@ -276,13 +276,13 @@ const BeneficiaryDashboard = () => {
                 title="عدد المدفوعات"
                 value={stats.paymentsCount}
                 icon={FileText}
-                colorClass="text-green-600"
+                colorClass="text-success"
               />
               <StatsCard
                 title="آخر دفعة"
                 value={stats.lastPaymentDate}
                 icon={Calendar}
-                colorClass="text-blue-600"
+                colorClass="text-info"
               />
               <StatsCard
                 title="متوسط الدفعة"
