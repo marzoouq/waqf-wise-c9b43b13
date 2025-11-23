@@ -5892,6 +5892,7 @@ export type Database = {
           invoice_id: string | null
           journal_entry_id: string | null
           late_fee: number | null
+          net_amount: number | null
           notes: string | null
           payment_date: string | null
           payment_method: string | null
@@ -5899,6 +5900,8 @@ export type Database = {
           receipt_id: string | null
           receipt_number: string | null
           status: string
+          tax_amount: number | null
+          tax_percentage: number | null
           updated_at: string
         }
         Insert: {
@@ -5912,6 +5915,7 @@ export type Database = {
           invoice_id?: string | null
           journal_entry_id?: string | null
           late_fee?: number | null
+          net_amount?: number | null
           notes?: string | null
           payment_date?: string | null
           payment_method?: string | null
@@ -5919,6 +5923,8 @@ export type Database = {
           receipt_id?: string | null
           receipt_number?: string | null
           status?: string
+          tax_amount?: number | null
+          tax_percentage?: number | null
           updated_at?: string
         }
         Update: {
@@ -5932,6 +5938,7 @@ export type Database = {
           invoice_id?: string | null
           journal_entry_id?: string | null
           late_fee?: number | null
+          net_amount?: number | null
           notes?: string | null
           payment_date?: string | null
           payment_method?: string | null
@@ -5939,6 +5946,8 @@ export type Database = {
           receipt_id?: string | null
           receipt_number?: string | null
           status?: string
+          tax_amount?: number | null
+          tax_percentage?: number | null
           updated_at?: string
         }
         Relationships: [
@@ -8046,7 +8055,7 @@ export type Database = {
           p_amount: number
           p_contract_id: string
           p_payment_date: string
-          p_payment_method?: string
+          p_payment_method: string
           p_property_name?: string
           p_rental_payment_id: string
           p_tenant_email?: string
