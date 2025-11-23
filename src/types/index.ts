@@ -174,29 +174,29 @@ export interface RequestType {
 
 export interface BeneficiaryRequest {
   id: string;
-  request_number: string;
+  request_number: string | null;
   beneficiary_id: string;
   request_type_id: string;
-  title: string;
   description: string;
-  amount: number;
-  status: string;
-  priority: string;
-  assigned_to?: string;
-  submitted_at: string;
-  reviewed_at?: string;
-  reviewed_by?: string;
-  approved_at?: string;
-  approved_by?: string;
-  decision_notes?: string;
-  rejection_reason?: string;
-  sla_due_at: string;
-  is_overdue: boolean;
+  amount: number | null;
+  status: string | null;
+  priority: string | null;
+  assigned_to?: string | null;
+  assigned_at?: string | null;
+  submitted_at: string | null;
+  reviewed_at?: string | null;
+  approved_at?: string | null;
+  decision_notes?: string | null;
+  rejection_reason?: string | null;
+  sla_due_at: string | null;
+  is_overdue: boolean | null;
+  attachments_count?: number;
+  last_message_at?: string | null;
   created_at: string;
-  updated_at: string;
+  updated_at: string | null;
   // Relations
   request_type?: RequestType;
-  beneficiary?: Beneficiary;
+  beneficiary?: { full_name: string };
 }
 
 export interface RequestAttachment {
