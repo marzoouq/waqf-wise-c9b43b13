@@ -4443,6 +4443,13 @@ export type Database = {
             referencedColumns: ["user_id"]
           },
           {
+            foreignKeyName: "loans_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "users_with_roles"
+            referencedColumns: ["user_id"]
+          },
+          {
             foreignKeyName: "loans_beneficiary_id_fkey"
             columns: ["beneficiary_id"]
             isOneToOne: false
@@ -7734,17 +7741,14 @@ export type Database = {
     Views: {
       beneficiary_statistics: {
         Row: {
-          approved_requests: number | null
-          attachments_count: number | null
+          beneficiary_number: string | null
+          category: string | null
           full_name: string | null
           id: string | null
-          last_payment_date: string | null
-          last_request_date: string | null
-          payment_count: number | null
-          pending_requests: number | null
-          total_payments: number | null
+          status: string | null
+          total_attachments: number | null
+          total_distributions: number | null
           total_requests: number | null
-          user_id: string | null
         }
         Relationships: []
       }
@@ -7762,15 +7766,12 @@ export type Database = {
       }
       distribution_statistics: {
         Row: {
-          completion_percentage: number | null
+          beneficiaries_count: number | null
           distribution_date: string | null
           id: string | null
-          remaining_amount: number | null
           status: string | null
           total_amount: number | null
-          total_beneficiaries: number | null
-          total_paid: number | null
-          total_vouchers: number | null
+          total_distributed: number | null
         }
         Relationships: []
       }
@@ -7819,23 +7820,20 @@ export type Database = {
       }
       payment_vouchers_with_details: {
         Row: {
-          account_number: string | null
           amount: number | null
           approved_at: string | null
           approved_by: string | null
           attachments: Json | null
           bank_account_id: string | null
-          bank_iban: string | null
-          bank_name: string | null
+          bank_transfer_file_number: string | null
+          bank_transfer_status: string | null
           beneficiary_id: string | null
-          beneficiary_name: string | null
-          beneficiary_national_id: string | null
           created_at: string | null
           created_by: string | null
           description: string | null
+          distribution_date: string | null
           distribution_id: string | null
           distribution_id_ref: string | null
-          distribution_total_amount: number | null
           id: string | null
           journal_entry_id: string | null
           metadata: Json | null
@@ -7935,17 +7933,10 @@ export type Database = {
       users_with_roles: {
         Row: {
           avatar_url: string | null
-          created_at: string | null
           email: string | null
           full_name: string | null
-          id: string | null
-          is_active: boolean | null
-          last_login_at: string | null
-          phone: string | null
-          roles: string | null
-          roles_array: Database["public"]["Enums"]["app_role"][] | null
-          roles_count: number | null
-          updated_at: string | null
+          roles: Database["public"]["Enums"]["app_role"][] | null
+          user_id: string | null
         }
         Relationships: []
       }
