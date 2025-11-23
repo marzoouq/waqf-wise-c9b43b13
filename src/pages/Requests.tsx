@@ -5,6 +5,7 @@ import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useRequests } from '@/hooks/useRequests';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { EmptyState } from '@/components/shared/EmptyState';
@@ -37,6 +38,12 @@ import { PrintButton } from '@/components/shared/PrintButton';
 import { Pagination } from '@/components/shared/Pagination';
 import { EnhancedEmptyState } from '@/components/shared/EnhancedEmptyState';
 import { PAGINATION } from '@/lib/constants';
+import { SortableTableHeader, SortDirection } from '@/components/shared/SortableTableHeader';
+import { BulkActionsBar } from '@/components/shared/BulkActionsBar';
+import { AdvancedFiltersDialog, FilterConfig } from '@/components/shared/AdvancedFiltersDialog';
+import { useTableSort } from '@/hooks/useTableSort';
+import { useBulkSelection } from '@/hooks/useBulkSelection';
+import { toast } from 'sonner';
 
 const Requests = () => {
   const { requests, isLoading, deleteRequest } = useRequests();
@@ -49,6 +56,7 @@ const Requests = () => {
   const [requestToDelete, setRequestToDelete] = useState<BeneficiaryRequest | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(20);
+  const [advancedFilters, setAdvancedFilters] = useState<Record<string, any>>({});
   
   const handleItemsPerPageChange = useCallback((items: number) => {
     setItemsPerPage(items);
@@ -64,18 +72,59 @@ const Requests = () => {
         request.beneficiary.full_name.toLowerCase().includes(searchQuery.toLowerCase()));
 
     const matchesStatus = statusFilter === 'all' || request.status === statusFilter;
+    const matchesPriority = !advancedFilters.priority || request.priority === advancedFilters.priority;
+    const matchesOverdue = advancedFilters.overdue === undefined || 
+      (advancedFilters.overdue === 'true' ? request.is_overdue : !request.is_overdue);
 
-    return matchesSearch && matchesStatus;
+    return matchesSearch && matchesStatus && matchesPriority && matchesOverdue;
     });
-  }, [requests, searchQuery, statusFilter]);
+  }, [requests, searchQuery, statusFilter, advancedFilters]);
+
+  const { sortedData, sortConfig, handleSort } = useTableSort({
+    data: filteredRequests,
+    defaultSortKey: 'submitted_at',
+    defaultDirection: 'desc',
+  });
+
+  const {
+    selectedIds,
+    selectedCount,
+    isSelected,
+    isAllSelected,
+    toggleSelection,
+    toggleAll,
+    clearSelection,
+  } = useBulkSelection(sortedData);
 
   const paginatedRequests = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-    return filteredRequests.slice(startIndex, endIndex);
-  }, [filteredRequests, currentPage, itemsPerPage]);
+    return sortedData.slice(startIndex, endIndex);
+  }, [sortedData, currentPage, itemsPerPage]);
 
-  const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
+  const totalPages = Math.ceil(sortedData.length / itemsPerPage);
+
+  const filterConfigs: FilterConfig[] = [
+    {
+      key: 'priority',
+      label: 'الأولوية',
+      type: 'select',
+      options: [
+        { value: 'عادي', label: 'عادي' },
+        { value: 'مهم', label: 'مهم' },
+        { value: 'عاجل', label: 'عاجل' },
+      ],
+    },
+    {
+      key: 'overdue',
+      label: 'متأخر',
+      type: 'select',
+      options: [
+        { value: 'true', label: 'نعم' },
+        { value: 'false', label: 'لا' },
+      ],
+    },
+  ];
 
   const stats = {
     total: requests.length,
@@ -89,6 +138,26 @@ const Requests = () => {
   const handleDeleteClick = (request: BeneficiaryRequest) => {
     setRequestToDelete(request);
     setDeleteDialogOpen(true);
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedCount === 0) return;
+    
+    const confirmed = window.confirm(`هل تريد حذف ${selectedCount} طلب؟`);
+    if (!confirmed) return;
+
+    try {
+      await Promise.all(selectedIds.map(id => deleteRequest.mutateAsync(id)));
+      toast.success(`تم حذف ${selectedCount} طلب بنجاح`);
+      clearSelection();
+    } catch (error) {
+      toast.error('فشل حذف بعض الطلبات');
+    }
+  };
+
+  const handleBulkExport = () => {
+    const selectedRequests = requests.filter(r => selectedIds.includes(r.id));
+    toast.success(`جاري تصدير ${selectedCount} طلب...`);
   };
 
   const handleDeleteConfirm = () => {
@@ -241,6 +310,12 @@ const Requests = () => {
                 className="pr-10"
               />
             </div>
+            <AdvancedFiltersDialog
+              filters={filterConfigs}
+              activeFilters={advancedFilters}
+              onApplyFilters={setAdvancedFilters}
+              onClearFilters={() => setAdvancedFilters({})}
+            />
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-[200px]">
                 <Filter className="ml-2 h-4 w-4" />
@@ -284,14 +359,51 @@ const Requests = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">رقم الطلب</TableHead>
+                    <TableHead className="w-[50px]">
+                      <Checkbox
+                        checked={isAllSelected}
+                        onCheckedChange={toggleAll}
+                        aria-label="تحديد الكل"
+                      />
+                    </TableHead>
+                    <SortableTableHeader
+                      label="رقم الطلب"
+                      sortKey="request_number"
+                      currentSort={sortConfig}
+                      onSort={handleSort}
+                      className="text-xs sm:text-sm whitespace-nowrap"
+                    />
                     <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">المستفيد</TableHead>
                     <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden md:table-cell">نوع الطلب</TableHead>
                     <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">الوصف</TableHead>
-                    <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden md:table-cell">المبلغ</TableHead>
-                    <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">الحالة</TableHead>
-                    <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">الأولوية</TableHead>
-                    <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">تاريخ التقديم</TableHead>
+                    <SortableTableHeader
+                      label="المبلغ"
+                      sortKey="amount"
+                      currentSort={sortConfig}
+                      onSort={handleSort}
+                      className="hidden md:table-cell text-xs sm:text-sm whitespace-nowrap"
+                    />
+                    <SortableTableHeader
+                      label="الحالة"
+                      sortKey="status"
+                      currentSort={sortConfig}
+                      onSort={handleSort}
+                      className="text-xs sm:text-sm whitespace-nowrap"
+                    />
+                    <SortableTableHeader
+                      label="الأولوية"
+                      sortKey="priority"
+                      currentSort={sortConfig}
+                      onSort={handleSort}
+                      className="hidden lg:table-cell text-xs sm:text-sm whitespace-nowrap"
+                    />
+                    <SortableTableHeader
+                      label="تاريخ التقديم"
+                      sortKey="submitted_at"
+                      currentSort={sortConfig}
+                      onSort={handleSort}
+                      className="hidden lg:table-cell text-xs sm:text-sm whitespace-nowrap"
+                    />
                     <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">الإجراءات</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -303,6 +415,13 @@ const Requests = () => {
                         request.is_overdue ? 'bg-destructive/5' : ''
                       }`}
                     >
+                      <TableCell>
+                        <Checkbox
+                          checked={isSelected(request.id)}
+                          onCheckedChange={() => toggleSelection(request.id)}
+                          aria-label={`تحديد ${request.request_number}`}
+                        />
+                      </TableCell>
                       <TableCell className="font-mono font-medium text-xs sm:text-sm">
                         {request.request_number}
                       </TableCell>

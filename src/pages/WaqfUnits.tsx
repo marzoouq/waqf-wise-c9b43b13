@@ -1,19 +1,26 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Plus, Search, Building2, DollarSign, TrendingUp, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useWaqfUnits, type WaqfUnit } from "@/hooks/useWaqfUnits";
 import { LoadingState } from "@/components/shared/LoadingState";
-import { EmptyState } from "@/components/shared/EmptyState";
+import { EnhancedEmptyState } from "@/components/shared/EnhancedEmptyState";
 import { WaqfUnitDialog } from "@/components/waqf/WaqfUnitDialog";
 import { ExportButton } from "@/components/shared/ExportButton";
+import { SortableTableHeader } from "@/components/shared/SortableTableHeader";
+import { BulkActionsBar } from "@/components/shared/BulkActionsBar";
+import { AdvancedFiltersDialog, FilterConfig } from "@/components/shared/AdvancedFiltersDialog";
+import { useTableSort } from "@/hooks/useTableSort";
+import { useBulkSelection } from "@/hooks/useBulkSelection";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import { toast } from "sonner";
 
 export default function WaqfUnits() {
   const { waqfUnits, isLoading } = useWaqfUnits();
@@ -21,6 +28,7 @@ export default function WaqfUnits() {
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [selectedUnit, setSelectedUnit] = useState<WaqfUnit | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [advancedFilters, setAdvancedFilters] = useState<Record<string, any>>({});
 
   // Filter waqf units
   const filteredUnits = waqfUnits.filter((unit) => {
@@ -30,9 +38,44 @@ export default function WaqfUnits() {
       unit.location?.toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesType = typeFilter === "all" || unit.waqf_type === typeFilter;
+    const matchesActive = advancedFilters.is_active === undefined || 
+      unit.is_active === (advancedFilters.is_active === 'true');
 
-    return matchesSearch && matchesType;
+    return matchesSearch && matchesType && matchesActive;
   });
+
+  const { sortedData, sortConfig, handleSort } = useTableSort({
+    data: filteredUnits,
+    defaultSortKey: 'name',
+    defaultDirection: 'asc',
+  });
+
+  const {
+    selectedIds,
+    selectedCount,
+    isSelected,
+    isAllSelected,
+    toggleSelection,
+    toggleAll,
+    clearSelection,
+  } = useBulkSelection(sortedData);
+
+  const filterConfigs: FilterConfig[] = [
+    {
+      key: 'is_active',
+      label: 'الحالة',
+      type: 'select',
+      options: [
+        { value: 'true', label: 'نشط' },
+        { value: 'false', label: 'غير نشط' },
+      ],
+    },
+  ];
+
+  const handleBulkExport = () => {
+    const selectedUnits = waqfUnits.filter(u => selectedIds.includes(u.id));
+    toast.success(`جاري تصدير ${selectedCount} قلم وقف...`);
+  };
 
   // Calculate statistics
   const stats = {
@@ -169,6 +212,12 @@ export default function WaqfUnits() {
               className="pr-10"
             />
           </div>
+          <AdvancedFiltersDialog
+            filters={filterConfigs}
+            activeFilters={advancedFilters}
+            onApplyFilters={setAdvancedFilters}
+            onClearFilters={() => setAdvancedFilters({})}
+          />
           <Select value={typeFilter} onValueChange={setTypeFilter}>
             <SelectTrigger className="w-full md:w-48">
               <SelectValue placeholder="نوع الوقف" />
@@ -185,11 +234,19 @@ export default function WaqfUnits() {
       </Card>
 
       {/* Waqf Units Table */}
-      {filteredUnits.length === 0 ? (
-        <EmptyState
-          title="لا توجد أقلام وقف"
-          description="ابدأ بإضافة قلم وقف جديد"
+      {sortedData.length === 0 ? (
+        <EnhancedEmptyState
           icon={Building2}
+          title="لا توجد أقلام وقف"
+          description={
+            searchQuery || typeFilter !== 'all'
+              ? 'لا توجد نتائج مطابقة لبحثك. جرب تغيير معايير البحث.'
+              : 'لم يتم إضافة أي أقلام وقف بعد. ابدأ بإضافة قلم وقف جديد الآن.'
+          }
+          action={!searchQuery && typeFilter === 'all' ? {
+            label: "إضافة قلم وقف",
+            onClick: () => setIsDialogOpen(true)
+          } : undefined}
         />
       ) : (
         <Card>
@@ -197,21 +254,71 @@ export default function WaqfUnits() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="text-right whitespace-nowrap">الكود</TableHead>
-                  <TableHead className="text-right whitespace-nowrap">الاسم</TableHead>
+                  <TableHead className="w-[50px]">
+                    <Checkbox
+                      checked={isAllSelected}
+                      onCheckedChange={toggleAll}
+                      aria-label="تحديد الكل"
+                    />
+                  </TableHead>
+                  <SortableTableHeader
+                    label="الكود"
+                    sortKey="code"
+                    currentSort={sortConfig}
+                    onSort={handleSort}
+                    className="whitespace-nowrap"
+                  />
+                  <SortableTableHeader
+                    label="الاسم"
+                    sortKey="name"
+                    currentSort={sortConfig}
+                    onSort={handleSort}
+                    className="whitespace-nowrap"
+                  />
                   <TableHead className="text-right whitespace-nowrap">النوع</TableHead>
                   <TableHead className="text-right whitespace-nowrap hidden md:table-cell">الموقع</TableHead>
-                  <TableHead className="text-right whitespace-nowrap hidden lg:table-cell">قيمة الاستحواذ</TableHead>
-                  <TableHead className="text-right whitespace-nowrap">القيمة الحالية</TableHead>
-                  <TableHead className="text-right whitespace-nowrap hidden md:table-cell">العائد السنوي</TableHead>
-                  <TableHead className="text-right whitespace-nowrap hidden lg:table-cell">تاريخ الاستحواذ</TableHead>
+                  <SortableTableHeader
+                    label="قيمة الاستحواذ"
+                    sortKey="acquisition_value"
+                    currentSort={sortConfig}
+                    onSort={handleSort}
+                    className="hidden lg:table-cell whitespace-nowrap"
+                  />
+                  <SortableTableHeader
+                    label="القيمة الحالية"
+                    sortKey="current_value"
+                    currentSort={sortConfig}
+                    onSort={handleSort}
+                    className="whitespace-nowrap"
+                  />
+                  <SortableTableHeader
+                    label="العائد السنوي"
+                    sortKey="annual_return"
+                    currentSort={sortConfig}
+                    onSort={handleSort}
+                    className="hidden md:table-cell whitespace-nowrap"
+                  />
+                  <SortableTableHeader
+                    label="تاريخ الاستحواذ"
+                    sortKey="acquisition_date"
+                    currentSort={sortConfig}
+                    onSort={handleSort}
+                    className="hidden lg:table-cell whitespace-nowrap"
+                  />
                   <TableHead className="text-right whitespace-nowrap">الحالة</TableHead>
                   <TableHead className="text-right whitespace-nowrap">الإجراءات</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredUnits.map((unit) => (
+                {sortedData.map((unit) => (
                   <TableRow key={unit.id}>
+                    <TableCell>
+                      <Checkbox
+                        checked={isSelected(unit.id)}
+                        onCheckedChange={() => toggleSelection(unit.id)}
+                        aria-label={`تحديد ${unit.name}`}
+                      />
+                    </TableCell>
                     <TableCell className="font-medium text-xs sm:text-sm">{unit.code}</TableCell>
                     <TableCell className="min-w-[150px]">
                       <div>
@@ -275,6 +382,13 @@ export default function WaqfUnits() {
           if (!open) setSelectedUnit(null);
         }}
         waqfUnit={selectedUnit}
+      />
+
+      {/* Bulk Actions Bar */}
+      <BulkActionsBar
+        selectedCount={selectedCount}
+        onClearSelection={clearSelection}
+        onExport={handleBulkExport}
       />
       </div>
     </PageErrorBoundary>
