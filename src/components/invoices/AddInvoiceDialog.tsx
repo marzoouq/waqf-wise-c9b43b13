@@ -294,6 +294,7 @@ export const AddInvoiceDialog = ({ open, onOpenChange, isEdit = false, invoiceTo
       open={open} 
       onOpenChange={onOpenChange}
       title={isEdit ? "تعديل فاتورة" : "إنشاء فاتورة جديدة"}
+      description={isEdit ? "تعديل بيانات الفاتورة وبنودها" : "إنشاء فاتورة ضريبية متوافقة مع متطلبات هيئة الزكاة والضريبة"}
       size="xl"
     >
       <Form {...form}>

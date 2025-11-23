@@ -18,8 +18,8 @@ class ErrorTracker {
   private errorQueue: ErrorReport[] = [];
   private isProcessing = false;
   private failedAttempts = 0;
-  private maxFailedAttempts = 5;
-  private backoffDelay = 1000;
+  private maxFailedAttempts = 3; // تقليل من 5 إلى 3
+  private backoffDelay = 2000; // زيادة من 1000 إلى 2000
   private readonly LOCAL_STORAGE_KEY = 'pending_error_reports';
   private circuitBreakerOpen = false;
   private circuitBreakerResetTime: number | null = null;
@@ -136,8 +136,8 @@ class ErrorTracker {
           const errorKey = `${response.status}-${requestUrl}`;
           const lastError = this.recentErrors.get(errorKey);
           
-          // تسجيل فقط إذا مر 10 دقائق على آخر خطأ مشابه
-          if (!lastError || Date.now() - lastError > 10 * 60 * 1000) {
+          // تسجيل فقط إذا مر 5 دقائق على آخر خطأ مشابه
+          if (!lastError || Date.now() - lastError > 5 * 60 * 1000) {
             this.recentErrors.set(errorKey, Date.now());
             this.trackError({
               error_type: 'network_error',
@@ -163,8 +163,8 @@ class ErrorTracker {
         const errorKey = `fetch-error-${requestUrl}`;
         const lastError = this.recentErrors.get(errorKey);
         
-        // تسجيل فقط إذا مر 10 دقائق على آخر خطأ مشابه
-        if (!lastError || Date.now() - lastError > 10 * 60 * 1000) {
+        // تسجيل فقط إذا مر 5 دقائق على آخر خطأ مشابه
+        if (!lastError || Date.now() - lastError > 5 * 60 * 1000) {
           this.recentErrors.set(errorKey, Date.now());
           this.trackError({
             error_type: 'network_error',
