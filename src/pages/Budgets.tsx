@@ -16,6 +16,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Budget } from "@/types/accounting";
 import {
   Select,
   SelectContent,
@@ -36,18 +37,18 @@ export default function Budgets() {
     useBudgets(selectedFiscalYear);
   
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingBudget, setEditingBudget] = useState<any>(null);
+  const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل الميزانيات..." />;
   }
 
-  const handleOpenDialog = (budget?: any) => {
+  const handleOpenDialog = (budget?: Budget) => {
     setEditingBudget(budget || null);
     setDialogOpen(true);
   };
 
-  const handleSave = async (data: any) => {
+  const handleSave = async (data: Budget) => {
     if (editingBudget) {
       await updateBudget(data);
     } else {

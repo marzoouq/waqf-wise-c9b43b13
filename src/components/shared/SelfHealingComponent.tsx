@@ -7,7 +7,7 @@ import { Component, ErrorInfo, ReactNode } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
-import { errorTracker } from '@/lib/errorTracking';
+import { errorTracker } from '@/lib/errors';
 import { debug } from '@/lib/debug';
 
 interface Props {

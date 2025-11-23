@@ -13,12 +13,15 @@ import { ResponsiveDialog, DialogFooter } from "@/components/shared/ResponsiveDi
 import { Budget } from "@/hooks/useBudgets";
 import { useAccounts } from "@/hooks/useAccounts";
 import { useFiscalYears } from "@/hooks/useFiscalYears";
+import { Database } from "@/integrations/supabase/types";
+
+type BudgetInsert = Database['public']['Tables']['budgets']['Insert'];
 
 interface BudgetDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   budget?: Budget | null;
-  onSave: (data: any) => Promise<void>;
+  onSave: (data: BudgetInsert | (BudgetInsert & { id: string })) => Promise<void>;
 }
 
 export function BudgetDialog({ open, onOpenChange, budget, onSave }: BudgetDialogProps) {

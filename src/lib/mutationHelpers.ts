@@ -4,7 +4,7 @@
  */
 
 import { UseMutationOptions } from '@tanstack/react-query';
-import { logError } from './errorService';
+import { logError } from './errors';
 import type { AppError } from '@/types/errors';
 
 export interface MutationHandlers<TData = unknown, TError = AppError, TVariables = unknown> {

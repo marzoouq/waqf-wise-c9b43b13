@@ -3,7 +3,7 @@
  * يستبدل console.error ويوفر معالجة موحدة
  */
 
-import { logError } from './errorService';
+import { logError } from './errors';
 import type { AppError } from '@/types/errors';
 
 export interface LogOptions {

@@ -25,6 +25,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { formatCurrency } from "@/lib/utils";
 
 import { BankAccountRow } from "@/types/supabase-helpers";
 
@@ -99,12 +100,7 @@ export function BankAccountsManagement() {
     }
   };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("ar-SA", {
-      style: "currency",
-      currency: "SAR",
-    }).format(amount);
-  };
+  // Using formatCurrency from @/lib/utils
 
   return (
     <>
