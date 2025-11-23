@@ -50,10 +50,10 @@ export function WelcomeMessage() {
           <Bot className="h-20 w-20 text-primary-foreground animate-bounce" />
         </div>
         <div className="absolute -top-2 -right-2">
-          <Sparkles className="h-6 w-6 text-yellow-400 animate-pulse" />
+          <Sparkles className="h-6 w-6 text-warning animate-pulse" />
         </div>
         <div className="absolute -bottom-2 -left-2">
-          <Sparkles className="h-5 w-5 text-blue-400 animate-pulse" />
+          <Sparkles className="h-5 w-5 text-info animate-pulse" />
         </div>
       </div>
       

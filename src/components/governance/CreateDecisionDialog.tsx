@@ -185,7 +185,7 @@ export function CreateDecisionDialog({
                           <RadioGroupItem value="first_class_beneficiaries" id="first_class" className="mt-1" />
                           <div className="flex-1">
                             <div className="flex items-center gap-2 font-semibold">
-                              <UserCheck className="h-5 w-5 text-green-600" />
+                              <UserCheck className="h-5 w-5 text-success" />
                               المستفيدين من الفئة الأولى فقط
                             </div>
                             <p className="text-sm text-muted-foreground mt-1">
@@ -201,7 +201,7 @@ export function CreateDecisionDialog({
                           <RadioGroupItem value="board_and_beneficiaries" id="both" className="mt-1" />
                           <div className="flex-1">
                             <div className="flex items-center gap-2 font-semibold">
-                              <UsersRound className="h-5 w-5 text-blue-600" />
+                              <UsersRound className="h-5 w-5 text-info" />
                               أعضاء المجلس + المستفيدين من الفئة الأولى
                             </div>
                             <p className="text-sm text-muted-foreground mt-1">
@@ -217,7 +217,7 @@ export function CreateDecisionDialog({
                           <RadioGroupItem value="custom" id="custom" className="mt-1" />
                           <div className="flex-1">
                             <div className="flex items-center gap-2 font-semibold">
-                              <UserCog className="h-5 w-5 text-purple-600" />
+                              <UserCog className="h-5 w-5 text-accent" />
                               اختيار مخصص
                             </div>
                             <p className="text-sm text-muted-foreground mt-1">

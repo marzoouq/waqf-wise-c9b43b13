@@ -74,32 +74,32 @@ export const ViewDisclosureDialog = ({
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-4 bg-green-50 dark:bg-green-950 rounded-lg border border-green-200 dark:border-green-800">
+              <div className="p-4 bg-success-light dark:bg-success/10 rounded-lg border border-success/30">
                 <div className="flex items-center gap-2 mb-2">
-                  <TrendingUp className="h-4 w-4 text-green-600" />
-                  <p className="text-sm font-medium text-green-600">إجمالي الإيرادات</p>
+                  <TrendingUp className="h-4 w-4 text-success" />
+                  <p className="text-sm font-medium text-success">إجمالي الإيرادات</p>
                 </div>
-                <p className="text-2xl font-bold text-green-700">
+                <p className="text-2xl font-bold text-success">
                   {disclosure.total_revenues.toLocaleString()} ر.س
                 </p>
               </div>
 
-              <div className="p-4 bg-red-50 dark:bg-red-950 rounded-lg border border-red-200 dark:border-red-800">
+              <div className="p-4 bg-destructive-light dark:bg-destructive/10 rounded-lg border border-destructive/30">
                 <div className="flex items-center gap-2 mb-2">
-                  <TrendingDown className="h-4 w-4 text-red-600" />
-                  <p className="text-sm font-medium text-red-600">إجمالي المصروفات</p>
+                  <TrendingDown className="h-4 w-4 text-destructive" />
+                  <p className="text-sm font-medium text-destructive">إجمالي المصروفات</p>
                 </div>
-                <p className="text-2xl font-bold text-red-700">
+                <p className="text-2xl font-bold text-destructive">
                   {disclosure.total_expenses.toLocaleString()} ر.س
                 </p>
               </div>
 
-              <div className="p-4 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200 dark:border-blue-800">
+              <div className="p-4 bg-info-light dark:bg-info/10 rounded-lg border border-info/30">
                 <div className="flex items-center gap-2 mb-2">
-                  <FileText className="h-4 w-4 text-blue-600" />
-                  <p className="text-sm font-medium text-blue-600">صافي الدخل</p>
+                  <FileText className="h-4 w-4 text-info" />
+                  <p className="text-sm font-medium text-info">صافي الدخل</p>
                 </div>
-                <p className="text-2xl font-bold text-blue-700">
+                <p className="text-2xl font-bold text-info">
                   {disclosure.net_income.toLocaleString()} ر.س
                 </p>
               </div>
@@ -209,7 +209,7 @@ export const ViewDisclosureDialog = ({
 
                 <div className="p-4 border rounded-lg">
                   <div className="flex items-center gap-2 mb-2">
-                    <Building className="h-4 w-4 text-blue-600" />
+                    <Building className="h-4 w-4 text-info" />
                     <p className="text-sm font-medium">رقبة الوقف</p>
                   </div>
                   <p className="text-xl font-bold mb-1">

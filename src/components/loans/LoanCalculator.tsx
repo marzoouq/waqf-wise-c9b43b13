@@ -125,13 +125,13 @@ export function LoanCalculator() {
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">إجمالي الفوائد</p>
-                  <p className="text-xl font-bold text-amber-600">
+                  <p className="text-xl font-bold text-warning">
                     {totalInterest.toLocaleString('ar-SA', { maximumFractionDigits: 2 })} ر.س
                   </p>
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">إجمالي المدفوع</p>
-                  <p className="text-xl font-bold text-blue-600">
+                  <p className="text-xl font-bold text-info">
                     {totalPayment.toLocaleString('ar-SA', { maximumFractionDigits: 2 })} ر.س
                   </p>
                 </div>
@@ -159,10 +159,10 @@ export function LoanCalculator() {
                           <TableCell className="text-center">
                             {item.payment.toLocaleString('ar-SA', { maximumFractionDigits: 2 })}
                           </TableCell>
-                          <TableCell className="text-center text-blue-600">
+                          <TableCell className="text-center text-info">
                             {item.principal.toLocaleString('ar-SA', { maximumFractionDigits: 2 })}
                           </TableCell>
-                          <TableCell className="text-center text-amber-600">
+                          <TableCell className="text-center text-warning">
                             {item.interest.toLocaleString('ar-SA', { maximumFractionDigits: 2 })}
                           </TableCell>
                           <TableCell className="text-center font-medium">

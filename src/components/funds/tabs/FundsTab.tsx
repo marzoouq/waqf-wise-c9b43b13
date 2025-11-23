@@ -31,7 +31,7 @@ export function FundsTab({ funds, isLoading }: FundsTabProps) {
 
   const getStatusBadge = (percentage: number) => {
     if (percentage >= 80) return <Badge variant="destructive">مرتفع</Badge>;
-    if (percentage >= 50) return <Badge className="bg-yellow-500">متوسط</Badge>;
+    if (percentage >= 50) return <Badge className="bg-warning">متوسط</Badge>;
     return <Badge variant="default">جيد</Badge>;
   };
 

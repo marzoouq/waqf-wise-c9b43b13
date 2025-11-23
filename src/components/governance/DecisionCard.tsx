@@ -93,7 +93,7 @@ export function DecisionCard({ decision }: DecisionCardProps) {
             <div className="space-y-1">
               <div className="flex items-center justify-between text-xs">
                 <span className="flex items-center gap-1">
-                  <ThumbsUp className="h-3 w-3 text-green-600" />
+                  <ThumbsUp className="h-3 w-3 text-success" />
                   موافق
                 </span>
                 <span className="font-semibold">{decision.votes_for} ({forPercentage.toFixed(0)}%)</span>
@@ -105,7 +105,7 @@ export function DecisionCard({ decision }: DecisionCardProps) {
             <div className="space-y-1">
               <div className="flex items-center justify-between text-xs">
                 <span className="flex items-center gap-1">
-                  <ThumbsDown className="h-3 w-3 text-red-600" />
+                  <ThumbsDown className="h-3 w-3 text-destructive" />
                   معارض
                 </span>
                 <span className="font-semibold">{decision.votes_against} ({againstPercentage.toFixed(0)}%)</span>

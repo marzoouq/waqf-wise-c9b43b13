@@ -74,18 +74,18 @@ export function ApprovalFlowDialog({
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "موافق":
-        return <CheckCircle2 className="h-5 w-5 text-green-500" />;
+        return <CheckCircle2 className="h-5 w-5 text-success" />;
       case "مرفوض":
-        return <XCircle className="h-5 w-5 text-red-500" />;
+        return <XCircle className="h-5 w-5 text-destructive" />;
       default:
-        return <Clock className="h-5 w-5 text-yellow-500" />;
+        return <Clock className="h-5 w-5 text-warning" />;
     }
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "موافق":
-        return <Badge className="bg-green-500">موافق</Badge>;
+        return <Badge className="bg-success">موافق</Badge>;
       case "مرفوض":
         return <Badge variant="destructive">مرفوض</Badge>;
       default:
@@ -175,9 +175,9 @@ export function ApprovalFlowDialog({
           )}
 
           {!canApprove && (
-            <Card className="bg-green-50 dark:bg-green-900/10 border-green-200">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
+            <Card className="bg-success-light dark:bg-success/10 border-success/30">
+              <CardContent className="pt-4">
+                <div className="flex items-center gap-2 text-success">
                   <CheckCircle2 className="h-5 w-5" />
                   <p className="font-semibold">تم اعتماد التوزيع من جميع المستويات</p>
                 </div>

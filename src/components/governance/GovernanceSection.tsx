@@ -50,15 +50,15 @@ export function GovernanceSection() {
       label: "قرارات نشطة", 
       value: activeDecisions, 
       icon: Vote,
-      color: "text-blue-600",
-      bg: "bg-blue-50"
+      color: "text-info",
+      bg: "bg-info-light"
     },
     { 
       label: "بانتظار التصويت", 
       value: pendingVotes, 
       icon: Clock,
-      color: "text-amber-600",
-      bg: "bg-amber-50"
+      color: "text-warning",
+      bg: "bg-warning-light"
     },
   ];
 
@@ -130,7 +130,7 @@ export function GovernanceSection() {
                   </div>
                   <Badge 
                     variant="secondary"
-                    className="bg-blue-50 text-blue-700 text-xs"
+                    className="bg-info-light text-info text-xs"
                   >
                     نشط
                   </Badge>

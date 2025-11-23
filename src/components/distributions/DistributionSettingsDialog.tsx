@@ -81,9 +81,9 @@ export function DistributionSettingsDialog() {
           </div>
 
           {/* Sharia Compliant Order Alert */}
-          <Alert className="bg-blue-50 border-blue-200">
-            <Info className="h-4 w-4 text-blue-600" />
-            <AlertDescription className="text-blue-800 text-sm">
+          <Alert className="bg-info-light border-info/30">
+            <Info className="h-4 w-4 text-info" />
+            <AlertDescription className="text-info text-sm">
               <strong>الترتيب الشرعي للاستقطاعات:</strong>
               <ol className="list-decimal mr-6 mt-2 space-y-1 text-xs">
                 <li>الصيانة والعمارة (حفظ أصل الوقف) - أولوية</li>
@@ -95,9 +95,9 @@ export function DistributionSettingsDialog() {
           </Alert>
 
           {/* Maintenance Percentage - Priority 1 */}
-          <div className="rounded-lg border-2 border-green-300 bg-green-50 p-4 space-y-2">
-            <Label className="text-green-800 font-bold flex items-center gap-2">
-              <Badge variant="secondary" className="bg-green-600 text-white">1</Badge>
+          <div className="rounded-lg border-2 border-success/30 bg-success-light p-4 space-y-2">
+            <Label className="text-success font-bold flex items-center gap-2">
+              <Badge variant="secondary" className="bg-success text-success-foreground">1</Badge>
               نسبة الصيانة والعمارة
             </Label>
             <Input
@@ -108,15 +108,15 @@ export function DistributionSettingsDialog() {
               min="0"
               max="20"
             />
-            <p className="text-xs text-green-700">
+            <p className="text-xs text-success/80">
               أول ما يُخرج من الغلة لحفظ عين الوقف
             </p>
           </div>
 
           {/* Nazer Percentage - Priority 2 */}
-          <div className="rounded-lg border-2 border-blue-300 bg-blue-50 p-4 space-y-2">
-            <Label className="text-blue-800 font-bold flex items-center gap-2">
-              <Badge variant="secondary" className="bg-blue-600 text-white">2</Badge>
+          <div className="rounded-lg border-2 border-info/30 bg-info-light p-4 space-y-2">
+            <Label className="text-info font-bold flex items-center gap-2">
+              <Badge variant="secondary" className="bg-info text-info-foreground">2</Badge>
               نسبة الناظر
             </Label>
             <Input
@@ -127,7 +127,7 @@ export function DistributionSettingsDialog() {
               min="0"
               max="15"
             />
-            <p className="text-xs text-blue-700">
+            <p className="text-xs text-info/80">
               تُحسب من الباقي بعد الصيانة
             </p>
           </div>

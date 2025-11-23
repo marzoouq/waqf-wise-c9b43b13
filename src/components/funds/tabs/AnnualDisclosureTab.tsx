@@ -101,25 +101,25 @@ export function AnnualDisclosureTab() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div className="space-y-1 p-3 bg-green-50 dark:bg-green-950 rounded-lg border border-green-200">
-                    <p className="text-sm text-green-600">إجمالي الإيرادات</p>
-                    <p className="text-2xl font-bold text-green-700">
+                  <div className="space-y-1 p-3 bg-success-light dark:bg-success/10 rounded-lg border border-success/30">
+                    <p className="text-sm text-success">إجمالي الإيرادات</p>
+                    <p className="text-2xl font-bold text-success">
                       {currentYearDisclosure.total_revenues.toLocaleString()}
                     </p>
                     <p className="text-xs text-muted-foreground">ريال سعودي</p>
                   </div>
                   
-                  <div className="space-y-1 p-3 bg-red-50 dark:bg-red-950 rounded-lg border border-red-200">
-                    <p className="text-sm text-red-600">إجمالي المصروفات</p>
-                    <p className="text-2xl font-bold text-red-700">
+                  <div className="space-y-1 p-3 bg-destructive-light dark:bg-destructive/10 rounded-lg border border-destructive/30">
+                    <p className="text-sm text-destructive">إجمالي المصروفات</p>
+                    <p className="text-2xl font-bold text-destructive">
                       {currentYearDisclosure.total_expenses.toLocaleString()}
                     </p>
                     <p className="text-xs text-muted-foreground">ريال سعودي</p>
                   </div>
                   
-                  <div className="space-y-1 p-3 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200">
-                    <p className="text-sm text-blue-600">صافي الدخل</p>
-                    <p className="text-2xl font-bold text-blue-700">
+                  <div className="space-y-1 p-3 bg-info-light dark:bg-info/10 rounded-lg border border-info/30">
+                    <p className="text-sm text-info">صافي الدخل</p>
+                    <p className="text-2xl font-bold text-info">
                       {currentYearDisclosure.net_income.toLocaleString()}
                     </p>
                     <p className="text-xs text-muted-foreground">ريال سعودي</p>
@@ -258,13 +258,13 @@ export function AnnualDisclosureTab() {
                         <TableRow key={disclosure.id}>
                           <TableCell className="font-medium">{disclosure.year}</TableCell>
                           <TableCell>{disclosure.waqf_name}</TableCell>
-                          <TableCell className="text-green-600">
+                          <TableCell className="text-success">
                             {disclosure.total_revenues.toLocaleString()}
                           </TableCell>
-                          <TableCell className="text-red-600">
+                          <TableCell className="text-destructive">
                             {disclosure.total_expenses.toLocaleString()}
                           </TableCell>
-                          <TableCell className="text-blue-600 font-bold">
+                          <TableCell className="text-info font-bold">
                             {disclosure.net_income.toLocaleString()}
                           </TableCell>
                           <TableCell>
@@ -417,10 +417,10 @@ export function AnnualDisclosureTab() {
                           return (
                             <TableRow key={data.year}>
                               <TableCell className="font-medium">{data.year}</TableCell>
-                              <TableCell className="text-green-600">
+                              <TableCell className="text-success">
                                 {data.revenues.toLocaleString()}
                               </TableCell>
-                              <TableCell className="text-red-600">
+                              <TableCell className="text-destructive">
                                 {data.expenses.toLocaleString()}
                               </TableCell>
                               <TableCell className="font-semibold">
@@ -431,11 +431,11 @@ export function AnnualDisclosureTab() {
                                 {index > 0 && (
                                   <div className="flex items-center gap-1">
                                     {change > 0 ? (
-                                      <TrendingUp className="h-4 w-4 text-green-600" />
+                                      <TrendingUp className="h-4 w-4 text-success" />
                                     ) : (
-                                      <TrendingDown className="h-4 w-4 text-red-600" />
+                                      <TrendingDown className="h-4 w-4 text-destructive" />
                                     )}
-                                    <span className={change > 0 ? "text-green-600" : "text-red-600"}>
+                                    <span className={change > 0 ? "text-success" : "text-destructive"}>
                                       {Math.abs(change).toFixed(1)}%
                                     </span>
                                   </div>

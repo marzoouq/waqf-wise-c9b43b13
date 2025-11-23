@@ -64,7 +64,7 @@ export function VotingInterface({
             التصويت على القرار
           </span>
           {hasVoted && (
-            <Badge variant="outline" className="bg-green-50">
+            <Badge variant="outline" className="bg-success-light">
               <CheckCircle2 className="h-4 w-4 ml-1" />
               صوّتَ بالفعل
             </Badge>
@@ -88,7 +88,7 @@ export function VotingInterface({
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
               <span className="flex items-center gap-2">
-                <ThumbsUp className="h-4 w-4 text-green-600" />
+                <ThumbsUp className="h-4 w-4 text-success" />
                 موافق
               </span>
               <span className="font-semibold">
@@ -101,7 +101,7 @@ export function VotingInterface({
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
               <span className="flex items-center gap-2">
-                <ThumbsDown className="h-4 w-4 text-red-600" />
+                <ThumbsDown className="h-4 w-4 text-destructive" />
                 معارض
               </span>
               <span className="font-semibold">
@@ -179,21 +179,21 @@ export function VotingInterface({
         )}
 
         {hasVoted && userVote && (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-            <p className="text-sm font-medium text-green-900">
-              ✅ شكراً لك! لقد صوّتَ بـ <strong>{userVote.vote}</strong>
+          <div className="bg-success-light border border-success/30 rounded-lg p-4">
+            <p className="text-sm font-medium text-success">
+              ✅ تم تسجيل صوتك بنجاح
             </p>
-            {userVote.vote_reason && (
-              <p className="text-sm text-green-700 mt-2">
+            <div className="mt-2">
+              <p className="text-sm text-success/80 mt-2">
                 السبب: {userVote.vote_reason}
               </p>
-            )}
+            </div>
           </div>
         )}
 
         {!canVote && (
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-            <p className="text-sm text-amber-900">
+          <div className="bg-warning-light border border-warning/30 rounded-lg p-4">
+            <p className="text-sm text-warning">
               ℹ️ ليس لديك صلاحية التصويت على هذا القرار
             </p>
           </div>

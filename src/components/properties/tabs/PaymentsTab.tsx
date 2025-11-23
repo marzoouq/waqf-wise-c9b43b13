@@ -186,12 +186,12 @@ export const PaymentsTab = ({ onEdit }: Props) => {
   const getPaymentStatus = (payment: RentalPayment) => {
     // Under collection - orange/yellow distinct color
     if (payment.status === 'تحت التحصيل') {
-      return { status: 'تحت التحصيل', color: 'bg-orange-100 text-orange-800 border-orange-200' };
+      return { status: 'تحت التحصيل', color: 'bg-warning-light text-warning border-warning/30' };
     }
     
     // Paid - green
     if (payment.status === 'مدفوع' || payment.payment_date) {
-      return { status: 'مدفوع', color: 'bg-green-100 text-green-800 border-green-200' };
+      return { status: 'مدفوع', color: 'bg-success-light text-success border-success/30' };
     }
     
     const today = new Date();
@@ -199,11 +199,11 @@ export const PaymentsTab = ({ onEdit }: Props) => {
     
     // Overdue - red
     if (dueDate < today && payment.status !== 'مدفوع' && !payment.payment_date) {
-      return { status: 'متأخر', color: 'bg-red-100 text-red-800 border-red-200' };
+      return { status: 'متأخر', color: 'bg-destructive-light text-destructive border-destructive/30' };
     }
     
     // Pending - blue (should be hidden by filter but keep for safety)
-    return { status: 'معلق', color: 'bg-blue-100 text-blue-800 border-blue-200' };
+    return { status: 'معلق', color: 'bg-info-light text-info border-info/30' };
   };
 
   const totalPaid = payments?.filter(p => p.status === 'مدفوع' || p.payment_date).reduce((sum, p) => sum + Number(p.amount_paid), 0) || 0;

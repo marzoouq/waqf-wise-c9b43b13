@@ -64,11 +64,11 @@ export function InstallmentScheduleDialog({
               </div>
               <div className="bg-card p-4 rounded-lg border">
                 <div className="text-sm text-muted-foreground">المدفوع</div>
-                <div className="text-2xl font-bold text-green-600">{totalPaid.toLocaleString('ar-SA')} ريال</div>
+                <div className="text-2xl font-bold text-success">{totalPaid.toLocaleString('ar-SA')} ريال</div>
               </div>
               <div className="bg-card p-4 rounded-lg border">
                 <div className="text-sm text-muted-foreground">المتبقي</div>
-                <div className="text-2xl font-bold text-orange-600">{totalRemaining.toLocaleString('ar-SA')} ريال</div>
+                <div className="text-2xl font-bold text-warning">{totalRemaining.toLocaleString('ar-SA')} ريال</div>
               </div>
             </div>
 
@@ -107,10 +107,10 @@ export function InstallmentScheduleDialog({
                       <TableCell className="font-semibold">
                         {installment.total_amount.toLocaleString('ar-SA')} ريال
                       </TableCell>
-                      <TableCell className="text-green-600">
+                      <TableCell className="text-success">
                         {installment.paid_amount.toLocaleString('ar-SA')} ريال
                       </TableCell>
-                      <TableCell className="text-orange-600">
+                      <TableCell className="text-warning">
                         {installment.remaining_amount.toLocaleString('ar-SA')} ريال
                       </TableCell>
                       <TableCell>{getStatusBadge(installment.status)}</TableCell>

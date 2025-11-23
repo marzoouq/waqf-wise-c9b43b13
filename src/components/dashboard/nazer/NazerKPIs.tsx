@@ -52,8 +52,8 @@ export default function NazerKPIs() {
       title: "إجمالي الأصول",
       value: data.totalAssets,
       icon: Building2,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50 dark:bg-blue-950/50",
+      color: "text-info",
+      bgColor: "bg-info-light dark:bg-info/10",
       description: "قيمة الأصول الكلية",
       trend: "+8.3%"
     },
@@ -61,8 +61,8 @@ export default function NazerKPIs() {
       title: "إجمالي الإيرادات",
       value: data.totalRevenue,
       icon: TrendingUp,
-      color: "text-green-600",
-      bgColor: "bg-green-50 dark:bg-green-950/50",
+      color: "text-success",
+      bgColor: "bg-success-light dark:bg-success/10",
       description: "الإيرادات المحققة",
       trend: "+5.2%"
     },
@@ -70,8 +70,8 @@ export default function NazerKPIs() {
       title: "المستفيدون النشطون",
       value: data.activeBeneficiaries,
       icon: Users,
-      color: "text-purple-600",
-      bgColor: "bg-purple-50 dark:bg-purple-950/50",
+      color: "text-accent",
+      bgColor: "bg-accent/10 dark:bg-accent/5",
       description: "عدد المستفيدين",
       trend: "+2.1%"
     },
@@ -79,8 +79,8 @@ export default function NazerKPIs() {
       title: "الميزانية المتاحة",
       value: data.availableBudget,
       icon: Wallet,
-      color: "text-emerald-600",
-      bgColor: "bg-emerald-50 dark:bg-emerald-950/50",
+      color: "text-success",
+      bgColor: "bg-success-light dark:bg-success/10",
       description: "الأرصدة البنكية",
       trend: "+15.7%"
     },
@@ -88,8 +88,8 @@ export default function NazerKPIs() {
       title: "العقارات النشطة",
       value: data.activeProperties,
       icon: Home,
-      color: "text-orange-600",
-      bgColor: "bg-orange-50 dark:bg-orange-950/50",
+      color: "text-warning",
+      bgColor: "bg-warning-light dark:bg-warning/10",
       description: "العقارات المسجلة",
       trend: "0"
     },
@@ -106,8 +106,8 @@ export default function NazerKPIs() {
       title: "القروض المستحقة",
       value: data.pendingLoans,
       icon: CreditCard,
-      color: "text-red-600",
-      bgColor: "bg-red-50 dark:bg-red-950/50",
+      color: "text-destructive",
+      bgColor: "bg-destructive-light dark:bg-destructive/10",
       description: "القروض النشطة",
       trend: "+3.2%"
     },
@@ -115,8 +115,8 @@ export default function NazerKPIs() {
       title: "العائد الشهري",
       value: data.monthlyReturn,
       icon: PieChart,
-      color: "text-indigo-600",
-      bgColor: "bg-indigo-50 dark:bg-indigo-950/50",
+      color: "text-primary",
+      bgColor: "bg-primary/10 dark:bg-primary/5",
       description: "إيرادات الشهر الحالي",
       trend: "+6.8%"
     }
@@ -143,8 +143,8 @@ export default function NazerKPIs() {
                 {kpi.trend && kpi.trend !== "0" && (
                   <div className={`text-xs font-medium px-2 py-1 rounded-full ${
                     kpi.trend.startsWith('+') 
-                      ? 'bg-green-50 text-green-600 dark:bg-green-950/50 dark:text-green-400' 
-                      : 'bg-red-50 text-red-600 dark:bg-red-950/50 dark:text-red-400'
+                      ? 'bg-success-light text-success dark:bg-success/10' 
+                      : 'bg-destructive-light text-destructive dark:bg-destructive/10'
                   }`}>
                     {kpi.trend}
                   </div>

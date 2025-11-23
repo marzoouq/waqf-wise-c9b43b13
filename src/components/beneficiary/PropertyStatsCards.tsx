@@ -93,7 +93,7 @@ export function PropertyStatsCards() {
           title="الإيجارات الشهرية"
           value={formatCurrency(totalMonthlyRent)}
           icon={DollarSign}
-          colorClass="text-purple-600"
+          colorClass="text-accent"
         />
       </div>
 

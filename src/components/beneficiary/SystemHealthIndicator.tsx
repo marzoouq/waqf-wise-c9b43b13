@@ -78,8 +78,8 @@ export function SystemHealthIndicator() {
         return {
           icon: CheckCircle2,
           label: 'النظام يعمل بشكل طبيعي',
-          color: 'text-green-600',
-          bgColor: 'bg-green-50',
+          color: 'text-success',
+          bgColor: 'bg-success-light',
           variant: 'default' as const,
         };
       case 'degraded':
@@ -94,8 +94,8 @@ export function SystemHealthIndicator() {
         return {
           icon: WifiOff,
           label: 'لا يوجد اتصال بالإنترنت',
-          color: 'text-red-600',
-          bgColor: 'bg-red-50',
+          color: 'text-destructive',
+          bgColor: 'bg-destructive-light',
           variant: 'destructive' as const,
         };
     }

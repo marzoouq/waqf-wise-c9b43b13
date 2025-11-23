@@ -13,15 +13,15 @@ interface NotificationItemProps {
 const getNotificationIcon = (type: Notification["type"]) => {
   switch (type) {
     case "approval":
-      return <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />;
+      return <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-success" />;
     case "payment":
-      return <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />;
+      return <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-info" />;
     case "journal_entry":
-      return <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />;
+      return <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-accent" />;
     case "distribution":
-      return <Users className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600" />;
+      return <Users className="w-4 h-4 sm:w-5 sm:h-5 text-warning" />;
     case "system":
-      return <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-600" />;
+      return <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-warning" />;
     default:
       return <Bell className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />;
   }
