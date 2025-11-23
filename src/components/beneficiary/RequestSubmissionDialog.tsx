@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -20,8 +19,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
 import { useRequestTypes } from "@/hooks/useRequests";
+import { useBeneficiaryRequests } from "@/hooks/useBeneficiaryRequests";
 import { Plus, FileText } from "lucide-react";
 
 interface RequestSubmissionDialogProps {
@@ -31,46 +30,25 @@ interface RequestSubmissionDialogProps {
 export function RequestSubmissionDialog({
   beneficiaryId,
 }: RequestSubmissionDialogProps) {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
   const { requestTypes } = useRequestTypes();
+  const { submitRequest } = useBeneficiaryRequests(beneficiaryId);
   const [open, setOpen] = useState(false);
   const [selectedType, setSelectedType] = useState("");
 
   const selectedTypeData = requestTypes.find((rt) => rt.id === selectedType);
 
-  const submitRequest = useMutation({
-    mutationFn: async (formData: {
-      request_type_id: string;
-      description: string;
-      amount?: number;
-      priority: string;
-    }) => {
-      const { error } = await supabase.from("beneficiary_requests").insert({
-        beneficiary_id: beneficiaryId,
-        ...formData,
-        submitted_at: new Date().toISOString(),
-        status: "قيد المراجعة",
-      });
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["requests"] });
-      setOpen(false);
-      toast({
-        title: "تم الإرسال",
-        description: "تم تقديم الطلب بنجاح، سيتم مراجعته قريباً",
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "خطأ",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
+  const handleSubmit = (formData: {
+    request_type_id: string;
+    description: string;
+    amount?: number;
+    priority: string;
+  }) => {
+    submitRequest.mutate(formData, {
+      onSuccess: () => {
+        setOpen(false);
+      },
+    });
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -97,7 +75,7 @@ export function RequestSubmissionDialog({
             const formData = new FormData(e.currentTarget);
             const amount = formData.get("amount");
 
-            submitRequest.mutate({
+            handleSubmit({
               request_type_id: formData.get("request_type_id") as string,
               description: formData.get("description") as string,
               amount: amount ? Number(amount) : undefined,

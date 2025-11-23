@@ -22,3 +22,4 @@ export { useApprovalHistory } from './useApprovalHistory';
 export { useMessages } from './useMessages';
 export { useDashboardKPIs } from './useDashboardKPIs';
 export { useGlobalSearch } from './useGlobalSearch';
+export { useBeneficiaryRequests } from './useBeneficiaryRequests';
