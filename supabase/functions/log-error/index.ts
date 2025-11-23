@@ -27,11 +27,11 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // 🔒 1. فحص المصادقة
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
+    // 🔒 1. التحقق من API Key (للحماية من الاستخدام الخاطئ)
+    const apiKey = req.headers.get('apikey');
+    if (!apiKey || !apiKey.startsWith('eyJ')) {
       return new Response(
-        JSON.stringify({ success: false, error: 'غير مصرح' }), 
+        JSON.stringify({ success: false, error: 'API key غير صالح' }), 
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -40,14 +40,13 @@ Deno.serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    
-    if (authError || !user) {
-      return new Response(
-        JSON.stringify({ success: false, error: 'مصادقة غير صالحة' }), 
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    // محاولة الحصول على المستخدم (اختياري)
+    let userId: string | null = null;
+    const authHeader = req.headers.get('Authorization');
+    if (authHeader) {
+      const token = authHeader.replace('Bearer ', '');
+      const { data: { user } } = await supabase.auth.getUser(token);
+      userId = user?.id || null;
     }
 
     // ✅ 2. التحقق من صحة المدخلات
@@ -69,22 +68,24 @@ Deno.serve(async (req) => {
       );
     }
 
-    // 🚦 3. Rate Limiting (100 خطأ في الساعة لكل مستخدم)
-    const oneHourAgo = new Date(Date.now() - 3600000).toISOString();
-    const { count } = await supabase
-      .from('system_error_logs')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', user.id)
-      .gte('created_at', oneHourAgo);
+    // 🚦 3. Rate Limiting (100 خطأ في الساعة لكل IP/User)
+    if (userId) {
+      const oneHourAgo = new Date(Date.now() - 3600000).toISOString();
+      const { count } = await supabase
+        .from('system_error_logs')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .gte('created_at', oneHourAgo);
 
-    if (count && count >= 100) {
-      return new Response(
-        JSON.stringify({ 
-          success: false, 
-          error: 'تم تجاوز الحد المسموح من الطلبات. يرجى المحاولة لاحقاً' 
-        }), 
-        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      if (count && count >= 100) {
+        return new Response(
+          JSON.stringify({ 
+            success: false, 
+            error: 'تم تجاوز الحد المسموح من الطلبات. يرجى المحاولة لاحقاً' 
+          }), 
+          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
     }
 
     // 🧹 4. تنظيف رسائل الخطأ من HTML tags
@@ -121,7 +122,7 @@ Deno.serve(async (req) => {
         severity: errorReport.severity,
         url: errorReport.url,
         user_agent: errorReport.user_agent,
-        user_id: user.id,
+        user_id: userId, // قد يكون null للمستخدمين غير المسجلين
         additional_data: errorReport.additional_data,
         status: 'new',
       })
