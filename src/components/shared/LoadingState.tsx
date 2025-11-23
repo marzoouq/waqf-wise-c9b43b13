@@ -2,6 +2,7 @@ import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { motion } from "framer-motion";
 
 interface LoadingStateProps {
   message?: string;
@@ -23,14 +24,19 @@ export function LoadingState({
   className 
 }: LoadingStateProps) {
   const content = (
-    <div className={cn("text-center space-y-4", className)}>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+      className={cn("text-center space-y-4", className)}
+    >
       <div className="flex justify-center">
         <Loader2 className={cn("animate-spin text-primary", sizeClasses[size])} />
       </div>
       {message && (
         <p className="text-sm text-muted-foreground">{message}</p>
       )}
-    </div>
+    </motion.div>
   );
 
   if (fullScreen) {
@@ -53,7 +59,11 @@ export function TableLoadingSkeleton({ rows = 5 }: { rows?: number }) {
   return (
     <div className="space-y-3">
       {Array.from({ length: rows }).map((_, i) => (
-        <div key={`table-row-${i}`} className="h-12 bg-muted animate-pulse rounded" />
+        <div 
+          key={`table-row-${i}`} 
+          className="h-12 bg-muted/50 animate-pulse rounded-md"
+          style={{ animationDelay: `${i * 0.1}s` }}
+        />
       ))}
     </div>
   );
@@ -62,9 +72,9 @@ export function TableLoadingSkeleton({ rows = 5 }: { rows?: number }) {
 export function CardLoadingSkeleton() {
   return (
     <div className="space-y-4 p-6 bg-card rounded-lg border">
-      <div className="h-6 w-1/3 bg-muted animate-pulse rounded" />
-      <div className="h-4 w-2/3 bg-muted animate-pulse rounded" />
-      <div className="h-4 w-1/2 bg-muted animate-pulse rounded" />
+      <Skeleton className="h-6 w-1/3" />
+      <Skeleton className="h-4 w-2/3" />
+      <Skeleton className="h-4 w-1/2" />
     </div>
   );
 }
