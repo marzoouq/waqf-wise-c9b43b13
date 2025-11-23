@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAccounts } from "@/hooks/useAccounts";
-import { ChevronDown, ChevronLeft, Plus, Edit, TrendingUp, TrendingDown, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronLeft, Plus, Edit, TrendingUp, TrendingDown, Trash2, TreePine } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -10,6 +10,8 @@ import AddAccountDialog from "./AddAccountDialog";
 import { AccountRow, AccountWithBalance } from "@/types/supabase-helpers";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { ExportButton } from "@/components/shared/ExportButton";
+import { EmptyAccountingState } from "./EmptyAccountingState";
+import { LoadingState } from "@/components/shared/LoadingState";
 
 interface AccountNodeProps {
   account: AccountWithBalance;
@@ -203,7 +205,22 @@ export function EnhancedAccountsTree() {
   };
 
   if (isLoading) {
-    return <div className="text-center py-8">جاري التحميل...</div>;
+    return <LoadingState message="جاري تحميل شجرة الحسابات..." />;
+  }
+
+  if (accountTree.length === 0) {
+    return (
+      <EmptyAccountingState
+        icon={<TreePine className="h-12 w-12" />}
+        title="لا توجد حسابات"
+        description="ابدأ بإنشاء شجرة الحسابات لتنظيم العمليات المالية"
+        actionLabel="إضافة حساب رئيسي"
+        onAction={() => {
+          setSelectedAccount(null);
+          setDialogOpen(true);
+        }}
+      />
+    );
   }
 
   return (
