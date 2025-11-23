@@ -11,7 +11,7 @@ import { LoadingState } from "./components/shared/LoadingState";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { usePWAUpdate } from "./lib/pwa";
 import { AutoFixExecutor } from "./components/system/AutoFixExecutor";
-import "@/lib/errorTracking";
+import "@/lib/errors/tracker";
 import "@/lib/selfHealing";
 
 // Import DevTools configuration
@@ -340,24 +340,6 @@ const App = () => {
           />
           <Route path="/all-transactions" element={<AllTransactions />} />
                 {/* Governance Routes */}
-                <Route 
-                  path="/governance/decisions" 
-                  element={
-                    <ProtectedRoute requiredRoles={["admin", "nazer", "beneficiary"]}>
-                      <GovernanceDecisions />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/governance/decisions/:id" 
-                  element={
-                    <ProtectedRoute requiredRoles={["admin", "nazer", "beneficiary"]}>
-                      <DecisionDetails />
-                    </ProtectedRoute>
-                  } 
-                />
-                
-                {/* Governance */}
                 <Route 
                   path="/governance/decisions" 
                   element={
