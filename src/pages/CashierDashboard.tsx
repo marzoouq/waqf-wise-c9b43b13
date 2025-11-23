@@ -47,39 +47,39 @@ export default function CashierDashboard() {
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-lg transition-all duration-300 border-l-4 border-l-green-500">
+          <Card className="hover:shadow-lg transition-all duration-300 border-l-4 border-l-success">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-xs sm:text-sm font-medium">مقبوضات اليوم</CardTitle>
-              <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
+              <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-success" />
             </CardHeader>
             <CardContent>
-              <div className="text-lg sm:text-xl md:text-2xl font-bold text-green-600">
+              <div className="text-lg sm:text-xl md:text-2xl font-bold text-success">
                 +{stats?.todayReceipts.toLocaleString('ar-SA')} ريال
               </div>
               <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">إجمالي المقبوضات</p>
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-lg transition-all duration-300 border-l-4 border-l-red-500">
+          <Card className="hover:shadow-lg transition-all duration-300 border-l-4 border-l-destructive">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-xs sm:text-sm font-medium">مدفوعات اليوم</CardTitle>
-              <TrendingDown className="h-3 w-3 sm:h-4 sm:w-4 text-red-600" />
+              <TrendingDown className="h-3 w-3 sm:h-4 sm:w-4 text-destructive" />
             </CardHeader>
             <CardContent>
-              <div className="text-lg sm:text-xl md:text-2xl font-bold text-red-600">
+              <div className="text-lg sm:text-xl md:text-2xl font-bold text-destructive">
                 -{stats?.todayPayments.toLocaleString('ar-SA')} ريال
               </div>
               <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">إجمالي المدفوعات</p>
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-lg transition-all duration-300 border-l-4 border-l-orange-500">
+          <Card className="hover:shadow-lg transition-all duration-300 border-l-4 border-l-warning">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-xs sm:text-sm font-medium">معاملات معلقة</CardTitle>
-              <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-orange-600" />
+              <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-warning" />
             </CardHeader>
             <CardContent>
-              <div className="text-lg sm:text-xl md:text-2xl font-bold text-orange-600">
+              <div className="text-lg sm:text-xl md:text-2xl font-bold text-warning">
                 {stats?.pendingTransactions || 0}
               </div>
               <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">في انتظار المعالجة</p>
@@ -117,13 +117,13 @@ export default function CashierDashboard() {
                 <div className="space-y-4">
                   <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
                     <span className="text-sm font-medium">إجمالي المقبوضات</span>
-                    <span className="text-lg font-bold text-green-600">
+                    <span className="text-lg font-bold text-success">
                       +{stats?.todayReceipts.toLocaleString('ar-SA')} ريال
                     </span>
                   </div>
                   <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
                     <span className="text-sm font-medium">إجمالي المدفوعات</span>
-                    <span className="text-lg font-bold text-red-600">
+                    <span className="text-lg font-bold text-destructive">
                       -{stats?.todayPayments.toLocaleString('ar-SA')} ريال
                     </span>
                   </div>
@@ -132,8 +132,8 @@ export default function CashierDashboard() {
                       <span className="text-sm font-medium">الصافي</span>
                       <span className={`text-xl font-bold ${
                         (stats?.todayReceipts || 0) - (stats?.todayPayments || 0) >= 0 
-                          ? 'text-green-600' 
-                          : 'text-red-600'
+                          ? 'text-success' 
+                          : 'text-destructive'
                       }`}>
                         {((stats?.todayReceipts || 0) - (stats?.todayPayments || 0)).toLocaleString('ar-SA')} ريال
                       </span>
@@ -151,7 +151,7 @@ export default function CashierDashboard() {
                     onClick={() => setIsReceiptDialogOpen(true)}>
                 <CardHeader>
                   <CardTitle className="text-base sm:text-lg flex items-center gap-2">
-                    <TrendingUp className="h-5 w-5 text-green-600" />
+                    <TrendingUp className="h-5 w-5 text-success" />
                     إضافة سند قبض
                   </CardTitle>
                 </CardHeader>
@@ -170,7 +170,7 @@ export default function CashierDashboard() {
                     onClick={() => setIsVoucherDialogOpen(true)}>
                 <CardHeader>
                   <CardTitle className="text-base sm:text-lg flex items-center gap-2">
-                    <TrendingDown className="h-5 w-5 text-red-600" />
+                    <TrendingDown className="h-5 w-5 text-destructive" />
                     إضافة سند صرف
                   </CardTitle>
                 </CardHeader>

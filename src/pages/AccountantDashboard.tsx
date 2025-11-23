@@ -137,39 +137,39 @@ const AccountantDashboard = () => {
               </CardContent>
             </Card>
 
-            <Card className="group hover:shadow-lg hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-blue-500">
+            <Card className="group hover:shadow-lg hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-info">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-xs sm:text-sm font-medium">قيود مسودة</CardTitle>
-                <FileClock className="h-3 w-3 sm:h-4 sm:w-4 text-blue-500 group-hover:scale-110 transition-transform" />
+                <FileClock className="h-3 w-3 sm:h-4 sm:w-4 text-info group-hover:scale-110 transition-transform" />
               </CardHeader>
               <CardContent>
-                <div className="text-lg sm:text-xl md:text-2xl font-bold text-blue-600">
+                <div className="text-lg sm:text-xl md:text-2xl font-bold text-info">
                   {kpis?.draftEntries || 0}
                 </div>
                 <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">غير مرحّلة</p>
               </CardContent>
             </Card>
 
-            <Card className="group hover:shadow-lg hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-green-500">
+            <Card className="group hover:shadow-lg hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-success">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-xs sm:text-sm font-medium">قيود مرحّلة</CardTitle>
-                <FileCheck className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 group-hover:scale-110 transition-transform" />
+                <FileCheck className="h-3 w-3 sm:h-4 sm:w-4 text-success group-hover:scale-110 transition-transform" />
               </CardHeader>
               <CardContent>
-                <div className="text-lg sm:text-xl md:text-2xl font-bold text-green-600">
+                <div className="text-lg sm:text-xl md:text-2xl font-bold text-success">
                   {kpis?.postedEntries || 0}
                 </div>
                 <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">معتمدة ومرحّلة</p>
               </CardContent>
             </Card>
 
-            <Card className="group hover:shadow-lg hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-purple-500">
+            <Card className="group hover:shadow-lg hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-accent">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-xs sm:text-sm font-medium">قيود اليوم</CardTitle>
-                <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-purple-500 group-hover:scale-110 transition-transform" />
+                <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-accent group-hover:scale-110 transition-transform" />
               </CardHeader>
               <CardContent>
-                <div className="text-lg sm:text-xl md:text-2xl font-bold text-purple-600">
+                <div className="text-lg sm:text-xl md:text-2xl font-bold text-accent">
                   {kpis?.todayEntries || 0}
                 </div>
                 <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">قيود جديدة اليوم</p>

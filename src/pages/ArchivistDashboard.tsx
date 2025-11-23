@@ -147,26 +147,26 @@ export default function ArchivistDashboard() {
               </CardContent>
             </Card>
 
-            <Card className="group hover:shadow-lg hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-blue-500">
+            <Card className="group hover:shadow-lg hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-info">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-xs sm:text-sm font-medium">المستندات</CardTitle>
-                <FileText className="h-3 w-3 sm:h-4 sm:w-4 text-blue-500 group-hover:scale-110 transition-transform" />
+                <FileText className="h-3 w-3 sm:h-4 sm:w-4 text-info group-hover:scale-110 transition-transform" />
               </CardHeader>
               <CardContent>
-                <div className="text-lg sm:text-xl md:text-2xl font-bold text-blue-600">
+                <div className="text-lg sm:text-xl md:text-2xl font-bold text-info">
                   {stats?.totalDocuments || 0}
                 </div>
                 <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">إجمالي المستندات</p>
               </CardContent>
             </Card>
 
-            <Card className="group hover:shadow-lg hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-green-500">
+            <Card className="group hover:shadow-lg hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-success">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-xs sm:text-sm font-medium">رفع اليوم</CardTitle>
-                <Upload className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 group-hover:scale-110 transition-transform" />
+                <Upload className="h-3 w-3 sm:h-4 sm:w-4 text-success group-hover:scale-110 transition-transform" />
               </CardHeader>
               <CardContent>
-                <div className="text-lg sm:text-xl md:text-2xl font-bold text-green-600">
+                <div className="text-lg sm:text-xl md:text-2xl font-bold text-success">
                   {stats?.todayUploads || 0}
                 </div>
                 <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">مستندات اليوم</p>

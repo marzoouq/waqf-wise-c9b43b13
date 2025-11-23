@@ -85,13 +85,13 @@ export default function SystemErrorLogs() {
   const getSeverityIcon = (severity: string) => {
     switch (severity) {
       case "critical":
-        return <AlertTriangle className="h-5 w-5 text-red-600" />;
+        return <AlertTriangle className="h-5 w-5 text-destructive" />;
       case "high":
-        return <AlertCircle className="h-5 w-5 text-orange-600" />;
+        return <AlertCircle className="h-5 w-5 text-warning" />;
       case "medium":
-        return <Clock className="h-5 w-5 text-yellow-600" />;
+        return <Clock className="h-5 w-5 text-warning" />;
       default:
-        return <TrendingUp className="h-5 w-5 text-blue-600" />;
+        return <TrendingUp className="h-5 w-5 text-info" />;
     }
   };
 
@@ -111,13 +111,13 @@ export default function SystemErrorLogs() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "resolved":
-        return <CheckCircle className="h-4 w-4 text-green-600" />;
+        return <CheckCircle className="h-4 w-4 text-success" />;
       case "investigating":
-        return <Clock className="h-4 w-4 text-blue-600" />;
+        return <Clock className="h-4 w-4 text-info" />;
       case "ignored":
-        return <XCircle className="h-4 w-4 text-gray-600" />;
+        return <XCircle className="h-4 w-4 text-muted-foreground" />;
       default:
-        return <AlertTriangle className="h-4 w-4 text-orange-600" />;
+        return <AlertTriangle className="h-4 w-4 text-warning" />;
     }
   };
 
@@ -153,7 +153,7 @@ export default function SystemErrorLogs() {
             <CardTitle className="text-sm">جديدة</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold text-orange-600">{stats.new}</p>
+            <p className="text-2xl font-bold text-warning">{stats.new}</p>
           </CardContent>
         </Card>
         <Card>
@@ -161,7 +161,7 @@ export default function SystemErrorLogs() {
             <CardTitle className="text-sm">قيد المعالجة</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold text-blue-600">{stats.investigating}</p>
+            <p className="text-2xl font-bold text-info">{stats.investigating}</p>
           </CardContent>
         </Card>
         <Card>
@@ -169,7 +169,7 @@ export default function SystemErrorLogs() {
             <CardTitle className="text-sm">محلولة</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold text-green-600">{stats.resolved}</p>
+            <p className="text-2xl font-bold text-success">{stats.resolved}</p>
           </CardContent>
         </Card>
         <Card>
@@ -177,16 +177,16 @@ export default function SystemErrorLogs() {
             <CardTitle className="text-sm">حرجة</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold text-red-600">{stats.critical}</p>
+            <p className="text-2xl font-bold text-destructive">{stats.critical}</p>
           </CardContent>
         </Card>
       </div>
 
       {/* التنبيهات النشطة */}
       {activeAlerts && activeAlerts.length > 0 && (
-        <Card className="border-red-200 bg-red-50 dark:bg-red-950/20">
+        <Card className="border-destructive/50 bg-destructive-light">
           <CardHeader>
-            <CardTitle className="text-red-600">تنبيهات نشطة</CardTitle>
+            <CardTitle className="text-destructive">تنبيهات نشطة</CardTitle>
             <CardDescription>مشاكل تتطلب انتباهاً فورياً</CardDescription>
           </CardHeader>
           <CardContent>
