@@ -75,6 +75,7 @@ const BankTransfers = lazy(() => import("./pages/BankTransfers"));
 const Messages = lazy(() => import("./pages/Messages"));
 const GovernanceDecisions = lazy(() => import("./pages/GovernanceDecisions"));
 const DecisionDetails = lazy(() => import("./pages/DecisionDetails"));
+const RolesManagement = lazy(() => import("./pages/RolesManagement"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Configure QueryClient with optimized defaults and error handling
@@ -289,6 +290,14 @@ const App = () => {
           <Route path="/waqf-units" element={<WaqfUnits />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/settings" element={<Settings />} />
+          <Route 
+            path="/settings/roles" 
+            element={
+              <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+                <RolesManagement />
+              </ProtectedRoute>
+            } 
+          />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/requests" element={<Requests />} />
           <Route path="/staff/requests" element={<StaffRequests />} />
