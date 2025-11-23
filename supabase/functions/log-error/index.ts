@@ -54,12 +54,16 @@ Deno.serve(async (req) => {
     let errorReport: ErrorReport;
     try {
       const rawData = await req.json();
+      console.log('📥 Received data:', JSON.stringify(rawData, null, 2));
       errorReport = errorReportSchema.parse(rawData);
     } catch (validationError) {
+      console.error('❌ Validation failed:', validationError);
+      console.error('📋 Validation details:', JSON.stringify(validationError, null, 2));
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: 'بيانات غير صالحة'
+          error: 'بيانات غير صالحة',
+          details: validationError instanceof Error ? validationError.message : String(validationError)
         }), 
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
