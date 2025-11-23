@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { Search, Edit, Trash2, FileText, Receipt } from "lucide-react";
 import { useRentalPayments } from "@/hooks/useRentalPayments";
 import { Input } from "@/components/ui/input";
+import { ArrearsReport } from "@/components/rental/ArrearsReport";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -217,8 +218,20 @@ export const PaymentsTab = ({ onEdit }: Props) => {
     return dueDate < new Date() && p.status !== 'مدفوع' && !p.payment_date && p.status !== 'تحت التحصيل';
   }).reduce((sum, p) => sum + Number(p.amount_due), 0) || 0;
 
+  // تحضير البيانات لـ ArrearsReport
+  const paymentsWithTenant = payments.map(p => ({
+    ...p,
+    tenant_name: p.contracts?.tenant_name,
+    tenant_phone: p.contracts?.tenant_phone,
+    tenant_email: p.contracts?.tenant_email,
+    contract_number: p.contracts?.contract_number,
+  }));
+
   return (
     <div className="space-y-6">
+      {/* Arrears Report */}
+      <ArrearsReport payments={paymentsWithTenant} />
+
       {/* Search Input */}
       <div className="relative">
         <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />

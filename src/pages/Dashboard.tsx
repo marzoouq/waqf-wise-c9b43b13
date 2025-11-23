@@ -28,6 +28,8 @@ const AccountDistributionChart = lazy(() => import("@/components/dashboard/Accou
 const BudgetComparisonChart = lazy(() => import("@/components/dashboard/BudgetComparisonChart"));
 const RecentJournalEntries = lazy(() => import("@/components/dashboard/RecentJournalEntries"));
 const VouchersStatsCard = lazy(() => import("@/components/dashboard/VouchersStatsCard").then(m => ({ default: m.VouchersStatsCard })));
+const PropertyStatsCard = lazy(() => import("@/components/dashboard/PropertyStatsCard").then(m => ({ default: m.PropertyStatsCard })));
+const ExpiringContractsCard = lazy(() => import("@/components/dashboard/ExpiringContractsCard").then(m => ({ default: m.ExpiringContractsCard })));
 
 // Skeleton components
 const KPISkeleton = () => (
@@ -162,6 +164,20 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
             <Suspense fallback={<ChartSkeleton />}>
               <AdminActivities />
+            </Suspense>
+            <Suspense fallback={<ChartSkeleton />}>
+              <AdminTasks />
+            </Suspense>
+          </div>
+
+          {/* Property Stats */}
+          <Suspense fallback={<ChartSkeleton />}>
+            <PropertyStatsCard />
+          </Suspense>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
+            <Suspense fallback={<ChartSkeleton />}>
+              <ExpiringContractsCard />
             </Suspense>
             <Suspense fallback={<ChartSkeleton />}>
               <AdminTasks />
