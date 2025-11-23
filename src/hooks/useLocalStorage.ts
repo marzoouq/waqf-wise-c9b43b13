@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { productionLogger } from '@/lib/logger/production-logger';
 
 /**
  * Hook لتخزين البيانات في LocalStorage
@@ -21,7 +22,7 @@ export function useLocalStorage<T>(
       const item = window.localStorage.getItem(key);
       return item ? (JSON.parse(item) as T) : initialValue;
     } catch (error) {
-      console.warn(`Error reading localStorage key "${key}":`, error);
+      productionLogger.warn(`Error reading localStorage key "${key}"`, error);
       return initialValue;
     }
   }, [initialValue, key]);
@@ -32,7 +33,7 @@ export function useLocalStorage<T>(
   const setValue = useCallback(
     (value: T | ((val: T) => T)) => {
       if (typeof window === 'undefined') {
-        console.warn(
+        productionLogger.warn(
           `Tried setting localStorage key "${key}" even though environment is not a client`
         );
         return;
@@ -46,7 +47,7 @@ export function useLocalStorage<T>(
         // إرسال حدث لمزامنة التبويبات الأخرى
         window.dispatchEvent(new Event('local-storage'));
       } catch (error) {
-        console.warn(`Error setting localStorage key "${key}":`, error);
+        productionLogger.warn(`Error setting localStorage key "${key}"`, error);
       }
     },
     [key, storedValue]
@@ -55,7 +56,7 @@ export function useLocalStorage<T>(
   // حذف القيمة من LocalStorage
   const removeValue = useCallback(() => {
     if (typeof window === 'undefined') {
-      console.warn(
+      productionLogger.warn(
         `Tried removing localStorage key "${key}" even though environment is not a client`
       );
       return;
@@ -66,7 +67,7 @@ export function useLocalStorage<T>(
       setStoredValue(initialValue);
       window.dispatchEvent(new Event('local-storage'));
     } catch (error) {
-      console.warn(`Error removing localStorage key "${key}":`, error);
+      productionLogger.warn(`Error removing localStorage key "${key}"`, error);
     }
   }, [initialValue, key]);
 

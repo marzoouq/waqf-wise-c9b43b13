@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { productionLogger } from '@/lib/logger/production-logger';
 
 interface Props {
   children: ReactNode;
@@ -61,13 +62,14 @@ export class ErrorBoundary extends Component<Props, State> {
         body: errorData,
       });
 
-      // تسجيل في الـ console للتطوير
-      console.error('🔴 Error caught by ErrorBoundary:', {
-        error,
-        errorInfo,
+      // تسجيل في النظام الموحد
+      productionLogger.error('Error caught by ErrorBoundary', error, {
+        context: 'ErrorBoundary',
+        severity: 'high',
+        metadata: { componentStack: errorInfo.componentStack },
       });
     } catch (loggingError) {
-      console.error('Failed to log error:', loggingError);
+      productionLogger.error('Failed to log error to support', loggingError);
     }
   }
 
