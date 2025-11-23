@@ -12,3 +12,5 @@ export { useActivities } from './useActivities';
 export { useTasks } from './useTasks';
 export { useSavedSearches } from './useSavedSearches';
 export { usePrint } from './usePrint';
+export { useBeneficiariesFilters } from './useBeneficiariesFilters';
+export { usePropertiesDialogs } from './usePropertiesDialogs';
