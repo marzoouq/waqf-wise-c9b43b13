@@ -132,7 +132,7 @@ export function CreateBeneficiaryAccountsButton() {
               <AlertDialogDescription className="space-y-3">
                 <div className="space-y-2">
                   <p>إجمالي المستفيدين: {results.total}</p>
-                  <p className="text-green-600">تم الإنشاء بنجاح: {results.created}</p>
+                  <p className="text-success">تم الإنشاء بنجاح: {results.created}</p>
                   {results.failed > 0 && (
                     <p className="text-destructive">فشل الإنشاء: {results.failed}</p>
                   )}

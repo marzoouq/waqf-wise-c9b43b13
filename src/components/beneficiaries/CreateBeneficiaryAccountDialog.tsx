@@ -232,10 +232,10 @@ export function CreateBeneficiaryAccountDialog({
           </Form>
         ) : (
           <div className="space-y-4">
-            <Alert className="bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800">
+            <Alert className="bg-success-light border-success">
               <AlertDescription>
                 <div className="space-y-3">
-                  <p className="font-semibold text-green-900 dark:text-green-100">
+                  <p className="font-semibold text-success-foreground">
                     ✅ تم إنشاء الحساب بنجاح!
                   </p>
                   <div className="space-y-2 text-sm">

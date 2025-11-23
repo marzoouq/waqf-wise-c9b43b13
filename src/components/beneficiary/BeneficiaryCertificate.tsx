@@ -162,7 +162,7 @@ export function BeneficiaryCertificate({
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">الحالة</p>
-                <p className="font-semibold text-green-600">{status}</p>
+                <p className="font-semibold text-success">{status}</p>
               </div>
             </div>
 

@@ -50,7 +50,7 @@ export function EnhancedBalanceSheet() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
           {/* Assets Section */}
           <div className="space-y-4">
-            <h3 className="text-lg font-bold border-b-2 border-blue-500 pb-2">الأصول</h3>
+            <h3 className="text-lg font-bold border-b-2 border-info pb-2">الأصول</h3>
             
             <div className="space-y-3">
               <div className="flex justify-between items-center">

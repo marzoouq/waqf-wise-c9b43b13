@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { StatsCard } from "./StatsCard";
-import { Building2, Home, TrendingUp, DollarSign, Package, MapPin, ChevronDown } from "lucide-react";
+import { Building2, Home, TrendingUp, DollarSign, Package, MapPin, ChevronDown, CheckCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -69,14 +69,19 @@ export function PropertyStatsCards() {
           title="إجمالي العقارات"
           value={totalProperties}
           icon={Building2}
-          colorClass="text-blue-600"
+          colorClass="text-info"
         />
         <StatsCard
           title="إجمالي الوحدات"
           value={totalUnits}
+          colorClass="text-info"
           icon={Home}
-          trend={`${occupiedUnits} مشغولة • ${vacantUnits} شاغرة`}
-          colorClass="text-green-600"
+        />
+        <StatsCard
+          title="الوحدات المشغولة"
+          value={occupiedUnits}
+          colorClass="text-success"
+          icon={CheckCircle}
         />
         <StatsCard
           title="معدل الإشغال"

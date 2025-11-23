@@ -112,7 +112,7 @@ export function ProfileFamilyTree({ beneficiaryId }: ProfileFamilyTreeProps) {
                   {beneficiary.full_name}
                 </h3>
                 {beneficiary.is_head_of_family && (
-                  <Crown className="h-4 w-4 text-yellow-500" />
+                  <Crown className="h-4 w-4 text-warning" />
                 )}
               </div>
               <div className="flex flex-wrap gap-2">
@@ -153,7 +153,7 @@ export function ProfileFamilyTree({ beneficiaryId }: ProfileFamilyTreeProps) {
                         {member.full_name}
                       </h4>
                       {member.is_head_of_family && (
-                        <Crown className="h-3 w-3 text-yellow-500" />
+                        <Crown className="h-3 w-3 text-warning" />
                       )}
                     </div>
                     <div className="flex flex-wrap gap-2 text-sm">

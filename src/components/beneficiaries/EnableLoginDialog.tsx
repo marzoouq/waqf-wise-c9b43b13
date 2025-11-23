@@ -290,9 +290,9 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
       ) : hasExistingAuth ? (
         // حساب معطل لكن user_id موجود
         <div className="space-y-4">
-          <Alert className="bg-orange-50 border-orange-200 dark:bg-orange-950 dark:border-orange-800">
-            <Info className="h-4 w-4 text-orange-600 dark:text-orange-400" />
-            <AlertDescription className="text-orange-800 dark:text-orange-200">
+          <Alert className="bg-warning-light border-warning">
+            <Info className="h-4 w-4 text-warning" />
+            <AlertDescription className="text-warning-foreground">
               هذا الحساب معطل مؤقتاً. البيانات والمعلومات محفوظة ويمكن تفعيله مباشرة.
             </AlertDescription>
           </Alert>

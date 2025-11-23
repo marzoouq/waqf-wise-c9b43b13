@@ -298,7 +298,7 @@ export default function SystemMonitoring() {
             <CardContent>
               {!activeAlerts || activeAlerts.length === 0 ? (
                 <div className="text-center py-8">
-                  <CheckCircle2 className="h-12 w-12 text-green-600 mx-auto mb-2" />
+                  <CheckCircle2 className="h-12 w-12 text-success mx-auto mb-2" />
                   <p className="text-muted-foreground">لا توجد تنبيهات نشطة</p>
                 </div>
               ) : (
@@ -356,7 +356,7 @@ export default function SystemMonitoring() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Zap className="h-5 w-5 text-blue-600" />
+                <Zap className="h-5 w-5 text-info" />
                 محاولات الإصلاح التلقائي
               </CardTitle>
             </CardHeader>
