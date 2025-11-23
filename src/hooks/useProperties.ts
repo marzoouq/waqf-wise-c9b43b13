@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -43,6 +44,23 @@ export function useProperties() {
     },
     staleTime: 3 * 60 * 1000, // Data stays fresh for 3 minutes
   });
+
+  // Real-time subscription
+  useEffect(() => {
+    const channel = supabase
+      .channel('properties-changes')
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'properties' }, 
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['properties'] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   const addProperty = useMutation({
     mutationFn: async (property: Omit<Property, "id" | "created_at" | "updated_at">) => {

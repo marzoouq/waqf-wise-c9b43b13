@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -32,6 +33,23 @@ export const useFamilies = () => {
       return data as unknown as Family[];
     },
   });
+
+  // Real-time subscription
+  useEffect(() => {
+    const channel = supabase
+      .channel('families-changes')
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'families' }, 
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['families'] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   // Add new family
   const addFamily = useMutation({
