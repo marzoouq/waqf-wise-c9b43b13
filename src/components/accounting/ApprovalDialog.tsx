@@ -1,13 +1,11 @@
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { ResponsiveDialog, DialogFooter } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { CheckCircle, XCircle } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { useApprovals } from "@/hooks/useApprovals";
 
 type Props = {
   open: boolean;
@@ -17,43 +15,21 @@ type Props = {
 };
 
 const ApprovalDialog = ({ open, onOpenChange, journalEntryId, entryNumber }: Props) => {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
+  const { addApproval } = useApprovals();
   const [approverName, setApproverName] = useState("");
   const [notes, setNotes] = useState("");
 
-  const approveMutation = useMutation({
-    mutationFn: async (status: "approved" | "rejected") => {
-      const { error } = await supabase.from("approvals").insert({
-        journal_entry_id: journalEntryId,
-        approver_name: approverName,
-        status: status,
-        notes: notes,
-        approved_at: new Date().toISOString(),
-      });
-      if (error) throw error;
-    },
-    onSuccess: (_, status) => {
-      queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
-      queryClient.invalidateQueries({ queryKey: ["approvals"] });
-      toast({
-        title: status === "approved" ? "تمت الموافقة" : "تم الرفض",
-        description: status === "approved" 
-          ? "تمت الموافقة على القيد المحاسبي بنجاح"
-          : "تم رفض القيد المحاسبي",
-      });
-      onOpenChange(false);
-      setApproverName("");
-      setNotes("");
-    },
-    onError: () => {
-      toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء معالجة الطلب",
-        variant: "destructive",
-      });
-    },
-  });
+  const handleApprove = async (status: "approved" | "rejected") => {
+    await addApproval.mutateAsync({
+      journal_entry_id: journalEntryId,
+      approver_name: approverName,
+      status,
+      notes,
+    });
+    onOpenChange(false);
+    setApproverName("");
+    setNotes("");
+  };
 
   return (
     <ResponsiveDialog 
@@ -95,21 +71,21 @@ const ApprovalDialog = ({ open, onOpenChange, journalEntryId, entryNumber }: Pro
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
-            disabled={approveMutation.isPending}
+            disabled={addApproval.isPending}
           >
             إلغاء
           </Button>
           <Button
             variant="destructive"
-            onClick={() => approveMutation.mutate("rejected")}
-            disabled={!approverName || approveMutation.isPending}
+            onClick={() => handleApprove("rejected")}
+            disabled={!approverName || addApproval.isPending}
           >
             <XCircle className="h-4 w-4 ml-2" />
             رفض
           </Button>
           <Button
-            onClick={() => approveMutation.mutate("approved")}
-            disabled={!approverName || approveMutation.isPending}
+            onClick={() => handleApprove("approved")}
+            disabled={!approverName || addApproval.isPending}
           >
             <CheckCircle className="h-4 w-4 ml-2" />
             موافقة

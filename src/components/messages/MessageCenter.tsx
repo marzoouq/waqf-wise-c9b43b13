@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,8 +6,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { useMessages, type Message } from "@/hooks/useMessages";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import {
@@ -37,98 +35,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-interface Message {
-  id: string;
-  sender_id: string;
-  receiver_id: string;
-  subject: string;
-  body: string;
-  is_read: boolean;
-  read_at: string | null;
-  priority?: string;
-  related_request_id?: string | null;
-  parent_message_id?: string | null;
-  request_id?: string | null;
-  created_at: string;
-  updated_at?: string;
-  sender_name?: string;
-  receiver_name?: string;
-  sender_number?: string;
-  receiver_number?: string;
-}
-
 export function MessageCenter() {
-  const { toast } = useToast();
   const { user } = useAuth();
-  const queryClient = useQueryClient();
+  const { messages, isLoading, unreadCount, markAsRead, sendMessage } = useMessages();
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [isComposing, setIsComposing] = useState(false);
-
-  // جلب الرسائل
-  const { data: messages = [], isLoading } = useQuery({
-    queryKey: ["messages", user?.id],
-    queryFn: async () => {
-      if (!user) return [];
-
-      const { data, error } = await supabase
-        .from("messages_with_users")
-        .select("*")
-        .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return data as Message[];
-    },
-    enabled: !!user,
-  });
-
-  // تحديد الرسالة كمقروءة
-  const markAsRead = useMutation({
-    mutationFn: async (messageId: string) => {
-      const { error } = await supabase
-        .from("internal_messages")
-        .update({ is_read: true, read_at: new Date().toISOString() })
-        .eq("id", messageId)
-        .eq("receiver_id", user?.id);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["messages"] });
-    },
-  });
-
-  // إرسال رسالة جديدة
-  const sendMessage = useMutation({
-    mutationFn: async (message: {
-      receiver_id: string;
-      subject: string;
-      body: string;
-      priority: string;
-    }) => {
-      const { error } = await supabase.from("internal_messages").insert({
-        sender_id: user?.id,
-        ...message,
-      });
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["messages"] });
-      setIsComposing(false);
-      toast({
-        title: "تم الإرسال",
-        description: "تم إرسال الرسالة بنجاح",
-      });
-    },
-    onError: () => {
-      toast({
-        title: "خطأ",
-        description: "فشل إرسال الرسالة",
-        variant: "destructive",
-      });
-    },
-  });
 
   const handleSelectMessage = (message: Message) => {
     setSelectedMessage(message);
@@ -158,10 +69,6 @@ export function MessageCenter() {
       </Badge>
     );
   };
-
-  const unreadCount = messages.filter(
-    (m) => m.receiver_id === user?.id && !m.is_read
-  ).length;
 
   return (
     <div className="grid gap-4 md:grid-cols-[300px_1fr]">

@@ -1,10 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
-import { Search, Users, Building2, FileText, DollarSign, Calendar, Archive, TrendingUp } from 'lucide-react';
+import { Search, Users, Building2, FileText, DollarSign } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
+import { useGlobalSearch } from '@/hooks/useGlobalSearch';
 import {
   SearchResult,
   BeneficiarySearchResult,
@@ -21,6 +22,7 @@ interface GlobalSearchProps {
 export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
+  const { saveSearchHistory } = useGlobalSearch();
 
   // البحث في المستفيدين
   const { data: beneficiaries = [] } = useQuery({
@@ -149,30 +151,16 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
     return results;
   }, [beneficiaries, properties, loans, documents]);
 
-  // حفظ في سجل البحث
-  const saveSearchHistory = async (query: string, resultsCount: number) => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      await supabase.from('search_history').insert({
-        user_id: user.id,
-        search_query: query,
-        search_type: 'global',
-        results_count: resultsCount,
-      });
-    } catch (error) {
-      // Silent fail - search history is not critical
-    }
-  };
-
   const handleSelect = (result: SearchResult) => {
     navigate(result.url);
     onOpenChange(false);
     setSearchQuery('');
     
     // حفظ في السجل
-    saveSearchHistory(searchQuery, searchResults.length);
+    saveSearchHistory.mutate({
+      query: searchQuery,
+      resultsCount: searchResults.length,
+    });
   };
 
   // Keyboard shortcut (Ctrl+K)

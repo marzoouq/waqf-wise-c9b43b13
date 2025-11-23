@@ -1,38 +1,16 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
 
+/**
+ * دمج classNames مع Tailwind
+ */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
 /**
- * Format currency as SAR
+ * إعادة تصدير جميع دوال المنفعة من المجلدات المنظمة
  */
-export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('ar-SA', {
-    style: 'currency',
-    currency: 'SAR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format(amount);
-}
-
-/**
- * Format date
- */
-export function formatDate(date: string | Date): string {
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-  return format(dateObj, 'dd/MM/yyyy', { locale: ar });
-}
-
-/**
- * Format number
- */
-export function formatNumber(amount: number): string {
-  return new Intl.NumberFormat('ar-SA', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(Math.abs(amount));
-}
+export * from './utils/arrays';
+export * from './utils/formatting';
+export * from './utils/validation';
