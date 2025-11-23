@@ -156,13 +156,16 @@ export interface FamilyMember {
 export interface RequestType {
   id: string;
   name: string;
+  name_ar?: string;
   name_en?: string;
   description?: string;
-  category: string;
-  requires_documents: boolean;
+  category?: string;
+  requires_documents?: boolean;
+  requires_attachments?: boolean;
+  requires_amount?: boolean;
   required_documents?: string[];
   requires_approval: boolean;
-  approval_levels: number;
+  approval_levels?: number;
   sla_hours: number;
   max_amount?: number;
   is_active: boolean;

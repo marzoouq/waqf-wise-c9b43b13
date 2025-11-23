@@ -178,7 +178,7 @@ export function RequestSubmissionDialog({
             </p>
           </div>
 
-          {selectedTypeData?.requires_attachments && (
+          {(selectedTypeData?.requires_attachments || selectedTypeData?.requires_documents) && (
             <div className="rounded-md border border-dashed p-4 text-center">
               <FileText className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
               <p className="text-sm text-muted-foreground">
