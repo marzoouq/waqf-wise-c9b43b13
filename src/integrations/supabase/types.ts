@@ -7419,6 +7419,39 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles_audit: {
+        Row: {
+          action: string
+          changed_at: string
+          changed_by: string | null
+          changed_by_name: string | null
+          id: string
+          notes: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          action: string
+          changed_at?: string
+          changed_by?: string | null
+          changed_by_name?: string | null
+          id?: string
+          notes?: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          action?: string
+          changed_at?: string
+          changed_by?: string | null
+          changed_by_name?: string | null
+          id?: string
+          notes?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       voting_delegations: {
         Row: {
           created_at: string | null
@@ -7896,6 +7929,23 @@ export type Database = {
           status: string | null
           transaction_date: string | null
           transaction_type: string | null
+        }
+        Relationships: []
+      }
+      users_with_roles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          email: string | null
+          full_name: string | null
+          id: string | null
+          is_active: boolean | null
+          last_login_at: string | null
+          phone: string | null
+          roles: string | null
+          roles_array: Database["public"]["Enums"]["app_role"][] | null
+          roles_count: number | null
+          updated_at: string | null
         }
         Relationships: []
       }

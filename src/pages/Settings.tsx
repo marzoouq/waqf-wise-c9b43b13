@@ -14,6 +14,7 @@ import OrganizationSettingsDialog from "@/components/settings/OrganizationSettin
 import { PushNotificationsSettings } from "@/components/settings/PushNotificationsSettings";
 import { LeakedPasswordCheck } from "@/components/settings/LeakedPasswordCheck";
 import { LanguageSelector } from "@/components/settings/LanguageSelector";
+import { RolesSettingsDialog } from "@/components/settings/RolesSettingsDialog";
 import { useToast } from "@/hooks/use-toast";
 import { MobileOptimizedLayout, MobileOptimizedHeader, MobileOptimizedGrid } from "@/components/layout/MobileOptimizedLayout";
 
@@ -28,6 +29,7 @@ const Settings = () => {
   const [systemSettingsDialogOpen, setSystemSettingsDialogOpen] = useState(false);
   const [organizationDialogOpen, setOrganizationDialogOpen] = useState(false);
   const [paymentSettingsDialogOpen, setPaymentSettingsDialogOpen] = useState(false);
+  const [rolesDialogOpen, setRolesDialogOpen] = useState(false);
 
   const handleSectionClick = (sectionTitle: string) => {
     switch (sectionTitle) {
@@ -57,6 +59,9 @@ const Settings = () => {
         break;
       case "إعدادات الدفعات":
         setPaymentSettingsDialogOpen(true);
+        break;
+      case "الأدوار والصلاحيات":
+        setRolesDialogOpen(true);
         break;
       default:
         toast({
@@ -129,6 +134,13 @@ const Settings = () => {
       description: "تخصيص عرض الدفعات والإيجارات",
       icon: Calendar,
       color: "bg-info-light text-info",
+    },
+    {
+      id: 10,
+      title: "الأدوار والصلاحيات",
+      description: "عرض وإدارة أدوار المستخدمين",
+      icon: Shield,
+      color: "bg-primary/10 text-primary",
     },
   ];
 
@@ -242,6 +254,10 @@ const Settings = () => {
         <PaymentSettingsDialog
           open={paymentSettingsDialogOpen}
           onOpenChange={setPaymentSettingsDialogOpen}
+        />
+        <RolesSettingsDialog
+          open={rolesDialogOpen}
+          onOpenChange={setRolesDialogOpen}
         />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
