@@ -16,6 +16,7 @@ import {
   Shield,
   Archive,
   Bell,
+  Mail,
   FolderOpen,
   ChevronDown,
   DollarSign,
@@ -124,8 +125,10 @@ const menuGroups = [
     icon: Headphones,
     roles: ["all"],
     subItems: [
+      { icon: Mail, label: "الرسائل الداخلية", path: "/messages", roles: ["all"] },
       { icon: MessageSquare, label: "تذاكر الدعم", path: "/support", roles: ["all"] },
       { icon: Headphones, label: "إدارة التذاكر", path: "/support-management", roles: ["admin", "nazer"] },
+      { icon: Bell, label: "الإشعارات", path: "/notifications", roles: ["all"] },
       { icon: Activity, label: "لوحة المراقبة", path: "/system-monitoring", roles: ["admin", "nazer"], badge: "متقدم" },
       { icon: AlertTriangle, label: "سجلات الأخطاء", path: "/system-error-logs", roles: ["admin", "nazer"] },
       { icon: Settings, label: "صيانة النظام", path: "/system-maintenance", roles: ["admin", "nazer"] },
