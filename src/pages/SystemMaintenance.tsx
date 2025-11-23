@@ -42,11 +42,12 @@ export default function SystemMaintenance() {
           variant: "destructive",
         });
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error calling backfill function:', error);
+      const errorMessage = error instanceof Error ? error.message : "فشل في معالجة المستندات";
       toast({
         title: "❌ خطأ",
-        description: error.message || "فشل في معالجة المستندات",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -146,7 +147,7 @@ export default function SystemMaintenance() {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-2">
-                        {result.processed_payments.map((payment: any, index: number) => (
+                        {(result.processed_payments as Array<{ payment_number: string }>).map((payment, index: number) => (
                           <div key={index} className="flex items-center justify-between p-2 bg-muted rounded-lg">
                             <span className="font-medium">{payment.payment_number}</span>
                             <div className="flex gap-2 text-xs text-muted-foreground">

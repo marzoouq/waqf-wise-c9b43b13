@@ -21,7 +21,7 @@ import {
   Clock,
 } from 'lucide-react';
 import { selfHealing, retryOperation, fetchWithFallback } from '@/lib/selfHealing';
-import { errorTracker } from '@/lib/errorTracking';
+import { errorTracker } from '@/lib/errors';
 import { supabase } from '@/integrations/supabase/client';
 import { SelfHealingComponent } from '@/components/shared/SelfHealingComponent';
 import { useToast } from '@/hooks/use-toast';

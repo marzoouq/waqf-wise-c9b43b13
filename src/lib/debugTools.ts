@@ -3,7 +3,7 @@
  * Developer Debug Tools
  */
 
-import { getErrorLogs, clearErrorLogs, exportErrorLogs } from './errorService';
+// Error logs moved to unified system
 import { selfHealing } from './selfHealing';
 
 interface DebugTools {

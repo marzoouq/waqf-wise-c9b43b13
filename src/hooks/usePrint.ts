@@ -26,7 +26,7 @@ export const usePrint = () => {
     }
   }, []);
 
-  const printWithData = useCallback((data: any, templateRenderer: (data: any) => JSX.Element) => {
+  const printWithData = useCallback(<T,>(data: T, templateRenderer: (data: T) => JSX.Element) => {
     try {
       // إنشاء عنصر مؤقت للطباعة
       const printWindow = window.open('', '', 'width=800,height=600');

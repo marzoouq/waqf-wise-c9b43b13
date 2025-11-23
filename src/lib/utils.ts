@@ -26,3 +26,13 @@ export function formatDate(date: string | Date): string {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
   return format(dateObj, 'dd/MM/yyyy', { locale: ar });
 }
+
+/**
+ * Format number
+ */
+export function formatNumber(amount: number): string {
+  return new Intl.NumberFormat('ar-SA', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(Math.abs(amount));
+}

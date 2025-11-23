@@ -4,7 +4,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
-import { errorTracker } from './errorTracking';
+import { errorTracker } from './errors';
 
 interface RetryConfig {
   maxAttempts: number;

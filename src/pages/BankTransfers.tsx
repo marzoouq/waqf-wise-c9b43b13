@@ -68,7 +68,16 @@ export default function BankTransfers() {
     if (!distribution) return;
 
     // تحويل البيانات إلى سجلات
-    const records: BankTransferRecord[] = (distribution.distribution_details || []).map((detail: any) => ({
+    interface DistributionDetail {
+      beneficiaries?: {
+        full_name?: string;
+        bank_account_number?: string;
+        iban?: string;
+      };
+      allocated_amount: number;
+    }
+    
+    const records: BankTransferRecord[] = ((distribution.distribution_details || []) as DistributionDetail[]).map((detail) => ({
       beneficiary_name: detail.beneficiaries?.full_name || "غير محدد",
       account_number: detail.beneficiaries?.bank_account_number || "",
       iban: detail.beneficiaries?.iban || undefined,
@@ -113,10 +122,11 @@ export default function BankTransfers() {
         title: "✅ تم التصدير بنجاح",
         description: `تم تصدير ${records.length} تحويل بنجي`,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "فشل في معالجة المستندات";
       toast({
         title: "❌ خطأ",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     }

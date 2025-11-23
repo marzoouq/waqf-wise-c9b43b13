@@ -9,6 +9,7 @@ import { ar } from "date-fns/locale";
 import jsPDF from "jspdf";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { formatCurrency, formatNumber } from "@/lib/utils";
 
 export function CashFlowStatement() {
   const { cashFlows, isLoading, calculateCashFlow } = useCashFlows();
@@ -21,19 +22,7 @@ export function CashFlowStatement() {
 
   const latestFlow = cashFlows[0];
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("ar-SA", {
-      style: "currency",
-      currency: "SAR",
-    }).format(amount);
-  };
-
-  const formatNumber = (amount: number) => {
-    return new Intl.NumberFormat("ar-SA", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(Math.abs(amount));
-  };
+  // Using formatCurrency and formatNumber from @/lib/utils
 
   const handlePrint = () => {
     window.print();
