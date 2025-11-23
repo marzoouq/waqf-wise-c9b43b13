@@ -7139,6 +7139,16 @@ export type Database = {
         }
         Returns: undefined
       }
+      auto_deduct_loan_installments: {
+        Args: { p_distribution_id: string }
+        Returns: {
+          beneficiary_id: string
+          deducted_amount: number
+          final_amount: number
+          installments_paid: number
+          original_amount: number
+        }[]
+      }
       auto_escalate_overdue_tickets: { Args: never; Returns: undefined }
       calculate_account_balance: {
         Args: { account_uuid: string }
@@ -7199,6 +7209,15 @@ export type Database = {
           p_trigger_event: string
         }
         Returns: string
+      }
+      create_loan_installments: {
+        Args: {
+          p_loan_id: string
+          p_monthly_installment: number
+          p_start_date: string
+          p_term_months: number
+        }
+        Returns: undefined
       }
       create_notification: {
         Args: {
