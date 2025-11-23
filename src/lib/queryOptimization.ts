@@ -18,15 +18,6 @@ export const createOptimizedSelect = (fields: Record<string, string[]>): string 
 };
 
 /**
- * Standard pagination settings
- */
-export const PAGINATION = {
-  DEFAULT_PAGE_SIZE: 10,
-  LARGE_PAGE_SIZE: 50,
-  SMALL_PAGE_SIZE: 5,
-} as const;
-
-/**
  * Cache times for different data types (in milliseconds)
  */
 export const CACHE_TIMES = {
