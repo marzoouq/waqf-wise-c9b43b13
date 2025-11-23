@@ -15,6 +15,13 @@ export interface Notification {
   created_at: string;
   read_at: string | null;
   action_url: string | null;
+  // الأعمدة الجديدة من المرحلة 4
+  channel?: string;
+  sent_at?: string | null;
+  delivery_status?: string;
+  scheduled_for?: string | null;
+  retry_count?: number;
+  error_message?: string | null;
 }
 
 export const useNotifications = () => {

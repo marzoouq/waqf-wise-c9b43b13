@@ -318,7 +318,6 @@ class ErrorTracker {
         severity: report.severity,
         title: `خطأ ${report.severity === 'critical' ? 'حرج' : 'عالي'}: ${report.error_type}`,
         description: report.error_message,
-        source: 'error_tracking',
         status: 'active',
         metadata: {
           url: report.url,
