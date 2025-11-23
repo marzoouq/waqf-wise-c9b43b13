@@ -9,9 +9,6 @@
     "strictPropertyInitialization": true,
     "skipLibCheck": true
   },
-    "skipLibCheck": true,
-    "strictNullChecks": false
-  },
   "files": [],
   "references": [
     {
