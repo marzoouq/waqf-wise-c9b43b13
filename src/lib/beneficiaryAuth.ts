@@ -22,12 +22,30 @@ export function validateNationalId(nationalId: string): boolean {
 }
 
 /**
- * توليد كلمة مرور مؤقتة من رقم الهوية
- * @param nationalId رقم الهوية
- * @returns كلمة المرور المؤقتة
+ * توليد كلمة مرور قوية وعشوائية
+ * @returns كلمة مرور آمنة (16 حرف)
  */
-export function generateTempPassword(nationalId: string): string {
-  return `${nationalId}@Waqf`;
+export function generateSecurePassword(): string {
+  const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const lowercase = 'abcdefghijklmnopqrstuvwxyz';
+  const numbers = '0123456789';
+  const symbols = '!@#$%^&*';
+  const allChars = uppercase + lowercase + numbers + symbols;
+  
+  // ضمان وجود حرف من كل نوع
+  let password = '';
+  password += uppercase[Math.floor(Math.random() * uppercase.length)];
+  password += lowercase[Math.floor(Math.random() * lowercase.length)];
+  password += numbers[Math.floor(Math.random() * numbers.length)];
+  password += symbols[Math.floor(Math.random() * symbols.length)];
+  
+  // إكمال باقي الـ 12 حرف
+  for (let i = 0; i < 12; i++) {
+    password += allChars[Math.floor(Math.random() * allChars.length)];
+  }
+  
+  // خلط الأحرف
+  return password.split('').sort(() => Math.random() - 0.5).join('');
 }
 
 /**

@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Key, Mail, User, Info, RefreshCw } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { logger } from "@/lib/logger";
-import { nationalIdToEmail, generateTempPassword } from "@/lib/beneficiaryAuth";
+import { nationalIdToEmail, generateSecurePassword } from "@/lib/beneficiaryAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ResetPasswordDialog } from "./ResetPasswordDialog";
 import { useLeakedPassword } from "@/hooks/useLeakedPassword";
@@ -37,7 +37,7 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
   
   // توليد البريد وكلمة المرور تلقائياً من رقم الهوية
   const autoEmail = nationalIdToEmail(beneficiary.national_id);
-  const tempPassword = generateTempPassword(beneficiary.national_id);
+  const tempPassword = generateSecurePassword();
   
   const [formData, setFormData] = useState({
     username: beneficiary.username || beneficiary.national_id,
