@@ -281,9 +281,6 @@ export default function Auth() {
                       {beneficiarySignInForm.formState.errors.password.message}
                     </p>
                   )}
-                  <p className="text-xs text-muted-foreground">
-                    كلمة المرور المؤقتة: رقم الهوية@Waqf
-                  </p>
                 </div>
 
                 <Button type="submit" className="w-full" disabled={isLoading}>
