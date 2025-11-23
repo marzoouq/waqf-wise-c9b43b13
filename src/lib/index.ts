@@ -1,7 +1,9 @@
-// Barrel exports for lib utilities
+/**
+ * Barrel exports for lib utilities
+ */
+
+export { cn, formatCurrency, formatDate, formatNumber } from './utils';
+export { logger } from './logger';
 export * from './constants';
-export * from './utils';
-export * from './errors';
-export * from './logger';
-export * from './mutationHelpers';
-export * from './queryOptimization';
+export { debounce, throttle, useRenderTracking } from './performance';
+export * from './errors/types';

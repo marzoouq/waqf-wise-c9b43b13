@@ -14,3 +14,4 @@ export { useSavedSearches } from './useSavedSearches';
 export { usePrint } from './usePrint';
 export { useBeneficiariesFilters } from './useBeneficiariesFilters';
 export { usePropertiesDialogs } from './usePropertiesDialogs';
+export { useAccountingTabs } from './useAccountingTabs';
