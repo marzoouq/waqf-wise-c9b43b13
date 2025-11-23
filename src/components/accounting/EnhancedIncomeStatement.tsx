@@ -49,8 +49,8 @@ export function EnhancedIncomeStatement() {
       <CardContent className="space-y-4 sm:space-y-6 p-3 sm:p-4 md:p-6">
         {/* Revenue Section */}
         <div className="space-y-4">
-          <h3 className="text-lg font-bold border-r-4 border-green-500 pr-3 flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-green-600" />
+          <h3 className="text-lg font-bold border-r-4 border-success pr-3 flex items-center gap-2">
+            <TrendingUp className="h-5 w-5 text-success" />
             الإيرادات
           </h3>
           
@@ -72,7 +72,7 @@ export function EnhancedIncomeStatement() {
             
             <div className="flex justify-between items-center pt-2 border-t-2 font-semibold">
               <span>إجمالي الإيرادات</span>
-              <span className="font-mono text-green-600 text-lg">
+              <span className="font-mono text-success text-lg">
                 {formatNumber(incomeStatement.revenue.total)}
               </span>
             </div>
@@ -92,8 +92,8 @@ export function EnhancedIncomeStatement() {
 
         {/* Expenses Section */}
         <div className="space-y-4">
-          <h3 className="text-lg font-bold border-r-4 border-red-500 pr-3 flex items-center gap-2">
-            <TrendingDown className="h-5 w-5 text-red-600" />
+          <h3 className="text-lg font-bold border-r-4 border-destructive pr-3 flex items-center gap-2">
+            <TrendingDown className="h-5 w-5 text-destructive" />
             المصروفات
           </h3>
           
@@ -115,7 +115,7 @@ export function EnhancedIncomeStatement() {
             
             <div className="flex justify-between items-center pt-2 border-t-2 font-semibold">
               <span>إجمالي المصروفات</span>
-              <span className="font-mono text-red-600 text-lg">
+              <span className="font-mono text-destructive text-lg">
                 {formatNumber(incomeStatement.expenses.total)}
               </span>
             </div>
@@ -131,7 +131,7 @@ export function EnhancedIncomeStatement() {
             </div>
             <div className="text-left">
               <span className={`font-mono font-bold text-2xl ${
-                incomeStatement.netIncome >= 0 ? "text-green-600" : "text-red-600"
+                incomeStatement.netIncome >= 0 ? "text-success" : "text-destructive"
               }`}>
                 {incomeStatement.netIncome >= 0 ? "+" : "-"}
                 {formatNumber(Math.abs(incomeStatement.netIncome))}
@@ -152,7 +152,7 @@ export function EnhancedIncomeStatement() {
           
           <Card className="p-4">
             <p className="text-sm text-muted-foreground">العائد على الإيرادات</p>
-            <p className="text-2xl font-bold text-green-600">
+            <p className="text-2xl font-bold text-success">
               {profitMargin.toFixed(1)}%
             </p>
           </Card>

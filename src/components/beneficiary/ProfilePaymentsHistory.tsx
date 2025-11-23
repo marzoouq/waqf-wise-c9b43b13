@@ -60,8 +60,8 @@ export function ProfilePaymentsHistory({ beneficiaryId }: ProfilePaymentsHistory
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-full bg-green-500/10 flex items-center justify-center">
-                <TrendingUp className="h-6 w-6 text-green-500" />
+              <div className="h-12 w-12 rounded-full bg-success-light flex items-center justify-center">
+                <TrendingUp className="h-6 w-6 text-success" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">مدفوعات {currentYear}</p>
@@ -76,8 +76,8 @@ export function ProfilePaymentsHistory({ beneficiaryId }: ProfilePaymentsHistory
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-full bg-blue-500/10 flex items-center justify-center">
-                <Calendar className="h-6 w-6 text-blue-500" />
+              <div className="h-12 w-12 rounded-full bg-info-light flex items-center justify-center">
+                <Calendar className="h-6 w-6 text-info" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">عدد المدفوعات</p>

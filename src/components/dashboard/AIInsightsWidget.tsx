@@ -13,9 +13,9 @@ const categoryIcons: Record<string, LucideIcon> = {
 };
 
 const severityColors = {
-  info: 'bg-blue-500/10 text-blue-600',
-  warning: 'bg-warning/10 text-warning',
-  critical: 'bg-destructive/10 text-destructive',
+  info: 'bg-info-light text-info',
+  warning: 'bg-warning-light text-warning',
+  critical: 'bg-destructive-light text-destructive',
 };
 
 export function AIInsightsWidget() {

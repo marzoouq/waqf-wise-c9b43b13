@@ -89,32 +89,32 @@ export const AnnualDisclosureCard = () => {
         <CardContent className="space-y-4">
           {/* إحصائيات سريعة */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div className="p-3 bg-green-50 dark:bg-green-950 rounded-lg border border-green-200 dark:border-green-800">
+            <div className="p-3 bg-success-light rounded-lg border border-success/20">
               <div className="flex items-center gap-2 mb-1">
-                <TrendingUp className="h-3 w-3 text-green-600" />
-                <p className="text-xs text-green-600">إجمالي الإيرادات</p>
+                <TrendingUp className="h-3 w-3 text-success" />
+                <p className="text-xs text-success">إجمالي الإيرادات</p>
               </div>
-              <p className="text-lg font-bold text-green-700">
+              <p className="text-lg font-bold text-success">
                 {latestDisclosure.total_revenues.toLocaleString()}
               </p>
             </div>
 
-            <div className="p-3 bg-red-50 dark:bg-red-950 rounded-lg border border-red-200 dark:border-red-800">
+            <div className="p-3 bg-destructive-light rounded-lg border border-destructive/20">
               <div className="flex items-center gap-2 mb-1">
-                <DollarSign className="h-3 w-3 text-red-600" />
-                <p className="text-xs text-red-600">إجمالي المصروفات</p>
+                <DollarSign className="h-3 w-3 text-destructive" />
+                <p className="text-xs text-destructive">إجمالي المصروفات</p>
               </div>
-              <p className="text-lg font-bold text-red-700">
+              <p className="text-lg font-bold text-destructive">
                 {latestDisclosure.total_expenses.toLocaleString()}
               </p>
             </div>
 
-            <div className="p-3 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200 dark:border-blue-800">
+            <div className="p-3 bg-info-light rounded-lg border border-info/20">
               <div className="flex items-center gap-2 mb-1">
-                <DollarSign className="h-3 w-3 text-blue-600" />
-                <p className="text-xs text-blue-600">صافي الدخل</p>
+                <DollarSign className="h-3 w-3 text-info" />
+                <p className="text-xs text-info">صافي الدخل</p>
               </div>
-              <p className="text-lg font-bold text-blue-700">
+              <p className="text-lg font-bold text-info">
                 {latestDisclosure.net_income.toLocaleString()}
               </p>
             </div>

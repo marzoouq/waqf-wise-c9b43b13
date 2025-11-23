@@ -13,12 +13,12 @@ interface KnowledgeBaseArticleCardProps {
 
 export function KnowledgeBaseArticleCard({ article, onView }: KnowledgeBaseArticleCardProps) {
   const categoryColors = {
-    getting_started: 'bg-blue-500/10 text-blue-500',
-    features: 'bg-green-500/10 text-green-500',
-    troubleshooting: 'bg-orange-500/10 text-orange-500',
-    account: 'bg-purple-500/10 text-purple-500',
-    billing: 'bg-red-500/10 text-red-500',
-    other: 'bg-gray-500/10 text-gray-500',
+    getting_started: 'bg-info-light text-info',
+    features: 'bg-success-light text-success',
+    troubleshooting: 'bg-warning-light text-warning',
+    account: 'bg-secondary text-secondary-foreground',
+    billing: 'bg-destructive-light text-destructive',
+    other: 'bg-muted text-muted-foreground',
   };
 
   return (

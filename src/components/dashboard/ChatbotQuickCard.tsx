@@ -15,7 +15,7 @@ export function ChatbotQuickCard() {
               <div className="p-2 sm:p-3 md:p-4 bg-gradient-to-br from-primary to-primary/80 rounded-xl sm:rounded-2xl shadow-lg">
                 <Bot className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-primary-foreground" />
               </div>
-              <Sparkles className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 text-yellow-500" style={{ animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' }} />
+              <Sparkles className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 text-accent" style={{ animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' }} />
             </div>
             
             <div className="space-y-0.5 sm:space-y-1 flex-1 min-w-0">

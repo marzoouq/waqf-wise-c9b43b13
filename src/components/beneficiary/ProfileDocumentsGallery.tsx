@@ -53,15 +53,15 @@ export function ProfileDocumentsGallery({ beneficiaryId }: ProfileDocumentsGalle
   const getFileTypeColor = (fileType: string) => {
     switch (fileType) {
       case 'هوية':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+        return 'bg-info-light text-info border-info/20';
       case 'شهادة ميلاد':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+        return 'bg-success-light text-success border-success/20';
       case 'عقد زواج':
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400';
+        return 'bg-secondary text-secondary-foreground border-secondary/20';
       case 'مستند بنكي':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
+        return 'bg-warning-light text-warning border-warning/20';
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
+        return 'bg-muted text-muted-foreground border-border';
     }
   };
 
@@ -96,8 +96,8 @@ export function ProfileDocumentsGallery({ beneficiaryId }: ProfileDocumentsGalle
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-full bg-green-500/10 flex items-center justify-center">
-                <CheckCircle className="h-6 w-6 text-green-500" />
+              <div className="h-12 w-12 rounded-full bg-success-light flex items-center justify-center">
+                <CheckCircle className="h-6 w-6 text-success" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">موثقة</p>
@@ -110,8 +110,8 @@ export function ProfileDocumentsGallery({ beneficiaryId }: ProfileDocumentsGalle
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-full bg-yellow-500/10 flex items-center justify-center">
-                <Clock className="h-6 w-6 text-yellow-500" />
+              <div className="h-12 w-12 rounded-full bg-warning-light flex items-center justify-center">
+                <Clock className="h-6 w-6 text-warning" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">قيد المراجعة</p>

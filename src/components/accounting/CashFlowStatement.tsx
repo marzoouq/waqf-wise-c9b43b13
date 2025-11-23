@@ -240,7 +240,7 @@ export function CashFlowStatement() {
           {/* التدفقات النقدية من الأنشطة الاستثمارية */}
           <div className="border rounded-lg p-4 bg-card">
             <div className="flex items-center gap-2 mb-4">
-              <Activity className="h-5 w-5 text-blue-500" />
+              <Activity className="h-5 w-5 text-info" />
               <h3 className="text-lg font-semibold">التدفقات النقدية من الأنشطة الاستثمارية</h3>
             </div>
             <div className="flex justify-between items-center py-2 border-b">

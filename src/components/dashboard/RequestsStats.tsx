@@ -90,8 +90,8 @@ const RequestsStats = () => {
       title: 'طلبات جديدة',
       value: recentRequests.length,
       icon: TrendingUp,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-600/10',
+      color: 'text-accent',
+      bgColor: 'bg-accent/10',
       description: 'خلال آخر 7 أيام',
     },
   ];

@@ -77,8 +77,8 @@ export function ProfileRequestsHistory({ beneficiaryId }: ProfileRequestsHistory
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-full bg-yellow-500/10 flex items-center justify-center">
-                <Clock className="h-6 w-6 text-yellow-500" />
+              <div className="h-12 w-12 rounded-full bg-warning-light flex items-center justify-center">
+                <Clock className="h-6 w-6 text-warning" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">قيد المراجعة</p>
@@ -91,8 +91,8 @@ export function ProfileRequestsHistory({ beneficiaryId }: ProfileRequestsHistory
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-full bg-green-500/10 flex items-center justify-center">
-                <CheckCircle className="h-6 w-6 text-green-500" />
+              <div className="h-12 w-12 rounded-full bg-success-light flex items-center justify-center">
+                <CheckCircle className="h-6 w-6 text-success" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">معتمد</p>
@@ -105,8 +105,8 @@ export function ProfileRequestsHistory({ beneficiaryId }: ProfileRequestsHistory
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-full bg-red-500/10 flex items-center justify-center">
-                <XCircle className="h-6 w-6 text-red-500" />
+              <div className="h-12 w-12 rounded-full bg-destructive-light flex items-center justify-center">
+                <XCircle className="h-6 w-6 text-destructive" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">مرفوض</p>

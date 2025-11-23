@@ -202,14 +202,14 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
 
   const getTypeBadgeColor = (type: string) => {
     const colors: Record<string, string> = {
-      beneficiary: 'bg-blue-500/10 text-blue-500',
-      property: 'bg-green-500/10 text-green-500',
-      loan: 'bg-purple-500/10 text-purple-500',
-      contract: 'bg-orange-500/10 text-orange-500',
-      document: 'bg-gray-500/10 text-gray-500',
-      distribution: 'bg-indigo-500/10 text-indigo-500',
+      beneficiary: 'bg-info-light text-info',
+      property: 'bg-success-light text-success',
+      loan: 'bg-secondary text-secondary-foreground',
+      contract: 'bg-warning-light text-warning',
+      document: 'bg-muted text-muted-foreground',
+      distribution: 'bg-accent/10 text-accent',
     };
-    return colors[type] || 'bg-gray-500/10 text-gray-500';
+    return colors[type] || 'bg-muted text-muted-foreground';
   };
 
   return (

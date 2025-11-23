@@ -82,21 +82,21 @@ export function ProfileStats({ beneficiaryId }: ProfileStatsProps) {
       title: 'الطلبات المعلقة',
       value: stats?.pendingRequests || 0,
       icon: Calendar,
-      color: 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/30',
+      color: 'text-warning bg-warning-light',
       subtext: 'قيد المراجعة',
     },
     {
       title: 'المستندات',
       value: stats?.attachmentsCount || 0,
       icon: FileText,
-      color: 'text-purple-600 bg-purple-100 dark:bg-purple-900/30',
+      color: 'text-secondary-foreground bg-secondary',
       subtext: 'مرفق',
     },
     {
       title: 'أفراد العائلة',
       value: stats?.familyMembersCount || 0,
       icon: Users,
-      color: 'text-teal-600 bg-teal-100 dark:bg-teal-900/30',
+      color: 'text-accent bg-accent/10',
       subtext: 'فرد مسجل',
     },
     {
@@ -105,7 +105,7 @@ export function ProfileStats({ beneficiaryId }: ProfileStatsProps) {
         ? `${Math.round((stats.totalPayments || 0) / stats.paymentsCount).toLocaleString('ar-SA')} ريال`
         : '0 ريال',
       icon: TrendingUp,
-      color: 'text-orange-600 bg-orange-100 dark:bg-orange-900/30',
+      color: 'text-warning bg-warning-light',
       subtext: 'لكل دفعة',
     },
   ];

@@ -133,9 +133,9 @@ export function DistributionSettingsDialog() {
           </div>
 
           {/* Waqif Charity Percentage - Priority 3 */}
-          <div className="rounded-lg border-2 border-purple-300 bg-purple-50 p-4 space-y-2">
-            <Label className="text-purple-800 font-bold flex items-center gap-2">
-              <Badge variant="secondary" className="bg-purple-600 text-white">3</Badge>
+          <div className="rounded-lg border-2 border-accent/30 bg-accent/10 p-4 space-y-2">
+            <Label className="text-accent font-bold flex items-center gap-2">
+              <Badge variant="secondary" className="bg-accent text-accent-foreground">3</Badge>
               صدقة الواقف
             </Label>
             <Input
@@ -146,7 +146,7 @@ export function DistributionSettingsDialog() {
               min="0"
               max="10"
             />
-            <p className="text-xs text-purple-700">
+            <p className="text-xs text-accent">
               تُحسب من الباقي بعد الناظر
             </p>
           </div>

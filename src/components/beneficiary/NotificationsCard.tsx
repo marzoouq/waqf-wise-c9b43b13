@@ -17,13 +17,13 @@ export function NotificationsCard() {
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case 'success':
-        return <CheckCircle2 className="h-4 w-4 text-green-600" />;
+        return <CheckCircle2 className="h-4 w-4 text-success" />;
       case 'error':
-        return <AlertCircle className="h-4 w-4 text-red-600" />;
+        return <AlertCircle className="h-4 w-4 text-destructive" />;
       case 'warning':
-        return <AlertCircle className="h-4 w-4 text-amber-600" />;
+        return <AlertCircle className="h-4 w-4 text-warning" />;
       default:
-        return <Info className="h-4 w-4 text-blue-600" />;
+        return <Info className="h-4 w-4 text-info" />;
     }
   };
 
@@ -32,13 +32,13 @@ export function NotificationsCard() {
     
     switch (type) {
       case 'success':
-        return "bg-green-50 border-green-200";
+        return "bg-success-light border-success/20";
       case 'error':
-        return "bg-red-50 border-red-200";
+        return "bg-destructive-light border-destructive/20";
       case 'warning':
-        return "bg-amber-50 border-amber-200";
+        return "bg-warning-light border-warning/20";
       default:
-        return "bg-blue-50 border-blue-200";
+        return "bg-info-light border-info/20";
     }
   };
 

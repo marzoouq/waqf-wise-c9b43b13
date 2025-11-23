@@ -34,26 +34,26 @@ export function ProfileHeader({ beneficiary }: ProfileHeaderProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'نشط':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+        return 'bg-success-light text-success border-success/20';
       case 'معلق':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
+        return 'bg-warning-light text-warning border-warning/20';
       case 'غير نشط':
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
+        return 'bg-muted text-muted-foreground border-border';
       default:
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+        return 'bg-info-light text-info border-info/20';
     }
   };
 
   const getCategoryColor = (category: string) => {
     switch (category) {
       case 'الفئة الأولى':
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400';
+        return 'bg-secondary text-secondary-foreground border-secondary/20';
       case 'الفئة الثانية':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+        return 'bg-info-light text-info border-info/20';
       case 'الفئة الثالثة':
-        return 'bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-400';
+        return 'bg-accent/10 text-accent border-accent/20';
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
+        return 'bg-muted text-muted-foreground border-border';
     }
   };
 

@@ -63,9 +63,9 @@ export function EnhancedBalanceSheet() {
                 <span className="font-mono">{formatNumber(balanceSheet.assets.fixed)}</span>
               </div>
               
-              <div className="flex justify-between items-center pt-2 border-t-2 border-blue-500">
+              <div className="flex justify-between items-center pt-2 border-t-2 border-info">
                 <span className="font-bold text-lg">إجمالي الأصول:</span>
-                <span className="font-mono font-bold text-lg text-blue-600">
+                <span className="font-mono font-bold text-lg text-info">
                   {formatNumber(balanceSheet.assets.total)}
                 </span>
               </div>
@@ -74,10 +74,10 @@ export function EnhancedBalanceSheet() {
 
           {/* Liabilities & Equity Section */}
           <div className="space-y-4">
-            <h3 className="text-lg font-bold border-b-2 border-orange-500 pb-2">الخصوم وحقوق الملكية</h3>
+            <h3 className="text-lg font-bold border-b-2 border-warning pb-2">الخصوم وحقوق الملكية</h3>
             
             <div className="space-y-3">
-              <h4 className="font-semibold text-orange-600">الخصوم:</h4>
+              <h4 className="font-semibold text-warning">الخصوم:</h4>
               
               <div className="flex justify-between items-center pr-4">
                 <span>خصوم متداولة:</span>
@@ -94,7 +94,7 @@ export function EnhancedBalanceSheet() {
                 <span className="font-mono">{formatNumber(balanceSheet.liabilities.total)}</span>
               </div>
 
-              <h4 className="font-semibold text-purple-600 pt-4">حقوق الملكية:</h4>
+              <h4 className="font-semibold text-accent pt-4">حقوق الملكية:</h4>
               
               <div className="flex justify-between items-center pr-4">
                 <span>رأس مال الوقف:</span>
@@ -111,9 +111,9 @@ export function EnhancedBalanceSheet() {
                 <span className="font-mono">{formatNumber(balanceSheet.equity.total)}</span>
               </div>
               
-              <div className="flex justify-between items-center pt-2 border-t-2 border-orange-500">
+              <div className="flex justify-between items-center pt-2 border-t-2 border-warning">
                 <span className="font-bold text-lg">إجمالي الخصوم وحقوق الملكية:</span>
-                <span className="font-mono font-bold text-lg text-orange-600">
+                <span className="font-mono font-bold text-lg text-warning">
                   {formatNumber(totalLiabilitiesAndEquity)}
                 </span>
               </div>
