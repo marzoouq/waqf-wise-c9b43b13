@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import {
   Activity,
   AlertTriangle,
@@ -132,7 +133,8 @@ export default function SystemMonitoring() {
   if (statsLoading) return <LoadingState message="جاري تحميل بيانات المراقبة..." />;
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <PageErrorBoundary pageName="مراقبة النظام">
+      <div className="container mx-auto p-6 space-y-6">
       {/* العنوان */}
       <div className="flex items-center justify-between">
         <div>
@@ -407,6 +409,7 @@ export default function SystemMonitoring() {
           <SelfHealingToolsPanel />
         </TabsContent>
       </Tabs>
-    </div>
+      </div>
+    </PageErrorBoundary>
   );
 }

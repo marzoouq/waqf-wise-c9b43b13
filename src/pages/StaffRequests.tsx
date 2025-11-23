@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback } from "react";
 import { useRequests } from "@/hooks/useRequests";
 import { useRequestTypes } from "@/hooks/useRequests";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -129,7 +130,8 @@ export default function StaffRequests() {
   if (isLoading) return <LoadingState />;
 
   return (
-    <div className="space-y-6 p-6">
+    <PageErrorBoundary pageName="إدارة الطلبات">
+      <div className="space-y-6 p-6">
       {/* العنوان */}
       <div>
         <h1 className="text-3xl font-bold">لوحة إدارة الطلبات</h1>
@@ -369,6 +371,7 @@ export default function StaffRequests() {
           />
         </>
       )}
-    </div>
+      </div>
+    </PageErrorBoundary>
   );
 }

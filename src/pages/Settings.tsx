@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { User, Bell, Shield, Database, Palette, Globe, Settings as SettingsIcon, Building2, Calendar } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { ProfileDialog } from "@/components/settings/ProfileDialog";
 import { NotificationsSettingsDialog } from "@/components/settings/NotificationsSettingsDialog";
 import { SecuritySettingsDialog } from "@/components/settings/SecuritySettingsDialog";
@@ -132,7 +133,8 @@ const Settings = () => {
   ];
 
   return (
-    <MobileOptimizedLayout>
+    <PageErrorBoundary pageName="الإعدادات">
+      <MobileOptimizedLayout>
       <MobileOptimizedHeader
         title="الإعدادات"
         description="إدارة إعدادات النظام والتفضيلات الشخصية"
@@ -246,7 +248,8 @@ const Settings = () => {
         <PushNotificationsSettings />
         <LeakedPasswordCheck />
       </div>
-    </MobileOptimizedLayout>
+      </MobileOptimizedLayout>
+    </PageErrorBoundary>
   );
 };
 
