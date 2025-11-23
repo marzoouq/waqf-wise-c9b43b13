@@ -10,6 +10,7 @@ import { ar } from "date-fns/locale";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { useApprovalHistory } from "@/hooks/useApprovalHistory";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -19,6 +20,7 @@ export function LoanApprovalsTab() {
   const { toast } = useToast();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { addToHistory } = useApprovalHistory();
   const [selectedLoan, setSelectedLoan] = useState<LoanForApproval | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [approvalNotes, setApprovalNotes] = useState("");
@@ -64,12 +66,12 @@ export function LoanApprovalsTab() {
       if (error) throw error;
 
       // سجل في تاريخ الموافقات
-      await supabase.from("approval_history").insert({
+      await addToHistory.mutateAsync({
         approval_type: "loan",
         approval_id: approvalId,
         reference_id: loanId,
         action: action === "approve" ? "approved" : "rejected",
-        performed_by: user?.id,
+        performed_by: user?.id || "",
         performed_by_name: user?.user_metadata?.full_name || "مستخدم",
         notes
       });
