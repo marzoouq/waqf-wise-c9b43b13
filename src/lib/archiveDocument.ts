@@ -94,3 +94,12 @@ export function pdfToBlob(pdfDoc: jsPDF): Blob {
   const pdfOutput = pdfDoc.output('blob');
   return pdfOutput;
 }
+
+/**
+ * إنشاء مسار منظم للمستندات حسب السنة والشهر
+ */
+export function getDocumentPath(fileType: string, date: Date = new Date()): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  return `documents/${fileType}/${year}/${month}`;
+}

@@ -6961,6 +6961,27 @@ export type Database = {
         }
         Relationships: []
       }
+      unified_transactions_view: {
+        Row: {
+          amount: number | null
+          beneficiary_id: string | null
+          contract_number: string | null
+          created_at: string | null
+          description: string | null
+          id: string | null
+          journal_entry_id: string | null
+          party_name: string | null
+          payment_method: string | null
+          reference_number: string | null
+          source: string | null
+          source_name_ar: string | null
+          source_name_en: string | null
+          status: string | null
+          transaction_date: string | null
+          transaction_type: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       assign_user_role: {

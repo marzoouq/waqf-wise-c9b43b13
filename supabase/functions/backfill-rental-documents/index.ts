@@ -1,0 +1,189 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    console.log('🔍 جاري البحث عن الدفعات المدفوعة بدون فواتير...');
+
+    // 1️⃣ جلب الدفعات المدفوعة فقط بدون فواتير
+    const { data: paidPayments, error: fetchError } = await supabaseClient
+      .from('rental_payments')
+      .select(`
+        *,
+        contracts!inner (
+          contract_number,
+          tenant_name,
+          tenant_id_number,
+          tenant_email,
+          tenant_phone,
+          properties!inner (
+            name
+          )
+        )
+      `)
+      .eq('status', 'مدفوع')
+      .gt('amount_paid', 0)
+      .is('invoice_id', null);
+
+    if (fetchError) throw fetchError;
+
+    console.log(`✅ تم العثور على ${paidPayments?.length || 0} دفعات مدفوعة`);
+
+    if (!paidPayments || paidPayments.length === 0) {
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          message: 'لا توجد دفعات تحتاج معالجة',
+          processed: 0 
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    let successCount = 0;
+    let failedCount = 0;
+    const errors: string[] = [];
+    const processedPayments: any[] = [];
+
+    // 2️⃣ معالجة كل دفعة
+    for (const payment of paidPayments) {
+      try {
+        console.log(`📝 معالجة الدفعة: ${payment.payment_number}`);
+
+        // استدعاء create_rental_invoice_and_receipt
+        const { data: rpcResult, error: rpcError } = await supabaseClient.rpc(
+          'create_rental_invoice_and_receipt',
+          {
+            p_rental_payment_id: payment.id,
+            p_contract_id: payment.contract_id,
+            p_amount: payment.amount_paid,
+            p_payment_date: payment.payment_date,
+            p_payment_method: payment.payment_method || 'نقدي',
+            p_tenant_name: payment.contracts.tenant_name,
+            p_tenant_id: payment.contracts.tenant_id_number,
+            p_tenant_email: payment.contracts.tenant_email || null,
+            p_tenant_phone: payment.contracts.tenant_phone,
+            p_property_name: payment.contracts.properties.name
+          }
+        );
+
+        if (rpcError) {
+          console.error(`❌ خطأ في RPC للدفعة ${payment.payment_number}:`, rpcError);
+          errors.push(`${payment.payment_number}: ${rpcError.message}`);
+          failedCount++;
+          continue;
+        }
+
+        if (!rpcResult || !rpcResult[0]?.success) {
+          console.error(`❌ فشل إنشاء المستندات للدفعة ${payment.payment_number}`);
+          errors.push(`${payment.payment_number}: ${rpcResult?.[0]?.message || 'فشل غير معروف'}`);
+          failedCount++;
+          continue;
+        }
+
+        console.log(`✅ تم إنشاء المستندات للدفعة ${payment.payment_number}`);
+        console.log(`   - Invoice ID: ${rpcResult[0].invoice_id}`);
+        console.log(`   - Receipt ID: ${rpcResult[0].receipt_id}`);
+        console.log(`   - Journal Entry ID: ${rpcResult[0].journal_entry_id}`);
+
+        processedPayments.push({
+          payment_number: payment.payment_number,
+          invoice_id: rpcResult[0].invoice_id,
+          receipt_id: rpcResult[0].receipt_id,
+          journal_entry_id: rpcResult[0].journal_entry_id
+        });
+
+        successCount++;
+
+      } catch (error) {
+        console.error(`❌ خطأ عام في معالجة ${payment.payment_number}:`, error);
+        const errorMessage = error instanceof Error ? error.message : 'خطأ غير معروف';
+        errors.push(`${payment.payment_number}: ${errorMessage}`);
+        failedCount++;
+      }
+    }
+
+    // 3️⃣ حذف القيود الخاطئة (المرتبطة بدفعات معلقة)
+    console.log('🧹 تنظيف القيود المحاسبية الخاطئة...');
+    
+    const { data: wrongEntries } = await supabaseClient
+      .from('journal_entries')
+      .select('id')
+      .eq('reference_type', 'rental_payment')
+      .in('reference_id', 
+        await supabaseClient
+          .from('rental_payments')
+          .select('id')
+          .neq('status', 'مدفوع')
+          .then(({ data }) => data?.map(p => p.id) || [])
+      );
+
+    if (wrongEntries && wrongEntries.length > 0) {
+      const wrongEntryIds = wrongEntries.map(e => e.id);
+      
+      // حذف السطور أولاً
+      await supabaseClient
+        .from('journal_entry_lines')
+        .delete()
+        .in('journal_entry_id', wrongEntryIds);
+      
+      // ثم حذف القيود
+      await supabaseClient
+        .from('journal_entries')
+        .delete()
+        .in('id', wrongEntryIds);
+      
+      console.log(`✅ تم حذف ${wrongEntries.length} قيد خاطئ`);
+    }
+
+    // 4️⃣ النتيجة النهائية
+    const result = {
+      success: true,
+      total: paidPayments.length,
+      processed: successCount,
+      failed: failedCount,
+      cleaned_entries: wrongEntries?.length || 0,
+      errors: errors.length > 0 ? errors : undefined,
+      processed_payments: processedPayments,
+      message: `تمت معالجة ${successCount} من ${paidPayments.length} دفعة بنجاح${wrongEntries?.length ? ` وتنظيف ${wrongEntries.length} قيد خاطئ` : ''}`
+    };
+
+    console.log('📊 النتيجة النهائية:', result);
+
+    return new Response(
+      JSON.stringify(result),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+
+  } catch (error) {
+    console.error('❌ خطأ حرج في Edge Function:', error);
+    const errorMessage = error instanceof Error ? error.message : 'خطأ غير معروف';
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    
+    return new Response(
+      JSON.stringify({ 
+        success: false, 
+        error: errorMessage,
+        details: errorStack
+      }),
+      { 
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
+    );
+  }
+});

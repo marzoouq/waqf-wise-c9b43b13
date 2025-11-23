@@ -65,6 +65,7 @@ const SystemErrorLogs = lazy(() => import("./pages/SystemErrorLogs"));
 const SystemMonitoring = lazy(() => import("./pages/SystemMonitoring"));
 const SystemTesting = lazy(() => import("./pages/SystemTesting"));
 const AdvancedSettings = lazy(() => import("./pages/AdvancedSettings"));
+const SystemMaintenance = lazy(() => import("./pages/SystemMaintenance"));
 const GovernanceDecisions = lazy(() => import("./pages/GovernanceDecisions"));
 const DecisionDetails = lazy(() => import("./pages/DecisionDetails"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -314,6 +315,14 @@ const App = () => {
             element={
               <ProtectedRoute requiredRole="admin">
                 <AdvancedSettings />
+              </ProtectedRoute>
+            } 
+          />
+          <Route
+            path="/system-maintenance" 
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <SystemMaintenance />
               </ProtectedRoute>
             } 
           />
