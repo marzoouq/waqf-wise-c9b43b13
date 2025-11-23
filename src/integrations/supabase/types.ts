@@ -1263,12 +1263,16 @@ export type Database = {
         Row: {
           amount: number | null
           approved_at: string | null
+          assigned_at: string | null
+          assigned_to: string | null
+          attachments_count: number | null
           beneficiary_id: string
           created_at: string | null
           decision_notes: string | null
           description: string
           id: string
           is_overdue: boolean | null
+          last_message_at: string | null
           priority: string | null
           rejection_reason: string | null
           request_number: string | null
@@ -1282,12 +1286,16 @@ export type Database = {
         Insert: {
           amount?: number | null
           approved_at?: string | null
+          assigned_at?: string | null
+          assigned_to?: string | null
+          attachments_count?: number | null
           beneficiary_id: string
           created_at?: string | null
           decision_notes?: string | null
           description: string
           id?: string
           is_overdue?: boolean | null
+          last_message_at?: string | null
           priority?: string | null
           rejection_reason?: string | null
           request_number?: string | null
@@ -1301,12 +1309,16 @@ export type Database = {
         Update: {
           amount?: number | null
           approved_at?: string | null
+          assigned_at?: string | null
+          assigned_to?: string | null
+          attachments_count?: number | null
           beneficiary_id?: string
           created_at?: string | null
           decision_notes?: string | null
           description?: string
           id?: string
           is_overdue?: boolean | null
+          last_message_at?: string | null
           priority?: string | null
           rejection_reason?: string | null
           request_number?: string | null
@@ -3766,6 +3778,7 @@ export type Database = {
           id: string
           is_read: boolean | null
           parent_message_id: string | null
+          priority: string | null
           read_at: string | null
           receiver_id: string
           request_id: string | null
@@ -3779,6 +3792,7 @@ export type Database = {
           id?: string
           is_read?: boolean | null
           parent_message_id?: string | null
+          priority?: string | null
           read_at?: string | null
           receiver_id: string
           request_id?: string | null
@@ -3792,6 +3806,7 @@ export type Database = {
           id?: string
           is_read?: boolean | null
           parent_message_id?: string | null
+          priority?: string | null
           read_at?: string | null
           receiver_id?: string
           request_id?: string | null
@@ -3805,6 +3820,13 @@ export type Database = {
             columns: ["parent_message_id"]
             isOneToOne: false
             referencedRelation: "internal_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "internal_messages_parent_message_id_fkey"
+            columns: ["parent_message_id"]
+            isOneToOne: false
+            referencedRelation: "messages_with_users"
             referencedColumns: ["id"]
           },
           {
@@ -5759,6 +5781,7 @@ export type Database = {
       }
       request_attachments: {
         Row: {
+          description: string | null
           file_name: string
           file_path: string
           file_size: number | null
@@ -5766,8 +5789,10 @@ export type Database = {
           id: string
           request_id: string
           uploaded_at: string | null
+          uploaded_by: string | null
         }
         Insert: {
+          description?: string | null
           file_name: string
           file_path: string
           file_size?: number | null
@@ -5775,8 +5800,10 @@ export type Database = {
           id?: string
           request_id: string
           uploaded_at?: string | null
+          uploaded_by?: string | null
         }
         Update: {
+          description?: string | null
           file_name?: string
           file_path?: string
           file_size?: number | null
@@ -5784,6 +5811,7 @@ export type Database = {
           id?: string
           request_id?: string
           uploaded_at?: string | null
+          uploaded_by?: string | null
         }
         Relationships: [
           {
@@ -5832,6 +5860,7 @@ export type Database = {
       }
       request_types: {
         Row: {
+          category: string | null
           created_at: string | null
           description: string | null
           icon: string | null
@@ -5840,10 +5869,13 @@ export type Database = {
           name: string
           name_ar: string
           name_en: string | null
+          requires_amount: boolean | null
           requires_approval: boolean | null
+          requires_attachments: boolean | null
           sla_hours: number | null
         }
         Insert: {
+          category?: string | null
           created_at?: string | null
           description?: string | null
           icon?: string | null
@@ -5852,10 +5884,13 @@ export type Database = {
           name: string
           name_ar: string
           name_en?: string | null
+          requires_amount?: boolean | null
           requires_approval?: boolean | null
+          requires_attachments?: boolean | null
           sla_hours?: number | null
         }
         Update: {
+          category?: string | null
           created_at?: string | null
           description?: string | null
           icon?: string | null
@@ -5864,7 +5899,9 @@ export type Database = {
           name?: string
           name_ar?: string
           name_en?: string | null
+          requires_amount?: boolean | null
           requires_approval?: boolean | null
+          requires_attachments?: boolean | null
           sla_hours?: number | null
         }
         Relationships: []
@@ -7458,6 +7495,49 @@ export type Database = {
           total_vouchers: number | null
         }
         Relationships: []
+      }
+      messages_with_users: {
+        Row: {
+          body: string | null
+          created_at: string | null
+          id: string | null
+          is_read: boolean | null
+          parent_message_id: string | null
+          priority: string | null
+          read_at: string | null
+          receiver_id: string | null
+          receiver_name: string | null
+          receiver_number: string | null
+          request_id: string | null
+          sender_id: string | null
+          sender_name: string | null
+          sender_number: string | null
+          subject: string | null
+          updated_at: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "internal_messages_parent_message_id_fkey"
+            columns: ["parent_message_id"]
+            isOneToOne: false
+            referencedRelation: "internal_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "internal_messages_parent_message_id_fkey"
+            columns: ["parent_message_id"]
+            isOneToOne: false
+            referencedRelation: "messages_with_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "internal_messages_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_requests"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       payment_vouchers_with_details: {
         Row: {
