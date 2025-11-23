@@ -2504,6 +2504,13 @@ export type Database = {
             referencedRelation: "payments"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "emergency_aid_requests_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments_with_contract_details"
+            referencedColumns: ["id"]
+          },
         ]
       }
       encrypted_data_registry: {
@@ -5185,6 +5192,13 @@ export type Database = {
             referencedRelation: "payments"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "payment_approvals_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments_with_contract_details"
+            referencedColumns: ["id"]
+          },
         ]
       }
       payment_reminders: {
@@ -5384,6 +5398,7 @@ export type Database = {
         Row: {
           amount: number
           beneficiary_id: string | null
+          contract_id: string | null
           created_at: string
           description: string
           id: string
@@ -5402,6 +5417,7 @@ export type Database = {
         Insert: {
           amount: number
           beneficiary_id?: string | null
+          contract_id?: string | null
           created_at?: string
           description: string
           id?: string
@@ -5420,6 +5436,7 @@ export type Database = {
         Update: {
           amount?: number
           beneficiary_id?: string | null
+          contract_id?: string | null
           created_at?: string
           description?: string
           id?: string
@@ -5448,6 +5465,13 @@ export type Database = {
             columns: ["beneficiary_id"]
             isOneToOne: false
             referencedRelation: "beneficiary_statistics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "contracts"
             referencedColumns: ["id"]
           },
           {
@@ -5977,6 +6001,13 @@ export type Database = {
             columns: ["receipt_id"]
             isOneToOne: false
             referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rental_payments_receipt_id_fkey"
+            columns: ["receipt_id"]
+            isOneToOne: false
+            referencedRelation: "payments_with_contract_details"
             referencedColumns: ["id"]
           },
         ]
@@ -7904,6 +7935,71 @@ export type Database = {
             columns: ["journal_entry_id"]
             isOneToOne: false
             referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payments_with_contract_details: {
+        Row: {
+          amount: number | null
+          beneficiary_id: string | null
+          contract_id: string | null
+          contract_number: string | null
+          created_at: string | null
+          description: string | null
+          id: string | null
+          journal_entry_id: string | null
+          notes: string | null
+          payer_name: string | null
+          payment_date: string | null
+          payment_method: string | null
+          payment_number: string | null
+          payment_type: string | null
+          property_location: string | null
+          property_name: string | null
+          property_type: string | null
+          reference_number: string | null
+          rental_payment_id: string | null
+          status: string | null
+          tenant_id_number: string | null
+          tenant_name: string | null
+          tenant_phone: string | null
+          updated_at: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_statistics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "contracts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
+            referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_rental_payment_id_fkey"
+            columns: ["rental_payment_id"]
+            isOneToOne: false
+            referencedRelation: "rental_payments"
             referencedColumns: ["id"]
           },
         ]

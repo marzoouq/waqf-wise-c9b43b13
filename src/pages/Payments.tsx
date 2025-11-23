@@ -1,8 +1,9 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { Plus, Search, Receipt, CreditCard, Printer, Edit, Trash2, FileText } from "lucide-react";
 import { PaymentDialog } from "@/components/payments/PaymentDialog";
 import { usePayments } from "@/hooks/usePayments";
 import { useJournalEntries } from "@/hooks/useJournalEntries";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,6 +31,12 @@ import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 
 type Payment = Database['public']['Tables']['payments']['Row'];
 
+interface PaymentWithContract extends Payment {
+  contract_number?: string;
+  tenant_name?: string;
+  property_name?: string;
+}
+
 const ITEMS_PER_PAGE = 20;
 
 const Payments = () => {
@@ -41,22 +48,46 @@ const Payments = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [paymentToDelete, setPaymentToDelete] = useState<Payment | null>(null);
   const [printPayment, setPrintPayment] = useState<Payment | null>(null);
+  const [paymentsWithContracts, setPaymentsWithContracts] = useState<PaymentWithContract[]>([]);
 
   const { payments, isLoading, addPayment, updatePayment, deletePayment } = usePayments();
   const { createAutoEntry } = useJournalEntries();
 
+  // جلب معلومات العقود مع السندات
+  useEffect(() => {
+    const fetchPaymentsWithContracts = async () => {
+      const { data, error } = await supabase
+        .from("payments_with_contract_details")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (!error && data) {
+        setPaymentsWithContracts(data as PaymentWithContract[]);
+      } else {
+        setPaymentsWithContracts(payments as PaymentWithContract[]);
+      }
+    };
+
+    if (payments.length > 0) {
+      fetchPaymentsWithContracts();
+    }
+  }, [payments]);
+
   // Memoize filtered payments
   const filteredPayments = useMemo(() => {
-    if (!searchQuery) return payments;
+    if (!searchQuery) return paymentsWithContracts;
 
     const query = searchQuery.toLowerCase();
-    return payments.filter(
+    return paymentsWithContracts.filter(
       (p) =>
         p.payment_number.toLowerCase().includes(query) ||
         p.payer_name.toLowerCase().includes(query) ||
-        p.description.toLowerCase().includes(query)
+        p.description.toLowerCase().includes(query) ||
+        (p.contract_number && p.contract_number.toLowerCase().includes(query)) ||
+        (p.tenant_name && p.tenant_name.toLowerCase().includes(query)) ||
+        (p.property_name && p.property_name.toLowerCase().includes(query))
     );
-  }, [payments, searchQuery]);
+  }, [paymentsWithContracts, searchQuery]);
 
   // Paginate filtered results
   const paginatedPayments = useMemo(() => {
@@ -237,6 +268,8 @@ const Payments = () => {
                     <TableHead className="whitespace-nowrap">النوع</TableHead>
                     <TableHead className="whitespace-nowrap hidden md:table-cell">التاريخ</TableHead>
                     <TableHead className="whitespace-nowrap">الاسم</TableHead>
+                    <TableHead className="whitespace-nowrap hidden lg:table-cell">العقد</TableHead>
+                    <TableHead className="whitespace-nowrap hidden xl:table-cell">العقار</TableHead>
                     <TableHead className="whitespace-nowrap">المبلغ</TableHead>
                     <TableHead className="whitespace-nowrap hidden lg:table-cell">الطريقة</TableHead>
                     <TableHead className="whitespace-nowrap hidden lg:table-cell">البيان</TableHead>
@@ -246,13 +279,13 @@ const Payments = () => {
                 <TableBody>
                   {isLoading ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center py-8">
+                      <TableCell colSpan={10} className="text-center py-8">
                         جاري التحميل...
                       </TableCell>
                     </TableRow>
                   ) : filteredPayments.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                      <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
                         {searchQuery
                           ? "لا توجد نتائج تطابق البحث"
                           : "لا يوجد سندات حالياً. قم بإضافة سند جديد."}
@@ -281,6 +314,18 @@ const Payments = () => {
                           })}
                         </TableCell>
                         <TableCell className="text-xs sm:text-sm">{payment.payer_name}</TableCell>
+                        <TableCell className="hidden lg:table-cell text-xs sm:text-sm">
+                          {payment.contract_number ? (
+                            <Badge variant="outline" className="text-xs">
+                              {payment.contract_number}
+                            </Badge>
+                          ) : (
+                            <span className="text-muted-foreground">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="hidden xl:table-cell text-xs sm:text-sm max-w-[150px] truncate">
+                          {payment.property_name || <span className="text-muted-foreground">-</span>}
+                        </TableCell>
                         <TableCell className="font-bold text-xs sm:text-sm whitespace-nowrap">
                           {Number(payment.amount).toLocaleString()} ر.س
                         </TableCell>

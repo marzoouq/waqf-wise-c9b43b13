@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useEffect } from "react";
 import { ResponsiveDialog, DialogFooter } from "@/components/shared/ResponsiveDialog";
 import {
   Form,
@@ -23,6 +24,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { format } from "date-fns";
 import { commonValidation } from "@/lib/validationSchemas";
 import { Database } from "@/integrations/supabase/types";
+import { useContracts } from "@/hooks/useContracts";
+import { Info } from "lucide-react";
 
 type Payment = Database['public']['Tables']['payments']['Row'];
 
@@ -40,6 +43,7 @@ const paymentSchema = z.object({
   reference_number: z.string().optional(),
   description: z.string().min(1, { message: "البيان مطلوب" }),
   notes: z.string().optional(),
+  contract_id: z.string().optional(),
 });
 
 type PaymentFormValues = z.infer<typeof paymentSchema>;
@@ -57,6 +61,11 @@ export function PaymentDialog({
   payment,
   onSave,
 }: PaymentDialogProps) {
+  const { contracts, isLoading: contractsLoading } = useContracts();
+  
+  // تصفية العقود النشطة فقط
+  const activeContracts = contracts?.filter(c => c.status === "نشط") || [];
+
   const form = useForm<PaymentFormValues>({
     resolver: zodResolver(paymentSchema),
     defaultValues: {
@@ -69,6 +78,7 @@ export function PaymentDialog({
       reference_number: payment?.reference_number || "",
       description: payment?.description || "",
       notes: payment?.notes || "",
+      contract_id: payment?.contract_id || "",
     },
   });
 
@@ -78,6 +88,20 @@ export function PaymentDialog({
   };
 
   const paymentType = form.watch("payment_type");
+  const selectedContractId = form.watch("contract_id");
+
+  // تعبئة تلقائية عند اختيار عقد
+  useEffect(() => {
+    if (selectedContractId && activeContracts.length > 0) {
+      const contract = activeContracts.find(c => c.id === selectedContractId);
+      if (contract) {
+        form.setValue("payer_name", contract.tenant_name);
+        form.setValue("description", 
+          `${paymentType === "receipt" ? "قبض" : "صرف"} - عقد رقم ${contract.contract_number} - ${contract.properties?.name || 'عقار'}`
+        );
+      }
+    }
+  }, [selectedContractId, activeContracts, form, paymentType]);
 
   return (
     <ResponsiveDialog 
@@ -127,6 +151,41 @@ export function PaymentDialog({
                 )}
               />
             </div>
+
+            {/* اختيار العقد (اختياري) */}
+            <FormField
+              control={form.control}
+              name="contract_id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>ربط بعقد (اختياري)</FormLabel>
+                  <Select 
+                    onValueChange={field.onChange} 
+                    value={field.value}
+                    disabled={contractsLoading}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="اختر عقد لربطه بالسند" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="">بدون ربط</SelectItem>
+                      {activeContracts.map((contract) => (
+                        <SelectItem key={contract.id} value={contract.id}>
+                          {contract.contract_number} - {contract.tenant_name} - {contract.properties?.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+                    <Info className="h-3 w-3" />
+                    <span>عند اختيار عقد، سيتم تعبئة الاسم والبيان تلقائياً</span>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
@@ -198,8 +257,12 @@ export function PaymentDialog({
                           : "اسم المستفيد"
                       }
                       {...field}
+                      disabled={!!selectedContractId}
                     />
                   </FormControl>
+                  {selectedContractId && (
+                    <p className="text-xs text-muted-foreground">تم التعبئة تلقائياً من العقد</p>
+                  )}
                   <FormMessage />
                 </FormItem>
               )}
@@ -231,8 +294,12 @@ export function PaymentDialog({
                       className="resize-none"
                       rows={2}
                       {...field}
+                      disabled={!!selectedContractId}
                     />
                   </FormControl>
+                  {selectedContractId && (
+                    <p className="text-xs text-muted-foreground">تم التعبئة تلقائياً من العقد</p>
+                  )}
                   <FormMessage />
                 </FormItem>
               )}
