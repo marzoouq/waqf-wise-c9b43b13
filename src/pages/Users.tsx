@@ -275,10 +275,16 @@ const Users = () => {
   };
 
   const handleSaveRoles = () => {
-    if (selectedUser && selectedRoles.length > 0) {
+    if (selectedUser?.user_id && selectedRoles.length > 0) {
       updateRolesMutation.mutate({
         userId: selectedUser.user_id,
         roles: selectedRoles,
+      });
+    } else if (!selectedUser?.user_id) {
+      toast({
+        title: "خطأ",
+        description: "هذا المستخدم ليس لديه حساب مفعّل في النظام",
+        variant: "destructive",
       });
     }
   };
@@ -434,8 +440,19 @@ const Users = () => {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => handleEditRoles(user)}
-                              title="تعديل الأدوار"
+                              onClick={() => {
+                                if (!user.user_id) {
+                                  toast({
+                                    title: "غير متاح",
+                                    description: "هذا المستخدم ليس لديه حساب مفعّل في النظام",
+                                    variant: "destructive",
+                                  });
+                                  return;
+                                }
+                                handleEditRoles(user);
+                              }}
+                              title={user.user_id ? "تعديل الأدوار" : "غير متاح - لا يوجد حساب"}
+                              disabled={!user.user_id}
                             >
                               <Edit className="h-4 w-4" />
                             </Button>
@@ -518,9 +535,9 @@ const Users = () => {
             </Button>
             <Button
               onClick={handleSaveRoles}
-              disabled={selectedRoles.length === 0}
+              disabled={selectedRoles.length === 0 || !selectedUser?.user_id || updateRolesMutation.isPending}
             >
-              حفظ التغييرات
+              {updateRolesMutation.isPending ? "جاري الحفظ..." : "حفظ التغييرات"}
             </Button>
           </div>
         </ResponsiveDialog>
