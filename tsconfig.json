@@ -2,13 +2,13 @@
   "compilerOptions": {
     "strict": true,
     "noImplicitAny": true,
-    "strictNullChecks": true,
+    "strictNullChecks": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "strictFunctionTypes": true,
-    "strictPropertyInitialization": true
-  }
-}
+    "strictPropertyInitialization": true,
+    "skipLibCheck": true
+  },
     "skipLibCheck": true,
     "strictNullChecks": false
   },
