@@ -127,7 +127,7 @@ export function AgentPerformanceReport({ userId, dateRange }: AgentPerformanceRe
                 <div className="text-left">
                   {day.customer_satisfaction_avg && (
                     <div className="flex items-center gap-1">
-                      <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                      <Star className="h-4 w-4 text-warning fill-warning" />
                       <span className="text-sm font-medium">
                         {day.customer_satisfaction_avg.toFixed(1)}
                       </span>

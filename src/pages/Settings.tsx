@@ -121,7 +121,7 @@ const Settings = () => {
       title: "إعدادات النظام",
       description: "إدارة الإعدادات العامة والمتقدمة",
       icon: SettingsIcon,
-      color: "bg-indigo-500/10 text-indigo-500",
+      color: "bg-primary/10 text-primary",
     },
     {
       id: 9,

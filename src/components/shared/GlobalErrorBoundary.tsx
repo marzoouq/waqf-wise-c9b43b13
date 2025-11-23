@@ -115,7 +115,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
               <CardDescription className="space-y-2">
                 <p>نعتذر عن هذا الخطأ. تم إرسال تقرير تلقائي لفريق الدعم الفني.</p>
                 {this.state.error?.message?.includes('Failed to fetch') && (
-                  <p className="text-amber-600 dark:text-amber-400 font-medium">
+                  <p className="text-warning dark:text-warning font-medium">
                     يبدو أن هناك مشكلة في تحميل أحد مكونات الصفحة. جرب مسح ذاكرة التخزين المؤقت.
                   </p>
                 )}
@@ -161,7 +161,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
                 {this.state.error?.message?.includes('Failed to fetch') && (
                   <Button 
                     onClick={this.handleHardRefresh} 
-                    className="w-full gap-2 bg-amber-600 hover:bg-amber-700 text-white"
+                    className="w-full gap-2 bg-warning hover:bg-warning/90 text-warning-foreground"
                   >
                     <RefreshCcw className="w-4 h-4" />
                     مسح ذاكرة التخزين وإعادة التحميل

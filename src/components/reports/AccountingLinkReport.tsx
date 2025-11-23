@@ -348,9 +348,9 @@ export function AccountingLinkReport() {
                   </Table>
                 </div>
               ) : (
-                <Card className="bg-green-50 dark:bg-green-900/10 border-green-200">
-                  <CardContent className="p-6 text-center">
-                    <p className="text-green-700 dark:text-green-400 font-semibold">
+                <Card className="bg-success-light dark:bg-success/10 border-success/30">
+                  <CardContent className="pt-4">
+                    <p className="text-success font-semibold">
                       ✓ جميع العمليات المالية مرتبطة بقيود محاسبية
                     </p>
                   </CardContent>

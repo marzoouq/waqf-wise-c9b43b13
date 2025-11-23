@@ -103,7 +103,7 @@ export function RequestCommentsDialog({
                     key={comment.id}
                     className={`p-4 rounded-lg border ${
                       comment.is_internal
-                        ? "bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-800"
+                        ? "bg-warning-light dark:bg-warning/10 border-warning/30"
                         : "bg-muted/50"
                     }`}
                   >
@@ -114,7 +114,7 @@ export function RequestCommentsDialog({
                             {comment.profiles?.full_name || "مستخدم"}
                           </span>
                           {comment.is_internal && (
-                            <span className="inline-flex items-center gap-1 text-xs bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200 px-2 py-0.5 rounded">
+                            <span className="inline-flex items-center gap-1 text-xs bg-warning-light dark:bg-warning/10 text-warning px-2 py-0.5 rounded">
                               <Lock className="h-3 w-3" />
                               داخلي
                             </span>

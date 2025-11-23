@@ -244,8 +244,8 @@ export default function Loans() {
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 إجمالي المبالغ
               </CardTitle>
-              <div className="h-8 w-8 rounded-lg bg-amber-500/10 flex items-center justify-center group-hover:bg-amber-500/20 transition-colors">
-                <DollarSign className="h-4 w-4 text-amber-500" />
+              <div className="h-8 w-8 rounded-lg bg-warning/10 flex items-center justify-center group-hover:bg-warning/20 transition-colors">
+                <DollarSign className="h-4 w-4 text-warning" />
               </div>
             </CardHeader>
             <CardContent>

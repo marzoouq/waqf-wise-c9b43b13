@@ -29,7 +29,7 @@ export function NotificationsPreviewDialog({
       message: "تم استلام طلب فزعة طارئة من أحمد محمد",
       time: "منذ 5 دقائق",
       enabled: settings.requestNotifications,
-      color: "text-orange-500"
+      color: "text-warning"
     },
     {
       id: 2,
@@ -39,7 +39,7 @@ export function NotificationsPreviewDialog({
       message: "تم اعتماد دفعة بمبلغ 50,000 ريال",
       time: "منذ 10 دقائق",
       enabled: settings.paymentNotifications,
-      color: "text-green-500"
+      color: "text-success"
     },
     {
       id: 3,
@@ -49,7 +49,7 @@ export function NotificationsPreviewDialog({
       message: "التقرير المالي لشهر نوفمبر متاح الآن",
       time: "منذ ساعة",
       enabled: settings.reportNotifications,
-      color: "text-blue-500"
+      color: "text-info"
     }
   ];
 
