@@ -10,9 +10,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useContracts, Contract } from "@/hooks/useContracts";
 import { useProperties } from "@/hooks/useProperties";
 import { usePropertyUnits } from "@/hooks/usePropertyUnits";
-import { ContractWithUnitsCount } from "@/types/contracts";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "@/hooks/use-toast";
+import { Calculator, Calendar, Banknote, CheckCircle2, Lightbulb } from "lucide-react";
 
 interface Props {
   open: boolean;
@@ -26,6 +27,11 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
   const [selectedPropertyId, setSelectedPropertyId] = useState<string>("");
   const { units, isLoading: unitsLoading } = usePropertyUnits(selectedPropertyId);
   const [selectedUnits, setSelectedUnits] = useState<string[]>([]);
+
+  // حقول جديدة مبسطة
+  const [contractDuration, setContractDuration] = useState<number>(1);
+  const [durationUnit, setDurationUnit] = useState<'سنوات' | 'أشهر'>('سنوات');
+  const [totalAmount, setTotalAmount] = useState<string>('');
 
   const [formData, setFormData] = useState({
     contract_number: "",
@@ -46,6 +52,35 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
     terms_and_conditions: "",
     notes: "",
   });
+
+  // دالة حساب تلقائية للتفاصيل
+  const calculateContractDetails = () => {
+    if (!formData.start_date || !totalAmount || !contractDuration) return;
+    
+    const startDate = new Date(formData.start_date);
+    const durationInMonths = durationUnit === 'سنوات' ? contractDuration * 12 : contractDuration;
+    
+    // حساب تاريخ النهاية تلقائياً
+    const endDate = new Date(startDate);
+    endDate.setMonth(startDate.getMonth() + durationInMonths);
+    
+    // حساب الإيجار الشهري تلقائياً
+    const monthlyRent = parseFloat(totalAmount) / durationInMonths;
+    
+    // تحديث الحقول تلقائياً
+    setFormData(prev => ({
+      ...prev,
+      end_date: endDate.toISOString().split('T')[0],
+      monthly_rent: monthlyRent.toFixed(2),
+    }));
+  };
+
+  // تشغيل الحساب عند تغيير أي حقل
+  useEffect(() => {
+    if (!contract) {
+      calculateContractDetails();
+    }
+  }, [formData.start_date, totalAmount, contractDuration, durationUnit]);
 
   useEffect(() => {
     if (contract) {
@@ -69,6 +104,22 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
         notes: contract.notes || "",
       });
       setSelectedPropertyId(contract.property_id);
+      
+      // حساب المدة والمبلغ الإجمالي من العقد الموجود
+      const start = new Date(contract.start_date);
+      const end = new Date(contract.end_date);
+      const months = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
+      const years = Math.floor(months / 12);
+      
+      if (years > 0 && months % 12 === 0) {
+        setContractDuration(years);
+        setDurationUnit('سنوات');
+      } else {
+        setContractDuration(months);
+        setDurationUnit('أشهر');
+      }
+      
+      setTotalAmount((contract.monthly_rent * months).toString());
     } else {
       // Generate contract number for new contracts
       const date = new Date();
@@ -95,6 +146,7 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    // التحقق من الوحدات
     if (!contract && selectedUnits.length === 0) {
       toast({
         title: "خطأ",
@@ -104,9 +156,52 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
       return;
     }
 
+    // التحقق من المدة
+    if (!contract && contractDuration < 1) {
+      toast({
+        title: "خطأ",
+        description: "مدة العقد يجب أن تكون أكبر من صفر",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // التحقق من المبلغ
+    if (!contract && (parseFloat(totalAmount) <= 0 || !totalAmount)) {
+      toast({
+        title: "خطأ",
+        description: "المبلغ الإجمالي يجب أن يكون أكبر من صفر",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // التحقق من التواريخ
+    const startDate = new Date(formData.start_date);
+    const endDate = new Date(formData.end_date);
+    if (endDate <= startDate) {
+      toast({
+        title: "خطأ",
+        description: "تاريخ النهاية يجب أن يكون بعد تاريخ البداية",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // التحقق من الإيجار الشهري
+    const monthlyRent = parseFloat(formData.monthly_rent);
+    if (monthlyRent <= 0 || isNaN(monthlyRent)) {
+      toast({
+        title: "خطأ",
+        description: "الإيجار الشهري غير صحيح",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const contractData = {
       ...formData,
-      monthly_rent: parseFloat(formData.monthly_rent),
+      monthly_rent: monthlyRent,
       security_deposit: parseFloat(formData.security_deposit) || 0,
       renewal_notice_days: parseInt(formData.renewal_notice_days),
       units_count: selectedUnits.length,
@@ -146,6 +241,9 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
     });
     setSelectedUnits([]);
     setSelectedPropertyId("");
+    setContractDuration(1);
+    setDurationUnit('سنوات');
+    setTotalAmount('');
   };
 
   const availableUnits = units?.filter(u => u.status === 'available') || [];
@@ -255,38 +353,107 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>تاريخ البداية *</Label>
-              <Input
-                type="date"
-                value={formData.start_date}
-                onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-                required
-              />
+          {/* قسم الحسابات الذكية */}
+          <div className="space-y-4 bg-primary/5 border border-primary/20 rounded-lg p-4">
+            <h3 className="text-sm font-semibold text-primary flex items-center gap-2">
+              <Calculator className="h-4 w-4" />
+              معلومات العقد الأساسية
+            </h3>
+            
+            <div className="grid grid-cols-2 gap-4">
+              {/* تاريخ البداية */}
+              <div className="space-y-2">
+                <Label>تاريخ بداية العقد *</Label>
+                <Input
+                  type="date"
+                  value={formData.start_date}
+                  onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+                  required
+                />
+              </div>
+              
+              {/* مدة العقد */}
+              <div className="space-y-2">
+                <Label>مدة العقد *</Label>
+                <div className="flex gap-2">
+                  <Input
+                    type="number"
+                    min="1"
+                    value={contractDuration}
+                    onChange={(e) => setContractDuration(parseInt(e.target.value) || 1)}
+                    className="flex-1"
+                    placeholder="3"
+                    required
+                    disabled={!!contract}
+                  />
+                  <Select 
+                    value={durationUnit} 
+                    onValueChange={(value: 'سنوات' | 'أشهر') => setDurationUnit(value)}
+                    disabled={!!contract}
+                  >
+                    <SelectTrigger className="w-24">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="سنوات">سنوات</SelectItem>
+                      <SelectItem value="أشهر">أشهر</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  مثال: 3 سنوات أو 18 شهر
+                </p>
+              </div>
             </div>
-
-            <div className="space-y-2">
-              <Label>تاريخ النهاية *</Label>
-              <Input
-                type="date"
-                value={formData.end_date}
-                onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label>الإيجار الشهري *</Label>
-              <Input
-                type="number"
-                step="0.01"
-                value={formData.monthly_rent}
-                onChange={(e) => setFormData({ ...formData, monthly_rent: e.target.value })}
-                required
-              />
+            
+            <div className="grid grid-cols-2 gap-4">
+              {/* المبلغ الإجمالي */}
+              <div className="space-y-2">
+                <Label>المبلغ الإجمالي للعقد (ر.س) *</Label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={totalAmount}
+                  onChange={(e) => setTotalAmount(e.target.value)}
+                  placeholder="360000"
+                  required
+                  disabled={!!contract}
+                />
+                <p className="text-xs text-muted-foreground">
+                  💡 إجمالي المبلغ لكامل مدة العقد
+                </p>
+              </div>
+              
+              {/* نوع الدفع */}
+              <div className="space-y-2">
+                <Label>نوع الدفع *</Label>
+                <Select
+                  value={formData.payment_frequency}
+                  onValueChange={(value) => setFormData({ ...formData, payment_frequency: value })}
+                  required
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="شهري">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4" />
+                        <span>دفعات شهرية</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="سنوي">
+                      <div className="flex items-center gap-2">
+                        <Banknote className="h-4 w-4" />
+                        <span>دفعة سنوية مقدماً</span>
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  💡 شهري = دفعات متعددة، سنوي = دفعة واحدة
+                </p>
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -301,32 +468,54 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
                 step="0.01"
                 value={formData.security_deposit}
                 onChange={(e) => setFormData({ ...formData, security_deposit: e.target.value })}
+                placeholder="10000"
               />
             </div>
-
-            <div className="space-y-2">
-              <Label>تكرار الدفع</Label>
-              <Select
-                value={formData.payment_frequency}
-                onValueChange={(value) => setFormData({ ...formData, payment_frequency: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="شهري">شهري</SelectItem>
-                <SelectItem value="ربع سنوي">ربع سنوي</SelectItem>
-                <SelectItem value="نصف سنوي">نصف سنوي</SelectItem>
-                <SelectItem value="سنوي">سنوي</SelectItem>
-                <SelectItem value="دفعة واحدة">دفعة واحدة (مقدماً)</SelectItem>
-                <SelectItem value="دفعتين">دفعتين</SelectItem>
-              </SelectContent>
-              </Select>
-              <p className="text-xs text-muted-foreground mt-1">
-                💡 اختر "دفعة واحدة" للعقود السنوية المدفوعة مقدماً
-              </p>
-            </div>
+            
+            {/* الحسابات التلقائية - للعرض فقط */}
+            {!contract && formData.end_date && formData.monthly_rent && (
+              <div className="bg-success/10 border border-success/30 rounded-lg p-3 space-y-2">
+                <p className="text-xs font-semibold text-success-foreground flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4" />
+                  الحسابات التلقائية:
+                </p>
+                <div className="grid grid-cols-3 gap-3 text-sm">
+                  <div>
+                    <span className="text-muted-foreground">تاريخ النهاية:</span>
+                    <p className="font-semibold text-success-foreground">
+                      {formData.end_date}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">الإيجار الشهري:</span>
+                    <p className="font-semibold text-success-foreground">
+                      {parseFloat(formData.monthly_rent).toLocaleString('ar-SA')} ر.س
+                    </p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">عدد الدفعات:</span>
+                    <p className="font-semibold text-success-foreground">
+                      {formData.payment_frequency === 'شهري' 
+                        ? `${contractDuration * (durationUnit === 'سنوات' ? 12 : 1)} دفعة`
+                        : '1 دفعة'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
+
+          {!contract && (
+            <Alert>
+              <Lightbulb className="h-4 w-4" />
+              <AlertTitle>أمثلة سريعة:</AlertTitle>
+              <AlertDescription className="space-y-1 text-xs">
+                <p>• عقد 3 سنوات بمبلغ 360,000 ر.س ← إيجار شهري: 10,000 ر.س</p>
+                <p>• عقد 18 شهر بمبلغ 90,000 ر.س ← إيجار شهري: 5,000 ر.س</p>
+                <p>• عقد سنوي بدفعة واحدة ← يُسجل كامل المبلغ عند الدفع</p>
+              </AlertDescription>
+            </Alert>
+          )}
 
           {!contract && selectedPropertyId && (
             <div className="space-y-3 border border-border rounded-lg p-4">
