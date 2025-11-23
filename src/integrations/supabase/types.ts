@@ -768,6 +768,185 @@ export type Database = {
           },
         ]
       }
+      bank_transfer_details: {
+        Row: {
+          amount: number
+          bank_name: string | null
+          beneficiary_id: string | null
+          beneficiary_name: string
+          created_at: string | null
+          description: string | null
+          error_message: string | null
+          iban: string
+          id: string
+          payment_voucher_id: string | null
+          processed_at: string | null
+          reference_number: string | null
+          status: string
+          transfer_file_id: string | null
+        }
+        Insert: {
+          amount: number
+          bank_name?: string | null
+          beneficiary_id?: string | null
+          beneficiary_name: string
+          created_at?: string | null
+          description?: string | null
+          error_message?: string | null
+          iban: string
+          id?: string
+          payment_voucher_id?: string | null
+          processed_at?: string | null
+          reference_number?: string | null
+          status?: string
+          transfer_file_id?: string | null
+        }
+        Update: {
+          amount?: number
+          bank_name?: string | null
+          beneficiary_id?: string | null
+          beneficiary_name?: string
+          created_at?: string | null
+          description?: string | null
+          error_message?: string | null
+          iban?: string
+          id?: string
+          payment_voucher_id?: string | null
+          processed_at?: string | null
+          reference_number?: string | null
+          status?: string
+          transfer_file_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bank_transfer_details_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bank_transfer_details_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_statistics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bank_transfer_details_payment_voucher_id_fkey"
+            columns: ["payment_voucher_id"]
+            isOneToOne: false
+            referencedRelation: "payment_vouchers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bank_transfer_details_payment_voucher_id_fkey"
+            columns: ["payment_voucher_id"]
+            isOneToOne: false
+            referencedRelation: "payment_vouchers_with_details"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bank_transfer_details_transfer_file_id_fkey"
+            columns: ["transfer_file_id"]
+            isOneToOne: false
+            referencedRelation: "bank_transfer_files"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bank_transfer_files: {
+        Row: {
+          bank_account_id: string | null
+          created_at: string | null
+          created_by: string | null
+          distribution_id: string | null
+          error_message: string | null
+          file_content: string | null
+          file_format: string
+          file_number: string
+          file_path: string | null
+          generated_at: string | null
+          id: string
+          metadata: Json | null
+          processed_at: string | null
+          sent_at: string | null
+          status: string
+          total_amount: number
+          total_transactions: number
+          updated_at: string | null
+        }
+        Insert: {
+          bank_account_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          distribution_id?: string | null
+          error_message?: string | null
+          file_content?: string | null
+          file_format: string
+          file_number: string
+          file_path?: string | null
+          generated_at?: string | null
+          id?: string
+          metadata?: Json | null
+          processed_at?: string | null
+          sent_at?: string | null
+          status?: string
+          total_amount: number
+          total_transactions: number
+          updated_at?: string | null
+        }
+        Update: {
+          bank_account_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          distribution_id?: string | null
+          error_message?: string | null
+          file_content?: string | null
+          file_format?: string
+          file_number?: string
+          file_path?: string | null
+          generated_at?: string | null
+          id?: string
+          metadata?: Json | null
+          processed_at?: string | null
+          sent_at?: string | null
+          status?: string
+          total_amount?: number
+          total_transactions?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bank_transfer_files_bank_account_id_fkey"
+            columns: ["bank_account_id"]
+            isOneToOne: false
+            referencedRelation: "bank_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bank_transfer_files_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "distribution_statistics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bank_transfer_files_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "distributions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bank_transfer_files_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "payment_vouchers_with_details"
+            referencedColumns: ["distribution_id_ref"]
+          },
+        ]
+      }
       beneficiaries: {
         Row: {
           address: string | null
@@ -1888,8 +2067,22 @@ export type Database = {
             foreignKeyName: "distribution_approvals_distribution_id_fkey"
             columns: ["distribution_id"]
             isOneToOne: false
+            referencedRelation: "distribution_statistics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "distribution_approvals_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
             referencedRelation: "distributions"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "distribution_approvals_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "payment_vouchers_with_details"
+            referencedColumns: ["distribution_id_ref"]
           },
         ]
       }
@@ -1952,8 +2145,22 @@ export type Database = {
             foreignKeyName: "distribution_details_distribution_id_fkey"
             columns: ["distribution_id"]
             isOneToOne: false
+            referencedRelation: "distribution_statistics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "distribution_details_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
             referencedRelation: "distributions"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "distribution_details_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "payment_vouchers_with_details"
+            referencedColumns: ["distribution_id_ref"]
           },
         ]
       }
@@ -4786,6 +4993,131 @@ export type Database = {
           },
         ]
       }
+      payment_vouchers: {
+        Row: {
+          amount: number
+          approved_at: string | null
+          approved_by: string | null
+          attachments: Json | null
+          bank_account_id: string | null
+          beneficiary_id: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string
+          distribution_id: string | null
+          id: string
+          journal_entry_id: string | null
+          metadata: Json | null
+          notes: string | null
+          paid_at: string | null
+          paid_by: string | null
+          payment_method: string | null
+          reference_number: string | null
+          status: string
+          updated_at: string | null
+          voucher_number: string
+          voucher_type: string
+        }
+        Insert: {
+          amount: number
+          approved_at?: string | null
+          approved_by?: string | null
+          attachments?: Json | null
+          bank_account_id?: string | null
+          beneficiary_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description: string
+          distribution_id?: string | null
+          id?: string
+          journal_entry_id?: string | null
+          metadata?: Json | null
+          notes?: string | null
+          paid_at?: string | null
+          paid_by?: string | null
+          payment_method?: string | null
+          reference_number?: string | null
+          status?: string
+          updated_at?: string | null
+          voucher_number: string
+          voucher_type: string
+        }
+        Update: {
+          amount?: number
+          approved_at?: string | null
+          approved_by?: string | null
+          attachments?: Json | null
+          bank_account_id?: string | null
+          beneficiary_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string
+          distribution_id?: string | null
+          id?: string
+          journal_entry_id?: string | null
+          metadata?: Json | null
+          notes?: string | null
+          paid_at?: string | null
+          paid_by?: string | null
+          payment_method?: string | null
+          reference_number?: string | null
+          status?: string
+          updated_at?: string | null
+          voucher_number?: string
+          voucher_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_vouchers_bank_account_id_fkey"
+            columns: ["bank_account_id"]
+            isOneToOne: false
+            referencedRelation: "bank_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_vouchers_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_vouchers_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_statistics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_vouchers_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "distribution_statistics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_vouchers_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "distributions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_vouchers_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "payment_vouchers_with_details"
+            referencedColumns: ["distribution_id_ref"]
+          },
+          {
+            foreignKeyName: "payment_vouchers_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
+            referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payments: {
         Row: {
           amount: number
@@ -7022,8 +7354,22 @@ export type Database = {
             foreignKeyName: "waqf_reserves_distribution_id_fkey"
             columns: ["distribution_id"]
             isOneToOne: false
+            referencedRelation: "distribution_statistics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "waqf_reserves_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
             referencedRelation: "distributions"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "waqf_reserves_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "payment_vouchers_with_details"
+            referencedColumns: ["distribution_id_ref"]
           },
         ]
       }
@@ -7098,6 +7444,104 @@ export type Database = {
           user_id: string | null
         }
         Relationships: []
+      }
+      distribution_statistics: {
+        Row: {
+          completion_percentage: number | null
+          distribution_date: string | null
+          id: string | null
+          remaining_amount: number | null
+          status: string | null
+          total_amount: number | null
+          total_beneficiaries: number | null
+          total_paid: number | null
+          total_vouchers: number | null
+        }
+        Relationships: []
+      }
+      payment_vouchers_with_details: {
+        Row: {
+          account_number: string | null
+          amount: number | null
+          approved_at: string | null
+          approved_by: string | null
+          attachments: Json | null
+          bank_account_id: string | null
+          bank_iban: string | null
+          bank_name: string | null
+          beneficiary_id: string | null
+          beneficiary_name: string | null
+          beneficiary_national_id: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          distribution_id: string | null
+          distribution_id_ref: string | null
+          distribution_total_amount: number | null
+          id: string | null
+          journal_entry_id: string | null
+          metadata: Json | null
+          notes: string | null
+          paid_at: string | null
+          paid_by: string | null
+          payment_method: string | null
+          reference_number: string | null
+          status: string | null
+          updated_at: string | null
+          voucher_number: string | null
+          voucher_type: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_vouchers_bank_account_id_fkey"
+            columns: ["bank_account_id"]
+            isOneToOne: false
+            referencedRelation: "bank_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_vouchers_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_vouchers_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_statistics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_vouchers_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "distribution_statistics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_vouchers_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "distributions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_vouchers_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "payment_vouchers_with_details"
+            referencedColumns: ["distribution_id_ref"]
+          },
+          {
+            foreignKeyName: "payment_vouchers_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
+            referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       recent_activities: {
         Row: {
@@ -7267,6 +7711,11 @@ export type Database = {
       }
       generate_beneficiary_number: { Args: never; Returns: string }
       generate_smart_insights: { Args: never; Returns: undefined }
+      generate_transfer_file_number: { Args: never; Returns: string }
+      generate_voucher_number: {
+        Args: { voucher_type: string }
+        Returns: string
+      }
       get_admin_dashboard_kpis: { Args: never; Returns: Json }
       get_beneficiary_number: { Args: { ben_id: string }; Returns: string }
       has_role: {

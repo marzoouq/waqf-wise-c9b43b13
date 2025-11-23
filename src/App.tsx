@@ -51,6 +51,7 @@ const Invoices = lazy(() => import("./pages/Invoices"));
 const Approvals = lazy(() => import("./pages/Approvals"));
 const Payments = lazy(() => import("./pages/Payments"));
 const Loans = lazy(() => import("./pages/Loans"));
+const PaymentVouchers = lazy(() => import("./pages/PaymentVouchers"));
 const WaqfUnits = lazy(() => import("./pages/WaqfUnits"));
 const Install = lazy(() => import("./pages/Install"));
 const Notifications = lazy(() => import("./pages/Notifications"));
@@ -276,6 +277,14 @@ const App = () => {
             } 
           />
           <Route path="/loans" element={<Loans />} />
+          <Route 
+            path="/payment-vouchers" 
+            element={
+              <ProtectedRoute requiredRoles={["admin", "nazer", "accountant", "cashier"]}>
+                <PaymentVouchers />
+              </ProtectedRoute>
+            } 
+          />
           <Route path="/waqf-units" element={<WaqfUnits />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/settings" element={<Settings />} />
