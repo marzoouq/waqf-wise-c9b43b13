@@ -17,6 +17,7 @@ import { useBeneficiaryProfile } from "@/hooks/useBeneficiaryProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { useNavigate } from "react-router-dom";
 
 export default function BeneficiarySupport() {
@@ -112,7 +113,8 @@ export default function BeneficiarySupport() {
   };
 
   return (
-    <MobileOptimizedLayout>
+    <PageErrorBoundary pageName="الدعم الفني">
+      <MobileOptimizedLayout>
       <div className="space-y-6 pb-20">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -264,5 +266,6 @@ export default function BeneficiarySupport() {
         </Tabs>
       </div>
     </MobileOptimizedLayout>
+    </PageErrorBoundary>
   );
 }

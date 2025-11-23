@@ -24,6 +24,7 @@ import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { cleanFilters } from '@/utils/cleanFilters';
 
 const AuditLogs = () => {
@@ -89,7 +90,8 @@ const AuditLogs = () => {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <PageErrorBoundary pageName="سجل العمليات">
+      <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -270,6 +272,7 @@ const AuditLogs = () => {
         )}
       </Card>
     </div>
+    </PageErrorBoundary>
   );
 };
 

@@ -5,6 +5,7 @@ import { Sparkles, TrendingUp, AlertTriangle, Lightbulb, X, RefreshCw } from "lu
 import { useAIInsights } from "@/hooks/useAIInsights";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EnhancedEmptyState } from "@/components/shared/EnhancedEmptyState";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import type { LucideIcon } from "lucide-react";
 
 const categoryIcons: Record<string, LucideIcon> = {
@@ -28,7 +29,8 @@ export default function AIInsights() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <PageErrorBoundary pageName="الرؤى الذكية">
+      <div className="min-h-screen bg-background">
       <div className="container mx-auto p-6 md:p-8 lg:p-10 space-y-8">
         <header className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -127,5 +129,6 @@ export default function AIInsights() {
         )}
       </div>
     </div>
+    </PageErrorBoundary>
   );
 }

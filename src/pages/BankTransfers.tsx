@@ -17,6 +17,7 @@ import {
 } from "@/lib/bankFileGenerators";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 
@@ -141,7 +142,8 @@ export default function BankTransfers() {
   const totalAmount = selectedDist?.total_amount || 0;
 
   return (
-    <MobileOptimizedLayout>
+    <PageErrorBoundary pageName="التحويلات البنكية">
+      <MobileOptimizedLayout>
       <div className="space-y-6">
         {/* Header */}
         <div>
@@ -256,5 +258,6 @@ export default function BankTransfers() {
         </Card>
       </div>
     </MobileOptimizedLayout>
+    </PageErrorBoundary>
   );
 }
