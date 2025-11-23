@@ -234,28 +234,28 @@ export const PaymentsTab = ({ onEdit }: Props) => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="p-4">
           <div className="text-sm text-muted-foreground">إجمالي المدفوع</div>
-          <div className="text-2xl font-bold text-green-600">
+          <div className="text-2xl font-bold text-success">
             {totalPaid.toLocaleString('ar-SA')} ر.س
           </div>
         </Card>
         
         <Card className="p-4">
           <div className="text-sm text-muted-foreground">تحت التحصيل</div>
-          <div className="text-2xl font-bold text-orange-600">
+          <div className="text-2xl font-bold text-warning">
             {underCollectionPayments.toLocaleString('ar-SA')} ر.س
           </div>
         </Card>
 
         <Card className="p-4">
           <div className="text-sm text-muted-foreground">معلق</div>
-          <div className="text-2xl font-bold text-blue-600">
+          <div className="text-2xl font-bold text-info">
             {totalDue.toLocaleString('ar-SA')} ر.س
           </div>
         </Card>
 
         <Card className="p-4">
           <div className="text-sm text-muted-foreground">المتأخرات</div>
-          <div className="text-2xl font-bold text-red-600">
+          <div className="text-2xl font-bold text-destructive">
             {overduePayments.toLocaleString('ar-SA')} ر.س
           </div>
         </Card>
@@ -313,7 +313,7 @@ export const PaymentsTab = ({ onEdit }: Props) => {
                           size="sm"
                           onClick={() => handleViewInvoice(payment)}
                           title="عرض الفاتورة"
-                          className="text-blue-600 hover:text-blue-700"
+                          className="text-info hover:text-info/80"
                         >
                           <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>
@@ -324,7 +324,7 @@ export const PaymentsTab = ({ onEdit }: Props) => {
                           size="sm"
                           onClick={() => handleViewReceipt(payment)}
                           title="عرض سند القبض"
-                          className="text-green-600 hover:text-green-700"
+                          className="text-success hover:text-success/80"
                         >
                           <Receipt className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>

@@ -80,8 +80,8 @@ export function TicketRatingDialog({
             <Star
               className={`h-8 w-8 ${
                 star <= (label === 'التقييم العام' ? (hoveredRating || value) : value)
-                  ? 'fill-yellow-500 text-yellow-500'
-                  : 'text-gray-300'
+                  ? 'fill-warning text-warning'
+                  : 'text-muted-foreground/30'
               }`}
             />
           </button>

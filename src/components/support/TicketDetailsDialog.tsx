@@ -149,7 +149,7 @@ export function TicketDetailsDialog({
                           </div>
                           <p className="text-sm whitespace-pre-wrap">{comment.comment}</p>
                           {comment.is_solution && (
-                            <Badge variant="outline" className="text-green-600">
+                            <Badge variant="outline" className="text-success">
                               ✓ حل مقبول
                             </Badge>
                           )}

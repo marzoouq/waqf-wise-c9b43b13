@@ -88,7 +88,7 @@ export function AgentAvailabilityCard() {
             <div
               className={`h-2 rounded-full transition-all ${
                 loadPercentage >= 80 ? 'bg-destructive' :
-                loadPercentage >= 60 ? 'bg-yellow-500' :
+                loadPercentage >= 60 ? 'bg-warning' :
                 'bg-primary'
               }`}
               style={{ width: `${Math.min(loadPercentage, 100)}%` }}

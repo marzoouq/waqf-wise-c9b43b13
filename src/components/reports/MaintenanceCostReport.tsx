@@ -171,7 +171,7 @@ export function MaintenanceCostReport() {
             <CardTitle className="text-sm font-medium">العمليات المكتملة</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{totalCompleted}</div>
+            <div className="text-2xl font-bold text-success">{totalCompleted}</div>
           </CardContent>
         </Card>
 
@@ -180,7 +180,7 @@ export function MaintenanceCostReport() {
             <CardTitle className="text-sm font-medium">العمليات المعلقة</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-600">{totalPending}</div>
+            <div className="text-2xl font-bold text-warning">{totalPending}</div>
           </CardContent>
         </Card>
       </div>

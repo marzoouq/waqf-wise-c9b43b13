@@ -116,7 +116,7 @@ const AccountantDashboard = () => {
       <MobileOptimizedHeader
         title="لوحة تحكم المحاسب"
         description="إدارة القيود المحاسبية والموافقات المالية"
-        icon={<DollarSign className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-emerald-600" />}
+        icon={<DollarSign className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-success" />}
       />
 
       {/* Statistics Cards */}
@@ -127,10 +127,10 @@ const AccountantDashboard = () => {
             <Card className="group hover:shadow-lg hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-amber-500">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-xs sm:text-sm font-medium">موافقات معلقة</CardTitle>
-                <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 text-amber-500 group-hover:scale-110 transition-transform" />
+                <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 text-warning group-hover:scale-110 transition-transform" />
               </CardHeader>
               <CardContent>
-                <div className="text-lg sm:text-xl md:text-2xl font-bold text-amber-600">
+                <div className="text-lg sm:text-xl md:text-2xl font-bold text-warning">
                   {kpis?.pendingApprovals || 0}
                 </div>
                 <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">تحتاج مراجعة</p>
@@ -196,7 +196,7 @@ const AccountantDashboard = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <AlertCircle className="h-5 w-5 text-amber-500" />
+                  <AlertCircle className="h-5 w-5 text-warning" />
                   الموافقات المعلقة
                 </CardTitle>
               </CardHeader>

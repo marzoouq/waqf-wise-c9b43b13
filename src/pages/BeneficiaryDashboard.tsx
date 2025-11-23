@@ -288,7 +288,7 @@ const BeneficiaryDashboard = () => {
                 title="متوسط الدفعة"
                 value={formatCurrency(stats.averagePayment)}
                 icon={TrendingUp}
-                colorClass="text-amber-600"
+                colorClass="text-warning"
               />
             </>
           )}

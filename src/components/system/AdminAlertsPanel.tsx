@@ -80,11 +80,11 @@ export function AdminAlertsPanel() {
       case 'critical':
         return <XCircle className="h-5 w-5 text-destructive" />;
       case 'high':
-        return <AlertTriangle className="h-5 w-5 text-orange-500" />;
+        return <AlertTriangle className="h-5 w-5 text-warning" />;
       case 'medium':
-        return <Clock className="h-5 w-5 text-yellow-500" />;
+        return <Clock className="h-5 w-5 text-warning" />;
       default:
-        return <Bell className="h-5 w-5 text-blue-500" />;
+        return <Bell className="h-5 w-5 text-info" />;
     }
   };
 
@@ -145,7 +145,7 @@ export function AdminAlertsPanel() {
       <CardContent className="space-y-4">
         {alerts.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
-            <CheckCircle className="h-12 w-12 mx-auto mb-2 text-green-500" />
+            <CheckCircle className="h-12 w-12 mx-auto mb-2 text-success" />
             <p>لا توجد تنبيهات حالياً</p>
           </div>
         ) : (

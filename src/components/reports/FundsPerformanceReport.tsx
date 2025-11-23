@@ -145,7 +145,7 @@ export function FundsPerformanceReport() {
             <CardTitle className="text-sm font-medium">إجمالي المنفق</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{totalSpent.toLocaleString('ar-SA')} ريال</div>
+            <div className="text-2xl font-bold text-success">{totalSpent.toLocaleString('ar-SA')} ريال</div>
           </CardContent>
         </Card>
 
@@ -154,7 +154,7 @@ export function FundsPerformanceReport() {
             <CardTitle className="text-sm font-medium">المتبقي</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
+            <div className="text-2xl font-bold text-info">
               {(totalAllocated - totalSpent).toLocaleString('ar-SA')} ريال
             </div>
           </CardContent>

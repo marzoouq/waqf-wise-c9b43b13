@@ -30,17 +30,17 @@ const getNotificationIcon = (type: Notification["type"]) => {
 const getNotificationBg = (type: Notification["type"]) => {
   switch (type) {
     case "approval":
-      return "bg-green-50 dark:bg-green-950";
+      return "bg-success-light dark:bg-success/10";
     case "payment":
-      return "bg-blue-50 dark:bg-blue-950";
+      return "bg-info-light dark:bg-info/10";
     case "journal_entry":
-      return "bg-purple-50 dark:bg-purple-950";
+      return "bg-accent/10 dark:bg-accent/5";
     case "distribution":
-      return "bg-orange-50 dark:bg-orange-950";
+      return "bg-warning-light dark:bg-warning/10";
     case "system":
-      return "bg-yellow-50 dark:bg-yellow-950";
+      return "bg-warning-light dark:bg-warning/10";
     default:
-      return "bg-gray-50 dark:bg-gray-950";
+      return "bg-muted";
   }
 };
 

@@ -117,7 +117,7 @@ export default function ArchivistDashboard() {
         {/* Header */}
         <header className="space-y-1 sm:space-y-2">
           <div className="flex items-center gap-2 sm:gap-3">
-            <Archive className="h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 text-teal-600" />
+            <Archive className="h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 text-accent" />
             <div>
               <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gradient-primary">
                 لوحة تحكم أمين الأرشيف
@@ -137,10 +137,10 @@ export default function ArchivistDashboard() {
             <Card className="group hover:shadow-lg hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-teal-500">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-xs sm:text-sm font-medium">المجلدات</CardTitle>
-                <FolderOpen className="h-3 w-3 sm:h-4 sm:w-4 text-teal-500 group-hover:scale-110 transition-transform" />
+                <FolderOpen className="h-3 w-3 sm:h-4 sm:w-4 text-accent group-hover:scale-110 transition-transform" />
               </CardHeader>
               <CardContent>
-                <div className="text-lg sm:text-xl md:text-2xl font-bold text-teal-600">
+                <div className="text-lg sm:text-xl md:text-2xl font-bold text-accent">
                   {stats?.totalFolders || 0}
                 </div>
                 <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">إجمالي المجلدات</p>
