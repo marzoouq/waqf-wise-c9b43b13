@@ -2196,6 +2196,97 @@ export type Database = {
           },
         ]
       }
+      emergency_aid_requests: {
+        Row: {
+          amount_approved: number | null
+          amount_requested: number
+          annual_limit: number | null
+          approved_at: string | null
+          approved_by: string | null
+          beneficiary_id: string | null
+          created_at: string | null
+          id: string
+          notes: string | null
+          payment_id: string | null
+          reason: string
+          rejected_at: string | null
+          rejected_by: string | null
+          rejection_reason: string | null
+          request_number: string | null
+          sla_due_at: string | null
+          status: string | null
+          updated_at: string | null
+          urgency_level: string | null
+          used_this_year: number | null
+        }
+        Insert: {
+          amount_approved?: number | null
+          amount_requested: number
+          annual_limit?: number | null
+          approved_at?: string | null
+          approved_by?: string | null
+          beneficiary_id?: string | null
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          payment_id?: string | null
+          reason: string
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_reason?: string | null
+          request_number?: string | null
+          sla_due_at?: string | null
+          status?: string | null
+          updated_at?: string | null
+          urgency_level?: string | null
+          used_this_year?: number | null
+        }
+        Update: {
+          amount_approved?: number | null
+          amount_requested?: number
+          annual_limit?: number | null
+          approved_at?: string | null
+          approved_by?: string | null
+          beneficiary_id?: string | null
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          payment_id?: string | null
+          reason?: string
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_reason?: string | null
+          request_number?: string | null
+          sla_due_at?: string | null
+          status?: string | null
+          updated_at?: string | null
+          urgency_level?: string | null
+          used_this_year?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emergency_aid_requests_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emergency_aid_requests_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_statistics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emergency_aid_requests_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       encrypted_data_registry: {
         Row: {
           access_count: number | null
@@ -4375,6 +4466,45 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_rules: {
+        Row: {
+          channels: string[] | null
+          created_at: string | null
+          days_before: number | null
+          id: string
+          is_active: boolean | null
+          rule_name: string
+          template_body: string | null
+          template_subject: string | null
+          trigger_event: string
+          updated_at: string | null
+        }
+        Insert: {
+          channels?: string[] | null
+          created_at?: string | null
+          days_before?: number | null
+          id?: string
+          is_active?: boolean | null
+          rule_name: string
+          template_body?: string | null
+          template_subject?: string | null
+          trigger_event: string
+          updated_at?: string | null
+        }
+        Update: {
+          channels?: string[] | null
+          created_at?: string | null
+          days_before?: number | null
+          id?: string
+          is_active?: boolean | null
+          rule_name?: string
+          template_body?: string | null
+          template_subject?: string | null
+          trigger_event?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       notification_templates: {
         Row: {
           body_template: string
@@ -4414,39 +4544,57 @@ export type Database = {
       notifications: {
         Row: {
           action_url: string | null
+          channel: string | null
           created_at: string
+          delivery_status: string | null
+          error_message: string | null
           id: string
           is_read: boolean
           message: string
           read_at: string | null
           reference_id: string | null
           reference_type: string | null
+          retry_count: number | null
+          scheduled_for: string | null
+          sent_at: string | null
           title: string
           type: string
           user_id: string
         }
         Insert: {
           action_url?: string | null
+          channel?: string | null
           created_at?: string
+          delivery_status?: string | null
+          error_message?: string | null
           id?: string
           is_read?: boolean
           message: string
           read_at?: string | null
           reference_id?: string | null
           reference_type?: string | null
+          retry_count?: number | null
+          scheduled_for?: string | null
+          sent_at?: string | null
           title: string
           type: string
           user_id: string
         }
         Update: {
           action_url?: string | null
+          channel?: string | null
           created_at?: string
+          delivery_status?: string | null
+          error_message?: string | null
           id?: string
           is_read?: boolean
           message?: string
           read_at?: string | null
           reference_id?: string | null
           reference_type?: string | null
+          retry_count?: number | null
+          scheduled_for?: string | null
+          sent_at?: string | null
           title?: string
           type?: string
           user_id?: string

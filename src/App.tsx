@@ -67,6 +67,7 @@ const SystemTesting = lazy(() => import("./pages/SystemTesting"));
 const AdvancedSettings = lazy(() => import("./pages/AdvancedSettings"));
 const SystemMaintenance = lazy(() => import("./pages/SystemMaintenance"));
 const AllTransactions = lazy(() => import("./pages/AllTransactions"));
+const BeneficiaryPortal = lazy(() => import("./pages/BeneficiaryPortal"));
 const GovernanceDecisions = lazy(() => import("./pages/GovernanceDecisions"));
 const DecisionDetails = lazy(() => import("./pages/DecisionDetails"));
 const NotFound = lazy(() => import("./pages/NotFound"));
