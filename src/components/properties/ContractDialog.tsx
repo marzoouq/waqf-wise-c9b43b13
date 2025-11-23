@@ -19,9 +19,6 @@ interface Props {
 export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
   const { addContract, updateContract } = useContracts();
   const { properties } = useProperties();
-  
-  // جلب العقار المحدد وملء البيانات تلقائياً
-  const selectedProperty = properties?.find(p => p.id === formData.property_id);
 
   const [formData, setFormData] = useState({
     contract_number: "",
@@ -76,14 +73,17 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
 
   // ملء تلقائي للإيجار وعدد الوحدات عند اختيار العقار
   useEffect(() => {
-    if (selectedProperty && !contract) {
-      setFormData(prev => ({
-        ...prev,
-        monthly_rent: selectedProperty.monthly_revenue?.toString() || prev.monthly_rent,
-        units_count: selectedProperty.units?.toString() || prev.units_count,
-      }));
+    if (formData.property_id && !contract && properties) {
+      const selectedProperty = properties.find(p => p.id === formData.property_id);
+      if (selectedProperty) {
+        setFormData(prev => ({
+          ...prev,
+          monthly_rent: selectedProperty.monthly_revenue?.toString() || prev.monthly_rent,
+          units_count: selectedProperty.units?.toString() || prev.units_count,
+        }));
+      }
     }
-  }, [selectedProperty, contract]);
+  }, [formData.property_id, properties, contract]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
