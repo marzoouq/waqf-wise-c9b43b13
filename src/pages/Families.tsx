@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Users, Search, MoreVertical, Edit, Trash2, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -34,6 +34,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import FamilyDialog from '@/components/families/FamilyDialog';
+import { FamiliesErrorState } from '@/components/families/FamiliesErrorState';
 import { Family } from '@/types';
 import { toast } from 'sonner';
 import { Database } from '@/integrations/supabase/types';
@@ -46,20 +47,41 @@ type FamilyWithHead = Family & {
 import { ScrollableTableWrapper } from '@/components/shared/ScrollableTableWrapper';
 import { MobileScrollHint } from '@/components/shared/MobileScrollHint';
 import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
+import { Pagination } from '@/components/shared/Pagination';
+import { EnhancedEmptyState } from '@/components/shared/EnhancedEmptyState';
+import { ExportButton } from '@/components/shared/ExportButton';
+import { PAGINATION } from '@/lib/constants';
 
 const Families = () => {
   const navigate = useNavigate();
-  const { families, isLoading, addFamily, updateFamily, deleteFamily } = useFamilies();
+  const { families, isLoading, error, refetch, addFamily, updateFamily, deleteFamily } = useFamilies();
   const [searchQuery, setSearchQuery] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedFamily, setSelectedFamily] = useState<Family | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [familyToDelete, setFamilyToDelete] = useState<Family | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState<number>(20);
+  
+  const handleItemsPerPageChange = useCallback((items: number) => {
+    setItemsPerPage(items);
+    setCurrentPage(1);
+  }, []);
 
-  const filteredFamilies = families.filter(family =>
-    family.family_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    family.tribe?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredFamilies = useMemo(() => {
+    return families.filter(family =>
+      family.family_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      family.tribe?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [families, searchQuery]);
+
+  const paginatedFamilies = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredFamilies.slice(startIndex, endIndex);
+  }, [filteredFamilies, currentPage, itemsPerPage]);
+
+  const totalPages = Math.ceil(filteredFamilies.length / itemsPerPage);
 
   const handleAddFamily = () => {
     setSelectedFamily(null);
@@ -121,6 +143,10 @@ const Families = () => {
     return <LoadingState size="lg" />;
   }
 
+  if (error) {
+    return <FamiliesErrorState error={error as Error} onRetry={() => refetch()} />;
+  }
+
   return (
     <PageErrorBoundary pageName="العائلات">
       <div className="min-h-screen bg-background">
@@ -133,10 +159,27 @@ const Families = () => {
             إدارة العائلات وربط أفرادها ببعضهم البعض
           </p>
         </div>
-        <Button onClick={handleAddFamily} className="w-full sm:w-auto gap-2 text-sm sm:text-base" size="sm">
-          <Plus className="h-4 w-4" />
-          إضافة عائلة
-        </Button>
+        <div className="flex gap-2">
+          {filteredFamilies.length > 0 && (
+            <ExportButton
+              data={filteredFamilies.map(f => ({
+                'اسم العائلة': f.family_name,
+                'رب الأسرة': (f as FamilyWithHead).head_of_family?.full_name || '-',
+                'القبيلة': f.tribe || '-',
+                'عدد الأفراد': f.total_members,
+                'الحالة': f.status,
+                'تاريخ التسجيل': new Date(f.created_at).toLocaleDateString('ar-SA'),
+              }))}
+              filename="العائلات"
+              title="تقرير العائلات"
+              headers={['اسم العائلة', 'رب الأسرة', 'القبيلة', 'عدد الأفراد', 'الحالة', 'تاريخ التسجيل']}
+            />
+          )}
+          <Button onClick={handleAddFamily} className="w-full sm:w-auto gap-2 text-sm sm:text-base" size="sm">
+            <Plus className="h-4 w-4" />
+            إضافة عائلة
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -207,17 +250,22 @@ const Families = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {filteredFamilies.length === 0 ? (
-            <EmptyState
+          {paginatedFamilies.length === 0 ? (
+            <EnhancedEmptyState
               icon={Users}
               title="لا توجد عائلات"
               description={
                 searchQuery
-                  ? 'لا توجد نتائج مطابقة لبحثك'
-                  : 'لم يتم إضافة أي عائلات بعد'
+                  ? 'لا توجد نتائج مطابقة لبحثك. جرب تغيير معايير البحث.'
+                  : 'لم يتم إضافة أي عائلات بعد. ابدأ بإضافة عائلة جديدة الآن.'
               }
+              action={!searchQuery ? {
+                label: "إضافة عائلة جديدة",
+                onClick: handleAddFamily
+              } : undefined}
             />
           ) : (
+            <div className="space-y-4">
             <div className="rounded-md border overflow-x-auto">
               <Table>
                 <TableHeader>
@@ -232,7 +280,7 @@ const Families = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredFamilies.map((family) => (
+                  {paginatedFamilies.map((family) => (
                     <TableRow key={family.id} className="hover:bg-muted/50">
                       <TableCell className="font-medium text-xs sm:text-sm">{family.family_name}</TableCell>
                       <TableCell className="text-xs sm:text-sm">
@@ -285,6 +333,19 @@ const Families = () => {
                   ))}
                 </TableBody>
               </Table>
+              
+              {/* Pagination */}
+              <div className="mt-4 pt-4 border-t">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  totalItems={filteredFamilies.length}
+                  itemsPerPage={itemsPerPage}
+                  onPageChange={setCurrentPage}
+                  onItemsPerPageChange={handleItemsPerPageChange}
+                />
+              </div>
+            </div>
             </div>
           )}
         </CardContent>

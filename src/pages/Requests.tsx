@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { Search, Filter, Clock, CheckCircle, XCircle, AlertCircle, GitBranch, MessageSquare, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
@@ -34,6 +34,9 @@ import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layou
 import type { BeneficiaryRequest } from '@/types/index';
 import { ExportButton } from '@/components/shared/ExportButton';
 import { PrintButton } from '@/components/shared/PrintButton';
+import { Pagination } from '@/components/shared/Pagination';
+import { EnhancedEmptyState } from '@/components/shared/EnhancedEmptyState';
+import { PAGINATION } from '@/lib/constants';
 
 const Requests = () => {
   const { requests, isLoading, deleteRequest } = useRequests();
@@ -44,8 +47,16 @@ const Requests = () => {
   const [commentsDialogOpen, setCommentsDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [requestToDelete, setRequestToDelete] = useState<BeneficiaryRequest | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState<number>(20);
+  
+  const handleItemsPerPageChange = useCallback((items: number) => {
+    setItemsPerPage(items);
+    setCurrentPage(1);
+  }, []);
 
-  const filteredRequests = requests.filter(request => {
+  const filteredRequests = useMemo(() => {
+    return requests.filter(request => {
     const matchesSearch = 
       request.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
       request.request_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -55,7 +66,16 @@ const Requests = () => {
     const matchesStatus = statusFilter === 'all' || request.status === statusFilter;
 
     return matchesSearch && matchesStatus;
-  });
+    });
+  }, [requests, searchQuery, statusFilter]);
+
+  const paginatedRequests = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredRequests.slice(startIndex, endIndex);
+  }, [filteredRequests, currentPage, itemsPerPage]);
+
+  const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
 
   const stats = {
     total: requests.length,
@@ -248,17 +268,18 @@ const Requests = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {filteredRequests.length === 0 ? (
-            <EmptyState
+          {paginatedRequests.length === 0 ? (
+            <EnhancedEmptyState
               icon={AlertCircle}
               title="لا توجد طلبات"
               description={
                 searchQuery || statusFilter !== 'all'
-                  ? 'لا توجد نتائج مطابقة لبحثك'
-                  : 'لم يتم تقديم أي طلبات بعد'
+                  ? 'لا توجد نتائج مطابقة لبحثك. جرب تغيير معايير البحث أو الفلتر.'
+                  : 'لم يتم تقديم أي طلبات بعد. سيتم عرض الطلبات هنا عند تقديمها من المستفيدين.'
               }
             />
           ) : (
+            <div className="space-y-4">
             <div className="rounded-md border overflow-x-auto">
               <Table>
                 <TableHeader>
@@ -275,7 +296,7 @@ const Requests = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredRequests.map((request) => (
+                  {paginatedRequests.map((request) => (
                     <TableRow
                       key={request.id}
                       className={`cursor-pointer hover:bg-muted/50 ${
@@ -366,6 +387,19 @@ const Requests = () => {
                   ))}
                 </TableBody>
               </Table>
+              
+              {/* Pagination */}
+              <div className="mt-4 pt-4 border-t">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  totalItems={filteredRequests.length}
+                  itemsPerPage={itemsPerPage}
+                  onPageChange={setCurrentPage}
+                  onItemsPerPageChange={handleItemsPerPageChange}
+                />
+              </div>
+            </div>
             </div>
           )}
         </CardContent>

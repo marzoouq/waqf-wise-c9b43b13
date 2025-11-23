@@ -14,6 +14,7 @@ import { ProfilePaymentsHistory } from '@/components/beneficiary/ProfilePayments
 import { ProfileRequestsHistory } from '@/components/beneficiary/ProfileRequestsHistory';
 import { ProfileFamilyTree } from '@/components/beneficiary/ProfileFamilyTree';
 import { ProfileDocumentsGallery } from '@/components/beneficiary/ProfileDocumentsGallery';
+import { BeneficiaryIntegrationPanel } from '@/components/beneficiaries/BeneficiaryIntegrationPanel';
 import BeneficiaryDialog from '@/components/beneficiaries/BeneficiaryDialog';
 
 export default function BeneficiaryProfile() {
@@ -101,6 +102,7 @@ export default function BeneficiaryProfile() {
         <div className="space-y-6 mb-6">
           <ProfileHeader beneficiary={beneficiary} />
           <ProfileStats beneficiaryId={beneficiary.id} />
+          <BeneficiaryIntegrationPanel beneficiaryId={beneficiary.id} />
         </div>
 
         {/* Tabs */}

@@ -7,11 +7,15 @@ import { PropertiesHeader } from "@/components/properties/PropertiesHeader";
 import { PropertiesTabs } from "@/components/properties/PropertiesTabs";
 import { useProperties, type Property } from "@/hooks/useProperties";
 import { usePropertiesDialogs } from "@/hooks/usePropertiesDialogs";
+import { usePropertiesStats } from "@/hooks/usePropertiesStats";
 import { logger } from "@/lib/logger";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Building2, TrendingUp, Wrench, AlertCircle } from "lucide-react";
 
 const Properties = () => {
   const { addProperty, updateProperty, properties } = useProperties();
+  const { data: stats, isLoading: statsLoading } = usePropertiesStats();
   const [activeTab, setActiveTab] = useState("properties");
   
   const {
@@ -71,6 +75,77 @@ const Properties = () => {
           properties={properties}
           onAddClick={handleAddClick}
         />
+
+        {/* Statistics Cards */}
+        {!statsLoading && stats && (
+          <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
+            <Card>
+              <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6">
+                <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground flex items-center gap-2">
+                  <Building2 className="h-4 w-4" />
+                  إجمالي العقارات
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-3 sm:p-6 pt-0">
+                <div className="text-xl sm:text-2xl font-bold">{stats.totalProperties}</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {stats.occupiedProperties} مؤجر، {stats.vacantProperties} شاغر
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6">
+                <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4" />
+                  الإيرادات الشهرية
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-3 sm:p-6 pt-0">
+                <div className="text-xl sm:text-2xl font-bold text-success">
+                  {stats.totalMonthlyRevenue.toLocaleString('ar-SA')} ريال
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {stats.totalAnnualRevenue.toLocaleString('ar-SA')} ريال سنوياً
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6">
+                <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground flex items-center gap-2">
+                  <Wrench className="h-4 w-4" />
+                  طلبات الصيانة
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-3 sm:p-6 pt-0">
+                <div className="text-xl sm:text-2xl font-bold text-warning">
+                  {stats.maintenanceRequests}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  قيد التنفيذ أو المعلقة
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className={stats.expiringContracts > 0 ? "border-destructive" : ""}>
+              <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6">
+                <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4" />
+                  عقود منتهية قريباً
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-3 sm:p-6 pt-0">
+                <div className={`text-xl sm:text-2xl font-bold ${stats.expiringContracts > 0 ? 'text-destructive' : ''}`}>
+                  {stats.expiringContracts}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  خلال 30 يوم القادمة
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         <PropertiesTabs
           activeTab={activeTab}
