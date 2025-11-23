@@ -13,7 +13,7 @@ export const ExpiringContractsCard = () => {
   const today = new Date();
 
   // تصفية العقود القريبة من الانتهاء (خلال 90 يوم)
-  const expiringContracts = contracts
+  const expiringContracts = (contracts || [])
     .filter((contract) => {
       const endDate = new Date(contract.end_date);
       const daysRemaining = differenceInDays(endDate, today);
