@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, Users, DollarSign, Coins, Wallet } from "lucide-react";
+import { FileText, Users, DollarSign, Coins, Wallet, AlertTriangle } from "lucide-react";
 import { ApprovalsOverview } from "@/components/approvals/ApprovalsOverview";
 import { JournalApprovalsTab } from "@/components/approvals/JournalApprovalsTab";
 import { DistributionApprovalsTab } from "@/components/approvals/DistributionApprovalsTab";
 import { RequestApprovalsTab } from "@/components/approvals/RequestApprovalsTab";
 import { LoanApprovalsTab } from "@/components/approvals/LoanApprovalsTab";
 import { PaymentApprovalsTab } from "@/components/approvals/PaymentApprovalsTab";
+import { EmergencyAidApprovalsTab } from "@/components/approvals/EmergencyAidApprovalsTab";
 
 const Approvals = () => {
   const [activeTab, setActiveTab] = useState("journal");
@@ -28,7 +29,7 @@ const Approvals = () => {
 
         {/* Tabs for different approval types */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="journal" className="flex items-center gap-1">
               <FileText className="h-4 w-4" />
               <span className="hidden lg:inline">القيود</span>
@@ -44,6 +45,10 @@ const Approvals = () => {
             <TabsTrigger value="loans" className="flex items-center gap-1">
               <Coins className="h-4 w-4" />
               <span className="hidden lg:inline">القروض</span>
+            </TabsTrigger>
+            <TabsTrigger value="emergency" className="flex items-center gap-1">
+              <AlertTriangle className="h-4 w-4" />
+              <span className="hidden lg:inline">الفزعات</span>
             </TabsTrigger>
             <TabsTrigger value="requests" className="flex items-center gap-1">
               <Users className="h-4 w-4" />
@@ -65,6 +70,10 @@ const Approvals = () => {
 
           <TabsContent value="loans" className="mt-6">
             <LoanApprovalsTab />
+          </TabsContent>
+
+          <TabsContent value="emergency" className="mt-6">
+            <EmergencyAidApprovalsTab />
           </TabsContent>
 
           <TabsContent value="requests" className="mt-6">

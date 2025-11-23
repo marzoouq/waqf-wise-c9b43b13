@@ -8,16 +8,16 @@ import type jsPDF from "jspdf";
 export async function archiveDocument(params: {
   fileBlob: Blob;
   fileName: string;
-  fileType: 'invoice' | 'receipt';
+  fileType: 'invoice' | 'receipt' | 'payment' | 'distribution' | 'contract';
   referenceId: string;
-  referenceType: 'rental_payment' | 'invoice' | 'payment';
+  referenceType: 'rental_payment' | 'invoice' | 'payment' | 'distribution' | 'contract' | 'emergency_aid';
   description?: string;
 }): Promise<{ success: boolean; documentId?: string; error?: string }> {
   try {
     const { fileBlob, fileName, fileType, referenceId, referenceType, description } = params;
 
-    // 1. رفع الملف إلى Supabase Storage
-    const storagePath = `${fileType}s/${new Date().getFullYear()}/${new Date().getMonth() + 1}/${fileName}`;
+    // 1. رفع الملف إلى Supabase Storage مع مسار منظم
+    const storagePath = `${getDocumentPath(fileType)}/${fileName}`;
     
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('documents')

@@ -68,6 +68,7 @@ const AdvancedSettings = lazy(() => import("./pages/AdvancedSettings"));
 const SystemMaintenance = lazy(() => import("./pages/SystemMaintenance"));
 const AllTransactions = lazy(() => import("./pages/AllTransactions"));
 const BeneficiaryPortal = lazy(() => import("./pages/BeneficiaryPortal"));
+const BankTransfers = lazy(() => import("./pages/BankTransfers"));
 const GovernanceDecisions = lazy(() => import("./pages/GovernanceDecisions"));
 const DecisionDetails = lazy(() => import("./pages/DecisionDetails"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -381,6 +382,22 @@ const App = () => {
                   element={
                     <ProtectedRoute requiredRole="admin">
                       <SystemTesting />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/beneficiary-portal" 
+                  element={
+                    <ProtectedRoute requiredRole="beneficiary">
+                      <BeneficiaryPortal />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/bank-transfers" 
+                  element={
+                    <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+                      <BankTransfers />
                     </ProtectedRoute>
                   } 
                 />
