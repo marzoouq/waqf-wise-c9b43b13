@@ -54,7 +54,7 @@ import {
 import { useUserRole } from "@/hooks/useUserRole";
 import { useMemo } from "react";
 
-// القائمة المنظمة الجديدة - 6 مجموعات رئيسية
+// القائمة المنظمة الجديدة - 8 مجموعات رئيسية
 const menuGroups = [
   {
     id: "dashboard",
@@ -72,51 +72,59 @@ const menuGroups = [
     subItems: [
       { icon: Users, label: "المستفيدون", path: "/beneficiaries", roles: ["admin", "accountant", "nazer"] },
       { icon: UsersRound, label: "العائلات", path: "/families", roles: ["admin", "accountant", "nazer"] },
-      { icon: Sparkles, label: "بوابة المستفيد", path: "/beneficiary-portal", roles: ["beneficiary"] },
       { icon: ClipboardList, label: "الطلبات", path: "/requests", roles: ["admin", "accountant", "nazer"] },
       { icon: CheckSquare, label: "إدارة الطلبات", path: "/staff/requests", roles: ["admin", "accountant", "nazer"] },
       { icon: Building2, label: "أقلام الوقف", path: "/waqf-units", roles: ["admin", "accountant", "nazer"] },
       { icon: Wallet, label: "الأموال والتوزيعات", path: "/funds", roles: ["admin", "accountant", "nazer"] },
+      { icon: Building2, label: "العقارات", path: "/properties", roles: ["admin", "accountant", "nazer"] },
     ]
   },
   {
-    id: "properties",
-    label: "العقارات",
-    icon: Building2,
-    path: "/properties",
-    roles: ["admin", "accountant", "nazer"],
-    subItems: []
-  },
-  {
     id: "finance",
-    label: "المالية والمحاسبة",
+    label: "المالية",
     icon: Calculator,
     roles: ["admin", "accountant", "nazer", "cashier"],
     subItems: [
       { icon: Calculator, label: "المحاسبة", path: "/accounting", roles: ["admin", "accountant", "nazer"] },
       { icon: TrendingUp, label: "الميزانيات", path: "/budgets", roles: ["admin", "accountant", "nazer"] },
-      { icon: Receipt, label: "الفواتير", path: "/invoices", roles: ["admin", "accountant", "nazer"] },
       { icon: FileText, label: "سندات الدفع", path: "/payment-vouchers", roles: ["admin", "accountant", "cashier", "nazer"] },
       { icon: CreditCard, label: "المدفوعات", path: "/payments", roles: ["admin", "accountant", "cashier", "nazer"] },
-      { icon: DollarSign, label: "جميع المعاملات", path: "/all-transactions", roles: ["admin", "accountant", "nazer"] },
       { icon: HandCoins, label: "القروض", path: "/loans", roles: ["admin", "accountant", "nazer"] },
-      { icon: CheckSquare, label: "الموافقات", path: "/approvals", roles: ["admin", "accountant", "nazer"] },
       { icon: Building2, label: "التحويلات البنكية", path: "/bank-transfers", roles: ["admin", "accountant", "nazer"] },
     ]
   },
   {
-    id: "management",
-    label: "الإدارة والتقارير",
-    icon: FolderOpen,
+    id: "operations",
+    label: "العمليات المحاسبية",
+    icon: DollarSign,
+    roles: ["admin", "accountant", "nazer"],
+    subItems: [
+      { icon: Receipt, label: "الفواتير", path: "/invoices", roles: ["admin", "accountant", "nazer"] },
+      { icon: DollarSign, label: "جميع المعاملات", path: "/all-transactions", roles: ["admin", "accountant", "nazer"] },
+      { icon: CheckSquare, label: "الموافقات", path: "/approvals", roles: ["admin", "accountant", "nazer"] },
+    ]
+  },
+  {
+    id: "reports",
+    label: "التقارير والرؤى",
+    icon: BarChart3,
+    roles: ["admin", "accountant", "nazer"],
+    subItems: [
+      { icon: BarChart3, label: "التقارير", path: "/reports", roles: ["all"] },
+      { icon: FileText, label: "منشئ التقارير", path: "/reports", roles: ["admin", "accountant", "nazer"] },
+      { icon: Sparkles, label: "الرؤى الذكية", path: "/ai-insights", roles: ["admin", "nazer"] },
+      { icon: Bot, label: "المساعد الذكي", path: "/chatbot", roles: ["all"] },
+      { icon: Shield, label: "سجل العمليات", path: "/audit-logs", roles: ["admin", "nazer"] },
+    ]
+  },
+  {
+    id: "archive",
+    label: "الأرشيف والوثائق",
+    icon: Archive,
     roles: ["admin", "accountant", "nazer", "archivist"],
     subItems: [
       { icon: Archive, label: "الأرشيف", path: "/archive", roles: ["admin", "archivist", "nazer"] },
-      { icon: BarChart3, label: "التقارير", path: "/reports", roles: ["all"] },
-      { icon: FileText, label: "منشئ التقارير", path: "/report-builder", roles: ["admin", "accountant", "nazer"] },
-      { icon: Sparkles, label: "الرؤى الذكية", path: "/ai-insights", roles: ["admin", "nazer"] },
-      { icon: Bot, label: "المساعد الذكي", path: "/chatbot", roles: ["all"], badge: "جديد" },
-      { icon: Shield, label: "سجل العمليات", path: "/audit-logs", roles: ["admin", "nazer"] },
-      { icon: Vote, label: "الحوكمة والقرارات", path: "/governance/decisions", roles: ["admin", "nazer"], badge: "جديد" },
+      { icon: Vote, label: "الحوكمة والقرارات", path: "/governance/decisions", roles: ["admin", "nazer"] },
     ]
   },
   {
@@ -128,21 +136,20 @@ const menuGroups = [
       { icon: Mail, label: "الرسائل الداخلية", path: "/messages", roles: ["all"] },
       { icon: MessageSquare, label: "تذاكر الدعم", path: "/support", roles: ["all"] },
       { icon: Headphones, label: "إدارة التذاكر", path: "/support-management", roles: ["admin", "nazer"] },
-      { icon: Bell, label: "الإشعارات", path: "/notifications", roles: ["all"] },
-      { icon: Activity, label: "لوحة المراقبة", path: "/system-monitoring", roles: ["admin", "nazer"], badge: "متقدم" },
-      { icon: AlertTriangle, label: "سجلات الأخطاء", path: "/system-error-logs", roles: ["admin", "nazer"] },
-      { icon: Settings, label: "صيانة النظام", path: "/system-maintenance", roles: ["admin", "nazer"] },
-      { icon: BookOpen, label: "قاعدة المعرفة", path: "/support#knowledge", roles: ["all"], badge: "قريباً" },
+      { icon: BookOpen, label: "قاعدة المعرفة", path: "/support#knowledge", roles: ["all"] },
     ]
   },
   {
-    id: "settings",
-    label: "الإعدادات",
+    id: "system",
+    label: "إدارة النظام",
     icon: Settings,
-    roles: ["all"],
+    roles: ["admin"],
     subItems: [
       { icon: Shield, label: "المستخدمون", path: "/users", roles: ["admin", "nazer"] },
       { icon: Bell, label: "الإشعارات", path: "/notifications", roles: ["all"] },
+      { icon: Activity, label: "لوحة المراقبة", path: "/system-monitoring", roles: ["admin", "nazer"] },
+      { icon: AlertTriangle, label: "سجلات الأخطاء", path: "/system-error-logs", roles: ["admin", "nazer"] },
+      { icon: Settings, label: "صيانة النظام", path: "/system-maintenance", roles: ["admin", "nazer"] },
       { icon: Settings, label: "الإعدادات العامة", path: "/settings", roles: ["all"] },
     ]
   },
