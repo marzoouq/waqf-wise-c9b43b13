@@ -26,49 +26,49 @@ export function ErrorReportingGuide() {
         </Alert>
 
         <div className="grid md:grid-cols-2 gap-3">
-          <div className="flex items-start gap-3 p-3 bg-white/60 dark:bg-gray-900/60 rounded-lg">
+          <div className="flex items-start gap-3 p-3 bg-card/60 rounded-lg">
             <Activity className="h-5 w-5 text-info mt-0.5 flex-shrink-0" />
             <div>
-              <p className="font-semibold text-sm text-gray-900 dark:text-gray-100">
+              <p className="font-semibold text-sm text-foreground">
                 مراقبة الأداء المستمرة
               </p>
-              <p className="text-xs text-gray-700 dark:text-gray-300 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 يتم رصد أي بطء في النظام أو استهلاك غير طبيعي للموارد تلقائياً
               </p>
             </div>
           </div>
 
-          <div className="flex items-start gap-3 p-3 bg-white/60 dark:bg-gray-900/60 rounded-lg">
+          <div className="flex items-start gap-3 p-3 bg-card/60 rounded-lg">
             <Eye className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
             <div>
-              <p className="font-semibold text-sm text-gray-900 dark:text-gray-100">
+              <p className="font-semibold text-sm text-foreground">
                 فحص صحة النظام الدوري
               </p>
-              <p className="text-xs text-gray-700 dark:text-gray-300 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 يتم فحص جميع الخدمات كل 5 دقائق للتأكد من سلامة عملها
               </p>
             </div>
           </div>
 
-          <div className="flex items-start gap-3 p-3 bg-white/60 dark:bg-gray-900/60 rounded-lg">
+          <div className="flex items-start gap-3 p-3 bg-card/60 rounded-lg">
             <Bell className="h-5 w-5 text-warning mt-0.5 flex-shrink-0" />
             <div>
-              <p className="font-semibold text-sm text-gray-900 dark:text-gray-100">
+              <p className="font-semibold text-sm text-foreground">
                 إشعارات فورية للدعم الفني
               </p>
-              <p className="text-xs text-gray-700 dark:text-gray-300 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 عند حدوث خطأ، يتم إشعار فريق الدعم فوراً مع تفاصيل كاملة
               </p>
             </div>
           </div>
 
-          <div className="flex items-start gap-3 p-3 bg-white/60 dark:bg-gray-900/60 rounded-lg">
+          <div className="flex items-start gap-3 p-3 bg-card/60 rounded-lg">
             <TrendingUp className="h-5 w-5 text-success mt-0.5 flex-shrink-0" />
             <div>
-              <p className="font-semibold text-sm text-gray-900 dark:text-gray-100">
+              <p className="font-semibold text-sm text-foreground">
                 تحليل الأخطاء المتكررة
               </p>
-              <p className="text-xs text-gray-700 dark:text-gray-300 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 يتم رصد الأخطاء المتكررة تلقائياً ورفع أولويتها للمعالجة
               </p>
             </div>

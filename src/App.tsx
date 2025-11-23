@@ -11,6 +11,7 @@ import { LoadingState } from "./components/shared/LoadingState";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { usePWAUpdate } from "./lib/pwa";
 import { AutoFixExecutor } from "./components/system/AutoFixExecutor";
+import { PerformanceMonitor } from "./components/performance/PerformanceMonitor";
 import "@/lib/errors/tracker";
 import "@/lib/selfHealing";
 
@@ -112,6 +113,7 @@ const App = () => {
     <GlobalErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <AutoFixExecutor />
+        <PerformanceMonitor />
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <TooltipProvider>
             <Toaster />

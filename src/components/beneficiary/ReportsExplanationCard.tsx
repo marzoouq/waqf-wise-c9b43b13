@@ -15,7 +15,7 @@ export function ReportsExplanationCard() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <Alert className="bg-white/50 dark:bg-gray-900/50 border-blue-300 dark:border-blue-700">
+        <Alert className="bg-card/50 border-info">
           <Zap className="h-4 w-4 text-blue-600" />
           <AlertTitle className="text-blue-900 dark:text-blue-100">
             تقارير تلقائية 100%
@@ -26,25 +26,25 @@ export function ReportsExplanationCard() {
         </Alert>
 
         <div className="space-y-3">
-          <div className="flex items-start gap-3 p-3 bg-white/60 dark:bg-gray-900/60 rounded-lg">
-            <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
+          <div className="flex items-start gap-3 p-3 bg-card/60 rounded-lg">
+            <CheckCircle className="h-5 w-5 text-success mt-0.5" />
             <div>
-              <p className="font-semibold text-sm text-gray-900 dark:text-gray-100">
+              <p className="font-semibold text-sm text-foreground">
                 تقرير المدفوعات (PDF)
               </p>
-              <p className="text-xs text-gray-700 dark:text-gray-300 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 يتم جمع جميع مدفوعاتك تلقائياً من قاعدة البيانات وإنشاء ملف PDF منسق احترافياً بضغطة زر واحدة
               </p>
             </div>
           </div>
 
-          <div className="flex items-start gap-3 p-3 bg-white/60 dark:bg-gray-900/60 rounded-lg">
-            <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
+          <div className="flex items-start gap-3 p-3 bg-card/60 rounded-lg">
+            <CheckCircle className="h-5 w-5 text-success mt-0.5" />
             <div>
-              <p className="font-semibold text-sm text-gray-900 dark:text-gray-100">
+              <p className="font-semibold text-sm text-foreground">
                 كشف الحساب (PDF)
               </p>
-              <p className="text-xs text-gray-700 dark:text-gray-300 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 ملخص شامل لحسابك يشمل: اسمك، رقمك الوطني، إجمالي المدفوعات، وجدول تفصيلي لكل العمليات
               </p>
             </div>

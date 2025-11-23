@@ -152,8 +152,8 @@ export function DistributionSettingsDialog() {
           </div>
 
           {/* Reserve Percentage - Optional */}
-          <div className="rounded-lg border border-gray-300 bg-gray-50 p-4 space-y-2">
-            <Label className="text-gray-700 flex items-center gap-2">
+          <div className="rounded-lg border border-border bg-muted/50 p-4 space-y-2">
+            <Label className="text-foreground flex items-center gap-2">
               <Info className="h-4 w-4" />
               احتياطي إضافي (اختياري)
             </Label>
@@ -165,7 +165,7 @@ export function DistributionSettingsDialog() {
               min="0"
               max="10"
             />
-            <p className="text-xs text-gray-600">
+            <p className="text-xs text-muted-foreground">
               للطوارئ والمشاريع المستقبلية، يُحسب من الباقي
             </p>
           </div>

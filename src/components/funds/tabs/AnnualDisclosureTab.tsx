@@ -125,9 +125,9 @@ export function AnnualDisclosureTab() {
                     <p className="text-xs text-muted-foreground">ريال سعودي</p>
                   </div>
                   
-                  <div className="space-y-1 p-3 bg-amber-50 dark:bg-amber-950 rounded-lg border border-amber-200">
-                    <p className="text-sm text-amber-600">عدد المستفيدين</p>
-                    <p className="text-2xl font-bold text-amber-700">
+                  <div className="space-y-1 p-3 bg-warning-light rounded-lg border border-warning">
+                    <p className="text-sm text-warning">عدد المستفيدين</p>
+                    <p className="text-2xl font-bold text-warning-foreground">
                       {currentYearDisclosure.total_beneficiaries}
                     </p>
                     <p className="text-xs text-muted-foreground">

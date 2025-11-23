@@ -87,7 +87,7 @@ export function PropertyStatsCards() {
           title="معدل الإشغال"
           value={`${occupancyRate.toFixed(1)}%`}
           icon={TrendingUp}
-          colorClass="text-amber-600"
+          colorClass="text-warning"
         />
         <StatsCard
           title="الإيجارات الشهرية"
@@ -127,7 +127,7 @@ export function PropertyStatsCards() {
                         <Badge variant="outline" className="text-xs">
                           {property.total_units || 0} وحدة
                         </Badge>
-                        <Badge className="bg-green-500/10 text-green-700 border-green-200 text-xs">
+                        <Badge className="bg-success-light text-success border-success text-xs">
                           {property.occupied_units || 0} مشغول
                         </Badge>
                         <Badge variant="secondary" className="text-xs">
@@ -221,7 +221,7 @@ function PropertyUnitsDisplay({ propertyId }: { propertyId: string }) {
           <Card
             key={unit.id}
             className={`border-l-4 ${
-              isOccupied ? "border-l-green-500" : "border-l-gray-300"
+              isOccupied ? "border-l-success" : "border-l-border"
             }`}
           >
             <CardContent className="p-3">
@@ -249,7 +249,7 @@ function PropertyUnitsDisplay({ propertyId }: { propertyId: string }) {
                       <p className="font-medium text-foreground">
                         المستأجر: {contract.tenant_name}
                       </p>
-                      <p className="text-green-600 font-medium">
+                     <p className="text-success font-medium">
                         {formatCurrency(contract.monthly_rent)}/شهر
                       </p>
                     </div>

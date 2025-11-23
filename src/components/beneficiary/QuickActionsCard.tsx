@@ -70,8 +70,8 @@ export function QuickActionsCard({
       label: "رفع مستند",
       description: "رفع مستندات جديدة",
       onClick: onUploadDocument,
-      color: "text-amber-600",
-      bg: "bg-amber-50 hover:bg-amber-100",
+      color: "text-warning",
+      bg: "bg-warning-light hover:bg-warning-light/80",
     },
     {
       icon: MessageSquare,

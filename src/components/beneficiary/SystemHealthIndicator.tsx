@@ -86,8 +86,8 @@ export function SystemHealthIndicator() {
         return {
           icon: AlertTriangle,
           label: 'النظام يعمل مع بعض المشاكل',
-          color: 'text-amber-600',
-          bgColor: 'bg-amber-50',
+          color: 'text-warning',
+          bgColor: 'bg-warning-light',
           variant: 'secondary' as const,
         };
       case 'offline':

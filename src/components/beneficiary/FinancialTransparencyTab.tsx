@@ -70,7 +70,7 @@ export function FinancialTransparencyTab() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-amber-600" />
+                <TrendingUp className="h-5 w-5 text-warning" />
                 الإيرادات الشهرية
               </CardTitle>
               <CardDescription>
