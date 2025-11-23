@@ -5,6 +5,7 @@ import { Plus, Pencil, Trash2, Building2 } from "lucide-react";
 import { useBankAccounts } from "@/hooks/useBankAccounts";
 import { useAccounts } from "@/hooks/useAccounts";
 import { LoadingState } from "@/components/shared/LoadingState";
+import { EmptyAccountingState } from "./EmptyAccountingState";
 import { logger } from "@/lib/logger";
 import { ResponsiveDialog, DialogFooter } from "@/components/shared/ResponsiveDialog";
 import { Input } from "@/components/ui/input";
@@ -129,46 +130,53 @@ export function BankAccountsManagement() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {bankAccounts.map((account) => (
-                <TableRow key={account.id}>
-                  <TableCell className="font-medium text-xs sm:text-sm">{account.bank_name}</TableCell>
-                  <TableCell className="text-xs sm:text-sm">{account.account_number}</TableCell>
-                  <TableCell className="font-mono text-xs sm:text-sm hidden lg:table-cell">{account.iban || "-"}</TableCell>
-                  <TableCell className="text-xs sm:text-sm hidden md:table-cell">{account.currency}</TableCell>
-                  <TableCell className="font-semibold text-xs sm:text-sm">
-                    {formatCurrency(account.current_balance)}
-                  </TableCell>
-                  <TableCell className="text-xs sm:text-sm hidden md:table-cell">
-                    <Badge variant={account.is_active ? "default" : "secondary"}>
-                      {account.is_active ? "نشط" : "غير نشط"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleOpenDialog(account as BankAccountRow)}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete(account.id)}
-                      >
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {bankAccounts.length === 0 && (
+              {bankAccounts.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
-                    لا توجد حسابات بنكية. قم بإضافة حساب جديد للبدء.
+                  <TableCell colSpan={7} className="py-8">
+                    <EmptyAccountingState
+                      icon={<Building2 className="h-12 w-12" />}
+                      title="لا توجد حسابات بنكية"
+                      description="ابدأ بإضافة أول حساب بنكي لإدارة المعاملات المصرفية"
+                      actionLabel="إضافة حساب بنكي"
+                      onAction={() => handleOpenDialog()}
+                    />
                   </TableCell>
                 </TableRow>
+              ) : (
+                bankAccounts.map((account) => (
+                  <TableRow key={account.id}>
+                    <TableCell className="font-medium text-xs sm:text-sm">{account.bank_name}</TableCell>
+                    <TableCell className="text-xs sm:text-sm">{account.account_number}</TableCell>
+                    <TableCell className="font-mono text-xs sm:text-sm hidden lg:table-cell">{account.iban || "-"}</TableCell>
+                    <TableCell className="text-xs sm:text-sm hidden md:table-cell">{account.currency}</TableCell>
+                    <TableCell className="font-semibold text-xs sm:text-sm">
+                      {formatCurrency(account.current_balance)}
+                    </TableCell>
+                    <TableCell className="text-xs sm:text-sm hidden md:table-cell">
+                      <Badge variant={account.is_active ? "default" : "secondary"}>
+                        {account.is_active ? "نشط" : "غير نشط"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleOpenDialog(account as BankAccountRow)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDelete(account.id)}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
               )}
             </TableBody>
           </Table>
