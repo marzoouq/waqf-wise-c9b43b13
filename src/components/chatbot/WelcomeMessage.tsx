@@ -8,37 +8,37 @@ export function WelcomeMessage() {
       icon: <BarChart3 className="h-5 w-5" />,
       title: "تحليل البيانات",
       description: "احصل على تحليلات فورية للبيانات المالية والإحصائية",
-      color: "from-blue-500 to-cyan-500"
+      color: "from-info to-info/80"
     },
     {
       icon: <MessageSquare className="h-5 w-5" />,
       title: "إجابات ذكية",
       description: "اسأل عن المستفيدين، العقارات، والطلبات",
-      color: "from-purple-500 to-pink-500"
+      color: "from-primary to-primary/70"
     },
     {
       icon: <TrendingUp className="h-5 w-5" />,
       title: "توصيات عملية",
       description: "احصل على توصيات مدروسة بناءً على البيانات",
-      color: "from-green-500 to-emerald-500"
+      color: "from-success to-success/80"
     },
     {
       icon: <Zap className="h-5 w-5" />,
       title: "استجابة فورية",
       description: "ردود سريعة ودقيقة في ثوانٍ معدودة",
-      color: "from-yellow-500 to-orange-500"
+      color: "from-warning to-warning/80"
     },
     {
       icon: <Shield className="h-5 w-5" />,
       title: "آمن ومحمي",
       description: "بياناتك محمية بأعلى معايير الأمان",
-      color: "from-red-500 to-rose-500"
+      color: "from-destructive to-destructive/80"
     },
     {
       icon: <Clock className="h-5 w-5" />,
       title: "متاح دائماً",
       description: "خدمة على مدار الساعة لمساعدتك",
-      color: "from-indigo-500 to-blue-500"
+      color: "from-info to-primary"
     }
   ];
 

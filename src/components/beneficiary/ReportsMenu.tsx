@@ -619,7 +619,7 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
   if (type === "waqf") {
     return (
       <Card>
-        <CardHeader className="bg-gradient-to-br from-green-500/5 to-background">
+        <CardHeader className="bg-gradient-to-br from-success/5 to-background">
           <CardTitle className="flex items-center gap-2 text-lg">
             <FileSpreadsheet className="h-5 w-5 text-success" />
             تقارير الوقف
