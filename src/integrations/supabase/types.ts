@@ -7315,6 +7315,10 @@ export type Database = {
           status: string
         }[]
       }
+      update_loan_balance_after_payment: {
+        Args: { p_loan_id: string; p_payment_amount: number }
+        Returns: undefined
+      }
       update_overdue_installments: { Args: never; Returns: undefined }
       verify_2fa_code: {
         Args: { p_code: string; p_user_id: string }
