@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PushNotificationsSetup } from '@/components/settings/PushNotificationsSetup';
@@ -21,7 +22,8 @@ export default function AdvancedSettings() {
   const [lastBackup, setLastBackup] = useState('2024-11-16 03:00 AM');
 
   return (
-    <MainLayout>
+    <PageErrorBoundary pageName="الإعدادات المتقدمة">
+      <MainLayout>
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold">الإعدادات المتقدمة</h1>
@@ -324,5 +326,6 @@ export default function AdvancedSettings() {
         </Tabs>
       </div>
     </MainLayout>
+    </PageErrorBoundary>
   );
 }

@@ -12,6 +12,7 @@ import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 
 // Skeleton loaders
 const StatsSkeleton = () => (
@@ -111,7 +112,8 @@ export default function ArchivistDashboard() {
   });
 
   return (
-    <MobileOptimizedLayout>
+    <PageErrorBoundary pageName="لوحة تحكم أمين الأرشيف">
+      <MobileOptimizedLayout>
         {/* Header */}
         <header className="space-y-1 sm:space-y-2">
           <div className="flex items-center gap-2 sm:gap-3">
@@ -300,5 +302,6 @@ export default function ArchivistDashboard() {
           </CardContent>
         </Card>
     </MobileOptimizedLayout>
+    </PageErrorBoundary>
   );
 }

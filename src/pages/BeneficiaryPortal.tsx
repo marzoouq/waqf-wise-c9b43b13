@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertCircle, Clock, CheckCircle2, XCircle, FileText } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 
@@ -157,7 +158,8 @@ export default function BeneficiaryPortal() {
   }
 
   return (
-    <MobileOptimizedLayout>
+    <PageErrorBoundary pageName="بوابة المستفيد">
+      <MobileOptimizedLayout>
       <div className="space-y-6">
         {/* Header */}
         <div>
@@ -274,5 +276,6 @@ export default function BeneficiaryPortal() {
         </Card>
       </div>
     </MobileOptimizedLayout>
+    </PageErrorBoundary>
   );
 }

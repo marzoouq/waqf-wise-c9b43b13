@@ -25,6 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import * as XLSX from "xlsx";
 import { format } from "date-fns";
 import { formatCurrency } from "@/lib/utils";
@@ -96,7 +97,8 @@ export default function Budgets() {
   };
 
   return (
-    <MobileOptimizedLayout>
+    <PageErrorBoundary pageName="إدارة الميزانيات">
+      <MobileOptimizedLayout>
       <MobileOptimizedHeader
         title="إدارة الميزانيات"
         description="تخطيط ومراقبة الميزانيات ومقارنتها بالمصروفات الفعلية"
@@ -224,5 +226,6 @@ export default function Budgets() {
         onSave={handleSave}
       />
     </MobileOptimizedLayout>
+    </PageErrorBoundary>
   );
 }

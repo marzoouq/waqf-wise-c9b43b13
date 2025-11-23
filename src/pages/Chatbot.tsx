@@ -1,8 +1,10 @@
 import { ChatbotInterface } from "@/components/chatbot/ChatbotInterface";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 
 export default function Chatbot() {
   return (
-    <div className="container mx-auto py-6 px-4">
+    <PageErrorBoundary pageName="المساعد الذكي">
+      <div className="container mx-auto py-6 px-4">
       <div className="max-w-5xl mx-auto">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-foreground mb-2">
@@ -16,5 +18,6 @@ export default function Chatbot() {
         <ChatbotInterface />
       </div>
     </div>
+    </PageErrorBoundary>
   );
 }

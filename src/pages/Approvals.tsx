@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { FileText, Users, DollarSign, Coins, Wallet, AlertTriangle } from "lucide-react";
 import { ApprovalsOverview } from "@/components/approvals/ApprovalsOverview";
 import { JournalApprovalsTab } from "@/components/approvals/JournalApprovalsTab";
@@ -13,7 +14,8 @@ const Approvals = () => {
   const [activeTab, setActiveTab] = useState("journal");
 
   return (
-    <div className="min-h-screen bg-background">
+    <PageErrorBoundary pageName="الموافقات">
+      <div className="min-h-screen bg-background">
       <div className="container mx-auto p-6 md:p-8 lg:p-10 space-y-6 md:space-y-8">
         <div>
           <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gradient-primary">
@@ -82,6 +84,7 @@ const Approvals = () => {
         </Tabs>
       </div>
     </div>
+    </PageErrorBoundary>
   );
 };
 

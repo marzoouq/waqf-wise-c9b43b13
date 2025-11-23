@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useBeneficiaries } from '@/hooks/useBeneficiaries';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
 import { ProfileHeader } from '@/components/beneficiary/ProfileHeader';
 import { ProfileStats } from '@/components/beneficiary/ProfileStats';
 import { ProfileTimeline } from '@/components/beneficiary/ProfileTimeline';
@@ -53,7 +54,8 @@ export default function BeneficiaryProfile() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <PageErrorBoundary pageName="ملف المستفيد">
+      <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="bg-card border-b border-border print:hidden">
         <div className="container mx-auto px-4 py-4">
@@ -143,5 +145,6 @@ export default function BeneficiaryProfile() {
         }}
       />
     </div>
+    </PageErrorBoundary>
   );
 }

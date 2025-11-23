@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar, User, FileText, ArrowRight } from "lucide-react";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import type { GovernanceDecision } from "@/types/governance";
 import { Database } from "@/integrations/supabase/types";
 
@@ -65,7 +66,8 @@ export default function DecisionDetails() {
   };
 
   return (
-    <MobileOptimizedLayout>
+    <PageErrorBoundary pageName="تفاصيل القرار">
+      <MobileOptimizedLayout>
       <MobileOptimizedHeader 
         title="تفاصيل القرار"
         actions={
@@ -142,5 +144,6 @@ export default function DecisionDetails() {
         </Tabs>
       </div>
     </MobileOptimizedLayout>
+    </PageErrorBoundary>
   );
 }

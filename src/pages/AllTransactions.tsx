@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Download, Filter, TrendingUp, TrendingDown, DollarSign, FileText, ChevronLeft, ChevronRight } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import * as XLSX from "xlsx";
@@ -127,7 +128,8 @@ export default function AllTransactions() {
   }
 
   return (
-    <MobileOptimizedLayout>
+    <PageErrorBoundary pageName="جميع المعاملات">
+      <MobileOptimizedLayout>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -375,5 +377,6 @@ export default function AllTransactions() {
         </Card>
       </div>
     </MobileOptimizedLayout>
+    </PageErrorBoundary>
   );
 }

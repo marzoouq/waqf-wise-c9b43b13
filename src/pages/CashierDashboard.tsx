@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { AddReceiptDialog } from "@/components/payments/AddReceiptDialog";
 import { AddVoucherDialog } from "@/components/payments/AddVoucherDialog";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 
 // Lazy load heavy components
 const RecentJournalEntries = lazy(() => import("@/components/dashboard/RecentJournalEntries"));
@@ -23,7 +24,8 @@ export default function CashierDashboard() {
   }
 
   return (
-    <MobileOptimizedLayout>
+    <PageErrorBoundary pageName="لوحة تحكم أمين الصندوق">
+      <MobileOptimizedLayout>
       <MobileOptimizedHeader
         title="لوحة تحكم أمين الصندوق"
         description="إدارة المدفوعات والمقبوضات اليومية"
@@ -216,5 +218,6 @@ export default function CashierDashboard() {
         onOpenChange={setIsVoucherDialogOpen} 
       />
     </MobileOptimizedLayout>
+    </PageErrorBoundary>
   );
 }
