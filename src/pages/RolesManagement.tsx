@@ -87,9 +87,9 @@ const RolesManagement = () => {
         full_name: u.full_name,
         email: u.email,
         avatar_url: u.avatar_url,
-        roles: u.roles || [],
-        roles_array: u.roles || [],
-        roles_count: (u.roles || []).length,
+        roles: Array.isArray(u.roles) ? u.roles : [],
+        roles_array: Array.isArray(u.roles) ? u.roles : [],
+        roles_count: Array.isArray(u.roles) ? u.roles.length : 0,
       })) as UserWithRoles[];
     },
   });
@@ -262,11 +262,15 @@ const RolesManagement = () => {
                         <TableCell>{user.email}</TableCell>
                         <TableCell>
                           <div className="flex flex-wrap gap-2">
-                            {user.roles_array?.map((role) => (
-                              <Badge key={role} className={ROLE_COLORS[role]}>
-                                {ROLE_LABELS[role]}
-                              </Badge>
-                            ))}
+                            {user.roles_array && user.roles_array.length > 0 ? (
+                              user.roles_array.map((role) => (
+                                <Badge key={role} className={ROLE_COLORS[role]}>
+                                  {ROLE_LABELS[role]}
+                                </Badge>
+                              ))
+                            ) : (
+                              <span className="text-sm text-muted-foreground">لا توجد أدوار</span>
+                            )}
                           </div>
                         </TableCell>
                         <TableCell>
@@ -309,28 +313,32 @@ const RolesManagement = () => {
               <div>
                 <Label>الأدوار الحالية</Label>
                 <div className="mt-2 flex flex-wrap gap-2">
-                  {selectedUser?.roles_array?.map((role) => (
-                    <Badge
-                      key={role}
-                      className={ROLE_COLORS[role]}
-                      variant="outline"
-                    >
-                      {ROLE_LABELS[role]}
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-4 w-4 p-0 mr-2 hover:bg-transparent"
-                        onClick={() =>
-                          removeRoleMutation.mutate({
-                            userId: selectedUser.id,
-                            role,
-                          })
-                        }
+                  {selectedUser?.roles_array && selectedUser.roles_array.length > 0 ? (
+                    selectedUser.roles_array.map((role) => (
+                      <Badge
+                        key={role}
+                        className={ROLE_COLORS[role]}
+                        variant="outline"
                       >
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
-                    </Badge>
-                  ))}
+                        {ROLE_LABELS[role]}
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-4 w-4 p-0 mr-2 hover:bg-transparent"
+                          onClick={() =>
+                            removeRoleMutation.mutate({
+                              userId: selectedUser.id,
+                              role,
+                            })
+                          }
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </Badge>
+                    ))
+                  ) : (
+                    <span className="text-sm text-muted-foreground">لا توجد أدوار حالية</span>
+                  )}
                 </div>
               </div>
               <div>
