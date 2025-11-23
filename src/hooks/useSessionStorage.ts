@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { productionLogger } from '@/lib/logger/production-logger';
 
 /**
  * Hook لتخزين البيانات في SessionStorage
@@ -21,7 +22,7 @@ export function useSessionStorage<T>(
       const item = window.sessionStorage.getItem(key);
       return item ? (JSON.parse(item) as T) : initialValue;
     } catch (error) {
-      console.warn(`Error reading sessionStorage key "${key}":`, error);
+      productionLogger.warn(`Error reading sessionStorage key "${key}"`, error);
       return initialValue;
     }
   }, [initialValue, key]);
@@ -32,7 +33,7 @@ export function useSessionStorage<T>(
   const setValue = useCallback(
     (value: T | ((val: T) => T)) => {
       if (typeof window === 'undefined') {
-        console.warn(
+        productionLogger.warn(
           `Tried setting sessionStorage key "${key}" even though environment is not a client`
         );
         return;
@@ -43,7 +44,7 @@ export function useSessionStorage<T>(
         window.sessionStorage.setItem(key, JSON.stringify(newValue));
         setStoredValue(newValue);
       } catch (error) {
-        console.warn(`Error setting sessionStorage key "${key}":`, error);
+        productionLogger.warn(`Error setting sessionStorage key "${key}"`, error);
       }
     },
     [key, storedValue]
@@ -52,7 +53,7 @@ export function useSessionStorage<T>(
   // حذف القيمة من SessionStorage
   const removeValue = useCallback(() => {
     if (typeof window === 'undefined') {
-      console.warn(
+      productionLogger.warn(
         `Tried removing sessionStorage key "${key}" even though environment is not a client`
       );
       return;
@@ -62,7 +63,7 @@ export function useSessionStorage<T>(
       window.sessionStorage.removeItem(key);
       setStoredValue(initialValue);
     } catch (error) {
-      console.warn(`Error removing sessionStorage key "${key}":`, error);
+      productionLogger.warn(`Error removing sessionStorage key "${key}"`, error);
     }
   }, [initialValue, key]);
 

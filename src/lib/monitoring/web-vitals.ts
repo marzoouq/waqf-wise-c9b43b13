@@ -18,19 +18,16 @@ const IS_PROD = import.meta.env.PROD;
  */
 export function initWebVitals(): void {
   if (!IS_PROD) {
-    console.info('ℹ️ Web Vitals monitoring (development mode)');
+    return;
   }
 
-  // TODO: Uncomment when user adds web-vitals package
-  /*
-  import('web-vitals').then(({ onCLS, onFID, onLCP, onFCP, onTTFB }) => {
+  import('web-vitals').then(({ onCLS, onINP, onLCP, onFCP, onTTFB }) => {
     onCLS(sendToAnalytics);
-    onFID(sendToAnalytics);
+    onINP(sendToAnalytics);
     onLCP(sendToAnalytics);
     onFCP(sendToAnalytics);
     onTTFB(sendToAnalytics);
   });
-  */
 }
 
 /**
@@ -50,11 +47,6 @@ function sendToAnalytics(metric: Metric): void {
         keepalive: true,
       });
     }
-  } else {
-    console.info(`📊 ${metric.name}:`, {
-      value: `${metric.value.toFixed(2)}ms`,
-      rating: metric.rating,
-    });
   }
 }
 
@@ -70,8 +62,6 @@ export function trackPerformance(metricName: string, value: number): void {
       delta: value,
       id: crypto.randomUUID(),
     });
-  } else {
-    console.info(`📊 ${metricName}: ${value.toFixed(2)}ms`);
   }
 }
 

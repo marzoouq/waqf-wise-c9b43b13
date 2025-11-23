@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { productionLogger } from "@/lib/logger/production-logger";
 
 /**
  * مكون خفي لتشغيل الإصلاح التلقائي دورياً
@@ -13,19 +14,22 @@ export function AutoFixExecutor() {
     // تشغيل الإصلاح التلقائي كل 5 دقائق
     const executeAutoFix = async () => {
       try {
-        console.log('🔧 Executing auto-fix...');
+        productionLogger.info('Executing auto-fix...');
         
         const { data, error } = await supabase.functions.invoke('execute-auto-fix', {
           body: {},
         });
 
         if (error) {
-          console.error('Auto-fix error:', error);
+          productionLogger.error('Auto-fix error', error, {
+            context: 'AutoFixExecutor',
+            severity: 'medium',
+          });
           return;
         }
 
         if (data.fixed > 0) {
-          console.log(`✅ Auto-fixed ${data.fixed} errors`);
+          productionLogger.success(`Auto-fixed ${data.fixed} errors`);
           toast.success(`تم إصلاح ${data.fixed} خطأ تلقائياً`);
           
           // تحديث البيانات
@@ -34,7 +38,10 @@ export function AutoFixExecutor() {
           queryClient.invalidateQueries({ queryKey: ['fix-attempts'] });
         }
       } catch (error) {
-        console.error('Failed to execute auto-fix:', error);
+        productionLogger.error('Failed to execute auto-fix', error, {
+          context: 'AutoFixExecutor',
+          severity: 'high',
+        });
       }
     };
 

@@ -10,6 +10,7 @@ import jsPDF from "jspdf";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { formatCurrency, formatNumber } from "@/lib/utils";
+import { productionLogger } from "@/lib/logger/production-logger";
 
 export function CashFlowStatement() {
   const { cashFlows, isLoading, calculateCashFlow } = useCashFlows();
@@ -49,7 +50,11 @@ export function CashFlowStatement() {
         periodEnd: fiscalYear.end_date,
       });
     } catch (error) {
-      console.error("Error calculating cash flow:", error);
+      productionLogger.error("Error calculating cash flow", error, {
+        context: 'CashFlowStatement',
+        severity: 'medium',
+      });
+      toast.error("حدث خطأ أثناء حساب التدفقات النقدية");
     } finally {
       setIsCalculating(false);
     }

@@ -1,83 +1,68 @@
 /**
- * نظام Debug موحد للتطبيق
- * Unified Debug System
+ * نظام Debug موحد للتطبيق باستخدام Production Logger
+ * Unified Debug System using Production Logger
  */
 
-const IS_DEV = import.meta.env.DEV;
+import { productionLogger } from './logger/production-logger';
 
 /**
- * Debug Utility - تسجيل فقط في Development
+ * Debug Utility - يستخدم productionLogger للتسجيل الذكي
+ * @deprecated استخدم productionLogger مباشرة للميزات الكاملة
  */
 export const debug = {
   /**
    * تسجيل معلومة عامة
    */
   log: (message: string, data?: unknown) => {
-    if (IS_DEV) {
-      console.log(message, data);
-    }
+    productionLogger.debug(message, data);
   },
 
   /**
    * تسجيل تحذير
    */
   warn: (message: string, data?: unknown) => {
-    if (IS_DEV) {
-      console.warn(`⚠️ ${message}`, data);
-    }
+    productionLogger.warn(`⚠️ ${message}`, data);
   },
 
   /**
    * تسجيل معلومة للمطورين فقط
    */
   devtools: (message: string, data?: unknown) => {
-    if (IS_DEV) {
-      console.log(`🛠️ ${message}`, data);
-    }
+    productionLogger.debug(`🛠️ ${message}`, data);
   },
 
   /**
    * تسجيل معلومات المصادقة
    */
   auth: (message: string, data?: unknown) => {
-    if (IS_DEV) {
-      console.log(`🔐 ${message}`, data);
-    }
+    productionLogger.info(`🔐 ${message}`, data);
   },
 
   /**
    * تسجيل معلومات الشبكة
    */
   network: (message: string, data?: unknown) => {
-    if (IS_DEV) {
-      console.log(`🌐 ${message}`, data);
-    }
+    productionLogger.debug(`🌐 ${message}`, data);
   },
 
   /**
    * تسجيل معلومات الأدوار
    */
   roles: (message: string, data?: unknown) => {
-    if (IS_DEV) {
-      console.log(`👤 ${message}`, data);
-    }
+    productionLogger.info(`👤 ${message}`, data);
   },
 
   /**
    * تسجيل حالة الاسترجاع
    */
   recovery: (message: string, data?: unknown) => {
-    if (IS_DEV) {
-      console.log(`🔄 ${message}`, data);
-    }
+    productionLogger.info(`🔄 ${message}`, data);
   },
 
   /**
    * تسجيل معلومات الصحة
    */
   health: (message: string, data?: unknown) => {
-    if (IS_DEV) {
-      console.log(`❤️ ${message}`, data);
-    }
+    productionLogger.info(`❤️ ${message}`, data);
   },
 };

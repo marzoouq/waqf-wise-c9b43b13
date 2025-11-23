@@ -15,6 +15,7 @@ import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { productionLogger } from "@/lib/logger/production-logger";
 
 interface InternalMessagesDialogProps {
   open: boolean;
@@ -105,7 +106,10 @@ export function InternalMessagesDialog({
           setRecipients(recipientsList);
         }
       } catch (error) {
-        console.error('Error fetching recipients:', error);
+        productionLogger.error('Error fetching recipients', error, {
+          context: 'InternalMessagesDialog',
+          severity: 'medium',
+        });
         toast({
           title: "خطأ في تحميل المستلمين",
           description: "حدث خطأ أثناء تحميل قائمة المستلمين",
