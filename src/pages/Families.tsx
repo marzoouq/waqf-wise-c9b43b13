@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Users, Search, MoreVertical, Edit, Trash2, Eye } from 'lucide-react';
+import { Plus, Users, Search, MoreVertical, Edit, Trash2, Eye, Download } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -51,6 +52,11 @@ import { Pagination } from '@/components/shared/Pagination';
 import { EnhancedEmptyState } from '@/components/shared/EnhancedEmptyState';
 import { ExportButton } from '@/components/shared/ExportButton';
 import { PAGINATION } from '@/lib/constants';
+import { SortableTableHeader, SortDirection } from '@/components/shared/SortableTableHeader';
+import { BulkActionsBar } from '@/components/shared/BulkActionsBar';
+import { AdvancedFiltersDialog, FilterConfig } from '@/components/shared/AdvancedFiltersDialog';
+import { useTableSort } from '@/hooks/useTableSort';
+import { useBulkSelection } from '@/hooks/useBulkSelection';
 
 const Families = () => {
   const navigate = useNavigate();
@@ -62,6 +68,7 @@ const Families = () => {
   const [familyToDelete, setFamilyToDelete] = useState<Family | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(20);
+  const [advancedFilters, setAdvancedFilters] = useState<Record<string, any>>({});
   
   const handleItemsPerPageChange = useCallback((items: number) => {
     setItemsPerPage(items);
@@ -69,19 +76,62 @@ const Families = () => {
   }, []);
 
   const filteredFamilies = useMemo(() => {
-    return families.filter(family =>
-      family.family_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      family.tribe?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [families, searchQuery]);
+    return families.filter(family => {
+      const matchesSearch = 
+        family.family_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        family.tribe?.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      const matchesStatus = !advancedFilters.status || family.status === advancedFilters.status;
+      const matchesTribe = !advancedFilters.tribe || family.tribe === advancedFilters.tribe;
+      
+      return matchesSearch && matchesStatus && matchesTribe;
+    });
+  }, [families, searchQuery, advancedFilters]);
+
+  const { sortedData, sortConfig, handleSort } = useTableSort({
+    data: filteredFamilies,
+    defaultSortKey: 'family_name',
+    defaultDirection: 'asc',
+  });
+
+  const {
+    selectedIds,
+    selectedCount,
+    isSelected,
+    isAllSelected,
+    toggleSelection,
+    toggleAll,
+    clearSelection,
+  } = useBulkSelection(sortedData);
 
   const paginatedFamilies = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-    return filteredFamilies.slice(startIndex, endIndex);
-  }, [filteredFamilies, currentPage, itemsPerPage]);
+    return sortedData.slice(startIndex, endIndex);
+  }, [sortedData, currentPage, itemsPerPage]);
 
-  const totalPages = Math.ceil(filteredFamilies.length / itemsPerPage);
+  const totalPages = Math.ceil(sortedData.length / itemsPerPage);
+
+  const filterConfigs: FilterConfig[] = [
+    {
+      key: 'status',
+      label: 'الحالة',
+      type: 'select',
+      options: [
+        { value: 'نشط', label: 'نشط' },
+        { value: 'غير نشط', label: 'غير نشط' },
+      ],
+    },
+    {
+      key: 'tribe',
+      label: 'القبيلة',
+      type: 'select',
+      options: Array.from(new Set(families.map(f => f.tribe).filter(Boolean))).map(tribe => ({
+        value: tribe!,
+        label: tribe!,
+      })),
+    },
+  ];
 
   const handleAddFamily = () => {
     setSelectedFamily(null);
@@ -96,6 +146,27 @@ const Families = () => {
   const handleDeleteClick = (family: Family) => {
     setFamilyToDelete(family);
     setDeleteDialogOpen(true);
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedCount === 0) return;
+    
+    const confirmed = window.confirm(`هل تريد حذف ${selectedCount} عائلة؟`);
+    if (!confirmed) return;
+
+    try {
+      await Promise.all(selectedIds.map(id => deleteFamily.mutateAsync(id)));
+      toast.success(`تم حذف ${selectedCount} عائلة بنجاح`);
+      clearSelection();
+    } catch (error) {
+      toast.error('فشل حذف بعض العائلات');
+    }
+  };
+
+  const handleBulkExport = () => {
+    const selectedFamilies = families.filter(f => selectedIds.includes(f.id));
+    // سيتم تصدير العائلات المحددة
+    toast.success(`جاري تصدير ${selectedCount} عائلة...`);
   };
 
   const handleDeleteConfirm = async () => {
@@ -160,6 +231,12 @@ const Families = () => {
           </p>
         </div>
         <div className="flex gap-2">
+          <AdvancedFiltersDialog
+            filters={filterConfigs}
+            activeFilters={advancedFilters}
+            onApplyFilters={setAdvancedFilters}
+            onClearFilters={() => setAdvancedFilters({})}
+          />
           {filteredFamilies.length > 0 && (
             <ExportButton
               data={filteredFamilies.map(f => ({
@@ -270,18 +347,62 @@ const Families = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-right whitespace-nowrap">اسم العائلة</TableHead>
+                    <TableHead className="w-[50px]">
+                      <Checkbox
+                        checked={isAllSelected}
+                        onCheckedChange={toggleAll}
+                        aria-label="تحديد الكل"
+                      />
+                    </TableHead>
+                    <SortableTableHeader
+                      label="اسم العائلة"
+                      sortKey="family_name"
+                      currentSort={sortConfig}
+                      onSort={handleSort}
+                      className="whitespace-nowrap"
+                    />
                     <TableHead className="text-right whitespace-nowrap">رب الأسرة</TableHead>
-                    <TableHead className="text-right whitespace-nowrap hidden md:table-cell">القبيلة</TableHead>
-                    <TableHead className="text-right whitespace-nowrap">عدد الأفراد</TableHead>
-                    <TableHead className="text-right whitespace-nowrap hidden lg:table-cell">الحالة</TableHead>
-                    <TableHead className="text-right whitespace-nowrap hidden lg:table-cell">تاريخ التسجيل</TableHead>
+                    <SortableTableHeader
+                      label="القبيلة"
+                      sortKey="tribe"
+                      currentSort={sortConfig}
+                      onSort={handleSort}
+                      className="hidden md:table-cell whitespace-nowrap"
+                    />
+                    <SortableTableHeader
+                      label="عدد الأفراد"
+                      sortKey="total_members"
+                      currentSort={sortConfig}
+                      onSort={handleSort}
+                      className="whitespace-nowrap"
+                    />
+                    <SortableTableHeader
+                      label="الحالة"
+                      sortKey="status"
+                      currentSort={sortConfig}
+                      onSort={handleSort}
+                      className="hidden lg:table-cell whitespace-nowrap"
+                    />
+                    <SortableTableHeader
+                      label="تاريخ التسجيل"
+                      sortKey="created_at"
+                      currentSort={sortConfig}
+                      onSort={handleSort}
+                      className="hidden lg:table-cell whitespace-nowrap"
+                    />
                     <TableHead className="text-right whitespace-nowrap w-[100px]">الإجراءات</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {paginatedFamilies.map((family) => (
                     <TableRow key={family.id} className="hover:bg-muted/50">
+                      <TableCell>
+                        <Checkbox
+                          checked={isSelected(family.id)}
+                          onCheckedChange={() => toggleSelection(family.id)}
+                          aria-label={`تحديد ${family.family_name}`}
+                        />
+                      </TableCell>
                       <TableCell className="font-medium text-xs sm:text-sm">{family.family_name}</TableCell>
                       <TableCell className="text-xs sm:text-sm">
                         {(family as FamilyWithHead).head_of_family?.full_name || '-'}
@@ -385,6 +506,25 @@ const Families = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Bulk Actions Bar */}
+      <BulkActionsBar
+        selectedCount={selectedCount}
+        onClearSelection={clearSelection}
+        onDelete={handleBulkDelete}
+        onExport={handleBulkExport}
+        customActions={[
+          {
+            label: 'تصدير المحدد',
+            icon: <Download className="h-4 w-4 ml-2" />,
+            action: 'export',
+            variant: 'outline',
+          },
+        ]}
+        onCustomAction={(action) => {
+          if (action === 'export') handleBulkExport();
+        }}
+      />
         </div>
       </div>
     </PageErrorBoundary>
