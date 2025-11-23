@@ -12,7 +12,7 @@ const errorReportSchema = z.object({
   error_message: z.string().min(1).max(2000),
   error_stack: z.string().max(10000).optional(),
   severity: z.enum(['low', 'medium', 'high', 'critical']),
-  url: z.string().max(500),
+  url: z.string().max(2000), // زيادة الحد للسماح بـ URLs الطويلة مع tokens
   user_agent: z.string().max(500),
   user_id: z.string().uuid().optional(),
   additional_data: z.record(z.unknown()).optional()
@@ -94,6 +94,19 @@ Deno.serve(async (req) => {
 
     if (errorReport.error_stack) {
       errorReport.error_stack = errorReport.error_stack.substring(0, 10000);
+    }
+
+    // 🧹 5. تنظيف URL من query parameters الطويلة (مثل tokens)
+    try {
+      const urlObj = new URL(errorReport.url);
+      // إزالة __lovable_token و tokens أخرى طويلة
+      urlObj.searchParams.delete('__lovable_token');
+      urlObj.searchParams.delete('token');
+      urlObj.searchParams.delete('access_token');
+      errorReport.url = urlObj.toString().substring(0, 1000);
+    } catch {
+      // إذا فشل parsing، نقتطع فقط
+      errorReport.url = errorReport.url.substring(0, 1000);
     }
 
     // إنشاء عميل Supabase (تم بالفعل في الأعلى)
