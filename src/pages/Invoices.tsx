@@ -5,6 +5,7 @@ import { AddInvoiceDialog } from "@/components/invoices/AddInvoiceDialog";
 import { ViewInvoiceDialog } from "@/components/invoices/ViewInvoiceDialog";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { ExportButton } from "@/components/shared/ExportButton";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -160,7 +161,8 @@ const Invoices = () => {
   }
 
   return (
-    <MobileOptimizedLayout>
+    <PageErrorBoundary pageName="الفواتير">
+      <MobileOptimizedLayout>
       <MobileOptimizedHeader
         title="الفواتير"
         description="إدارة الفواتير والمقبوضات"
@@ -414,8 +416,9 @@ const Invoices = () => {
         title="حذف الفاتورة"
         description="هل أنت متأكد من حذف هذه الفاتورة؟ سيتم حذف القيد المحاسبي المرتبط بها."
         itemName="الفاتورة"
-      />
-    </MobileOptimizedLayout>
+        />
+      </MobileOptimizedLayout>
+    </PageErrorBoundary>
   );
 };
 

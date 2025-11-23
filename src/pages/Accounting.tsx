@@ -4,26 +4,29 @@ import { BankReconciliationDialog } from "@/components/accounting/BankReconcilia
 import { AccountingHeader } from "@/components/accounting/AccountingHeader";
 import { AccountingTabs } from "@/components/accounting/AccountingTabs";
 import { useAccountingTabs } from "@/hooks/useAccountingTabs";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 
 const Accounting = () => {
   const [bankDialogOpen, setBankDialogOpen] = useState(false);
   const { activeTab, isLoadingTab, handleTabChange } = useAccountingTabs();
 
   return (
-    <MobileOptimizedLayout>
-      <AccountingHeader onBankReconciliation={() => setBankDialogOpen(true)} />
+    <PageErrorBoundary pageName="المحاسبة">
+      <MobileOptimizedLayout>
+        <AccountingHeader onBankReconciliation={() => setBankDialogOpen(true)} />
 
-      <AccountingTabs 
-        activeTab={activeTab}
-        onTabChange={handleTabChange}
-        isLoading={isLoadingTab}
-      />
+        <AccountingTabs 
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          isLoading={isLoadingTab}
+        />
 
-      <BankReconciliationDialog
-        open={bankDialogOpen}
-        onOpenChange={setBankDialogOpen}
-      />
-    </MobileOptimizedLayout>
+        <BankReconciliationDialog
+          open={bankDialogOpen}
+          onOpenChange={setBankDialogOpen}
+        />
+      </MobileOptimizedLayout>
+    </PageErrorBoundary>
   );
 };
 

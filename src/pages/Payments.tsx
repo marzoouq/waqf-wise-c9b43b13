@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import {
   Table,
   TableBody,
@@ -179,7 +180,8 @@ const Payments = () => {
   };
 
   return (
-    <MobileOptimizedLayout>
+    <PageErrorBoundary pageName="المدفوعات">
+      <MobileOptimizedLayout>
       <MobileOptimizedHeader
         title="المدفوعات والمقبوضات"
         description="إدارة سندات القبض والصرف"
@@ -355,7 +357,8 @@ const Payments = () => {
             payment={printPayment as any}
           />
         )}
-    </MobileOptimizedLayout>
+      </MobileOptimizedLayout>
+    </PageErrorBoundary>
   );
 };
 

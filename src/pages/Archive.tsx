@@ -3,6 +3,7 @@ import { Database } from "@/integrations/supabase/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Search, FolderOpen, FileText, Download, Upload, Eye, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { UploadDocumentDialog } from "@/components/archive/UploadDocumentDialog";
 import { CreateFolderDialog } from "@/components/archive/CreateFolderDialog";
 import { DocumentPreviewDialog } from "@/components/archive/DocumentPreviewDialog";
@@ -89,7 +90,8 @@ const Archive = () => {
   }
 
   return (
-    <MobileOptimizedLayout>
+    <PageErrorBoundary pageName="الأرشيف">
+      <MobileOptimizedLayout>
       <MobileOptimizedHeader
         title="الأرشيف الإلكتروني"
         description="إدارة وأرشفة المستندات والملفات"
@@ -306,7 +308,8 @@ const Archive = () => {
         itemName={documentToDelete?.name || ""}
       />
       </div>
-    </MobileOptimizedLayout>
+      </MobileOptimizedLayout>
+    </PageErrorBoundary>
   );
 };
 

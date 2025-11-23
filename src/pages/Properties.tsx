@@ -8,6 +8,7 @@ import { PropertiesTabs } from "@/components/properties/PropertiesTabs";
 import { useProperties, type Property } from "@/hooks/useProperties";
 import { usePropertiesDialogs } from "@/hooks/usePropertiesDialogs";
 import { logger } from "@/lib/logger";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 
 const Properties = () => {
   const { addProperty, updateProperty, properties } = useProperties();
@@ -62,8 +63,9 @@ const Properties = () => {
   }, [openPropertyDialog, openContractDialog, openPaymentDialog, openMaintenanceDialog]);
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-6 md:p-8 lg:p-10 space-y-6 md:space-y-8">
+    <PageErrorBoundary pageName="العقارات">
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto p-6 md:p-8 lg:p-10 space-y-6 md:space-y-8">
         <PropertiesHeader
           activeTab={activeTab}
           properties={properties}
@@ -103,8 +105,9 @@ const Properties = () => {
           onOpenChange={setMaintenanceDialogOpen}
           request={selectedMaintenance}
         />
+        </div>
       </div>
-    </div>
+    </PageErrorBoundary>
   );
 };
 

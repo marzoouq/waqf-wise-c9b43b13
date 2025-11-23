@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -306,7 +307,8 @@ const Users = () => {
   }
 
   return (
-    <MobileOptimizedLayout>
+    <PageErrorBoundary pageName="إدارة المستخدمين">
+      <MobileOptimizedLayout>
       <MobileOptimizedHeader
         title="إدارة المستخدمين"
         description="إدارة المستخدمين والأدوار والصلاحيات"
@@ -583,7 +585,8 @@ const Users = () => {
           itemName={userToDelete ? `${userToDelete.full_name} (${userToDelete.email})` : ""}
           isLoading={deleteUserMutation.isPending}
         />
-    </MobileOptimizedLayout>
+      </MobileOptimizedLayout>
+    </PageErrorBoundary>
   );
 };
 

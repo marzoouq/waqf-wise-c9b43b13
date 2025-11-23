@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Search, Filter, Clock, CheckCircle, XCircle, AlertCircle, GitBranch, MessageSquare, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -106,7 +107,8 @@ const Requests = () => {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6 p-3 sm:p-4 md:p-6" dir="rtl">
+    <PageErrorBoundary pageName="الطلبات">
+      <div className="space-y-4 sm:space-y-6 p-3 sm:p-4 md:p-6" dir="rtl">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -398,8 +400,9 @@ const Requests = () => {
         description="هل أنت متأكد من حذف هذا الطلب؟"
         itemName={requestToDelete ? `${requestToDelete.request_number} - ${requestToDelete.description}` : ""}
         isLoading={deleteRequest.isPending}
-      />
-    </div>
+        />
+      </div>
+    </PageErrorBoundary>
   );
 };
 

@@ -12,6 +12,7 @@ import { DistributionDialog } from "@/components/funds/DistributionDialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 
 // Lazy load heavy components
 const AdminKPIs = lazy(() => import("@/components/dashboard/admin/AdminKPIs").then(m => ({ default: m.AdminKPIs })));
@@ -88,7 +89,8 @@ const Dashboard = () => {
   }
 
   return (
-    <MobileOptimizedLayout>
+    <PageErrorBoundary pageName="لوحة التحكم">
+      <MobileOptimizedLayout>
       <div className="flex items-center justify-between mb-4">
         <MobileOptimizedHeader
           title="لوحة تحكم المشرف"
@@ -251,7 +253,8 @@ const Dashboard = () => {
         open={messageDialogOpen}
         onOpenChange={setMessageDialogOpen}
       />
-    </MobileOptimizedLayout>
+      </MobileOptimizedLayout>
+    </PageErrorBoundary>
   );
 };
 

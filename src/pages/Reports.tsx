@@ -1,8 +1,8 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { InteractiveDashboard } from '@/components/reports/InteractiveDashboard';
-import { ScheduledReports } from '@/components/reports/ScheduledReports';
-import { ReportBuilder } from '@/components/reports/ReportBuilder';
+import { ScheduledReportsManager } from '@/components/reports/ScheduledReportsManager';
 import { CustomReportBuilder } from '@/components/reports/CustomReportBuilder';
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { BeneficiaryReports } from '@/components/reports/BeneficiaryReports';
 import { PropertiesReports } from '@/components/reports/PropertiesReports';
 import { EnhancedIncomeStatement } from "@/components/accounting/EnhancedIncomeStatement";
@@ -19,7 +19,8 @@ import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layou
 
 const Reports = () => {
   return (
-    <MobileOptimizedLayout>
+    <PageErrorBoundary pageName="التقارير">
+      <MobileOptimizedLayout>
       <MobileOptimizedHeader
         title="التقارير والإحصائيات"
         description="تقارير تحليلية شاملة ومتقدمة"
@@ -28,7 +29,7 @@ const Reports = () => {
 
       <div className="space-y-6">
         <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-1">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-1">
             <TabsTrigger value="dashboard" className="gap-2">
               <BarChart3 className="h-4 w-4" />
               لوحة التحكم
@@ -39,11 +40,7 @@ const Reports = () => {
             </TabsTrigger>
             <TabsTrigger value="builder" className="gap-2">
               <Settings className="h-4 w-4" />
-              المنشئ
-            </TabsTrigger>
-            <TabsTrigger value="custom" className="gap-2">
-              <Wand2 className="h-4 w-4" />
-              مخصص
+              منشئ التقارير
             </TabsTrigger>
             <TabsTrigger value="beneficiaries" className="gap-2">
               <Users className="h-4 w-4" />
@@ -68,14 +65,10 @@ const Reports = () => {
           </TabsContent>
 
           <TabsContent value="scheduled">
-            <ScheduledReports />
+            <ScheduledReportsManager />
           </TabsContent>
 
           <TabsContent value="builder">
-            <ReportBuilder />
-          </TabsContent>
-
-          <TabsContent value="custom">
             <CustomReportBuilder />
           </TabsContent>
 
@@ -144,7 +137,8 @@ const Reports = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </MobileOptimizedLayout>
+      </MobileOptimizedLayout>
+    </PageErrorBoundary>
   );
 };
 
