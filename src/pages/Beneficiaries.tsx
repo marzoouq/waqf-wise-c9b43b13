@@ -11,6 +11,7 @@ import { AttachmentsDialog } from "@/components/beneficiaries/AttachmentsDialog"
 import { ActivityLogDialog } from "@/components/beneficiaries/ActivityLogDialog";
 import { EnableLoginDialog } from "@/components/beneficiaries/EnableLoginDialog";
 import { TribeManagementDialog } from "@/components/beneficiaries/TribeManagementDialog";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import {
   BeneficiariesHeader,
   BeneficiariesSearchBar,
@@ -113,8 +114,9 @@ const Beneficiaries = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-6 md:p-8 lg:p-10 space-y-6 md:space-y-8">
+    <PageErrorBoundary pageName="المستفيدون">
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto p-6 md:p-8 lg:p-10 space-y-6 md:space-y-8">
         <BeneficiariesHeader
           filteredBeneficiaries={filteredBeneficiaries}
           onAddBeneficiary={handleAddBeneficiary}
@@ -199,8 +201,9 @@ const Beneficiaries = () => {
             />
           </>
         )}
+        </div>
       </div>
-    </div>
+    </PageErrorBoundary>
   );
 };
 

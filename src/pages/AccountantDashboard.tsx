@@ -10,6 +10,7 @@ import { FileText, DollarSign, AlertCircle, CheckCircle, XCircle, TrendingUp, Fi
 import { useAccountantKPIs } from "@/hooks/useAccountantKPIs";
 import { ApproveJournalDialog } from "@/components/accounting/ApproveJournalDialog";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 
 // Lazy load components
 const AccountingStats = lazy(() => import("@/components/dashboard/AccountingStats"));
@@ -110,7 +111,8 @@ const AccountantDashboard = () => {
   };
 
   return (
-    <MobileOptimizedLayout>
+    <PageErrorBoundary pageName="لوحة تحكم المحاسب">
+      <MobileOptimizedLayout>
       <MobileOptimizedHeader
         title="لوحة تحكم المحاسب"
         description="إدارة القيود المحاسبية والموافقات المالية"
@@ -317,7 +319,8 @@ const AccountantDashboard = () => {
           approval={selectedApproval}
         />
       )}
-    </MobileOptimizedLayout>
+      </MobileOptimizedLayout>
+    </PageErrorBoundary>
   );
 };
 

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { 
   User, 
   FileText, 
@@ -244,7 +245,8 @@ const BeneficiaryDashboard = () => {
   }
 
   return (
-    <MobileOptimizedLayout>
+    <PageErrorBoundary pageName="لوحة تحكم المستفيد">
+      <MobileOptimizedLayout>
       <div className="space-y-6 pb-20">
         {/* بطاقة الملف الشخصي */}
         <BeneficiaryProfileCard
@@ -480,8 +482,9 @@ const BeneficiaryDashboard = () => {
           onOpenChange={setDocumentUploadOpen}
           beneficiaryId={beneficiary.id}
         />
-      </div>
-    </MobileOptimizedLayout>
+        </div>
+      </MobileOptimizedLayout>
+    </PageErrorBoundary>
   );
 };
 

@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { useFamilies } from '@/hooks/useFamilies';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import {
   Table,
   TableBody,
@@ -121,7 +122,9 @@ const Families = () => {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6 p-3 sm:p-4 md:p-6" dir="rtl">
+    <PageErrorBoundary pageName="العائلات">
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto p-6 md:p-8 lg:p-10 space-y-6 md:space-y-8">
       {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex-1 min-w-0">
@@ -321,7 +324,9 @@ const Families = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+        </div>
+      </div>
+    </PageErrorBoundary>
   );
 };
 

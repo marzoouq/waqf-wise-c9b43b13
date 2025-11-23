@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
 import { Button } from "@/components/ui/button";
 import { AdminSendMessageDialog } from "@/components/messages/AdminSendMessageDialog";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import PendingApprovalsSection from "@/components/dashboard/nazer/PendingApprovalsSection";
 import NazerKPIs from "@/components/dashboard/nazer/NazerKPIs";
 import SmartAlertsSection from "@/components/dashboard/nazer/SmartAlertsSection";
@@ -51,7 +52,8 @@ export default function NazerDashboard() {
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
 
   return (
-    <MobileOptimizedLayout>
+    <PageErrorBoundary pageName="لوحة تحكم الناظر">
+      <MobileOptimizedLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <MobileOptimizedHeader
@@ -204,6 +206,7 @@ export default function NazerDashboard() {
         open={messageDialogOpen}
         onOpenChange={setMessageDialogOpen}
       />
-    </MobileOptimizedLayout>
+      </MobileOptimizedLayout>
+    </PageErrorBoundary>
   );
 }
