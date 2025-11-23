@@ -97,7 +97,7 @@ class ErrorTracker {
         error_message: event.message || 'Unknown error',
         error_stack: event.error?.stack || undefined,
         severity: 'high',
-        url: window.location.href,
+        url: this.cleanUrl(window.location.href),
         user_agent: navigator.userAgent,
         additional_data: Object.keys(additionalData).length > 0 ? additionalData : undefined,
       });
@@ -113,7 +113,7 @@ class ErrorTracker {
         error_message: message || 'Promise rejected',
         error_stack: event.reason?.stack || undefined,
         severity: 'high',
-        url: window.location.href,
+        url: this.cleanUrl(window.location.href),
         user_agent: navigator.userAgent,
       });
     });
@@ -143,7 +143,7 @@ class ErrorTracker {
               error_type: 'network_error',
               error_message: `HTTP ${response.status}: ${response.statusText}`,
               severity: 'medium',
-              url: window.location.href,
+              url: this.cleanUrl(window.location.href),
               user_agent: navigator.userAgent,
               additional_data: {
                 request_url: requestUrl,
@@ -170,7 +170,7 @@ class ErrorTracker {
             error_type: 'network_error',
             error_message: errorMessage,
             severity: 'medium',
-            url: window.location.href,
+            url: this.cleanUrl(window.location.href),
             user_agent: navigator.userAgent,
             additional_data: {
               request_url: requestUrl,
@@ -180,6 +180,26 @@ class ErrorTracker {
         throw error;
       }
     };
+  }
+
+  private cleanUrl(url: string): string {
+    try {
+      const urlObj = new URL(url);
+      // Remove sensitive query parameters
+      urlObj.searchParams.delete('__lovable_token');
+      urlObj.searchParams.delete('token');
+      urlObj.searchParams.delete('access_token');
+      
+      let cleanedUrl = urlObj.toString();
+      // Truncate to 500 characters max
+      if (cleanedUrl.length > 500) {
+        cleanedUrl = cleanedUrl.substring(0, 497) + '...';
+      }
+      return cleanedUrl;
+    } catch {
+      // If URL parsing fails, just truncate the string
+      return url.length > 500 ? url.substring(0, 497) + '...' : url;
+    }
   }
 
   private setupHealthCheck() {
@@ -195,7 +215,7 @@ class ErrorTracker {
           error_type: 'health_check_failed',
           error_message: error.message || 'Database connection check failed',
           severity: 'critical',
-          url: window.location.href,
+          url: this.cleanUrl(window.location.href),
           user_agent: navigator.userAgent,
           additional_data: { error: error.message },
         });
@@ -207,7 +227,7 @@ class ErrorTracker {
         error_type: 'health_check_error',
         error_message: error instanceof Error ? error.message : String(error) || 'Health check failed',
         severity: 'critical',
-        url: window.location.href,
+        url: this.cleanUrl(window.location.href),
         user_agent: navigator.userAgent,
       });
     }
@@ -247,7 +267,7 @@ class ErrorTracker {
         error_type: report.error_type || 'unknown_error',
         error_message: report.error_message || 'No error message',
         severity: report.severity,
-        url: report.url || window.location.href,
+        url: this.cleanUrl(report.url || window.location.href),
         user_agent: report.user_agent || navigator.userAgent,
       };
       
@@ -351,7 +371,7 @@ class ErrorTracker {
       error_type: 'manual_log',
       error_message: message || 'Manual log entry',
       severity,
-      url: window.location.href,
+      url: this.cleanUrl(window.location.href),
       user_agent: navigator.userAgent,
       additional_data: additionalData && Object.keys(additionalData).length > 0 ? additionalData : undefined,
     });
