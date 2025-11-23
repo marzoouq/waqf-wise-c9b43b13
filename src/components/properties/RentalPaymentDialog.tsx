@@ -101,7 +101,7 @@ export const RentalPaymentDialog = ({ open, onOpenChange, payment, contractId }:
     >
       <form onSubmit={handleSubmit} className="space-y-4">
           {/* Info Alert */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800">
+          <div className="bg-info-light border border-info/30 rounded-lg p-3 text-sm text-info">
             <div className="font-medium mb-1">💡 ملاحظة:</div>
             <div>عند إدخال المبلغ المدفوع + تاريخ الدفع، ستتحول الحالة تلقائياً إلى "مدفوع"</div>
           </div>

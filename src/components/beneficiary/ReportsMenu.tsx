@@ -621,7 +621,7 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
       <Card>
         <CardHeader className="bg-gradient-to-br from-green-500/5 to-background">
           <CardTitle className="flex items-center gap-2 text-lg">
-            <FileSpreadsheet className="h-5 w-5 text-green-600" />
+            <FileSpreadsheet className="h-5 w-5 text-success" />
             تقارير الوقف
           </CardTitle>
           <CardDescription>الإفصاحات المالية وتقارير العقارات</CardDescription>

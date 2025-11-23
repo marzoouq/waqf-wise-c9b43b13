@@ -15,10 +15,10 @@ export default function InvoiceStatusBadge({ status }: InvoiceStatusBadgeProps) 
         return { label: "مرسلة", variant: "default" as const };
       case "paid":
       case "مدفوعة":
-        return { label: "مدفوعة", variant: "default" as const, className: "bg-green-600 text-white" };
+        return { label: "مدفوعة", variant: "default" as const, className: "bg-success text-success-foreground" };
       case "partially_paid":
       case "مدفوعة جزئياً":
-        return { label: "مدفوعة جزئياً", variant: "outline" as const, className: "border-yellow-600 text-yellow-600" };
+        return { label: "مدفوعة جزئياً", variant: "outline" as const, className: "border-warning text-warning" };
       case "overdue":
       case "متأخرة":
         return { label: "متأخرة", variant: "destructive" as const };

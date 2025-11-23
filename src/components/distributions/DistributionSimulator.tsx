@@ -250,13 +250,13 @@ export function DistributionSimulator({ open, onOpenChange }: DistributionSimula
                 </div>
                 <div className="text-center">
                   <p className="text-xs text-muted-foreground mb-1">صافي الموزع</p>
-                  <p className="text-lg font-bold text-green-600">
+                  <p className="text-lg font-bold text-success">
                     {totalNetDistributed.toLocaleString('ar-SA', { maximumFractionDigits: 2 })} ر.س
                   </p>
                 </div>
                 <div className="text-center">
                   <p className="text-xs text-muted-foreground mb-1">عدد المستفيدين</p>
-                  <p className="text-lg font-bold text-blue-600">
+                  <p className="text-lg font-bold text-info">
                     {results.length}
                   </p>
                 </div>
@@ -292,7 +292,7 @@ export function DistributionSimulator({ open, onOpenChange }: DistributionSimula
                             <TableCell className="text-center text-warning">
                               {totalDeduction.toLocaleString('ar-SA', { maximumFractionDigits: 2 })}
                             </TableCell>
-                            <TableCell className="text-center font-bold text-green-600">
+                            <TableCell className="text-center font-bold text-success">
                               {result.net_amount.toLocaleString('ar-SA', { maximumFractionDigits: 2 })}
                             </TableCell>
                           </TableRow>

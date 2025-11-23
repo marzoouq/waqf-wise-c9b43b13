@@ -40,8 +40,8 @@ export function FloatingChatButton() {
       >
         <Bot className="h-7 w-7 group-hover:animate-pulse text-primary-foreground" />
         <span className="absolute -top-2 -right-2 flex h-4 w-4">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-4 w-4 bg-green-500 border-2 border-white shadow-lg"></span>
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success/60 opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-4 w-4 bg-success border-2 border-white dark:border-black shadow-lg"></span>
         </span>
         <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary to-primary/50 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-300" />
       </Button>

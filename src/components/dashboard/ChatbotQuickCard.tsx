@@ -26,7 +26,7 @@ export function ChatbotQuickCard() {
                 اسأل عن أي شيء متعلق بإدارة الوقف
               </p>
               <div className="flex items-center gap-1 sm:gap-2 pt-1 sm:pt-2">
-                <span className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 bg-green-500/10 text-green-600 dark:text-green-400 rounded-full font-medium">
+                <span className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 bg-success/10 text-success rounded-full font-medium">
                   • متصل
                 </span>
                 <span className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 bg-primary/10 text-primary rounded-full font-medium">

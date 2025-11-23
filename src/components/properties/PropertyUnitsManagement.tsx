@@ -78,9 +78,9 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
 
   const getStatusBadge = (status: string) => {
     const statusColors: Record<string, string> = {
-      'متاح': 'bg-green-50 text-green-700 border-green-200',
-      'مشغول': 'bg-blue-50 text-blue-700 border-blue-200',
-      'صيانة': 'bg-amber-50 text-amber-700 border-amber-200',
+      'متاح': 'bg-success-light text-success border-success/30',
+      'مشغول': 'bg-info-light text-info border-info/30',
+      'صيانة': 'bg-warning-light text-warning border-warning/30',
       'غير متاح': 'bg-gray-50 text-gray-700 border-gray-200',
     };
     return (
@@ -130,27 +130,27 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
               </div>
               <p className="text-xl font-bold">{units.length}</p>
             </div>
-            <div className="bg-green-50 rounded-lg p-3 border border-green-200">
+            <div className="bg-success-light rounded-lg p-3 border border-success/30">
               <div className="flex items-center gap-2 mb-1">
-                <CheckCircle2 className="h-4 w-4 text-green-600" />
+                <CheckCircle2 className="h-4 w-4 text-success" />
                 <span className="text-xs text-muted-foreground">متاح</span>
               </div>
               <p className="text-xl font-bold">
                 {units.filter(u => u.status === 'متاح').length}
               </p>
             </div>
-            <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
+            <div className="bg-info-light rounded-lg p-3 border border-info/30">
               <div className="flex items-center gap-2 mb-1">
-                <Home className="h-4 w-4 text-blue-600" />
+                <Home className="h-4 w-4 text-info" />
                 <span className="text-xs text-muted-foreground">مشغول</span>
               </div>
               <p className="text-xl font-bold">
                 {units.filter(u => u.occupancy_status === 'مشغول').length}
               </p>
             </div>
-            <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
+            <div className="bg-warning-light rounded-lg p-3 border border-warning/30">
               <div className="flex items-center gap-2 mb-1">
-                <XCircle className="h-4 w-4 text-amber-600" />
+                <XCircle className="h-4 w-4 text-warning" />
                 <span className="text-xs text-muted-foreground">صيانة</span>
               </div>
               <p className="text-xl font-bold">

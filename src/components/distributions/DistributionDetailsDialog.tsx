@@ -55,7 +55,7 @@ export function DistributionDetailsDialog({
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">المبلغ القابل للتوزيع</p>
-                <p className="text-lg font-bold text-green-600">{distribution.distributable_amount?.toLocaleString()} ريال</p>
+                <p className="text-lg font-bold text-success">{distribution.distributable_amount?.toLocaleString()} ريال</p>
               </div>
             </div>
 
@@ -104,7 +104,7 @@ export function DistributionDetailsDialog({
                           <TableCell>
                             <Badge variant="outline">{detail.beneficiary_type}</Badge>
                           </TableCell>
-                          <TableCell className="font-semibold text-green-600">
+                          <TableCell className="font-semibold text-success">
                             {detail.allocated_amount.toLocaleString()} ريال
                           </TableCell>
                           <TableCell>

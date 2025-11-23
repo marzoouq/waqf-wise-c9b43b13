@@ -112,11 +112,11 @@ export class ErrorBoundary extends Component<Props, State> {
                 </p>
               </div>
 
-              <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
-                <p className="text-sm text-green-800 dark:text-green-200">
+              <div className="bg-success-light dark:bg-success/10 border border-success/30 rounded-lg p-4">
+                <p className="text-sm text-success">
                   ✅ تم إرسال تقرير الخطأ تلقائياً إلى فريق الدعم الفني
                 </p>
-                <p className="text-xs text-green-700 dark:text-green-300 mt-1">
+                <p className="text-xs text-success/80 mt-1">
                   سيتم معالجة المشكلة في أقرب وقت ممكن
                 </p>
               </div>

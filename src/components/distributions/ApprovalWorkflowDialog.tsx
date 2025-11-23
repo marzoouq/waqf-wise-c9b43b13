@@ -78,7 +78,7 @@ export function ApprovalWorkflowDialog({
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "موافق": return <CheckCircle2 className="h-5 w-5 text-green-600" />;
+      case "موافق": return <CheckCircle2 className="h-5 w-5 text-success" />;
       case "مرفوض": return <XCircle className="h-5 w-5 text-destructive" />;
       default: return <Clock className="h-5 w-5 text-muted-foreground" />;
     }
@@ -213,8 +213,8 @@ export function ApprovalWorkflowDialog({
 
           {/* رسائل الحالة */}
           {allApproved && (
-            <Card className="p-4 bg-green-50 border-green-200">
-              <div className="flex items-center gap-2 text-green-700">
+            <Card className="p-4 bg-success-light border-success/30">
+              <div className="flex items-center gap-2 text-success">
                 <CheckCircle2 className="h-5 w-5" />
                 <p className="font-semibold">تم اعتماد التوزيع بنجاح من جميع المستويات</p>
               </div>
@@ -222,8 +222,8 @@ export function ApprovalWorkflowDialog({
           )}
           
           {isRejected && (
-            <Card className="p-4 bg-red-50 border-red-200">
-              <div className="flex items-center gap-2 text-red-700">
+            <Card className="p-4 bg-destructive-light border-destructive/30">
+              <div className="flex items-center gap-2 text-destructive">
                 <XCircle className="h-5 w-5" />
                 <p className="font-semibold">تم رفض التوزيع</p>
               </div>

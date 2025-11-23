@@ -180,22 +180,22 @@ export function EligibleVotersList({ decision }: EligibleVotersListProps) {
                       variant="outline" 
                       className={
                         voter.vote === 'موافق' 
-                          ? 'bg-green-50 text-green-700 border-green-200' 
+                          ? 'bg-success-light text-success border-success/30' 
                           : voter.vote === 'معارض'
-                          ? 'bg-red-50 text-red-700 border-red-200'
-                          : 'bg-gray-50 text-gray-700 border-gray-200'
+                          ? 'bg-destructive-light text-destructive border-destructive/30'
+                          : 'bg-muted text-muted-foreground border-border'
                       }
                     >
                       {voter.vote}
                     </Badge>
-                    <CheckCircle2 className="h-5 w-5 text-green-600" />
+                    <CheckCircle2 className="h-5 w-5 text-success" />
                   </>
                 ) : (
                   <>
-                    <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
+                    <Badge variant="outline" className="bg-warning-light text-warning border-warning/30">
                       لم يصوت
                     </Badge>
-                    <Clock className="h-5 w-5 text-amber-600" />
+                    <Clock className="h-5 w-5 text-warning" />
                   </>
                 )}
               </div>

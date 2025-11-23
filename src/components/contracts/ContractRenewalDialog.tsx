@@ -268,8 +268,8 @@ export function ContractRenewalDialog({
             </div>
 
             {watchRentIncrease && watchRentIncrease > 0 && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                <p className="text-sm text-blue-800">
+              <div className="bg-info-light border border-info/30 rounded-lg p-3">
+                <p className="text-sm text-info">
                   <strong>الزيادة المتوقعة:</strong>{" "}
                   {(form.watch("new_monthly_rent") - currentRent).toLocaleString()} ر.س
                   ({watchRentIncrease.toFixed(2)}%)
