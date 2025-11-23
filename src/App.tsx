@@ -11,7 +11,6 @@ import { GlobalErrorBoundary } from "./components/shared/GlobalErrorBoundary";
 import { LoadingState } from "./components/shared/LoadingState";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { usePWAUpdate } from "./lib/pwa";
-import { PerformanceMonitor } from "./components/performance/PerformanceMonitor";
 import "@/lib/errors/tracker";
 import "@/lib/selfHealing";
 
@@ -115,7 +114,6 @@ const App = () => {
   return (
     <GlobalErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <PerformanceMonitor />
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <SettingsProvider>
             <TooltipProvider>
