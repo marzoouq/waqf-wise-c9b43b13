@@ -5,7 +5,8 @@ import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { logger } from '@/lib/logger';
 import { useLeakedPassword } from './useLeakedPassword';
-import { debug } from '@/lib/debug';
+import { productionLogger } from '@/lib/logger/production-logger';
+import { TOTP } from 'otpauth';
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
@@ -19,7 +20,7 @@ export function useAuth() {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        debug.auth('Auth event:', { event, email: session?.user?.email || 'none' });
+        productionLogger.info('Auth event', { event, email: session?.user?.email || 'none' });
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
@@ -238,14 +239,43 @@ export function useAuth() {
     }
   };
 
-  // التحقق من رمز 2FA (محاكاة TOTP)
+  // التحقق من رمز 2FA باستخدام TOTP حقيقي
   const verify2FACode = async (secret: string, code: string): Promise<boolean> => {
-    // في الإنتاج، يجب استخدام مكتبة TOTP فعلية
-    // هذه محاكاة بسيطة للتوضيح
-    if (code.length === 6 && /^\d+$/.test(code)) {
-      return true; // في الإنتاج، يجب التحقق الفعلي من TOTP
+    try {
+      // إنشاء TOTP instance بالإعدادات القياسية
+      const totp = new TOTP({
+        issuer: 'Waqf Management',
+        label: user?.email || 'User',
+        algorithm: 'SHA1',
+        digits: 6,
+        period: 30,
+        secret: secret,
+      });
+
+      // التحقق من الرمز مع window tolerance (30 ثانية قبل وبعد)
+      const delta = totp.validate({ token: code, window: 1 });
+      
+      if (delta !== null) {
+        productionLogger.success('2FA code verified successfully', { userId: user?.id });
+        return true;
+      }
+
+      // إذا فشل TOTP، تحقق من backup codes
+      const { data, error } = await supabase.rpc('verify_2fa_code', {
+        p_user_id: user?.id || '',
+        p_code: code,
+      });
+
+      if (error) {
+        productionLogger.warn('2FA verification failed', { error: error.message });
+        return false;
+      }
+
+      return data || false;
+    } catch (error) {
+      productionLogger.error('Error verifying 2FA code', error);
+      return false;
     }
-    return false;
   };
 
   return {

@@ -36,10 +36,11 @@ import { AppRole } from "@/hooks/useUserRole";
 
 interface UserWithRoles {
   id: string;
+  user_id: string;
   email: string;
   full_name: string;
   avatar_url: string | null;
-  roles: string;
+  roles: AppRole[];
   roles_array: AppRole[];
   roles_count: number;
 }
@@ -80,7 +81,16 @@ const RolesManagement = () => {
     queryFn: async () => {
       const { data, error } = await supabase.from("users_with_roles").select("*");
       if (error) throw error;
-      return data as UserWithRoles[];
+      return (data || []).map(u => ({
+        id: u.user_id,
+        user_id: u.user_id,
+        full_name: u.full_name,
+        email: u.email,
+        avatar_url: u.avatar_url,
+        roles: u.roles || [],
+        roles_array: u.roles || [],
+        roles_count: (u.roles || []).length,
+      })) as UserWithRoles[];
     },
   });
 

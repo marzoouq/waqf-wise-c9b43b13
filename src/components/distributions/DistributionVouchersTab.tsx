@@ -161,7 +161,7 @@ export function DistributionVouchersTab({ distributionId }: DistributionVouchers
                           {voucher.voucher_number}
                         </div>
                       </TableCell>
-                      <TableCell>{voucher.beneficiary_name || "-"}</TableCell>
+                      <TableCell>{voucher.beneficiary_id || "-"}</TableCell>
                       <TableCell className="font-bold">
                         {voucher.amount.toLocaleString('ar-SA', { minimumFractionDigits: 2 })} ر.س
                       </TableCell>

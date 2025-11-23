@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { useEffect } from "react";
-import { debug } from "@/lib/debug";
+import { productionLogger } from '@/lib/logger/production-logger';
 
 export type AppRole = "nazer" | "admin" | "accountant" | "cashier" | "archivist" | "beneficiary" | "user";
 
@@ -13,16 +13,16 @@ export function useUserRole() {
     queryKey: ["user-roles", user?.id || undefined],
     queryFn: async () => {
       if (!user) {
-        debug.roles('useUserRole: No user yet');
+        productionLogger.debug('useUserRole: No user yet');
         return [];
       }
 
-      debug.roles('useUserRole: Fetching roles for user:', user.email);
+      productionLogger.debug('useUserRole: Fetching roles for user', { email: user.email });
 
       // Get current authenticated user's ID
       const { data: { user: authUser } } = await supabase.auth.getUser();
       if (!authUser) {
-        debug.warn('useUserRole: No authenticated user');
+        productionLogger.warn('useUserRole: No authenticated user');
         return [];
       }
 
@@ -32,11 +32,11 @@ export function useUserRole() {
         .eq("user_id", authUser.id);
 
       if (error) {
-        debug.warn('useUserRole: Error fetching roles:', error);
+        productionLogger.warn('useUserRole: Error fetching roles', { error: error.message });
         return [];
       }
       
-      debug.roles('useUserRole: Roles loaded:', data);
+      productionLogger.debug('useUserRole: Roles loaded', { roles: data });
       return (data || []).map(r => r.role as AppRole);
     },
     enabled: !!user,
