@@ -199,8 +199,9 @@ async function applyAlertRules(supabase: any, errorLog: any, errorReport: ErrorR
 
         if (!alert) continue;
 
-        // إرسال إشعارات للأدوار المحددة
-        await sendRoleNotifications(supabase, rule.notify_roles, errorLog, alert);
+        // إرسال إشعارات للأدوار المحددة (مع التحقق من صحة البيانات)
+        const notifyRoles = Array.isArray(rule.notify_roles) ? rule.notify_roles : [];
+        await sendRoleNotifications(supabase, notifyRoles, errorLog, alert);
 
         // التصعيد التلقائي إذا كان مفعلاً
         if (rule.auto_escalate) {
@@ -244,11 +245,19 @@ function shouldApplyRule(rule: any, errorReport: ErrorReport): boolean {
  */
 async function sendRoleNotifications(supabase: any, roles: string[], errorLog: any, alert: any) {
   try {
-    // جلب المستخدمين حسب الأدوار (بدون فلتر is_active لأنه غير موجود في جدول user_roles)
+    // تنظيف الأدوار من أي قيم فارغة أو null
+    const validRoles = roles?.filter(r => r && r.trim() !== '') || [];
+    
+    if (validRoles.length === 0) {
+      console.log('No valid roles provided for notifications');
+      return;
+    }
+
+    // جلب المستخدمين حسب الأدوار
     const { data: users, error: usersError } = await supabase
       .from('user_roles')
       .select('user_id, role')
-      .in('role', roles);
+      .in('role', validRoles);
 
     if (usersError) {
       console.error('Error fetching users:', usersError);
