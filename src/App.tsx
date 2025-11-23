@@ -66,6 +66,7 @@ const SystemMonitoring = lazy(() => import("./pages/SystemMonitoring"));
 const SystemTesting = lazy(() => import("./pages/SystemTesting"));
 const AdvancedSettings = lazy(() => import("./pages/AdvancedSettings"));
 const SystemMaintenance = lazy(() => import("./pages/SystemMaintenance"));
+const AllTransactions = lazy(() => import("./pages/AllTransactions"));
 const GovernanceDecisions = lazy(() => import("./pages/GovernanceDecisions"));
 const DecisionDetails = lazy(() => import("./pages/DecisionDetails"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -326,6 +327,7 @@ const App = () => {
               </ProtectedRoute>
             } 
           />
+          <Route path="/all-transactions" element={<AllTransactions />} />
                 {/* Governance Routes */}
                 <Route 
                   path="/governance/decisions" 
