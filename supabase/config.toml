@@ -1,7 +1,7 @@
 project_id = "zsacuvrcohmraoldilph"
 
 [functions.log-error]
-verify_jwt = true
+verify_jwt = false
 
 [functions.execute-auto-fix]
 verify_jwt = true
