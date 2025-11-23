@@ -15,17 +15,18 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { format } from "date-fns";
-import { ar } from "date-fns/locale";
-import { FileText, Printer } from "lucide-react";
+import { FileText, Printer, Book } from "lucide-react";
 import { AccountRow, GeneralLedgerEntry } from "@/types/supabase-helpers";
-import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
+import { EmptyAccountingState } from "./EmptyAccountingState";
+import { AccountingErrorState } from "./AccountingErrorState";
+import { LoadingState } from "@/components/shared/LoadingState";
 
 const GeneralLedgerReport = () => {
   const [selectedAccountId, setSelectedAccountId] = useState<string>("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
 
-  const { data: accounts } = useQuery({
+  const { data: accounts, error: accountsError } = useQuery({
     queryKey: ["accounts_for_ledger"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -39,7 +40,7 @@ const GeneralLedgerReport = () => {
     },
   });
 
-  const { data: ledgerData, isLoading } = useQuery({
+  const { data: ledgerData, isLoading, error, refetch } = useQuery({
     queryKey: ["general_ledger", selectedAccountId || undefined, dateFrom || undefined, dateTo || undefined],
     queryFn: async () => {
       if (!selectedAccountId) return null;
@@ -103,12 +104,16 @@ const GeneralLedgerReport = () => {
     window.print();
   };
 
+  if (accountsError) {
+    return <AccountingErrorState error={accountsError as Error} onRetry={refetch} />;
+  }
+
   return (
     <div className="space-y-4">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5" />
+            <Book className="h-5 w-5" />
             دفتر الأستاذ العام
           </CardTitle>
         </CardHeader>
@@ -158,14 +163,28 @@ const GeneralLedgerReport = () => {
         </CardContent>
       </Card>
 
-      {isLoading && (
-        <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-        </div>
+      {isLoading && <LoadingState message="جاري تحميل دفتر الأستاذ..." />}
+
+      {error && <AccountingErrorState error={error as Error} onRetry={refetch} />}
+
+      {!selectedAccountId && !isLoading && !error && (
+        <EmptyAccountingState
+          icon={<FileText className="h-12 w-12" />}
+          title="اختر حساباً لعرض دفتر الأستاذ"
+          description="قم باختيار حساب من القائمة أعلاه لعرض جميع الحركات والأرصدة"
+        />
       )}
 
-      {selectedAccount && ledgerData && (
-        <Card id="print-content">
+      {selectedAccount && ledgerData && ledgerData.length === 0 && (
+        <EmptyAccountingState
+          icon={<FileText className="h-12 w-12" />}
+          title="لا توجد حركات على هذا الحساب"
+          description="لا توجد قيود محاسبية مرحلة على هذا الحساب في الفترة المحددة"
+        />
+      )}
+
+      {selectedAccount && ledgerData && ledgerData.length > 0 && (
+        <Card id="print-content" className="print:shadow-none">
           <CardHeader className="print:border-b">
             <div className="text-center space-y-2">
               <h2 className="text-xl font-bold">دفتر الأستاذ العام</h2>
@@ -192,51 +211,34 @@ const GeneralLedgerReport = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {ledgerData.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                      لا توجد حركات على هذا الحساب في الفترة المحددة
+                {ledgerData.map((line) => (
+                  <TableRow key={line.id}>
+                    <TableCell className="text-xs sm:text-sm whitespace-nowrap">
+                      {format(new Date(line.journal_entry.entry_date), "dd/MM/yyyy")}
+                    </TableCell>
+                    <TableCell className="font-mono text-xs sm:text-sm hidden lg:table-cell">
+                      {line.journal_entry.entry_number}
+                    </TableCell>
+                    <TableCell className="text-xs sm:text-sm hidden md:table-cell">
+                      {line.description || line.journal_entry.description}
+                    </TableCell>
+                    <TableCell className="text-center font-mono text-xs sm:text-sm">
+                      {Number(line.debit_amount) > 0
+                        ? Number(line.debit_amount).toFixed(2)
+                        : "-"}
+                    </TableCell>
+                    <TableCell className="text-center font-mono text-xs sm:text-sm">
+                      {Number(line.credit_amount) > 0
+                        ? Number(line.credit_amount).toFixed(2)
+                        : "-"}
+                    </TableCell>
+                    <TableCell className="text-center font-mono text-sm font-semibold">
+                      {line.balance.toFixed(2)}
                     </TableCell>
                   </TableRow>
-                ) : (
-                  ledgerData.map((line) => (
-                    <TableRow key={line.id}>
-                      <TableCell className="text-xs sm:text-sm whitespace-nowrap">
-                        {format(new Date(line.journal_entry.entry_date), "dd/MM/yyyy")}
-                      </TableCell>
-                      <TableCell className="font-mono text-xs sm:text-sm hidden lg:table-cell">
-                        {line.journal_entry.entry_number}
-                      </TableCell>
-                      <TableCell className="text-xs sm:text-sm hidden md:table-cell">
-                        {line.description || line.journal_entry.description}
-                      </TableCell>
-                      <TableCell className="text-center font-mono text-xs sm:text-sm">
-                        {Number(line.debit_amount) > 0
-                          ? Number(line.debit_amount).toFixed(2)
-                          : "-"}
-                      </TableCell>
-                      <TableCell className="text-center font-mono text-xs sm:text-sm">
-                        {Number(line.credit_amount) > 0
-                          ? Number(line.credit_amount).toFixed(2)
-                          : "-"}
-                      </TableCell>
-                      <TableCell className="text-center font-mono text-sm font-semibold">
-                        {line.balance.toFixed(2)}
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
+                ))}
               </TableBody>
             </Table>
-          </CardContent>
-        </Card>
-      )}
-
-      {!selectedAccountId && !isLoading && (
-        <Card>
-          <CardContent className="py-12 text-center text-muted-foreground">
-            <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p>اختر حساباً لعرض دفتر الأستاذ</p>
           </CardContent>
         </Card>
       )}

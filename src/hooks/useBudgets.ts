@@ -25,7 +25,12 @@ export function useBudgets(fiscalYearId?: string) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: budgets = [], isLoading } = useQuery({
+  const { 
+    data: budgets = [], 
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ["budgets", fiscalYearId],
     queryFn: async () => {
       let query = supabase
@@ -172,6 +177,8 @@ export function useBudgets(fiscalYearId?: string) {
   return {
     budgets,
     isLoading,
+    error,
+    refetch,
     addBudget: addBudget.mutateAsync,
     updateBudget: updateBudget.mutateAsync,
     deleteBudget: deleteBudget.mutateAsync,

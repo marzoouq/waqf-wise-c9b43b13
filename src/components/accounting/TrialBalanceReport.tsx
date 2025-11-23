@@ -3,12 +3,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Download, Printer } from "lucide-react";
+import { Download, Printer, Scale } from "lucide-react";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
 import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
 import { TrialBalanceRow } from "@/types/supabase-helpers";
+import { EmptyAccountingState } from "./EmptyAccountingState";
+import { LoadingState } from "@/components/shared/LoadingState";
+import * as XLSX from "xlsx";
 
 export function TrialBalanceReport() {
   const { trialBalance, isLoading } = useFinancialReports();
@@ -24,13 +27,51 @@ export function TrialBalanceReport() {
   const totalCredit = trialBalance.reduce((sum, acc) => sum + acc.credit, 0);
   const difference = Math.abs(totalDebit - totalCredit);
 
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const handleExport = () => {
+    const exportData = trialBalance.map(acc => ({
+      'رمز الحساب': acc.code,
+      'اسم الحساب': acc.name,
+      'مدين': acc.debit > 0 ? acc.debit.toFixed(2) : '0.00',
+      'دائن': acc.credit > 0 ? acc.credit.toFixed(2) : '0.00',
+      'الرصيد': acc.balance.toFixed(2),
+    }));
+
+    // Add total row
+    exportData.push({
+      'رمز الحساب': '',
+      'اسم الحساب': 'الإجمالي',
+      'مدين': totalDebit.toFixed(2),
+      'دائن': totalCredit.toFixed(2),
+      'الرصيد': difference < 0.01 ? 'متوازن' : `فرق: ${difference.toFixed(2)}`,
+    });
+
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "ميزان المراجعة");
+    XLSX.writeFile(wb, `trial-balance-${format(new Date(), "yyyyMMdd")}.xlsx`);
+  };
+
   if (isLoading) {
-    return <div className="text-center py-8">جاري التحميل...</div>;
+    return <LoadingState message="جاري تحميل ميزان المراجعة..." />;
+  }
+
+  if (trialBalance.length === 0) {
+    return (
+      <EmptyAccountingState
+        icon={<Scale className="h-12 w-12" />}
+        title="لا توجد بيانات لميزان المراجعة"
+        description="تأكد من وجود قيود محاسبية مرحلة لإنشاء ميزان المراجعة"
+      />
+    );
   }
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="print:shadow-none">
+      <CardHeader className="print:border-b">
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="text-2xl">ميزان المراجعة</CardTitle>
@@ -38,12 +79,12 @@ export function TrialBalanceReport() {
               التاريخ: {format(new Date(), "dd MMMM yyyy", { locale: ar })}
             </p>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm">
+          <div className="flex gap-2 print:hidden">
+            <Button variant="outline" size="sm" onClick={handlePrint}>
               <Printer className="ml-2 h-4 w-4" />
               طباعة
             </Button>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={handleExport}>
               <Download className="ml-2 h-4 w-4" />
               تصدير Excel
             </Button>

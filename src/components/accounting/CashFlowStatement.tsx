@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Printer, FileDown, TrendingUp, TrendingDown, Activity } from "lucide-react";
 import { useCashFlows } from "@/hooks/useCashFlows";
 import { LoadingState } from "@/components/shared/LoadingState";
+import { EmptyAccountingState } from "./EmptyAccountingState";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import jsPDF from "jspdf";
@@ -169,23 +170,13 @@ export function CashFlowStatement() {
 
   if (!latestFlow) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>قائمة التدفقات النقدية</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-12">
-            <Activity className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <p className="text-muted-foreground">لا توجد بيانات متاحة</p>
-            <p className="text-sm text-muted-foreground mt-2">
-              قم بحساب التدفقات النقدية للفترة المالية
-            </p>
-            <Button onClick={handleCalculate} disabled={isCalculating} className="mt-4">
-              {isCalculating ? "جاري الحساب..." : "حساب التدفقات النقدية"}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      <EmptyAccountingState
+        icon={<Activity className="h-12 w-12" />}
+        title="لا توجد بيانات متاحة"
+        description="قم بحساب التدفقات النقدية للفترة المالية لعرض البيانات"
+        actionLabel={isCalculating ? "جاري الحساب..." : "حساب التدفقات النقدية"}
+        onAction={handleCalculate}
+      />
     );
   }
 

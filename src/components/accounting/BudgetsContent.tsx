@@ -35,7 +35,7 @@ export function BudgetsContent() {
   const activeFiscalYear = fiscalYears.find(fy => fy.is_active);
   
   const [selectedFiscalYear, setSelectedFiscalYear] = useState(activeFiscalYear?.id || "");
-  const { budgets, isLoading, addBudget, updateBudget, deleteBudget, calculateVariances } = 
+  const { budgets, isLoading, addBudget, updateBudget, deleteBudget, calculateVariances, error, refetch } = 
     useBudgets(selectedFiscalYear);
   
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -43,6 +43,10 @@ export function BudgetsContent() {
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل الميزانيات..." />;
+  }
+
+  if (error) {
+    return <AccountingErrorState error={error as Error} onRetry={refetch} />;
   }
 
   const handleOpenDialog = (budget?: Budget) => {
