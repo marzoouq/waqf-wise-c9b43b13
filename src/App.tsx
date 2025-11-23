@@ -43,6 +43,7 @@ const Properties = lazy(() => import("./pages/Properties"));
 const Funds = lazy(() => import("./pages/Funds"));
 const Archive = lazy(() => import("./pages/Archive"));
 const Accounting = lazy(() => import("./pages/Accounting"));
+const Budgets = lazy(() => import("./pages/Budgets"));
 const Reports = lazy(() => import("./pages/Reports"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Invoices = lazy(() => import("./pages/Invoices"));
@@ -237,6 +238,14 @@ const App = () => {
             element={
               <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
                 <Accounting />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/budgets" 
+            element={
+              <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+                <Budgets />
               </ProtectedRoute>
             } 
           />

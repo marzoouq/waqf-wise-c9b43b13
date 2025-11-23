@@ -8,10 +8,12 @@ import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import jsPDF from "jspdf";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export function CashFlowStatement() {
-  const { cashFlows, isLoading } = useCashFlows();
+  const { cashFlows, isLoading, calculateCashFlow } = useCashFlows();
   const [selectedPeriod, setSelectedPeriod] = useState<string | null>(null);
+  const [isCalculating, setIsCalculating] = useState(false);
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل قائمة التدفقات النقدية..." />;
@@ -35,6 +37,33 @@ export function CashFlowStatement() {
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const handleCalculate = async () => {
+    setIsCalculating(true);
+    try {
+      // الحصول على السنة المالية النشطة
+      const { data: fiscalYear } = await supabase
+        .from("fiscal_years")
+        .select("*")
+        .eq("is_active", true)
+        .single();
+
+      if (!fiscalYear) {
+        toast.error("لا توجد سنة مالية نشطة");
+        return;
+      }
+
+      await calculateCashFlow({
+        fiscalYearId: fiscalYear.id,
+        periodStart: fiscalYear.start_date,
+        periodEnd: fiscalYear.end_date,
+      });
+    } catch (error) {
+      console.error("Error calculating cash flow:", error);
+    } finally {
+      setIsCalculating(false);
+    }
   };
 
   const handleExport = () => {
@@ -157,6 +186,9 @@ export function CashFlowStatement() {
             <p className="text-sm text-muted-foreground mt-2">
               قم بحساب التدفقات النقدية للفترة المالية
             </p>
+            <Button onClick={handleCalculate} disabled={isCalculating} className="mt-4">
+              {isCalculating ? "جاري الحساب..." : "حساب التدفقات النقدية"}
+            </Button>
           </div>
         </CardContent>
       </Card>
