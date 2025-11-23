@@ -4,6 +4,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { ErrorReport } from './types';
+import { productionLogger } from '@/lib/logger/production-logger';
 
 // أنماط الأخطاء التي يجب تجاهلها
 const IGNORE_ERROR_PATTERNS = [
@@ -48,10 +49,10 @@ class ErrorTracker {
       if (pending) {
         const errors = JSON.parse(pending) as ErrorReport[];
         this.errorQueue.push(...errors);
-        console.log(`📥 Loaded ${errors.length} pending errors`);
+        productionLogger.info(`Loaded ${errors.length} pending errors from storage`);
       }
     } catch (error) {
-      console.error('Failed to load pending errors:', error);
+      productionLogger.error('Failed to load pending errors', error);
     }
   }
 
@@ -63,7 +64,7 @@ class ErrorTracker {
         localStorage.removeItem(this.LOCAL_STORAGE_KEY);
       }
     } catch (error) {
-      console.error('Failed to save pending errors:', error);
+      productionLogger.error('Failed to save pending errors', error);
     }
   }
 
@@ -71,7 +72,7 @@ class ErrorTracker {
     setInterval(() => {
       if (this.circuitBreakerOpen && this.circuitBreakerResetTime) {
         if (Date.now() >= this.circuitBreakerResetTime) {
-          console.log('🔄 Circuit breaker reset');
+          productionLogger.info('Circuit breaker reset');
           this.circuitBreakerOpen = false;
           this.failedAttempts = 0;
           this.backoffDelay = 1000;
@@ -198,7 +199,7 @@ class ErrorTracker {
           additional_data: { error: error.message },
         });
       } else {
-        console.info('✅ All systems healthy');
+        productionLogger.info('All systems healthy');
       }
     } catch (error) {
       this.trackError({
@@ -224,14 +225,10 @@ class ErrorTracker {
     this.errorQueue.push(report);
     this.processQueue();
 
-    const emoji = {
-      low: '🟡',
-      medium: '🟠',
-      high: '🔴',
-      critical: '🚨',
-    }[report.severity];
-
-    console.error(`${emoji} Error tracked:`, report);
+    productionLogger.error(`Error tracked: ${report.error_type}`, report, {
+      severity: report.severity,
+      context: 'error_tracker',
+    });
   }
 
   private async processQueue() {
@@ -265,7 +262,7 @@ class ErrorTracker {
         }
         
       } catch (error) {
-        console.error('❌ Failed to send error report:', error);
+        productionLogger.error('Failed to send error report', error);
         
         this.failedAttempts++;
         this.errorQueue.unshift(report);
@@ -273,7 +270,9 @@ class ErrorTracker {
         if (this.failedAttempts >= this.maxFailedAttempts) {
           this.circuitBreakerOpen = true;
           this.circuitBreakerResetTime = Date.now() + 60000;
-          console.warn(`🔴 Circuit breaker opened. Queue: ${this.errorQueue.length}`);
+          productionLogger.warn(`Circuit breaker opened. Queue: ${this.errorQueue.length}`, undefined, {
+            severity: 'high',
+          });
           this.savePendingErrors();
         } else {
           this.backoffDelay = Math.min(this.backoffDelay * 2, 30000);
@@ -306,10 +305,10 @@ class ErrorTracker {
       }]);
 
       if (error) {
-        console.error('Failed to create system alert:', error);
+        productionLogger.error('Failed to create system alert', error);
       }
     } catch (error) {
-      console.error('Error creating system alert:', error);
+      productionLogger.error('Error creating system alert', error);
     }
   }
 
