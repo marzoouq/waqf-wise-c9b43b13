@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { TrendingUp, Users, Building2, DollarSign, Calendar } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
+import { useDashboardKPIs } from '@/hooks/useDashboardKPIs';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
@@ -91,27 +91,7 @@ export function InteractiveDashboard() {
   });
 
   // KPIs الرئيسية
-  const { data: kpis, isLoading: loadingKPIs } = useQuery({
-    queryKey: ['dashboard-kpis'],
-    queryFn: async () => {
-      const [beneficiariesCount, propertiesCount, totalPayments, activeContracts] = await Promise.all([
-        supabase.from('beneficiaries').select('id', { count: 'exact', head: true }),
-        supabase.from('properties').select('id', { count: 'exact', head: true }),
-        supabase.from('payments').select('amount').then(res => {
-          if (res.error) throw res.error;
-          return res.data.reduce((sum, p) => sum + Number(p.amount), 0);
-        }),
-        supabase.from('contracts').select('id', { count: 'exact', head: true }).eq('status', 'نشط'),
-      ]);
-
-      return {
-        beneficiaries: beneficiariesCount.count || 0,
-        properties: propertiesCount.count || 0,
-        totalPayments,
-        activeContracts: activeContracts.count || 0,
-      };
-    },
-  });
+  const { data: kpis, isLoading: loadingKPIs } = useDashboardKPIs();
 
   const isLoading = loadingBeneficiaries || loadingPayments || loadingProperties || loadingKPIs;
 
