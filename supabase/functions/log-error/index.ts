@@ -245,13 +245,18 @@ function shouldApplyRule(rule: any, errorReport: ErrorReport): boolean {
  */
 async function sendRoleNotifications(supabase: any, roles: string[], errorLog: any, alert: any) {
   try {
-    // تنظيف الأدوار من أي قيم فارغة أو null
-    const validRoles = roles?.filter(r => r && r.trim() !== '') || [];
+    // الأدوار الصحيحة المسموح بها في enum app_role
+    const validAppRoles = ['admin', 'nazer', 'accountant', 'disbursement_officer', 'archivist'];
+    
+    // تنظيف الأدوار والتأكد من أنها من القيم الصحيحة فقط
+    const validRoles = roles?.filter(r => r && r.trim() !== '' && validAppRoles.includes(r)) || [];
     
     if (validRoles.length === 0) {
       console.log('No valid roles provided for notifications');
       return;
     }
+    
+    console.log(`Sending notifications to roles: ${validRoles.join(', ')}`);
 
     // جلب المستخدمين حسب الأدوار
     const { data: users, error: usersError } = await supabase
