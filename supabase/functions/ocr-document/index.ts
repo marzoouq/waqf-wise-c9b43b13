@@ -146,9 +146,32 @@ serve(async (req) => {
     );
   } catch (error) {
     console.error('OCR Error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    
+    // تسجيل تفاصيل كاملة للمطورين
+    console.error('Full error details:', {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString()
+    });
+    
+    // رسالة آمنة للعميل
+    let safeMessage = 'حدث خطأ أثناء معالجة المستند';
+    
+    if (error instanceof Error) {
+      if (error.message.includes('authorization') || error.message.includes('Unauthorized')) {
+        safeMessage = 'غير مصرح بالوصول - يتطلب دور أرشيفي أو مسؤول';
+      } else if (error.message.includes('required')) {
+        safeMessage = 'بيانات مطلوبة مفقودة';
+      } else if (error.message.includes('processing failed') || error.message.includes('OCR')) {
+        safeMessage = 'فشلت معالجة استخراج النص، يرجى المحاولة مرة أخرى';
+      }
+    }
+    
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ 
+        success: false,
+        error: safeMessage 
+      }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

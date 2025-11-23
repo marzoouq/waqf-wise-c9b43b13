@@ -11,11 +11,66 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // 🔒 1. فحص المصادقة
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'غير مصرح' }), 
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    console.log('🔧 Starting auto-fix execution...');
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'مصادقة غير صالحة' }), 
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // 🔐 2. التحقق من الصلاحيات (يجب أن يكون admin أو nazer)
+    const { data: roleData } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id);
+
+    const userRoles = roleData?.map(r => r.role) || [];
+    const hasAccess = userRoles.includes('admin') || userRoles.includes('nazer');
+
+    if (!hasAccess) {
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'ليس لديك صلاحية لتنفيذ هذه العملية - يتطلب دور مسؤول' 
+        }), 
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // 🚦 3. Rate Limiting (محاولة واحدة كل دقيقة)
+    const oneMinuteAgo = new Date(Date.now() - 60000).toISOString();
+    const { data: recentFixes } = await supabase
+      .from('auto_fix_attempts')
+      .select('id')
+      .gte('created_at', oneMinuteAgo);
+
+    if (recentFixes && recentFixes.length >= 1) {
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'يرجى الانتظار دقيقة واحدة قبل المحاولة مرة أخرى' 
+        }), 
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log(`🔧 Starting auto-fix execution by user: ${user.email}...`);
 
     // جلب محاولات الإصلاح المعلقة
     const { data: pendingFixes, error: fetchError } = await supabase
@@ -89,7 +144,7 @@ Deno.serve(async (req) => {
             .update({
               status: 'resolved',
               resolved_at: new Date().toISOString(),
-              resolved_by: 'auto_fix_system',
+              resolved_by: user.id,
             })
             .eq('id', errorLog.id);
         } else {
@@ -133,7 +188,7 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: 'حدث خطأ أثناء تنفيذ الإصلاحات التلقائية',
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

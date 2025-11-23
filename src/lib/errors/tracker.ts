@@ -242,12 +242,25 @@ class ErrorTracker {
       const report = this.errorQueue.shift()!;
       
       try {
+        // 🔒 الحصول على session للمصادقة
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
+          console.warn('No session available for error tracking');
+          this.errorQueue.unshift(report);
+          break;
+        }
+
         const timeoutPromise = new Promise<never>((_, reject) => 
           setTimeout(() => reject(new Error('Request timeout')), 10000)
         );
         
+        // ✅ إضافة Authorization header
         const invokePromise = supabase.functions.invoke('log-error', {
           body: report,
+          headers: {
+            Authorization: `Bearer ${session.access_token}`
+          }
         });
         
         const result = await Promise.race([invokePromise, timeoutPromise]);

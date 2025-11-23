@@ -173,11 +173,31 @@ serve(async (req) => {
     );
   } catch (error) {
     console.error('❌ خطأ في تشفير الملف:', error);
-    const errorMessage = error instanceof Error ? error.message : 'خطأ غير معروف';
+    
+    // تسجيل تفاصيل كاملة للمطورين
+    console.error('Full error details:', {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString()
+    });
+    
+    // رسالة آمنة للعميل
+    let safeMessage = 'حدث خطأ أثناء تشفير الملف';
+    
+    if (error instanceof Error) {
+      if (error.message.includes('غير مصرح') || error.message.includes('unauthorized')) {
+        safeMessage = 'غير مصرح بالوصول';
+      } else if (error.message.includes('لم يتم إرفاق')) {
+        safeMessage = 'لم يتم إرفاق ملف';
+      } else if (error.message.includes('فشل رفع') || error.message.includes('upload')) {
+        safeMessage = 'فشل رفع الملف، يرجى المحاولة مرة أخرى';
+      }
+    }
+    
     return new Response(
       JSON.stringify({ 
         success: false,
-        error: errorMessage 
+        error: safeMessage
       }),
       {
         status: 500,

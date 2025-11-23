@@ -7715,6 +7715,18 @@ export type Database = {
         }
         Relationships: []
       }
+      current_user_roles: {
+        Row: {
+          role: Database["public"]["Enums"]["app_role"] | null
+        }
+        Insert: {
+          role?: Database["public"]["Enums"]["app_role"] | null
+        }
+        Update: {
+          role?: Database["public"]["Enums"]["app_role"] | null
+        }
+        Relationships: []
+      }
       distribution_statistics: {
         Row: {
           completion_percentage: number | null
@@ -8031,6 +8043,13 @@ export type Database = {
       }
       get_admin_dashboard_kpis: { Args: never; Returns: Json }
       get_beneficiary_number: { Args: { ben_id: string }; Returns: string }
+      has_any_role: {
+        Args: {
+          _roles: Database["public"]["Enums"]["app_role"][]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
