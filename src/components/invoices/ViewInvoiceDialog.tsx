@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { logger } from "@/lib/logger";
 import { InvoiceStatusActions } from "./InvoiceStatusActions";
+import { format } from "date-fns";
 
 interface ViewInvoiceDialogProps {
   invoiceId: string | null;
@@ -117,7 +118,13 @@ export const ViewInvoiceDialog = ({ invoiceId, open, onOpenChange }: ViewInvoice
   if (!invoice) return null;
 
   return (
-    <ResponsiveDialog open={open} onOpenChange={onOpenChange} title="تفاصيل الفاتورة" size="xl">
+    <ResponsiveDialog 
+      open={open} 
+      onOpenChange={onOpenChange} 
+      title="تفاصيل الفاتورة" 
+      description={`رقم الفاتورة: ${invoice.invoice_number} | التاريخ: ${format(new Date(invoice.invoice_date), "yyyy-MM-dd")}`}
+      size="xl"
+    >
       <div className="space-y-4">
         <div className="flex gap-2 print:hidden">
           <Button variant="outline" size="sm" onClick={handlePrint}>
