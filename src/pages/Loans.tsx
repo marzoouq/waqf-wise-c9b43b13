@@ -26,7 +26,10 @@ import {
   Calendar,
   Percent,
   Calculator,
+  Download,
 } from "lucide-react";
+import * as XLSX from "xlsx";
+import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
 import {
@@ -150,10 +153,36 @@ export default function Loans() {
             إدارة القروض وجداول الأقساط والمدفوعات
           </p>
         </div>
-        <Button onClick={() => setIsDialogOpen(true)} className="gap-2">
-          <Plus className="h-4 w-4" />
-          إضافة قرض جديد
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline"
+            onClick={() => {
+              const exportData = filteredLoans.map((loan) => ({
+                "رقم القرض": loan.loan_number,
+                "المستفيد": loan.beneficiary?.full_name,
+                "الهوية الوطنية": loan.beneficiary?.national_id,
+                "مبلغ القرض": loan.loan_amount,
+                "نسبة الفائدة": loan.interest_rate + "%",
+                "المدة (شهر)": loan.term_months,
+                "القسط الشهري": loan.monthly_installment,
+                "تاريخ البداية": format(new Date(loan.start_date), "dd/MM/yyyy"),
+                "الحالة": loan.status,
+              }));
+              const ws = XLSX.utils.json_to_sheet(exportData);
+              const wb = XLSX.utils.book_new();
+              XLSX.utils.book_append_sheet(wb, ws, "القروض");
+              XLSX.writeFile(wb, `قروض_${format(new Date(), "yyyy-MM-dd")}.xlsx`);
+            }}
+            className="gap-2"
+          >
+            <Download className="h-4 w-4" />
+            تصدير Excel
+          </Button>
+          <Button onClick={() => setIsDialogOpen(true)} className="gap-2">
+            <Plus className="h-4 w-4" />
+            إضافة قرض جديد
+          </Button>
+        </div>
       </div>
 
       {/* Statistics Cards */}
