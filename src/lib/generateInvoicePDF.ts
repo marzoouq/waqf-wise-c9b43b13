@@ -40,7 +40,7 @@ export const generateInvoicePDF = async (
   invoice: Invoice,
   lines: InvoiceLine[],
   orgSettings: OrganizationSettings | null
-) => {
+): Promise<jsPDF> => {
   try {
     // تحميل الخطوط العربية
     const { regular: amiriRegular, bold: amiriBold } = await loadAmiriFonts();
@@ -425,8 +425,8 @@ export const generateInvoicePDF = async (
     );
   }
 
-    // حفظ الملف
-    doc.save(`Invoice-${invoice.invoice_number}.pdf`);
+    // إرجاع المستند بدلاً من الحفظ
+    return doc;
   } catch (error) {
     logger.error(error, { context: 'generate_invoice_pdf', severity: 'high' });
     throw new Error("فشل في إنشاء ملف PDF: " + (error instanceof Error ? error.message : "خطأ غير معروف"));

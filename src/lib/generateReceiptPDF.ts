@@ -20,7 +20,7 @@ interface Receipt {
 export const generateReceiptPDF = async (
   receipt: Receipt,
   orgSettings: OrganizationSettings | null
-) => {
+): Promise<jsPDF> => {
   try {
     // تحميل الخطوط العربية
     const { regular: amiriRegular, bold: amiriBold } = await loadAmiriFonts();
@@ -268,8 +268,8 @@ export const generateReceiptPDF = async (
       );
     }
 
-    // حفظ الملف
-    doc.save(`Receipt-${receipt.payment_number}.pdf`);
+    // إرجاع المستند بدلاً من الحفظ
+    return doc;
   } catch (error) {
     logger.error(error, { context: 'generate_receipt_pdf', severity: 'high' });
     throw new Error("فشل في إنشاء ملف PDF: " + (error instanceof Error ? error.message : "خطأ غير معروف"));
