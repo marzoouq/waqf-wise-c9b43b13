@@ -120,23 +120,24 @@ function PropertyUnitsSection({ propertyId, propertyName, totalUnits, occupiedUn
   }
 
   const availableUnits = units.filter(u => u.occupancy_status === 'شاغر').length;
+  const occupiedCount = units.filter(u => u.occupancy_status === 'مشغول').length;
 
   return (
     <div className="space-y-4 pt-4 border-t">
       {/* إحصائيات سريعة */}
       <div className="grid grid-cols-3 gap-3">
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100/50 border-blue-200 dark:from-blue-950 dark:to-blue-900/50 dark:border-blue-800">
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl md:text-3xl font-bold text-blue-600 dark:text-blue-400">{units.length}</div>
-            <div className="text-xs text-blue-700 dark:text-blue-300 mt-1">إجمالي الوحدات</div>
+        <Card className="bg-gradient-to-br from-info-light to-info-light/50 border-info">
+          <CardContent className="pt-6 text-center">
+            <div className="text-2xl md:text-3xl font-bold text-info">{units.length}</div>
+            <div className="text-xs text-info-foreground mt-1">إجمالي الوحدات</div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-green-50 to-green-100/50 border-green-200 dark:from-green-950 dark:to-green-900/50 dark:border-green-800">
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl md:text-3xl font-bold text-green-600 dark:text-green-400">
-              {units.filter(u => u.occupancy_status === 'مشغول').length}
+        <Card className="bg-gradient-to-br from-success-light to-success-light/50 border-success">
+          <CardContent className="pt-6 text-center">
+            <div className="text-2xl md:text-3xl font-bold text-success">
+              {occupiedCount}
             </div>
-            <div className="text-xs text-green-700 dark:text-green-300 mt-1">مشغول</div>
+            <div className="text-xs text-success-foreground mt-1">مشغول</div>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-br from-amber-50 to-amber-100/50 border-amber-200 dark:from-amber-950 dark:to-amber-900/50 dark:border-amber-800">

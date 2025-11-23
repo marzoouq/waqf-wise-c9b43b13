@@ -52,7 +52,7 @@ export function FinancialTransparencyTab() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5 text-blue-600" />
+            <FileText className="h-5 w-5 text-info" />
             عقود الإيجار النشطة
           </CardTitle>
           <CardDescription>
@@ -86,7 +86,7 @@ export function FinancialTransparencyTab() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <PieChart className="h-5 w-5 text-purple-600" />
+                <PieChart className="h-5 w-5 text-primary" />
                 نسب التوزيع بين المستفيدين
               </CardTitle>
               <CardDescription>

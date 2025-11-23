@@ -368,7 +368,7 @@ export default function SupportManagement() {
                       overviewStats.avgSatisfaction.toFixed(1) : 
                       '0.0'}
                   </div>
-                  <Star className="h-6 w-6 text-yellow-500 fill-yellow-500" />
+                  <Star className="h-6 w-6 text-warning fill-warning" />
                 </div>
               </CardContent>
             </Card>

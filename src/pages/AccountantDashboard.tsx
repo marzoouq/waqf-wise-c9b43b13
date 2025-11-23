@@ -205,7 +205,7 @@ const AccountantDashboard = () => {
                   <TableSkeleton />
                 ) : pendingApprovals.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
-                    <CheckCircle className="h-12 w-12 mx-auto mb-3 text-green-500" />
+                    <CheckCircle className="h-12 w-12 mx-auto mb-3 text-success" />
                     <p>لا توجد موافقات معلقة</p>
                   </div>
                 ) : (

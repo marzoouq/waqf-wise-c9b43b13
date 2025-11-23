@@ -29,7 +29,7 @@ export default function CashierDashboard() {
       <MobileOptimizedHeader
         title="لوحة تحكم أمين الصندوق"
         description="إدارة المدفوعات والمقبوضات اليومية"
-        icon={<Wallet className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-orange-600" />}
+        icon={<Wallet className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-warning" />}
       />
 
         {/* KPI Cards */}

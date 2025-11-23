@@ -49,13 +49,13 @@ const roleLabels: Record<AppRole, string> = {
 };
 
 const roleColors: Record<AppRole, string> = {
-  nazer: "bg-purple-500/10 text-purple-500 border-purple-500/30",
-  admin: "bg-red-500/10 text-red-500 border-red-500/30",
-  accountant: "bg-blue-500/10 text-blue-500 border-blue-500/30",
-  cashier: "bg-green-500/10 text-green-500 border-green-500/30",
-  archivist: "bg-orange-500/10 text-orange-500 border-orange-500/30",
-  beneficiary: "bg-cyan-500/10 text-cyan-500 border-cyan-500/30",
-  user: "bg-gray-500/10 text-gray-500 border-gray-500/30",
+  nazer: "bg-primary/10 text-primary border-primary/30",
+  admin: "bg-destructive/10 text-destructive border-destructive/30",
+  accountant: "bg-info/10 text-info border-info/30",
+  cashier: "bg-success/10 text-success border-success/30",
+  archivist: "bg-warning/10 text-warning border-warning/30",
+  beneficiary: "bg-accent/10 text-accent border-accent/30",
+  user: "bg-muted/10 text-muted-foreground border-border/30",
 };
 
 const Users = () => {

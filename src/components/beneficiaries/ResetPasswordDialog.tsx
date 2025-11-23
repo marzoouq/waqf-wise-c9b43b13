@@ -193,9 +193,9 @@ export function ResetPasswordDialog({
           </div>
         ) : (
           <div className="space-y-4 py-4">
-            <Alert className="bg-green-50 border-green-200">
-              <CheckCircle2 className="h-5 w-5 text-green-600" />
-              <AlertDescription className="text-green-800">
+            <Alert className="bg-success-light border-success">
+              <CheckCircle2 className="h-5 w-5 text-success" />
+              <AlertDescription className="text-success-foreground">
                 تم إعادة تعيين كلمة المرور بنجاح!
               </AlertDescription>
             </Alert>

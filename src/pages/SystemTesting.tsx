@@ -297,7 +297,7 @@ export default function SystemTesting() {
   const getStatusIcon = (status: TestResult['status']) => {
     switch (status) {
       case 'passed':
-        return <CheckCircle2 className="h-5 w-5 text-green-600" />;
+        return <CheckCircle2 className="h-5 w-5 text-success" />;
       case 'failed':
         return <XCircle className="h-5 w-5 text-destructive" />;
       case 'running':
@@ -313,7 +313,7 @@ export default function SystemTesting() {
       throw new Error('Component crash test triggered!');
     }
     return (
-      <div className="p-4 border rounded-lg bg-green-50 text-green-700">
+      <div className="p-4 border rounded-lg bg-success-light text-success">
         <p className="font-semibold">✅ المكون يعمل بشكل صحيح</p>
         <p className="text-sm mt-1">اضغط الزر أدناه لاختبار الاسترجاع التلقائي</p>
       </div>
