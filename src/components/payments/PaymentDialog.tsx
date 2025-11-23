@@ -43,7 +43,7 @@ const paymentSchema = z.object({
   reference_number: z.string().optional(),
   description: z.string().min(1, { message: "البيان مطلوب" }),
   notes: z.string().optional(),
-  contract_id: z.string().optional(),
+  contract_id: z.string().transform(val => val === "none" ? undefined : val).optional(),
 });
 
 type PaymentFormValues = z.infer<typeof paymentSchema>;
@@ -78,7 +78,7 @@ export function PaymentDialog({
       reference_number: payment?.reference_number || "",
       description: payment?.description || "",
       notes: payment?.notes || "",
-      contract_id: payment?.contract_id || "",
+      contract_id: payment?.contract_id || "none",
     },
   });
 
@@ -92,7 +92,7 @@ export function PaymentDialog({
 
   // تعبئة تلقائية عند اختيار عقد
   useEffect(() => {
-    if (selectedContractId && activeContracts.length > 0) {
+    if (selectedContractId && selectedContractId !== "none" && activeContracts.length > 0) {
       const contract = activeContracts.find(c => c.id === selectedContractId);
       if (contract) {
         form.setValue("payer_name", contract.tenant_name);
@@ -170,7 +170,7 @@ export function PaymentDialog({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="">بدون ربط</SelectItem>
+                      <SelectItem value="none">بدون ربط</SelectItem>
                       {activeContracts.map((contract) => (
                         <SelectItem key={contract.id} value={contract.id}>
                           {contract.contract_number} - {contract.tenant_name} - {contract.properties?.name}
@@ -257,10 +257,10 @@ export function PaymentDialog({
                           : "اسم المستفيد"
                       }
                       {...field}
-                      disabled={!!selectedContractId}
+                      disabled={!!selectedContractId && selectedContractId !== "none"}
                     />
                   </FormControl>
-                  {selectedContractId && (
+                  {selectedContractId && selectedContractId !== "none" && (
                     <p className="text-xs text-muted-foreground">تم التعبئة تلقائياً من العقد</p>
                   )}
                   <FormMessage />
@@ -294,10 +294,10 @@ export function PaymentDialog({
                       className="resize-none"
                       rows={2}
                       {...field}
-                      disabled={!!selectedContractId}
+                      disabled={!!selectedContractId && selectedContractId !== "none"}
                     />
                   </FormControl>
-                  {selectedContractId && (
+                  {selectedContractId && selectedContractId !== "none" && (
                     <p className="text-xs text-muted-foreground">تم التعبئة تلقائياً من العقد</p>
                   )}
                   <FormMessage />
