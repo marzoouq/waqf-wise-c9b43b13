@@ -11,6 +11,10 @@ const IGNORE_ERROR_PATTERNS = [
   /Failed to fetch.*log-error/i,
   /NetworkError.*execute-auto-fix/i,
   /ResizeObserver loop/i,
+  /Auth session missing/i,
+  /Failed to fetch/i,
+  /getUser/i,
+  /getSession/i,
 ];
 
 class ErrorTracker {
@@ -24,6 +28,10 @@ class ErrorTracker {
   private circuitBreakerOpen = false;
   private circuitBreakerResetTime: number | null = null;
   private recentErrors = new Map<string, number>();
+  private errorCounts = new Map<string, number>(); // ✅ عداد الأخطاء المتطابقة
+  private consecutiveErrors = 0; // ✅ عداد الأخطاء المتتالية
+  private readonly MAX_SAME_ERROR_COUNT = 5; // ✅ حد أقصى للأخطاء المتطابقة
+  private readonly MAX_CONSECUTIVE_ERRORS = 3; // ✅ حد أقصى للأخطاء المتتالية
 
   private constructor() {
     this.setupGlobalHandlers();
@@ -124,8 +132,11 @@ class ErrorTracker {
     window.fetch = async (...args) => {
       const requestUrl = typeof args[0] === 'string' ? args[0] : args[0]?.toString() || 'unknown';
       
-      // تجاهل طلبات log-error لتجنب الحلقة اللانهائية
-      if (requestUrl.includes('log-error') || requestUrl.includes('analytics')) {
+      // تجاهل طلبات log-error و auth لتجنب الحلقة اللانهائية
+      if (requestUrl.includes('log-error') || 
+          requestUrl.includes('analytics') ||
+          requestUrl.includes('auth/v1/user') ||
+          requestUrl.includes('auth/v1/session')) {
         return originalFetch(...args);
       }
       
@@ -136,8 +147,8 @@ class ErrorTracker {
           const errorKey = `${response.status}-${requestUrl}`;
           const lastError = this.recentErrors.get(errorKey);
           
-          // تسجيل فقط إذا مر 5 دقائق على آخر خطأ مشابه
-          if (!lastError || Date.now() - lastError > 5 * 60 * 1000) {
+          // تسجيل فقط إذا مر 30 ثانية على آخر خطأ مشابه
+          if (!lastError || Date.now() - lastError > 30 * 1000) {
             this.recentErrors.set(errorKey, Date.now());
             this.trackError({
               error_type: 'network_error',
@@ -163,8 +174,8 @@ class ErrorTracker {
         const errorKey = `fetch-error-${requestUrl}`;
         const lastError = this.recentErrors.get(errorKey);
         
-        // تسجيل فقط إذا مر 5 دقائق على آخر خطأ مشابه
-        if (!lastError || Date.now() - lastError > 5 * 60 * 1000) {
+        // تسجيل فقط إذا مر 30 ثانية على آخر خطأ مشابه
+        if (!lastError || Date.now() - lastError > 30 * 1000) {
           this.recentErrors.set(errorKey, Date.now());
           this.trackError({
             error_type: 'network_error',
@@ -238,9 +249,35 @@ class ErrorTracker {
       return;
     }
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      report.user_id = user.id;
+    // ✅ التحقق من Circuit Breaker
+    if (this.consecutiveErrors >= this.MAX_CONSECUTIVE_ERRORS) {
+      console.warn('Circuit breaker opened - too many consecutive errors');
+      return;
+    }
+
+    // ✅ التحقق من عدد الأخطاء المتطابقة
+    const errorKey = `${report.error_type}-${report.error_message}`;
+    const count = this.errorCounts.get(errorKey) || 0;
+    
+    if (count >= this.MAX_SAME_ERROR_COUNT) {
+      return; // تجاهل الخطأ إذا تجاوز الحد الأقصى
+    }
+    
+    this.errorCounts.set(errorKey, count + 1);
+    
+    // ✅ إعادة تعيين العداد بعد دقيقة
+    setTimeout(() => {
+      this.errorCounts.delete(errorKey);
+    }, 60 * 1000);
+
+    // ✅ استخدام getSession بدلاً من getUser لتجنب HTTP request
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        report.user_id = session.user.id;
+      }
+    } catch (error) {
+      // تجاهل الخطأ بصمت - المستخدم ليس مسجل دخول
     }
 
     this.errorQueue.push(report);
@@ -305,6 +342,7 @@ class ErrorTracker {
         if (result.error) throw result.error;
         
         this.failedAttempts = 0;
+        this.consecutiveErrors = 0; // ✅ إعادة تعيين عند النجاح
         this.backoffDelay = 1000;
         
         if (report.severity === 'critical' || report.severity === 'high') {
@@ -315,6 +353,7 @@ class ErrorTracker {
         productionLogger.error('Failed to send error report', error);
         
         this.failedAttempts++;
+        this.consecutiveErrors++; // ✅ زيادة العداد عند الفشل
         this.errorQueue.unshift(report);
         
         if (this.failedAttempts >= this.maxFailedAttempts) {
