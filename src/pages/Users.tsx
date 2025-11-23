@@ -443,10 +443,19 @@ const Users = () => {
                               variant="ghost"
                               size="sm"
                               onClick={() => {
+                                if (!user.user_id) {
+                                  toast({
+                                    title: "غير متاح",
+                                    description: "هذا المستخدم ليس لديه حساب مفعّل في النظام",
+                                    variant: "destructive",
+                                  });
+                                  return;
+                                }
                                 setSelectedUserForReset(user);
                                 setResetPasswordDialogOpen(true);
                               }}
-                              title="تعيين كلمة مرور مؤقتة"
+                              title={user.user_id ? "تعيين كلمة مرور مؤقتة" : "غير متاح - لا يوجد حساب"}
+                              disabled={!user.user_id}
                             >
                               <Key className="h-4 w-4" />
                             </Button>
@@ -562,14 +571,14 @@ const Users = () => {
             </Button>
             <Button
               onClick={() => {
-                if (selectedUserForReset) {
+                if (selectedUserForReset?.user_id) {
                   resetPasswordMutation.mutate({
                     userId: selectedUserForReset.user_id,
                     password: newPassword
                   });
                 }
               }}
-              disabled={newPassword.length < 8 || resetPasswordMutation.isPending}
+              disabled={newPassword.length < 8 || resetPasswordMutation.isPending || !selectedUserForReset?.user_id}
             >
               {resetPasswordMutation.isPending ? "جاري التحديث..." : "تعيين كلمة المرور"}
             </Button>
