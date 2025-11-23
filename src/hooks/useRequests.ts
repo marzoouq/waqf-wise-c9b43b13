@@ -4,7 +4,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useTasks } from '@/hooks/useTasks';
 import type { BeneficiaryRequest, RequestType } from '@/types';
 import { logger } from '@/lib/logger';
-import { createMutationErrorHandler } from '@/lib/errorHandling';
+import { createMutationErrorHandler } from '@/lib/errors';
 
 // ===========================
 // Request Types Hook

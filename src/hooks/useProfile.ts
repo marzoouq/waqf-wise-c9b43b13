@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { TOAST_MESSAGES, QUERY_STALE_TIME } from "@/lib/constants";
 import { useAuth } from "./useAuth";
-import { createMutationErrorHandler } from "@/lib/errorHandling";
+import { createMutationErrorHandler } from "@/lib/errors";
 
 export interface Profile {
   id: string;

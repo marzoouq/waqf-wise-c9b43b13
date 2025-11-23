@@ -51,12 +51,22 @@ export function handleError(
  * معالج أخطاء للـ mutations
  */
 export function createMutationErrorHandler(options: {
-  context?: ErrorContext;
+  context?: string | ErrorContext;
   severity?: ErrorSeverity;
   showToast?: boolean;
+  toastTitle?: string;
 } = {}) {
   return (error: unknown) => {
-    handleError(error, options);
+    const contextObj = typeof options.context === 'string' 
+      ? { operation: options.context } 
+      : options.context;
+    
+    handleError(error, {
+      context: contextObj,
+      severity: options.severity,
+      showToast: options.showToast,
+      toastTitle: options.toastTitle,
+    });
   };
 }
 

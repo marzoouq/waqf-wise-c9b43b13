@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useUnifiedErrorHandler } from "@/hooks/useUnifiedErrorHandler";
+import { handleError, showSuccess } from "@/lib/errors";
 import { executeMutation } from "@/lib/mutationHelpers";
 import { useActivities } from "@/hooks/useActivities";
 import { useAuth } from "@/hooks/useAuth";
@@ -8,7 +8,6 @@ import { Beneficiary } from "@/types/beneficiary";
 import { logger } from "@/lib/logger";
 
 export function useBeneficiaries() {
-  const { handleError, showSuccess } = useUnifiedErrorHandler();
   const queryClient = useQueryClient();
   const { addActivity } = useActivities();
   const { user } = useAuth();
@@ -63,7 +62,7 @@ export function useBeneficiaries() {
       showSuccess("تمت الإضافة بنجاح", "تم إضافة المستفيد الجديد بنجاح");
     },
     onError: (error: unknown) => {
-      handleError(error, { operation: 'add_beneficiary', component: 'Beneficiaries' });
+      handleError(error, { context: { operation: 'add_beneficiary', component: 'Beneficiaries' } });
     },
   });
 
@@ -99,7 +98,7 @@ export function useBeneficiaries() {
       showSuccess("تم التحديث بنجاح", "تم تحديث بيانات المستفيد بنجاح");
     },
     onError: (error: unknown) => {
-      handleError(error, { operation: 'update_beneficiary', component: 'Beneficiaries' });
+      handleError(error, { context: { operation: 'update_beneficiary', component: 'Beneficiaries' } });
     },
   });
 
@@ -122,7 +121,7 @@ export function useBeneficiaries() {
       showSuccess("تم الحذف بنجاح", "تم حذف المستفيد بنجاح");
     },
     onError: (error: unknown) => {
-      handleError(error, { operation: 'delete_beneficiary', component: 'Beneficiaries' });
+      handleError(error, { context: { operation: 'delete_beneficiary', component: 'Beneficiaries' } });
     },
   });
 

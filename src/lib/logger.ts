@@ -23,14 +23,13 @@ class Logger {
    * تسجيل خطأ
    */
   error(error: unknown, options?: LogOptions): void {
-    // تحويل error إلى AppError
-    const appError = this.toAppError(error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
     
-    // تسجيل في errorService
-    logError(appError, {
-      operation: options?.context,
+    // تسجيل في النظام الموحد
+    logError(errorMessage, options?.severity || 'medium', {
+      context: options?.context,
       userId: options?.userId,
-      metadata: options?.metadata,
+      ...options?.metadata,
     });
   }
 
