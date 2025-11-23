@@ -100,32 +100,32 @@ export function SmartArchiveFeatures() {
       title: "المسح الضوئي الذكي (OCR)",
       description: "استخراج النص من المستندات الممسوحة ضوئياً",
       action: handleOCRScan,
-      color: "text-blue-600",
-      bg: "bg-blue-50",
+      color: "text-info",
+      bg: "bg-info-light",
     },
     {
       icon: Tag,
       title: "التصنيف التلقائي",
       description: "تصنيف المستندات تلقائياً باستخدام AI",
       action: () => toast({ title: "قريباً", description: "هذه الميزة قيد التطوير" }),
-      color: "text-purple-600",
-      bg: "bg-purple-50",
+      color: "text-secondary-foreground",
+      bg: "bg-secondary",
     },
     {
       icon: FolderTree,
       title: "التنظيم الذكي",
       description: "تنظيم الملفات حسب النوع والتاريخ",
       action: () => toast({ title: "قريباً", description: "هذه الميزة قيد التطوير" }),
-      color: "text-green-600",
-      bg: "bg-green-50",
+      color: "text-success",
+      bg: "bg-success-light",
     },
     {
       icon: Clock,
       title: "سياسات الاحتفاظ",
       description: "إدارة دورة حياة المستندات",
       action: () => toast({ title: "قريباً", description: "هذه الميزة قيد التطوير" }),
-      color: "text-amber-600",
-      bg: "bg-amber-50",
+      color: "text-warning",
+      bg: "bg-warning-light",
     },
   ];
 
@@ -229,15 +229,15 @@ export function SmartArchiveFeatures() {
               <p className="text-xs text-muted-foreground mt-1">مستندات معالجة</p>
             </div>
             <div className="text-center p-3 bg-muted/50 rounded-lg">
-              <p className="text-2xl font-bold text-green-600">0</p>
+              <p className="text-2xl font-bold text-success">0</p>
               <p className="text-xs text-muted-foreground mt-1">تصنيف تلقائي</p>
             </div>
             <div className="text-center p-3 bg-muted/50 rounded-lg">
-              <p className="text-2xl font-bold text-blue-600">0</p>
+              <p className="text-2xl font-bold text-info">0</p>
               <p className="text-xs text-muted-foreground mt-1">نص مستخرج</p>
             </div>
             <div className="text-center p-3 bg-muted/50 rounded-lg">
-              <p className="text-2xl font-bold text-amber-600">0 MB</p>
+              <p className="text-2xl font-bold text-warning">0 MB</p>
               <p className="text-xs text-muted-foreground mt-1">مساحة مستخدمة</p>
             </div>
           </div>

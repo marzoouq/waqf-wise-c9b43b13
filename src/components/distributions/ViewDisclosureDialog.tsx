@@ -198,7 +198,7 @@ export const ViewDisclosureDialog = ({
 
                 <div className="p-4 border rounded-lg">
                   <div className="flex items-center gap-2 mb-2">
-                    <Heart className="h-4 w-4 text-pink-600" />
+                    <Heart className="h-4 w-4 text-accent" />
                     <p className="text-sm font-medium">صدقة الواقف</p>
                   </div>
                   <p className="text-xl font-bold mb-1">
@@ -262,19 +262,19 @@ export const ViewDisclosureDialog = ({
               </div>
               
               <div className="p-4 text-center border rounded-lg">
-                <Users className="h-8 w-8 mx-auto mb-2 text-blue-600" />
+                <Users className="h-8 w-8 mx-auto mb-2 text-info" />
                 <p className="text-2xl font-bold">{disclosure.sons_count}</p>
                 <p className="text-sm text-muted-foreground">الأبناء</p>
               </div>
               
               <div className="p-4 text-center border rounded-lg">
-                <Users className="h-8 w-8 mx-auto mb-2 text-pink-600" />
+                <Users className="h-8 w-8 mx-auto mb-2 text-accent" />
                 <p className="text-2xl font-bold">{disclosure.daughters_count}</p>
                 <p className="text-sm text-muted-foreground">البنات</p>
               </div>
               
               <div className="p-4 text-center border rounded-lg">
-                <Users className="h-8 w-8 mx-auto mb-2 text-purple-600" />
+                <Users className="h-8 w-8 mx-auto mb-2 text-secondary-foreground" />
                 <p className="text-2xl font-bold">{disclosure.wives_count}</p>
                 <p className="text-sm text-muted-foreground">الزوجات</p>
               </div>
@@ -295,36 +295,36 @@ export const ViewDisclosureDialog = ({
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="grid grid-cols-2 gap-3">
                   {disclosure.maintenance_expenses && disclosure.maintenance_expenses > 0 && (
-                    <div className="p-3 bg-orange-50 dark:bg-orange-950 rounded-lg border border-orange-200">
-                      <p className="text-xs text-orange-600 mb-1">مصروفات الصيانة</p>
-                      <p className="text-lg font-bold text-orange-700">
+                    <div className="p-3 bg-warning-light rounded-lg border border-warning/20">
+                      <p className="text-xs text-warning mb-1">مصروفات الصيانة</p>
+                      <p className="text-lg font-bold text-warning">
                         {disclosure.maintenance_expenses.toLocaleString()}
                       </p>
                     </div>
                   )}
                   
                   {disclosure.administrative_expenses && disclosure.administrative_expenses > 0 && (
-                    <div className="p-3 bg-cyan-50 dark:bg-cyan-950 rounded-lg border border-cyan-200">
-                      <p className="text-xs text-cyan-600 mb-1">مصروفات إدارية</p>
-                      <p className="text-lg font-bold text-cyan-700">
+                    <div className="p-3 bg-info-light rounded-lg border border-info/20">
+                      <p className="text-xs text-info mb-1">مصروفات إدارية</p>
+                      <p className="text-lg font-bold text-info">
                         {disclosure.administrative_expenses.toLocaleString()}
                       </p>
                     </div>
                   )}
                   
                   {disclosure.development_expenses && disclosure.development_expenses > 0 && (
-                    <div className="p-3 bg-violet-50 dark:bg-violet-950 rounded-lg border border-violet-200">
-                      <p className="text-xs text-violet-600 mb-1">مصروفات التطوير</p>
-                      <p className="text-lg font-bold text-violet-700">
+                    <div className="p-3 bg-secondary rounded-lg border border-secondary/20">
+                      <p className="text-xs text-secondary-foreground mb-1">مصروفات التطوير</p>
+                      <p className="text-lg font-bold text-secondary-foreground">
                         {disclosure.development_expenses.toLocaleString()}
                       </p>
                     </div>
                   )}
                   
                   {disclosure.other_expenses && disclosure.other_expenses > 0 && (
-                    <div className="p-3 bg-pink-50 dark:bg-pink-950 rounded-lg border border-pink-200">
-                      <p className="text-xs text-pink-600 mb-1">مصروفات أخرى</p>
-                      <p className="text-lg font-bold text-pink-700">
+                    <div className="p-3 bg-accent/10 rounded-lg border border-accent/20">
+                      <p className="text-xs text-accent mb-1">مصروفات أخرى</p>
+                      <p className="text-lg font-bold text-accent">
                         {disclosure.other_expenses.toLocaleString()}
                       </p>
                     </div>

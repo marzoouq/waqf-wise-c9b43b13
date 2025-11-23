@@ -79,13 +79,13 @@ export function ProfileFamilyTree({ beneficiaryId }: ProfileFamilyTreeProps) {
   const getCategoryColor = (category: string) => {
     switch (category) {
       case 'الفئة الأولى':
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400';
+        return 'bg-secondary text-secondary-foreground border-secondary/20';
       case 'الفئة الثانية':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+        return 'bg-info-light text-info border-info/20';
       case 'الفئة الثالثة':
-        return 'bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-400';
+        return 'bg-accent/10 text-accent border-accent/20';
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
+        return 'bg-muted text-muted-foreground border-border';
     }
   };
 

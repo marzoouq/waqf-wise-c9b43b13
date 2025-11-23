@@ -75,7 +75,7 @@ export function TrialBalanceReport() {
                     {account.credit > 0 ? formatNumber(account.credit) : "-"}
                   </TableCell>
                   <TableCell className="text-left font-mono font-semibold text-xs sm:text-sm whitespace-nowrap">
-                    <span className={account.balance > 0 ? "text-green-600" : account.balance < 0 ? "text-red-600" : ""}>
+                    <span className={account.balance > 0 ? "text-success" : account.balance < 0 ? "text-destructive" : ""}>
                       {formatNumber(account.balance)}
                     </span>
                   </TableCell>

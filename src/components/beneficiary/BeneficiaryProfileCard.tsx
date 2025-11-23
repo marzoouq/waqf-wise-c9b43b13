@@ -56,10 +56,10 @@ export function BeneficiaryProfileCard({
 
   const getCategoryColor = (category: string) => {
     const colors: Record<string, string> = {
-      "أبناء": "bg-blue-500/10 text-blue-700 border-blue-200",
-      "بنات": "bg-pink-500/10 text-pink-700 border-pink-200",
-      "زوجات": "bg-purple-500/10 text-purple-700 border-purple-200",
-      "خيرية": "bg-green-500/10 text-green-700 border-green-200",
+      "أبناء": "bg-info-light text-info border-info/20",
+      "بنات": "bg-accent-light text-accent border-accent/20",
+      "زوجات": "bg-secondary text-secondary-foreground border-secondary/20",
+      "خيرية": "bg-success-light text-success border-success/20",
     };
     return colors[category] || "bg-muted";
   };

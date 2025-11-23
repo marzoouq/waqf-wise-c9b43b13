@@ -34,12 +34,12 @@ interface TicketDetailsDialogProps {
 }
 
 const statusColors = {
-  open: 'bg-blue-500',
-  in_progress: 'bg-yellow-500',
-  waiting_customer: 'bg-purple-500',
-  resolved: 'bg-green-500',
-  closed: 'bg-gray-500',
-  cancelled: 'bg-red-500',
+  open: 'bg-info',
+  in_progress: 'bg-warning',
+  waiting_customer: 'bg-secondary',
+  resolved: 'bg-success',
+  closed: 'bg-muted',
+  cancelled: 'bg-destructive',
 };
 
 const statusLabels = {

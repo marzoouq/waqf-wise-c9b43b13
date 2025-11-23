@@ -25,20 +25,20 @@ export default function PendingApprovalsSection() {
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'distribution': return 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-200';
-      case 'request': return 'bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-200';
-      case 'journal': return 'bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-200';
-      case 'payment': return 'bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-200';
-      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
+      case 'distribution': return 'bg-info-light text-info border-info/20';
+      case 'request': return 'bg-secondary text-secondary-foreground border-secondary/20';
+      case 'journal': return 'bg-success-light text-success border-success/20';
+      case 'payment': return 'bg-warning-light text-warning border-warning/20';
+      default: return 'bg-muted text-muted-foreground border-border';
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-200';
-      case 'medium': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-200';
-      case 'low': return 'bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-200';
-      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
+      case 'high': return 'bg-destructive-light text-destructive border-destructive/20';
+      case 'medium': return 'bg-warning-light text-warning border-warning/20';
+      case 'low': return 'bg-success-light text-success border-success/20';
+      default: return 'bg-muted text-muted-foreground border-border';
     }
   };
 

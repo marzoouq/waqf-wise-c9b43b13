@@ -62,8 +62,8 @@ export function QuickActionsCard({
       label: "إضافة فرد",
       description: "إضافة فرد جديد للعائلة",
       onClick: onAddFamily,
-      color: "text-purple-600",
-      bg: "bg-purple-50 hover:bg-purple-100",
+      color: "text-secondary-foreground",
+      bg: "bg-secondary hover:bg-secondary/80",
     },
     {
       icon: Upload,
@@ -86,8 +86,8 @@ export function QuickActionsCard({
       label: "الدعم الفني",
       description: "المساعدة والأسئلة الشائعة",
       onClick: () => navigate("/beneficiary-support"),
-      color: "text-orange-600",
-      bg: "bg-orange-50 hover:bg-orange-100",
+      color: "text-warning",
+      bg: "bg-warning-light hover:bg-warning/20",
     },
   ];
 

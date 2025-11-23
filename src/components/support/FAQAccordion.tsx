@@ -11,11 +11,11 @@ interface FAQAccordionProps {
 
 export function FAQAccordion({ faqs, onRate }: FAQAccordionProps) {
   const categoryColors = {
-    general: 'bg-blue-500/10 text-blue-500',
-    account: 'bg-purple-500/10 text-purple-500',
-    billing: 'bg-red-500/10 text-red-500',
-    technical: 'bg-orange-500/10 text-orange-500',
-    features: 'bg-green-500/10 text-green-500',
+    general: 'bg-info-light text-info',
+    account: 'bg-secondary text-secondary-foreground',
+    billing: 'bg-destructive-light text-destructive',
+    technical: 'bg-warning-light text-warning',
+    features: 'bg-success-light text-success',
   };
 
   const getCategoryLabel = (category: string) => {
