@@ -19,6 +19,9 @@ interface Props {
 export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
   const { addContract, updateContract } = useContracts();
   const { properties } = useProperties();
+  
+  // جلب العقار المحدد وملء البيانات تلقائياً
+  const selectedProperty = properties?.find(p => p.id === formData.property_id);
 
   const [formData, setFormData] = useState({
     contract_number: "",
@@ -70,6 +73,17 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
       setFormData(prev => ({ ...prev, contract_number: contractNumber }));
     }
   }, [contract]);
+
+  // ملء تلقائي للإيجار وعدد الوحدات عند اختيار العقار
+  useEffect(() => {
+    if (selectedProperty && !contract) {
+      setFormData(prev => ({
+        ...prev,
+        monthly_rent: selectedProperty.monthly_revenue?.toString() || prev.monthly_rent,
+        units_count: selectedProperty.units?.toString() || prev.units_count,
+      }));
+    }
+  }, [selectedProperty, contract]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,7 +139,15 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
       size="xl"
     >
       <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+        {!contract && (
+          <div className="bg-info/10 border border-info/30 rounded-lg p-3 text-sm mb-4">
+            <p className="text-info-foreground">
+              💡 <strong>ملاحظة:</strong> سيتم ملء الإيجار الشهري وعدد الوحدات تلقائياً من بيانات العقار المحدد
+            </p>
+          </div>
+        )}
+        
+        <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>العقار *</Label>
               <Select
@@ -240,7 +262,12 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
             </div>
 
             <div className="space-y-2">
-              <Label>التأمين</Label>
+              <Label>
+                التأمين (ريال) - اختياري
+                <span className="text-xs text-muted-foreground mr-2">
+                  (مبلغ يُدفع مرة واحدة عند توقيع العقد)
+                </span>
+              </Label>
               <Input
                 type="number"
                 step="0.01"
@@ -269,13 +296,18 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="شهري">شهري</SelectItem>
-                  <SelectItem value="ربع سنوي">ربع سنوي</SelectItem>
-                  <SelectItem value="نصف سنوي">نصف سنوي</SelectItem>
-                  <SelectItem value="سنوي">سنوي</SelectItem>
-                </SelectContent>
+              <SelectContent>
+                <SelectItem value="شهري">شهري</SelectItem>
+                <SelectItem value="ربع سنوي">ربع سنوي</SelectItem>
+                <SelectItem value="نصف سنوي">نصف سنوي</SelectItem>
+                <SelectItem value="سنوي">سنوي</SelectItem>
+                <SelectItem value="دفعة واحدة">دفعة واحدة (مقدماً)</SelectItem>
+                <SelectItem value="دفعتين">دفعتين</SelectItem>
+              </SelectContent>
               </Select>
+              <p className="text-xs text-muted-foreground mt-1">
+                💡 اختر "دفعة واحدة" للعقود السنوية المدفوعة مقدماً
+              </p>
             </div>
           </div>
 

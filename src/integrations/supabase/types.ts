@@ -5074,6 +5074,7 @@ export type Database = {
           commercial_registration_number: string
           country: string | null
           created_at: string | null
+          default_tax_percentage: number | null
           email: string | null
           governance_type: string | null
           id: string
@@ -5101,6 +5102,7 @@ export type Database = {
           commercial_registration_number: string
           country?: string | null
           created_at?: string | null
+          default_tax_percentage?: number | null
           email?: string | null
           governance_type?: string | null
           id?: string
@@ -5128,6 +5130,7 @@ export type Database = {
           commercial_registration_number?: string
           country?: string | null
           created_at?: string | null
+          default_tax_percentage?: number | null
           email?: string | null
           governance_type?: string | null
           id?: string
@@ -8100,6 +8103,14 @@ export type Database = {
         Args: { annual_rate: number; months: number; principal: number }
         Returns: number
       }
+      calculate_occupied_units: {
+        Args: { property_id: string }
+        Returns: number
+      }
+      calculate_property_revenue: {
+        Args: { property_id: string }
+        Returns: number
+      }
       check_file_retention_eligibility: {
         Args: { p_file_category: string; p_uploaded_at: string }
         Returns: boolean
@@ -8145,6 +8156,16 @@ export type Database = {
           p_user_id: string
         }
         Returns: string
+      }
+      create_payment_schedule: {
+        Args: {
+          p_contract_id: string
+          p_end_date: string
+          p_monthly_rent: number
+          p_payment_frequency: string
+          p_start_date: string
+        }
+        Returns: Json
       }
       create_rental_invoice_and_receipt: {
         Args: {

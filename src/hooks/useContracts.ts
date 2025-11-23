@@ -34,14 +34,41 @@ export const useContracts = () => {
         .single();
 
       if (error) throw error;
+
+      // إنشاء جدول الدفعات تلقائياً
+      if (data) {
+        const { data: scheduleResult, error: scheduleError } = await supabase
+          .rpc('create_payment_schedule', {
+            p_contract_id: data.id,
+            p_start_date: data.start_date,
+            p_end_date: data.end_date,
+            p_monthly_rent: data.monthly_rent,
+            p_payment_frequency: data.payment_frequency
+          });
+
+        if (scheduleError) {
+          logger.error(scheduleError, { context: 'create_payment_schedule', severity: 'high' });
+          toast({
+            title: "تحذير",
+            description: "تم إنشاء العقد لكن فشل في إنشاء جدول الدفعات",
+            variant: "destructive",
+          });
+        } else if (scheduleResult && typeof scheduleResult === 'object' && 'success' in scheduleResult) {
+          const result = scheduleResult as { success: boolean; payments_created?: number };
+          if (result.success) {
+            toast({
+              title: "تم إضافة العقد بنجاح",
+              description: `تم إنشاء العقد مع ${result.payments_created || 0} دفعة`,
+            });
+          }
+        }
+      }
+
       return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contracts"] });
-      toast({
-        title: "تم إضافة العقد",
-        description: "تم إضافة العقد بنجاح",
-      });
+      queryClient.invalidateQueries({ queryKey: ["rental_payments"] });
     },
     onError: (error) => {
       logger.error(error, { context: 'add_contract', severity: 'medium' });

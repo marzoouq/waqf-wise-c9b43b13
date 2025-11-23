@@ -6,6 +6,7 @@ import { ResponsiveDialog, DialogFooter } from "@/components/shared/ResponsiveDi
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -34,19 +35,10 @@ const propertySchema = z.object({
   units: z.coerce
     .number()
     .min(1, { message: "عدد الوحدات يجب أن يكون 1 على الأقل" }),
-  occupied: z.coerce.number().min(0, { message: "عدد الوحدات المؤجرة لا يمكن أن يكون سالباً" }),
-  monthly_revenue: z.coerce
-    .number()
-    .min(0, { message: "الإيراد لا يمكن أن يكون سالباً" }),
   status: z.string().min(1, { message: "الحالة مطلوبة" }),
   description: z.string().optional(),
-  tax_percentage: z.coerce.number().min(0).max(100).default(15),
   shop_count: z.coerce.number().min(0).default(0),
   apartment_count: z.coerce.number().min(0).default(0),
-  revenue_type: z.enum(['شهري', 'سنوي']).default('شهري'),
-}).refine((data) => data.occupied <= data.units, {
-  message: "عدد الوحدات المؤجرة لا يمكن أن يتجاوز إجمالي الوحدات",
-  path: ["occupied"],
 });
 
 type PropertyFormValues = z.infer<typeof propertySchema>;
@@ -73,14 +65,10 @@ export function PropertyDialog({
       type: "",
       location: "",
       units: 1,
-      occupied: 0,
-      monthly_revenue: 0,
       status: "",
       description: "",
-      tax_percentage: 15,
       shop_count: 0,
       apartment_count: 0,
-      revenue_type: 'شهري',
     },
   });
 
@@ -92,14 +80,10 @@ export function PropertyDialog({
         type: property.type || "",
         location: property.location || "",
         units: property.units || 1,
-        occupied: property.occupied || 0,
-        monthly_revenue: property.monthly_revenue || 0,
         status: property.status || "",
         description: property.description || "",
-        tax_percentage: property.tax_percentage || 15,
         shop_count: property.shop_count || 0,
         apartment_count: property.apartment_count || 0,
-        revenue_type: property.revenue_type || 'شهري',
       });
     } else {
       form.reset({
@@ -107,14 +91,10 @@ export function PropertyDialog({
         type: "",
         location: "",
         units: 1,
-        occupied: 0,
-        monthly_revenue: 0,
         status: "",
         description: "",
-        tax_percentage: 15,
         shop_count: 0,
         apartment_count: 0,
-        revenue_type: 'شهري',
       });
     }
   }, [property, form]);
@@ -241,82 +221,19 @@ export function PropertyDialog({
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               <FormField
                 control={form.control}
                 name="units"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>عدد الوحدات *</FormLabel>
+                    <FormLabel>عدد الوحدات الكلية *</FormLabel>
                     <FormControl>
                       <Input type="number" min="1" {...field} />
                     </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="occupied"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>الوحدات المؤجرة *</FormLabel>
-                    <FormControl>
-                      <Input type="number" min="0" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="tax_percentage"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>نسبة الضريبة (%)</FormLabel>
-                    <FormControl>
-                      <Input type="number" min="0" max="100" step="0.01" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="revenue_type"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>نوع الإيراد *</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="اختر نوع الإيراد" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="شهري">شهري</SelectItem>
-                        <SelectItem value="سنوي">سنوي</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="monthly_revenue"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>الإيراد (ر.س) *</FormLabel>
-                    <FormControl>
-                      <Input type="number" min="0" step="0.01" {...field} />
-                    </FormControl>
+                    <FormDescription className="text-xs text-muted-foreground">
+                      💡 الوحدات المشغولة والإيراد سيتم حسابهما تلقائياً من العقود النشطة
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
