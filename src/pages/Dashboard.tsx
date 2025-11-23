@@ -21,6 +21,7 @@ const AdminTasks = lazy(() => import("@/components/dashboard/admin/AdminTasks").
 const QuickActions = lazy(() => import("@/components/dashboard/admin/QuickActions").then(m => ({ default: m.QuickActions })));
 const FinancialStats = lazy(() => import("@/components/dashboard/FinancialStats"));
 const FamiliesStats = lazy(() => import("@/components/dashboard/FamiliesStats"));
+const IntegratedReportsWidget = lazy(() => import("@/components/dashboard/IntegratedReportsWidget").then(m => ({ default: m.IntegratedReportsWidget })));
 const RequestsStats = lazy(() => import("@/components/dashboard/RequestsStats"));
 const AccountingStats = lazy(() => import("@/components/dashboard/AccountingStats"));
 const RevenueExpenseChart = lazy(() => import("@/components/dashboard/RevenueExpenseChart"));
@@ -180,7 +181,7 @@ const Dashboard = () => {
               <ExpiringContractsCard />
             </Suspense>
             <Suspense fallback={<ChartSkeleton />}>
-              <AdminTasks />
+              <IntegratedReportsWidget />
             </Suspense>
           </div>
 

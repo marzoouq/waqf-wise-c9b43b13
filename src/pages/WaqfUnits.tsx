@@ -11,6 +11,7 @@ import { useWaqfUnits, type WaqfUnit } from "@/hooks/useWaqfUnits";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { WaqfUnitDialog } from "@/components/waqf/WaqfUnitDialog";
+import { ExportButton } from "@/components/shared/ExportButton";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 
@@ -75,10 +76,30 @@ export default function WaqfUnits() {
             إدارة ومتابعة أقلام الوقف وأصوله
           </p>
         </div>
-        <Button onClick={() => setIsDialogOpen(true)} className="gap-2">
-          <Plus className="h-4 w-4" />
-          إضافة قلم وقف
-        </Button>
+        <div className="flex gap-2">
+          {filteredUnits.length > 0 && (
+            <ExportButton
+              data={filteredUnits.map(u => ({
+                'الكود': u.code,
+                'الاسم': u.name,
+                'النوع': u.waqf_type,
+                'الموقع': u.location || '-',
+                'قيمة الاستحواذ': u.acquisition_value?.toLocaleString('ar-SA') || '0',
+                'القيمة الحالية': u.current_value?.toLocaleString('ar-SA') || '0',
+                'العائد السنوي': u.annual_return?.toLocaleString('ar-SA') || '0',
+                'تاريخ الاستحواذ': u.acquisition_date ? format(new Date(u.acquisition_date), 'dd/MM/yyyy') : '-',
+                'الحالة': u.is_active ? 'نشط' : 'غير نشط',
+              }))}
+              filename="أقلام_الوقف"
+              title="تقرير أقلام الوقف"
+              headers={['الكود', 'الاسم', 'النوع', 'الموقع', 'قيمة الاستحواذ', 'القيمة الحالية', 'العائد السنوي', 'تاريخ الاستحواذ', 'الحالة']}
+            />
+          )}
+          <Button onClick={() => setIsDialogOpen(true)} className="gap-2">
+            <Plus className="h-4 w-4" />
+            إضافة قلم وقف
+          </Button>
+        </div>
       </div>
 
       {/* Statistics Cards */}

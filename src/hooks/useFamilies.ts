@@ -13,7 +13,7 @@ export const useFamilies = () => {
   const queryClient = useQueryClient();
 
   // Fetch all families
-  const { data: families = [], isLoading, error } = useQuery({
+  const { data: families = [], isLoading, error, refetch } = useQuery({
     queryKey: ['families'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -115,6 +115,7 @@ export const useFamilies = () => {
     families,
     isLoading,
     error,
+    refetch,
     addFamily,
     updateFamily,
     deleteFamily,
