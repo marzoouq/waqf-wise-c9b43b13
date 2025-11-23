@@ -244,7 +244,7 @@ export function DistributionSimulator({ open, onOpenChange }: DistributionSimula
                 </div>
                 <div className="text-center">
                   <p className="text-xs text-muted-foreground mb-1">الاستقطاعات</p>
-                  <p className="text-lg font-bold text-amber-600">
+                  <p className="text-lg font-bold text-warning">
                     {totalDeductions.toLocaleString('ar-SA', { maximumFractionDigits: 2 })} ر.س
                   </p>
                 </div>
@@ -289,7 +289,7 @@ export function DistributionSimulator({ open, onOpenChange }: DistributionSimula
                             <TableCell className="text-center">
                               {result.allocated_amount.toLocaleString('ar-SA', { maximumFractionDigits: 2 })}
                             </TableCell>
-                            <TableCell className="text-center text-amber-600">
+                            <TableCell className="text-center text-warning">
                               {totalDeduction.toLocaleString('ar-SA', { maximumFractionDigits: 2 })}
                             </TableCell>
                             <TableCell className="text-center font-bold text-green-600">

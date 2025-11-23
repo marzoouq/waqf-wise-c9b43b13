@@ -233,7 +233,7 @@ export function CreateDecisionDialog({
                           <RadioGroupItem value="nazer_only" id="nazer" className="mt-1" />
                           <div className="flex-1">
                             <div className="flex items-center gap-2 font-semibold">
-                              <User className="h-5 w-5 text-amber-600" />
+                              <User className="h-5 w-5 text-warning" />
                               قرار الناظر (بدون تصويت)
                             </div>
                             <p className="text-sm text-muted-foreground mt-1">

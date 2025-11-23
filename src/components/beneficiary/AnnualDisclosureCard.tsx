@@ -119,12 +119,12 @@ export const AnnualDisclosureCard = () => {
               </p>
             </div>
 
-            <div className="p-3 bg-amber-50 dark:bg-amber-950 rounded-lg border border-amber-200 dark:border-amber-800">
+            <div className="p-3 bg-warning-light rounded-lg border border-warning">
               <div className="flex items-center gap-2 mb-1">
-                <Users className="h-3 w-3 text-amber-600" />
-                <p className="text-xs text-amber-600">المستفيدون</p>
+                <Users className="h-3 w-3 text-warning" />
+                <p className="text-xs text-warning">المستفيدون</p>
               </div>
-              <p className="text-lg font-bold text-amber-700">
+              <p className="text-lg font-bold text-warning-foreground">
                 {latestDisclosure.total_beneficiaries}
               </p>
             </div>

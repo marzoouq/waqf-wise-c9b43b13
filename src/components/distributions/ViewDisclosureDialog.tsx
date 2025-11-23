@@ -187,7 +187,7 @@ export const ViewDisclosureDialog = ({
               <div className="space-y-3">
                 <div className="p-4 border rounded-lg">
                   <div className="flex items-center gap-2 mb-2">
-                    <Crown className="h-4 w-4 text-amber-600" />
+                    <Crown className="h-4 w-4 text-warning" />
                     <p className="text-sm font-medium">حصة الناظر</p>
                   </div>
                   <p className="text-xl font-bold mb-1">

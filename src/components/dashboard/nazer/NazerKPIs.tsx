@@ -97,8 +97,8 @@ export default function NazerKPIs() {
       title: "العقارات المؤجرة",
       value: data.occupiedProperties,
       icon: Building2,
-      color: "text-cyan-600",
-      bgColor: "bg-cyan-50 dark:bg-cyan-950/50",
+      color: "text-info",
+      bgColor: "bg-info-light",
       description: "عقود الإيجار النشطة",
       trend: "+12.5%"
     },

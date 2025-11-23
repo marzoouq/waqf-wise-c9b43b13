@@ -140,12 +140,12 @@ function PropertyUnitsSection({ propertyId, propertyName, totalUnits, occupiedUn
             <div className="text-xs text-success-foreground mt-1">مشغول</div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-amber-50 to-amber-100/50 border-amber-200 dark:from-amber-950 dark:to-amber-900/50 dark:border-amber-800">
+        <Card className="bg-gradient-to-br from-warning-light to-warning-light/50 border-warning">
           <CardContent className="p-4 text-center">
-            <div className="text-2xl md:text-3xl font-bold text-amber-600 dark:text-amber-400">
+            <div className="text-2xl md:text-3xl font-bold text-warning">
               {availableUnits}
             </div>
-            <div className="text-xs text-amber-700 dark:text-amber-300 mt-1">متاح</div>
+            <div className="text-xs text-warning-foreground mt-1">متاح</div>
           </CardContent>
         </Card>
       </div>

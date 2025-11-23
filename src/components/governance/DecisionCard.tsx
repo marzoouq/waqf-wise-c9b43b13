@@ -118,7 +118,7 @@ export function DecisionCard({ decision }: DecisionCardProps) {
               <div className="space-y-1">
                 <div className="flex items-center justify-between text-xs">
                   <span className="flex items-center gap-1">
-                    <Minus className="h-3 w-3 text-gray-600" />
+                    <Minus className="h-3 w-3 text-muted-foreground" />
                     ممتنع
                   </span>
                   <span className="font-semibold">{decision.votes_abstain} ({abstainPercentage.toFixed(0)}%)</span>
