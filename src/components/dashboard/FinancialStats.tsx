@@ -2,15 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, Wallet, PiggyBank, Calculator } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useFinancialData } from "@/hooks/useFinancialData";
-
-const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat('ar-SA', {
-    style: 'currency',
-    currency: 'SAR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value);
-};
+import { formatCurrency } from "@/lib/utils";
 
 const FinancialStats = () => {
   const { data, isLoading } = useFinancialData();

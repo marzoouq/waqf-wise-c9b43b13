@@ -27,6 +27,7 @@ import {
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import * as XLSX from "xlsx";
 import { format } from "date-fns";
+import { formatCurrency } from "@/lib/utils";
 
 export default function Budgets() {
   const { fiscalYears } = useFiscalYears();
@@ -87,14 +88,6 @@ export default function Budgets() {
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "الميزانيات");
     XLSX.writeFile(wb, `budgets-${format(new Date(), "yyyyMMdd")}.xlsx`);
-  };
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("ar-SA", {
-      style: "currency",
-      currency: "SAR",
-      minimumFractionDigits: 0,
-    }).format(amount);
   };
 
   const getVarianceColor = (variance: number | null) => {

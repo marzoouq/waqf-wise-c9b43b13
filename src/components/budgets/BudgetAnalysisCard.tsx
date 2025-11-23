@@ -2,21 +2,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { TrendingUp, TrendingDown, AlertCircle } from "lucide-react";
 import { Budget } from "@/hooks/useBudgets";
+import { formatCurrency } from "@/lib/utils";
 
 interface BudgetAnalysisCardProps {
   budgets: Budget[];
 }
 
 export function BudgetAnalysisCard({ budgets }: BudgetAnalysisCardProps) {
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("ar-SA", {
-      style: "currency",
-      currency: "SAR",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
-
   const totalBudgeted = budgets.reduce((sum, b) => sum + b.budgeted_amount, 0);
   const totalActual = budgets.reduce((sum, b) => sum + (b.actual_amount || 0), 0);
   const totalVariance = budgets.reduce((sum, b) => sum + (b.variance_amount || 0), 0);

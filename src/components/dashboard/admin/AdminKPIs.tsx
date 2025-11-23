@@ -3,18 +3,7 @@ import { Users, UsersRound, Building2, Wallet, AlertCircle, TrendingUp, Trending
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAdminKPIs } from "@/hooks/useAdminKPIs";
 import { Skeleton } from "@/components/ui/skeleton";
-
-const currencyFormatter = new Intl.NumberFormat('ar-SA', {
-  style: 'currency',
-  currency: 'SAR',
-  minimumFractionDigits: 0,
-  maximumFractionDigits: 0,
-});
-
-const numberFormatter = new Intl.NumberFormat('ar-SA');
-
-const formatCurrency = (value: number) => currencyFormatter.format(value);
-const formatNumber = (value: number) => numberFormatter.format(value);
+import { formatCurrency, formatNumber } from "@/lib/utils";
 
 export const AdminKPIs = memo(() => {
   const { data: kpis, isLoading } = useAdminKPIs();
