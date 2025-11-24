@@ -15,6 +15,10 @@ const IGNORE_ERROR_PATTERNS = [
   /Failed to fetch/i,
   /getUser/i,
   /getSession/i,
+  /Failed to send error report/i,
+  /Edge Function returned a non-2xx status code/i,
+  /429/i,
+  /rate limit/i,
 ];
 
 class ErrorTracker {
@@ -439,18 +443,17 @@ class ErrorTracker {
         }
         
       } catch (error) {
-        productionLogger.error('Failed to send error report', error);
+        // ❌ لا نسجل فشل إرسال الأخطاء كخطأ جديد - هذا يسبب حلقة لا نهائية
+        console.warn('Failed to send error report (will retry)', error);
         
         this.failedAttempts++;
-        this.consecutiveErrors++; // ✅ زيادة العداد عند الفشل
+        this.consecutiveErrors++;
         this.errorQueue.unshift(report);
         
         if (this.failedAttempts >= this.maxFailedAttempts) {
           this.circuitBreakerOpen = true;
           this.circuitBreakerResetTime = Date.now() + 60000;
-          productionLogger.warn(`Circuit breaker opened. Queue: ${this.errorQueue.length}`, undefined, {
-            severity: 'high',
-          });
+          console.warn(`⚠️ Circuit breaker opened. Queue: ${this.errorQueue.length}`);
           this.savePendingErrors();
         } else {
           this.backoffDelay = Math.min(this.backoffDelay * 2, 30000);

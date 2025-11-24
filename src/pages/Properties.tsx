@@ -155,6 +155,7 @@ const Properties = () => {
           onEditPayment={editPayment}
           onEditMaintenance={editMaintenance}
         />
+        </div>
 
         <PropertyDialog
           open={propertyDialogOpen}
@@ -180,7 +181,6 @@ const Properties = () => {
           onOpenChange={setMaintenanceDialogOpen}
           request={selectedMaintenance}
         />
-        </div>
       </div>
     </PageErrorBoundary>
   );
