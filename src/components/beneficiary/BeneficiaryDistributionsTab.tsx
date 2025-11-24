@@ -6,12 +6,16 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { TrendingUp, Clock, CheckCircle2, DollarSign } from "lucide-react";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
+import { MaskedValue } from "@/components/shared/MaskedValue";
 
 interface BeneficiaryDistributionsTabProps {
   beneficiaryId: string;
 }
 
 export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistributionsTabProps) {
+  const { settings } = useVisibilitySettings();
+  
   // استخدام payments بدلاً من distribution_allocations
   const { data: distributions = [], isLoading } = useQuery({
     queryKey: ["beneficiary-distributions-payments", beneficiaryId],
@@ -70,7 +74,13 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
             <TrendingUp className="h-4 w-4 text-success" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalReceived.toLocaleString("ar-SA")} ريال</div>
+            <div className="text-2xl font-bold">
+              <MaskedValue
+                value={totalReceived.toLocaleString("ar-SA")}
+                type="amount"
+                masked={settings?.mask_exact_amounts || false}
+              /> ريال
+            </div>
             <p className="text-xs text-muted-foreground mt-1">إجمالي ما تم استلامه</p>
           </CardContent>
         </Card>
@@ -126,11 +136,19 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
                         {payment.payment_date && format(new Date(payment.payment_date), "dd/MM/yyyy", { locale: ar })}
                       </TableCell>
                       <TableCell className="font-semibold">
-                        {Number(payment.amount || 0).toLocaleString("ar-SA")} ريال
+                        <MaskedValue
+                          value={Number(payment.amount || 0).toLocaleString("ar-SA")}
+                          type="amount"
+                          masked={settings?.mask_exact_amounts || false}
+                        /> ريال
                       </TableCell>
                       <TableCell className="text-muted-foreground">—</TableCell>
                       <TableCell className="font-bold text-success">
-                        {Number(payment.amount || 0).toLocaleString("ar-SA")} ريال
+                        <MaskedValue
+                          value={Number(payment.amount || 0).toLocaleString("ar-SA")}
+                          type="amount"
+                          masked={settings?.mask_exact_amounts || false}
+                        /> ريال
                       </TableCell>
                       <TableCell>{getPaymentStatusBadge(payment.status || "معلق")}</TableCell>
                       <TableCell>
