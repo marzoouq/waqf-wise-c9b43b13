@@ -8257,6 +8257,14 @@ export type Database = {
         Args: { p_amount: number }
         Returns: boolean
       }
+      process_existing_rental_payments: {
+        Args: never
+        Returns: {
+          journal_entry_id: string
+          payment_id: string
+          success: boolean
+        }[]
+      }
       seed_demo_data: { Args: never; Returns: Json }
       seed_journal_entries: { Args: never; Returns: Json }
       setup_demo_accounts: {
