@@ -16,6 +16,8 @@ import { BeneficiaryProfileTab } from "@/components/beneficiary/BeneficiaryProfi
 import { BeneficiaryRequestsTab } from "@/components/beneficiary/BeneficiaryRequestsTab";
 import { BeneficiaryStatementsTab } from "@/components/beneficiary/BeneficiaryStatementsTab";
 import { BeneficiaryDocumentsTab } from "@/components/beneficiary/BeneficiaryDocumentsTab";
+import { BeneficiaryDistributionsTab } from "@/components/beneficiary/BeneficiaryDistributionsTab";
+import { BeneficiaryPropertiesTab } from "@/components/beneficiary/BeneficiaryPropertiesTab";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 
@@ -109,22 +111,30 @@ export default function BeneficiaryPortal() {
 
           {/* Main Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-5 mb-6">
+            <TabsList className="grid w-full grid-cols-7 mb-6">
               <TabsTrigger value="overview">
                 <TrendingUp className="h-4 w-4 ml-2" />
                 نظرة عامة
               </TabsTrigger>
               <TabsTrigger value="profile">
                 <User className="h-4 w-4 ml-2" />
-                الملف الشخصي
+                الملف
               </TabsTrigger>
               <TabsTrigger value="requests">
                 <FileText className="h-4 w-4 ml-2" />
                 الطلبات
               </TabsTrigger>
+              <TabsTrigger value="distributions">
+                <TrendingUp className="h-4 w-4 ml-2" />
+                التوزيعات
+              </TabsTrigger>
               <TabsTrigger value="statements">
                 <CreditCard className="h-4 w-4 ml-2" />
                 كشف الحساب
+              </TabsTrigger>
+              <TabsTrigger value="properties">
+                <FileText className="h-4 w-4 ml-2" />
+                العقارات
               </TabsTrigger>
               <TabsTrigger value="documents">
                 <Upload className="h-4 w-4 ml-2" />
@@ -230,9 +240,19 @@ export default function BeneficiaryPortal() {
               <BeneficiaryRequestsTab beneficiaryId={beneficiary.id} />
             </TabsContent>
 
+            {/* Distributions Tab */}
+            <TabsContent value="distributions">
+              <BeneficiaryDistributionsTab beneficiaryId={beneficiary.id} />
+            </TabsContent>
+
             {/* Statements Tab */}
             <TabsContent value="statements">
               <BeneficiaryStatementsTab beneficiaryId={beneficiary.id} />
+            </TabsContent>
+
+            {/* Properties Tab */}
+            <TabsContent value="properties">
+              <BeneficiaryPropertiesTab />
             </TabsContent>
 
             {/* Documents Tab */}
