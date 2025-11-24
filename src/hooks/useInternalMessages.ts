@@ -35,7 +35,7 @@ export function useInternalMessages() {
 
   // جلب الرسائل الواردة
   const { data: inboxMessages = [], isLoading: isLoadingInbox } = useQuery<InternalMessage[]>({
-    queryKey: ["internal_messages", "inbox", user?.id || undefined],
+    queryKey: ["internal_messages", "inbox", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("internal_messages")
@@ -51,7 +51,7 @@ export function useInternalMessages() {
 
   // جلب الرسائل المرسلة
   const { data: sentMessages = [], isLoading: isLoadingSent } = useQuery<InternalMessage[]>({
-    queryKey: ["internal_messages", "sent", user?.id || undefined],
+    queryKey: ["internal_messages", "sent", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("internal_messages")

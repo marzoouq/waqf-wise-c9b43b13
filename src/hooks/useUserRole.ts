@@ -10,7 +10,7 @@ export function useUserRole() {
   const { user } = useAuth();
 
   const { data: roles = [], isLoading, isFetching, refetch } = useQuery({
-    queryKey: ["user-roles", user?.id || undefined],
+    queryKey: ["user-roles", user?.id],
     queryFn: async () => {
       if (!user) {
         productionLogger.debug('useUserRole: No user yet');

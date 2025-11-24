@@ -47,7 +47,7 @@ export function useLoanInstallments(loanId?: string) {
 
   // Fetch installments
   const { data: installments = [], isLoading } = useQuery({
-    queryKey: ['loan_installments', loanId || undefined],
+    queryKey: ['loan_installments', loanId],
     queryFn: async () => {
       let query = supabase
         .from('loan_installments')

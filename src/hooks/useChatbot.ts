@@ -48,7 +48,7 @@ export function useChatbot() {
 
   // جلب سجل المحادثات
   const { data: conversations = [], isLoading } = useQuery({
-    queryKey: ["chatbot_conversations", userId || undefined],
+    queryKey: ["chatbot_conversations", userId],
     queryFn: async () => {
       if (!userId) return [];
       
