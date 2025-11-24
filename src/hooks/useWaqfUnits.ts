@@ -88,7 +88,7 @@ export function useWaqfUnits() {
     // Get related funds
     const { data: funds, error: fundsError } = await supabase
       .from('funds')
-      .select('id, name, allocated_amount, spent_amount, status')
+      .select('id, name, allocated_amount, spent_amount, category')
       .eq('waqf_unit_id', id);
 
     if (fundsError) throw fundsError;
