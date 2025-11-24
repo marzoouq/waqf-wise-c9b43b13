@@ -8835,6 +8835,24 @@ export type Database = {
         Args: { p_beneficiary_id: string }
         Returns: Json
       }
+      get_user_permissions: {
+        Args: { _user_id: string }
+        Returns: {
+          granted: boolean
+          permission_category: string
+          permission_id: string
+          permission_name: string
+          source: string
+        }[]
+      }
+      has_all_permissions: {
+        Args: { _permissions: string[]; _user_id: string }
+        Returns: boolean
+      }
+      has_any_permission: {
+        Args: { _permissions: string[]; _user_id: string }
+        Returns: boolean
+      }
       has_any_role: {
         Args: {
           _roles: Database["public"]["Enums"]["app_role"][]
