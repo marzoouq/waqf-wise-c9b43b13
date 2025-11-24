@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,6 +42,34 @@ export function MessageCenter() {
   const { messages, isLoading, unreadCount, markAsRead, sendMessage } = useMessages();
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [isComposing, setIsComposing] = useState(false);
+  const [receiverId, setReceiverId] = useState<string>("");
+  
+  // Fetch available users for messaging
+  const { data: availableUsers = [] } = useQuery({
+    queryKey: ["available-users"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("user_id, role")
+        .in("role", ["admin", "nazer", "accountant", "cashier"])
+        .limit(50);
+        
+      if (error) throw error;
+      
+      // Get user names from profiles or auth.users
+      const userIds = data.map(u => u.user_id);
+      const { data: profiles } = await supabase
+        .from("beneficiaries")
+        .select("user_id, full_name")
+        .in("user_id", userIds);
+        
+      return data.map(u => ({
+        id: u.user_id,
+        name: profiles?.find(p => p.user_id === u.user_id)?.full_name || u.role || "مستخدم",
+        role: u.role,
+      }));
+    },
+  });
 
   const handleSelectMessage = (message: Message) => {
     setSelectedMessage(message);
@@ -94,23 +124,42 @@ export function MessageCenter() {
                 onSubmit={(e) => {
                   e.preventDefault();
                   const formData = new FormData(e.currentTarget);
-                  sendMessage.mutate({
-                    receiver_id: formData.get("receiver_id") as string,
-                    subject: formData.get("subject") as string,
-                    body: formData.get("body") as string,
-                    priority: formData.get("priority") as string,
-                  });
+                  sendMessage.mutate(
+                    {
+                      receiver_id: receiverId,
+                      subject: formData.get("subject") as string,
+                      body: formData.get("body") as string,
+                      priority: formData.get("priority") as string,
+                    },
+                    {
+                      onSuccess: () => {
+                        setIsComposing(false);
+                        setReceiverId("");
+                        e.currentTarget.reset();
+                      },
+                    }
+                  );
                 }}
                 className="space-y-4"
               >
                 <div className="space-y-2">
                   <Label htmlFor="receiver_id">إلى</Label>
-                  <Input
-                    id="receiver_id"
-                    name="receiver_id"
-                    placeholder="معرف المستقبل"
+                  <Select
+                    value={receiverId}
+                    onValueChange={setReceiverId}
                     required
-                  />
+                  >
+                    <SelectTrigger id="receiver_id">
+                      <SelectValue placeholder="اختر المستقبل" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableUsers.map((u) => (
+                        <SelectItem key={u.id} value={u.id}>
+                          {u.name} ({u.role})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="priority">الأولوية</Label>

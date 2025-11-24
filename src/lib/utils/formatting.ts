@@ -89,3 +89,8 @@ export function formatFileSize(bytes: number): string {
   
   return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${sizes[i]}`;
 }
+
+/**
+ * Alias for formatFileSize (for compatibility)
+ */
+export const formatBytes = formatFileSize;
