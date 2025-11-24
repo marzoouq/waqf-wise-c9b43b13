@@ -387,6 +387,136 @@ export type Database = {
         }
         Relationships: []
       }
+      approval_status: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          current_level: number | null
+          entity_id: string
+          entity_type: string
+          id: string
+          started_at: string | null
+          status: string | null
+          total_levels: number
+          workflow_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          current_level?: number | null
+          entity_id: string
+          entity_type: string
+          id?: string
+          started_at?: string | null
+          status?: string | null
+          total_levels: number
+          workflow_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          current_level?: number | null
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          started_at?: string | null
+          status?: string | null
+          total_levels?: number
+          workflow_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "approval_status_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "approval_workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      approval_steps: {
+        Row: {
+          action: string | null
+          actioned_at: string | null
+          approval_status_id: string | null
+          approver_id: string | null
+          approver_name: string | null
+          approver_role: string
+          created_at: string | null
+          id: string
+          level: number | null
+          notes: string | null
+        }
+        Insert: {
+          action?: string | null
+          actioned_at?: string | null
+          approval_status_id?: string | null
+          approver_id?: string | null
+          approver_name?: string | null
+          approver_role: string
+          created_at?: string | null
+          id?: string
+          level?: number | null
+          notes?: string | null
+        }
+        Update: {
+          action?: string | null
+          actioned_at?: string | null
+          approval_status_id?: string | null
+          approver_id?: string | null
+          approver_name?: string | null
+          approver_role?: string
+          created_at?: string | null
+          id?: string
+          level?: number | null
+          notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "approval_steps_approval_status_id_fkey"
+            columns: ["approval_status_id"]
+            isOneToOne: false
+            referencedRelation: "approval_status"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      approval_workflows: {
+        Row: {
+          approval_levels: Json
+          conditions: Json | null
+          created_at: string | null
+          created_by: string | null
+          entity_type: string
+          id: string
+          is_active: boolean | null
+          updated_at: string | null
+          workflow_name: string
+        }
+        Insert: {
+          approval_levels: Json
+          conditions?: Json | null
+          created_at?: string | null
+          created_by?: string | null
+          entity_type: string
+          id?: string
+          is_active?: boolean | null
+          updated_at?: string | null
+          workflow_name: string
+        }
+        Update: {
+          approval_levels?: Json
+          conditions?: Json | null
+          created_at?: string | null
+          created_by?: string | null
+          entity_type?: string
+          id?: string
+          is_active?: boolean | null
+          updated_at?: string | null
+          workflow_name?: string
+        }
+        Relationships: []
+      }
       approvals: {
         Row: {
           approved_at: string | null
@@ -536,6 +666,105 @@ export type Database = {
           },
         ]
       }
+      auto_journal_log: {
+        Row: {
+          amount: number
+          error_message: string | null
+          executed_at: string | null
+          id: string
+          journal_entry_id: string | null
+          metadata: Json | null
+          reference_id: string | null
+          reference_type: string | null
+          success: boolean | null
+          template_id: string | null
+          trigger_event: string
+        }
+        Insert: {
+          amount: number
+          error_message?: string | null
+          executed_at?: string | null
+          id?: string
+          journal_entry_id?: string | null
+          metadata?: Json | null
+          reference_id?: string | null
+          reference_type?: string | null
+          success?: boolean | null
+          template_id?: string | null
+          trigger_event: string
+        }
+        Update: {
+          amount?: number
+          error_message?: string | null
+          executed_at?: string | null
+          id?: string
+          journal_entry_id?: string | null
+          metadata?: Json | null
+          reference_id?: string | null
+          reference_type?: string | null
+          success?: boolean | null
+          template_id?: string | null
+          trigger_event?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auto_journal_log_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
+            referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "auto_journal_log_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "auto_journal_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      auto_journal_templates: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          credit_accounts: Json
+          debit_accounts: Json
+          description: string | null
+          id: string
+          is_active: boolean | null
+          priority: number | null
+          template_name: string
+          trigger_event: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          credit_accounts: Json
+          debit_accounts: Json
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          priority?: number | null
+          template_name: string
+          trigger_event: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          credit_accounts?: Json
+          debit_accounts?: Json
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          priority?: number | null
+          template_name?: string
+          trigger_event?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       backup_logs: {
         Row: {
           backup_type: string
@@ -666,6 +895,106 @@ export type Database = {
             columns: ["account_id"]
             isOneToOne: false
             referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bank_matching_rules: {
+        Row: {
+          account_mapping: Json
+          conditions: Json
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          last_matched_at: string | null
+          match_count: number | null
+          priority: number | null
+          rule_name: string
+          updated_at: string | null
+        }
+        Insert: {
+          account_mapping: Json
+          conditions: Json
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_matched_at?: string | null
+          match_count?: number | null
+          priority?: number | null
+          rule_name: string
+          updated_at?: string | null
+        }
+        Update: {
+          account_mapping?: Json
+          conditions?: Json
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_matched_at?: string | null
+          match_count?: number | null
+          priority?: number | null
+          rule_name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      bank_reconciliation_matches: {
+        Row: {
+          bank_transaction_id: string | null
+          confidence_score: number | null
+          id: string
+          journal_entry_id: string | null
+          match_type: string
+          matched_at: string | null
+          matched_by: string | null
+          matching_rule_id: string | null
+          notes: string | null
+        }
+        Insert: {
+          bank_transaction_id?: string | null
+          confidence_score?: number | null
+          id?: string
+          journal_entry_id?: string | null
+          match_type: string
+          matched_at?: string | null
+          matched_by?: string | null
+          matching_rule_id?: string | null
+          notes?: string | null
+        }
+        Update: {
+          bank_transaction_id?: string | null
+          confidence_score?: number | null
+          id?: string
+          journal_entry_id?: string | null
+          match_type?: string
+          matched_at?: string | null
+          matched_by?: string | null
+          matching_rule_id?: string | null
+          notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bank_reconciliation_matches_bank_transaction_id_fkey"
+            columns: ["bank_transaction_id"]
+            isOneToOne: false
+            referencedRelation: "bank_transactions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bank_reconciliation_matches_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
+            referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bank_reconciliation_matches_matching_rule_id_fkey"
+            columns: ["matching_rule_id"]
+            isOneToOne: false
+            referencedRelation: "bank_matching_rules"
             referencedColumns: ["id"]
           },
         ]
@@ -1958,6 +2287,39 @@ export type Database = {
         }
         Relationships: []
       }
+      dashboard_configs: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          dashboard_name: string
+          id: string
+          is_default: boolean | null
+          is_shared: boolean | null
+          layout_config: Json
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          dashboard_name: string
+          id?: string
+          is_default?: boolean | null
+          is_shared?: boolean | null
+          layout_config: Json
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          dashboard_name?: string
+          id?: string
+          is_default?: boolean | null
+          is_shared?: boolean | null
+          layout_config?: Json
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       dashboard_configurations: {
         Row: {
           created_at: string | null
@@ -3035,6 +3397,106 @@ export type Database = {
         }
         Relationships: []
       }
+      financial_forecasts: {
+        Row: {
+          account_id: string | null
+          actual_amount: number | null
+          confidence_level: number | null
+          created_at: string | null
+          forecast_type: string
+          forecasted_amount: number
+          id: string
+          metadata: Json | null
+          model_used: string | null
+          period_end: string
+          period_start: string
+          variance: number | null
+        }
+        Insert: {
+          account_id?: string | null
+          actual_amount?: number | null
+          confidence_level?: number | null
+          created_at?: string | null
+          forecast_type: string
+          forecasted_amount: number
+          id?: string
+          metadata?: Json | null
+          model_used?: string | null
+          period_end: string
+          period_start: string
+          variance?: number | null
+        }
+        Update: {
+          account_id?: string | null
+          actual_amount?: number | null
+          confidence_level?: number | null
+          created_at?: string | null
+          forecast_type?: string
+          forecasted_amount?: number
+          id?: string
+          metadata?: Json | null
+          model_used?: string | null
+          period_end?: string
+          period_start?: string
+          variance?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_forecasts_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      financial_kpis: {
+        Row: {
+          created_at: string | null
+          fiscal_year_id: string | null
+          id: string
+          kpi_category: string
+          kpi_name: string
+          kpi_target: number | null
+          kpi_value: number
+          metadata: Json | null
+          period_end: string
+          period_start: string
+        }
+        Insert: {
+          created_at?: string | null
+          fiscal_year_id?: string | null
+          id?: string
+          kpi_category: string
+          kpi_name: string
+          kpi_target?: number | null
+          kpi_value: number
+          metadata?: Json | null
+          period_end: string
+          period_start: string
+        }
+        Update: {
+          created_at?: string | null
+          fiscal_year_id?: string | null
+          id?: string
+          kpi_category?: string
+          kpi_name?: string
+          kpi_target?: number | null
+          kpi_value?: number
+          metadata?: Json | null
+          period_end?: string
+          period_start?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_kpis_fiscal_year_id_fkey"
+            columns: ["fiscal_year_id"]
+            isOneToOne: false
+            referencedRelation: "fiscal_years"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fiscal_years: {
         Row: {
           created_at: string
@@ -4046,6 +4508,8 @@ export type Database = {
           invoice_hash: string | null
           invoice_number: string
           invoice_time: string | null
+          invoice_type: string | null
+          is_zatca_compliant: boolean | null
           journal_entry_id: string | null
           notes: string | null
           qr_code_data: string | null
@@ -4056,6 +4520,12 @@ export type Database = {
           tax_rate: number | null
           total_amount: number
           updated_at: string
+          vat_number: string | null
+          zatca_hash: string | null
+          zatca_qr_data: string | null
+          zatca_status: string | null
+          zatca_submitted_at: string | null
+          zatca_uuid: string | null
         }
         Insert: {
           created_at?: string
@@ -4072,6 +4542,8 @@ export type Database = {
           invoice_hash?: string | null
           invoice_number: string
           invoice_time?: string | null
+          invoice_type?: string | null
+          is_zatca_compliant?: boolean | null
           journal_entry_id?: string | null
           notes?: string | null
           qr_code_data?: string | null
@@ -4082,6 +4554,12 @@ export type Database = {
           tax_rate?: number | null
           total_amount?: number
           updated_at?: string
+          vat_number?: string | null
+          zatca_hash?: string | null
+          zatca_qr_data?: string | null
+          zatca_status?: string | null
+          zatca_submitted_at?: string | null
+          zatca_uuid?: string | null
         }
         Update: {
           created_at?: string
@@ -4098,6 +4576,8 @@ export type Database = {
           invoice_hash?: string | null
           invoice_number?: string
           invoice_time?: string | null
+          invoice_type?: string | null
+          is_zatca_compliant?: boolean | null
           journal_entry_id?: string | null
           notes?: string | null
           qr_code_data?: string | null
@@ -4108,6 +4588,12 @@ export type Database = {
           tax_rate?: number | null
           total_amount?: number
           updated_at?: string
+          vat_number?: string | null
+          zatca_hash?: string | null
+          zatca_qr_data?: string | null
+          zatca_status?: string | null
+          zatca_submitted_at?: string | null
+          zatca_uuid?: string | null
         }
         Relationships: [
           {
@@ -8361,6 +8847,50 @@ export type Database = {
           waqf_type?: string | null
         }
         Relationships: []
+      }
+      zatca_submission_log: {
+        Row: {
+          error_code: string | null
+          error_message: string | null
+          id: string
+          invoice_id: string | null
+          request_payload: Json | null
+          response_payload: Json | null
+          status: string
+          submission_type: string
+          submitted_at: string | null
+        }
+        Insert: {
+          error_code?: string | null
+          error_message?: string | null
+          id?: string
+          invoice_id?: string | null
+          request_payload?: Json | null
+          response_payload?: Json | null
+          status: string
+          submission_type: string
+          submitted_at?: string | null
+        }
+        Update: {
+          error_code?: string | null
+          error_message?: string | null
+          id?: string
+          invoice_id?: string | null
+          request_payload?: Json | null
+          response_payload?: Json | null
+          status?: string
+          submission_type?: string
+          submitted_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "zatca_submission_log_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
