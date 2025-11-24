@@ -68,23 +68,33 @@ Deno.serve(async (req) => {
       );
     }
 
-    // 🚦 3. Rate Limiting (100 خطأ في الساعة لكل IP/User)
+    // 🚦 3. Rate Limiting الذكي - منع الحلقات اللانهائية
     if (userId) {
-      const oneHourAgo = new Date(Date.now() - 3600000).toISOString();
-      const { count } = await supabase
+      const oneMinuteAgo = new Date(Date.now() - 60 * 1000).toISOString();
+      
+      // عد الأخطاء الأخيرة
+      const { data: recentErrors } = await supabase
         .from('system_error_logs')
-        .select('*', { count: 'exact', head: true })
+        .select('error_type, error_message')
         .eq('user_id', userId)
-        .gte('created_at', oneHourAgo);
+        .gte('created_at', oneMinuteAgo);
 
-      if (count && count >= 100) {
-        return new Response(
-          JSON.stringify({ 
-            success: false, 
-            error: 'تم تجاوز الحد المسموح من الطلبات. يرجى المحاولة لاحقاً' 
-          }), 
-          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+      if (recentErrors && recentErrors.length >= 15) {
+        // فحص إذا كانت كل الأخطاء متشابهة (حلقة لا نهائية)
+        const sameTypeCount = recentErrors.filter(
+          e => e.error_type === errorReport.error_type
+        ).length;
+        
+        if (sameTypeCount >= 5) {
+          console.warn(`⚠️ Infinite loop detected for user ${userId}`);
+          return new Response(
+            JSON.stringify({ 
+              success: false, 
+              error: 'تم اكتشاف حلقة أخطاء لا نهائية. يرجى تحديث الصفحة.' 
+            }), 
+            { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
       }
     }
 
