@@ -10,6 +10,7 @@ import {
   Book,
   Building2,
   Activity,
+  Sparkles,
 } from "lucide-react";
 
 // Lazy load components for better performance
@@ -20,6 +21,7 @@ const TrialBalanceReport = lazy(() => import("./TrialBalanceReport").then(m => (
 const GeneralLedgerReport = lazy(() => import("./GeneralLedgerReport"));
 const BankAccountsManagement = lazy(() => import("./BankAccountsManagement").then(m => ({ default: m.BankAccountsManagement })));
 const CashFlowStatement = lazy(() => import("./CashFlowStatement").then(m => ({ default: m.CashFlowStatement })));
+const AdvancedAccountingTab = lazy(() => import("./AdvancedAccountingTab").then(m => ({ default: m.AdvancedAccountingTab })));
 
 interface AccountingTabsProps {
   activeTab: string;
@@ -36,6 +38,7 @@ export const AccountingTabs = memo(({ activeTab, onTabChange, isLoading }: Accou
     ledger: <GeneralLedgerReport />,
     "bank-accounts": <BankAccountsManagement />,
     "cash-flow": <CashFlowStatement />,
+    advanced: <AdvancedAccountingTab />,
   }), []);
 
   return (
@@ -75,6 +78,11 @@ export const AccountingTabs = memo(({ activeTab, onTabChange, isLoading }: Accou
             <Activity className="h-3 w-3 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline">التدفقات النقدية</span>
             <span className="sm:hidden">التدفقات</span>
+          </TabsTrigger>
+          <TabsTrigger value="advanced" className="gap-2 text-xs sm:text-sm" title="Alt+8">
+            <Sparkles className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">متقدم</span>
+            <span className="sm:hidden">متقدم</span>
           </TabsTrigger>
         </TabsList>
       </ScrollArea>

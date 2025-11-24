@@ -14,6 +14,11 @@ import { DistributionAnalysisReport } from "@/components/reports/DistributionAna
 import { LoansAgingReport } from "@/components/reports/LoansAgingReport";
 import { MaintenanceCostReport } from "@/components/reports/MaintenanceCostReport";
 import { FundsPerformanceReport } from "@/components/reports/FundsPerformanceReport";
+import { DetailedGeneralLedger } from "@/components/reports/DetailedGeneralLedger";
+import { AgingReport } from "@/components/reports/AgingReport";
+import { FinancialRatiosReport } from "@/components/reports/FinancialRatiosReport";
+import { BudgetVarianceReport } from "@/components/reports/BudgetVarianceReport";
+import { InvoiceManager } from "@/components/invoices/InvoiceManager";
 import { BarChart3, Calendar, Settings, Users, Building2, FileText, DollarSign, Wand2 } from "lucide-react";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 
@@ -109,11 +114,12 @@ const Reports = () => {
 
           <TabsContent value="analysis" className="space-y-6">
             <Tabs defaultValue="accounting" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
+              <TabsList className="grid w-full grid-cols-2 md:grid-cols-5">
                 <TabsTrigger value="accounting">الربط المحاسبي</TabsTrigger>
                 <TabsTrigger value="distributions">تحليل التوزيعات</TabsTrigger>
                 <TabsTrigger value="loans">أعمار الديون</TabsTrigger>
                 <TabsTrigger value="maintenance">تكاليف الصيانة</TabsTrigger>
+                <TabsTrigger value="ledger">دفتر الأستاذ</TabsTrigger>
               </TabsList>
 
               <TabsContent value="accounting">
@@ -125,11 +131,18 @@ const Reports = () => {
               </TabsContent>
 
               <TabsContent value="loans">
-                <LoansAgingReport />
+                <div className="space-y-4">
+                  <LoansAgingReport />
+                  <AgingReport />
+                </div>
               </TabsContent>
 
               <TabsContent value="maintenance">
                 <MaintenanceCostReport />
+              </TabsContent>
+
+              <TabsContent value="ledger">
+                <DetailedGeneralLedger />
               </TabsContent>
             </Tabs>
 
