@@ -1726,6 +1726,234 @@ export type Database = {
           },
         ]
       }
+      beneficiary_visibility_audit: {
+        Row: {
+          changed_at: string | null
+          changed_by: string | null
+          changed_by_name: string | null
+          id: string
+          ip_address: string | null
+          new_value: boolean | null
+          old_value: boolean | null
+          reason: string | null
+          setting_name: string
+        }
+        Insert: {
+          changed_at?: string | null
+          changed_by?: string | null
+          changed_by_name?: string | null
+          id?: string
+          ip_address?: string | null
+          new_value?: boolean | null
+          old_value?: boolean | null
+          reason?: string | null
+          setting_name: string
+        }
+        Update: {
+          changed_at?: string | null
+          changed_by?: string | null
+          changed_by_name?: string | null
+          id?: string
+          ip_address?: string | null
+          new_value?: boolean | null
+          old_value?: boolean | null
+          reason?: string | null
+          setting_name?: string
+        }
+        Relationships: []
+      }
+      beneficiary_visibility_settings: {
+        Row: {
+          allow_export_pdf: boolean | null
+          allow_print: boolean | null
+          created_at: string | null
+          id: string
+          mask_exact_amounts: boolean | null
+          mask_iban: boolean | null
+          mask_loan_amounts: boolean | null
+          mask_national_ids: boolean | null
+          mask_phone_numbers: boolean | null
+          mask_tenant_info: boolean | null
+          notes: string | null
+          show_annual_budget: boolean | null
+          show_approvals_log: boolean | null
+          show_audit_reports: boolean | null
+          show_bank_accounts: boolean | null
+          show_bank_balances: boolean | null
+          show_bank_statements: boolean | null
+          show_bank_transactions: boolean | null
+          show_beneficiaries_statistics: boolean | null
+          show_beneficiary_categories: boolean | null
+          show_budget_execution: boolean | null
+          show_budgets: boolean | null
+          show_compliance_reports: boolean | null
+          show_contracts_details: boolean | null
+          show_disclosures: boolean | null
+          show_distributions: boolean | null
+          show_documents: boolean | null
+          show_emergency_aid: boolean | null
+          show_emergency_statistics: boolean | null
+          show_expenses_breakdown: boolean | null
+          show_family_tree: boolean | null
+          show_financial_reports: boolean | null
+          show_governance: boolean | null
+          show_governance_meetings: boolean | null
+          show_inactive_beneficiaries: boolean | null
+          show_internal_messages: boolean | null
+          show_investment_plans: boolean | null
+          show_invoices: boolean | null
+          show_journal_entries: boolean | null
+          show_ledger_details: boolean | null
+          show_maintenance_costs: boolean | null
+          show_nazer_decisions: boolean | null
+          show_other_beneficiaries_amounts: boolean | null
+          show_other_beneficiaries_names: boolean | null
+          show_other_beneficiaries_personal_data: boolean | null
+          show_other_loans: boolean | null
+          show_overview: boolean | null
+          show_own_loans: boolean | null
+          show_policy_changes: boolean | null
+          show_profile: boolean | null
+          show_properties: boolean | null
+          show_property_revenues: boolean | null
+          show_requests: boolean | null
+          show_reserve_funds: boolean | null
+          show_statements: boolean | null
+          show_strategic_plans: boolean | null
+          show_support_tickets: boolean | null
+          show_total_beneficiaries_count: boolean | null
+          show_trial_balance: boolean | null
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          allow_export_pdf?: boolean | null
+          allow_print?: boolean | null
+          created_at?: string | null
+          id?: string
+          mask_exact_amounts?: boolean | null
+          mask_iban?: boolean | null
+          mask_loan_amounts?: boolean | null
+          mask_national_ids?: boolean | null
+          mask_phone_numbers?: boolean | null
+          mask_tenant_info?: boolean | null
+          notes?: string | null
+          show_annual_budget?: boolean | null
+          show_approvals_log?: boolean | null
+          show_audit_reports?: boolean | null
+          show_bank_accounts?: boolean | null
+          show_bank_balances?: boolean | null
+          show_bank_statements?: boolean | null
+          show_bank_transactions?: boolean | null
+          show_beneficiaries_statistics?: boolean | null
+          show_beneficiary_categories?: boolean | null
+          show_budget_execution?: boolean | null
+          show_budgets?: boolean | null
+          show_compliance_reports?: boolean | null
+          show_contracts_details?: boolean | null
+          show_disclosures?: boolean | null
+          show_distributions?: boolean | null
+          show_documents?: boolean | null
+          show_emergency_aid?: boolean | null
+          show_emergency_statistics?: boolean | null
+          show_expenses_breakdown?: boolean | null
+          show_family_tree?: boolean | null
+          show_financial_reports?: boolean | null
+          show_governance?: boolean | null
+          show_governance_meetings?: boolean | null
+          show_inactive_beneficiaries?: boolean | null
+          show_internal_messages?: boolean | null
+          show_investment_plans?: boolean | null
+          show_invoices?: boolean | null
+          show_journal_entries?: boolean | null
+          show_ledger_details?: boolean | null
+          show_maintenance_costs?: boolean | null
+          show_nazer_decisions?: boolean | null
+          show_other_beneficiaries_amounts?: boolean | null
+          show_other_beneficiaries_names?: boolean | null
+          show_other_beneficiaries_personal_data?: boolean | null
+          show_other_loans?: boolean | null
+          show_overview?: boolean | null
+          show_own_loans?: boolean | null
+          show_policy_changes?: boolean | null
+          show_profile?: boolean | null
+          show_properties?: boolean | null
+          show_property_revenues?: boolean | null
+          show_requests?: boolean | null
+          show_reserve_funds?: boolean | null
+          show_statements?: boolean | null
+          show_strategic_plans?: boolean | null
+          show_support_tickets?: boolean | null
+          show_total_beneficiaries_count?: boolean | null
+          show_trial_balance?: boolean | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          allow_export_pdf?: boolean | null
+          allow_print?: boolean | null
+          created_at?: string | null
+          id?: string
+          mask_exact_amounts?: boolean | null
+          mask_iban?: boolean | null
+          mask_loan_amounts?: boolean | null
+          mask_national_ids?: boolean | null
+          mask_phone_numbers?: boolean | null
+          mask_tenant_info?: boolean | null
+          notes?: string | null
+          show_annual_budget?: boolean | null
+          show_approvals_log?: boolean | null
+          show_audit_reports?: boolean | null
+          show_bank_accounts?: boolean | null
+          show_bank_balances?: boolean | null
+          show_bank_statements?: boolean | null
+          show_bank_transactions?: boolean | null
+          show_beneficiaries_statistics?: boolean | null
+          show_beneficiary_categories?: boolean | null
+          show_budget_execution?: boolean | null
+          show_budgets?: boolean | null
+          show_compliance_reports?: boolean | null
+          show_contracts_details?: boolean | null
+          show_disclosures?: boolean | null
+          show_distributions?: boolean | null
+          show_documents?: boolean | null
+          show_emergency_aid?: boolean | null
+          show_emergency_statistics?: boolean | null
+          show_expenses_breakdown?: boolean | null
+          show_family_tree?: boolean | null
+          show_financial_reports?: boolean | null
+          show_governance?: boolean | null
+          show_governance_meetings?: boolean | null
+          show_inactive_beneficiaries?: boolean | null
+          show_internal_messages?: boolean | null
+          show_investment_plans?: boolean | null
+          show_invoices?: boolean | null
+          show_journal_entries?: boolean | null
+          show_ledger_details?: boolean | null
+          show_maintenance_costs?: boolean | null
+          show_nazer_decisions?: boolean | null
+          show_other_beneficiaries_amounts?: boolean | null
+          show_other_beneficiaries_names?: boolean | null
+          show_other_beneficiaries_personal_data?: boolean | null
+          show_other_loans?: boolean | null
+          show_overview?: boolean | null
+          show_own_loans?: boolean | null
+          show_policy_changes?: boolean | null
+          show_profile?: boolean | null
+          show_properties?: boolean | null
+          show_property_revenues?: boolean | null
+          show_requests?: boolean | null
+          show_reserve_funds?: boolean | null
+          show_statements?: boolean | null
+          show_strategic_plans?: boolean | null
+          show_support_tickets?: boolean | null
+          show_total_beneficiaries_count?: boolean | null
+          show_trial_balance?: boolean | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       budgets: {
         Row: {
           account_id: string
@@ -9459,6 +9687,78 @@ export type Database = {
         Args: { p_beneficiary_id: string }
         Returns: Json
       }
+      get_beneficiary_visibility_settings: {
+        Args: never
+        Returns: {
+          allow_export_pdf: boolean | null
+          allow_print: boolean | null
+          created_at: string | null
+          id: string
+          mask_exact_amounts: boolean | null
+          mask_iban: boolean | null
+          mask_loan_amounts: boolean | null
+          mask_national_ids: boolean | null
+          mask_phone_numbers: boolean | null
+          mask_tenant_info: boolean | null
+          notes: string | null
+          show_annual_budget: boolean | null
+          show_approvals_log: boolean | null
+          show_audit_reports: boolean | null
+          show_bank_accounts: boolean | null
+          show_bank_balances: boolean | null
+          show_bank_statements: boolean | null
+          show_bank_transactions: boolean | null
+          show_beneficiaries_statistics: boolean | null
+          show_beneficiary_categories: boolean | null
+          show_budget_execution: boolean | null
+          show_budgets: boolean | null
+          show_compliance_reports: boolean | null
+          show_contracts_details: boolean | null
+          show_disclosures: boolean | null
+          show_distributions: boolean | null
+          show_documents: boolean | null
+          show_emergency_aid: boolean | null
+          show_emergency_statistics: boolean | null
+          show_expenses_breakdown: boolean | null
+          show_family_tree: boolean | null
+          show_financial_reports: boolean | null
+          show_governance: boolean | null
+          show_governance_meetings: boolean | null
+          show_inactive_beneficiaries: boolean | null
+          show_internal_messages: boolean | null
+          show_investment_plans: boolean | null
+          show_invoices: boolean | null
+          show_journal_entries: boolean | null
+          show_ledger_details: boolean | null
+          show_maintenance_costs: boolean | null
+          show_nazer_decisions: boolean | null
+          show_other_beneficiaries_amounts: boolean | null
+          show_other_beneficiaries_names: boolean | null
+          show_other_beneficiaries_personal_data: boolean | null
+          show_other_loans: boolean | null
+          show_overview: boolean | null
+          show_own_loans: boolean | null
+          show_policy_changes: boolean | null
+          show_profile: boolean | null
+          show_properties: boolean | null
+          show_property_revenues: boolean | null
+          show_requests: boolean | null
+          show_reserve_funds: boolean | null
+          show_statements: boolean | null
+          show_strategic_plans: boolean | null
+          show_support_tickets: boolean | null
+          show_total_beneficiaries_count: boolean | null
+          show_trial_balance: boolean | null
+          updated_at: string | null
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "beneficiary_visibility_settings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       get_user_permissions: {
         Args: { _user_id: string }
         Returns: {
@@ -9495,6 +9795,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_first_class_beneficiary: { Args: never; Returns: boolean }
       is_first_degree_beneficiary: {
         Args: { user_uuid: string }
         Returns: boolean

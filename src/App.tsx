@@ -46,6 +46,7 @@ const Accounting = lazy(() => import("./pages/Accounting"));
 const Budgets = lazy(() => import("./pages/Budgets"));
 const Reports = lazy(() => import("./pages/Reports"));
 const Settings = lazy(() => import("./pages/Settings"));
+const TransparencySettings = lazy(() => import("./pages/TransparencySettings"));
 const Invoices = lazy(() => import("./pages/Invoices"));
 const Approvals = lazy(() => import("./pages/Approvals"));
 const Payments = lazy(() => import("./pages/Payments"));
@@ -292,7 +293,8 @@ const App = () => {
           />
           <Route path="/waqf-units" element={<WaqfUnits />} />
           <Route path="/reports" element={<Reports />} />
-          <Route path="/settings" element={<Settings />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/transparency-settings" element={<TransparencySettings />} />
           <Route 
             path="/settings/roles" 
             element={

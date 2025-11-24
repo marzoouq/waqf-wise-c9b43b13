@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { User, Bell, Shield, Database, Palette, Globe, Settings as SettingsIcon, Building2, Calendar } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { User, Bell, Shield, Database, Palette, Globe, Settings as SettingsIcon, Building2, Calendar, Eye } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { ProfileDialog } from "@/components/settings/ProfileDialog";
@@ -16,10 +17,13 @@ import { LeakedPasswordCheck } from "@/components/settings/LeakedPasswordCheck";
 import { LanguageSelector } from "@/components/settings/LanguageSelector";
 import { RolesSettingsDialog } from "@/components/settings/RolesSettingsDialog";
 import { useToast } from "@/hooks/use-toast";
+import { useUserRole } from "@/hooks/useUserRole";
 import { MobileOptimizedLayout, MobileOptimizedHeader, MobileOptimizedGrid } from "@/components/layout/MobileOptimizedLayout";
 
 const Settings = () => {
+  const navigate = useNavigate();
   const { toast } = useToast();
+  const { isNazer, isAdmin } = useUserRole();
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
   const [notificationsDialogOpen, setNotificationsDialogOpen] = useState(false);
   const [securityDialogOpen, setSecurityDialogOpen] = useState(false);
@@ -62,6 +66,9 @@ const Settings = () => {
         break;
       case "الأدوار والصلاحيات":
         setRolesDialogOpen(true);
+        break;
+      case "إعدادات الشفافية":
+        navigate("/transparency-settings");
         break;
       default:
         toast({
@@ -142,6 +149,14 @@ const Settings = () => {
       icon: Shield,
       color: "bg-primary/10 text-primary",
     },
+    {
+      id: 11,
+      title: "إعدادات الشفافية",
+      description: "التحكم في ما يراه المستفيدون من الدرجة الأولى",
+      icon: Eye,
+      color: "bg-info/10 text-info",
+      requiredRole: "nazer",
+    },
   ];
 
   return (
@@ -156,7 +171,15 @@ const Settings = () => {
 
       {/* Settings Grid */}
       <MobileOptimizedGrid cols={3}>
-        {settingsSections.map((section) => {
+        {settingsSections
+          .filter((section) => {
+            // إخفاء قسم الشفافية إذا لم يكن الناظر أو المشرف
+            if (section.requiredRole === "nazer" && !isNazer && !isAdmin) {
+              return false;
+            }
+            return true;
+          })
+          .map((section) => {
           const Icon = section.icon;
           return (
             <Card
