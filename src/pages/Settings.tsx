@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, Bell, Shield, Database, Palette, Globe, Settings as SettingsIcon, Building2, Calendar, Eye } from "lucide-react";
+import { User, Bell, Shield, Database, Palette, Globe, Settings as SettingsIcon, Building2, Calendar, Eye, BookOpen } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { ProfileDialog } from "@/components/settings/ProfileDialog";
@@ -69,6 +69,9 @@ const Settings = () => {
         break;
       case "إعدادات الشفافية":
         navigate("/transparency-settings");
+        break;
+      case "دليل المطور":
+        navigate("/developer-guide");
         break;
       default:
         toast({
@@ -157,6 +160,14 @@ const Settings = () => {
       color: "bg-info/10 text-info",
       requiredRole: "nazer",
     },
+    {
+      id: 12,
+      title: "دليل المطور",
+      description: "دليل شامل للبنية المعمارية والميزات والتوثيق",
+      icon: BookOpen,
+      color: "bg-purple-500/10 text-purple-600 dark:text-purple-400",
+      requiredRole: "admin",
+    },
   ];
 
   return (
@@ -175,6 +186,10 @@ const Settings = () => {
           .filter((section) => {
             // إخفاء قسم الشفافية إذا لم يكن الناظر أو المشرف
             if (section.requiredRole === "nazer" && !isNazer && !isAdmin) {
+              return false;
+            }
+            // إخفاء دليل المطور إذا لم يكن مشرف
+            if (section.requiredRole === "admin" && !isAdmin) {
               return false;
             }
             return true;

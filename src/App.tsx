@@ -81,6 +81,7 @@ const TestPhase3 = lazy(() => import("./pages/TestPhase3"));
 const TestPhase4 = lazy(() => import("./pages/TestPhase4"));
 const TestPhase5 = lazy(() => import("./pages/TestPhase5"));
 const TestPhase6 = lazy(() => import("./pages/TestPhase6"));
+const DeveloperGuide = lazy(() => import("./pages/DeveloperGuide"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Configure QueryClient with optimized defaults and error handling
@@ -294,6 +295,14 @@ const App = () => {
           <Route path="/waqf-units" element={<WaqfUnits />} />
           <Route path="/reports" element={<Reports />} />
             <Route path="/settings" element={<Settings />} />
+            <Route 
+              path="/developer-guide" 
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <DeveloperGuide />
+                </ProtectedRoute>
+              } 
+            />
             <Route path="/transparency-settings" element={<TransparencySettings />} />
           <Route 
             path="/settings/roles" 
