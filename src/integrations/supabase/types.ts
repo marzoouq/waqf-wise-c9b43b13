@@ -1758,6 +1758,36 @@ export type Database = {
           },
         ]
       }
+      custom_dashboards: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          dashboard_name: string
+          id: string
+          is_default: boolean | null
+          is_shared: boolean | null
+          layout_config: Json
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          dashboard_name: string
+          id?: string
+          is_default?: boolean | null
+          is_shared?: boolean | null
+          layout_config?: Json
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          dashboard_name?: string
+          id?: string
+          is_default?: boolean | null
+          is_shared?: boolean | null
+          layout_config?: Json
+        }
+        Relationships: []
+      }
       custom_kpis: {
         Row: {
           calculation_formula: Json
@@ -2039,38 +2069,47 @@ export type Database = {
       }
       distribution_approvals: {
         Row: {
+          approval_level: number | null
           approved_at: string | null
           approver_id: string | null
           approver_name: string
+          auto_approved: boolean | null
           created_at: string | null
           distribution_id: string
           id: string
           level: number
           notes: string | null
+          notification_sent: boolean | null
           status: string
           updated_at: string | null
         }
         Insert: {
+          approval_level?: number | null
           approved_at?: string | null
           approver_id?: string | null
           approver_name: string
+          auto_approved?: boolean | null
           created_at?: string | null
           distribution_id: string
           id?: string
           level: number
           notes?: string | null
+          notification_sent?: boolean | null
           status?: string
           updated_at?: string | null
         }
         Update: {
+          approval_level?: number | null
           approved_at?: string | null
           approver_id?: string | null
           approver_name?: string
+          auto_approved?: boolean | null
           created_at?: string | null
           distribution_id?: string
           id?: string
           level?: number
           notes?: string | null
+          notification_sent?: boolean | null
           status?: string
           updated_at?: string | null
         }
@@ -4204,6 +4243,51 @@ export type Database = {
         }
         Relationships: []
       }
+      kpi_definitions: {
+        Row: {
+          calculation_formula: string
+          category: string | null
+          chart_type: string | null
+          created_at: string | null
+          data_source: string
+          description: string | null
+          id: string
+          is_active: boolean | null
+          kpi_code: string
+          kpi_name: string
+          target_value: number | null
+          unit: string | null
+        }
+        Insert: {
+          calculation_formula: string
+          category?: string | null
+          chart_type?: string | null
+          created_at?: string | null
+          data_source: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          kpi_code: string
+          kpi_name: string
+          target_value?: number | null
+          unit?: string | null
+        }
+        Update: {
+          calculation_formula?: string
+          category?: string | null
+          chart_type?: string | null
+          created_at?: string | null
+          data_source?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          kpi_code?: string
+          kpi_name?: string
+          target_value?: number | null
+          unit?: string | null
+        }
+        Relationships: []
+      }
       leaked_password_checks: {
         Row: {
           checked_at: string | null
@@ -6031,6 +6115,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      report_templates: {
+        Row: {
+          columns: Json | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          filters: Json | null
+          id: string
+          is_public: boolean | null
+          report_type: string
+          template_config: Json
+          template_name: string
+        }
+        Insert: {
+          columns?: Json | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          filters?: Json | null
+          id?: string
+          is_public?: boolean | null
+          report_type: string
+          template_config?: Json
+          template_name: string
+        }
+        Update: {
+          columns?: Json | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          filters?: Json | null
+          id?: string
+          is_public?: boolean | null
+          report_type?: string
+          template_config?: Json
+          template_name?: string
+        }
+        Relationships: []
       }
       request_approvals: {
         Row: {
