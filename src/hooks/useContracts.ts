@@ -9,7 +9,7 @@ export type { Contract, ContractInsert };
 export const useContracts = () => {
   const queryClient = useQueryClient();
 
-  const { data: contracts, isLoading } = useQuery({
+  const { data: contracts = [], isLoading } = useQuery({
     queryKey: ["contracts"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -21,8 +21,9 @@ export const useContracts = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as Contract[];
+      return (data || []) as Contract[];
     },
+    staleTime: 3 * 60 * 1000, // 3 minutes
   });
 
   const addContract = useMutation({

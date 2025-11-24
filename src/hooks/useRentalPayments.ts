@@ -142,7 +142,7 @@ export const useRentalPayments = (
     };
   }, [queryClient]);
 
-  const { data: allPayments, isLoading } = useQuery({
+  const { data: allPayments = [], isLoading } = useQuery({
     queryKey: ["rental_payments", contractId || undefined],
     queryFn: async () => {
       let query = supabase
@@ -163,8 +163,9 @@ export const useRentalPayments = (
 
       const { data, error } = await query;
       if (error) throw error;
-      return data as RentalPayment[];
+      return (data || []) as RentalPayment[];
     },
+    staleTime: 2 * 60 * 1000, // 2 minutes
   });
 
   // Apply filtering logic - always show only paid, under collection, and overdue

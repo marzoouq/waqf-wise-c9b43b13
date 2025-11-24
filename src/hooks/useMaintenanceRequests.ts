@@ -63,7 +63,7 @@ export const useMaintenanceRequests = () => {
     };
   }, [queryClient]);
 
-  const { data: requests, isLoading } = useQuery({
+  const { data: requests = [], isLoading } = useQuery({
     queryKey: ["maintenance_requests"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -75,8 +75,9 @@ export const useMaintenanceRequests = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as MaintenanceRequest[];
+      return (data || []) as MaintenanceRequest[];
     },
+    staleTime: 2 * 60 * 1000, // 2 minutes
   });
 
   const addRequest = useMutation({
