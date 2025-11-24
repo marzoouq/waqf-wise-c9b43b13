@@ -89,10 +89,16 @@ export function useInvoices() {
 
   const addInvoice = useMutation({
     mutationFn: async (invoiceData: InvoiceWithLines) => {
-      // إنشاء الفاتورة
+      // إنشاء الفاتورة (رقم الفاتورة سيتم توليده تلقائياً من Trigger)
+      const invoiceToInsert = { ...invoiceData.invoice };
+      // إزالة invoice_number إذا كان فارغاً لتفعيل التوليد التلقائي
+      if (!invoiceToInsert.invoice_number || invoiceToInsert.invoice_number.trim() === '') {
+        delete invoiceToInsert.invoice_number;
+      }
+      
       const { data: invoiceRecord, error: invoiceError } = await supabase
         .from("invoices")
-        .insert([invoiceData.invoice])
+        .insert([invoiceToInsert])
         .select()
         .maybeSingle();
 

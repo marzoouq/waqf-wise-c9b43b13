@@ -8283,6 +8283,13 @@ export type Database = {
         Returns: string
       }
       generate_beneficiary_number: { Args: never; Returns: string }
+      generate_budget_from_previous_year: {
+        Args: { p_fiscal_year_id: string; p_increase_percentage?: number }
+        Returns: number
+      }
+      generate_entry_number: { Args: never; Returns: string }
+      generate_invoice_number: { Args: never; Returns: string }
+      generate_payment_voucher_number: { Args: never; Returns: string }
       generate_smart_insights: { Args: never; Returns: undefined }
       generate_transfer_file_number: { Args: never; Returns: string }
       generate_voucher_number: {
