@@ -6005,6 +6005,70 @@ export type Database = {
           },
         ]
       }
+      payment_schedules: {
+        Row: {
+          batch_number: string | null
+          created_at: string
+          distribution_id: string | null
+          error_message: string | null
+          id: string
+          notes: string | null
+          processed_at: string | null
+          scheduled_amount: number
+          scheduled_date: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          batch_number?: string | null
+          created_at?: string
+          distribution_id?: string | null
+          error_message?: string | null
+          id?: string
+          notes?: string | null
+          processed_at?: string | null
+          scheduled_amount: number
+          scheduled_date: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          batch_number?: string | null
+          created_at?: string
+          distribution_id?: string | null
+          error_message?: string | null
+          id?: string
+          notes?: string | null
+          processed_at?: string | null
+          scheduled_amount?: number
+          scheduled_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_schedules_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "distribution_statistics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_schedules_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "distributions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_schedules_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "payment_vouchers_with_details"
+            referencedColumns: ["distribution_id_ref"]
+          },
+        ]
+      }
       payment_vouchers: {
         Row: {
           amount: number
