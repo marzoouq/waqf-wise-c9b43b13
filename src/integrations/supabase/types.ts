@@ -8697,20 +8697,45 @@ export type Database = {
           total_revenues: number
         }[]
       }
-      calculate_loan_schedule: {
-        Args: {
-          p_interest_rate: number
-          p_loan_id: string
-          p_principal: number
-          p_start_date: string
-          p_term_months: number
-        }
-        Returns: undefined
-      }
-      calculate_monthly_payment: {
-        Args: { annual_rate: number; months: number; principal: number }
-        Returns: number
-      }
+      calculate_loan_schedule:
+        | {
+            Args: {
+              p_interest_rate: number
+              p_loan_id: string
+              p_principal: number
+              p_start_date: string
+              p_term_months: number
+            }
+            Returns: undefined
+          }
+        | {
+            Args: {
+              p_interest_rate?: number
+              p_principal: number
+              p_term_months: number
+            }
+            Returns: {
+              due_date: string
+              installment_number: number
+              interest_amount: number
+              principal_amount: number
+              remaining_balance: number
+              total_amount: number
+            }[]
+          }
+      calculate_monthly_payment:
+        | {
+            Args: { annual_rate: number; months: number; principal: number }
+            Returns: number
+          }
+        | {
+            Args: {
+              p_interest_rate?: number
+              p_principal: number
+              p_term_months: number
+            }
+            Returns: number
+          }
       calculate_occupied_units: {
         Args: { property_uuid: string }
         Returns: number
