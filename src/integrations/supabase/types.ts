@@ -6189,6 +6189,65 @@ export type Database = {
         }
         Relationships: []
       }
+      request_workflows: {
+        Row: {
+          assigned_at: string | null
+          assigned_to: string | null
+          created_at: string | null
+          current_step: number
+          escalated: boolean | null
+          escalated_at: string | null
+          escalation_level: number | null
+          id: string
+          metadata: Json | null
+          request_id: string
+          sla_due_at: string | null
+          total_steps: number
+          updated_at: string | null
+          workflow_status: string | null
+        }
+        Insert: {
+          assigned_at?: string | null
+          assigned_to?: string | null
+          created_at?: string | null
+          current_step?: number
+          escalated?: boolean | null
+          escalated_at?: string | null
+          escalation_level?: number | null
+          id?: string
+          metadata?: Json | null
+          request_id: string
+          sla_due_at?: string | null
+          total_steps?: number
+          updated_at?: string | null
+          workflow_status?: string | null
+        }
+        Update: {
+          assigned_at?: string | null
+          assigned_to?: string | null
+          created_at?: string | null
+          current_step?: number
+          escalated?: boolean | null
+          escalated_at?: string | null
+          escalation_level?: number | null
+          id?: string
+          metadata?: Json | null
+          request_id?: string
+          sla_due_at?: string | null
+          total_steps?: number
+          updated_at?: string | null
+          workflow_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "request_workflows_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reserve_transactions: {
         Row: {
           amount: number
@@ -8201,6 +8260,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      escalate_overdue_requests: { Args: never; Returns: undefined }
       generate_annual_disclosure: {
         Args: { p_waqf_name: string; p_year: number }
         Returns: string
@@ -8252,6 +8312,7 @@ export type Database = {
         Returns: undefined
       }
       notify_contract_expiring: { Args: never; Returns: undefined }
+      notify_payment_due: { Args: never; Returns: undefined }
       notify_rental_payment_due: { Args: never; Returns: undefined }
       payment_requires_approval: {
         Args: { p_amount: number }
