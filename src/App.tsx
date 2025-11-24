@@ -76,6 +76,8 @@ const GovernanceDecisions = lazy(() => import("./pages/GovernanceDecisions"));
 const DecisionDetails = lazy(() => import("./pages/DecisionDetails"));
 const RolesManagement = lazy(() => import("./pages/RolesManagement"));
 const KnowledgeBase = lazy(() => import("./pages/KnowledgeBase"));
+const TestPhase3 = lazy(() => import("./pages/TestPhase3"));
+const TestPhase4 = lazy(() => import("./pages/TestPhase4"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Configure QueryClient with optimized defaults and error handling
@@ -400,7 +402,25 @@ const App = () => {
                 {/* Knowledge Base */}
                 <Route path="/knowledge-base" element={<KnowledgeBase />} />
                 
+                {/* Testing Pages */}
                 <Route 
+                  path="/test-phase3" 
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <TestPhase3 />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/test-phase4" 
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <TestPhase4 />
+                    </ProtectedRoute>
+                  } 
+                />
+                
+                <Route
                   path="/beneficiary-portal"
                   element={
                     <ProtectedRoute requiredRole="beneficiary">
