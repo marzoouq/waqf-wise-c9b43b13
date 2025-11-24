@@ -66,16 +66,12 @@ const Beneficiaries = () => {
   }, []);
 
   const handleSaveBeneficiary = async (data: Omit<Beneficiary, 'id' | 'created_at' | 'updated_at'>) => {
-    try {
-      if (selectedBeneficiary) {
-        await updateBeneficiary({ id: selectedBeneficiary.id, ...data });
-      } else {
-        await addBeneficiary(data);
-      }
-      setDialogOpen(false);
-    } catch (error) {
-      // Error is handled by the mutation's onError callback
+    if (selectedBeneficiary) {
+      await updateBeneficiary({ id: selectedBeneficiary.id, ...data });
+    } else {
+      await addBeneficiary(data);
     }
+    setDialogOpen(false);
   };
 
   const handleDeleteBeneficiary = useCallback(async (id: string) => {

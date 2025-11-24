@@ -145,26 +145,13 @@ const Payments = () => {
 
   const handleSavePayment = async (data: Record<string, unknown>) => {
     try {
-      let paymentId: string;
-      
       if (selectedPayment) {
         await updatePayment({ id: selectedPayment.id, ...data } as Parameters<typeof updatePayment>[0]);
-        paymentId = selectedPayment.id;
       } else {
-        const result = await addPayment(data as Parameters<typeof addPayment>[0]);
-        paymentId = result.id;
+        await addPayment(data as Parameters<typeof addPayment>[0]);
       }
 
-      // Create automatic journal entry
-      const triggerEvent = data.payment_type === 'receipt' ? 'payment_received' : 'payment_made';
-      await createAutoEntry(
-        triggerEvent,
-        paymentId,
-        Number(data.amount),
-        data.description as string,
-        data.payment_date as string
-      );
-
+      // القيد المحاسبي يتم إنشاؤه تلقائياً عبر database trigger
       setDialogOpen(false);
     } catch (error) {
       logger.error(error, { context: 'save_payment', severity: 'medium' });
