@@ -1,38 +1,13 @@
-import { lazy, Suspense, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useNavigate } from "react-router-dom";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart3, Users, Bell, Mail } from "lucide-react";
-import { ChatbotQuickCard } from "@/components/dashboard/ChatbotQuickCard";
-import { Button } from "@/components/ui/button";
-import { AdminSendMessageDialog } from "@/components/messages/AdminSendMessageDialog";
-import BeneficiaryDialog from "@/components/beneficiaries/BeneficiaryDialog";
-import { PropertyDialog } from "@/components/properties/PropertyDialog";
-import { DistributionDialog } from "@/components/funds/DistributionDialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
+import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { DashboardTabs } from "@/components/dashboard/DashboardTabs";
+import { DashboardDialogs } from "@/components/dashboard/DashboardDialogs";
 
-// Lazy load heavy components
-const AdminKPIs = lazy(() => import("@/components/dashboard/admin/AdminKPIs").then(m => ({ default: m.AdminKPIs })));
-const AdminActivities = lazy(() => import("@/components/dashboard/admin/AdminActivities").then(m => ({ default: m.AdminActivities })));
-const AdminTasks = lazy(() => import("@/components/dashboard/admin/AdminTasks").then(m => ({ default: m.AdminTasks })));
-const QuickActions = lazy(() => import("@/components/dashboard/admin/QuickActions").then(m => ({ default: m.QuickActions })));
-const FinancialStats = lazy(() => import("@/components/dashboard/FinancialStats"));
-const FamiliesStats = lazy(() => import("@/components/dashboard/FamiliesStats"));
-const IntegratedReportsWidget = lazy(() => import("@/components/dashboard/IntegratedReportsWidget").then(m => ({ default: m.IntegratedReportsWidget })));
-const RequestsStats = lazy(() => import("@/components/dashboard/RequestsStats"));
-const AccountingStats = lazy(() => import("@/components/dashboard/AccountingStats"));
-const RevenueExpenseChart = lazy(() => import("@/components/dashboard/RevenueExpenseChart"));
-const AccountDistributionChart = lazy(() => import("@/components/dashboard/AccountDistributionChart"));
-const BudgetComparisonChart = lazy(() => import("@/components/dashboard/BudgetComparisonChart"));
-const RecentJournalEntries = lazy(() => import("@/components/dashboard/RecentJournalEntries"));
-const VouchersStatsCard = lazy(() => import("@/components/dashboard/VouchersStatsCard").then(m => ({ default: m.VouchersStatsCard })));
-const PropertyStatsCard = lazy(() => import("@/components/dashboard/PropertyStatsCard").then(m => ({ default: m.PropertyStatsCard })));
-const ExpiringContractsCard = lazy(() => import("@/components/dashboard/ExpiringContractsCard").then(m => ({ default: m.ExpiringContractsCard })));
-
-// Skeleton components
 const KPISkeleton = () => (
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-4 sm:mb-6 md:mb-8">
     {[...Array(8)].map((_, i) => (
@@ -47,17 +22,6 @@ const KPISkeleton = () => (
       </Card>
     ))}
   </div>
-);
-
-const ChartSkeleton = () => (
-  <Card className="shadow-soft">
-    <CardHeader className="pb-2 sm:pb-4">
-      <Skeleton className="h-4 sm:h-6 w-32 sm:w-40" />
-    </CardHeader>
-    <CardContent>
-      <Skeleton className="h-[200px] sm:h-[250px] md:h-[300px] w-full" />
-    </CardContent>
-  </Card>
 );
 
 const Dashboard = () => {
@@ -93,192 +57,24 @@ const Dashboard = () => {
   }
 
   return (
-    <PageErrorBoundary pageName="لوحة التحكم">
-      <MobileOptimizedLayout>
-      <div className="flex items-center justify-between mb-4">
-        <MobileOptimizedHeader
-          title="لوحة تحكم المشرف"
-          description="نظرة شاملة على جميع عمليات الوقف"
-          icon={<BarChart3 className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
-        />
-        <Button onClick={() => setMessageDialogOpen(true)} className="gap-2">
-          <Mail className="h-4 w-4" />
-          <span className="hidden sm:inline">إرسال رسالة</span>
-        </Button>
-      </div>
-
-      {/* Chatbot Quick Access Card */}
-      <div className="mb-4 sm:mb-6 md:mb-8">
-        <Suspense fallback={<ChartSkeleton />}>
-          <ChatbotQuickCard />
-        </Suspense>
-      </div>
-
-      {/* Tabs Navigation */}
-      <Tabs defaultValue="overview" className="w-full space-y-4 sm:space-y-5 md:space-y-6">
-        <TabsList className="w-full grid grid-cols-2 sm:grid-cols-4 gap-1 sm:gap-2 bg-muted/50 p-1">
-          <TabsTrigger 
-            value="overview" 
-            className="gap-1 sm:gap-2 text-xs sm:text-sm py-2 sm:py-3 data-[state=active]:bg-background data-[state=active]:shadow-sm"
-          >
-            <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4" />
-            <span>نظرة عامة</span>
-          </TabsTrigger>
-          <TabsTrigger 
-            value="financial" 
-            className="gap-1 sm:gap-2 text-xs sm:text-sm py-2 sm:py-3 data-[state=active]:bg-background data-[state=active]:shadow-sm"
-          >
-            <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4" />
-            <span>المالية</span>
-          </TabsTrigger>
-          <TabsTrigger 
-            value="beneficiaries" 
-            className="gap-1 sm:gap-2 text-xs sm:text-sm py-2 sm:py-3 data-[state=active]:bg-background data-[state=active]:shadow-sm"
-          >
-            <Users className="h-3 w-3 sm:h-4 sm:w-4" />
-            <span>المستفيدون</span>
-          </TabsTrigger>
-          <TabsTrigger 
-            value="activities" 
-            className="gap-1 sm:gap-2 text-xs sm:text-sm py-2 sm:py-3 data-[state=active]:bg-background data-[state=active]:shadow-sm"
-          >
-            <Bell className="h-3 w-3 sm:h-4 sm:w-4" />
-            <span>النشاطات</span>
-          </TabsTrigger>
-        </TabsList>
-
-        {/* Overview Tab */}
-        <TabsContent value="overview" className="space-y-4 sm:space-y-5 md:space-y-6">
-          <Suspense fallback={<KPISkeleton />}>
-            <AdminKPIs />
-          </Suspense>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
-            <Suspense fallback={<ChartSkeleton />}>
-              <RevenueExpenseChart />
-            </Suspense>
-            <Suspense fallback={<ChartSkeleton />}>
-              <AccountDistributionChart />
-            </Suspense>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
-            <Suspense fallback={<ChartSkeleton />}>
-              <AdminActivities />
-            </Suspense>
-            <Suspense fallback={<ChartSkeleton />}>
-              <AdminTasks />
-            </Suspense>
-          </div>
-
-          {/* Property Stats */}
-          <Suspense fallback={<ChartSkeleton />}>
-            <PropertyStatsCard />
-          </Suspense>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
-            <Suspense fallback={<ChartSkeleton />}>
-              <ExpiringContractsCard />
-            </Suspense>
-            <Suspense fallback={<ChartSkeleton />}>
-              <IntegratedReportsWidget />
-            </Suspense>
-          </div>
-
-          <Suspense fallback={<ChartSkeleton />}>
-            <QuickActions
-              onOpenBeneficiaryDialog={() => setIsBeneficiaryDialogOpen(true)}
-              onOpenPropertyDialog={() => setIsPropertyDialogOpen(true)}
-              onOpenDistributionDialog={() => setIsDistributionDialogOpen(true)}
-            />
-          </Suspense>
-        </TabsContent>
-
-        {/* Financial Tab */}
-        <TabsContent value="financial" className="space-y-4 sm:space-y-5 md:space-y-6">
-          <Suspense fallback={<KPISkeleton />}>
-            <FinancialStats />
-          </Suspense>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
-            <Suspense fallback={<KPISkeleton />}>
-              <AccountingStats />
-            </Suspense>
-
-            <Suspense fallback={<KPISkeleton />}>
-              <VouchersStatsCard />
-            </Suspense>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
-            <Suspense fallback={<ChartSkeleton />}>
-              <RevenueExpenseChart />
-            </Suspense>
-            <Suspense fallback={<ChartSkeleton />}>
-              <BudgetComparisonChart />
-            </Suspense>
-          </div>
-
-          <Suspense fallback={<ChartSkeleton />}>
-            <RecentJournalEntries />
-          </Suspense>
-        </TabsContent>
-
-        {/* Beneficiaries Tab */}
-        <TabsContent value="beneficiaries" className="space-y-4 sm:space-y-5 md:space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
-            <Suspense fallback={<ChartSkeleton />}>
-              <FamiliesStats />
-            </Suspense>
-            <Suspense fallback={<ChartSkeleton />}>
-              <RequestsStats />
-            </Suspense>
-          </div>
-
-          <Suspense fallback={<ChartSkeleton />}>
-            <QuickActions
-              onOpenBeneficiaryDialog={() => setIsBeneficiaryDialogOpen(true)}
-              onOpenPropertyDialog={() => setIsPropertyDialogOpen(true)}
-              onOpenDistributionDialog={() => setIsDistributionDialogOpen(true)}
-            />
-          </Suspense>
-        </TabsContent>
-
-        {/* Activities Tab */}
-        <TabsContent value="activities" className="space-y-4 sm:space-y-5 md:space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
-            <Suspense fallback={<ChartSkeleton />}>
-              <AdminActivities />
-            </Suspense>
-            <Suspense fallback={<ChartSkeleton />}>
-              <AdminTasks />
-            </Suspense>
-          </div>
-        </TabsContent>
-      </Tabs>
-
-      {/* Dialogs */}
-      <BeneficiaryDialog
-        open={isBeneficiaryDialogOpen}
-        onOpenChange={setIsBeneficiaryDialogOpen}
-        onSave={() => setIsBeneficiaryDialogOpen(false)}
+    <DashboardLayout onMessageClick={() => setMessageDialogOpen(true)}>
+      <DashboardTabs
+        onOpenBeneficiaryDialog={() => setIsBeneficiaryDialogOpen(true)}
+        onOpenPropertyDialog={() => setIsPropertyDialogOpen(true)}
+        onOpenDistributionDialog={() => setIsDistributionDialogOpen(true)}
       />
-      <PropertyDialog
-        open={isPropertyDialogOpen}
-        onOpenChange={setIsPropertyDialogOpen}
-        onSave={() => setIsPropertyDialogOpen(false)}
+
+      <DashboardDialogs
+        beneficiaryDialogOpen={isBeneficiaryDialogOpen}
+        setBeneficiaryDialogOpen={setIsBeneficiaryDialogOpen}
+        propertyDialogOpen={isPropertyDialogOpen}
+        setPropertyDialogOpen={setIsPropertyDialogOpen}
+        distributionDialogOpen={isDistributionDialogOpen}
+        setDistributionDialogOpen={setIsDistributionDialogOpen}
+        messageDialogOpen={messageDialogOpen}
+        setMessageDialogOpen={setMessageDialogOpen}
       />
-      <DistributionDialog
-        open={isDistributionDialogOpen}
-        onOpenChange={setIsDistributionDialogOpen}
-        onDistribute={() => setIsDistributionDialogOpen(false)}
-      />
-      <AdminSendMessageDialog
-        open={messageDialogOpen}
-        onOpenChange={setMessageDialogOpen}
-      />
-      </MobileOptimizedLayout>
-    </PageErrorBoundary>
+    </DashboardLayout>
   );
 };
 

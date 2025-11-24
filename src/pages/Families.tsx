@@ -36,6 +36,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import FamilyDialog from '@/components/families/FamilyDialog';
 import { FamiliesErrorState } from '@/components/families/FamiliesErrorState';
+import { FamilyMembersDialog } from '@/components/families/FamilyMembersDialog';
 import { Family } from '@/types';
 import { toast } from 'sonner';
 import { Database } from '@/integrations/supabase/types';
@@ -66,6 +67,8 @@ const Families = () => {
   const [selectedFamily, setSelectedFamily] = useState<Family | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [familyToDelete, setFamilyToDelete] = useState<Family | null>(null);
+  const [membersDialogOpen, setMembersDialogOpen] = useState(false);
+  const [selectedFamilyForMembers, setSelectedFamilyForMembers] = useState<Family | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(20);
   const [advancedFilters, setAdvancedFilters] = useState<Record<string, any>>({});
@@ -432,7 +435,10 @@ const Families = () => {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => navigate(`/beneficiaries?family=${family.id}`)}>
+                            <DropdownMenuItem onClick={() => {
+                              setSelectedFamilyForMembers(family);
+                              setMembersDialogOpen(true);
+                            }}>
                               <Users className="ml-2 h-4 w-4" />
                               عرض الأفراد ({family.total_members})
                             </DropdownMenuItem>
@@ -525,6 +531,16 @@ const Families = () => {
           if (action === 'export') handleBulkExport();
         }}
       />
+
+      {/* Family Members Dialog */}
+      {selectedFamilyForMembers && (
+        <FamilyMembersDialog
+          open={membersDialogOpen}
+          onOpenChange={setMembersDialogOpen}
+          familyId={selectedFamilyForMembers.id}
+          familyName={selectedFamilyForMembers.family_name}
+        />
+      )}
         </div>
       </div>
     </PageErrorBoundary>

@@ -5,12 +5,7 @@ import { Beneficiary } from "@/types/beneficiary";
 import { useBeneficiaries } from "@/hooks/useBeneficiaries";
 import { useSavedSearches } from "@/hooks/useSavedSearches";
 import { useBeneficiariesFilters } from "@/hooks/useBeneficiariesFilters";
-import BeneficiaryDialog from "@/components/beneficiaries/BeneficiaryDialog";
-import { AdvancedSearchDialog, SearchCriteria } from "@/components/beneficiaries/AdvancedSearchDialog";
-import { AttachmentsDialog } from "@/components/beneficiaries/AttachmentsDialog";
-import { ActivityLogDialog } from "@/components/beneficiaries/ActivityLogDialog";
-import { EnableLoginDialog } from "@/components/beneficiaries/EnableLoginDialog";
-import { TribeManagementDialog } from "@/components/beneficiaries/TribeManagementDialog";
+import { SearchCriteria } from "@/components/beneficiaries/AdvancedSearchDialog";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import {
   BeneficiariesHeader,
@@ -18,6 +13,7 @@ import {
   BeneficiariesStats,
   BeneficiariesTable,
 } from "@/components/beneficiaries/list";
+import { BeneficiariesDialogs } from "@/components/beneficiaries/BeneficiariesDialogs";
 import { PAGINATION } from "@/lib/constants";
 
 const ITEMS_PER_PAGE = PAGINATION.BENEFICIARIES_PAGE_SIZE;
@@ -39,14 +35,12 @@ const Beneficiaries = () => {
   const { beneficiaries, totalCount, isLoading, addBeneficiary, updateBeneficiary, deleteBeneficiary } = useBeneficiaries();
   const { searches } = useSavedSearches();
   
-  // Use custom hook for filtering
   const { filteredBeneficiaries, stats } = useBeneficiariesFilters(
     beneficiaries,
     searchQuery,
     advancedCriteria
   );
 
-  // Paginate filtered results
   const paginatedBeneficiaries = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
@@ -85,118 +79,72 @@ const Beneficiaries = () => {
     setCurrentPage(1);
   };
 
-  const handleViewProfile = (beneficiary: Beneficiary) => {
-    navigate(`/beneficiaries/${beneficiary.id}`);
-  };
-
-  const handleViewAttachments = (beneficiary: Beneficiary) => {
-    setSelectedBeneficiary(beneficiary);
-    setAttachmentsDialogOpen(true);
-  };
-
-  const handleViewActivity = (beneficiary: Beneficiary) => {
-    setSelectedBeneficiary(beneficiary);
-    setActivityLogDialogOpen(true);
-  };
-
   const handleLoadSavedSearch = (search: { search_criteria: unknown }) => {
     setAdvancedCriteria(search.search_criteria as SearchCriteria);
     setCurrentPage(1);
-  };
-
-  const handleEnableLogin = (beneficiary: Beneficiary) => {
-    setSelectedBeneficiary(beneficiary);
-    setEnableLoginDialogOpen(true);
   };
 
   return (
     <PageErrorBoundary pageName="المستفيدون">
       <div className="min-h-screen bg-background">
         <div className="container mx-auto p-6 md:p-8 lg:p-10 space-y-6 md:space-y-8">
-        <BeneficiariesHeader
-          filteredBeneficiaries={filteredBeneficiaries}
-          onAddBeneficiary={handleAddBeneficiary}
-          onImportSuccess={() => queryClient.invalidateQueries({ queryKey: ['beneficiaries'] })}
-        />
+          <BeneficiariesHeader
+            filteredBeneficiaries={filteredBeneficiaries}
+            onAddBeneficiary={handleAddBeneficiary}
+            onImportSuccess={() => queryClient.invalidateQueries({ queryKey: ['beneficiaries'] })}
+          />
 
-        <BeneficiariesSearchBar
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          onAdvancedSearchClick={() => setAdvancedSearchOpen(true)}
-          onTribeManagementClick={() => setTribeManagementDialogOpen(true)}
-          savedSearches={searches}
-          onLoadSearch={handleLoadSavedSearch}
-        />
+          <BeneficiariesSearchBar
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            onAdvancedSearchClick={() => setAdvancedSearchOpen(true)}
+            onTribeManagementClick={() => setTribeManagementDialogOpen(true)}
+            savedSearches={searches}
+            onLoadSearch={handleLoadSavedSearch}
+          />
 
-        <BeneficiariesStats
-          total={stats.total}
-          active={stats.active}
-          suspended={stats.suspended}
-          families={stats.families}
-        />
+          <BeneficiariesStats
+            total={stats.total}
+            active={stats.active}
+            suspended={stats.suspended}
+            families={stats.families}
+          />
 
-        <BeneficiariesTable
-          beneficiaries={paginatedBeneficiaries}
-          isLoading={isLoading}
-          searchQuery={searchQuery}
-          currentPage={currentPage}
-          totalPages={totalPages}
-          totalItems={filteredBeneficiaries.length}
-          itemsPerPage={ITEMS_PER_PAGE}
-          onPageChange={setCurrentPage}
-          onViewProfile={handleViewProfile}
-          onEdit={handleEditBeneficiary}
-          onViewAttachments={handleViewAttachments}
-          onViewActivity={handleViewActivity}
-          onEnableLogin={handleEnableLogin}
-          onDelete={handleDeleteBeneficiary}
-        />
+          <BeneficiariesTable
+            beneficiaries={paginatedBeneficiaries}
+            isLoading={isLoading}
+            searchQuery={searchQuery}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={filteredBeneficiaries.length}
+            itemsPerPage={ITEMS_PER_PAGE}
+            onPageChange={setCurrentPage}
+            onViewProfile={(b) => navigate(`/beneficiaries/${b.id}`)}
+            onEdit={handleEditBeneficiary}
+            onViewAttachments={(b) => { setSelectedBeneficiary(b); setAttachmentsDialogOpen(true); }}
+            onViewActivity={(b) => { setSelectedBeneficiary(b); setActivityLogDialogOpen(true); }}
+            onEnableLogin={(b) => { setSelectedBeneficiary(b); setEnableLoginDialogOpen(true); }}
+            onDelete={handleDeleteBeneficiary}
+          />
 
-        {/* Beneficiary Dialog */}
-        <BeneficiaryDialog
-          open={dialogOpen}
-          onOpenChange={setDialogOpen}
-          beneficiary={selectedBeneficiary}
-          onSave={handleSaveBeneficiary}
-        />
-        
-        <AdvancedSearchDialog
-          open={advancedSearchOpen}
-          onOpenChange={setAdvancedSearchOpen}
-          onSearch={handleAdvancedSearch}
-        />
-
-        {selectedBeneficiary && (
-          <>
-            <AttachmentsDialog
-              open={attachmentsDialogOpen}
-              onOpenChange={setAttachmentsDialogOpen}
-              beneficiaryId={selectedBeneficiary.id}
-              beneficiaryName={selectedBeneficiary.full_name}
-            />
-
-            <ActivityLogDialog
-              open={activityLogDialogOpen}
-              onOpenChange={setActivityLogDialogOpen}
-              beneficiaryId={selectedBeneficiary.id}
-              beneficiaryName={selectedBeneficiary.full_name}
-            />
-
-            <EnableLoginDialog
-              open={enableLoginDialogOpen}
-              onOpenChange={setEnableLoginDialogOpen}
-              beneficiary={selectedBeneficiary}
-              onSuccess={() => {
-                queryClient.invalidateQueries({ queryKey: ["beneficiaries"] });
-              }}
-            />
-            
-            <TribeManagementDialog
-              open={tribeManagementDialogOpen}
-              onOpenChange={setTribeManagementDialogOpen}
-            />
-          </>
-        )}
+          <BeneficiariesDialogs
+            dialogOpen={dialogOpen}
+            setDialogOpen={setDialogOpen}
+            advancedSearchOpen={advancedSearchOpen}
+            setAdvancedSearchOpen={setAdvancedSearchOpen}
+            attachmentsDialogOpen={attachmentsDialogOpen}
+            setAttachmentsDialogOpen={setAttachmentsDialogOpen}
+            activityLogDialogOpen={activityLogDialogOpen}
+            setActivityLogDialogOpen={setActivityLogDialogOpen}
+            enableLoginDialogOpen={enableLoginDialogOpen}
+            setEnableLoginDialogOpen={setEnableLoginDialogOpen}
+            tribeManagementDialogOpen={tribeManagementDialogOpen}
+            setTribeManagementDialogOpen={setTribeManagementDialogOpen}
+            selectedBeneficiary={selectedBeneficiary}
+            onSaveBeneficiary={handleSaveBeneficiary}
+            onAdvancedSearch={handleAdvancedSearch}
+            onSuccessCallback={() => queryClient.invalidateQueries({ queryKey: ["beneficiaries"] })}
+          />
         </div>
       </div>
     </PageErrorBoundary>
