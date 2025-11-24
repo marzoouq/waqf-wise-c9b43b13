@@ -10,7 +10,8 @@ import { LoadingState } from "@/components/shared/LoadingState";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { 
   User, FileText, CreditCard, Upload, MessageSquare, 
-  TrendingUp, Clock, CheckCircle, AlertCircle, Users, Landmark 
+  TrendingUp, Clock, CheckCircle, AlertCircle, Users, Landmark,
+  Home, DollarSign, Building2, File, BarChart3, Shield
 } from "lucide-react";
 import { BeneficiaryProfileTab } from "@/components/beneficiary/BeneficiaryProfileTab";
 import { BeneficiaryRequestsTab } from "@/components/beneficiary/BeneficiaryRequestsTab";
@@ -24,6 +25,9 @@ import { BankAccountsTab } from "@/components/beneficiary/BankAccountsTab";
 import { FinancialReportsTab } from "@/components/beneficiary/FinancialReportsTab";
 import { ApprovalsLogTab } from "@/components/beneficiary/ApprovalsLogTab";
 import { DisclosuresTab } from "@/components/beneficiary/DisclosuresTab";
+import { GovernanceTab } from "@/components/beneficiary/GovernanceTab";
+import { BudgetsTab } from "@/components/beneficiary/BudgetsTab";
+import { LoansOverviewTab } from "@/components/beneficiary/LoansOverviewTab";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
@@ -119,7 +123,7 @@ export default function BeneficiaryPortal() {
 
           {/* Main Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-9 mb-6">
+            <TabsList className="grid w-full grid-cols-12 mb-6">
               {settings?.show_overview && (
                 <TabsTrigger value="overview">
                   <TrendingUp className="h-4 w-4 ml-2" />
@@ -172,6 +176,24 @@ export default function BeneficiaryPortal() {
                 <Landmark className="h-4 w-4 ml-2" />
                 الوقف
               </TabsTrigger>
+              {settings?.show_governance && (
+                <TabsTrigger value="governance">
+                  <Shield className="h-4 w-4 ml-2" />
+                  الحوكمة
+                </TabsTrigger>
+              )}
+              {settings?.show_budgets && (
+                <TabsTrigger value="budgets">
+                  <DollarSign className="h-4 w-4 ml-2" />
+                  الميزانيات
+                </TabsTrigger>
+              )}
+              {settings?.show_own_loans && (
+                <TabsTrigger value="loans">
+                  <CreditCard className="h-4 w-4 ml-2" />
+                  القروض
+                </TabsTrigger>
+              )}
             </TabsList>
 
             {/* Overview Tab */}
@@ -324,6 +346,34 @@ export default function BeneficiaryPortal() {
             {settings?.show_disclosures && (
               <TabsContent value="disclosures">
                 <DisclosuresTab />
+              </TabsContent>
+            )}
+
+            {/* Governance Tab */}
+            {settings?.show_governance && (
+              <TabsContent value="governance">
+                <GovernanceTab />
+              </TabsContent>
+            )}
+
+            {/* Budgets Tab */}
+            {settings?.show_budgets && (
+              <TabsContent value="budgets">
+                <BudgetsTab />
+              </TabsContent>
+            )}
+
+            {/* Loans Overview Tab */}
+            {settings?.show_own_loans && (
+              <TabsContent value="loans">
+                <LoansOverviewTab />
+              </TabsContent>
+            )}
+
+            {/* Documents Tab */}
+            {settings?.show_documents && (
+              <TabsContent value="documents">
+                <BeneficiaryDocumentsTab beneficiaryId={beneficiary.id} />
               </TabsContent>
             )}
           </Tabs>
