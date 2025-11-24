@@ -10,7 +10,7 @@ import { LoadingState } from "@/components/shared/LoadingState";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { 
   User, FileText, CreditCard, Upload, MessageSquare, 
-  TrendingUp, Clock, CheckCircle, AlertCircle 
+  TrendingUp, Clock, CheckCircle, AlertCircle, Users, Landmark 
 } from "lucide-react";
 import { BeneficiaryProfileTab } from "@/components/beneficiary/BeneficiaryProfileTab";
 import { BeneficiaryRequestsTab } from "@/components/beneficiary/BeneficiaryRequestsTab";
@@ -18,12 +18,20 @@ import { BeneficiaryStatementsTab } from "@/components/beneficiary/BeneficiarySt
 import { BeneficiaryDocumentsTab } from "@/components/beneficiary/BeneficiaryDocumentsTab";
 import { BeneficiaryDistributionsTab } from "@/components/beneficiary/BeneficiaryDistributionsTab";
 import { BeneficiaryPropertiesTab } from "@/components/beneficiary/BeneficiaryPropertiesTab";
+import { WaqfSummaryTab } from "@/components/beneficiary/WaqfSummaryTab";
+import { FamilyTreeTab } from "@/components/beneficiary/FamilyTreeTab";
+import { BankAccountsTab } from "@/components/beneficiary/BankAccountsTab";
+import { FinancialReportsTab } from "@/components/beneficiary/FinancialReportsTab";
+import { ApprovalsLogTab } from "@/components/beneficiary/ApprovalsLogTab";
+import { DisclosuresTab } from "@/components/beneficiary/DisclosuresTab";
+import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 
 export default function BeneficiaryPortal() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
+  const { settings, isLoading: settingsLoading } = useVisibilitySettings();
 
   // جلب بيانات المستفيد الحالي
   const { data: beneficiary, isLoading } = useQuery({
@@ -111,34 +119,58 @@ export default function BeneficiaryPortal() {
 
           {/* Main Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-7 mb-6">
-              <TabsTrigger value="overview">
-                <TrendingUp className="h-4 w-4 ml-2" />
-                نظرة عامة
-              </TabsTrigger>
-              <TabsTrigger value="profile">
-                <User className="h-4 w-4 ml-2" />
-                الملف
-              </TabsTrigger>
-              <TabsTrigger value="requests">
-                <FileText className="h-4 w-4 ml-2" />
-                الطلبات
-              </TabsTrigger>
-              <TabsTrigger value="distributions">
-                <TrendingUp className="h-4 w-4 ml-2" />
-                التوزيعات
-              </TabsTrigger>
-              <TabsTrigger value="statements">
-                <CreditCard className="h-4 w-4 ml-2" />
-                كشف الحساب
-              </TabsTrigger>
-              <TabsTrigger value="properties">
-                <FileText className="h-4 w-4 ml-2" />
-                العقارات
-              </TabsTrigger>
-              <TabsTrigger value="documents">
-                <Upload className="h-4 w-4 ml-2" />
-                المستندات
+            <TabsList className="grid w-full grid-cols-9 mb-6">
+              {settings?.show_overview && (
+                <TabsTrigger value="overview">
+                  <TrendingUp className="h-4 w-4 ml-2" />
+                  نظرة عامة
+                </TabsTrigger>
+              )}
+              {settings?.show_profile && (
+                <TabsTrigger value="profile">
+                  <User className="h-4 w-4 ml-2" />
+                  الملف
+                </TabsTrigger>
+              )}
+              {settings?.show_requests && (
+                <TabsTrigger value="requests">
+                  <FileText className="h-4 w-4 ml-2" />
+                  الطلبات
+                </TabsTrigger>
+              )}
+              {settings?.show_distributions && (
+                <TabsTrigger value="distributions">
+                  <TrendingUp className="h-4 w-4 ml-2" />
+                  التوزيعات
+                </TabsTrigger>
+              )}
+              {settings?.show_statements && (
+                <TabsTrigger value="statements">
+                  <CreditCard className="h-4 w-4 ml-2" />
+                  كشف الحساب
+                </TabsTrigger>
+              )}
+              {settings?.show_properties && (
+                <TabsTrigger value="properties">
+                  <FileText className="h-4 w-4 ml-2" />
+                  العقارات
+                </TabsTrigger>
+              )}
+              {settings?.show_documents && (
+                <TabsTrigger value="documents">
+                  <Upload className="h-4 w-4 ml-2" />
+                  المستندات
+                </TabsTrigger>
+              )}
+              {settings?.show_family_tree && (
+                <TabsTrigger value="family">
+                  <Users className="h-4 w-4 ml-2" />
+                  العائلة
+                </TabsTrigger>
+              )}
+              <TabsTrigger value="waqf">
+                <Landmark className="h-4 w-4 ml-2" />
+                الوقف
               </TabsTrigger>
             </TabsList>
 
@@ -255,10 +287,45 @@ export default function BeneficiaryPortal() {
               <BeneficiaryPropertiesTab />
             </TabsContent>
 
-            {/* Documents Tab */}
-            <TabsContent value="documents">
-              <BeneficiaryDocumentsTab beneficiaryId={beneficiary.id} />
+            {/* Waqf Summary Tab */}
+            <TabsContent value="waqf">
+              <WaqfSummaryTab />
             </TabsContent>
+
+            {/* Family Tree Tab */}
+            {settings?.show_family_tree && (
+              <TabsContent value="family">
+                <FamilyTreeTab beneficiaryId={beneficiary.id} />
+              </TabsContent>
+            )}
+
+            {/* Bank Accounts Tab */}
+            {settings?.show_bank_accounts && (
+              <TabsContent value="bank">
+                <BankAccountsTab />
+              </TabsContent>
+            )}
+
+            {/* Financial Reports Tab */}
+            {settings?.show_financial_reports && (
+              <TabsContent value="reports">
+                <FinancialReportsTab />
+              </TabsContent>
+            )}
+
+            {/* Approvals Log Tab */}
+            {settings?.show_approvals_log && (
+              <TabsContent value="approvals">
+                <ApprovalsLogTab />
+              </TabsContent>
+            )}
+
+            {/* Disclosures Tab */}
+            {settings?.show_disclosures && (
+              <TabsContent value="disclosures">
+                <DisclosuresTab />
+              </TabsContent>
+            )}
           </Tabs>
         </div>
       </MobileOptimizedLayout>
