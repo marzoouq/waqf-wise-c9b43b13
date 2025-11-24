@@ -143,7 +143,7 @@ export const useRentalPayments = (
   }, [queryClient]);
 
   const { data: allPayments = [], isLoading } = useQuery({
-    queryKey: ["rental_payments", contractId || undefined],
+    queryKey: ["rental_payments", contractId],
     queryFn: async () => {
       let query = supabase
         .from("rental_payments")

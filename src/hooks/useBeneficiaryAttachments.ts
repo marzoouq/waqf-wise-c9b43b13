@@ -28,7 +28,7 @@ export function useBeneficiaryAttachments(beneficiaryId?: string) {
 
   // Fetch attachments
   const { data: attachments = [], isLoading } = useQuery({
-    queryKey: ["beneficiary-attachments", beneficiaryId || undefined],
+    queryKey: ["beneficiary-attachments", beneficiaryId],
     queryFn: async () => {
       if (!beneficiaryId) return [];
       

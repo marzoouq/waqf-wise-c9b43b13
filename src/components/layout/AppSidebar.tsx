@@ -110,11 +110,11 @@ const menuGroups = [
     icon: BarChart3,
     roles: ["admin", "accountant", "nazer"],
     subItems: [
-      { icon: BarChart3, label: "التقارير", path: "/reports", roles: ["all"] },
-      { icon: FileText, label: "منشئ التقارير", path: "/reports", roles: ["admin", "accountant", "nazer"] },
-      { icon: Sparkles, label: "الرؤى الذكية", path: "/ai-insights", roles: ["admin", "nazer"] },
-      { icon: Bot, label: "المساعد الذكي", path: "/chatbot", roles: ["all"] },
-      { icon: Shield, label: "سجل العمليات", path: "/audit-logs", roles: ["admin", "nazer"] },
+      { icon: BarChart3, label: "التقارير", path: "/reports", roles: ["all"], id: "reports-view" },
+      { icon: FileText, label: "منشئ التقارير", path: "/reports", roles: ["admin", "accountant", "nazer"], id: "reports-builder" },
+      { icon: Sparkles, label: "الرؤى الذكية", path: "/ai-insights", roles: ["admin", "nazer"], id: "ai-insights" },
+      { icon: Bot, label: "المساعد الذكي", path: "/chatbot", roles: ["all"], id: "chatbot" },
+      { icon: Shield, label: "سجل العمليات", path: "/audit-logs", roles: ["admin", "nazer"], id: "audit-logs" },
     ]
   },
   {
@@ -260,12 +260,13 @@ const AppSidebar = () => {
                       </CollapsibleTrigger>
                       <CollapsibleContent>
                         <SidebarMenuSub>
-                          {filteredSubItems.map((subItem) => {
+                          {filteredSubItems.map((subItem, index) => {
                             const SubIcon = subItem.icon;
                             const isSubActive = location.pathname === subItem.path;
+                            const uniqueKey = ('id' in subItem && subItem.id) ? subItem.id : `${subItem.path}-${index}`;
                             
                             return (
-                              <SidebarMenuSubItem key={`sub-${subItem.path}`}>
+                              <SidebarMenuSubItem key={uniqueKey}>
                                 <SidebarMenuSubButton
                                   asChild
                                   isActive={isSubActive}

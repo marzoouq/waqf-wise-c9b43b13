@@ -23,7 +23,7 @@ export function useCashFlows(fiscalYearId?: string) {
   const queryClient = useQueryClient();
 
   const { data: cashFlows = [], isLoading } = useQuery({
-    queryKey: ["cash_flows", fiscalYearId || undefined],
+    queryKey: ["cash_flows", fiscalYearId],
     queryFn: async () => {
       // استخدام استعلام SQL مباشر لحساب التدفقات النقدية
       const endDate = new Date().toISOString().split('T')[0];

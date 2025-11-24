@@ -48,7 +48,7 @@ export function useRequestApprovals(requestId?: string) {
   }, [queryClient]);
 
   const { data: approvals = [], isLoading } = useQuery({
-    queryKey: ["request_approvals", requestId || undefined],
+    queryKey: ["request_approvals", requestId],
     queryFn: async () => {
       let query = supabase
         .from("request_approvals")
