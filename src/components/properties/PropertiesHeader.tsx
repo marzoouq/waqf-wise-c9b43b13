@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Building, FileText, DollarSign, Wrench, LucideIcon } from "lucide-react";
+import { Building, FileText, DollarSign, Wrench, LucideIcon, Brain, Users } from "lucide-react";
 import { ExportButton } from "@/components/shared/ExportButton";
 import { type Property } from "@/hooks/useProperties";
 
@@ -7,9 +7,11 @@ interface PropertiesHeaderProps {
   activeTab: string;
   properties?: Property[];
   onAddClick: (type: 'property' | 'contract' | 'payment' | 'maintenance') => void;
+  onAIClick?: () => void;
+  onProvidersClick?: () => void;
 }
 
-export const PropertiesHeader = ({ activeTab, properties, onAddClick }: PropertiesHeaderProps) => {
+export const PropertiesHeader = ({ activeTab, properties, onAddClick, onAIClick, onProvidersClick }: PropertiesHeaderProps) => {
   const getAddButton = () => {
     const buttons: Record<string, { label: string; icon: LucideIcon; type: 'property' | 'contract' | 'payment' | 'maintenance' }> = {
       properties: { label: "إضافة عقار", icon: Building, type: 'property' },
@@ -44,7 +46,19 @@ export const PropertiesHeader = ({ activeTab, properties, onAddClick }: Properti
           إدارة شاملة للعقارات، العقود، الإيجارات والصيانة
         </p>
       </div>
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-wrap">
+        {onAIClick && (
+          <Button variant="outline" size="sm" onClick={onAIClick}>
+            <Brain className="h-4 w-4 ml-2" />
+            مساعد AI
+          </Button>
+        )}
+        {onProvidersClick && (
+          <Button variant="outline" size="sm" onClick={onProvidersClick}>
+            <Users className="h-4 w-4 ml-2" />
+            مقدمي الخدمة
+          </Button>
+        )}
         {activeTab === "properties" && properties && properties.length > 0 && (
           <ExportButton
             data={properties.map(p => ({

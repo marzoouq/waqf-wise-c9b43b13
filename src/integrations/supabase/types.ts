@@ -4679,11 +4679,69 @@ export type Database = {
         }
         Relationships: []
       }
+      maintenance_providers: {
+        Row: {
+          active_jobs: number | null
+          address: string | null
+          average_cost: number | null
+          average_response_time: number | null
+          contact_person: string | null
+          created_at: string | null
+          email: string | null
+          id: string
+          is_active: boolean | null
+          notes: string | null
+          phone: string
+          provider_name: string
+          rating: number | null
+          specialization: string[] | null
+          total_jobs: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          active_jobs?: number | null
+          address?: string | null
+          average_cost?: number | null
+          average_response_time?: number | null
+          contact_person?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          phone: string
+          provider_name: string
+          rating?: number | null
+          specialization?: string[] | null
+          total_jobs?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          active_jobs?: number | null
+          address?: string | null
+          average_cost?: number | null
+          average_response_time?: number | null
+          contact_person?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          phone?: string
+          provider_name?: string
+          rating?: number | null
+          specialization?: string[] | null
+          total_jobs?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       maintenance_requests: {
         Row: {
           actual_cost: number | null
           assigned_to: string | null
           category: string
+          completed_at: string | null
           completed_date: string | null
           contract_id: string | null
           created_at: string
@@ -4694,6 +4752,7 @@ export type Database = {
           notes: string | null
           priority: string
           property_id: string
+          provider_id: string | null
           request_number: string
           requested_by: string
           requested_date: string
@@ -4707,6 +4766,7 @@ export type Database = {
           actual_cost?: number | null
           assigned_to?: string | null
           category: string
+          completed_at?: string | null
           completed_date?: string | null
           contract_id?: string | null
           created_at?: string
@@ -4717,6 +4777,7 @@ export type Database = {
           notes?: string | null
           priority?: string
           property_id: string
+          provider_id?: string | null
           request_number: string
           requested_by: string
           requested_date?: string
@@ -4730,6 +4791,7 @@ export type Database = {
           actual_cost?: number | null
           assigned_to?: string | null
           category?: string
+          completed_at?: string | null
           completed_date?: string | null
           contract_id?: string | null
           created_at?: string
@@ -4740,6 +4802,7 @@ export type Database = {
           notes?: string | null
           priority?: string
           property_id?: string
+          provider_id?: string | null
           request_number?: string
           requested_by?: string
           requested_date?: string
@@ -4769,6 +4832,13 @@ export type Database = {
             columns: ["property_id"]
             isOneToOne: false
             referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_requests_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "maintenance_providers"
             referencedColumns: ["id"]
           },
         ]
@@ -6082,6 +6152,60 @@ export type Database = {
           verification_notes?: string | null
         }
         Relationships: []
+      }
+      provider_ratings: {
+        Row: {
+          comments: string | null
+          cost_score: number | null
+          created_at: string | null
+          id: string
+          maintenance_request_id: string | null
+          provider_id: string
+          quality_score: number | null
+          rated_by: string | null
+          rating: number
+          timeliness_score: number | null
+        }
+        Insert: {
+          comments?: string | null
+          cost_score?: number | null
+          created_at?: string | null
+          id?: string
+          maintenance_request_id?: string | null
+          provider_id: string
+          quality_score?: number | null
+          rated_by?: string | null
+          rating: number
+          timeliness_score?: number | null
+        }
+        Update: {
+          comments?: string | null
+          cost_score?: number | null
+          created_at?: string | null
+          id?: string
+          maintenance_request_id?: string | null
+          provider_id?: string
+          quality_score?: number | null
+          rated_by?: string | null
+          rating?: number
+          timeliness_score?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "provider_ratings_maintenance_request_id_fkey"
+            columns: ["maintenance_request_id"]
+            isOneToOne: false
+            referencedRelation: "maintenance_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "provider_ratings_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "maintenance_providers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       push_subscriptions: {
         Row: {

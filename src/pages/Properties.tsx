@@ -3,6 +3,8 @@ import { PropertyDialog } from "@/components/properties/PropertyDialog";
 import { ContractDialog } from "@/components/properties/ContractDialog";
 import { RentalPaymentDialog } from "@/components/properties/RentalPaymentDialog";
 import { MaintenanceRequestDialog } from "@/components/properties/MaintenanceRequestDialog";
+import { AIAssistantDialog } from "@/components/properties/AIAssistantDialog";
+import { MaintenanceProvidersDialog } from "@/components/properties/MaintenanceProvidersDialog";
 import { PropertiesHeader } from "@/components/properties/PropertiesHeader";
 import { PropertiesTabs } from "@/components/properties/PropertiesTabs";
 import { useProperties, type Property } from "@/hooks/useProperties";
@@ -14,6 +16,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Building2, TrendingUp, Wrench, AlertCircle } from "lucide-react";
 
 const Properties = () => {
+  const [aiDialogOpen, setAiDialogOpen] = useState(false);
+  const [providersDialogOpen, setProvidersDialogOpen] = useState(false);
+  const [aiAction, setAiAction] = useState<"analyze_property" | "suggest_maintenance" | "predict_revenue" | "optimize_contracts" | "alert_insights">("analyze_property");
+  const [selectedPropertyForAI, setSelectedPropertyForAI] = useState<any>(null);
+  
   const { addProperty, updateProperty, properties } = useProperties();
   const { data: stats, isLoading: statsLoading } = usePropertiesStats();
   const [activeTab, setActiveTab] = useState("properties");
@@ -74,6 +81,12 @@ const Properties = () => {
           activeTab={activeTab}
           properties={properties}
           onAddClick={handleAddClick}
+          onAIClick={() => {
+            setSelectedPropertyForAI(properties[0]);
+            setAiAction("analyze_property");
+            setAiDialogOpen(true);
+          }}
+          onProvidersClick={() => setProvidersDialogOpen(true)}
         />
 
         {/* Statistics Cards */}
@@ -147,14 +160,31 @@ const Properties = () => {
           </div>
         )}
 
-        <PropertiesTabs
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          onEditProperty={editProperty}
-          onEditContract={editContract}
-          onEditPayment={editPayment}
-          onEditMaintenance={editMaintenance}
-        />
+        {activeTab === "properties" && (
+          <div className="grid gap-6 lg:grid-cols-3 mb-6">
+            <div className="lg:col-span-2">
+              <PropertiesTabs
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
+                onEditProperty={editProperty}
+                onEditContract={editContract}
+                onEditPayment={editPayment}
+                onEditMaintenance={editMaintenance}
+              />
+            </div>
+          </div>
+        )}
+        
+        {activeTab !== "properties" && (
+          <PropertiesTabs
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            onEditProperty={editProperty}
+            onEditContract={editContract}
+            onEditPayment={editPayment}
+            onEditMaintenance={editMaintenance}
+          />
+        )}
         </div>
 
         <PropertyDialog
@@ -180,6 +210,18 @@ const Properties = () => {
           open={maintenanceDialogOpen}
           onOpenChange={setMaintenanceDialogOpen}
           request={selectedMaintenance}
+        />
+
+        <AIAssistantDialog
+          open={aiDialogOpen}
+          onOpenChange={setAiDialogOpen}
+          actionType={aiAction}
+          propertyData={selectedPropertyForAI}
+        />
+
+        <MaintenanceProvidersDialog
+          open={providersDialogOpen}
+          onOpenChange={setProvidersDialogOpen}
         />
       </div>
     </PageErrorBoundary>
