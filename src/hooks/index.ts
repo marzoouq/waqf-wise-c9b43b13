@@ -31,3 +31,9 @@ export { useApprovalPermissions } from './useApprovalPermissions';
 export { useCrudDialog } from './useCrudDialog';
 export { useTablePagination } from './useTablePagination';
 export { useSearchFilter } from './useSearchFilter';
+
+// Phase 4: Distribution & Payment hooks
+export { useDistributionEngine } from './useDistributionEngine';
+export { useDistributionDetails } from './useDistributionDetails';
+export { useDistributionSettings } from './useDistributionSettings';
+export { useBatchPayments } from './useBatchPayments';
