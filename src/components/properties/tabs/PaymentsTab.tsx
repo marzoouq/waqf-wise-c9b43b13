@@ -280,45 +280,48 @@ export const PaymentsTab = ({ onEdit }: Props) => {
       ) : filteredPayments.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground">لا توجد دفعات</div>
       ) : (
-        <div className="border rounded-lg overflow-x-auto">
+        <div className="border rounded-lg overflow-hidden shadow-sm">
           <Table>
-            <TableHeader>
+            <TableHeader className="bg-muted/50">
               <TableRow>
-                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">رقم الدفعة</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">العقد</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden md:table-cell">المستأجر</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">تاريخ الاستحقاق</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden md:table-cell">المبلغ المستحق</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">المبلغ المدفوع</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">المتبقي</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">الحالة</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">الإجراءات</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4">رقم الدفعة</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4 hidden lg:table-cell">العقد</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4 hidden md:table-cell">المستأجر</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4 hidden lg:table-cell">تاريخ الاستحقاق</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4 hidden md:table-cell">المبلغ المستحق</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4">المبلغ المدفوع</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4 hidden lg:table-cell">المتبقي</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4">الحالة</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4">الإجراءات</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredPayments.map((payment) => (
-                <TableRow key={payment.id}>
-                  <TableCell className="font-medium text-xs sm:text-sm whitespace-nowrap">{payment.payment_number}</TableCell>
-                  <TableCell className="text-xs sm:text-sm hidden lg:table-cell">{payment.contracts?.contract_number || '-'}</TableCell>
-                  <TableCell className="text-xs sm:text-sm hidden md:table-cell">{payment.contracts?.tenant_name || '-'}</TableCell>
-                  <TableCell className="text-xs sm:text-sm hidden lg:table-cell whitespace-nowrap">
+              {filteredPayments.map((payment, index) => (
+                <TableRow 
+                  key={payment.id}
+                  className={index % 2 === 0 ? 'bg-background' : 'bg-muted/30'}
+                >
+                  <TableCell className="font-medium text-xs sm:text-sm whitespace-nowrap py-3 px-4">{payment.payment_number}</TableCell>
+                  <TableCell className="text-xs sm:text-sm py-3 px-4 hidden lg:table-cell">{payment.contracts?.contract_number || '-'}</TableCell>
+                  <TableCell className="text-xs sm:text-sm py-3 px-4 hidden md:table-cell">{payment.contracts?.tenant_name || '-'}</TableCell>
+                  <TableCell className="text-xs sm:text-sm py-3 px-4 hidden lg:table-cell whitespace-nowrap">
                     {format(new Date(payment.due_date), 'yyyy/MM/dd', { locale: ar })}
                   </TableCell>
-                  <TableCell className="font-medium text-xs sm:text-sm whitespace-nowrap hidden md:table-cell">
+                  <TableCell className="font-medium text-xs sm:text-sm whitespace-nowrap py-3 px-4 hidden md:table-cell">
                     {Number(payment.amount_due).toLocaleString()} ر.س
                   </TableCell>
-                  <TableCell className="font-bold text-success text-xs sm:text-sm whitespace-nowrap">
+                  <TableCell className="font-bold text-success text-xs sm:text-sm whitespace-nowrap py-3 px-4">
                     {Number(payment.amount_paid).toLocaleString()} ر.س
                   </TableCell>
-                  <TableCell className="font-bold text-warning text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">
+                  <TableCell className="font-bold text-warning text-xs sm:text-sm whitespace-nowrap py-3 px-4 hidden lg:table-cell">
                     {(Number(payment.amount_due) - Number(payment.amount_paid)).toLocaleString()} ر.س
                   </TableCell>
-                  <TableCell className="text-xs sm:text-sm">
+                  <TableCell className="text-xs sm:text-sm py-3 px-4">
                     <Badge className={getPaymentStatus(payment).color}>
                       {getPaymentStatus(payment).status}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-xs sm:text-sm">
+                  <TableCell className="text-xs sm:text-sm py-3 px-4">
                     <div className="flex gap-1">
                       {payment.invoice_id && (
                         <Button
@@ -326,7 +329,7 @@ export const PaymentsTab = ({ onEdit }: Props) => {
                           size="sm"
                           onClick={() => handleViewInvoice(payment)}
                           title="عرض الفاتورة"
-                          className="text-info hover:text-info/80"
+                          className="text-info hover:text-info/80 hover:bg-info/10"
                         >
                           <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>
@@ -337,7 +340,7 @@ export const PaymentsTab = ({ onEdit }: Props) => {
                           size="sm"
                           onClick={() => handleViewReceipt(payment)}
                           title="عرض سند القبض"
-                          className="text-success hover:text-success/80"
+                          className="text-success hover:text-success/80 hover:bg-success/10"
                         >
                           <Receipt className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>
@@ -347,6 +350,7 @@ export const PaymentsTab = ({ onEdit }: Props) => {
                         size="sm"
                         onClick={() => onEdit(payment)}
                         title="تعديل الدفعة"
+                        className="hover:bg-primary/10"
                       >
                         <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
                       </Button>
@@ -355,7 +359,7 @@ export const PaymentsTab = ({ onEdit }: Props) => {
                         size="sm"
                         onClick={() => handleDeleteClick(payment)}
                         title="حذف الدفعة"
-                        className="text-destructive hover:text-destructive"
+                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
                       >
                         <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                       </Button>

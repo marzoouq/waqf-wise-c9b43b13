@@ -145,51 +145,55 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
       ) : filteredRequests.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground">لا توجد طلبات صيانة</div>
       ) : (
-        <div className="border rounded-lg overflow-x-auto">
+        <div className="border rounded-lg overflow-hidden shadow-sm">
           <Table>
-            <TableHeader>
+            <TableHeader className="bg-muted/50">
               <TableRow>
-                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">رقم الطلب</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">العقار</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">العنوان</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden md:table-cell">الفئة</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">الأولوية</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">التاريخ</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden md:table-cell">التكلفة</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">الحالة</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">الإجراءات</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4">رقم الطلب</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4 hidden lg:table-cell">العقار</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4">العنوان</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4 hidden md:table-cell">الفئة</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4 hidden lg:table-cell">الأولوية</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4 hidden lg:table-cell">التاريخ</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4 hidden md:table-cell">التكلفة</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4">الحالة</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4">الإجراءات</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredRequests.map((request) => (
-                <TableRow key={request.id}>
-                  <TableCell className="font-medium text-xs sm:text-sm whitespace-nowrap">{request.request_number}</TableCell>
-                  <TableCell className="text-xs sm:text-sm hidden lg:table-cell">{request.properties?.name || '-'}</TableCell>
-                  <TableCell className="text-xs sm:text-sm">{request.title}</TableCell>
-                  <TableCell className="text-xs sm:text-sm hidden md:table-cell">{request.category}</TableCell>
-                  <TableCell className="text-xs sm:text-sm hidden lg:table-cell">
+              {filteredRequests.map((request, index) => (
+                <TableRow 
+                  key={request.id}
+                  className={index % 2 === 0 ? 'bg-background' : 'bg-muted/30'}
+                >
+                  <TableCell className="font-medium text-xs sm:text-sm whitespace-nowrap py-3 px-4">{request.request_number}</TableCell>
+                  <TableCell className="text-xs sm:text-sm py-3 px-4 hidden lg:table-cell">{request.properties?.name || '-'}</TableCell>
+                  <TableCell className="text-xs sm:text-sm py-3 px-4">{request.title}</TableCell>
+                  <TableCell className="text-xs sm:text-sm py-3 px-4 hidden md:table-cell">{request.category}</TableCell>
+                  <TableCell className="text-xs sm:text-sm py-3 px-4 hidden lg:table-cell">
                     <Badge className={getPriorityBadge(request.priority)}>
                       {request.priority}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-xs sm:text-sm hidden lg:table-cell whitespace-nowrap">
+                  <TableCell className="text-xs sm:text-sm py-3 px-4 hidden lg:table-cell whitespace-nowrap">
                     {format(new Date(request.requested_date), 'yyyy/MM/dd', { locale: ar })}
                   </TableCell>
-                  <TableCell className="font-medium text-xs sm:text-sm whitespace-nowrap hidden md:table-cell">
+                  <TableCell className="font-medium text-xs sm:text-sm whitespace-nowrap py-3 px-4 hidden md:table-cell">
                     {(Number(request.actual_cost || request.estimated_cost || 0)).toLocaleString()} ر.س
                   </TableCell>
-                  <TableCell className="text-xs sm:text-sm">
+                  <TableCell className="text-xs sm:text-sm py-3 px-4">
                     <Badge className={getStatusBadge(request.status)}>
                       {request.status}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-xs sm:text-sm">
+                  <TableCell className="text-xs sm:text-sm py-3 px-4">
                     <div className="flex gap-1">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => onEdit(request)}
                         title="تعديل"
+                        className="hover:bg-primary/10"
                       >
                         <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
                       </Button>
@@ -199,7 +203,7 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
                           size="sm"
                           onClick={() => handleDeleteClick(request)}
                           title="حذف"
-                          className="text-destructive hover:text-destructive"
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
                         >
                           <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>
