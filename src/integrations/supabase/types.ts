@@ -8676,6 +8676,10 @@ export type Database = {
         Args: { p_waqf_name: string; p_year: number }
         Returns: string
       }
+      generate_annual_disclosure_by_year: {
+        Args: { p_waqf_name: string; p_year: number }
+        Returns: string
+      }
       generate_beneficiary_number: { Args: never; Returns: string }
       generate_budget_from_previous_year: {
         Args: { p_fiscal_year_id: string; p_increase_percentage?: number }
