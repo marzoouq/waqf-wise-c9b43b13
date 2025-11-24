@@ -6,8 +6,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Building2, Home, MapPin, Calendar } from "lucide-react";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
+import { MaskedValue } from "@/components/shared/MaskedValue";
 
 export function BeneficiaryPropertiesTab() {
+  const { settings } = useVisibilitySettings();
+  
   // جلب العقارات
   const { data: properties = [], isLoading: propertiesLoading } = useQuery({
     queryKey: ["properties-for-beneficiary"],
@@ -98,10 +102,20 @@ export function BeneficiaryPropertiesTab() {
             <Calendar className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {contracts.reduce((sum, c) => sum + Number(c.monthly_rent || 0), 0).toLocaleString("ar-SA")} ريال
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">من الإيجارات</p>
+            {settings?.show_property_revenues ? (
+              <>
+                <div className="text-2xl font-bold">
+                  <MaskedValue
+                    value={contracts.reduce((sum, c) => sum + Number(c.monthly_rent || 0), 0).toLocaleString("ar-SA")}
+                    type="amount"
+                    masked={settings?.mask_exact_amounts || false}
+                  /> ريال
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">من الإيجارات</p>
+              </>
+            ) : (
+              <div className="text-sm text-muted-foreground">غير مصرح</div>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -161,11 +175,12 @@ export function BeneficiaryPropertiesTab() {
       </Card>
 
       {/* Contracts Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>عقود الإيجار النشطة</CardTitle>
-          <CardDescription>العقود الحالية مع المستأجرين</CardDescription>
-        </CardHeader>
+      {settings?.show_contracts_details && (
+        <Card>
+          <CardHeader>
+            <CardTitle>عقود الإيجار النشطة</CardTitle>
+            <CardDescription>العقود الحالية مع المستأجرين</CardDescription>
+          </CardHeader>
         <CardContent>
           <div className="rounded-md border">
             <Table>
@@ -198,9 +213,19 @@ export function BeneficiaryPropertiesTab() {
                       <TableCell>
                         {(contract.properties as any)?.name || "—"}
                       </TableCell>
-                      <TableCell>{contract.tenant_name}</TableCell>
+                      <TableCell>
+                        {settings?.mask_tenant_info ? "مستأجر" : contract.tenant_name}
+                      </TableCell>
                       <TableCell className="font-semibold">
-                        {Number(contract.monthly_rent).toLocaleString("ar-SA")} ريال
+                        {settings?.show_property_revenues ? (
+                          <>
+                            <MaskedValue
+                              value={Number(contract.monthly_rent).toLocaleString("ar-SA")}
+                              type="amount"
+                              masked={settings?.mask_exact_amounts || false}
+                            /> ريال
+                          </>
+                        ) : "—"}
                       </TableCell>
                       <TableCell>
                         {format(new Date(contract.start_date), "dd/MM/yyyy", { locale: ar })}
@@ -217,6 +242,7 @@ export function BeneficiaryPropertiesTab() {
           </div>
         </CardContent>
       </Card>
+      )}
     </div>
   );
 }

@@ -6,12 +6,16 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Download, TrendingUp, TrendingDown } from "lucide-react";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
+import { MaskedValue } from "@/components/shared/MaskedValue";
 
 interface BeneficiaryStatementsTabProps {
   beneficiaryId: string;
 }
 
 export function BeneficiaryStatementsTab({ beneficiaryId }: BeneficiaryStatementsTabProps) {
+  const { settings } = useVisibilitySettings();
+  
   const { data: payments = [], isLoading } = useQuery({
     queryKey: ["beneficiary-payments", beneficiaryId],
     queryFn: async () => {
@@ -44,10 +48,12 @@ export function BeneficiaryStatementsTab({ beneficiaryId }: BeneficiaryStatement
             <CardTitle>كشف الحساب</CardTitle>
             <CardDescription>جميع المدفوعات المستلمة</CardDescription>
           </div>
-          <Button variant="outline" onClick={handleExport}>
-            <Download className="h-4 w-4 ml-2" />
-            تصدير PDF
-          </Button>
+          {settings?.allow_export_pdf && (
+            <Button variant="outline" onClick={handleExport}>
+              <Download className="h-4 w-4 ml-2" />
+              تصدير PDF
+            </Button>
+          )}
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2">
@@ -57,7 +63,13 @@ export function BeneficiaryStatementsTab({ beneficiaryId }: BeneficiaryStatement
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">إجمالي المستلم</p>
-                <p className="text-2xl font-bold">{totalReceived.toLocaleString("ar-SA")} ريال</p>
+                <p className="text-2xl font-bold">
+                  <MaskedValue
+                    value={totalReceived.toLocaleString("ar-SA")}
+                    type="amount"
+                    masked={settings?.mask_exact_amounts || false}
+                  /> ريال
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-4 p-4 rounded-lg border bg-card">
@@ -113,7 +125,11 @@ export function BeneficiaryStatementsTab({ beneficiaryId }: BeneficiaryStatement
                       </TableCell>
                       <TableCell>{payment.description || "—"}</TableCell>
                       <TableCell className="font-semibold">
-                        {Number(payment.amount).toLocaleString("ar-SA")} ريال
+                        <MaskedValue
+                          value={Number(payment.amount).toLocaleString("ar-SA")}
+                          type="amount"
+                          masked={settings?.mask_exact_amounts || false}
+                        /> ريال
                       </TableCell>
                       <TableCell>{payment.payment_method || "—"}</TableCell>
                       <TableCell>
