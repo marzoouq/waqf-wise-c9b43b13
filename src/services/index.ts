@@ -12,6 +12,9 @@
 
 export { DistributionService } from './distribution.service';
 export { PaymentService } from './payment.service';
+export { ApprovalService } from './approval.service';
+export { NotificationService } from './notification.service';
+export { RequestService } from './request.service';
 
 export type { DistributionData, ApprovalData } from './distribution.service';
 export type { PaymentData } from './payment.service';
