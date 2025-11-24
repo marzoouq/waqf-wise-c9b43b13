@@ -5,6 +5,8 @@ import { Edit, Phone, Mail, MapPin, CreditCard, Users, Calendar } from "lucide-r
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import type { Database } from "@/integrations/supabase/types";
+import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
+import { MaskedValue } from "@/components/shared/MaskedValue";
 
 type Beneficiary = Database['public']['Tables']['beneficiaries']['Row'];
 
@@ -13,6 +15,8 @@ interface BeneficiaryProfileTabProps {
 }
 
 export function BeneficiaryProfileTab({ beneficiary }: BeneficiaryProfileTabProps) {
+  const { settings } = useVisibilitySettings();
+
   return (
     <div className="space-y-6">
       {/* Personal Information */}
@@ -34,7 +38,13 @@ export function BeneficiaryProfileTab({ beneficiary }: BeneficiaryProfileTabProp
           </div>
           <div>
             <label className="text-sm font-medium text-muted-foreground">رقم الهوية</label>
-            <p className="text-lg mt-1">{beneficiary.national_id}</p>
+            <p className="text-lg mt-1">
+              <MaskedValue
+                value={beneficiary.national_id}
+                type="national_id"
+                masked={settings?.mask_national_ids || false}
+              />
+            </p>
           </div>
           <div>
             <label className="text-sm font-medium text-muted-foreground">رقم المستفيد</label>
@@ -77,7 +87,13 @@ export function BeneficiaryProfileTab({ beneficiary }: BeneficiaryProfileTabProp
             <Phone className="h-5 w-5 text-muted-foreground" />
             <div>
               <label className="text-sm font-medium text-muted-foreground">الهاتف</label>
-              <p className="text-lg">{beneficiary.phone}</p>
+              <p className="text-lg">
+                <MaskedValue
+                  value={beneficiary.phone}
+                  type="phone"
+                  masked={settings?.mask_phone_numbers || false}
+                />
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -119,11 +135,23 @@ export function BeneficiaryProfileTab({ beneficiary }: BeneficiaryProfileTabProp
           </div>
           <div>
             <label className="text-sm font-medium text-muted-foreground">رقم الحساب</label>
-            <p className="text-lg font-mono">{beneficiary.bank_account_number || "—"}</p>
+            <p className="text-lg font-mono">
+              <MaskedValue
+                value={beneficiary.bank_account_number || "—"}
+                type="iban"
+                masked={settings?.mask_iban || false}
+              />
+            </p>
           </div>
           <div className="md:col-span-2">
             <label className="text-sm font-medium text-muted-foreground">رقم الآيبان</label>
-            <p className="text-lg font-mono">{beneficiary.iban || "—"}</p>
+            <p className="text-lg font-mono">
+              <MaskedValue
+                value={beneficiary.iban || "—"}
+                type="iban"
+                masked={settings?.mask_iban || false}
+              />
+            </p>
           </div>
         </CardContent>
       </Card>
