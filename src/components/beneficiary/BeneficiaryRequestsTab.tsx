@@ -5,8 +5,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Clock, CheckCircle2, XCircle, AlertCircle, FileText } from "lucide-react";
+import { Plus, Clock, CheckCircle2, XCircle, AlertCircle, FileText, Eye } from "lucide-react";
 import { RequestSubmissionDialog } from "@/components/beneficiary/RequestSubmissionDialog";
+import { RequestDetailsDialog } from "@/components/beneficiary/RequestDetailsDialog";
+import { RequestAttachmentsUploader } from "@/components/beneficiary/RequestAttachmentsUploader";
+import { SLAIndicator } from "@/components/beneficiary/SLAIndicator";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 
@@ -16,6 +19,7 @@ interface BeneficiaryRequestsTabProps {
 
 export function BeneficiaryRequestsTab({ beneficiaryId }: BeneficiaryRequestsTabProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
 
   const { data: requests = [], isLoading } = useQuery({
     queryKey: ["beneficiary-requests", beneficiaryId],
@@ -92,18 +96,21 @@ export function BeneficiaryRequestsTab({ beneficiaryId }: BeneficiaryRequestsTab
                   <TableHead className="text-right">النوع</TableHead>
                   <TableHead className="text-right">المبلغ</TableHead>
                   <TableHead className="text-right">الأولوية</TableHead>
+                  <TableHead className="text-right">SLA</TableHead>
+                  <TableHead className="text-right">المرفقات</TableHead>
                   <TableHead className="text-right">تاريخ التقديم</TableHead>
                   <TableHead className="text-right">الحالة</TableHead>
+                  <TableHead className="text-right">الإجراءات</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center">جاري التحميل...</TableCell>
+                    <TableCell colSpan={9} className="text-center">جاري التحميل...</TableCell>
                   </TableRow>
                 ) : requests.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={9} className="text-center text-muted-foreground py-8">
                       لا توجد طلبات مقدمة بعد
                     </TableCell>
                   </TableRow>
@@ -121,9 +128,32 @@ export function BeneficiaryRequestsTab({ beneficiaryId }: BeneficiaryRequestsTab
                       </TableCell>
                       <TableCell>{getPriorityBadge(request.priority)}</TableCell>
                       <TableCell>
+                        <SLAIndicator
+                          slaDueAt={request.sla_due_at}
+                          status={request.status || "معلق"}
+                          showLabel={true}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <RequestAttachmentsUploader
+                          requestId={request.id}
+                          attachmentsCount={request.attachments_count || 0}
+                        />
+                      </TableCell>
+                      <TableCell>
                         {request.created_at && format(new Date(request.created_at), "dd/MM/yyyy", { locale: ar })}
                       </TableCell>
                       <TableCell>{getStatusBadge(request.status || "معلق")}</TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setSelectedRequestId(request.id)}
+                        >
+                          <Eye className="h-4 w-4 ml-1" />
+                          عرض
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   ))
                 )}
@@ -138,6 +168,14 @@ export function BeneficiaryRequestsTab({ beneficiaryId }: BeneficiaryRequestsTab
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
       />
+
+      {selectedRequestId && (
+        <RequestDetailsDialog
+          requestId={selectedRequestId}
+          isOpen={!!selectedRequestId}
+          onClose={() => setSelectedRequestId(null)}
+        />
+      )}
     </div>
   );
 }

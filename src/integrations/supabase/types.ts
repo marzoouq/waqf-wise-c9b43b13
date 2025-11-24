@@ -9338,6 +9338,10 @@ export type Database = {
         Args: { property_id: string }
         Returns: number
       }
+      calculate_sla_due_date: {
+        Args: { p_request_type_id: string }
+        Returns: string
+      }
       check_file_retention_eligibility: {
         Args: { p_file_category: string; p_uploaded_at: string }
         Returns: boolean
