@@ -19,4 +19,9 @@ export { default as ViewJournalEntryDialog } from './ViewJournalEntryDialog';
 export { AccountsPrintTemplate } from './AccountsPrintTemplate';
 export { AccountingHeader } from './AccountingHeader';
 export { AccountingTabs } from './AccountingTabs';
+export { AutoJournalTemplatesManager } from './AutoJournalTemplatesManager';
+export { ApprovalWorkflowBuilder } from './ApprovalWorkflowBuilder';
+export { SmartBankReconciliation } from './SmartBankReconciliation';
+export { FinancialAnalyticsDashboard } from './FinancialAnalyticsDashboard';
+export { AdvancedAccountingTab } from './AdvancedAccountingTab';
 
