@@ -135,51 +135,55 @@ export const ContractsTab = ({ onEdit }: Props) => {
       ) : filteredContracts.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground">لا توجد عقود</div>
       ) : (
-        <div className="border rounded-lg overflow-x-auto">
+        <div className="border rounded-lg overflow-hidden shadow-sm">
           <Table>
-            <TableHeader>
+            <TableHeader className="bg-muted/50">
               <TableRow>
-                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">رقم العقد</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">العقار</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">المستأجر</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden md:table-cell">النوع</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">تاريخ البداية</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">تاريخ النهاية</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">الإيجار الشهري</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">الحالة</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm whitespace-nowrap">الإجراءات</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4">رقم العقد</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4 hidden lg:table-cell">العقار</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4">المستأجر</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4 hidden md:table-cell">النوع</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4 hidden lg:table-cell">تاريخ البداية</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4 hidden lg:table-cell">تاريخ النهاية</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4">الإيجار الشهري</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4">الحالة</TableHead>
+                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4">الإجراءات</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredContracts.map((contract) => (
-                <TableRow key={contract.id}>
-                  <TableCell className="font-medium text-xs sm:text-sm whitespace-nowrap">{contract.contract_number}</TableCell>
-                  <TableCell className="text-xs sm:text-sm hidden lg:table-cell">{contract.properties?.name || '-'}</TableCell>
-                  <TableCell className="text-xs sm:text-sm">{contract.tenant_name}</TableCell>
-                  <TableCell className="text-xs sm:text-sm hidden md:table-cell">{contract.contract_type}</TableCell>
-                  <TableCell className="text-xs sm:text-sm hidden lg:table-cell whitespace-nowrap">
+              {filteredContracts.map((contract, index) => (
+                <TableRow 
+                  key={contract.id}
+                  className={index % 2 === 0 ? 'bg-background' : 'bg-muted/30'}
+                >
+                  <TableCell className="font-medium text-xs sm:text-sm whitespace-nowrap py-3 px-4">{contract.contract_number}</TableCell>
+                  <TableCell className="text-xs sm:text-sm py-3 px-4 hidden lg:table-cell">{contract.properties?.name || '-'}</TableCell>
+                  <TableCell className="text-xs sm:text-sm py-3 px-4">{contract.tenant_name}</TableCell>
+                  <TableCell className="text-xs sm:text-sm py-3 px-4 hidden md:table-cell">{contract.contract_type}</TableCell>
+                  <TableCell className="text-xs sm:text-sm py-3 px-4 hidden lg:table-cell whitespace-nowrap">
                     {format(new Date(contract.start_date), 'yyyy/MM/dd', { locale: ar })}
                   </TableCell>
-                  <TableCell className="text-xs sm:text-sm hidden lg:table-cell whitespace-nowrap">
+                  <TableCell className="text-xs sm:text-sm py-3 px-4 hidden lg:table-cell whitespace-nowrap">
                     {format(new Date(contract.end_date), 'yyyy/MM/dd', { locale: ar })}
                   </TableCell>
-                  <TableCell className="font-bold text-primary text-xs sm:text-sm whitespace-nowrap">
+                  <TableCell className="font-bold text-primary text-xs sm:text-sm whitespace-nowrap py-3 px-4">
                     {Number(contract.monthly_rent).toLocaleString()} ر.س
                   </TableCell>
-                  <TableCell className="text-xs sm:text-sm">
+                  <TableCell className="text-xs sm:text-sm py-3 px-4">
                     <ContractStatusBadge 
                       startDate={contract.start_date}
                       endDate={contract.end_date}
                       status={contract.status}
                     />
                   </TableCell>
-                  <TableCell className="text-xs sm:text-sm">
+                  <TableCell className="text-xs sm:text-sm py-3 px-4">
                     <div className="flex gap-1">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => handlePrintContract(contract)}
                         title="طباعة"
+                        className="hover:bg-primary/10"
                       >
                         <Printer className="h-3 w-3 sm:h-4 sm:w-4" />
                       </Button>
@@ -188,6 +192,7 @@ export const ContractsTab = ({ onEdit }: Props) => {
                         size="sm"
                         onClick={() => onEdit(contract)}
                         title="تعديل"
+                        className="hover:bg-primary/10"
                       >
                         <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
                       </Button>
