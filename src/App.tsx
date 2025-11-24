@@ -79,6 +79,7 @@ const KnowledgeBase = lazy(() => import("./pages/KnowledgeBase"));
 const TestPhase3 = lazy(() => import("./pages/TestPhase3"));
 const TestPhase4 = lazy(() => import("./pages/TestPhase4"));
 const TestPhase5 = lazy(() => import("./pages/TestPhase5"));
+const TestPhase6 = lazy(() => import("./pages/TestPhase6"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Configure QueryClient with optimized defaults and error handling
@@ -424,6 +425,12 @@ const App = () => {
                   path="/test-phase5" 
                   element={
                     <TestPhase5 />
+                  } 
+                />
+                <Route 
+                  path="/test-phase6" 
+                  element={
+                    <TestPhase6 />
                   } 
                 />
                 
