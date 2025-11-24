@@ -23,3 +23,11 @@ export { useMessages } from './useMessages';
 export { useDashboardKPIs } from './useDashboardKPIs';
 export { useGlobalSearch } from './useGlobalSearch';
 export { useBeneficiaryRequests } from './useBeneficiaryRequests';
+
+// Phase 1: Approval & RBAC hooks
+export { useApprovalPermissions } from './useApprovalPermissions';
+
+// Phase 3: Shared utility hooks
+export { useCrudDialog } from './useCrudDialog';
+export { useTablePagination } from './useTablePagination';
+export { useSearchFilter } from './useSearchFilter';

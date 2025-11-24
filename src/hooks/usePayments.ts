@@ -96,28 +96,8 @@ export function usePayments() {
         );
       }
 
-      // إنشاء قيد محاسبي تلقائي للمدفوعات (فقط إذا لم تحتاج موافقة أو تمت الموافقة)
-      if (data && data.amount && data.payment_date && paymentStatus === 'completed') {
-        try {
-          const entryId = await createAutoEntry(
-            data.payment_type === "قبض" ? "payment_receipt" : "payment_voucher",
-            data.id,
-            data.amount,
-            `${data.payment_type} - ${data.description} - ${data.payer_name}`,
-            data.payment_date
-          );
-
-          // تحديث رقم القيد في الدفعة
-          if (entryId) {
-            await supabase
-              .from("payments")
-              .update({ journal_entry_id: entryId })
-              .eq("id", data.id);
-          }
-        } catch (journalError) {
-          logger.error(journalError, { context: 'payment_journal_entry', severity: 'medium' });
-        }
-      }
+      // القيد المحاسبي سيتم إنشاؤه تلقائياً عبر Trigger
+      // عند إدخال المدفوعة في قاعدة البيانات
 
       return data;
     },
@@ -153,27 +133,7 @@ export function usePayments() {
 
       if (error) throw error;
 
-      // إنشاء قيد محاسبي جديد إذا لم يكن موجوداً وتم تحديث المبلغ
-      if (!oldPayment?.journal_entry_id && data.amount && data.payment_date) {
-        try {
-          const entryId = await createAutoEntry(
-            data.payment_type === "قبض" ? "payment_receipt" : "payment_voucher",
-            data.id,
-            data.amount,
-            `${data.payment_type} - ${data.description} - ${data.payer_name}`,
-            data.payment_date
-          );
-
-          if (entryId) {
-            await supabase
-              .from("payments")
-              .update({ journal_entry_id: entryId })
-              .eq("id", id);
-          }
-        } catch (journalError) {
-          logger.error(journalError, { context: 'update_payment_journal_entry', severity: 'medium' });
-        }
-      }
+      // القيد المحاسبي تم إنشاؤه مسبقاً عبر Trigger عند الإدخال
 
       return data;
     },

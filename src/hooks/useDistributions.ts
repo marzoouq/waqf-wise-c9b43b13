@@ -120,27 +120,8 @@ export function useDistributions() {
 
       if (error) throw error;
 
-      // إنشاء قيد محاسبي عند اعتماد التوزيع
-      if (updates.status === "معتمد" && !data.journal_entry_id) {
-        try {
-          const entryId = await createAutoEntry(
-            "distribution_approved",
-            data.id,
-            data.total_amount,
-            `توزيع معتمد - ${data.month} - عدد المستفيدين: ${data.beneficiaries_count}`,
-            data.distribution_date
-          );
-
-          if (entryId) {
-            await supabase
-              .from("distributions")
-              .update({ journal_entry_id: entryId })
-              .eq("id", id);
-          }
-        } catch (journalError) {
-          logger.error(journalError, { context: 'distribution_journal_entry', severity: 'medium' });
-        }
-      }
+      // القيد المحاسبي سيتم إنشاؤه تلقائياً عبر Trigger
+      // عند تغيير الحالة إلى "معتمد"
 
       return data;
     },

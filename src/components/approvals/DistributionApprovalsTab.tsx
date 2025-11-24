@@ -3,16 +3,20 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, XCircle, Clock, Eye } from "lucide-react";
+import { CheckCircle, XCircle, Clock, Eye, Lock } from "lucide-react";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { useState } from "react";
 import { ApprovalFlowDialog } from "@/components/funds/ApprovalFlowDialog";
 import { DistributionForApproval, calculateProgress, StatusConfigMap } from "@/types/approvals";
+import { useApprovalPermissions } from "@/hooks/useApprovalPermissions";
+import { useToast } from "@/hooks/use-toast";
 
 export function DistributionApprovalsTab() {
   const [selectedDistribution, setSelectedDistribution] = useState<DistributionForApproval | null>(null);
   const [isFlowDialogOpen, setIsFlowDialogOpen] = useState(false);
+  const { canApproveLevel, userRole } = useApprovalPermissions();
+  const { toast } = useToast();
 
   const { data: distributions, isLoading } = useQuery<DistributionForApproval[]>({
     queryKey: ["distributions_with_approvals"],
@@ -95,17 +99,25 @@ export function DistributionApprovalsTab() {
                     <p className="text-lg font-semibold">
                       {getApprovalProgress(dist.distribution_approvals)}
                     </p>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        setSelectedDistribution(dist);
-                        setIsFlowDialogOpen(true);
-                      }}
-                    >
-                      <Eye className="h-4 w-4 ml-1" />
-                      عرض التفاصيل
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedDistribution(dist);
+                          setIsFlowDialogOpen(true);
+                        }}
+                      >
+                        <Eye className="h-4 w-4 ml-1" />
+                        عرض التفاصيل
+                      </Button>
+                      {userRole && (
+                        <Badge variant="outline" className="text-xs">
+                          <Lock className="h-3 w-3 ml-1" />
+                          {userRole === 'nazer' ? 'ناظر' : userRole === 'accountant' ? 'محاسب' : userRole}
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
