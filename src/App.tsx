@@ -75,6 +75,7 @@ const Messages = lazy(() => import("./pages/Messages"));
 const GovernanceDecisions = lazy(() => import("./pages/GovernanceDecisions"));
 const DecisionDetails = lazy(() => import("./pages/DecisionDetails"));
 const RolesManagement = lazy(() => import("./pages/RolesManagement"));
+const KnowledgeBase = lazy(() => import("./pages/KnowledgeBase"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Configure QueryClient with optimized defaults and error handling
@@ -395,8 +396,12 @@ const App = () => {
                     </ProtectedRoute>
                   } 
                 />
+                
+                {/* Knowledge Base */}
+                <Route path="/knowledge-base" element={<KnowledgeBase />} />
+                
                 <Route 
-                  path="/beneficiary-portal" 
+                  path="/beneficiary-portal"
                   element={
                     <ProtectedRoute requiredRole="beneficiary">
                       <BeneficiaryPortal />
