@@ -78,6 +78,7 @@ const RolesManagement = lazy(() => import("./pages/RolesManagement"));
 const KnowledgeBase = lazy(() => import("./pages/KnowledgeBase"));
 const TestPhase3 = lazy(() => import("./pages/TestPhase3"));
 const TestPhase4 = lazy(() => import("./pages/TestPhase4"));
+const TestPhase5 = lazy(() => import("./pages/TestPhase5"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Configure QueryClient with optimized defaults and error handling
@@ -417,6 +418,12 @@ const App = () => {
                     <ProtectedRoute requiredRole="admin">
                       <TestPhase4 />
                     </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/test-phase5" 
+                  element={
+                    <TestPhase5 />
                   } 
                 />
                 
