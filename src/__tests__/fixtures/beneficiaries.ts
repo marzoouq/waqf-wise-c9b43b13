@@ -43,6 +43,10 @@ export const mockBeneficiary = (overrides?: Partial<Beneficiary>): Beneficiary =
   last_notification_at: null,
   parent_beneficiary_id: null,
   relationship: null,
+  // New fields from Phase 4
+  account_balance: 0,
+  total_received: 0,
+  pending_requests: 0,
   created_at: '2025-01-01T00:00:00.000Z',
   updated_at: '2025-01-01T00:00:00.000Z',
   ...overrides,

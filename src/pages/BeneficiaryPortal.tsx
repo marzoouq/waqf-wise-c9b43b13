@@ -1,43 +1,30 @@
 import { useState } from "react";
-import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { AlertCircle, Clock, CheckCircle2, XCircle, FileText } from "lucide-react";
+import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
+import { 
+  User, FileText, CreditCard, Upload, MessageSquare, 
+  TrendingUp, Clock, CheckCircle, AlertCircle 
+} from "lucide-react";
+import { BeneficiaryProfileTab } from "@/components/beneficiary/BeneficiaryProfileTab";
+import { BeneficiaryRequestsTab } from "@/components/beneficiary/BeneficiaryRequestsTab";
+import { BeneficiaryStatementsTab } from "@/components/beneficiary/BeneficiaryStatementsTab";
+import { BeneficiaryDocumentsTab } from "@/components/beneficiary/BeneficiaryDocumentsTab";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 
-interface EmergencyRequest {
-  id: string;
-  request_number: string;
-  amount_requested: number;
-  amount_approved: number | null;
-  reason: string;
-  urgency_level: string;
-  status: string;
-  sla_due_at: string | null;
-  created_at: string;
-  approved_at: string | null;
-  rejection_reason: string | null;
-}
-
 export default function BeneficiaryPortal() {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("overview");
 
-  // جلب بيانات المستفيد
-  const { data: beneficiary } = useQuery({
+  // جلب بيانات المستفيد الحالي
+  const { data: beneficiary, isLoading } = useQuery({
     queryKey: ["current-beneficiary"],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -54,228 +41,207 @@ export default function BeneficiaryPortal() {
     },
   });
 
-  // جلب طلبات الفزعة
-  const { data: requests = [], isLoading } = useQuery({
-    queryKey: ["emergency-requests", beneficiary?.id],
+  // جلب الإحصائيات
+  const { data: statistics } = useQuery({
+    queryKey: ["beneficiary-statistics", beneficiary?.id],
     queryFn: async () => {
-      if (!beneficiary?.id) return [];
-
+      if (!beneficiary?.id) return null;
+      
       const { data, error } = await supabase
-        .from("emergency_aid_requests")
-        .select("*")
-        .eq("beneficiary_id", beneficiary.id)
-        .order("created_at", { ascending: false });
+        .rpc('get_beneficiary_statistics', { p_beneficiary_id: beneficiary.id });
 
       if (error) throw error;
-      return data as EmergencyRequest[];
+      return data;
     },
     enabled: !!beneficiary?.id,
   });
 
-  // إرسال طلب جديد
-  const submitRequestMutation = useMutation({
-    mutationFn: async (formData: {
-      amount: number;
-      reason: string;
-      urgency: string;
-    }) => {
-      if (!beneficiary?.id) throw new Error("معرف المستفيد مفقود");
-
-      const { error } = await supabase.from("emergency_aid_requests").insert({
-        beneficiary_id: beneficiary.id,
-        amount_requested: formData.amount,
-        reason: formData.reason,
-        urgency_level: formData.urgency,
-        status: "معلق",
-      });
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast({
-        title: "✅ تم إرسال الطلب",
-        description: "سيتم مراجعة طلبك في أقرب وقت",
-      });
-      queryClient.invalidateQueries({ queryKey: ["emergency-requests"] });
-      setIsSubmitting(false);
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "❌ خطأ",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    
-    submitRequestMutation.mutate({
-      amount: Number(formData.get("amount")),
-      reason: formData.get("reason") as string,
-      urgency: formData.get("urgency") as string,
-    });
-  };
-
-  const getStatusBadge = (status: string) => {
-    const config: Record<
-      string,
-      { label: string; icon: any; variant: "default" | "secondary" | "destructive" | "outline" }
-    > = {
-      معلق: { label: "معلق", icon: Clock, variant: "secondary" },
-      "قيد المراجعة": { label: "قيد المراجعة", icon: FileText, variant: "default" },
-      معتمد: { label: "معتمد", icon: CheckCircle2, variant: "outline" },
-      مرفوض: { label: "مرفوض", icon: XCircle, variant: "destructive" },
-      مدفوع: { label: "مدفوع", icon: CheckCircle2, variant: "outline" },
-    };
-
-    const s = config[status] || { label: status, icon: AlertCircle, variant: "secondary" };
-    const Icon = s.icon;
-
-    return (
-      <Badge variant={s.variant} className="gap-1">
-        <Icon className="h-3 w-3" />
-        {s.label}
-      </Badge>
-    );
-  };
-
-  const getUrgencyBadge = (level: string) => {
-    const config: Record<string, { variant: "default" | "secondary" | "destructive" }> = {
-      "عاجل جداً": { variant: "destructive" },
-      عاجل: { variant: "default" },
-      متوسط: { variant: "secondary" },
-    };
-
-    const s = config[level] || { variant: "secondary" };
-    return <Badge variant={s.variant}>{level}</Badge>;
-  };
-
   if (isLoading) {
-    return <LoadingState />;
+    return <LoadingState fullScreen />;
   }
+
+  if (!beneficiary) {
+    return (
+      <MobileOptimizedLayout>
+        <Card>
+          <CardContent className="p-6 text-center">
+            <AlertCircle className="h-12 w-12 mx-auto mb-4 text-destructive" />
+            <h3 className="text-lg font-semibold mb-2">خطأ في الوصول</h3>
+            <p className="text-muted-foreground mb-4">لم يتم العثور على بيانات المستفيد</p>
+            <Button onClick={() => navigate("/auth")}>العودة لتسجيل الدخول</Button>
+          </CardContent>
+        </Card>
+      </MobileOptimizedLayout>
+    );
+  }
+
+  const stats = (statistics as {
+    total_received: number;
+    pending_amount: number;
+    total_requests: number;
+    pending_requests: number;
+  }) || {
+    total_received: 0,
+    pending_amount: 0,
+    total_requests: 0,
+    pending_requests: 0,
+  };
 
   return (
     <PageErrorBoundary pageName="بوابة المستفيد">
       <MobileOptimizedLayout>
-      <div className="space-y-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold">بوابة المستفيد</h1>
-          <p className="text-muted-foreground mt-2">تقديم طلبات الفزعة ومتابعة الطلبات السابقة</p>
-        </div>
-
-        {/* نموذج طلب جديد */}
-        <Card>
-          <CardHeader>
-            <CardTitle>تقديم طلب فزعة طارئة</CardTitle>
-            <CardDescription>
-              املأ النموذج أدناه لتقديم طلب فزعة. سيتم مراجعة الطلب والرد عليه حسب مستوى الأولوية.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="amount">المبلغ المطلوب (ريال)</Label>
-                  <Input
-                    id="amount"
-                    name="amount"
-                    type="number"
-                    min="100"
-                    max="50000"
-                    required
-                    placeholder="مثال: 5000"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="urgency">مستوى العجلة</Label>
-                  <Select name="urgency" required>
-                    <SelectTrigger id="urgency">
-                      <SelectValue placeholder="اختر مستوى العجلة" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="عاجل جداً">عاجل جداً (4 ساعات)</SelectItem>
-                      <SelectItem value="عاجل">عاجل (24 ساعة)</SelectItem>
-                      <SelectItem value="متوسط">متوسط (3 أيام)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="reason">سبب الطلب</Label>
-                <Textarea
-                  id="reason"
-                  name="reason"
-                  required
-                  rows={4}
-                  placeholder="يرجى ذكر سبب الحاجة للمساعدة بالتفصيل..."
-                />
-              </div>
-
-              <Button type="submit" disabled={submitRequestMutation.isPending} className="w-full">
-                {submitRequestMutation.isPending ? "جاري الإرسال..." : "إرسال الطلب"}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-
-        {/* الطلبات السابقة */}
-        <Card>
-          <CardHeader>
-            <CardTitle>طلباتي السابقة ({requests.length})</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-right">رقم الطلب</TableHead>
-                    <TableHead className="text-right">المبلغ المطلوب</TableHead>
-                    <TableHead className="text-right">المبلغ المعتمد</TableHead>
-                    <TableHead className="text-right">مستوى العجلة</TableHead>
-                    <TableHead className="text-right">تاريخ التقديم</TableHead>
-                    <TableHead className="text-right">الحالة</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {requests.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={6} className="text-center text-muted-foreground">
-                        لا توجد طلبات سابقة
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    requests.map((request) => (
-                      <TableRow key={request.id}>
-                        <TableCell className="font-medium">{request.request_number}</TableCell>
-                        <TableCell>{request.amount_requested.toLocaleString("ar-SA")} ريال</TableCell>
-                        <TableCell>
-                          {request.amount_approved
-                            ? `${request.amount_approved.toLocaleString("ar-SA")} ريال`
-                            : "—"}
-                        </TableCell>
-                        <TableCell>{getUrgencyBadge(request.urgency_level)}</TableCell>
-                        <TableCell>
-                          {format(new Date(request.created_at), "dd/MM/yyyy - HH:mm", {
-                            locale: ar,
-                          })}
-                        </TableCell>
-                        <TableCell>{getStatusBadge(request.status)}</TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold">مرحباً، {beneficiary.full_name}</h1>
+              <p className="text-muted-foreground mt-1">
+                آخر تسجيل دخول: {beneficiary.last_login_at 
+                  ? format(new Date(beneficiary.last_login_at), "dd MMMM yyyy - HH:mm", { locale: ar })
+                  : "—"}
+              </p>
             </div>
-          </CardContent>
-        </Card>
-      </div>
-    </MobileOptimizedLayout>
+            <Button onClick={() => navigate("/messages")} variant="outline">
+              <MessageSquare className="h-4 w-4 ml-2" />
+              الرسائل
+            </Button>
+          </div>
+
+          {/* Main Tabs */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-5 mb-6">
+              <TabsTrigger value="overview">
+                <TrendingUp className="h-4 w-4 ml-2" />
+                نظرة عامة
+              </TabsTrigger>
+              <TabsTrigger value="profile">
+                <User className="h-4 w-4 ml-2" />
+                الملف الشخصي
+              </TabsTrigger>
+              <TabsTrigger value="requests">
+                <FileText className="h-4 w-4 ml-2" />
+                الطلبات
+              </TabsTrigger>
+              <TabsTrigger value="statements">
+                <CreditCard className="h-4 w-4 ml-2" />
+                كشف الحساب
+              </TabsTrigger>
+              <TabsTrigger value="documents">
+                <Upload className="h-4 w-4 ml-2" />
+                المستندات
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Overview Tab */}
+            <TabsContent value="overview" className="space-y-6">
+              {/* KPIs */}
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">إجمالي المستلم</CardTitle>
+                    <TrendingUp className="h-4 w-4 text-success" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{Number(stats.total_received || 0).toLocaleString("ar-SA")} ريال</div>
+                    <p className="text-xs text-muted-foreground mt-1">من جميع المدفوعات</p>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">الرصيد الحالي</CardTitle>
+                    <CreditCard className="h-4 w-4 text-primary" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{Number(beneficiary.account_balance || 0).toLocaleString("ar-SA")} ريال</div>
+                    <p className="text-xs text-muted-foreground mt-1">الرصيد المتاح</p>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">الطلبات المعلقة</CardTitle>
+                    <Clock className="h-4 w-4 text-warning" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{stats.pending_requests || 0}</div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {Number(stats.pending_amount || 0).toLocaleString("ar-SA")} ريال
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">إجمالي الطلبات</CardTitle>
+                    <CheckCircle className="h-4 w-4 text-info" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{stats.total_requests || 0}</div>
+                    <p className="text-xs text-muted-foreground mt-1">جميع الطلبات</p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Quick Actions */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>إجراءات سريعة</CardTitle>
+                  <CardDescription>الإجراءات الأكثر استخداماً</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-4 md:grid-cols-3">
+                    <Button 
+                      variant="outline" 
+                      className="h-auto py-6 flex-col gap-2"
+                      onClick={() => setActiveTab("requests")}
+                    >
+                      <FileText className="h-6 w-6" />
+                      <span>تقديم طلب جديد</span>
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="h-auto py-6 flex-col gap-2"
+                      onClick={() => setActiveTab("statements")}
+                    >
+                      <CreditCard className="h-6 w-6" />
+                      <span>عرض كشف الحساب</span>
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="h-auto py-6 flex-col gap-2"
+                      onClick={() => setActiveTab("documents")}
+                    >
+                      <Upload className="h-6 w-6" />
+                      <span>رفع مستند</span>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Profile Tab */}
+            <TabsContent value="profile">
+              <BeneficiaryProfileTab beneficiary={beneficiary} />
+            </TabsContent>
+
+            {/* Requests Tab */}
+            <TabsContent value="requests">
+              <BeneficiaryRequestsTab beneficiaryId={beneficiary.id} />
+            </TabsContent>
+
+            {/* Statements Tab */}
+            <TabsContent value="statements">
+              <BeneficiaryStatementsTab beneficiaryId={beneficiary.id} />
+            </TabsContent>
+
+            {/* Documents Tab */}
+            <TabsContent value="documents">
+              <BeneficiaryDocumentsTab beneficiaryId={beneficiary.id} />
+            </TabsContent>
+          </Tabs>
+        </div>
+      </MobileOptimizedLayout>
     </PageErrorBoundary>
   );
 }
