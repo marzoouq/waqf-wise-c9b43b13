@@ -19,7 +19,8 @@ import { AgingReport } from "@/components/reports/AgingReport";
 import { FinancialRatiosReport } from "@/components/reports/FinancialRatiosReport";
 import { BudgetVarianceReport } from "@/components/reports/BudgetVarianceReport";
 import { InvoiceManager } from "@/components/invoices/InvoiceManager";
-import { BarChart3, Calendar, Settings, Users, Building2, FileText, DollarSign, Wand2 } from "lucide-react";
+import { ZATCAInvoicePreview, ZATCASettings, ZATCAComplianceChecker } from "@/components/zatca";
+import { BarChart3, Calendar, Settings, Users, Building2, FileText, DollarSign, Wand2, ShieldCheck, Receipt } from "lucide-react";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 
 const Reports = () => {
@@ -34,7 +35,7 @@ const Reports = () => {
 
       <div className="space-y-6">
         <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-1">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-9 gap-1">
             <TabsTrigger value="dashboard" className="gap-2">
               <BarChart3 className="h-4 w-4" />
               لوحة التحكم
@@ -62,6 +63,14 @@ const Reports = () => {
             <TabsTrigger value="analysis" className="gap-2">
               <FileText className="h-4 w-4" />
               التحليلات
+            </TabsTrigger>
+            <TabsTrigger value="invoices" className="gap-2">
+              <Receipt className="h-4 w-4" />
+              الفواتير
+            </TabsTrigger>
+            <TabsTrigger value="zatca" className="gap-2">
+              <ShieldCheck className="h-4 w-4" />
+              ZATCA
             </TabsTrigger>
           </TabsList>
 
@@ -147,6 +156,45 @@ const Reports = () => {
             </Tabs>
 
             <FundsPerformanceReport />
+          </TabsContent>
+
+          <TabsContent value="invoices" className="space-y-6">
+            <Tabs defaultValue="manager" className="space-y-4">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="manager">إدارة الفواتير</TabsTrigger>
+                <TabsTrigger value="ratios">النسب المالية</TabsTrigger>
+                <TabsTrigger value="budget">مقارنة الميزانية</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="manager">
+                <InvoiceManager />
+              </TabsContent>
+
+              <TabsContent value="ratios">
+                <FinancialRatiosReport />
+              </TabsContent>
+
+              <TabsContent value="budget">
+                <BudgetVarianceReport />
+              </TabsContent>
+            </Tabs>
+          </TabsContent>
+
+          <TabsContent value="zatca" className="space-y-6">
+            <Tabs defaultValue="compliance" className="space-y-4">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="compliance">فحص الامتثال</TabsTrigger>
+                <TabsTrigger value="settings">الإعدادات</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="compliance">
+                <ZATCAComplianceChecker />
+              </TabsContent>
+
+              <TabsContent value="settings">
+                <ZATCASettings />
+              </TabsContent>
+            </Tabs>
           </TabsContent>
         </Tabs>
       </div>
