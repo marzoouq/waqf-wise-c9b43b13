@@ -21,12 +21,13 @@ serve(async (req) => {
       );
     }
 
-    const supabaseAuth = createClient(
+    // استخدام Service Role للتحقق من الهوية والصلاحيات
+    const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser(
       authHeader.replace('Bearer ', '')
     );
 
@@ -38,25 +39,29 @@ serve(async (req) => {
     }
 
     // 2. التحقق من دور admin أو accountant
-    const { data: roleData } = await supabaseAuth
+    const { data: roleData, error: roleError } = await supabaseClient
       .from('user_roles')
       .select('role')
-      .eq('user_id', user.id)
-      .single();
+      .eq('user_id', user.id);
 
-    if (!roleData || !['admin', 'accountant'].includes(roleData.role)) {
-      console.warn('Unauthorized backfill attempt by:', user.id);
+    if (roleError) {
+      console.error('Error checking user role:', roleError);
+      return new Response(
+        JSON.stringify({ error: 'Error verifying permissions' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const userRoles = roleData?.map(r => r.role) || [];
+    const hasRequiredRole = userRoles.some(role => ['admin', 'accountant'].includes(role));
+
+    if (!hasRequiredRole) {
+      console.warn('Unauthorized backfill attempt by:', user.id, 'with roles:', userRoles);
       return new Response(
         JSON.stringify({ error: 'Forbidden: Admin or Accountant role required' }),
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
-
-    // 3. استخدام Service Role للعمليات
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
 
     console.log('🔍 جاري البحث عن الدفعات المدفوعة بدون فواتير...');
 
