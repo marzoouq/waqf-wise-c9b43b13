@@ -15,6 +15,8 @@ export { PaymentService } from './payment.service';
 export { ApprovalService } from './approval.service';
 export { NotificationService } from './notification.service';
 export { RequestService } from './request.service';
+export { BeneficiaryService } from './beneficiary.service';
 
 export type { DistributionData, ApprovalData } from './distribution.service';
 export type { PaymentData } from './payment.service';
+export type { BeneficiaryData } from './beneficiary.service';
