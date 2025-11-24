@@ -25,15 +25,22 @@ import { Plus, FileText } from "lucide-react";
 
 interface RequestSubmissionDialogProps {
   beneficiaryId: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export function RequestSubmissionDialog({
   beneficiaryId,
+  open: externalOpen,
+  onOpenChange: externalOnOpenChange,
 }: RequestSubmissionDialogProps) {
   const { requestTypes } = useRequestTypes();
   const { submitRequest } = useBeneficiaryRequests(beneficiaryId);
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
   const [selectedType, setSelectedType] = useState("");
+  
+  const open = externalOpen !== undefined ? externalOpen : internalOpen;
+  const setOpen = externalOnOpenChange || setInternalOpen;
 
   const selectedTypeData = requestTypes.find((rt) => rt.id === selectedType);
 

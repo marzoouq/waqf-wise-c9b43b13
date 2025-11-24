@@ -1,198 +1,143 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { RequestSubmissionDialog } from "./RequestSubmissionDialog";
-import { DocumentUploadDialog } from "./DocumentUploadDialog";
+import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Plus, Clock, CheckCircle2, XCircle, AlertCircle, FileText } from "lucide-react";
+import { RequestSubmissionDialog } from "@/components/beneficiary/RequestSubmissionDialog";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
-import {
-  Clock,
-  CheckCircle2,
-  XCircle,
-  AlertCircle,
-  FileText,
-  Paperclip,
-} from "lucide-react";
 
 interface BeneficiaryRequestsTabProps {
   beneficiaryId: string;
 }
 
-interface Request {
-  id: string;
-  request_number: string | null;
-  description: string;
-  amount: number | null;
-  status: string | null;
-  priority: string | null;
-  submitted_at: string | null;
-  attachments_count: number;
-  request_type: {
-    name: string;
-    icon: string | null;
-  } | null;
-}
+export function BeneficiaryRequestsTab({ beneficiaryId }: BeneficiaryRequestsTabProps) {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-export function BeneficiaryRequestsTab({
-  beneficiaryId,
-}: BeneficiaryRequestsTabProps) {
   const { data: requests = [], isLoading } = useQuery({
     queryKey: ["beneficiary-requests", beneficiaryId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("beneficiary_requests")
-        .select(
-          `
+        .select(`
           *,
-          request_type:request_types(name, icon)
-        `
-        )
+          request_types (
+            name_ar,
+            icon,
+            requires_amount
+          )
+        `)
         .eq("beneficiary_id", beneficiaryId)
-        .order("submitted_at", { ascending: false });
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as Request[];
+      return data;
     },
-    enabled: !!beneficiaryId,
   });
 
-  const getStatusBadge = (status: string | null) => {
-    const config: Record<
-      string,
-      {
-        label: string;
-        icon: any;
-        variant: "default" | "secondary" | "destructive" | "outline";
-      }
-    > = {
-      "قيد المراجعة": { label: "قيد المراجعة", icon: Clock, variant: "secondary" },
-      موافق: { label: "موافق عليه", icon: CheckCircle2, variant: "outline" },
-      مرفوض: { label: "مرفوض", icon: XCircle, variant: "destructive" },
-      معلق: { label: "معلق", icon: AlertCircle, variant: "default" },
+  const getStatusBadge = (status: string) => {
+    const config: Record<string, { icon: any; variant: "default" | "secondary" | "destructive" | "outline" }> = {
+      "معلق": { icon: Clock, variant: "secondary" },
+      "قيد المراجعة": { icon: FileText, variant: "default" },
+      "معتمد": { icon: CheckCircle2, variant: "outline" },
+      "مرفوض": { icon: XCircle, variant: "destructive" },
     };
 
-    const s = config[status || "معلق"] || config["معلق"];
+    const s = config[status] || { icon: AlertCircle, variant: "secondary" };
     const Icon = s.icon;
 
     return (
       <Badge variant={s.variant} className="gap-1">
         <Icon className="h-3 w-3" />
-        {s.label}
+        {status}
       </Badge>
     );
   };
 
   const getPriorityBadge = (priority: string | null) => {
-    const config: Record<
-      string,
-      { variant: "default" | "secondary" | "destructive" }
-    > = {
-      عاجلة: { variant: "destructive" },
-      مهمة: { variant: "default" },
-      متوسطة: { variant: "secondary" },
-      منخفضة: { variant: "secondary" },
+    if (!priority) return null;
+    
+    const config: Record<string, { variant: "default" | "secondary" | "destructive" }> = {
+      "عاجل": { variant: "destructive" },
+      "مهم": { variant: "default" },
+      "عادي": { variant: "secondary" },
     };
 
-    const p = config[priority || "متوسطة"] || config["متوسطة"];
-    return <Badge variant={p.variant}>{priority || "متوسطة"}</Badge>;
+    const s = config[priority] || { variant: "secondary" };
+    return <Badge variant={s.variant}>{priority}</Badge>;
   };
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="flex items-center gap-2">
-          <FileText className="h-5 w-5" />
-          الطلبات ({requests.length})
-        </CardTitle>
-        <RequestSubmissionDialog beneficiaryId={beneficiaryId} />
-      </CardHeader>
-      <CardContent>
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="text-right">رقم الطلب</TableHead>
-                <TableHead className="text-right">النوع</TableHead>
-                <TableHead className="text-right">المبلغ</TableHead>
-                <TableHead className="text-right">الأولوية</TableHead>
-                <TableHead className="text-right">التاريخ</TableHead>
-                <TableHead className="text-right">الحالة</TableHead>
-                <TableHead className="text-right">المرفقات</TableHead>
-                <TableHead className="text-right">إجراءات</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>طلباتي ({requests.length})</CardTitle>
+            <CardDescription>جميع الطلبات المقدمة مع حالتها الحالية</CardDescription>
+          </div>
+          <Button onClick={() => setIsDialogOpen(true)}>
+            <Plus className="h-4 w-4 ml-2" />
+            طلب جديد
+          </Button>
+        </CardHeader>
+        <CardContent>
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center">
-                    جاري التحميل...
-                  </TableCell>
+                  <TableHead className="text-right">رقم الطلب</TableHead>
+                  <TableHead className="text-right">النوع</TableHead>
+                  <TableHead className="text-right">المبلغ</TableHead>
+                  <TableHead className="text-right">الأولوية</TableHead>
+                  <TableHead className="text-right">تاريخ التقديم</TableHead>
+                  <TableHead className="text-right">الحالة</TableHead>
                 </TableRow>
-              ) : requests.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={8}
-                    className="text-center text-muted-foreground"
-                  >
-                    لا توجد طلبات
-                  </TableCell>
-                </TableRow>
-              ) : (
-                requests.map((request) => (
-                  <TableRow key={request.id}>
-                    <TableCell className="font-medium">
-                      {request.request_number || "—"}
-                    </TableCell>
-                    <TableCell>{request.request_type?.name || "—"}</TableCell>
-                    <TableCell>
-                      {request.amount
-                        ? `${request.amount.toLocaleString("ar-SA")} ريال`
-                        : "—"}
-                    </TableCell>
-                    <TableCell>{getPriorityBadge(request.priority)}</TableCell>
-                    <TableCell>
-                      {request.submitted_at
-                        ? format(new Date(request.submitted_at), "dd/MM/yyyy", {
-                            locale: ar,
-                          })
-                        : "—"}
-                    </TableCell>
-                    <TableCell>{getStatusBadge(request.status)}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="gap-1">
-                        <Paperclip className="h-3 w-3" />
-                        {request.attachments_count || 0}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => {
-                          // سيتم فتح Dialog المرفقات
-                        }}
-                      >
-                        <Paperclip className="h-4 w-4 ml-2" />
-                        {request.attachments_count || 0}
-                      </Button>
+              </TableHeader>
+              <TableBody>
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center">جاري التحميل...</TableCell>
+                  </TableRow>
+                ) : requests.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                      لا توجد طلبات مقدمة بعد
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-    </Card>
+                ) : (
+                  requests.map((request) => (
+                    <TableRow key={request.id}>
+                      <TableCell className="font-medium">{request.request_number || "—"}</TableCell>
+                      <TableCell>
+                        {(request.request_types as any)?.name_ar || "—"}
+                      </TableCell>
+                      <TableCell>
+                        {request.amount 
+                          ? `${Number(request.amount).toLocaleString("ar-SA")} ريال`
+                          : "—"}
+                      </TableCell>
+                      <TableCell>{getPriorityBadge(request.priority)}</TableCell>
+                      <TableCell>
+                        {request.created_at && format(new Date(request.created_at), "dd/MM/yyyy", { locale: ar })}
+                      </TableCell>
+                      <TableCell>{getStatusBadge(request.status || "معلق")}</TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+
+      <RequestSubmissionDialog 
+        beneficiaryId={beneficiaryId}
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+      />
+    </div>
   );
 }
