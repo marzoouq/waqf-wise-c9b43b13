@@ -35,8 +35,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="https://zsacuvrcohmraoldilph.supabase.co">
     
-    <!-- Performance: Optimized font loading with display=swap -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Performance: Async font loading with preload -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap"></noscript>
     
     <!-- Performance: Preload critical CSS -->
     <link rel="preload" href="/src/index.css" as="style">
