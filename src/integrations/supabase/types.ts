@@ -9213,13 +9213,11 @@ export type Database = {
       }
       current_user_roles: {
         Row: {
+          created_at: string | null
+          email: string | null
+          full_name: string | null
           role: Database["public"]["Enums"]["app_role"] | null
-        }
-        Insert: {
-          role?: Database["public"]["Enums"]["app_role"] | null
-        }
-        Update: {
-          role?: Database["public"]["Enums"]["app_role"] | null
+          user_id: string | null
         }
         Relationships: []
       }
