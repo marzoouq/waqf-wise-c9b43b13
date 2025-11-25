@@ -46,8 +46,8 @@ export function useAccountantKPIs() {
         monthlyTotal: monthlyRes.count || 0,
       };
     },
-    staleTime: 60 * 1000, // 1 minute
-    refetchInterval: 60 * 1000, // Refetch every minute
-    refetchOnWindowFocus: true,
+    staleTime: 5 * 60 * 1000, // 5 minutes (محسّن)
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false, // إيقاف التحديث التلقائي
   });
 }

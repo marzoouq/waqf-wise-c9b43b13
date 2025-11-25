@@ -3,6 +3,7 @@ import { Building, DollarSign, TrendingUp, Home } from "lucide-react";
 import { useProperties } from "@/hooks/useProperties";
 import { usePropertyUnits } from "@/hooks/usePropertyUnits";
 import { useRentalPayments } from "@/hooks/useRentalPayments";
+import { safeFilter, safeLength, safeReduce } from '@/lib/utils/array-safe';
 
 export const PropertyStatsCard = () => {
   const { properties } = useProperties();
@@ -10,23 +11,25 @@ export const PropertyStatsCard = () => {
   const { payments } = useRentalPayments();
 
   // حساب الإحصائيات
-  const totalProperties = properties.length;
-  const totalUnits = propertyUnits.length;
-  const occupiedUnits = propertyUnits.filter(u => u.occupancy_status === 'مؤجرة').length;
-  const vacantUnits = propertyUnits.filter(u => u.occupancy_status === 'شاغرة').length;
+  const totalProperties = safeLength(properties);
+  const totalUnits = safeLength(propertyUnits);
+  const occupiedUnits = safeFilter(propertyUnits, u => u.occupancy_status === 'مؤجرة').length;
+  const vacantUnits = safeFilter(propertyUnits, u => u.occupancy_status === 'شاغرة').length;
   const occupancyRate = totalUnits > 0 ? Math.round((occupiedUnits / totalUnits) * 100) : 0;
 
   // حساب العوائد الشهرية
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
-  const monthlyRevenue = payments
-    .filter(p => {
+  const monthlyRevenue = safeReduce(
+    safeFilter(payments, p => {
       const paymentDate = new Date(p.payment_date || p.due_date);
       return paymentDate.getMonth() === currentMonth && 
              paymentDate.getFullYear() === currentYear &&
              p.status === 'مدفوع';
-    })
-    .reduce((sum, p) => sum + (p.amount_paid || 0), 0);
+    }),
+    (sum, p) => sum + (p.amount_paid || 0),
+    0
+  );
 
   const stats = [
     {
