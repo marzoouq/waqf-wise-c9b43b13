@@ -82,6 +82,7 @@ const TestPhase4 = lazy(() => import("./pages/TestPhase4"));
 const TestPhase5 = lazy(() => import("./pages/TestPhase5"));
 const TestPhase6 = lazy(() => import("./pages/TestPhase6"));
 const TestPhase7 = lazy(() => import("./pages/TestPhase7"));
+const TestDataManager = lazy(() => import("./pages/TestDataManager"));
 const DeveloperGuide = lazy(() => import("./pages/DeveloperGuide"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -449,6 +450,18 @@ const App = () => {
                   path="/test-phase7" 
                   element={
                     <TestPhase7 />
+                  } 
+                />
+                <Route 
+                  path="/test-data-manager" 
+                  element={
+                    <TestDataManager />
+                  } 
+                />
+                <Route 
+                  path="/developer-guide" 
+                  element={
+                    <DeveloperGuide />
                   } 
                 />
                 

@@ -9,7 +9,7 @@ export const mockLoan = (beneficiaryId: string, overrides?: Partial<Loan>): Loan
   start_date: '2024-01-01',
   end_date: '2024-12-31',
   monthly_installment: 1000,
-  remaining_balance: 25000,
+  term_months: 12,
   status: 'active',
   ...overrides,
 });
@@ -39,7 +39,6 @@ export const mockLoans = (beneficiaryIds: string[], count: number = 10): Loan[] 
         loan_amount: loanAmount,
         start_date: `2024-${String((i % 12) + 1).padStart(2, '0')}-01`,
         monthly_installment: installmentAmount,
-        remaining_balance: remainingAmount,
         status: statuses[i % statuses.length],
       }
     );
