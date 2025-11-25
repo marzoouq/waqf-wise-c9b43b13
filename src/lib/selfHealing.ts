@@ -40,11 +40,11 @@ export class RetryHandler {
 
     for (let attempt = 1; attempt <= finalConfig.maxAttempts; attempt++) {
       try {
-        console.log(`🔄 Attempt ${attempt}/${finalConfig.maxAttempts}`);
+        // Removed console.log for production
         const result = await operation();
         
         if (attempt > 1) {
-          console.log('✅ Operation succeeded after retry!');
+          // Removed console.log for production
           await errorTracker.logError(
             `Operation succeeded on attempt ${attempt}`,
             'low',
@@ -53,12 +53,14 @@ export class RetryHandler {
         }
         
         return result;
-      } catch (error) {
-        lastError = error as Error;
-        console.error(`❌ Attempt ${attempt} failed:`, error);
+        } catch (error) {
+          // Error logged via errorTracker instead
+          lastError = error as Error;
+        // Error logged via errorTracker instead
 
         if (attempt < finalConfig.maxAttempts) {
-          console.log(`⏳ Waiting ${currentDelay}ms before retry...`);
+          // Silent wait before retry
+          // Silent wait before retry
           await this.sleep(currentDelay);
           currentDelay = Math.min(
             currentDelay * finalConfig.backoffMultiplier,
@@ -244,16 +246,14 @@ export class HealthMonitor {
 
   start(): void {
     if (this.intervalId) {
-      console.warn('Health monitor already running');
+      // Already running
       return;
     }
 
-    console.log('🏥 Starting health monitor...');
-    
-    // فحص فوري
+    // Start immediate check
     this.performHealthCheck();
     
-    // فحص دوري
+    // Start periodic checks
     this.intervalId = setInterval(() => {
       this.performHealthCheck();
     }, this.checkInterval);
@@ -263,7 +263,7 @@ export class HealthMonitor {
     if (this.intervalId) {
       clearInterval(this.intervalId);
       this.intervalId = null;
-      console.log('🛑 Health monitor stopped');
+      // Stopped silently
     }
   }
 
