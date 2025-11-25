@@ -8,6 +8,7 @@ import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { MaskedValue } from "@/components/shared/MaskedValue";
+import { toast } from "sonner";
 
 interface BeneficiaryStatementsTabProps {
   beneficiaryId: string;
@@ -34,9 +35,56 @@ export function BeneficiaryStatementsTab({ beneficiaryId }: BeneficiaryStatement
     .filter(p => p.status === 'مدفوع')
     .reduce((sum, p) => sum + Number(p.amount), 0);
 
-  const handleExport = () => {
-    // TODO: تنفيذ تصدير كشف الحساب
-    console.log("Export statement");
+  const handleExport = async () => {
+    try {
+      const { data: transactions } = await supabase
+        .from('journal_entries')
+        .select(`
+          *,
+          journal_entry_lines(
+            *,
+            accounts(name_ar, code)
+          )
+        `)
+        .order('entry_date', { ascending: false });
+
+      if (!transactions || transactions.length === 0) {
+        toast.warning('لا توجد معاملات لتصديرها');
+        return;
+      }
+
+      // Create CSV content
+      const headers = ['التاريخ', 'الوصف', 'المدين', 'الدائن', 'الرصيد'];
+      const rows = transactions.map(entry => {
+        const lines = (entry as any).journal_entry_lines || [];
+        const debit = lines.reduce((sum: number, line: any) => 
+          sum + (line.debit_amount || 0), 0
+        );
+        const credit = lines.reduce((sum: number, line: any) => 
+          sum + (line.credit_amount || 0), 0
+        );
+        
+        return [
+          new Date(entry.entry_date).toLocaleDateString('ar-SA'),
+          entry.description || '',
+          debit.toFixed(2),
+          credit.toFixed(2),
+          (debit - credit).toFixed(2),
+        ].join(',');
+      });
+
+      const csv = [headers.join(','), ...rows].join('\n');
+      const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `كشف_حساب_${new Date().toISOString().split('T')[0]}.csv`;
+      link.click();
+
+      toast.success('تم تصدير كشف الحساب بنجاح');
+    } catch (error) {
+      console.error('Export failed:', error);
+      toast.error('فشل تصدير كشف الحساب');
+    }
   };
 
   return (

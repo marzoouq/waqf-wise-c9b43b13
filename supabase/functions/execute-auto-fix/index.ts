@@ -75,8 +75,28 @@ Deno.serve(async (req) => {
 
     console.log(`🔧 Starting auto-fix execution by user: ${user.email}...`);
 
-    // 🔧 1. Auto-resolve old errors (أقدم من 24 ساعة)
-    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    // ✅ تحميل الإعدادات من قاعدة البيانات
+    const { data: settings } = await supabase
+      .from('system_settings')
+      .select('setting_key, setting_value')
+      .in('setting_key', ['cron_old_errors_threshold_hours', 'cron_duplicate_alerts_window_hours']);
+
+    let oldErrorsThresholdHours = 24;
+    let duplicateAlertsWindowHours = 1;
+
+    if (settings && settings.length > 0) {
+      settings.forEach(setting => {
+        if (setting.setting_key === 'cron_old_errors_threshold_hours') {
+          oldErrorsThresholdHours = Number(setting.setting_value);
+        } else if (setting.setting_key === 'cron_duplicate_alerts_window_hours') {
+          duplicateAlertsWindowHours = Number(setting.setting_value);
+        }
+      });
+      console.log(`✅ Using settings: old errors threshold=${oldErrorsThresholdHours}h, duplicate alerts window=${duplicateAlertsWindowHours}h`);
+    }
+
+    // 🔧 1. Auto-resolve old errors (حسب الإعداد من DB)
+    const thresholdTime = new Date(Date.now() - oldErrorsThresholdHours * 60 * 60 * 1000).toISOString();
     const { data: oldErrors } = await supabase
       .from('system_error_logs')
       .update({ 
@@ -85,20 +105,20 @@ Deno.serve(async (req) => {
         resolved_by: 'system_auto_cleanup'
       })
       .eq('status', 'new')
-      .lt('created_at', oneDayAgo)
+      .lt('created_at', thresholdTime)
       .select('id');
     
     if (oldErrors && oldErrors.length > 0) {
       console.log(`✅ Auto-resolved ${oldErrors.length} old errors`);
     }
 
-    // 🔧 2. Clean duplicate alerts (نفس النوع والشدة في آخر ساعة)
-    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    // 🔧 2. Clean duplicate alerts (حسب الإعداد من DB)
+    const alertsWindowTime = new Date(Date.now() - duplicateAlertsWindowHours * 60 * 60 * 1000).toISOString();
     const { data: alerts } = await supabase
       .from('system_alerts')
       .select('alert_type, severity, id')
       .eq('status', 'active')
-      .gte('created_at', oneHourAgo);
+      .gte('created_at', alertsWindowTime);
     
     if (alerts && alerts.length > 1) {
       // تجميع حسب النوع والشدة
