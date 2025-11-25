@@ -53,14 +53,10 @@ export class RetryHandler {
         }
         
         return result;
-        } catch (error) {
-          // Error logged via errorTracker instead
-          lastError = error as Error;
-        // Error logged via errorTracker instead
-
+      } catch (error) {
+        lastError = error as Error;
+        
         if (attempt < finalConfig.maxAttempts) {
-          // Silent wait before retry
-          // Silent wait before retry
           await this.sleep(currentDelay);
           currentDelay = Math.min(
             currentDelay * finalConfig.backoffMultiplier,
