@@ -138,13 +138,88 @@ export default defineConfig(({ mode }) => ({
   },
   
   build: {
+    // Aggressive minification
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: mode === 'production',
+        drop_debugger: true,
+        pure_funcs: mode === 'production' ? ['console.log', 'console.info', 'console.debug'] : []
+      }
+    },
+    
+    // Chunk size optimization
+    chunkSizeWarningLimit: 1000,
+    cssCodeSplit: true,
+    sourcemap: false,
+    
     rollupOptions: {
       output: {
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-router-dom', 'react-is'],
-          'supabase': ['@supabase/supabase-js'],
-          'charts': ['recharts'],
-          'ui': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu']
+        manualChunks: (id) => {
+          // Core React libraries
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom')) {
+              return 'react-core';
+            }
+            if (id.includes('react-router-dom')) {
+              return 'react-router';
+            }
+            
+            // Radix UI - split into two chunks
+            if (id.includes('@radix-ui')) {
+              if (id.includes('dialog') || id.includes('dropdown') || id.includes('select')) {
+                return 'radix-ui-core';
+              }
+              return 'radix-ui-extended';
+            }
+            
+            // Data & State Management
+            if (id.includes('@tanstack/react-query')) {
+              return 'query-client';
+            }
+            if (id.includes('@supabase/supabase-js')) {
+              return 'supabase';
+            }
+            
+            // Heavy libraries
+            if (id.includes('recharts')) {
+              return 'charts';
+            }
+            if (id.includes('framer-motion')) {
+              return 'animations';
+            }
+            
+            // Forms
+            if (id.includes('react-hook-form') || id.includes('zod') || id.includes('@hookform')) {
+              return 'forms';
+            }
+            
+            // Date utilities
+            if (id.includes('date-fns')) {
+              return 'date-utils';
+            }
+            
+            // PDF generation
+            if (id.includes('jspdf')) {
+              return 'pdf-generator';
+            }
+            
+            // Excel/XLSX
+            if (id.includes('xlsx')) {
+              return 'excel-utils';
+            }
+            
+            // UI utilities
+            if (id.includes('lucide-react')) {
+              return 'icons';
+            }
+            if (id.includes('clsx') || id.includes('tailwind-merge') || id.includes('class-variance-authority')) {
+              return 'utils';
+            }
+            
+            // Everything else goes to vendor
+            return 'vendor';
+          }
         }
       }
     }

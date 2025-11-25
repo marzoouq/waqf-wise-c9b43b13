@@ -1,42 +1,96 @@
 /**
- * Web Vitals Monitoring
- * تتبع مؤشرات أداء الويب الأساسية
+ * Enhanced Web Vitals Monitoring
+ * تتبع محسّن لمؤشرات أداء الويب الأساسية مع تقييم وتحليل متقدم
  */
 
-interface Metric {
+interface VitalsMetric {
   name: string;
   value: number;
   rating: 'good' | 'needs-improvement' | 'poor';
   delta: number;
   id: string;
+  navigationType?: string;
 }
 
 const IS_PROD = import.meta.env.PROD;
+const IS_DEV = import.meta.env.DEV;
+
+// عتبات الأداء حسب معايير Google
+const THRESHOLDS = {
+  LCP: { good: 2500, poor: 4000 },
+  FID: { good: 100, poor: 300 },
+  CLS: { good: 0.1, poor: 0.25 },
+  FCP: { good: 1800, poor: 3000 },
+  TTFB: { good: 800, poor: 1800 },
+  INP: { good: 200, poor: 500 }
+};
 
 /**
- * تهيئة Web Vitals monitoring
+ * تقييم الأداء بناءً على القيمة والعتبات
+ */
+function getRating(name: string, value: number): 'good' | 'needs-improvement' | 'poor' {
+  const threshold = THRESHOLDS[name as keyof typeof THRESHOLDS];
+  if (!threshold) return 'good';
+  
+  if (value <= threshold.good) return 'good';
+  if (value <= threshold.poor) return 'needs-improvement';
+  return 'poor';
+}
+
+/**
+ * تهيئة Web Vitals monitoring محسّن
  */
 export function initWebVitals(): void {
-  if (!IS_PROD) {
-    return;
-  }
-
   import('web-vitals').then(({ onCLS, onINP, onLCP, onFCP, onTTFB }) => {
-    onCLS(sendToAnalytics);
-    onINP(sendToAnalytics);
-    onLCP(sendToAnalytics);
-    onFCP(sendToAnalytics);
-    onTTFB(sendToAnalytics);
+    onLCP((metric) => sendToAnalytics({ 
+      ...metric, 
+      rating: getRating('LCP', metric.value) 
+    }));
+    
+    onCLS((metric) => sendToAnalytics({ 
+      ...metric, 
+      rating: getRating('CLS', metric.value) 
+    }));
+    
+    onFCP((metric) => sendToAnalytics({ 
+      ...metric, 
+      rating: getRating('FCP', metric.value) 
+    }));
+    
+    onTTFB((metric) => sendToAnalytics({ 
+      ...metric, 
+      rating: getRating('TTFB', metric.value) 
+    }));
+    
+    onINP((metric) => sendToAnalytics({ 
+      ...metric, 
+      rating: getRating('INP', metric.value) 
+    }));
   });
 }
 
 /**
- * إرسال metrics للتحليلات
+ * إرسال metrics للتحليلات مع تحسينات
  */
-function sendToAnalytics(metric: Metric): void {
-  const body = JSON.stringify(metric);
+function sendToAnalytics(metric: VitalsMetric): void {
+  // طباعة في وضع التطوير للتصحيح
+  if (IS_DEV) {
+    const emoji = metric.rating === 'good' ? '✅' : metric.rating === 'needs-improvement' ? '⚠️' : '❌';
+    console.log(`${emoji} ${metric.name}:`, {
+      value: Math.round(metric.value),
+      rating: metric.rating,
+      delta: Math.round(metric.delta)
+    });
+  }
   
   if (IS_PROD) {
+    const body = JSON.stringify({
+      ...metric,
+      timestamp: Date.now(),
+      url: window.location.href,
+      userAgent: navigator.userAgent
+    });
+    
     // استخدم sendBeacon لإرسال بيانات الأداء بشكل موثوق
     if (navigator.sendBeacon) {
       navigator.sendBeacon('/api/analytics', body);
@@ -45,6 +99,8 @@ function sendToAnalytics(metric: Metric): void {
         body,
         method: 'POST',
         keepalive: true,
+      }).catch(() => {
+        // تجاهل الأخطاء في إرسال التحليلات
       });
     }
   }
