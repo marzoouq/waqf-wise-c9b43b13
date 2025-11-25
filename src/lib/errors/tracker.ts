@@ -34,18 +34,70 @@ class ErrorTracker {
   private recentErrors = new Map<string, number>();
   private errorCounts = new Map<string, number>();
   private consecutiveErrors = 0;
-  private readonly MAX_SAME_ERROR_COUNT = 20; // 🔧 تحسين: رفع لـ 20 لتحمل أكبر
-  private readonly MAX_CONSECUTIVE_ERRORS = 10; // 🔧 تحسين: رفع لـ 10
+  private MAX_SAME_ERROR_COUNT = 20; // ✅ قابل للتخصيص من DB
+  private MAX_CONSECUTIVE_ERRORS = 10; // ✅ قابل للتخصيص من DB
   private errorDeduplication = new Map<string, { count: number; lastSeen: number; resolved: boolean }>();
-  private readonly DEDUPLICATION_WINDOW = 15 * 60 * 1000; // 🔧 تحسين: 15 دقيقة بدلاً من 5
-  private readonly AUTO_RESOLVE_THRESHOLD = 24 * 60 * 60 * 1000; // 24 ساعة
+  private DEDUPLICATION_WINDOW = 15 * 60 * 1000; // ✅ قابل للتخصيص من DB
+  private AUTO_RESOLVE_THRESHOLD = 24 * 60 * 60 * 1000; // ✅ قابل للتخصيص من DB
+  private CIRCUIT_BREAKER_TIMEOUT = 60000; // ✅ قابل للتخصيص من DB
 
   private constructor() {
+    this.loadSettingsFromDB(); // ✅ تحميل الإعدادات من DB
     this.setupGlobalHandlers();
     this.cleanupOldAuthErrors();
     this.loadPendingErrors();
     this.setupCircuitBreakerCheck();
-    // ❌ حذف setupHealthCheck() - يتم في selfHealing.ts فقط
+  }
+
+  /**
+   * ✅ تحميل إعدادات Error Tracker من قاعدة البيانات
+   */
+  private async loadSettingsFromDB() {
+    try {
+      const { data: settings } = await supabase
+        .from('system_settings')
+        .select('setting_key, setting_value')
+        .in('setting_key', [
+          'error_tracker_dedup_window_minutes',
+          'error_tracker_max_same_error',
+          'error_tracker_max_consecutive_errors',
+          'error_tracker_auto_resolve_hours',
+          'error_tracker_circuit_breaker_timeout'
+        ]);
+
+      if (settings && settings.length > 0) {
+        settings.forEach(setting => {
+          const value = Number(setting.setting_value);
+          switch (setting.setting_key) {
+            case 'error_tracker_dedup_window_minutes':
+              this.DEDUPLICATION_WINDOW = value * 60 * 1000;
+              break;
+            case 'error_tracker_max_same_error':
+              this.MAX_SAME_ERROR_COUNT = value;
+              break;
+            case 'error_tracker_max_consecutive_errors':
+              this.MAX_CONSECUTIVE_ERRORS = value;
+              break;
+            case 'error_tracker_auto_resolve_hours':
+              this.AUTO_RESOLVE_THRESHOLD = value * 60 * 60 * 1000;
+              break;
+            case 'error_tracker_circuit_breaker_timeout':
+              this.CIRCUIT_BREAKER_TIMEOUT = value * 1000;
+              break;
+          }
+        });
+
+        productionLogger.info('Loaded Error Tracker settings from DB', {
+          dedupWindow: `${this.DEDUPLICATION_WINDOW / 60000}min`,
+          maxSameError: this.MAX_SAME_ERROR_COUNT,
+          maxConsecutive: this.MAX_CONSECUTIVE_ERRORS,
+          autoResolve: `${this.AUTO_RESOLVE_THRESHOLD / 3600000}h`,
+          circuitTimeout: `${this.CIRCUIT_BREAKER_TIMEOUT / 1000}s`
+        });
+      }
+    } catch (error) {
+      productionLogger.warn('Failed to load settings from DB, using defaults', error);
+    }
   }
 
   static getInstance(): ErrorTracker {
@@ -458,7 +510,7 @@ class ErrorTracker {
         
         if (this.failedAttempts >= this.maxFailedAttempts) {
           this.circuitBreakerOpen = true;
-          this.circuitBreakerResetTime = Date.now() + 60000;
+          this.circuitBreakerResetTime = Date.now() + this.CIRCUIT_BREAKER_TIMEOUT; // ✅ استخدام الإعداد من DB
           console.warn(`⚠️ Circuit breaker opened. Queue: ${this.errorQueue.length}`);
           this.savePendingErrors();
         } else {

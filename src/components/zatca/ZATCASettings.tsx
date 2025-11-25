@@ -6,6 +6,7 @@ import { Switch } from "@/components/ui/switch";
 import { Settings, Shield, Key, CheckCircle } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export function ZATCASettings() {
   const [settings, setSettings] = useState({
@@ -21,8 +22,30 @@ export function ZATCASettings() {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      // TODO: حفظ الإعدادات في قاعدة البيانات
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // ✅ حفظ إعدادات ZATCA في قاعدة البيانات
+      const settingsToSave = [
+        { key: 'zatca_enabled', value: settings.enabled ? 'true' : 'false' },
+        { key: 'zatca_organization_id', value: settings.organizationId },
+        { key: 'zatca_vat_number', value: settings.vatNumber },
+        { key: 'zatca_api_key', value: settings.apiKey },
+        { key: 'zatca_test_mode', value: settings.testMode ? 'true' : 'false' },
+      ];
+
+      for (const { key, value } of settingsToSave) {
+        const { error } = await supabase
+          .from('system_settings')
+          .upsert({
+            setting_key: key,
+            setting_value: value,
+            setting_type: 'text',
+            category: 'zatca',
+            updated_at: new Date().toISOString(),
+          }, {
+            onConflict: 'setting_key'
+          });
+
+        if (error) throw error;
+      }
       
       toast.success("تم حفظ الإعدادات", {
         description: "تم حفظ إعدادات هيئة الزكاة والضريبة بنجاح",
