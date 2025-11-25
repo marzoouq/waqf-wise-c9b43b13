@@ -24,11 +24,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import * as XLSX from "xlsx";
 import { format } from "date-fns";
 import { formatCurrency } from "@/lib/utils";
 import { EmptyAccountingState } from "./EmptyAccountingState";
 import { AccountingErrorState } from "./AccountingErrorState";
+import { toast } from "sonner";
 
 export function BudgetsContent() {
   const { fiscalYears } = useFiscalYears();
@@ -76,23 +76,33 @@ export function BudgetsContent() {
     await calculateVariances(selectedFiscalYear);
   };
 
-  const handleExport = () => {
-    const exportData = budgets.map(b => ({
-      "الحساب": `${b.accounts?.code} - ${b.accounts?.name_ar}`,
-      "نوع الفترة": b.period_type,
-      "رقم الفترة": b.period_number,
-      "المقدّر": b.budgeted_amount,
-      "الفعلي": b.actual_amount || 0,
-      "الانحراف": b.variance_amount || 0,
-      "نسبة التنفيذ": b.budgeted_amount > 0 
-        ? `${((b.actual_amount || 0) / b.budgeted_amount * 100).toFixed(1)}%` 
-        : "0%",
-    }));
+  const handleExport = async () => {
+    try {
+      // Dynamic import for XLSX
+      const XLSX = await import('xlsx');
+      
+      const exportData = budgets.map(b => ({
+        "الحساب": `${b.accounts?.code} - ${b.accounts?.name_ar}`,
+        "نوع الفترة": b.period_type,
+        "رقم الفترة": b.period_number,
+        "المقدّر": b.budgeted_amount,
+        "الفعلي": b.actual_amount || 0,
+        "الانحراف": b.variance_amount || 0,
+        "نسبة التنفيذ": b.budgeted_amount > 0 
+          ? `${((b.actual_amount || 0) / b.budgeted_amount * 100).toFixed(1)}%` 
+          : "0%",
+      }));
 
-    const ws = XLSX.utils.json_to_sheet(exportData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "الميزانيات");
-    XLSX.writeFile(wb, `budgets-${format(new Date(), "yyyyMMdd")}.xlsx`);
+      const ws = XLSX.utils.json_to_sheet(exportData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "الميزانيات");
+      XLSX.writeFile(wb, `budgets-${format(new Date(), "yyyyMMdd")}.xlsx`);
+      
+      toast.success("تم تصدير الميزانيات بنجاح");
+    } catch (error) {
+      toast.error("فشل تصدير الميزانيات");
+      console.error("Excel export error:", error);
+    }
   };
 
   const getVarianceColor = (variance: number | null) => {
