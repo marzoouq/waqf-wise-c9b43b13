@@ -9793,11 +9793,20 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_accountant: { Args: never; Returns: boolean }
+      is_admin: { Args: never; Returns: boolean }
+      is_admin_or_nazer: { Args: never; Returns: boolean }
+      is_archivist: { Args: never; Returns: boolean }
+      is_beneficiary: { Args: never; Returns: boolean }
+      is_cashier: { Args: never; Returns: boolean }
+      is_financial_staff: { Args: never; Returns: boolean }
       is_first_class_beneficiary: { Args: never; Returns: boolean }
       is_first_degree_beneficiary: {
         Args: { user_uuid: string }
         Returns: boolean
       }
+      is_nazer: { Args: never; Returns: boolean }
+      is_staff: { Args: never; Returns: boolean }
       log_login_attempt: {
         Args: {
           p_email: string
