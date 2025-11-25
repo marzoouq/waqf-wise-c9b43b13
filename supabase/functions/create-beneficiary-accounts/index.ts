@@ -6,12 +6,33 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// 🔐 SECURITY: Generate secure random password
+function generateSecurePassword(): string {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+  const array = new Uint8Array(16);
+  crypto.getRandomValues(array);
+  return Array.from(array).map(x => chars[x % chars.length]).join('') + '@Waqf';
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
 
   try {
+    // 🔐 SECURITY: Verify Authorization header
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.error('❌ No authorization header provided');
+      return new Response(
+        JSON.stringify({ error: 'غير مصرح - يجب تسجيل الدخول' }),
+        { 
+          status: 401, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
@@ -22,6 +43,59 @@ serve(async (req) => {
         }
       }
     );
+
+    // 🔐 SECURITY: Extract and verify JWT token
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+
+    if (authError || !user) {
+      console.error('❌ Invalid token:', authError);
+      return new Response(
+        JSON.stringify({ error: 'رمز المصادقة غير صحيح' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // 🔐 SECURITY: Check if user has admin or nazer role
+    const { data: roles, error: roleError } = await supabaseAdmin
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id);
+
+    if (roleError) {
+      console.error('❌ Error checking roles:', roleError);
+      return new Response(
+        JSON.stringify({ error: 'خطأ في التحقق من الصلاحيات' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const hasPermission = roles?.some(r => ['admin', 'nazer'].includes(r.role));
+    if (!hasPermission) {
+      console.error('❌ User lacks required permissions:', { userId: user.id, roles });
+      
+      // 📝 Audit log: Unauthorized access attempt
+      await supabaseAdmin.from('audit_logs').insert({
+        user_id: user.id,
+        user_email: user.email,
+        action_type: 'UNAUTHORIZED_ACCESS_ATTEMPT',
+        table_name: 'beneficiaries',
+        severity: 'warning',
+        description: 'محاولة غير مصرح بها لإنشاء حسابات مستفيدين',
+        ip_address: req.headers.get('X-Forwarded-For') || req.headers.get('X-Real-IP'),
+        user_agent: req.headers.get('User-Agent')
+      });
+
+      return new Response(
+        JSON.stringify({ error: 'ليس لديك صلاحية لتنفيذ هذه العملية' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log('✅ Authorized user creating beneficiary accounts:', { 
+      userId: user.id,
+      email: user.email 
+    });
 
     // جلب المستفيدين المفعلين بدون حسابات
     const { data: beneficiaries, error: fetchError } = await supabaseAdmin
@@ -37,9 +111,11 @@ serve(async (req) => {
 
     for (const beneficiary of beneficiaries || []) {
       try {
-        // توليد البريد وكلمة المرور
+        // 🔐 SECURITY: Use secure random password generation
         const internalEmail = `${beneficiary.national_id}@waqf.internal`;
-        const tempPassword = `${beneficiary.national_id}@Waqf`;
+        const tempPassword = generateSecurePassword();
+
+        console.log('🔐 Creating account with secure password for:', beneficiary.national_id);
 
         // إنشاء حساب Supabase Auth
         const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
@@ -60,7 +136,7 @@ serve(async (req) => {
             const existingUser = users.users.find(u => u.email === internalEmail);
             
             if (existingUser) {
-              // تحديث كلمة المرور
+              // تحديث كلمة المرور بكلمة مرور آمنة جديدة
               await supabaseAdmin.auth.admin.updateUserById(existingUser.id, {
                 password: tempPassword,
                 email_confirm: true,
@@ -77,11 +153,24 @@ serve(async (req) => {
                 })
                 .eq('id', beneficiary.id);
 
+              // 📝 Audit log
+              await supabaseAdmin.from('audit_logs').insert({
+                user_id: user.id,
+                user_email: user.email,
+                action_type: 'BENEFICIARY_ACCOUNT_UPDATED',
+                table_name: 'beneficiaries',
+                record_id: beneficiary.id,
+                severity: 'info',
+                description: `تم تحديث حساب المستفيد: ${beneficiary.full_name}`,
+                new_values: { beneficiary_id: beneficiary.id, user_id: existingUser.id }
+              });
+
               results.push({
                 beneficiary_id: beneficiary.id,
                 national_id: beneficiary.national_id,
                 status: 'updated',
                 user_id: existingUser.id,
+                password: tempPassword, // للعرض مرة واحدة
               });
               continue;
             }
@@ -114,11 +203,24 @@ serve(async (req) => {
           console.error('Error creating profile/role:', roleError);
         }
 
+        // 📝 Audit log
+        await supabaseAdmin.from('audit_logs').insert({
+          user_id: user.id,
+          user_email: user.email,
+          action_type: 'BENEFICIARY_ACCOUNT_CREATED',
+          table_name: 'beneficiaries',
+          record_id: beneficiary.id,
+          severity: 'info',
+          description: `تم إنشاء حساب للمستفيد: ${beneficiary.full_name}`,
+          new_values: { beneficiary_id: beneficiary.id, user_id: authData.user?.id }
+        });
+
         results.push({
           beneficiary_id: beneficiary.id,
           national_id: beneficiary.national_id,
           status: 'created',
           user_id: authData.user?.id,
+          password: tempPassword, // للعرض مرة واحدة
         });
       } catch (error) {
         errors.push({
@@ -144,6 +246,7 @@ serve(async (req) => {
       }
     );
   } catch (error) {
+    console.error('❌ Error in create-beneficiary-accounts:', error);
     return new Response(
       JSON.stringify({
         success: false,

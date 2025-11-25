@@ -9807,6 +9807,7 @@ export type Database = {
       }
       is_nazer: { Args: never; Returns: boolean }
       is_staff: { Args: never; Returns: boolean }
+      is_staff_only: { Args: never; Returns: boolean }
       log_login_attempt: {
         Args: {
           p_email: string
