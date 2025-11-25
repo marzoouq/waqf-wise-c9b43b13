@@ -53,14 +53,17 @@ Deno.serve(async (req) => {
       );
     }
 
-    // 🚦 3. Rate Limiting (محاولة واحدة كل دقيقة)
-    const oneMinuteAgo = new Date(Date.now() - 60000).toISOString();
+    // 🚦 3. Rate Limiting المحسّن (محاولة كل 10 ثواني للـ cron, دقيقة للـ manual)
+    const tenSecondsAgo = new Date(Date.now() - 10000).toISOString();
     const { data: recentFixes } = await supabase
       .from('auto_fix_attempts')
       .select('id')
-      .gte('created_at', oneMinuteAgo);
+      .gte('created_at', tenSecondsAgo);
 
-    if (recentFixes && recentFixes.length >= 1) {
+    // التحقق من المصدر (cron vs manual)
+    const isCronJob = req.headers.get('x-cron-job') === 'true';
+    
+    if (!isCronJob && recentFixes && recentFixes.length >= 1) {
       return new Response(
         JSON.stringify({ 
           success: false, 
@@ -72,12 +75,72 @@ Deno.serve(async (req) => {
 
     console.log(`🔧 Starting auto-fix execution by user: ${user.email}...`);
 
+    // 🔧 1. Auto-resolve old errors (أقدم من 24 ساعة)
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const { data: oldErrors } = await supabase
+      .from('system_error_logs')
+      .update({ 
+        status: 'auto_resolved',
+        resolved_at: new Date().toISOString(),
+        resolved_by: 'system_auto_cleanup'
+      })
+      .eq('status', 'new')
+      .lt('created_at', oneDayAgo)
+      .select('id');
+    
+    if (oldErrors && oldErrors.length > 0) {
+      console.log(`✅ Auto-resolved ${oldErrors.length} old errors`);
+    }
+
+    // 🔧 2. Clean duplicate alerts (نفس النوع والشدة في آخر ساعة)
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    const { data: alerts } = await supabase
+      .from('system_alerts')
+      .select('alert_type, severity, id')
+      .eq('status', 'active')
+      .gte('created_at', oneHourAgo);
+    
+    if (alerts && alerts.length > 1) {
+      // تجميع حسب النوع والشدة
+      const alertGroups = new Map<string, string[]>();
+      alerts.forEach(alert => {
+        const key = `${alert.alert_type}-${alert.severity}`;
+        if (!alertGroups.has(key)) {
+          alertGroups.set(key, []);
+        }
+        alertGroups.get(key)!.push(alert.id);
+      });
+      
+      // حل المكررات (نحتفظ بواحد فقط من كل مجموعة)
+      let resolvedCount = 0;
+      for (const [_, ids] of alertGroups) {
+        if (ids.length > 1) {
+          // حل جميع التنبيهات ماعدا الأول
+          const { error } = await supabase
+            .from('system_alerts')
+            .update({ 
+              status: 'resolved',
+              resolved_at: new Date().toISOString()
+            })
+            .in('id', ids.slice(1));
+          
+          if (!error) {
+            resolvedCount += ids.length - 1;
+          }
+        }
+      }
+      
+      if (resolvedCount > 0) {
+        console.log(`✅ Cleaned ${resolvedCount} duplicate alerts`);
+      }
+    }
+
     // جلب محاولات الإصلاح المعلقة
     const { data: pendingFixes, error: fetchError } = await supabase
       .from('auto_fix_attempts')
       .select('*, system_error_logs(*)')
       .eq('status', 'pending')
-      .limit(50);
+      .limit(100);
 
     if (fetchError) throw fetchError;
 

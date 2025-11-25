@@ -24,6 +24,7 @@ import { ar } from "date-fns/locale";
 import { SystemError, SystemAlert, AutoFixAttempt } from "@/types/monitoring";
 import { AdminAlertsPanel } from "@/components/system/AdminAlertsPanel";
 import { SelfHealingToolsPanel } from "@/components/system/SelfHealingToolsPanel";
+import { SystemHealthDashboard } from "@/components/system/SystemHealthDashboard";
 
 export default function SystemMonitoring() {
   const { toast } = useToast();
@@ -212,6 +213,9 @@ export default function SystemMonitoring() {
           </CardContent>
         </Card>
       </div>
+
+      {/* لوحة الصحة الحية */}
+      <SystemHealthDashboard />
 
       {/* لوحة تنبيهات المسؤولين */}
       <AdminAlertsPanel />

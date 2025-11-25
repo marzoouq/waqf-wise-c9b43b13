@@ -34,8 +34,11 @@ class ErrorTracker {
   private recentErrors = new Map<string, number>();
   private errorCounts = new Map<string, number>();
   private consecutiveErrors = 0;
-  private readonly MAX_SAME_ERROR_COUNT = 15; // ⬆️ رفع من 5 إلى 15
-  private readonly MAX_CONSECUTIVE_ERRORS = 8; // ⬆️ رفع من 3 إلى 8
+  private readonly MAX_SAME_ERROR_COUNT = 20; // 🔧 تحسين: رفع لـ 20 لتحمل أكبر
+  private readonly MAX_CONSECUTIVE_ERRORS = 10; // 🔧 تحسين: رفع لـ 10
+  private errorDeduplication = new Map<string, { count: number; lastSeen: number; resolved: boolean }>();
+  private readonly DEDUPLICATION_WINDOW = 5 * 60 * 1000; // 5 دقائق
+  private readonly AUTO_RESOLVE_THRESHOLD = 24 * 60 * 60 * 1000; // 24 ساعة
 
   private constructor() {
     this.setupGlobalHandlers();
@@ -313,18 +316,50 @@ class ErrorTracker {
       return;
     }
 
+    // 🔧 Deduplication المحسّن
+    const errorKey = `${report.error_type}-${report.error_message}`;
+    const now = Date.now();
+    const dedupEntry = this.errorDeduplication.get(errorKey);
+    
+    if (dedupEntry) {
+      // إذا كان الخطأ محلول تلقائياً، لا نسجله مجدداً
+      if (dedupEntry.resolved) {
+        return;
+      }
+      
+      // إذا كان في نفس النافذة الزمنية، زيادة العداد فقط
+      if (now - dedupEntry.lastSeen < this.DEDUPLICATION_WINDOW) {
+        dedupEntry.count++;
+        dedupEntry.lastSeen = now;
+        
+        // إذا تجاوز الحد، نحله تلقائياً
+        if (dedupEntry.count >= this.MAX_SAME_ERROR_COUNT) {
+          dedupEntry.resolved = true;
+          this.autoResolveError(errorKey);
+          productionLogger.info(`Auto-resolved repeated error: ${errorKey}`, { count: dedupEntry.count });
+        }
+        return;
+      }
+    }
+    
+    // تسجيل جديد في Deduplication Map
+    this.errorDeduplication.set(errorKey, {
+      count: 1,
+      lastSeen: now,
+      resolved: false
+    });
+    
     // ✅ التحقق من Circuit Breaker
     if (this.consecutiveErrors >= this.MAX_CONSECUTIVE_ERRORS) {
       console.warn('Circuit breaker opened - too many consecutive errors');
       return;
     }
 
-    // ✅ التحقق من عدد الأخطاء المتطابقة
-    const errorKey = `${report.error_type}-${report.error_message}`;
+    // ✅ التحقق من عدد الأخطاء المتطابقة (Fallback)
     const count = this.errorCounts.get(errorKey) || 0;
     
     if (count >= this.MAX_SAME_ERROR_COUNT) {
-      return; // تجاهل الخطأ إذا تجاوز الحد الأقصى
+      return;
     }
     
     this.errorCounts.set(errorKey, count + 1);
@@ -464,6 +499,27 @@ class ErrorTracker {
     }
   }
 
+  private async autoResolveError(errorKey: string) {
+    try {
+      // حل الخطأ في قاعدة البيانات
+      const { error } = await supabase
+        .from('system_error_logs')
+        .update({ 
+          status: 'auto_resolved',
+          resolved_at: new Date().toISOString(),
+          resolved_by: 'system'
+        })
+        .eq('error_type', errorKey.split('-')[0])
+        .eq('status', 'new');
+      
+      if (error) {
+        productionLogger.error('Failed to auto-resolve error', error);
+      }
+    } catch (error) {
+      productionLogger.error('Error auto-resolving', error);
+    }
+  }
+
   async logError(
     message: string,
     severity: ErrorReport['severity'] = 'medium',
@@ -477,6 +533,22 @@ class ErrorTracker {
       user_agent: navigator.userAgent,
       additional_data: additionalData && Object.keys(additionalData).length > 0 ? additionalData : undefined,
     });
+  }
+
+  // 🔧 API لإحصائيات Deduplication
+  getDeduplicationStats() {
+    const stats = {
+      total: this.errorDeduplication.size,
+      resolved: 0,
+      active: 0,
+    };
+    
+    this.errorDeduplication.forEach(entry => {
+      if (entry.resolved) stats.resolved++;
+      else stats.active++;
+    });
+    
+    return stats;
   }
 }
 
