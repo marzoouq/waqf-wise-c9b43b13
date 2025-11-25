@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
 import { 
   RefreshCw, 
   Trash2, 
@@ -17,11 +19,54 @@ import {
 import { useSelfHealing } from "@/hooks/useSelfHealing";
 import { useToast } from "@/hooks/use-toast";
 import { selfHealing } from "@/lib/selfHealing";
+import { supabase } from "@/integrations/supabase/client";
 
 export function SelfHealingToolsPanel() {
   const { toast } = useToast();
   const { clearCache, reconnectDatabase, syncPendingData } = useSelfHealing();
   const [isHealthMonitorRunning, setIsHealthMonitorRunning] = useState(true);
+
+  // 📊 إحصائيات ديناميكية حقيقية من قاعدة البيانات
+  const { data: stats, isLoading: statsLoading } = useQuery({
+    queryKey: ['self-healing-stats'],
+    queryFn: async () => {
+      // إجمالي الأخطاء
+      const { count: totalErrors } = await supabase
+        .from('system_error_logs')
+        .select('*', { count: 'exact', head: true });
+      
+      // الأخطاء المحلولة
+      const { count: resolvedErrors } = await supabase
+        .from('system_error_logs')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'resolved');
+      
+      // التنبيهات النشطة
+      const { count: activeAlerts } = await supabase
+        .from('system_alerts')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'active');
+      
+      // معدل النجاح
+      const retrySuccessRate = totalErrors > 0 
+        ? Math.round((resolvedErrors / totalErrors) * 100) 
+        : 100;
+      
+      // صحة النظام (عكسي للتنبيهات النشطة)
+      const systemHealth = activeAlerts < 100 ? 99 : 
+                          activeAlerts < 500 ? 95 : 
+                          activeAlerts < 1000 ? 85 : 70;
+      
+      return {
+        retrySuccessRate,
+        systemHealth,
+        totalErrors,
+        resolvedErrors,
+        activeAlerts,
+      };
+    },
+    refetchInterval: 60000, // تحديث كل دقيقة
+  });
 
   // حالة الأدوات
   const toolsStatus = {
@@ -40,11 +85,11 @@ export function SelfHealingToolsPanel() {
       status: "active",
       description: "يسترجع البيانات من Cache عند فشل العمليات"
     },
-    healthMonitor: { 
-      name: "مراقب الصحة",
-      status: isHealthMonitorRunning ? "active" : "stopped",
-      description: "يفحص صحة النظام كل 30 ثانية"
-    },
+      healthMonitor: { 
+        name: "مراقب الصحة",
+        status: isHealthMonitorRunning ? "active" : "stopped",
+        description: "يفحص صحة النظام كل دقيقتين"
+      },
     circuitBreaker: { 
       name: "قاطع الدائرة",
       status: "standby",
@@ -65,7 +110,7 @@ export function SelfHealingToolsPanel() {
       setIsHealthMonitorRunning(true);
       toast({ 
         title: "▶️ تم تشغيل مراقب الصحة",
-        description: "سيتم فحص صحة النظام كل 30 ثانية"
+        description: "سيتم فحص صحة النظام كل دقيقتين"
       });
     }
   };
@@ -233,33 +278,47 @@ export function SelfHealingToolsPanel() {
         <CardHeader>
           <CardTitle>إحصائيات الأداء</CardTitle>
           <CardDescription>
-            مراقبة أداء أدوات الإصلاح الذاتي
+            مراقبة أداء أدوات الإصلاح الذاتي (بيانات حقيقية)
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm">معدل نجاح إعادة المحاولة</span>
-              <Badge>95%</Badge>
-            </div>
-            <Progress value={95} />
-          </div>
+          {statsLoading ? (
+            <>
+              <Skeleton className="h-16 w-full" />
+              <Skeleton className="h-16 w-full" />
+              <Skeleton className="h-16 w-full" />
+            </>
+          ) : (
+            <>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm">معدل نجاح إعادة المحاولة</span>
+                  <Badge>{stats?.retrySuccessRate}%</Badge>
+                </div>
+                <Progress value={stats?.retrySuccessRate || 0} />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {stats?.resolvedErrors} من {stats?.totalErrors} خطأ تم حله
+                </p>
+              </div>
 
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm">فعالية Cache</span>
-              <Badge>88%</Badge>
-            </div>
-            <Progress value={88} />
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm">صحة النظام العامة</span>
-              <Badge variant="default">99%</Badge>
-            </div>
-            <Progress value={99} />
-          </div>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm">صحة النظام العامة</span>
+                  <Badge variant={
+                    (stats?.systemHealth || 0) >= 95 ? "default" : 
+                    (stats?.systemHealth || 0) >= 85 ? "secondary" : 
+                    "destructive"
+                  }>
+                    {stats?.systemHealth}%
+                  </Badge>
+                </div>
+                <Progress value={stats?.systemHealth || 0} />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {stats?.activeAlerts} تنبيه نشط
+                </p>
+              </div>
+            </>
+          )}
         </CardContent>
       </Card>
 

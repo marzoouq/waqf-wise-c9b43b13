@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, Suspense } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, PieChart } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import { OverviewTab } from "@/components/funds/tabs/OverviewTab";
 import { FundsTab } from "@/components/funds/tabs/FundsTab";
 import { DistributionsTab } from "@/components/funds/tabs/DistributionsTab";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Funds = () => {
   const [distributionDialogOpen, setDistributionDialogOpen] = useState(false);
@@ -118,7 +119,14 @@ const Funds = () => {
           </TabsContent>
 
           <TabsContent value="disclosure" className="space-y-6">
-            <AnnualDisclosureTab />
+            <Suspense fallback={
+              <div className="space-y-4">
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-64 w-full" />
+              </div>
+            }>
+              <AnnualDisclosureTab />
+            </Suspense>
           </TabsContent>
         </Tabs>
 
