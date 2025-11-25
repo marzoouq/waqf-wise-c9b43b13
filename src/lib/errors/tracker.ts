@@ -37,7 +37,7 @@ class ErrorTracker {
   private readonly MAX_SAME_ERROR_COUNT = 20; // 🔧 تحسين: رفع لـ 20 لتحمل أكبر
   private readonly MAX_CONSECUTIVE_ERRORS = 10; // 🔧 تحسين: رفع لـ 10
   private errorDeduplication = new Map<string, { count: number; lastSeen: number; resolved: boolean }>();
-  private readonly DEDUPLICATION_WINDOW = 5 * 60 * 1000; // 5 دقائق
+  private readonly DEDUPLICATION_WINDOW = 15 * 60 * 1000; // 🔧 تحسين: 15 دقيقة بدلاً من 5
   private readonly AUTO_RESOLVE_THRESHOLD = 24 * 60 * 60 * 1000; // 24 ساعة
 
   private constructor() {

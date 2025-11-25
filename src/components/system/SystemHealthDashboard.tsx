@@ -128,6 +128,25 @@ export function SystemHealthDashboard() {
     }
   };
 
+  // 🔧 تنظيف فوري يدوي - تشغيل Cron Job
+  const handleManualCleanup = async () => {
+    try {
+      toast.info("جاري تنفيذ التنظيف الفوري...");
+      
+      const { data, error } = await supabase.functions.invoke('execute-auto-fix', {
+        body: { manual: true }
+      });
+
+      if (error) throw error;
+
+      toast.success(`تم التنظيف بنجاح! تم إصلاح ${data?.fixed || 0} مشكلة`);
+      refetch();
+    } catch (error) {
+      toast.error("فشل التنظيف الفوري");
+      console.error(error);
+    }
+  };
+
   if (isLoading) {
     return (
       <Card>
@@ -166,6 +185,14 @@ export function SystemHealthDashboard() {
             >
               <RefreshCw className="h-4 w-4 ml-2" />
               تحديث
+            </Button>
+            <Button 
+              size="sm" 
+              variant="default"
+              onClick={handleManualCleanup}
+            >
+              <Zap className="h-4 w-4 ml-2" />
+              تنظيف فوري
             </Button>
             <Button 
               size="sm" 
