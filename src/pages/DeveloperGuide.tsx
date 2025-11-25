@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { Card, CardContent } from "@/components/ui/card";
-import { BookOpen, Download, ExternalLink } from "lucide-react";
+import { BookOpen, Download, ExternalLink, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import ReactMarkdown from "react-markdown";
@@ -70,6 +70,15 @@ const DeveloperGuide = () => {
             icon={<BookOpen className="h-8 w-8 text-primary" />}
           />
           <div className="flex gap-2">
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() => window.open("/COMPREHENSIVE_TEST_REPORT.md", "_blank")}
+              className="gap-2"
+            >
+              <CheckCircle className="h-4 w-4" />
+              <span className="hidden sm:inline">تقرير الاختبار</span>
+            </Button>
             <Button
               variant="outline"
               size="sm"
