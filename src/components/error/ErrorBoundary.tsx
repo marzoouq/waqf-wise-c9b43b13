@@ -1,9 +1,10 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
+import { AlertTriangle, RefreshCw, Home, Cloud, Flag } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { productionLogger } from '@/lib/logger/production-logger';
+import { toast } from 'sonner';
 
 interface Props {
   children: ReactNode;
@@ -85,6 +86,26 @@ export class ErrorBoundary extends Component<Props, State> {
     window.location.href = '/';
   };
 
+  handleEnableOfflineMode = () => {
+    localStorage.setItem('offlineMode', 'true');
+    toast.success('تم تفعيل الوضع دون اتصال');
+    this.handleReset();
+  };
+
+  handleReportIssue = () => {
+    const { error, errorInfo } = this.state;
+    const issueData = {
+      error: error?.message,
+      stack: error?.stack,
+      componentStack: errorInfo?.componentStack,
+      url: window.location.href,
+      timestamp: new Date().toISOString(),
+    };
+    
+    navigator.clipboard.writeText(JSON.stringify(issueData, null, 2));
+    toast.success('تم نسخ تفاصيل المشكلة للحافظة');
+  };
+
   render() {
     if (this.state.hasError) {
       if (this.props.fallback) {
@@ -121,15 +142,27 @@ export class ErrorBoundary extends Component<Props, State> {
                 </p>
               </div>
 
-              <div className="flex gap-3">
-                <Button onClick={this.handleReset} className="flex-1">
-                  <RefreshCw className="h-4 w-4 ml-2" />
-                  إعادة المحاولة
-                </Button>
-                <Button onClick={this.handleGoHome} variant="outline" className="flex-1">
-                  <Home className="h-4 w-4 ml-2" />
-                  العودة للرئيسية
-                </Button>
+              <div className="flex flex-col gap-3">
+                <div className="flex gap-2">
+                  <Button onClick={this.handleReset} className="flex-1">
+                    <RefreshCw className="h-4 w-4 ml-2" />
+                    إعادة المحاولة
+                  </Button>
+                  <Button onClick={this.handleGoHome} variant="outline" className="flex-1">
+                    <Home className="h-4 w-4 ml-2" />
+                    العودة للرئيسية
+                  </Button>
+                </div>
+                <div className="flex gap-2">
+                  <Button onClick={this.handleEnableOfflineMode} variant="secondary" size="sm" className="flex-1">
+                    <Cloud className="h-4 w-4 ml-2" />
+                    تفعيل الوضع دون اتصال
+                  </Button>
+                  <Button onClick={this.handleReportIssue} variant="ghost" size="sm" className="flex-1">
+                    <Flag className="h-4 w-4 ml-2" />
+                    نسخ تفاصيل المشكلة
+                  </Button>
+                </div>
               </div>
 
               {process.env.NODE_ENV === 'development' && this.state.errorInfo && (
