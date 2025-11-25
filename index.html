@@ -68,7 +68,20 @@
   </head>
 
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Instant loading spinner - shown immediately before React loads -->
+      <div id="app-loading" style="position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: hsl(48 20% 97%);">
+        <div style="text-align: center;">
+          <div style="width: 48px; height: 48px; margin: 0 auto 16px; border: 3px solid hsl(142.1 76.2% 36.3% / 0.2); border-top-color: hsl(142.1 76.2% 36.3%); border-radius: 50%; animation: spin-app 1s linear infinite;"></div>
+          <p style="color: hsl(240 3.8% 46.1%); font-size: 14px; font-family: Cairo, sans-serif;">جاري التحميل...</p>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
+    <style>
+      @keyframes spin-app {
+        to { transform: rotate(360deg); }
+      }
+    </style>
   </body>
 </html>
