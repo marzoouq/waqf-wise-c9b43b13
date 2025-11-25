@@ -49,7 +49,9 @@ export function useKPIs(category?: string) {
 
       return kpisWithValues;
     },
-    refetchInterval: 5 * 60 * 1000, // تحديث كل 5 دقائق
+    staleTime: 10 * 60 * 1000, // 10 minutes (محسّن)
+    gcTime: 15 * 60 * 1000,
+    refetchOnWindowFocus: false, // إيقاف التحديث التلقائي
   });
 
   return {

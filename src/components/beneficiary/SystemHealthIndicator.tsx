@@ -14,6 +14,7 @@ import {
 import { Activity, AlertTriangle, WifiOff, CheckCircle2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { debug } from '@/lib/debug';
+import { retryWithBackoff, isRetryableError } from '@/lib/utils/retry';
 
 type HealthStatus = 'healthy' | 'degraded' | 'offline';
 
@@ -52,22 +53,39 @@ export function SystemHealthIndicator() {
 
   const checkHealth = async () => {
     try {
-      // فحص سريع للاتصال بقاعدة البيانات
-      const { error } = await supabase
-        .from('beneficiaries')
-        .select('id')
-        .limit(1);
+      // فحص سريع للاتصال بقاعدة البيانات مع إعادة محاولة تلقائية
+      const { error } = await retryWithBackoff(
+        async () => {
+          const result = await supabase
+            .from('beneficiaries')
+            .select('id')
+            .limit(1);
+          
+          // إذا كان هناك خطأ من Supabase، نرميه ليتم التعامل معه
+          if (result.error) {
+            throw result.error;
+          }
+          
+          return result;
+        },
+        {
+          maxRetries: 2,
+          baseDelay: 1000,
+          shouldRetry: isRetryableError
+        }
+      );
 
       if (error) {
         debug.warn('Health check warning:', error);
         setStatus('degraded');
       } else {
         setStatus('healthy');
+        debug.log('✅ All systems healthy');
       }
 
       setLastCheck(new Date());
     } catch (error) {
-      debug.warn('Health check failed:', error);
+      debug.warn('Health check failed after retries:', error);
       setStatus('degraded');
     }
   };

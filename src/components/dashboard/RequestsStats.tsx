@@ -3,6 +3,7 @@ import { ClipboardList, Clock, AlertTriangle, CheckCircle, TrendingUp } from 'lu
 import { useRequests } from '@/hooks/useRequests';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useNavigate } from 'react-router-dom';
+import { safeFilter, safeLength } from '@/lib/utils/array-safe';
 
 const RequestsStats = () => {
   const { requests, isLoading } = useRequests();
@@ -32,22 +33,22 @@ const RequestsStats = () => {
     );
   }
 
-  const pendingRequests = requests.filter(r => r.status === 'قيد المراجعة' || r.status === 'معلق');
-  const overdueRequests = requests.filter(r => r.is_overdue);
-  const approvedRequests = requests.filter(r => r.status === 'موافق');
-  const rejectedRequests = requests.filter(r => r.status === 'مرفوض');
-  const needsApproval = requests.filter(r => 
+  const pendingRequests = safeFilter(requests, r => r.status === 'قيد المراجعة' || r.status === 'معلق');
+  const overdueRequests = safeFilter(requests, r => r.is_overdue);
+  const approvedRequests = safeFilter(requests, r => r.status === 'موافق');
+  const rejectedRequests = safeFilter(requests, r => r.status === 'مرفوض');
+  const needsApproval = safeFilter(requests, r => 
     r.status === 'قيد المراجعة'
   );
 
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-  const recentRequests = requests.filter(r => new Date(r.submitted_at) >= sevenDaysAgo);
+  const recentRequests = safeFilter(requests, r => new Date(r.submitted_at) >= sevenDaysAgo);
 
   const stats = [
     {
       title: 'إجمالي الطلبات',
-      value: requests.length,
+      value: safeLength(requests),
       icon: ClipboardList,
       color: 'text-primary',
       bgColor: 'bg-primary/10',
