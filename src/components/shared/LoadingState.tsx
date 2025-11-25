@@ -2,7 +2,6 @@ import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { motion } from "framer-motion";
 
 interface LoadingStateProps {
   message?: string;
@@ -24,19 +23,14 @@ export function LoadingState({
   className 
 }: LoadingStateProps) {
   const content = (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
-      className={cn("text-center space-y-4", className)}
-    >
+    <div className={cn("text-center space-y-4 animate-in fade-in duration-300", className)}>
       <div className="flex justify-center">
         <Loader2 className={cn("animate-spin text-primary", sizeClasses[size])} />
       </div>
       {message && (
         <p className="text-sm text-muted-foreground">{message}</p>
       )}
-    </motion.div>
+    </div>
   );
 
   if (fullScreen) {

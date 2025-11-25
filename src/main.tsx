@@ -8,4 +8,12 @@ import { initWebVitals } from "./lib/monitoring/web-vitals";
 initDebugTools();
 initWebVitals();
 
-createRoot(document.getElementById("root")!).render(<App />);
+const rootElement = document.getElementById("root")!;
+
+// Remove loading spinner immediately when React mounts
+const loadingElement = document.getElementById("app-loading");
+if (loadingElement) {
+  loadingElement.remove();
+}
+
+createRoot(rootElement).render(<App />);
