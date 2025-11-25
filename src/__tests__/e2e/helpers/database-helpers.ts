@@ -22,10 +22,14 @@ export async function cleanupTestData() {
   ];
 
   for (const table of tables) {
-    await testSupabase
-      .from(table as any)
-      .delete()
-      .like('created_at', new Date().toISOString().split('T')[0] + '%');
+    try {
+      await testSupabase
+        .from(table as keyof Database['public']['Tables'])
+        .delete()
+        .like('created_at', new Date().toISOString().split('T')[0] + '%');
+    } catch (error) {
+      console.warn(`Failed to clean table ${table}:`, error);
+    }
   }
 }
 
