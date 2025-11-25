@@ -32,17 +32,17 @@ class ErrorTracker {
   private circuitBreakerOpen = false;
   private circuitBreakerResetTime: number | null = null;
   private recentErrors = new Map<string, number>();
-  private errorCounts = new Map<string, number>(); // ✅ عداد الأخطاء المتطابقة
-  private consecutiveErrors = 0; // ✅ عداد الأخطاء المتتالية
-  private readonly MAX_SAME_ERROR_COUNT = 5; // ✅ حد أقصى للأخطاء المتطابقة
-  private readonly MAX_CONSECUTIVE_ERRORS = 3; // ✅ حد أقصى للأخطاء المتتالية
+  private errorCounts = new Map<string, number>();
+  private consecutiveErrors = 0;
+  private readonly MAX_SAME_ERROR_COUNT = 15; // ⬆️ رفع من 5 إلى 15
+  private readonly MAX_CONSECUTIVE_ERRORS = 8; // ⬆️ رفع من 3 إلى 8
 
   private constructor() {
     this.setupGlobalHandlers();
-    this.cleanupOldAuthErrors(); // ✅ مسح أخطاء auth القديمة أولاً
+    this.cleanupOldAuthErrors();
     this.loadPendingErrors();
     this.setupCircuitBreakerCheck();
-    this.setupHealthCheck();
+    // ❌ حذف setupHealthCheck() - يتم في selfHealing.ts فقط
   }
 
   static getInstance(): ErrorTracker {
@@ -305,36 +305,7 @@ class ErrorTracker {
     }
   }
 
-  private setupHealthCheck() {
-    setInterval(() => this.performHealthCheck(), 5 * 60 * 1000);
-  }
-
-  private async performHealthCheck() {
-    try {
-      const { error } = await supabase.from('beneficiaries').select('id').limit(1);
-      
-      if (error) {
-        this.trackError({
-          error_type: 'health_check_failed',
-          error_message: error.message || 'Database connection check failed',
-          severity: 'critical',
-          url: this.cleanUrl(window.location.href),
-          user_agent: navigator.userAgent,
-          additional_data: { error: error.message },
-        });
-      } else {
-        productionLogger.info('All systems healthy');
-      }
-    } catch (error) {
-      this.trackError({
-        error_type: 'health_check_error',
-        error_message: error instanceof Error ? error.message : String(error) || 'Health check failed',
-        severity: 'critical',
-        url: this.cleanUrl(window.location.href),
-        user_agent: navigator.userAgent,
-      });
-    }
-  }
+  // ❌ حذف setupHealthCheck() و performHealthCheck() - يتم في selfHealing.ts فقط
 
   async trackError(report: ErrorReport) {
     // ✅ فحص الخطأ مع additional_data

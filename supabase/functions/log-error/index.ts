@@ -27,7 +27,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // 🔒 1. التحقق من API Key (للحماية من الاستخدام الخاطئ)
+    // 🔒 1. التحقق من API Key + Rate Limiting
     const apiKey = req.headers.get('apikey');
     if (!apiKey || !apiKey.startsWith('eyJ')) {
       return new Response(
@@ -40,13 +40,33 @@ Deno.serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // محاولة الحصول على المستخدم (اختياري)
+    // 🚦 Rate Limiting: 100 requests/minute per user
     let userId: string | null = null;
     const authHeader = req.headers.get('Authorization');
     if (authHeader) {
       const token = authHeader.replace('Bearer ', '');
       const { data: { user } } = await supabase.auth.getUser(token);
       userId = user?.id || null;
+      
+      if (userId) {
+        // فحص عدد الطلبات خلال الدقيقة الأخيرة
+        const { count } = await supabase
+          .from('system_error_logs')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', userId)
+          .gte('created_at', new Date(Date.now() - 60000).toISOString());
+        
+        if (count && count >= 100) {
+          console.log(`⚠️ Rate limit exceeded for user ${userId}: ${count} requests`);
+          return new Response(
+            JSON.stringify({ 
+              success: false, 
+              error: 'Rate limit exceeded. Maximum 100 errors per minute.' 
+            }), 
+            { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+      }
     }
 
     // ✅ 2. التحقق من صحة المدخلات

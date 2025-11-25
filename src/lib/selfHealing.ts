@@ -238,7 +238,7 @@ export class AutoRecovery {
  * 4. مراقب الصحة النشط - Active Health Monitor
  */
 export class HealthMonitor {
-  private checkInterval: number = 30000; // 30 ثانية
+  private checkInterval: number = 120000; // ⬆️ 2 دقيقة (كان 30 ثانية)
   private intervalId: NodeJS.Timeout | null = null;
   private autoRecovery = new AutoRecovery();
 
