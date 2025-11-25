@@ -5,8 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Download, FileText, Calendar } from "lucide-react";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
-import jsPDF from "jspdf";
-import "jspdf-autotable";
+import { toast } from "sonner";
 
 interface PaymentRecord {
   id: string;
@@ -30,21 +29,28 @@ export function AccountStatementView({
 }: AccountStatementViewProps) {
   const totalAmount = payments.reduce((sum, payment) => sum + payment.amount, 0);
 
-  const handleExportPDF = () => {
-    const doc = new jsPDF({
-      orientation: "portrait",
-      unit: "mm",
-      format: "a4",
-    });
+  const handleExportPDF = async () => {
+    try {
+      // Dynamic import for jsPDF
+      const [{ default: jsPDF }, autoTable] = await Promise.all([
+        import('jspdf'),
+        import('jspdf-autotable')
+      ]);
 
-    // Set Arabic font
-    doc.addFont("https://cdn.jsdelivr.net/npm/amiri-font@1.0.0/Amiri-Regular.ttf", "Amiri", "normal");
-    doc.setFont("Amiri");
-    doc.setR2L(true);
+      const doc = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
 
-    // Title
-    doc.setFontSize(20);
-    doc.text("كشف حساب مستفيد", 105, 20, { align: "center" });
+      // Set Arabic font
+      doc.addFont("https://cdn.jsdelivr.net/npm/amiri-font@1.0.0/Amiri-Regular.ttf", "Amiri", "normal");
+      doc.setFont("Amiri");
+      doc.setR2L(true);
+
+      // Title
+      doc.setFontSize(20);
+      doc.text("كشف حساب مستفيد", 105, 20, { align: "center" });
 
     // Beneficiary Info
     doc.setFontSize(12);
@@ -81,7 +87,11 @@ export function AccountStatementView({
       finalY + 20
     );
 
-    doc.save(`كشف-حساب-${beneficiaryName}-${format(new Date(), "yyyy-MM-dd")}.pdf`);
+      doc.save(`كشف-حساب-${beneficiaryName}-${format(new Date(), "yyyy-MM-dd")}.pdf`);
+    } catch (error) {
+      toast.error("فشل تصدير كشف الحساب");
+      console.error("PDF export error:", error);
+    }
   };
 
   const handlePrint = () => {

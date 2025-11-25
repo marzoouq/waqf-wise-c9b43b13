@@ -70,8 +70,13 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
 
 [[headers]]
-  # Service Worker - no cache
+  # Service Worker & Workbox - no cache
   for = "/sw.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/workbox-*.js"
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
 
