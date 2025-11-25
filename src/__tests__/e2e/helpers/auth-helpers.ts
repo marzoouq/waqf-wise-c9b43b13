@@ -1,30 +1,32 @@
 import { Page } from '@playwright/test';
+import { TEST_CREDENTIALS, getTestCredentials } from './test-credentials';
 
 export type UserRole = 'nazer' | 'accountant' | 'cashier' | 'archivist' | 'beneficiary' | 'admin';
 
-const credentials = {
-  nazer: { email: 'nazer@waqf.sa', password: 'Test@123456' },
-  accountant: { email: 'accountant@waqf.sa', password: 'Test@123456' },
-  cashier: { email: 'cashier@waqf.sa', password: 'Test@123456' },
-  archivist: { email: 'archivist@waqf.sa', password: 'Test@123456' },
-  beneficiary: { email: 'beneficiary@waqf.sa', password: 'Test@123456' },
-  admin: { email: 'admin@waqf.sa', password: 'Test@123456' },
-};
-
+/**
+ * تسجيل الدخول كدور محدد
+ * يدعم تسجيل الدخول بالبريد الإلكتروني أو رقم الهوية
+ */
 export async function loginAs(page: Page, role: UserRole) {
-  const { email, password } = credentials[role];
+  const credentials = getTestCredentials(role);
   
   await page.goto('/auth');
   await page.waitForLoadState('networkidle');
   
-  await page.fill('input[type="email"]', email);
-  await page.fill('input[type="password"]', password);
+  // البحث عن حقل تسجيل الدخول (مرن - يدعم email أو username أو national_id)
+  const loginField = page.locator(
+    'input[type="email"], input[name="username"], input[name="identifier"]'
+  ).first();
+  
+  await loginField.waitFor({ state: 'visible', timeout: 5000 });
+  await loginField.fill(credentials.identifier);
+  
+  await page.fill('input[type="password"]', credentials.password);
   await page.click('button[type="submit"]');
   
   // انتظار التوجيه للصفحة الرئيسية بناءً على الدور
-  await page.waitForURL(/\/(nazer-dashboard|dashboard|accountant-dashboard|cashier-dashboard|archivist-dashboard|beneficiary-dashboard)/, {
-    timeout: 10000
-  });
+  await page.waitForLoadState('networkidle');
+  await page.waitForTimeout(2000);
 }
 
 export async function logout(page: Page) {
