@@ -12,10 +12,60 @@ serve(async (req) => {
   }
 
   try {
+    // 🔐 SECURITY: Verify Authorization header
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.error('❌ No authorization header provided');
+      return new Response(
+        JSON.stringify({ error: 'غير مصرح - يجب تسجيل الدخول' }),
+        { 
+          status: 401, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
+
+    // 🔐 SECURITY: Extract and verify JWT token
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+    if (authError || !user) {
+      console.error('❌ Invalid token:', authError);
+      return new Response(
+        JSON.stringify({ error: 'رمز المصادقة غير صحيح' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // 🔐 SECURITY: Check if user is staff (not beneficiary)
+    const { data: roles, error: roleError } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id);
+
+    if (roleError) {
+      console.error('❌ Error checking roles:', roleError);
+      return new Response(
+        JSON.stringify({ error: 'خطأ في التحقق من الصلاحيات' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const isStaff = roles?.some(r => ['admin', 'nazer', 'accountant', 'cashier', 'archivist'].includes(r.role));
+    if (!isStaff) {
+      console.error('❌ User is not staff:', { userId: user.id, roles });
+      return new Response(
+        JSON.stringify({ error: 'هذه الخدمة متاحة للموظفين فقط' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log('✅ Authorized chatbot request from:', { userId: user.id, email: user.email });
 
     const { message, userId, quickReplyId } = await req.json();
 

@@ -13,6 +13,16 @@ serve(async (req) => {
   }
 
   try {
+    // 🔐 SECURITY: Verify Authorization header
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.error('❌ No authorization header provided');
+      return new Response(
+        JSON.stringify({ error: 'غير مصرح - يجب تسجيل الدخول' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     
@@ -24,9 +34,63 @@ serve(async (req) => {
       }
     });
 
+    // 🔐 SECURITY: Extract and verify JWT token
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+
+    if (authError || !user) {
+      console.error('❌ Invalid token:', authError);
+      return new Response(
+        JSON.stringify({ error: 'رمز المصادقة غير صحيح' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // 🔐 SECURITY: Check if user has admin or nazer role
+    const { data: roles, error: roleError } = await supabaseAdmin
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id);
+
+    if (roleError) {
+      console.error('❌ Error checking roles:', roleError);
+      return new Response(
+        JSON.stringify({ error: 'خطأ في التحقق من الصلاحيات' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const hasPermission = roles?.some(r => ['admin', 'nazer'].includes(r.role));
+    if (!hasPermission) {
+      console.error('❌ User lacks required permissions:', { userId: user.id, roles });
+      
+      // 📝 Audit log: Unauthorized access attempt
+      await supabaseAdmin.from('audit_logs').insert({
+        user_id: user.id,
+        user_email: user.email,
+        action_type: 'UNAUTHORIZED_ACCESS_ATTEMPT',
+        table_name: 'beneficiaries',
+        severity: 'warning',
+        description: 'محاولة غير مصرح بها لإعادة تعيين كلمة مرور مستفيد',
+        ip_address: req.headers.get('X-Forwarded-For') || req.headers.get('X-Real-IP'),
+        user_agent: req.headers.get('User-Agent')
+      });
+
+      return new Response(
+        JSON.stringify({ error: 'ليس لديك صلاحية لتنفيذ هذه العملية' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const { action, beneficiaryId, nationalId, newPassword } = await req.json();
 
-    console.log('Admin manage password request:', { action, beneficiaryId, nationalId });
+    console.log('✅ Admin manage password request:', { 
+      action, 
+      beneficiaryId, 
+      nationalId,
+      adminId: user.id,
+      adminEmail: user.email 
+    });
 
     if (action === 'reset-password') {
       // التحقق من وجود المستفيد
@@ -65,7 +129,21 @@ serve(async (req) => {
         );
       }
 
-      console.log('Password updated successfully for user:', beneficiary.user_id);
+      console.log('✅ Password updated successfully for user:', beneficiary.user_id);
+
+      // 📝 Audit log: Successful password reset
+      await supabaseAdmin.from('audit_logs').insert({
+        user_id: user.id,
+        user_email: user.email,
+        action_type: 'PASSWORD_RESET',
+        table_name: 'beneficiaries',
+        record_id: beneficiary.id,
+        severity: 'info',
+        description: `تم إعادة تعيين كلمة المرور للمستفيد: ${beneficiary.full_name} (${beneficiary.national_id})`,
+        new_values: { beneficiary_id: beneficiary.id, beneficiary_name: beneficiary.full_name },
+        ip_address: req.headers.get('X-Forwarded-For') || req.headers.get('X-Real-IP'),
+        user_agent: req.headers.get('User-Agent')
+      });
 
       return new Response(
         JSON.stringify({ 
