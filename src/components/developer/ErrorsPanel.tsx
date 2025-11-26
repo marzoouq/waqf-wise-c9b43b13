@@ -1,24 +1,85 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, CheckCircle, XCircle, RefreshCw } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { AlertCircle, CheckCircle, XCircle, RefreshCw, Trash2, Filter } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import { useState } from "react";
+import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export function ErrorsPanel() {
+  const queryClient = useQueryClient();
+  const [severityFilter, setSeverityFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+
   const { data: errors, refetch } = useQuery({
-    queryKey: ["system-errors"],
+    queryKey: ["system-errors", severityFilter, statusFilter],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("system_error_logs")
         .select("*")
         .order("created_at", { ascending: false })
-        .limit(20);
+        .limit(50);
+      
+      if (severityFilter !== "all") {
+        query = query.eq("severity", severityFilter);
+      }
+      
+      if (statusFilter !== "all") {
+        query = query.eq("status", statusFilter);
+      }
+      
+      const { data, error } = await query;
       
       if (error) throw error;
       return data;
+    }
+  });
+
+  // حذف الأخطاء المحلولة
+  const deleteResolvedErrors = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from("system_error_logs")
+        .delete()
+        .eq("status", "resolved");
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("تم حذف الأخطاء المحلولة");
+      queryClient.invalidateQueries({ queryKey: ["system-errors"] });
+    },
+    onError: () => {
+      toast.error("فشل حذف الأخطاء");
+    }
+  });
+
+  // تحديث حالة خطأ
+  const updateErrorStatus = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      const { error } = await supabase
+        .from("system_error_logs")
+        .update({ status })
+        .eq("id", id);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("تم تحديث الحالة");
+      queryClient.invalidateQueries({ queryKey: ["system-errors"] });
+    },
+    onError: () => {
+      toast.error("فشل تحديث الحالة");
     }
   });
 
@@ -111,16 +172,62 @@ export function ErrorsPanel() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>سجل الأخطاء</CardTitle>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => refetch()}
-          >
-            <RefreshCw className="w-4 h-4 ml-2" />
-            تحديث
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => deleteResolvedErrors.mutate()}
+              disabled={deleteResolvedErrors.isPending}
+            >
+              <Trash2 className="w-4 h-4 ml-2" />
+              حذف المحلولة
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => refetch()}
+            >
+              <RefreshCw className="w-4 h-4 ml-2" />
+              تحديث
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
+          {/* Filters */}
+          <div className="flex gap-4 mb-4">
+            <div className="flex items-center gap-2">
+              <Filter className="w-4 h-4" />
+              <span className="text-sm">الخطورة:</span>
+              <Select value={severityFilter} onValueChange={setSeverityFilter}>
+                <SelectTrigger className="w-32">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">الكل</SelectItem>
+                  <SelectItem value="critical">حرج</SelectItem>
+                  <SelectItem value="error">خطأ</SelectItem>
+                  <SelectItem value="warning">تحذير</SelectItem>
+                  <SelectItem value="info">معلومات</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="text-sm">الحالة:</span>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-32">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">الكل</SelectItem>
+                  <SelectItem value="new">جديد</SelectItem>
+                  <SelectItem value="investigating">قيد التحقيق</SelectItem>
+                  <SelectItem value="resolved">محلول</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
           <div className="space-y-3">
             {!errors || errors.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
@@ -146,6 +253,20 @@ export function ErrorsPanel() {
                       <p className="text-sm text-muted-foreground mt-1">
                         {error.error_message}
                       </p>
+                    </div>
+                    <div className="flex gap-2">
+                      {error.status !== "resolved" && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => updateErrorStatus.mutate({ 
+                            id: error.id, 
+                            status: "resolved" 
+                          })}
+                        >
+                          <CheckCircle className="w-4 h-4" />
+                        </Button>
+                      )}
                     </div>
                   </div>
                   {error.error_stack && (

@@ -74,11 +74,31 @@ export function createMutationErrorHandler(options: {
  * تسجيل خطأ يدوياً
  */
 export function logError(
-  message: string,
+  message: string | unknown,
   severity: ErrorSeverity = 'medium',
   additionalData?: Record<string, unknown>
 ) {
-  errorTracker.logError(message, severity, additionalData);
+  // تحويل الرسالة إلى نص إذا كانت كائن
+  let cleanMessage: string;
+  
+  if (typeof message === 'string') {
+    cleanMessage = message;
+  } else if (typeof message === 'object' && message !== null) {
+    try {
+      cleanMessage = JSON.stringify(message);
+    } catch {
+      cleanMessage = String(message);
+    }
+  } else {
+    cleanMessage = String(message);
+  }
+  
+  // تجاهل رسائل "[object Object]"
+  if (cleanMessage === '[object Object]') {
+    return;
+  }
+  
+  errorTracker.logError(cleanMessage, severity, additionalData);
 }
 
 /**

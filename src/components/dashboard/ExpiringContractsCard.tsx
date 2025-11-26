@@ -8,16 +8,61 @@ import { ar } from "date-fns/locale";
 import { useNavigate } from "react-router-dom";
 
 export const ExpiringContractsCard = () => {
-  const { contracts } = useContracts();
+  const { contracts, isLoading } = useContracts();
   const navigate = useNavigate();
   const today = new Date();
 
+  // فحص البيانات بشكل آمن
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Calendar className="h-4 w-4" />
+            العقود القريبة من الانتهاء
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-6 text-muted-foreground">
+            جاري التحميل...
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // التأكد من أن contracts مصفوفة صالحة
+  if (!Array.isArray(contracts)) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Calendar className="h-4 w-4" />
+            العقود القريبة من الانتهاء
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-6 text-muted-foreground">
+            لا توجد بيانات
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   // تصفية العقود القريبة من الانتهاء (خلال 90 يوم)
-  const expiringContracts = (contracts || [])
+  const expiringContracts = contracts
     .filter((contract) => {
-      const endDate = new Date(contract.end_date);
-      const daysRemaining = differenceInDays(endDate, today);
-      return contract.status === 'نشط' && daysRemaining > 0 && daysRemaining <= 90;
+      // التأكد من وجود تاريخ الانتهاء والحالة
+      if (!contract?.end_date || !contract?.status) return false;
+      
+      try {
+        const endDate = new Date(contract.end_date);
+        const daysRemaining = differenceInDays(endDate, today);
+        return contract.status === 'نشط' && daysRemaining > 0 && daysRemaining <= 90;
+      } catch {
+        return false;
+      }
     })
     .sort((a, b) => {
       const daysA = differenceInDays(new Date(a.end_date), today);
