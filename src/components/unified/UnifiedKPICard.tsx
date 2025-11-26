@@ -7,6 +7,7 @@ interface UnifiedKPICardProps {
   value: string | number;
   icon: LucideIcon;
   trend?: string;
+  subtitle?: string;
   variant?: "default" | "success" | "warning" | "danger";
   loading?: boolean;
 }
@@ -43,6 +44,7 @@ export function UnifiedKPICard({
   value, 
   icon: Icon, 
   trend,
+  subtitle,
   variant = "default",
   loading = false
 }: UnifiedKPICardProps) {
@@ -75,12 +77,15 @@ export function UnifiedKPICard({
             <p className="text-sm font-medium text-muted-foreground">
               {title}
             </p>
-            <p className="text-2xl md:text-3xl font-bold">
+            <p className={cn(
+              "text-2xl md:text-3xl font-bold tabular-nums",
+              styles.text
+            )}>
               {value}
             </p>
-            {trend && (
+            {(trend || subtitle) && (
               <p className="text-xs text-muted-foreground">
-                {trend}
+                {trend || subtitle}
               </p>
             )}
           </div>
