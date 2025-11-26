@@ -93,29 +93,29 @@ const MainLayout = ({ children }: MainLayoutProps) => {
               </DropdownMenu>
             </header>
 
-            {/* Desktop Header */}
+            {/* Desktop Header - تبسيط بدون تكرار */}
             <div className="hidden lg:block sticky top-0 z-30 h-14 border-b bg-background">
               <div className="flex items-center justify-between h-full px-4">
                 <SidebarTrigger>
                   <Menu className="h-5 w-5" />
                 </SidebarTrigger>
                 
-            {/* User Menu - Desktop */}
-            <div className="flex items-center gap-3">
-              <RoleSwitcher />
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setSearchOpen(true)}
-                className="gap-2"
-              >
-                <Search className="h-4 w-4" />
-                <span className="hidden md:inline">بحث</span>
-                <kbd className="hidden md:inline pointer-events-none h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 ml-2">
-                  <span className="text-xs">Ctrl+K</span>
-                </kbd>
-              </Button>
-              <NotificationsBell />
+                <div className="flex items-center gap-3">
+                  <RoleSwitcher />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSearchOpen(true)}
+                    className="gap-2"
+                  >
+                    <Search className="h-4 w-4" />
+                    <span className="hidden md:inline">بحث</span>
+                    <kbd className="hidden md:inline pointer-events-none h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 ml-2">
+                      <span className="text-xs">Ctrl+K</span>
+                    </kbd>
+                  </Button>
+                  <NotificationsBell />
+                  
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" className="gap-2 px-3">
