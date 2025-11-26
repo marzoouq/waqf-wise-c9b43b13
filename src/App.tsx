@@ -65,6 +65,9 @@ const LoansManagement = lazy(() => import("./pages/LoansManagement"));
 const EmergencyAidManagement = lazy(() => import("./pages/EmergencyAidManagement"));
 const NotificationSettingsPage = lazy(() => import("./pages/NotificationSettings"));
 const CustomReportsPage = lazy(() => import("./pages/CustomReports"));
+const IntegrationsManagement = lazy(() => import("./pages/IntegrationsManagement"));
+const SecurityDashboard = lazy(() => import("./pages/SecurityDashboard"));
+const PerformanceDashboard = lazy(() => import("./pages/PerformanceDashboard"));
 const Families = lazy(() => import("./pages/Families"));
 const FamilyDetails = lazy(() => import("./pages/FamilyDetails"));
 const Users = lazy(() => import("./pages/Users"));
@@ -306,6 +309,30 @@ const App = () => {
             } 
           />
           <Route path="/loans" element={<Loans />} />
+          <Route 
+            path="/integrations" 
+            element={
+              <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+                <IntegrationsManagement />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/security" 
+            element={
+              <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+                <SecurityDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/performance" 
+            element={
+              <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+                <PerformanceDashboard />
+              </ProtectedRoute>
+            } 
+          />
           <Route 
             path="/payment-vouchers" 
             element={
