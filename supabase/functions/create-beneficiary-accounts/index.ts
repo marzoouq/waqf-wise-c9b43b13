@@ -97,12 +97,23 @@ serve(async (req) => {
       email: user.email 
     });
 
-    // جلب المستفيدين المفعلين بدون حسابات
-    const { data: beneficiaries, error: fetchError } = await supabaseAdmin
+    // استلام قائمة IDs المحددة من الطلب
+    const requestBody = await req.json();
+    const beneficiaryIds = requestBody?.beneficiary_ids;
+
+    // جلب المستفيدين المحددين
+    let query = supabaseAdmin
       .from('beneficiaries')
       .select('id, full_name, national_id, email')
       .eq('can_login', true)
       .is('user_id', null);
+
+    // إذا تم تحديد مستفيدين محددين، نستخدمهم
+    if (beneficiaryIds && Array.isArray(beneficiaryIds) && beneficiaryIds.length > 0) {
+      query = query.in('id', beneficiaryIds);
+    }
+
+    const { data: beneficiaries, error: fetchError } = await query;
 
     if (fetchError) throw fetchError;
 
