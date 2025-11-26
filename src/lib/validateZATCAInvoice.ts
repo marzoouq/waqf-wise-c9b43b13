@@ -146,3 +146,49 @@ export const formatValidationErrors = (result: ValidationResult): string => {
 
   return message;
 };
+
+/**
+ * التحقق السريع من البيانات المستخرجة بـ OCR
+ * يستخدم للتحقق من جودة البيانات قبل حفظها
+ */
+export const validateOCRExtractedData = (data: Partial<InvoiceValidationData>): {
+  isComplete: boolean;
+  missingFields: string[];
+  suggestions: string[];
+} => {
+  const missingFields: string[] = [];
+  const suggestions: string[] = [];
+
+  // التحقق من الحقول الأساسية
+  if (!data.invoice_number?.trim()) missingFields.push("رقم الفاتورة");
+  if (!data.invoice_date) missingFields.push("تاريخ الفاتورة");
+  if (!data.customer_name?.trim()) missingFields.push("اسم العميل");
+  if (!data.lines || data.lines.length === 0) missingFields.push("بنود الفاتورة");
+
+  // اقتراحات للتحسين
+  if (data.seller_vat_number && !validateVATNumber(data.seller_vat_number)) {
+    suggestions.push("الرقم الضريبي للبائع قد يكون غير صحيح - يرجى المراجعة");
+  }
+
+  if (data.lines && data.lines.length > 0) {
+    const hasZeroQuantity = data.lines.some(line => line.quantity === 0);
+    if (hasZeroQuantity) {
+      suggestions.push("بعض البنود بكمية صفر - يرجى المراجعة");
+    }
+
+    const hasZeroPrice = data.lines.some(line => line.unit_price === 0);
+    if (hasZeroPrice) {
+      suggestions.push("بعض البنود بسعر صفر - يرجى المراجعة");
+    }
+  }
+
+  if (data.total_amount && data.total_amount < 0) {
+    suggestions.push("المبلغ الإجمالي سالب - يرجى المراجعة");
+  }
+
+  return {
+    isComplete: missingFields.length === 0,
+    missingFields,
+    suggestions,
+  };
+};

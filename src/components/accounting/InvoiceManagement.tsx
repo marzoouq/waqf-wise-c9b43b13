@@ -3,10 +3,18 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Plus, FileText, Send, CheckCircle } from "lucide-react";
+import { Plus, FileText, Send, CheckCircle, ScanLine } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { formatCurrency } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { BatchInvoiceOCR } from "@/components/invoices/BatchInvoiceOCR";
 
 interface Invoice {
   id: string;
@@ -24,6 +32,7 @@ export function InvoiceManagement() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
+  const [showOCRDialog, setShowOCRDialog] = useState(false);
 
   const { data: invoices, isLoading } = useQuery({
     queryKey: ["invoices", selectedStatus],
@@ -80,10 +89,16 @@ export function InvoiceManagement() {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">إدارة الفواتير</h2>
-        <Button>
-          <Plus className="ml-2 h-4 w-4" />
-          فاتورة جديدة
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setShowOCRDialog(true)}>
+            <ScanLine className="ml-2 h-4 w-4" />
+            استيراد من صورة
+          </Button>
+          <Button>
+            <Plus className="ml-2 h-4 w-4" />
+            فاتورة جديدة
+          </Button>
+        </div>
       </div>
 
       <div className="flex gap-2 mb-4">
@@ -180,6 +195,32 @@ export function InvoiceManagement() {
           </Card>
         ))}
       </div>
+
+      {/* OCR Dialog */}
+      <Dialog open={showOCRDialog} onOpenChange={setShowOCRDialog}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ScanLine className="h-5 w-5" />
+              استيراد فواتير من الصور
+            </DialogTitle>
+            <DialogDescription>
+              ارفع صورة أو عدة صور للفواتير لاستخراج البيانات تلقائياً باستخدام الذكاء الاصطناعي
+            </DialogDescription>
+          </DialogHeader>
+          <BatchInvoiceOCR
+            onComplete={(results) => {
+              queryClient.invalidateQueries({ queryKey: ["invoices"] });
+              setShowOCRDialog(false);
+              toast({
+                title: "تم الاستيراد بنجاح",
+                description: `تم استيراد ${results.length} فاتورة`,
+              });
+            }}
+            onCancel={() => setShowOCRDialog(false)}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

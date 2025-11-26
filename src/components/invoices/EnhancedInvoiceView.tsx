@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatVATNumber, formatZATCACurrency } from "@/lib/zatca";
-import { Building2, Calendar, Clock, User } from "lucide-react";
+import { Building2, Calendar, Clock, User, Image as ImageIcon } from "lucide-react";
 import InvoiceStatusBadge from "./InvoiceStatusBadge";
 import { ZATCAQRCode } from "./ZATCAQRCode";
 import type { OrganizationSettings } from "@/hooks/useOrganizationSettings";
@@ -33,6 +33,9 @@ interface Invoice {
   status: string;
   notes?: string;
   qr_code_data?: string;
+  source_image_url?: string;
+  ocr_extracted?: boolean;
+  ocr_confidence_score?: number;
 }
 
 interface InvoiceLine {
@@ -60,6 +63,39 @@ export default function EnhancedInvoiceView({
 }: EnhancedInvoiceViewProps) {
   return (
     <div className="space-y-6 print:space-y-4">
+      {/* الصورة الأصلية للفاتورة (إن وجدت) */}
+      {invoice.source_image_url && (
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-primary">
+                <ImageIcon className="h-5 w-5" />
+                <h3 className="font-bold">الفاتورة الأصلية</h3>
+              </div>
+              {invoice.ocr_extracted && (
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="text-muted-foreground">استخراج تلقائي</span>
+                  {invoice.ocr_confidence_score && (
+                    <span className="font-mono text-xs bg-primary/10 text-primary px-2 py-1 rounded">
+                      دقة: {invoice.ocr_confidence_score}%
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="relative w-full max-w-2xl mx-auto">
+              <img
+                src={invoice.source_image_url}
+                alt="صورة الفاتورة الأصلية"
+                className="w-full h-auto rounded-lg border shadow-sm"
+              />
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Header */}
       <Card className="border-2 border-primary">
         <CardHeader className="bg-primary text-primary-foreground">
