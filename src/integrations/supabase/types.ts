@@ -5935,8 +5935,12 @@ export type Database = {
           is_zatca_compliant: boolean | null
           journal_entry_id: string | null
           notes: string | null
+          ocr_confidence_score: number | null
+          ocr_extracted: boolean | null
+          ocr_processed_at: string | null
           qr_code_data: string | null
           rental_payment_id: string | null
+          source_image_url: string | null
           status: string
           subtotal: number
           tax_amount: number
@@ -5969,8 +5973,12 @@ export type Database = {
           is_zatca_compliant?: boolean | null
           journal_entry_id?: string | null
           notes?: string | null
+          ocr_confidence_score?: number | null
+          ocr_extracted?: boolean | null
+          ocr_processed_at?: string | null
           qr_code_data?: string | null
           rental_payment_id?: string | null
+          source_image_url?: string | null
           status?: string
           subtotal?: number
           tax_amount?: number
@@ -6003,8 +6011,12 @@ export type Database = {
           is_zatca_compliant?: boolean | null
           journal_entry_id?: string | null
           notes?: string | null
+          ocr_confidence_score?: number | null
+          ocr_extracted?: boolean | null
+          ocr_processed_at?: string | null
           qr_code_data?: string | null
           rental_payment_id?: string | null
+          source_image_url?: string | null
           status?: string
           subtotal?: number
           tax_amount?: number
@@ -7416,6 +7428,50 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      ocr_corrections: {
+        Row: {
+          confidence_score: number | null
+          corrected_at: string | null
+          corrected_by: string | null
+          corrected_value: string
+          extracted_value: string | null
+          field_name: string
+          id: string
+          invoice_id: string | null
+          notes: string | null
+        }
+        Insert: {
+          confidence_score?: number | null
+          corrected_at?: string | null
+          corrected_by?: string | null
+          corrected_value: string
+          extracted_value?: string | null
+          field_name: string
+          id?: string
+          invoice_id?: string | null
+          notes?: string | null
+        }
+        Update: {
+          confidence_score?: number | null
+          corrected_at?: string | null
+          corrected_by?: string | null
+          corrected_value?: string
+          extracted_value?: string | null
+          field_name?: string
+          id?: string
+          invoice_id?: string | null
+          notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ocr_corrections_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ocr_processing_log: {
         Row: {
