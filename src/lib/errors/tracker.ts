@@ -21,6 +21,13 @@ const IGNORE_ERROR_PATTERNS = [
   /rate limit/i,
   /\[object Object\]/i,
   /The provided callback is no longer runnable/i,
+  /Error tracked:/i,
+  /HTTP 50[0-9]:/i,
+  /violates row-level security/i,
+  /violates foreign key constraint/i,
+  /Invalid login credentials/i,
+  /Database error saving new user/i,
+  /manual_log/i,
 ];
 
 class ErrorTracker {
