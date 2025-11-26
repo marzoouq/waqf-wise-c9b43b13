@@ -85,7 +85,7 @@ export default function BeneficiarySupport() {
       // إنشاء طلب دعم فني
       const { error } = await supabase.from("beneficiary_requests").insert({
         beneficiary_id: beneficiary?.id,
-        request_type_id: "support",
+        request_type_id: null, // تم إصلاح: استخدام null بدلاً من "support"
         description: `${subject}\n\n${message}`,
         priority: "عادية",
         status: "قيد المراجعة",
@@ -141,7 +141,9 @@ export default function BeneficiarySupport() {
                 <div>
                   <p className="font-semibold">الهاتف</p>
                   <p className="text-sm text-muted-foreground">للحالات العاجلة فقط</p>
-                  <p className="text-sm font-medium mt-1" dir="ltr">+966 XX XXX XXXX</p>
+                  <a href="tel:+966533030345" className="text-sm font-medium mt-1 block hover:text-primary transition-colors" dir="ltr">
+                    0533030345
+                  </a>
                 </div>
               </div>
             </CardContent>
