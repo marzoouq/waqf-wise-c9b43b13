@@ -4,6 +4,8 @@ import { useProperties } from "@/hooks/useProperties";
 import { usePropertyUnits } from "@/hooks/usePropertyUnits";
 import { useRentalPayments } from "@/hooks/useRentalPayments";
 import { safeFilter, safeLength, safeReduce } from '@/lib/utils/array-safe';
+import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
+import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
 
 export const PropertyStatsCard = () => {
   const { properties } = useProperties();
@@ -34,32 +36,28 @@ export const PropertyStatsCard = () => {
   const stats = [
     {
       title: "إجمالي العقارات",
-      value: totalProperties,
+      value: totalProperties.toString(),
       icon: Building,
-      color: "text-primary",
-      bgColor: "bg-primary/10",
+      variant: "default" as const,
     },
     {
       title: "إجمالي الوحدات",
-      value: totalUnits,
+      value: totalUnits.toString(),
       icon: Home,
-      color: "text-blue-600",
-      bgColor: "bg-blue-500/10",
+      variant: "default" as const,
     },
     {
       title: "نسبة الإشغال",
       value: `${occupancyRate}%`,
       subtitle: `${occupiedUnits} مؤجرة / ${vacantUnits} شاغرة`,
       icon: TrendingUp,
-      color: occupancyRate >= 80 ? "text-success" : "text-warning",
-      bgColor: occupancyRate >= 80 ? "bg-success/10" : "bg-warning/10",
+      variant: occupancyRate >= 80 ? ("success" as const) : ("warning" as const),
     },
     {
       title: "العوائد الشهرية",
-      value: `${monthlyRevenue.toLocaleString('ar-SA')} ريال`,
+      value: `${monthlyRevenue.toLocaleString('ar-SA')} ر.س`,
       icon: DollarSign,
-      color: "text-success",
-      bgColor: "bg-success/10",
+      variant: "success" as const,
     },
   ];
 
@@ -72,22 +70,18 @@ export const PropertyStatsCard = () => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <UnifiedStatsGrid columns={4}>
           {stats.map((stat, index) => (
-            <div key={index} className="flex items-center gap-3 p-4 rounded-lg border bg-card">
-              <div className={`p-2 rounded-lg ${stat.bgColor}`}>
-                <stat.icon className={`h-5 w-5 ${stat.color}`} />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm text-muted-foreground">{stat.title}</p>
-                <p className="text-xl font-bold">{stat.value}</p>
-                {stat.subtitle && (
-                  <p className="text-xs text-muted-foreground mt-1">{stat.subtitle}</p>
-                )}
-              </div>
-            </div>
+            <UnifiedKPICard
+              key={index}
+              title={stat.title}
+              value={stat.value}
+              icon={stat.icon}
+              subtitle={stat.subtitle}
+              variant={stat.variant}
+            />
           ))}
-        </div>
+        </UnifiedStatsGrid>
       </CardContent>
     </Card>
   );
