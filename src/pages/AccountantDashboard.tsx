@@ -5,42 +5,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Skeleton } from "@/components/ui/skeleton";
-import { FileText, DollarSign, AlertCircle, CheckCircle, XCircle, TrendingUp, FileCheck, FileClock } from "lucide-react";
+import { FileText, DollarSign, AlertCircle, CheckCircle, XCircle, TrendingUp, FileCheck, FileClock, LayoutDashboard, Mail } from "lucide-react";
 import { useAccountantKPIs } from "@/hooks/useAccountantKPIs";
 import { ApproveJournalDialog } from "@/components/accounting/ApproveJournalDialog";
-import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
+import { UnifiedDashboardLayout } from "@/components/dashboard/UnifiedDashboardLayout";
+import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
+import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
+import { SectionSkeleton } from "@/components/dashboard";
+import { AdminSendMessageDialog } from "@/components/messages/AdminSendMessageDialog";
 
 // Lazy load components
 const AccountingStats = lazy(() => import("@/components/dashboard/AccountingStats"));
 const RecentJournalEntries = lazy(() => import("@/components/dashboard/RecentJournalEntries"));
-
-// Skeleton loaders
-const StatsSkeleton = () => (
-  <div className="grid gap-3 sm:gap-4 md:gap-5 lg:gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
-    {[1, 2, 3, 4].map((i) => (
-      <Card key={i}>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <Skeleton className="h-3 sm:h-4 w-20 sm:w-24" />
-          <Skeleton className="h-3 w-3 sm:h-4 sm:w-4 rounded-full" />
-        </CardHeader>
-        <CardContent>
-          <Skeleton className="h-6 sm:h-7 md:h-8 w-16 sm:w-20 mb-1 sm:mb-2" />
-          <Skeleton className="h-2 sm:h-3 w-24 sm:w-32" />
-        </CardContent>
-      </Card>
-    ))}
-  </div>
-);
-
-const TableSkeleton = () => (
-  <div className="space-y-2 sm:space-y-3">
-    {[1, 2, 3].map((i) => (
-      <Skeleton key={i} className="h-16 sm:h-20 w-full" />
-    ))}
-  </div>
-);
 
 interface JournalApproval {
   id: string;
@@ -70,6 +46,7 @@ interface JournalApproval {
 const AccountantDashboard = () => {
   const [selectedApproval, setSelectedApproval] = useState<JournalApproval | null>(null);
   const [isApprovalDialogOpen, setIsApprovalDialogOpen] = useState(false);
+  const [messageDialogOpen, setMessageDialogOpen] = useState(false);
   
   const { data: kpis, isLoading: kpisLoading } = useAccountantKPIs();
 
@@ -111,86 +88,82 @@ const AccountantDashboard = () => {
   };
 
   return (
-    <PageErrorBoundary pageName="لوحة تحكم المحاسب">
-      <MobileOptimizedLayout>
-      <MobileOptimizedHeader
-        title="لوحة تحكم المحاسب"
-        description="إدارة القيود المحاسبية والموافقات المالية"
-        icon={<DollarSign className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-success" />}
-      />
-
+    <UnifiedDashboardLayout
+      role="accountant"
+      actions={
+        <Button onClick={() => setMessageDialogOpen(true)} className="gap-2">
+          <Mail className="h-4 w-4" />
+          <span className="hidden sm:inline">إرسال رسالة</span>
+        </Button>
+      }
+    >
       {/* Statistics Cards */}
       {kpisLoading ? (
-        <StatsSkeleton />
+        <SectionSkeleton />
       ) : (
-        <div className="grid gap-3 sm:gap-4 md:gap-5 lg:gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
-            <Card className="group hover:shadow-lg hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-amber-500">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-xs sm:text-sm font-medium">موافقات معلقة</CardTitle>
-                <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 text-warning group-hover:scale-110 transition-transform" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-lg sm:text-xl md:text-2xl font-bold text-warning">
-                  {kpis?.pendingApprovals || 0}
-                </div>
-                <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">تحتاج مراجعة</p>
-              </CardContent>
-            </Card>
+        <UnifiedStatsGrid columns={4}>
+          <UnifiedKPICard
+            title="موافقات معلقة"
+            value={kpis?.pendingApprovals || 0}
+            icon={AlertCircle}
+            variant="warning"
+            subtitle="تحتاج مراجعة"
+          />
+          <UnifiedKPICard
+            title="قيود مسودة"
+            value={kpis?.draftEntries || 0}
+            icon={FileClock}
+            variant="default"
+            subtitle="غير مرحّلة"
+          />
+          <UnifiedKPICard
+            title="قيود مرحّلة"
+            value={kpis?.postedEntries || 0}
+            icon={FileCheck}
+            variant="success"
+            subtitle="معتمدة ومرحّلة"
+          />
+          <UnifiedKPICard
+            title="قيود اليوم"
+            value={kpis?.todayEntries || 0}
+            icon={TrendingUp}
+            variant="default"
+            subtitle="قيود جديدة اليوم"
+          />
+        </UnifiedStatsGrid>
+      )}
 
-            <Card className="group hover:shadow-lg hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-info">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-xs sm:text-sm font-medium">قيود مسودة</CardTitle>
-                <FileClock className="h-3 w-3 sm:h-4 sm:w-4 text-info group-hover:scale-110 transition-transform" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-lg sm:text-xl md:text-2xl font-bold text-info">
-                  {kpis?.draftEntries || 0}
-                </div>
-                <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">غير مرحّلة</p>
-              </CardContent>
-            </Card>
+      {/* Tabs for organized view */}
+      <Tabs defaultValue="overview" className="space-y-4">
+        <TabsList className="grid w-full grid-cols-3 h-auto p-1 bg-muted/50">
+          <TabsTrigger 
+            value="overview" 
+            className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
+          >
+            <LayoutDashboard className="h-4 w-4" />
+            <span className="hidden sm:inline">نظرة عامة</span>
+          </TabsTrigger>
+          <TabsTrigger 
+            value="approvals"
+            className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
+          >
+            <AlertCircle className="h-4 w-4" />
+            <span className="hidden sm:inline">الموافقات</span>
+          </TabsTrigger>
+          <TabsTrigger 
+            value="entries"
+            className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
+          >
+            <FileText className="h-4 w-4" />
+            <span className="hidden sm:inline">القيود الأخيرة</span>
+          </TabsTrigger>
+        </TabsList>
 
-            <Card className="group hover:shadow-lg hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-success">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-xs sm:text-sm font-medium">قيود مرحّلة</CardTitle>
-                <FileCheck className="h-3 w-3 sm:h-4 sm:w-4 text-success group-hover:scale-110 transition-transform" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-lg sm:text-xl md:text-2xl font-bold text-success">
-                  {kpis?.postedEntries || 0}
-                </div>
-                <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">معتمدة ومرحّلة</p>
-              </CardContent>
-            </Card>
-
-            <Card className="group hover:shadow-lg hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-accent">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-xs sm:text-sm font-medium">قيود اليوم</CardTitle>
-                <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-accent group-hover:scale-110 transition-transform" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-lg sm:text-xl md:text-2xl font-bold text-accent">
-                  {kpis?.todayEntries || 0}
-                </div>
-                <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">قيود جديدة اليوم</p>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
-        {/* Tabs for organized view */}
-        <Tabs defaultValue="overview" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="overview">نظرة عامة</TabsTrigger>
-            <TabsTrigger value="approvals">الموافقات</TabsTrigger>
-            <TabsTrigger value="entries">القيود الأخيرة</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="overview" className="space-y-4">
-            <Suspense fallback={<TableSkeleton />}>
-              <AccountingStats />
-            </Suspense>
-          </TabsContent>
+        <TabsContent value="overview" className="space-y-4">
+          <Suspense fallback={<SectionSkeleton />}>
+            <AccountingStats />
+          </Suspense>
+        </TabsContent>
 
           <TabsContent value="approvals" className="space-y-4">
             <Card>
@@ -202,7 +175,7 @@ const AccountantDashboard = () => {
               </CardHeader>
               <CardContent>
                 {approvalsLoading ? (
-                  <TableSkeleton />
+                  <SectionSkeleton />
                 ) : pendingApprovals.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <CheckCircle className="h-12 w-12 mx-auto mb-3 text-success" />
@@ -247,10 +220,10 @@ const AccountantDashboard = () => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="entries" className="space-y-4">
-            <Suspense fallback={<TableSkeleton />}>
-              <RecentJournalEntries />
-            </Suspense>
+        <TabsContent value="entries" className="space-y-4">
+          <Suspense fallback={<SectionSkeleton />}>
+            <RecentJournalEntries />
+          </Suspense>
         </TabsContent>
 
         {/* Quick Actions - Inside Stats Tab */}
@@ -260,7 +233,7 @@ const AccountantDashboard = () => {
               <CardTitle>الإحصائيات المحاسبية</CardTitle>
             </CardHeader>
             <CardContent>
-              <Suspense fallback={<TableSkeleton />}>
+              <Suspense fallback={<SectionSkeleton />}>
                 <AccountingStats />
               </Suspense>
             </CardContent>
@@ -319,8 +292,13 @@ const AccountantDashboard = () => {
           approval={selectedApproval}
         />
       )}
-      </MobileOptimizedLayout>
-    </PageErrorBoundary>
+
+      {/* Message Dialog */}
+      <AdminSendMessageDialog
+        open={messageDialogOpen}
+        onOpenChange={setMessageDialogOpen}
+      />
+    </UnifiedDashboardLayout>
   );
 };
 
