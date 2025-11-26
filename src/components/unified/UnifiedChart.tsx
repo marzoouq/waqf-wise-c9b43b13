@@ -34,7 +34,7 @@ interface UnifiedChartProps {
   description?: string;
   type: ChartType;
   data: ChartDataPoint[];
-  series: ChartSeries[];
+  series?: ChartSeries[]; // اختياري لـ pie charts
   xAxisKey?: string;
   height?: number;
   showGrid?: boolean;
@@ -87,6 +87,9 @@ export function UnifiedChart({
 
     switch (type) {
       case "line":
+        if (!series || series.length === 0) {
+          return <div className="flex items-center justify-center h-full text-muted-foreground">لا توجد بيانات للعرض</div>;
+        }
         return (
           <LineChart {...commonProps}>
             {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />}
@@ -108,6 +111,9 @@ export function UnifiedChart({
         );
 
       case "bar":
+        if (!series || series.length === 0) {
+          return <div className="flex items-center justify-center h-full text-muted-foreground">لا توجد بيانات للعرض</div>;
+        }
         return (
           <BarChart {...commonProps}>
             {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />}
@@ -127,6 +133,9 @@ export function UnifiedChart({
         );
 
       case "area":
+        if (!series || series.length === 0) {
+          return <div className="flex items-center justify-center h-full text-muted-foreground">لا توجد بيانات للعرض</div>;
+        }
         return (
           <AreaChart {...commonProps}>
             {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />}
@@ -153,7 +162,7 @@ export function UnifiedChart({
           <PieChart>
             <Pie
               data={data}
-              dataKey={series[0]?.dataKey}
+              dataKey={series && series[0] ? series[0].dataKey : "value"}
               nameKey={xAxisKey || "name"}
               cx="50%"
               cy="50%"
