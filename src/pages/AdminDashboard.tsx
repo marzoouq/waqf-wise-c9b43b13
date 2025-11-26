@@ -10,6 +10,7 @@ import { SecurityAlertsSection } from "@/components/dashboard/admin/SecurityAler
 import { AuditLogsPreview } from "@/components/dashboard/admin/AuditLogsPreview";
 import { SystemPerformanceChart } from "@/components/dashboard/admin/SystemPerformanceChart";
 import { UsersActivityChart } from "@/components/dashboard/admin/UsersActivityChart";
+import { AdminSettingsSection } from "@/components/dashboard/admin/AdminSettingsSection";
 import { useAdminKPIs } from "@/hooks/useAdminKPIs";
 import { Users as UsersIcon, Building2, Wallet, FileText } from "lucide-react";
 import { LazyTabContent } from "@/components/dashboard/admin/LazyTabContent";
@@ -211,16 +212,9 @@ export default function AdminDashboard() {
             {/* Settings Tab - Lazy Load */}
             <TabsContent value="settings" className="space-y-6 mt-6">
               <LazyTabContent isActive={activeTab === "settings"}>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>إعدادات النظام</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">
-                      قريباً: إعدادات متقدمة للنظام
-                    </p>
-                  </CardContent>
-                </Card>
+                <Suspense fallback={<ChartSkeleton />}>
+                  <AdminSettingsSection />
+                </Suspense>
               </LazyTabContent>
             </TabsContent>
           </Tabs>
