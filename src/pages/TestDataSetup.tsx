@@ -52,12 +52,12 @@ export default function TestDataSetup() {
           <Alert>
             <AlertTitle>ملاحظة مهمة</AlertTitle>
             <AlertDescription>
-              هذه الأداة تقوم بإنشاء حسابات مصادقة لخمسة مستفيدين تجريبيين بكلمة المرور: <code className="bg-muted px-2 py-1 rounded">Test@123456</code>
+              هذه الأداة تقوم بإنشاء حسابات مصادقة لـ 14 مستفيد تجريبي بكلمة المرور: <code className="bg-muted px-2 py-1 rounded">Test@123456</code>
             </AlertDescription>
           </Alert>
 
           <div className="space-y-4">
-            <h3 className="font-semibold">المستفيدون التجريبيون (5 مستفيدين):</h3>
+            <h3 className="font-semibold">المستفيدون التجريبيون (14 مستفيد):</h3>
             <div className="grid gap-2 text-sm">
               <div className="flex justify-between p-2 bg-muted rounded">
                 <span>عبدالرحمن مرزوق علي الثبيتي</span>
@@ -78,6 +78,42 @@ export default function TestDataSetup() {
               <div className="flex justify-between p-2 bg-muted rounded">
                 <span>منى مرزوق علي الثبيتي</span>
                 <code className="font-mono">1048839425</code>
+              </div>
+              <div className="flex justify-between p-2 bg-muted rounded">
+                <span>هدى مرزوق علي الثبيتي</span>
+                <code className="font-mono">1048839417</code>
+              </div>
+              <div className="flex justify-between p-2 bg-muted rounded">
+                <span>فاطمه مرزوق علي الثبيتي</span>
+                <code className="font-mono">1014548331</code>
+              </div>
+              <div className="flex justify-between p-2 bg-muted rounded">
+                <span>سلوى مرزوق علي الثبيتي</span>
+                <code className="font-mono">1014548315</code>
+              </div>
+              <div className="flex justify-between p-2 bg-muted rounded">
+                <span>عفاف مرزوق علي الثبيتي</span>
+                <code className="font-mono">1014548281</code>
+              </div>
+              <div className="flex justify-between p-2 bg-muted rounded">
+                <span>امل مرزوق علي الثبيتي</span>
+                <code className="font-mono">1014548323</code>
+              </div>
+              <div className="flex justify-between p-2 bg-muted rounded">
+                <span>ماجد ابن مرزوق ابن علي الثبيتي</span>
+                <code className="font-mono">1014548307</code>
+              </div>
+              <div className="flex justify-between p-2 bg-muted rounded">
+                <span>محمد مرزوق علي الثبيتي</span>
+                <code className="font-mono">1086970629</code>
+              </div>
+              <div className="flex justify-between p-2 bg-muted rounded">
+                <span>عبدالله مرزوق علي الثبيتي</span>
+                <code className="font-mono">1014548349</code>
+              </div>
+              <div className="flex justify-between p-2 bg-muted rounded">
+                <span>عبدالعزيز مرزوق علي الثبيتي</span>
+                <code className="font-mono">1014548299</code>
               </div>
             </div>
           </div>
