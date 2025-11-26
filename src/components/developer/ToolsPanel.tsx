@@ -1,10 +1,30 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Trash2, Download, Database, Activity } from "lucide-react";
+import { RefreshCw, Trash2, Download, Database, Activity, FileJson, FileSpreadsheet } from "lucide-react";
 import { toast } from "sonner";
 import { selfHealing } from "@/lib/selfHealing";
+import { reportExporter } from "@/lib/developer/reportExporter";
+import { useWebVitals } from "@/hooks/developer/useWebVitals";
+import { useNetworkMonitor } from "@/hooks/developer/useNetworkMonitor";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export function ToolsPanel() {
+  const { vitals } = useWebVitals();
+  const { requests } = useNetworkMonitor();
+  
+  const { data: errors } = useQuery({
+    queryKey: ["system-errors"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("system_error_logs")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(20);
+      return data || [];
+    }
+  });
+
   const handleClearCache = () => {
     selfHealing.cache.clear();
     toast.success("تم مسح الذاكرة المؤقتة");
@@ -52,26 +72,42 @@ export function ToolsPanel() {
     }
   };
 
-  const handleExportLogs = () => {
-    const logs = {
-      timestamp: new Date().toISOString(),
-      userAgent: navigator.userAgent,
-      online: navigator.onLine,
-      storage: {
-        local: localStorage.length,
-        session: sessionStorage.length,
-      }
-    };
-    
-    const blob = new Blob([JSON.stringify(logs, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `logs-${Date.now()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    
-    toast.success("تم تصدير السجلات");
+  const handleExportWebVitalsJSON = () => {
+    reportExporter.exportWebVitals(vitals).json();
+    toast.success("تم تصدير Web Vitals (JSON)");
+  };
+
+  const handleExportWebVitalsCSV = () => {
+    reportExporter.exportWebVitals(vitals).csv();
+    toast.success("تم تصدير Web Vitals (CSV)");
+  };
+
+  const handleExportNetworkJSON = () => {
+    reportExporter.exportNetworkStats(requests).json();
+    toast.success("تم تصدير طلبات الشبكة (JSON)");
+  };
+
+  const handleExportNetworkCSV = () => {
+    reportExporter.exportNetworkStats(requests).csv();
+    toast.success("تم تصدير طلبات الشبكة (CSV)");
+  };
+
+  const handleExportErrorsJSON = () => {
+    if (errors && errors.length > 0) {
+      reportExporter.exportErrors(errors).json();
+      toast.success("تم تصدير الأخطاء (JSON)");
+    } else {
+      toast.error("لا توجد أخطاء لتصديرها");
+    }
+  };
+
+  const handleExportErrorsCSV = () => {
+    if (errors && errors.length > 0) {
+      reportExporter.exportErrors(errors).csv();
+      toast.success("تم تصدير الأخطاء (CSV)");
+    } else {
+      toast.error("لا توجد أخطاء لتصديرها");
+    }
   };
 
   return (
@@ -118,14 +154,82 @@ export function ToolsPanel() {
             فحص صحة النظام
           </Button>
 
-          <Button
-            variant="outline"
-            className="w-full justify-start"
-            onClick={handleExportLogs}
-          >
-            <Download className="w-4 h-4 ml-2" />
-            تصدير السجلات
-          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Export Reports */}
+      <Card>
+        <CardHeader>
+          <CardTitle>تصدير التقارير</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <h4 className="font-semibold mb-2 text-sm">Web Vitals</h4>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportWebVitalsJSON}
+              >
+                <FileJson className="w-4 h-4 ml-2" />
+                JSON
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportWebVitalsCSV}
+              >
+                <FileSpreadsheet className="w-4 h-4 ml-2" />
+                CSV
+              </Button>
+            </div>
+          </div>
+
+          <div>
+            <h4 className="font-semibold mb-2 text-sm">طلبات الشبكة</h4>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportNetworkJSON}
+              >
+                <FileJson className="w-4 h-4 ml-2" />
+                JSON
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportNetworkCSV}
+              >
+                <FileSpreadsheet className="w-4 h-4 ml-2" />
+                CSV
+              </Button>
+            </div>
+          </div>
+
+          <div>
+            <h4 className="font-semibold mb-2 text-sm">سجل الأخطاء</h4>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportErrorsJSON}
+                disabled={!errors || errors.length === 0}
+              >
+                <FileJson className="w-4 h-4 ml-2" />
+                JSON
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportErrorsCSV}
+                disabled={!errors || errors.length === 0}
+              >
+                <FileSpreadsheet className="w-4 h-4 ml-2" />
+                CSV
+              </Button>
+            </div>
+          </div>
         </CardContent>
       </Card>
 
