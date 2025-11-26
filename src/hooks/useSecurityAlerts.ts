@@ -19,10 +19,10 @@ export function useSecurityAlerts() {
       // جلب محاولات الدخول الفاشلة من audit_logs
       const { data: auditData, error } = await supabase
         .from("audit_logs")
-        .select("*")
+        .select("id, action_type, severity, description, table_name, user_email, ip_address, created_at")
         .in("severity", ["error", "warn"])
         .order("created_at", { ascending: false })
-        .limit(10);
+        .limit(5);
 
       if (error) throw error;
 
@@ -41,7 +41,7 @@ export function useSecurityAlerts() {
 
       return alerts;
     },
-    refetchInterval: 60000, // كل دقيقة
-    staleTime: 30000,
+    refetchInterval: false, // Disable auto-refetch
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 }

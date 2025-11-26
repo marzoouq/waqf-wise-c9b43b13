@@ -15,6 +15,7 @@ import { SystemPerformanceChart } from "@/components/dashboard/admin/SystemPerfo
 import { UsersActivityChart } from "@/components/dashboard/admin/UsersActivityChart";
 import { useAdminKPIs } from "@/hooks/useAdminKPIs";
 import { Users as UsersIcon, Building2, Wallet, FileText } from "lucide-react";
+import { LazyTabContent } from "@/components/dashboard/admin/LazyTabContent";
 
 const ChartSkeleton = () => (
   <Card>
@@ -134,6 +135,7 @@ function AdminKPIsSection() {
 
 export default function AdminDashboard() {
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("system");
 
   return (
     <PageErrorBoundary pageName="لوحة تحكم المشرف">
@@ -151,7 +153,7 @@ export default function AdminDashboard() {
             </Button>
           </div>
 
-          <Tabs defaultValue="system" className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-grid h-auto p-1 bg-muted/50">
               <TabsTrigger 
                 value="system" 
@@ -210,60 +212,68 @@ export default function AdminDashboard() {
               </Suspense>
             </TabsContent>
 
-            {/* Users Tab */}
+            {/* Users Tab - Lazy Load */}
             <TabsContent value="users" className="space-y-6 mt-6">
-              <Suspense fallback={<ChartSkeleton />}>
-                <UserManagementSection />
-              </Suspense>
-
-              <Suspense fallback={<ChartSkeleton />}>
-                <UsersActivityChart />
-              </Suspense>
-
-              <Suspense fallback={<ChartSkeleton />}>
-                <AuditLogsPreview />
-              </Suspense>
-            </TabsContent>
-
-            {/* Security Tab */}
-            <TabsContent value="security" className="space-y-6 mt-6">
-              <Suspense fallback={<ChartSkeleton />}>
-                <SecurityAlertsSection />
-              </Suspense>
-
-              <Suspense fallback={<ChartSkeleton />}>
-                <AuditLogsPreview />
-              </Suspense>
-            </TabsContent>
-
-            {/* Performance Tab */}
-            <TabsContent value="performance" className="space-y-6 mt-6">
-              <Suspense fallback={<ChartSkeleton />}>
-                <SystemPerformanceChart />
-              </Suspense>
-
-              <div className="grid gap-6 lg:grid-cols-2">
+              <LazyTabContent isActive={activeTab === "users"}>
                 <Suspense fallback={<ChartSkeleton />}>
-                  <SystemHealthMonitor />
+                  <UserManagementSection />
                 </Suspense>
+
                 <Suspense fallback={<ChartSkeleton />}>
                   <UsersActivityChart />
                 </Suspense>
-              </div>
+
+                <Suspense fallback={<ChartSkeleton />}>
+                  <AuditLogsPreview />
+                </Suspense>
+              </LazyTabContent>
             </TabsContent>
 
-            {/* Settings Tab */}
+            {/* Security Tab - Lazy Load */}
+            <TabsContent value="security" className="space-y-6 mt-6">
+              <LazyTabContent isActive={activeTab === "security"}>
+                <Suspense fallback={<ChartSkeleton />}>
+                  <SecurityAlertsSection />
+                </Suspense>
+
+                <Suspense fallback={<ChartSkeleton />}>
+                  <AuditLogsPreview />
+                </Suspense>
+              </LazyTabContent>
+            </TabsContent>
+
+            {/* Performance Tab - Lazy Load */}
+            <TabsContent value="performance" className="space-y-6 mt-6">
+              <LazyTabContent isActive={activeTab === "performance"}>
+                <Suspense fallback={<ChartSkeleton />}>
+                  <SystemPerformanceChart />
+                </Suspense>
+
+                <div className="grid gap-6 lg:grid-cols-2">
+                  <Suspense fallback={<ChartSkeleton />}>
+                    <SystemHealthMonitor />
+                  </Suspense>
+                  <Suspense fallback={<ChartSkeleton />}>
+                    <UsersActivityChart />
+                  </Suspense>
+                </div>
+              </LazyTabContent>
+            </TabsContent>
+
+            {/* Settings Tab - Lazy Load */}
             <TabsContent value="settings" className="space-y-6 mt-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>إعدادات النظام</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    قريباً: إعدادات متقدمة للنظام
-                  </p>
-                </CardContent>
-              </Card>
+              <LazyTabContent isActive={activeTab === "settings"}>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>إعدادات النظام</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">
+                      قريباً: إعدادات متقدمة للنظام
+                    </p>
+                  </CardContent>
+                </Card>
+              </LazyTabContent>
             </TabsContent>
           </Tabs>
         </div>
