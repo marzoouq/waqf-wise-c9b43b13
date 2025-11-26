@@ -10895,6 +10895,13 @@ export type Database = {
         Returns: string
       }
       get_admin_dashboard_kpis: { Args: never; Returns: Json }
+      get_beneficiary_email_by_national_id: {
+        Args: { p_national_id: string }
+        Returns: {
+          email: string
+          user_id: string
+        }[]
+      }
       get_beneficiary_number: { Args: { ben_id: string }; Returns: string }
       get_beneficiary_statistics: {
         Args: { p_beneficiary_id: string }
