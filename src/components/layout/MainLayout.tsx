@@ -9,6 +9,7 @@ import { GlobalSearch } from "@/components/shared/GlobalSearch";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
+import { RoleSwitcher } from "./RoleSwitcher";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -91,21 +92,22 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                   <Menu className="h-5 w-5" />
                 </SidebarTrigger>
                 
-                {/* User Menu - Desktop */}
-                <div className="flex items-center gap-3">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setSearchOpen(true)}
-                    className="gap-2"
-                  >
-                    <Search className="h-4 w-4" />
-                    <span className="hidden md:inline">بحث</span>
-                    <kbd className="hidden md:inline pointer-events-none h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 ml-2">
-                      <span className="text-xs">Ctrl+K</span>
-                    </kbd>
-                  </Button>
-                  <NotificationsBell />
+            {/* User Menu - Desktop */}
+            <div className="flex items-center gap-3">
+              <RoleSwitcher />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSearchOpen(true)}
+                className="gap-2"
+              >
+                <Search className="h-4 w-4" />
+                <span className="hidden md:inline">بحث</span>
+                <kbd className="hidden md:inline pointer-events-none h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 ml-2">
+                  <span className="text-xs">Ctrl+K</span>
+                </kbd>
+              </Button>
+              <NotificationsBell />
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" className="gap-2 px-3">

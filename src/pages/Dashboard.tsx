@@ -26,7 +26,7 @@ const KPISkeleton = () => (
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { isBeneficiary, isAccountant, isNazer, isCashier, isArchivist, isLoading: roleLoading } = useUserRole();
+  const { isBeneficiary, isAccountant, isNazer, isAdmin, isCashier, isArchivist, isLoading: roleLoading } = useUserRole();
   
   const [isBeneficiaryDialogOpen, setIsBeneficiaryDialogOpen] = useState(false);
   const [isPropertyDialogOpen, setIsPropertyDialogOpen] = useState(false);
@@ -41,12 +41,14 @@ const Dashboard = () => {
       navigate("/accountant-dashboard", { replace: true });
     } else if (isNazer) {
       navigate("/nazer-dashboard", { replace: true });
+    } else if (isAdmin) {
+      navigate("/admin-dashboard", { replace: true });
     } else if (isCashier) {
       navigate("/cashier-dashboard", { replace: true });
     } else if (isArchivist) {
       navigate("/archivist-dashboard", { replace: true });
     }
-  }, [isBeneficiary, isAccountant, isNazer, isCashier, isArchivist, navigate]);
+  }, [isBeneficiary, isAccountant, isNazer, isAdmin, isCashier, isArchivist, navigate]);
 
   if (roleLoading) {
     return (
