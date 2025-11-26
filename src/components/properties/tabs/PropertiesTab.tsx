@@ -2,10 +2,11 @@ import { useState, useMemo } from "react";
 import { Search, MapPin, DollarSign, Home, Building, Edit, Trash2 } from "lucide-react";
 import { useProperties } from "@/hooks/useProperties";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { StatCard } from "@/components/dashboard/DashboardStats";
+import { UnifiedDataTable } from "@/components/unified/UnifiedDataTable";
 import { type Property } from "@/hooks/useProperties";
 
 interface Props {
@@ -93,96 +94,101 @@ export const PropertiesTab = ({ onEdit }: Props) => {
         ))}
       </div>
 
-      {/* Properties Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {isLoading ? (
-          <div className="col-span-full text-center py-12 text-muted-foreground">
-            جاري التحميل...
+      {/* Properties Table */}
+      <UnifiedDataTable
+        title="العقارات"
+        columns={[
+          {
+            key: "name",
+            label: "اسم العقار",
+            render: (value: string) => (
+              <span className="font-medium">{value}</span>
+            )
+          },
+          {
+            key: "type",
+            label: "النوع",
+            render: (value: string) => (
+              <Badge variant="outline" className="border-primary/30">
+                {value}
+              </Badge>
+            )
+          },
+          {
+            key: "location",
+            label: "الموقع",
+            hideOnMobile: true,
+            render: (value: string) => (
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-muted-foreground" />
+                <span>{value}</span>
+              </div>
+            )
+          },
+          {
+            key: "units",
+            label: "الوحدات",
+            hideOnTablet: true,
+            render: (_: any, row: Property) => (
+              <span className="font-medium whitespace-nowrap">
+                {row.occupied}/{row.units}
+              </span>
+            )
+          },
+          {
+            key: "monthly_revenue",
+            label: "الإيراد الشهري",
+            render: (value: number) => (
+              <span className="font-bold text-primary whitespace-nowrap">
+                {Number(value || 0).toLocaleString()} ر.س
+              </span>
+            )
+          },
+          {
+            key: "status",
+            label: "الحالة",
+            render: (value: string) => (
+              <Badge
+                className={
+                  value === "مؤجر"
+                    ? "bg-success/10 text-success border-success/30"
+                    : value === "شاغر"
+                    ? "bg-warning/10 text-warning border-warning/30"
+                    : "bg-primary/10 text-primary border-primary/30"
+                }
+              >
+                {value}
+              </Badge>
+            )
+          }
+        ]}
+        data={filteredProperties}
+        loading={isLoading}
+        emptyMessage="لا توجد عقارات"
+        actions={(property: Property) => (
+          <div className="flex gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onEdit(property)}
+              title="تعديل"
+              className="hover:bg-primary/10"
+            >
+              <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-destructive hover:text-destructive hover:bg-destructive/10"
+              onClick={() => handleDelete(property.id)}
+              title="حذف"
+            >
+              <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+            </Button>
           </div>
-        ) : filteredProperties.length === 0 ? (
-          <div className="col-span-full text-center py-12 text-muted-foreground">
-            لا توجد عقارات
-          </div>
-        ) : (
-          filteredProperties.map((property) => {
-            const propertyIcons: Record<string, string> = {
-              "سكني": "🏢",
-              "تجاري": "🏪",
-              "زراعي": "🌾",
-              "إداري": "🏛️"
-            };
-            
-            return (
-              <Card key={property.id} className="shadow-soft hover:shadow-medium transition-all">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="text-5xl mb-4">{propertyIcons[property.type] || "🏢"}</div>
-                    <Badge
-                      className={
-                        property.status === "مؤجر"
-                          ? "bg-success/10 text-success"
-                          : property.status === "شاغر"
-                          ? "bg-warning/10 text-warning"
-                          : "bg-primary/10 text-primary"
-                      }
-                    >
-                      {property.status}
-                    </Badge>
-                  </div>
-                  <CardTitle className="text-xl">{property.name}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Building className="h-4 w-4" />
-                      <span>{property.type}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <MapPin className="h-4 w-4" />
-                      <span>{property.location}</span>
-                    </div>
-                  </div>
-
-                  <div className="pt-4 border-t space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">الوحدات:</span>
-                      <span className="font-medium">
-                        {property.occupied}/{property.units}
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">الإيراد السنوي:</span>
-                      <span className="font-bold text-primary">
-                        {Number(property.monthly_revenue || 0).toLocaleString()} ر.س
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => onEdit(property)}
-                    >
-                      <Edit className="ml-1 h-3 w-3" />
-                      تعديل
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
-                      onClick={() => handleDelete(property.id)}
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })
         )}
-      </div>
+        showMobileScrollHint={true}
+      />
     </div>
   );
 };
