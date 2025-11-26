@@ -9,7 +9,8 @@ import {
   FileCheck,
   Bell,
   Calendar,
-  HelpCircle
+  HelpCircle,
+  BarChart3
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -80,6 +81,14 @@ export function QuickActionsCard({
       onClick: onMessages,
       color: "text-primary",
       bg: "bg-primary/10 hover:bg-primary/20",
+    },
+    {
+      icon: BarChart3,
+      label: "التقارير الشخصية",
+      description: "عرض وتحميل التقارير",
+      onClick: () => navigate("/beneficiary/reports"),
+      color: "text-info",
+      bg: "bg-info-light hover:bg-info-light/80",
     },
     {
       icon: HelpCircle,

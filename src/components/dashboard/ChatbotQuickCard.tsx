@@ -1,10 +1,11 @@
+import { useState } from "react";
 import { Bot, Sparkles, ArrowLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { ChatbotSidePanel } from "@/components/chatbot/ChatbotSidePanel";
 
 export function ChatbotQuickCard() {
-  const navigate = useNavigate();
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
 
   return (
     <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/5 via-background to-background hover:shadow-lg transition-shadow duration-300 group" style={{ minHeight: '120px' }}>
@@ -37,13 +38,15 @@ export function ChatbotQuickCard() {
           </div>
           
           <Button
-            onClick={() => navigate("/chatbot")}
+            onClick={() => setIsPanelOpen(true)}
             className="gap-1 sm:gap-2 group-hover:gap-3 transition-all w-full sm:w-auto text-xs sm:text-sm"
             size="sm"
           >
             ابدأ المحادثة
             <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4" />
           </Button>
+          
+          <ChatbotSidePanel open={isPanelOpen} onOpenChange={setIsPanelOpen} />
         </div>
         
         {/* أمثلة على الأسئلة */}
@@ -57,7 +60,7 @@ export function ChatbotQuickCard() {
             ].map((question, i) => (
               <button
                 key={i}
-                onClick={() => navigate("/chatbot")}
+                onClick={() => setIsPanelOpen(true)}
                 className="text-[10px] sm:text-xs px-2 sm:px-3 py-1 sm:py-1.5 bg-muted hover:bg-muted/80 rounded-full text-muted-foreground hover:text-foreground transition-colors"
               >
                 {question}
