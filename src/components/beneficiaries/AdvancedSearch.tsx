@@ -79,11 +79,11 @@ export function AdvancedSearch({ onSearch }: AdvancedSearchProps) {
 
     const { error } = await supabase
       .from('saved_searches')
-      .insert({
+      .insert([{
         user_id: user.id,
         name: savedSearchName,
-        search_criteria: filters,
-      });
+        search_criteria: filters as any,
+      }]);
 
     if (!error) {
       setSavedSearchName('');

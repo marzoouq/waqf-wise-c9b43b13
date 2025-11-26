@@ -5435,6 +5435,13 @@ export type Database = {
             foreignKeyName: "loans_approved_by_fkey"
             columns: ["approved_by"]
             isOneToOne: false
+            referencedRelation: "user_profile_with_roles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "loans_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
             referencedRelation: "users_with_roles"
             referencedColumns: ["user_id"]
           },
@@ -6815,7 +6822,6 @@ export type Database = {
           last_login_at: string | null
           phone: string | null
           position: string | null
-          role_id: string | null
           updated_at: string
           user_id: string | null
         }
@@ -6829,7 +6835,6 @@ export type Database = {
           last_login_at?: string | null
           phone?: string | null
           position?: string | null
-          role_id?: string | null
           updated_at?: string
           user_id?: string | null
         }
@@ -6843,19 +6848,10 @@ export type Database = {
           last_login_at?: string | null
           phone?: string | null
           position?: string | null
-          role_id?: string | null
           updated_at?: string
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "profiles_role_id_fkey"
-            columns: ["role_id"]
-            isOneToOne: false
-            referencedRelation: "roles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       properties: {
         Row: {
@@ -8949,10 +8945,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "user_permissions_granted_by_fkey"
+            columns: ["granted_by"]
+            isOneToOne: false
+            referencedRelation: "user_profile_with_roles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "user_permissions_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_permissions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profile_with_roles"
             referencedColumns: ["id"]
           },
         ]
@@ -9048,6 +9058,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profile_with_roles"
             referencedColumns: ["id"]
           },
         ]
@@ -9653,6 +9670,51 @@ export type Database = {
           status: string | null
           transaction_date: string | null
           transaction_type: string | null
+        }
+        Relationships: []
+      }
+      user_profile_with_roles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          email: string | null
+          full_name: string | null
+          id: string | null
+          is_active: boolean | null
+          last_login_at: string | null
+          phone: string | null
+          position: string | null
+          updated_at: string | null
+          user_id: string | null
+          user_roles: Json | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          last_login_at?: string | null
+          phone?: string | null
+          position?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          user_roles?: never
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          last_login_at?: string | null
+          phone?: string | null
+          position?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          user_roles?: never
         }
         Relationships: []
       }

@@ -15,7 +15,6 @@ export interface Role {
 
 export interface Profile {
   id: string;
-  role_id: string | null;
   full_name: string;
   email: string;
   phone: string | null;
