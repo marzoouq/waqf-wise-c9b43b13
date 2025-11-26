@@ -36,6 +36,7 @@ const BeneficiaryDashboard = lazy(() => import("./pages/BeneficiaryDashboard"));
 const BeneficiarySupport = lazy(() => import("./pages/BeneficiarySupport"));
 const AccountantDashboard = lazy(() => import("./pages/AccountantDashboard"));
 const NazerDashboard = lazy(() => import("./pages/NazerDashboard"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const CashierDashboard = lazy(() => import("./pages/CashierDashboard"));
 const ArchivistDashboard = lazy(() => import("./pages/ArchivistDashboard"));
 const Beneficiaries = lazy(() => import("./pages/Beneficiaries"));
@@ -213,6 +214,14 @@ const App = () => {
             element={
               <ProtectedRoute requiredRole="archivist">
                 <ArchivistDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin-dashboard" 
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminDashboard />
               </ProtectedRoute>
             } 
           />
