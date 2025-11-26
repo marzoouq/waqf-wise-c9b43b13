@@ -13,21 +13,17 @@ export function GlobalMonitoring() {
   // تفعيل الميزات فقط للمشرفين
   const shouldMonitor = !isLoading && isAdmin;
 
-  // تفعيل مراقبة الأخطاء
-  if (shouldMonitor) {
-    useErrorNotifications();
-  }
+  // تفعيل مراقبة الأخطاء - دائماً استدعاء الـ Hook
+  useErrorNotifications(shouldMonitor);
 
-  // تفعيل مراقبة الأداء
-  const { violations } = shouldMonitor 
-    ? usePerformanceBudget({
-        lcp: 2500,
-        fcp: 1800,
-        cls: 0.1,
-        ttfb: 800,
-        inp: 200,
-      })
-    : { violations: [] };
+  // تفعيل مراقبة الأداء - دائماً استدعاء الـ Hook
+  const { violations } = usePerformanceBudget({
+    lcp: 2500,
+    fcp: 1800,
+    cls: 0.1,
+    ttfb: 800,
+    inp: 200,
+  }, shouldMonitor);
 
   useEffect(() => {
     if (shouldMonitor) {
