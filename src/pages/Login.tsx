@@ -26,24 +26,22 @@ export default function Login() {
     try {
       if (loginType === 'beneficiary') {
         // تسجيل دخول المستفيد برقم الهوية
-        const { data: beneficiary, error: beneficiaryError } = await supabase
-          .from('beneficiaries')
-          .select('email, user_id')
-          .eq('national_id', identifier)
-          .maybeSingle();
+        const { data, error: rpcError } = await supabase
+          .rpc('get_beneficiary_email_by_national_id', { 
+            p_national_id: identifier 
+          });
 
-        if (beneficiaryError || !beneficiary) {
-          throw new Error('رقم الهوية غير مسجل في النظام');
+        if (rpcError) {
+          console.error('RPC Error:', rpcError);
+          throw new Error('حدث خطأ في البحث عن رقم الهوية');
         }
 
-        if (!beneficiary.user_id) {
-          throw new Error('هذا المستفيد ليس لديه حساب دخول. يرجى التواصل مع الإدارة');
+        if (!data || data.length === 0) {
+          throw new Error('رقم الهوية غير مسجل في النظام أو ليس لديه حساب دخول. يرجى التواصل مع الإدارة');
         }
 
-        if (!beneficiary.email) {
-          throw new Error('لا يوجد بريد إلكتروني مسجل لهذا المستفيد');
-        }
-
+        const beneficiary = data[0];
+        
         // تسجيل الدخول بالبريد الإلكتروني المرتبط
         await signIn(beneficiary.email, password);
       } else {
