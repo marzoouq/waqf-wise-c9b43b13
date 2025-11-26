@@ -1,9 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export function useErrorNotifications() {
+  // تتبع الأخطاء التي تم عرضها لتجنب التكرار
+  const shownErrorsRef = useRef<Set<string>>(new Set());
   const { data: errors } = useQuery({
     queryKey: ["system-errors"],
     queryFn: async () => {
@@ -26,8 +28,12 @@ export function useErrorNotifications() {
     const latestError = errors[0];
     const errorAge = Date.now() - new Date(latestError.created_at).getTime();
     
-    // إذا كان الخطأ أحدث من 15 ثانية، أظهر إشعار
-    if (errorAge < 15000 && latestError.status?.toLowerCase() !== "resolved") {
+    // تجاهل الأخطاء التي تم عرضها مسبقاً
+    if (shownErrorsRef.current.has(latestError.id)) return;
+    
+    // إذا كان الخطأ أحدث من 30 ثانية، أظهر إشعار
+    if (errorAge < 30000 && latestError.status?.toLowerCase() !== "resolved") {
+      shownErrorsRef.current.add(latestError.id);
       const severity = latestError.severity?.toLowerCase();
       
       if (severity === "critical") {
@@ -66,7 +72,12 @@ export function useErrorNotifications() {
           table: "system_error_logs",
         },
         (payload) => {
-          const newError = payload.new as any;
+      const newError = payload.new as any;
+          
+          // تجاهل الأخطاء المكررة
+          if (shownErrorsRef.current.has(newError.id)) return;
+          shownErrorsRef.current.add(newError.id);
+          
           const severity = newError.severity?.toLowerCase();
           
           if (severity === "critical") {

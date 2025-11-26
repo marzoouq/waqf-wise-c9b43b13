@@ -12,6 +12,7 @@ import { GlobalErrorBoundary } from "./components/shared/GlobalErrorBoundary";
 import { LoadingState } from "./components/shared/LoadingState";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { usePWAUpdate } from "./lib/pwa";
+import { GlobalMonitoring } from "./components/developer/GlobalMonitoring";
 import "@/lib/errors/tracker";
 import "@/lib/selfHealing";
 
@@ -152,6 +153,8 @@ const App = () => {
               <TooltipProvider>
                 <Toaster />
                 <Sonner />
+                {/* Global monitoring for admins only */}
+                <GlobalMonitoring />
               <BrowserRouter
                 future={{
                   v7_startTransition: true,

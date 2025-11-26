@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { toast } from "sonner";
 
 interface PerformanceBudget {
@@ -24,6 +24,9 @@ export function usePerformanceBudget(customBudget?: Partial<PerformanceBudget>) 
   });
 
   const [violations, setViolations] = useState<string[]>([]);
+  
+  // تتبع التنبيهات المعروضة لتجنب التكرار
+  const shownAlertsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     // مراقبة Web Vitals
@@ -32,55 +35,80 @@ export function usePerformanceBudget(customBudget?: Partial<PerformanceBudget>) 
         onLCP((metric) => {
           if (metric.value > budget.lcp) {
             const violation = `LCP تجاوز الحد: ${metric.value.toFixed(0)}ms (الحد: ${budget.lcp}ms)`;
-            setViolations(prev => [...prev, violation]);
-            toast.warning("⚠️ تحذير أداء", {
-              description: violation,
-              duration: 5000,
-            });
+            const alertKey = `lcp-${metric.value.toFixed(0)}`;
+            
+            if (!shownAlertsRef.current.has(alertKey)) {
+              shownAlertsRef.current.add(alertKey);
+              setViolations(prev => [...prev, violation]);
+              toast.warning("⚠️ تحذير أداء - LCP", {
+                description: violation,
+                duration: 5000,
+              });
+            }
           }
         });
 
         onFCP((metric) => {
           if (metric.value > budget.fcp) {
             const violation = `FCP تجاوز الحد: ${metric.value.toFixed(0)}ms (الحد: ${budget.fcp}ms)`;
-            setViolations(prev => [...prev, violation]);
-            toast.warning("⚠️ تحذير أداء", {
-              description: violation,
-              duration: 5000,
-            });
+            const alertKey = `fcp-${metric.value.toFixed(0)}`;
+            
+            if (!shownAlertsRef.current.has(alertKey)) {
+              shownAlertsRef.current.add(alertKey);
+              setViolations(prev => [...prev, violation]);
+              toast.warning("⚠️ تحذير أداء - FCP", {
+                description: violation,
+                duration: 5000,
+              });
+            }
           }
         });
 
         onCLS((metric) => {
           if (metric.value > budget.cls) {
             const violation = `CLS تجاوز الحد: ${metric.value.toFixed(3)} (الحد: ${budget.cls})`;
-            setViolations(prev => [...prev, violation]);
-            toast.warning("⚠️ تحذير أداء", {
-              description: violation,
-              duration: 5000,
-            });
+            const alertKey = `cls-${metric.value.toFixed(3)}`;
+            
+            if (!shownAlertsRef.current.has(alertKey)) {
+              shownAlertsRef.current.add(alertKey);
+              setViolations(prev => [...prev, violation]);
+              toast.warning("⚠️ تحذير أداء - CLS", {
+                description: violation,
+                duration: 5000,
+              });
+            }
           }
         });
 
         onTTFB((metric) => {
           if (metric.value > budget.ttfb) {
             const violation = `TTFB تجاوز الحد: ${metric.value.toFixed(0)}ms (الحد: ${budget.ttfb}ms)`;
-            setViolations(prev => [...prev, violation]);
-            toast.warning("⚠️ تحذير أداء", {
-              description: violation,
-              duration: 5000,
-            });
+            const alertKey = `ttfb-${metric.value.toFixed(0)}`;
+            
+            if (!shownAlertsRef.current.has(alertKey)) {
+              shownAlertsRef.current.add(alertKey);
+              setViolations(prev => [...prev, violation]);
+              toast.warning("⚠️ تحذير أداء - TTFB", {
+                description: violation,
+                duration: 5000,
+              });
+            }
           }
         });
 
         onINP((metric) => {
           if (metric.value > budget.inp) {
             const violation = `INP تجاوز الحد: ${metric.value.toFixed(0)}ms (الحد: ${budget.inp}ms)`;
-            setViolations(prev => [...prev, violation]);
-            toast.warning("⚠️ تحذير أداء", {
-              description: violation,
-              duration: 5000,
-            });
+            const alertKey = `inp-${metric.value.toFixed(0)}`;
+            
+            if (!shownAlertsRef.current.has(alertKey)) {
+              shownAlertsRef.current.add(alertKey);
+              setViolations(prev => [...prev, violation]);
+              toast.warning("⚠️ تحذير أداء - INP", {
+                description: violation,
+                duration: 5000,
+              });
+            }
           }
         });
       });
