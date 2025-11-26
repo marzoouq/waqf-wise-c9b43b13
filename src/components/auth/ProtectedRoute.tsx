@@ -1,58 +1,42 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
-import { useUserRole, AppRole } from '@/hooks/useUserRole';
-import { LoadingState } from '@/components/shared/LoadingState';
-import { logger } from '@/lib/logger';
+import { Navigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { Loader2 } from 'lucide-react';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredRole?: AppRole;
-  requiredRoles?: AppRole[];
+  requiredPermission?: string;
+  requiredRole?: string;
+  requiredRoles?: string[];
 }
 
-export function ProtectedRoute({ children, requiredRole, requiredRoles }: ProtectedRouteProps) {
-  const { user, loading: authLoading } = useAuth();
-  const { roles, isLoading: roleLoading } = useUserRole();
-  const navigate = useNavigate();
+export function ProtectedRoute({ children, requiredPermission, requiredRole, requiredRoles }: ProtectedRouteProps) {
+  const { user, profile, isLoading, hasPermission, isRole } = useAuth();
 
-  useEffect(() => {
-    if (!authLoading && !roleLoading && !user) {
-      navigate('/auth', { replace: true });
-    }
-  }, [user, authLoading, roleLoading, navigate]);
-
-  // Check role permissions after loading
-  useEffect(() => {
-    if (!authLoading && !roleLoading && user) {
-      if (roles.length === 0 && !roleLoading) {
-        return;
-      }
-      
-      if (requiredRole && !roles.includes(requiredRole)) {
-        logger.warn('Access denied', { userId: user.id, metadata: { requiredRole } });
-        navigate('/', { replace: true });
-        return;
-      }
-
-      if (requiredRoles && requiredRoles.length > 0) {
-        const hasAnyRole = requiredRoles.some(role => roles.includes(role));
-        if (!hasAnyRole) {
-          logger.warn('Access denied', { userId: user.id, metadata: { requiredRoles } });
-          navigate('/', { replace: true });
-          return;
-        }
-      }
-    }
-  }, [user, authLoading, roleLoading, requiredRole, requiredRoles, roles, navigate]);
-
-  // Show loading when auth is loading OR when user exists but roles are loading
-  if (authLoading || (user && roleLoading)) {
-    return <LoadingState fullScreen />;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
   }
 
   if (!user) {
-    return null;
+    return <Navigate to="/login" replace />;
+  }
+
+  if (requiredPermission && !hasPermission(requiredPermission)) {
+    return <Navigate to="/unauthorized" replace />;
+  }
+
+  if (requiredRole && !isRole(requiredRole)) {
+    return <Navigate to="/unauthorized" replace />;
+  }
+
+  if (requiredRoles && requiredRoles.length > 0) {
+    const hasAnyRole = requiredRoles.some(role => isRole(role));
+    if (!hasAnyRole) {
+      return <Navigate to="/unauthorized" replace />;
+    }
   }
 
   return <>{children}</>;
