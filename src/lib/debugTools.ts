@@ -44,6 +44,26 @@ function exportErrors() {
  */
 function clearCacheDebug() {
   selfHealing.cache.clear();
+  
+  // تنظيف localStorage من الأخطاء القديمة
+  try {
+    const errorLogs = localStorage.getItem('error_logs');
+    if (errorLogs) {
+      const errors = JSON.parse(errorLogs);
+      const cutoffTime = Date.now() - (24 * 60 * 60 * 1000); // 24 ساعة
+      const recentErrors = errors.filter((e: any) => {
+        return new Date(e.timestamp).getTime() > cutoffTime;
+      });
+      
+      if (recentErrors.length < errors.length) {
+        localStorage.setItem('error_logs', JSON.stringify(recentErrors));
+        console.log(`🧹 تم حذف ${errors.length - recentErrors.length} خطأ قديم`);
+      }
+    }
+  } catch (error) {
+    console.error('خطأ في تنظيف error_logs:', error);
+  }
+  
   console.log('🗑️ تم مسح الذاكرة المؤقتة');
 }
 
