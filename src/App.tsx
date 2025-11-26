@@ -13,6 +13,7 @@ import { LoadingState } from "./components/shared/LoadingState";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { usePWAUpdate } from "./lib/pwa";
 import { GlobalMonitoring } from "./components/developer/GlobalMonitoring";
+import { IdleTimeoutManager } from "./components/auth/IdleTimeoutManager";
 import "@/lib/errors/tracker";
 import "@/lib/selfHealing";
 
@@ -155,6 +156,8 @@ const App = () => {
                 <Sonner />
                 {/* Global monitoring for admins only */}
                 <GlobalMonitoring />
+                {/* Auto logout for beneficiaries after 1 minute of inactivity */}
+                <IdleTimeoutManager />
               <BrowserRouter
                 future={{
                   v7_startTransition: true,

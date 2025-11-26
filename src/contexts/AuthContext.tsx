@@ -158,8 +158,62 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    try {
+      console.log('🔄 بدء عملية تسجيل الخروج...');
+      
+      // تنظيف localStorage (الاحتفاظ فقط بإعدادات الثيم)
+      const keysToKeep = ['theme', 'vite-ui-theme'];
+      const keysToRemove: string[] = [];
+      
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && !keysToKeep.includes(key)) {
+          keysToRemove.push(key);
+        }
+      }
+      
+      keysToRemove.forEach(key => {
+        localStorage.removeItem(key);
+        console.log(`🧹 تم حذف: ${key}`);
+      });
+
+      // تنظيف sessionStorage
+      sessionStorage.clear();
+      console.log('🧹 تم تنظيف sessionStorage');
+
+      // تسجيل الخروج من Supabase
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error('❌ خطأ في تسجيل الخروج:', error);
+        throw error;
+      }
+
+      // تنظيف الحالة المحلية
+      setUser(null);
+      setSession(null);
+      setProfile(null);
+      
+      console.log('✅ تم تسجيل الخروج والتنظيف بنجاح');
+      
+      toast({
+        title: "تم تسجيل الخروج",
+        description: "تم تسجيل خروجك بنجاح",
+      });
+    } catch (error: any) {
+      console.error('❌ خطأ في signOut:', error);
+      toast({
+        title: "خطأ",
+        description: error?.message || "حدث خطأ أثناء تسجيل الخروج",
+        variant: "destructive",
+      });
+      
+      // محاولة التنظيف على أي حال
+      setUser(null);
+      setSession(null);
+      setProfile(null);
+      throw error;
+    }
   };
 
   const hasPermission = (permission: string): boolean => {
