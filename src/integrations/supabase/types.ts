@@ -6717,6 +6717,7 @@ export type Database = {
           last_login_at: string | null
           phone: string | null
           position: string | null
+          role_id: string | null
           updated_at: string
           user_id: string | null
         }
@@ -6730,6 +6731,7 @@ export type Database = {
           last_login_at?: string | null
           phone?: string | null
           position?: string | null
+          role_id?: string | null
           updated_at?: string
           user_id?: string | null
         }
@@ -6743,10 +6745,19 @@ export type Database = {
           last_login_at?: string | null
           phone?: string | null
           position?: string | null
+          role_id?: string | null
           updated_at?: string
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       properties: {
         Row: {
@@ -7630,6 +7641,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      roles: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_system_role: boolean | null
+          permissions: Json | null
+          role_name: string
+          role_name_ar: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_system_role?: boolean | null
+          permissions?: Json | null
+          role_name: string
+          role_name_ar: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_system_role?: boolean | null
+          permissions?: Json | null
+          role_name?: string
+          role_name_ar?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       saved_filters: {
         Row: {
@@ -8772,38 +8816,45 @@ export type Database = {
       }
       user_permissions: {
         Row: {
-          created_at: string | null
-          created_by: string | null
-          granted: boolean
+          expires_at: string | null
+          granted: boolean | null
+          granted_at: string | null
+          granted_by: string | null
           id: string
-          notes: string | null
-          permission_id: string | null
+          permission_key: string
           user_id: string | null
         }
         Insert: {
-          created_at?: string | null
-          created_by?: string | null
-          granted: boolean
+          expires_at?: string | null
+          granted?: boolean | null
+          granted_at?: string | null
+          granted_by?: string | null
           id?: string
-          notes?: string | null
-          permission_id?: string | null
+          permission_key: string
           user_id?: string | null
         }
         Update: {
-          created_at?: string | null
-          created_by?: string | null
-          granted?: boolean
+          expires_at?: string | null
+          granted?: boolean | null
+          granted_at?: string | null
+          granted_by?: string | null
           id?: string
-          notes?: string | null
-          permission_id?: string | null
+          permission_key?: string
           user_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "user_permissions_permission_id_fkey"
-            columns: ["permission_id"]
+            foreignKeyName: "user_permissions_granted_by_fkey"
+            columns: ["granted_by"]
             isOneToOne: false
-            referencedRelation: "permissions"
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_permissions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -8861,6 +8912,47 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_sessions: {
+        Row: {
+          ended_at: string | null
+          id: string
+          ip_address: string | null
+          last_activity_at: string | null
+          session_token: string
+          started_at: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          ended_at?: string | null
+          id?: string
+          ip_address?: string | null
+          last_activity_at?: string | null
+          session_token: string
+          started_at?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          ended_at?: string | null
+          id?: string
+          ip_address?: string | null
+          last_activity_at?: string | null
+          session_token?: string
+          started_at?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       voting_delegations: {
         Row: {
@@ -9585,6 +9677,10 @@ export type Database = {
       }
       check_units_availability: {
         Args: { unit_ids: string[] }
+        Returns: boolean
+      }
+      check_user_permission: {
+        Args: { p_permission: string; p_user_id: string }
         Returns: boolean
       }
       cleanup_old_error_logs: { Args: never; Returns: undefined }
