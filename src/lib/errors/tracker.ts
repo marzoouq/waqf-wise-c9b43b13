@@ -220,17 +220,29 @@ class ErrorTracker {
   }
 
   private setupCircuitBreakerCheck() {
-    setInterval(() => {
+    // استخدام requestIdleCallback بدلاً من setInterval لتحسين الأداء
+    const checkCircuitBreaker = () => {
       if (this.circuitBreakerOpen && this.circuitBreakerResetTime) {
         if (Date.now() >= this.circuitBreakerResetTime) {
           productionLogger.info('Circuit breaker reset');
           this.circuitBreakerOpen = false;
           this.failedAttempts = 0;
-          this.backoffDelay = 1000;
+          this.backoffDelay = 2000;
           this.processQueue();
         }
       }
-    }, 30000);
+      
+      // Schedule next check
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => {
+          setTimeout(checkCircuitBreaker, 30000);
+        });
+      } else {
+        setTimeout(checkCircuitBreaker, 30000);
+      }
+    };
+    
+    checkCircuitBreaker();
   }
 
   private setupGlobalHandlers() {
@@ -475,8 +487,12 @@ class ErrorTracker {
 
     this.isProcessing = true;
 
-    while (this.errorQueue.length > 0) {
-      const report = this.errorQueue.shift()!;
+    // معالجة باتش من 10 أخطاء فقط لتحسين الأداء
+    const batchSize = Math.min(10, this.errorQueue.length);
+    
+    for (let i = 0; i < batchSize; i++) {
+      const report = this.errorQueue.shift();
+      if (!report) break;
       
       // تنظيف البيانات قبل الإرسال
       let cleanMessage = report.error_message || 'No error message';
@@ -516,14 +532,15 @@ class ErrorTracker {
         }
 
         const timeoutPromise = new Promise<never>((_, reject) => 
-          setTimeout(() => reject(new Error('Request timeout')), 10000)
+          setTimeout(() => reject(new Error('Request timeout')), 15000)
         );
         
         // ✅ إرسال البيانات النظيفة
         const invokePromise = supabase.functions.invoke('log-error', {
           body: cleanReport,
           headers: {
-            Authorization: `Bearer ${session.access_token}`
+            Authorization: `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json'
           }
         });
         
