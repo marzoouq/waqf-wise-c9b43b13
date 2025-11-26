@@ -12,13 +12,14 @@ import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapp
 import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
 import { ReactNode } from "react";
 
-interface Column<T> {
+export interface Column<T> {
   key: string;
   label: string;
   render?: (value: any, row: T) => ReactNode;
   align?: "right" | "left" | "center";
   hideOnMobile?: boolean; // مخفي على الموبايل
   hideOnTablet?: boolean; // مخفي على التابلت
+  className?: string; // إضافة className للتخصيص
 }
 
 interface UnifiedDataTableProps<T> {
