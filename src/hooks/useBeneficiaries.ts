@@ -12,7 +12,7 @@ export function useBeneficiaries() {
   const { addActivity } = useActivities();
   const { user } = useAuth();
 
-  // Paginated query with count
+  // Paginated query with count - Optimized for list view
   const { data: beneficiariesData, isLoading } = useQuery({
     queryKey: ["beneficiaries"],
     queryFn: async () => {
@@ -24,8 +24,9 @@ export function useBeneficiaries() {
       if (error) throw error;
       return { beneficiaries: (data || []) as Beneficiary[], totalCount: count || 0 };
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes - improved caching
-    gcTime: 10 * 60 * 1000, // 10 minutes - garbage collection
+    staleTime: 10 * 60 * 1000, // 10 minutes - improved caching
+    gcTime: 20 * 60 * 1000, // 20 minutes - garbage collection
+    refetchOnWindowFocus: false,
   });
 
   const beneficiaries = beneficiariesData?.beneficiaries || [];

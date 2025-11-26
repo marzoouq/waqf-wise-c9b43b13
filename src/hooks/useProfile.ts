@@ -29,7 +29,7 @@ export function useProfile() {
 
       const { data, error } = await supabase
         .from("profiles")
-        .select("*")
+        .select("id, user_id, full_name, email, phone, position, avatar_url, created_at, updated_at")
         .eq("user_id", user.id)
         .maybeSingle();
 
@@ -38,7 +38,8 @@ export function useProfile() {
       return data as Profile | null;
     },
     enabled: !!user?.id,
-    staleTime: QUERY_STALE_TIME.DEFAULT,
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnWindowFocus: false,
   });
 
   const upsertProfile = useMutation({
