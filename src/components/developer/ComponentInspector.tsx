@@ -42,7 +42,9 @@ export function ComponentInspector() {
       
       setElementInfo({
         tagName: target.tagName.toLowerCase(),
-        className: target.className,
+        className: typeof target.className === 'string' 
+          ? target.className 
+          : (target.className as any)?.baseVal || '',
         id: target.id,
         textContent: target.textContent?.substring(0, 100),
         dimensions: {
@@ -144,7 +146,11 @@ export function ComponentInspector() {
                     <Badge variant="outline">{elementInfo.tagName}</Badge>
                     {elementInfo.id && <Badge>#{elementInfo.id}</Badge>}
                     {elementInfo.className && (
-                      <Badge variant="secondary">.{elementInfo.className.split(' ')[0]}</Badge>
+                      <Badge variant="secondary">
+                        .{typeof elementInfo.className === 'string'
+                          ? elementInfo.className.split(' ')[0]
+                          : 'element'}
+                      </Badge>
                     )}
                   </div>
                 </div>
