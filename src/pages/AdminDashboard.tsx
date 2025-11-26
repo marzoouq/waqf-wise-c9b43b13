@@ -1,12 +1,9 @@
-import { Shield, LayoutDashboard, Users, Lock, Activity, Settings, Mail } from "lucide-react";
+import { LayoutDashboard, Users, Lock, Activity, Settings, Mail } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Suspense, useState } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
 import { Button } from "@/components/ui/button";
 import { AdminSendMessageDialog } from "@/components/messages/AdminSendMessageDialog";
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { SystemHealthMonitor } from "@/components/dashboard/admin/SystemHealthMonitor";
 import { UserManagementSection } from "@/components/dashboard/admin/UserManagementSection";
 import { SecurityAlertsSection } from "@/components/dashboard/admin/SecurityAlertsSection";
@@ -18,36 +15,8 @@ import { Users as UsersIcon, Building2, Wallet, FileText } from "lucide-react";
 import { LazyTabContent } from "@/components/dashboard/admin/LazyTabContent";
 import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
 import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
-
-const ChartSkeleton = () => (
-  <Card>
-    <CardHeader>
-      <Skeleton className="h-6 w-32" />
-    </CardHeader>
-    <CardContent>
-      <Skeleton className="h-64 w-full" />
-    </CardContent>
-  </Card>
-);
-
-const SectionSkeleton = () => (
-  <Card>
-    <CardHeader>
-      <Skeleton className="h-6 w-40" />
-    </CardHeader>
-    <CardContent className="space-y-3">
-      {[...Array(3)].map((_, i) => (
-        <div key={i} className="flex items-center gap-4">
-          <Skeleton className="h-12 w-12 rounded-lg" />
-          <div className="flex-1 space-y-2">
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-3 w-2/3" />
-          </div>
-        </div>
-      ))}
-    </CardContent>
-  </Card>
-);
+import { UnifiedDashboardLayout } from "@/components/dashboard/UnifiedDashboardLayout";
+import { ChartSkeleton, SectionSkeleton } from "@/components/dashboard";
 
 function AdminKPIsSection() {
   const { data: kpis, isLoading } = useAdminKPIs();
@@ -122,20 +91,15 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("system");
 
   return (
-    <PageErrorBoundary pageName="لوحة تحكم المشرف">
-      <MobileOptimizedLayout>
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <MobileOptimizedHeader
-              title="لوحة تحكم المشرف"
-              description="إدارة شاملة للنظام والمستخدمين"
-              icon={<Shield className="h-8 w-8 text-primary" />}
-            />
-            <Button onClick={() => setMessageDialogOpen(true)} className="gap-2">
-              <Mail className="h-4 w-4" />
-              <span className="hidden sm:inline">إرسال رسالة</span>
-            </Button>
-          </div>
+    <UnifiedDashboardLayout
+      role="admin"
+      actions={
+        <Button onClick={() => setMessageDialogOpen(true)} className="gap-2">
+          <Mail className="h-4 w-4" />
+          <span className="hidden sm:inline">إرسال رسالة</span>
+        </Button>
+      }
+    >
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-grid h-auto p-1 bg-muted/50">
@@ -260,13 +224,11 @@ export default function AdminDashboard() {
               </LazyTabContent>
             </TabsContent>
           </Tabs>
-        </div>
 
-        <AdminSendMessageDialog
-          open={messageDialogOpen}
-          onOpenChange={setMessageDialogOpen}
-        />
-      </MobileOptimizedLayout>
-    </PageErrorBoundary>
+      <AdminSendMessageDialog
+        open={messageDialogOpen}
+        onOpenChange={setMessageDialogOpen}
+      />
+    </UnifiedDashboardLayout>
   );
 }
