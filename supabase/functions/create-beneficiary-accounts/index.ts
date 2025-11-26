@@ -104,9 +104,8 @@ serve(async (req) => {
     // جلب المستفيدين المحددين
     let query = supabaseAdmin
       .from('beneficiaries')
-      .select('id, full_name, national_id, email')
-      .eq('can_login', true)
-      .is('user_id', null);
+      .select('id, full_name, national_id, email, user_id')
+      .eq('can_login', true);
 
     // إذا تم تحديد مستفيدين محددين، نستخدمهم
     if (beneficiaryIds && Array.isArray(beneficiaryIds) && beneficiaryIds.length > 0) {
