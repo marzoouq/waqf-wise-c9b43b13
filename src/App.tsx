@@ -22,9 +22,14 @@ import { DEVTOOLS_CONFIG } from "./lib/devtools";
 const ReactQueryDevtools =
   DEVTOOLS_CONFIG.enabled
     ? lazy(() =>
-        import("@tanstack/react-query-devtools").then((d) => ({
-          default: d.ReactQueryDevtools,
-        }))
+        import("@tanstack/react-query-devtools")
+          .then((d) => ({
+            default: d.ReactQueryDevtools,
+          }))
+          .catch((err) => {
+            console.warn('DevTools failed to load:', err);
+            return { default: () => null };
+          })
       )
     : null;
 
