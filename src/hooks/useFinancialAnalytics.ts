@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { safeFilter, safeReduce } from '@/lib/utils/array-safe';
 
 export interface FinancialKPI {
   id: string;
@@ -84,25 +85,35 @@ export function useFinancialAnalytics(fiscalYearId?: string) {
       if (accountsError) throw accountsError;
 
       // حساب المؤشرات
-      const totalAssets = accounts
-        ?.filter(a => a.account_type === 'asset')
-        .reduce((sum, a) => sum + (a.current_balance || 0), 0) || 0;
+      const totalAssets = safeReduce(
+        safeFilter(accounts, a => a.account_type === 'asset'),
+        (sum, a) => sum + (a.current_balance || 0),
+        0
+      );
 
-      const currentAssets = accounts
-        ?.filter(a => a.account_type === 'asset' && a.code.startsWith('1'))
-        .reduce((sum, a) => sum + (a.current_balance || 0), 0) || 0;
+      const currentAssets = safeReduce(
+        safeFilter(accounts, a => a.account_type === 'asset' && a.code.startsWith('1')),
+        (sum, a) => sum + (a.current_balance || 0),
+        0
+      );
 
-      const currentLiabilities = accounts
-        ?.filter(a => a.account_type === 'liability' && a.code.startsWith('21'))
-        .reduce((sum, a) => sum + (a.current_balance || 0), 0) || 0;
+      const currentLiabilities = safeReduce(
+        safeFilter(accounts, a => a.account_type === 'liability' && a.code.startsWith('21')),
+        (sum, a) => sum + (a.current_balance || 0),
+        0
+      );
 
-      const totalLiabilities = accounts
-        ?.filter(a => a.account_type === 'liability')
-        .reduce((sum, a) => sum + (a.current_balance || 0), 0) || 0;
+      const totalLiabilities = safeReduce(
+        safeFilter(accounts, a => a.account_type === 'liability'),
+        (sum, a) => sum + (a.current_balance || 0),
+        0
+      );
 
-      const totalEquity = accounts
-        ?.filter(a => a.account_type === 'equity')
-        .reduce((sum, a) => sum + (a.current_balance || 0), 0) || 0;
+      const totalEquity = safeReduce(
+        safeFilter(accounts, a => a.account_type === 'equity'),
+        (sum, a) => sum + (a.current_balance || 0),
+        0
+      );
 
       // جلب الإيرادات والمصروفات للفترة
       const { data: journalLines, error: journalError } = await supabase
@@ -114,13 +125,17 @@ export function useFinancialAnalytics(fiscalYearId?: string) {
 
       if (journalError) throw journalError;
 
-      const totalRevenue = journalLines
-        ?.filter((line: any) => line.accounts?.account_type === 'revenue')
-        .reduce((sum: number, line: any) => sum + (line.credit_amount - line.debit_amount), 0) || 0;
+      const totalRevenue = safeReduce(
+        safeFilter(journalLines, (line: any) => line.accounts?.account_type === 'revenue'),
+        (sum: number, line: any) => sum + (line.credit_amount - line.debit_amount),
+        0
+      );
 
-      const totalExpenses = journalLines
-        ?.filter((line: any) => line.accounts?.account_type === 'expense')
-        .reduce((sum: number, line: any) => sum + (line.debit_amount - line.credit_amount), 0) || 0;
+      const totalExpenses = safeReduce(
+        safeFilter(journalLines, (line: any) => line.accounts?.account_type === 'expense'),
+        (sum: number, line: any) => sum + (line.debit_amount - line.credit_amount),
+        0
+      );
 
       const netIncome = totalRevenue - totalExpenses;
 
