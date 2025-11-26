@@ -7,7 +7,6 @@ import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyAccountingState } from "./EmptyAccountingState";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
-import jsPDF from "jspdf";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { formatCurrency, formatNumber } from "@/lib/utils";
@@ -61,13 +60,14 @@ export function CashFlowStatement() {
     }
   };
 
-  const handleExport = () => {
+  const handleExport = async () => {
     if (!latestFlow) {
       toast.error("لا توجد بيانات للتصدير");
       return;
     }
 
     try {
+      const { default: jsPDF } = await import('jspdf');
       const doc = new jsPDF();
       
       // إعداد الخط - استخدام خط يدعم العربية

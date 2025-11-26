@@ -13,8 +13,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { formatCurrency } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
 
 interface Payment {
   id: string;
@@ -102,7 +100,14 @@ export default function BeneficiaryAccountStatement() {
   };
 
   // تصدير PDF
-  const exportToPDF = () => {
+  const exportToPDF = async () => {
+    const [jsPDFModule, autoTableModule] = await Promise.all([
+      import('jspdf'),
+      import('jspdf-autotable')
+    ]);
+    
+    const jsPDF = jsPDFModule.default;
+    const autoTable = autoTableModule.default;
     const doc = new jsPDF();
     
     // Add Arabic font support

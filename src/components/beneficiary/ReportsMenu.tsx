@@ -16,8 +16,6 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useBeneficiaryProfile } from "@/hooks/useBeneficiaryProfile";
 import { useAuth } from "@/hooks/useAuth";
-import jsPDF from "jspdf";
-import "jspdf-autotable";
 import * as XLSX from "xlsx";
 import { withAutoTable } from "@/types/pdf";
 import { Contract } from "@/hooks/useContracts";
@@ -33,6 +31,12 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
 
   const exportPaymentsPDF = async () => {
     try {
+      const [jsPDFModule, autoTableModule] = await Promise.all([
+        import('jspdf'),
+        import('jspdf-autotable')
+      ]);
+      
+      const jsPDF = jsPDFModule.default;
       const baseDoc = new jsPDF();
       const doc = withAutoTable(baseDoc);
       
@@ -120,6 +124,12 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
 
       if (error) throw error;
 
+      const [jsPDFModule, autoTableModule] = await Promise.all([
+        import('jspdf'),
+        import('jspdf-autotable')
+      ]);
+      
+      const jsPDF = jsPDFModule.default;
       const baseDoc = new jsPDF();
       const doc = withAutoTable(baseDoc);
       
@@ -216,8 +226,14 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
     }
   };
 
-  const exportAccountStatement = () => {
+  const exportAccountStatement = async () => {
     try {
+      const [jsPDFModule, autoTableModule] = await Promise.all([
+        import('jspdf'),
+        import('jspdf-autotable')
+      ]);
+      
+      const jsPDF = jsPDFModule.default;
       const baseDoc = new jsPDF();
       const doc = withAutoTable(baseDoc);
       
@@ -312,6 +328,7 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
         return;
       }
 
+      const { default: jsPDF } = await import('jspdf');
       const doc = new jsPDF();
 
       // العنوان
@@ -472,6 +489,12 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
         return;
       }
 
+      const [jsPDFModule, autoTableModule] = await Promise.all([
+        import('jspdf'),
+        import('jspdf-autotable')
+      ]);
+      
+      const jsPDF = jsPDFModule.default;
       const baseDoc = new jsPDF();
       const doc = withAutoTable(baseDoc);
 
