@@ -16,8 +16,9 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
-import { Shield, Lock, Key } from "lucide-react";
+import { Shield, Lock, Key, Monitor } from "lucide-react";
 import { TwoFactorDialog } from "./TwoFactorDialog";
+import { ActiveSessionsDialog } from "./ActiveSessionsDialog";
 
 interface SecuritySettingsDialogProps {
   open: boolean;
@@ -42,6 +43,7 @@ export function SecuritySettingsDialog({
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [twoFactorDialogOpen, setTwoFactorDialogOpen] = useState(false);
+  const [activeSessionsDialogOpen, setActiveSessionsDialogOpen] = useState(false);
 
   const form = useForm<PasswordFormValues>({
     resolver: zodResolver(passwordSchema),
@@ -204,10 +206,35 @@ export function SecuritySettingsDialog({
               </Button>
             </CardContent>
           </Card>
+
+          {/* إدارة الجلسات النشطة */}
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-2 mb-2">
+                <Monitor className="h-4 w-4" />
+                <h3 className="font-semibold">الجلسات النشطة</h3>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">
+                عرض وإدارة جلسات تسجيل الدخول النشطة على جميع الأجهزة
+              </p>
+              <Button 
+                variant="outline"
+                onClick={() => setActiveSessionsDialogOpen(true)}
+              >
+                <Monitor className="h-4 w-4 ml-2" />
+                إدارة الجلسات النشطة
+              </Button>
+            </CardContent>
+          </Card>
         </div>
+        
         <TwoFactorDialog 
           open={twoFactorDialogOpen}
           onOpenChange={setTwoFactorDialogOpen}
+        />
+        <ActiveSessionsDialog
+          open={activeSessionsDialogOpen}
+          onOpenChange={setActiveSessionsDialogOpen}
         />
     </ResponsiveDialog>
   );
