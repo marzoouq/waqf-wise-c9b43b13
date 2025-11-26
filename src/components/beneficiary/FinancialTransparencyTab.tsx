@@ -1,11 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Building2, FileText, TrendingUp, PieChart } from "lucide-react";
 import { PropertyAccordionView } from "./PropertyAccordionView";
-import { PropertyStatsCards } from "./PropertyStatsCards";
 import { ContractsTable } from "./ContractsTable";
 import { MonthlyRevenueChart } from "./MonthlyRevenueChart";
 import { DistributionPieChart } from "./DistributionPieChart";
-import { ReportsMenu } from "./ReportsMenu";
 import { EmptyPaymentsState } from "./EmptyPaymentsState";
 import { useBeneficiaryProfile } from "@/hooks/useBeneficiaryProfile";
 import { useAuth } from "@/hooks/useAuth";
@@ -29,10 +27,38 @@ export function FinancialTransparencyTab() {
         </CardHeader>
       </Card>
 
-      {/* إحصائيات العقارات */}
-      <PropertyStatsCards />
+      {/* الرسوم البيانية المالية */}
+      {hasPayments ? (
+        <div className="grid md:grid-cols-2 gap-6 mb-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-warning" />
+                الإيرادات الشهرية
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <MonthlyRevenueChart />
+            </CardContent>
+          </Card>
 
-      {/* عقارات الوقف ووحداتها - نظام Accordion */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <PieChart className="h-5 w-5 text-primary" />
+                نسب التوزيع
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <DistributionPieChart />
+            </CardContent>
+          </Card>
+        </div>
+      ) : (
+        <EmptyPaymentsState />
+      )}
+
+      {/* عقارات الوقف ووحداتها */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -63,47 +89,6 @@ export function FinancialTransparencyTab() {
           <ContractsTable />
         </CardContent>
       </Card>
-
-      {/* الإيرادات الشهرية */}
-      {hasPayments ? (
-        <>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-warning" />
-                الإيرادات الشهرية
-              </CardTitle>
-              <CardDescription>
-                تطور إيرادات الوقف خلال الأشهر الماضية
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <MonthlyRevenueChart />
-            </CardContent>
-          </Card>
-
-          {/* نسب التوزيع */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <PieChart className="h-5 w-5 text-primary" />
-                نسب التوزيع بين المستفيدين
-              </CardTitle>
-              <CardDescription>
-                توزيع غلة الوقف حسب الفئات والأولويات
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <DistributionPieChart />
-            </CardContent>
-          </Card>
-        </>
-      ) : (
-        <EmptyPaymentsState />
-      )}
-
-      {/* تقارير الوقف */}
-      <ReportsMenu type="waqf" />
     </div>
   );
 }
