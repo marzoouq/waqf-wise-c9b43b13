@@ -157,13 +157,21 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks: (id) => {
-          // Core React libraries
           if (id.includes('node_modules')) {
-            if (id.includes('react') || id.includes('react-dom')) {
-              return 'react-core';
-            }
-            if (id.includes('react-router-dom')) {
+            // Specific React libraries FIRST (before general react check)
+            if (id.includes('react-router-dom') || id.includes('react-router')) {
               return 'react-router';
+            }
+            if (id.includes('react-hook-form') || id.includes('@hookform')) {
+              return 'forms';
+            }
+            if (id.includes('react-day-picker')) {
+              return 'react-context-libs';
+            }
+            
+            // Core React libraries (only pure react/react-dom)
+            if (id.match(/\/node_modules\/(react|react-dom|scheduler)\//)) {
+              return 'react-core';
             }
             
             // Radix UI - split into two chunks
@@ -190,8 +198,8 @@ export default defineConfig(({ mode }) => ({
               return 'animations';
             }
             
-            // Forms
-            if (id.includes('react-hook-form') || id.includes('zod') || id.includes('@hookform')) {
+            // Forms (zod only, react-hook-form handled above)
+            if (id.includes('zod')) {
               return 'forms';
             }
             
@@ -218,12 +226,11 @@ export default defineConfig(({ mode }) => ({
               return 'utils';
             }
             
-            // Libraries that depend on React Context - must load after React
+            // Libraries that depend on React Context (react-day-picker handled above)
             if (id.includes('next-themes') || 
                 id.includes('sonner') || 
                 id.includes('cmdk') || 
                 id.includes('vaul') ||
-                id.includes('react-day-picker') ||
                 id.includes('embla-carousel')) {
               return 'react-context-libs';
             }
