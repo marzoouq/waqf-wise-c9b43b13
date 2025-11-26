@@ -104,6 +104,7 @@ const TestPhase6 = lazy(() => import("./pages/TestPhase6"));
 const TestPhase7 = lazy(() => import("./pages/TestPhase7"));
 const TestDataManager = lazy(() => import("./pages/TestDataManager"));
 const DeveloperGuide = lazy(() => import("./pages/DeveloperGuide"));
+const DeveloperTools = lazy(() => import("./pages/DeveloperTools"));
 const ProjectDocumentation = lazy(() => import("./pages/ProjectDocumentation"));
 const DesignPreview = lazy(() => import("./pages/DesignPreview"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -366,6 +367,14 @@ const App = () => {
               element={
                 <ProtectedRoute requiredRole="admin">
                   <DeveloperGuide />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/developer-tools" 
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <DeveloperTools />
                 </ProtectedRoute>
               } 
             />
