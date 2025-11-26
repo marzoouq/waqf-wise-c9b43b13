@@ -26,7 +26,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Permission } from "@/hooks/usePermissions";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface UserPermissionsOverrideProps {
@@ -34,29 +33,35 @@ interface UserPermissionsOverrideProps {
   userName: string;
 }
 
+// قائمة الصلاحيات المتاحة في النظام
+const AVAILABLE_PERMISSIONS = [
+  { key: 'users.manage', name: 'إدارة المستخدمين', description: 'إنشاء وتعديل وحذف المستخدمين', category: 'المستخدمون' },
+  { key: 'settings.manage', name: 'إدارة الإعدادات', description: 'تعديل إعدادات النظام', category: 'الإعدادات' },
+  { key: 'reports.view', name: 'عرض التقارير', description: 'الوصول للتقارير المالية والإدارية', category: 'التقارير' },
+  { key: 'beneficiaries.manage', name: 'إدارة المستفيدين', description: 'إضافة وتعديل بيانات المستفيدين', category: 'المستفيدون' },
+  { key: 'beneficiaries.view', name: 'عرض المستفيدين', description: 'الاطلاع على بيانات المستفيدين', category: 'المستفيدون' },
+  { key: 'properties.manage', name: 'إدارة العقارات', description: 'إضافة وتعديل العقارات', category: 'العقارات' },
+  { key: 'funds.manage', name: 'إدارة الصناديق', description: 'إدارة صناديق الوقف', category: 'المالية' },
+  { key: 'accounting.manage', name: 'إدارة المحاسبة', description: 'الوصول الكامل للنظام المحاسبي', category: 'المالية' },
+  { key: 'journal_entries.create', name: 'إنشاء قيود محاسبية', description: 'تسجيل القيود المحاسبية', category: 'المالية' },
+  { key: 'bank_accounts.view', name: 'عرض الحسابات البنكية', description: 'الاطلاع على الحسابات البنكية', category: 'المالية' },
+  { key: 'payments.execute', name: 'تنفيذ المدفوعات', description: 'صرف المستحقات', category: 'المالية' },
+  { key: 'vouchers.create', name: 'إنشاء السندات', description: 'إنشاء سندات الصرف والقبض', category: 'المالية' },
+  { key: 'documents.manage', name: 'إدارة المستندات', description: 'رفع وتعديل المستندات', category: 'الأرشيف' },
+  { key: 'archive.manage', name: 'إدارة الأرشيف', description: 'إدارة نظام الأرشيف', category: 'الأرشيف' },
+  { key: 'documents.upload', name: 'رفع المستندات', description: 'رفع مستندات جديدة', category: 'الأرشيف' },
+  { key: 'profile.view', name: 'عرض الملف الشخصي', description: 'الاطلاع على الملف الشخصي', category: 'الملف الشخصي' },
+  { key: 'requests.submit', name: 'تقديم الطلبات', description: 'تقديم طلبات جديدة', category: 'الطلبات' },
+];
+
 export function UserPermissionsOverride({ userId, userName }: UserPermissionsOverrideProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedPermission, setSelectedPermission] = useState<Permission | null>(null);
+  const [selectedPermission, setSelectedPermission] = useState<typeof AVAILABLE_PERMISSIONS[0] | null>(null);
   const [overrideNotes, setOverrideNotes] = useState("");
   const [grantPermission, setGrantPermission] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-  // Fetch all permissions
-  const { data: allPermissions = [] } = useQuery({
-    queryKey: ["all-permissions"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("permissions")
-        .select("*")
-        .order("category", { ascending: true })
-        .order("name", { ascending: true });
-      
-      if (error) throw error;
-      return data as Permission[];
-    },
-  });
 
   // Fetch user's permission overrides
   const { data: userOverrides = [], isLoading } = useQuery({
@@ -64,15 +69,7 @@ export function UserPermissionsOverride({ userId, userName }: UserPermissionsOve
     queryFn: async () => {
       const { data, error } = await supabase
         .from("user_permissions")
-        .select(`
-          *,
-          permissions (
-            id,
-            name,
-            category,
-            description
-          )
-        `)
+        .select("*")
         .eq("user_id", userId);
       
       if (error) throw error;
@@ -83,17 +80,14 @@ export function UserPermissionsOverride({ userId, userName }: UserPermissionsOve
 
   // Add permission override mutation
   const addOverrideMutation = useMutation({
-    mutationFn: async ({ permissionId, granted, notes }: { permissionId: string; granted: boolean; notes: string }) => {
+    mutationFn: async ({ permissionKey, granted }: { permissionKey: string; granted: boolean }) => {
       const { error } = await supabase
         .from("user_permissions")
         .upsert({
           user_id: userId,
-          permission_id: permissionId,
+          permission_key: permissionKey,
           granted,
-          notes,
           granted_at: new Date().toISOString()
-        }, {
-          onConflict: 'user_id,permission_id'
         });
       
       if (error) throw error;
@@ -120,12 +114,12 @@ export function UserPermissionsOverride({ userId, userName }: UserPermissionsOve
 
   // Remove permission override mutation
   const removeOverrideMutation = useMutation({
-    mutationFn: async (permissionId: string) => {
+    mutationFn: async (permissionKey: string) => {
       const { error } = await supabase
         .from("user_permissions")
         .delete()
         .eq("user_id", userId)
-        .eq("permission_id", permissionId);
+        .eq("permission_key", permissionKey);
       
       if (error) throw error;
     },
@@ -150,19 +144,19 @@ export function UserPermissionsOverride({ userId, userName }: UserPermissionsOve
     if (!selectedPermission) return;
     
     await addOverrideMutation.mutateAsync({
-      permissionId: selectedPermission.id,
+      permissionKey: selectedPermission.key,
       granted: grantPermission,
-      notes: overrideNotes
     });
   };
 
-  const handleRemoveOverride = async (permissionId: string) => {
-    await removeOverrideMutation.mutateAsync(permissionId);
+  const handleRemoveOverride = async (permissionKey: string) => {
+    await removeOverrideMutation.mutateAsync(permissionKey);
   };
 
-  const filteredPermissions = allPermissions.filter(perm =>
+  const filteredPermissions = AVAILABLE_PERMISSIONS.filter(perm =>
     perm.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    perm.description?.toLowerCase().includes(searchQuery.toLowerCase())
+    perm.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    perm.key.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const hasOverrides = userOverrides.length > 0;
@@ -216,22 +210,25 @@ export function UserPermissionsOverride({ userId, userName }: UserPermissionsOve
                       <TableBody>
                         {filteredPermissions.map((perm) => (
                           <TableRow
-                            key={perm.id}
-                            className={selectedPermission?.id === perm.id ? "bg-muted" : ""}
+                            key={perm.key}
+                            className={selectedPermission?.key === perm.key ? "bg-muted" : ""}
                           >
-                            <TableCell className="font-mono text-xs">
-                              {perm.name}
+                            <TableCell>
+                              <div>
+                                <p className="font-medium text-sm">{perm.name}</p>
+                                <p className="font-mono text-xs text-muted-foreground">{perm.key}</p>
+                              </div>
                             </TableCell>
                             <TableCell className="text-sm text-muted-foreground">
-                              {perm.description || "-"}
+                              {perm.description}
                             </TableCell>
                             <TableCell>
                               <Button
                                 size="sm"
-                                variant={selectedPermission?.id === perm.id ? "default" : "outline"}
+                                variant={selectedPermission?.key === perm.key ? "default" : "outline"}
                                 onClick={() => setSelectedPermission(perm)}
                               >
-                                {selectedPermission?.id === perm.id ? "مختار" : "اختيار"}
+                                {selectedPermission?.key === perm.key ? "مختار" : "اختيار"}
                               </Button>
                             </TableCell>
                           </TableRow>
@@ -241,34 +238,20 @@ export function UserPermissionsOverride({ userId, userName }: UserPermissionsOve
                   </div>
 
                   {selectedPermission && (
-                    <>
-                      <div className="flex items-center justify-between p-4 border rounded-lg bg-muted/50">
-                        <div className="flex items-center gap-3">
-                          <span className="text-sm font-medium">
-                            {grantPermission ? "منح الصلاحية" : "منع الصلاحية"}
-                          </span>
-                          <Switch
-                            checked={grantPermission}
-                            onCheckedChange={setGrantPermission}
-                          />
-                        </div>
-                        <Badge variant={grantPermission ? "default" : "destructive"}>
-                          {grantPermission ? "سماح" : "رفض"}
-                        </Badge>
-                      </div>
-
-                      <div>
-                        <label className="text-sm font-medium mb-2 block">
-                          ملاحظات (اختياري)
-                        </label>
-                        <Textarea
-                          placeholder="سبب إضافة هذا الاستثناء..."
-                          value={overrideNotes}
-                          onChange={(e) => setOverrideNotes(e.target.value)}
-                          rows={3}
+                    <div className="flex items-center justify-between p-4 border rounded-lg bg-muted/50">
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-medium">
+                          {grantPermission ? "منح الصلاحية" : "منع الصلاحية"}
+                        </span>
+                        <Switch
+                          checked={grantPermission}
+                          onCheckedChange={setGrantPermission}
                         />
                       </div>
-                    </>
+                      <Badge variant={grantPermission ? "default" : "destructive"}>
+                        {grantPermission ? "سماح" : "رفض"}
+                      </Badge>
+                    </div>
                   )}
                 </div>
 
@@ -296,39 +279,42 @@ export function UserPermissionsOverride({ userId, userName }: UserPermissionsOve
             </Alert>
           ) : (
             <div className="space-y-2">
-              {userOverrides.map((override: any) => (
-                <div
-                  key={override.id}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-                >
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <p className="font-mono text-sm font-medium">
-                        {override.permissions?.name}
-                      </p>
-                      <Badge variant={override.granted ? "default" : "destructive"}>
-                        {override.granted ? "سماح" : "رفض"}
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      {override.permissions?.description || "لا يوجد وصف"}
-                    </p>
-                    {override.notes && (
-                      <p className="text-xs text-muted-foreground mt-2 italic">
-                        ملاحظات: {override.notes}
-                      </p>
-                    )}
-                  </div>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => handleRemoveOverride(override.permission_id)}
-                    disabled={removeOverrideMutation.isPending}
+              {userOverrides.map((override) => {
+                const permInfo = AVAILABLE_PERMISSIONS.find(p => p.key === override.permission_key);
+                return (
+                  <div
+                    key={override.id}
+                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
                   >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="text-sm font-medium">
+                          {permInfo?.name || override.permission_key}
+                        </p>
+                        <Badge variant={override.granted ? "default" : "destructive"}>
+                          {override.granted ? "سماح" : "رفض"}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground font-mono">
+                        {override.permission_key}
+                      </p>
+                      {permInfo?.description && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {permInfo.description}
+                        </p>
+                      )}
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleRemoveOverride(override.permission_key)}
+                      disabled={removeOverrideMutation.isPending}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                );
+              })}
             </div>
           )}
         </CardContent>
