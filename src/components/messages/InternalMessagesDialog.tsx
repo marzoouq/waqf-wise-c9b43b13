@@ -36,7 +36,7 @@ export function InternalMessagesDialog({
     subject: "",
     body: "",
   });
-  const [recipients, setRecipients] = useState<Array<{ id: string; name: string; role: string }>>([]);
+  const [recipients, setRecipients] = useState<Array<{ id: string; name: string; role: string; roleKey: string }>>([]);
   const [loadingRecipients, setLoadingRecipients] = useState(false);
 
   // جلب قائمة المستخدمين المتاحين للمراسلة
@@ -56,6 +56,8 @@ export function InternalMessagesDialog({
         // تحديد الأدوار المتاحة للمراسلة بناءً على دور المستخدم
         let allowedRoles: ('accountant' | 'admin' | 'archivist' | 'beneficiary' | 'cashier' | 'nazer' | 'user')[];
         
+        console.log('📌 Current user role:', currentUserRole?.role);
+        
         if (currentUserRole?.role === 'beneficiary') {
           // المستفيد يمكنه مراسلة الناظر والمشرف فقط
           allowedRoles = ['admin', 'nazer'];
@@ -64,6 +66,8 @@ export function InternalMessagesDialog({
           allowedRoles = ['admin', 'nazer', 'accountant', 'cashier', 'beneficiary', 'archivist'];
         }
         
+        console.log('📌 Allowed roles:', allowedRoles);
+        
         const { data: userRoles, error: rolesError } = await supabase
           .from('user_roles')
           .select('user_id, role')
@@ -71,9 +75,13 @@ export function InternalMessagesDialog({
           .neq('user_id', user?.id); // استبعاد المستخدم الحالي
 
         if (rolesError) throw rolesError;
+        
+        console.log('📌 User roles found:', userRoles?.length, userRoles);
 
         if (userRoles && userRoles.length > 0) {
           const userIds = userRoles.map(ur => ur.user_id);
+          
+          console.log('📌 User IDs to fetch profiles for:', userIds.length);
           
           // جلب بيانات المستخدمين
           const { data: profiles, error: profilesError } = await supabase
@@ -82,6 +90,8 @@ export function InternalMessagesDialog({
             .in('user_id', userIds);
 
           if (profilesError) throw profilesError;
+          
+          console.log('📌 Profiles found:', profiles?.length, profiles);
 
           // دمج البيانات وترجمة الأدوار
           const roleTranslations: Record<string, string> = {
@@ -93,17 +103,38 @@ export function InternalMessagesDialog({
             'archivist': 'أرشيفي'
           };
 
+          // ترتيب الأدوار حسب الأهمية
+          const roleOrder: Record<string, number> = {
+            'nazer': 1,
+            'admin': 2,
+            'accountant': 3,
+            'cashier': 4,
+            'archivist': 5,
+            'beneficiary': 6
+          };
+
           const recipientsList = profiles?.map(profile => {
             const userRole = userRoles.find(ur => ur.user_id === profile.user_id);
             const roleName = userRole?.role || 'user';
             return {
               id: profile.user_id,
               name: profile.full_name || 'مستخدم',
-              role: roleTranslations[roleName] || roleName
+              role: roleTranslations[roleName] || roleName,
+              roleKey: roleName
             };
+          })
+          .sort((a, b) => {
+            // ترتيب حسب الدور أولاً، ثم الاسم
+            const roleCompare = (roleOrder[a.roleKey] || 999) - (roleOrder[b.roleKey] || 999);
+            if (roleCompare !== 0) return roleCompare;
+            return a.name.localeCompare(b.name, 'ar');
           }) || [];
 
+          console.log('📧 Recipients loaded:', recipientsList.length, recipientsList);
           setRecipients(recipientsList);
+        } else {
+          console.log('⚠️ No user roles found');
+          setRecipients([]);
         }
       } catch (error) {
         productionLogger.error('Error fetching recipients', error, {
@@ -123,7 +154,7 @@ export function InternalMessagesDialog({
     if (open && user?.id) {
       fetchRecipients();
     }
-  }, [open, user?.id, toast]);
+  }, [open, user?.id]); // إزالة toast من dependencies
 
   const handleReplyToMessage = (message: typeof inboxMessages[0]) => {
     setReplyToMessage(message);
@@ -300,22 +331,27 @@ export function InternalMessagesDialog({
               {!replyToMessage && (
                 <div>
                   <label className="text-sm font-medium mb-1 block">إلى</label>
-                  <Select
-                    value={newMessage.receiver_id}
-                    onValueChange={(value) => setNewMessage({ ...newMessage, receiver_id: value })}
-                    disabled={loadingRecipients}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder={loadingRecipients ? "جاري التحميل..." : "اختر المستلم"} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {recipients.map((recipient) => (
-                        <SelectItem key={recipient.id} value={recipient.id}>
-                          {recipient.name} ({recipient.role})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  {loadingRecipients ? (
+                    <div className="text-sm text-muted-foreground p-2">جاري تحميل المستلمين...</div>
+                  ) : recipients.length === 0 ? (
+                    <div className="text-sm text-destructive p-2">⚠️ لا يوجد مستلمون متاحون</div>
+                  ) : (
+                    <Select
+                      value={newMessage.receiver_id}
+                      onValueChange={(value) => setNewMessage({ ...newMessage, receiver_id: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="اختر المستلم" />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-[300px]">
+                        {recipients.map((recipient) => (
+                          <SelectItem key={recipient.id} value={recipient.id}>
+                            {recipient.name} ({recipient.role})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
                 </div>
               )}
               <div>
