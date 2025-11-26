@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-export function useErrorNotifications() {
+export function useErrorNotifications(enabled: boolean = true) {
   // تتبع الأخطاء التي تم عرضها لتجنب التكرار
   const shownErrorsRef = useRef<Set<string>>(new Set());
   const { data: errors } = useQuery({
@@ -18,11 +18,12 @@ export function useErrorNotifications() {
       if (error) throw error;
       return data;
     },
-    refetchInterval: 10000, // تحديث كل 10 ثواني
+    refetchInterval: enabled ? 10000 : false, // تحديث كل 10 ثواني فقط عند التفعيل
+    enabled,
   });
 
   useEffect(() => {
-    if (!errors || errors.length === 0) return;
+    if (!enabled || !errors || errors.length === 0) return;
 
     // مراقبة الأخطاء الجديدة
     const latestError = errors[0];
@@ -58,7 +59,7 @@ export function useErrorNotifications() {
         );
       }
     }
-  }, [errors]);
+  }, [errors, enabled]);
 
   // الاشتراك في التحديثات الفورية
   useEffect(() => {

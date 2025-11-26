@@ -17,7 +17,10 @@ const DEFAULT_BUDGET: PerformanceBudget = {
   inp: 200,
 };
 
-export function usePerformanceBudget(customBudget?: Partial<PerformanceBudget>) {
+export function usePerformanceBudget(
+  customBudget?: Partial<PerformanceBudget>,
+  enabled: boolean = true
+) {
   const [budget] = useState<PerformanceBudget>({
     ...DEFAULT_BUDGET,
     ...customBudget,
@@ -29,6 +32,8 @@ export function usePerformanceBudget(customBudget?: Partial<PerformanceBudget>) 
   const shownAlertsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
+    if (!enabled) return;
+    
     // مراقبة Web Vitals
     if ('web-vitals' in window) {
       import('web-vitals').then(({ onLCP, onFCP, onCLS, onTTFB, onINP }) => {
@@ -113,7 +118,7 @@ export function usePerformanceBudget(customBudget?: Partial<PerformanceBudget>) 
         });
       });
     }
-  }, [budget]);
+  }, [budget, enabled]);
 
   return { budget, violations };
 }
