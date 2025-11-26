@@ -3,15 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-  FormDescription,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -26,6 +18,7 @@ import { useBeneficiaries } from "@/hooks/useBeneficiaries";
 import { useDistributions } from "@/hooks/useDistributions";
 import { useToast } from "@/hooks/use-toast";
 import { useDistributionSettings } from "@/hooks/useDistributionSettings";
+import { UnifiedFormField, FormGrid, FormSection } from "@/components/unified/UnifiedFormField";
 
 const distributionSchema = z.object({
   period_start: z.string().min(1, "تاريخ البداية مطلوب"),
