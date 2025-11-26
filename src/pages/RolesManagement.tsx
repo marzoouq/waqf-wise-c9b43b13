@@ -75,16 +75,20 @@ const RolesManagement = () => {
   const [newRole, setNewRole] = useState<AppRole>("user");
   const [auditDialogOpen, setAuditDialogOpen] = useState(false);
 
-  // جلب المستخدمين مع أدوارهم
+  // جلب المستخدمين مع أدوارهم من الـ cache الآمن
   const { data: users = [], isLoading } = useQuery({
-    queryKey: ["users-with-roles"],
+    queryKey: ["users-profiles-cache"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("users_with_roles").select("*");
+      const { data, error } = await supabase
+        .from("users_profiles_cache")
+        .select("*")
+        .order("user_created_at", { ascending: false });
+        
       if (error) throw error;
       return (data || []).map(u => ({
-        id: u.id,
-        user_id: u.id,
-        full_name: u.full_name || '',
+        id: u.user_id,
+        user_id: u.user_id,
+        full_name: u.full_name || u.email || '',
         email: u.email || '',
         avatar_url: '',
         roles: Array.isArray(u.roles) ? u.roles : [],
@@ -92,6 +96,7 @@ const RolesManagement = () => {
         roles_count: Array.isArray(u.roles) ? u.roles.length : 0,
       })) as UserWithRoles[];
     },
+    staleTime: 30 * 1000,
   });
 
   // جلب سجل الأدوار
