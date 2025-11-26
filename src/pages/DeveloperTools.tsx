@@ -11,17 +11,9 @@ import { StorageInspector } from "@/components/developer/StorageInspector";
 import { ToolsPanel } from "@/components/developer/ToolsPanel";
 import { ComponentInspector } from "@/components/developer/ComponentInspector";
 import { ResponsiveTester } from "@/components/developer/ResponsiveTester";
-import { useErrorNotifications } from "@/hooks/developer/useErrorNotifications";
-import { usePerformanceBudget } from "@/hooks/developer/usePerformanceBudget";
 
 export default function DeveloperTools() {
   const [activeTab, setActiveTab] = useState("overview");
-  
-  // تفعيل الإشعارات الفورية للأخطاء
-  useErrorNotifications();
-  
-  // تفعيل تنبيهات الأداء
-  const { violations } = usePerformanceBudget();
 
   // قراءة tab من URL إن وجد
   useEffect(() => {
@@ -46,23 +38,6 @@ export default function DeveloperTools() {
               </p>
             </div>
           </div>
-
-          {/* Performance Budget Violations */}
-          {violations.length > 0 && (
-            <div className="p-4 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-              <h3 className="font-semibold text-yellow-900 dark:text-yellow-100 mb-2">
-                ⚠️ تنبيهات الأداء ({violations.length})
-              </h3>
-              <ul className="space-y-1 text-sm text-yellow-800 dark:text-yellow-200">
-                {violations.slice(0, 3).map((v, i) => (
-                  <li key={i}>• {v}</li>
-                ))}
-                {violations.length > 3 && (
-                  <li className="text-xs">... و {violations.length - 3} تنبيهات أخرى</li>
-                )}
-              </ul>
-            </div>
-          )}
 
           {/* Main Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
