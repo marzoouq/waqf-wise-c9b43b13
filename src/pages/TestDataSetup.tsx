@@ -57,8 +57,8 @@ export default function TestDataSetup() {
           </Alert>
 
           <div className="space-y-4">
-            <h3 className="font-semibold">المستفيدون التجريبيون:</h3>
-            <div className="grid gap-2 text-sm">
+            <h3 className="font-semibold">المستفيدون التجريبيون (19 مستفيد):</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm max-h-96 overflow-y-auto">
               <div className="flex justify-between p-2 bg-muted rounded">
                 <span>عبدالرحمن مرزوق علي الثبيتي</span>
                 <code className="font-mono">1014548273</code>
@@ -78,6 +78,62 @@ export default function TestDataSetup() {
               <div className="flex justify-between p-2 bg-muted rounded">
                 <span>منى مرزوق علي الثبيتي</span>
                 <code className="font-mono">1048839425</code>
+              </div>
+              <div className="flex justify-between p-2 bg-muted rounded">
+                <span>أحمد بن محمد العتيبي</span>
+                <code className="font-mono">1023456789</code>
+              </div>
+              <div className="flex justify-between p-2 bg-muted rounded">
+                <span>سارة بنت عبدالله القحطاني</span>
+                <code className="font-mono">1034567890</code>
+              </div>
+              <div className="flex justify-between p-2 bg-muted rounded">
+                <span>خالد بن سعد الدوسري</span>
+                <code className="font-mono">1045678901</code>
+              </div>
+              <div className="flex justify-between p-2 bg-muted rounded">
+                <span>نورة بنت علي المطيري</span>
+                <code className="font-mono">1056789012</code>
+              </div>
+              <div className="flex justify-between p-2 bg-muted rounded">
+                <span>محمد بن أحمد الشمري</span>
+                <code className="font-mono">1067890123</code>
+              </div>
+              <div className="flex justify-between p-2 bg-muted rounded">
+                <span>هند بنت خالد الحربي</span>
+                <code className="font-mono">1078901234</code>
+              </div>
+              <div className="flex justify-between p-2 bg-muted rounded">
+                <span>سلطان بن عبدالعزيز العنزي</span>
+                <code className="font-mono">1089012345</code>
+              </div>
+              <div className="flex justify-between p-2 bg-muted rounded">
+                <span>ريم بنت فهد السبيعي</span>
+                <code className="font-mono">1090123456</code>
+              </div>
+              <div className="flex justify-between p-2 bg-muted rounded">
+                <span>فيصل بن ناصر الغامدي</span>
+                <code className="font-mono">1012345678</code>
+              </div>
+              <div className="flex justify-between p-2 bg-muted rounded">
+                <span>لطيفة بنت سليمان الزهراني</span>
+                <code className="font-mono">1023456780</code>
+              </div>
+              <div className="flex justify-between p-2 bg-muted rounded">
+                <span>بدر بن راشد القرني</span>
+                <code className="font-mono">1034567891</code>
+              </div>
+              <div className="flex justify-between p-2 bg-muted rounded">
+                <span>جواهر بنت مشعل اليامي</span>
+                <code className="font-mono">1045678902</code>
+              </div>
+              <div className="flex justify-between p-2 bg-muted rounded">
+                <span>طلال بن عبيد الحارثي</span>
+                <code className="font-mono">1056789013</code>
+              </div>
+              <div className="flex justify-between p-2 bg-muted rounded">
+                <span>شهد بنت تركي البقمي</span>
+                <code className="font-mono">1067890124</code>
               </div>
             </div>
           </div>
