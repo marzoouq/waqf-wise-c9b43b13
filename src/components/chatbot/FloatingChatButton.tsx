@@ -13,8 +13,16 @@ export function FloatingChatButton() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // إخفاء الزر في صفحة الشات نفسها
-  if (location.pathname === "/chatbot") {
+  // إخفاء الزر في صفحات معينة
+  const hiddenPaths = [
+    "/chatbot",
+    "/support-management",
+    "/admin",
+    "/developer-tools",
+    "/system-monitoring"
+  ];
+  
+  if (hiddenPaths.some(path => location.pathname.startsWith(path))) {
     return null;
   }
 

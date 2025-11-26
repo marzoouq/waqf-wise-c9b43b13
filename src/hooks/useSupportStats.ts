@@ -7,9 +7,10 @@ import type { SupportStatistics } from '@/types/support';
  */
 export function useSupportStats() {
   // إحصائيات عامة
-  const { data: overviewStats, isLoading: overviewLoading } = useQuery({
+  const { data: overviewStats, isLoading: overviewLoading, error: overviewError } = useQuery({
     queryKey: ['support-stats', 'overview'],
     queryFn: async () => {
+      try {
       // عدد التذاكر حسب الحالة
       const { data: ticketsByStatus } = await supabase
         .from('support_tickets')
@@ -58,35 +59,47 @@ export function useSupportStats() {
         ? ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length
         : 0;
 
-      return {
-        ticketsByStatus,
-        ticketsByCategory,
-        ticketsByPriority,
-        avgSatisfaction,
-        totalRatings: ratings?.length || 0,
-      };
+        return {
+          ticketsByStatus,
+          ticketsByCategory,
+          ticketsByPriority,
+          avgSatisfaction,
+          totalRatings: ratings?.length || 0,
+        };
+      } catch (error) {
+        console.error('Error fetching overview stats:', error);
+        throw error;
+      }
     },
+    retry: 2,
   });
 
   // التذاكر المتأخرة
-  const { data: overdueTickets } = useQuery({
+  const { data: overdueTickets, error: overdueError } = useQuery({
     queryKey: ['support-stats', 'overdue'],
     queryFn: async () => {
+      try {
       const { data, error } = await supabase
         .from('support_tickets')
         .select('*')
         .eq('is_overdue', true)
         .order('sla_due_at', { ascending: true });
 
-      if (error) throw error;
-      return data;
+        if (error) throw error;
+        return data || [];
+      } catch (error) {
+        console.error('Error fetching overdue tickets:', error);
+        return [];
+      }
     },
+    retry: 2,
   });
 
   // التذاكر الحديثة
-  const { data: recentTickets } = useQuery({
+  const { data: recentTickets, error: recentError } = useQuery({
     queryKey: ['support-stats', 'recent'],
     queryFn: async () => {
+      try {
       const { data, error } = await supabase
         .from('support_tickets')
         .select(`
@@ -97,15 +110,24 @@ export function useSupportStats() {
         .order('created_at', { ascending: false })
         .limit(10);
 
-      if (error) throw error;
-      return data;
+        if (error) {
+          console.error('Error fetching recent tickets:', error);
+          return [];
+        }
+        return data || [];
+      } catch (error) {
+        console.error('Error in recent tickets query:', error);
+        return [];
+      }
     },
+    retry: 2,
   });
 
   // إحصائيات تاريخية (آخر 30 يوم)
-  const { data: historicalStats } = useQuery({
+  const { data: historicalStats, error: historicalError } = useQuery({
     queryKey: ['support-stats', 'historical'],
     queryFn: async () => {
+      try {
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
@@ -115,9 +137,17 @@ export function useSupportStats() {
         .gte('date', thirtyDaysAgo.toISOString().split('T')[0])
         .order('date', { ascending: true });
 
-      if (error) throw error;
-      return data as SupportStatistics[];
+        if (error) {
+          console.error('Error fetching historical stats:', error);
+          return [];
+        }
+        return (data || []) as SupportStatistics[];
+      } catch (error) {
+        console.error('Error in historical stats query:', error);
+        return [];
+      }
     },
+    retry: 2,
   });
 
   return {
@@ -126,5 +156,9 @@ export function useSupportStats() {
     recentTickets,
     historicalStats,
     overviewLoading,
+    overviewError,
+    overdueError,
+    recentError,
+    historicalError,
   };
 }
