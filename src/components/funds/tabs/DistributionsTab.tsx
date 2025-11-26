@@ -1,17 +1,14 @@
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Eye, CheckSquare, Calculator, Plus, Trash2, Edit } from "lucide-react";
-import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
-import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
+import { Eye, CheckSquare, Calculator, Plus, Trash2 } from "lucide-react";
 import { DistributionDetailsDialog } from "@/components/distributions/DistributionDetailsDialog";
 import { ApprovalWorkflowDialog } from "@/components/distributions/ApprovalWorkflowDialog";
 import { DistributionSimulator } from "@/components/distributions/DistributionSimulator";
 import { CreateDistributionDialog } from "@/components/distributions/CreateDistributionDialog";
 import { useDistributions, Distribution } from "@/hooks/useDistributions";
 import { ExportButton } from "@/components/shared/ExportButton";
+import { UnifiedDataTable } from "@/components/unified/UnifiedDataTable";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import {
@@ -61,6 +58,70 @@ export function DistributionsTab() {
     return <Badge variant={variants[status] || "default"}>{status}</Badge>;
   };
 
+  // Define columns for UnifiedDataTable
+  const columns = [
+    {
+      key: "month",
+      label: "الشهر",
+      render: (value: string) => <span className="font-medium">{value}</span>
+    },
+    {
+      key: "total_amount",
+      label: "إجمالي المبلغ",
+      render: (value: number) => `${value?.toLocaleString() || 0} ر.س`
+    },
+    {
+      key: "beneficiaries_count",
+      label: "عدد المستفيدين",
+    },
+    {
+      key: "status",
+      label: "الحالة",
+      render: (_: any, row: Distribution) => getStatusBadge(row.status)
+    }
+  ];
+
+  // Actions for each row
+  const renderActions = (distribution: Distribution) => (
+    <div className="flex items-center justify-center gap-2">
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => {
+          setSelectedDistribution(distribution);
+          setDetailsOpen(true);
+        }}
+        className="gap-1 text-xs"
+      >
+        <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
+        <span className="hidden sm:inline">التفاصيل</span>
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => {
+          setSelectedDistribution(distribution);
+          setApprovalOpen(true);
+        }}
+        className="gap-1 text-xs"
+      >
+        <CheckSquare className="h-3 w-3 sm:h-4 sm:w-4" />
+        <span className="hidden sm:inline">الموافقات</span>
+      </Button>
+      {distribution.status !== "معتمد" && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => handleDeleteClick(distribution)}
+          className="gap-1 text-xs text-destructive hover:text-destructive"
+        >
+          <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+          <span className="hidden sm:inline">حذف</span>
+        </Button>
+      )}
+    </div>
+  );
+
   return (
     <div className="space-y-6">
       {/* أزرار الإجراءات */}
@@ -92,97 +153,16 @@ export function DistributionsTab() {
         </Button>
       </div>
 
-      {/* جدول التوزيعات السابقة */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base sm:text-lg">التوزيعات السابقة</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ScrollableTableWrapper>
-            <MobileScrollHint />
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-xs sm:text-sm">الشهر</TableHead>
-                  <TableHead className="text-xs sm:text-sm">إجمالي المبلغ</TableHead>
-                  <TableHead className="text-xs sm:text-sm">عدد المستفيدين</TableHead>
-                  <TableHead className="text-xs sm:text-sm">الحالة</TableHead>
-                  <TableHead className="text-xs sm:text-sm text-center">الإجراءات</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoading ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center text-xs sm:text-sm">
-                      جاري التحميل...
-                    </TableCell>
-                  </TableRow>
-                ) : distributions.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center text-xs sm:text-sm text-muted-foreground">
-                      لا توجد توزيعات
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  distributions.map((distribution) => (
-                    <TableRow key={distribution.id}>
-                      <TableCell className="font-medium text-xs sm:text-sm">
-                        {distribution.month}
-                      </TableCell>
-                      <TableCell className="text-xs sm:text-sm">
-                        {distribution.total_amount?.toLocaleString()} ر.س
-                      </TableCell>
-                      <TableCell className="text-xs sm:text-sm">
-                        {distribution.beneficiaries_count}
-                      </TableCell>
-                      <TableCell>{getStatusBadge(distribution.status)}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center justify-center gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              setSelectedDistribution(distribution);
-                              setDetailsOpen(true);
-                            }}
-                            className="gap-1 text-xs"
-                          >
-                            <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
-                            <span className="hidden sm:inline">التفاصيل</span>
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              setSelectedDistribution(distribution);
-                              setApprovalOpen(true);
-                            }}
-                            className="gap-1 text-xs"
-                          >
-                            <CheckSquare className="h-3 w-3 sm:h-4 sm:w-4" />
-                            <span className="hidden sm:inline">الموافقات</span>
-                          </Button>
-                          {distribution.status !== "معتمد" && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDeleteClick(distribution)}
-                              className="gap-1 text-xs text-destructive hover:text-destructive"
-                            >
-                              <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
-                              <span className="hidden sm:inline">حذف</span>
-                            </Button>
-                          )}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </ScrollableTableWrapper>
-        </CardContent>
-      </Card>
+      {/* Unified Data Table */}
+      <UnifiedDataTable
+        title="التوزيعات السابقة"
+        columns={columns}
+        data={distributions}
+        loading={isLoading}
+        emptyMessage="لا توجد توزيعات"
+        actions={renderActions}
+        showMobileScrollHint={true}
+      />
 
       <DistributionDetailsDialog
         open={detailsOpen}
