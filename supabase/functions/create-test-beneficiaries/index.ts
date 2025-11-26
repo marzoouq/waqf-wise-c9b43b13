@@ -51,6 +51,13 @@ serve(async (req) => {
       const oldUser = existingUser?.users?.find(u => u.email === email)
       
       if (oldUser) {
+        // فك الربط من جدول beneficiaries أولاً
+        await supabaseAdmin
+          .from('beneficiaries')
+          .update({ user_id: null })
+          .eq('user_id', oldUser.id)
+        
+        // الآن يمكن حذف المستخدم
         await supabaseAdmin.auth.admin.deleteUser(oldUser.id)
       }
 
