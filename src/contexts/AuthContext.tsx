@@ -24,23 +24,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check current session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // Listen for auth changes FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        fetchProfile(session.user.id);
+        // Defer fetchProfile to avoid callback deadlock
+        setTimeout(() => fetchProfile(session.user.id), 0);
       } else {
+        setProfile(null);
         setIsLoading(false);
       }
     });
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    // Then check current session
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        fetchProfile(session.user.id);
+        // Defer fetchProfile to avoid callback deadlock
+        setTimeout(() => fetchProfile(session.user.id), 0);
       } else {
-        setProfile(null);
         setIsLoading(false);
       }
     });

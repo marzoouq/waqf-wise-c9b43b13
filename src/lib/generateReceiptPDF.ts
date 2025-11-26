@@ -1,9 +1,10 @@
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import { formatZATCACurrency } from "./zatca";
 import type { OrganizationSettings } from "@/hooks/useOrganizationSettings";
 import { loadAmiriFonts } from "./fonts/loadArabicFonts";
 import { logger } from "./logger";
+
+// Dynamic import type
+type JsPDF = any;
 
 interface Receipt {
   id: string;
@@ -20,8 +21,16 @@ interface Receipt {
 export const generateReceiptPDF = async (
   receipt: Receipt,
   orgSettings: OrganizationSettings | null
-): Promise<jsPDF> => {
+): Promise<any> => {
   try {
+    // Dynamic imports
+    const [jsPDFModule] = await Promise.all([
+      import('jspdf'),
+      import('jspdf-autotable')
+    ]);
+    
+    const jsPDF = jsPDFModule.default;
+    
     // تحميل الخطوط العربية
     const { regular: amiriRegular, bold: amiriBold } = await loadAmiriFonts();
     

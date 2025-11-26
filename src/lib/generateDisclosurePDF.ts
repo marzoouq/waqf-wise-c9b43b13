@@ -1,5 +1,3 @@
-import jsPDF from "jspdf";
-import "jspdf-autotable";
 import { AnnualDisclosure } from "@/hooks/useAnnualDisclosures";
 import { logger } from "@/lib/logger";
 import { Database } from "@/integrations/supabase/types";
@@ -7,8 +5,11 @@ import { withAutoTable } from "@/types/pdf";
 
 type DisclosureBeneficiary = Database['public']['Tables']['disclosure_beneficiaries']['Row'];
 
+// Dynamic import type
+type JsPDF = any;
+
 // Load Arabic font
-const loadArabicFont = async (doc: jsPDF) => {
+const loadArabicFont = async (doc: JsPDF) => {
   try {
     const response = await fetch('/fonts/amiri.zip');
     if (response.ok) {
@@ -37,6 +38,12 @@ export const generateDisclosurePDF = async (
   disclosure: AnnualDisclosure,
   beneficiaries: DisclosureBeneficiary[] = []
 ) => {
+  const [jsPDFModule] = await Promise.all([
+    import('jspdf'),
+    import('jspdf-autotable')
+  ]);
+  
+  const jsPDF = jsPDFModule.default;
   const baseDoc = new jsPDF();
   const doc = withAutoTable(baseDoc);
   

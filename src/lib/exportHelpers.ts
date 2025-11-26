@@ -1,20 +1,30 @@
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import * as XLSX from "xlsx";
 
+// Dynamic imports for jsPDF
+type JsPDF = any;
+type AutoTable = any;
+
 // Add Arabic font support for PDF (using a fallback for now)
-const configureArabicPDF = (doc: jsPDF) => {
+const configureArabicPDF = (doc: JsPDF) => {
   // Note: For proper Arabic support, you would need to add a custom Arabic font
   // For now, we'll use the default font with right-to-left text
   doc.setLanguage("ar");
 };
 
-export const exportToPDF = (
+export const exportToPDF = async (
   title: string,
   headers: string[],
   data: (string | number | boolean | null | undefined)[][],
   filename: string
 ) => {
+  const [jsPDFModule, autoTableModule] = await Promise.all([
+    import('jspdf'),
+    import('jspdf-autotable')
+  ]);
+  
+  const jsPDF = jsPDFModule.default;
+  const autoTable = autoTableModule.default;
+  
   const doc = new jsPDF();
   configureArabicPDF(doc);
 
@@ -76,12 +86,14 @@ export const exportToExcel = (
   XLSX.writeFile(workbook, `${filename}.xlsx`);
 };
 
-export const exportFinancialStatementToPDF = (
+export const exportFinancialStatementToPDF = async (
   title: string,
   sections: { title: string; items: { label: string; amount: number }[] }[],
   totals: { label: string; amount: number }[],
   filename: string
 ) => {
+  const { default: jsPDF } = await import('jspdf');
+  
   const doc = new jsPDF();
   configureArabicPDF(doc);
 

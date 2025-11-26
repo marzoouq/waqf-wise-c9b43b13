@@ -1,10 +1,11 @@
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import QRCode from "qrcode";
 import { formatZATCACurrency, formatVATNumber } from "./zatca";
 import type { OrganizationSettings } from "@/hooks/useOrganizationSettings";
 import { loadAmiriFonts } from "./fonts/loadArabicFonts";
 import { logger } from "./logger";
+
+// Dynamic import type
+type JsPDF = any;
 
 interface Invoice {
   id: string;
@@ -40,8 +41,17 @@ export const generateInvoicePDF = async (
   invoice: Invoice,
   lines: InvoiceLine[],
   orgSettings: OrganizationSettings | null
-): Promise<jsPDF> => {
+): Promise<any> => {
   try {
+    // Dynamic imports
+    const [jsPDFModule, autoTableModule] = await Promise.all([
+      import('jspdf'),
+      import('jspdf-autotable')
+    ]);
+    
+    const jsPDF = jsPDFModule.default;
+    const autoTable = autoTableModule.default;
+    
     // تحميل الخطوط العربية
     const { regular: amiriRegular, bold: amiriBold } = await loadAmiriFonts();
     
