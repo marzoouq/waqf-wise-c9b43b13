@@ -10,7 +10,7 @@ import { ar } from 'date-fns/locale';
 import { Database } from '@/integrations/supabase/types';
 
 type BeneficiaryRequest = Database['public']['Tables']['beneficiary_requests']['Row'] & {
-  request_types?: { name: string; description: string | null } | null;
+  request_types?: { name_ar: string; description: string | null } | null;
 };
 
 interface ProfileRequestsHistoryProps {
@@ -25,13 +25,13 @@ export function ProfileRequestsHistory({ beneficiaryId }: ProfileRequestsHistory
         .from('beneficiary_requests')
         .select(`
           *,
-          request_types(name, description)
+          request_types(name_ar, description)
         `)
         .eq('beneficiary_id', beneficiaryId)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return (data || []) as BeneficiaryRequest[];
+      return (data || []) as any[];
     },
     staleTime: 60 * 1000,
   });
@@ -140,7 +140,7 @@ export function ProfileRequestsHistory({ beneficiaryId }: ProfileRequestsHistory
                       <div className="flex items-center gap-2 mb-2">
                         <FileText className="h-4 w-4 text-muted-foreground" />
                         <h4 className="font-semibold text-foreground">
-                          {request.request_types?.name || 'طلب'}
+                          {request.request_types?.name_ar || 'طلب'}
                         </h4>
                       </div>
                       <p className="text-sm text-muted-foreground mb-2">

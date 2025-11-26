@@ -75,7 +75,7 @@ export default function StaffRequestsManagement() {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['all-beneficiary-requests'] });
-      toast.success(variables.status === 'موافق' ? 'تمت الموافقة على الطلب' : 'تم رفض الطلب');
+      toast.success(variables.status === 'approved' ? 'تمت الموافقة على الطلب' : 'تم رفض الطلب');
       setSelectedRequest(null);
       setReviewNotes('');
     },
@@ -88,7 +88,7 @@ export default function StaffRequestsManagement() {
     if (!selectedRequest) return;
     updateRequestStatus.mutate({
       requestId: selectedRequest.id,
-      status: 'موافق',
+      status: 'approved',
       notes: reviewNotes,
     });
   };
@@ -100,7 +100,7 @@ export default function StaffRequestsManagement() {
     }
     updateRequestStatus.mutate({
       requestId: selectedRequest.id,
-      status: 'مرفوض',
+      status: 'rejected',
       notes: reviewNotes,
     });
   };

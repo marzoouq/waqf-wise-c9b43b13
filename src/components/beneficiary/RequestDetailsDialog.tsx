@@ -150,7 +150,7 @@ export function RequestDetailsDialog({
             {getPriorityBadge(request.priority)}
           </DialogTitle>
           <DialogDescription>
-            {request.request_types?.name_ar} • تم التقديم في{" "}
+            {(request as any).request_types?.name_ar} • تم التقديم في{" "}
             {new Date(request.submitted_at).toLocaleDateString("ar-SA")}
           </DialogDescription>
         </DialogHeader>

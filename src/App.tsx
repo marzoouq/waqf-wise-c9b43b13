@@ -59,6 +59,8 @@ const Install = lazy(() => import("./pages/Install"));
 const Notifications = lazy(() => import("./pages/Notifications"));
 const Requests = lazy(() => import("./pages/Requests"));
 const StaffRequests = lazy(() => import("./pages/StaffRequests"));
+const BeneficiaryRequests = lazy(() => import("./pages/BeneficiaryRequests"));
+const StaffRequestsManagement = lazy(() => import("./pages/StaffRequestsManagement"));
 const Families = lazy(() => import("./pages/Families"));
 const FamilyDetails = lazy(() => import("./pages/FamilyDetails"));
 const Users = lazy(() => import("./pages/Users"));
@@ -330,8 +332,23 @@ const App = () => {
             } 
           />
           <Route path="/notifications" element={<Notifications />} />
+          <Route 
+            path="/beneficiary/requests" 
+            element={
+              <ProtectedRoute requiredRole="beneficiary">
+                <BeneficiaryRequests />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/staff/requests" 
+            element={
+              <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+                <StaffRequestsManagement />
+              </ProtectedRoute>
+            } 
+          />
           <Route path="/requests" element={<Requests />} />
-          <Route path="/staff/requests" element={<StaffRequests />} />
           <Route 
             path="/audit-logs" 
             element={

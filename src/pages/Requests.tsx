@@ -211,7 +211,7 @@ const Requests = () => {
             data={filteredRequests.map(r => ({
               'رقم الطلب': r.request_number,
               'المستفيد': r.beneficiary && 'full_name' in r.beneficiary ? r.beneficiary.full_name : '-',
-              'نوع الطلب': r.request_type?.name || '-',
+              'نوع الطلب': (r.request_type as any)?.name_ar || '-',
               'الوصف': r.description,
               'المبلغ': r.amount ? `${r.amount.toLocaleString()} ر.س` : '-',
               'الحالة': r.status,
@@ -432,9 +432,7 @@ const Requests = () => {
                       </TableCell>
                       <TableCell className="text-xs sm:text-sm hidden md:table-cell">
                         <Badge variant="outline" className="text-xs whitespace-nowrap">
-                          {request.request_type && 'name' in request.request_type 
-                            ? request.request_type.name 
-                            : '-'}
+                          {(request.request_type as any)?.name_ar || '-'}
                         </Badge>
                       </TableCell>
                       <TableCell className="max-w-xs truncate text-xs sm:text-sm hidden lg:table-cell">
@@ -469,7 +467,7 @@ const Requests = () => {
                             size="sm"
                             variant="outline"
                             onClick={() => {
-                              setSelectedRequest(request);
+                              setSelectedRequest(request as any);
                               setApprovalDialogOpen(true);
                             }}
                             className="text-xs"
@@ -482,7 +480,7 @@ const Requests = () => {
                             size="sm"
                             variant="outline"
                             onClick={() => {
-                              setSelectedRequest(request);
+                              setSelectedRequest(request as any);
                               setCommentsDialogOpen(true);
                             }}
                             className="text-xs"
@@ -494,7 +492,7 @@ const Requests = () => {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => handleDeleteClick(request)}
+                            onClick={() => handleDeleteClick(request as any)}
                             className="text-xs text-destructive hover:text-destructive"
                           >
                             <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />

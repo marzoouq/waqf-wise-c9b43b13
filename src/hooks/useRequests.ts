@@ -19,7 +19,7 @@ export const useRequestTypes = () => {
         .from('request_types')
         .select('*')
         .eq('is_active', true)
-        .order('name', { ascending: true });
+        .order('name_ar', { ascending: true });
 
       if (error) throw error;
       return data as unknown as RequestType[];
@@ -49,7 +49,7 @@ export const useRequests = (beneficiaryId?: string) => {
         .from('beneficiary_requests')
         .select(`
           *,
-          request_type:request_types(name, icon),
+          request_type:request_types(name_ar, description),
           beneficiary:beneficiaries(full_name)
         `)
         .order('submitted_at', { ascending: false });
@@ -61,7 +61,7 @@ export const useRequests = (beneficiaryId?: string) => {
       const { data, error } = await query;
 
       if (error) throw error;
-      return data as BeneficiaryRequest[];
+      return data || [];
     },
   });
 
@@ -91,14 +91,14 @@ export const useRequests = (beneficiaryId?: string) => {
           .from('beneficiary_requests')
           .select(`
             *,
-            request_type:request_types(name, icon),
+            request_type:request_types(name_ar, description),
             beneficiary:beneficiaries(full_name)
           `)
           .eq('id', requestId)
           .maybeSingle();
 
         if (error) throw error;
-        return data as BeneficiaryRequest | null;
+        return data || null;
       },
       enabled: !!requestId,
     });

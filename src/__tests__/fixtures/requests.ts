@@ -4,22 +4,20 @@ type BeneficiaryRequest = Database['public']['Tables']['beneficiary_requests']['
 type RequestType = Database['public']['Tables']['request_types']['Insert'];
 
 export const mockRequestType = (overrides?: Partial<RequestType>): RequestType => ({
-  name: 'فزعة طارئة',
   name_ar: 'فزعة طارئة',
+  name_en: 'Emergency Aid',
   description: 'طلب مساعدة مالية طارئة',
-  icon: 'alert-circle',
-  requires_approval: true,
-  sla_hours: 24,
+  requires_amount: true,
   is_active: true,
   ...overrides,
 });
 
 export const mockRequestTypes = (): RequestType[] => [
-  mockRequestType({ name: 'فزعة طارئة', name_ar: 'فزعة طارئة', sla_hours: 24 }),
-  mockRequestType({ name: 'قرض حسن', name_ar: 'قرض حسن', sla_hours: 72 }),
-  mockRequestType({ name: 'تحديث بيانات', name_ar: 'تحديث بيانات', requires_approval: false, sla_hours: 48 }),
-  mockRequestType({ name: 'إضافة مولود', name_ar: 'إضافة مولود', sla_hours: 48 }),
-  mockRequestType({ name: 'استقلالية زوجة', name_ar: 'استقلالية زوجة', sla_hours: 72 }),
+  mockRequestType({ name_ar: 'فزعة طارئة', name_en: 'Emergency Aid', requires_amount: true }),
+  mockRequestType({ name_ar: 'قرض حسن', name_en: 'Loan', requires_amount: true }),
+  mockRequestType({ name_ar: 'تحديث بيانات', name_en: 'Data Update', requires_amount: false }),
+  mockRequestType({ name_ar: 'إضافة مولود', name_en: 'Add Newborn', requires_amount: false }),
+  mockRequestType({ name_ar: 'استقلالية زوجة', name_en: 'Wife Separation', requires_amount: false }),
 ];
 
 export const mockBeneficiaryRequest = (
