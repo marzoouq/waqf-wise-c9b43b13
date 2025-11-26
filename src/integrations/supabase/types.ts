@@ -8235,6 +8235,7 @@ export type Database = {
           name_ar: string
           name_en: string | null
           requires_amount: boolean | null
+          sla_hours: number | null
           updated_at: string | null
         }
         Insert: {
@@ -8245,6 +8246,7 @@ export type Database = {
           name_ar: string
           name_en?: string | null
           requires_amount?: boolean | null
+          sla_hours?: number | null
           updated_at?: string | null
         }
         Update: {
@@ -8255,6 +8257,7 @@ export type Database = {
           name_ar?: string
           name_en?: string | null
           requires_amount?: boolean | null
+          sla_hours?: number | null
           updated_at?: string | null
         }
         Relationships: []
