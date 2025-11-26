@@ -3200,6 +3200,112 @@ export type Database = {
           },
         ]
       }
+      emergency_aid: {
+        Row: {
+          aid_type: string
+          amount: number
+          approved_by: string | null
+          approved_date: string | null
+          beneficiary_id: string
+          created_at: string | null
+          disbursed_by: string | null
+          disbursed_date: string | null
+          id: string
+          notes: string | null
+          payment_voucher_id: string | null
+          reason: string
+          rejection_reason: string | null
+          request_id: string | null
+          requested_date: string
+          status: string | null
+          updated_at: string | null
+          urgency_level: string | null
+        }
+        Insert: {
+          aid_type?: string
+          amount: number
+          approved_by?: string | null
+          approved_date?: string | null
+          beneficiary_id: string
+          created_at?: string | null
+          disbursed_by?: string | null
+          disbursed_date?: string | null
+          id?: string
+          notes?: string | null
+          payment_voucher_id?: string | null
+          reason: string
+          rejection_reason?: string | null
+          request_id?: string | null
+          requested_date?: string
+          status?: string | null
+          updated_at?: string | null
+          urgency_level?: string | null
+        }
+        Update: {
+          aid_type?: string
+          amount?: number
+          approved_by?: string | null
+          approved_date?: string | null
+          beneficiary_id?: string
+          created_at?: string | null
+          disbursed_by?: string | null
+          disbursed_date?: string | null
+          id?: string
+          notes?: string | null
+          payment_voucher_id?: string | null
+          reason?: string
+          rejection_reason?: string | null
+          request_id?: string | null
+          requested_date?: string
+          status?: string | null
+          updated_at?: string | null
+          urgency_level?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emergency_aid_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emergency_aid_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_account_statement"
+            referencedColumns: ["beneficiary_id"]
+          },
+          {
+            foreignKeyName: "emergency_aid_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_statistics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emergency_aid_payment_voucher_id_fkey"
+            columns: ["payment_voucher_id"]
+            isOneToOne: false
+            referencedRelation: "payment_vouchers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emergency_aid_payment_voucher_id_fkey"
+            columns: ["payment_voucher_id"]
+            isOneToOne: false
+            referencedRelation: "payment_vouchers_with_details"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emergency_aid_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       emergency_aid_requests: {
         Row: {
           amount_approved: number | null
@@ -5380,6 +5486,110 @@ export type Database = {
           },
         ]
       }
+      loan_schedules: {
+        Row: {
+          created_at: string | null
+          due_date: string
+          id: string
+          installment_number: number
+          interest_amount: number | null
+          loan_id: string
+          notes: string | null
+          paid_amount: number | null
+          payment_date: string | null
+          principal_amount: number
+          status: string | null
+          total_amount: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          due_date: string
+          id?: string
+          installment_number: number
+          interest_amount?: number | null
+          loan_id: string
+          notes?: string | null
+          paid_amount?: number | null
+          payment_date?: string | null
+          principal_amount: number
+          status?: string | null
+          total_amount: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          due_date?: string
+          id?: string
+          installment_number?: number
+          interest_amount?: number | null
+          loan_id?: string
+          notes?: string | null
+          paid_amount?: number | null
+          payment_date?: string | null
+          principal_amount?: number
+          status?: string | null
+          total_amount?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loan_schedules_loan_id_fkey"
+            columns: ["loan_id"]
+            isOneToOne: false
+            referencedRelation: "loans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      loan_types: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          grace_period_months: number | null
+          id: string
+          interest_rate: number | null
+          is_active: boolean | null
+          max_amount: number | null
+          max_term_months: number | null
+          min_amount: number | null
+          name_ar: string
+          name_en: string | null
+          requires_guarantor: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          grace_period_months?: number | null
+          id?: string
+          interest_rate?: number | null
+          is_active?: boolean | null
+          max_amount?: number | null
+          max_term_months?: number | null
+          min_amount?: number | null
+          name_ar: string
+          name_en?: string | null
+          requires_guarantor?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          grace_period_months?: number | null
+          id?: string
+          interest_rate?: number | null
+          is_active?: boolean | null
+          max_amount?: number | null
+          max_term_months?: number | null
+          min_amount?: number | null
+          name_ar?: string
+          name_en?: string | null
+          requires_guarantor?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       loans: {
         Row: {
           approved_at: string | null
@@ -5996,6 +6206,79 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      notification_settings: {
+        Row: {
+          beneficiary_id: string | null
+          created_at: string | null
+          distribution_notifications: boolean | null
+          email_enabled: boolean | null
+          id: string
+          in_app_enabled: boolean | null
+          loan_notifications: boolean | null
+          payment_notifications: boolean | null
+          push_enabled: boolean | null
+          request_notifications: boolean | null
+          sms_enabled: boolean | null
+          system_notifications: boolean | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          beneficiary_id?: string | null
+          created_at?: string | null
+          distribution_notifications?: boolean | null
+          email_enabled?: boolean | null
+          id?: string
+          in_app_enabled?: boolean | null
+          loan_notifications?: boolean | null
+          payment_notifications?: boolean | null
+          push_enabled?: boolean | null
+          request_notifications?: boolean | null
+          sms_enabled?: boolean | null
+          system_notifications?: boolean | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          beneficiary_id?: string | null
+          created_at?: string | null
+          distribution_notifications?: boolean | null
+          email_enabled?: boolean | null
+          id?: string
+          in_app_enabled?: boolean | null
+          loan_notifications?: boolean | null
+          payment_notifications?: boolean | null
+          push_enabled?: boolean | null
+          request_notifications?: boolean | null
+          sms_enabled?: boolean | null
+          system_notifications?: boolean | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_settings_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: true
+            referencedRelation: "beneficiaries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notification_settings_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: true
+            referencedRelation: "beneficiary_account_statement"
+            referencedColumns: ["beneficiary_id"]
+          },
+          {
+            foreignKeyName: "notification_settings_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: true
+            referencedRelation: "beneficiary_statistics"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       notification_templates: {
         Row: {
@@ -7319,6 +7602,53 @@ export type Database = {
             columns: ["receipt_id"]
             isOneToOne: false
             referencedRelation: "payments_with_contract_details"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      report_generation_log: {
+        Row: {
+          created_at: string | null
+          error_message: string | null
+          file_format: string | null
+          file_path: string | null
+          generated_by: string | null
+          generation_time_ms: number | null
+          id: string
+          report_id: string | null
+          report_name: string
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          error_message?: string | null
+          file_format?: string | null
+          file_path?: string | null
+          generated_by?: string | null
+          generation_time_ms?: number | null
+          id?: string
+          report_id?: string | null
+          report_name: string
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          error_message?: string | null
+          file_format?: string | null
+          file_path?: string | null
+          generated_by?: string | null
+          generation_time_ms?: number | null
+          id?: string
+          report_id?: string | null
+          report_name?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_generation_log_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "custom_reports"
             referencedColumns: ["id"]
           },
         ]

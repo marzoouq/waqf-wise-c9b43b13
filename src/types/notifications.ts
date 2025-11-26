@@ -33,3 +33,33 @@ export interface NotificationPreferences {
   sms: boolean;
   push: boolean;
 }
+
+export interface Notification {
+  id: string;
+  user_id?: string;
+  beneficiary_id?: string;
+  title: string;
+  message: string;
+  notification_type: string;
+  priority: 'low' | 'normal' | 'high' | 'urgent';
+  status: 'unread' | 'read' | 'archived';
+  channel: 'in_app' | 'email' | 'sms' | 'push';
+  reference_type?: string;
+  reference_id?: string;
+  created_at: string;
+}
+
+export interface NotificationSettings {
+  id: string;
+  user_id?: string;
+  beneficiary_id?: string;
+  email_enabled: boolean;
+  sms_enabled: boolean;
+  push_enabled: boolean;
+  in_app_enabled: boolean;
+  distribution_notifications: boolean;
+  request_notifications: boolean;
+  payment_notifications: boolean;
+  loan_notifications: boolean;
+  system_notifications: boolean;
+}
