@@ -150,6 +150,7 @@ const menuGroups = [
       { icon: Activity, label: "لوحة المراقبة", path: "/system-monitoring", roles: ["admin", "nazer"] },
       { icon: AlertTriangle, label: "سجلات الأخطاء", path: "/system-error-logs", roles: ["admin", "nazer"] },
       { icon: Settings, label: "صيانة النظام", path: "/system-maintenance", roles: ["admin", "nazer"] },
+      { icon: BookOpen, label: "توثيق المشروع", path: "/project-documentation", roles: ["admin", "nazer"] },
       { icon: BookOpen, label: "دليل المطور", path: "/developer-guide", roles: ["admin"] },
       { icon: Settings, label: "الإعدادات العامة", path: "/settings", roles: ["all"] },
     ]

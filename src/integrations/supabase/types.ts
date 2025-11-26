@@ -3512,6 +3512,64 @@ export type Database = {
           },
         ]
       }
+      documentation_changelog: {
+        Row: {
+          change_type: string
+          changed_by: string | null
+          changed_by_name: string | null
+          created_at: string | null
+          doc_id: string | null
+          id: string
+          new_value: string | null
+          notes: string | null
+          old_value: string | null
+        }
+        Insert: {
+          change_type: string
+          changed_by?: string | null
+          changed_by_name?: string | null
+          created_at?: string | null
+          doc_id?: string | null
+          id?: string
+          new_value?: string | null
+          notes?: string | null
+          old_value?: string | null
+        }
+        Update: {
+          change_type?: string
+          changed_by?: string | null
+          changed_by_name?: string | null
+          created_at?: string | null
+          doc_id?: string | null
+          id?: string
+          new_value?: string | null
+          notes?: string | null
+          old_value?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documentation_changelog_changed_by_fkey"
+            columns: ["changed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documentation_changelog_changed_by_fkey"
+            columns: ["changed_by"]
+            isOneToOne: false
+            referencedRelation: "user_profile_with_roles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documentation_changelog_doc_id_fkey"
+            columns: ["doc_id"]
+            isOneToOne: false
+            referencedRelation: "project_documentation"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       documents: {
         Row: {
           category: string
@@ -8178,6 +8236,92 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      project_documentation: {
+        Row: {
+          assigned_to: string | null
+          category: string
+          completion_date: string | null
+          completion_percentage: number | null
+          created_at: string | null
+          deliverables: Json | null
+          description: string | null
+          id: string
+          notes: string | null
+          phase_name: string
+          phase_number: number
+          start_date: string | null
+          status: string
+          tasks: Json | null
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          category: string
+          completion_date?: string | null
+          completion_percentage?: number | null
+          created_at?: string | null
+          deliverables?: Json | null
+          description?: string | null
+          id?: string
+          notes?: string | null
+          phase_name: string
+          phase_number: number
+          start_date?: string | null
+          status?: string
+          tasks?: Json | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          category?: string
+          completion_date?: string | null
+          completion_percentage?: number | null
+          created_at?: string | null
+          deliverables?: Json | null
+          description?: string | null
+          id?: string
+          notes?: string | null
+          phase_name?: string
+          phase_number?: number
+          start_date?: string | null
+          status?: string
+          tasks?: Json | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_documentation_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_documentation_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "user_profile_with_roles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_documentation_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_documentation_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "user_profile_with_roles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       properties: {
         Row: {
