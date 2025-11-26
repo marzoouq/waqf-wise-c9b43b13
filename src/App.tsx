@@ -68,6 +68,7 @@ const CustomReportsPage = lazy(() => import("./pages/CustomReports"));
 const IntegrationsManagement = lazy(() => import("./pages/IntegrationsManagement"));
 const SecurityDashboard = lazy(() => import("./pages/SecurityDashboard"));
 const PerformanceDashboard = lazy(() => import("./pages/PerformanceDashboard"));
+const TestDataSetup = lazy(() => import("./pages/TestDataSetup"));
 const Families = lazy(() => import("./pages/Families"));
 const FamilyDetails = lazy(() => import("./pages/FamilyDetails"));
 const Users = lazy(() => import("./pages/Users"));
@@ -154,6 +155,7 @@ const App = () => {
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/install" element={<Install />} />
+                <Route path="/test-data-setup" element={<TestDataSetup />} />
                 
                 {/* Beneficiary Dashboard - مستقل خارج MainLayout */}
                 <Route 
