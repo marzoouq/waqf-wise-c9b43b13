@@ -1,206 +1,278 @@
-import { Card } from "@/components/ui/card";
-import { UnifiedDashboardLayout } from "@/components/dashboard/UnifiedDashboardLayout";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { Users, Building, FileText, AlertTriangle, Activity, Settings } from "lucide-react";
+import { Shield, LayoutDashboard, Users, Lock, Activity, Settings, Mail } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Suspense, useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { AdminSendMessageDialog } from "@/components/messages/AdminSendMessageDialog";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
+import { SystemHealthMonitor } from "@/components/dashboard/admin/SystemHealthMonitor";
+import { UserManagementSection } from "@/components/dashboard/admin/UserManagementSection";
+import { SecurityAlertsSection } from "@/components/dashboard/admin/SecurityAlertsSection";
+import { AuditLogsPreview } from "@/components/dashboard/admin/AuditLogsPreview";
+import { SystemPerformanceChart } from "@/components/dashboard/admin/SystemPerformanceChart";
+import { UsersActivityChart } from "@/components/dashboard/admin/UsersActivityChart";
+import { useAdminKPIs } from "@/hooks/useAdminKPIs";
+import { Users as UsersIcon, Building2, Wallet, FileText } from "lucide-react";
 
-export default function AdminDashboard() {
-  const navigate = useNavigate();
+const ChartSkeleton = () => (
+  <Card>
+    <CardHeader>
+      <Skeleton className="h-6 w-32" />
+    </CardHeader>
+    <CardContent>
+      <Skeleton className="h-64 w-full" />
+    </CardContent>
+  </Card>
+);
 
-  const { data: stats } = useQuery({
-    queryKey: ["admin-stats"],
-    queryFn: async () => {
-      const [users, beneficiaries, properties, activities] = await Promise.all([
-        supabase.from("user_roles").select("*", { count: "exact", head: true }),
-        supabase.from("beneficiaries").select("*", { count: "exact", head: true }),
-        supabase.from("properties").select("*", { count: "exact", head: true }),
-        supabase.from("activities").select("*", { count: "exact", head: true }),
-      ]);
+const SectionSkeleton = () => (
+  <Card>
+    <CardHeader>
+      <Skeleton className="h-6 w-40" />
+    </CardHeader>
+    <CardContent className="space-y-3">
+      {[...Array(3)].map((_, i) => (
+        <div key={i} className="flex items-center gap-4">
+          <Skeleton className="h-12 w-12 rounded-lg" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-3 w-2/3" />
+          </div>
+        </div>
+      ))}
+    </CardContent>
+  </Card>
+);
 
-      return {
-        users: users.count || 0,
-        beneficiaries: beneficiaries.count || 0,
-        properties: properties.count || 0,
-        activities: activities.count || 0,
-      };
-    },
-  });
+function AdminKPIsSection() {
+  const { data: kpis, isLoading } = useAdminKPIs();
 
-  const { data: recentActivities } = useQuery({
-    queryKey: ["recent-activities"],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("activities")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(5);
-      return data || [];
-    },
-  });
+  if (isLoading) {
+    return (
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {[...Array(4)].map((_, i) => (
+          <Card key={i}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-4 w-4" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-8 w-16 mb-2" />
+              <Skeleton className="h-3 w-32" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
 
-  const statsCards = [
-    {
-      title: "إجمالي المستخدمين",
-      value: stats?.users || 0,
-      icon: Users,
-      color: "bg-blue-500",
-      link: "/users",
-    },
+  if (!kpis) return null;
+
+  const stats = [
     {
       title: "إجمالي المستفيدين",
-      value: stats?.beneficiaries || 0,
-      icon: Users,
-      color: "bg-green-500",
-      link: "/beneficiaries",
+      value: kpis.totalBeneficiaries,
+      subtitle: `${kpis.activeBeneficiaries} نشط`,
+      icon: UsersIcon,
+      color: "text-blue-600",
+      bgColor: "bg-blue-50",
     },
     {
-      title: "إجمالي العقارات",
-      value: stats?.properties || 0,
-      icon: Building,
-      color: "bg-purple-500",
-      link: "/properties",
+      title: "العقارات",
+      value: kpis.totalProperties,
+      subtitle: `${kpis.occupiedProperties} مؤجر`,
+      icon: Building2,
+      color: "text-green-600",
+      bgColor: "bg-green-50",
     },
     {
-      title: "النشاطات الأخيرة",
-      value: stats?.activities || 0,
-      icon: Activity,
-      color: "bg-orange-500",
-      link: "/audit-logs",
-    },
-  ];
-
-  const quickLinks = [
-    {
-      title: "إدارة المستخدمين",
-      description: "إضافة وتعديل المستخدمين والصلاحيات",
-      icon: Users,
-      link: "/users",
+      title: "الأموال",
+      value: kpis.totalFunds,
+      subtitle: `${kpis.activeFunds} نشط`,
+      icon: Wallet,
+      color: "text-purple-600",
+      bgColor: "bg-purple-50",
     },
     {
-      title: "سجلات التدقيق",
-      description: "متابعة جميع العمليات في النظام",
+      title: "الطلبات المعلقة",
+      value: kpis.pendingRequests,
+      subtitle: `${kpis.overdueRequests} متأخر`,
       icon: FileText,
-      link: "/audit-logs",
-    },
-    {
-      title: "الإعدادات",
-      description: "تكوين النظام والإعدادات العامة",
-      icon: Settings,
-      link: "/settings",
-    },
-    {
-      title: "المراقبة والأداء",
-      description: "مراقبة أداء النظام والموارد",
-      icon: Activity,
-      link: "/monitoring",
+      color: "text-orange-600",
+      bgColor: "bg-orange-50",
     },
   ];
 
   return (
-    <UnifiedDashboardLayout
-      role="admin"
-      title="لوحة تحكم المشرف"
-      description="إدارة شاملة لجميع عمليات النظام"
-    >
-      {/* إحصائيات النظام */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {statsCards.map((stat, index) => {
-          const Icon = stat.icon;
-          return (
-            <Card
-              key={index}
-              className="p-6 hover:shadow-lg transition-shadow cursor-pointer"
-              onClick={() => navigate(stat.link)}
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">{stat.title}</p>
-                  <p className="text-3xl font-bold mt-2">{stat.value}</p>
-                </div>
-                <div className={`${stat.color} p-3 rounded-lg`}>
-                  <Icon className="h-6 w-6 text-white" />
-                </div>
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      {stats.map((stat, index) => {
+        const Icon = stat.icon;
+        return (
+          <Card key={index}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                {stat.title}
+              </CardTitle>
+              <div className={`${stat.bgColor} p-2 rounded-lg`}>
+                <Icon className={`h-4 w-4 ${stat.color}`} />
               </div>
-            </Card>
-          );
-        })}
-      </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stat.value}</div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {stat.subtitle}
+              </p>
+            </CardContent>
+          </Card>
+        );
+      })}
+    </div>
+  );
+}
 
-      {/* الروابط السريعة */}
-      <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4">الوصول السريع</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {quickLinks.map((link, index) => {
-            const Icon = link.icon;
-            return (
-              <Button
-                key={index}
-                variant="outline"
-                className="h-auto flex-col items-start p-4 text-right"
-                onClick={() => navigate(link.link)}
-              >
-                <Icon className="h-5 w-5 mb-2" />
-                <div className="font-semibold">{link.title}</div>
-                <div className="text-xs text-muted-foreground mt-1">
-                  {link.description}
-                </div>
-              </Button>
-            );
-          })}
-        </div>
-      </Card>
+export default function AdminDashboard() {
+  const [messageDialogOpen, setMessageDialogOpen] = useState(false);
 
-      {/* النشاطات الأخيرة */}
-      <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-          <Activity className="h-5 w-5" />
-          النشاطات الأخيرة
-        </h3>
-        <div className="space-y-3">
-          {recentActivities && recentActivities.length > 0 ? (
-            recentActivities.map((activity) => (
-              <div
-                key={activity.id}
-                className="flex items-center justify-between py-3 border-b last:border-b-0"
+  return (
+    <PageErrorBoundary pageName="لوحة تحكم المشرف">
+      <MobileOptimizedLayout>
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <MobileOptimizedHeader
+              title="لوحة تحكم المشرف"
+              description="إدارة شاملة للنظام والمستخدمين"
+              icon={<Shield className="h-8 w-8 text-primary" />}
+            />
+            <Button onClick={() => setMessageDialogOpen(true)} className="gap-2">
+              <Mail className="h-4 w-4" />
+              <span className="hidden sm:inline">إرسال رسالة</span>
+            </Button>
+          </div>
+
+          <Tabs defaultValue="system" className="w-full">
+            <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-grid h-auto p-1 bg-muted/50">
+              <TabsTrigger 
+                value="system" 
+                className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
               >
-                <div>
-                  <p className="font-medium">{activity.action}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {activity.user_name}
+                <LayoutDashboard className="h-4 w-4" />
+                <span className="hidden sm:inline">النظام</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="users" 
+                className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
+              >
+                <Users className="h-4 w-4" />
+                <span className="hidden sm:inline">المستخدمون</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="security" 
+                className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
+              >
+                <Lock className="h-4 w-4" />
+                <span className="hidden sm:inline">الأمان</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="performance" 
+                className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
+              >
+                <Activity className="h-4 w-4" />
+                <span className="hidden sm:inline">الأداء</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="settings" 
+                className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
+              >
+                <Settings className="h-4 w-4" />
+                <span className="hidden sm:inline">الإعدادات</span>
+              </TabsTrigger>
+            </TabsList>
+
+            {/* System Tab */}
+            <TabsContent value="system" className="space-y-6 mt-6">
+              <Suspense fallback={<SectionSkeleton />}>
+                <AdminKPIsSection />
+              </Suspense>
+
+              <div className="grid gap-6 lg:grid-cols-2">
+                <Suspense fallback={<ChartSkeleton />}>
+                  <SystemHealthMonitor />
+                </Suspense>
+                <Suspense fallback={<ChartSkeleton />}>
+                  <SecurityAlertsSection />
+                </Suspense>
+              </div>
+
+              <Suspense fallback={<ChartSkeleton />}>
+                <AuditLogsPreview />
+              </Suspense>
+            </TabsContent>
+
+            {/* Users Tab */}
+            <TabsContent value="users" className="space-y-6 mt-6">
+              <Suspense fallback={<ChartSkeleton />}>
+                <UserManagementSection />
+              </Suspense>
+
+              <Suspense fallback={<ChartSkeleton />}>
+                <UsersActivityChart />
+              </Suspense>
+
+              <Suspense fallback={<ChartSkeleton />}>
+                <AuditLogsPreview />
+              </Suspense>
+            </TabsContent>
+
+            {/* Security Tab */}
+            <TabsContent value="security" className="space-y-6 mt-6">
+              <Suspense fallback={<ChartSkeleton />}>
+                <SecurityAlertsSection />
+              </Suspense>
+
+              <Suspense fallback={<ChartSkeleton />}>
+                <AuditLogsPreview />
+              </Suspense>
+            </TabsContent>
+
+            {/* Performance Tab */}
+            <TabsContent value="performance" className="space-y-6 mt-6">
+              <Suspense fallback={<ChartSkeleton />}>
+                <SystemPerformanceChart />
+              </Suspense>
+
+              <div className="grid gap-6 lg:grid-cols-2">
+                <Suspense fallback={<ChartSkeleton />}>
+                  <SystemHealthMonitor />
+                </Suspense>
+                <Suspense fallback={<ChartSkeleton />}>
+                  <UsersActivityChart />
+                </Suspense>
+              </div>
+            </TabsContent>
+
+            {/* Settings Tab */}
+            <TabsContent value="settings" className="space-y-6 mt-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>إعدادات النظام</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">
+                    قريباً: إعدادات متقدمة للنظام
                   </p>
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  {new Date(activity.timestamp).toLocaleString("ar-SA")}
-                </div>
-              </div>
-            ))
-          ) : (
-            <p className="text-center text-muted-foreground py-4">
-              لا توجد نشاطات حديثة
-            </p>
-          )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </div>
-      </Card>
 
-      {/* تنبيهات النظام */}
-      <Card className="p-6 border-orange-200 bg-orange-50">
-        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-orange-800">
-          <AlertTriangle className="h-5 w-5" />
-          تنبيهات النظام
-        </h3>
-        <div className="space-y-2">
-          <div className="flex items-start gap-2 text-sm">
-            <div className="h-2 w-2 bg-orange-500 rounded-full mt-1.5" />
-            <p>النظام يعمل بشكل طبيعي</p>
-          </div>
-          <div className="flex items-start gap-2 text-sm">
-            <div className="h-2 w-2 bg-green-500 rounded-full mt-1.5" />
-            <p>آخر نسخة احتياطية: اليوم</p>
-          </div>
-        </div>
-      </Card>
-    </UnifiedDashboardLayout>
+        <AdminSendMessageDialog
+          open={messageDialogOpen}
+          onOpenChange={setMessageDialogOpen}
+        />
+      </MobileOptimizedLayout>
+    </PageErrorBoundary>
   );
 }
