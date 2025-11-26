@@ -43,44 +43,56 @@ serve(async (req) => {
     const results = []
     const password = 'Test@123456'
 
-    // أولاً: حذف جميع المستخدمين القدامى دفعة واحدة
-    console.log('🔍 البحث عن المستخدمين القدامى...')
+    console.log('🧹 تنظيف البيانات القديمة...')
+    
+    // Step 1: حذف جميع المستخدمين في auth.users الذين لديهم emails مثل @waqf.internal
     const { data: allUsers } = await supabaseAdmin.auth.admin.listUsers()
-    const emailsToDelete = beneficiaries.map(b => `${b.national_id}@waqf.internal`)
-    const usersToDelete = allUsers?.users?.filter(u => emailsToDelete.includes(u.email || '')) || []
+    const waqfUsers = allUsers?.users?.filter(u => u.email?.includes('@waqf.internal')) || []
     
-    console.log(`📝 وجد ${usersToDelete.length} مستخدم للحذف`)
-    
-    for (const user of usersToDelete) {
-      console.log(`🗑️ حذف المستخدم: ${user.email}`)
-      
-      // فك الربط من beneficiaries
-      const { error: unlinkError } = await supabaseAdmin
-        .from('beneficiaries')
-        .update({ user_id: null })
-        .eq('user_id', user.id)
-      
-      if (unlinkError) {
-        console.error(`❌ خطأ في فك الربط: ${unlinkError.message}`)
-      }
-      
-      // حذف المستخدم
-      const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(user.id)
-      if (deleteError) {
-        console.error(`❌ خطأ في حذف المستخدم: ${deleteError.message}`)
+    console.log(`🗑️ حذف ${waqfUsers.length} مستخدم من auth.users`)
+    for (const user of waqfUsers) {
+      const { error } = await supabaseAdmin.auth.admin.deleteUser(user.id)
+      if (error) {
+        console.error(`❌ فشل حذف ${user.email}: ${error.message}`)
       }
     }
+    
+    // Step 2: حذف الأدوار القديمة المرتبطة بالمستفيدين
+    const nationalIds = beneficiaries.map(b => b.national_id)
+    const { error: roleDeleteError } = await supabaseAdmin
+      .from('user_roles')
+      .delete()
+      .in('user_id', waqfUsers.map(u => u.id))
+    
+    if (roleDeleteError) {
+      console.error(`❌ خطأ في حذف الأدوار: ${roleDeleteError.message}`)
+    }
 
-    console.log('✅ تم حذف جميع المستخدمين القدامى')
+    // Step 3: تحديث beneficiaries لإزالة الربط مع المستخدمين المحذوفين
+    const { error: unlinkError } = await supabaseAdmin
+      .from('beneficiaries')
+      .update({ 
+        user_id: null,
+        can_login: false,
+        login_enabled_at: null
+      })
+      .in('national_id', nationalIds)
+    
+    if (unlinkError) {
+      console.error(`❌ خطأ في فك الربط: ${unlinkError.message}`)
+    }
 
-    // ثانياً: إنشاء المستخدمين الجدد
+    console.log('✅ تم تنظيف البيانات القديمة')
+
+    // Step 4: إنشاء المستخدمين الجدد
+    console.log('\n📝 إنشاء المستخدمين الجدد...\n')
+    
     for (const ben of beneficiaries) {
       const email = `${ben.national_id}@waqf.internal`
-      console.log(`\n🔧 معالجة: ${ben.full_name} (${ben.national_id})`)
+      console.log(`🔧 معالجة: ${ben.full_name} (${ben.national_id})`)
       
       try {
-        // إنشاء مستخدم جديد
-        console.log(`📧 إنشاء حساب مصادقة لـ: ${email}`)
+        // إنشاء مستخدم جديد في auth.users
         const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
           email,
           password,
@@ -92,14 +104,18 @@ serve(async (req) => {
         })
 
         if (authError) {
-          console.error(`❌ خطأ في إنشاء المصادقة: ${authError.message}`)
-          results.push({ national_id: ben.national_id, success: false, error: authError.message })
+          console.error(`  ❌ فشل إنشاء المصادقة: ${authError.message}`)
+          results.push({ 
+            national_id: ben.national_id, 
+            success: false, 
+            error: authError.message 
+          })
           continue
         }
 
-        console.log(`✅ تم إنشاء حساب المصادقة: ${authData.user.id}`)
+        console.log(`  ✅ تم إنشاء حساب المصادقة: ${authData.user.id}`)
 
-        // تحديث/إنشاء المستفيد
+        // تحديث/إنشاء المستفيد في جدول beneficiaries
         const { data: existingBen } = await supabaseAdmin
           .from('beneficiaries')
           .select('id')
@@ -107,12 +123,14 @@ serve(async (req) => {
           .maybeSingle()
 
         if (existingBen) {
-          console.log(`📝 تحديث بيانات المستفيد الموجود`)
+          console.log(`  📝 تحديث بيانات المستفيد الموجود`)
           const { error: updateError } = await supabaseAdmin
             .from('beneficiaries')
             .update({
-              user_id: authData.user.id,
+              full_name: ben.full_name,
+              phone: ben.phone,
               email,
+              user_id: authData.user.id,
               can_login: true,
               login_enabled_at: new Date().toISOString(),
               verification_status: 'موثق'
@@ -120,12 +138,20 @@ serve(async (req) => {
             .eq('national_id', ben.national_id)
           
           if (updateError) {
-            console.error(`❌ خطأ في تحديث المستفيد: ${updateError.message}`)
-            results.push({ national_id: ben.national_id, success: false, error: updateError.message })
+            console.error(`  ❌ فشل تحديث المستفيد: ${updateError.message}`)
+            
+            // حذف المستخدم الذي تم إنشاؤه
+            await supabaseAdmin.auth.admin.deleteUser(authData.user.id)
+            
+            results.push({ 
+              national_id: ben.national_id, 
+              success: false, 
+              error: updateError.message 
+            })
             continue
           }
         } else {
-          console.log(`➕ إنشاء مستفيد جديد`)
+          console.log(`  ➕ إنشاء مستفيد جديد`)
           const { error: insertError } = await supabaseAdmin
             .from('beneficiaries')
             .insert({
@@ -142,38 +168,44 @@ serve(async (req) => {
             })
           
           if (insertError) {
-            console.error(`❌ خطأ في إنشاء المستفيد: ${insertError.message}`)
-            results.push({ national_id: ben.national_id, success: false, error: insertError.message })
+            console.error(`  ❌ فشل إنشاء المستفيد: ${insertError.message}`)
+            
+            // حذف المستخدم الذي تم إنشاؤه
+            await supabaseAdmin.auth.admin.deleteUser(authData.user.id)
+            
+            results.push({ 
+              national_id: ben.national_id, 
+              success: false, 
+              error: insertError.message 
+            })
             continue
           }
         }
 
-        // إضافة دور المستفيد
-        console.log(`👤 إضافة دور المستفيد`)
+        // إضافة دور المستفيد في user_roles
+        console.log(`  👤 إضافة دور المستفيد`)
         const { error: roleError } = await supabaseAdmin
           .from('user_roles')
-          .upsert({
+          .insert({
             user_id: authData.user.id,
             role: 'beneficiary'
-          }, {
-            onConflict: 'user_id,role',
-            ignoreDuplicates: true
           })
 
-        if (roleError) {
-          console.error(`❌ خطأ في إضافة الدور: ${roleError.message}`)
+        if (roleError && !roleError.message.includes('duplicate')) {
+          console.error(`  ⚠️ تحذير عند إضافة الدور: ${roleError.message}`)
         }
 
-        console.log(`✅ اكتمل بنجاح: ${ben.full_name}`)
+        console.log(`  ✅ اكتمل بنجاح: ${ben.full_name}\n`)
         results.push({ 
           national_id: ben.national_id, 
           success: true, 
           email,
           user_id: authData.user.id 
         })
+        
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'خطأ غير متوقع'
-        console.error(`❌ خطأ عام: ${errorMessage}`)
+        console.error(`  ❌ خطأ عام: ${errorMessage}\n`)
         results.push({ 
           national_id: ben.national_id, 
           success: false, 
@@ -181,6 +213,8 @@ serve(async (req) => {
         })
       }
     }
+    
+    console.log('🎉 انتهت عملية الإعداد')
 
     return new Response(
       JSON.stringify({ 
