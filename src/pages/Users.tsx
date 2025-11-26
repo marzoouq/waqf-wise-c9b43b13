@@ -22,7 +22,9 @@ import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layou
 import { Database } from "@/integrations/supabase/types";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { useAuth } from "@/hooks/useAuth";
+import { ROLE_LABELS } from "@/lib/role-labels";
 
+// Use Database enum for AppRole (DB only has 7 roles)
 type AppRole = Database['public']['Enums']['app_role'];
 
 interface UserProfile {
@@ -37,16 +39,6 @@ interface UserProfile {
   created_at: string;
   user_roles?: Array<{ role: string }>;
 }
-
-const roleLabels: Record<AppRole, string> = {
-  nazer: "الناظر",
-  admin: "المشرف",
-  accountant: "المحاسب",
-  cashier: "موظف صرف",
-  archivist: "أرشيفي",
-  beneficiary: "مستفيد",
-  user: "مستخدم",
-};
 
 const roleColors: Record<AppRole, string> = {
   nazer: "bg-primary/10 text-primary border-primary/30",
@@ -81,7 +73,7 @@ const Users = () => {
       user.email,
       user.phone || "-",
       user.position || "-",
-      user.user_roles?.map(r => roleLabels[r.role as AppRole]).join(", ") || "-",
+      user.user_roles?.map(r => ROLE_LABELS[r.role as AppRole]).join(", ") || "-",
       user.is_active ? "نشط" : "غير نشط",
       format(new Date(user.created_at), "dd/MM/yyyy", { locale: ar })
     ]);
@@ -406,7 +398,7 @@ const Users = () => {
                                   variant="outline"
                                   className={roleColors[role] + " text-xs whitespace-nowrap"}
                                 >
-                                  {roleLabels[role]}
+                                  {ROLE_LABELS[role as keyof typeof ROLE_LABELS] || role}
                                 </Badge>
                               );
                             })}
@@ -509,7 +501,9 @@ const Users = () => {
           size="md"
         >
           <div className="space-y-4">
-            {(Object.keys(roleLabels) as AppRole[]).map((role) => (
+            {(Object.keys(ROLE_LABELS).filter(r => 
+              ['nazer', 'admin', 'accountant', 'cashier', 'archivist', 'beneficiary', 'user'].includes(r)
+            ) as AppRole[]).map((role) => (
               <div
                 key={role}
                 className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent/50 transition-colors cursor-pointer"
@@ -520,7 +514,7 @@ const Users = () => {
                     checked={selectedRoles.includes(role)}
                     onCheckedChange={() => toggleRole(role)}
                   />
-                  <Label className="cursor-pointer">{roleLabels[role]}</Label>
+                  <Label className="cursor-pointer">{ROLE_LABELS[role as keyof typeof ROLE_LABELS]}</Label>
                 </div>
                 <Badge variant="outline" className={roleColors[role]}>
                   {role}

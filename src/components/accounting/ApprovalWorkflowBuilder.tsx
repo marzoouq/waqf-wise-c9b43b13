@@ -2,23 +2,14 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { Plus, CheckCircle } from 'lucide-react';
 import { useApprovalWorkflows } from '@/hooks/useApprovalWorkflows';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { ROLE_LABELS, ENTITY_TYPE_LABELS } from '@/lib/role-labels';
 
-const entityTypeLabels: Record<string, string> = {
-  journal_entry: 'قيد محاسبي',
-  distribution: 'توزيع غلة',
-  payment: 'دفع مستحقات',
-  loan: 'قرض',
-};
-
-const roleLabels: Record<string, string> = {
-  accountant: 'المحاسب',
-  manager: 'المدير',
-  nazer: 'الناظر',
-  finance: 'الموظف المالي',
-};
+/**
+ * ApprovalWorkflowBuilder - عرض مسارات الموافقات من قاعدة البيانات
+ * يستخدم لعرض وإدارة مسارات الموافقات المحفوظة في Supabase
+ */
 
 export function ApprovalWorkflowBuilder() {
   const { workflows, isLoading } = useApprovalWorkflows();
@@ -59,24 +50,26 @@ export function ApprovalWorkflowBuilder() {
           {workflows.map((workflow) => (
             <Card key={workflow.id} className="border-2">
               <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-base">{workflow.workflow_name}</CardTitle>
-                    <CardDescription className="text-sm mt-1">
+               <div className="flex items-center justify-between">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <CardTitle className="text-base">{workflow.workflow_name}</CardTitle>
+                      <Badge variant={workflow.is_active ? 'default' : 'secondary'}>
+                        {workflow.is_active ? 'نشط' : 'متوقف'}
+                      </Badge>
+                    </div>
+                    <CardDescription className="text-sm flex items-center gap-2 flex-wrap">
                       <Badge variant="outline">
-                        {entityTypeLabels[workflow.entity_type] || workflow.entity_type}
+                        {ENTITY_TYPE_LABELS[workflow.entity_type] || workflow.entity_type}
                       </Badge>
                       {workflow.conditions && Object.keys(workflow.conditions).length > 0 && (
-                        <span className="mr-2 text-xs">
+                        <span className="text-xs">
                           {workflow.conditions.min_amount && `من ${workflow.conditions.min_amount} ريال`}
-                          {workflow.conditions.max_amount && `إلى ${workflow.conditions.max_amount} ريال`}
+                          {workflow.conditions.max_amount && ` - إلى ${workflow.conditions.max_amount} ريال`}
                         </span>
                       )}
                     </CardDescription>
                   </div>
-                  <Badge variant={workflow.is_active ? 'default' : 'secondary'}>
-                    {workflow.is_active ? 'نشط' : 'متوقف'}
-                  </Badge>
                 </div>
               </CardHeader>
               <CardContent>
@@ -88,7 +81,7 @@ export function ApprovalWorkflowBuilder() {
                           المستوى {level.level}
                         </Badge>
                         <div className="font-medium text-sm">
-                          {roleLabels[level.role] || level.role}
+                          {ROLE_LABELS[level.role as keyof typeof ROLE_LABELS] || level.role}
                         </div>
                         <div className="text-xs text-muted-foreground">
                           {level.required ? 'مطلوب' : 'اختياري'}

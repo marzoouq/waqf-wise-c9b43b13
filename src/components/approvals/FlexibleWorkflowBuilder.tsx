@@ -8,6 +8,13 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Trash2, ArrowRight, Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { ROLE_LABELS, WORKFLOW_ROLES } from '@/lib/role-labels';
+
+/**
+ * FlexibleWorkflowBuilder - منشئ مسارات موافقات مرنة (محلي)
+ * يستخدم لإنشاء مسارات موافقات مخصصة بشكل تفاعلي
+ * ملاحظة: هذا المكون محلي ولا يحفظ في قاعدة البيانات
+ */
 
 interface ApprovalLevel {
   id: string;
@@ -48,13 +55,10 @@ export function FlexibleWorkflowBuilder() {
   const [editingWorkflow, setEditingWorkflow] = useState<WorkflowConfig | null>(null);
   const [isCreating, setIsCreating] = useState(false);
 
-  const roles = [
-    { value: 'reviewer', label: 'مراجع' },
-    { value: 'accountant', label: 'محاسب' },
-    { value: 'nazer', label: 'ناظر' },
-    { value: 'financial_manager', label: 'مدير مالي' },
-    { value: 'executor', label: 'منفذ' },
-  ];
+  const roles = WORKFLOW_ROLES.map(role => ({
+    value: role,
+    label: ROLE_LABELS[role],
+  }));
 
   const startNew = () => {
     setEditingWorkflow({
