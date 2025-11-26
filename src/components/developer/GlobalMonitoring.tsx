@@ -5,13 +5,13 @@ import { usePerformanceBudget } from "@/hooks/developer/usePerformanceBudget";
 
 /**
  * مكون عام لمراقبة الأداء والأخطاء على كامل التطبيق
- * يعمل فقط للمشرفين (Admin)
+ * يعمل للناظر والمشرفين فقط
  */
 export function GlobalMonitoring() {
-  const { isAdmin, isLoading } = useUserRole();
+  const { isAdmin, isNazer, isLoading } = useUserRole();
 
-  // تفعيل الميزات فقط للمشرفين
-  const shouldMonitor = !isLoading && isAdmin;
+  // تفعيل الميزات للناظر والمشرفين
+  const shouldMonitor = !isLoading && (isAdmin || isNazer);
 
   // تفعيل مراقبة الأخطاء - دائماً استدعاء الـ Hook
   useErrorNotifications(shouldMonitor);
@@ -27,9 +27,10 @@ export function GlobalMonitoring() {
 
   useEffect(() => {
     if (shouldMonitor) {
+      const userType = isNazer ? 'الناظر' : 'المشرف';
       console.log(`
 ╔══════════════════════════════════════════════╗
-║  👁️  المراقبة العامة مفعّلة للمشرف         ║
+║  👁️  المراقبة العامة مفعّلة لـ${userType}      ║
 ╚══════════════════════════════════════════════╝
 
 ✅ الإشعارات الفورية للأخطاء
@@ -46,7 +47,7 @@ export function GlobalMonitoring() {
   • /developer-tools - لوحة المطور الكاملة
       `);
     }
-  }, [shouldMonitor]);
+  }, [shouldMonitor, isNazer]);
 
   // لا نعرض أي UI - هذا مكون مراقبة فقط
   return null;
