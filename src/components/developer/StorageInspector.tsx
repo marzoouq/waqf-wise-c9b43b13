@@ -1,9 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Database, HardDrive, Trash2 } from "lucide-react";
+import { Database, HardDrive, Trash2, RefreshCw } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { forceRefresh } from "@/lib/clearCache";
 
 interface StorageItem {
   key: string;
@@ -83,6 +84,15 @@ export function StorageInspector() {
     }
   };
 
+  const handleForceRefresh = async () => {
+    toast.loading("جاري مسح الذاكرة المؤقتة...");
+    try {
+      await forceRefresh();
+    } catch (error) {
+      toast.error("حدث خطأ أثناء التحديث");
+    }
+  };
+
   const deleteItem = (key: string, type: "local" | "session") => {
     if (type === "local") {
       window.localStorage.removeItem(key);
@@ -104,7 +114,25 @@ export function StorageInspector() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold mb-2">لوحة تحكم المطور</h2>
+          <p className="text-muted-foreground">
+            أدوات متقدمة لمراقبة وتحليل أداء التطبيق
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          size="lg"
+          onClick={handleForceRefresh}
+          className="gap-2"
+        >
+          <RefreshCw className="w-4 h-4" />
+          تحديث إجباري
+        </Button>
+      </div>
+      
       {/* Storage Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card>

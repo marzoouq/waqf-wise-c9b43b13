@@ -10,6 +10,9 @@ initWebVitals();
 
 const rootElement = document.getElementById("root")!;
 
+// تنظيف كامل لـ root قبل render
+rootElement.innerHTML = '';
+
 // Remove loading spinner immediately when React mounts
 const loadingElement = document.getElementById("app-loading");
 if (loadingElement) {

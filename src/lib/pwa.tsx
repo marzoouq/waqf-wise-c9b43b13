@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { clearOldCaches } from './clearCache';
 
 export function usePWAUpdate() {
   const { toast } = useToast();
@@ -22,6 +23,9 @@ export function usePWAUpdate() {
           if (newWorker) {
             newWorker.addEventListener('statechange', () => {
               if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                // مسح الـ caches القديمة عند اكتشاف تحديث
+                clearOldCaches().catch(console.error);
+                
                 const version = import.meta.env.VITE_APP_VERSION || '2.1.0';
                 toast({
                   title: "⬆️ تحديث متوفر",

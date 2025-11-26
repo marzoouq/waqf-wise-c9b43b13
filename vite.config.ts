@@ -65,10 +65,10 @@ export default defineConfig(({ mode }) => ({
             handler: 'NetworkFirst',
             options: {
               cacheName: 'supabase-api-cache',
-              networkTimeoutSeconds: 10,
+              networkTimeoutSeconds: 5,
               expiration: {
-                maxEntries: 100,
-                maxAgeSeconds: 3600
+                maxEntries: 50,
+                maxAgeSeconds: 30 * 60
               },
               cacheableResponse: {
                 statuses: [0, 200]
