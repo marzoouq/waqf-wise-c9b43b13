@@ -1,8 +1,7 @@
 import { useState, useMemo } from "react";
-import { Search, FileText, Calendar, User, Edit, Eye, Trash2, Printer } from "lucide-react";
+import { Search, Printer, Edit, Trash2 } from "lucide-react";
 import { useContracts } from "@/hooks/useContracts";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -14,6 +13,7 @@ import { usePrint } from "@/hooks/usePrint";
 import { ContractPrintTemplate } from "@/components/contracts/ContractPrintTemplate";
 import { ContractStatusBadge } from "@/components/contracts/ContractStatusBadge";
 import { ContractExpiryAlert } from "@/components/contracts/ContractExpiryAlert";
+import { UnifiedDataTable } from "@/components/unified/UnifiedDataTable";
 
 interface Props {
   onEdit: (contract: Contract) => void;
@@ -130,89 +130,106 @@ export const ContractsTab = ({ onEdit }: Props) => {
       </div>
 
       {/* Contracts Table */}
-      {isLoading ? (
-        <div className="text-center py-12 text-muted-foreground">جاري التحميل...</div>
-      ) : filteredContracts.length === 0 ? (
-        <div className="text-center py-12 text-muted-foreground">لا توجد عقود</div>
-      ) : (
-        <div className="border rounded-lg overflow-hidden shadow-sm">
-          <Table>
-            <TableHeader className="bg-muted/50">
-              <TableRow>
-                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4">رقم العقد</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4 hidden lg:table-cell">العقار</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4">المستأجر</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4 hidden md:table-cell">النوع</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4 hidden lg:table-cell">تاريخ البداية</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4 hidden lg:table-cell">تاريخ النهاية</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4">الإيجار الشهري</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4">الحالة</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4">الإجراءات</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredContracts.map((contract, index) => (
-                <TableRow 
-                  key={contract.id}
-                  className={index % 2 === 0 ? 'bg-background' : 'bg-muted/30'}
-                >
-                  <TableCell className="font-medium text-xs sm:text-sm whitespace-nowrap py-3 px-4">{contract.contract_number}</TableCell>
-                  <TableCell className="text-xs sm:text-sm py-3 px-4 hidden lg:table-cell">{contract.properties?.name || '-'}</TableCell>
-                  <TableCell className="text-xs sm:text-sm py-3 px-4">{contract.tenant_name}</TableCell>
-                  <TableCell className="text-xs sm:text-sm py-3 px-4 hidden md:table-cell">{contract.contract_type}</TableCell>
-                  <TableCell className="text-xs sm:text-sm py-3 px-4 hidden lg:table-cell whitespace-nowrap">
-                    {format(new Date(contract.start_date), 'yyyy/MM/dd', { locale: ar })}
-                  </TableCell>
-                  <TableCell className="text-xs sm:text-sm py-3 px-4 hidden lg:table-cell whitespace-nowrap">
-                    {format(new Date(contract.end_date), 'yyyy/MM/dd', { locale: ar })}
-                  </TableCell>
-                  <TableCell className="font-bold text-primary text-xs sm:text-sm whitespace-nowrap py-3 px-4">
-                    {Number(contract.monthly_rent).toLocaleString()} ر.س
-                  </TableCell>
-                  <TableCell className="text-xs sm:text-sm py-3 px-4">
-                    <ContractStatusBadge 
-                      startDate={contract.start_date}
-                      endDate={contract.end_date}
-                      status={contract.status}
-                    />
-                  </TableCell>
-                  <TableCell className="text-xs sm:text-sm py-3 px-4">
-                    <div className="flex gap-1">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handlePrintContract(contract)}
-                        title="طباعة"
-                        className="hover:bg-primary/10"
-                      >
-                        <Printer className="h-3 w-3 sm:h-4 sm:w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onEdit(contract)}
-                        title="تعديل"
-                        className="hover:bg-primary/10"
-                      >
-                        <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                        onClick={() => handleDelete(contract.id)}
-                        title="حذف"
-                      >
-                        <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      )}
+      <UnifiedDataTable
+        title="العقود"
+        columns={[
+          {
+            key: "contract_number",
+            label: "رقم العقد",
+            render: (value: string) => <span className="font-medium">{value}</span>
+          },
+          {
+            key: "properties",
+            label: "العقار",
+            hideOnTablet: true,
+            render: (_: any, row: Contract) => row.properties?.name || '-'
+          },
+          {
+            key: "tenant_name",
+            label: "المستأجر"
+          },
+          {
+            key: "contract_type",
+            label: "النوع",
+            hideOnMobile: true
+          },
+          {
+            key: "start_date",
+            label: "تاريخ البداية",
+            hideOnTablet: true,
+            render: (value: string) => (
+              <span className="whitespace-nowrap">
+                {format(new Date(value), 'yyyy/MM/dd', { locale: ar })}
+              </span>
+            )
+          },
+          {
+            key: "end_date",
+            label: "تاريخ النهاية",
+            hideOnTablet: true,
+            render: (value: string) => (
+              <span className="whitespace-nowrap">
+                {format(new Date(value), 'yyyy/MM/dd', { locale: ar })}
+              </span>
+            )
+          },
+          {
+            key: "monthly_rent",
+            label: "الإيجار الشهري",
+            render: (value: number) => (
+              <span className="font-bold text-primary whitespace-nowrap">
+                {Number(value).toLocaleString()} ر.س
+              </span>
+            )
+          },
+          {
+            key: "status",
+            label: "الحالة",
+            render: (_: any, row: Contract) => (
+              <ContractStatusBadge 
+                startDate={row.start_date}
+                endDate={row.end_date}
+                status={row.status}
+              />
+            )
+          }
+        ]}
+        data={filteredContracts}
+        loading={isLoading}
+        emptyMessage="لا توجد عقود"
+        actions={(contract: Contract) => (
+          <div className="flex gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handlePrintContract(contract)}
+              title="طباعة"
+              className="hover:bg-primary/10"
+            >
+              <Printer className="h-3 w-3 sm:h-4 sm:w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onEdit(contract)}
+              title="تعديل"
+              className="hover:bg-primary/10"
+            >
+              <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-destructive hover:text-destructive hover:bg-destructive/10"
+              onClick={() => handleDelete(contract.id)}
+              title="حذف"
+            >
+              <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+            </Button>
+          </div>
+        )}
+        showMobileScrollHint={true}
+      />
     </div>
   );
 };

@@ -1,10 +1,9 @@
 import { useState, useMemo } from "react";
-import { Search, Wrench, Edit, Trash2, Printer, Calendar } from "lucide-react";
+import { Search, Edit, Trash2 } from "lucide-react";
 import { useMaintenanceRequests } from "@/hooks/useMaintenanceRequests";
 import { useMaintenanceSchedules } from "@/hooks/useMaintenanceSchedules";
 import { Input } from "@/components/ui/input";
 import { MaintenanceScheduleCalendar } from "@/components/maintenance/MaintenanceScheduleCalendar";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -13,6 +12,7 @@ import { ar } from "date-fns/locale";
 import { type MaintenanceRequest } from "@/hooks/useMaintenanceRequests";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { ExportButton } from "@/components/shared/ExportButton";
+import { UnifiedDataTable } from "@/components/unified/UnifiedDataTable";
 
 interface Props {
   onEdit: (request: MaintenanceRequest) => void;
@@ -140,82 +140,98 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
       </div>
 
       {/* Maintenance Table */}
-      {isLoading ? (
-        <div className="text-center py-12 text-muted-foreground">جاري التحميل...</div>
-      ) : filteredRequests.length === 0 ? (
-        <div className="text-center py-12 text-muted-foreground">لا توجد طلبات صيانة</div>
-      ) : (
-        <div className="border rounded-lg overflow-hidden shadow-sm">
-          <Table>
-            <TableHeader className="bg-muted/50">
-              <TableRow>
-                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4">رقم الطلب</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4 hidden lg:table-cell">العقار</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4">العنوان</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4 hidden md:table-cell">الفئة</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4 hidden lg:table-cell">الأولوية</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4 hidden lg:table-cell">التاريخ</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4 hidden md:table-cell">التكلفة</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4">الحالة</TableHead>
-                <TableHead className="text-right text-xs sm:text-sm font-semibold whitespace-nowrap py-3 px-4">الإجراءات</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredRequests.map((request, index) => (
-                <TableRow 
-                  key={request.id}
-                  className={index % 2 === 0 ? 'bg-background' : 'bg-muted/30'}
-                >
-                  <TableCell className="font-medium text-xs sm:text-sm whitespace-nowrap py-3 px-4">{request.request_number}</TableCell>
-                  <TableCell className="text-xs sm:text-sm py-3 px-4 hidden lg:table-cell">{request.properties?.name || '-'}</TableCell>
-                  <TableCell className="text-xs sm:text-sm py-3 px-4">{request.title}</TableCell>
-                  <TableCell className="text-xs sm:text-sm py-3 px-4 hidden md:table-cell">{request.category}</TableCell>
-                  <TableCell className="text-xs sm:text-sm py-3 px-4 hidden lg:table-cell">
-                    <Badge className={getPriorityBadge(request.priority)}>
-                      {request.priority}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-xs sm:text-sm py-3 px-4 hidden lg:table-cell whitespace-nowrap">
-                    {format(new Date(request.requested_date), 'yyyy/MM/dd', { locale: ar })}
-                  </TableCell>
-                  <TableCell className="font-medium text-xs sm:text-sm whitespace-nowrap py-3 px-4 hidden md:table-cell">
-                    {(Number(request.actual_cost || request.estimated_cost || 0)).toLocaleString()} ر.س
-                  </TableCell>
-                  <TableCell className="text-xs sm:text-sm py-3 px-4">
-                    <Badge className={getStatusBadge(request.status)}>
-                      {request.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-xs sm:text-sm py-3 px-4">
-                    <div className="flex gap-1">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onEdit(request)}
-                        title="تعديل"
-                        className="hover:bg-primary/10"
-                      >
-                        <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
-                      </Button>
-                      {(request.status === "جديد" || request.status === "ملغي") && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteClick(request)}
-                          title="حذف"
-                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                        >
-                          <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
-                        </Button>
-                      )}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      )}
+      <UnifiedDataTable
+        title="طلبات الصيانة"
+        columns={[
+          {
+            key: "request_number",
+            label: "رقم الطلب",
+            render: (value: string) => <span className="font-medium">{value}</span>
+          },
+          {
+            key: "properties",
+            label: "العقار",
+            hideOnTablet: true,
+            render: (_: any, row: MaintenanceRequest) => row.properties?.name || '-'
+          },
+          {
+            key: "title",
+            label: "العنوان"
+          },
+          {
+            key: "category",
+            label: "الفئة",
+            hideOnMobile: true
+          },
+          {
+            key: "priority",
+            label: "الأولوية",
+            hideOnTablet: true,
+            render: (value: string) => (
+              <Badge className={getPriorityBadge(value)}>
+                {value}
+              </Badge>
+            )
+          },
+          {
+            key: "requested_date",
+            label: "التاريخ",
+            hideOnTablet: true,
+            render: (value: string) => (
+              <span className="whitespace-nowrap">
+                {format(new Date(value), 'yyyy/MM/dd', { locale: ar })}
+              </span>
+            )
+          },
+          {
+            key: "cost",
+            label: "التكلفة",
+            hideOnMobile: true,
+            render: (_: any, row: MaintenanceRequest) => (
+              <span className="font-medium whitespace-nowrap">
+                {(Number(row.actual_cost || row.estimated_cost || 0)).toLocaleString()} ر.س
+              </span>
+            )
+          },
+          {
+            key: "status",
+            label: "الحالة",
+            render: (value: string) => (
+              <Badge className={getStatusBadge(value)}>
+                {value}
+              </Badge>
+            )
+          }
+        ]}
+        data={filteredRequests}
+        loading={isLoading}
+        emptyMessage="لا توجد طلبات صيانة"
+        actions={(request: MaintenanceRequest) => (
+          <div className="flex gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onEdit(request)}
+              title="تعديل"
+              className="hover:bg-primary/10"
+            >
+              <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
+            </Button>
+            {(request.status === "جديد" || request.status === "ملغي") && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleDeleteClick(request)}
+                title="حذف"
+                className="text-destructive hover:text-destructive hover:bg-destructive/10"
+              >
+                <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+              </Button>
+            )}
+          </div>
+        )}
+        showMobileScrollHint={true}
+      />
 
       <DeleteConfirmDialog
         open={deleteDialogOpen}
