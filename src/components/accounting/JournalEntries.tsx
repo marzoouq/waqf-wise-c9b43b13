@@ -16,14 +16,6 @@ import { AccountingFilters } from "./AccountingFilters";
 import { EmptyAccountingState } from "./EmptyAccountingState";
 import { AccountingErrorState } from "./AccountingErrorState";
 import { UnifiedDataTable, type Column } from "@/components/unified/UnifiedDataTable";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 
 type JournalEntry = {
   id: string;
@@ -175,62 +167,28 @@ const JournalEntries = () => {
           onAction={() => setIsAddDialogOpen(true)}
         />
       ) : (
-        <div className="border rounded-lg overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                {columns.map((col) => (
-                  <TableHead
-                    key={col.key}
-                    className={`text-xs sm:text-sm ${
-                      col.hideOnMobile ? "hidden lg:table-cell" : ""
-                    }`}
-                  >
-                    {col.label}
-                  </TableHead>
-                ))}
-                <TableHead className="text-left text-xs sm:text-sm">الإجراءات</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={columns.length + 1} className="text-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                    <p className="mt-2 text-muted-foreground">جاري التحميل...</p>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                entries.map((entry) => (
-                  <TableRow key={entry.id}>
-                    {columns.map((col) => (
-                      <TableCell
-                        key={col.key}
-                        className={col.hideOnMobile ? "hidden lg:table-cell" : ""}
-                      >
-                        {col.render ? col.render(entry[col.key], entry) : entry[col.key]}
-                      </TableCell>
-                    ))}
-                    <TableCell className="text-xs sm:text-sm">
-                      <div className="flex gap-2 justify-end">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            setSelectedEntry(entry);
-                            setIsViewDialogOpen(true);
-                          }}
-                        >
-                          <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
+        <UnifiedDataTable
+          title=""
+          columns={columns}
+          data={entries}
+          loading={isLoading}
+          emptyMessage="لا توجد قيود محاسبية"
+          actions={(entry: JournalEntry) => (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setSelectedEntry(entry);
+                setIsViewDialogOpen(true);
+              }}
+              title="عرض"
+              className="hover:bg-primary/10"
+            >
+              <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
+            </Button>
+          )}
+          showMobileScrollHint={true}
+        />
       )}
 
       <AddJournalEntryDialog
