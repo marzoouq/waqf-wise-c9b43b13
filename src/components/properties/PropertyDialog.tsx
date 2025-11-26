@@ -3,27 +3,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useEffect } from "react";
 import { ResponsiveDialog, DialogFooter } from "@/components/shared/ResponsiveDialog";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
+import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { type Property } from "@/hooks/useProperties";
+import { UnifiedFormField, FormGrid } from "@/components/unified/UnifiedFormField";
 
 const propertySchema = z.object({
   name: z
@@ -114,149 +98,88 @@ export function PropertyDialog({
     >
       <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-            <FormField
+            <UnifiedFormField
               control={form.control}
               name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>اسم العقار *</FormLabel>
-                  <FormControl>
-                    <Input placeholder="مثال: مبنى سكني - حي الملك فهد" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              label="اسم العقار"
+              placeholder="مثال: مبنى سكني - حي الملك فهد"
+              required
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
+            <FormGrid columns={2}>
+              <UnifiedFormField
                 control={form.control}
                 name="type"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>نوع العقار *</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="اختر نوع العقار" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="سكني تجاري">سكني تجاري</SelectItem>
-                        <SelectItem value="سكني">سكني</SelectItem>
-                        <SelectItem value="عمارة">عمارة</SelectItem>
-                        <SelectItem value="محلات تجارية">محلات تجارية</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="نوع العقار"
+                type="select"
+                options={[
+                  { label: "سكني تجاري", value: "سكني تجاري" },
+                  { label: "سكني", value: "سكني" },
+                  { label: "عمارة", value: "عمارة" },
+                  { label: "محلات تجارية", value: "محلات تجارية" },
+                ]}
+                placeholder="اختر نوع العقار"
+                required
               />
 
-              <FormField
+              <UnifiedFormField
                 control={form.control}
                 name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>الحالة *</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="اختر حالة العقار" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="مؤجر">مؤجر</SelectItem>
-                        <SelectItem value="شاغر">شاغر</SelectItem>
-                        <SelectItem value="مؤجر جزئياً">مؤجر جزئياً</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="الحالة"
+                type="select"
+                options={[
+                  { label: "مؤجر", value: "مؤجر" },
+                  { label: "شاغر", value: "شاغر" },
+                  { label: "مؤجر جزئياً", value: "مؤجر جزئياً" },
+                ]}
+                placeholder="اختر حالة العقار"
+                required
               />
-            </div>
+            </FormGrid>
 
-            <FormField
+            <UnifiedFormField
               control={form.control}
               name="location"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>الموقع *</FormLabel>
-                  <FormControl>
-                    <Input placeholder="مثال: الرياض، حي الملك فهد" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              label="الموقع"
+              placeholder="مثال: الرياض، حي الملك فهد"
+              required
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
+            <FormGrid columns={2}>
+              <UnifiedFormField
                 control={form.control}
                 name="shop_count"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>عدد المحلات التجارية</FormLabel>
-                    <FormControl>
-                      <Input type="number" min="0" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="عدد المحلات التجارية"
+                type="number"
+                min={0}
               />
 
-              <FormField
+              <UnifiedFormField
                 control={form.control}
                 name="apartment_count"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>عدد الشقق السكنية</FormLabel>
-                    <FormControl>
-                      <Input type="number" min="0" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="عدد الشقق السكنية"
+                type="number"
+                min={0}
               />
-            </div>
+            </FormGrid>
 
-            <div className="grid grid-cols-1 gap-4">
-              <FormField
-                control={form.control}
-                name="units"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>عدد الوحدات الكلية *</FormLabel>
-                    <FormControl>
-                      <Input type="number" min="1" {...field} />
-                    </FormControl>
-                    <FormDescription className="text-xs text-muted-foreground">
-                      💡 الوحدات المشغولة والإيراد سيتم حسابهما تلقائياً من العقود النشطة
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <UnifiedFormField
+              control={form.control}
+              name="units"
+              label="عدد الوحدات الكلية"
+              type="number"
+              min={1}
+              description="💡 الوحدات المشغولة والإيراد سيتم حسابهما تلقائياً من العقود النشطة"
+              required
+            />
 
-            <FormField
+            <UnifiedFormField
               control={form.control}
               name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>الوصف</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="أضف وصفاً للعقار (اختياري)"
-                      className="resize-none"
-                      rows={3}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              label="الوصف"
+              type="textarea"
+              placeholder="أضف وصفاً للعقار (اختياري)"
+              rows={3}
             />
 
             <DialogFooter>
