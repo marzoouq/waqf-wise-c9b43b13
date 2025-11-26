@@ -11,7 +11,6 @@ import MainLayout from "./components/layout/MainLayout";
 import { GlobalErrorBoundary } from "./components/shared/GlobalErrorBoundary";
 import { LoadingState } from "./components/shared/LoadingState";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
-import { usePWAUpdate } from "./lib/pwa";
 import { GlobalMonitoring } from "./components/developer/GlobalMonitoring";
 import { IdleTimeoutManager } from "./components/auth/IdleTimeoutManager";
 import { useAlertCleanup } from "./hooks/useAlertCleanup";
@@ -145,7 +144,6 @@ const queryClient = new QueryClient({
 });
 
 const App = () => {
-  usePWAUpdate();
   useAlertCleanup();
   
   return (

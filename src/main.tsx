@@ -3,6 +3,7 @@ import App from "./App.tsx";
 import "./index.css";
 import { initDebugTools } from "./lib/debugTools";
 import { initWebVitals } from "./lib/monitoring/web-vitals";
+import { checkAndForceUpdate } from "./lib/versionManager";
 
 // تهيئة أدوات التصحيح ومراقبة الأداء
 initDebugTools();
@@ -19,4 +20,9 @@ if (loadingElement) {
   loadingElement.remove();
 }
 
-createRoot(rootElement).render(<App />);
+// التحقق من الإصدار أولاً قبل render
+checkAndForceUpdate().then((needsUpdate) => {
+  if (!needsUpdate) {
+    createRoot(rootElement).render(<App />);
+  }
+});

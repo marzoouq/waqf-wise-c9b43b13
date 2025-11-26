@@ -1,6 +1,7 @@
 import { ReactNode, useState } from "react";
 // ⚠️ IMPORTANT: Always import from AppSidebar.tsx (not Sidebar.tsx)
 import AppSidebar from "./AppSidebar";
+import AppVersionFooter from "./AppVersionFooter";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { Menu, LogOut, Search } from "lucide-react";
 import { NotificationsBell } from "./NotificationsBell";
@@ -144,10 +145,13 @@ const MainLayout = ({ children }: MainLayoutProps) => {
 
             {/* Page Content with padding for mobile bottom navigation */}
             <div className={cn(
-              "flex-1 overflow-auto",
+              "flex-1 overflow-auto flex flex-col",
               isMobile && "pb-20" // Add padding for bottom navigation on mobile
             )}>
-              {children}
+              <div className="flex-1">
+                {children}
+              </div>
+              <AppVersionFooter />
             </div>
           </SidebarInset>
           
