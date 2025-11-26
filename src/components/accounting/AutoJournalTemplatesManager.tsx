@@ -5,8 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Plus, Edit, Trash2, Zap, Settings } from 'lucide-react';
 import { useAutoJournalTemplates } from '@/hooks/useAutoJournalTemplates';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { AutoJournalTemplateDialog } from './AutoJournalTemplateDialog';
+import { UnifiedDataTable, type Column } from '@/components/unified/UnifiedDataTable';
 
 const triggerEventLabels: Record<string, string> = {
   payment_made: 'دفع مستحقات مستفيد',
@@ -51,6 +51,70 @@ export function AutoJournalTemplatesManager() {
     await toggleActive({ id, is_active: !isActive });
   };
 
+  const columns: Column<any>[] = [
+    {
+      key: "trigger_event",
+      label: "الحدث المُشغل",
+      render: (_, template) => (
+        <Badge variant="outline" className="text-xs">
+          {triggerEventLabels[template.trigger_event] || template.trigger_event}
+        </Badge>
+      ),
+    },
+    {
+      key: "template_name",
+      label: "اسم القالب",
+      render: (_, template) => (
+        <span className="font-medium text-xs sm:text-sm">{template.template_name}</span>
+      ),
+    },
+    {
+      key: "debit_accounts",
+      label: "الحسابات المدينة",
+      render: (_, template) => (
+        <div className="flex flex-wrap gap-1">
+          {template.debit_accounts.map((acc: any, idx: number) => (
+            <Badge key={idx} variant="secondary" className="text-xs">
+              {acc.account_code}
+            </Badge>
+          ))}
+        </div>
+      ),
+      hideOnMobile: true,
+    },
+    {
+      key: "credit_accounts",
+      label: "الحسابات الدائنة",
+      render: (_, template) => (
+        <div className="flex flex-wrap gap-1">
+          {template.credit_accounts.map((acc: any, idx: number) => (
+            <Badge key={idx} variant="secondary" className="text-xs">
+              {acc.account_code}
+            </Badge>
+          ))}
+        </div>
+      ),
+      hideOnMobile: true,
+    },
+    {
+      key: "priority",
+      label: "الأولوية",
+      render: (_, template) => (
+        <span className="text-xs sm:text-sm">{template.priority}</span>
+      ),
+    },
+    {
+      key: "is_active",
+      label: "الحالة",
+      render: (_, template) => (
+        <Switch
+          checked={template.is_active}
+          onCheckedChange={() => handleToggle(template.id, template.is_active)}
+        />
+      ),
+    },
+  ];
+
   if (isLoading) {
     return (
       <Card>
@@ -84,80 +148,30 @@ export function AutoJournalTemplatesManager() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>الحدث المُشغل</TableHead>
-                  <TableHead>اسم القالب</TableHead>
-                  <TableHead>الحسابات المدينة</TableHead>
-                  <TableHead>الحسابات الدائنة</TableHead>
-                  <TableHead>الأولوية</TableHead>
-                  <TableHead>الحالة</TableHead>
-                  <TableHead className="text-left">الإجراءات</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {templates.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center text-muted-foreground">
-                      لا توجد قوالب
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  templates.map((template) => (
-                    <TableRow key={template.id}>
-                      <TableCell>
-                        <Badge variant="outline">
-                          {triggerEventLabels[template.trigger_event] || template.trigger_event}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="font-medium">{template.template_name}</TableCell>
-                      <TableCell>
-                        {template.debit_accounts.map((acc: any, idx: number) => (
-                          <Badge key={idx} variant="secondary" className="mr-1">
-                            {acc.account_code}
-                          </Badge>
-                        ))}
-                      </TableCell>
-                      <TableCell>
-                        {template.credit_accounts.map((acc: any, idx: number) => (
-                          <Badge key={idx} variant="secondary" className="mr-1">
-                            {acc.account_code}
-                          </Badge>
-                        ))}
-                      </TableCell>
-                      <TableCell>{template.priority}</TableCell>
-                      <TableCell>
-                        <Switch
-                          checked={template.is_active}
-                          onCheckedChange={() => handleToggle(template.id, template.is_active)}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEdit(template)}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDelete(template.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
+          <UnifiedDataTable
+            columns={columns}
+            data={templates}
+            loading={isLoading}
+            emptyMessage="لا توجد قوالب"
+            actions={(template) => (
+              <div className="flex gap-2 justify-end">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleEdit(template)}
+                >
+                  <Edit className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleDelete(template.id)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          />
 
           <div className="mt-4 p-4 bg-muted/50 rounded-lg">
             <div className="flex items-start gap-2">

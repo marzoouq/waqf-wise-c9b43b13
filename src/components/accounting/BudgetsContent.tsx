@@ -2,21 +2,12 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Pencil, Trash2, Calculator, FileSpreadsheet } from "lucide-react";
-import { useBudgets } from "@/hooks/useBudgets";
+import { useBudgets, Budget } from "@/hooks/useBudgets";
 import { useFiscalYears } from "@/hooks/useFiscalYears";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { BudgetDialog } from "@/components/budgets/BudgetDialog";
 import { BudgetAnalysisCard } from "@/components/budgets/BudgetAnalysisCard";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Budget } from "@/types/accounting";
 import {
   Select,
   SelectContent,
@@ -29,6 +20,7 @@ import { formatCurrency } from "@/lib/utils";
 import { EmptyAccountingState } from "./EmptyAccountingState";
 import { AccountingErrorState } from "./AccountingErrorState";
 import { toast } from "sonner";
+import { UnifiedDataTable, type Column } from "@/components/unified/UnifiedDataTable";
 
 export function BudgetsContent() {
   const { fiscalYears } = useFiscalYears();
@@ -110,6 +102,70 @@ export function BudgetsContent() {
     return variance >= 0 ? "text-success" : "text-destructive";
   };
 
+  const columns: Column<Budget>[] = [
+    {
+      key: "account",
+      label: "الحساب",
+      render: (_, budget) => (
+        <div>
+          <div className="text-sm font-medium">{budget.accounts?.name_ar}</div>
+          <div className="text-xs text-muted-foreground">{budget.accounts?.code}</div>
+        </div>
+      ),
+    },
+    {
+      key: "period",
+      label: "الفترة",
+      render: (_, budget) => (
+        <span className="text-xs sm:text-sm">
+          {budget.period_type} {budget.period_number}
+        </span>
+      ),
+    },
+    {
+      key: "budgeted_amount",
+      label: "المقدّر",
+      render: (_, budget) => (
+        <span className="text-xs sm:text-sm">{formatCurrency(budget.budgeted_amount)}</span>
+      ),
+    },
+    {
+      key: "actual_amount",
+      label: "الفعلي",
+      render: (_, budget) => (
+        <span className="text-xs sm:text-sm">{formatCurrency(budget.actual_amount || 0)}</span>
+      ),
+    },
+    {
+      key: "variance_amount",
+      label: "الانحراف",
+      render: (_, budget) => (
+        <span className={`text-xs sm:text-sm ${getVarianceColor(budget.variance_amount)}`}>
+          {formatCurrency(Math.abs(budget.variance_amount || 0))}
+          {budget.variance_amount !== null && (
+            <Badge variant={budget.variance_amount >= 0 ? "default" : "destructive"} className="mr-2 text-xs">
+              {budget.variance_amount >= 0 ? "توفير" : "تجاوز"}
+            </Badge>
+          )}
+        </span>
+      ),
+    },
+    {
+      key: "utilization",
+      label: "نسبة التنفيذ",
+      render: (_, budget) => {
+        const utilization = budget.budgeted_amount > 0 
+          ? ((budget.actual_amount || 0) / budget.budgeted_amount * 100)
+          : 0;
+        return (
+          <Badge variant={utilization > 100 ? "destructive" : utilization > 80 ? "secondary" : "default"}>
+            {utilization.toFixed(1)}%
+          </Badge>
+        );
+      },
+    },
+  ];
+
   return (
     <div className="space-y-6">
       <BudgetAnalysisCard budgets={budgets} />
@@ -156,73 +212,29 @@ export function BudgetsContent() {
               onAction={() => handleOpenDialog()}
             />
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>الحساب</TableHead>
-                  <TableHead>الفترة</TableHead>
-                  <TableHead>المقدّر</TableHead>
-                  <TableHead>الفعلي</TableHead>
-                  <TableHead>الانحراف</TableHead>
-                  <TableHead>نسبة التنفيذ</TableHead>
-                  <TableHead>الإجراءات</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {budgets.map((budget) => {
-                  const utilization = budget.budgeted_amount > 0 
-                    ? ((budget.actual_amount || 0) / budget.budgeted_amount * 100)
-                    : 0;
-
-                  return (
-                    <TableRow key={budget.id}>
-                      <TableCell className="font-medium">
-                        <div>
-                          <div className="text-sm">{budget.accounts?.name_ar}</div>
-                          <div className="text-xs text-muted-foreground">{budget.accounts?.code}</div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {budget.period_type} {budget.period_number}
-                      </TableCell>
-                      <TableCell>{formatCurrency(budget.budgeted_amount)}</TableCell>
-                      <TableCell>{formatCurrency(budget.actual_amount || 0)}</TableCell>
-                      <TableCell className={getVarianceColor(budget.variance_amount)}>
-                        {formatCurrency(Math.abs(budget.variance_amount || 0))}
-                        {budget.variance_amount !== null && (
-                          <Badge variant={budget.variance_amount >= 0 ? "default" : "destructive"} className="mr-2">
-                            {budget.variance_amount >= 0 ? "توفير" : "تجاوز"}
-                          </Badge>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={utilization > 100 ? "destructive" : utilization > 80 ? "secondary" : "default"}>
-                          {utilization.toFixed(1)}%
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleOpenDialog(budget)}
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDelete(budget.id)}
-                          >
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+            <UnifiedDataTable
+              columns={columns}
+              data={budgets}
+              loading={isLoading}
+              actions={(budget) => (
+                <div className="flex gap-2 justify-end">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleOpenDialog(budget)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDelete(budget.id)}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
+              )}
+            />
           )}
         </CardContent>
       </Card>

@@ -17,18 +17,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/lib/utils";
-
 import { BankAccountRow } from "@/types/supabase-helpers";
+import { UnifiedDataTable, type Column } from "@/components/unified/UnifiedDataTable";
 
 export function BankAccountsManagement() {
   const { bankAccounts, isLoading, addBankAccount, updateBankAccount, deleteBankAccount } =
@@ -101,7 +93,57 @@ export function BankAccountsManagement() {
     }
   };
 
-  // Using formatCurrency from @/lib/utils
+  const columns: Column<BankAccountRow>[] = [
+    {
+      key: "bank_name",
+      label: "اسم البنك",
+      render: (_, account) => (
+        <span className="font-medium text-xs sm:text-sm">{account.bank_name}</span>
+      ),
+    },
+    {
+      key: "account_number",
+      label: "رقم الحساب",
+      render: (_, account) => (
+        <span className="text-xs sm:text-sm">{account.account_number}</span>
+      ),
+    },
+    {
+      key: "iban",
+      label: "IBAN",
+      render: (_, account) => (
+        <span className="font-mono text-xs sm:text-sm">{account.iban || "-"}</span>
+      ),
+      hideOnMobile: true,
+    },
+    {
+      key: "currency",
+      label: "العملة",
+      render: (_, account) => (
+        <span className="text-xs sm:text-sm">{account.currency}</span>
+      ),
+      hideOnMobile: true,
+    },
+    {
+      key: "current_balance",
+      label: "الرصيد الحالي",
+      render: (_, account) => (
+        <span className="font-semibold text-xs sm:text-sm">
+          {formatCurrency(account.current_balance)}
+        </span>
+      ),
+    },
+    {
+      key: "is_active",
+      label: "الحالة",
+      render: (_, account) => (
+        <Badge variant={account.is_active ? "default" : "secondary"}>
+          {account.is_active ? "نشط" : "غير نشط"}
+        </Badge>
+      ),
+      hideOnMobile: true,
+    },
+  ];
 
   return (
     <>
@@ -117,69 +159,39 @@ export function BankAccountsManagement() {
           </Button>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="text-xs sm:text-sm">اسم البنك</TableHead>
-                <TableHead className="text-xs sm:text-sm">رقم الحساب</TableHead>
-                <TableHead className="text-xs sm:text-sm hidden lg:table-cell">IBAN</TableHead>
-                <TableHead className="text-xs sm:text-sm hidden md:table-cell">العملة</TableHead>
-                <TableHead className="text-xs sm:text-sm">الرصيد الحالي</TableHead>
-                <TableHead className="text-xs sm:text-sm hidden md:table-cell">الحالة</TableHead>
-                <TableHead className="text-xs sm:text-sm">الإجراءات</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {bankAccounts.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="py-8">
-                    <EmptyAccountingState
-                      icon={<Building2 className="h-12 w-12" />}
-                      title="لا توجد حسابات بنكية"
-                      description="ابدأ بإضافة أول حساب بنكي لإدارة المعاملات المصرفية"
-                      actionLabel="إضافة حساب بنكي"
-                      onAction={() => handleOpenDialog()}
-                    />
-                  </TableCell>
-                </TableRow>
-              ) : (
-                bankAccounts.map((account) => (
-                  <TableRow key={account.id}>
-                    <TableCell className="font-medium text-xs sm:text-sm">{account.bank_name}</TableCell>
-                    <TableCell className="text-xs sm:text-sm">{account.account_number}</TableCell>
-                    <TableCell className="font-mono text-xs sm:text-sm hidden lg:table-cell">{account.iban || "-"}</TableCell>
-                    <TableCell className="text-xs sm:text-sm hidden md:table-cell">{account.currency}</TableCell>
-                    <TableCell className="font-semibold text-xs sm:text-sm">
-                      {formatCurrency(account.current_balance)}
-                    </TableCell>
-                    <TableCell className="text-xs sm:text-sm hidden md:table-cell">
-                      <Badge variant={account.is_active ? "default" : "secondary"}>
-                        {account.is_active ? "نشط" : "غير نشط"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleOpenDialog(account as BankAccountRow)}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDelete(account.id)}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
+          {bankAccounts.length === 0 ? (
+            <EmptyAccountingState
+              icon={<Building2 className="h-12 w-12" />}
+              title="لا توجد حسابات بنكية"
+              description="ابدأ بإضافة أول حساب بنكي لإدارة المعاملات المصرفية"
+              actionLabel="إضافة حساب بنكي"
+              onAction={() => handleOpenDialog()}
+            />
+          ) : (
+            <UnifiedDataTable
+              columns={columns}
+              data={bankAccounts}
+              loading={isLoading}
+              actions={(account) => (
+                <div className="flex gap-2 justify-end">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleOpenDialog(account as BankAccountRow)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDelete(account.id)}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
               )}
-            </TableBody>
-          </Table>
+            />
+          )}
         </CardContent>
       </Card>
 
