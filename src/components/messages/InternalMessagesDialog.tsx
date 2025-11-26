@@ -57,8 +57,8 @@ export function InternalMessagesDialog({
         let allowedRoles: ('accountant' | 'admin' | 'archivist' | 'beneficiary' | 'cashier' | 'nazer' | 'user')[];
         
         if (currentUserRole?.role === 'beneficiary') {
-          // المستفيد يمكنه مراسلة الإداريين فقط
-          allowedRoles = ['admin', 'nazer', 'accountant', 'cashier'];
+          // المستفيد يمكنه مراسلة الناظر والمشرف فقط
+          allowedRoles = ['admin', 'nazer'];
         } else {
           // الإداريون يمكنهم مراسلة الجميع
           allowedRoles = ['admin', 'nazer', 'accountant', 'cashier', 'beneficiary', 'archivist'];
@@ -205,9 +205,14 @@ export function InternalMessagesDialog({
                         ) : (
                           <Mail className="h-4 w-4 text-primary" />
                         )}
-                        <h4 className={`font-semibold ${!message.is_read ? 'text-primary' : ''}`}>
-                          {message.subject}
-                        </h4>
+                        <div>
+                          <h4 className={`font-semibold ${!message.is_read ? 'text-primary' : ''}`}>
+                            {message.subject}
+                          </h4>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            من: {message.sender?.full_name || 'مستخدم'}
+                          </p>
+                        </div>
                       </div>
                       <div className="flex items-center gap-2">
                         {!message.is_read && <Badge>جديد</Badge>}
@@ -246,10 +251,15 @@ export function InternalMessagesDialog({
                 <Card key={message.id}>
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between mb-2">
-                      <h4 className="font-semibold">{message.subject}</h4>
+                      <div>
+                        <h4 className="font-semibold">{message.subject}</h4>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          إلى: {message.receiver?.full_name || 'مستخدم'}
+                        </p>
+                      </div>
                       <Badge variant="outline">مرسلة</Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground mb-2">{message.body}</p>
+                    <p className="text-sm text-muted-foreground mb-2 whitespace-pre-wrap">{message.body}</p>
                     <p className="text-xs text-muted-foreground">
                       {format(new Date(message.created_at), "dd MMMM yyyy - HH:mm", { locale: ar })}
                     </p>

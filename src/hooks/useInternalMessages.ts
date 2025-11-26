@@ -34,33 +34,39 @@ export function useInternalMessages() {
   }, [queryClient]);
 
   // جلب الرسائل الواردة
-  const { data: inboxMessages = [], isLoading: isLoadingInbox } = useQuery<InternalMessage[]>({
+  const { data: inboxMessages = [], isLoading: isLoadingInbox } = useQuery<any[]>({
     queryKey: ["internal_messages", "inbox", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("internal_messages")
-        .select("*")
+        .select(`
+          *,
+          sender:profiles!internal_messages_sender_id_fkey(full_name, user_id)
+        `)
         .eq("receiver_id", user?.id)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as InternalMessage[];
+      return data || [];
     },
     enabled: !!user?.id,
   });
 
   // جلب الرسائل المرسلة
-  const { data: sentMessages = [], isLoading: isLoadingSent } = useQuery<InternalMessage[]>({
+  const { data: sentMessages = [], isLoading: isLoadingSent } = useQuery<any[]>({
     queryKey: ["internal_messages", "sent", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("internal_messages")
-        .select("*")
+        .select(`
+          *,
+          receiver:profiles!internal_messages_receiver_id_fkey(full_name, user_id)
+        `)
         .eq("sender_id", user?.id)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as InternalMessage[];
+      return data || [];
     },
     enabled: !!user?.id,
   });
