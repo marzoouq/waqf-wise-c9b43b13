@@ -8,6 +8,8 @@ import { Shield, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
 import { UnifiedDataTable, type Column } from "@/components/unified/UnifiedDataTable";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
+import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 
 export default function SecurityDashboard() {
   const { data: securityEvents = [], isLoading } = useQuery({
@@ -107,47 +109,36 @@ export default function SecurityDashboard() {
       />
 
       {/* الإحصائيات */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">إجمالي الأحداث</CardTitle>
-            <Shield className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.total}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">تحذيرات</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.warning}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">أخطاء</CardTitle>
-            <XCircle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.error}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">تم الحل</CardTitle>
-            <CheckCircle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.resolved}</div>
-          </CardContent>
-        </Card>
-      </div>
+      <UnifiedStatsGrid columns={4}>
+        <UnifiedKPICard
+          title="إجمالي الأحداث"
+          value={stats.total}
+          icon={Shield}
+          variant="default"
+          loading={isLoading}
+        />
+        <UnifiedKPICard
+          title="تحذيرات"
+          value={stats.warning}
+          icon={AlertTriangle}
+          variant="warning"
+          loading={isLoading}
+        />
+        <UnifiedKPICard
+          title="أخطاء"
+          value={stats.error}
+          icon={XCircle}
+          variant="danger"
+          loading={isLoading}
+        />
+        <UnifiedKPICard
+          title="تم الحل"
+          value={stats.resolved}
+          icon={CheckCircle}
+          variant="success"
+          loading={isLoading}
+        />
+      </UnifiedStatsGrid>
 
       {/* أحداث الأمان */}
       <Card>

@@ -8,6 +8,8 @@ import { UnifiedDataTable, type Column } from "@/components/unified/UnifiedDataT
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
+import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 
 export default function LoansManagement() {
   const { loans, isLoading } = useLoans();
@@ -82,49 +84,36 @@ export default function LoansManagement() {
       />
 
       {/* الإحصائيات */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">إجمالي القروض</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.total}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">القروض النشطة</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.active}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">القروض المسددة</CardTitle>
-            <CheckCircle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.completed}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">إجمالي المبالغ</CardTitle>
-            <AlertCircle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {stats.totalAmount.toLocaleString()} ر.س
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <UnifiedStatsGrid columns={4}>
+        <UnifiedKPICard
+          title="إجمالي القروض"
+          value={stats.total}
+          icon={DollarSign}
+          variant="default"
+          loading={isLoading}
+        />
+        <UnifiedKPICard
+          title="القروض النشطة"
+          value={stats.active}
+          icon={TrendingUp}
+          variant="warning"
+          loading={isLoading}
+        />
+        <UnifiedKPICard
+          title="القروض المسددة"
+          value={stats.completed}
+          icon={CheckCircle}
+          variant="success"
+          loading={isLoading}
+        />
+        <UnifiedKPICard
+          title="إجمالي المبالغ"
+          value={`${stats.totalAmount.toLocaleString()} ر.س`}
+          icon={AlertCircle}
+          variant="default"
+          loading={isLoading}
+        />
+      </UnifiedStatsGrid>
 
       {/* جدول القروض */}
       <Card>

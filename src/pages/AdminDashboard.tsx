@@ -16,6 +16,8 @@ import { UsersActivityChart } from "@/components/dashboard/admin/UsersActivityCh
 import { useAdminKPIs } from "@/hooks/useAdminKPIs";
 import { Users as UsersIcon, Building2, Wallet, FileText } from "lucide-react";
 import { LazyTabContent } from "@/components/dashboard/admin/LazyTabContent";
+import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
+import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 
 const ChartSkeleton = () => (
   <Card>
@@ -52,20 +54,17 @@ function AdminKPIsSection() {
 
   if (isLoading) {
     return (
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <UnifiedStatsGrid columns={4}>
         {[...Array(4)].map((_, i) => (
-          <Card key={i}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-4 w-4" />
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="h-8 w-16 mb-2" />
-              <Skeleton className="h-3 w-32" />
-            </CardContent>
-          </Card>
+          <UnifiedKPICard
+            key={i}
+            title="جاري التحميل..."
+            value="..."
+            icon={UsersIcon}
+            loading={true}
+          />
         ))}
-      </div>
+      </UnifiedStatsGrid>
     );
   }
 
@@ -77,59 +76,44 @@ function AdminKPIsSection() {
       value: kpis.totalBeneficiaries,
       subtitle: `${kpis.activeBeneficiaries} نشط`,
       icon: UsersIcon,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
+      variant: "default" as const,
     },
     {
       title: "العقارات",
       value: kpis.totalProperties,
       subtitle: `${kpis.occupiedProperties} مؤجر`,
       icon: Building2,
-      color: "text-green-600",
-      bgColor: "bg-green-50",
+      variant: "success" as const,
     },
     {
       title: "الأموال",
       value: kpis.totalFunds,
       subtitle: `${kpis.activeFunds} نشط`,
       icon: Wallet,
-      color: "text-purple-600",
-      bgColor: "bg-purple-50",
+      variant: "default" as const,
     },
     {
       title: "الطلبات المعلقة",
       value: kpis.pendingRequests,
       subtitle: `${kpis.overdueRequests} متأخر`,
       icon: FileText,
-      color: "text-orange-600",
-      bgColor: "bg-orange-50",
+      variant: "warning" as const,
     },
   ];
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      {stats.map((stat, index) => {
-        const Icon = stat.icon;
-        return (
-          <Card key={index}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                {stat.title}
-              </CardTitle>
-              <div className={`${stat.bgColor} p-2 rounded-lg`}>
-                <Icon className={`h-4 w-4 ${stat.color}`} />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {stat.subtitle}
-              </p>
-            </CardContent>
-          </Card>
-        );
-      })}
-    </div>
+    <UnifiedStatsGrid columns={4}>
+      {stats.map((stat, index) => (
+        <UnifiedKPICard
+          key={index}
+          title={stat.title}
+          value={stat.value}
+          icon={stat.icon}
+          variant={stat.variant}
+          subtitle={stat.subtitle}
+        />
+      ))}
+    </UnifiedStatsGrid>
   );
 }
 
