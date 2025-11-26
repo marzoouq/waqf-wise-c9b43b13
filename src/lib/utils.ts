@@ -9,8 +9,31 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
- * إعادة تصدير جميع دوال المنفعة من المجلدات المنظمة
+ * إعادة تصدير دوال المنفعة الأكثر استخداماً بشكل مباشر
+ * لتحسين الأداء وتقليل حجم الحزمة
  */
+
+// الدوال الأكثر استخداماً
+export { 
+  formatCurrency, 
+  formatDate, 
+  formatNumber,
+  formatPercentage 
+} from './utils/formatting';
+
+export { 
+  groupBy, 
+  sortBy, 
+  unique 
+} from './utils/arrays';
+
+export { 
+  isValidEmail,
+  isValidSaudiPhone,
+  isNotEmpty 
+} from './utils/validation';
+
+// استيراد كسول للدوال الأقل استخداماً
 export * from './utils/arrays';
 export * from './utils/formatting';
 export * from './utils/validation';

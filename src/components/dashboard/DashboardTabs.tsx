@@ -5,8 +5,11 @@ import { ChatbotQuickCard } from "@/components/dashboard/ChatbotQuickCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
-// Lazy load components
-const AdminKPIs = lazy(() => import("@/components/dashboard/admin/AdminKPIs").then(m => ({ default: m.AdminKPIs })));
+// Import critical components directly for better FCP/LCP
+import { AdminKPIs } from "@/components/dashboard/admin/AdminKPIs";
+import RevenueExpenseChart from "@/components/dashboard/RevenueExpenseChart";
+
+// Lazy load non-critical components
 const AdminActivities = lazy(() => import("@/components/dashboard/admin/AdminActivities").then(m => ({ default: m.AdminActivities })));
 const AdminTasks = lazy(() => import("@/components/dashboard/admin/AdminTasks").then(m => ({ default: m.AdminTasks })));
 const QuickActions = lazy(() => import("@/components/dashboard/admin/QuickActions").then(m => ({ default: m.QuickActions })));
@@ -15,7 +18,6 @@ const FamiliesStats = lazy(() => import("@/components/dashboard/FamiliesStats"))
 const IntegratedReportsWidget = lazy(() => import("@/components/dashboard/IntegratedReportsWidget").then(m => ({ default: m.IntegratedReportsWidget })));
 const RequestsStats = lazy(() => import("@/components/dashboard/RequestsStats"));
 const AccountingStats = lazy(() => import("@/components/dashboard/AccountingStats"));
-const RevenueExpenseChart = lazy(() => import("@/components/dashboard/RevenueExpenseChart"));
 const AccountDistributionChart = lazy(() => import("@/components/dashboard/AccountDistributionChart"));
 const BudgetComparisonChart = lazy(() => import("@/components/dashboard/BudgetComparisonChart"));
 const RecentJournalEntries = lazy(() => import("@/components/dashboard/RecentJournalEntries"));
@@ -92,14 +94,11 @@ export function DashboardTabs({
 
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-4 sm:space-y-5 md:space-y-6">
-          <Suspense fallback={<KPISkeleton />}>
-            <AdminKPIs />
-          </Suspense>
+          {/* Critical content loaded immediately */}
+          <AdminKPIs />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
-            <Suspense fallback={<ChartSkeleton />}>
-              <RevenueExpenseChart />
-            </Suspense>
+            <RevenueExpenseChart />
             <Suspense fallback={<ChartSkeleton />}>
               <AccountDistributionChart />
             </Suspense>
