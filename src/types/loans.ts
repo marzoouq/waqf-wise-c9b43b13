@@ -1,19 +1,3 @@
-export interface LoanType {
-  id: string;
-  name_ar: string;
-  name_en?: string;
-  description?: string;
-  max_amount?: number;
-  min_amount: number;
-  interest_rate: number;
-  max_term_months: number;
-  grace_period_months: number;
-  requires_guarantor: boolean;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
 export interface LoanSchedule {
   id: string;
   loan_id: string;
@@ -30,20 +14,6 @@ export interface LoanSchedule {
   updated_at: string;
 }
 
-export interface LoanPayment {
-  id: string;
-  loan_id: string;
-  schedule_id?: string;
-  payment_amount: number;
-  payment_date: string;
-  payment_method: string;
-  reference_number?: string;
-  journal_entry_id?: string;
-  notes?: string;
-  created_by?: string;
-  created_at: string;
-}
-
 export interface EmergencyAid {
   id: string;
   beneficiary_id: string;
@@ -55,12 +25,8 @@ export interface EmergencyAid {
   status: 'pending' | 'approved' | 'rejected' | 'disbursed';
   requested_date: string;
   approved_date?: string;
-  approved_by?: string;
   disbursed_date?: string;
-  disbursed_by?: string;
-  payment_voucher_id?: string;
   notes?: string;
-  rejection_reason?: string;
   created_at: string;
   updated_at: string;
   beneficiaries?: {

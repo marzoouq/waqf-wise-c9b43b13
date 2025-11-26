@@ -63,8 +63,8 @@ const BeneficiaryRequests = lazy(() => import("./pages/BeneficiaryRequests"));
 const StaffRequestsManagement = lazy(() => import("./pages/StaffRequestsManagement"));
 const LoansManagement = lazy(() => import("./pages/LoansManagement"));
 const EmergencyAidManagement = lazy(() => import("./pages/EmergencyAidManagement"));
-const NotificationSettings = lazy(() => import("./pages/NotificationSettings"));
-const CustomReports = lazy(() => import("./pages/CustomReports"));
+const NotificationSettingsPage = lazy(() => import("./pages/NotificationSettings"));
+const CustomReportsPage = lazy(() => import("./pages/CustomReports"));
 const Families = lazy(() => import("./pages/Families"));
 const FamilyDetails = lazy(() => import("./pages/FamilyDetails"));
 const Users = lazy(() => import("./pages/Users"));
@@ -353,6 +353,38 @@ const App = () => {
             } 
           />
           <Route path="/requests" element={<Requests />} />
+          <Route 
+            path="/loans" 
+            element={
+              <ProtectedRoute requiredRoles={["admin", "nazer", "accountant", "cashier"]}>
+                <LoansManagement />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/emergency-aid" 
+            element={
+              <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+                <EmergencyAidManagement />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/notifications/settings" 
+            element={
+              <ProtectedRoute requiredRoles={["admin", "nazer", "accountant", "cashier", "beneficiary"]}>
+                <NotificationSettingsPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/reports/custom" 
+            element={
+              <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+                <CustomReportsPage />
+              </ProtectedRoute>
+            } 
+          />
           <Route 
             path="/audit-logs" 
             element={

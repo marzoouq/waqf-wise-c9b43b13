@@ -1,229 +1,93 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useActivities } from "./useActivities";
-import { useAuth } from "./useAuth";
-import { useEffect } from "react";
-import { QUERY_CONFIG } from "@/lib/queryOptimization";
-import { logger } from "@/lib/logger";
+import type { Database } from "@/integrations/supabase/types";
 
-export interface Loan {
-  id: string;
-  beneficiary_id: string;
-  loan_number: string;
-  loan_amount: number;
-  interest_rate: number;
-  term_months: number;
-  monthly_installment: number;
-  start_date: string;
-  end_date?: string;
-  status: 'active' | 'paid' | 'defaulted' | 'cancelled';
-  approved_by?: string;
-  approved_at?: string;
-  notes?: string;
-  created_at: string;
-  updated_at: string;
-  beneficiary?: {
-    id: string;
+export type Loan = Database['public']['Tables']['loans']['Row'] & {
+  beneficiaries?: {
     full_name: string;
     national_id: string;
-    phone: string;
   };
-}
+  beneficiary?: {
+    full_name: string;
+    national_id: string;
+  };
+};
 
-export function useLoans(beneficiaryId?: string) {
+export function useLoans() {
   const { toast } = useToast();
-  const { addActivity } = useActivities();
-  const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  // Real-time subscription
-  useEffect(() => {
-    const channel = supabase
-      .channel('loans-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'loans'
-        },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ['loans'] });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
-
-  // Fetch loans
   const { data: loans = [], isLoading } = useQuery({
-    queryKey: ['loans', beneficiaryId],
+    queryKey: ["loans"],
     queryFn: async () => {
-      let query = supabase
-        .from('loans')
+      const { data, error } = await supabase
+        .from("loans")
         .select(`
           *,
-          beneficiary:beneficiaries(id, full_name, national_id, phone)
+          beneficiaries (
+            full_name,
+            national_id
+          )
         `)
-        .order('created_at', { ascending: false });
-
-      if (beneficiaryId) {
-        query = query.eq('beneficiary_id', beneficiaryId);
-      }
-
-      const { data, error } = await query;
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
       return data as Loan[];
     },
-    ...QUERY_CONFIG.LOANS,
   });
 
-  // Add loan mutation
   const addLoan = useMutation({
-    mutationFn: async (loan: Omit<Loan, 'id' | 'loan_number' | 'created_at' | 'updated_at' | 'beneficiary' | 'monthly_installment'>) => {
-      const { data: loanData, error: loanError } = await supabase
-        .from('loans')
-        .insert([{
-          ...loan,
-          status: 'pending', // سيتم تفعيله بعد الموافقات
-          approved_by: user?.id,
-        }])
+    mutationFn: async (loan: Database['public']['Tables']['loans']['Insert']) => {
+      const { data, error } = await supabase
+        .from("loans")
+        .insert([loan])
         .select()
-        .maybeSingle();
+        .single();
 
-      if (loanError) throw loanError;
-      if (!loanData) throw new Error("فشل في إضافة القرض");
-
-      // Calculate installment schedule
-      const { error: scheduleError } = await supabase.rpc('calculate_loan_schedule', {
-        p_loan_id: loanData.id,
-        p_principal: loan.loan_amount,
-        p_interest_rate: loan.interest_rate || 0,
-        p_term_months: loan.term_months,
-        p_start_date: loan.start_date
-      });
-
-      if (scheduleError) throw scheduleError;
-
-      // إنشاء موافقات القرض (3 مستويات)
-      const approvals = [
-        { level: 1, approver_name: 'المشرف' },
-        { level: 2, approver_name: 'المدير' },
-        { level: 3, approver_name: 'الناظر' }
-      ];
-
-      const { error: approvalsError } = await supabase
-        .from('loan_approvals')
-        .insert(
-          approvals.map(approval => ({
-            loan_id: loanData.id,
-            ...approval,
-            status: 'معلق'
-          }))
-        );
-
-      if (approvalsError) throw approvalsError;
-
-      // بعد الموافقة النهائية، سيتم إنشاء القيد المحاسبي تلقائياً عبر trigger
-
-      return loanData;
+      if (error) throw error;
+      return data;
     },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['loans'] });
-      queryClient.invalidateQueries({ queryKey: ['loan_installments'] });
-      
-      addActivity({
-        action: `تم إضافة قرض جديد: ${data.loan_number}`,
-        user_name: user?.user_metadata?.full_name || 'مستخدم',
-      }).catch((error) => {
-        logger.error(error, { context: 'add_loan_activity', severity: 'low' });
-      });
-
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["loans"] });
       toast({
-        title: "تم إضافة القرض بنجاح",
-        description: `رقم القرض: ${data.loan_number}`,
+        title: "تم إضافة القرض",
+        description: "تم إضافة القرض بنجاح",
       });
     },
-    onError: (error: Error) => {
+    onError: (error) => {
       toast({
-        variant: "destructive",
-        title: "خطأ في إضافة القرض",
+        title: "خطأ",
         description: error.message,
+        variant: "destructive",
       });
     },
   });
 
-  // Update loan mutation
   const updateLoan = useMutation({
     mutationFn: async ({ id, ...updates }: Partial<Loan> & { id: string }) => {
       const { data, error } = await supabase
-        .from('loans')
+        .from("loans")
         .update(updates)
-        .eq('id', id)
+        .eq("id", id)
         .select()
-        .maybeSingle();
+        .single();
 
       if (error) throw error;
-      if (!data) throw new Error("فشل في تحديث القرض");
       return data;
     },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['loans'] });
-      
-      addActivity({
-        action: `تم تحديث القرض: ${data.loan_number}`,
-        user_name: user?.user_metadata?.full_name || 'مستخدم',
-      }).catch((error) => {
-        logger.error(error, { context: 'update_loan_activity', severity: 'low' });
-      });
-
-      toast({
-        title: "تم تحديث القرض بنجاح",
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        variant: "destructive",
-        title: "خطأ في تحديث القرض",
-        description: error.message,
-      });
-    },
-  });
-
-  // Delete loan mutation
-  const deleteLoan = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('loans')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['loans'] });
-      
-      addActivity({
-        action: 'تم حذف قرض',
-        user_name: user?.user_metadata?.full_name || 'مستخدم',
-      }).catch((error) => {
-        logger.error(error, { context: 'delete_loan_activity', severity: 'low' });
-      });
-
+      queryClient.invalidateQueries({ queryKey: ["loans"] });
       toast({
-        title: "تم حذف القرض بنجاح",
+        title: "تم التحديث",
+        description: "تم تحديث القرض بنجاح",
       });
     },
-    onError: (error: Error) => {
+    onError: (error) => {
       toast({
-        variant: "destructive",
-        title: "خطأ في حذف القرض",
+        title: "خطأ",
         description: error.message,
+        variant: "destructive",
       });
     },
   });
@@ -231,8 +95,7 @@ export function useLoans(beneficiaryId?: string) {
   return {
     loans,
     isLoading,
-    addLoan: addLoan.mutateAsync,
-    updateLoan: updateLoan.mutateAsync,
-    deleteLoan: deleteLoan.mutateAsync,
+    addLoan: addLoan.mutate,
+    updateLoan: updateLoan.mutate,
   };
 }
