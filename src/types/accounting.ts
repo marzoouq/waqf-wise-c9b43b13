@@ -14,6 +14,7 @@ export interface Account {
   parent_id: string | null;
   is_header: boolean;
   is_active: boolean;
+  current_balance?: number | null;
   description: string | null;
   created_at: string;
   updated_at: string;
