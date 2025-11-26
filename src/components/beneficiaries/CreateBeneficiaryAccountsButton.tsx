@@ -34,6 +34,7 @@ interface EligibleBeneficiary {
   id: string;
   full_name: string;
   national_id: string;
+  user_id: string | null;
 }
 
 export function CreateBeneficiaryAccountsButton() {
@@ -58,9 +59,8 @@ export function CreateBeneficiaryAccountsButton() {
     try {
       const { data, error } = await supabase
         .from('beneficiaries')
-        .select('id, full_name, national_id')
+        .select('id, full_name, national_id, user_id')
         .eq('can_login', true)
-        .is('user_id', null)
         .order('full_name');
 
       if (error) throw error;
@@ -73,8 +73,8 @@ export function CreateBeneficiaryAccountsButton() {
         setShowSelectionDialog(true);
       } else {
         toast({
-          title: "لا توجد حسابات للإنشاء",
-          description: "جميع المستفيدين لديهم حسابات بالفعل",
+          title: "لا توجد مستفيدين مؤهلين",
+          description: "لا يوجد مستفيدين مفعل لهم خاصية تسجيل الدخول",
         });
       }
     } catch (error) {
@@ -217,9 +217,16 @@ export function CreateBeneficiaryAccountsButton() {
                       htmlFor={beneficiary.id}
                       className="flex-1 cursor-pointer space-y-1"
                     >
-                      <p className="text-sm font-medium leading-none">
-                        {beneficiary.full_name}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-medium leading-none">
+                          {beneficiary.full_name}
+                        </p>
+                        {beneficiary.user_id && (
+                          <span className="text-xs bg-blue-500/10 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded">
+                            لديه حساب
+                          </span>
+                        )}
+                      </div>
                       <p className="text-xs text-muted-foreground">
                         رقم الهوية: {beneficiary.national_id}
                       </p>
