@@ -18,11 +18,10 @@ import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
-import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
-import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { ExportButton } from "@/components/shared/ExportButton";
+import { UnifiedTable, UnifiedTableColumn } from "@/components/unified/UnifiedTable";
 
 type Document = Database['public']['Tables']['documents']['Row'];
 
@@ -198,82 +197,84 @@ const Archive = () => {
               />
             </div>
 
-            {filteredDocuments.length === 0 ? (
-              <EmptyState
-                icon={FileText}
-                title="لا توجد مستندات"
-                description="ابدأ برفع المستندات لإدارتها وأرشفتها"
-                actionLabel="رفع مستند جديد"
-                onAction={() => setUploadDialogOpen(true)}
-              />
-            ) : (
-              <ScrollableTableWrapper>
-                <MobileScrollHint />
-                <div className="rounded-md border">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b bg-muted/50">
-                        <th className="p-3 text-right text-sm font-medium">اسم المستند</th>
-                        <th className="p-3 text-right text-sm font-medium hidden md:table-cell">الفئة</th>
-                        <th className="p-3 text-right text-sm font-medium hidden lg:table-cell">الحجم</th>
-                        <th className="p-3 text-right text-sm font-medium hidden lg:table-cell">تاريخ الرفع</th>
-                        <th className="p-3 text-center text-sm font-medium">الإجراءات</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredDocuments.map((doc) => (
-                        <tr key={doc.id} className="border-b hover:bg-muted/50 transition-colors">
-                          <td className="p-3">
-                            <div className="flex items-center gap-2">
-                              <FileText className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                              <span className="truncate">{doc.name}</span>
-                            </div>
-                          </td>
-                          <td className="p-3 hidden md:table-cell">
-                            <Badge variant="outline">{doc.category}</Badge>
-                          </td>
-                          <td className="p-3 hidden lg:table-cell text-muted-foreground text-sm">
-                            {doc.file_size || '-'}
-                          </td>
-                          <td className="p-3 hidden lg:table-cell text-muted-foreground text-sm">
-                            {format(new Date(doc.created_at), 'dd/MM/yyyy', { locale: ar })}
-                          </td>
-                          <td className="p-3">
-                            <div className="flex justify-center gap-1">
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => handlePreviewDocument(doc)}
-                                title="عرض"
-                              >
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => handleDeleteClick(doc)}
-                                className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                                title="حذف"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                disabled
-                                title="وظيفة التنزيل قيد التطوير"
-                              >
-                                <Download className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </ScrollableTableWrapper>
-            )}
+            <UnifiedTable
+              columns={[
+                {
+                  key: 'name',
+                  label: 'اسم المستند',
+                  render: (doc) => (
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                      <span className="truncate">{doc.name}</span>
+                    </div>
+                  ),
+                },
+                {
+                  key: 'category',
+                  label: 'الفئة',
+                  headerClassName: 'hidden md:table-cell',
+                  className: 'hidden md:table-cell',
+                  render: (doc) => <Badge variant="outline">{doc.category}</Badge>,
+                },
+                {
+                  key: 'file_size',
+                  label: 'الحجم',
+                  headerClassName: 'hidden lg:table-cell',
+                  className: 'hidden lg:table-cell text-muted-foreground text-sm',
+                  render: (doc) => doc.file_size || '-',
+                },
+                {
+                  key: 'created_at',
+                  label: 'تاريخ الرفع',
+                  headerClassName: 'hidden lg:table-cell',
+                  className: 'hidden lg:table-cell text-muted-foreground text-sm',
+                  render: (doc) => format(new Date(doc.created_at), 'dd/MM/yyyy', { locale: ar }),
+                },
+                {
+                  key: 'actions',
+                  label: 'الإجراءات',
+                  headerClassName: 'text-center',
+                  render: (doc) => (
+                    <div className="flex justify-center gap-1">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handlePreviewDocument(doc);
+                        }}
+                        title="عرض"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteClick(doc);
+                        }}
+                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                        title="حذف"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        disabled
+                        title="وظيفة التنزيل قيد التطوير"
+                      >
+                        <Download className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ),
+                },
+              ] as UnifiedTableColumn<Document>[]}
+              data={filteredDocuments}
+              loading={isLoading}
+              emptyMessage="لا توجد مستندات. ابدأ برفع المستندات لإدارتها وأرشفتها"
+            />
           </TabsContent>
 
           <TabsContent value="smart">
