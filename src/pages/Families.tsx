@@ -435,6 +435,10 @@ const Families = () => {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => navigate(`/families/${family.id}`)}>
+                              <Eye className="ml-2 h-4 w-4" />
+                              شجرة العائلة
+                            </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => {
                               setSelectedFamilyForMembers(family);
                               setMembersDialogOpen(true);
