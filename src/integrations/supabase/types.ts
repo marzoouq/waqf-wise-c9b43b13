@@ -2202,7 +2202,10 @@ export type Database = {
           created_at: string
           fiscal_year_id: string
           id: string
+          notes: string | null
+          period_end_date: string | null
           period_number: number | null
+          period_start_date: string | null
           period_type: string
           updated_at: string
           variance_amount: number | null
@@ -2214,7 +2217,10 @@ export type Database = {
           created_at?: string
           fiscal_year_id: string
           id?: string
+          notes?: string | null
+          period_end_date?: string | null
           period_number?: number | null
+          period_start_date?: string | null
           period_type: string
           updated_at?: string
           variance_amount?: number | null
@@ -2226,7 +2232,10 @@ export type Database = {
           created_at?: string
           fiscal_year_id?: string
           id?: string
+          notes?: string | null
+          period_end_date?: string | null
           period_number?: number | null
+          period_start_date?: string | null
           period_type?: string
           updated_at?: string
           variance_amount?: number | null
@@ -3133,9 +3142,162 @@ export type Database = {
           },
         ]
       }
+      distribution_reports: {
+        Row: {
+          distribution_id: string | null
+          file_path: string | null
+          generated_at: string | null
+          generated_by: string | null
+          id: string
+          report_data: Json
+          report_type: string
+        }
+        Insert: {
+          distribution_id?: string | null
+          file_path?: string | null
+          generated_at?: string | null
+          generated_by?: string | null
+          id?: string
+          report_data: Json
+          report_type: string
+        }
+        Update: {
+          distribution_id?: string | null
+          file_path?: string | null
+          generated_at?: string | null
+          generated_by?: string | null
+          id?: string
+          report_data?: Json
+          report_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "distribution_reports_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "distribution_statistics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "distribution_reports_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "distributions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "distribution_reports_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "payment_vouchers_with_details"
+            referencedColumns: ["distribution_id_ref"]
+          },
+        ]
+      }
+      distribution_simulations: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          daughter_share: number | null
+          daughters_count: number | null
+          development_amount: number | null
+          development_percentage: number | null
+          distributable_amount: number
+          fund_id: string | null
+          id: string
+          investment_amount: number | null
+          investment_percentage: number | null
+          maintenance_amount: number | null
+          maintenance_percentage: number | null
+          nazer_amount: number | null
+          nazer_percentage: number | null
+          reserve_amount: number | null
+          reserve_percentage: number | null
+          simulation_date: string
+          simulation_name: string
+          son_share: number | null
+          sons_count: number | null
+          status: string | null
+          total_amount: number
+          total_beneficiaries: number | null
+          updated_at: string | null
+          wife_share: number | null
+          wives_count: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          daughter_share?: number | null
+          daughters_count?: number | null
+          development_amount?: number | null
+          development_percentage?: number | null
+          distributable_amount: number
+          fund_id?: string | null
+          id?: string
+          investment_amount?: number | null
+          investment_percentage?: number | null
+          maintenance_amount?: number | null
+          maintenance_percentage?: number | null
+          nazer_amount?: number | null
+          nazer_percentage?: number | null
+          reserve_amount?: number | null
+          reserve_percentage?: number | null
+          simulation_date?: string
+          simulation_name: string
+          son_share?: number | null
+          sons_count?: number | null
+          status?: string | null
+          total_amount: number
+          total_beneficiaries?: number | null
+          updated_at?: string | null
+          wife_share?: number | null
+          wives_count?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          daughter_share?: number | null
+          daughters_count?: number | null
+          development_amount?: number | null
+          development_percentage?: number | null
+          distributable_amount?: number
+          fund_id?: string | null
+          id?: string
+          investment_amount?: number | null
+          investment_percentage?: number | null
+          maintenance_amount?: number | null
+          maintenance_percentage?: number | null
+          nazer_amount?: number | null
+          nazer_percentage?: number | null
+          reserve_amount?: number | null
+          reserve_percentage?: number | null
+          simulation_date?: string
+          simulation_name?: string
+          son_share?: number | null
+          sons_count?: number | null
+          status?: string | null
+          total_amount?: number
+          total_beneficiaries?: number | null
+          updated_at?: string | null
+          wife_share?: number | null
+          wives_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "distribution_simulations_fund_id_fkey"
+            columns: ["fund_id"]
+            isOneToOne: false
+            referencedRelation: "funds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       distributions: {
         Row: {
+          approved_at: string | null
+          approved_by: string | null
           bank_statement_ref: string | null
+          bank_transfer_file_id: string | null
           beneficiaries_count: number
           calculation_notes: string | null
           charity_percentage: number | null
@@ -3145,6 +3307,8 @@ export type Database = {
           distributable_amount: number | null
           distribution_date: string
           distribution_type: string | null
+          executed_at: string | null
+          executed_by: string | null
           expenses_amount: number | null
           id: string
           journal_entry_id: string | null
@@ -3154,9 +3318,11 @@ export type Database = {
           nazer_share: number | null
           net_revenues: number | null
           notes: string | null
+          payment_method: string | null
           period_end: string | null
           period_start: string | null
           reserve_amount: number | null
+          simulation_id: string | null
           sons_count: number | null
           status: string
           total_amount: number
@@ -3169,7 +3335,10 @@ export type Database = {
           wives_count: number | null
         }
         Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
           bank_statement_ref?: string | null
+          bank_transfer_file_id?: string | null
           beneficiaries_count: number
           calculation_notes?: string | null
           charity_percentage?: number | null
@@ -3179,6 +3348,8 @@ export type Database = {
           distributable_amount?: number | null
           distribution_date: string
           distribution_type?: string | null
+          executed_at?: string | null
+          executed_by?: string | null
           expenses_amount?: number | null
           id?: string
           journal_entry_id?: string | null
@@ -3188,9 +3359,11 @@ export type Database = {
           nazer_share?: number | null
           net_revenues?: number | null
           notes?: string | null
+          payment_method?: string | null
           period_end?: string | null
           period_start?: string | null
           reserve_amount?: number | null
+          simulation_id?: string | null
           sons_count?: number | null
           status?: string
           total_amount: number
@@ -3203,7 +3376,10 @@ export type Database = {
           wives_count?: number | null
         }
         Update: {
+          approved_at?: string | null
+          approved_by?: string | null
           bank_statement_ref?: string | null
+          bank_transfer_file_id?: string | null
           beneficiaries_count?: number
           calculation_notes?: string | null
           charity_percentage?: number | null
@@ -3213,6 +3389,8 @@ export type Database = {
           distributable_amount?: number | null
           distribution_date?: string
           distribution_type?: string | null
+          executed_at?: string | null
+          executed_by?: string | null
           expenses_amount?: number | null
           id?: string
           journal_entry_id?: string | null
@@ -3222,9 +3400,11 @@ export type Database = {
           nazer_share?: number | null
           net_revenues?: number | null
           notes?: string | null
+          payment_method?: string | null
           period_end?: string | null
           period_start?: string | null
           reserve_amount?: number | null
+          simulation_id?: string | null
           sons_count?: number | null
           status?: string
           total_amount?: number
@@ -3242,6 +3422,13 @@ export type Database = {
             columns: ["journal_entry_id"]
             isOneToOne: false
             referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "distributions_simulation_id_fkey"
+            columns: ["simulation_id"]
+            isOneToOne: false
+            referencedRelation: "distribution_simulations"
             referencedColumns: ["id"]
           },
         ]
@@ -5795,6 +5982,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           description: string
+          distribution_id: string | null
           entry_date: string
           entry_number: string
           entry_type: Database["public"]["Enums"]["entry_type"] | null
@@ -5812,6 +6000,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           description: string
+          distribution_id?: string | null
           entry_date: string
           entry_number: string
           entry_type?: Database["public"]["Enums"]["entry_type"] | null
@@ -5829,6 +6018,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           description?: string
+          distribution_id?: string | null
           entry_date?: string
           entry_number?: string
           entry_type?: Database["public"]["Enums"]["entry_type"] | null
@@ -5843,6 +6033,27 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "journal_entries_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "distribution_statistics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "journal_entries_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "distributions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "journal_entries_distribution_id_fkey"
+            columns: ["distribution_id"]
+            isOneToOne: false
+            referencedRelation: "payment_vouchers_with_details"
+            referencedColumns: ["distribution_id_ref"]
+          },
           {
             foreignKeyName: "journal_entries_fiscal_year_id_fkey"
             columns: ["fiscal_year_id"]
@@ -9311,6 +9522,71 @@ export type Database = {
         }
         Relationships: []
       }
+      simulation_beneficiary_details: {
+        Row: {
+          adjustments: number | null
+          beneficiary_id: string | null
+          beneficiary_type: string | null
+          calculated_share: number
+          created_at: string | null
+          final_amount: number
+          id: string
+          notes: string | null
+          simulation_id: string | null
+        }
+        Insert: {
+          adjustments?: number | null
+          beneficiary_id?: string | null
+          beneficiary_type?: string | null
+          calculated_share: number
+          created_at?: string | null
+          final_amount: number
+          id?: string
+          notes?: string | null
+          simulation_id?: string | null
+        }
+        Update: {
+          adjustments?: number | null
+          beneficiary_id?: string | null
+          beneficiary_type?: string | null
+          calculated_share?: number
+          created_at?: string | null
+          final_amount?: number
+          id?: string
+          notes?: string | null
+          simulation_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "simulation_beneficiary_details_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "simulation_beneficiary_details_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_account_statement"
+            referencedColumns: ["beneficiary_id"]
+          },
+          {
+            foreignKeyName: "simulation_beneficiary_details_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_statistics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "simulation_beneficiary_details_simulation_id_fkey"
+            columns: ["simulation_id"]
+            isOneToOne: false
+            referencedRelation: "distribution_simulations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       slow_query_log: {
         Row: {
           created_at: string | null
@@ -11198,6 +11474,10 @@ export type Database = {
         Args: { p_beneficiary_id: string }
         Returns: Json
       }
+      auto_create_distribution_journal_entry: {
+        Args: { p_distribution_id: string }
+        Returns: string
+      }
       auto_deduct_loan_installments: {
         Args: { p_distribution_id: string }
         Returns: {
@@ -11229,6 +11509,19 @@ export type Database = {
           other_expenses: number
           total_expenses: number
           total_revenues: number
+        }[]
+      }
+      calculate_distribution_shares: {
+        Args: {
+          p_daughters_count: number
+          p_sons_count: number
+          p_total_amount: number
+          p_wives_count: number
+        }
+        Returns: {
+          daughter_share: number
+          son_share: number
+          wife_share: number
         }[]
       }
       calculate_loan_schedule:

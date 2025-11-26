@@ -29,14 +29,22 @@ export const mockDistribution = (overrides?: Partial<Distribution>): Distributio
   charity_percentage: 5,
   corpus_percentage: 0,
   expenses_amount: 100000,
-  bank_statement_ref: null,
+  bank_statement_ref: 'TEST-BANK-001',
   maintenance_amount: 0,
   reserve_amount: 0,
   calculation_notes: 'حساب تسلسلي: صيانة ← ناظر ← صدقة ← مستفيدين',
+  // الحقول الجديدة
+  simulation_id: null,
+  payment_method: 'bank_transfer',
+  bank_transfer_file_id: null,
+  approved_by: null,
+  approved_at: null,
+  executed_by: null,
+  executed_at: null,
   created_at: '2025-01-01T00:00:00.000Z',
   updated_at: '2025-01-01T00:00:00.000Z',
   ...overrides,
-});
+} as Distribution);
 
 export const mockDistributions = (count: number = 3): Distribution[] => {
   return Array.from({ length: count }, (_, i) => 
