@@ -46,11 +46,15 @@ export function useGovernanceVoting(decisionId: string) {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("غير مصرح");
       
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("full_name")
         .eq("user_id", user.id)
-        .single();
+        .maybeSingle();
+      
+      if (profileError && profileError.code !== 'PGRST116') {
+        console.error('Error fetching profile:', profileError);
+      }
       
       const { data: beneficiary } = await supabase
         .from("beneficiaries")
@@ -76,7 +80,10 @@ export function useGovernanceVoting(decisionId: string) {
         .select()
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error casting vote:', error);
+        throw error;
+      }
       return data;
     },
     onSuccess: () => {

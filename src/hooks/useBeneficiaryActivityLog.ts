@@ -17,28 +17,51 @@ export interface BeneficiaryActivity {
 }
 
 export function useBeneficiaryActivityLog(beneficiaryId?: string) {
-  const { data: activities = [], isLoading } = useQuery({
+  const { data: activities = [], isLoading, error } = useQuery({
     queryKey: ["beneficiary-activity-log", beneficiaryId],
     queryFn: async () => {
-      let query = supabase
-        .from("beneficiary_activity_log")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (beneficiaryId) {
-        query = query.eq("beneficiary_id", beneficiaryId);
+      if (!beneficiaryId) {
+        return [];
       }
 
-      const { data, error } = await query.limit(100);
+      // التحقق من وجود المستفيد أولاً
+      const { data: beneficiary, error: checkError } = await supabase
+        .from("beneficiaries")
+        .select("id")
+        .eq("id", beneficiaryId)
+        .maybeSingle();
 
-      if (error) throw error;
+      if (checkError) {
+        console.error('Error checking beneficiary:', checkError);
+        throw new Error('فشل التحقق من المستفيد');
+      }
+
+      if (!beneficiary) {
+        console.warn('Beneficiary not found:', beneficiaryId);
+        return [];
+      }
+
+      const { data, error: queryError } = await supabase
+        .from("beneficiary_activity_log")
+        .select("*")
+        .eq("beneficiary_id", beneficiaryId)
+        .order("created_at", { ascending: false })
+        .limit(100);
+
+      if (queryError) {
+        console.error('Error fetching activity log:', queryError);
+        throw queryError;
+      }
+      
       return data as BeneficiaryActivity[];
     },
     enabled: !!beneficiaryId,
+    retry: 1,
   });
 
   return {
     activities,
     isLoading,
+    error,
   };
 }
