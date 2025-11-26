@@ -9437,15 +9437,12 @@ export type Database = {
         Row: {
           account_code: string | null
           account_name: string | null
-          account_type: Database["public"]["Enums"]["account_type"] | null
           credit_amount: number | null
           debit_amount: number | null
           entry_date: string | null
           entry_description: string | null
           entry_number: string | null
           line_description: string | null
-          posted: boolean | null
-          running_balance: number | null
           status: Database["public"]["Enums"]["entry_status"] | null
         }
         Relationships: []
