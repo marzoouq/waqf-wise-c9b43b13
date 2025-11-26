@@ -19,6 +19,7 @@ import { TicketDetailsDialog } from '@/components/support/TicketDetailsDialog';
 import { AgentPerformanceReport } from '@/components/support/AgentPerformanceReport';
 import { AssignmentSettingsDialog } from '@/components/support/AssignmentSettingsDialog';
 import { AgentAvailabilityCard } from '@/components/support/AgentAvailabilityCard';
+import { EmptySupportState } from '@/components/support/EmptySupportState';
 import { 
   MessageSquare, 
   Clock, 
@@ -58,10 +59,20 @@ export default function SupportManagement() {
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   const { tickets, isLoading } = useSupportTickets(cleanFilters(filters));
-  const { overviewStats, overdueTickets, recentTickets, overviewLoading } = useSupportStats();
+  const { 
+    overviewStats, 
+    overdueTickets, 
+    recentTickets, 
+    overviewLoading,
+    overviewError 
+  } = useSupportStats();
 
   const handleFilterChange = (key: keyof SupportFilters, value: string | string[] | undefined) => {
     setFilters(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleRefresh = () => {
+    window.location.reload();
   };
 
   return (
@@ -89,6 +100,23 @@ export default function SupportManagement() {
         <TabsContent value="overview" className="space-y-6">
           {overviewLoading ? (
             <LoadingState message="جاري تحميل الإحصائيات..." />
+          ) : overviewError ? (
+            <Card>
+              <CardContent className="pt-6">
+                <div className="text-center py-8">
+                  <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">خطأ في تحميل البيانات</h3>
+                  <p className="text-muted-foreground">حدث خطأ أثناء تحميل إحصائيات الدعم الفني</p>
+                  <Button 
+                    variant="outline" 
+                    className="mt-4"
+                    onClick={() => window.location.reload()}
+                  >
+                    إعادة المحاولة
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           ) : (
             <>
               {/* بطاقات الإحصائيات */}
@@ -285,7 +313,9 @@ export default function SupportManagement() {
                 {/* قائمة التذاكر */}
                   {isLoading ? (
                     <LoadingState message="جاري تحميل التذاكر..." />
-                  ) : tickets && tickets.length > 0 ? (
+                  ) : !tickets || tickets.length === 0 ? (
+                    <EmptySupportState onRefresh={handleRefresh} />
+                  ) : (
                     <div className="space-y-2">
                       {tickets.map((ticket) => {
                         const ticketWithRelations = ticket as TicketWithRelations;
@@ -316,11 +346,7 @@ export default function SupportManagement() {
                         );
                       })}
                     </div>
-                  ) : (
-                  <div className="text-center py-8">
-                    <p className="text-muted-foreground">لا توجد تذاكر</p>
-                  </div>
-                )}
+                  )}
               </div>
             </CardContent>
           </Card>
