@@ -17,10 +17,11 @@ export const mockJournalEntry = (overrides?: Partial<JournalEntry>): JournalEntr
   posted: false,
   posted_at: null,
   rejection_reason: null,
+  distribution_id: null,
   created_at: '2025-01-01T00:00:00.000Z',
   updated_at: '2025-01-01T00:00:00.000Z',
   ...overrides,
-});
+} as JournalEntry);
 
 export const mockJournalEntryLine = (
   journalEntryId: string,
