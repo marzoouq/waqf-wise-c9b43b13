@@ -10,8 +10,18 @@ export const mockFamily = (overrides?: Partial<Family>): Family => ({
   total_members: 5,
   status: 'active',
   notes: null,
+  family_type: 'nuclear',
+  income_level: null,
+  housing_status: null,
+  special_needs: null,
+  family_metadata: null,
+  average_age: null,
+  dependents_count: 0,
+  contact_person_id: null,
+  emergency_contact: null,
   created_at: '2025-01-01T00:00:00.000Z',
   updated_at: '2025-01-01T00:00:00.000Z',
+  created_by: null,
   ...overrides,
 });
 
