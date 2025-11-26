@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, LogIn } from 'lucide-react';
+import { Loader2, LogIn, Smartphone } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -187,6 +187,12 @@ export default function Login() {
             </form>
           </TabsContent>
         </Tabs>
+        <div className="text-center text-sm text-muted-foreground px-6 pb-4">
+          <Link to="/install" className="text-primary hover:underline inline-flex items-center justify-center gap-1">
+            <Smartphone className="h-4 w-4" />
+            تثبيت التطبيق على جهازك
+          </Link>
+        </div>
       </Card>
     </div>
   );
