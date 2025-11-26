@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
-import { Plus, Trash2, Loader2, AlertCircle } from "lucide-react";
+import { Plus, Trash2, Loader2, AlertCircle, FileImage } from "lucide-react";
 import { format } from "date-fns";
 import { generateZATCAQRData, formatZATCACurrency, validateVATNumber } from "@/lib/zatca";
 import { useOrganizationSettings } from "@/hooks/useOrganizationSettings";
@@ -20,6 +20,8 @@ import { validateZATCAInvoice, formatValidationErrors } from "@/lib/validateZATC
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { commonValidation } from "@/lib/validationSchemas";
+import { InvoiceOCRUpload } from "./InvoiceOCRUpload";
+import { ExtractedInvoiceData } from "@/hooks/useInvoiceOCR";
 
 const invoiceSchema = z.object({
   invoice_date: commonValidation.dateString("تاريخ الفاتورة غير صحيح"),
@@ -67,6 +69,8 @@ export const AddInvoiceDialog = ({ open, onOpenChange, isEdit = false, invoiceTo
     unit_price: 0,
     tax_rate: 15,
   });
+  const [showOCRDialog, setShowOCRDialog] = useState(false);
+  const [ocrImageUrl, setOcrImageUrl] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const { settings: orgSettings } = useOrganizationSettings();
 
@@ -233,6 +237,10 @@ export const AddInvoiceDialog = ({ open, onOpenChange, isEdit = false, invoiceTo
           notes: data.notes || null,
           qr_code_data: qrCodeData,
           status: "draft",
+          source_image_url: ocrImageUrl,
+          ocr_extracted: !!ocrImageUrl,
+          ocr_confidence_score: ocrImageUrl ? 85 : null,
+          ocr_processed_at: ocrImageUrl ? new Date().toISOString() : null,
         })
         .select()
         .single();
@@ -266,6 +274,7 @@ export const AddInvoiceDialog = ({ open, onOpenChange, isEdit = false, invoiceTo
       queryClient.invalidateQueries({ queryKey: ["next-invoice-number"] });
       form.reset();
       setLines([]);
+      setOcrImageUrl(null);
       onOpenChange(false);
     },
     onError: (error: Error) => {
@@ -289,31 +298,85 @@ export const AddInvoiceDialog = ({ open, onOpenChange, isEdit = false, invoiceTo
     createInvoiceMutation.mutate(data);
   };
 
-  return (
-    <ResponsiveDialog 
-      open={open} 
-      onOpenChange={onOpenChange}
-      title={isEdit ? "تعديل فاتورة" : "إنشاء فاتورة جديدة"}
-      description={isEdit ? "تعديل بيانات الفاتورة وبنودها" : "إنشاء فاتورة ضريبية متوافقة مع متطلبات هيئة الزكاة والضريبة"}
-      size="xl"
-    >
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          {!orgSettings && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
-                لم يتم تعيين بيانات المنشأة. يرجى إضافة بيانات المنشأة من صفحة الإعدادات أولاً.
-              </AlertDescription>
-            </Alert>
-          )}
+  const handleOCRDataExtracted = (data: ExtractedInvoiceData, imageUrl: string) => {
+    // ملء النموذج من البيانات المستخرجة
+    if (data.invoice_date) {
+      form.setValue('invoice_date', data.invoice_date);
+    }
+    if (data.customer_name) {
+      form.setValue('customer_name', data.customer_name);
+    }
+    if (data.customer_vat_number) {
+      form.setValue('customer_vat_number', data.customer_vat_number);
+    }
+    if (data.customer_address) {
+      form.setValue('customer_address', data.customer_address);
+    }
 
-          <div className="bg-muted/50 p-4 rounded-lg">
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">رقم الفاتورة التالي</span>
-              <span className="font-bold text-primary">{nextInvoiceNumber || "..."}</span>
+    // إضافة البنود المستخرجة
+    const extractedLines: InvoiceLine[] = data.items.map((item, index) => ({
+      id: `ocr-${index}`,
+      account_id: accounts?.[0]?.id || "",
+      description: item.description,
+      quantity: item.quantity,
+      unit_price: item.unit_price,
+      tax_rate: item.tax_rate,
+      subtotal: item.quantity * item.unit_price,
+      tax_amount: (item.quantity * item.unit_price) * (item.tax_rate / 100),
+      line_total: item.total,
+    }));
+
+    setLines(extractedLines);
+    setOcrImageUrl(imageUrl);
+    setShowOCRDialog(false);
+    
+    toast.success(`تم استيراد ${data.items.length} بند من الفاتورة`);
+  };
+
+  return (
+    <>
+      <ResponsiveDialog 
+        open={open} 
+        onOpenChange={onOpenChange}
+        title={isEdit ? "تعديل فاتورة" : "إنشاء فاتورة جديدة"}
+        description={isEdit ? "تعديل بيانات الفاتورة وبنودها" : "إنشاء فاتورة ضريبية متوافقة مع متطلبات هيئة الزكاة والضريبة"}
+        size="xl"
+      >
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {!orgSettings && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  لم يتم تعيين بيانات المنشأة. يرجى إضافة بيانات المنشأة من صفحة الإعدادات أولاً.
+                </AlertDescription>
+              </Alert>
+            )}
+
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-muted-foreground">رقم الفاتورة التالي</span>
+                  <span className="font-bold text-primary">{nextInvoiceNumber || "..."}</span>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowOCRDialog(true)}
+                  className="gap-2"
+                >
+                  <FileImage className="h-4 w-4" />
+                  استيراد من صورة
+                </Button>
+              </div>
+              {ocrImageUrl && (
+                <div className="mt-2 text-xs text-green-600 flex items-center gap-1">
+                  <FileImage className="h-3 w-3" />
+                  تم استيراد البيانات من صورة
+                </div>
+              )}
             </div>
-          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <FormField
               control={form.control}
@@ -596,5 +659,20 @@ export const AddInvoiceDialog = ({ open, onOpenChange, isEdit = false, invoiceTo
         </form>
       </Form>
     </ResponsiveDialog>
+
+    {/* OCR Dialog */}
+    <ResponsiveDialog
+      open={showOCRDialog}
+      onOpenChange={setShowOCRDialog}
+      title="استخراج بيانات الفاتورة من صورة"
+      description="ارفع صورة الفاتورة لاستخراج البيانات تلقائياً بالذكاء الاصطناعي"
+      size="xl"
+    >
+      <InvoiceOCRUpload
+        onDataExtracted={handleOCRDataExtracted}
+        onCancel={() => setShowOCRDialog(false)}
+      />
+    </ResponsiveDialog>
+    </>
   );
 };
