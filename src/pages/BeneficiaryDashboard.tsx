@@ -15,9 +15,10 @@ import {
   Briefcase
 } from "lucide-react";
 import { BeneficiaryProfileCard } from "@/components/beneficiary/BeneficiaryProfileCard";
-import { StatsCard } from "@/components/beneficiary/StatsCard";
-import { StatsCardSkeleton } from "@/components/beneficiary/StatsCardSkeleton";
 import { QuickActionsCard } from "@/components/beneficiary/QuickActionsCard";
+import { UnifiedDashboardLayout } from "@/components/dashboard/UnifiedDashboardLayout";
+import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
+import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 import { AnnualDisclosureCard } from "@/components/beneficiary/AnnualDisclosureCard";
 import { PropertyStatsCards } from "@/components/beneficiary/PropertyStatsCards";
 import { ReportsMenu } from "@/components/beneficiary/ReportsMenu";
@@ -26,7 +27,7 @@ import { ErrorReportingGuide } from "@/components/beneficiary/ErrorReportingGuid
 import { ActivityTimeline } from "@/components/beneficiary/ActivityTimeline";
 import { YearlyComparison } from "@/components/beneficiary/YearlyComparison";
 import { ChatbotQuickCard } from "@/components/dashboard/ChatbotQuickCard";
-import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
+
 import { InternalMessagesDialog } from "@/components/messages/InternalMessagesDialog";
 import { ChangePasswordDialog } from "@/components/beneficiary/ChangePasswordDialog";
 import { DocumentUploadDialog } from "@/components/beneficiary/DocumentUploadDialog";
@@ -297,8 +298,7 @@ const BeneficiaryDashboard = () => {
   }
 
   return (
-    <PageErrorBoundary pageName="لوحة تحكم المستفيد">
-      <MobileOptimizedLayout>
+    <UnifiedDashboardLayout role="beneficiary">
       <div className="space-y-6 pb-20">
         {/* بطاقة الملف الشخصي */}
         <BeneficiaryProfileCard
@@ -308,43 +308,36 @@ const BeneficiaryDashboard = () => {
         />
 
         {/* الإحصائيات المحسنة */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {loading ? (
-            <>
-              <StatsCardSkeleton />
-              <StatsCardSkeleton />
-              <StatsCardSkeleton />
-              <StatsCardSkeleton />
-            </>
-          ) : (
-            <>
-              <StatsCard
-                title="إجمالي المدفوعات"
-                value={formatCurrency(stats.totalPayments)}
-                icon={DollarSign}
-                colorClass="text-primary"
-              />
-              <StatsCard
-                title="عدد المدفوعات"
-                value={stats.paymentsCount}
-                icon={FileText}
-                colorClass="text-success"
-              />
-              <StatsCard
-                title="آخر دفعة"
-                value={stats.lastPaymentDate}
-                icon={Calendar}
-                colorClass="text-info"
-              />
-              <StatsCard
-                title="متوسط الدفعة"
-                value={formatCurrency(stats.averagePayment)}
-                icon={TrendingUp}
-                colorClass="text-warning"
-              />
-            </>
-          )}
-        </div>
+        <UnifiedStatsGrid columns={4}>
+          <UnifiedKPICard
+            title="إجمالي المدفوعات"
+            value={formatCurrency(stats.totalPayments)}
+            icon={DollarSign}
+            variant="default"
+            loading={loading}
+          />
+          <UnifiedKPICard
+            title="عدد المدفوعات"
+            value={stats.paymentsCount}
+            icon={FileText}
+            variant="success"
+            loading={loading}
+          />
+          <UnifiedKPICard
+            title="آخر دفعة"
+            value={stats.lastPaymentDate}
+            icon={Calendar}
+            variant="default"
+            loading={loading}
+          />
+          <UnifiedKPICard
+            title="متوسط الدفعة"
+            value={formatCurrency(stats.averagePayment)}
+            icon={TrendingUp}
+            variant="warning"
+            loading={loading}
+          />
+        </UnifiedStatsGrid>
 
         {/* التبويبات الرئيسية - 3 فقط */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
@@ -535,8 +528,7 @@ const BeneficiaryDashboard = () => {
           beneficiaryId={beneficiary.id}
         />
         </div>
-      </MobileOptimizedLayout>
-    </PageErrorBoundary>
+      </UnifiedDashboardLayout>
   );
 };
 
