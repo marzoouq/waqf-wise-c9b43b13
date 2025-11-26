@@ -13,35 +13,42 @@ export function useUserRole() {
     queryKey: ["user-roles", user?.id],
     queryFn: async () => {
       if (!user) {
-        productionLogger.debug('useUserRole: No user yet');
+        console.log('🔍 useUserRole: No user yet');
         return [];
       }
 
-      productionLogger.debug('useUserRole: Fetching roles for user', { email: user.email });
+      console.log('🔍 useUserRole: Fetching roles for user', { 
+        email: user.email,
+        userId: user.id 
+      });
 
-      // Get current authenticated user's ID
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      if (!authUser) {
-        productionLogger.warn('useUserRole: No authenticated user');
+      try {
+        const { data, error } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.id);
+
+        if (error) {
+          console.error('❌ useUserRole: Error fetching roles', error);
+          return [];
+        }
+        
+        console.log('✅ useUserRole: Roles loaded successfully', { 
+          roles: data,
+          count: data?.length 
+        });
+        
+        return (data || []).map(r => r.role as AppRole);
+      } catch (err) {
+        console.error('❌ useUserRole: Exception in queryFn', err);
         return [];
       }
-
-      const { data, error } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", authUser.id);
-
-      if (error) {
-        productionLogger.warn('useUserRole: Error fetching roles', { error: error.message });
-        return [];
-      }
-      
-      productionLogger.debug('useUserRole: Roles loaded', { roles: data });
-      return (data || []).map(r => r.role as AppRole);
     },
     enabled: !!user,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
+    retry: 3,
+    retryDelay: 1000,
   });
 
   // Real-time subscription
@@ -82,6 +89,13 @@ export function useUserRole() {
   const isArchivist = hasRole("archivist");
   const isBeneficiary = hasRole("beneficiary");
   const isUser = hasRole("user");
+
+  console.log('🎭 useUserRole State:', {
+    isLoading: isLoadingRoles,
+    roles,
+    primaryRole,
+    hasUser: !!user
+  });
 
   return {
     roles,
