@@ -56,35 +56,66 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .eq('user_id', userId)
         .maybeSingle();
 
-      if (error) throw error;
+      if (error && error.code !== 'PGRST116') {
+        // PGRST116 = no rows returned, which is ok
+        throw error;
+      }
       
       // إذا لم يوجد profile، نحاول إنشاء واحد
       if (!data) {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
-          const { data: newProfile, error: createError } = await supabase
-            .from('profiles')
-            .insert({
-              user_id: userId,
-              email: user.email,
-              full_name: user.user_metadata?.full_name || user.email
-            })
-            .select('*')
-            .single();
-          
-          if (createError) throw createError;
-          setProfile(newProfile as any);
+          try {
+            const { data: newProfile, error: createError } = await supabase
+              .from('profiles')
+              .insert({
+                user_id: userId,
+                email: user.email || '',
+                full_name: user.user_metadata?.full_name || user.email || 'مستخدم جديد'
+              })
+              .select('*')
+              .single();
+            
+            if (createError) {
+              // التحقق من أخطاء foreign key أو unique constraint
+              if (createError.code === '23503') {
+                console.error('Foreign key violation - user_id not found in auth.users');
+              } else if (createError.code === '23505') {
+                // Unique violation - profile already exists, try fetching again
+                const { data: existingProfile } = await supabase
+                  .from('profiles')
+                  .select('*')
+                  .eq('user_id', userId)
+                  .single();
+                
+                if (existingProfile) {
+                  setProfile(existingProfile as any);
+                  return;
+                }
+              }
+              throw createError;
+            }
+            
+            setProfile(newProfile as any);
+          } catch (insertError: any) {
+            console.error('Error creating profile:', insertError);
+            // لا نعرض toast هنا لأنه قد يكون طبيعي في بعض الحالات
+            // المستخدم يمكنه الاستمرار بدون profile
+          }
         }
       } else {
         setProfile(data as any);
       }
     } catch (error: any) {
       console.error('Error fetching profile:', error);
-      toast({
-        title: 'خطأ',
-        description: 'فشل تحميل بيانات المستخدم',
-        variant: 'destructive',
-      });
+      // نعرض toast فقط للأخطاء الحقيقية
+      if (error.code && error.code !== '23505' && error.code !== '23503') {
+        toast({
+          title: 'خطأ',
+          description: 'فشل تحميل بيانات المستخدم',
+          variant: 'destructive',
+        });
+      }
     } finally {
       setIsLoading(false);
     }
