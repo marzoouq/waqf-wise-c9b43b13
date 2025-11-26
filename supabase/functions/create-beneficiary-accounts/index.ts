@@ -191,16 +191,39 @@ serve(async (req) => {
 
         if (updateError) throw updateError;
 
-        // إنشاء profile و role
+        // إنشاء profile و role - تحقق من عدم وجود profile مسبقاً
         try {
-          await supabaseAdmin.rpc('create_user_profile_and_role', {
-            p_user_id: authData.user!.id,
-            p_full_name: beneficiary.full_name,
-            p_email: internalEmail,
-            p_role: 'beneficiary'
-          });
+          const { data: existingProfile } = await supabaseAdmin
+            .from('profiles')
+            .select('id')
+            .eq('user_id', authData.user!.id)
+            .maybeSingle();
+
+          if (!existingProfile) {
+            // إنشاء profile يدوياً بدلاً من استخدام RPC
+            await supabaseAdmin.from('profiles').insert({
+              user_id: authData.user!.id,
+              full_name: beneficiary.full_name,
+              email: internalEmail
+            });
+          }
+
+          // إنشاء role
+          const { data: existingRole } = await supabaseAdmin
+            .from('user_roles')
+            .select('id')
+            .eq('user_id', authData.user!.id)
+            .maybeSingle();
+
+          if (!existingRole) {
+            await supabaseAdmin.from('user_roles').insert({
+              user_id: authData.user!.id,
+              role: 'beneficiary'
+            });
+          }
         } catch (roleError) {
-          console.error('Error creating profile/role:', roleError);
+          console.error('Error creating profile/role (non-critical):', roleError);
+          // لا نفشل العملية بأكملها إذا فشل إنشاء profile/role
         }
 
         // 📝 Audit log
