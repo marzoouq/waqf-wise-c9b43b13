@@ -54,6 +54,19 @@ export interface Beneficiary {
   last_notification_at: string | null;
   beneficiary_number: string | null;
   beneficiary_type: string | null;
+  verification_documents: any | null;
+  verification_notes: string | null;
+  last_verification_date: string | null;
+  verification_method: string | null;
+  risk_score: number | null;
+  eligibility_status: string | null;
+  eligibility_notes: string | null;
+  last_review_date: string | null;
+  next_review_date: string | null;
+  social_status_details: any | null;
+  income_sources: any | null;
+  disabilities: any | null;
+  medical_conditions: any | null;
   created_at: string;
   updated_at: string;
 }
