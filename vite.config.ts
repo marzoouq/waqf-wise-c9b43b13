@@ -153,9 +153,6 @@ export default defineConfig(({ mode }) => ({
       }
     },
     
-    // CSS optimization
-    cssMinify: 'lightningcss',
-    
     // Chunk size optimization
     chunkSizeWarningLimit: 500,
     cssCodeSplit: true,
