@@ -10136,24 +10136,54 @@ export type Database = {
           success: boolean
         }[]
       }
-      search_beneficiaries_advanced: {
-        Args: {
-          search_category?: string
-          search_status?: string
-          search_text?: string
-          search_tribe?: string
-        }
-        Returns: {
-          category: string
-          full_name: string
-          id: string
-          national_id: string
-          phone: string
-          status: string
-          total_received: number
-          tribe: string
-        }[]
-      }
+      search_beneficiaries_advanced:
+        | {
+            Args: {
+              p_category?: string
+              p_city?: string
+              p_family_id?: string
+              p_full_name?: string
+              p_gender?: string
+              p_has_family?: boolean
+              p_marital_status?: string
+              p_max_income?: number
+              p_min_income?: number
+              p_national_id?: string
+              p_phone?: string
+              p_priority_level?: number
+              p_status?: string
+              p_tribe?: string
+            }
+            Returns: {
+              category: string
+              family_id: string
+              full_name: string
+              id: string
+              monthly_income: number
+              national_id: string
+              phone: string
+              priority_level: number
+              status: string
+            }[]
+          }
+        | {
+            Args: {
+              search_category?: string
+              search_status?: string
+              search_text?: string
+              search_tribe?: string
+            }
+            Returns: {
+              category: string
+              full_name: string
+              id: string
+              national_id: string
+              phone: string
+              status: string
+              total_received: number
+              tribe: string
+            }[]
+          }
       seed_demo_data: { Args: never; Returns: Json }
       seed_journal_entries: { Args: never; Returns: Json }
       setup_demo_accounts: {

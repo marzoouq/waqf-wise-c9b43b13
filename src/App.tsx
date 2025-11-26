@@ -60,6 +60,7 @@ const Notifications = lazy(() => import("./pages/Notifications"));
 const Requests = lazy(() => import("./pages/Requests"));
 const StaffRequests = lazy(() => import("./pages/StaffRequests"));
 const Families = lazy(() => import("./pages/Families"));
+const FamilyDetails = lazy(() => import("./pages/FamilyDetails"));
 const Users = lazy(() => import("./pages/Users"));
 const AuditLogs = lazy(() => import("./pages/AuditLogs"));
 const AIInsights = lazy(() => import("./pages/AIInsights"));
@@ -234,6 +235,14 @@ const App = () => {
           />
           <Route path="/families" element={<Families />} />
           <Route 
+            path="/families/:id" 
+            element={
+              <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+                <FamilyDetails />
+              </ProtectedRoute>
+            } 
+          />
+          <Route
             path="/properties" 
             element={
               <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
