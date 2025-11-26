@@ -11,7 +11,6 @@ export const mockRealisticLoans = (beneficiaryIds: string[]): Loan[] => [
     term_months: 24,
     start_date: '2024-01-15',
     status: 'نشط',
-    remaining_balance: 29167,
   },
   {
     beneficiary_id: beneficiaryIds[1],
@@ -21,6 +20,14 @@ export const mockRealisticLoans = (beneficiaryIds: string[]): Loan[] => [
     term_months: 36,
     start_date: '2024-03-01',
     status: 'متعثر',
-    remaining_balance: 64444,
+  },
+  {
+    beneficiary_id: beneficiaryIds[2],
+    loan_number: 'LOAN-2024-003',
+    loan_amount: 30000,
+    monthly_installment: 1500,
+    term_months: 20,
+    start_date: '2023-06-01',
+    status: 'مسدد',
   },
 ];
