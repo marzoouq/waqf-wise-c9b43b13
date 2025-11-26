@@ -126,9 +126,12 @@ class ProductionLogger {
     this.queue = [];
 
     try {
-      await supabase.functions.invoke('log-batch', {
-        body: { logs: logsToSend },
-      });
+      // إرسال الـ logs واحدة تلو الأخرى (تعطيل log-batch غير الموجودة)
+      for (const log of logsToSend.slice(0, 10)) { // فقط أول 10 لتجنب الحمل الزائد
+        await supabase.functions.invoke('log-error', {
+          body: log,
+        }).catch(() => {}); // تجاهل الأخطاء للـ logs غير الحرجة
+      }
     } catch (error) {
       // في حالة فشل الإرسال، أعد الـ logs للـ queue
       this.queue.unshift(...logsToSend);
