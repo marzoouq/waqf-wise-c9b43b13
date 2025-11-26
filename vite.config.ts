@@ -145,12 +145,19 @@ export default defineConfig(({ mode }) => ({
       compress: {
         drop_console: mode === 'production',
         drop_debugger: true,
-        pure_funcs: mode === 'production' ? ['console.log', 'console.info', 'console.debug'] : []
+        pure_funcs: mode === 'production' ? ['console.log', 'console.info', 'console.debug'] : [],
+        passes: 2
+      },
+      mangle: {
+        safari10: true
       }
     },
     
+    // CSS optimization
+    cssMinify: 'lightningcss',
+    
     // Chunk size optimization
-    chunkSizeWarningLimit: 1000,
+    chunkSizeWarningLimit: 500,
     cssCodeSplit: true,
     sourcemap: false,
     
@@ -158,53 +165,60 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks: (id) => {
           if (id.includes('node_modules')) {
-            // Specific React libraries FIRST (before general react check)
-            if (id.includes('react-router-dom') || id.includes('react-router')) {
-              return 'react-router';
-            }
-            if (id.includes('react-hook-form') || id.includes('@hookform')) {
-              return 'forms';
-            }
-            if (id.includes('react-day-picker')) {
-              return 'react-context-libs';
-            }
-            
-            // Core React libraries (only pure react/react-dom/scheduler)
-            // Match ONLY exact packages, not packages with react- prefix
-            if (id.match(/\/node_modules\/(react|react-dom|scheduler)(\/|$)/) && 
+            // Core React - MUST be first and most specific
+            if (id.match(/node_modules[\\/](react|react-dom|scheduler)[\\/]/) && 
                 !id.includes('react-router') && 
-                !id.includes('react-hook-form') &&
-                !id.includes('react-day-picker')) {
+                !id.includes('react-hook-') &&
+                !id.includes('react-day') &&
+                !id.includes('react-markdown') &&
+                !id.includes('react-is')) {
               return 'react-core';
             }
             
-            // Radix UI - split into two chunks
-            if (id.includes('@radix-ui')) {
-              if (id.includes('dialog') || id.includes('dropdown') || id.includes('select')) {
-                return 'radix-ui-core';
-              }
-              return 'radix-ui-extended';
+            // React ecosystem libraries (after core React check)
+            if (id.includes('react-router')) {
+              return 'react-router';
+            }
+            if (id.includes('react-hook-form') || id.includes('@hookform')) {
+              return 'react-forms';
+            }
+            if (id.includes('react-day-picker') || id.includes('react-markdown') || 
+                id.includes('next-themes') || id.includes('sonner')) {
+              return 'react-ui-libs';
             }
             
-            // Data & State Management
-            if (id.includes('@tanstack/react-query')) {
-              return 'query-client';
+            // Radix UI - critical UI components
+            if (id.includes('@radix-ui')) {
+              if (id.includes('dialog') || id.includes('dropdown-menu') || 
+                  id.includes('select') || id.includes('popover')) {
+                return 'radix-core';
+              }
+              return 'radix-extended';
             }
+            
+            // Query & State Management
+            if (id.includes('@tanstack/react-query')) {
+              return 'react-query';
+            }
+            
+            // Supabase
             if (id.includes('@supabase/supabase-js')) {
               return 'supabase';
             }
             
-            // Heavy libraries
+            // Charts - lazy loaded
             if (id.includes('recharts')) {
               return 'charts';
             }
+            
+            // Animations - lazy loaded
             if (id.includes('framer-motion')) {
               return 'animations';
             }
             
-            // Forms (zod only, react-hook-form handled above)
+            // Form validation
             if (id.includes('zod')) {
-              return 'forms';
+              return 'validation';
             }
             
             // Date utilities
@@ -212,36 +226,36 @@ export default defineConfig(({ mode }) => ({
               return 'date-utils';
             }
             
-            // PDF generation
+            // PDF - lazy loaded
             if (id.includes('jspdf')) {
-              return 'pdf-generator';
+              return 'pdf-lib';
             }
             
-            // Excel/XLSX
+            // Excel - lazy loaded
             if (id.includes('xlsx')) {
-              return 'excel-utils';
+              return 'excel-lib';
             }
             
-            // UI utilities
+            // Icons
             if (id.includes('lucide-react')) {
               return 'icons';
             }
-            if (id.includes('clsx') || id.includes('tailwind-merge') || id.includes('class-variance-authority')) {
-              return 'utils';
+            
+            // Utility libraries
+            if (id.includes('clsx') || id.includes('tailwind-merge') || 
+                id.includes('class-variance-authority')) {
+              return 'ui-utils';
             }
             
-            // Libraries that depend on React Context (react-day-picker handled above)
-            if (id.includes('next-themes') || 
-                id.includes('sonner') || 
-                id.includes('cmdk') || 
-                id.includes('vaul') ||
-                id.includes('embla-carousel')) {
-              return 'react-context-libs';
-            }
-            
-            // Everything else goes to vendor
+            // Small utilities and everything else
             return 'vendor';
           }
+        },
+        // Optimize chunk sizes
+        chunkFileNames: (chunkInfo) => {
+          const name = chunkInfo.name;
+          // Add hash for cache busting
+          return `assets/${name}-[hash].js`;
         }
       }
     }
