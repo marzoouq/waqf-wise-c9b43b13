@@ -145,11 +145,9 @@ export function ComponentInspector() {
                   <div className="flex items-center gap-2">
                     <Badge variant="outline">{elementInfo.tagName}</Badge>
                     {elementInfo.id && <Badge>#{elementInfo.id}</Badge>}
-                    {elementInfo.className && (
+                    {elementInfo.className && typeof elementInfo.className === 'string' && elementInfo.className.trim() && (
                       <Badge variant="secondary">
-                        .{typeof elementInfo.className === 'string'
-                          ? elementInfo.className.split(' ')[0]
-                          : 'element'}
+                        .{elementInfo.className.split(' ')[0]}
                       </Badge>
                     )}
                   </div>
