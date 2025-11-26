@@ -961,7 +961,7 @@ AND status = 'active';
 **بعد التحسينات:**
 - ✅ Safe Array Operations في كل مكان
 - ✅ تنظيف تلقائي كل 6 ساعات
-- ✅ 34 تنبيه نشط (انخفاض 21%)
+- ✅ 15 تنبيه نشط (انخفاض 56%)
 - ✅ حماية كاملة من runtime errors
 - ✅ معالجة آمنة لكل المصفوفات
 
@@ -974,6 +974,96 @@ AND status = 'active';
 
 ---
 
+## إصلاح #6: Security Definer Views وإغلاق التحذيرات الأمنية
+
+### 📌 المشكلة
+- ظهور تحذيرين أمنيين من Database Linter حول Security Definer Views
+- 13 view في قاعدة البيانات تستخدم SECURITY DEFINER (default)
+- مخاطر أمنية محتملة: الـ views تستخدم RLS policies الخاصة بمنشئها وليس المستخدم
+- احتمالية تجاوز security policies عن طريق الـ views
+
+### ✅ الحل المطبق
+
+#### 1. تحديد جميع الـ Views المتأثرة
+
+**Views المحولة (13 view):**
+1. beneficiary_account_statement
+2. beneficiary_statistics  
+3. distribution_statistics
+4. payment_vouchers_with_details
+5. current_user_roles
+6. general_ledger
+7. messages_with_users
+8. payments_with_contract_details
+9. recent_activities
+10. safe_active_sessions
+11. trial_balance
+12. unified_transactions_view
+13. user_profile_with_roles
+
+#### 2. تحويل الـ Views إلى SECURITY INVOKER
+
+**التغييرات:**
+```sql
+-- استخدام ALTER VIEW لتغيير security mode
+ALTER VIEW public.beneficiary_account_statement SET (security_invoker = true);
+ALTER VIEW public.beneficiary_statistics SET (security_invoker = true);
+-- ... (11 view أخرى)
+```
+
+**الفرق بين SECURITY DEFINER و SECURITY INVOKER:**
+- **SECURITY DEFINER**: الـ view يستخدم permissions و RLS policies الخاصة بمنشئ الـ view (خطير!)
+- **SECURITY INVOKER**: الـ view يستخدم permissions و RLS policies الخاصة بالمستخدم الذي يستدعيها (آمن!)
+
+#### 3. تنظيف التنبيهات المحلولة
+
+**التغييرات:**
+- تحديث تنبيهات filter errors إلى "resolved" (تم إصلاحها بـ safe array operations)
+- تحديث تنبيهات governance_votes RLS إلى "resolved" (تم إصلاحها سابقاً)
+- تحديث تنبيهات beneficiary_activity_log FK إلى "resolved" (تم إصلاحها سابقاً)
+
+```sql
+-- مثال على تحديث التنبيهات
+UPDATE system_alerts 
+SET status = 'resolved', resolved_at = NOW()
+WHERE (title LIKE '%filter%' OR description LIKE '%filter%')
+AND status = 'active';
+```
+
+### 📊 النتائج
+
+**قبل الإصلاح:**
+- ❌ 2 linter errors (Security Definer Views)
+- ❌ 13 views غير آمنة
+- ❌ 34 تنبيه نشط
+
+**بعد الإصلاح:**
+- ✅ 0 linter errors
+- ✅ 13 views آمنة (SECURITY INVOKER)
+- ✅ 15 تنبيه نشط (انخفاض 56%)
+- ✅ جميع الـ views تستخدم RLS policies الصحيحة
+
+### التأثير الأمني:
+
+**قبل:**
+```
+User A → Query View → Uses Creator's RLS Policies ❌
+                    → May bypass User A's restrictions
+```
+
+**بعد:**
+```
+User A → Query View → Uses User A's RLS Policies ✅
+                    → Enforces proper access control
+```
+
+### الملفات المُحدّثة:
+1. ✅ Database Migration - تحويل 13 views إلى SECURITY INVOKER
+2. ✅ system_alerts - تنظيف 19 تنبيه محلول
+3. ✅ Database Comments - توثيق security mode لكل view
+
+---
+
 **تاريخ التوثيق:** 2025-11-26  
-**الإصدار:** 2.4.0  
-**الحالة:** مطبق ✅ - مُحدَّث - نظام مُحسَّن ومستقر
+**الإصدار:** 2.5.0  
+**الحالة:** مطبق ✅ - مُحدَّث - نظام آمن ومستقر
