@@ -88,12 +88,86 @@ export function useVisibilitySettings() {
   const { data: settings, isLoading } = useQuery({
     queryKey: ["visibility-settings"],
     queryFn: async () => {
+      // محاولة جلب السجل الحالي
       const { data, error } = await supabase
         .from("beneficiary_visibility_settings")
         .select("*")
-        .single();
+        .maybeSingle();
 
+      // إذا كان هناك خطأ (وليس عدم وجود سجل)
       if (error) throw error;
+
+      // إذا لم يكن هناك سجل، أنشئ واحد افتراضي بكل الصلاحيات مفعّلة
+      if (!data) {
+        const defaultSettings = {
+          show_overview: true,
+          show_profile: true,
+          show_requests: true,
+          show_distributions: true,
+          show_statements: true,
+          show_properties: true,
+          show_documents: true,
+          show_bank_accounts: true,
+          show_financial_reports: true,
+          show_approvals_log: true,
+          show_disclosures: true,
+          show_governance: true,
+          show_budgets: true,
+          show_other_beneficiaries_names: true,
+          show_other_beneficiaries_amounts: false,
+          show_other_beneficiaries_personal_data: false,
+          show_family_tree: true,
+          show_total_beneficiaries_count: true,
+          show_beneficiary_categories: true,
+          show_beneficiaries_statistics: true,
+          show_inactive_beneficiaries: false,
+          mask_iban: true,
+          mask_phone_numbers: true,
+          mask_exact_amounts: false,
+          mask_tenant_info: true,
+          mask_national_ids: true,
+          show_bank_balances: true,
+          show_bank_transactions: true,
+          show_bank_statements: true,
+          show_invoices: true,
+          show_contracts_details: true,
+          show_maintenance_costs: true,
+          show_property_revenues: true,
+          show_expenses_breakdown: true,
+          show_governance_meetings: true,
+          show_nazer_decisions: true,
+          show_policy_changes: true,
+          show_strategic_plans: true,
+          show_audit_reports: true,
+          show_compliance_reports: true,
+          show_own_loans: true,
+          show_other_loans: false,
+          mask_loan_amounts: false,
+          show_emergency_aid: true,
+          show_emergency_statistics: true,
+          show_annual_budget: true,
+          show_budget_execution: true,
+          show_reserve_funds: true,
+          show_investment_plans: true,
+          show_journal_entries: false,
+          show_trial_balance: false,
+          show_ledger_details: false,
+          show_internal_messages: true,
+          show_support_tickets: true,
+          allow_export_pdf: true,
+          allow_print: true,
+        };
+
+        const { data: newData, error: insertError } = await supabase
+          .from("beneficiary_visibility_settings")
+          .insert(defaultSettings)
+          .select()
+          .single();
+
+        if (insertError) throw insertError;
+        return newData as VisibilitySettings;
+      }
+
       return data as VisibilitySettings;
     },
     staleTime: 5 * 60 * 1000,
