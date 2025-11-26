@@ -1298,6 +1298,7 @@ export type Database = {
           date_of_birth: string | null
           email: string | null
           employment_status: string | null
+          family_id: string | null
           family_name: string | null
           family_size: number | null
           full_name: string
@@ -1306,6 +1307,7 @@ export type Database = {
           iban: string | null
           id: string
           is_head_of_family: boolean | null
+          last_activity_at: string | null
           last_login_at: string | null
           last_notification_at: string | null
           login_enabled_at: string | null
@@ -1319,17 +1321,22 @@ export type Database = {
           number_of_sons: number | null
           number_of_wives: number | null
           parent_beneficiary_id: string | null
+          pending_amount: number | null
           pending_requests: number | null
           phone: string
           priority_level: number | null
           relationship: string | null
           status: string
           tags: string[] | null
+          total_payments: number | null
           total_received: number | null
           tribe: string | null
           updated_at: string
           user_id: string | null
           username: string | null
+          verification_status: string | null
+          verified_at: string | null
+          verified_by: string | null
         }
         Insert: {
           account_balance?: number | null
@@ -1345,6 +1352,7 @@ export type Database = {
           date_of_birth?: string | null
           email?: string | null
           employment_status?: string | null
+          family_id?: string | null
           family_name?: string | null
           family_size?: number | null
           full_name: string
@@ -1353,6 +1361,7 @@ export type Database = {
           iban?: string | null
           id?: string
           is_head_of_family?: boolean | null
+          last_activity_at?: string | null
           last_login_at?: string | null
           last_notification_at?: string | null
           login_enabled_at?: string | null
@@ -1366,17 +1375,22 @@ export type Database = {
           number_of_sons?: number | null
           number_of_wives?: number | null
           parent_beneficiary_id?: string | null
+          pending_amount?: number | null
           pending_requests?: number | null
           phone: string
           priority_level?: number | null
           relationship?: string | null
           status?: string
           tags?: string[] | null
+          total_payments?: number | null
           total_received?: number | null
           tribe?: string | null
           updated_at?: string
           user_id?: string | null
           username?: string | null
+          verification_status?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
         }
         Update: {
           account_balance?: number | null
@@ -1392,6 +1406,7 @@ export type Database = {
           date_of_birth?: string | null
           email?: string | null
           employment_status?: string | null
+          family_id?: string | null
           family_name?: string | null
           family_size?: number | null
           full_name?: string
@@ -1400,6 +1415,7 @@ export type Database = {
           iban?: string | null
           id?: string
           is_head_of_family?: boolean | null
+          last_activity_at?: string | null
           last_login_at?: string | null
           last_notification_at?: string | null
           login_enabled_at?: string | null
@@ -1413,19 +1429,31 @@ export type Database = {
           number_of_sons?: number | null
           number_of_wives?: number | null
           parent_beneficiary_id?: string | null
+          pending_amount?: number | null
           pending_requests?: number | null
           phone?: string
           priority_level?: number | null
           relationship?: string | null
           status?: string
           tags?: string[] | null
+          total_payments?: number | null
           total_received?: number | null
           tribe?: string | null
           updated_at?: string
           user_id?: string | null
           username?: string | null
+          verification_status?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "beneficiaries_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "beneficiaries_parent_beneficiary_id_fkey"
             columns: ["parent_beneficiary_id"]
@@ -1624,6 +1652,76 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      beneficiary_changes_log: {
+        Row: {
+          beneficiary_id: string | null
+          change_reason: string | null
+          change_type: string
+          changed_by: string | null
+          changed_by_name: string | null
+          changed_by_role: string | null
+          created_at: string | null
+          field_name: string | null
+          id: string
+          ip_address: string | null
+          new_value: string | null
+          old_value: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          beneficiary_id?: string | null
+          change_reason?: string | null
+          change_type: string
+          changed_by?: string | null
+          changed_by_name?: string | null
+          changed_by_role?: string | null
+          created_at?: string | null
+          field_name?: string | null
+          id?: string
+          ip_address?: string | null
+          new_value?: string | null
+          old_value?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          beneficiary_id?: string | null
+          change_reason?: string | null
+          change_type?: string
+          changed_by?: string | null
+          changed_by_name?: string | null
+          changed_by_role?: string | null
+          created_at?: string | null
+          field_name?: string | null
+          id?: string
+          ip_address?: string | null
+          new_value?: string | null
+          old_value?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beneficiary_changes_log_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "beneficiary_changes_log_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_account_statement"
+            referencedColumns: ["beneficiary_id"]
+          },
+          {
+            foreignKeyName: "beneficiary_changes_log_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_statistics"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       beneficiary_requests: {
         Row: {
@@ -9936,6 +10034,24 @@ export type Database = {
           journal_entry_id: string
           payment_id: string
           success: boolean
+        }[]
+      }
+      search_beneficiaries_advanced: {
+        Args: {
+          search_category?: string
+          search_status?: string
+          search_text?: string
+          search_tribe?: string
+        }
+        Returns: {
+          category: string
+          full_name: string
+          id: string
+          national_id: string
+          phone: string
+          status: string
+          total_received: number
+          tribe: string
         }[]
       }
       seed_demo_data: { Args: never; Returns: Json }
