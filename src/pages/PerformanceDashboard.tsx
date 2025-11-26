@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { PerformanceMetric, SlowQueryLog } from "@/types/performance";
 import { Activity, Database, Zap, Clock } from "lucide-react";
 import { UnifiedDataTable, type Column } from "@/components/unified/UnifiedDataTable";
+import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
+import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 
 export default function PerformanceDashboard() {
   const { data: metrics = [] } = useQuery({
@@ -65,47 +67,36 @@ export default function PerformanceDashboard() {
       />
 
       {/* مقاييس الأداء */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">تحميل الصفحة</CardTitle>
-            <Zap className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{latestMetrics.pageLoad.toFixed(2)}s</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">استجابة API</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{latestMetrics.apiResponse.toFixed(3)}s</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">استعلام DB</CardTitle>
-            <Database className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{latestMetrics.dbQuery.toFixed(3)}s</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">استخدام الذاكرة</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{latestMetrics.memoryUsage.toFixed(1)}%</div>
-          </CardContent>
-        </Card>
-      </div>
+      <UnifiedStatsGrid columns={4}>
+        <UnifiedKPICard
+          title="تحميل الصفحة"
+          value={`${latestMetrics.pageLoad.toFixed(2)}s`}
+          icon={Zap}
+          variant="default"
+          loading={isLoading}
+        />
+        <UnifiedKPICard
+          title="استجابة API"
+          value={`${latestMetrics.apiResponse.toFixed(3)}s`}
+          icon={Activity}
+          variant="success"
+          loading={isLoading}
+        />
+        <UnifiedKPICard
+          title="استعلام DB"
+          value={`${latestMetrics.dbQuery.toFixed(3)}s`}
+          icon={Database}
+          variant="default"
+          loading={isLoading}
+        />
+        <UnifiedKPICard
+          title="استخدام الذاكرة"
+          value={`${latestMetrics.memoryUsage.toFixed(1)}%`}
+          icon={Clock}
+          variant="warning"
+          loading={isLoading}
+        />
+      </UnifiedStatsGrid>
 
       {/* الاستعلامات البطيئة */}
       <Card>

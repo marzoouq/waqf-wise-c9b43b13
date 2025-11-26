@@ -8,6 +8,8 @@ import { UnifiedDataTable, type Column } from "@/components/unified/UnifiedDataT
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
+import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 
 export default function EmergencyAidManagement() {
   const { emergencyAids, isLoading } = useEmergencyAid();
@@ -92,49 +94,36 @@ export default function EmergencyAidManagement() {
       />
 
       {/* الإحصائيات */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">طلبات معلقة</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.pending}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">طلبات موافق عليها</CardTitle>
-            <CheckCircle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.approved}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">طلبات مصروفة</CardTitle>
-            <AlertCircle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.disbursed}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">إجمالي المبالغ</CardTitle>
-            <XCircle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {stats.totalAmount.toLocaleString()} ر.س
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <UnifiedStatsGrid columns={4}>
+        <UnifiedKPICard
+          title="طلبات معلقة"
+          value={stats.pending}
+          icon={Clock}
+          variant="warning"
+          loading={isLoading}
+        />
+        <UnifiedKPICard
+          title="طلبات موافق عليها"
+          value={stats.approved}
+          icon={CheckCircle}
+          variant="success"
+          loading={isLoading}
+        />
+        <UnifiedKPICard
+          title="طلبات مصروفة"
+          value={stats.disbursed}
+          icon={AlertCircle}
+          variant="default"
+          loading={isLoading}
+        />
+        <UnifiedKPICard
+          title="إجمالي المبالغ"
+          value={`${stats.totalAmount.toLocaleString()} ر.س`}
+          icon={XCircle}
+          variant="default"
+          loading={isLoading}
+        />
+      </UnifiedStatsGrid>
 
       {/* جدول الفزعات */}
       <Card>
