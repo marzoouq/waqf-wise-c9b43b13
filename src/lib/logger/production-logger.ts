@@ -120,17 +120,23 @@ class ProductionLogger {
    * إرسال جميع الـ logs المتراكمة
    */
   private async flush(): Promise<void> {
+    // تعطيل في بيئة التطوير
+    if (import.meta.env.DEV) {
+      this.queue = [];
+      return;
+    }
+
     if (this.queue.length === 0) return;
 
     const logsToSend = [...this.queue];
     this.queue = [];
 
     try {
-      // إرسال الـ logs واحدة تلو الأخرى (تعطيل log-batch غير الموجودة)
-      for (const log of logsToSend.slice(0, 10)) { // فقط أول 10 لتجنب الحمل الزائد
+      // إرسال الـ logs واحدة تلو الأخرى
+      for (const log of logsToSend.slice(0, 10)) {
         await supabase.functions.invoke('log-error', {
           body: log,
-        }).catch(() => {}); // تجاهل الأخطاء للـ logs غير الحرجة
+        }).catch(() => {});
       }
     } catch (error) {
       // في حالة فشل الإرسال، أعد الـ logs للـ queue
@@ -147,6 +153,9 @@ class ProductionLogger {
     data?: unknown,
     options?: LogOptions
   ): Promise<void> {
+    // تعطيل في بيئة التطوير
+    if (import.meta.env.DEV) return;
+
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const user = session?.user;
