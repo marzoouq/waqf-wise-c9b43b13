@@ -19,9 +19,9 @@ interface RequestApprovalDialogProps {
 }
 
 const APPROVAL_LEVELS = [
-  { level: 1, name: "مشرف", role: "moderator" },
-  { level: 2, name: "مدير", role: "financial_manager" },
-  { level: 3, name: "ناظر", role: "admin" },
+  { level: 1, name: "المشرف", role: "admin" },
+  { level: 2, name: "المحاسب", role: "accountant" },
+  { level: 3, name: "الناظر", role: "nazer" },
 ];
 
 export function RequestApprovalDialog({
