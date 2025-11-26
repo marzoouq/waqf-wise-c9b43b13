@@ -38,6 +38,7 @@ import { FinancialTransparencyTab } from "@/components/beneficiary/FinancialTran
 import { useBeneficiaryProfile } from "@/hooks/useBeneficiaryProfile";
 import { useBeneficiaryAttachments } from "@/hooks/useBeneficiaryAttachments";
 import { useAuth } from "@/hooks/useAuth";
+import { useRequestTypes } from "@/hooks/useRequests";
 import { formatCurrency } from "@/lib/utils";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -60,6 +61,13 @@ const BeneficiaryDashboard = () => {
   const queryClient = useQueryClient();
   const { beneficiary, payments, loading } = useBeneficiaryProfile(user?.id);
   const { attachments } = useBeneficiaryAttachments(beneficiary?.id);
+  const { requestTypes } = useRequestTypes();
+
+  // دالة مساعدة للحصول على UUID نوع الطلب من الاسم الإنجليزي
+  const getRequestTypeId = (nameEn: string): string => {
+    const type = requestTypes?.find(t => t.name_en === nameEn);
+    return type?.id || "";
+  };
 
   const [messagesOpen, setMessagesOpen] = useState(false);
   const [documentUploadOpen, setDocumentUploadOpen] = useState(false);
@@ -147,9 +155,20 @@ const BeneficiaryDashboard = () => {
 
   const handleEmergencyRequest = async (data: Record<string, unknown>) => {
     try {
+      const requestTypeId = getRequestTypeId("Emergency Aid");
+      
+      if (!requestTypeId) {
+        toast({
+          title: "خطأ",
+          description: "نوع الطلب غير متوفر حالياً",
+          variant: "destructive",
+        });
+        return;
+      }
+
       await createRequestMutation.mutateAsync({
         beneficiary_id: beneficiary?.id || "",
-        request_type_id: "emergency",
+        request_type_id: requestTypeId,
         description: (data.description as string) || (data.emergency_reason as string),
         amount: data.amount as number,
         priority: "عاجل",
@@ -162,9 +181,20 @@ const BeneficiaryDashboard = () => {
 
   const handleLoanRequest = async (data: Record<string, unknown>) => {
     try {
+      const requestTypeId = getRequestTypeId("Loan");
+      
+      if (!requestTypeId) {
+        toast({
+          title: "خطأ",
+          description: "نوع الطلب غير متوفر حالياً",
+          variant: "destructive",
+        });
+        return;
+      }
+
       await createRequestMutation.mutateAsync({
         beneficiary_id: beneficiary?.id || "",
-        request_type_id: "loan",
+        request_type_id: requestTypeId,
         description: (data.description as string) || `طلب قرض بمبلغ ${data.amount}`,
         amount: (data.amount as number) || (data.loan_amount as number),
         priority: "عادية",
@@ -177,9 +207,20 @@ const BeneficiaryDashboard = () => {
 
   const handleDataUpdate = async (data: Record<string, unknown>) => {
     try {
+      const requestTypeId = getRequestTypeId("Data Update");
+      
+      if (!requestTypeId) {
+        toast({
+          title: "خطأ",
+          description: "نوع الطلب غير متوفر حالياً",
+          variant: "destructive",
+        });
+        return;
+      }
+
       await createRequestMutation.mutateAsync({
         beneficiary_id: beneficiary?.id || "",
-        request_type_id: "data-update",
+        request_type_id: requestTypeId,
         description: `طلب تحديث البيانات: ${JSON.stringify(data)}`,
         priority: "عادية",
         status: "قيد المراجعة",
@@ -191,9 +232,20 @@ const BeneficiaryDashboard = () => {
 
   const handleAddFamily = async (data: Record<string, unknown>) => {
     try {
+      const requestTypeId = getRequestTypeId("Add Newborn");
+      
+      if (!requestTypeId) {
+        toast({
+          title: "خطأ",
+          description: "نوع الطلب غير متوفر حالياً",
+          variant: "destructive",
+        });
+        return;
+      }
+
       await createRequestMutation.mutateAsync({
         beneficiary_id: beneficiary?.id || "",
-        request_type_id: "add-family-member",
+        request_type_id: requestTypeId,
         description: `طلب إضافة فرد جديد للعائلة: ${JSON.stringify(data)}`,
         priority: "عادية",
         status: "قيد المراجعة",
