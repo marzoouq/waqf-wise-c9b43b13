@@ -59,8 +59,16 @@ export default defineConfig(({ mode }) => ({
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,woff}'],
         navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/^\/api/, /^\/functions/],
         
         runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/zsacuvrcohmraoldilph\.supabase\.co\/functions\/v1\/log-error$/i,
+            handler: 'NetworkOnly',
+            options: {
+              networkTimeoutSeconds: 15
+            }
+          },
           {
             urlPattern: /^https:\/\/zsacuvrcohmraoldilph\.supabase\.co\/rest\/.*/i,
             handler: 'NetworkFirst',

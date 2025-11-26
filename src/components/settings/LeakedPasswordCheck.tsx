@@ -39,37 +39,46 @@ export const LeakedPasswordCheck = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="password-check">كلمة المرور للفحص</Label>
-          <Input
-            id="password-check"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="أدخل كلمة المرور للتحقق منها"
-          />
-          <p className="text-xs text-muted-foreground">
-            يتم الفحص بشكل آمن عبر Have I Been Pwned API دون إرسال كلمة المرور الفعلية
-          </p>
-        </div>
-
-        <Button 
-          onClick={handleCheck} 
-          disabled={isChecking || !password}
-          className="w-full"
+        <form 
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleCheck();
+          }}
+          className="space-y-4"
         >
-          {isChecking ? (
-            <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              جاري الفحص...
-            </>
-          ) : (
-            <>
-              <Shield className="h-4 w-4 mr-2" />
-              فحص كلمة المرور
-            </>
-          )}
-        </Button>
+          <div className="space-y-2">
+            <Label htmlFor="password-check">كلمة المرور للفحص</Label>
+            <Input
+              id="password-check"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="أدخل كلمة المرور للتحقق منها"
+              autoComplete="off"
+            />
+            <p className="text-xs text-muted-foreground">
+              يتم الفحص بشكل آمن عبر Have I Been Pwned API دون إرسال كلمة المرور الفعلية
+            </p>
+          </div>
+
+          <Button 
+            type="submit"
+            disabled={isChecking || !password}
+            className="w-full"
+          >
+            {isChecking ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                جاري الفحص...
+              </>
+            ) : (
+              <>
+                <Shield className="h-4 w-4 mr-2" />
+                فحص كلمة المرور
+              </>
+            )}
+          </Button>
+        </form>
 
         {result && (
           <Alert variant={result.isLeaked ? 'destructive' : 'default'}>
