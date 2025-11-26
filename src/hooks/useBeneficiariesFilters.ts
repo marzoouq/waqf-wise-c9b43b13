@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { Beneficiary } from "@/types/beneficiary";
 import { SearchCriteria } from "@/components/beneficiaries/AdvancedSearchDialog";
+import { safeFilter } from "@/lib/utils/array-safe";
 
 export function useBeneficiariesFilters(
   beneficiaries: Beneficiary[],
@@ -13,56 +14,61 @@ export function useBeneficiariesFilters(
     // Apply quick search
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      results = results.filter(
-        (b) =>
-          b.full_name.toLowerCase().includes(query) ||
-          b.national_id.includes(query) ||
-          b.phone.includes(query) ||
-          (b.family_name && b.family_name.toLowerCase().includes(query))
+      results = safeFilter(results, (b) =>
+        b.full_name.toLowerCase().includes(query) ||
+        b.national_id.includes(query) ||
+        b.phone.includes(query) ||
+        (b.family_name && b.family_name.toLowerCase().includes(query))
       );
     }
     
     // Apply advanced criteria
     if (advancedCriteria.fullName) {
-      results = results.filter(b => b.full_name.toLowerCase().includes(advancedCriteria.fullName!.toLowerCase()));
+      results = safeFilter(results, b => b.full_name.toLowerCase().includes(advancedCriteria.fullName!.toLowerCase()));
     }
     if (advancedCriteria.nationalId) {
-      results = results.filter(b => b.national_id.includes(advancedCriteria.nationalId!));
+      results = safeFilter(results, b => b.national_id.includes(advancedCriteria.nationalId!));
     }
     if (advancedCriteria.phone) {
-      results = results.filter(b => b.phone.includes(advancedCriteria.phone!));
+      results = safeFilter(results, b => b.phone.includes(advancedCriteria.phone!));
     }
     if (advancedCriteria.category) {
-      results = results.filter(b => b.category === advancedCriteria.category);
+      results = safeFilter(results, b => b.category === advancedCriteria.category);
     }
     if (advancedCriteria.status) {
-      results = results.filter(b => b.status === advancedCriteria.status);
+      results = safeFilter(results, b => b.status === advancedCriteria.status);
     }
     if (advancedCriteria.tribe) {
-      results = results.filter(b => b.tribe && b.tribe.toLowerCase().includes(advancedCriteria.tribe!.toLowerCase()));
+      results = safeFilter(results, b => b.tribe && b.tribe.toLowerCase().includes(advancedCriteria.tribe!.toLowerCase()));
     }
     if (advancedCriteria.city) {
-      results = results.filter(b => b.city && b.city.toLowerCase().includes(advancedCriteria.city!.toLowerCase()));
+      results = safeFilter(results, b => b.city && b.city.toLowerCase().includes(advancedCriteria.city!.toLowerCase()));
     }
     if (advancedCriteria.gender) {
-      results = results.filter(b => b.gender === advancedCriteria.gender);
+      results = safeFilter(results, b => b.gender === advancedCriteria.gender);
     }
     if (advancedCriteria.maritalStatus) {
-      results = results.filter(b => b.marital_status === advancedCriteria.maritalStatus);
+      results = safeFilter(results, b => b.marital_status === advancedCriteria.maritalStatus);
     }
     if (advancedCriteria.priorityLevel) {
-      results = results.filter(b => String(b.priority_level || 1) === advancedCriteria.priorityLevel);
+      results = safeFilter(results, b => String(b.priority_level || 1) === advancedCriteria.priorityLevel);
     }
     
     return results;
   }, [beneficiaries, searchQuery, advancedCriteria]);
 
-  const stats = useMemo(() => ({
-    total: beneficiaries.length,
-    active: beneficiaries.filter(b => b.status === "نشط").length,
-    suspended: beneficiaries.filter(b => b.status === "معلق").length,
-    families: new Set(beneficiaries.map(b => b.family_name).filter(Boolean)).size,
-  }), [beneficiaries]);
+  const stats = useMemo(() => {
+    const activeBeneficiaries = safeFilter(beneficiaries, b => b.status === "نشط");
+    const suspendedBeneficiaries = safeFilter(beneficiaries, b => b.status === "معلق");
+    const beneficiariesWithFamily = beneficiaries?.filter(b => b.family_name) || [];
+    
+    return {
+      total: beneficiaries?.length || 0,
+      active: activeBeneficiaries.length,
+      suspended: suspendedBeneficiaries.length,
+      families: new Set(beneficiariesWithFamily.map(b => b.family_name)).size,
+    };
+  }, [beneficiaries]);
 
   return { filteredBeneficiaries, stats };
 }
