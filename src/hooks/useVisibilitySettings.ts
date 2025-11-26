@@ -88,16 +88,17 @@ export function useVisibilitySettings() {
   const { data: settings, isLoading } = useQuery({
     queryKey: ["visibility-settings"],
     queryFn: async () => {
-      // محاولة جلب السجل الحالي
+      // جلب السجل الأول فقط
       const { data, error } = await supabase
         .from("beneficiary_visibility_settings")
         .select("*")
+        .order('created_at', { ascending: true })
+        .limit(1)
         .maybeSingle();
 
-      // إذا كان هناك خطأ (وليس عدم وجود سجل)
       if (error) throw error;
-
-      // إذا لم يكن هناك سجل، أنشئ واحد افتراضي بكل الصلاحيات مفعّلة
+      
+      // إذا لم يكن هناك سجل، استخدم القيم الافتراضية
       if (!data) {
         const defaultSettings = {
           show_overview: true,
