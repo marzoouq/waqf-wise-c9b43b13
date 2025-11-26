@@ -5386,6 +5386,7 @@ export type Database = {
           approved_by: string | null
           beneficiary_id: string
           created_at: string
+          disbursement_date: string | null
           end_date: string | null
           id: string
           interest_rate: number | null
@@ -5393,6 +5394,8 @@ export type Database = {
           loan_number: string | null
           monthly_installment: number | null
           notes: string | null
+          paid_amount: number | null
+          principal_amount: number | null
           start_date: string
           status: string | null
           term_months: number
@@ -5403,6 +5406,7 @@ export type Database = {
           approved_by?: string | null
           beneficiary_id: string
           created_at?: string
+          disbursement_date?: string | null
           end_date?: string | null
           id?: string
           interest_rate?: number | null
@@ -5410,6 +5414,8 @@ export type Database = {
           loan_number?: string | null
           monthly_installment?: number | null
           notes?: string | null
+          paid_amount?: number | null
+          principal_amount?: number | null
           start_date: string
           status?: string | null
           term_months: number
@@ -5420,6 +5426,7 @@ export type Database = {
           approved_by?: string | null
           beneficiary_id?: string
           created_at?: string
+          disbursement_date?: string | null
           end_date?: string | null
           id?: string
           interest_rate?: number | null
@@ -5427,6 +5434,8 @@ export type Database = {
           loan_number?: string | null
           monthly_installment?: number | null
           notes?: string | null
+          paid_amount?: number | null
+          principal_amount?: number | null
           start_date?: string
           status?: string | null
           term_months?: number
