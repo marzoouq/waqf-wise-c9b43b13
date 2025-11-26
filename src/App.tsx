@@ -30,7 +30,7 @@ const ReactQueryDevtools =
             default: d.ReactQueryDevtools,
           }))
           .catch((err) => {
-            console.warn('DevTools failed to load:', err);
+            // DevTools تحميل فاشل - يمكن تجاهله في التطوير
             return { default: () => null };
           })
       )

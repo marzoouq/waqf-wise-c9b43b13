@@ -17,12 +17,27 @@ export interface SecuritySession {
   session_token: string;
   ip_address?: string;
   user_agent?: string;
-  device_info?: Record<string, any>;
-  location?: Record<string, any>;
+  device_info?: DeviceInfo;
+  location?: Location;
   is_active: boolean;
   last_activity_at: string;
   expires_at: string;
   created_at: string;
+}
+
+interface DeviceInfo {
+  browser?: string;
+  os?: string;
+  device_type?: 'mobile' | 'tablet' | 'desktop';
+  screen_resolution?: string;
+}
+
+interface Location {
+  ip?: string;
+  country?: string;
+  city?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface LoginAttempt {
@@ -32,7 +47,7 @@ export interface LoginAttempt {
   success: boolean;
   failure_reason?: string;
   user_agent?: string;
-  location?: Record<string, any>;
+  location?: Location;
   created_at: string;
 }
 
@@ -42,7 +57,7 @@ export interface SecurityEvent {
   severity: 'info' | 'warning' | 'error' | 'critical';
   user_id?: string;
   ip_address?: string;
-  event_data?: Record<string, any>;
+  event_data?: EventData;
   description: string;
   resolved: boolean;
   resolved_by?: string;
@@ -50,16 +65,39 @@ export interface SecurityEvent {
   created_at: string;
 }
 
+interface EventData {
+  action?: string;
+  resource?: string;
+  changes?: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
+}
+
 export interface SecurityRule {
   id: string;
   rule_name: string;
   rule_type: string;
   is_active: boolean;
-  conditions: Record<string, any>;
-  actions: Record<string, any>;
+  conditions: RuleConditions;
+  actions: RuleActions;
   priority: number;
   last_triggered_at?: string;
   trigger_count: number;
   created_at: string;
   updated_at: string;
+}
+
+interface RuleConditions {
+  event_pattern?: string;
+  threshold?: number;
+  time_window?: number;
+  user_role?: string[];
+  [key: string]: unknown;
+}
+
+interface RuleActions {
+  alert?: boolean;
+  block?: boolean;
+  notify_users?: string[];
+  custom_action?: string;
+  [key: string]: unknown;
 }
