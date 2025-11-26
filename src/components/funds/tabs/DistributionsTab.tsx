@@ -1,16 +1,24 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Eye, CheckSquare, Calculator, Plus, Trash2 } from "lucide-react";
+import { Eye, CheckSquare, Calculator, Plus, Trash2, History } from "lucide-react";
 import { DistributionDetailsDialog } from "@/components/distributions/DistributionDetailsDialog";
 import { ApprovalWorkflowDialog } from "@/components/distributions/ApprovalWorkflowDialog";
 import { DistributionSimulator } from "@/components/distributions/DistributionSimulator";
 import { CreateDistributionDialog } from "@/components/distributions/CreateDistributionDialog";
+import { DistributionTimelineTab } from "@/components/distributions/DistributionTimelineTab";
 import { useDistributions, Distribution } from "@/hooks/useDistributions";
 import { ExportButton } from "@/components/shared/ExportButton";
 import { UnifiedDataTable } from "@/components/unified/UnifiedDataTable";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,6 +39,8 @@ export function DistributionsTab() {
   const [createOpen, setCreateOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [distributionToDelete, setDistributionToDelete] = useState<Distribution | null>(null);
+  const [timelineOpen, setTimelineOpen] = useState(false);
+  const [timelineDistribution, setTimelineDistribution] = useState<Distribution | null>(null);
 
   const handleDeleteClick = (distribution: Distribution) => {
     if (distribution.status === "معتمد") {
@@ -107,6 +117,18 @@ export function DistributionsTab() {
       >
         <CheckSquare className="h-3 w-3 sm:h-4 sm:w-4" />
         <span className="hidden sm:inline">الموافقات</span>
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => {
+          setTimelineDistribution(distribution);
+          setTimelineOpen(true);
+        }}
+        className="gap-1 text-xs"
+      >
+        <History className="h-3 w-3 sm:h-4 sm:w-4" />
+        <span className="hidden sm:inline">السجل</span>
       </Button>
       {distribution.status !== "معتمد" && (
         <Button
@@ -185,6 +207,18 @@ export function DistributionsTab() {
         open={createOpen}
         onOpenChange={setCreateOpen}
       />
+
+      <Dialog open={timelineOpen} onOpenChange={setTimelineOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>سجل التوزيع: {timelineDistribution?.month}</DialogTitle>
+            <DialogDescription>
+              تاريخ الموافقات والتغييرات للتوزيع
+            </DialogDescription>
+          </DialogHeader>
+          <DistributionTimelineTab distribution={timelineDistribution} />
+        </DialogContent>
+      </Dialog>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
