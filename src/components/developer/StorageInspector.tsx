@@ -62,6 +62,27 @@ export function StorageInspector() {
     loadStorage();
   };
 
+  const cleanOldErrors = () => {
+    try {
+      const errorLogs = window.localStorage.getItem('error_logs');
+      if (errorLogs) {
+        const errors = JSON.parse(errorLogs);
+        const cutoffTime = Date.now() - (24 * 60 * 60 * 1000); // 24 ساعة
+        const recentErrors = errors.filter((e: any) => {
+          return new Date(e.timestamp).getTime() > cutoffTime;
+        });
+        
+        window.localStorage.setItem('error_logs', JSON.stringify(recentErrors));
+        loadStorage();
+        toast.success(`تم حذف ${errors.length - recentErrors.length} خطأ قديم`);
+      } else {
+        toast.info("لا توجد أخطاء قديمة");
+      }
+    } catch (error) {
+      toast.error("فشل تنظيف الأخطاء القديمة");
+    }
+  };
+
   const deleteItem = (key: string, type: "local" | "session") => {
     if (type === "local") {
       window.localStorage.removeItem(key);
@@ -121,14 +142,23 @@ export function StorageInspector() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>localStorage</CardTitle>
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={() => clearStorage("local")}
-          >
-            <Trash2 className="w-4 h-4 ml-2" />
-            مسح الكل
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={cleanOldErrors}
+            >
+              تنظيف الأخطاء القديمة
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => clearStorage("local")}
+            >
+              <Trash2 className="w-4 h-4 ml-2" />
+              مسح الكل
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
