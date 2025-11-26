@@ -34,7 +34,7 @@ export function AnnualDisclosureTab() {
   const [publishing, setPublishing] = useState(false);
 
   // بيانات المقارنة السنوية
-  const comparisonData = disclosures.slice(0, 5).reverse().map(d => ({
+  const comparisonData = (disclosures || []).slice(0, 5).reverse().map(d => ({
     year: d.year.toString(),
     revenues: d.total_revenues,
     expenses: d.total_expenses,
