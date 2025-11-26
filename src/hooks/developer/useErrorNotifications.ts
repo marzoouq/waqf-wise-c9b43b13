@@ -18,7 +18,11 @@ export function useErrorNotifications(enabled: boolean = true) {
       if (error) throw error;
       return data;
     },
-    refetchInterval: enabled ? 10000 : false, // تحديث كل 10 ثواني فقط عند التفعيل
+    // ✅ تحسين الأداء: تقليل الطلبات المتكررة
+    refetchInterval: enabled ? 60000 : false, // تحديث كل 60 ثانية (بدلاً من 10)
+    staleTime: 30 * 1000, // البيانات صالحة لمدة 30 ثانية
+    refetchOnWindowFocus: false, // تجنب refetch عند العودة للنافذة
+    refetchOnReconnect: false, // تجنب refetch عند إعادة الاتصال
     enabled,
   });
 
