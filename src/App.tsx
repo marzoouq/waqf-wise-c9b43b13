@@ -66,6 +66,8 @@ const Notifications = lazy(() => import("./pages/Notifications"));
 const Requests = lazy(() => import("./pages/Requests"));
 const StaffRequests = lazy(() => import("./pages/StaffRequests"));
 const BeneficiaryRequests = lazy(() => import("./pages/BeneficiaryRequests"));
+const BeneficiaryAccountStatement = lazy(() => import("./pages/BeneficiaryAccountStatement"));
+const BeneficiaryReports = lazy(() => import("./pages/BeneficiaryReports"));
 const StaffRequestsManagement = lazy(() => import("./pages/StaffRequestsManagement"));
 const LoansManagement = lazy(() => import("./pages/LoansManagement"));
 const EmergencyAidManagement = lazy(() => import("./pages/EmergencyAidManagement"));
@@ -391,6 +393,22 @@ const App = () => {
             element={
               <ProtectedRoute requiredRole="beneficiary">
                 <BeneficiaryRequests />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/beneficiary/account-statement" 
+            element={
+              <ProtectedRoute requiredRole="beneficiary">
+                <BeneficiaryAccountStatement />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/beneficiary/reports" 
+            element={
+              <ProtectedRoute requiredRole="beneficiary">
+                <BeneficiaryReports />
               </ProtectedRoute>
             } 
           />
