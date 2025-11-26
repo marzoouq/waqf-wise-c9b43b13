@@ -43,94 +43,143 @@ serve(async (req) => {
     const results = []
     const password = 'Test@123456'
 
+    // أولاً: حذف جميع المستخدمين القدامى دفعة واحدة
+    console.log('🔍 البحث عن المستخدمين القدامى...')
+    const { data: allUsers } = await supabaseAdmin.auth.admin.listUsers()
+    const emailsToDelete = beneficiaries.map(b => `${b.national_id}@waqf.internal`)
+    const usersToDelete = allUsers?.users?.filter(u => emailsToDelete.includes(u.email || '')) || []
+    
+    console.log(`📝 وجد ${usersToDelete.length} مستخدم للحذف`)
+    
+    for (const user of usersToDelete) {
+      console.log(`🗑️ حذف المستخدم: ${user.email}`)
+      
+      // فك الربط من beneficiaries
+      const { error: unlinkError } = await supabaseAdmin
+        .from('beneficiaries')
+        .update({ user_id: null })
+        .eq('user_id', user.id)
+      
+      if (unlinkError) {
+        console.error(`❌ خطأ في فك الربط: ${unlinkError.message}`)
+      }
+      
+      // حذف المستخدم
+      const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(user.id)
+      if (deleteError) {
+        console.error(`❌ خطأ في حذف المستخدم: ${deleteError.message}`)
+      }
+    }
+
+    console.log('✅ تم حذف جميع المستخدمين القدامى')
+
+    // ثانياً: إنشاء المستخدمين الجدد
     for (const ben of beneficiaries) {
       const email = `${ben.national_id}@waqf.internal`
+      console.log(`\n🔧 معالجة: ${ben.full_name} (${ben.national_id})`)
       
-      // حذف المستخدم القديم إن وجد
-      const { data: existingUser } = await supabaseAdmin.auth.admin.listUsers()
-      const oldUser = existingUser?.users?.find(u => u.email === email)
-      
-      if (oldUser) {
-        // فك الربط من جدول beneficiaries أولاً
-        await supabaseAdmin
-          .from('beneficiaries')
-          .update({ user_id: null })
-          .eq('user_id', oldUser.id)
-        
-        // الآن يمكن حذف المستخدم
-        await supabaseAdmin.auth.admin.deleteUser(oldUser.id)
-      }
-
-      // إنشاء مستخدم جديد
-      const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
-        email,
-        password,
-        email_confirm: true,
-        user_metadata: {
-          full_name: ben.full_name,
-          national_id: ben.national_id
-        }
-      })
-
-      if (authError) {
-        results.push({ national_id: ben.national_id, success: false, error: authError.message })
-        continue
-      }
-
-      // تحديث/إنشاء المستفيد
-      const { data: existingBen } = await supabaseAdmin
-        .from('beneficiaries')
-        .select('id')
-        .eq('national_id', ben.national_id)
-        .maybeSingle()
-
-      if (existingBen) {
-        // تحديث المستفيد الموجود
-        await supabaseAdmin
-          .from('beneficiaries')
-          .update({
-            user_id: authData.user.id,
-            email,
-            can_login: true,
-            login_enabled_at: new Date().toISOString(),
-            verification_status: 'موثق'
-          })
-          .eq('national_id', ben.national_id)
-      } else {
-        // إنشاء مستفيد جديد
-        await supabaseAdmin
-          .from('beneficiaries')
-          .insert({
+      try {
+        // إنشاء مستخدم جديد
+        console.log(`📧 إنشاء حساب مصادقة لـ: ${email}`)
+        const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+          email,
+          password,
+          email_confirm: true,
+          user_metadata: {
             full_name: ben.full_name,
-            national_id: ben.national_id,
-            email,
-            phone: ben.phone,
-            category: 'عائلة',
-            status: 'نشط',
-            user_id: authData.user.id,
-            can_login: true,
-            login_enabled_at: new Date().toISOString(),
-            verification_status: 'موثق'
-          })
-      }
-
-      // إضافة دور المستفيد (تجاهل إذا كان موجوداً)
-      const { error: roleError } = await supabaseAdmin
-        .from('user_roles')
-        .upsert({
-          user_id: authData.user.id,
-          role: 'beneficiary'
-        }, {
-          onConflict: 'user_id,role',
-          ignoreDuplicates: true
+            national_id: ben.national_id
+          }
         })
 
-      results.push({ 
-        national_id: ben.national_id, 
-        success: true, 
-        email,
-        user_id: authData.user.id 
-      })
+        if (authError) {
+          console.error(`❌ خطأ في إنشاء المصادقة: ${authError.message}`)
+          results.push({ national_id: ben.national_id, success: false, error: authError.message })
+          continue
+        }
+
+        console.log(`✅ تم إنشاء حساب المصادقة: ${authData.user.id}`)
+
+        // تحديث/إنشاء المستفيد
+        const { data: existingBen } = await supabaseAdmin
+          .from('beneficiaries')
+          .select('id')
+          .eq('national_id', ben.national_id)
+          .maybeSingle()
+
+        if (existingBen) {
+          console.log(`📝 تحديث بيانات المستفيد الموجود`)
+          const { error: updateError } = await supabaseAdmin
+            .from('beneficiaries')
+            .update({
+              user_id: authData.user.id,
+              email,
+              can_login: true,
+              login_enabled_at: new Date().toISOString(),
+              verification_status: 'موثق'
+            })
+            .eq('national_id', ben.national_id)
+          
+          if (updateError) {
+            console.error(`❌ خطأ في تحديث المستفيد: ${updateError.message}`)
+            results.push({ national_id: ben.national_id, success: false, error: updateError.message })
+            continue
+          }
+        } else {
+          console.log(`➕ إنشاء مستفيد جديد`)
+          const { error: insertError } = await supabaseAdmin
+            .from('beneficiaries')
+            .insert({
+              full_name: ben.full_name,
+              national_id: ben.national_id,
+              email,
+              phone: ben.phone,
+              category: 'عائلة',
+              status: 'نشط',
+              user_id: authData.user.id,
+              can_login: true,
+              login_enabled_at: new Date().toISOString(),
+              verification_status: 'موثق'
+            })
+          
+          if (insertError) {
+            console.error(`❌ خطأ في إنشاء المستفيد: ${insertError.message}`)
+            results.push({ national_id: ben.national_id, success: false, error: insertError.message })
+            continue
+          }
+        }
+
+        // إضافة دور المستفيد
+        console.log(`👤 إضافة دور المستفيد`)
+        const { error: roleError } = await supabaseAdmin
+          .from('user_roles')
+          .upsert({
+            user_id: authData.user.id,
+            role: 'beneficiary'
+          }, {
+            onConflict: 'user_id,role',
+            ignoreDuplicates: true
+          })
+
+        if (roleError) {
+          console.error(`❌ خطأ في إضافة الدور: ${roleError.message}`)
+        }
+
+        console.log(`✅ اكتمل بنجاح: ${ben.full_name}`)
+        results.push({ 
+          national_id: ben.national_id, 
+          success: true, 
+          email,
+          user_id: authData.user.id 
+        })
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'خطأ غير متوقع'
+        console.error(`❌ خطأ عام: ${errorMessage}`)
+        results.push({ 
+          national_id: ben.national_id, 
+          success: false, 
+          error: errorMessage 
+        })
+      }
     }
 
     return new Response(
