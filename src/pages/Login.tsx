@@ -7,11 +7,14 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, LogIn } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function Login() {
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [loginType, setLoginType] = useState<'staff' | 'beneficiary'>('staff');
   const { signIn } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -21,7 +24,33 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      await signIn(email, password);
+      if (loginType === 'beneficiary') {
+        // تسجيل دخول المستفيد برقم الهوية
+        const { data: beneficiary, error: beneficiaryError } = await supabase
+          .from('beneficiaries')
+          .select('email, user_id')
+          .eq('national_id', identifier)
+          .maybeSingle();
+
+        if (beneficiaryError || !beneficiary) {
+          throw new Error('رقم الهوية غير مسجل في النظام');
+        }
+
+        if (!beneficiary.user_id) {
+          throw new Error('هذا المستفيد ليس لديه حساب دخول. يرجى التواصل مع الإدارة');
+        }
+
+        if (!beneficiary.email) {
+          throw new Error('لا يوجد بريد إلكتروني مسجل لهذا المستفيد');
+        }
+
+        // تسجيل الدخول بالبريد الإلكتروني المرتبط
+        await signIn(beneficiary.email, password);
+      } else {
+        // تسجيل دخول الموظفين بالبريد الإلكتروني
+        await signIn(identifier, password);
+      }
+
       toast({
         title: 'تم تسجيل الدخول بنجاح',
         description: 'مرحباً بك في منصة إدارة الوقف',
@@ -30,7 +59,7 @@ export default function Login() {
     } catch (error: any) {
       toast({
         title: 'خطأ في تسجيل الدخول',
-        description: error.message || 'البريد الإلكتروني أو كلمة المرور غير صحيحة',
+        description: error.message || 'البيانات المدخلة غير صحيحة',
         variant: 'destructive',
       });
     } finally {
@@ -44,61 +73,122 @@ export default function Login() {
         <CardHeader className="space-y-1 text-center">
           <CardTitle className="text-3xl font-bold">تسجيل الدخول</CardTitle>
           <CardDescription>
-            أدخل بريدك الإلكتروني وكلمة المرور للدخول إلى النظام
+            اختر نوع الحساب وأدخل بياناتك للدخول إلى النظام
           </CardDescription>
         </CardHeader>
-        <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">البريد الإلكتروني</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="example@domain.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={isLoading}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">كلمة المرور</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                disabled={isLoading}
-              />
-            </div>
-          </CardContent>
-          <CardFooter className="flex flex-col space-y-4">
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="ml-2 h-4 w-4 animate-spin" />
-                  جاري تسجيل الدخول...
-                </>
-              ) : (
-                <>
-                  <LogIn className="ml-2 h-4 w-4" />
-                  تسجيل الدخول
-                </>
-              )}
-            </Button>
-            <div className="text-center text-sm text-muted-foreground">
-              ليس لديك حساب؟{' '}
-              <Link to="/signup" className="text-primary hover:underline">
-                إنشاء حساب جديد
-              </Link>
-            </div>
-          </CardFooter>
-        </form>
+        
+        <Tabs value={loginType} onValueChange={(v) => setLoginType(v as 'staff' | 'beneficiary')} className="px-6">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="staff">الموظفون</TabsTrigger>
+            <TabsTrigger value="beneficiary">المستفيدون</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="staff">
+            <form onSubmit={handleSubmit}>
+              <CardContent className="space-y-4 px-0">
+                <div className="space-y-2">
+                  <Label htmlFor="staff-email">البريد الإلكتروني</Label>
+                  <Input
+                    id="staff-email"
+                    type="email"
+                    placeholder="example@waqf.sa"
+                    value={identifier}
+                    onChange={(e) => setIdentifier(e.target.value)}
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="staff-password">كلمة المرور</Label>
+                  <Input
+                    id="staff-password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+              </CardContent>
+              <CardFooter className="flex flex-col space-y-4 px-0">
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                      جاري تسجيل الدخول...
+                    </>
+                  ) : (
+                    <>
+                      <LogIn className="ml-2 h-4 w-4" />
+                      تسجيل الدخول
+                    </>
+                  )}
+                </Button>
+              </CardFooter>
+            </form>
+          </TabsContent>
+          
+          <TabsContent value="beneficiary">
+            <form onSubmit={handleSubmit}>
+              <CardContent className="space-y-4 px-0">
+                <div className="space-y-2">
+                  <Label htmlFor="national-id">رقم الهوية الوطنية</Label>
+                  <Input
+                    id="national-id"
+                    type="text"
+                    placeholder="1014548273"
+                    value={identifier}
+                    onChange={(e) => setIdentifier(e.target.value)}
+                    required
+                    disabled={isLoading}
+                    maxLength={10}
+                    pattern="[0-9]{10}"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    أدخل رقم الهوية الوطنية المسجل في النظام
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="beneficiary-password">كلمة المرور</Label>
+                  <Input
+                    id="beneficiary-password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+              </CardContent>
+              <CardFooter className="flex flex-col space-y-4 px-0">
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                      جاري تسجيل الدخول...
+                    </>
+                  ) : (
+                    <>
+                      <LogIn className="ml-2 h-4 w-4" />
+                      تسجيل الدخول
+                    </>
+                  )}
+                </Button>
+                <div className="text-center text-xs text-muted-foreground">
+                  إذا كنت مستفيداً جديداً، يرجى التواصل مع الإدارة لإنشاء حساب
+                </div>
+              </CardFooter>
+            </form>
+          </TabsContent>
+        </Tabs>
       </Card>
     </div>
   );
