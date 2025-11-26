@@ -1,18 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Plus, Eye } from "lucide-react";
+import { Plus, Eye, FileText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import AddJournalEntryDialog from "./AddJournalEntryDialog";
@@ -23,7 +15,15 @@ import { useAccountingFilters } from "@/hooks/useAccountingFilters";
 import { AccountingFilters } from "./AccountingFilters";
 import { EmptyAccountingState } from "./EmptyAccountingState";
 import { AccountingErrorState } from "./AccountingErrorState";
-import { FileText } from "lucide-react";
+import { UnifiedDataTable, type Column } from "@/components/unified/UnifiedDataTable";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 type JournalEntry = {
   id: string;
@@ -69,14 +69,50 @@ const JournalEntries = () => {
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
-  if (isLoading) {
-    return (
-      <div className="text-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-        <p className="mt-2 text-muted-foreground">جاري التحميل...</p>
-      </div>
-    );
-  }
+  const columns: Column<JournalEntry>[] = [
+    {
+      key: "entry_number",
+      label: "رقم القيد",
+      render: (_, entry) => (
+        <span className="font-mono text-xs sm:text-sm">{entry.entry_number}</span>
+      ),
+    },
+    {
+      key: "entry_date",
+      label: "التاريخ",
+      render: (_, entry) => (
+        <span className="text-xs sm:text-sm whitespace-nowrap">
+          {format(new Date(entry.entry_date), "dd MMM yyyy", { locale: ar })}
+        </span>
+      ),
+      hideOnMobile: true,
+    },
+    {
+      key: "description",
+      label: "البيان",
+      render: (_, entry) => (
+        <span className="text-xs sm:text-sm">{entry.description}</span>
+      ),
+      hideOnMobile: true,
+    },
+    {
+      key: "status",
+      label: "الحالة",
+      render: (_, entry) => getStatusBadge(entry.status),
+    },
+    {
+      key: "posted_at",
+      label: "تاريخ الترحيل",
+      render: (_, entry) => (
+        <span className="text-xs sm:text-sm whitespace-nowrap">
+          {entry.posted_at
+            ? format(new Date(entry.posted_at), "dd MMM yyyy", { locale: ar })
+            : "-"}
+        </span>
+      ),
+      hideOnMobile: true,
+    },
+  ];
 
   if (error) {
     return <AccountingErrorState error={error as Error} onRetry={refetch} />;
@@ -130,7 +166,7 @@ const JournalEntries = () => {
         </CardContent>
       </Card>
 
-      {entries.length === 0 ? (
+      {entries.length === 0 && !isLoading ? (
         <EmptyAccountingState
           icon={<FileText className="h-12 w-12" />}
           title="لا توجد قيود محاسبية"
@@ -143,48 +179,55 @@ const JournalEntries = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="text-xs sm:text-sm">رقم القيد</TableHead>
-                <TableHead className="text-xs sm:text-sm hidden lg:table-cell">التاريخ</TableHead>
-                <TableHead className="hidden md:table-cell text-xs sm:text-sm">البيان</TableHead>
-                <TableHead className="text-xs sm:text-sm">الحالة</TableHead>
-                <TableHead className="hidden lg:table-cell text-xs sm:text-sm">تاريخ الترحيل</TableHead>
+                {columns.map((col) => (
+                  <TableHead
+                    key={col.key}
+                    className={`text-xs sm:text-sm ${
+                      col.hideOnMobile ? "hidden lg:table-cell" : ""
+                    }`}
+                  >
+                    {col.label}
+                  </TableHead>
+                ))}
                 <TableHead className="text-left text-xs sm:text-sm">الإجراءات</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {entries.map((entry) => (
-                <TableRow key={entry.id}>
-                  <TableCell className="font-mono text-xs sm:text-sm">{entry.entry_number}</TableCell>
-                  <TableCell className="text-xs sm:text-sm hidden lg:table-cell whitespace-nowrap">
-                    {format(new Date(entry.entry_date), "dd MMM yyyy", {
-                      locale: ar,
-                    })}
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell text-xs sm:text-sm">{entry.description}</TableCell>
-                  <TableCell className="text-xs sm:text-sm">{getStatusBadge(entry.status)}</TableCell>
-                  <TableCell className="hidden lg:table-cell text-xs sm:text-sm whitespace-nowrap">
-                    {entry.posted_at
-                      ? format(new Date(entry.posted_at), "dd MMM yyyy", {
-                          locale: ar,
-                        })
-                      : "-"}
-                  </TableCell>
-                  <TableCell className="text-xs sm:text-sm">
-                    <div className="flex gap-2 justify-end">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setSelectedEntry(entry);
-                          setIsViewDialogOpen(true);
-                        }}
-                      >
-                        <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
-                      </Button>
-                    </div>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={columns.length + 1} className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                    <p className="mt-2 text-muted-foreground">جاري التحميل...</p>
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                entries.map((entry) => (
+                  <TableRow key={entry.id}>
+                    {columns.map((col) => (
+                      <TableCell
+                        key={col.key}
+                        className={col.hideOnMobile ? "hidden lg:table-cell" : ""}
+                      >
+                        {col.render ? col.render(entry[col.key], entry) : entry[col.key]}
+                      </TableCell>
+                    ))}
+                    <TableCell className="text-xs sm:text-sm">
+                      <div className="flex gap-2 justify-end">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedEntry(entry);
+                            setIsViewDialogOpen(true);
+                          }}
+                        >
+                          <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </div>
