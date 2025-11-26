@@ -14,6 +14,7 @@ import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { usePWAUpdate } from "./lib/pwa";
 import { GlobalMonitoring } from "./components/developer/GlobalMonitoring";
 import { IdleTimeoutManager } from "./components/auth/IdleTimeoutManager";
+import { useAlertCleanup } from "./hooks/useAlertCleanup";
 import "@/lib/errors/tracker";
 import "@/lib/selfHealing";
 
@@ -144,6 +145,7 @@ const queryClient = new QueryClient({
 
 const App = () => {
   usePWAUpdate();
+  useAlertCleanup();
   
   return (
     <GlobalErrorBoundary>
