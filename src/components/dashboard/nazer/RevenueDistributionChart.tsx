@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
 import type { RevenueDistribution } from "@/types/dashboard";
-import { ChartSkeleton } from "@/components/shared/ChartSkeleton";
+import { ChartSkeleton } from "@/components/dashboard/ChartSkeleton";
 
 export default function RevenueDistributionChart() {
   const [data, setData] = useState<RevenueDistribution[]>([]);

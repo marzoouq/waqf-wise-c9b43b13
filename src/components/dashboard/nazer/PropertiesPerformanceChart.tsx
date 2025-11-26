@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
 import type { PropertyPerformance } from "@/types/dashboard";
-import { ChartSkeleton } from "@/components/shared/ChartSkeleton";
+import { ChartSkeleton } from "@/components/dashboard/ChartSkeleton";
 
 export default function PropertiesPerformanceChart() {
   const [data, setData] = useState<PropertyPerformance[]>([]);
