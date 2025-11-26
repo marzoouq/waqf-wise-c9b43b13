@@ -218,6 +218,16 @@ export default defineConfig(({ mode }) => ({
               return 'utils';
             }
             
+            // Libraries that depend on React Context - must load after React
+            if (id.includes('next-themes') || 
+                id.includes('sonner') || 
+                id.includes('cmdk') || 
+                id.includes('vaul') ||
+                id.includes('react-day-picker') ||
+                id.includes('embla-carousel')) {
+              return 'react-context-libs';
+            }
+            
             // Everything else goes to vendor
             return 'vendor';
           }
