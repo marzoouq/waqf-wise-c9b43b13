@@ -11741,6 +11741,7 @@ export type Database = {
         Args: { p_permission_key: string; p_user_id: string }
         Returns: boolean
       }
+      cleanup_old_alerts: { Args: never; Returns: undefined }
       cleanup_old_error_logs: { Args: never; Returns: undefined }
       create_auto_journal_entry: {
         Args: {

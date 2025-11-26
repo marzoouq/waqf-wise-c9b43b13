@@ -70,11 +70,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .maybeSingle();
 
       if (error && error.code !== 'PGRST116') {
-        // PGRST116 = no rows returned, which is ok
         throw error;
       }
       
-      // إذا لم يوجد profile، نحاول إنشاء واحد
       if (!data) {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
@@ -90,39 +88,54 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               .single();
             
             if (createError) {
-              // التحقق من أخطاء foreign key أو unique constraint
+              // معالجة أخطاء FK (23503): user_id غير موجود
               if (createError.code === '23503') {
-                console.error('Foreign key violation - user_id not found in auth.users');
-              } else if (createError.code === '23505') {
-                // Unique violation - profile already exists, try fetching again
+                console.warn('FK violation - retrying after delay');
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                const { data: retryProfile } = await supabase
+                  .from('profiles')
+                  .select('*')
+                  .eq('user_id', userId)
+                  .maybeSingle();
+                
+                if (retryProfile) {
+                  setProfile(retryProfile);
+                  return;
+                }
+              } 
+              // معالجة Unique constraint (23505): profile موجود مسبقاً
+              else if (createError.code === '23505') {
                 const { data: existingProfile } = await supabase
                   .from('profiles')
                   .select('*')
                   .eq('user_id', userId)
-                  .single();
+                  .maybeSingle();
                 
                 if (existingProfile) {
-                  setProfile(existingProfile as any);
+                  setProfile(existingProfile);
                   return;
                 }
               }
               throw createError;
             }
             
-            setProfile(newProfile as any);
-          } catch (insertError: any) {
-            console.error('Error creating profile:', insertError);
-            // لا نعرض toast هنا لأنه قد يكون طبيعي في بعض الحالات
-            // المستخدم يمكنه الاستمرار بدون profile
+            setProfile(newProfile);
+          } catch (insertError: unknown) {
+            const err = insertError as { code?: string; message?: string };
+            // لا نعرض أخطاء FK وUnique للمستخدم
+            if (!['23503', '23505'].includes(err.code || '')) {
+              console.error('Error creating profile:', err);
+            }
           }
         }
       } else {
-        setProfile(data as any);
+        setProfile(data);
       }
-    } catch (error: any) {
-      console.error('Error fetching profile:', error);
-      // نعرض toast فقط للأخطاء الحقيقية
-      if (error.code && error.code !== '23505' && error.code !== '23503') {
+    } catch (error: unknown) {
+      const err = error as { code?: string; message?: string };
+      // نعرض toast فقط للأخطاء غير المتوقعة
+      if (!['23505', '23503', 'PGRST116'].includes(err.code || '')) {
+        console.error('Error fetching profile:', err);
         toast({
           title: 'خطأ',
           description: 'فشل تحميل بيانات المستخدم',
