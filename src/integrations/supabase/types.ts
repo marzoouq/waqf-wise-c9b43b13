@@ -11349,6 +11349,7 @@ export type Database = {
           notes: string | null
           paid_at: string | null
           paid_by: string | null
+          payment_id: string | null
           payment_method: string | null
           reference_number: string | null
           status: string | null
@@ -11411,6 +11412,20 @@ export type Database = {
             columns: ["journal_entry_id"]
             isOneToOne: false
             referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_vouchers_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_vouchers_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments_with_contract_details"
             referencedColumns: ["id"]
           },
         ]
