@@ -4,46 +4,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Archive, FolderOpen, FileText, Upload, Search, Clock } from "lucide-react";
+import { Archive, FolderOpen, FileText, Upload, Search, Clock, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
-import { QUERY_CONFIG } from "@/lib/queryOptimization";
-import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
-import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-
-// Skeleton loaders
-const StatsSkeleton = () => (
-  <div className="grid gap-4 sm:gap-5 md:gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
-    {[1, 2, 3, 4].map((i) => (
-      <Card key={i}>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <Skeleton className="h-4 w-24" />
-          <Skeleton className="h-4 w-4 rounded-full" />
-        </CardHeader>
-        <CardContent>
-          <Skeleton className="h-8 w-20 mb-2" />
-          <Skeleton className="h-3 w-32" />
-        </CardContent>
-      </Card>
-    ))}
-  </div>
-);
-
-const TableSkeleton = () => (
-  <div className="space-y-3">
-    {[1, 2, 3, 4, 5].map((i) => (
-      <Skeleton key={i} className="h-16 w-full" />
-    ))}
-  </div>
-);
+import { UnifiedDashboardLayout } from "@/components/dashboard/UnifiedDashboardLayout";
+import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
+import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
+import { SectionSkeleton } from "@/components/dashboard";
+import { AdminSendMessageDialog } from "@/components/messages/AdminSendMessageDialog";
 
 export default function ArchivistDashboard() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [messageDialogOpen, setMessageDialogOpen] = useState(false);
 
   // Fetch archive statistics
   const { data: stats, isLoading: statsLoading } = useQuery({
@@ -112,81 +88,50 @@ export default function ArchivistDashboard() {
   });
 
   return (
-    <PageErrorBoundary pageName="لوحة تحكم أمين الأرشيف">
-      <MobileOptimizedLayout>
-        {/* Header */}
-        <header className="space-y-1 sm:space-y-2">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <Archive className="h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 text-accent" />
-            <div>
-              <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gradient-primary">
-                لوحة تحكم أمين الأرشيف
-              </h1>
-              <p className="text-xs sm:text-sm md:text-base text-muted-foreground">
-                إدارة وتنظيم المستندات والملفات
-              </p>
-            </div>
-          </div>
-        </header>
-
+    <UnifiedDashboardLayout
+      role="archivist"
+      actions={
+        <Button onClick={() => setMessageDialogOpen(true)} className="gap-2">
+          <Mail className="h-4 w-4" />
+          <span className="hidden sm:inline">إرسال رسالة</span>
+        </Button>
+      }
+    >
       {/* Statistics Cards */}
       {statsLoading ? (
-        <StatsSkeleton />
+        <SectionSkeleton />
       ) : (
-        <div className="grid gap-3 sm:gap-4 md:gap-5 lg:gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
-            <Card className="group hover:shadow-lg hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-teal-500">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-xs sm:text-sm font-medium">المجلدات</CardTitle>
-                <FolderOpen className="h-3 w-3 sm:h-4 sm:w-4 text-accent group-hover:scale-110 transition-transform" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-lg sm:text-xl md:text-2xl font-bold text-accent">
-                  {stats?.totalFolders || 0}
-                </div>
-                <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">إجمالي المجلدات</p>
-              </CardContent>
-            </Card>
-
-            <Card className="group hover:shadow-lg hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-info">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-xs sm:text-sm font-medium">المستندات</CardTitle>
-                <FileText className="h-3 w-3 sm:h-4 sm:w-4 text-info group-hover:scale-110 transition-transform" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-lg sm:text-xl md:text-2xl font-bold text-info">
-                  {stats?.totalDocuments || 0}
-                </div>
-                <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">إجمالي المستندات</p>
-              </CardContent>
-            </Card>
-
-            <Card className="group hover:shadow-lg hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-success">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-xs sm:text-sm font-medium">رفع اليوم</CardTitle>
-                <Upload className="h-3 w-3 sm:h-4 sm:w-4 text-success group-hover:scale-110 transition-transform" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-lg sm:text-xl md:text-2xl font-bold text-success">
-                  {stats?.todayUploads || 0}
-                </div>
-                <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">مستندات اليوم</p>
-              </CardContent>
-            </Card>
-
-            <Card className="group hover:shadow-lg hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-primary">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-xs sm:text-sm font-medium">المساحة</CardTitle>
-                <Archive className="h-3 w-3 sm:h-4 sm:w-4 text-primary group-hover:scale-110 transition-transform" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-lg sm:text-xl md:text-2xl font-bold text-primary">
-                  {stats?.totalSize || '0 MB'}
-                </div>
-                <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">حجم الأرشيف</p>
-              </CardContent>
-            </Card>
-          </div>
-        )}
+        <UnifiedStatsGrid columns={4}>
+          <UnifiedKPICard
+            title="المجلدات"
+            value={stats?.totalFolders || 0}
+            icon={FolderOpen}
+            variant="default"
+            subtitle="إجمالي المجلدات"
+          />
+          <UnifiedKPICard
+            title="المستندات"
+            value={stats?.totalDocuments || 0}
+            icon={FileText}
+            variant="default"
+            subtitle="إجمالي المستندات"
+          />
+          <UnifiedKPICard
+            title="رفع اليوم"
+            value={stats?.todayUploads || 0}
+            icon={Upload}
+            variant="success"
+            subtitle="مستندات اليوم"
+          />
+          <UnifiedKPICard
+            title="المساحة"
+            value={stats?.totalSize || '0 MB'}
+            icon={Archive}
+            variant="default"
+            subtitle="حجم الأرشيف"
+          />
+        </UnifiedStatsGrid>
+      )}
 
         {/* Filters */}
         <Card>
@@ -234,7 +179,7 @@ export default function ArchivistDashboard() {
           </CardHeader>
           <CardContent>
             {docsLoading ? (
-              <TableSkeleton />
+              <SectionSkeleton />
             ) : recentDocuments.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 <FileText className="h-12 w-12 mx-auto mb-3 opacity-50" />
@@ -301,7 +246,11 @@ export default function ArchivistDashboard() {
             </div>
           </CardContent>
         </Card>
-    </MobileOptimizedLayout>
-    </PageErrorBoundary>
+
+      <AdminSendMessageDialog
+        open={messageDialogOpen}
+        onOpenChange={setMessageDialogOpen}
+      />
+    </UnifiedDashboardLayout>
   );
 }
