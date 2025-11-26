@@ -13,8 +13,8 @@ export interface ApprovalPermissions {
 /**
  * Hook للتحقق من صلاحيات الموافقة حسب الدور
  * 
- * المستوى 1: المحاسب (accountant)
- * المستوى 2: المدير المالي (يمكن استخدام admin مؤقتاً)
+ * المستوى 1: المشرف (admin)
+ * المستوى 2: المحاسب (accountant)
  * المستوى 3: الناظر (nazer)
  */
 export function useApprovalPermissions(): ApprovalPermissions {
@@ -41,18 +41,17 @@ export function useApprovalPermissions(): ApprovalPermissions {
   const canApproveLevel = (level: ApprovalLevel): boolean => {
     if (!userRole) return false;
 
-    // Admin والناظر يمكنهم الموافقة على كل المستويات
-    if (userRole === "admin" || userRole === "nazer") {
+    // الناظر يمكنه الموافقة على كل المستويات
+    if (userRole === "nazer") {
       return true;
     }
 
-    // المحاسب يمكنه الموافقة على المستوى 1 فقط
-    if (level === 1 && userRole === "accountant") {
+    // Admin (المشرف) يمكنه الموافقة على المستوى 1
+    if (level === 1 && userRole === "admin") {
       return true;
     }
 
-    // المدير المالي يمكنه الموافقة على المستوى 1 و 2
-    // (مؤقتاً نستخدم admin لحين إضافة دور financial_manager)
+    // المحاسب يمكنه الموافقة على المستوى 1 و 2
     if (level <= 2 && userRole === "accountant") {
       return true;
     }
