@@ -3,8 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Download, FileCheck, Printer } from "lucide-react";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
-import jsPDF from "jspdf";
-import "jspdf-autotable";
 
 interface BeneficiaryCertificateProps {
   beneficiaryName: string;
@@ -27,7 +25,13 @@ export function BeneficiaryCertificate({
     window.print();
   };
 
-  const handleGeneratePDF = () => {
+  const handleGeneratePDF = async () => {
+    const [jsPDFModule] = await Promise.all([
+      import('jspdf'),
+      import('jspdf-autotable')
+    ]);
+    
+    const jsPDF = jsPDFModule.default;
     const doc = new jsPDF({
       orientation: "portrait",
       unit: "mm",

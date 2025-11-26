@@ -9,8 +9,6 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
-import jsPDF from "jspdf";
-import "jspdf-autotable";
 import { 
   PaymentRow, 
   JournalEntryRow, 
@@ -199,7 +197,14 @@ export function AccountingLinkReport() {
     },
   });
 
-  const exportToPDF = () => {
+  const exportToPDF = async () => {
+    const [jsPDFModule, autoTableModule] = await Promise.all([
+      import('jspdf'),
+      import('jspdf-autotable')
+    ]);
+    
+    const jsPDF = jsPDFModule.default;
+    const autoTable = autoTableModule.default;
     const doc = new jsPDF();
     
     // إعداد الخط العربي
@@ -217,17 +222,7 @@ export function AccountingLinkReport() {
       op.journalEntry || "-",
     ]);
 
-    interface AutoTableDoc extends jsPDF {
-      autoTable: (options: {
-        head: string[][];
-        body: string[][];
-        startY: number;
-        styles: { font: string; halign: string };
-        headStyles: { fillColor: number[] };
-      }) => void;
-    }
-
-    (doc as AutoTableDoc).autoTable({
+    autoTable(doc, {
       head: [["النوع", "الرقم", "الوصف", "المبلغ", "التاريخ", "رقم القيد"]],
       body: tableData,
       startY: 40,

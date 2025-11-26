@@ -8,8 +8,6 @@ import { FileText, Download, Printer, Mail, TrendingUp, Calendar, DollarSign } f
 import { LoadingState } from '@/components/shared/LoadingState';
 import { useAuth } from '@/hooks/useAuth';
 import { formatCurrency } from '@/lib/utils';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
@@ -114,7 +112,14 @@ export default function BeneficiaryReports() {
   ].filter(item => item.value > 0);
 
   // تصدير التقرير السنوي PDF
-  const exportAnnualReport = () => {
+  const exportAnnualReport = async () => {
+    const [jsPDFModule, autoTableModule] = await Promise.all([
+      import('jspdf'),
+      import('jspdf-autotable')
+    ]);
+    
+    const jsPDF = jsPDFModule.default;
+    const autoTable = autoTableModule.default;
     const doc = new jsPDF();
     doc.setR2L(true);
     
