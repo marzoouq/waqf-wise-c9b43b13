@@ -306,14 +306,7 @@ const App = () => {
                 </ProtectedRoute>
               } 
             />
-            <Route 
-              path="/design-preview" 
-              element={
-                <ProtectedRoute requiredRole="admin">
-                  <DesignPreview />
-                </ProtectedRoute>
-              } 
-            />
+            <Route path="/design-preview" element={<DesignPreview />} />
             <Route path="/transparency-settings" element={<TransparencySettings />} />
           <Route 
             path="/settings/roles" 
