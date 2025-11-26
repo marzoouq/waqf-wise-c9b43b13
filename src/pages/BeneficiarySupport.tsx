@@ -14,18 +14,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { HelpCircle, MessageSquare, Send, ArrowRight, Phone, Mail } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useBeneficiaryProfile } from "@/hooks/useBeneficiaryProfile";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { useNavigate } from "react-router-dom";
+import { useSupportTickets } from "@/hooks/useSupportTickets";
 
 export default function BeneficiarySupport() {
   const { user } = useAuth();
   const { beneficiary } = useBeneficiaryProfile(user?.id);
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { createTicket } = useSupportTickets();
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
 
@@ -79,36 +79,31 @@ export default function BeneficiarySupport() {
 
   const handleSubmitSupportTicket = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
 
     try {
-      // إنشاء طلب دعم فني
-      const { error } = await supabase.from("beneficiary_requests").insert({
+      // إنشاء تذكرة دعم فني
+      await createTicket.mutateAsync({
+        subject: subject,
+        description: message,
+        category: 'inquiry',
+        priority: 'medium',
         beneficiary_id: beneficiary?.id,
-        request_type_id: null, // تم إصلاح: استخدام null بدلاً من "support"
-        description: `${subject}\n\n${message}`,
-        priority: "عادية",
-        status: "قيد المراجعة",
       });
 
-      if (error) throw error;
-
       toast({
-        title: "تم إرسال الطلب بنجاح",
+        title: "تم إرسال التذكرة بنجاح",
         description: "سيتم الرد عليك في أقرب وقت ممكن",
       });
 
       setSubject("");
       setMessage("");
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "فشل إرسال الطلب";
+      const errorMessage = error instanceof Error ? error.message : "فشل إرسال التذكرة";
       toast({
         title: "خطأ",
         description: errorMessage,
         variant: "destructive",
       });
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -251,8 +246,8 @@ export default function BeneficiarySupport() {
                     </p>
                   </div>
 
-                  <Button type="submit" disabled={isSubmitting} className="w-full">
-                    {isSubmitting ? (
+                  <Button type="submit" disabled={createTicket.isPending} className="w-full">
+                    {createTicket.isPending ? (
                       "جاري الإرسال..."
                     ) : (
                       <>
