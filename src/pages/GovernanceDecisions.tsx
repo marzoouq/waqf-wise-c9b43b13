@@ -16,7 +16,7 @@ type GovernanceDecisionRow = Database['public']['Tables']['governance_decisions'
 
 export default function GovernanceDecisions() {
   const [dialogOpen, setDialogOpen] = useState(false);
-  const { decisions, isLoading } = useGovernanceDecisions();
+  const { decisions, isLoading, error } = useGovernanceDecisions();
 
   const typedDecisions = decisions as GovernanceDecisionRow[];
   
@@ -46,6 +46,16 @@ export default function GovernanceDecisions() {
       <div className="p-4">
         {isLoading ? (
           <LoadingState message="جاري تحميل القرارات..." />
+        ) : error ? (
+          <EnhancedEmptyState 
+            icon={Vote}
+            title="خطأ في تحميل القرارات"
+            description="حدث خطأ أثناء تحميل القرارات، يرجى المحاولة مرة أخرى"
+            action={{
+              label: "إعادة المحاولة",
+              onClick: () => window.location.reload()
+            }}
+          />
         ) : decisions.length === 0 ? (
           <EnhancedEmptyState 
             icon={Vote}

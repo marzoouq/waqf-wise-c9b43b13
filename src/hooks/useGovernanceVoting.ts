@@ -7,19 +7,28 @@ export function useGovernanceVoting(decisionId: string) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: votes = [], isLoading } = useQuery({
+  const { data: votes = [], isLoading, error: votesError } = useQuery({
     queryKey: ["governance-votes", decisionId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("governance_votes")
-        .select("*")
-        .eq("decision_id", decisionId)
-        .order("voted_at", { ascending: false });
-      
-      if (error) throw error;
-      return data as GovernanceVote[];
+      try {
+        const { data, error } = await supabase
+          .from("governance_votes")
+          .select("*")
+          .eq("decision_id", decisionId)
+          .order("voted_at", { ascending: false });
+        
+        if (error) {
+          console.error('Error fetching votes:', error);
+          throw error;
+        }
+        return (data || []) as GovernanceVote[];
+      } catch (error) {
+        console.error('Error in votes query:', error);
+        return [];
+      }
     },
     enabled: !!decisionId,
+    retry: 2,
   });
 
   const { data: userVote } = useQuery({
@@ -43,48 +52,53 @@ export function useGovernanceVoting(decisionId: string) {
 
   const castVote = useMutation({
     mutationFn: async ({ vote, reason }: { vote: VoteType; reason?: string }) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("غير مصرح");
-      
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("full_name")
-        .eq("user_id", user.id)
-        .maybeSingle();
-      
-      if (profileError && profileError.code !== 'PGRST116') {
-        console.error('Error fetching profile:', profileError);
-      }
-      
-      const { data: beneficiary } = await supabase
-        .from("beneficiaries")
-        .select("id, full_name, category")
-        .eq("user_id", user.id)
-        .maybeSingle();
-      
-      const voterType = beneficiary 
-        ? 'beneficiary' 
-        : 'board_member';
-      
-      const { data, error } = await supabase
-        .from("governance_votes")
-        .insert([{
-          decision_id: decisionId,
-          voter_id: user.id,
-          voter_name: profile?.full_name || 'مستخدم',
-          voter_type: voterType,
-          beneficiary_id: beneficiary?.id,
-          vote,
-          vote_reason: reason,
-        }])
-        .select()
-        .single();
-      
-      if (error) {
-        console.error('Error casting vote:', error);
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error("غير مصرح");
+        
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("user_id", user.id)
+          .maybeSingle();
+        
+        if (profileError && profileError.code !== 'PGRST116') {
+          console.error('Error fetching profile:', profileError);
+        }
+        
+        const { data: beneficiary } = await supabase
+          .from("beneficiaries")
+          .select("id, full_name, category")
+          .eq("user_id", user.id)
+          .maybeSingle();
+        
+        const voterType = beneficiary 
+          ? 'beneficiary' 
+          : 'board_member';
+        
+        const { data, error } = await supabase
+          .from("governance_votes")
+          .insert([{
+            decision_id: decisionId,
+            voter_id: user.id,
+            voter_name: profile?.full_name || 'مستخدم',
+            voter_type: voterType,
+            beneficiary_id: beneficiary?.id,
+            vote,
+            vote_reason: reason,
+          }])
+          .select()
+          .single();
+        
+        if (error) {
+          console.error('Error casting vote:', error);
+          throw error;
+        }
+        return data;
+      } catch (error) {
+        console.error('Error in cast vote mutation:', error);
         throw error;
       }
-      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["governance-votes", decisionId] });
@@ -95,12 +109,21 @@ export function useGovernanceVoting(decisionId: string) {
         description: "شكراً لمشاركتك في التصويت",
       });
     },
+    onError: (error: Error) => {
+      console.error('Cast vote mutation error:', error);
+      toast({
+        title: "خطأ في التصويت",
+        description: error.message || "حدث خطأ أثناء تسجيل صوتك، يرجى المحاولة مرة أخرى",
+        variant: "destructive",
+      });
+    },
   });
 
   return {
     votes,
     userVote,
     isLoading,
+    votesError,
     hasVoted: !!userVote,
     castVote: castVote.mutateAsync,
   };
