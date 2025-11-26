@@ -36,7 +36,7 @@ export const useNotifications = () => {
 
       const { data, error } = await supabase
         .from("notifications")
-        .select("*")
+        .select("id, user_id, title, message, type, reference_id, reference_type, is_read, created_at, read_at, action_url")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
         .limit(50);
@@ -44,6 +44,8 @@ export const useNotifications = () => {
       if (error) throw error;
       return data as Notification[];
     },
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    refetchOnWindowFocus: false,
   });
 
   // Mark notification as read

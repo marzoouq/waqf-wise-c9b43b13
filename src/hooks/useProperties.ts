@@ -36,13 +36,14 @@ export function useProperties() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("properties")
-        .select("*")
+        .select("id, name, type, location, units, occupied, monthly_revenue, status, description, tax_percentage, shop_count, apartment_count, revenue_type, created_at, updated_at")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
       return data as Property[];
     },
-    staleTime: 3 * 60 * 1000, // Data stays fresh for 3 minutes
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnWindowFocus: false,
   });
 
   // Real-time subscription
