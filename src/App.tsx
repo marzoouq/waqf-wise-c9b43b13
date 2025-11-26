@@ -156,14 +156,14 @@ const App = () => {
                 <Sonner />
                 {/* Global monitoring for admins only */}
                 <GlobalMonitoring />
-                {/* Auto logout for beneficiaries after 1 minute of inactivity */}
-                <IdleTimeoutManager />
               <BrowserRouter
                 future={{
                   v7_startTransition: true,
                   v7_relativeSplatPath: true,
                 }}
               >
+                {/* Auto logout after 1 minute of inactivity (except nazer & admin) */}
+                <IdleTimeoutManager />
             <Suspense fallback={<LoadingState size="lg" fullScreen />}>
               <Routes>
                 {/* Public routes */}
