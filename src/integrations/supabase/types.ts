@@ -899,6 +899,57 @@ export type Database = {
           },
         ]
       }
+      bank_integrations: {
+        Row: {
+          api_endpoint: string | null
+          api_version: string | null
+          auth_method: string | null
+          bank_code: string
+          bank_name: string
+          configuration: Json | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          last_sync_at: string | null
+          supports_balance_inquiry: boolean | null
+          supports_statement: boolean | null
+          supports_transfers: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          api_endpoint?: string | null
+          api_version?: string | null
+          auth_method?: string | null
+          bank_code: string
+          bank_name: string
+          configuration?: Json | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          supports_balance_inquiry?: boolean | null
+          supports_statement?: boolean | null
+          supports_transfers?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          api_endpoint?: string | null
+          api_version?: string | null
+          auth_method?: string | null
+          bank_code?: string
+          bank_name?: string
+          configuration?: Json | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          supports_balance_inquiry?: boolean | null
+          supports_statement?: boolean | null
+          supports_transfers?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       bank_matching_rules: {
         Row: {
           account_mapping: Json
@@ -2105,6 +2156,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      cache_entries: {
+        Row: {
+          cache_key: string
+          cache_value: Json
+          created_at: string | null
+          expires_at: string
+          hit_count: number | null
+          id: string
+          last_accessed_at: string | null
+        }
+        Insert: {
+          cache_key: string
+          cache_value: Json
+          created_at?: string | null
+          expires_at: string
+          hit_count?: number | null
+          id?: string
+          last_accessed_at?: string | null
+        }
+        Update: {
+          cache_key?: string
+          cache_value?: Json
+          created_at?: string | null
+          expires_at?: string
+          hit_count?: number | null
+          id?: string
+          last_accessed_at?: string | null
+        }
+        Relationships: []
       }
       cash_flows: {
         Row: {
@@ -3520,6 +3601,39 @@ export type Database = {
           },
         ]
       }
+      encrypted_sensitive_data: {
+        Row: {
+          created_at: string | null
+          data_type: string
+          encrypted_value: string
+          encryption_method: string | null
+          id: string
+          key_version: number | null
+          reference_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          data_type: string
+          encrypted_value: string
+          encryption_method?: string | null
+          id?: string
+          key_version?: number | null
+          reference_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          data_type?: string
+          encrypted_value?: string
+          encryption_method?: string | null
+          id?: string
+          key_version?: number | null
+          reference_id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       encryption_key_rotation_history: {
         Row: {
           affected_records_count: number | null
@@ -3613,6 +3727,48 @@ export type Database = {
           key_type?: string
           metadata?: Json | null
           rotated_at?: string | null
+        }
+        Relationships: []
+      }
+      external_api_logs: {
+        Row: {
+          created_at: string | null
+          endpoint: string
+          error_message: string | null
+          id: string
+          integration_id: string | null
+          integration_type: string
+          method: string
+          request_payload: Json | null
+          response_payload: Json | null
+          response_time_ms: number | null
+          status_code: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          endpoint: string
+          error_message?: string | null
+          id?: string
+          integration_id?: string | null
+          integration_type: string
+          method: string
+          request_payload?: Json | null
+          response_payload?: Json | null
+          response_time_ms?: number | null
+          status_code?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          endpoint?: string
+          error_message?: string | null
+          id?: string
+          integration_id?: string | null
+          integration_type?: string
+          method?: string
+          request_payload?: Json | null
+          response_payload?: Json | null
+          response_time_ms?: number | null
+          status_code?: number | null
         }
         Relationships: []
       }
@@ -4038,6 +4194,94 @@ export type Database = {
             columns: ["waqf_unit_id"]
             isOneToOne: false
             referencedRelation: "waqf_units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gateway_transactions: {
+        Row: {
+          amount: number
+          beneficiary_id: string | null
+          created_at: string | null
+          currency: string | null
+          gateway_id: string | null
+          gateway_response: Json | null
+          id: string
+          payment_method: string | null
+          payment_voucher_id: string | null
+          processed_at: string | null
+          status: string | null
+          transaction_reference: string | null
+        }
+        Insert: {
+          amount: number
+          beneficiary_id?: string | null
+          created_at?: string | null
+          currency?: string | null
+          gateway_id?: string | null
+          gateway_response?: Json | null
+          id?: string
+          payment_method?: string | null
+          payment_voucher_id?: string | null
+          processed_at?: string | null
+          status?: string | null
+          transaction_reference?: string | null
+        }
+        Update: {
+          amount?: number
+          beneficiary_id?: string | null
+          created_at?: string | null
+          currency?: string | null
+          gateway_id?: string | null
+          gateway_response?: Json | null
+          id?: string
+          payment_method?: string | null
+          payment_voucher_id?: string | null
+          processed_at?: string | null
+          status?: string | null
+          transaction_reference?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gateway_transactions_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gateway_transactions_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_account_statement"
+            referencedColumns: ["beneficiary_id"]
+          },
+          {
+            foreignKeyName: "gateway_transactions_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_statistics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gateway_transactions_gateway_id_fkey"
+            columns: ["gateway_id"]
+            isOneToOne: false
+            referencedRelation: "payment_gateways"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gateway_transactions_payment_voucher_id_fkey"
+            columns: ["payment_voucher_id"]
+            isOneToOne: false
+            referencedRelation: "payment_vouchers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gateway_transactions_payment_voucher_id_fkey"
+            columns: ["payment_voucher_id"]
+            isOneToOne: false
+            referencedRelation: "payment_vouchers_with_details"
             referencedColumns: ["id"]
           },
         ]
@@ -4793,6 +5037,95 @@ export type Database = {
             columns: ["decision_id"]
             isOneToOne: false
             referencedRelation: "governance_decisions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      government_integrations: {
+        Row: {
+          api_endpoint: string | null
+          configuration: Json | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          last_sync_at: string | null
+          requires_authentication: boolean | null
+          service_name: string
+          service_type: string
+          sync_frequency: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          api_endpoint?: string | null
+          configuration?: Json | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          requires_authentication?: boolean | null
+          service_name: string
+          service_type: string
+          sync_frequency?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          api_endpoint?: string | null
+          configuration?: Json | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          requires_authentication?: boolean | null
+          service_name?: string
+          service_type?: string
+          sync_frequency?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      government_queries: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          id: string
+          integration_id: string | null
+          national_id: string | null
+          query_payload: Json | null
+          query_type: string
+          response_payload: Json | null
+          status: string | null
+          verified: boolean | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          integration_id?: string | null
+          national_id?: string | null
+          query_payload?: Json | null
+          query_type: string
+          response_payload?: Json | null
+          status?: string | null
+          verified?: boolean | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          integration_id?: string | null
+          national_id?: string | null
+          query_payload?: Json | null
+          query_type?: string
+          response_payload?: Json | null
+          status?: string | null
+          verified?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "government_queries_integration_id_fkey"
+            columns: ["integration_id"]
+            isOneToOne: false
+            referencedRelation: "government_integrations"
             referencedColumns: ["id"]
           },
         ]
@@ -5726,6 +6059,39 @@ export type Database = {
         }
         Relationships: []
       }
+      login_attempts_log: {
+        Row: {
+          created_at: string | null
+          failure_reason: string | null
+          id: string
+          ip_address: unknown
+          location: Json | null
+          success: boolean | null
+          user_agent: string | null
+          user_email: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          failure_reason?: string | null
+          id?: string
+          ip_address: unknown
+          location?: Json | null
+          success?: boolean | null
+          user_agent?: string | null
+          user_email?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          failure_reason?: string | null
+          id?: string
+          ip_address?: unknown
+          location?: Json | null
+          success?: boolean | null
+          user_agent?: string | null
+          user_email?: string | null
+        }
+        Relationships: []
+      }
       maintenance_providers: {
         Row: {
           active_jobs: number | null
@@ -6570,6 +6936,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      payment_gateways: {
+        Row: {
+          configuration: Json | null
+          created_at: string | null
+          gateway_name: string
+          gateway_type: string
+          id: string
+          is_active: boolean | null
+          merchant_id: string | null
+          success_rate: number | null
+          supported_methods: string[] | null
+          total_transactions: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          configuration?: Json | null
+          created_at?: string | null
+          gateway_name: string
+          gateway_type: string
+          id?: string
+          is_active?: boolean | null
+          merchant_id?: string | null
+          success_rate?: number | null
+          supported_methods?: string[] | null
+          total_transactions?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          configuration?: Json | null
+          created_at?: string | null
+          gateway_name?: string
+          gateway_type?: string
+          id?: string
+          is_active?: boolean | null
+          merchant_id?: string | null
+          success_rate?: number | null
+          supported_methods?: string[] | null
+          total_transactions?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       payment_reminders: {
         Row: {
@@ -8302,6 +8710,132 @@ export type Database = {
         }
         Relationships: []
       }
+      security_events_log: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          event_data: Json | null
+          event_type: string
+          id: string
+          ip_address: unknown
+          resolved: boolean | null
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          event_data?: Json | null
+          event_type: string
+          id?: string
+          ip_address?: unknown
+          resolved?: boolean | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          event_data?: Json | null
+          event_type?: string
+          id?: string
+          ip_address?: unknown
+          resolved?: boolean | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      security_rules_config: {
+        Row: {
+          actions: Json
+          conditions: Json
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          last_triggered_at: string | null
+          priority: number | null
+          rule_name: string
+          rule_type: string
+          trigger_count: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          actions: Json
+          conditions: Json
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_triggered_at?: string | null
+          priority?: number | null
+          rule_name: string
+          rule_type: string
+          trigger_count?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          actions?: Json
+          conditions?: Json
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_triggered_at?: string | null
+          priority?: number | null
+          rule_name?: string
+          rule_type?: string
+          trigger_count?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      security_sessions: {
+        Row: {
+          created_at: string | null
+          device_info: Json | null
+          expires_at: string
+          id: string
+          ip_address: unknown
+          is_active: boolean | null
+          last_activity_at: string | null
+          location: Json | null
+          session_token: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          device_info?: Json | null
+          expires_at: string
+          id?: string
+          ip_address?: unknown
+          is_active?: boolean | null
+          last_activity_at?: string | null
+          location?: Json | null
+          session_token: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          device_info?: Json | null
+          expires_at?: string
+          id?: string
+          ip_address?: unknown
+          is_active?: boolean | null
+          last_activity_at?: string | null
+          location?: Json | null
+          session_token?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       sensitive_data_access_log: {
         Row: {
           access_reason: string | null
@@ -8353,6 +8887,33 @@ export type Database = {
           user_email?: string | null
           user_id?: string | null
           was_granted?: boolean | null
+        }
+        Relationships: []
+      }
+      slow_query_log: {
+        Row: {
+          created_at: string | null
+          execution_time_ms: number
+          id: string
+          parameters: Json | null
+          query_text: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          execution_time_ms: number
+          id?: string
+          parameters?: Json | null
+          query_text: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          execution_time_ms?: number
+          id?: string
+          parameters?: Json | null
+          query_text?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -9205,6 +9766,45 @@ export type Database = {
           total_beneficiaries?: number | null
           total_families?: number | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      two_factor_auth: {
+        Row: {
+          backup_codes: string[] | null
+          created_at: string | null
+          id: string
+          is_enabled: boolean | null
+          last_used_at: string | null
+          method: string | null
+          phone_number: string | null
+          secret: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          backup_codes?: string[] | null
+          created_at?: string | null
+          id?: string
+          is_enabled?: boolean | null
+          last_used_at?: string | null
+          method?: string | null
+          phone_number?: string | null
+          secret: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          backup_codes?: string[] | null
+          created_at?: string | null
+          id?: string
+          is_enabled?: boolean | null
+          last_used_at?: string | null
+          method?: string | null
+          phone_number?: string | null
+          secret?: string
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
