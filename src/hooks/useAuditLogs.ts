@@ -8,7 +8,7 @@ export const useAuditLogs = (filters?: AuditLogFilters) => {
     queryFn: async () => {
       let query = supabase
         .from("audit_logs")
-        .select("*")
+        .select("id, action_type, table_name, description, user_email, created_at, severity")
         .order("created_at", { ascending: false });
 
       if (filters?.userId) {
@@ -30,10 +30,12 @@ export const useAuditLogs = (filters?: AuditLogFilters) => {
         query = query.lte("created_at", filters.endDate);
       }
 
-      const { data, error } = await query.limit(100);
+      const { data, error } = await query.limit(filters ? 100 : 10);
 
       if (error) throw error;
       return data as AuditLog[];
     },
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    refetchInterval: false, // Disable auto-refetch
   });
 };

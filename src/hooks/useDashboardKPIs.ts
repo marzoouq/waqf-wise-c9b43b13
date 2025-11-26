@@ -29,6 +29,7 @@ export function useDashboardKPIs() {
         supabase
           .from('payments')
           .select('amount')
+          .limit(1000)
           .then(res => {
             if (res.error) throw res.error;
             return res.data.reduce((sum, p) => sum + Number(p.amount), 0);
@@ -47,6 +48,8 @@ export function useDashboardKPIs() {
         activeContracts: activeContracts.count || 0,
       } as DashboardKPIs;
     },
-    staleTime: 5 * 60 * 1000, // 5 دقائق
+    staleTime: 60 * 60 * 1000, // 1 hour
+    refetchInterval: false,
+    refetchOnWindowFocus: false,
   });
 }

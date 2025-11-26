@@ -28,8 +28,9 @@ export function UserManagementSection() {
       // جلب المستخدمين من user_roles
       const { data: usersData, error: usersError } = await supabase
         .from("user_roles")
-        .select("user_id, role")
-        .order("created_at", { ascending: false });
+        .select("user_id, role, created_at")
+        .order("created_at", { ascending: false })
+        .limit(100);
 
       if (usersError) throw usersError;
 
@@ -37,26 +38,31 @@ export function UserManagementSection() {
       const uniqueUsers = new Set(usersData?.map(u => u.user_id) || []);
       const adminUsers = usersData?.filter(u => u.role === 'admin') || [];
 
-      // جلب آخر المستخدمين المسجلين
-      const { data: authUsers } = await supabase.auth.admin.listUsers();
+      // جلب آخر 5 مستخدمين من profiles بدلاً من auth.admin
+      const { data: profilesData, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, email, created_at, last_login_at")
+        .order("created_at", { ascending: false })
+        .limit(5);
 
-      const recentUsers = (authUsers?.users || [])
-        .slice(0, 5)
-        .map(user => ({
-          id: user.id,
-          email: user.email || '',
-          created_at: user.created_at,
-          last_login_at: user.last_sign_in_at,
-        }));
+      if (profilesError) throw profilesError;
+
+      const recentUsers = (profilesData || []).map(user => ({
+        id: user.id,
+        email: user.email || '',
+        created_at: user.created_at,
+        last_login_at: user.last_login_at,
+      }));
 
       return {
         totalUsers: uniqueUsers.size,
-        activeUsers: recentUsers.length,
+        activeUsers: recentUsers.filter(u => u.last_login_at).length,
         adminCount: new Set(adminUsers.map(u => u.user_id)).size,
         recentUsers,
       };
     },
-    refetchInterval: 60000,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchInterval: false,
   });
 
   if (isLoading) {

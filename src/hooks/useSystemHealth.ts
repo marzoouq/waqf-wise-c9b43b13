@@ -66,7 +66,7 @@ export function useSystemHealth() {
         },
       };
     },
-    refetchInterval: 30000, // كل 30 ثانية
-    staleTime: 15000,
+    refetchInterval: false, // Disabled
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 }
