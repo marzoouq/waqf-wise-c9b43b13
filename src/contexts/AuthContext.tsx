@@ -173,7 +173,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     try {
       // تنظيف localStorage (الاحتفاظ فقط بإعدادات الثيم)
-      const keysToKeep = ['theme', 'vite-ui-theme'];
+      const keysToKeep = [
+        'theme',
+        'vite-ui-theme',
+        'paymentDaysThreshold',
+        'itemsPerPage',
+        'language',
+        'notificationsEnabled',
+      ];
       const keysToRemove: string[] = [];
       
       for (let i = 0; i < localStorage.length; i++) {
