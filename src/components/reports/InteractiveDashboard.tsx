@@ -1,14 +1,13 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { TrendingUp, Users, Building2, DollarSign, Calendar } from 'lucide-react';
+import { Users, Building2, DollarSign, Calendar } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { useDashboardKPIs } from '@/hooks/useDashboardKPIs';
-
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
+import { UnifiedChart, ChartDataPoint } from '@/components/unified/UnifiedChart';
+import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
+import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
 
 export function InteractiveDashboard() {
   const [timeRange, setTimeRange] = useState('month');
@@ -64,7 +63,7 @@ export function InteractiveDashboard() {
         return acc;
       }, {} as Record<string, { month: string; total: number; count: number }>);
 
-      return Object.values(monthlyData);
+      return Object.values(monthlyData) as ChartDataPoint[];
     },
   });
 
@@ -86,7 +85,7 @@ export function InteractiveDashboard() {
       return Object.entries(statusCount).map(([name, value]) => ({
         name,
         value,
-      }));
+      })) as ChartDataPoint[];
     },
   });
 
@@ -129,153 +128,70 @@ export function InteractiveDashboard() {
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">إجمالي المستفيدين</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{kpis?.beneficiaries.toLocaleString('ar-SA')}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">العقارات</CardTitle>
-            <Building2 className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{kpis?.properties.toLocaleString('ar-SA')}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">إجمالي المدفوعات</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{kpis?.totalPayments.toLocaleString('ar-SA')} ريال</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">العقود النشطة</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{kpis?.activeContracts.toLocaleString('ar-SA')}</div>
-          </CardContent>
-        </Card>
-      </div>
+      <UnifiedStatsGrid columns={4}>
+        <UnifiedKPICard
+          title="إجمالي المستفيدين"
+          value={kpis?.beneficiaries.toLocaleString('ar-SA') || '0'}
+          icon={Users}
+          variant="default"
+        />
+        <UnifiedKPICard
+          title="العقارات"
+          value={kpis?.properties.toLocaleString('ar-SA') || '0'}
+          icon={Building2}
+          variant="success"
+        />
+        <UnifiedKPICard
+          title="إجمالي المدفوعات"
+          value={`${kpis?.totalPayments.toLocaleString('ar-SA') || '0'} ريال`}
+          icon={DollarSign}
+          variant="warning"
+        />
+        <UnifiedKPICard
+          title="العقود النشطة"
+          value={kpis?.activeContracts.toLocaleString('ar-SA') || '0'}
+          icon={Calendar}
+          variant="default"
+        />
+      </UnifiedStatsGrid>
 
       {/* الرسوم البيانية */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* المدفوعات */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
-              المدفوعات حسب الفترة
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              {chartType === 'bar' ? (
-                <BarChart data={paymentsStats}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="total" fill="#8884d8" name="المجموع" />
-                </BarChart>
-              ) : chartType === 'line' ? (
-                <LineChart data={paymentsStats}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line type="monotone" dataKey="total" stroke="#8884d8" name="المجموع" />
-                </LineChart>
-              ) : (
-                <PieChart>
-                  <Pie
-                    data={paymentsStats}
-                    dataKey="total"
-                    nameKey="month"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={100}
-                    label
-                  >
-                    {paymentsStats?.map((_, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              )}
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+        <UnifiedChart
+          title="المدفوعات حسب الفترة"
+          description="تحليل المدفوعات خلال الفترة المحددة"
+          type={chartType === 'pie' ? 'pie' : chartType}
+          data={paymentsStats || []}
+          series={chartType !== 'pie' ? [
+            { dataKey: "total", name: "المجموع", color: "hsl(var(--chart-1))" }
+          ] : undefined}
+          xAxisKey={chartType !== 'pie' ? "month" : undefined}
+          height={300}
+        />
 
         {/* المستفيدون حسب الفئة */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              المستفيدون حسب الفئة
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={beneficiariesStats}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={100}
-                  label
-                >
-                  {beneficiariesStats?.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* العقارات حسب الحالة */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Building2 className="h-5 w-5" />
-              العقارات حسب الحالة
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={propertiesStats}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="value" fill="#00C49F" name="العدد" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+        <UnifiedChart
+          title="المستفيدون حسب الفئة"
+          description="توزيع المستفيدين على الفئات المختلفة"
+          type="pie"
+          data={beneficiariesStats || []}
+          height={300}
+        />
       </div>
+
+      {/* العقارات حسب الحالة */}
+      <UnifiedChart
+        title="العقارات حسب الحالة"
+        description="توزيع العقارات حسب حالتها"
+        type="bar"
+        data={propertiesStats || []}
+        series={[
+          { dataKey: "value", name: "العدد", color: "hsl(var(--chart-2))" }
+        ]}
+        xAxisKey="name"
+        height={300}
+      />
     </div>
   );
 }
