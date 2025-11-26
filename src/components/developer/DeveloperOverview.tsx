@@ -3,6 +3,7 @@ import { CheckCircle, AlertTriangle, XCircle, Activity } from "lucide-react";
 import { usePerformanceMetrics } from "@/hooks/developer/usePerformanceMetrics";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { ImageOptimizationPanel } from "./ImageOptimizationPanel";
 
 export function DeveloperOverview() {
   const { systemHealth, vitals } = usePerformanceMetrics();
@@ -98,33 +99,38 @@ export function DeveloperOverview() {
       </div>
 
       {/* Detailed Status */}
-      <Card>
-        <CardHeader>
-          <CardTitle>تفاصيل الصحة</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">قاعدة البيانات</span>
-              <Badge variant={systemHealth.database ? "default" : "destructive"}>
-                {systemHealth.database ? "متصلة" : "غير متصلة"}
-              </Badge>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>تفاصيل الصحة</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">قاعدة البيانات</span>
+                <Badge variant={systemHealth.database ? "default" : "destructive"}>
+                  {systemHealth.database ? "متصلة" : "غير متصلة"}
+                </Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">التخزين المحلي</span>
+                <Badge variant={systemHealth.storage ? "default" : "destructive"}>
+                  {systemHealth.storage ? "سليم" : "فشل"}
+                </Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">الشبكة</span>
+                <Badge variant={systemHealth.network ? "default" : "destructive"}>
+                  {systemHealth.network ? "متصل" : "غير متصل"}
+                </Badge>
+              </div>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">التخزين المحلي</span>
-              <Badge variant={systemHealth.storage ? "default" : "destructive"}>
-                {systemHealth.storage ? "سليم" : "فشل"}
-              </Badge>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">الشبكة</span>
-              <Badge variant={systemHealth.network ? "default" : "destructive"}>
-                {systemHealth.network ? "متصل" : "غير متصل"}
-              </Badge>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+
+        {/* لوحة تحسين الصور */}
+        <ImageOptimizationPanel />
+      </div>
     </div>
   );
 }

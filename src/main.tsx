@@ -9,6 +9,13 @@ import { checkAndForceUpdate } from "./lib/versionManager";
 initDebugTools();
 initWebVitals();
 
+// تحسين LCP وتحسين الصور
+if (typeof window !== 'undefined') {
+  import('./lib/imageOptimization').then(({ optimizeLCP }) => {
+    optimizeLCP();
+  });
+}
+
 const rootElement = document.getElementById("root")!;
 
 // تنظيف كامل لـ root قبل render
