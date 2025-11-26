@@ -82,11 +82,11 @@ const RolesManagement = () => {
       const { data, error } = await supabase.from("users_with_roles").select("*");
       if (error) throw error;
       return (data || []).map(u => ({
-        id: u.user_id,
-        user_id: u.user_id,
-        full_name: u.full_name,
-        email: u.email,
-        avatar_url: u.avatar_url,
+        id: u.id,
+        user_id: u.id,
+        full_name: u.full_name || '',
+        email: u.email || '',
+        avatar_url: '',
         roles: Array.isArray(u.roles) ? u.roles : [],
         roles_array: Array.isArray(u.roles) ? u.roles : [],
         roles_count: Array.isArray(u.roles) ? u.roles.length : 0,
