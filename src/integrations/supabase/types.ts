@@ -4945,11 +4945,14 @@ export type Database = {
           description: string
           entry_date: string
           entry_number: string
+          entry_type: Database["public"]["Enums"]["entry_type"] | null
           fiscal_year_id: string
           id: string
+          posted: boolean | null
           posted_at: string | null
           reference_id: string | null
           reference_type: string | null
+          rejection_reason: string | null
           status: Database["public"]["Enums"]["entry_status"]
           updated_at: string
         }
@@ -4959,11 +4962,14 @@ export type Database = {
           description: string
           entry_date: string
           entry_number: string
+          entry_type?: Database["public"]["Enums"]["entry_type"] | null
           fiscal_year_id: string
           id?: string
+          posted?: boolean | null
           posted_at?: string | null
           reference_id?: string | null
           reference_type?: string | null
+          rejection_reason?: string | null
           status?: Database["public"]["Enums"]["entry_status"]
           updated_at?: string
         }
@@ -4973,11 +4979,14 @@ export type Database = {
           description?: string
           entry_date?: string
           entry_number?: string
+          entry_type?: Database["public"]["Enums"]["entry_type"] | null
           fiscal_year_id?: string
           id?: string
+          posted?: boolean | null
           posted_at?: string | null
           reference_id?: string | null
           reference_type?: string | null
+          rejection_reason?: string | null
           status?: Database["public"]["Enums"]["entry_status"]
           updated_at?: string
         }
@@ -9439,6 +9448,23 @@ export type Database = {
         }
         Relationships: []
       }
+      general_ledger: {
+        Row: {
+          account_code: string | null
+          account_name: string | null
+          account_type: Database["public"]["Enums"]["account_type"] | null
+          credit_amount: number | null
+          debit_amount: number | null
+          entry_date: string | null
+          entry_description: string | null
+          entry_number: string | null
+          line_description: string | null
+          posted: boolean | null
+          running_balance: number | null
+          status: Database["public"]["Enums"]["entry_status"] | null
+        }
+        Relationships: []
+      }
       messages_with_users: {
         Row: {
           body: string | null
@@ -9649,6 +9675,18 @@ export type Database = {
           id: string | null
           timestamp: string | null
           user_name: string | null
+        }
+        Relationships: []
+      }
+      trial_balance: {
+        Row: {
+          account_nature: Database["public"]["Enums"]["account_nature"] | null
+          account_type: Database["public"]["Enums"]["account_type"] | null
+          balance: number | null
+          code: string | null
+          name_ar: string | null
+          total_credit: number | null
+          total_debit: number | null
         }
         Relationships: []
       }
@@ -10148,6 +10186,7 @@ export type Database = {
         | "archivist"
         | "beneficiary"
       entry_status: "draft" | "posted" | "cancelled"
+      entry_type: "manual" | "auto" | "adjustment" | "opening" | "closing"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -10287,6 +10326,7 @@ export const Constants = {
         "beneficiary",
       ],
       entry_status: ["draft", "posted", "cancelled"],
+      entry_type: ["manual", "auto", "adjustment", "opening", "closing"],
     },
   },
 } as const
