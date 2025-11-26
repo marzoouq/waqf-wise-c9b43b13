@@ -48,26 +48,66 @@ export function MessageCenter() {
   const { data: availableUsers = [] } = useQuery({
     queryKey: ["available-users"],
     queryFn: async () => {
+      // جلب جميع المستخدمين بجميع أدوارهم
       const { data, error } = await supabase
         .from("user_roles")
         .select("user_id, role")
-        .in("role", ["admin", "nazer", "accountant", "cashier"])
-        .limit(50);
+        .limit(200);
         
       if (error) throw error;
       
-      // Get user names from profiles or auth.users
-      const userIds = data.map(u => u.user_id);
-      const { data: profiles } = await supabase
+      if (!data || data.length === 0) return [];
+      
+      // جلب أسماء المستفيدين
+      const userIds = [...new Set(data.map(u => u.user_id))];
+      const { data: beneficiaries } = await supabase
         .from("beneficiaries")
-        .select("user_id, full_name")
+        .select("user_id, full_name, beneficiary_number")
         .in("user_id", userIds);
         
-      return data.map(u => ({
-        id: u.user_id,
-        name: profiles?.find(p => p.user_id === u.user_id)?.full_name || u.role || "مستخدم",
-        role: u.role,
-      }));
+      // تجميع المستخدمين حسب user_id وأدوارهم
+      const userMap = new Map<string, { id: string; name: string; roles: string[] }>();
+      
+      data.forEach(u => {
+        const beneficiary = beneficiaries?.find(b => b.user_id === u.user_id);
+        const existingUser = userMap.get(u.user_id);
+        
+        if (existingUser) {
+          existingUser.roles.push(u.role);
+        } else {
+          userMap.set(u.user_id, {
+            id: u.user_id,
+            name: beneficiary?.full_name || 
+                  (u.role === 'nazer' ? 'الناظر' : 
+                   u.role === 'admin' ? 'المشرف' :
+                   u.role === 'accountant' ? 'المحاسب' :
+                   u.role === 'cashier' ? 'أمين الصندوق' :
+                   u.role === 'archivist' ? 'الأرشيفي' :
+                   beneficiary?.beneficiary_number || 'مستخدم'),
+            roles: [u.role]
+          });
+        }
+      });
+      
+      return Array.from(userMap.values())
+        .map(u => ({
+          ...u,
+          displayName: `${u.name} (${u.roles.join(', ')})`,
+          role: u.roles[0] // للعرض فقط
+        }))
+        .sort((a, b) => {
+          // ترتيب حسب الأدوار: nazer, admin, ثم المستفيدين
+          const roleOrder: Record<string, number> = {
+            nazer: 1,
+            admin: 2,
+            accountant: 3,
+            cashier: 4,
+            archivist: 5,
+            beneficiary: 6,
+            user: 7
+          };
+          return (roleOrder[a.role] || 999) - (roleOrder[b.role] || 999);
+        });
     },
   });
 
@@ -153,11 +193,17 @@ export function MessageCenter() {
                       <SelectValue placeholder="اختر المستقبل" />
                     </SelectTrigger>
                     <SelectContent>
-                      {availableUsers.map((u) => (
-                        <SelectItem key={u.id} value={u.id}>
-                          {u.name} ({u.role})
-                        </SelectItem>
-                      ))}
+                      {availableUsers.length === 0 ? (
+                        <div className="p-4 text-sm text-muted-foreground text-center">
+                          لا يوجد مستخدمون متاحون
+                        </div>
+                      ) : (
+                        availableUsers.map((u) => (
+                          <SelectItem key={u.id} value={u.id}>
+                            {u.displayName}
+                          </SelectItem>
+                        ))
+                      )}
                     </SelectContent>
                   </Select>
                 </div>
