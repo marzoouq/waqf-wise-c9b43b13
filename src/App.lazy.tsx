@@ -42,7 +42,8 @@ export const DecisionDetails = lazy(() => import('./pages/DecisionDetails'));
 // PropertyUnits page removed - integrated into Properties page
 
 // Auth
-export const Auth = lazy(() => import('./pages/Auth'));
+export const Login = lazy(() => import('./pages/Login'));
+export const Signup = lazy(() => import('./pages/Signup'));
 
 // Special
 export const NotFound = lazy(() => import('./pages/NotFound'));

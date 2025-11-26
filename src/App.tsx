@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import { ThemeProvider } from "next-themes";
 import { SettingsProvider } from "./contexts/SettingsContext";
+import { AuthProvider } from "./contexts/AuthContext";
 import MainLayout from "./components/layout/MainLayout";
 import { GlobalErrorBoundary } from "./components/shared/GlobalErrorBoundary";
 import { LoadingState } from "./components/shared/LoadingState";
@@ -28,7 +29,8 @@ const ReactQueryDevtools =
     : null;
 
 // Lazy load pages for better performance
-const Auth = lazy(() => import("./pages/Auth"));
+const Login = lazy(() => import("./pages/Login"));
+const Signup = lazy(() => import("./pages/Signup"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const BeneficiaryDashboard = lazy(() => import("./pages/BeneficiaryDashboard"));
 const BeneficiarySupport = lazy(() => import("./pages/BeneficiarySupport"));
@@ -125,10 +127,11 @@ const App = () => {
     <GlobalErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-          <SettingsProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Sonner />
+          <AuthProvider>
+            <SettingsProvider>
+              <TooltipProvider>
+                <Toaster />
+                <Sonner />
               <BrowserRouter
                 future={{
                   v7_startTransition: true,
@@ -138,7 +141,8 @@ const App = () => {
             <Suspense fallback={<LoadingState size="lg" fullScreen />}>
               <Routes>
                 {/* Public routes */}
-                <Route path="/auth" element={<Auth />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
                 <Route path="/install" element={<Install />} />
                 
                 {/* Beneficiary Dashboard - مستقل خارج MainLayout */}
@@ -513,7 +517,8 @@ const App = () => {
         </Suspense>
       )}
       </SettingsProvider>
-    </ThemeProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </QueryClientProvider>
     </GlobalErrorBoundary>
   );
