@@ -14,12 +14,12 @@ import { supabase } from "@/integrations/supabase/client";
  */
 export function IdleTimeoutManager() {
   const { user, signOut } = useAuth();
-  const { isBeneficiary, isLoading: roleLoading } = useUserRole();
+  const { isNazer, isAdmin, isLoading: roleLoading } = useUserRole();
   const navigate = useNavigate();
 
   // الخروج التلقائي وتنظيف الحالة
   const handleIdleLogout = async () => {
-    console.log('🔴 خروج تلقائي للمستفيد بسبب عدم النشاط');
+    console.log('🔴 خروج تلقائي بسبب عدم النشاط');
 
     // عرض إشعار
     toast.warning("تم تسجيل خروجك تلقائياً", {
@@ -59,32 +59,32 @@ export function IdleTimeoutManager() {
   const { resetTimer } = useIdleTimeout({
     onIdle: handleIdleLogout,
     idleTime: 60 * 1000, // دقيقة واحدة
-    enabled: !roleLoading && !!user && isBeneficiary, // فقط للمستفيدين
+    enabled: !roleLoading && !!user && !isNazer && !isAdmin, // لجميع المستخدمين عدا الناظر والمشرف
   });
 
   // تنظيف إضافي عند فك التحميل (unmount)
   useEffect(() => {
     return () => {
-      if (isBeneficiary && user) {
+      if (user && !isNazer && !isAdmin) {
         console.log('🧹 تنظيف مكون IdleTimeoutManager');
       }
     };
-  }, [isBeneficiary, user]);
+  }, [isNazer, isAdmin, user]);
 
   // رسالة تأكيد عند تفعيل النظام
   useEffect(() => {
-    if (!roleLoading && user && isBeneficiary) {
+    if (!roleLoading && user && !isNazer && !isAdmin) {
       console.log(`
 ╔══════════════════════════════════════════════╗
 ║  ⏰ نظام الخروج التلقائي مفعّل              ║
 ╚══════════════════════════════════════════════╝
 
-👤 المستخدم: مستفيد
+👤 نوع المستخدم: عام (باستثناء الناظر والمشرف)
 ⏱️  المهلة: 60 ثانية من عدم النشاط
 🔄 التنظيف: تلقائي عند الخروج
       `);
     }
-  }, [roleLoading, user, isBeneficiary]);
+  }, [roleLoading, user, isNazer, isAdmin]);
 
   // المكون لا يعرض أي UI
   return null;
