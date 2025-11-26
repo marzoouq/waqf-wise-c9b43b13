@@ -82,16 +82,16 @@ export async function createAutoJournalEntry(params: {
  * Type-safe wrapper لاستدعاء check_rate_limit
  */
 export async function checkRateLimit(params: {
-  userId: string;
-  actionType: string;
-  limit: number;
-  windowMinutes: number;
+  email: string;
+  ipAddress: string;
+  maxAttempts?: number;
+  timeWindowMinutes?: number;
 }): Promise<SupabaseResult<boolean>> {
   return safeRPC<boolean>('check_rate_limit', {
-    p_user_id: params.userId,
-    p_action_type: params.actionType,
-    p_limit: params.limit,
-    p_window_minutes: params.windowMinutes
+    p_email: params.email,
+    p_ip_address: params.ipAddress,
+    p_max_attempts: params.maxAttempts || 5,
+    p_time_window_minutes: params.timeWindowMinutes || 15
   });
 }
 
@@ -132,15 +132,15 @@ export async function calculatePreciseLoanSchedule(params: {
  * Type-safe wrapper لاستدعاء log_login_attempt
  */
 export async function logLoginAttempt(params: {
-  userId: string;
+  email: string;
+  ipAddress: string;
   success: boolean;
-  ipAddress?: string;
   userAgent?: string;
 }): Promise<SupabaseResult<void>> {
   return safeRPC<void>('log_login_attempt', {
-    p_user_id: params.userId,
-    p_success: params.success,
+    p_email: params.email,
     p_ip_address: params.ipAddress,
+    p_success: params.success,
     p_user_agent: params.userAgent
   });
 }

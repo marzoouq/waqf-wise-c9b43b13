@@ -18,18 +18,20 @@ export function useRateLimit() {
    * التحقق من إمكانية تسجيل الدخول
    */
   const checkLoginRateLimit = async (
-    userId: string,
+    email: string,
     maxAttempts: number = 5,
     timeWindowMinutes: number = 15
   ): Promise<RateLimitResult> => {
     setIsChecking(true);
     
     try {
+      const ipAddress = await getClientIP();
+      
       const result = await checkRateLimit({
-        userId,
-        actionType: 'login',
-        limit: maxAttempts,
-        windowMinutes: timeWindowMinutes,
+        email,
+        ipAddress,
+        maxAttempts,
+        timeWindowMinutes,
       });
 
       if (result.error) {
@@ -53,14 +55,14 @@ export function useRateLimit() {
   /**
    * تسجيل محاولة تسجيل دخول
    */
-  const logLoginAttempt = async (userId: string, success: boolean): Promise<void> => {
+  const logLoginAttempt = async (email: string, success: boolean): Promise<void> => {
     try {
       const ipAddress = await getClientIP();
       
       await logLoginAttemptWrapper({
-        userId,
-        success,
+        email,
         ipAddress,
+        success,
         userAgent: navigator.userAgent,
       });
     } catch (error) {
