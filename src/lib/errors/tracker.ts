@@ -19,6 +19,8 @@ const IGNORE_ERROR_PATTERNS = [
   /Edge Function returned a non-2xx status code/i,
   /429/i,
   /rate limit/i,
+  /\[object Object\]/i,
+  /The provided callback is no longer runnable/i,
 ];
 
 class ErrorTracker {
@@ -363,6 +365,25 @@ class ErrorTracker {
   // ❌ حذف setupHealthCheck() و performHealthCheck() - يتم في selfHealing.ts فقط
 
   async trackError(report: ErrorReport) {
+    // تنظيف رسالة الخطأ أولاً
+    let cleanMessage = report.error_message;
+    
+    // إذا كانت رسالة الخطأ كائن، حولها إلى نص
+    if (typeof cleanMessage === 'object' && cleanMessage !== null) {
+      try {
+        cleanMessage = JSON.stringify(cleanMessage);
+      } catch {
+        cleanMessage = String(cleanMessage);
+      }
+    }
+    
+    // تجاهل رسائل "[object Object]"
+    if (cleanMessage === '[object Object]') {
+      return;
+    }
+    
+    report.error_message = cleanMessage;
+    
     // ✅ فحص الخطأ مع additional_data
     if (this.shouldIgnoreError(report.error_message, report.additional_data)) {
       return;
@@ -451,9 +472,20 @@ class ErrorTracker {
       const report = this.errorQueue.shift()!;
       
       // تنظيف البيانات قبل الإرسال
+      let cleanMessage = report.error_message || 'No error message';
+      
+      // تأكد من أن الرسالة نص وليست كائن
+      if (typeof cleanMessage === 'object' && cleanMessage !== null) {
+        try {
+          cleanMessage = JSON.stringify(cleanMessage);
+        } catch {
+          cleanMessage = String(cleanMessage);
+        }
+      }
+      
       const cleanReport: ErrorReport = {
         error_type: report.error_type || 'unknown_error',
-        error_message: report.error_message || 'No error message',
+        error_message: cleanMessage,
         severity: report.severity,
         url: this.cleanUrl(report.url || window.location.href),
         user_agent: report.user_agent || navigator.userAgent,

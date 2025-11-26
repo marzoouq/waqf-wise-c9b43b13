@@ -36,18 +36,32 @@ export function getErrorMessage(error: unknown): string {
   }
 
   if (typeof error === 'object' && error !== null) {
-    const err = error as { code?: string; message?: string; details?: string };
+    const err = error as { code?: string; message?: string; details?: string; error?: unknown };
     
     if ('code' in err && err.code) {
       return ERROR_MESSAGES[err.code] || err.message || 'حدث خطأ في قاعدة البيانات';
     }
     
-    if ('message' in err) {
+    if ('message' in err && err.message) {
       return String(err.message);
     }
     
-    if ('error' in err) {
-      return String((err as { error: unknown }).error);
+    if ('error' in err && err.error) {
+      // إذا كان الخطأ كائن آخر، استدعي الدالة بشكل تكراري
+      if (typeof err.error === 'object') {
+        return getErrorMessage(err.error);
+      }
+      return String(err.error);
+    }
+    
+    // محاولة أخيرة: تحويل الكائن إلى JSON
+    try {
+      const jsonStr = JSON.stringify(error);
+      if (jsonStr && jsonStr !== '{}' && jsonStr !== '[object Object]') {
+        return jsonStr;
+      }
+    } catch {
+      // تجاهل أخطاء JSON.stringify
     }
   }
 
