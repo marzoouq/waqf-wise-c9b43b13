@@ -64,17 +64,17 @@ export function ProfileTimeline({ beneficiaryId }: ProfileTimelineProps) {
       // جلب الطلبات
       const { data: requests } = await supabase
         .from('beneficiary_requests')
-        .select('*, request_types(name)')
+        .select('*, request_types(name_ar)')
         .eq('beneficiary_id', beneficiaryId)
         .order('created_at', { ascending: false })
         .limit(10);
 
       if (requests) {
-        (requests as BeneficiaryRequest[]).forEach((request) => {
+        (requests as any[]).forEach((request) => {
           timelineEvents.push({
             id: request.id,
             type: 'request',
-            title: request.request_types?.name || 'طلب جديد',
+            title: request.request_types?.name_ar || 'طلب جديد',
             description: request.description,
             date: request.created_at,
             status: request.status

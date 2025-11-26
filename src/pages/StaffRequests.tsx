@@ -326,7 +326,7 @@ export default function StaffRequests() {
                           variant="ghost"
                           size="icon"
                           onClick={() => {
-                            setSelectedRequest(request);
+                            setSelectedRequest(request as any);
                             setApprovalDialogOpen(true);
                           }}
                         >
@@ -336,7 +336,7 @@ export default function StaffRequests() {
                           variant="ghost"
                           size="icon"
                           onClick={() => {
-                            setSelectedRequest(request);
+                            setSelectedRequest(request as any);
                             setCommentsDialogOpen(true);
                           }}
                         >
