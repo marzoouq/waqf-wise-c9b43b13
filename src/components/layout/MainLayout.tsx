@@ -6,10 +6,13 @@ import { Menu, LogOut, Search } from "lucide-react";
 import { NotificationsBell } from "./NotificationsBell";
 import { FloatingChatButton } from "@/components/chatbot/FloatingChatButton";
 import { GlobalSearch } from "@/components/shared/GlobalSearch";
+import { BottomNavigation } from "@/components/mobile/BottomNavigation";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { RoleSwitcher } from "./RoleSwitcher";
+import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,6 +31,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   const { user, signOut } = useAuth();
   const { profile } = useProfile();
   const [searchOpen, setSearchOpen] = useState(false);
+  const isMobile = useIsMobile();
   
   const displayName = profile?.full_name || user?.user_metadata?.full_name || 'مستخدم';
   const displayEmail = profile?.email || user?.email || '';
@@ -36,7 +40,10 @@ const MainLayout = ({ children }: MainLayoutProps) => {
     <div dir="rtl">
       <SidebarProvider>
         <div className="min-h-screen flex w-full bg-background">
-          <AppSidebar />
+          {/* Hide sidebar on mobile, show bottom navigation instead */}
+          <div className="hidden md:block">
+            <AppSidebar />
+          </div>
           <SidebarInset>
             {/* Mobile Header */}
             <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 lg:hidden">
@@ -135,8 +142,11 @@ const MainLayout = ({ children }: MainLayoutProps) => {
               </div>
             </div>
 
-            {/* Page Content */}
-            <div className="flex-1 overflow-auto">
+            {/* Page Content with padding for mobile bottom navigation */}
+            <div className={cn(
+              "flex-1 overflow-auto",
+              isMobile && "pb-20" // Add padding for bottom navigation on mobile
+            )}>
               {children}
             </div>
           </SidebarInset>
@@ -144,6 +154,9 @@ const MainLayout = ({ children }: MainLayoutProps) => {
           {/* Floating Chat Button - يظهر في جميع الصفحات */}
           <FloatingChatButton />
         </div>
+        
+        {/* Mobile Bottom Navigation */}
+        <BottomNavigation />
         
         {/* Global Search */}
         <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
