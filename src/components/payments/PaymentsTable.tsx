@@ -1,16 +1,9 @@
 import { Receipt, CreditCard, Edit, Trash2, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import { UnifiedDataTable, type Column } from "@/components/unified/UnifiedDataTable";
 
 interface Payment {
   id: string;
@@ -62,100 +55,133 @@ export function PaymentsTable({
     return labels[method] || method;
   };
 
-  if (isLoading) {
-    return (
-      <div className="text-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-        <p className="text-muted-foreground mt-4">جاري التحميل...</p>
-      </div>
-    );
-  }
-
-  if (payments.length === 0) {
-    return (
-      <div className="text-center py-12">
-        <Receipt className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-        <p className="text-muted-foreground">لا توجد سندات</p>
-      </div>
-    );
-  }
+  const columns: Column<Payment>[] = [
+    {
+      key: "payment_type",
+      label: "النوع",
+      render: (value: string, row: Payment) => (
+        <Badge variant={value === "receipt" ? "default" : "secondary"}>
+          <div className="flex items-center gap-1">
+            {getPaymentTypeIcon(value)}
+            <span className="text-xs">{getPaymentTypeLabel(value)}</span>
+          </div>
+        </Badge>
+      )
+    },
+    {
+      key: "payment_number",
+      label: "رقم السند",
+      render: (value: string) => (
+        <span className="font-mono text-xs sm:text-sm">{value}</span>
+      )
+    },
+    {
+      key: "payment_date",
+      label: "التاريخ",
+      render: (value: string) => (
+        <span className="text-xs sm:text-sm whitespace-nowrap">
+          {format(new Date(value), "dd MMM yyyy", { locale: ar })}
+        </span>
+      )
+    },
+    {
+      key: "payer_name",
+      label: "الاسم",
+      render: (value: string) => (
+        <span className="text-xs sm:text-sm">{value}</span>
+      )
+    },
+    {
+      key: "contract_number",
+      label: "رقم العقد",
+      hideOnTablet: true,
+      render: (value?: string) => value ? (
+        <Badge variant="outline" className="text-xs">
+          {value}
+        </Badge>
+      ) : (
+        <span className="text-muted-foreground">-</span>
+      )
+    },
+    {
+      key: "property_name",
+      label: "العقار",
+      hideOnTablet: true,
+      render: (value?: string) => (
+        <span className="text-xs sm:text-sm max-w-[150px] truncate">
+          {value || <span className="text-muted-foreground">-</span>}
+        </span>
+      )
+    },
+    {
+      key: "amount",
+      label: "المبلغ",
+      render: (value: number) => (
+        <span className="font-bold text-xs sm:text-sm whitespace-nowrap">
+          {Number(value).toLocaleString()} ر.س
+        </span>
+      )
+    },
+    {
+      key: "payment_method",
+      label: "الطريقة",
+      hideOnTablet: true,
+      render: (value: string) => (
+        <span className="text-xs sm:text-sm">
+          {getPaymentMethodLabel(value)}
+        </span>
+      )
+    },
+    {
+      key: "description",
+      label: "الوصف",
+      hideOnTablet: true,
+      render: (value: string) => (
+        <span className="text-xs sm:text-sm max-w-[200px] truncate">
+          {value}
+        </span>
+      )
+    }
+  ];
 
   return (
-    <div className="overflow-x-auto">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="text-right">النوع</TableHead>
-            <TableHead className="text-right">رقم السند</TableHead>
-            <TableHead className="text-right">التاريخ</TableHead>
-            <TableHead className="text-right">الاسم</TableHead>
-            <TableHead className="hidden lg:table-cell text-right">رقم العقد</TableHead>
-            <TableHead className="hidden xl:table-cell text-right">العقار</TableHead>
-            <TableHead className="text-right">المبلغ</TableHead>
-            <TableHead className="hidden lg:table-cell text-right">الطريقة</TableHead>
-            <TableHead className="hidden lg:table-cell text-right">الوصف</TableHead>
-            <TableHead className="text-left">الإجراءات</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {payments.map((payment) => (
-            <TableRow key={payment.id}>
-              <TableCell>
-                <Badge variant={payment.payment_type === "receipt" ? "default" : "secondary"}>
-                  <div className="flex items-center gap-1">
-                    {getPaymentTypeIcon(payment.payment_type)}
-                    <span className="text-xs">{getPaymentTypeLabel(payment.payment_type)}</span>
-                  </div>
-                </Badge>
-              </TableCell>
-              <TableCell className="font-mono text-xs sm:text-sm">{payment.payment_number}</TableCell>
-              <TableCell className="text-xs sm:text-sm whitespace-nowrap">
-                {format(new Date(payment.payment_date), "dd MMM yyyy", { locale: ar })}
-              </TableCell>
-              <TableCell className="text-xs sm:text-sm">{payment.payer_name}</TableCell>
-              <TableCell className="hidden lg:table-cell text-xs sm:text-sm">
-                {payment.contract_number ? (
-                  <Badge variant="outline" className="text-xs">
-                    {payment.contract_number}
-                  </Badge>
-                ) : (
-                  <span className="text-muted-foreground">-</span>
-                )}
-              </TableCell>
-              <TableCell className="hidden xl:table-cell text-xs sm:text-sm max-w-[150px] truncate">
-                {payment.property_name || <span className="text-muted-foreground">-</span>}
-              </TableCell>
-              <TableCell className="font-bold text-xs sm:text-sm whitespace-nowrap">
-                {Number(payment.amount).toLocaleString()} ر.س
-              </TableCell>
-              <TableCell className="hidden lg:table-cell text-xs sm:text-sm">
-                {getPaymentMethodLabel(payment.payment_method)}
-              </TableCell>
-              <TableCell className="hidden lg:table-cell max-w-[200px] truncate text-xs sm:text-sm">
-                {payment.description}
-              </TableCell>
-              <TableCell>
-                <div className="flex gap-2 justify-end">
-                  <Button variant="ghost" size="sm" onClick={() => onPrint(payment)}>
-                    <Printer className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={() => onEdit(payment)}>
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onDelete(payment)}
-                    className="text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+    <UnifiedDataTable
+      columns={columns}
+      data={payments}
+      loading={isLoading}
+      emptyMessage="لا توجد سندات"
+      actions={(payment: Payment) => (
+        <div className="flex gap-1">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => onPrint(payment)}
+            title="طباعة"
+            className="hover:bg-primary/10"
+          >
+            <Printer className="h-3 w-3 sm:h-4 sm:w-4" />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => onEdit(payment)}
+            title="تعديل"
+            className="hover:bg-primary/10"
+          >
+            <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onDelete(payment)}
+            title="حذف"
+            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+          >
+            <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+          </Button>
+        </div>
+      )}
+      showMobileScrollHint={true}
+    />
   );
 }
