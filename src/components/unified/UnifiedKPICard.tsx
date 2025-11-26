@@ -19,19 +19,19 @@ const variantStyles = {
     bg: "bg-primary/10",
   },
   success: {
-    border: "border-l-green-500",
-    text: "text-green-600 dark:text-green-400",
-    bg: "bg-green-500/10",
+    border: "border-l-[hsl(var(--chart-2))]",
+    text: "text-[hsl(var(--chart-2))]",
+    bg: "bg-[hsl(var(--chart-2))]/10",
   },
   warning: {
-    border: "border-l-yellow-500",
-    text: "text-yellow-600 dark:text-yellow-400",
-    bg: "bg-yellow-500/10",
+    border: "border-l-[hsl(var(--chart-4))]",
+    text: "text-[hsl(var(--chart-4))]",
+    bg: "bg-[hsl(var(--chart-4))]/10",
   },
   danger: {
-    border: "border-l-red-500",
-    text: "text-red-600 dark:text-red-400",
-    bg: "bg-red-500/10",
+    border: "border-l-[hsl(var(--chart-3))]",
+    text: "text-[hsl(var(--chart-3))]",
+    bg: "bg-[hsl(var(--chart-3))]/10",
   },
 };
 

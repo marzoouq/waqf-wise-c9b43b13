@@ -18,20 +18,58 @@ export function RevenueExpenseChartUnified() {
     },
   });
 
+  // جلب بيانات القيود مع التفاصيل
+  const { data: journalEntriesWithLines } = useQuery({
+    queryKey: ['journal-entries-with-lines'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('journal_entries')
+        .select(`
+          *,
+          journal_entry_lines (
+            amount,
+            entry_type,
+            account_id,
+            accounts (
+              account_type,
+              account_nature
+            )
+          )
+        `)
+        .eq('status', 'posted')
+        .order('entry_date', { ascending: true })
+        .limit(100);
+      
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
   const chartData: ChartDataPoint[] = useMemo(() => {
-    if (!journalEntries) return [];
+    if (!journalEntriesWithLines || journalEntriesWithLines.length === 0) return [];
 
     // تجميع البيانات حسب الشهر
     const monthlyData: Record<string, { revenue: number; expense: number }> = {};
 
-    // لا يوجد total_amount في journal_entries، لذا سنستخدم بيانات افتراضية للتوضيح
-    // في التطبيق الحقيقي، يجب جلب البيانات من journal_entry_lines
-    const months = ['محرم', 'صفر', 'ربيع الأول', 'ربيع الثاني', 'جمادى الأولى', 'جمادى الآخرة'];
-    months.forEach((month, index) => {
-      monthlyData[month] = {
-        revenue: Math.floor(Math.random() * 500000) + 300000,
-        expense: Math.floor(Math.random() * 400000) + 200000,
-      };
+    journalEntriesWithLines.forEach((entry: any) => {
+      const date = new Date(entry.entry_date);
+      const monthName = date.toLocaleDateString('ar-SA', { month: 'long' });
+      
+      if (!monthlyData[monthName]) {
+        monthlyData[monthName] = { revenue: 0, expense: 0 };
+      }
+
+      // جمع المبالغ من journal_entry_lines
+      entry.journal_entry_lines?.forEach((line: any) => {
+        const amount = Math.abs(line.amount);
+        
+        // تصنيف حسب نوع الحساب
+        if (line.accounts?.account_type === 'revenue') {
+          monthlyData[monthName].revenue += amount;
+        } else if (line.accounts?.account_type === 'expense') {
+          monthlyData[monthName].expense += amount;
+        }
+      });
     });
 
     return Object.entries(monthlyData).map(([month, data]) => ({
@@ -39,7 +77,7 @@ export function RevenueExpenseChartUnified() {
       revenue: Math.round(data.revenue),
       expense: Math.round(data.expense),
     }));
-  }, [journalEntries]);
+  }, [journalEntriesWithLines]);
 
   return (
     <UnifiedChart
