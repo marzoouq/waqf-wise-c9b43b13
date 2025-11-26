@@ -183,6 +183,28 @@ export function ErrorsPanel() {
               حذف المحلولة
             </Button>
             <Button
+              variant="destructive"
+              size="sm"
+              onClick={async () => {
+                if (confirm("هل أنت متأكد من حذف جميع الأخطاء؟")) {
+                  const { error } = await supabase
+                    .from("system_error_logs")
+                    .delete()
+                    .neq("id", "00000000-0000-0000-0000-000000000000");
+                  
+                  if (!error) {
+                    toast.success("تم حذف جميع الأخطاء");
+                    queryClient.invalidateQueries({ queryKey: ["system-errors"] });
+                  } else {
+                    toast.error("فشل حذف الأخطاء");
+                  }
+                }
+              }}
+            >
+              <Trash2 className="w-4 h-4 ml-2" />
+              حذف الكل
+            </Button>
+            <Button
               variant="outline"
               size="sm"
               onClick={() => refetch()}
