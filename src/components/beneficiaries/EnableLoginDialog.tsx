@@ -144,15 +144,39 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
       });
 
       if (authError) {
-        if (authError.message.includes("already registered")) {
-          toast({
-            title: "البريد الإلكتروني مستخدم",
-            description: "هذا البريد الإلكتروني مسجل بالفعل. حاول استخدام بريد آخر.",
-            variant: "destructive",
-          });
+        let errorMessage = "حدث خطأ أثناء إنشاء الحساب";
+        let errorTitle = "خطأ في الإنشاء";
+        
+        // معالجة الأخطاء الشائعة برسائل واضحة
+        if (authError.message.includes("already registered") || authError.message.includes("User already registered")) {
+          errorTitle = "البريد الإلكتروني مستخدم";
+          errorMessage = "هذا البريد الإلكتروني مسجل بالفعل. حاول استخدام بريد آخر.";
+        } else if (authError.message.includes("Invalid email")) {
+          errorTitle = "بريد إلكتروني غير صالح";
+          errorMessage = "يرجى التأكد من صحة البريد الإلكتروني المدخل.";
+        } else if (authError.message.includes("Password")) {
+          errorTitle = "خطأ في كلمة المرور";
+          errorMessage = "كلمة المرور يجب أن تكون على الأقل 6 أحرف وتحتوي على أحرف وأرقام.";
+        } else if (authError.message.includes("Database")) {
+          errorTitle = "خطأ في قاعدة البيانات";
+          errorMessage = "حدث خطأ أثناء حفظ البيانات. يرجى المحاولة مرة أخرى.";
         } else {
-          throw authError;
+          // رسالة عامة مع تفاصيل الخطأ
+          errorMessage = `${errorMessage}: ${authError.message}`;
         }
+        
+        logger.error(authError, { 
+          context: 'auth_signup_failed', 
+          severity: 'high'
+        });
+        
+        toast({
+          title: errorTitle,
+          description: errorMessage,
+          variant: "destructive",
+        });
+        
+        setLoading(false);
         return;
       }
 
@@ -167,7 +191,21 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
         })
         .eq("id", beneficiary.id);
 
-      if (updateError) throw updateError;
+      if (updateError) {
+        logger.error(updateError, { 
+          context: 'beneficiary_update_failed', 
+          severity: 'critical'
+        });
+        
+        toast({
+          title: "خطأ في حفظ البيانات",
+          description: "تم إنشاء حساب المصادقة لكن فشل ربطه بالمستفيد. يرجى التواصل مع الدعم الفني.",
+          variant: "destructive",
+        });
+        
+        setLoading(false);
+        return;
+      }
 
       if (authData.user) {
         try {
