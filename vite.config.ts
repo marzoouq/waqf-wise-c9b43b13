@@ -169,8 +169,12 @@ export default defineConfig(({ mode }) => ({
               return 'react-context-libs';
             }
             
-            // Core React libraries (only pure react/react-dom)
-            if (id.match(/\/node_modules\/(react|react-dom|scheduler)\//)) {
+            // Core React libraries (only pure react/react-dom/scheduler)
+            // Match ONLY exact packages, not packages with react- prefix
+            if (id.match(/\/node_modules\/(react|react-dom|scheduler)(\/|$)/) && 
+                !id.includes('react-router') && 
+                !id.includes('react-hook-form') &&
+                !id.includes('react-day-picker')) {
               return 'react-core';
             }
             
