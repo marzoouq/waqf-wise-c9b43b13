@@ -66,7 +66,6 @@ const WaqfUnits = lazy(() => import("./pages/WaqfUnits"));
 const Install = lazy(() => import("./pages/Install"));
 const Notifications = lazy(() => import("./pages/Notifications"));
 const Requests = lazy(() => import("./pages/Requests"));
-const StaffRequests = lazy(() => import("./pages/StaffRequests"));
 const BeneficiaryRequests = lazy(() => import("./pages/BeneficiaryRequests"));
 const BeneficiaryAccountStatement = lazy(() => import("./pages/BeneficiaryAccountStatement"));
 const BeneficiaryReports = lazy(() => import("./pages/BeneficiaryReports"));

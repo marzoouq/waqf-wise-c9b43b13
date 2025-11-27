@@ -27,7 +27,6 @@ export const Approvals = lazy(() => import('./pages/Approvals'));
 export const Reports = lazy(() => import('./pages/Reports'));
 export const AuditLogs = lazy(() => import('./pages/AuditLogs'));
 export const Users = lazy(() => import('./pages/Users'));
-export const StaffRequests = lazy(() => import('./pages/StaffRequests'));
 export const AIInsights = lazy(() => import('./pages/AIInsights'));
 export const Settings = lazy(() => import('./pages/Settings'));
 export const Notifications = lazy(() => import('./pages/Notifications'));
