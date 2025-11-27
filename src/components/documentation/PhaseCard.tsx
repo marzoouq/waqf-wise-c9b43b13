@@ -25,8 +25,9 @@ import { Calendar, FileText, History, User } from "lucide-react";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { useState } from "react";
-import { useUpdatePhaseStatus } from "@/hooks/useProjectDocumentation";
+import { useUpdatePhaseStatus, parseTasks } from "@/hooks/useProjectDocumentation";
 import type { ProjectPhase } from "@/hooks/useProjectDocumentation";
+
 
 interface PhaseCardProps {
   phase: ProjectPhase;
@@ -84,15 +85,18 @@ export const PhaseCard = ({ phase }: PhaseCardProps) => {
       <CardContent className="space-y-4">
         <PhaseProgress percentage={phase.completion_percentage} />
 
-        {phase.tasks && phase.tasks.length > 0 && (
-          <div>
-            <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              المهام ({phase.tasks.filter((t) => t.completed).length}/{phase.tasks.length})
-            </h4>
-            <PhaseTaskList phaseId={phase.id} tasks={phase.tasks} />
-          </div>
-        )}
+        {(() => {
+          const tasks = parseTasks(phase.tasks);
+          return tasks.length > 0 && (
+            <div>
+              <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                المهام ({tasks.filter((t) => t.completed).length}/{tasks.length})
+              </h4>
+              <PhaseTaskList phaseId={phase.id} tasks={tasks} />
+            </div>
+          );
+        })()}
 
         <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
           {phase.start_date && (

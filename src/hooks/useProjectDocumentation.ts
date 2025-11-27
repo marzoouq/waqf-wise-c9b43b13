@@ -1,6 +1,21 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import type { Json } from "@/integrations/supabase/types";
+
+// أنواع المهام والتسليمات
+interface PhaseTask {
+  id: string;
+  name: string;
+  completed: boolean;
+  description?: string;
+}
+
+interface PhaseDeliverable {
+  id: string;
+  name: string;
+  delivered: boolean;
+}
 
 export interface ProjectPhase {
   id: string;
@@ -12,22 +27,38 @@ export interface ProjectPhase {
   completion_percentage: number;
   start_date: string | null;
   completion_date: string | null;
-  tasks: Array<{
-    id: string;
-    name: string;
-    completed: boolean;
-    description?: string;
-  }>;
-  deliverables: Array<{
-    id: string;
-    name: string;
-    delivered: boolean;
-  }>;
+  tasks: Json;
+  deliverables: Json;
   notes: string | null;
   assigned_to: string | null;
   created_at: string;
   updated_at: string;
   updated_by: string | null;
+}
+
+// دوال مساعدة لتحويل البيانات
+export function parseTasks(data: Json | null): PhaseTask[] {
+  if (!data || !Array.isArray(data)) return [];
+  return data as unknown as PhaseTask[];
+}
+
+export function parseDeliverables(data: Json | null): PhaseDeliverable[] {
+  if (!data || !Array.isArray(data)) return [];
+  return data as unknown as PhaseDeliverable[];
+}
+
+// نوع الإدخال لإضافة مرحلة جديدة
+export interface AddPhaseInput {
+  category: "core" | "design" | "testing" | "future";
+  phase_number: number;
+  phase_name: string;
+  description?: string;
+  status?: "completed" | "in_progress" | "planned" | "blocked";
+  completion_percentage?: number;
+  tasks?: PhaseTask[];
+  deliverables?: PhaseDeliverable[];
+  notes?: string;
+  assigned_to?: string;
 }
 
 export interface ChangelogEntry {
@@ -95,7 +126,14 @@ export const useUpdatePhaseStatus = () => {
     }) => {
       const { data: userData } = await supabase.auth.getUser();
 
-      const updateData: any = {
+      const updateData: {
+        status: string;
+        updated_by?: string;
+        notes?: string;
+        completion_percentage?: number;
+        completion_date?: string;
+        start_date?: string;
+      } = {
         status,
         updated_by: userData.user?.id,
       };
@@ -178,7 +216,7 @@ export const useUpdatePhaseTasks = () => {
       tasks,
     }: {
       phaseId: string;
-      tasks: Array<any>;
+      tasks: PhaseTask[];
     }) => {
       const { data: userData } = await supabase.auth.getUser();
 
@@ -188,7 +226,7 @@ export const useUpdatePhaseTasks = () => {
       const { data, error } = await supabase
         .from("project_documentation")
         .update({
-          tasks,
+          tasks: tasks as unknown as Json,
           completion_percentage: percentage,
           updated_by: userData.user?.id,
         })
@@ -214,20 +252,26 @@ export const useAddPhase = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (phaseData: Partial<ProjectPhase>) => {
+    mutationFn: async (phaseData: AddPhaseInput) => {
       const { data: userData } = await supabase.auth.getUser();
 
-      const insertData: any = {
-        ...phaseData,
+      const insertData = {
+        category: phaseData.category,
+        phase_number: phaseData.phase_number,
+        phase_name: phaseData.phase_name,
+        description: phaseData.description,
+        status: phaseData.status || 'planned',
+        completion_percentage: phaseData.completion_percentage || 0,
+        tasks: (phaseData.tasks || []) as unknown as Json,
+        deliverables: (phaseData.deliverables || []) as unknown as Json,
+        notes: phaseData.notes,
+        assigned_to: phaseData.assigned_to,
+        updated_by: userData.user?.id,
       };
-
-      if (userData.user?.id) {
-        insertData.updated_by = userData.user.id;
-      }
 
       const { data, error } = await supabase
         .from("project_documentation")
-        .insert(insertData)
+        .insert([insertData])
         .select()
         .single();
 

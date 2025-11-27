@@ -3,7 +3,12 @@
  * يوفر أدوات مختلفة لتحسين أداء التطبيق
  */
 
-import { useCallback, useMemo, useRef, useEffect } from 'react';
+import { useCallback, useMemo, useRef, useEffect, useState } from 'react';
+
+/**
+ * نوع عام للدوال
+ */
+type AnyFunction = (...args: unknown[]) => unknown;
 
 /**
  * Hook لتتبع أداء العرض
@@ -34,10 +39,11 @@ export function useRenderPerformance(componentName: string) {
 /**
  * Hook لتحسين callback functions
  */
-export function useOptimizedCallback<T extends (...args: any[]) => any>(
+export function useOptimizedCallback<T extends AnyFunction>(
   callback: T,
   deps: React.DependencyList
 ): T {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   return useCallback(callback, deps);
 }
 
@@ -48,20 +54,21 @@ export function useOptimizedMemo<T>(
   factory: () => T,
   deps: React.DependencyList
 ): T {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   return useMemo(factory, deps);
 }
 
 /**
  * Hook للتحكم في معدل استدعاء الدوال (Throttle)
  */
-export function useThrottle<T extends (...args: any[]) => any>(
+export function useThrottle<T extends AnyFunction>(
   callback: T,
   delay: number
 ): T {
   const lastRun = useRef(Date.now());
 
   return useCallback(
-    ((...args) => {
+    ((...args: unknown[]) => {
       const now = Date.now();
       if (now - lastRun.current >= delay) {
         lastRun.current = now;
@@ -75,14 +82,14 @@ export function useThrottle<T extends (...args: any[]) => any>(
 /**
  * Hook للتحكم في معدل استدعاء الدوال (Debounce)
  */
-export function useDebounce<T extends (...args: any[]) => any>(
+export function useDebounce<T extends AnyFunction>(
   callback: T,
   delay: number
 ): T {
   const timeoutRef = useRef<NodeJS.Timeout>();
 
   return useCallback(
-    ((...args) => {
+    ((...args: unknown[]) => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
@@ -119,5 +126,3 @@ export function useIntersectionObserver(
 
   return isIntersecting;
 }
-
-import { useState } from 'react';

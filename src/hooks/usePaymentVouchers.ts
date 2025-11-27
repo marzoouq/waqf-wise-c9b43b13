@@ -22,7 +22,7 @@ export interface PaymentVoucher {
   approved_by?: string;
   bank_account_id?: string;
   created_by?: string;
-  attachments?: any;
+  attachments?: Record<string, unknown>[];
 }
 
 export function usePaymentVouchers() {
