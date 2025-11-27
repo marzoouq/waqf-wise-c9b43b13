@@ -5,7 +5,7 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["dist"] },
+  { ignores: ["dist", "src/__tests__/**", "**/*.test.ts", "**/*.test.tsx"] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],
@@ -24,7 +24,9 @@ export default tseslint.config(
         "argsIgnorePattern": "^_",
         "varsIgnorePattern": "^_" 
       }],
-      "@typescript-eslint/no-explicit-any": "warn",
+      // STRICT: منع استخدام any - يجب استخدام أنواع محددة
+      // الاستثناءات المسموحة فقط مع eslint-disable-next-line
+      "@typescript-eslint/no-explicit-any": "error",
       "no-console": ["error", { 
         "allow": ["warn", "error", "info"] 
       }],

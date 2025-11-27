@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { Control, FieldPath, FieldValues } from "react-hook-form";
+import { Control, ControllerRenderProps, FieldPath, FieldValues } from "react-hook-form";
 import {
   FormControl,
   FormDescription,
@@ -66,8 +66,9 @@ export interface UnifiedFormFieldProps<TFieldValues extends FieldValues> {
   step?: number; // for number
   maxLength?: number; // for text inputs
   
-  // Custom render
-  render?: (field: any) => ReactNode;
+  // Custom render - استخدام ControllerRenderProps للأنواع المحددة
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  render?: (field: ControllerRenderProps<TFieldValues, any>) => ReactNode;
   
   // Grid layout
   className?: string;

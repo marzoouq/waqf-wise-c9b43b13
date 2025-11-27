@@ -152,7 +152,7 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
             key: "properties",
             label: "العقار",
             hideOnTablet: true,
-            render: (_: any, row: MaintenanceRequest) => row.properties?.name || '-'
+            render: (_: unknown, row: MaintenanceRequest) => row.properties?.name || '-'
           },
           {
             key: "title",
@@ -187,7 +187,7 @@ export const MaintenanceTab = ({ onEdit }: Props) => {
             key: "cost",
             label: "التكلفة",
             hideOnMobile: true,
-            render: (_: any, row: MaintenanceRequest) => (
+            render: (_: unknown, row: MaintenanceRequest) => (
               <span className="font-medium whitespace-nowrap">
                 {(Number(row.actual_cost || row.estimated_cost || 0)).toLocaleString()} ر.س
               </span>

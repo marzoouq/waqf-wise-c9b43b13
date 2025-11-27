@@ -98,6 +98,7 @@ const ChartTooltipContent = React.forwardRef<
       indicator?: "line" | "dot" | "dashed";
       nameKey?: string;
       labelKey?: string;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       payload?: any[];
       label?: string;
     }
@@ -234,6 +235,7 @@ const ChartLegendContent = React.forwardRef<
   React.ComponentProps<"div"> & {
       hideIcon?: boolean;
       nameKey?: string;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       payload?: any[];
       verticalAlign?: "top" | "bottom";
     }
