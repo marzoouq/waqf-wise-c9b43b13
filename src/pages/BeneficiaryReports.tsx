@@ -226,7 +226,7 @@ export default function BeneficiaryReports() {
 
           <div>
             <label className="text-sm font-medium mb-2 block">نوع التقرير</label>
-            <Select value={reportType} onValueChange={(v: any) => setReportType(v)}>
+            <Select value={reportType} onValueChange={(v) => setReportType(v as 'annual' | 'quarterly' | 'monthly')}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>

@@ -59,6 +59,7 @@ export interface MonthlyEfficiencyData {
 
 // أنواع النسب المالية
 export interface FinancialRatioKPI {
+  id: string;
   kpi_name: string;
   kpi_value: number;
   kpi_target?: number;

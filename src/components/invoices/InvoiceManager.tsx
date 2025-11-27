@@ -23,7 +23,8 @@ export function InvoiceManager() {
   });
 
   const getStatusBadge = (status: string) => {
-    const statusMap: Record<string, { label: string; variant: any }> = {
+    type BadgeVariant = 'default' | 'secondary' | 'destructive' | 'outline';
+    const statusMap: Record<string, { label: string; variant: BadgeVariant }> = {
       draft: { label: 'مسودة', variant: 'secondary' },
       pending: { label: 'معلق', variant: 'default' },
       paid: { label: 'مدفوع', variant: 'default' },

@@ -150,7 +150,7 @@ export function FinancialReports() {
                 <div className="space-y-2">
                   {accounts
                     .filter(acc => acc.account_type === 'revenue')
-                    .map((acc: any, index: number) => (
+                    .map((acc, index) => (
                       <div
                         key={index}
                         className="flex items-center justify-between p-2 rounded hover:bg-muted"
@@ -181,7 +181,7 @@ export function FinancialReports() {
                 <div className="space-y-2">
                   {accounts
                     .filter(acc => acc.account_type === 'expense')
-                    .map((acc: any, index: number) => (
+                    .map((acc, index) => (
                       <div
                         key={index}
                         className="flex items-center justify-between p-2 rounded hover:bg-muted"

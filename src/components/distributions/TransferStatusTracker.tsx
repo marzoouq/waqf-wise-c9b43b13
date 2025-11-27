@@ -67,7 +67,7 @@ export function TransferStatusTracker({ transferFileId }: TransferStatusTrackerP
   const progress = stats.total > 0 ? (stats.completed / stats.total) * 100 : 0;
 
   const statusConfig: Record<string, {
-    icon: any;
+    icon: React.ComponentType<{ className?: string }>;
     color: string;
     bgColor: string;
     label: string;

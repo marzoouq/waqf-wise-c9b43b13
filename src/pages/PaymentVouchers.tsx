@@ -42,7 +42,8 @@ export default function PaymentVouchers() {
   });
 
   const getStatusBadge = (status: string) => {
-    const configs: Record<string, { label: string; variant: any; icon: any; className?: string }> = {
+    type BadgeVariant = "default" | "secondary" | "outline" | "destructive";
+    const configs: Record<string, { label: string; variant: BadgeVariant; icon: React.ComponentType<{ className?: string }>; className?: string }> = {
       draft: { label: "مسودة", variant: "secondary" as const, icon: Clock },
       approved: { label: "معتمد", variant: "default" as const, icon: CheckCircle },
       paid: { label: "مدفوع", variant: "default" as const, icon: CheckCircle, className: "bg-success text-success-foreground" },

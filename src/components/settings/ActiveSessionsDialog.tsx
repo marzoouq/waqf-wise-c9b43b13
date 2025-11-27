@@ -239,8 +239,21 @@ export function ActiveSessionsDialog({ open, onOpenChange }: ActiveSessionsDialo
   );
 }
 
+interface SessionData {
+  id: string;
+  user_agent?: string | null;
+  ip_address?: string;
+  created_at: string;
+  last_activity_at?: string;
+  device_info?: {
+    browser?: string;
+    os?: string;
+    device_type?: string;
+  } | null;
+}
+
 interface SessionCardProps {
-  session: any;
+  session: SessionData;
   isCurrent?: boolean;
   onEnd?: () => void;
   isEnding?: boolean;

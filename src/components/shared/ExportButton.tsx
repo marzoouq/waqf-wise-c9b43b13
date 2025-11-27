@@ -9,6 +9,7 @@ import { Download, FileText, FileSpreadsheet } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { exportToPDF, exportToExcel } from "@/lib/exportHelpers";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface ExportButtonProps {
   data: any[];
   filename: string;

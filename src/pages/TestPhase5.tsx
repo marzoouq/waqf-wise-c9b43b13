@@ -91,7 +91,7 @@ export default function TestPhase5() {
   }: { 
     title: string; 
     value: number; 
-    icon: any; 
+    icon: React.ComponentType<{ className?: string }>; 
     description?: string;
     variant?: "default" | "success" | "warning" | "destructive";
   }) => {

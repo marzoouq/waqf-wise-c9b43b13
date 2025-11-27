@@ -54,12 +54,13 @@ export const RentalPaymentDialog = ({ open, onOpenChange, payment, contractId }:
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const paymentData: any = {
+    const paymentData = {
       ...formData,
       amount_due: parseFloat(formData.amount_due),
       amount_paid: parseFloat(formData.amount_paid) || 0,
       discount: parseFloat(formData.discount) || 0,
       payment_date: formData.payment_date || null,
+      status: undefined as string | undefined,
     };
 
     // Auto-set status to "مدفوع" if payment is made

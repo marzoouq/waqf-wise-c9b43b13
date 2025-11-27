@@ -392,7 +392,7 @@ const RolesManagement = () => {
               <DialogTitle>سجل تغييرات الأدوار</DialogTitle>
             </DialogHeader>
             <div className="space-y-3">
-              {auditLogs.map((log: any) => (
+              {auditLogs.map((log) => (
                 <div
                   key={log.id}
                   className="p-4 border rounded-lg flex items-start gap-3"
