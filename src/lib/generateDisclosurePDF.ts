@@ -1,12 +1,12 @@
 import { AnnualDisclosure } from "@/hooks/useAnnualDisclosures";
 import { logger } from "@/lib/logger";
 import { Database } from "@/integrations/supabase/types";
-import { withAutoTable } from "@/types/pdf";
+import 'jspdf-autotable';
 
 type DisclosureBeneficiary = Database['public']['Tables']['disclosure_beneficiaries']['Row'];
 
 // Dynamic import type
-type JsPDF = any;
+type JsPDF = import('jspdf').jsPDF;
 
 // Load Arabic font
 const loadArabicFont = async (doc: JsPDF) => {
@@ -44,10 +44,9 @@ export const generateDisclosurePDF = async (
   ]);
   
   const jsPDF = jsPDFModule.default;
-  const baseDoc = new jsPDF();
-  const doc = withAutoTable(baseDoc);
+  const doc = new jsPDF();
   
-  await loadArabicFont(baseDoc);
+  await loadArabicFont(doc);
   
   // RTL support
   doc.setR2L(true);
@@ -90,11 +89,11 @@ export const generateDisclosurePDF = async (
     },
     headStyles: {
       fillColor: [66, 139, 202],
-      textColor: 255,
+      textColor: [255, 255, 255],
     },
   });
 
-  yPos = doc.lastAutoTable.finalY + 10;
+  yPos = (doc.lastAutoTable?.finalY ?? yPos) + 10;
 
   // نسب التوزيع
   doc.text("نسب وحصص التوزيع", 200, yPos, { align: "right" });
@@ -117,11 +116,11 @@ export const generateDisclosurePDF = async (
     },
     headStyles: {
       fillColor: [92, 184, 92],
-      textColor: 255,
+      textColor: [255, 255, 255],
     },
   });
 
-  yPos = doc.lastAutoTable.finalY + 10;
+  yPos = (doc.lastAutoTable?.finalY ?? yPos) + 10;
 
   // إحصائيات المستفيدين
   doc.text("إحصائيات المستفيدين", 200, yPos, { align: "right" });
@@ -145,17 +144,17 @@ export const generateDisclosurePDF = async (
     },
     headStyles: {
       fillColor: [240, 173, 78],
-      textColor: 255,
+      textColor: [255, 255, 255],
     },
   });
 
   // صفحة جديدة للمستفيدين إذا كانوا موجودين
   if (beneficiaries.length > 0) {
-    baseDoc.addPage();
+    doc.addPage();
     yPos = 20;
     
-    baseDoc.setFontSize(14);
-    baseDoc.text("قائمة المستفيدين وحصصهم", 200, yPos, { align: "right" });
+    doc.setFontSize(14);
+    doc.text("قائمة المستفيدين وحصصهم", 200, yPos, { align: "right" });
     yPos += 7;
 
     const beneficiariesData = beneficiaries.map(b => [
@@ -177,7 +176,7 @@ export const generateDisclosurePDF = async (
       },
       headStyles: {
         fillColor: [217, 83, 79],
-        textColor: 255,
+        textColor: [255, 255, 255],
       },
     });
   }
@@ -185,14 +184,14 @@ export const generateDisclosurePDF = async (
   // المصروفات التفصيلية
   if (disclosure.maintenance_expenses || disclosure.administrative_expenses || 
       disclosure.development_expenses || disclosure.other_expenses) {
-    baseDoc.addPage();
+    doc.addPage();
     yPos = 20;
     
-    baseDoc.setFontSize(14);
-    baseDoc.text("تفصيل المصروفات", 200, yPos, { align: "right" });
+    doc.setFontSize(14);
+    doc.text("تفصيل المصروفات", 200, yPos, { align: "right" });
     yPos += 7;
 
-    const expensesData = [];
+    const expensesData: string[][] = [];
     if (disclosure.maintenance_expenses) {
       expensesData.push(["مصروفات الصيانة", `${disclosure.maintenance_expenses.toLocaleString()} ر.س`]);
     }
@@ -217,24 +216,24 @@ export const generateDisclosurePDF = async (
       },
       headStyles: {
         fillColor: [91, 192, 222],
-        textColor: 255,
+        textColor: [255, 255, 255],
       },
     });
   }
 
   // التذييل
-  const pageCount = baseDoc.getNumberOfPages();
+  const pageCount = doc.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
-    baseDoc.setPage(i);
-    baseDoc.setFontSize(8);
-    baseDoc.setTextColor(150, 150, 150);
-    baseDoc.text(
+    doc.setPage(i);
+    doc.setFontSize(8);
+    doc.setTextColor(150, 150, 150);
+    doc.text(
       `تاريخ الإصدار: ${new Date().toLocaleDateString('ar-SA')}`,
       105,
       285,
       { align: "center" }
     );
-    baseDoc.text(
+    doc.text(
       `صفحة ${i} من ${pageCount}`,
       105,
       290,
@@ -243,5 +242,5 @@ export const generateDisclosurePDF = async (
   }
 
   // حفظ الملف
-  baseDoc.save(`إفصاح-سنوي-${disclosure.year}-${disclosure.waqf_name}.pdf`);
+  doc.save(`إفصاح-سنوي-${disclosure.year}-${disclosure.waqf_name}.pdf`);
 };

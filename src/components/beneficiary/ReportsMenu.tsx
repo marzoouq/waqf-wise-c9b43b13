@@ -17,7 +17,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useBeneficiaryProfile } from "@/hooks/useBeneficiaryProfile";
 import { useAuth } from "@/hooks/useAuth";
 import * as XLSX from "xlsx";
-import { withAutoTable } from "@/types/pdf";
 import { Contract } from "@/hooks/useContracts";
 
 interface ReportsMenuProps {
@@ -37,33 +36,32 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
       ]);
       
       const jsPDF = jsPDFModule.default;
-      const baseDoc = new jsPDF();
-      const doc = withAutoTable(baseDoc);
+      const doc = new jsPDF();
       
       // العنوان
-      baseDoc.setFontSize(18);
-      baseDoc.text("تقرير المدفوعات", 105, 20, { align: "center" });
+      doc.setFontSize(18);
+      doc.text("تقرير المدفوعات", 105, 20, { align: "center" });
       
       // معلومات المستفيد
-      baseDoc.setFontSize(11);
-      baseDoc.text(`الاسم: ${beneficiary?.full_name || ""}`, 20, 35);
-      baseDoc.text(`رقم الهوية: ${beneficiary?.national_id || ""}`, 20, 42);
-      baseDoc.text(`الجوال: ${beneficiary?.phone || ""}`, 20, 49);
-      baseDoc.text(`الفئة: ${beneficiary?.category || ""}`, 120, 35);
-      baseDoc.text(`الحالة: ${beneficiary?.status || ""}`, 120, 42);
-      baseDoc.text(`التاريخ: ${new Date().toLocaleDateString("ar-SA")}`, 120, 49);
+      doc.setFontSize(11);
+      doc.text(`الاسم: ${beneficiary?.full_name || ""}`, 20, 35);
+      doc.text(`رقم الهوية: ${beneficiary?.national_id || ""}`, 20, 42);
+      doc.text(`الجوال: ${beneficiary?.phone || ""}`, 20, 49);
+      doc.text(`الفئة: ${beneficiary?.category || ""}`, 120, 35);
+      doc.text(`الحالة: ${beneficiary?.status || ""}`, 120, 42);
+      doc.text(`التاريخ: ${new Date().toLocaleDateString("ar-SA")}`, 120, 49);
 
       // الملخص المالي إذا وُجدت مدفوعات
       if (payments && payments.length > 0) {
         const totalAmount = payments.reduce((sum, p) => sum + (p.amount || 0), 0);
         const avgAmount = totalAmount / payments.length;
 
-        baseDoc.setFontSize(14);
-        baseDoc.text("الملخص المالي", 105, 60, { align: "center" });
-        baseDoc.setFontSize(11);
-        baseDoc.text(`إجمالي المدفوعات: ${totalAmount.toLocaleString("ar-SA")} ر.س`, 20, 68);
-        baseDoc.text(`عدد الدفعات: ${payments.length}`, 20, 75);
-        baseDoc.text(`متوسط الدفعة: ${avgAmount.toLocaleString("ar-SA")} ر.س`, 20, 82);
+        doc.setFontSize(14);
+        doc.text("الملخص المالي", 105, 60, { align: "center" });
+        doc.setFontSize(11);
+        doc.text(`إجمالي المدفوعات: ${totalAmount.toLocaleString("ar-SA")} ر.س`, 20, 68);
+        doc.text(`عدد الدفعات: ${payments.length}`, 20, 75);
+        doc.text(`متوسط الدفعة: ${avgAmount.toLocaleString("ar-SA")} ر.س`, 20, 82);
 
         // جدول المدفوعات
         const tableData = payments.map((payment) => [
@@ -89,13 +87,13 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
         });
       } else {
         // رسالة عدم وجود مدفوعات
-        baseDoc.setFontSize(12);
-        baseDoc.setTextColor(150, 150, 150);
-        baseDoc.text("لا توجد مدفوعات مسجلة حتى الآن", 105, 70, { align: "center" });
-        baseDoc.text("سيتم تحديث هذا التقرير عند إضافة مدفوعات جديدة", 105, 80, { align: "center" });
+        doc.setFontSize(12);
+        doc.setTextColor(150, 150, 150);
+        doc.text("لا توجد مدفوعات مسجلة حتى الآن", 105, 70, { align: "center" });
+        doc.text("سيتم تحديث هذا التقرير عند إضافة مدفوعات جديدة", 105, 80, { align: "center" });
       }
 
-      baseDoc.save(`payments-report-${Date.now()}.pdf`);
+      doc.save(`payments-report-${Date.now()}.pdf`);
 
       toast({
         title: "تم التصدير",
@@ -130,15 +128,14 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
       ]);
       
       const jsPDF = jsPDFModule.default;
-      const baseDoc = new jsPDF();
-      const doc = withAutoTable(baseDoc);
+      const doc = new jsPDF();
       
-      baseDoc.setFontSize(18);
-      baseDoc.text("Annual Disclosure / الإفصاح السنوي", 105, 20, { align: "center" });
+      doc.setFontSize(18);
+      doc.text("Annual Disclosure / الإفصاح السنوي", 105, 20, { align: "center" });
       
-      baseDoc.setFontSize(12);
-      baseDoc.text(`Year / السنة: ${disclosure.year}`, 20, 40);
-      baseDoc.text(`Waqf / الوقف: ${disclosure.waqf_name}`, 20, 50);
+      doc.setFontSize(12);
+      doc.text(`Year / السنة: ${disclosure.year}`, 20, 40);
+      doc.text(`Waqf / الوقف: ${disclosure.waqf_name}`, 20, 50);
       
       const financialData = [
         ["Total Revenue / إجمالي الإيرادات", disclosure.total_revenues.toLocaleString("ar-SA")],
@@ -155,7 +152,7 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
         body: financialData,
       });
       
-      baseDoc.save(`annual-disclosure-${disclosure.year}.pdf`);
+      doc.save(`annual-disclosure-${disclosure.year}.pdf`);
       
       toast({
         title: "تم التصدير",
@@ -234,36 +231,35 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
       ]);
       
       const jsPDF = jsPDFModule.default;
-      const baseDoc = new jsPDF();
-      const doc = withAutoTable(baseDoc);
+      const doc = new jsPDF();
       
       // العنوان
-      baseDoc.setFontSize(18);
-      baseDoc.text("كشف حساب المستفيد", 105, 20, { align: "center" });
+      doc.setFontSize(18);
+      doc.text("كشف حساب المستفيد", 105, 20, { align: "center" });
 
       // معلومات المستفيد الكاملة
-      baseDoc.setFontSize(11);
-      baseDoc.text(`الاسم: ${beneficiary?.full_name || ""}`, 20, 35);
-      baseDoc.text(`رقم الهوية: ${beneficiary?.national_id || ""}`, 20, 42);
-      baseDoc.text(`الجوال: ${beneficiary?.phone || ""}`, 20, 49);
-      baseDoc.text(`البريد: ${beneficiary?.email || "لا يوجد"}`, 20, 56);
+      doc.setFontSize(11);
+      doc.text(`الاسم: ${beneficiary?.full_name || ""}`, 20, 35);
+      doc.text(`رقم الهوية: ${beneficiary?.national_id || ""}`, 20, 42);
+      doc.text(`الجوال: ${beneficiary?.phone || ""}`, 20, 49);
+      doc.text(`البريد: ${beneficiary?.email || "لا يوجد"}`, 20, 56);
       
-      baseDoc.text(`الفئة: ${beneficiary?.category || ""}`, 120, 35);
-      baseDoc.text(`الحالة: ${beneficiary?.status || ""}`, 120, 42);
-      baseDoc.text(`البنك: ${beneficiary?.bank_name || "لا يوجد"}`, 120, 49);
-      baseDoc.text(`الآيبان: ${beneficiary?.iban || "لا يوجد"}`, 120, 56);
+      doc.text(`الفئة: ${beneficiary?.category || ""}`, 120, 35);
+      doc.text(`الحالة: ${beneficiary?.status || ""}`, 120, 42);
+      doc.text(`البنك: ${beneficiary?.bank_name || "لا يوجد"}`, 120, 49);
+      doc.text(`الآيبان: ${beneficiary?.iban || "لا يوجد"}`, 120, 56);
 
       // الملخص المالي
       if (payments && payments.length > 0) {
         const totalAmount = payments.reduce((sum, p) => sum + (p.amount || 0), 0);
         const avgAmount = totalAmount / payments.length;
 
-        baseDoc.setFontSize(14);
-        baseDoc.text("الملخص المالي", 105, 68, { align: "center" });
-        baseDoc.setFontSize(11);
-        baseDoc.text(`إجمالي المدفوعات: ${totalAmount.toLocaleString("ar-SA")} ر.س`, 20, 76);
-        baseDoc.text(`عدد الدفعات: ${payments.length}`, 20, 83);
-        baseDoc.text(`متوسط الدفعة: ${avgAmount.toLocaleString("ar-SA")} ر.س`, 20, 90);
+        doc.setFontSize(14);
+        doc.text("الملخص المالي", 105, 68, { align: "center" });
+        doc.setFontSize(11);
+        doc.text(`إجمالي المدفوعات: ${totalAmount.toLocaleString("ar-SA")} ر.س`, 20, 76);
+        doc.text(`عدد الدفعات: ${payments.length}`, 20, 83);
+        doc.text(`متوسط الدفعة: ${avgAmount.toLocaleString("ar-SA")} ر.س`, 20, 90);
 
         // جدول المدفوعات
         const tableData = payments.map((payment) => [
@@ -289,18 +285,18 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
 
         // الإجمالي النهائي
         const finalY = doc.lastAutoTable?.finalY || 98;
-        baseDoc.setFontSize(12);
-        baseDoc.setFont("helvetica", "bold");
-        baseDoc.text(`الإجمالي الكلي: ${totalAmount.toLocaleString("ar-SA")} ر.س`, 20, finalY + 10);
+        doc.setFontSize(12);
+        doc.setFont("helvetica", "bold");
+        doc.text(`الإجمالي الكلي: ${totalAmount.toLocaleString("ar-SA")} ر.س`, 20, finalY + 10);
       } else {
         // رسالة عدم وجود معاملات
-        baseDoc.setFontSize(12);
-        baseDoc.setTextColor(150, 150, 150);
-        baseDoc.text("لا توجد معاملات مالية مسجلة حتى الآن", 105, 75, { align: "center" });
-        baseDoc.text("سيتم تحديث الكشف عند إضافة معاملات جديدة", 105, 85, { align: "center" });
+        doc.setFontSize(12);
+        doc.setTextColor(150, 150, 150);
+        doc.text("لا توجد معاملات مالية مسجلة حتى الآن", 105, 75, { align: "center" });
+        doc.text("سيتم تحديث الكشف عند إضافة معاملات جديدة", 105, 85, { align: "center" });
       }
 
-      baseDoc.save(`account-statement-${Date.now()}.pdf`);
+      doc.save(`account-statement-${Date.now()}.pdf`);
 
       toast({
         title: "تم التصدير",
@@ -495,14 +491,13 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
       ]);
       
       const jsPDF = jsPDFModule.default;
-      const baseDoc = new jsPDF();
-      const doc = withAutoTable(baseDoc);
+      const doc = new jsPDF();
 
       // العنوان
-      baseDoc.setFontSize(18);
-      baseDoc.text("تقرير العقارات والإيجارات", 105, 20, { align: "center" });
-      baseDoc.setFontSize(10);
-      baseDoc.text(`تاريخ التقرير: ${new Date().toLocaleDateString("ar-SA")}`, 105, 28, { align: "center" });
+      doc.setFontSize(18);
+      doc.text("تقرير العقارات والإيجارات", 105, 20, { align: "center" });
+      doc.setFontSize(10);
+      doc.text(`تاريخ التقرير: ${new Date().toLocaleDateString("ar-SA")}`, 105, 28, { align: "center" });
 
       // حساب الإجماليات
       const totalMonthlyRent = properties.reduce((sum, prop) => {
@@ -513,10 +508,10 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
       const totalAnnualRent = totalMonthlyRent * 12;
 
       // الملخص
-      baseDoc.setFontSize(12);
-      baseDoc.text(`عدد العقارات: ${properties.length}`, 20, 40);
-      baseDoc.text(`الإيجار الشهري: ${totalMonthlyRent.toLocaleString("ar-SA")} ر.س`, 20, 47);
-      baseDoc.text(`الإيجار السنوي: ${totalAnnualRent.toLocaleString("ar-SA")} ر.س`, 20, 54);
+      doc.setFontSize(12);
+      doc.text(`عدد العقارات: ${properties.length}`, 20, 40);
+      doc.text(`الإيجار الشهري: ${totalMonthlyRent.toLocaleString("ar-SA")} ر.س`, 20, 47);
+      doc.text(`الإيجار السنوي: ${totalAnnualRent.toLocaleString("ar-SA")} ر.س`, 20, 54);
 
       // جدول العقارات
       const tableData = properties.map((prop) => {
@@ -548,7 +543,7 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
         },
       });
 
-      baseDoc.save(`properties-report-${Date.now()}.pdf`);
+      doc.save(`properties-report-${Date.now()}.pdf`);
 
       toast({
         title: "تم التصدير",
