@@ -2896,6 +2896,107 @@ export type Database = {
         }
         Relationships: []
       }
+      dashboard_widgets: {
+        Row: {
+          config: Json | null
+          created_at: string | null
+          dashboard_id: string | null
+          data_source: string | null
+          height: number | null
+          id: string
+          is_visible: boolean | null
+          position_x: number | null
+          position_y: number | null
+          refresh_interval: number | null
+          updated_at: string | null
+          widget_name: string
+          widget_name_ar: string | null
+          widget_type: string
+          width: number | null
+        }
+        Insert: {
+          config?: Json | null
+          created_at?: string | null
+          dashboard_id?: string | null
+          data_source?: string | null
+          height?: number | null
+          id?: string
+          is_visible?: boolean | null
+          position_x?: number | null
+          position_y?: number | null
+          refresh_interval?: number | null
+          updated_at?: string | null
+          widget_name: string
+          widget_name_ar?: string | null
+          widget_type: string
+          width?: number | null
+        }
+        Update: {
+          config?: Json | null
+          created_at?: string | null
+          dashboard_id?: string | null
+          data_source?: string | null
+          height?: number | null
+          id?: string
+          is_visible?: boolean | null
+          position_x?: number | null
+          position_y?: number | null
+          refresh_interval?: number | null
+          updated_at?: string | null
+          widget_name?: string
+          widget_name_ar?: string | null
+          widget_type?: string
+          width?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dashboard_widgets_dashboard_id_fkey"
+            columns: ["dashboard_id"]
+            isOneToOne: false
+            referencedRelation: "dashboards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dashboards: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          dashboard_name: string
+          dashboard_name_ar: string | null
+          description: string | null
+          id: string
+          is_default: boolean | null
+          is_system: boolean | null
+          layout_config: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          dashboard_name: string
+          dashboard_name_ar?: string | null
+          description?: string | null
+          id?: string
+          is_default?: boolean | null
+          is_system?: boolean | null
+          layout_config?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          dashboard_name?: string
+          dashboard_name_ar?: string | null
+          description?: string | null
+          id?: string
+          is_default?: boolean | null
+          is_system?: boolean | null
+          layout_config?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       deleted_files_audit: {
         Row: {
           backup_location: string | null
@@ -6364,6 +6465,50 @@ export type Database = {
         }
         Relationships: []
       }
+      kpi_values: {
+        Row: {
+          change_percentage: number | null
+          id: string
+          kpi_id: string | null
+          metadata: Json | null
+          period_end: string | null
+          period_start: string | null
+          previous_value: number | null
+          recorded_at: string | null
+          value: number
+        }
+        Insert: {
+          change_percentage?: number | null
+          id?: string
+          kpi_id?: string | null
+          metadata?: Json | null
+          period_end?: string | null
+          period_start?: string | null
+          previous_value?: number | null
+          recorded_at?: string | null
+          value: number
+        }
+        Update: {
+          change_percentage?: number | null
+          id?: string
+          kpi_id?: string | null
+          metadata?: Json | null
+          period_end?: string | null
+          period_start?: string | null
+          previous_value?: number | null
+          recorded_at?: string | null
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kpi_values_kpi_id_fkey"
+            columns: ["kpi_id"]
+            isOneToOne: false
+            referencedRelation: "kpi_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leaked_password_checks: {
         Row: {
           checked_at: string | null
@@ -8867,6 +9012,69 @@ export type Database = {
           },
         ]
       }
+      report_execution_log: {
+        Row: {
+          completed_at: string | null
+          error_message: string | null
+          executed_by: string | null
+          execution_type: string
+          file_path: string | null
+          file_size: number | null
+          id: string
+          metadata: Json | null
+          report_template_id: string | null
+          row_count: number | null
+          scheduled_report_id: string | null
+          started_at: string | null
+          status: string
+        }
+        Insert: {
+          completed_at?: string | null
+          error_message?: string | null
+          executed_by?: string | null
+          execution_type: string
+          file_path?: string | null
+          file_size?: number | null
+          id?: string
+          metadata?: Json | null
+          report_template_id?: string | null
+          row_count?: number | null
+          scheduled_report_id?: string | null
+          started_at?: string | null
+          status: string
+        }
+        Update: {
+          completed_at?: string | null
+          error_message?: string | null
+          executed_by?: string | null
+          execution_type?: string
+          file_path?: string | null
+          file_size?: number | null
+          id?: string
+          metadata?: Json | null
+          report_template_id?: string | null
+          row_count?: number | null
+          scheduled_report_id?: string | null
+          started_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_execution_log_report_template_id_fkey"
+            columns: ["report_template_id"]
+            isOneToOne: false
+            referencedRelation: "report_templates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "report_execution_log_scheduled_report_id_fkey"
+            columns: ["scheduled_report_id"]
+            isOneToOne: false
+            referencedRelation: "scheduled_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       report_generation_log: {
         Row: {
           created_at: string | null
@@ -9398,6 +9606,53 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      saved_reports: {
+        Row: {
+          columns: Json | null
+          created_at: string | null
+          filters: Json | null
+          id: string
+          is_favorite: boolean | null
+          report_name: string
+          report_template_id: string | null
+          sort_config: Json | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          columns?: Json | null
+          created_at?: string | null
+          filters?: Json | null
+          id?: string
+          is_favorite?: boolean | null
+          report_name: string
+          report_template_id?: string | null
+          sort_config?: Json | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          columns?: Json | null
+          created_at?: string | null
+          filters?: Json | null
+          id?: string
+          is_favorite?: boolean | null
+          report_name?: string
+          report_template_id?: string | null
+          sort_config?: Json | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_reports_report_template_id_fkey"
+            columns: ["report_template_id"]
+            isOneToOne: false
+            referencedRelation: "report_templates"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       saved_searches: {
         Row: {
