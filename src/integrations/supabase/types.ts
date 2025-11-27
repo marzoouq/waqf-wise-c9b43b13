@@ -2406,6 +2406,42 @@ export type Database = {
         }
         Relationships: []
       }
+      cleanup_logs: {
+        Row: {
+          cleanup_type: string
+          completed_at: string | null
+          created_at: string | null
+          error_message: string | null
+          id: string
+          records_deleted: number | null
+          started_at: string | null
+          status: string | null
+          tables_cleaned: string[] | null
+        }
+        Insert: {
+          cleanup_type: string
+          completed_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          records_deleted?: number | null
+          started_at?: string | null
+          status?: string | null
+          tables_cleaned?: string[] | null
+        }
+        Update: {
+          cleanup_type?: string
+          completed_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          records_deleted?: number | null
+          started_at?: string | null
+          status?: string | null
+          tables_cleaned?: string[] | null
+        }
+        Relationships: []
+      }
       contract_attachments: {
         Row: {
           contract_id: string
@@ -12117,6 +12153,7 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: undefined
       }
+      run_scheduled_cleanup: { Args: never; Returns: Json }
       search_beneficiaries_advanced:
         | {
             Args: {
