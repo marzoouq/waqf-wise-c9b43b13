@@ -62,8 +62,8 @@ serve(async (req) => {
 
     console.log('Calling Lovable AI API...');
     
-    // استخدام AI لتحليل البيانات
-    const aiResponse = await fetch('https://api.lovable.app/v1/ai/chat/completions', {
+    // استخدام AI لتحليل البيانات - Lovable AI Gateway
+    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -87,7 +87,16 @@ serve(async (req) => {
 
     console.log('AI Response status:', aiResponse.status);
     
+    // معالجة أخطاء Rate Limit و Payment
     if (!aiResponse.ok) {
+      if (aiResponse.status === 429) {
+        console.error('Rate limit exceeded');
+        return errorResponse('تم تجاوز الحد الأقصى للطلبات، يرجى المحاولة لاحقاً', 429);
+      }
+      if (aiResponse.status === 402) {
+        console.error('Payment required');
+        return errorResponse('يرجى إضافة رصيد لاستخدام خدمات الذكاء الاصطناعي', 402);
+      }
       const errorText = await aiResponse.text();
       console.error('AI API Error:', errorText);
       throw new Error(`AI analysis failed: ${aiResponse.status} - ${errorText}`);
