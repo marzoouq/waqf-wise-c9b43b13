@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { productionLogger } from "@/lib/logger/production-logger";
 import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -44,7 +45,7 @@ export default function SystemMaintenance() {
         });
       }
     } catch (error: unknown) {
-      console.error('Error calling backfill function:', error);
+      productionLogger.error('Error calling backfill function:', error);
       const errorMessage = error instanceof Error ? error.message : "فشل في معالجة المستندات";
       toast({
         title: "❌ خطأ",

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { productionLogger } from '@/lib/logger/production-logger';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -32,7 +33,7 @@ export default function Login() {
           });
 
         if (rpcError) {
-          console.error('RPC Error:', rpcError);
+          productionLogger.error('RPC Error:', rpcError);
           throw new Error('حدث خطأ في البحث عن رقم الهوية');
         }
 

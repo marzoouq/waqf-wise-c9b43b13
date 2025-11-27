@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { productionLogger } from "@/lib/logger/production-logger";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -115,7 +116,7 @@ export function MultiChannelNotifications() {
         });
       }
     } catch (error) {
-      console.error('Error updating notification preferences:', error);
+      productionLogger.error('Error updating notification preferences:', error);
       toast({
         title: "خطأ",
         description: "فشل حفظ الإعدادات",

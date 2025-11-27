@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { productionLogger } from "@/lib/logger/production-logger";
 import {
   Dialog,
   DialogContent,
@@ -84,7 +85,7 @@ export function ActiveSessionsDialog({ open, onOpenChange }: ActiveSessionsDialo
       await endSession(sessionId);
       setSessionToEnd(null);
     } catch (error) {
-      console.error('Error ending session:', error);
+      productionLogger.error('Error ending session:', error);
     }
   };
 
@@ -93,7 +94,7 @@ export function ActiveSessionsDialog({ open, onOpenChange }: ActiveSessionsDialo
       await endAllOtherSessions();
       setShowEndAllDialog(false);
     } catch (error) {
-      console.error('Error ending all sessions:', error);
+      productionLogger.error('Error ending all sessions:', error);
     }
   };
 

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { productionLogger } from "@/lib/logger/production-logger";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { Card, CardContent } from "@/components/ui/card";
@@ -20,7 +21,7 @@ const DeveloperGuide = () => {
         setLoading(false);
       })
       .catch((error) => {
-        console.error("Error loading developer guide:", error);
+        productionLogger.error("Error loading developer guide:", error);
         setLoading(false);
       });
   }, []);

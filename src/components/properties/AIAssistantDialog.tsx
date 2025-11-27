@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { productionLogger } from "@/lib/logger/production-logger";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -50,7 +51,7 @@ export function AIAssistantDialog({ open, onOpenChange, propertyData, actionType
       setAnalysis(data.analysis);
       toast.success("تم التحليل بنجاح!");
     } catch (error) {
-      console.error("AI Analysis Error:", error);
+      productionLogger.error("AI Analysis Error:", error);
       toast.error("حدث خطأ أثناء التحليل");
     } finally {
       setIsAnalyzing(false);
