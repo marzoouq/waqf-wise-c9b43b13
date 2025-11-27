@@ -47,9 +47,9 @@ const MainLayout = ({ children }: MainLayoutProps) => {
           </div>
           <SidebarInset>
             {/* Mobile Header */}
-            <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 lg:hidden">
-              <SidebarTrigger>
-                <Menu className="h-6 w-6" />
+            <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 lg:hidden" role="banner">
+              <SidebarTrigger aria-label="فتح القائمة الجانبية">
+                <Menu className="h-6 w-6" aria-hidden="true" />
               </SidebarTrigger>
               <div className="flex-1">
                 <h1 className="text-lg font-bold text-gradient-primary">
@@ -61,15 +61,16 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                 size="sm"
                 onClick={() => setSearchOpen(true)}
                 className="gap-2"
+                aria-label="فتح البحث"
               >
-                <Search className="h-4 w-4" />
+                <Search className="h-4 w-4" aria-hidden="true" />
               </Button>
               <NotificationsBell />
               
               {/* User Menu - Mobile */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-full">
+                  <Button variant="ghost" size="icon" className="rounded-full" aria-label="قائمة المستخدم">
                     <Avatar className="h-8 w-8">
                       <AvatarFallback className="bg-primary text-primary-foreground">
                         {user?.email?.[0]?.toUpperCase() || 'U'}
@@ -94,10 +95,10 @@ const MainLayout = ({ children }: MainLayoutProps) => {
             </header>
 
             {/* Desktop Header - تبسيط بدون تكرار */}
-            <div className="hidden lg:block sticky top-0 z-30 h-14 border-b bg-background">
+            <div className="hidden lg:block sticky top-0 z-30 h-14 border-b bg-background" role="banner">
               <div className="flex items-center justify-between h-full px-4">
-                <SidebarTrigger>
-                  <Menu className="h-5 w-5" />
+                <SidebarTrigger aria-label="فتح/إغلاق القائمة الجانبية">
+                  <Menu className="h-5 w-5" aria-hidden="true" />
                 </SidebarTrigger>
                 
                 <div className="flex items-center gap-3">
@@ -107,10 +108,11 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                     size="sm"
                     onClick={() => setSearchOpen(true)}
                     className="gap-2"
+                    aria-label="فتح البحث السريع (Ctrl+K)"
                   >
-                    <Search className="h-4 w-4" />
+                    <Search className="h-4 w-4" aria-hidden="true" />
                     <span className="hidden md:inline">بحث</span>
-                    <kbd className="hidden md:inline pointer-events-none h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 ml-2">
+                    <kbd className="hidden md:inline pointer-events-none h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 ml-2" aria-hidden="true">
                       <span className="text-xs">Ctrl+K</span>
                     </kbd>
                   </Button>
@@ -118,7 +120,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                   
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="gap-2 px-3">
+                      <Button variant="ghost" className="gap-2 px-3" aria-label="قائمة الحساب">
                         <Avatar className="h-8 w-8">
                           <AvatarFallback className="bg-primary text-primary-foreground">
                             {user?.email?.[0]?.toUpperCase() || 'U'}

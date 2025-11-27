@@ -199,7 +199,7 @@ const AppSidebar = () => {
   }, [roles, roleLoading, hasRole]);
 
   return (
-    <Sidebar collapsible="icon" side="right">
+    <Sidebar collapsible="icon" side="right" aria-label="القائمة الرئيسية">
       <SidebarHeader className="border-b border-sidebar-border p-4 bg-sidebar-accent/30">
         <div className="flex items-center justify-between">
           {!isCollapsed && (

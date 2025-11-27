@@ -9,6 +9,14 @@
 - الإبقاء على `<Sonner />` كنظام toast موحد
 - تبسيط الكود وتقليل التكرار
 
+#### تحسينات Accessibility ♿
+- إضافة `aria-label` للأزرار التفاعلية في:
+  - `MainLayout.tsx` (أزرار القائمة، البحث، الحساب)
+  - `NotificationsBell.tsx` (جرس الإشعارات مع عدد غير المقروءة)
+  - `AppSidebar.tsx` (القائمة الجانبية)
+- إضافة `role="banner"` للـ headers
+- إضافة `aria-hidden="true"` للأيقونات الزخرفية
+
 #### التوثيق النهائي
 - إنشاء `docs/FINAL_OPTIMIZATION_PLAN.md` - خطة التحسين الشاملة
 - إنشاء `docs/FINAL_AUDIT_REPORT.md` - تقرير الفحص النهائي
@@ -22,6 +30,7 @@
 | console.log | 100% ✅ |
 | Type Safety | 95% ✅ |
 | قاعدة البيانات | 100% ✅ |
+| Accessibility | 90% ✅ |
 | التوثيق | 100% ✅ |
 
 ---
