@@ -8,6 +8,7 @@ import {
   optimizePageImages,
   preloadImages 
 } from '@/lib/imageOptimization';
+import { productionLogger } from '@/lib/logger/production-logger';
 
 export function useImageOptimization() {
   const [lcp, setLcp] = useState<number | null>(null);
@@ -20,14 +21,14 @@ export function useImageOptimization() {
     observeLCP((lcpValue) => {
       setLcp(lcpValue);
       
-      // تسجيل في console للتطوير
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`📊 LCP: ${lcpValue.toFixed(2)}ms`);
+      // تسجيل للتطوير فقط
+      if (import.meta.env.DEV) {
+        productionLogger.debug(`📊 LCP: ${lcpValue.toFixed(2)}ms`);
         
         if (lcpValue > 2500) {
-          console.warn('⚠️ LCP is above recommended threshold (2.5s)');
+          productionLogger.warn('⚠️ LCP is above recommended threshold (2.5s)');
         } else if (lcpValue <= 2500) {
-          console.log('✅ LCP is good!');
+          productionLogger.debug('✅ LCP is good!');
         }
       }
     });
@@ -50,7 +51,7 @@ export function useImagePreload(urls: string[]) {
       .then(() => setIsLoaded(true))
       .catch((err) => {
         setError(err);
-        console.error('Failed to preload images:', err);
+        productionLogger.error('Failed to preload images:', err);
       });
   }, [urls]);
 

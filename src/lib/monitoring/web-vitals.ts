@@ -3,6 +3,8 @@
  * تتبع محسّن لمؤشرات أداء الويب الأساسية مع تقييم وتحليل متقدم
  */
 
+import { productionLogger } from '@/lib/logger/production-logger';
+
 interface VitalsMetric {
   name: string;
   value: number;
@@ -76,7 +78,7 @@ function sendToAnalytics(metric: VitalsMetric): void {
   // طباعة في وضع التطوير للتصحيح
   if (IS_DEV) {
     const emoji = metric.rating === 'good' ? '✅' : metric.rating === 'needs-improvement' ? '⚠️' : '❌';
-    console.log(`${emoji} ${metric.name}:`, {
+    productionLogger.debug(`${emoji} ${metric.name}:`, {
       value: Math.round(metric.value),
       rating: metric.rating,
       delta: Math.round(metric.delta)

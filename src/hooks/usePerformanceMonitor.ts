@@ -5,6 +5,7 @@
 
 import { useEffect, useRef } from 'react';
 import { hasMemoryAPI } from '@/types/performance';
+import { productionLogger } from '@/lib/logger/production-logger';
 
 interface PerformanceMetrics {
   renderTime: number;
@@ -27,7 +28,7 @@ export function usePerformanceMonitor(componentName: string) {
       const mountDuration = performance.now() - mountTimeRef.current;
       
       if (import.meta.env.DEV && mountDuration > 16) { // > 1 frame (16ms)
-        console.warn(`⚠️ Slow component: ${componentName} took ${mountDuration.toFixed(2)}ms to mount`);
+        productionLogger.warn(`⚠️ Slow component: ${componentName} took ${mountDuration.toFixed(2)}ms to mount`);
       }
     };
   }, [componentName]);
@@ -41,7 +42,7 @@ export function usePerformanceMonitor(componentName: string) {
       const renderTime = now - lastRenderRef.current;
       
       if (import.meta.env.DEV && renderTime > 16) {
-        console.warn(`⚠️ Slow render: ${componentName} took ${renderTime.toFixed(2)}ms (render #${renderCountRef.current})`);
+        productionLogger.warn(`⚠️ Slow render: ${componentName} took ${renderTime.toFixed(2)}ms (render #${renderCountRef.current})`);
       }
     }
     
@@ -52,7 +53,7 @@ export function usePerformanceMonitor(componentName: string) {
     renderCount: renderCountRef.current,
     logMetrics: () => {
       if (import.meta.env.DEV) {
-        console.log(`📊 ${componentName} metrics:`, {
+        productionLogger.debug(`📊 ${componentName} metrics:`, {
           renders: renderCountRef.current,
           avgRenderTime: '~' + ((performance.now() - mountTimeRef.current) / renderCountRef.current).toFixed(2) + 'ms'
         });
@@ -73,7 +74,7 @@ export function useOperationTimer() {
       } finally {
         const duration = performance.now() - start;
         if (import.meta.env.DEV && duration > 100) {
-          console.warn(`⚠️ Slow operation: ${name} took ${duration.toFixed(2)}ms`);
+          productionLogger.warn(`⚠️ Slow operation: ${name} took ${duration.toFixed(2)}ms`);
         }
       }
     },
@@ -85,7 +86,7 @@ export function useOperationTimer() {
       } finally {
         const duration = performance.now() - start;
         if (import.meta.env.DEV && duration > 16) {
-          console.warn(`⚠️ Slow sync operation: ${name} took ${duration.toFixed(2)}ms`);
+          productionLogger.warn(`⚠️ Slow sync operation: ${name} took ${duration.toFixed(2)}ms`);
         }
       }
     }
@@ -108,10 +109,10 @@ export function useMemoryMonitor() {
           const limitMB = Math.round(memory.jsHeapSizeLimit / 1048576);
           
           if (usedMB > limitMB * 0.9) {
-            console.warn(`⚠️ High memory usage: ${usedMB}MB / ${limitMB}MB (${Math.round(usedMB / limitMB * 100)}%)`);
+            productionLogger.warn(`⚠️ High memory usage: ${usedMB}MB / ${limitMB}MB (${Math.round(usedMB / limitMB * 100)}%)`);
           }
           
-          console.log(`💾 Memory: ${usedMB}MB / ${totalMB}MB (Limit: ${limitMB}MB)`);
+          productionLogger.debug(`💾 Memory: ${usedMB}MB / ${totalMB}MB (Limit: ${limitMB}MB)`);
         }
       }
     };

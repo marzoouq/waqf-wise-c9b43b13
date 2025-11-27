@@ -6,6 +6,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import type { DistributionApprovalInsert, LoanApprovalInsert } from '@/types/approvals';
+import { productionLogger } from '@/lib/logger/production-logger';
 
 export interface ApprovalData {
   reference_id: string;
@@ -64,7 +65,7 @@ export class ApprovalService {
 
         if (updateError) throw updateError;
 
-        console.log(`تم اعتماد التوزيع ${distributionId} بواسطة ${approverName}`);
+        productionLogger.info(`تم اعتماد التوزيع ${distributionId} بواسطة ${approverName}`);
 
         return {
           success: true,
@@ -121,7 +122,7 @@ export class ApprovalService {
 
       if (updateError) throw updateError;
 
-      console.log(`تم رفض التوزيع ${distributionId} بواسطة ${approverName}`);
+      productionLogger.info(`تم رفض التوزيع ${distributionId} بواسطة ${approverName}`);
 
       return {
         success: true,
@@ -178,7 +179,7 @@ export class ApprovalService {
           .update({ status: 'approved' })
           .eq('id', loanId);
 
-        console.log(`تم اعتماد القرض ${loanId} بواسطة ${approverName}`);
+        productionLogger.info(`تم اعتماد القرض ${loanId} بواسطة ${approverName}`);
       }
 
       return { success: true, message: 'تمت الموافقة على القرض' };

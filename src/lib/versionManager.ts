@@ -1,3 +1,5 @@
+import { productionLogger } from '@/lib/logger/production-logger';
+
 const VERSION_KEY = 'app_version';
 
 /**
@@ -9,7 +11,7 @@ export async function checkAndForceUpdate(): Promise<boolean> {
   const currentVersion = import.meta.env.VITE_APP_VERSION;
 
   if (storedVersion !== currentVersion) {
-    console.log(`🔄 إصدار جديد: ${storedVersion} → ${currentVersion}`);
+    productionLogger.info(`🔄 إصدار جديد: ${storedVersion} → ${currentVersion}`);
 
     // 1. مسح جميع الـ caches
     if ('caches' in window) {
