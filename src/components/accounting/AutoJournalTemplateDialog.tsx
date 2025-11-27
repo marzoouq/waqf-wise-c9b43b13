@@ -13,6 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAutoJournalTemplates } from '@/hooks/useAutoJournalTemplates';
 import { Plus, Trash2 } from 'lucide-react';
+import type { AutoJournalTemplate, AccountMapping } from '@/types/auto-journal';
 
 const triggerEvents = [
   { value: 'payment_made', label: 'دفع مستحقات مستفيد' },
@@ -32,15 +33,24 @@ const triggerEvents = [
   { value: 'custom_transaction', label: 'معاملة مخصصة' },
 ];
 
+interface FormData {
+  trigger_event: string;
+  template_name: string;
+  description: string;
+  priority: number;
+  debit_accounts: AccountMapping[];
+  credit_accounts: AccountMapping[];
+}
+
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  template?: any;
+  template?: AutoJournalTemplate;
 }
 
 export function AutoJournalTemplateDialog({ open, onOpenChange, template }: Props) {
   const { createTemplate, updateTemplate } = useAutoJournalTemplates();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     trigger_event: '',
     template_name: '',
     description: '',

@@ -1,16 +1,8 @@
 import { supabase } from "@/integrations/supabase/client";
 import { logger } from "@/lib/logger";
+import type { ReportTemplate, ReportData, ReportFilters } from "@/types/report";
 
-export interface ReportTemplate {
-  id?: string;
-  template_name: string;
-  report_type: string;
-  description?: string;
-  template_config: Record<string, any>;
-  filters?: Record<string, any>;
-  columns?: string[];
-  is_public?: boolean;
-}
+export type { ReportTemplate };
 
 /**
  * خدمة إدارة التقارير المخصصة
@@ -78,7 +70,7 @@ export class ReportService {
   /**
    * توليد تقرير من قالب
    */
-  static async generateReport(templateId: string, customFilters?: Record<string, any>) {
+  static async generateReport(templateId: string, customFilters?: ReportFilters) {
     try {
       // الحصول على القالب
       const { data: template, error: templateError } = await supabase
@@ -90,7 +82,7 @@ export class ReportService {
       if (templateError) throw templateError;
 
       // توليد البيانات حسب نوع التقرير
-      let reportData: any[] = [];
+      let reportData: ReportData[] = [];
       
       switch (template.report_type) {
         case "distributions":

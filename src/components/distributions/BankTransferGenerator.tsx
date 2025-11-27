@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Download, FileText, Loader2, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import type { BankFileFormat, DistributionDetail, GeneratedTransferFile } from "@/types/bank-transfer";
 
 interface BankTransferGeneratorProps {
   distributionId: string;
@@ -15,13 +16,8 @@ interface BankTransferGeneratorProps {
 export function BankTransferGenerator({ distributionId, onSuccess }: BankTransferGeneratorProps) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [fileFormat, setFileFormat] = useState<"ISO20022" | "SWIFT_MT940" | "CSV" | "EXCEL" | "SEPA" | "ACH" | "BACS" | "NCB" | "ALRAJHI">("CSV");
-  const [generatedFile, setGeneratedFile] = useState<{
-    fileNumber: string;
-    totalAmount: number;
-    totalTransactions: number;
-    fileContent: string;
-  } | null>(null);
+  const [fileFormat, setFileFormat] = useState<BankFileFormat>("CSV");
+  const [generatedFile, setGeneratedFile] = useState<GeneratedTransferFile | null>(null);
 
   const handleGenerate = async () => {
     setIsLoading(true);
@@ -42,7 +38,9 @@ export function BankTransferGenerator({ distributionId, onSuccess }: BankTransfe
 
       if (detailsError) throw detailsError;
 
-      if (!details || details.length === 0) {
+      const typedDetails = details as unknown as DistributionDetail[];
+
+      if (!typedDetails || typedDetails.length === 0) {
         toast({
           title: "تنبيه",
           description: "لا توجد دفعات معتمدة للتصدير",
@@ -59,30 +57,30 @@ export function BankTransferGenerator({ distributionId, onSuccess }: BankTransfe
       if (fileNumberError) throw fileNumberError;
 
       // حساب الإجماليات
-      const totalAmount = details.reduce((sum, detail) => sum + detail.allocated_amount, 0);
-      const totalTransactions = details.length;
+      const totalAmount = typedDetails.reduce((sum, detail) => sum + detail.allocated_amount, 0);
+      const totalTransactions = typedDetails.length;
 
       // توليد محتوى الملف حسب الصيغة
       let fileContent = "";
       
       if (fileFormat === "CSV") {
-        fileContent = generateCSV(details);
+        fileContent = generateCSV(typedDetails);
       } else if (fileFormat === "EXCEL") {
-        fileContent = generateExcelData(details);
+        fileContent = generateExcelData(typedDetails);
       } else if (fileFormat === "ISO20022") {
-        fileContent = generateISO20022(details);
+        fileContent = generateISO20022(typedDetails);
       } else if (fileFormat === "SWIFT_MT940") {
-        fileContent = generateSWIFT(details);
+        fileContent = generateSWIFT(typedDetails);
       } else if (fileFormat === "SEPA") {
-        fileContent = generateSEPA(details);
+        fileContent = generateSEPA(typedDetails);
       } else if (fileFormat === "ACH") {
-        fileContent = generateACH(details);
+        fileContent = generateACH(typedDetails);
       } else if (fileFormat === "BACS") {
-        fileContent = generateBACS(details);
+        fileContent = generateBACS(typedDetails);
       } else if (fileFormat === "NCB") {
-        fileContent = generateNCB(details);
+        fileContent = generateNCB(typedDetails);
       } else if (fileFormat === "ALRAJHI") {
-        fileContent = generateAlRajhi(details);
+        fileContent = generateAlRajhi(typedDetails);
       }
 
       // حفظ الملف في قاعدة البيانات
@@ -161,7 +159,7 @@ export function BankTransferGenerator({ distributionId, onSuccess }: BankTransfe
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <label className="text-sm font-medium">صيغة الملف</label>
-          <Select value={fileFormat} onValueChange={(value: any) => setFileFormat(value)}>
+          <Select value={fileFormat} onValueChange={(value: BankFileFormat) => setFileFormat(value)}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
@@ -218,7 +216,7 @@ export function BankTransferGenerator({ distributionId, onSuccess }: BankTransfe
 }
 
 // دوال مساعدة لتوليد محتوى الملفات
-function generateCSV(details: any[]): string {
+function generateCSV(details: DistributionDetail[]): string {
   const headers = "اسم المستفيد,رقم الآيبان,البنك,المبلغ,البيان\n";
   const rows = details.map(d => 
     `"${d.beneficiaries?.full_name || ''}","${d.beneficiaries?.iban || ''}","${d.beneficiaries?.bank_name || ''}",${d.allocated_amount},"${d.notes || ''}"`
@@ -226,12 +224,12 @@ function generateCSV(details: any[]): string {
   return headers + rows;
 }
 
-function generateExcelData(details: any[]): string {
+function generateExcelData(details: DistributionDetail[]): string {
   // نفس CSV لكن سيتم تحويله لـ Excel في المستقبل
   return generateCSV(details);
 }
 
-function generateISO20022(details: any[]): string {
+function generateISO20022(details: DistributionDetail[]): string {
   // XML format for ISO20022
   let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
   xml += '<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pain.001.001.03">\n';
@@ -249,11 +247,11 @@ function generateISO20022(details: any[]): string {
   return xml;
 }
 
-function generateSWIFT(details: any[]): string {
+function generateSWIFT(details: DistributionDetail[]): string {
   // SWIFT MT940 format
   let swift = ":20:Transfer File\n";
   swift += `:25:Waqf Account\n`;
-  details.forEach((d, i) => {
+  details.forEach((d) => {
     swift += `:61:${d.allocated_amount}SAR\n`;
     swift += `:86:${d.beneficiaries?.full_name || ''}\n`;
   });
@@ -261,7 +259,7 @@ function generateSWIFT(details: any[]): string {
 }
 
 // صيغة SEPA (Single Euro Payments Area)
-function generateSEPA(details: any[]): string {
+function generateSEPA(details: DistributionDetail[]): string {
   let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
   xml += '<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pain.008.001.02">\n';
   xml += '  <CstmrDrctDbtInitn>\n';
@@ -298,9 +296,8 @@ function generateSEPA(details: any[]): string {
 }
 
 // صيغة ACH (Automated Clearing House) - أمريكي
-function generateACH(details: any[]): string {
+function generateACH(details: DistributionDetail[]): string {
   let ach = '';
-  const batchNumber = '0000001';
   const today = new Date();
   const dateStr = today.toISOString().split('T')[0].replace(/-/g, '').substring(2);
   
@@ -332,7 +329,7 @@ function generateACH(details: any[]): string {
 }
 
 // صيغة BACS (Bankers' Automated Clearing Services) - بريطاني
-function generateBACS(details: any[]): string {
+function generateBACS(details: DistributionDetail[]): string {
   let bacs = '';
   const today = new Date();
   const dateStr = today.toISOString().split('T')[0].replace(/-/g, '');
@@ -361,7 +358,7 @@ function generateBACS(details: any[]): string {
 }
 
 // صيغة البنك الأهلي السعودي (NCB)
-function generateNCB(details: any[]): string {
+function generateNCB(details: DistributionDetail[]): string {
   let ncb = '';
   const today = new Date();
   const dateStr = today.toISOString().split('T')[0].replace(/-/g, '');
@@ -396,7 +393,7 @@ function generateNCB(details: any[]): string {
 }
 
 // صيغة بنك الراجحي
-function generateAlRajhi(details: any[]): string {
+function generateAlRajhi(details: DistributionDetail[]): string {
   let rajhi = '';
   const today = new Date();
   const batchId = `WAQF${Date.now()}`;
