@@ -1,15 +1,14 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { 
+  handleCors, 
+  jsonResponse, 
+  errorResponse 
+} from '../_shared/cors.ts';
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     const supabase = createClient(
@@ -74,12 +73,6 @@ serve(async (req) => {
       const backupJson = JSON.stringify(backupData, null, 2);
       const backupSize = new Blob([backupJson]).size;
 
-      // في بيئة الإنتاج، يجب حفظ الملف في Storage
-      // const fileName = `backup-${new Date().toISOString()}.json`;
-      // await supabase.storage
-      //   .from('backups')
-      //   .upload(fileName, backupJson);
-
       // تحديث سجل النسخ الاحتياطي
       await supabase
         .from('backup_logs')
@@ -94,19 +87,14 @@ serve(async (req) => {
 
       const backupTime = Date.now() - backupStart;
 
-      return new Response(
-        JSON.stringify({
-          success: true,
-          backupId: backupLog.id,
-          tablesBackedUp: criticalTables.length,
-          totalRecords,
-          backupSize,
-          backupTime,
-        }),
-        {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
-      );
+      return jsonResponse({
+        success: true,
+        backupId: backupLog.id,
+        tablesBackedUp: criticalTables.length,
+        totalRecords,
+        backupSize,
+        backupTime,
+      });
     } catch (error) {
       // تسجيل الخطأ
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -123,13 +111,9 @@ serve(async (req) => {
     }
   } catch (error) {
     console.error('Backup Error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(
-      JSON.stringify({ error: errorMessage }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+    return errorResponse(
+      error instanceof Error ? error.message : 'Unknown error',
+      500
     );
   }
 });

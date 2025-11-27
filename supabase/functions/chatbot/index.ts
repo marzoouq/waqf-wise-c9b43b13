@@ -1,28 +1,23 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { 
+  handleCors, 
+  jsonResponse, 
+  errorResponse, 
+  unauthorizedResponse,
+  forbiddenResponse 
+} from '../_shared/cors.ts';
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     // 🔐 SECURITY: Verify Authorization header
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       console.error('❌ No authorization header provided');
-      return new Response(
-        JSON.stringify({ error: 'غير مصرح - يجب تسجيل الدخول' }),
-        { 
-          status: 401, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
+      return unauthorizedResponse('غير مصرح - يجب تسجيل الدخول');
     }
 
     const supabase = createClient(
@@ -36,10 +31,7 @@ serve(async (req) => {
 
     if (authError || !user) {
       console.error('❌ Invalid token:', authError);
-      return new Response(
-        JSON.stringify({ error: 'رمز المصادقة غير صحيح' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return unauthorizedResponse('رمز المصادقة غير صحيح');
     }
 
     // 🔐 SECURITY: Check if user is staff (not beneficiary)
@@ -50,19 +42,13 @@ serve(async (req) => {
 
     if (roleError) {
       console.error('❌ Error checking roles:', roleError);
-      return new Response(
-        JSON.stringify({ error: 'خطأ في التحقق من الصلاحيات' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return errorResponse('خطأ في التحقق من الصلاحيات', 500);
     }
 
     const isStaff = roles?.some(r => ['admin', 'nazer', 'accountant', 'cashier', 'archivist'].includes(r.role));
     if (!isStaff) {
       console.error('❌ User is not staff:', { userId: user.id, roles });
-      return new Response(
-        JSON.stringify({ error: 'هذه الخدمة متاحة للموظفين فقط' }),
-        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return forbiddenResponse('هذه الخدمة متاحة للموظفين فقط');
     }
 
     console.log('✅ Authorized chatbot request from:', { userId: user.id, email: user.email });
@@ -477,54 +463,19 @@ serve(async (req) => {
       };
     }
 
-    // التحقق من وجود LOVABLE_API_KEY
+    // بناء السياق للذكاء الاصطناعي
+    const contextSummary = Object.entries(contextData)
+      .map(([key, value]) => `${key}: ${JSON.stringify(value)}`)
+      .join('\n');
+
+    // استخدام Lovable AI API
     const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
     if (!lovableApiKey) {
-      throw new Error('LOVABLE_API_KEY is not configured');
+      console.error('LOVABLE_API_KEY is not set');
+      return errorResponse('API Key not configured', 500);
     }
 
-  // إعداد System Prompt المحسّن
-    const systemPrompt = `أنت مساعد ذكي متخصص في إدارة الأوقاف الإسلامية. 
-مهمتك مساعدة الإدارة والموظفين في:
-- تحليل البيانات المالية والإحصائية بدقة عالية
-- الإجابة على الأسئلة حول المستفيدين والعقارات والطلبات والتوزيعات
-- تقديم توصيات عملية ومدروسة بناءً على البيانات المتاحة
-- مساعدة في اتخاذ القرارات الإدارية والتشغيلية
-
-قواعد التفاعل:
-1. استخدم اللغة العربية الفصحى بأسلوب واضح ومباشر
-2. كن مختصراً ومفيداً (200-300 كلمة كحد أقصى)
-3. قدم الأرقام والإحصائيات بتنسيق واضح مع مقارنات مفيدة
-4. استخدم الإيموجي بشكل مناسب (واحد أو اثنين فقط)
-5. إذا لم تكن لديك بيانات كافية، أخبر المستخدم بذلك بوضوح
-6. قدم معلومات دقيقة فقط بناءً على البيانات المتوفرة
-7. نسق الأرقام المالية بوضوح (مثال: 50,000 ريال)
-
-قواعد العرض المحسّنة:
-- عند ذكر قسم معين، اذكر الرابط المباشر له في نهاية الإجابة
-- استخدم تنسيق Markdown للعناوين والقوائم
-- قدم ملخص سريع في بداية الإجابة
-- اختم بتوصية عملية أو خطوة تالية مقترحة
-- عند توفر directLink في البيانات، اذكره في نهاية الرد بصيغة:
-  "🔗 **للوصول المباشر**: [اضغط هنا للذهاب إلى {القسم}]({الرابط})"
-
-مثال على التنسيق الجيد:
-### 📊 ملخص سريع
-- إجمالي المستفيدين: 250 مستفيد
-- المستفيدون النشطون: 230 (92%)
-
-### 📈 التفاصيل
-(تفاصيل إضافية...)
-
-### 💡 توصية
-يُنصح بمراجعة حالات المستفيدين غير النشطين...
-
-🔗 **للوصول المباشر**: [اذهب إلى صفحة المستفيدين](/beneficiaries)`;
-
-    console.log('🤖 Sending to AI with context:', Object.keys(contextData));
-
-    // إرسال الطلب إلى Lovable AI
-    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const aiResponse = await fetch('https://api.lovable.app/v1/ai/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -533,112 +484,49 @@ serve(async (req) => {
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash',
         messages: [
-          { role: 'system', content: systemPrompt },
-          { 
-            role: 'user', 
-            content: `${message}\n\n===البيانات المتاحة للتحليل===\n${JSON.stringify(contextData, null, 2)}`
+          {
+            role: 'system',
+            content: `أنت مساعد ذكي لمنصة إدارة الأوقاف. ساعد المستخدم بالإجابة على أسئلته بناءً على البيانات المتاحة.
+            
+البيانات المتاحة:
+${contextSummary}
+
+قواعد الرد:
+1. استخدم اللغة العربية الفصحى
+2. كن مختصراً ومفيداً
+3. إذا طُلبت بيانات غير متوفرة، أخبر المستخدم
+4. قدم روابط مباشرة للصفحات المناسبة عند الحاجة
+5. استخدم الأرقام والإحصائيات من البيانات المتاحة`
+          },
+          {
+            role: 'user',
+            content: message
           }
         ],
-        max_tokens: 800,
-        temperature: 0.7,
+        max_tokens: 1000,
       }),
     });
 
     if (!aiResponse.ok) {
       const errorText = await aiResponse.text();
-      console.error('❌ AI API Error:', errorText);
-      throw new Error(`AI request failed: ${aiResponse.status}`);
+      console.error('AI API Error:', errorText);
+      return errorResponse(`AI API Error: ${aiResponse.status}`, 500);
     }
 
     const aiData = await aiResponse.json();
-    const botResponse = aiData.choices?.[0]?.message?.content || 'عذراً، لم أتمكن من الإجابة على سؤالك.';
+    const responseText = aiData.choices?.[0]?.message?.content || 'عذراً، لم أتمكن من معالجة طلبك.';
 
-    console.log('✅ AI Response received');
+    return jsonResponse({
+      success: true,
+      response: responseText,
+      context: contextData,
+    });
 
-    // حفظ المحادثة في قاعدة البيانات
-    const { error: insertError } = await supabase.from('chatbot_conversations').insert([
-      { 
-        user_id: userId, 
-        message, 
-        message_type: 'user', 
-        quick_reply_id: quickReplyId,
-        context: contextData 
-      },
-      { 
-        user_id: userId, 
-        message: botResponse, 
-        response: botResponse, 
-        message_type: 'bot' 
-      }
-    ]);
-
-    if (insertError) {
-      console.error('⚠️ Error saving conversation:', insertError);
-    }
-
-    return new Response(
-      JSON.stringify({
-        success: true,
-        response: botResponse,
-        contextDataSummary: {
-          beneficiariesCount: contextData.beneficiaries?.total || 0,
-          hasFinancialData: !!contextData.financial,
-          propertiesCount: contextData.properties?.total || 0,
-          pendingRequestsCount: contextData.requests?.pending || 0,
-          recentDistributions: contextData.distributions?.total || 0,
-          loansCount: contextData.loans?.total || 0,
-          familiesCount: contextData.families?.total || 0,
-          invoicesCount: contextData.invoices?.total || 0,
-        },
-        quickActions: [
-          contextData.beneficiaries?.directLink && {
-            label: 'المستفيدون',
-            icon: '👥',
-            link: contextData.beneficiaries.directLink,
-            count: contextData.beneficiaries.total
-          },
-          contextData.properties?.directLink && {
-            label: 'العقارات',
-            icon: '🏢',
-            link: contextData.properties.directLink,
-            count: contextData.properties.total
-          },
-          contextData.requests?.directLink && {
-            label: 'الطلبات',
-            icon: '📋',
-            link: contextData.requests.directLink,
-            count: contextData.requests.pending
-          },
-          contextData.financial?.directLink && {
-            label: 'المحاسبة',
-            icon: '💰',
-            link: contextData.financial.directLink
-          },
-          contextData.distributions?.directLink && {
-            label: 'التوزيعات',
-            icon: '📊',
-            link: contextData.distributions.directLink,
-            count: contextData.distributions.total
-          },
-        ].filter(Boolean)
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    );
   } catch (error) {
-    console.error('💥 Chatbot Error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'حدث خطأ غير متوقع';
-    
-    return new Response(
-      JSON.stringify({ 
-        error: errorMessage,
-        success: false 
-      }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+    console.error('Chatbot error:', error);
+    return errorResponse(
+      error instanceof Error ? error.message : 'حدث خطأ غير متوقع',
+      500
     );
   }
 });

@@ -1,10 +1,12 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { 
+  handleCors, 
+  jsonResponse, 
+  errorResponse, 
+  unauthorizedResponse,
+  forbiddenResponse 
+} from '../_shared/cors.ts';
 
 /**
  * Edge Function مجدولة لحذف الملفات القديمة تلقائياً
@@ -14,18 +16,14 @@ const corsHeaders = {
  * ⚠️ CRITICAL: يتطلب دور admin فقط
  */
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     // 1. التحقق من المصادقة والصلاحيات
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      return new Response(
-        JSON.stringify({ error: 'Missing authorization header' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return unauthorizedResponse('Missing authorization header');
     }
 
     const supabaseClient = createClient(
@@ -38,10 +36,7 @@ serve(async (req) => {
     );
 
     if (authError || !user) {
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return unauthorizedResponse('Unauthorized');
     }
 
     // 2. التحقق من دور admin
@@ -53,10 +48,7 @@ serve(async (req) => {
 
     if (!roleData || roleData.role !== 'admin') {
       console.warn('Unauthorized cleanup attempt by:', user.id);
-      return new Response(
-        JSON.stringify({ error: 'Forbidden: Admin role required' }),
-        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return forbiddenResponse('Forbidden: Admin role required');
     }
 
     // 3. استخدام Service Role للعمليات
@@ -235,31 +227,19 @@ serve(async (req) => {
     console.log(`   - عدد الملفات المحذوفة: ${totalDeleted}`);
     console.log(`   - المساحة المحررة: ${sizeMB} MB`);
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        message: 'تمت عملية التنظيف بنجاح',
-        stats: {
-          filesDeleted: totalDeleted,
-          sizeFreedMB: parseFloat(sizeMB)
-        }
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    return jsonResponse({
+      success: true,
+      message: 'تمت عملية التنظيف بنجاح',
+      stats: {
+        filesDeleted: totalDeleted,
+        sizeFreedMB: parseFloat(sizeMB)
       }
-    );
+    });
   } catch (error) {
     console.error('❌ خطأ في عملية التنظيف:', error);
-    const errorMessage = error instanceof Error ? error.message : 'خطأ غير معروف';
-    return new Response(
-      JSON.stringify({ 
-        success: false,
-        error: errorMessage 
-      }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+    return errorResponse(
+      error instanceof Error ? error.message : 'خطأ غير معروف',
+      500
     );
   }
 });

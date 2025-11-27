@@ -1,28 +1,24 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { 
+  handleCors, 
+  jsonResponse, 
+  errorResponse 
+} from '../_shared/cors.ts';
 
 /**
  * Edge Function للتحقق من كلمات المرور المسربة
  * يستخدم Have I Been Pwned API v3 (k-Anonymity model)
  */
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     const { password } = await req.json();
 
     if (!password || password.length < 6) {
-      return new Response(
-        JSON.stringify({ isLeaked: false, message: 'Invalid password' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return jsonResponse({ isLeaked: false, message: 'Invalid password' });
     }
 
     // Hash كلمة المرور باستخدام SHA-1
@@ -78,27 +74,18 @@ serve(async (req) => {
       }
     }
 
-    return new Response(
-      JSON.stringify({ 
-        isLeaked, 
-        count,
-        message: isLeaked 
-          ? `تم العثور على هذه الكلمة في ${count} تسريب` 
-          : 'كلمة المرور آمنة'
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    );
+    return jsonResponse({ 
+      isLeaked, 
+      count,
+      message: isLeaked 
+        ? `تم العثور على هذه الكلمة في ${count} تسريب` 
+        : 'كلمة المرور آمنة'
+    });
   } catch (error) {
     console.error('Password check error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(
-      JSON.stringify({ error: errorMessage }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+    return errorResponse(
+      error instanceof Error ? error.message : 'Unknown error',
+      500
     );
   }
 });

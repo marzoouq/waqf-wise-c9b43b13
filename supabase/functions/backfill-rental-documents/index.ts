@@ -1,24 +1,22 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { 
+  handleCors, 
+  jsonResponse, 
+  errorResponse, 
+  unauthorizedResponse,
+  forbiddenResponse 
+} from '../_shared/cors.ts';
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     // 1. التحقق من المصادقة والصلاحيات
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      return new Response(
-        JSON.stringify({ error: 'Missing authorization header' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return unauthorizedResponse('Missing authorization header');
     }
 
     // استخدام Service Role للتحقق من الهوية والصلاحيات
@@ -32,10 +30,7 @@ serve(async (req) => {
     );
 
     if (authError || !user) {
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return unauthorizedResponse('Unauthorized');
     }
 
     // 2. التحقق من دور admin أو accountant
@@ -46,10 +41,7 @@ serve(async (req) => {
 
     if (roleError) {
       console.error('Error checking user role:', roleError);
-      return new Response(
-        JSON.stringify({ error: 'Error verifying permissions' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return errorResponse('Error verifying permissions', 500);
     }
 
     const userRoles = roleData?.map(r => r.role) || [];
@@ -57,10 +49,7 @@ serve(async (req) => {
 
     if (!hasRequiredRole) {
       console.warn('Unauthorized backfill attempt by:', user.id, 'with roles:', userRoles);
-      return new Response(
-        JSON.stringify({ error: 'Forbidden: Admin or Accountant role required' }),
-        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return forbiddenResponse('Forbidden: Admin or Accountant role required');
     }
 
     console.log('🔍 جاري البحث عن الدفعات المدفوعة بدون فواتير...');
@@ -90,14 +79,11 @@ serve(async (req) => {
     console.log(`✅ تم العثور على ${paidPayments?.length || 0} دفعات مدفوعة`);
 
     if (!paidPayments || paidPayments.length === 0) {
-      return new Response(
-        JSON.stringify({ 
-          success: true, 
-          message: 'لا توجد دفعات تحتاج معالجة',
-          processed: 0 
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return jsonResponse({ 
+        success: true, 
+        message: 'لا توجد دفعات تحتاج معالجة',
+        processed: 0 
+      });
     }
 
     let successCount = 0;
@@ -210,26 +196,14 @@ serve(async (req) => {
 
     console.log('📊 النتيجة النهائية:', result);
 
-    return new Response(
-      JSON.stringify(result),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return jsonResponse(result);
 
   } catch (error) {
     console.error('❌ خطأ حرج في Edge Function:', error);
-    const errorMessage = error instanceof Error ? error.message : 'خطأ غير معروف';
-    const errorStack = error instanceof Error ? error.stack : undefined;
-    
-    return new Response(
-      JSON.stringify({ 
-        success: false, 
-        error: errorMessage,
-        details: errorStack
-      }),
-      { 
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
+    return errorResponse(
+      error instanceof Error ? error.message : 'خطأ غير معروف',
+      500,
+      error instanceof Error ? error.stack : undefined
     );
   }
 });

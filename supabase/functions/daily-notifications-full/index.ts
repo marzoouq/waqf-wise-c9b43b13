@@ -1,16 +1,14 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { 
+  handleCors, 
+  jsonResponse, 
+  errorResponse 
+} from '../_shared/cors.ts';
 
 serve(async (req) => {
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -102,39 +100,26 @@ serve(async (req) => {
 
     console.log('🎉 اكتمل تشغيل نظام الإشعارات اليومية بنجاح');
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        message: 'تم تنفيذ جميع المهام اليومية بنجاح',
-        results: {
-          invoices: !invoicesError,
-          installments: !installmentsError,
-          contracts: !contractsError,
-          rentals: !rentalsError,
-          updates: !updateError && !requestsError,
-          reports: !viewsError,
-          cleanup: !cleanupError,
-          deletedNotifications: deletedCount || 0
-        }
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
+    return jsonResponse({
+      success: true,
+      message: 'تم تنفيذ جميع المهام اليومية بنجاح',
+      results: {
+        invoices: !invoicesError,
+        installments: !installmentsError,
+        contracts: !contractsError,
+        rentals: !rentalsError,
+        updates: !updateError && !requestsError,
+        reports: !viewsError,
+        cleanup: !cleanupError,
+        deletedNotifications: deletedCount || 0
       }
-    );
+    });
 
   } catch (error) {
     console.error('❌ خطأ عام:', error);
-    
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: error instanceof Error ? error.message : 'خطأ غير معروف'
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500,
-      }
+    return errorResponse(
+      error instanceof Error ? error.message : 'خطأ غير معروف',
+      500
     );
   }
 });

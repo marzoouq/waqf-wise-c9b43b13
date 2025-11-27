@@ -1,10 +1,10 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { 
+  handleCors, 
+  jsonResponse, 
+  errorResponse 
+} from '../_shared/cors.ts';
 
 interface SmartAlert {
   alert_type: 'contract_expiring' | 'rent_overdue' | 'loan_due' | 'request_overdue' | 'anomaly' | 'recommendation';
@@ -16,9 +16,8 @@ interface SmartAlert {
 }
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -142,27 +141,17 @@ serve(async (req) => {
       if (insertError) throw insertError;
     }
 
-    return new Response(
-      JSON.stringify({ 
-        success: true, 
-        alerts_generated: alerts.length,
-        message: `تم إنشاء ${alerts.length} تنبيه ذكي` 
-      }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200 
-      }
-    );
+    return jsonResponse({ 
+      success: true, 
+      alerts_generated: alerts.length,
+      message: `تم إنشاء ${alerts.length} تنبيه ذكي` 
+    });
 
   } catch (error) {
     console.error('Error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(
-      JSON.stringify({ error: errorMessage }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500 
-      }
+    return errorResponse(
+      error instanceof Error ? error.message : 'Unknown error',
+      500
     );
   }
 });

@@ -1,26 +1,24 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { 
+  handleCors, 
+  jsonResponse, 
+  errorResponse, 
+  unauthorizedResponse,
+  forbiddenResponse,
+  notFoundResponse 
+} from '../_shared/cors.ts';
 
 serve(async (req) => {
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     // 🔐 SECURITY: Verify Authorization header
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       console.error('❌ No authorization header provided');
-      return new Response(
-        JSON.stringify({ error: 'غير مصرح - يجب تسجيل الدخول' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return unauthorizedResponse('غير مصرح - يجب تسجيل الدخول');
     }
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -40,10 +38,7 @@ serve(async (req) => {
 
     if (authError || !user) {
       console.error('❌ Invalid token:', authError);
-      return new Response(
-        JSON.stringify({ error: 'رمز المصادقة غير صحيح' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return unauthorizedResponse('رمز المصادقة غير صحيح');
     }
 
     // 🔐 SECURITY: Check if user has admin or nazer role
@@ -54,10 +49,7 @@ serve(async (req) => {
 
     if (roleError) {
       console.error('❌ Error checking roles:', roleError);
-      return new Response(
-        JSON.stringify({ error: 'خطأ في التحقق من الصلاحيات' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return errorResponse('خطأ في التحقق من الصلاحيات', 500);
     }
 
     const hasPermission = roles?.some(r => ['admin', 'nazer'].includes(r.role));
@@ -76,10 +68,7 @@ serve(async (req) => {
         user_agent: req.headers.get('User-Agent')
       });
 
-      return new Response(
-        JSON.stringify({ error: 'ليس لديك صلاحية لتنفيذ هذه العملية' }),
-        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return forbiddenResponse('ليس لديك صلاحية لتنفيذ هذه العملية');
     }
 
     const { action, beneficiaryId, nationalId, newPassword } = await req.json();
@@ -102,17 +91,11 @@ serve(async (req) => {
 
       if (beneficiaryError || !beneficiary) {
         console.error('Beneficiary not found:', beneficiaryError);
-        return new Response(
-          JSON.stringify({ error: 'المستفيد غير موجود' }),
-          { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+        return notFoundResponse('المستفيد غير موجود');
       }
 
       if (!beneficiary.user_id) {
-        return new Response(
-          JSON.stringify({ error: 'المستفيد لا يملك حساب مفعل' }),
-          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+        return errorResponse('المستفيد لا يملك حساب مفعل', 400);
       }
 
       // تحديث كلمة المرور مباشرة باستخدام Admin API
@@ -123,10 +106,7 @@ serve(async (req) => {
 
       if (updateError) {
         console.error('Error updating password:', updateError);
-        return new Response(
-          JSON.stringify({ error: 'فشل تحديث كلمة المرور: ' + updateError.message }),
-          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+        return errorResponse('فشل تحديث كلمة المرور: ' + updateError.message, 400);
       }
 
       console.log('✅ Password updated successfully for user:', beneficiary.user_id);
@@ -145,31 +125,24 @@ serve(async (req) => {
         user_agent: req.headers.get('User-Agent')
       });
 
-      return new Response(
-        JSON.stringify({ 
-          success: true, 
-          message: 'تم تحديث كلمة المرور بنجاح',
-          beneficiary: {
-            id: beneficiary.id,
-            full_name: beneficiary.full_name,
-            national_id: beneficiary.national_id
-          }
-        }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return jsonResponse({ 
+        success: true, 
+        message: 'تم تحديث كلمة المرور بنجاح',
+        beneficiary: {
+          id: beneficiary.id,
+          full_name: beneficiary.full_name,
+          national_id: beneficiary.national_id
+        }
+      });
     }
 
-    return new Response(
-      JSON.stringify({ error: 'عملية غير معروفة' }),
-      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return errorResponse('عملية غير معروفة', 400);
 
   } catch (error) {
     console.error('Error in admin-manage-beneficiary-password:', error);
-    const errorMessage = error instanceof Error ? error.message : 'حدث خطأ غير متوقع';
-    return new Response(
-      JSON.stringify({ error: errorMessage }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    return errorResponse(
+      error instanceof Error ? error.message : 'حدث خطأ غير متوقع',
+      500
     );
   }
 });
