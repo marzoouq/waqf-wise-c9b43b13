@@ -62,3 +62,12 @@ verify_jwt = true
 
 [functions.extract-invoice-data]
 verify_jwt = true
+
+[functions.auto-classify-document]
+verify_jwt = true
+
+[functions.contract-renewal-alerts]
+verify_jwt = false
+
+[functions.intelligent-search]
+verify_jwt = true
