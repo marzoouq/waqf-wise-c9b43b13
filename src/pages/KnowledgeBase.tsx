@@ -242,8 +242,8 @@ const KnowledgeBase = () => {
             </CardHeader>
             <CardContent>
               <Accordion type="single" collapsible className="w-full">
-                {filteredFAQs.map((faq, index) => (
-                  <AccordionItem key={index} value={`faq-${index}`}>
+                {filteredFAQs.map((faq) => (
+                  <AccordionItem key={faq.question} value={faq.question}>
                     <AccordionTrigger className="text-right">
                       {faq.question}
                     </AccordionTrigger>

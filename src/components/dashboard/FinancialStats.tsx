@@ -72,9 +72,9 @@ const FinancialStats = () => {
 
   return (
     <UnifiedStatsGrid columns={3}>
-      {stats.map((stat, index) => (
+      {stats.map((stat) => (
         <UnifiedKPICard
-          key={index}
+          key={stat.title}
           title={stat.title}
           value={stat.value}
           icon={stat.icon}

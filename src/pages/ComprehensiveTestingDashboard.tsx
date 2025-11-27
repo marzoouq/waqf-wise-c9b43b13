@@ -421,9 +421,9 @@ export default function ComprehensiveTestingDashboard() {
                 </div>
 
                 <div className="space-y-2">
-                  {phase.tests.map((test, index) => (
+                  {phase.tests.map((test) => (
                     <div 
-                      key={index}
+                      key={test.name}
                       className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
                     >
                       <div className="flex items-center gap-3">

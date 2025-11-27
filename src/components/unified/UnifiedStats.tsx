@@ -70,12 +70,12 @@ export function UnifiedStats({
   if (variant === "compact") {
     return (
       <div className={cn("grid gap-4", gridCols[columns], className)}>
-        {stats.map((stat, index) => {
+        {stats.map((stat) => {
           const Icon = stat.icon;
           const color = stat.color || "primary";
           
           return (
-            <Card key={index}>
+            <Card key={stat.title}>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
@@ -111,12 +111,12 @@ export function UnifiedStats({
 
   return (
     <div className={cn("grid gap-4", gridCols[columns], className)}>
-      {stats.map((stat, index) => {
+      {stats.map((stat) => {
         const Icon = stat.icon;
         const color = stat.color || "primary";
         
         return (
-          <Card key={index}>
+          <Card key={stat.title}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">
                 {stat.title}

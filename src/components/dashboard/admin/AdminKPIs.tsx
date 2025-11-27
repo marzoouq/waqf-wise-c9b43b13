@@ -81,7 +81,7 @@ export const AdminKPIs = memo(() => {
       <UnifiedStatsGrid>
         {[...Array(8)].map((_, i) => (
           <UnifiedKPICard
-            key={i}
+            key={`skeleton-${i}`}
             title=""
             value="0"
             icon={Users}
@@ -96,9 +96,9 @@ export const AdminKPIs = memo(() => {
 
   return (
     <UnifiedStatsGrid className="mb-8">
-      {stats.map((stat, index) => (
+      {stats.map((stat) => (
         <UnifiedKPICard
-          key={index}
+          key={stat.title}
           title={stat.title}
           value={stat.value}
           icon={stat.icon}

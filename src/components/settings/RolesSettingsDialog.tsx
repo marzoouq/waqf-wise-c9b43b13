@@ -129,8 +129,8 @@ export function RolesSettingsDialog({
                     </Badge>
                   </div>
                   <ul className="space-y-2">
-                    {permissions.map((permission, index) => (
-                      <li key={index} className="flex items-start gap-2 text-sm">
+                    {permissions.map((permission) => (
+                      <li key={permission} className="flex items-start gap-2 text-sm">
                         <CheckCircle2 className="h-4 w-4 text-success mt-0.5 flex-shrink-0" />
                         <span>{permission}</span>
                       </li>

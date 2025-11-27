@@ -39,7 +39,7 @@ export default function NazerKPIs() {
         <UnifiedStatsGrid columns={4}>
           {[...Array(8)].map((_, i) => (
             <UnifiedKPICard 
-              key={i}
+              key={`skeleton-${i}`}
               title="جاري التحميل..."
               value="..."
               icon={Building2}
@@ -126,9 +126,9 @@ export default function NazerKPIs() {
       />
       
       <UnifiedStatsGrid columns={4}>
-        {kpiCards.map((kpi, index) => (
+        {kpiCards.map((kpi) => (
           <UnifiedKPICard 
-            key={index}
+            key={kpi.title}
             title={kpi.title}
             value={kpi.value}
             icon={kpi.icon}

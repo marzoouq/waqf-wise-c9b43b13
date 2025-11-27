@@ -213,8 +213,8 @@ export function DistributionEfficiencyReport({ distributions }: DistributionEffi
         <Card className="p-6">
           <h3 className="text-lg font-semibold mb-4">نقاط الاختناق</h3>
           <div className="space-y-4">
-            {bottlenecks.map((bottleneck, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+            {bottlenecks.map((bottleneck) => (
+              <div key={bottleneck.stage} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                 <div className="flex-1">
                   <div className="font-medium">{bottleneck.stage}</div>
                   <div className="text-sm text-muted-foreground">

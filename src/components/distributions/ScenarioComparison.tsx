@@ -82,8 +82,8 @@ export function ScenarioComparison({ scenarios, onExport }: ScenarioComparisonPr
 
       {/* ملخص السيناريوهات */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {scenarios.map((scenario, index) => (
-          <Card key={index}>
+        {scenarios.map((scenario) => (
+          <Card key={scenario.pattern}>
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <Badge className={patternColors[scenario.pattern]}>
@@ -128,7 +128,7 @@ export function ScenarioComparison({ scenarios, onExport }: ScenarioComparisonPr
           <ScrollArea className="h-[500px]">
             <div className="space-y-4">
               {beneficiaryComparison.map((comparison, index) => (
-                <div key={index}>
+                <div key={comparison.beneficiary}>
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <h4 className="font-medium">{comparison.beneficiary}</h4>

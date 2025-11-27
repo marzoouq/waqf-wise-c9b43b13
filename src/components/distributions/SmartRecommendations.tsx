@@ -127,7 +127,7 @@ export function SmartRecommendations({ scenarios, onSelectScenario }: SmartRecom
               ملاحظات مهمة
             </h4>
             {analysis.warnings.map((warning, index) => (
-              <Alert key={index} variant="destructive">
+              <Alert key={`warning-${index}`} variant="destructive">
                 <AlertDescription className="text-sm">{warning}</AlertDescription>
               </Alert>
             ))}

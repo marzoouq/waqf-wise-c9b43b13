@@ -187,8 +187,8 @@ export default function BeneficiarySupport() {
               </CardHeader>
               <CardContent>
                 <Accordion type="single" collapsible className="w-full">
-                  {faqs.map((faq, index) => (
-                    <AccordionItem key={index} value={`item-${index}`}>
+                  {faqs.map((faq) => (
+                    <AccordionItem key={faq.question} value={faq.question}>
                       <AccordionTrigger className="text-right hover:no-underline">
                         {faq.question}
                       </AccordionTrigger>

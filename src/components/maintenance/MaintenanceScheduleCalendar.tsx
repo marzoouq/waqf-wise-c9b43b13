@@ -109,14 +109,14 @@ export const MaintenanceScheduleCalendar = ({
 
           {/* أيام الشهر */}
           <div className="grid grid-cols-7 gap-2">
-            {daysInMonth.map((day, index) => {
+          {daysInMonth.map((day) => {
               const daySchedules = getSchedulesForDay(day);
               const hasSchedules = daySchedules.length > 0;
               const today = isToday(day);
 
               return (
                 <div
-                  key={index}
+                  key={day.toISOString()}
                   className={cn(
                     "min-h-[80px] p-2 rounded-lg border transition-colors",
                     today && "border-primary bg-primary/5",

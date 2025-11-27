@@ -25,11 +25,11 @@ export function DashboardActions({ actions }: DashboardActionsProps) {
       </CardHeader>
       <CardContent>
         <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
-          {actions.map((action, index) => {
+          {actions.map((action) => {
             const Icon = action.icon;
             return (
               <Button
-                key={index}
+                key={action.label}
                 variant={action.variant || "outline"}
                 className="w-full justify-start"
                 onClick={action.onClick}
