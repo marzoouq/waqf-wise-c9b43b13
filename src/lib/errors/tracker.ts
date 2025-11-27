@@ -400,16 +400,9 @@ class ErrorTracker {
           setTimeout(() => reject(new Error('Request timeout')), this.config.requestTimeout)
         );
         
-        let bodyString: string;
-        try {
-          bodyString = JSON.stringify(cleanReport);
-        } catch {
-          console.warn('Failed to stringify error report, skipping');
-          continue;
-        }
-        
+        // إرسال object مباشرة - Supabase client يقوم بالـ serialization تلقائياً
         const invokePromise = supabase.functions.invoke('log-error', {
-          body: bodyString,
+          body: cleanReport,
           headers: {
             Authorization: `Bearer ${session.access_token}`,
             'Content-Type': 'application/json'
