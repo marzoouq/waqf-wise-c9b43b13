@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { TrendingUp, Clock, CheckCircle2, DollarSign } from "lucide-react";
+import { TrendingUp, Clock, CheckCircle2, DollarSign, LucideIcon } from "lucide-react";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
@@ -12,6 +12,8 @@ import { MaskedValue } from "@/components/shared/MaskedValue";
 interface BeneficiaryDistributionsTabProps {
   beneficiaryId: string;
 }
+
+type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
 
 export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistributionsTabProps) {
   const { settings } = useVisibilitySettings();
@@ -36,7 +38,7 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
   const pendingAmount = 0; // سيتم حسابه من الطلبات المعلقة
 
   const getPaymentStatusBadge = (status: string) => {
-    const config: Record<string, { icon: any; variant: "default" | "secondary" | "destructive" | "outline" }> = {
+    const config: Record<string, { icon: LucideIcon; variant: BadgeVariant }> = {
       "مدفوع": { icon: CheckCircle2, variant: "outline" },
       "معلق": { icon: Clock, variant: "secondary" },
       "قيد المعالجة": { icon: Clock, variant: "default" },

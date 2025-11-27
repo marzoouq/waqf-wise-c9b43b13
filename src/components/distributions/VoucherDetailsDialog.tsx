@@ -3,14 +3,42 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { FileText, Download, CheckCircle, XCircle, Clock, User, Calendar, DollarSign, Building2 } from "lucide-react";
+import { FileText, Download, CheckCircle, XCircle, Clock, User, Calendar, DollarSign, Building2, LucideIcon } from "lucide-react";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+
+type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
+
+interface VoucherBeneficiary {
+  full_name: string;
+  national_id?: string;
+}
+
+interface Voucher {
+  id: string;
+  voucher_number: string;
+  voucher_type?: string;
+  amount: number;
+  status: string;
+  description?: string;
+  payment_method?: string;
+  bank_name?: string;
+  account_number?: string;
+  bank_iban?: string;
+  reference_number?: string;
+  notes?: string;
+  created_at: string;
+  approved_by?: string;
+  approved_at?: string;
+  paid_by?: string;
+  paid_at?: string;
+  beneficiaries?: VoucherBeneficiary;
+}
 
 interface VoucherDetailsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  voucher: any;
+  voucher: Voucher | null;
 }
 
 export function VoucherDetailsDialog({
@@ -21,7 +49,7 @@ export function VoucherDetailsDialog({
   if (!voucher) return null;
 
   const getStatusConfig = (status: string) => {
-    const configs: Record<string, { label: string; variant: any; icon: any; className?: string }> = {
+    const configs: Record<string, { label: string; variant: BadgeVariant; icon: LucideIcon; className?: string }> = {
       draft: { label: "مسودة", variant: "secondary", icon: Clock },
       approved: { label: "معتمد", variant: "default", icon: CheckCircle, className: "bg-info text-info-foreground" },
       paid: { label: "مدفوع", variant: "default", icon: CheckCircle, className: "bg-success text-success-foreground" },

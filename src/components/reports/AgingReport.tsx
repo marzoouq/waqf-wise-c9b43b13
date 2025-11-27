@@ -48,7 +48,16 @@ export function AgingReport() {
       const twoMonthsAgo = new Date(today.getTime() - 60 * 24 * 60 * 60 * 1000);
       const threeMonthsAgo = new Date(today.getTime() - 90 * 24 * 60 * 60 * 1000);
       
-      return ((beneficiaries || []) as BeneficiaryAgingData[]).map((ben) => {
+interface AgingItem {
+  id: string;
+  beneficiary_name: string;
+  amount_due: number;
+  due_date: string;
+  daysPastDue: number;
+  ageCategory: string;
+}
+
+      return ((beneficiaries || []) as BeneficiaryAgingData[]).map((ben): AgingItem => {
         // محاكاة بيانات العمر بناءً على الرصيد
         const balance = ben.account_balance || 0;
         let ageCategory = 'current';
@@ -204,7 +213,7 @@ export function AgingReport() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  agingData.map((item: any) => (
+                  agingData.map((item) => (
                     <TableRow key={item.id}>
                       <TableCell className="font-medium">
                         {item.beneficiary_name || 'غير معروف'}

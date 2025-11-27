@@ -13,8 +13,8 @@ interface ActivityLog {
   action_description: string;
   performed_by_name: string | null;
   created_at: string;
-  old_values: any;
-  new_values: any;
+  old_values: Record<string, unknown> | null;
+  new_values: Record<string, unknown> | null;
 }
 
 interface BeneficiaryActivityTimelineProps {

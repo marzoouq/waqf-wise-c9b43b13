@@ -7,6 +7,27 @@ import { Plus, Edit, Trash2, Zap, Settings } from 'lucide-react';
 import { useAutoJournalTemplates } from '@/hooks/useAutoJournalTemplates';
 import { AutoJournalTemplateDialog } from './AutoJournalTemplateDialog';
 import { UnifiedDataTable, type Column } from '@/components/unified/UnifiedDataTable';
+import type { AutoJournalTemplate as DialogTemplate } from '@/types/auto-journal';
+
+interface AccountEntry {
+  account_code: string;
+  account_id?: string;
+  percentage?: number;
+  fixed_amount?: number;
+}
+
+interface Template {
+  id: string;
+  template_name: string;
+  trigger_event: string;
+  debit_accounts: AccountEntry[];
+  credit_accounts: AccountEntry[];
+  is_active: boolean;
+  priority?: number;
+  description?: string;
+  created_at?: string;
+  updated_at?: string;
+}
 
 const triggerEventLabels: Record<string, string> = {
   payment_made: 'دفع مستحقات مستفيد',
@@ -29,10 +50,10 @@ const triggerEventLabels: Record<string, string> = {
 export function AutoJournalTemplatesManager() {
   const { templates, isLoading, toggleActive, deleteTemplate } = useAutoJournalTemplates();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingTemplate, setEditingTemplate] = useState<any>(null);
+  const [editingTemplate, setEditingTemplate] = useState<DialogTemplate | null>(null);
 
-  const handleEdit = (template: any) => {
-    setEditingTemplate(template);
+  const handleEdit = (template: Template) => {
+    setEditingTemplate(template as unknown as DialogTemplate);
     setDialogOpen(true);
   };
 
@@ -51,7 +72,9 @@ export function AutoJournalTemplatesManager() {
     await toggleActive({ id, is_active: !isActive });
   };
 
-  const columns: Column<any>[] = [
+  const typedTemplates = templates as unknown as Template[];
+
+  const columns: Column<Template>[] = [
     {
       key: "trigger_event",
       label: "الحدث المُشغل",
@@ -73,7 +96,7 @@ export function AutoJournalTemplatesManager() {
       label: "الحسابات المدينة",
       render: (_, template) => (
         <div className="flex flex-wrap gap-1">
-          {template.debit_accounts.map((acc: any, idx: number) => (
+          {(template.debit_accounts as AccountEntry[]).map((acc, idx) => (
             <Badge key={idx} variant="secondary" className="text-xs">
               {acc.account_code}
             </Badge>
@@ -87,7 +110,7 @@ export function AutoJournalTemplatesManager() {
       label: "الحسابات الدائنة",
       render: (_, template) => (
         <div className="flex flex-wrap gap-1">
-          {template.credit_accounts.map((acc: any, idx: number) => (
+          {(template.credit_accounts as AccountEntry[]).map((acc, idx) => (
             <Badge key={idx} variant="secondary" className="text-xs">
               {acc.account_code}
             </Badge>
@@ -150,7 +173,7 @@ export function AutoJournalTemplatesManager() {
         <CardContent>
           <UnifiedDataTable
             columns={columns}
-            data={templates}
+            data={typedTemplates}
             loading={isLoading}
             emptyMessage="لا توجد قوالب"
             actions={(template) => (

@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Clock, CheckCircle2, XCircle, AlertCircle, FileText, Eye } from "lucide-react";
+import { Plus, Clock, CheckCircle2, XCircle, AlertCircle, FileText, Eye, LucideIcon } from "lucide-react";
 import { RequestSubmissionDialog } from "@/components/beneficiary/RequestSubmissionDialog";
 import { RequestDetailsDialog } from "@/components/beneficiary/RequestDetailsDialog";
 import { RequestAttachmentsUploader } from "@/components/beneficiary/RequestAttachmentsUploader";
@@ -16,6 +16,13 @@ import { ar } from "date-fns/locale";
 interface BeneficiaryRequestsTabProps {
   beneficiaryId: string;
 }
+
+interface RequestType {
+  name_ar: string;
+  requires_amount?: boolean;
+}
+
+type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
 
 export function BeneficiaryRequestsTab({ beneficiaryId }: BeneficiaryRequestsTabProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -30,7 +37,6 @@ export function BeneficiaryRequestsTab({ beneficiaryId }: BeneficiaryRequestsTab
           *,
           request_types (
             name_ar,
-            icon,
             requires_amount
           )
         `)
@@ -43,7 +49,7 @@ export function BeneficiaryRequestsTab({ beneficiaryId }: BeneficiaryRequestsTab
   });
 
   const getStatusBadge = (status: string) => {
-    const config: Record<string, { icon: any; variant: "default" | "secondary" | "destructive" | "outline" }> = {
+    const config: Record<string, { icon: LucideIcon; variant: BadgeVariant }> = {
       "معلق": { icon: Clock, variant: "secondary" },
       "قيد المراجعة": { icon: FileText, variant: "default" },
       "معتمد": { icon: CheckCircle2, variant: "outline" },
@@ -119,7 +125,7 @@ export function BeneficiaryRequestsTab({ beneficiaryId }: BeneficiaryRequestsTab
                     <TableRow key={request.id}>
                       <TableCell className="font-medium">{request.request_number || "—"}</TableCell>
                       <TableCell>
-                        {(request.request_types as any)?.name_ar || "—"}
+                        {(request.request_types as RequestType | null)?.name_ar || "—"}
                       </TableCell>
                       <TableCell>
                         {request.amount 
