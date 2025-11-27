@@ -9,6 +9,7 @@ import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { useState } from "react";
 import { AIAssistantDialog } from "./AIAssistantDialog";
+import type { SystemAlert, SeverityConfig } from "@/types/alerts";
 
 export function AlertsPanel() {
   const [aiDialogOpen, setAiDialogOpen] = useState(false);
@@ -17,19 +18,19 @@ export function AlertsPanel() {
     queryKey: ["system-alerts"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("system_alerts" as any)
+        .from("system_alerts")
         .select("*")
         .order("created_at", { ascending: false })
         .limit(10);
       
       if (error) throw error;
-      return data as any[];
+      return (data || []) as SystemAlert[];
     },
     refetchInterval: 60000
   });
 
-  const getSeverityConfig = (severity: string) => {
-    const configs: Record<string, { icon: any; variant: "default" | "secondary" | "destructive" | "outline"; color: string }> = {
+  const getSeverityConfig = (severity: string): SeverityConfig => {
+    const configs: Record<string, SeverityConfig> = {
       critical: { icon: XCircle, variant: "destructive", color: "text-destructive" },
       high: { icon: AlertCircle, variant: "destructive", color: "text-destructive" },
       medium: { icon: Clock, variant: "secondary", color: "text-warning" },

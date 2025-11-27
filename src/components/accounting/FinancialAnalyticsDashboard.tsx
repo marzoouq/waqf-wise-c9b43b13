@@ -5,6 +5,7 @@ import { TrendingUp, TrendingDown, DollarSign, Activity, RefreshCw } from 'lucid
 import { useFinancialAnalytics } from '@/hooks/useFinancialAnalytics';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
+import type { FinancialKPI, KPIsByName, KPIsByCategory } from '@/types/financial';
 
 const kpiLabels: Record<string, string> = {
   current_ratio: 'نسبة السيولة الجارية',
@@ -60,18 +61,19 @@ export function FinancialAnalyticsDashboard() {
     return 'neutral';
   };
 
-  const latestKPIs = kpis.reduce((acc: any, kpi) => {
+  const latestKPIs = kpis.reduce<KPIsByName>((acc, kpi) => {
     if (!acc[kpi.kpi_name] || new Date(kpi.created_at) > new Date(acc[kpi.kpi_name].created_at)) {
-      acc[kpi.kpi_name] = kpi;
+      acc[kpi.kpi_name] = kpi as FinancialKPI;
     }
     return acc;
   }, {});
 
-  const groupedKPIs = Object.values(latestKPIs).reduce((acc: any, kpi: any) => {
-    if (!acc[kpi.kpi_category]) {
-      acc[kpi.kpi_category] = [];
+  const groupedKPIs = Object.values(latestKPIs).reduce<KPIsByCategory>((acc, kpi) => {
+    const category = kpi.kpi_category || 'other';
+    if (!acc[category]) {
+      acc[category] = [];
     }
-    acc[kpi.kpi_category].push(kpi);
+    acc[category].push(kpi);
     return acc;
   }, {});
 
@@ -97,7 +99,7 @@ export function FinancialAnalyticsDashboard() {
         </CardHeader>
       </Card>
 
-      {Object.entries(groupedKPIs).map(([category, categoryKPIs]: [string, any]) => (
+      {Object.entries(groupedKPIs).map(([category, categoryKPIs]) => (
         <Card key={category}>
           <CardHeader>
             <CardTitle className="text-lg">
@@ -106,7 +108,7 @@ export function FinancialAnalyticsDashboard() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {categoryKPIs.map((kpi: any) => {
+              {categoryKPIs.map((kpi) => {
                 const status = getKPIStatus(kpi);
                 return (
                   <Card key={kpi.id} className="border-2">

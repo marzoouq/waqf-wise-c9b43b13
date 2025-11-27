@@ -6,6 +6,30 @@ import { Clock, AlertTriangle } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 
+interface BeneficiaryAgingData {
+  id: string;
+  full_name: string;
+  account_balance: number | null;
+  total_received: number | null;
+}
+
+interface AgingRecord {
+  id: string;
+  beneficiary_name: string;
+  amount_due: number;
+  days_overdue: number;
+  ageCategory: string;
+}
+
+interface AgingSummary {
+  current: number;
+  '1-30': number;
+  '30-60': number;
+  '60-90': number;
+  '90+': number;
+  total: number;
+}
+
 export function AgingReport() {
   const { data: agingData, isLoading } = useQuery({
     queryKey: ['aging_report'],
@@ -24,7 +48,7 @@ export function AgingReport() {
       const twoMonthsAgo = new Date(today.getTime() - 60 * 24 * 60 * 60 * 1000);
       const threeMonthsAgo = new Date(today.getTime() - 90 * 24 * 60 * 60 * 1000);
       
-      return (beneficiaries || []).map((ben: any) => {
+      return ((beneficiaries || []) as BeneficiaryAgingData[]).map((ben) => {
         // محاكاة بيانات العمر بناءً على الرصيد
         const balance = ben.account_balance || 0;
         let ageCategory = 'current';
@@ -57,9 +81,12 @@ export function AgingReport() {
     },
   });
 
-  const summary = agingData?.reduce(
-    (acc: any, loan: any) => {
-      acc[loan.ageCategory] = (acc[loan.ageCategory] || 0) + loan.amount_due;
+  const summary = agingData?.reduce<AgingSummary>(
+    (acc, loan) => {
+      const category = loan.ageCategory as keyof AgingSummary;
+      if (category !== 'total') {
+        acc[category] = (acc[category] || 0) + loan.amount_due;
+      }
       acc.total += loan.amount_due;
       return acc;
     },

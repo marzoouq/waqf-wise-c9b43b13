@@ -3,6 +3,23 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useMemo } from "react";
 
+interface JournalEntryLineWithAccount {
+  debit_amount: number;
+  credit_amount: number;
+  entry_type?: string;
+  account_id: string;
+  accounts?: {
+    account_type?: string;
+    account_nature?: string;
+  };
+}
+
+interface JournalEntryWithLines {
+  id: string;
+  entry_date: string;
+  journal_entry_lines?: JournalEntryLineWithAccount[];
+}
+
 export function RevenueExpenseChartUnified() {
   const { data: journalEntries } = useQuery({
     queryKey: ['journal-entries-chart'],
@@ -27,8 +44,8 @@ export function RevenueExpenseChartUnified() {
         .select(`
           *,
           journal_entry_lines (
-            amount,
-            entry_type,
+            debit_amount,
+            credit_amount,
             account_id,
             accounts (
               account_type,
@@ -51,7 +68,7 @@ export function RevenueExpenseChartUnified() {
     // تجميع البيانات حسب الشهر
     const monthlyData: Record<string, { revenue: number; expense: number }> = {};
 
-    journalEntriesWithLines.forEach((entry: any) => {
+    (journalEntriesWithLines as unknown as JournalEntryWithLines[]).forEach((entry) => {
       const date = new Date(entry.entry_date);
       const monthName = date.toLocaleDateString('ar-SA', { month: 'long' });
       
@@ -60,8 +77,8 @@ export function RevenueExpenseChartUnified() {
       }
 
       // جمع المبالغ من journal_entry_lines
-      entry.journal_entry_lines?.forEach((line: any) => {
-        const amount = Math.abs(line.amount);
+      entry.journal_entry_lines?.forEach((line) => {
+        const amount = Math.abs(line.debit_amount - line.credit_amount);
         
         // تصنيف حسب نوع الحساب
         if (line.accounts?.account_type === 'revenue') {
