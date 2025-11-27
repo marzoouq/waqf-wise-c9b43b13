@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { productionLogger } from "@/lib/logger/production-logger";
 import type { Json } from "@/integrations/supabase/types";
 
 export interface BeneficiaryActivity {
@@ -32,12 +33,12 @@ export function useBeneficiaryActivityLog(beneficiaryId?: string) {
         .maybeSingle();
 
       if (checkError) {
-        console.error('Error checking beneficiary:', checkError);
+        productionLogger.error('Error checking beneficiary:', checkError);
         throw new Error('فشل التحقق من المستفيد');
       }
 
       if (!beneficiary) {
-        console.warn('Beneficiary not found:', beneficiaryId);
+        productionLogger.warn('Beneficiary not found:', { beneficiaryId });
         return [];
       }
 
@@ -49,7 +50,7 @@ export function useBeneficiaryActivityLog(beneficiaryId?: string) {
         .limit(100);
 
       if (queryError) {
-        console.error('Error fetching activity log:', queryError);
+        productionLogger.error('Error fetching activity log:', queryError);
         throw queryError;
       }
       

@@ -4,6 +4,7 @@
  */
 
 import { useCallback, useMemo, useRef, useEffect, useState } from 'react';
+import { productionLogger } from '@/lib/logger/production-logger';
 
 /**
  * نوع عام للدوال
@@ -23,10 +24,8 @@ export function useRenderPerformance(componentName: string) {
     const renderTime = endTime - startTime.current;
 
     if (renderTime > 16) { // أكثر من 16ms (60fps)
-      console.warn(
-        `⚠️ Slow render detected in ${componentName}:`,
-        `${renderTime.toFixed(2)}ms`,
-        `(render #${renderCount.current})`
+      productionLogger.warn(
+        `Slow render detected in ${componentName}: ${renderTime.toFixed(2)}ms (render #${renderCount.current})`
       );
     }
 

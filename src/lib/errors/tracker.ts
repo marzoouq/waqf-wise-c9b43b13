@@ -330,7 +330,7 @@ class ErrorTracker {
     this.errorDeduplication.set(errorKey, { count: 1, lastSeen: now, resolved: false });
     
     if (this.consecutiveErrors >= this.config.maxConsecutiveErrors) {
-      console.warn('Circuit breaker opened - too many consecutive errors');
+      productionLogger.warn('Circuit breaker opened - too many consecutive errors');
       return;
     }
 
@@ -391,7 +391,7 @@ class ErrorTracker {
         const { data: { session } } = await supabase.auth.getSession();
         
         if (!session) {
-          console.warn('No session available for error tracking');
+          productionLogger.warn('No session available for error tracking');
           this.errorQueue.unshift(report);
           break;
         }
@@ -422,7 +422,7 @@ class ErrorTracker {
         }
         
       } catch (error) {
-        console.warn('Failed to send error report (will retry)', error);
+        productionLogger.warn('Failed to send error report (will retry)', error);
         
         this.failedAttempts++;
         this.consecutiveErrors++;
@@ -431,7 +431,7 @@ class ErrorTracker {
         if (this.failedAttempts >= this.config.maxFailedAttempts) {
           this.circuitBreakerOpen = true;
           this.circuitBreakerResetTime = Date.now() + this.config.circuitBreakerTimeout;
-          console.warn(`Circuit breaker opened. Queue: ${this.errorQueue.length}`);
+          productionLogger.warn(`Circuit breaker opened. Queue: ${this.errorQueue.length}`);
           this.savePendingErrors();
         } else {
           this.config.backoffDelay = Math.min(this.config.backoffDelay * 2, 30000);

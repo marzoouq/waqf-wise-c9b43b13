@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { productionLogger } from "@/lib/logger/production-logger";
 
 interface SendNotificationParams {
   userId: string;
@@ -25,7 +26,7 @@ export function useNotificationSystem() {
 
       return { success: true, data };
     } catch (error) {
-      console.error('Failed to send notification:', error);
+      productionLogger.error('Failed to send notification:', error);
       toast.error('فشل إرسال الإشعار');
       return { success: false, error };
     }

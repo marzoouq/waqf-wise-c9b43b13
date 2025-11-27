@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { productionLogger } from "@/lib/logger/production-logger";
 
 export interface KPI {
   id: string;
@@ -197,7 +198,7 @@ async function calculateKPIValue(kpiCode: string): Promise<number> {
         return 0;
     }
   } catch (error) {
-    console.error(`Error calculating KPI ${kpiCode}:`, error);
+    productionLogger.error(`Error calculating KPI ${kpiCode}:`, error);
     return 0;
   }
 }

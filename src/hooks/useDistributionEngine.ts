@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { DistributionEngine, DistributionParams, DistributionResult, DistributionSummary } from '@/lib/distribution-engine';
 import { useToast } from './use-toast';
+import { productionLogger } from '@/lib/logger/production-logger';
 
 export interface SimulationResult {
   results: DistributionResult[];
@@ -37,7 +38,7 @@ export function useDistributionEngine() {
 
         return simulation;
       } catch (error) {
-        console.error('خطأ في حساب التوزيع:', error);
+        productionLogger.error('خطأ في حساب التوزيع:', error);
         toast({
           title: 'خطأ في الحساب',
           description: error instanceof Error ? error.message : 'حدث خطأ غير متوقع',
@@ -84,7 +85,7 @@ export function useDistributionEngine() {
 
         return results;
       } catch (error) {
-        console.error('خطأ في حساب السيناريوهات:', error);
+        productionLogger.error('خطأ في حساب السيناريوهات:', error);
         toast({
           title: 'خطأ في الحساب',
           description: error instanceof Error ? error.message : 'حدث خطأ غير متوقع',

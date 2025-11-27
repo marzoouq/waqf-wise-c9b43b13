@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "./use-toast";
+import { productionLogger } from "@/lib/logger/production-logger";
 import type { Database } from "@/integrations/supabase/types";
 
 type DbGovernanceDecision = Database['public']['Tables']['governance_decisions']['Row'];
@@ -20,12 +21,12 @@ export function useGovernanceDecisions() {
           .order("decision_date", { ascending: false });
         
         if (error) {
-          console.error('Error fetching governance decisions:', error);
+          productionLogger.error('Error fetching governance decisions:', error);
           throw error;
         }
         return data || [];
       } catch (error) {
-        console.error('Error in governance decisions query:', error);
+        productionLogger.error('Error in governance decisions query:', error);
         throw error;
       }
     },
@@ -42,12 +43,12 @@ export function useGovernanceDecisions() {
           .single();
         
         if (error) {
-          console.error('Error creating decision:', error);
+          productionLogger.error('Error creating decision:', error);
           throw error;
         }
         return data;
       } catch (error) {
-        console.error('Error in create decision mutation:', error);
+        productionLogger.error('Error in create decision mutation:', error);
         throw error;
       }
     },
@@ -59,7 +60,7 @@ export function useGovernanceDecisions() {
       });
     },
     onError: (error) => {
-      console.error('Create decision mutation error:', error);
+      productionLogger.error('Create decision mutation error:', error);
       toast({
         title: "خطأ في إضافة القرار",
         description: "حدث خطأ أثناء إضافة القرار، يرجى المحاولة مرة أخرى",
@@ -80,11 +81,11 @@ export function useGovernanceDecisions() {
           .eq("id", decisionId);
         
         if (error) {
-          console.error('Error closing voting:', error);
+          productionLogger.error('Error closing voting:', error);
           throw error;
         }
       } catch (error) {
-        console.error('Error in close voting mutation:', error);
+        productionLogger.error('Error in close voting mutation:', error);
         throw error;
       }
     },
@@ -96,7 +97,7 @@ export function useGovernanceDecisions() {
       });
     },
     onError: (error) => {
-      console.error('Close voting mutation error:', error);
+      productionLogger.error('Close voting mutation error:', error);
       toast({
         title: "خطأ في إغلاق التصويت",
         description: "حدث خطأ أثناء إغلاق التصويت، يرجى المحاولة مرة أخرى",

@@ -3,6 +3,7 @@
  */
 
 import { useEffect, useRef } from 'react';
+import { productionLogger } from '@/lib/logger/production-logger';
 
 /**
  * Hook to detect slow renders
@@ -17,7 +18,7 @@ export const useRenderTracking = (componentName: string, threshold = 16) => {
     const renderTime = currentTime - lastRenderTime.current;
     
     if (renderTime > threshold) {
-      console.warn(
+      productionLogger.warn(
         `[Performance] ${componentName} rendered in ${renderTime}ms (threshold: ${threshold}ms)`,
         { renderCount: renderCount.current }
       );
