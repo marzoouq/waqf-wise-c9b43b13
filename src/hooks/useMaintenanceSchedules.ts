@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { productionLogger } from "@/lib/logger/production-logger";
 import { Database } from "@/integrations/supabase/types";
 
 type MaintenanceSchedule = Database['public']['Tables']['maintenance_schedules']['Row'];
@@ -59,7 +60,7 @@ export const useMaintenanceSchedules = () => {
         description: "فشل إضافة جدول الصيانة",
         variant: "destructive",
       });
-      console.error('Error adding schedule:', error);
+      productionLogger.error('Error adding schedule:', error);
     },
   });
 

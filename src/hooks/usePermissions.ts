@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { useEffect } from "react";
+import { productionLogger } from "@/lib/logger/production-logger";
 
 export interface Permission {
   id: string;
@@ -33,7 +34,7 @@ export function usePermissions() {
         .eq("user_id", user.id);
 
       if (rolesError) {
-        console.error("Error fetching user roles:", rolesError);
+        productionLogger.error("Error fetching user roles:", rolesError);
         return [];
       }
 
@@ -60,7 +61,7 @@ export function usePermissions() {
         .eq("granted", true);
 
       if (rolePermsError) {
-        console.error("Error fetching role permissions:", rolePermsError);
+        productionLogger.error("Error fetching role permissions:", rolePermsError);
         return [];
       }
 
@@ -74,7 +75,7 @@ export function usePermissions() {
         .eq("user_id", user.id);
 
       if (userPermsError) {
-        console.error("Error fetching user permissions:", userPermsError);
+        productionLogger.error("Error fetching user permissions:", userPermsError);
       }
 
       // Merge permissions (user overrides take precedence)

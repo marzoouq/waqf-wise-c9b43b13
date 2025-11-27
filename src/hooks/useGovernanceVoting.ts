@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "./use-toast";
+import { productionLogger } from "@/lib/logger/production-logger";
 import type { GovernanceVote, VoteType } from "@/types/governance";
 
 export function useGovernanceVoting(decisionId: string) {
@@ -18,12 +19,12 @@ export function useGovernanceVoting(decisionId: string) {
           .order("voted_at", { ascending: false });
         
         if (error) {
-          console.error('Error fetching votes:', error);
+          productionLogger.error('Error fetching votes:', error);
           throw error;
         }
         return (data || []) as GovernanceVote[];
       } catch (error) {
-        console.error('Error in votes query:', error);
+        productionLogger.error('Error in votes query:', error);
         return [];
       }
     },
@@ -63,7 +64,7 @@ export function useGovernanceVoting(decisionId: string) {
           .maybeSingle();
         
         if (profileError && profileError.code !== 'PGRST116') {
-          console.error('Error fetching profile:', profileError);
+          productionLogger.error('Error fetching profile:', profileError);
         }
         
         const { data: beneficiary } = await supabase
@@ -91,12 +92,12 @@ export function useGovernanceVoting(decisionId: string) {
           .single();
         
         if (error) {
-          console.error('Error casting vote:', error);
+          productionLogger.error('Error casting vote:', error);
           throw error;
         }
         return data;
       } catch (error) {
-        console.error('Error in cast vote mutation:', error);
+        productionLogger.error('Error in cast vote mutation:', error);
         throw error;
       }
     },
@@ -110,7 +111,7 @@ export function useGovernanceVoting(decisionId: string) {
       });
     },
     onError: (error: Error) => {
-      console.error('Cast vote mutation error:', error);
+      productionLogger.error('Cast vote mutation error:', error);
       toast({
         title: "خطأ في التصويت",
         description: error.message || "حدث خطأ أثناء تسجيل صوتك، يرجى المحاولة مرة أخرى",

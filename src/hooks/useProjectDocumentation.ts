@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { productionLogger } from "@/lib/logger/production-logger";
 import type { Json } from "@/integrations/supabase/types";
 
 // أنواع المهام والتسليمات
@@ -165,7 +166,7 @@ export const useUpdatePhaseStatus = () => {
     },
     onError: (error) => {
       toast.error("فشل تحديث حالة المرحلة");
-      console.error("Error updating phase status:", error);
+      productionLogger.error("Error updating phase status:", error);
     },
   });
 };
@@ -202,7 +203,7 @@ export const useUpdatePhaseProgress = () => {
     },
     onError: (error) => {
       toast.error("فشل تحديث نسبة الإنجاز");
-      console.error("Error updating progress:", error);
+      productionLogger.error("Error updating progress:", error);
     },
   });
 };
@@ -243,7 +244,7 @@ export const useUpdatePhaseTasks = () => {
     },
     onError: (error) => {
       toast.error("فشل تحديث المهام");
-      console.error("Error updating tasks:", error);
+      productionLogger.error("Error updating tasks:", error);
     },
   });
 };
@@ -284,7 +285,7 @@ export const useAddPhase = () => {
     },
     onError: (error) => {
       toast.error("فشل إضافة المرحلة");
-      console.error("Error adding phase:", error);
+      productionLogger.error("Error adding phase:", error);
     },
   });
 };

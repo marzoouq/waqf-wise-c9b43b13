@@ -8,6 +8,8 @@
  * - تحسين LCP
  */
 
+import { productionLogger } from '@/lib/logger/production-logger';
+
 export interface ImageOptimizationOptions {
   width?: number;
   height?: number;
@@ -261,7 +263,7 @@ export function observeLCP(callback: (lcp: number) => void) {
 
     observer.observe({ entryTypes: ['largest-contentful-paint'] });
   } catch (error) {
-    console.warn('LCP observation not supported:', error);
+    productionLogger.warn('LCP observation not supported:', error);
   }
 }
 

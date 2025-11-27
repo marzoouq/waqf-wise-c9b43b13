@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { productionLogger } from '@/lib/logger/production-logger';
 import type { SupportStatistics } from '@/types/support';
 
 /**
@@ -67,7 +68,7 @@ export function useSupportStats() {
           totalRatings: ratings?.length || 0,
         };
       } catch (error) {
-        console.error('Error fetching overview stats:', error);
+        productionLogger.error('Error fetching overview stats:', error);
         throw error;
       }
     },
@@ -88,7 +89,7 @@ export function useSupportStats() {
         if (error) throw error;
         return data || [];
       } catch (error) {
-        console.error('Error fetching overdue tickets:', error);
+        productionLogger.error('Error fetching overdue tickets:', error);
         return [];
       }
     },
@@ -111,12 +112,12 @@ export function useSupportStats() {
         .limit(10);
 
         if (error) {
-          console.error('Error fetching recent tickets:', error);
+          productionLogger.error('Error fetching recent tickets:', error);
           return [];
         }
         return data || [];
       } catch (error) {
-        console.error('Error in recent tickets query:', error);
+        productionLogger.error('Error in recent tickets query:', error);
         return [];
       }
     },
@@ -138,12 +139,12 @@ export function useSupportStats() {
         .order('date', { ascending: true });
 
         if (error) {
-          console.error('Error fetching historical stats:', error);
+          productionLogger.error('Error fetching historical stats:', error);
           return [];
         }
         return (data || []) as SupportStatistics[];
       } catch (error) {
-        console.error('Error in historical stats query:', error);
+        productionLogger.error('Error in historical stats query:', error);
         return [];
       }
     },
