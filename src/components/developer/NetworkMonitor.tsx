@@ -101,9 +101,9 @@ export function NetworkMonitor() {
                 لا توجد طلبات شبكة مسجلة
               </p>
             ) : (
-              requests.slice(0, 20).map((request, index) => (
+              requests.slice(0, 20).map((request) => (
                 <div
-                  key={index}
+                  key={`request-${request.timestamp}-${request.url}`}
                   className="border rounded-lg p-3 space-y-2 hover:bg-accent/50 transition-colors"
                 >
                   <div className="flex items-center justify-between">
