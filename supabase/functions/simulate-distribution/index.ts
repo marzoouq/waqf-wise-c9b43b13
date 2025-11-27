@@ -1,10 +1,10 @@
 // Edge Function: محاكاة توزيع متقدمة
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.81.1';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { 
+  handleCors, 
+  jsonResponse, 
+  errorResponse 
+} from '../_shared/cors.ts';
 
 interface SimulationParams {
   total_amount: number;
@@ -39,10 +39,8 @@ interface DistributionDetail {
 }
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     const supabaseClient = createClient(
@@ -88,26 +86,23 @@ Deno.serve(async (req) => {
     }
 
     if (!beneficiaries || beneficiaries.length === 0) {
-      return new Response(
-        JSON.stringify({
-          error: 'لا يوجد مستفيدون نشطون',
-          summary: {
-            total_revenues: params.total_amount,
-            deductions: {
-              nazer_share,
-              reserve,
-              waqf_corpus,
-              maintenance,
-              development,
-              total: total_deductions,
-            },
-            distributable_amount,
-            beneficiaries_count: 0,
+      return jsonResponse({
+        error: 'لا يوجد مستفيدون نشطون',
+        summary: {
+          total_revenues: params.total_amount,
+          deductions: {
+            nazer_share,
+            reserve,
+            waqf_corpus,
+            maintenance,
+            development,
+            total: total_deductions,
           },
-          details: [],
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+          distributable_amount,
+          beneficiaries_count: 0,
+        },
+        details: [],
+      });
     }
 
     console.log(`👥 تم جلب ${beneficiaries.length} مستفيد نشط`);
@@ -195,33 +190,21 @@ Deno.serve(async (req) => {
 
     console.log('✅ اكتملت المحاكاة:', summary);
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        summary,
-        details: distribution,
-        metadata: {
-          simulation_date: new Date().toISOString(),
-          priority_levels: sortedPriorities,
-          loan_deductions_count: loanDeductions.size,
-        },
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      }
-    );
+    return jsonResponse({
+      success: true,
+      summary,
+      details: distribution,
+      metadata: {
+        simulation_date: new Date().toISOString(),
+        priority_levels: sortedPriorities,
+        loan_deductions_count: loanDeductions.size,
+      },
+    });
   } catch (error) {
     console.error('❌ خطأ في المحاكاة:', error);
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: error instanceof Error ? error.message : 'حدث خطأ غير متوقع',
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500,
-      }
+    return errorResponse(
+      error instanceof Error ? error.message : 'حدث خطأ غير متوقع',
+      500
     );
   }
 });

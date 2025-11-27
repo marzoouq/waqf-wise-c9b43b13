@@ -1,24 +1,22 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { 
+  handleCors, 
+  jsonResponse, 
+  errorResponse, 
+  unauthorizedResponse,
+  forbiddenResponse 
+} from '../_shared/cors.ts';
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     // التحقق من JWT token
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      return new Response(
-        JSON.stringify({ error: 'Missing authorization header' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return unauthorizedResponse('Missing authorization header');
     }
 
     const supabase = createClient(
@@ -30,10 +28,7 @@ serve(async (req) => {
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
-      return new Response(
-        JSON.stringify({ error: 'Invalid or expired token' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return unauthorizedResponse('Invalid or expired token');
     }
 
     // التحقق من الصلاحيات - فقط المسؤولون يمكنهم إرسال إشعارات
@@ -45,10 +40,7 @@ serve(async (req) => {
     const isAdmin = roles?.some(r => ['admin', 'nazer'].includes(r.role));
     
     if (!isAdmin) {
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized - Admin access required' }),
-        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return forbiddenResponse('Unauthorized - Admin access required');
     }
 
     const { userId, title, body, icon, badge, data, actionUrl } = await req.json();
@@ -65,10 +57,7 @@ serve(async (req) => {
       .eq('is_active', true);
 
     if (subError || !subscriptions || subscriptions.length === 0) {
-      return new Response(
-        JSON.stringify({ message: 'No active subscriptions found' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return jsonResponse({ message: 'No active subscriptions found' });
     }
 
     const results = [];
@@ -113,26 +102,17 @@ serve(async (req) => {
         is_read: false,
       });
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        results,
-        sent: results.filter(r => r.success).length,
-        failed: results.filter(r => !r.success).length,
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    );
+    return jsonResponse({
+      success: true,
+      results,
+      sent: results.filter(r => r.success).length,
+      failed: results.filter(r => !r.success).length,
+    });
   } catch (error) {
     console.error('Push notification error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(
-      JSON.stringify({ error: errorMessage }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+    return errorResponse(
+      error instanceof Error ? error.message : 'Unknown error',
+      500
     );
   }
 });

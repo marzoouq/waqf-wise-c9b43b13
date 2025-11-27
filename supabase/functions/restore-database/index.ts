@@ -1,15 +1,14 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { 
+  handleCors, 
+  jsonResponse, 
+  errorResponse 
+} from '../_shared/cors.ts';
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     const supabaseClient = createClient(
@@ -95,39 +94,21 @@ serve(async (req) => {
       errors: errors.length
     });
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        restoredTables,
-        totalRestored,
-        errors: errors.length > 0 ? errors : undefined,
-        message: errors.length > 0 
-          ? `تمت الاستعادة مع بعض الأخطاء (${errors.length} جداول فشلت)`
-          : 'تمت استعادة جميع البيانات بنجاح'
-      }),
-      { 
-        headers: { 
-          ...corsHeaders, 
-          'Content-Type': 'application/json' 
-        } 
-      }
-    );
+    return jsonResponse({
+      success: true,
+      restoredTables,
+      totalRestored,
+      errors: errors.length > 0 ? errors : undefined,
+      message: errors.length > 0 
+        ? `تمت الاستعادة مع بعض الأخطاء (${errors.length} جداول فشلت)`
+        : 'تمت استعادة جميع البيانات بنجاح'
+    });
 
   } catch (error) {
     console.error('Restore error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(
-      JSON.stringify({ 
-        error: errorMessage,
-        success: false 
-      }),
-      { 
-        status: 500,
-        headers: { 
-          ...corsHeaders, 
-          'Content-Type': 'application/json' 
-        } 
-      }
+    return errorResponse(
+      error instanceof Error ? error.message : 'Unknown error',
+      500
     );
   }
 });

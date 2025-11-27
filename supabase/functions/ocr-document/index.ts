@@ -1,24 +1,22 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { 
+  handleCors, 
+  jsonResponse, 
+  errorResponse, 
+  unauthorizedResponse,
+  forbiddenResponse 
+} from '../_shared/cors.ts';
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     // التحقق من JWT token
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      return new Response(
-        JSON.stringify({ error: 'Missing authorization header' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return unauthorizedResponse('Missing authorization header');
     }
 
     const supabase = createClient(
@@ -30,10 +28,7 @@ serve(async (req) => {
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
-      return new Response(
-        JSON.stringify({ error: 'Invalid or expired token' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return unauthorizedResponse('Invalid or expired token');
     }
 
     // التحقق من الصلاحيات - يجب أن يكون أرشيفي أو مسؤول
@@ -45,10 +40,7 @@ serve(async (req) => {
     const hasAccess = roles?.some(r => ['admin', 'nazer', 'archivist'].includes(r.role));
     
     if (!hasAccess) {
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized - Archivist or Admin access required' }),
-        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return forbiddenResponse('Unauthorized - Archivist or Admin access required');
     }
 
     const { documentId, attachmentId, fileUrl } = await req.json();
@@ -133,17 +125,12 @@ serve(async (req) => {
         .eq('id', documentId);
     }
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        extractedText,
-        processingTime,
-        logId: logData.id,
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    );
+    return jsonResponse({
+      success: true,
+      extractedText,
+      processingTime,
+      logId: logData.id,
+    });
   } catch (error) {
     console.error('OCR Error:', error);
     
@@ -167,15 +154,6 @@ serve(async (req) => {
       }
     }
     
-    return new Response(
-      JSON.stringify({ 
-        success: false,
-        error: safeMessage 
-      }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    );
+    return errorResponse(safeMessage, 500);
   }
 });

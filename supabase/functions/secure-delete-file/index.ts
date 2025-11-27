@@ -1,19 +1,20 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { 
+  handleCors, 
+  jsonResponse, 
+  errorResponse, 
+  unauthorizedResponse,
+  forbiddenResponse 
+} from '../_shared/cors.ts';
 
 /**
  * Edge Function للحذف الآمن للملفات
  * يتبع سياسات الاحتفاظ ويسجل عمليات الحذف
  */
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     const supabase = createClient(
@@ -23,14 +24,14 @@ serve(async (req) => {
 
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      throw new Error('غير مصرح بالوصول');
+      return unauthorizedResponse('غير مصرح بالوصول');
     }
 
     const token = authHeader.replace('Bearer ', '');
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     
     if (authError || !user) {
-      throw new Error('فشل التحقق من الهوية');
+      return unauthorizedResponse('فشل التحقق من الهوية');
     }
 
     const { 
@@ -42,7 +43,7 @@ serve(async (req) => {
     } = await req.json();
 
     if (!fileId) {
-      throw new Error('معرف الملف مطلوب');
+      return errorResponse('معرف الملف مطلوب', 400);
     }
 
     console.log(`🗑️ طلب حذف ملف: ${fileId} من المستخدم: ${user.email}`);
@@ -57,7 +58,7 @@ serve(async (req) => {
     const isAdmin = userRoles.includes('admin') || userRoles.includes('nazer');
 
     if (!isAdmin && permanentDelete) {
-      throw new Error('فقط المدراء يمكنهم الحذف النهائي');
+      return forbiddenResponse('فقط المدراء يمكنهم الحذف النهائي');
     }
 
     // الحصول على معلومات الملف
@@ -98,7 +99,7 @@ serve(async (req) => {
     }
 
     if (!fileRecord) {
-      throw new Error('الملف غير موجود');
+      return errorResponse('الملف غير موجود', 404);
     }
 
     // التحقق من سياسة الاحتفاظ
@@ -126,17 +127,12 @@ serve(async (req) => {
         .select()
         .single();
 
-      return new Response(
-        JSON.stringify({
-          success: true,
-          message: 'تم إنشاء طلب الحذف - في انتظار الموافقة',
-          requestId: deletionRequest.id,
-          requiresApproval: true
-        }),
-        {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
-      );
+      return jsonResponse({
+        success: true,
+        message: 'تم إنشاء طلب الحذف - في انتظار الموافقة',
+        requestId: deletionRequest.id,
+        requiresApproval: true
+      });
     }
 
     // إذا كان حذف نهائي
@@ -174,16 +170,11 @@ serve(async (req) => {
 
       console.log(`✅ تم الحذف النهائي للملف: ${fileId}`);
 
-      return new Response(
-        JSON.stringify({
-          success: true,
-          message: 'تم حذف الملف نهائياً',
-          permanentDelete: true
-        }),
-        {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
-      );
+      return jsonResponse({
+        success: true,
+        message: 'تم حذف الملف نهائياً',
+        permanentDelete: true
+      });
     }
 
     // حذف مؤقت (soft delete)
@@ -214,29 +205,17 @@ serve(async (req) => {
 
     console.log(`✅ تم الحذف المؤقت للملف: ${fileId} (استرجاع حتى ${restoreUntil})`);
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        message: `تم حذف الملف مؤقتاً - يمكن استرجاعه حتى ${restoreDays} يوم`,
-        permanentDelete: false,
-        restoreUntil: restoreUntil
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    );
+    return jsonResponse({
+      success: true,
+      message: `تم حذف الملف مؤقتاً - يمكن استرجاعه حتى ${restoreDays} يوم`,
+      permanentDelete: false,
+      restoreUntil: restoreUntil
+    });
   } catch (error) {
     console.error('❌ خطأ في حذف الملف:', error);
-    const errorMessage = error instanceof Error ? error.message : 'خطأ غير معروف';
-    return new Response(
-      JSON.stringify({ 
-        success: false,
-        error: errorMessage 
-      }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+    return errorResponse(
+      error instanceof Error ? error.message : 'خطأ غير معروف',
+      500
     );
   }
 });

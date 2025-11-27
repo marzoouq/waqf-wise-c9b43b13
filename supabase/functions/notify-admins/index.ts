@@ -1,9 +1,11 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { 
+  handleCors, 
+  jsonResponse, 
+  errorResponse, 
+  unauthorizedResponse,
+  forbiddenResponse 
+} from '../_shared/cors.ts';
 
 interface NotificationPayload {
   alertId: string;
@@ -14,22 +16,15 @@ interface NotificationPayload {
 }
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     // 🔐 SECURITY: Verify Authorization header
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       console.error('❌ No authorization header provided');
-      return new Response(
-        JSON.stringify({ error: 'غير مصرح - يجب تسجيل الدخول' }),
-        { 
-          status: 401, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
+      return unauthorizedResponse('غير مصرح - يجب تسجيل الدخول');
     }
 
     const supabase = createClient(
@@ -43,10 +38,7 @@ Deno.serve(async (req) => {
 
     if (authError || !user) {
       console.error('❌ Invalid token:', authError);
-      return new Response(
-        JSON.stringify({ error: 'رمز المصادقة غير صحيح' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return unauthorizedResponse('رمز المصادقة غير صحيح');
     }
 
     // 🔐 SECURITY: Check if user is staff
@@ -57,19 +49,13 @@ Deno.serve(async (req) => {
 
     if (roleError) {
       console.error('❌ Error checking roles:', roleError);
-      return new Response(
-        JSON.stringify({ error: 'خطأ في التحقق من الصلاحيات' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return errorResponse('خطأ في التحقق من الصلاحيات', 500);
     }
 
     const isStaff = roles?.some(r => ['admin', 'nazer', 'accountant', 'cashier', 'archivist'].includes(r.role));
     if (!isStaff) {
       console.error('❌ User is not staff:', { userId: user.id, roles });
-      return new Response(
-        JSON.stringify({ error: 'ليس لديك صلاحية لإرسال الإشعارات' }),
-        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return forbiddenResponse('ليس لديك صلاحية لإرسال الإشعارات');
     }
 
     console.log('✅ Authorized notification request from:', { userId: user.id, email: user.email });
@@ -115,31 +101,16 @@ Deno.serve(async (req) => {
       console.log(`✅ Created ${notifications.length} notifications`);
     }
 
-    // إرسال إشعار Push (اختياري - يمكن تفعيله لاحقاً)
-    // await sendPushNotifications(admins, payload);
-
-    return new Response(
-      JSON.stringify({
-        success: true,
-        notified: notifications.length,
-        message: `تم إشعار ${notifications.length} من المسؤولين`,
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    );
+    return jsonResponse({
+      success: true,
+      notified: notifications.length,
+      message: `تم إشعار ${notifications.length} من المسؤولين`,
+    });
   } catch (error) {
     console.error('❌ Error in notify-admins function:', error);
-    const errorMessage = error instanceof Error ? error.message : 'حدث خطأ غير متوقع';
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: errorMessage,
-      }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+    return errorResponse(
+      error instanceof Error ? error.message : 'حدث خطأ غير متوقع',
+      500
     );
   }
 });
