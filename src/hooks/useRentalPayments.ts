@@ -9,6 +9,7 @@ import { logger } from "@/lib/logger";
 import { generateInvoicePDF } from "@/lib/generateInvoicePDF";
 import { generateReceiptPDF } from "@/lib/generateReceiptPDF";
 import { archiveDocument, pdfToBlob } from "@/lib/archiveDocument";
+import type { OrganizationSettings } from "@/hooks/useOrganizationSettings";
 
 export interface RentalPayment {
   id: string;
@@ -269,7 +270,7 @@ export const useRentalPayments = (
                 const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
                 
                 // استخدام دالة generateInvoicePDF لكن بدون save
-                await generateInvoicePDF(invoiceData, invoiceData.invoice_lines || [], orgSettings as any);
+                await generateInvoicePDF(invoiceData, invoiceData.invoice_lines || [], orgSettings as OrganizationSettings | null);
                 
                 // توليد Blob من PDF
                 const invoiceBlob = doc.output('blob');
@@ -286,7 +287,7 @@ export const useRentalPayments = (
 
                 // توليد PDF سند القبض (بدون حفظ)
                 const receiptDoc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-                await generateReceiptPDF(receiptData, orgSettings as any);
+                await generateReceiptPDF(receiptData, orgSettings as OrganizationSettings | null);
                 const receiptBlob = receiptDoc.output('blob');
 
                 // أرشفة سند القبض
@@ -415,7 +416,7 @@ export const useRentalPayments = (
                 const jsPDF = (await import('jspdf')).default;
                 const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
                 
-                await generateInvoicePDF(invoiceData, invoiceData.invoice_lines || [], orgSettings as any);
+                await generateInvoicePDF(invoiceData, invoiceData.invoice_lines || [], orgSettings as OrganizationSettings | null);
                 const invoiceBlob = doc.output('blob');
 
                 await archiveDocument({
@@ -428,7 +429,7 @@ export const useRentalPayments = (
                 });
 
                 const receiptDoc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-                await generateReceiptPDF(receiptData, orgSettings as any);
+                await generateReceiptPDF(receiptData, orgSettings as OrganizationSettings | null);
                 const receiptBlob = receiptDoc.output('blob');
 
                 await archiveDocument({

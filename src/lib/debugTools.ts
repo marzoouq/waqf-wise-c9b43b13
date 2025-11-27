@@ -49,9 +49,10 @@ function clearCacheDebug() {
   try {
     const errorLogs = localStorage.getItem('error_logs');
     if (errorLogs) {
-      const errors = JSON.parse(errorLogs);
+      interface ErrorEntry { timestamp: string; [key: string]: unknown }
+      const errors: ErrorEntry[] = JSON.parse(errorLogs);
       const cutoffTime = Date.now() - (24 * 60 * 60 * 1000); // 24 ساعة
-      const recentErrors = errors.filter((e: any) => {
+      const recentErrors = errors.filter((e) => {
         return new Date(e.timestamp).getTime() > cutoffTime;
       });
       

@@ -5,6 +5,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import type { DistributionApprovalInsert, LoanApprovalInsert } from '@/types/approval';
 
 export interface ApprovalData {
   reference_id: string;
@@ -29,17 +30,19 @@ export class ApprovalService {
   ): Promise<{ success: boolean; message: string }> {
     try {
       // 1. إضافة الموافقة
+      const approvalData: DistributionApprovalInsert = {
+        distribution_id: distributionId,
+        approver_id: approverId,
+        approver_name: approverName,
+        level: level,
+        status: 'موافق',
+        notes,
+        approved_at: new Date().toISOString(),
+      };
+      
       const { error: approvalError } = await supabase
         .from('distribution_approvals')
-        .insert({
-          distribution_id: distributionId,
-          approver_id: approverId,
-          approver_name: approverName,
-          level: level,
-          status: 'موافق',
-          notes,
-          approved_at: new Date().toISOString(),
-        } as any);
+        .insert(approvalData);
 
       if (approvalError) throw approvalError;
 
@@ -94,17 +97,19 @@ export class ApprovalService {
   ): Promise<{ success: boolean; message: string }> {
     try {
       // 1. إضافة الرفض
+      const approvalData: DistributionApprovalInsert = {
+        distribution_id: distributionId,
+        approver_id: approverId,
+        approver_name: approverName,
+        level: level,
+        status: 'مرفوض',
+        notes: reason,
+        approved_at: new Date().toISOString(),
+      };
+      
       const { error: approvalError } = await supabase
         .from('distribution_approvals')
-        .insert({
-          distribution_id: distributionId,
-          approver_id: approverId,
-          approver_name: approverName,
-          level: level,
-          status: 'مرفوض',
-          notes: reason,
-          approved_at: new Date().toISOString(),
-        } as any);
+        .insert(approvalData);
 
       if (approvalError) throw approvalError;
 
@@ -142,17 +147,19 @@ export class ApprovalService {
     notes?: string
   ): Promise<{ success: boolean; message: string }> {
     try {
+      const loanApprovalData: LoanApprovalInsert = {
+        loan_id: loanId,
+        approver_id: approverId,
+        approver_name: approverName,
+        level: level,
+        status: 'موافق',
+        notes,
+        approved_at: new Date().toISOString(),
+      };
+      
       const { error: approvalError } = await supabase
         .from('loan_approvals')
-        .insert({
-          loan_id: loanId,
-          approver_id: approverId,
-          approver_name: approverName,
-          level: level,
-          status: 'موافق',
-          notes,
-          approved_at: new Date().toISOString(),
-        } as any);
+        .insert(loanApprovalData);
 
       if (approvalError) throw approvalError;
 
