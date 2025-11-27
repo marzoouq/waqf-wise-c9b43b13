@@ -2,6 +2,15 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { safeFilter, safeReduce } from '@/lib/utils/array-safe';
+import type { Json } from '@/integrations/supabase/types';
+
+export interface KPIMetadata {
+  current_assets?: number;
+  current_liabilities?: number;
+  total_revenue?: number;
+  net_income?: number;
+  [key: string]: number | undefined;
+}
 
 export interface FinancialKPI {
   id: string;
@@ -12,7 +21,7 @@ export interface FinancialKPI {
   period_start: string;
   period_end: string;
   fiscal_year_id?: string;
-  metadata?: Record<string, any>;
+  metadata?: KPIMetadata;
   created_at: string;
 }
 
@@ -28,6 +37,20 @@ export interface FinancialForecast {
   confidence_level?: number;
   model_used?: string;
   created_at: string;
+}
+
+interface Account {
+  id: string;
+  code: string;
+  account_type: string;
+  current_balance: number | null;
+}
+
+interface JournalEntryLine {
+  debit_amount: number;
+  credit_amount: number;
+  accounts: { account_type: string } | null;
+  journal_entries: { entry_date: string };
 }
 
 export function useFinancialAnalytics(fiscalYearId?: string) {
@@ -76,7 +99,6 @@ export function useFinancialAnalytics(fiscalYearId?: string) {
       periodEnd: string;
       fiscalYearId?: string;
     }) => {
-      // جلب البيانات المالية
       const { data: accounts, error: accountsError } = await supabase
         .from('accounts')
         .select('*')
@@ -84,38 +106,38 @@ export function useFinancialAnalytics(fiscalYearId?: string) {
 
       if (accountsError) throw accountsError;
 
-      // حساب المؤشرات
+      const typedAccounts = (accounts || []) as Account[];
+
       const totalAssets = safeReduce(
-        safeFilter(accounts, a => a.account_type === 'asset'),
-        (sum, a) => sum + (a.current_balance || 0),
+        safeFilter(typedAccounts, (a: Account) => a.account_type === 'asset'),
+        (sum: number, a: Account) => sum + (a.current_balance || 0),
         0
       );
 
       const currentAssets = safeReduce(
-        safeFilter(accounts, a => a.account_type === 'asset' && a.code.startsWith('1')),
-        (sum, a) => sum + (a.current_balance || 0),
+        safeFilter(typedAccounts, (a: Account) => a.account_type === 'asset' && a.code.startsWith('1')),
+        (sum: number, a: Account) => sum + (a.current_balance || 0),
         0
       );
 
       const currentLiabilities = safeReduce(
-        safeFilter(accounts, a => a.account_type === 'liability' && a.code.startsWith('21')),
-        (sum, a) => sum + (a.current_balance || 0),
+        safeFilter(typedAccounts, (a: Account) => a.account_type === 'liability' && a.code.startsWith('21')),
+        (sum: number, a: Account) => sum + (a.current_balance || 0),
         0
       );
 
       const totalLiabilities = safeReduce(
-        safeFilter(accounts, a => a.account_type === 'liability'),
-        (sum, a) => sum + (a.current_balance || 0),
+        safeFilter(typedAccounts, (a: Account) => a.account_type === 'liability'),
+        (sum: number, a: Account) => sum + (a.current_balance || 0),
         0
       );
 
       const totalEquity = safeReduce(
-        safeFilter(accounts, a => a.account_type === 'equity'),
-        (sum, a) => sum + (a.current_balance || 0),
+        safeFilter(typedAccounts, (a: Account) => a.account_type === 'equity'),
+        (sum: number, a: Account) => sum + (a.current_balance || 0),
         0
       );
 
-      // جلب الإيرادات والمصروفات للفترة
       const { data: journalLines, error: journalError } = await supabase
         .from('journal_entry_lines')
         .select('*, accounts(*), journal_entries!inner(*)')
@@ -125,21 +147,22 @@ export function useFinancialAnalytics(fiscalYearId?: string) {
 
       if (journalError) throw journalError;
 
+      const typedLines = (journalLines || []) as JournalEntryLine[];
+
       const totalRevenue = safeReduce(
-        safeFilter(journalLines, (line: any) => line.accounts?.account_type === 'revenue'),
-        (sum: number, line: any) => sum + (line.credit_amount - line.debit_amount),
+        safeFilter(typedLines, (line: JournalEntryLine) => line.accounts?.account_type === 'revenue'),
+        (sum: number, line: JournalEntryLine) => sum + (line.credit_amount - line.debit_amount),
         0
       );
 
       const totalExpenses = safeReduce(
-        safeFilter(journalLines, (line: any) => line.accounts?.account_type === 'expense'),
-        (sum: number, line: any) => sum + (line.debit_amount - line.credit_amount),
+        safeFilter(typedLines, (line: JournalEntryLine) => line.accounts?.account_type === 'expense'),
+        (sum: number, line: JournalEntryLine) => sum + (line.debit_amount - line.credit_amount),
         0
       );
 
       const netIncome = totalRevenue - totalExpenses;
 
-      // إنشاء المؤشرات
       const kpiData: Omit<FinancialKPI, 'id' | 'created_at'>[] = [
         {
           kpi_name: 'current_ratio',
@@ -223,9 +246,14 @@ export function useFinancialAnalytics(fiscalYearId?: string) {
         },
       ];
 
+      const insertData = kpiData.map(kpi => ({
+        ...kpi,
+        metadata: kpi.metadata as unknown as Json,
+      }));
+
       const { error: insertError } = await supabase
         .from('financial_kpis')
-        .insert(kpiData);
+        .insert(insertData);
 
       if (insertError) throw insertError;
 
@@ -250,7 +278,6 @@ export function useFinancialAnalytics(fiscalYearId?: string) {
       accountId?: string;
       months?: number;
     }) => {
-      // جلب البيانات التاريخية (آخر 12 شهر)
       const endDate = new Date();
       const startDate = new Date();
       startDate.setMonth(startDate.getMonth() - 12);
@@ -274,10 +301,10 @@ export function useFinancialAnalytics(fiscalYearId?: string) {
 
       if (error) throw error;
 
-      // حساب المتوسط المتحرك البسيط
       const monthlyTotals = new Map<string, number>();
+      const typedData = (historicalData || []) as JournalEntryLine[];
       
-      historicalData?.forEach((line: any) => {
+      typedData.forEach((line: JournalEntryLine) => {
         const month = new Date(line.journal_entries.entry_date).toISOString().substring(0, 7);
         const amount = forecastType === 'revenue' 
           ? line.credit_amount - line.debit_amount
@@ -287,14 +314,12 @@ export function useFinancialAnalytics(fiscalYearId?: string) {
       });
 
       const totals = Array.from(monthlyTotals.values());
-      const avgMonthly = totals.reduce((a, b) => a + b, 0) / totals.length;
+      const avgMonthly = totals.length > 0 ? totals.reduce((a, b) => a + b, 0) / totals.length : 0;
 
-      // حساب الاتجاه (نمو بسيط)
       const trend = totals.length > 1 
         ? (totals[totals.length - 1] - totals[0]) / totals.length
         : 0;
 
-      // توليد التنبؤات
       const forecasts = [];
       for (let i = 1; i <= months; i++) {
         const forecastDate = new Date();
@@ -304,7 +329,7 @@ export function useFinancialAnalytics(fiscalYearId?: string) {
         const periodEnd = new Date(forecastDate.getFullYear(), forecastDate.getMonth() + 1, 0);
 
         const forecastedAmount = avgMonthly + (trend * i);
-        const confidence = Math.max(0.5, 1 - (i * 0.1)); // تقل الثقة مع المستقبل
+        const confidence = Math.max(0.5, 1 - (i * 0.1));
 
         forecasts.push({
           forecast_type: forecastType,

@@ -10,6 +10,12 @@ export interface Permission {
   description: string | null;
 }
 
+interface RolePermissionResult {
+  permission_id: string;
+  granted: boolean;
+  permissions: Permission | null;
+}
+
 export function usePermissions() {
   const { user } = useAuth();
 
@@ -62,14 +68,8 @@ export function usePermissions() {
       const { data: userPermissions, error: userPermsError } = await supabase
         .from("user_permissions")
         .select(`
-          permission_id,
-          granted,
-          permissions (
-            id,
-            name,
-            category,
-            description
-          )
+          permission_key,
+          granted
         `)
         .eq("user_id", user.id);
 
@@ -81,20 +81,27 @@ export function usePermissions() {
       const permissionsMap = new Map<string, Permission>();
 
       // Add role permissions
-      rolePermissions?.forEach((rp: any) => {
+      (rolePermissions as RolePermissionResult[] | null)?.forEach((rp) => {
         if (rp.permissions && rp.granted) {
           permissionsMap.set(rp.permissions.name, rp.permissions);
         }
       });
 
       // Override with user-specific permissions
-      userPermissions?.forEach((up: any) => {
-        if (up.permissions) {
+      userPermissions?.forEach((up) => {
+        if (up.permission_key) {
           if (up.granted) {
-            permissionsMap.set(up.permissions.name, up.permissions);
+            // Create a simple permission entry for user-specific permissions
+            const perm: Permission = {
+              id: up.permission_key,
+              name: up.permission_key,
+              category: 'user_specific',
+              description: null,
+            };
+            permissionsMap.set(up.permission_key, perm);
           } else {
             // User explicitly denied this permission
-            permissionsMap.delete(up.permissions.name);
+            permissionsMap.delete(up.permission_key);
           }
         }
       });

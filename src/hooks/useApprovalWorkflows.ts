@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import type { Database } from '@/integrations/supabase/types';
+import type { Json } from '@/integrations/supabase/types';
 
 export interface ApprovalLevel {
   level: number;
@@ -9,12 +9,18 @@ export interface ApprovalLevel {
   required: boolean;
 }
 
+export interface ApprovalConditions {
+  min_amount?: number;
+  max_amount?: number;
+  entity_subtype?: string;
+}
+
 export interface ApprovalWorkflow {
   id: string;
   workflow_name: string;
   entity_type: string;
   approval_levels: ApprovalLevel[];
-  conditions?: Record<string, any>;
+  conditions?: ApprovalConditions;
   is_active: boolean;
   created_at: string;
 }
@@ -43,6 +49,30 @@ export interface ApprovalStep {
   actioned_at?: string;
 }
 
+interface ApprovalStatusWithSteps {
+  id: string;
+  workflow_id: string | null;
+  entity_type: string;
+  entity_id: string;
+  current_level: number | null;
+  total_levels: number;
+  status: string | null;
+  started_at: string | null;
+  completed_at: string | null;
+  created_at: string | null;
+  approval_steps: ApprovalStep[];
+}
+
+function parseApprovalLevels(data: Json): ApprovalLevel[] {
+  if (!data || !Array.isArray(data)) return [];
+  return data as unknown as ApprovalLevel[];
+}
+
+function parseConditions(data: Json | null): ApprovalConditions | undefined {
+  if (!data || typeof data !== 'object') return undefined;
+  return data as ApprovalConditions;
+}
+
 export function useApprovalWorkflows() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -58,8 +88,9 @@ export function useApprovalWorkflows() {
       if (error) throw error;
       return (data || []).map(item => ({
         ...item,
-        approval_levels: item.approval_levels as any,
-        conditions: item.conditions as any,
+        approval_levels: parseApprovalLevels(item.approval_levels),
+        conditions: parseConditions(item.conditions),
+        is_active: item.is_active ?? false,
       })) as ApprovalWorkflow[];
     },
   });
@@ -73,7 +104,7 @@ export function useApprovalWorkflows() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data;
+      return data as ApprovalStatusWithSteps[];
     },
   });
 
@@ -82,9 +113,11 @@ export function useApprovalWorkflows() {
       const { data, error } = await supabase
         .from('approval_workflows')
         .insert({
-          ...workflow,
-          approval_levels: workflow.approval_levels as any,
-          conditions: workflow.conditions as any,
+          workflow_name: workflow.workflow_name,
+          entity_type: workflow.entity_type,
+          approval_levels: workflow.approval_levels as unknown as Json,
+          conditions: workflow.conditions as unknown as Json,
+          is_active: workflow.is_active,
         })
         .select()
         .single();
@@ -111,7 +144,6 @@ export function useApprovalWorkflows() {
       entityId: string;
       workflowId?: string;
     }) => {
-      // العثور على مسار الموافقة المناسب
       let workflow = workflows?.find(w => w.id === workflowId);
       
       if (!workflow) {
@@ -124,7 +156,6 @@ export function useApprovalWorkflows() {
         throw new Error('لم يتم العثور على مسار موافقات مناسب');
       }
 
-      // إنشاء حالة الموافقة
       const { data: statusData, error: statusError } = await supabase
         .from('approval_status')
         .insert({
@@ -140,7 +171,6 @@ export function useApprovalWorkflows() {
 
       if (statusError) throw statusError;
 
-      // إنشاء خطوات الموافقة
       const steps = workflow.approval_levels.map(level => ({
         approval_status_id: statusData.id,
         level: level.level,
@@ -177,7 +207,6 @@ export function useApprovalWorkflows() {
       notes?: string;
       approverName: string;
     }) => {
-      // تحديث الخطوة
       const { data: step, error: stepError } = await supabase
         .from('approval_steps')
         .update({
@@ -192,7 +221,6 @@ export function useApprovalWorkflows() {
 
       if (stepError) throw stepError;
 
-      // جلب حالة الموافقة
       const { data: status, error: statusFetchError } = await supabase
         .from('approval_status')
         .select('*, approval_steps(*)')
@@ -201,7 +229,6 @@ export function useApprovalWorkflows() {
 
       if (statusFetchError) throw statusFetchError;
 
-      // تحديث حالة الموافقة
       if (action === 'rejected') {
         await supabase
           .from('approval_status')
@@ -211,11 +238,12 @@ export function useApprovalWorkflows() {
           })
           .eq('id', status.id);
       } else {
-        const allApproved = status.approval_steps
-          .filter((s: any) => s.level <= step.level)
-          .every((s: any) => s.action === 'approved');
+        const steps = status.approval_steps as ApprovalStep[];
+        const allApproved = steps
+          .filter((s) => s.level <= (step.level ?? 0))
+          .every((s) => s.action === 'approved');
 
-        const isLastLevel = step.level === status.total_levels;
+        const isLastLevel = (step.level ?? 0) === status.total_levels;
 
         if (allApproved && isLastLevel) {
           await supabase
@@ -229,7 +257,7 @@ export function useApprovalWorkflows() {
           await supabase
             .from('approval_status')
             .update({
-              current_level: step.level + 1,
+              current_level: (step.level ?? 0) + 1,
             })
             .eq('id', status.id);
         }
