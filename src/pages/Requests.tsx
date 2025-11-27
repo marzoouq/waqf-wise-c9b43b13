@@ -32,7 +32,6 @@ import {
 import { ScrollableTableWrapper } from '@/components/shared/ScrollableTableWrapper';
 import { MobileScrollHint } from '@/components/shared/MobileScrollHint';
 import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
-import type { BeneficiaryRequest } from '@/types/index';
 import { ExportButton } from '@/components/shared/ExportButton';
 import { PrintButton } from '@/components/shared/PrintButton';
 import { Pagination } from '@/components/shared/Pagination';
@@ -40,23 +39,40 @@ import { EnhancedEmptyState } from '@/components/shared/EnhancedEmptyState';
 import { PAGINATION } from '@/lib/constants';
 import { SortableTableHeader, SortDirection } from '@/components/shared/SortableTableHeader';
 import { BulkActionsBar } from '@/components/shared/BulkActionsBar';
-import { AdvancedFiltersDialog, FilterConfig } from '@/components/shared/AdvancedFiltersDialog';
+import { AdvancedFiltersDialog, FilterConfig, FiltersRecord } from '@/components/shared/AdvancedFiltersDialog';
 import { useTableSort } from '@/hooks/useTableSort';
 import { useBulkSelection } from '@/hooks/useBulkSelection';
 import { toast } from 'sonner';
+import { getRequestTypeName, getBeneficiaryName } from '@/types/request.types';
+
+// Type for request data from the hook (with partial relations)
+interface RequestData {
+  id: string;
+  request_number: string;
+  beneficiary_id: string;
+  description: string;
+  amount: number;
+  status: string;
+  priority: string;
+  is_overdue: boolean;
+  submitted_at: string;
+  request_type?: { name_ar?: string; description?: string; name?: string } | null;
+  beneficiary?: { full_name?: string } | null;
+  [key: string]: unknown;
+}
 
 const Requests = () => {
   const { requests, isLoading, deleteRequest } = useRequests();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [selectedRequest, setSelectedRequest] = useState<BeneficiaryRequest | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<RequestData | null>(null);
   const [approvalDialogOpen, setApprovalDialogOpen] = useState(false);
   const [commentsDialogOpen, setCommentsDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [requestToDelete, setRequestToDelete] = useState<BeneficiaryRequest | null>(null);
+  const [requestToDelete, setRequestToDelete] = useState<RequestData | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(20);
-  const [advancedFilters, setAdvancedFilters] = useState<Record<string, any>>({});
+  const [advancedFilters, setAdvancedFilters] = useState<FiltersRecord>({});
   
   const handleItemsPerPageChange = useCallback((items: number) => {
     setItemsPerPage(items);
@@ -135,7 +151,7 @@ const Requests = () => {
     overdue: requests.filter(r => r.is_overdue).length,
   };
 
-  const handleDeleteClick = (request: BeneficiaryRequest) => {
+  const handleDeleteClick = (request: RequestData) => {
     setRequestToDelete(request);
     setDeleteDialogOpen(true);
   };
@@ -210,8 +226,8 @@ const Requests = () => {
           <ExportButton
             data={filteredRequests.map(r => ({
               'رقم الطلب': r.request_number,
-              'المستفيد': r.beneficiary && 'full_name' in r.beneficiary ? r.beneficiary.full_name : '-',
-              'نوع الطلب': (r.request_type as any)?.name_ar || '-',
+              'المستفيد': getBeneficiaryName(r),
+              'نوع الطلب': getRequestTypeName(r),
               'الوصف': r.description,
               'المبلغ': r.amount ? `${r.amount.toLocaleString()} ر.س` : '-',
               'الحالة': r.status,
@@ -432,7 +448,7 @@ const Requests = () => {
                       </TableCell>
                       <TableCell className="text-xs sm:text-sm hidden md:table-cell">
                         <Badge variant="outline" className="text-xs whitespace-nowrap">
-                          {(request.request_type as any)?.name_ar || '-'}
+                          {getRequestTypeName(request)}
                         </Badge>
                       </TableCell>
                       <TableCell className="max-w-xs truncate text-xs sm:text-sm hidden lg:table-cell">
@@ -467,7 +483,7 @@ const Requests = () => {
                             size="sm"
                             variant="outline"
                             onClick={() => {
-                              setSelectedRequest(request as any);
+                              setSelectedRequest(request);
                               setApprovalDialogOpen(true);
                             }}
                             className="text-xs"
@@ -480,7 +496,7 @@ const Requests = () => {
                             size="sm"
                             variant="outline"
                             onClick={() => {
-                              setSelectedRequest(request as any);
+                              setSelectedRequest(request);
                               setCommentsDialogOpen(true);
                             }}
                             className="text-xs"
@@ -492,7 +508,7 @@ const Requests = () => {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => handleDeleteClick(request as any)}
+                            onClick={() => handleDeleteClick(request)}
                             className="text-xs text-destructive hover:text-destructive"
                           >
                             <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />

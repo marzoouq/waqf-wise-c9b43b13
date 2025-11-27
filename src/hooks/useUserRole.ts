@@ -89,7 +89,7 @@ export function useUserRole() {
     const currentState = JSON.stringify({ roles, primaryRole, isLoading: isLoadingRoles, hasUser: !!userId });
     if (currentState !== lastLoggedState.current) {
       lastLoggedState.current = currentState;
-      console.log('🎭 useUserRole State Changed:', { roles, primaryRole, isLoading: isLoadingRoles });
+      // Removed console.log for production cleanliness
     }
   }, [roles, primaryRole, isLoadingRoles, userId]);
 

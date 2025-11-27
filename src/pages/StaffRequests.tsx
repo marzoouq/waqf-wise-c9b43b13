@@ -38,7 +38,23 @@ import {
 import { formatDistanceToNow } from "date-fns";
 import { ar } from "date-fns/locale";
 import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
-import type { BeneficiaryRequest } from '@/types/index';
+
+// Type for request data from the hook (with partial relations)
+interface RequestData {
+  id: string;
+  request_number: string;
+  beneficiary_id: string;
+  description: string;
+  amount: number;
+  status: string;
+  priority: string;
+  is_overdue: boolean;
+  submitted_at: string;
+  request_type?: { name_ar?: string; description?: string; name?: string } | null;
+  beneficiary?: { full_name?: string } | null;
+  request_type_id?: string;
+  [key: string]: unknown;
+}
 
 export default function StaffRequests() {
   const { requests, isLoading } = useRequests();
@@ -46,7 +62,7 @@ export default function StaffRequests() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [typeFilter, setTypeFilter] = useState<string>("all");
-  const [selectedRequest, setSelectedRequest] = useState<BeneficiaryRequest | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<RequestData | null>(null);
   const [approvalDialogOpen, setApprovalDialogOpen] = useState(false);
   const [commentsDialogOpen, setCommentsDialogOpen] = useState(false);
 
@@ -326,7 +342,7 @@ export default function StaffRequests() {
                           variant="ghost"
                           size="icon"
                           onClick={() => {
-                            setSelectedRequest(request as any);
+                            setSelectedRequest(request as RequestData);
                             setApprovalDialogOpen(true);
                           }}
                         >
@@ -336,7 +352,7 @@ export default function StaffRequests() {
                           variant="ghost"
                           size="icon"
                           onClick={() => {
-                            setSelectedRequest(request as any);
+                            setSelectedRequest(request as RequestData);
                             setCommentsDialogOpen(true);
                           }}
                         >
