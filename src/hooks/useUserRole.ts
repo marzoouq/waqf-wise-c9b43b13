@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useMemo } from "react";
 
 export type AppRole = "nazer" | "admin" | "accountant" | "cashier" | "archivist" | "beneficiary" | "user";
 
@@ -10,17 +10,20 @@ const IS_DEV = import.meta.env.DEV;
 export function useUserRole() {
   const { user } = useAuth();
   const lastLoggedState = useRef<string>("");
+  
+  // Memoize user ID to prevent unnecessary re-renders
+  const userId = useMemo(() => user?.id, [user?.id]);
 
   const { data: roles = [], isLoading, isFetching, refetch } = useQuery({
-    queryKey: ["user-roles", user?.id],
+    queryKey: ["user-roles", userId],
     queryFn: async () => {
-      if (!user) return [];
+      if (!userId) return [];
 
       try {
         const { data, error } = await supabase
           .from("user_roles")
           .select("role")
-          .eq("user_id", user.id);
+          .eq("user_id", userId);
 
         if (error) {
           if (IS_DEV) console.error('❌ useUserRole: Error fetching roles', error);
@@ -33,7 +36,7 @@ export function useUserRole() {
         return [];
       }
     },
-    enabled: !!user,
+    enabled: !!userId,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     retry: 3,
@@ -42,7 +45,7 @@ export function useUserRole() {
 
   // Real-time subscription
   useEffect(() => {
-    if (!user?.id) return;
+    if (!userId) return;
 
     const channel = supabase
       .channel('user-roles-changes')
@@ -52,7 +55,7 @@ export function useUserRole() {
           event: '*',
           schema: 'public',
           table: 'user_roles',
-          filter: `user_id=eq.${user.id}`
+          filter: `user_id=eq.${userId}`
         },
         () => {
           refetch();
@@ -63,13 +66,13 @@ export function useUserRole() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user?.id, refetch]);
+  }, [userId, refetch]);
 
   const hasRole = (role: AppRole) => roles.includes(role);
   const primaryRole = roles[0] || "user";
 
   // More accurate loading state
-  const isLoadingRoles = isLoading || (!!user && isFetching);
+  const isLoadingRoles = isLoading || (!!userId && isFetching);
 
   const isNazer = hasRole("nazer");
   const isAdmin = hasRole("admin");
@@ -83,12 +86,12 @@ export function useUserRole() {
   useEffect(() => {
     if (!IS_DEV) return;
     
-    const currentState = JSON.stringify({ roles, primaryRole, isLoading: isLoadingRoles, hasUser: !!user });
+    const currentState = JSON.stringify({ roles, primaryRole, isLoading: isLoadingRoles, hasUser: !!userId });
     if (currentState !== lastLoggedState.current) {
       lastLoggedState.current = currentState;
       console.log('🎭 useUserRole State Changed:', { roles, primaryRole, isLoading: isLoadingRoles });
     }
-  }, [roles, primaryRole, isLoadingRoles, user]);
+  }, [roles, primaryRole, isLoadingRoles, userId]);
 
   return {
     roles,
