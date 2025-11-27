@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { PaymentVoucherDialog } from "./PaymentVoucherDialog";
 import { VoucherDetailsDialog } from "./VoucherDetailsDialog";
 import { BankTransferGenerator } from "./BankTransferGenerator";
-import { Receipt, Eye, Plus, FileText, CheckCircle, XCircle, Clock, AlertCircle } from "lucide-react";
+import { Receipt, Eye, Plus, FileText, CheckCircle, XCircle, Clock, AlertCircle, LucideIcon } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ar } from "date-fns/locale";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -17,9 +17,33 @@ interface DistributionVouchersTabProps {
   distributionId: string;
 }
 
+type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
+
+interface VoucherRecord {
+  id: string;
+  voucher_number: string;
+  voucher_type?: string;
+  beneficiary_id?: string;
+  amount: number;
+  status: string;
+  created_at: string;
+  description?: string;
+  payment_method?: string;
+  bank_name?: string;
+  account_number?: string;
+  bank_iban?: string;
+  reference_number?: string;
+  notes?: string;
+  approved_by?: string;
+  approved_at?: string;
+  paid_by?: string;
+  paid_at?: string;
+  beneficiaries?: { full_name: string; national_id?: string };
+}
+
 export function DistributionVouchersTab({ distributionId }: DistributionVouchersTabProps) {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [selectedVoucher, setSelectedVoucher] = useState<any>(null);
+  const [selectedVoucher, setSelectedVoucher] = useState<VoucherRecord | null>(null);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
 
   const { data: vouchers, isLoading, refetch } = useQuery({
@@ -58,7 +82,7 @@ export function DistributionVouchersTab({ distributionId }: DistributionVouchers
   });
 
   const getStatusBadge = (status: string) => {
-    const configs: Record<string, { label: string; variant: any; icon: any; className?: string }> = {
+    const configs: Record<string, { label: string; variant: BadgeVariant; icon: LucideIcon; className?: string }> = {
       draft: { label: "مسودة", variant: "secondary", icon: Clock },
       approved: { label: "معتمد", variant: "default", icon: CheckCircle, className: "bg-info text-info-foreground" },
       paid: { label: "مدفوع", variant: "default", icon: CheckCircle, className: "bg-success text-success-foreground" },
@@ -77,7 +101,7 @@ export function DistributionVouchersTab({ distributionId }: DistributionVouchers
     );
   };
 
-  const handleViewDetails = (voucher: any) => {
+  const handleViewDetails = (voucher: VoucherRecord) => {
     setSelectedVoucher(voucher);
     setShowDetailsDialog(true);
   };

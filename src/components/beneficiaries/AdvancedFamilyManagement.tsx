@@ -28,6 +28,37 @@ interface FamilyWithStats {
   };
 }
 
+interface FamilyStats {
+  total_members: number;
+  active_members: number;
+  male_members: number;
+  female_members: number;
+  children_count: number;
+  adults_count: number;
+  average_age: number;
+  total_income: number;
+  verified_members: number;
+}
+
+interface FamilyMember {
+  id: string;
+  full_name: string;
+  is_head_of_family: boolean;
+  relationship?: string;
+  gender?: string;
+  date_of_birth?: string;
+  status: string;
+}
+
+interface FamilyRelationship {
+  id: string;
+  relationship_type: string;
+  is_guardian?: boolean;
+  is_dependent?: boolean;
+  beneficiary?: { full_name: string };
+  related_to?: { full_name: string };
+}
+
 interface AdvancedFamilyManagementProps {
   familyId: string;
 }
@@ -59,7 +90,7 @@ export function AdvancedFamilyManagement({ familyId }: AdvancedFamilyManagementP
 
       return {
         ...familyData,
-        stats: statsData as any,
+        stats: statsData as unknown as FamilyStats | undefined,
       } as unknown as FamilyWithStats;
     },
   });
@@ -67,34 +98,37 @@ export function AdvancedFamilyManagement({ familyId }: AdvancedFamilyManagementP
   // جلب أفراد العائلة
   const { data: members = [] } = useQuery({
     queryKey: ['family-members', familyId],
-    queryFn: async () => {
+    queryFn: async (): Promise<FamilyMember[]> => {
       const { data, error } = await supabase
         .from('beneficiaries')
-        .select('*')
+        .select('id, full_name, is_head_of_family, relationship, gender, date_of_birth, status')
         .eq('family_id', familyId)
         .order('is_head_of_family', { ascending: false })
         .order('created_at', { ascending: true });
 
       if (error) throw error;
-      return data;
+      return (data || []) as FamilyMember[];
     },
   });
 
   // جلب العلاقات الأسرية
   const { data: relationships = [] } = useQuery({
     queryKey: ['family-relationships', familyId],
-    queryFn: async () => {
+    queryFn: async (): Promise<FamilyRelationship[]> => {
       const { data, error } = await supabase
         .from('family_relationships')
         .select(`
-          *,
+          id,
+          relationship_type,
+          is_guardian,
+          is_dependent,
           beneficiary:beneficiaries!family_relationships_beneficiary_id_fkey(full_name),
           related_to:beneficiaries!family_relationships_related_to_id_fkey(full_name)
         `)
         .eq('family_id', familyId);
 
       if (error) throw error;
-      return data;
+      return (data || []) as unknown as FamilyRelationship[];
     },
   });
 
@@ -223,7 +257,7 @@ export function AdvancedFamilyManagement({ familyId }: AdvancedFamilyManagementP
         </TabsList>
 
         <TabsContent value="members" className="space-y-3">
-          {members.map((member: any) => (
+          {members.map((member) => (
             <Card key={member.id}>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
@@ -267,7 +301,7 @@ export function AdvancedFamilyManagement({ familyId }: AdvancedFamilyManagementP
               description="لم يتم تحديد علاقات أسرية معقدة لهذه العائلة"
             />
           ) : (
-            relationships.map((rel: any) => (
+            relationships.map((rel) => (
               <Card key={rel.id}>
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">

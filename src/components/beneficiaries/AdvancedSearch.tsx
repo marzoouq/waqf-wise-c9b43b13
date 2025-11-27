@@ -71,6 +71,13 @@ export function AdvancedSearch({ onSearch }: AdvancedSearchProps) {
     onSearch(emptyFilters);
   };
 
+  interface SavedSearchRecord {
+    id: string;
+    name: string;
+    search_criteria: unknown;
+    usage_count: number;
+  }
+
   const handleSaveSearch = async () => {
     if (!savedSearchName.trim()) return;
 
@@ -82,7 +89,7 @@ export function AdvancedSearch({ onSearch }: AdvancedSearchProps) {
       .insert([{
         user_id: user.id,
         name: savedSearchName,
-        search_criteria: filters as any,
+        search_criteria: JSON.parse(JSON.stringify(filters)),
       }]);
 
     if (!error) {
@@ -91,9 +98,10 @@ export function AdvancedSearch({ onSearch }: AdvancedSearchProps) {
     }
   };
 
-  const handleLoadSearch = (search: any) => {
-    setFilters(search.search_criteria);
-    onSearch(search.search_criteria);
+  const handleLoadSearch = (search: SavedSearchRecord) => {
+    const criteria = search.search_criteria as SearchFilters;
+    setFilters(criteria);
+    onSearch(criteria);
 
     // تحديث عدد الاستخدام
     supabase

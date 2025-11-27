@@ -186,8 +186,17 @@ export function EnhancedAccountsTree() {
     }
   };
 
-  const flattenAccounts = (accounts: AccountWithBalance[]): any[] => {
-    let result: any[] = [];
+  interface FlattenedAccount {
+    الكود: string;
+    الاسم: string;
+    النوع: string;
+    الطبيعة: string;
+    الرصيد: string;
+    الحالة: string;
+  }
+
+  const flattenAccounts = (accounts: AccountWithBalance[]): FlattenedAccount[] => {
+    let result: FlattenedAccount[] = [];
     accounts.forEach(account => {
       result.push({
         'الكود': account.code,

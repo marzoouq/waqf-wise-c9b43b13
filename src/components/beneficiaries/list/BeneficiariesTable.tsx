@@ -50,7 +50,7 @@ export function BeneficiariesTable({
     {
       key: "beneficiary_number",
       label: "رقم المستفيد",
-      render: (_: any, row: Beneficiary) => (
+      render: (_: unknown, row: Beneficiary) => (
         <Badge variant="secondary" className="whitespace-nowrap text-xs">
           {row.beneficiary_number || 'قيد الإنشاء'}
         </Badge>
@@ -59,7 +59,7 @@ export function BeneficiariesTable({
     {
       key: "full_name",
       label: "الاسم",
-      render: (_: any, row: Beneficiary) => (
+      render: (_: unknown, row: Beneficiary) => (
         <div className="flex items-center gap-2">
           <div className="h-6 w-6 sm:h-8 sm:w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
             <span className="text-primary font-semibold text-xs sm:text-sm">
@@ -97,7 +97,7 @@ export function BeneficiariesTable({
     {
       key: "status",
       label: "الحالة",
-      render: (_: any, row: Beneficiary) => (
+      render: (_: unknown, row: Beneficiary) => (
         <div className="flex items-center gap-1">
           <Badge
             className={
