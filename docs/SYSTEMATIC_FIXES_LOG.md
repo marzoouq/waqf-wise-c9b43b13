@@ -15,6 +15,7 @@
 | 3 | Service Worker Cache | تحديث Workbox configuration | `vite.config.ts` | ✅ مكتمل |
 | 4 | DOM Warning - Password | إضافة form wrapper | `LeakedPasswordCheck.tsx` | ✅ مكتمل |
 | 5 | أخطاء تاريخية (20 خطأ) | تحديث حالة الأخطاء في قاعدة البيانات | `system_error_logs` table | ✅ مكتمل |
+| 6 | Console.log Spam | تحسين logging مع DEV check و useEffect | `useUserRole.ts` | ✅ مكتمل |
 
 ---
 
@@ -44,6 +45,45 @@ WHERE status = 'new'
 ### النتيجة
 - ✅ 20/20 خطأ تم حلها
 - ✅ أدوات المطور نظيفة
+
+---
+
+## 🔧 الإصلاح #6: Console.log Spam في useUserRole
+
+### المشكلة
+- `console.log` في hook `useUserRole` يُنفذ في كل render
+- يظهر أكثر من 20 مرة في Console
+- يؤثر سلباً على الأداء والقراءة
+
+### الحل المطبق
+```typescript
+// قبل: console.log يُنفذ في كل render
+console.log('🎭 useUserRole State:', { ... });
+
+// بعد: logging مشروط ومحسّن
+const IS_DEV = import.meta.env.DEV;
+const lastLoggedState = useRef<string>("");
+
+useEffect(() => {
+  if (!IS_DEV) return;
+  const currentState = JSON.stringify({ roles, primaryRole, isLoading });
+  if (currentState !== lastLoggedState.current) {
+    lastLoggedState.current = currentState;
+    console.log('🎭 useUserRole State Changed:', { ... });
+  }
+}, [roles, primaryRole, isLoadingRoles, user]);
+```
+
+### التحسينات
+1. ✅ فحص `IS_DEV` - لا logging في الإنتاج
+2. ✅ استخدام `useRef` لتتبع آخر حالة
+3. ✅ logging فقط عند تغيّر الحالة فعلياً
+4. ✅ إزالة import غير مستخدم (`productionLogger`)
+
+### النتيجة
+- ✅ Console نظيف من الـ spam
+- ✅ أداء محسّن
+- ✅ debugging فعّال في DEV فقط
 
 ---
 

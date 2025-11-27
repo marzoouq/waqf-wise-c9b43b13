@@ -1,26 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
-import { useEffect } from "react";
-import { productionLogger } from '@/lib/logger/production-logger';
+import { useEffect, useRef } from "react";
 
 export type AppRole = "nazer" | "admin" | "accountant" | "cashier" | "archivist" | "beneficiary" | "user";
 
+const IS_DEV = import.meta.env.DEV;
+
 export function useUserRole() {
   const { user } = useAuth();
+  const lastLoggedState = useRef<string>("");
 
   const { data: roles = [], isLoading, isFetching, refetch } = useQuery({
     queryKey: ["user-roles", user?.id],
     queryFn: async () => {
-      if (!user) {
-        console.log('🔍 useUserRole: No user yet');
-        return [];
-      }
-
-      console.log('🔍 useUserRole: Fetching roles for user', { 
-        email: user.email,
-        userId: user.id 
-      });
+      if (!user) return [];
 
       try {
         const { data, error } = await supabase
@@ -29,18 +23,13 @@ export function useUserRole() {
           .eq("user_id", user.id);
 
         if (error) {
-          console.error('❌ useUserRole: Error fetching roles', error);
+          if (IS_DEV) console.error('❌ useUserRole: Error fetching roles', error);
           return [];
         }
         
-        console.log('✅ useUserRole: Roles loaded successfully', { 
-          roles: data,
-          count: data?.length 
-        });
-        
         return (data || []).map(r => r.role as AppRole);
       } catch (err) {
-        console.error('❌ useUserRole: Exception in queryFn', err);
+        if (IS_DEV) console.error('❌ useUserRole: Exception in queryFn', err);
         return [];
       }
     },
@@ -90,12 +79,16 @@ export function useUserRole() {
   const isBeneficiary = hasRole("beneficiary");
   const isUser = hasRole("user");
 
-  console.log('🎭 useUserRole State:', {
-    isLoading: isLoadingRoles,
-    roles,
-    primaryRole,
-    hasUser: !!user
-  });
+  // Log state changes only in DEV and only when state actually changes
+  useEffect(() => {
+    if (!IS_DEV) return;
+    
+    const currentState = JSON.stringify({ roles, primaryRole, isLoading: isLoadingRoles, hasUser: !!user });
+    if (currentState !== lastLoggedState.current) {
+      lastLoggedState.current = currentState;
+      console.log('🎭 useUserRole State Changed:', { roles, primaryRole, isLoading: isLoadingRoles });
+    }
+  }, [roles, primaryRole, isLoadingRoles, user]);
 
   return {
     roles,
