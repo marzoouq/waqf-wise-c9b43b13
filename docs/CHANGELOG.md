@@ -9,6 +9,13 @@
 - إضافة 40+ نوع جديد موزعة على ملفات منفصلة
 - إصلاح 60+ ملف لإزالة استخدامات `any`
 
+#### نظام التصميم المحسّن (Design System v2.2.0)
+- إضافة متغيرات CSS جديدة للتدرجات والظلال
+- دعم الانتقالات المتعددة (fast, smooth, slow)
+- إضافة ألوان `primary-light` للوضعين الفاتح والداكن
+- تحسين دعم اللغة العربية والخطوط
+- إضافة animations جديدة في Tailwind
+
 #### أنواع البيانات الجديدة
 - `src/types/table-rows.ts` - أنواع صفوف الجداول (20+ نوع)
 - `src/types/accounting.ts` - أنواع المحاسبة
@@ -17,6 +24,34 @@
 - `src/types/alerts.ts` - أنواع التنبيهات
 - `src/types/activity.ts` - أنواع النشاط
 - `src/types/reports.types.ts` - أنواع التقارير
+
+### 🎨 تحسينات نظام التصميم
+
+#### index.css
+```css
+/* متغيرات جديدة */
+--primary-light: 150 45% 95%;
+--gradient-success: linear-gradient(...);
+--gradient-warning: linear-gradient(...);
+--gradient-destructive: linear-gradient(...);
+--gradient-glass: linear-gradient(...);
+--shadow-glow: 0 0 20px hsl(150 45% 35% / 0.3);
+--transition-fast: all 0.15s cubic-bezier(...);
+--transition-slow: all 0.5s cubic-bezier(...);
+--spacing-xs/sm/md/lg/xl/2xl
+```
+
+#### tailwind.config.ts
+```typescript
+// إضافات جديدة
+- fontFamily: { arabic: [...] }
+- borderRadius: { xl, 2xl }
+- spacing: { 18, 22, 30 }
+- boxShadow: { soft, medium, strong, glow }
+- animations: fade-in/out, slide-in/out, scale-in, pulse-soft, shimmer
+- transitionDuration: { 250, 350, 400 }
+- zIndex: { 60-100 }
+```
 
 ### 🔧 تحسينات
 
@@ -93,6 +128,8 @@
 | الملفات المُصلحة | 60+ |
 | الأنواع الجديدة | 40+ |
 | ملفات الأنواع | 7 |
+| متغيرات CSS جديدة | 15+ |
+| animations جديدة | 8 |
 | نسبة التغطية | ~95% |
 
 ### ⚠️ الاستثناءات المقبولة
