@@ -4,11 +4,13 @@
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.81.1';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { 
+  corsHeaders, 
+  handleCors, 
+  jsonResponse, 
+  errorResponse, 
+  unauthorizedResponse 
+} from '../_shared/cors.ts';
 
 interface CleanupResult {
   success: boolean;
@@ -25,9 +27,8 @@ interface CleanupResult {
 
 Deno.serve(async (req) => {
   // Handle CORS preflight
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     // يمكن استدعاؤها بدون مصادقة للـ Cron Jobs
@@ -37,10 +38,7 @@ Deno.serve(async (req) => {
     
     if (!isCronJob && !authHeader) {
       console.log('Unauthorized access attempt - not a cron job and no auth header');
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return unauthorizedResponse('Unauthorized');
     }
 
     const supabase = createClient(
@@ -70,26 +68,16 @@ Deno.serve(async (req) => {
       severity: 'info',
     });
 
-    return new Response(
-      JSON.stringify({
-        ...result,
-        message: `تم التنظيف بنجاح: ${result.total_deleted || 0} سجل محذوف`,
-      }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return jsonResponse({
+      ...result,
+      message: `تم التنظيف بنجاح: ${result.total_deleted || 0} سجل محذوف`,
+    });
 
   } catch (error) {
     console.error('Cleanup error:', error);
-    
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      }),
-      { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
+    return errorResponse(
+      error instanceof Error ? error.message : 'Unknown error',
+      500
     );
   }
 });

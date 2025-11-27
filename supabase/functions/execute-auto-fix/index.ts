@@ -1,23 +1,22 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { 
+  handleCors, 
+  jsonResponse, 
+  errorResponse, 
+  unauthorizedResponse,
+  forbiddenResponse,
+  rateLimitResponse 
+} from '../_shared/cors.ts';
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     // 🔒 1. فحص المصادقة
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      return new Response(
-        JSON.stringify({ success: false, error: 'غير مصرح' }), 
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return unauthorizedResponse('غير مصرح');
     }
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -28,10 +27,7 @@ Deno.serve(async (req) => {
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     
     if (authError || !user) {
-      return new Response(
-        JSON.stringify({ success: false, error: 'مصادقة غير صالحة' }), 
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return unauthorizedResponse('مصادقة غير صالحة');
     }
 
     // 🔐 2. التحقق من الصلاحيات (يجب أن يكون admin أو nazer)
@@ -44,13 +40,7 @@ Deno.serve(async (req) => {
     const hasAccess = userRoles.includes('admin') || userRoles.includes('nazer');
 
     if (!hasAccess) {
-      return new Response(
-        JSON.stringify({ 
-          success: false, 
-          error: 'ليس لديك صلاحية لتنفيذ هذه العملية - يتطلب دور مسؤول' 
-        }), 
-        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return forbiddenResponse('ليس لديك صلاحية لتنفيذ هذه العملية - يتطلب دور مسؤول');
     }
 
     // 🚦 3. Rate Limiting المحسّن (محاولة كل 10 ثواني للـ cron, دقيقة للـ manual)
@@ -64,13 +54,7 @@ Deno.serve(async (req) => {
     const isCronJob = req.headers.get('x-cron-job') === 'true';
     
     if (!isCronJob && recentFixes && recentFixes.length >= 1) {
-      return new Response(
-        JSON.stringify({ 
-          success: false, 
-          error: 'يرجى الانتظار دقيقة واحدة قبل المحاولة مرة أخرى' 
-        }), 
-        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return rateLimitResponse('يرجى الانتظار دقيقة واحدة قبل المحاولة مرة أخرى');
     }
 
     console.log(`🔧 Starting auto-fix execution by user: ${user.email}...`);
@@ -166,10 +150,7 @@ Deno.serve(async (req) => {
 
     if (!pendingFixes || pendingFixes.length === 0) {
       console.log('✅ No pending fixes found');
-      return new Response(
-        JSON.stringify({ success: true, message: 'No pending fixes', fixed: 0 }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return jsonResponse({ success: true, message: 'No pending fixes', fixed: 0 });
     }
 
     console.log(`📋 Found ${pendingFixes.length} pending fixes`);
@@ -253,31 +234,16 @@ Deno.serve(async (req) => {
 
     console.log(`✅ Auto-fix completed: ${successCount} succeeded, ${failedCount} failed`);
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        fixed: successCount,
-        failed: failedCount,
-        total: pendingFixes.length,
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      }
-    );
+    return jsonResponse({
+      success: true,
+      fixed: successCount,
+      failed: failedCount,
+      total: pendingFixes.length,
+    });
 
   } catch (error) {
     console.error('Error in execute-auto-fix:', error);
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: 'حدث خطأ أثناء تنفيذ الإصلاحات التلقائية',
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500,
-      }
-    );
+    return errorResponse('حدث خطأ أثناء تنفيذ الإصلاحات التلقائية', 500);
   }
 });
 

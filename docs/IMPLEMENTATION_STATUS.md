@@ -11,7 +11,7 @@
 | المرحلة 1: Logger Fix | ✅ مكتمل | تم إصلاح تنسيق البيانات |
 | المرحلة 2: Auth Fix | ✅ مكتمل | ROLE_PERMISSIONS مفعلة |
 | المرحلة 3: Database Cleanup | ✅ مكتمل | دوال التنظيف جاهزة |
-| المرحلة 4: CORS توحيد | ✅ موجود | `_shared/cors.ts` |
+| المرحلة 4: CORS توحيد | ✅ جزئي | 8/36 ملف محدث |
 | المرحلة 5: Dead Files | ✅ مكتمل | services/index.ts نظيف |
 | المرحلة 6: Types دمج | ✅ مكتمل | distribution + reports موحدة |
 | المرحلة 7: Type Safety | ⏳ جزئي | بحاجة مراجعة إضافية |
@@ -23,167 +23,130 @@
 
 ---
 
-## ✅ المرحلة 1: إصلاح Logger (مكتمل)
+## ✅ المرحلة 4: توحيد CORS (جزئي)
 
-### الملفات المعدلة
-- `src/lib/logger/production-logger.ts`
-
-### التغييرات
-1. ✅ إضافة `mapLevelToSeverity()` function
-2. ✅ إضافة `mapLevelToErrorType()` function
-3. ✅ تحديث `flush()` لإرسال التنسيق الصحيح:
-   - `error_type` ← من `level`
-   - `error_message` ← من `message`
-   - `severity` ← من `mapLevelToSeverity()`
-   - `url` و `user_agent` ← إضافة تلقائية
-
-### التنسيق الجديد
-```typescript
-{
-  error_type: 'error' | 'warning' | 'info' | 'debug',
-  error_message: string,
-  severity: 'low' | 'medium' | 'high' | 'critical',
-  url: string,
-  user_agent: string,
-  additional_data?: object
-}
-```
-
----
-
-## ✅ المرحلة 2: إصلاح نظام الصلاحيات (مكتمل)
-
-### الملفات المعدلة
-- `src/contexts/AuthContext.tsx`
-- `src/components/auth/ProtectedRoute.tsx`
-
-### التغييرات
-1. ✅ `ROLE_PERMISSIONS` معرفة بشكل كامل
-2. ✅ `hasPermission()` تتحقق من الصلاحيات الفعلية
-3. ✅ `isRole()` تتحقق من الأدوار الفعلية
-4. ✅ `checkPermissionSync()` للاستخدام في المكونات
-5. ✅ `ProtectedRoute` يتحقق من `requiredPermission`
-
-### خريطة الصلاحيات
-```typescript
-ROLE_PERMISSIONS = {
-  nazer: ['view_all_data', ...],      // كل الصلاحيات
-  admin: ['manage_users', ...],        // إدارة النظام
-  accountant: ['manage_journal_entries', ...],
-  cashier: ['process_payments', ...],
-  archivist: ['manage_documents', ...],
-  beneficiary: ['view_own_profile', ...],
-  user: ['view_dashboard']
-}
-```
-
----
-
-## ✅ المرحلة 3: تنظيف قاعدة البيانات (مكتمل)
-
-### التغييرات
-1. ✅ دالة `cleanup_old_records()` للتنظيف التلقائي
-2. ✅ دالة `run_scheduled_cleanup()` مع التسجيل
-3. ✅ جدول `cleanup_logs` للتتبع
-4. ✅ Edge Function `scheduled-cleanup`
-5. ✅ فهارس لتحسين الأداء
-
-### سياسات الاحتفاظ
-| الجدول | الفترة | الشرط |
-|--------|--------|-------|
-| system_health_checks | 7 أيام | جميع السجلات |
-| system_error_logs | 30 يوم | المحلولة فقط |
-| system_alerts | 24 ساعة | المحلولة/المُقرة |
-| audit_logs | 90 يوم | جميع السجلات |
-| notifications | 30 يوم | المقروءة فقط |
-
----
-
-## ✅ المرحلة 4: توحيد CORS (موجود)
-
-### الملف
+### الملف المشترك
 - `supabase/functions/_shared/cors.ts`
 
 ### الدوال المتاحة
 ```typescript
-corsHeaders          // الـ headers الأساسية
-createCorsResponse() // للـ OPTIONS requests
-jsonResponse()       // JSON مع CORS
-errorResponse()      // خطأ مع CORS
-handleCors()         // معالجة preflight
+corsHeaders              // الـ headers الأساسية
+handleCors(req)         // معالجة preflight - يرجع Response أو null
+createCorsResponse()    // للـ OPTIONS requests
+jsonResponse(data)      // JSON مع CORS
+errorResponse(msg, status)      // خطأ مع CORS
+unauthorizedResponse(msg)       // 401
+forbiddenResponse(msg)          // 403
+notFoundResponse(msg)           // 404
+rateLimitResponse(msg)          // 429
+serverErrorResponse(msg)        // 500
+```
+
+### Edge Functions المحدثة (8)
+| الملف | الحالة |
+|-------|--------|
+| `scheduled-cleanup` | ✅ محدث |
+| `send-notification` | ✅ محدث |
+| `auto-create-journal` | ✅ محدث |
+| `generate-ai-insights` | ✅ محدث |
+| `generate-distribution-summary` | ✅ محدث |
+| `decrypt-file` | ✅ محدث |
+| `encrypt-file` | ✅ محدث |
+| `execute-auto-fix` | ✅ محدث |
+
+### Edge Functions المتبقية (28)
+- admin-manage-beneficiary-password
+- backfill-rental-documents
+- backup-database
+- chatbot
+- check-leaked-password
+- cleanup-old-files
+- cleanup-sensitive-files
+- create-beneficiary-accounts
+- daily-backup
+- daily-notifications-full
+- daily-notifications
+- enhanced-backup
+- extract-invoice-data
+- generate-scheduled-report
+- generate-smart-alerts
+- log-error
+- notify-admins
+- notify-disclosure-published
+- ocr-document
+- property-ai-assistant
+- reset-user-password
+- restore-database
+- secure-delete-file
+- send-invoice-email
+- send-push-notification
+- simulate-distribution
+- support-auto-escalate
+- zatca-submit
+
+### كيفية تحديث الملفات المتبقية
+```typescript
+// 1. استبدل:
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+// 2. بـ:
+import { 
+  handleCors, 
+  jsonResponse, 
+  errorResponse 
+} from '../_shared/cors.ts';
+
+// 3. واستبدل:
+if (req.method === 'OPTIONS') {
+  return new Response(null, { headers: corsHeaders });
+}
+
+// 4. بـ:
+const corsResponse = handleCors(req);
+if (corsResponse) return corsResponse;
 ```
 
 ---
 
-## ✅ المرحلة 5: حذف الملفات الميتة (مكتمل)
-
-### التغييرات
-- ✅ `src/services/index.ts` تم تنظيفه
-- ❌ تم إزالة exports:
-  - `DistributionService`
-  - `PaymentService`
-  - `ApprovalService`
-  - `BeneficiaryService`
-
----
-
-## ✅ المرحلة 6: دمج Types المكررة (مكتمل)
+## ✅ المرحلة 6: دمج Types (مكتمل)
 
 ### الملفات الجديدة
-- `src/types/distribution/index.ts` - موحد
-- `src/types/reports/index.ts` - موحد
+- `src/types/distribution/index.ts` - أنواع التوزيعات الموحدة
+- `src/types/reports/index.ts` - أنواع التقارير الموحدة
 
-### الملفات القديمة (توافقية)
-- `src/types/distribution.ts` → يعيد التصدير
-- `src/types/distributions.ts` → يعيد التصدير
-- `src/types/report.ts` → يعيد التصدير
-- `src/types/reports.ts` → يعيد التصدير
-
----
-
-## ✅ المرحلة 11: الاختبارات (مكتمل)
-
-### الملفات
-- `src/__tests__/unit/production-logger.test.ts`
-- `src/__tests__/unit/auth-context.test.ts`
-- `src/__tests__/integration/phase1-2-integration.test.ts`
+### الملفات التوافقية (تعيد التصدير)
+- `src/types/distribution.ts` → يعيد التصدير من `distribution/index.ts`
+- `src/types/distributions.ts` → يعيد التصدير من `distribution/index.ts`
+- `src/types/report.ts` → يعيد التصدير من `reports/index.ts`
+- `src/types/reports.ts` → يعيد التصدير من `reports/index.ts`
 
 ---
 
 ## 📈 النتائج
 
 ### قبل الإصلاح
-- Logger Errors: 100% فشل
-- نظام الصلاحيات: معطل
-- Types مكررة: عالي
-- CORS مكرر: 35x
+- CORS مكرر: 36x (في كل Edge Function)
+- Types مكررة: 4 ملفات متداخلة
 
 ### بعد الإصلاح
-- Logger Errors: 0% فشل ✅
-- نظام الصلاحيات: فعال ✅
-- Types مكررة: موحدة ✅
-- CORS مكرر: 1x ✅
+- CORS موحد: 8 ملفات محدثة ✅
+- Types موحدة: ملفان رئيسيان ✅
+- _shared/cors.ts: موجود ومحسّن ✅
 
 ---
 
-## 🔜 المتبقي (اختياري)
+## 🔜 المتبقي
 
-### المرحلة 7-8: Type Safety والأداء
+### CORS (اختياري)
+- تحديث 28 Edge Function المتبقية
+
+### Type Safety
 - 27 استخدام `as any`
 - 51 استخدام `key={index}`
 - 96 استخدام `select('*')`
 
-### المرحلة 9: Console.log
+### Console.log
 - ~67 في ملفات الإنتاج
-
-### المرحلة 10: دمج الصفحات
-- Loans + LoansManagement
-- Request pages (4)
-- Support pages (3)
-
----
-
-## 🔗 الملفات المرجعية
-- `docs/PHASE1_LOGGER_FIX.md`
-- `docs/PHASE2_AUTH_FIX.md`
-- `docs/PHASE3_CLEANUP_FIX.md`
