@@ -1,44 +1,29 @@
 /**
- * أنواع التوزيعات ومعالج التوزيع
+ * أنواع التوزيعات - ملف توافقي
+ * @deprecated استخدم @/types/distribution/index.ts بدلاً من هذا الملف
+ * 
+ * هذا الملف موجود للتوافق مع الكود القديم فقط
+ * جميع الأنواع الآن في @/types/distribution/index.ts
  */
 
-export type DistributionPattern = 'shariah' | 'equal' | 'need_based' | 'custom' | 'hybrid';
-
-export type ApprovalWorkflowType = 'standard' | 'fast' | 'extended';
-
-export interface DeductionsValues {
-  nazer: number;
-  reserve: number;
-  development: number;
-  maintenance: number;
-  investment: number;
-}
-
-export interface ApprovalSettingsValues {
-  workflow: ApprovalWorkflowType;
-  autoNotify: boolean;
-}
-
-export interface DistributionWizardFormData {
-  pattern: DistributionPattern;
-  beneficiaries: string[];
-  deductions: DeductionsValues;
-  approvalSettings: ApprovalSettingsValues;
-}
-
-export interface DistributionPreviewData {
-  pattern: DistributionPattern;
-  beneficiaries: string[];
-  deductions: DeductionsValues;
-  approvalSettings: ApprovalSettingsValues;
-}
-
-/**
- * نوع قيمة الفلتر المتقدم
- */
-export type FilterValue = string | number | boolean | null | undefined;
-
-/**
- * نوع سجل الفلاتر
- */
-export type FiltersRecord = Record<string, FilterValue>;
+export {
+  // Types
+  type DistributionPattern,
+  type ApprovalWorkflowType,
+  type DistributionFrequency,
+  type DistributionRule,
+  type BeneficiaryDistributionType,
+  type PaymentStatus,
+  type FilterValue,
+  type FiltersRecord,
+  
+  // Interfaces
+  type DeductionsValues,
+  type ApprovalSettingsValues,
+  type DistributionWizardFormData,
+  type DistributionPreviewData,
+  type WaqfDistributionSettings,
+  type DistributionBeneficiary,
+  type DistributionDetail,
+  type DistributionSummary,
+} from './distribution/index';
