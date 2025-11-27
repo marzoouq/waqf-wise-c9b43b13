@@ -1,19 +1,19 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { 
+  handleCors, 
+  jsonResponse, 
+  errorResponse, 
+  unauthorizedResponse 
+} from '../_shared/cors.ts';
 
 /**
  * Edge Function لفك تشفير الملفات
  * يتحقق من الصلاحيات ويسجل عمليات الوصول
  */
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     const supabase = createClient(
@@ -23,14 +23,14 @@ serve(async (req) => {
 
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      throw new Error('غير مصرح بالوصول');
+      return unauthorizedResponse('غير مصرح بالوصول');
     }
 
     const token = authHeader.replace('Bearer ', '');
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     
     if (authError || !user) {
-      throw new Error('فشل التحقق من الهوية');
+      return unauthorizedResponse('فشل التحقق من الهوية');
     }
 
     const { fileId, accessReason } = await req.json();
@@ -158,22 +158,17 @@ serve(async (req) => {
 
     console.log(`✅ تم فك تشفير الملف بنجاح: ${fileId}`);
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        message: 'تم فك تشفير الملف بنجاح',
-        file: {
-          id: fileRecord.id,
-          original_name: fileRecord.original_file_name,
-          mime_type: fileRecord.mime_type,
-          size: fileRecord.file_size,
-          data: decryptedBase64
-        }
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    return jsonResponse({
+      success: true,
+      message: 'تم فك تشفير الملف بنجاح',
+      file: {
+        id: fileRecord.id,
+        original_name: fileRecord.original_file_name,
+        mime_type: fileRecord.mime_type,
+        size: fileRecord.file_size,
+        data: decryptedBase64
       }
-    );
+    });
   } catch (error) {
     console.error('❌ خطأ في فك تشفير الملف:', error);
     
@@ -199,15 +194,6 @@ serve(async (req) => {
       }
     }
     
-    return new Response(
-      JSON.stringify({ 
-        success: false,
-        error: safeMessage
-      }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    );
+    return errorResponse(safeMessage, 500);
   }
 });
