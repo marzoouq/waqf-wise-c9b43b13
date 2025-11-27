@@ -69,7 +69,7 @@ export function useBackup() {
         queryClient.invalidateQueries({ queryKey: ["backup-logs"] });
       }
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "فشل إنشاء النسخة الاحتياطية",
         description: error.message || "حدث خطأ أثناء النسخ الاحتياطي",
@@ -80,7 +80,7 @@ export function useBackup() {
 
   // استعادة نسخة احتياطية
   const restoreBackup = useMutation({
-    mutationFn: async (options: { backupData: any; mode?: "replace" | "merge" }) => {
+    mutationFn: async (options: { backupData: Record<string, unknown>; mode?: "replace" | "merge" }) => {
       const { data, error } = await supabase.functions.invoke("restore-database", {
         body: {
           backupData: options.backupData,
@@ -102,7 +102,7 @@ export function useBackup() {
         queryClient.invalidateQueries();
       }
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "فشلت الاستعادة",
         description: error.message || "حدث خطأ أثناء استعادة البيانات",

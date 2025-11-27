@@ -61,7 +61,7 @@ export function useActiveSessions() {
         description: "تم إنهاء الجلسة بنجاح",
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "خطأ",
         description: error.message || "فشل في إنهاء الجلسة",
@@ -97,7 +97,7 @@ export function useActiveSessions() {
         description: "تم إنهاء جميع الجلسات الأخرى بنجاح",
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "خطأ",
         description: error.message || "فشل في إنهاء الجلسات",

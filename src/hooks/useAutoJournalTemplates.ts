@@ -1,25 +1,21 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import type { Database } from '@/integrations/supabase/types';
+import type { Json } from '@/integrations/supabase/types';
 
-type AutoJournalTemplateRow = Database['public']['Tables']['auto_journal_templates']['Row'];
+export interface AccountMapping {
+  account_code: string;
+  percentage?: number;
+  fixed_amount?: number;
+}
 
 export interface AutoJournalTemplate {
   id: string;
   trigger_event: string;
   template_name: string;
   description?: string;
-  debit_accounts: Array<{
-    account_code: string;
-    percentage?: number;
-    fixed_amount?: number;
-  }>;
-  credit_accounts: Array<{
-    account_code: string;
-    percentage?: number;
-    fixed_amount?: number;
-  }>;
+  debit_accounts: AccountMapping[];
+  credit_accounts: AccountMapping[];
   is_active: boolean;
   priority: number;
   created_at: string;
@@ -29,10 +25,15 @@ export interface AutoJournalTemplateInsert {
   trigger_event: string;
   template_name: string;
   description?: string;
-  debit_accounts: any;
-  credit_accounts: any;
+  debit_accounts: AccountMapping[];
+  credit_accounts: AccountMapping[];
   is_active?: boolean;
   priority?: number;
+}
+
+function parseAccountMappings(data: Json): AccountMapping[] {
+  if (!data || !Array.isArray(data)) return [];
+  return data as unknown as AccountMapping[];
 }
 
 export function useAutoJournalTemplates() {
@@ -50,8 +51,10 @@ export function useAutoJournalTemplates() {
       if (error) throw error;
       return (data || []).map(item => ({
         ...item,
-        debit_accounts: item.debit_accounts as any,
-        credit_accounts: item.credit_accounts as any,
+        debit_accounts: parseAccountMappings(item.debit_accounts),
+        credit_accounts: parseAccountMappings(item.credit_accounts),
+        is_active: item.is_active ?? false,
+        priority: item.priority ?? 0,
       })) as AutoJournalTemplate[];
     },
   });
@@ -60,7 +63,15 @@ export function useAutoJournalTemplates() {
     mutationFn: async (template: AutoJournalTemplateInsert) => {
       const { data, error } = await supabase
         .from('auto_journal_templates')
-        .insert(template)
+        .insert({
+          trigger_event: template.trigger_event,
+          template_name: template.template_name,
+          description: template.description,
+          debit_accounts: template.debit_accounts as unknown as Json,
+          credit_accounts: template.credit_accounts as unknown as Json,
+          is_active: template.is_active,
+          priority: template.priority,
+        })
         .select()
         .single();
 
@@ -85,9 +96,17 @@ export function useAutoJournalTemplates() {
 
   const updateTemplate = useMutation({
     mutationFn: async ({ id, ...template }: Partial<AutoJournalTemplate> & { id: string }) => {
+      const updateData: Record<string, unknown> = { ...template };
+      if (template.debit_accounts) {
+        updateData.debit_accounts = template.debit_accounts as unknown as Json;
+      }
+      if (template.credit_accounts) {
+        updateData.credit_accounts = template.credit_accounts as unknown as Json;
+      }
+      
       const { data, error } = await supabase
         .from('auto_journal_templates')
-        .update(template)
+        .update(updateData)
         .eq('id', id)
         .select()
         .single();
