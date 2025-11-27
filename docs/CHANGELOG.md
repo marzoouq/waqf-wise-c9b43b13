@@ -1,5 +1,109 @@
 # سجل التغييرات (Changelog)
 
+## النسخة 2.2.0 - 2025-11-27
+
+### ✨ ميزات جديدة
+
+#### نظام الأمان النوعي الصارم (Strict Type Safety)
+- تفعيل قاعدة `@typescript-eslint/no-explicit-any` كخطأ بناء
+- إضافة 40+ نوع جديد موزعة على ملفات منفصلة
+- إصلاح 60+ ملف لإزالة استخدامات `any`
+
+#### أنواع البيانات الجديدة
+- `src/types/table-rows.ts` - أنواع صفوف الجداول (20+ نوع)
+- `src/types/accounting.ts` - أنواع المحاسبة
+- `src/types/auth.ts` - أنواع المصادقة
+- `src/types/errors.ts` - أنواع الأخطاء
+- `src/types/alerts.ts` - أنواع التنبيهات
+- `src/types/activity.ts` - أنواع النشاط
+- `src/types/reports.types.ts` - أنواع التقارير
+
+### 🔧 تحسينات
+
+#### المكونات المُصلحة
+- `FinancialReports.tsx` - استبدال `any` بـ `Account`
+- `DetailedGeneralLedger.tsx` - `GeneralLedgerEntryRow`
+- `FinancialRatiosReport.tsx` - `FinancialRatioKPI`
+- `TransferStatusTracker.tsx` - تحديث نوع الأيقونة
+- `PaymentVoucherDialog.tsx` - type casting محدد
+- `DistributionsTab.tsx` - `unknown` بدلاً من `any`
+- `ContractsTab.tsx` - `unknown` في render
+- `MaintenanceTab.tsx` - `unknown` في render
+- `PropertiesTab.tsx` - `unknown` في render
+- `ProfileRequestsHistory.tsx` - `BeneficiaryRequest[]`
+- `ProfileTimeline.tsx` - `BeneficiaryRequest` type
+- `BeneficiaryPropertiesTab.tsx` - `ContractWithProperty`
+- `RequestDetailsDialog.tsx` - `RequestWithDetails`
+- `AddInvoiceDialog.tsx` - `InvoiceFormData`
+- `InvoiceManager.tsx` - `BadgeVariant` typing
+- `ComponentInspector.tsx` - `ElementInfoData` interface
+- `PhaseCard.tsx` - type casting للـ status
+- `FamilyTreeView.tsx` - `as never` للـ Supabase
+- `SimulationDialog.tsx` - type casting محدد
+- `MessageCenter.tsx` - تحديث نوع الأيقونة
+- `ActiveSessionsDialog.tsx` - `SessionData` interface
+- `UnifiedDataTable.tsx` - Generic type refinement
+- `UnifiedFormField.tsx` - `ControllerRenderProps`
+
+#### تحديث ESLint
+```javascript
+// eslint.config.js
+"@typescript-eslint/no-explicit-any": "error"
+// استثناء ملفات الاختبار
+```
+
+### 📚 التوثيق
+
+#### ملفات جديدة
+- `docs/FIXES_AND_PHASES_DOCUMENTATION.md` - توثيق شامل للإصلاحات والمراحل
+- `docs/TYPE_SAFETY_GUIDE.md` - دليل الأمان النوعي
+- تحديث `docs/CHANGELOG.md` - سجل التغييرات
+
+#### محتوى التوثيق
+- توثيق 8 مراحل التطوير
+- شرح نظام الأنواع الجديد
+- أمثلة على الاستخدام الصحيح
+- قائمة الملفات المُصلحة
+
+### 🔒 الأمان
+
+#### الأمان النوعي
+- منع استخدام `any` في جميع الملفات (باستثناء الاختبارات)
+- Type casting صريح للقيم الديناميكية
+- استخدام `unknown` للقيم غير المعروفة
+- استثناءات موثقة للمكتبات الخارجية
+
+### 🐛 إصلاح الأخطاء
+
+#### أخطاء TypeScript
+- إصلاح جميع أخطاء `any` في المكونات
+- تصحيح أنواع Supabase mismatches
+- إصلاح Generic types في الجداول الموحدة
+- تصحيح نوع `render` في UnifiedFormField
+
+#### أخطاء البناء
+- إصلاح جميع أخطاء البناء المتعلقة بالأنواع
+- تصحيح استيراد الأنواع المفقودة
+- إضافة تعليقات `eslint-disable` للمكتبات الخارجية
+
+### 📊 الإحصائيات
+
+| المقياس | القيمة |
+|---------|--------|
+| الملفات المُصلحة | 60+ |
+| الأنواع الجديدة | 40+ |
+| ملفات الأنواع | 7 |
+| نسبة التغطية | ~95% |
+
+### ⚠️ الاستثناءات المقبولة
+
+1. **المكتبات الخارجية** (recharts, jspdf) - تستخدم `any` داخلياً
+2. **Supabase Type Mismatches** - استخدام `as never` أو `as unknown`
+3. **Generic Components** - استخدام `unknown` مع type guards
+4. **ملفات الاختبار** - مستثناة من القاعدة
+
+---
+
 ## النسخة 2.1.1 - 2025-11-27
 
 ### 🔒 الأمان النوعي (Type Safety)
