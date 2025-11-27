@@ -21,6 +21,7 @@ import { EmptyAccountingState } from "./EmptyAccountingState";
 import { AccountingErrorState } from "./AccountingErrorState";
 import { toast } from "sonner";
 import { UnifiedDataTable, type Column } from "@/components/unified/UnifiedDataTable";
+import { productionLogger } from '@/lib/logger/production-logger';
 
 export function BudgetsContent() {
   const { fiscalYears } = useFiscalYears();
@@ -93,7 +94,7 @@ export function BudgetsContent() {
       toast.success("تم تصدير الميزانيات بنجاح");
     } catch (error) {
       toast.error("فشل تصدير الميزانيات");
-      console.error("Excel export error:", error);
+      productionLogger.error("Excel export error", error);
     }
   };
 

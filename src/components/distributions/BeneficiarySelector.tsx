@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { Search, Users } from 'lucide-react';
+import { productionLogger } from '@/lib/logger/production-logger';
 
 interface BeneficiarySelectorProps {
   selected: string[];
@@ -30,7 +31,7 @@ export function BeneficiarySelector({ selected, onChange }: BeneficiarySelectorP
       if (error) throw error;
       setBeneficiaries(data || []);
     } catch (error) {
-      console.error('Error loading beneficiaries:', error);
+      productionLogger.error('Error loading beneficiaries', error);
     } finally {
       setLoading(false);
     }

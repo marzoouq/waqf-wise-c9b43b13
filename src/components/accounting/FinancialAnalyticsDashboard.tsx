@@ -6,6 +6,7 @@ import { useFinancialAnalytics } from '@/hooks/useFinancialAnalytics';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import type { FinancialKPI, KPIsByName, KPIsByCategory } from '@/types/financial';
+import { productionLogger } from '@/lib/logger/production-logger';
 
 const kpiLabels: Record<string, string> = {
   current_ratio: 'نسبة السيولة الجارية',
@@ -41,7 +42,7 @@ export function FinancialAnalyticsDashboard() {
         periodEnd: endDate.toISOString().split('T')[0],
       });
     } catch (error) {
-      console.error('Error calculating KPIs:', error);
+      productionLogger.error('Error calculating KPIs', error);
     } finally {
       setIsCalculating(false);
     }

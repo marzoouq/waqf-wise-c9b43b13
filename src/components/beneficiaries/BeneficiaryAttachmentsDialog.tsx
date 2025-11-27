@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Beneficiary } from "@/types/beneficiary";
 import { Loader2 } from "lucide-react";
+import { productionLogger } from "@/lib/logger/production-logger";
 
 interface BeneficiaryAttachmentsDialogProps {
   open: boolean;
@@ -81,7 +82,7 @@ export function BeneficiaryAttachmentsDialog({
       queryClient.invalidateQueries({ queryKey: ['beneficiary-attachments', beneficiary.id] });
       setUploadedFiles([]);
     } catch (error) {
-      console.error('Error uploading files:', error);
+      productionLogger.error('Error uploading files', error);
       toast({
         title: "خطأ في الرفع",
         description: "حدث خطأ أثناء رفع الملفات",
@@ -116,7 +117,7 @@ export function BeneficiaryAttachmentsDialog({
 
       queryClient.invalidateQueries({ queryKey: ['beneficiary-attachments', beneficiary?.id] });
     } catch (error) {
-      console.error('Error deleting attachment:', error);
+      productionLogger.error('Error deleting attachment', error);
       toast({
         title: "خطأ",
         description: "حدث خطأ أثناء حذف المرفق",

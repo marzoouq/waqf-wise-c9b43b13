@@ -78,7 +78,9 @@ export class ApprovalService {
         message: `تمت الموافقة (${approvals?.filter(a => a.status === 'موافق').length}/3)`,
       };
     } catch (error) {
-      console.error('Error in approveDistribution:', error);
+      productionLogger.error('Error in approveDistribution', error, {
+        context: 'approval_service',
+      });
       return {
         success: false,
         message: 'فشل في معالجة الموافقة',
@@ -129,7 +131,9 @@ export class ApprovalService {
         message: 'تم رفض التوزيع',
       };
     } catch (error) {
-      console.error('Error in rejectDistribution:', error);
+      productionLogger.error('Error in rejectDistribution', error, {
+        context: 'approval_service',
+      });
       return {
         success: false,
         message: 'فشل في معالجة الرفض',
@@ -184,7 +188,9 @@ export class ApprovalService {
 
       return { success: true, message: 'تمت الموافقة على القرض' };
     } catch (error) {
-      console.error('Error in approveLoan:', error);
+      productionLogger.error('Error in approveLoan', error, {
+        context: 'approval_service',
+      });
       return { success: false, message: 'فشل في معالجة الموافقة' };
     }
   }

@@ -57,7 +57,9 @@ export class RequestService {
         message: 'تم تقديم الطلب بنجاح',
       };
     } catch (error) {
-      console.error('Error in RequestService.create:', error);
+      productionLogger.error('Error in RequestService.create', error, {
+        context: 'request_service',
+      });
       return {
         success: false,
         message: 'فشل في إنشاء الطلب',
@@ -107,7 +109,9 @@ export class RequestService {
         message: 'تمت الموافقة على الطلب',
       };
     } catch (error) {
-      console.error('Error in RequestService.approve:', error);
+      productionLogger.error('Error in RequestService.approve', error, {
+        context: 'request_service',
+      });
       return {
         success: false,
         message: 'فشل في معالجة الموافقة',
@@ -152,7 +156,9 @@ export class RequestService {
         message: 'تم رفض الطلب',
       };
     } catch (error) {
-      console.error('Error in RequestService.reject:', error);
+      productionLogger.error('Error in RequestService.reject', error, {
+        context: 'request_service',
+      });
       return {
         success: false,
         message: 'فشل في معالجة الرفض',
@@ -171,7 +177,9 @@ export class RequestService {
       if (error) throw error;
       return { success: true };
     } catch (error) {
-      console.error('Error in RequestService.escalate:', error);
+      productionLogger.error('Error in RequestService.escalate', error, {
+        context: 'request_service',
+      });
       return { success: false };
     }
   }

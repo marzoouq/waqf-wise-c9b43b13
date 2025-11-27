@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Download, FileText, Loader2, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import type { BankFileFormat, DistributionDetail, GeneratedTransferFile } from "@/types/bank-transfer";
+import { productionLogger } from "@/lib/logger/production-logger";
 
 interface BankTransferGeneratorProps {
   distributionId: string;
@@ -113,7 +114,7 @@ export function BankTransferGenerator({ distributionId, onSuccess }: BankTransfe
 
       onSuccess?.();
     } catch (error) {
-      console.error('Error generating transfer file:', error);
+      productionLogger.error('Error generating transfer file', error);
       toast({
         title: "خطأ",
         description: "فشل توليد ملف التحويل",
