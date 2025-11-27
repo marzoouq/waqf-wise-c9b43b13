@@ -1,9 +1,10 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.81.1';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { 
+  handleCors, 
+  jsonResponse, 
+  errorResponse, 
+  unauthorizedResponse 
+} from '../_shared/cors.ts';
 
 interface CleanupRequest {
   bucket: string;
@@ -12,19 +13,15 @@ interface CleanupRequest {
 }
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     // Authentication check
     const authHeader = req.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       console.log('Unauthorized access attempt');
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized' }), 
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return unauthorizedResponse('Unauthorized');
     }
 
     const supabase = createClient(
@@ -72,14 +69,11 @@ Deno.serve(async (req) => {
 
       if (!files || files.length === 0) {
         console.log('No files found in bucket');
-        return new Response(
-          JSON.stringify({ 
-            success: true, 
-            deletedCount: 0,
-            message: 'No files to delete' 
-          }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+        return jsonResponse({ 
+          success: true, 
+          deletedCount: 0,
+          message: 'No files to delete' 
+        });
       }
 
       const oldFiles = files.filter(file => {
@@ -110,27 +104,17 @@ Deno.serve(async (req) => {
       }
     }
 
-    return new Response(
-      JSON.stringify({ 
-        success: true, 
-        deletedCount,
-        message: `تم حذف ${deletedCount} ملف بنجاح` 
-      }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return jsonResponse({ 
+      success: true, 
+      deletedCount,
+      message: `تم حذف ${deletedCount} ملف بنجاح` 
+    });
 
   } catch (error) {
     console.error('Cleanup error:', error);
-    
-    return new Response(
-      JSON.stringify({ 
-        success: false, 
-        error: error instanceof Error ? error.message : 'Unknown error' 
-      }),
-      { 
-        status: 400, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
+    return errorResponse(
+      error instanceof Error ? error.message : 'Unknown error',
+      400
     );
   }
 });

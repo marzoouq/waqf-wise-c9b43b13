@@ -1,15 +1,14 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { 
+  handleCors, 
+  jsonResponse, 
+  errorResponse 
+} from '../_shared/cors.ts';
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     const supabaseClient = createClient(
@@ -113,39 +112,21 @@ serve(async (req) => {
 
     console.log('Backup completed successfully:', backupFileName);
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        backupId: backupLog.id,
-        fileName: backupFileName,
-        fileSize: fileSize,
-        totalRecords: totalRecords,
-        totalTables: tablesToBackup.length,
-        content: backupContent // إرسال المحتوى للتنزيل المباشر
-      }),
-      { 
-        headers: { 
-          ...corsHeaders, 
-          'Content-Type': 'application/json' 
-        } 
-      }
-    );
+    return jsonResponse({
+      success: true,
+      backupId: backupLog.id,
+      fileName: backupFileName,
+      fileSize: fileSize,
+      totalRecords: totalRecords,
+      totalTables: tablesToBackup.length,
+      content: backupContent
+    });
 
   } catch (error) {
     console.error('Backup error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(
-      JSON.stringify({ 
-        error: errorMessage,
-        success: false 
-      }),
-      { 
-        status: 500,
-        headers: { 
-          ...corsHeaders, 
-          'Content-Type': 'application/json' 
-        } 
-      }
+    return errorResponse(
+      error instanceof Error ? error.message : 'Unknown error',
+      500
     );
   }
 });

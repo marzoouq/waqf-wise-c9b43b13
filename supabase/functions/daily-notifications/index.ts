@@ -1,15 +1,13 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { 
+  handleCors, 
+  jsonResponse, 
+  errorResponse 
+} from '../_shared/cors.ts';
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     const supabase = createClient(
@@ -69,35 +67,13 @@ Deno.serve(async (req) => {
 
     console.log('🎉 اكتمل تشغيل الإشعارات الدورية:', result);
 
-    return new Response(
-      JSON.stringify(result),
-      { 
-        headers: { 
-          ...corsHeaders, 
-          'Content-Type': 'application/json' 
-        },
-        status: 200
-      }
-    );
+    return jsonResponse(result);
 
   } catch (error) {
     console.error('💥 خطأ في تشغيل الإشعارات الدورية:', error);
-    
-    const errorMessage = error instanceof Error ? error.message : 'حدث خطأ غير متوقع';
-    
-    return new Response(
-      JSON.stringify({ 
-        success: false,
-        error: errorMessage,
-        timestamp: new Date().toISOString()
-      }),
-      { 
-        status: 500, 
-        headers: { 
-          ...corsHeaders, 
-          'Content-Type': 'application/json' 
-        } 
-      }
+    return errorResponse(
+      error instanceof Error ? error.message : 'حدث خطأ غير متوقع',
+      500
     );
   }
 });

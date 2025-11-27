@@ -1,10 +1,12 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { 
+  handleCors, 
+  jsonResponse, 
+  errorResponse, 
+  unauthorizedResponse,
+  rateLimitResponse 
+} from '../_shared/cors.ts';
 
 // Schema للتحقق من صحة المدخلات
 const errorReportSchema = z.object({
@@ -12,7 +14,7 @@ const errorReportSchema = z.object({
   error_message: z.string().min(1).max(2000),
   error_stack: z.string().max(10000).optional(),
   severity: z.enum(['low', 'medium', 'high', 'critical']),
-  url: z.string().max(2000), // زيادة الحد للسماح بـ URLs الطويلة مع tokens
+  url: z.string().max(2000),
   user_agent: z.string().max(500),
   user_id: z.string().uuid().optional(),
   additional_data: z.record(z.unknown()).optional()
@@ -21,19 +23,14 @@ const errorReportSchema = z.object({
 type ErrorReport = z.infer<typeof errorReportSchema>;
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     // 🔒 1. التحقق من API Key + Rate Limiting
     const apiKey = req.headers.get('apikey');
     if (!apiKey || !apiKey.startsWith('eyJ')) {
-      return new Response(
-        JSON.stringify({ success: false, error: 'API key غير صالح' }), 
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return unauthorizedResponse('API key غير صالح');
     }
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -58,13 +55,7 @@ Deno.serve(async (req) => {
         
         if (count && count >= 100) {
           console.log(`⚠️ Rate limit exceeded for user ${userId}: ${count} requests`);
-          return new Response(
-            JSON.stringify({ 
-              success: false, 
-              error: 'Rate limit exceeded. Maximum 100 errors per minute.' 
-            }), 
-            { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          );
+          return rateLimitResponse('Rate limit exceeded. Maximum 100 errors per minute.');
         }
       }
     }
@@ -77,14 +68,10 @@ Deno.serve(async (req) => {
       errorReport = errorReportSchema.parse(rawData);
     } catch (validationError) {
       console.error('❌ Validation failed:', validationError);
-      console.error('📋 Validation details:', JSON.stringify(validationError, null, 2));
-      return new Response(
-        JSON.stringify({ 
-          success: false, 
-          error: 'بيانات غير صالحة',
-          details: validationError instanceof Error ? validationError.message : String(validationError)
-        }), 
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      return errorResponse(
+        'بيانات غير صالحة',
+        400,
+        validationError instanceof Error ? validationError.message : String(validationError)
       );
     }
 
@@ -92,7 +79,6 @@ Deno.serve(async (req) => {
     if (userId) {
       const oneMinuteAgo = new Date(Date.now() - 60 * 1000).toISOString();
       
-      // عد الأخطاء الأخيرة
       const { data: recentErrors } = await supabase
         .from('system_error_logs')
         .select('error_type, error_message')
@@ -100,20 +86,13 @@ Deno.serve(async (req) => {
         .gte('created_at', oneMinuteAgo);
 
       if (recentErrors && recentErrors.length >= 15) {
-        // فحص إذا كانت كل الأخطاء متشابهة (حلقة لا نهائية)
         const sameTypeCount = recentErrors.filter(
           e => e.error_type === errorReport.error_type
         ).length;
         
         if (sameTypeCount >= 5) {
           console.warn(`⚠️ Infinite loop detected for user ${userId}`);
-          return new Response(
-            JSON.stringify({ 
-              success: false, 
-              error: 'تم اكتشاف حلقة أخطاء لا نهائية. يرجى تحديث الصفحة.' 
-            }), 
-            { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          );
+          return rateLimitResponse('تم اكتشاف حلقة أخطاء لا نهائية. يرجى تحديث الصفحة.');
         }
       }
     }
@@ -127,20 +106,16 @@ Deno.serve(async (req) => {
       errorReport.error_stack = errorReport.error_stack.substring(0, 10000);
     }
 
-    // 🧹 5. تنظيف URL من query parameters الطويلة (مثل tokens)
+    // 🧹 5. تنظيف URL من query parameters الطويلة
     try {
       const urlObj = new URL(errorReport.url);
-      // إزالة __lovable_token و tokens أخرى طويلة
       urlObj.searchParams.delete('__lovable_token');
       urlObj.searchParams.delete('token');
       urlObj.searchParams.delete('access_token');
       errorReport.url = urlObj.toString().substring(0, 1000);
     } catch {
-      // إذا فشل parsing، نقتطع فقط
       errorReport.url = errorReport.url.substring(0, 1000);
     }
-
-    // إنشاء عميل Supabase (تم بالفعل في الأعلى)
 
     // تسجيل الخطأ في قاعدة البيانات
     const { data: errorLog, error: insertError } = await supabase
@@ -152,7 +127,7 @@ Deno.serve(async (req) => {
         severity: errorReport.severity,
         url: errorReport.url,
         user_agent: errorReport.user_agent,
-        user_id: userId, // قد يكون null للمستخدمين غير المسجلين
+        user_id: userId,
         additional_data: errorReport.additional_data,
         status: 'new',
       })
@@ -168,42 +143,20 @@ Deno.serve(async (req) => {
 
     // معالجة متوازية للمهام
     await Promise.all([
-      // 1. تطبيق قواعد الإشعارات
       applyAlertRules(supabase, errorLog, errorReport),
-      
-      // 2. تحليل الأخطاء المتكررة
       analyzeRecurringErrors(supabase, errorReport, errorLog.id),
-      
-      // 3. محاولة الإصلاح التلقائي
       attemptAutoFix(supabase, errorLog, errorReport),
-      
-      // 4. تسجيل مقياس الأداء
       recordPerformanceMetric(supabase, errorReport),
     ]);
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        error_id: errorLog.id,
-        message: 'Error logged and processed successfully',
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      }
-    );
+    return jsonResponse({
+      success: true,
+      error_id: errorLog.id,
+      message: 'Error logged and processed successfully',
+    });
   } catch (error) {
     console.error('Error in log-error function:', error);
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: 'حدث خطأ أثناء معالجة الطلب',
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500,
-      }
-    );
+    return errorResponse('حدث خطأ أثناء معالجة الطلب', 500);
   }
 });
 
@@ -212,7 +165,6 @@ Deno.serve(async (req) => {
  */
 async function applyAlertRules(supabase: any, errorLog: any, errorReport: ErrorReport) {
   try {
-    // جلب القواعد النشطة
     const { data: rules, error: rulesError } = await supabase
       .from('alert_rules')
       .select('*')
@@ -224,13 +176,10 @@ async function applyAlertRules(supabase: any, errorLog: any, errorReport: ErrorR
       return;
     }
 
-    // تطبيق كل قاعدة
     for (const rule of rules) {
-      // فحص إذا كانت القاعدة تنطبق على هذا الخطأ
       if (shouldApplyRule(rule, errorReport)) {
         console.log(`✅ Applying rule: ${rule.rule_name}`);
         
-        // إنشاء تنبيه
         const { data: alert } = await supabase
           .from('system_alerts')
           .insert({
@@ -247,11 +196,9 @@ async function applyAlertRules(supabase: any, errorLog: any, errorReport: ErrorR
 
         if (!alert) continue;
 
-        // إرسال إشعارات للأدوار المحددة (مع التحقق من صحة البيانات)
         const notifyRoles = Array.isArray(rule.notify_roles) ? rule.notify_roles : [];
         await sendRoleNotifications(supabase, notifyRoles, errorLog, alert);
 
-        // التصعيد التلقائي إذا كان مفعلاً
         if (rule.auto_escalate) {
           setTimeout(() => {
             handleAutoEscalation(supabase, alert.id, errorLog.id, rule.escalation_delay_minutes);
@@ -264,11 +211,7 @@ async function applyAlertRules(supabase: any, errorLog: any, errorReport: ErrorR
   }
 }
 
-/**
- * فحص إذا كانت القاعدة تنطبق على هذا الخطأ
- */
 function shouldApplyRule(rule: any, errorReport: ErrorReport): boolean {
-  // فحص نمط نوع الخطأ
   if (rule.error_type_pattern) {
     const regex = new RegExp(rule.error_type_pattern);
     if (!regex.test(errorReport.error_type)) {
@@ -276,7 +219,6 @@ function shouldApplyRule(rule: any, errorReport: ErrorReport): boolean {
     }
   }
 
-  // فحص مستوى الخطورة
   const severityLevels = ['low', 'medium', 'high', 'critical'];
   const minSeverityIndex = severityLevels.indexOf(rule.min_severity || 'low');
   const currentSeverityIndex = severityLevels.indexOf(errorReport.severity);
@@ -288,15 +230,9 @@ function shouldApplyRule(rule: any, errorReport: ErrorReport): boolean {
   return true;
 }
 
-/**
- * إرسال إشعارات للأدوار المحددة
- */
 async function sendRoleNotifications(supabase: any, roles: string[], errorLog: any, alert: any) {
   try {
-    // الأدوار الصحيحة المسموح بها في enum app_role
     const validAppRoles = ['admin', 'nazer', 'accountant', 'disbursement_officer', 'archivist'];
-    
-    // تنظيف الأدوار والتأكد من أنها من القيم الصحيحة فقط
     const validRoles = roles?.filter(r => r && r.trim() !== '' && validAppRoles.includes(r)) || [];
     
     if (validRoles.length === 0) {
@@ -306,38 +242,26 @@ async function sendRoleNotifications(supabase: any, roles: string[], errorLog: a
     
     console.log(`Sending notifications to roles: ${validRoles.join(', ')}`);
 
-    // جلب المستخدمين حسب الأدوار
     const { data: users, error: usersError } = await supabase
       .from('user_roles')
       .select('user_id, role')
       .in('role', validRoles);
 
-    if (usersError) {
-      console.error('Error fetching users:', usersError);
-      return;
-    }
-
-    if (!users || users.length === 0) {
+    if (usersError || !users || users.length === 0) {
       console.log(`No users found for roles: ${roles.join(', ')}`);
       return;
     }
 
-    // جلب تفضيلات الإشعارات
     const { data: preferences } = await supabase
       .from('notification_preferences')
       .select('*')
       .in('user_id', users.map((u: any) => u.user_id));
 
-    // إنشاء إشعارات
     const notifications = [];
     
     for (const user of users) {
       const userPref = preferences?.find((p: any) => p.user_id === user.user_id);
-      
-      // فحص إذا كان المستخدم يريد الإشعار عن هذا المستوى
-      const shouldNotify = userPref
-        ? userPref[`notify_${errorLog.severity}`]
-        : true; // افتراضي: إرسال الإشعار
+      const shouldNotify = userPref ? userPref[`notify_${errorLog.severity}`] : true;
 
       if (shouldNotify) {
         notifications.push({
@@ -361,12 +285,8 @@ async function sendRoleNotifications(supabase: any, roles: string[], errorLog: a
   }
 }
 
-/**
- * التصعيد التلقائي للتنبيهات
- */
 async function handleAutoEscalation(supabase: any, alertId: string, errorLogId: string, delayMinutes: number) {
   try {
-    // فحص إذا تم حل التنبيه
     const { data: alert } = await supabase
       .from('system_alerts')
       .select('status')
@@ -378,7 +298,6 @@ async function handleAutoEscalation(supabase: any, alertId: string, errorLogId: 
       return;
     }
 
-    // جلب المدراء (admin) - بدون is_active
     const { data: admins } = await supabase
       .from('user_roles')
       .select('user_id')
@@ -389,7 +308,6 @@ async function handleAutoEscalation(supabase: any, alertId: string, errorLogId: 
       return;
     }
 
-    // إنشاء سجل تصعيد
     await supabase.from('alert_escalations').insert({
       alert_id: alertId,
       error_log_id: errorLogId,
@@ -399,7 +317,6 @@ async function handleAutoEscalation(supabase: any, alertId: string, errorLogId: 
       status: 'pending',
     });
 
-    // إرسال إشعار للمدير
     await supabase.from('notifications').insert({
       user_id: admins[0].user_id,
       title: '🚨 تصعيد تنبيه حرج',
@@ -416,9 +333,6 @@ async function handleAutoEscalation(supabase: any, alertId: string, errorLogId: 
   }
 }
 
-/**
- * تحليل الأخطاء المتكررة
- */
 async function analyzeRecurringErrors(supabase: any, errorReport: ErrorReport, errorLogId: string) {
   try {
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
@@ -448,12 +362,8 @@ async function analyzeRecurringErrors(supabase: any, errorReport: ErrorReport, e
   }
 }
 
-/**
- * محاولة الإصلاح التلقائي
- */
 async function attemptAutoFix(supabase: any, errorLog: any, errorReport: ErrorReport) {
   try {
-    // تحديد استراتيجية الإصلاح حسب نوع الخطأ
     let fixStrategy = 'retry';
     
     if (errorReport.error_type === 'network_error') {
@@ -464,7 +374,6 @@ async function attemptAutoFix(supabase: any, errorLog: any, errorReport: ErrorRe
       fixStrategy = 'fallback';
     }
 
-    // تسجيل محاولة الإصلاح
     await supabase.from('auto_fix_attempts').insert({
       error_log_id: errorLog.id,
       fix_strategy: fixStrategy,
@@ -480,9 +389,6 @@ async function attemptAutoFix(supabase: any, errorLog: any, errorReport: ErrorRe
   }
 }
 
-/**
- * تسجيل مقياس الأداء
- */
 async function recordPerformanceMetric(supabase: any, errorReport: ErrorReport) {
   try {
     if (errorReport.error_type.includes('performance') || errorReport.error_type === 'layout_shift') {
@@ -501,14 +407,11 @@ async function recordPerformanceMetric(supabase: any, errorReport: ErrorReport) 
   }
 }
 
-/**
- * الحصول على تسمية مستوى الخطورة بالعربية
- */
 function getSeverityLabel(severity: string): string {
   const labels: Record<string, string> = {
-    low: 'منخفض',
-    medium: 'متوسط',
-    high: 'مرتفع',
+    low: 'منخفض الخطورة',
+    medium: 'متوسط الخطورة',
+    high: 'عالي الخطورة',
     critical: 'حرج',
   };
   return labels[severity] || severity;

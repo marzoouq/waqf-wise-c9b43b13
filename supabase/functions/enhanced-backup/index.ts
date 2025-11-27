@@ -1,19 +1,18 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { 
+  handleCors, 
+  jsonResponse, 
+  errorResponse 
+} from '../_shared/cors.ts';
 
 /**
  * Enhanced Backup System
  * نظام نسخ احتياطي محسّن مع ضغط وتشفير
  */
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     const supabase = createClient(
@@ -77,38 +76,25 @@ serve(async (req) => {
       error_message: errors.length > 0 ? errors.join('; ') : null,
     });
 
-    return new Response(
-      JSON.stringify({
-        success: errors.length === 0,
-        message: errors.length === 0 
-          ? 'تم النسخ الاحتياطي بنجاح' 
-          : 'تم النسخ الاحتياطي مع بعض الأخطاء',
-        statistics: {
-          totalTables: tables.length,
-          successfulTables: tables.length - errors.length,
-          totalRecords,
-          backupSize: `${(backupSize / 1024 / 1024).toFixed(2)} MB`,
-          duration: `${(duration / 1000).toFixed(2)}s`,
-        },
-        errors: errors.length > 0 ? errors : undefined,
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    );
+    return jsonResponse({
+      success: errors.length === 0,
+      message: errors.length === 0 
+        ? 'تم النسخ الاحتياطي بنجاح' 
+        : 'تم النسخ الاحتياطي مع بعض الأخطاء',
+      statistics: {
+        totalTables: tables.length,
+        successfulTables: tables.length - errors.length,
+        totalRecords,
+        backupSize: `${(backupSize / 1024 / 1024).toFixed(2)} MB`,
+        duration: `${(duration / 1000).toFixed(2)}s`,
+      },
+      errors: errors.length > 0 ? errors : undefined,
+    });
   } catch (error) {
     console.error('Backup error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    
-    return new Response(
-      JSON.stringify({ 
-        success: false,
-        error: errorMessage 
-      }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+    return errorResponse(
+      error instanceof Error ? error.message : 'Unknown error',
+      500
     );
   }
 });
