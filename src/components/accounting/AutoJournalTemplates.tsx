@@ -12,33 +12,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
-interface Template {
-  id: string;
-  template_name: string;
-  trigger_event: string;
-  debit_accounts: any;
-  credit_accounts: any;
-  description: string | null;
-  is_active: boolean;
-  priority: number;
-}
+import type { AutoJournalTemplate, AutoJournalTemplateRaw } from "@/types/auto-journal";
+import { parseAutoJournalTemplate } from "@/types/auto-journal";
 
 export function AutoJournalTemplates() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingTemplate, setEditingTemplate] = useState<Template | null>(null);
+  const [editingTemplate, setEditingTemplate] = useState<AutoJournalTemplate | null>(null);
 
   const { data: templates, isLoading } = useQuery({
     queryKey: ["auto-journal-templates"],
@@ -48,7 +29,7 @@ export function AutoJournalTemplates() {
         .select("*")
         .order("priority", { ascending: true });
       if (error) throw error;
-      return data as Template[];
+      return (data as unknown as AutoJournalTemplateRaw[]).map(parseAutoJournalTemplate);
     },
   });
 

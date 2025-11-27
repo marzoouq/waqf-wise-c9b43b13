@@ -1,5 +1,8 @@
 import { supabase } from "@/integrations/supabase/client";
 import { logger } from "@/lib/logger";
+import type { Database } from "@/integrations/supabase/types";
+
+type PaymentVoucherInsert = Database['public']['Tables']['payment_vouchers']['Insert'];
 
 export interface VoucherData {
   voucher_type: string;
@@ -19,28 +22,36 @@ export interface VoucherData {
  */
 export class VoucherService {
   /**
-   * إنشاء سند جديد (سيتم توليد الرقم تلقائياً من قاعدة البيانات)
+   * توليد رقم سند تلقائي
+   */
+  private static generateVoucherNumber(): string {
+    const timestamp = Date.now().toString(36).toUpperCase();
+    const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+    return `V-${timestamp}-${random}`;
+  }
+
+  /**
+   * إنشاء سند جديد
    */
   static async create(data: VoucherData) {
     try {
       // 1. التحقق من البيانات
       this.validateVoucherData(data);
 
-      // 2. إنشاء السند (الرقم والتاريخ سيتم توليدهما تلقائياً من قاعدة البيانات)
-      const insertData: any = {
+      // 2. إنشاء السند مع رقم تلقائي
+      const insertData: PaymentVoucherInsert = {
+        voucher_number: this.generateVoucherNumber(),
         voucher_type: data.voucher_type,
         amount: data.amount,
         description: data.description,
         status: "pending",
+        beneficiary_id: data.beneficiary_id,
+        payment_method: data.payment_method,
+        notes: data.notes,
+        distribution_id: data.distribution_id,
+        bank_account_id: data.bank_account_id,
+        created_by: data.created_by,
       };
-
-      // إضافة الحقول الاختيارية فقط إذا كانت موجودة
-      if (data.beneficiary_id) insertData.beneficiary_id = data.beneficiary_id;
-      if (data.payment_method) insertData.payment_method = data.payment_method;
-      if (data.notes) insertData.notes = data.notes;
-      if (data.distribution_id) insertData.distribution_id = data.distribution_id;
-      if (data.bank_account_id) insertData.bank_account_id = data.bank_account_id;
-      if (data.created_by) insertData.created_by = data.created_by;
 
       const { data: voucher, error: insertError } = await supabase
         .from("payment_vouchers")
