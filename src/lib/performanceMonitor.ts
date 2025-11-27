@@ -2,6 +2,8 @@
  * أداة لمراقبة الأداء وتسجيل المقاييس
  */
 
+import { productionLogger } from '@/lib/logger/production-logger';
+
 interface PerformanceMetric {
   name: string;
   duration: number;
@@ -25,7 +27,7 @@ class PerformanceMonitor {
   end(name: string): number | null {
     const startTime = this.marks.get(name);
     if (!startTime) {
-      console.warn(`Performance mark "${name}" not found`);
+      productionLogger.warn(`Performance mark "${name}" not found`);
       return null;
     }
 
@@ -71,11 +73,11 @@ class PerformanceMonitor {
    */
   report(): void {
     if (this.metrics.length === 0) {
-      console.log('No performance metrics recorded');
+      productionLogger.info('No performance metrics recorded');
       return;
     }
 
-    console.group('📊 Performance Report');
+    productionLogger.info('📊 Performance Report:');
     
     const grouped = this.metrics.reduce((acc, metric) => {
       if (!acc[metric.name]) {
@@ -90,15 +92,13 @@ class PerformanceMonitor {
       const min = Math.min(...durations);
       const max = Math.max(...durations);
       
-      console.log(`${name}:`, {
+      productionLogger.info(`${name}:`, {
         count: durations.length,
         avg: `${avg.toFixed(2)}ms`,
         min: `${min.toFixed(2)}ms`,
         max: `${max.toFixed(2)}ms`,
       });
     });
-
-    console.groupEnd();
   }
 
   /**
@@ -110,7 +110,7 @@ class PerformanceMonitor {
     const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
     
     if (!navigation) {
-      console.warn('Navigation timing not available');
+      productionLogger.warn('Navigation timing not available');
       return;
     }
 
@@ -125,12 +125,11 @@ class PerformanceMonitor {
       'DOM Content Loaded': Math.round(navigation.domContentLoadedEventEnd - navigation.fetchStart),
     };
 
-    console.group('🚀 Page Load Metrics');
+    productionLogger.info('🚀 Page Load Metrics:');
     Object.entries(metrics).forEach(([key, value]) => {
       const color = value < 100 ? '🟢' : value < 500 ? '🟡' : '🔴';
-      console.log(`${color} ${key}: ${value}ms`);
+      productionLogger.info(`${color} ${key}: ${value}ms`);
     });
-    console.groupEnd();
   }
 
   /**
@@ -143,18 +142,18 @@ class PerformanceMonitor {
       // First Contentful Paint
       const fcpEntry = performance.getEntriesByName('first-contentful-paint')[0] as PerformanceEntry;
       if (fcpEntry) {
-        console.log(`🎨 First Contentful Paint: ${Math.round(fcpEntry.startTime)}ms`);
+        productionLogger.info(`🎨 First Contentful Paint: ${Math.round(fcpEntry.startTime)}ms`);
       }
 
       // Largest Contentful Paint
       const observer = new PerformanceObserver((list) => {
         const entries = list.getEntries();
         const lastEntry = entries[entries.length - 1] as PerformanceEntry & { startTime: number };
-        console.log(`🖼️ Largest Contentful Paint: ${Math.round(lastEntry.startTime)}ms`);
+        productionLogger.info(`🖼️ Largest Contentful Paint: ${Math.round(lastEntry.startTime)}ms`);
       });
       observer.observe({ entryTypes: ['largest-contentful-paint'] });
     } catch (error) {
-      console.warn('Web Vitals not available:', error);
+      productionLogger.warn('Web Vitals not available:', error);
     }
   }
 }

@@ -5,6 +5,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { productionLogger } from '@/lib/logger/production-logger';
 
 export interface RequestData {
   beneficiary_id: string;
@@ -46,7 +47,7 @@ export class RequestService {
       if (error) throw error;
 
       // 3. تسجيل النشاط
-      console.log(`تم إنشاء طلب جديد ${request.request_number}`);
+      productionLogger.info(`تم إنشاء طلب جديد ${request.request_number}`);
 
       // 4. الإشعارات تتم تلقائياً عبر trigger
 
@@ -97,7 +98,7 @@ export class RequestService {
       if (workflowError) throw workflowError;
 
       // 3. تسجيل النشاط
-      console.log(`تمت الموافقة على الطلب ${requestId} بواسطة ${approverName}`);
+      productionLogger.info(`تمت الموافقة على الطلب ${requestId} بواسطة ${approverName}`);
 
       // 4. الإشعار يتم إرساله تلقائياً عبر trigger
 
@@ -144,7 +145,7 @@ export class RequestService {
 
       if (workflowError) throw workflowError;
 
-      console.log(`تم رفض الطلب ${requestId} بواسطة ${approverName}`);
+      productionLogger.info(`تم رفض الطلب ${requestId} بواسطة ${approverName}`);
 
       return {
         success: true,

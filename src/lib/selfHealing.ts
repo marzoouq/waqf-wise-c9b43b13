@@ -5,6 +5,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { errorTracker } from './errors';
+import { productionLogger } from '@/lib/logger/production-logger';
 
 interface RetryConfig {
   maxAttempts: number;
@@ -40,11 +41,9 @@ export class RetryHandler {
 
     for (let attempt = 1; attempt <= finalConfig.maxAttempts; attempt++) {
       try {
-        // Removed console.log for production
         const result = await operation();
         
         if (attempt > 1) {
-          // Removed console.log for production
           await errorTracker.logError(
             `Operation succeeded on attempt ${attempt}`,
             'low',
@@ -95,7 +94,9 @@ export class SmartCache {
       expiresIn: ttl,
     });
     
-    console.log(`💾 Cached data for key: ${key}`);
+    if (import.meta.env.DEV) {
+      productionLogger.debug(`💾 Cached data for key: ${key}`);
+    }
   }
 
   get<T>(key: string): T | null {
@@ -109,17 +110,23 @@ export class SmartCache {
     
     if (isExpired) {
       this.cache.delete(key);
-      console.log(`🗑️ Cache expired for key: ${key}`);
+      if (import.meta.env.DEV) {
+        productionLogger.debug(`🗑️ Cache expired for key: ${key}`);
+      }
       return null;
     }
 
-    console.log(`✅ Cache hit for key: ${key}`);
+    if (import.meta.env.DEV) {
+      productionLogger.debug(`✅ Cache hit for key: ${key}`);
+    }
     return entry.data as T;
   }
 
   clear(): void {
     this.cache.clear();
-    console.log('🗑️ Cache cleared');
+    if (import.meta.env.DEV) {
+      productionLogger.debug('🗑️ Cache cleared');
+    }
   }
 
   has(key: string): boolean {
@@ -151,13 +158,13 @@ export class AutoRecovery {
       
       return { data, fromCache: false };
     } catch (error) {
-      console.warn('⚠️ Operation failed, trying cache fallback...');
+      productionLogger.warn('⚠️ Operation failed, trying cache fallback...');
       
       // محاولة الاسترجاع من الـ Cache
       const cachedData = this.cache.get<T>(cacheKey);
       
       if (cachedData) {
-        console.log('✅ Using cached data as fallback');
+        productionLogger.info('✅ Using cached data as fallback');
         await errorTracker.logError(
           'Used cache fallback after operation failure',
           'medium',
@@ -167,7 +174,7 @@ export class AutoRecovery {
       }
 
       // لا يوجد cache متاح
-      console.error('❌ No cache available, operation failed completely');
+      productionLogger.error('❌ No cache available, operation failed completely');
       throw error;
     }
   }
@@ -177,7 +184,7 @@ export class AutoRecovery {
    */
   async reconnectDatabase(): Promise<boolean> {
     try {
-      console.log('🔄 Attempting to reconnect to database...');
+      productionLogger.info('🔄 Attempting to reconnect to database...');
       
       const { error } = await supabase
         .from('beneficiaries')
@@ -186,11 +193,11 @@ export class AutoRecovery {
 
       if (error) throw error;
 
-      console.log('✅ Database reconnected successfully!');
+      productionLogger.info('✅ Database reconnected successfully!');
       await errorTracker.logError('Database reconnection successful', 'low');
       return true;
     } catch (error) {
-      console.error('❌ Database reconnection failed:', error);
+      productionLogger.error('❌ Database reconnection failed:', error);
       return false;
     }
   }
@@ -200,34 +207,34 @@ export class AutoRecovery {
    */
   async syncPendingData(): Promise<void> {
     try {
-      console.log('🔄 Syncing pending data...');
+      productionLogger.info('🔄 Syncing pending data...');
       
       const pendingData = localStorage.getItem('pending_operations');
       if (!pendingData) {
-        console.log('✅ No pending data to sync');
+        productionLogger.debug('✅ No pending data to sync');
         return;
       }
 
       const operations = JSON.parse(pendingData);
-      console.log(`📦 Found ${operations.length} pending operations`);
+      productionLogger.info(`📦 Found ${operations.length} pending operations`);
 
       for (const operation of operations) {
         try {
           // محاولة إعادة تنفيذ العملية
           await this.retryHandler.execute(async () => {
             // هنا يمكن إضافة منطق محدد حسب نوع العملية
-            console.log('Executing pending operation:', operation);
+            productionLogger.debug('Executing pending operation:', operation);
           });
         } catch (error) {
-          console.error('Failed to sync operation:', operation, error);
+          productionLogger.error('Failed to sync operation:', { operation, error });
         }
       }
 
       // حذف البيانات المعلقة بعد المزامنة
       localStorage.removeItem('pending_operations');
-      console.log('✅ Pending data synced successfully');
+      productionLogger.info('✅ Pending data synced successfully');
     } catch (error) {
-      console.error('❌ Failed to sync pending data:', error);
+      productionLogger.error('❌ Failed to sync pending data:', error);
     }
   }
 }
@@ -236,13 +243,12 @@ export class AutoRecovery {
  * 4. مراقب الصحة النشط - Active Health Monitor
  */
 export class HealthMonitor {
-  private checkInterval: number = 120000; // ⬆️ 2 دقيقة (كان 30 ثانية)
+  private checkInterval: number = 120000; // 2 دقيقة
   private intervalId: NodeJS.Timeout | null = null;
   private autoRecovery = new AutoRecovery();
 
   start(): void {
     if (this.intervalId) {
-      // Already running
       return;
     }
 
@@ -259,7 +265,6 @@ export class HealthMonitor {
     if (this.intervalId) {
       clearInterval(this.intervalId);
       this.intervalId = null;
-      // Stopped silently
     }
   }
 
@@ -273,10 +278,10 @@ export class HealthMonitor {
     const allHealthy = Object.values(checks).every((status) => status);
 
     if (!allHealthy) {
-      console.warn('⚠️ Health check failed, attempting recovery...');
+      productionLogger.warn('⚠️ Health check failed, attempting recovery...');
       await this.attemptRecovery(checks);
-    } else {
-      console.log('✅ All systems healthy');
+    } else if (import.meta.env.DEV) {
+      productionLogger.debug('✅ All systems healthy');
     }
 
     // تسجيل في قاعدة البيانات
@@ -293,7 +298,7 @@ export class HealthMonitor {
         await this.createHealthAlert(checks);
       }
     } catch (error) {
-      console.error('Failed to log health check:', error);
+      productionLogger.error('Failed to log health check:', error);
     }
   }
 
@@ -325,14 +330,14 @@ export class HealthMonitor {
 
   private async attemptRecovery(checks: Record<string, boolean>): Promise<void> {
     if (!checks.database) {
-      console.log('🔧 Attempting database recovery...');
+      productionLogger.info('🔧 Attempting database recovery...');
       await this.autoRecovery.reconnectDatabase();
     }
 
     if (!checks.network) {
-      console.log('⚠️ Network is offline, will retry when online');
+      productionLogger.warn('⚠️ Network is offline, will retry when online');
       window.addEventListener('online', () => {
-        console.log('🌐 Network back online, resuming operations...');
+        productionLogger.info('🌐 Network back online, resuming operations...');
         this.autoRecovery.syncPendingData();
       }, { once: true });
     }
@@ -362,7 +367,7 @@ export class HealthMonitor {
         .single();
 
       if (error) {
-        console.error('Failed to create health alert:', error);
+        productionLogger.error('Failed to create health alert:', error);
         return;
       }
 
@@ -377,9 +382,9 @@ export class HealthMonitor {
         },
       });
 
-      console.log('✅ Health alert created and admins notified');
+      productionLogger.info('✅ Health alert created and admins notified');
     } catch (error) {
-      console.error('Error creating health alert:', error);
+      productionLogger.error('Error creating health alert:', error);
     }
   }
 }
@@ -412,13 +417,13 @@ export class SelfHealingManager {
   private setupGlobalHandlers(): void {
     // الاسترجاع عند العودة للاتصال
     window.addEventListener('online', () => {
-      console.log('🌐 Network reconnected, syncing pending data...');
+      productionLogger.info('🌐 Network reconnected, syncing pending data...');
       this.autoRecovery.syncPendingData();
     });
 
     // حفظ البيانات قبل إغلاق الصفحة
     window.addEventListener('beforeunload', () => {
-      console.log('💾 Saving state before page unload...');
+      productionLogger.debug('💾 Saving state before page unload...');
     });
   }
 

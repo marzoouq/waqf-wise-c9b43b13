@@ -2,6 +2,8 @@
  * وظائف تنظيف الذاكرة المؤقتة و Service Workers
  */
 
+import { productionLogger } from '@/lib/logger/production-logger';
+
 /**
  * مسح جميع الـ caches و Service Workers
  */
@@ -13,7 +15,7 @@ export async function clearAllCaches(): Promise<void> {
       await Promise.all(
         cacheNames.map(cacheName => caches.delete(cacheName))
       );
-      console.log(`🗑️ تم مسح ${cacheNames.length} cache`);
+      productionLogger.info(`🗑️ تم مسح ${cacheNames.length} cache`);
     }
     
     // إلغاء تسجيل جميع Service Workers
@@ -22,10 +24,10 @@ export async function clearAllCaches(): Promise<void> {
       await Promise.all(
         registrations.map(registration => registration.unregister())
       );
-      console.log(`🗑️ تم إلغاء تسجيل ${registrations.length} service worker`);
+      productionLogger.info(`🗑️ تم إلغاء تسجيل ${registrations.length} service worker`);
     }
   } catch (error) {
-    console.error('خطأ في مسح الـ caches:', error);
+    productionLogger.error('خطأ في مسح الـ caches:', error);
     throw error;
   }
 }
@@ -39,7 +41,7 @@ export async function forceRefresh(): Promise<void> {
     // إعادة تحميل الصفحة بشكل كامل (تجاهل الـ cache)
     window.location.reload();
   } catch (error) {
-    console.error('خطأ في التحديث الإجباري:', error);
+    productionLogger.error('خطأ في التحديث الإجباري:', error);
     // إعادة التحميل حتى لو فشل المسح
     window.location.reload();
   }
@@ -63,10 +65,10 @@ export async function clearOldCaches(): Promise<void> {
       );
       
       if (oldCaches.length > 0) {
-        console.log(`🗑️ تم مسح ${oldCaches.length} cache قديم`);
+        productionLogger.info(`🗑️ تم مسح ${oldCaches.length} cache قديم`);
       }
     } catch (error) {
-      console.error('خطأ في مسح الـ caches القديمة:', error);
+      productionLogger.error('خطأ في مسح الـ caches القديمة:', error);
     }
   }
 }
