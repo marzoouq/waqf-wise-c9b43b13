@@ -30,17 +30,31 @@ interface TestResult {
   duration?: number;
 }
 
+interface SeedResultCounts {
+  beneficiaries?: number;
+  properties?: number;
+  contracts?: number;
+  distributions?: number;
+  loans?: number;
+  emergencyAid?: number;
+  invoices?: number;
+}
+
+interface SeedResult {
+  counts?: SeedResultCounts;
+}
+
 interface TestPhase {
   id: string;
   title: string;
-  icon: any;
+  icon: React.ComponentType<{ className?: string }>;
   tests: TestResult[];
 }
 
 export default function ComprehensiveTestingDashboard() {
   const [isSeeding, setIsSeeding] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
-  const [seedResult, setSeedResult] = useState<any>(null);
+  const [seedResult, setSeedResult] = useState<SeedResult | null>(null);
   const [testPhases, setTestPhases] = useState<TestPhase[]>([
     {
       id: 'data',

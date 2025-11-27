@@ -20,7 +20,7 @@ export default function TestDataManager() {
       if (result.success) {
         toast({
           title: 'تم إضافة البيانات بنجاح',
-          description: `تم إضافة ${Object.values(result.counts).reduce((a: any, b: any) => a + b, 0)} سجل`,
+          description: `تم إضافة ${Object.values(result.counts).reduce((a: number, b: number) => a + b, 0)} سجل`,
         });
       } else {
         toast({

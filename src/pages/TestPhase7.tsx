@@ -194,7 +194,7 @@ export default function TestPhase7() {
           {smartSearch.data && smartSearch.data.length > 0 && (
             <div className="mt-4 space-y-2">
               <p className="text-sm font-semibold">النتائج ({smartSearch.data.length}):</p>
-              {smartSearch.data.map((result: any) => (
+              {smartSearch.data.map((result) => (
                 <div key={result.id} className="p-3 border rounded-lg hover:bg-accent/50">
                   <p className="font-semibold text-sm">{result.documents?.name}</p>
                   <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
@@ -218,15 +218,15 @@ export default function TestPhase7() {
         <CardContent>
           {ocrLogs && ocrLogs.length > 0 ? (
             <div className="space-y-3">
-              {ocrLogs.map((log: any) => (
+              {ocrLogs.map((log) => (
                 <div key={log.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors">
                   <div className="flex-1">
                     <h4 className="font-semibold text-sm">{log.documents?.name}</h4>
                     <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
                       <span>📄 {log.documents?.file_type}</span>
                       <span>⏱️ {format(new Date(log.created_at), 'dd MMM yyyy - HH:mm', { locale: ar })}</span>
-                      {log.processing_time_seconds && (
-                        <span>⚡ {log.processing_time_seconds}s</span>
+                      {log.processing_time_ms && (
+                        <span>⚡ {(log.processing_time_ms / 1000).toFixed(1)}s</span>
                       )}
                     </div>
                     {log.error_message && (

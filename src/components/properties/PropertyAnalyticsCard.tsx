@@ -3,8 +3,15 @@ import { Button } from "@/components/ui/button";
 import { Brain, TrendingUp, Wrench, DollarSign, AlertTriangle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
+interface PropertyData {
+  name?: string;
+  units?: number;
+  occupied?: number;
+  monthly_revenue?: number;
+}
+
 interface PropertyAnalyticsCardProps {
-  property: any;
+  property: PropertyData;
   onAnalyzeClick: () => void;
 }
 

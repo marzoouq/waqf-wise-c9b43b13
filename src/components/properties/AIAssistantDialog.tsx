@@ -8,10 +8,11 @@ import { Brain, Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface AIAssistantDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  propertyData?: any;
+  propertyData?: Record<string, any>;
   actionType: "analyze_property" | "suggest_maintenance" | "predict_revenue" | "optimize_contracts" | "alert_insights";
 }
 

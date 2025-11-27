@@ -33,7 +33,7 @@ export function ContractsTable() {
       key: "properties",
       label: "العقار",
       hideOnMobile: true,
-      render: (_: any, row: Contract) => row.properties?.name ?? 'غير محدد'
+      render: (_: unknown, row: Contract) => row.properties?.name ?? 'غير محدد'
     },
     {
       key: "start_date",

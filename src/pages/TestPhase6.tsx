@@ -186,7 +186,7 @@ export default function TestPhase6() {
         <CardContent>
           {maintenanceSchedules && maintenanceSchedules.length > 0 ? (
             <div className="space-y-3">
-              {maintenanceSchedules.slice(0, 5).map((schedule: any) => (
+              {maintenanceSchedules.slice(0, 5).map((schedule) => (
                 <div key={schedule.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors">
                   <div className="flex-1">
                     <h4 className="font-semibold">{schedule.schedule_name}</h4>
@@ -230,7 +230,7 @@ export default function TestPhase6() {
         <CardContent>
           {providers && providers.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {providers.map((provider: any) => (
+              {providers.map((provider) => (
                 <div key={provider.id} className="p-4 border rounded-lg hover:shadow-md transition-shadow">
                   <div className="flex items-start justify-between mb-2">
                     <h4 className="font-semibold text-sm">{provider.provider_name}</h4>
@@ -241,11 +241,13 @@ export default function TestPhase6() {
                   <p className="text-xs text-muted-foreground mb-2">{provider.contact_person}</p>
                   <p className="text-xs text-muted-foreground mb-2">📞 {provider.phone}</p>
                   <div className="flex flex-wrap gap-1 mt-2">
-                    {provider.specializations?.slice(0, 3).map((spec: string, idx: number) => (
-                      <Badge key={idx} variant="secondary" className="text-xs">
-                        {spec}
-                      </Badge>
-                    ))}
+                    {Array.isArray(provider.specialization) 
+                      ? provider.specialization.slice(0, 3).map((spec: string, idx: number) => (
+                          <Badge key={idx} variant="secondary" className="text-xs">
+                            {spec}
+                          </Badge>
+                        ))
+                      : null}
                   </div>
                   <p className="text-xs text-muted-foreground mt-2">
                     {provider.total_jobs} مشروع مكتمل
@@ -273,7 +275,7 @@ export default function TestPhase6() {
         <CardContent>
           {expiredContracts && expiredContracts.length > 0 ? (
             <div className="space-y-3">
-              {expiredContracts.map((contract: any) => (
+              {expiredContracts.map((contract) => (
                 <div key={contract.id} className="flex items-center justify-between p-4 border rounded-lg">
                   <div>
                     <h4 className="font-semibold">{contract.contract_number}</h4>

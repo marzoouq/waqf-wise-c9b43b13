@@ -60,7 +60,19 @@ export function DetailedGeneralLedger() {
 
       // حساب الرصيد الجاري
       let runningBalance = 0;
-      return (data || []).map((entry: any) => {
+      interface LedgerEntry {
+        id: string;
+        debit_amount: number;
+        credit_amount: number;
+        description?: string;
+        journal_entries: {
+          entry_number: string;
+          entry_date: string;
+          description: string;
+          status: string;
+        };
+      }
+      return (data || []).map((entry: LedgerEntry) => {
         runningBalance += entry.debit_amount - entry.credit_amount;
         return {
           ...entry,
@@ -168,7 +180,7 @@ export function DetailedGeneralLedger() {
                         </TableCell>
                       </TableRow>
                     ) : (
-                      ledgerEntries?.map((entry: any) => (
+                      ledgerEntries?.map((entry) => (
                         <TableRow key={entry.id}>
                           <TableCell>
                             {new Date(entry.journal_entries.entry_date).toLocaleDateString('ar-SA')}

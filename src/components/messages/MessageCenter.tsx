@@ -122,7 +122,7 @@ export function MessageCenter() {
     if (!priority) priority = "عادي";
     const config: Record<
       string,
-      { icon: any; variant: "default" | "secondary" | "destructive" }
+      { icon: React.ComponentType<{ className?: string }>; variant: "default" | "secondary" | "destructive" }
     > = {
       عاجل: { icon: AlertCircle, variant: "destructive" },
       مهم: { icon: AlertTriangle, variant: "default" },

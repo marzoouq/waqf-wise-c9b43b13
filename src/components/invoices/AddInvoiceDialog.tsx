@@ -57,7 +57,7 @@ interface AddInvoiceDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   isEdit?: boolean;
-  invoiceToEdit?: any;
+  invoiceToEdit?: InvoiceFormData | null;
 }
 
 export const AddInvoiceDialog = ({ open, onOpenChange, isEdit = false, invoiceToEdit }: AddInvoiceDialogProps) => {

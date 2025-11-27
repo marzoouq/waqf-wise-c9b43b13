@@ -51,12 +51,12 @@ const ratioInfo: Record<string, { label: string; description: string; goodAbove?
 export function FinancialRatiosReport() {
   const { kpis, isLoading } = useFinancialAnalytics();
 
-  const latestKPIs = kpis.reduce((acc: any, kpi) => {
+  const latestKPIs = kpis.reduce((acc: Record<string, FinancialRatioKPI>, kpi) => {
     if (!acc[kpi.kpi_name] || new Date(kpi.created_at) > new Date(acc[kpi.kpi_name].created_at)) {
       acc[kpi.kpi_name] = kpi;
     }
     return acc;
-  }, {});
+  }, {} as Record<string, FinancialRatioKPI>);
 
   const getStatus = (kpi: FinancialRatioKPI) => {
     if (!kpi.kpi_target) return 'neutral';
@@ -95,7 +95,7 @@ export function FinancialRatiosReport() {
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {Object.entries(latestKPIs).map(([name, kpi]: [string, any]) => {
+          {Object.entries(latestKPIs).map(([name, kpi]) => {
             const info = ratioInfo[name];
             if (!info) return null;
 

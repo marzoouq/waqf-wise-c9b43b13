@@ -3,7 +3,7 @@ import { Printer } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 interface PrintButtonProps {
-  data: any;
+  data: unknown;
   title: string;
   onPrint?: () => void;
   variant?: "default" | "outline" | "ghost";

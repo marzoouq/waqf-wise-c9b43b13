@@ -38,7 +38,7 @@ export default function TransparencySettings() {
   }
 
   const handleToggle = (key: keyof typeof settings) => {
-    setLocalSettings((prev: any) => ({
+    setLocalSettings((prev) => ({
       ...prev,
       [key]: !prev?.[key],
     }));
