@@ -17,9 +17,12 @@ import { DistributionsDashboard } from '@/components/distributions/Distributions
 import { DistributionAnalysisReport } from '@/components/reports/DistributionAnalysisReport';
 import { DistributionEfficiencyReport } from '@/components/reports/DistributionEfficiencyReport';
 import { BeneficiaryDistributionReport } from '@/components/reports/BeneficiaryDistributionReport';
+import type { TestBeneficiary, TestDistribution, TimelineEvent } from '@/types/test-data.types';
+import type { BeneficiaryReportData, DistributionReportData } from '@/types/reports/index';
+import type { SimulationResult } from '@/hooks/useDistributionEngine';
 
 // بيانات تجريبية
-const testBeneficiaries = [
+const testBeneficiaries: TestBeneficiary[] = [
   {
     id: '1',
     full_name: 'أحمد محمد العتيبي',
@@ -97,7 +100,7 @@ const testBeneficiaries = [
   },
 ];
 
-const testDistributions = [
+const testDistributions: TestDistribution[] = [
   {
     id: '1',
     distribution_number: 'DIST-2024-001',
@@ -139,7 +142,7 @@ const testDistributions = [
   },
 ];
 
-const timelineEvents = [
+const timelineEvents: TimelineEvent[] = [
   {
     id: '1',
     title: 'تم إنشاء التوزيع',
@@ -185,13 +188,16 @@ export default function TestPhase4() {
     useDistributionEngine();
   const [pattern, setPattern] = useState<'shariah' | 'equal' | 'need_based' | 'custom' | 'hybrid'>('equal');
   const [showWizard, setShowWizard] = useState(false);
-  const [distributionResults, setDistributionResults] = useState<any>(null);
+  const [distributionResults, setDistributionResults] = useState<SimulationResult | null>(null);
 
   const handleTestCalculation = async () => {
     const result = await calculate({
       total_amount: 500000,
-      beneficiaries: testBeneficiaries as any,
-      pattern: pattern as any,
+      beneficiaries: testBeneficiaries.map(b => ({
+        ...b,
+        national_id: b.national_id || `ID-${b.id}`,
+      })),
+      pattern: pattern,
       deductions: {
         nazer_percentage: 5,
         reserve_percentage: 10,
@@ -200,7 +206,6 @@ export default function TestPhase4() {
         waqf_corpus_percentage: 5,
       },
     });
-
     setDistributionResults(result);
   };
 
@@ -208,7 +213,10 @@ export default function TestPhase4() {
     await calculateMultipleScenarios(
       {
         total_amount: 500000,
-        beneficiaries: testBeneficiaries as any,
+        beneficiaries: testBeneficiaries.map(b => ({
+          ...b,
+          national_id: b.national_id || `ID-${b.id}`,
+        })),
         deductions: {
           nazer_percentage: 5,
           reserve_percentage: 10,
@@ -221,7 +229,10 @@ export default function TestPhase4() {
     );
   };
 
-  const recommendation = getRecommendation(testBeneficiaries as any);
+  const recommendation = getRecommendation(testBeneficiaries.map(b => ({
+    ...b,
+    national_id: b.national_id || `ID-${b.id}`,
+  })));
 
   return (
     <div className="container mx-auto p-6 space-y-6" dir="rtl">
@@ -354,14 +365,14 @@ export default function TestPhase4() {
 
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4">تقرير كفاءة التوزيعات</h3>
-            <DistributionEfficiencyReport distributions={testDistributions as any} />
+            <DistributionEfficiencyReport distributions={testDistributions as unknown as DistributionReportData[]} />
           </Card>
 
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4">تقرير المستفيدين</h3>
             <BeneficiaryDistributionReport
-              beneficiaries={testBeneficiaries as any}
-              distributions={testDistributions as any}
+              beneficiaries={testBeneficiaries as unknown as BeneficiaryReportData[]}
+              distributions={testDistributions as unknown as DistributionReportData[]}
             />
           </Card>
         </TabsContent>
@@ -378,8 +389,7 @@ export default function TestPhase4() {
       <DistributionWizard
         open={showWizard}
         onOpenChange={setShowWizard}
-        onComplete={data => {
-          console.log('Distribution created:', data);
+        onComplete={() => {
           setShowWizard(false);
         }}
       />

@@ -13,6 +13,7 @@ import { PaymentReceiptTemplate } from "@/components/payments/PaymentReceiptTemp
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { logger } from "@/lib/logger";
 import { Database } from '@/integrations/supabase/types';
+import { toPaymentReceipt } from '@/types/payment-receipt.types';
 
 type Payment = Database['public']['Tables']['payments']['Row'];
 
@@ -186,7 +187,12 @@ const Payments = () => {
 
         {printPayment && (
           <PaymentReceiptTemplate
-            payment={printPayment as any}
+            payment={toPaymentReceipt({
+              ...printPayment,
+              contract_number: (printPayment as PaymentWithContract).contract_number,
+              tenant_name: (printPayment as PaymentWithContract).tenant_name,
+              property_name: (printPayment as PaymentWithContract).property_name,
+            })}
           />
         )}
       </MobileOptimizedLayout>

@@ -148,7 +148,7 @@ export default function BeneficiaryReports() {
       .filter(m => m.amount > 0)
       .map(m => [m.month, m.count, formatCurrency(m.amount)]);
     
-    (doc as any).autoTable({
+    doc.autoTable({
       startY: 130,
       head: [['الشهر', 'عدد المدفوعات', 'المبلغ الإجمالي']],
       body: tableData,

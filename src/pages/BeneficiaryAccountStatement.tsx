@@ -138,7 +138,7 @@ export default function BeneficiaryAccountStatement() {
       payment.payment_method || '-',
     ]);
     
-    (doc as any).autoTable({
+    doc.autoTable({
       startY: 95,
       head: [['التاريخ', 'الوصف', 'المبلغ', 'طريقة الدفع']],
       body: tableData,
