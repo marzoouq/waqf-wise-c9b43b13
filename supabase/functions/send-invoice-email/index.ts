@@ -1,12 +1,11 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { 
+  handleCors, 
+  jsonResponse, 
+  errorResponse 
+} from '../_shared/cors.ts';
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
 
 interface SendInvoiceEmailRequest {
   invoiceId: string;
@@ -17,10 +16,8 @@ interface SendInvoiceEmailRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
-  // Handle CORS preflight requests
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     const {
@@ -157,7 +154,7 @@ const handler = async (req: Request): Promise<Response> => {
             
             <div class="content">
               <div class="greeting">
-                السلام عليكم \${customerName}،
+                السلام عليكم ${customerName}،
               </div>
               
               <p class="message">
@@ -167,16 +164,16 @@ const handler = async (req: Request): Promise<Response> => {
               <div class="invoice-box">
                 <div class="invoice-detail">
                   <span class="label">رقم الفاتورة</span>
-                  <span class="value">\${invoiceNumber}</span>
+                  <span class="value">${invoiceNumber}</span>
                 </div>
                 <div class="invoice-detail">
                   <span class="label">التاريخ</span>
-                  <span class="value">\${new Date().toLocaleDateString('ar-SA')}</span>
+                  <span class="value">${new Date().toLocaleDateString('ar-SA')}</span>
                 </div>
               </div>
               
               <div class="total-amount">
-                المبلغ الإجمالي: \${totalAmount.toFixed(2)} ر.س
+                المبلغ الإجمالي: ${totalAmount.toFixed(2)} ر.س
               </div>
               
               <p class="message">
@@ -208,22 +205,12 @@ const handler = async (req: Request): Promise<Response> => {
     const responseData = await emailResponse.json();
     console.log("Email sent successfully:", responseData);
 
-    return new Response(JSON.stringify(responseData), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-        ...corsHeaders,
-      },
-    });
+    return jsonResponse(responseData);
   } catch (error: unknown) {
     console.error("Error in send-invoice-email function:", error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(
-      JSON.stringify({ error: errorMessage }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
+    return errorResponse(
+      error instanceof Error ? error.message : 'Unknown error',
+      500
     );
   }
 };

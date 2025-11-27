@@ -1,15 +1,15 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { 
+  handleCors, 
+  jsonResponse, 
+  errorResponse,
+  rateLimitResponse 
+} from '../_shared/cors.ts';
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     const { action, data } = await req.json();
@@ -126,16 +126,10 @@ serve(async (req) => {
 
     if (!aiResponse.ok) {
       if (aiResponse.status === 429) {
-        return new Response(
-          JSON.stringify({ error: "تم تجاوز حد الطلبات، يرجى المحاولة لاحقاً" }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+        return rateLimitResponse('تم تجاوز حد الطلبات، يرجى المحاولة لاحقاً');
       }
       if (aiResponse.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "يرجى إضافة رصيد إلى حساب Lovable AI" }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+        return errorResponse('يرجى إضافة رصيد إلى حساب Lovable AI', 402);
       }
       
       const errorText = await aiResponse.text();
@@ -146,16 +140,13 @@ serve(async (req) => {
     const aiResult = await aiResponse.json();
     const analysis = aiResult.choices[0].message.content;
 
-    return new Response(
-      JSON.stringify({ success: true, analysis }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return jsonResponse({ success: true, analysis });
     
   } catch (error) {
     console.error("Error:", error);
-    return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    return errorResponse(
+      error instanceof Error ? error.message : "Unknown error",
+      500
     );
   }
 });

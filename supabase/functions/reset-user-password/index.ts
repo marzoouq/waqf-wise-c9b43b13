@@ -1,15 +1,16 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.81.1";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { 
+  handleCors, 
+  jsonResponse, 
+  errorResponse, 
+  unauthorizedResponse,
+  forbiddenResponse 
+} from '../_shared/cors.ts';
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     // إنشاء عميل Supabase بصلاحيات Admin
@@ -25,10 +26,7 @@ serve(async (req) => {
     const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
     
     if (userError || !user) {
-      return new Response(JSON.stringify({ error: 'غير مصرح' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+      return unauthorizedResponse('غير مصرح');
     }
 
     // التحقق من صلاحيات المستخدم (admin أو nazer فقط)
@@ -40,27 +38,18 @@ serve(async (req) => {
     const hasPermission = roles?.some(r => r.role === 'admin' || r.role === 'nazer');
     
     if (!hasPermission) {
-      return new Response(JSON.stringify({ error: 'ليس لديك صلاحية لتنفيذ هذه العملية' }), {
-        status: 403,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+      return forbiddenResponse('ليس لديك صلاحية لتنفيذ هذه العملية');
     }
 
     // قراءة البيانات من الطلب
     const { user_id, new_password } = await req.json();
 
     if (!user_id || !new_password) {
-      return new Response(JSON.stringify({ error: 'البيانات المطلوبة ناقصة' }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+      return errorResponse('البيانات المطلوبة ناقصة', 400);
     }
 
     if (new_password.length < 8) {
-      return new Response(JSON.stringify({ error: 'كلمة المرور يجب أن تكون 8 أحرف على الأقل' }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+      return errorResponse('كلمة المرور يجب أن تكون 8 أحرف على الأقل', 400);
     }
 
     // تحديث كلمة المرور
@@ -97,22 +86,16 @@ serve(async (req) => {
       p_action_url: '/settings'
     });
 
-    return new Response(JSON.stringify({ 
+    return jsonResponse({ 
       success: true,
       message: 'تم تحديث كلمة المرور بنجاح'
-    }), {
-      status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
   } catch (error) {
     console.error('Error in reset-user-password:', error);
-    const errorMessage = error instanceof Error ? error.message : 'حدث خطأ غير متوقع';
-    return new Response(JSON.stringify({ 
-      error: errorMessage
-    }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return errorResponse(
+      error instanceof Error ? error.message : 'حدث خطأ غير متوقع',
+      500
+    );
   }
 });

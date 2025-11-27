@@ -4,11 +4,13 @@
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { 
+  handleCors, 
+  jsonResponse, 
+  errorResponse, 
+  unauthorizedResponse,
+  forbiddenResponse 
+} from '../_shared/cors.ts';
 
 interface ExtractedInvoiceData {
   invoice_number?: string;
@@ -36,10 +38,8 @@ interface ExtractedInvoiceData {
 }
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     const supabase = createClient(
@@ -62,13 +62,7 @@ Deno.serve(async (req) => {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return new Response(
-        JSON.stringify({ error: 'غير مصرح', details: 'يجب تسجيل الدخول' }),
-        {
-          status: 401,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
-      );
+      return unauthorizedResponse('يجب تسجيل الدخول');
     }
 
     // Check user role (admin, nazer, accountant only)
@@ -80,25 +74,13 @@ Deno.serve(async (req) => {
       .maybeSingle();
 
     if (!userRole) {
-      return new Response(
-        JSON.stringify({ error: 'غير مصرح', details: 'صلاحيات غير كافية' }),
-        {
-          status: 403,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
-      );
+      return forbiddenResponse('صلاحيات غير كافية');
     }
 
     const { image_base64, image_url } = await req.json();
 
     if (!image_base64 && !image_url) {
-      return new Response(
-        JSON.stringify({ error: 'يجب تقديم صورة إما بتنسيق Base64 أو URL' }),
-        {
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
-      );
+      return errorResponse('يجب تقديم صورة إما بتنسيق Base64 أو URL', 400);
     }
 
     console.log('🔍 بدء تحليل صورة الفاتورة باستخدام Lovable AI...');
@@ -260,28 +242,16 @@ Deno.serve(async (req) => {
       confidence: extractedData.overall_confidence,
     });
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        data: extractedData,
-        processed_at: new Date().toISOString(),
-      }),
-      {
-        status: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    );
+    return jsonResponse({
+      success: true,
+      data: extractedData,
+      processed_at: new Date().toISOString(),
+    });
   } catch (error: any) {
     console.error('❌ خطأ في معالجة الطلب:', error);
-    return new Response(
-      JSON.stringify({
-        error: 'فشل في معالجة الصورة',
-        details: error?.message || 'خطأ غير معروف',
-      }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+    return errorResponse(
+      error?.message || 'خطأ غير معروف',
+      500
     );
   }
 });

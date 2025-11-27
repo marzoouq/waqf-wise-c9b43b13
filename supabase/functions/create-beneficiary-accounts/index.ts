@@ -1,10 +1,12 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.81.1";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { 
+  handleCors, 
+  jsonResponse, 
+  errorResponse, 
+  unauthorizedResponse,
+  forbiddenResponse 
+} from '../_shared/cors.ts';
 
 // 🔐 SECURITY: Generate secure random password
 function generateSecurePassword(): string {
@@ -15,22 +17,15 @@ function generateSecurePassword(): string {
 }
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     // 🔐 SECURITY: Verify Authorization header
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       console.error('❌ No authorization header provided');
-      return new Response(
-        JSON.stringify({ error: 'غير مصرح - يجب تسجيل الدخول' }),
-        { 
-          status: 401, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
+      return unauthorizedResponse('غير مصرح - يجب تسجيل الدخول');
     }
 
     const supabaseAdmin = createClient(
@@ -50,10 +45,7 @@ serve(async (req) => {
 
     if (authError || !user) {
       console.error('❌ Invalid token:', authError);
-      return new Response(
-        JSON.stringify({ error: 'رمز المصادقة غير صحيح' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return unauthorizedResponse('رمز المصادقة غير صحيح');
     }
 
     // 🔐 SECURITY: Check if user has admin or nazer role
@@ -64,10 +56,7 @@ serve(async (req) => {
 
     if (roleError) {
       console.error('❌ Error checking roles:', roleError);
-      return new Response(
-        JSON.stringify({ error: 'خطأ في التحقق من الصلاحيات' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return errorResponse('خطأ في التحقق من الصلاحيات', 500);
     }
 
     const hasPermission = roles?.some(r => ['admin', 'nazer'].includes(r.role));
@@ -86,10 +75,7 @@ serve(async (req) => {
         user_agent: req.headers.get('User-Agent')
       });
 
-      return new Response(
-        JSON.stringify({ error: 'ليس لديك صلاحية لتنفيذ هذه العملية' }),
-        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return forbiddenResponse('ليس لديك صلاحية لتنفيذ هذه العملية');
     }
 
     console.log('✅ Authorized user creating beneficiary accounts:', { 
@@ -264,31 +250,19 @@ serve(async (req) => {
       }
     }
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        total: beneficiaries?.length || 0,
-        created: results.length,
-        failed: errors.length,
-        results,
-        errors,
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      }
-    );
+    return jsonResponse({
+      success: true,
+      total: beneficiaries?.length || 0,
+      created: results.length,
+      failed: errors.length,
+      results,
+      errors,
+    });
   } catch (error) {
     console.error('❌ Error in create-beneficiary-accounts:', error);
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400,
-      }
+    return errorResponse(
+      error instanceof Error ? error.message : 'Unknown error',
+      400
     );
   }
 });

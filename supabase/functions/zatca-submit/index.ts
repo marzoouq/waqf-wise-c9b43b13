@@ -1,10 +1,10 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { 
+  handleCors, 
+  jsonResponse, 
+  errorResponse 
+} from '../_shared/cors.ts';
 
 interface ZATCASubmitRequest {
   invoice_id: string;
@@ -12,9 +12,8 @@ interface ZATCASubmitRequest {
 }
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     const supabase = createClient(
@@ -79,32 +78,16 @@ serve(async (req) => {
       status: 'success',
     });
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        qr_data: qrData,
-        invoice_hash: invoiceHash,
-        zatca_response: simulatedResponse,
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      }
-    );
+    return jsonResponse({
+      success: true,
+      qr_data: qrData,
+      invoice_hash: invoiceHash,
+      zatca_response: simulatedResponse,
+    });
 
   } catch (error: any) {
     console.error('Error submitting to ZATCA:', error);
-
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: error.message,
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400,
-      }
-    );
+    return errorResponse(error.message, 400);
   }
 });
 
