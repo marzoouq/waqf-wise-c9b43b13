@@ -471,11 +471,15 @@ sequenceDiagram
 
 ### التوثيق الداخلي:
 - [دليل المطور](./DEVELOPER_GUIDE.md)
-- [سياسات RLS](./RLS_POLICIES_DOCUMENTATION.md)
 - [دليل الاختبار](./TESTING.md)
-- [نظام الشفافية](./TRANSPARENCY_SYSTEM_GUIDE.md)
-- [إجراءات الصيانة](./MAINTENANCE_PROCEDURES.md)
-- [صحة النظام](./SYSTEM_HEALTH_GUIDE.md)
+- [مخطط قاعدة البيانات](./DATABASE_SCHEMA.md)
+- [دليل تنظيف قاعدة البيانات](./DATABASE_CLEANUP_GUIDE.md)
+- [مرجع API](./API_REFERENCE.md)
+- [دليل استكشاف الأخطاء](./TROUBLESHOOTING_GUIDE.md)
+- [نظام التصميم](./DESIGN_SYSTEM.md)
+- [سجل التغييرات](../CHANGELOG.md)
+- [تقرير التدقيق النهائي](./FINAL_AUDIT_REPORT.md)
+- [خطة التحسين النهائية](./FINAL_OPTIMIZATION_PLAN.md)
 - [استكشاف الأخطاء](./TROUBLESHOOTING_GUIDE.md)
 
 ### الموارد الخارجية:
