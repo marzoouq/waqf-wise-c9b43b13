@@ -9,6 +9,7 @@ import { ar } from "date-fns/locale";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { MaskedValue } from "@/components/shared/MaskedValue";
 import { toast } from "sonner";
+import { productionLogger } from "@/lib/logger/production-logger";
 
 interface BeneficiaryStatementsTabProps {
   beneficiaryId: string;
@@ -94,7 +95,7 @@ interface JournalEntryWithLines {
 
       toast.success('تم تصدير كشف الحساب بنجاح');
     } catch (error) {
-      console.error('Export failed:', error);
+      productionLogger.error('Export failed', error);
       toast.error('فشل تصدير كشف الحساب');
     }
   };

@@ -3,6 +3,7 @@
  */
 
 import { getErrorMessage } from '@/types/errors';
+import { productionLogger } from '@/lib/logger/production-logger';
 
 export interface ErrorHandlerOptions {
   context?: string;
@@ -23,9 +24,12 @@ export function handleMutationError(
 } {
   const { context, severity = 'medium', silent = false } = options;
   
-  // تسجيل الخطأ في console
+  // تسجيل الخطأ في logger
   if (!silent) {
-    console.error(`[${severity.toUpperCase()}] Error in ${context || 'mutation'}:`, error);
+    productionLogger.error(`Error in ${context || 'mutation'}`, error, { 
+      context, 
+      severity 
+    });
   }
   
   return {
@@ -45,7 +49,10 @@ export function handleQueryError(
   const { context, severity = 'medium', silent = false } = options;
   
   if (!silent) {
-    console.error(`[${severity.toUpperCase()}] Query error in ${context}:`, error);
+    productionLogger.error(`Query error in ${context}`, error, {
+      context,
+      severity
+    });
   }
 }
 

@@ -5,6 +5,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { productionLogger } from '@/lib/logger/production-logger';
 
 export interface NotificationData {
   user_id: string;
@@ -40,7 +41,9 @@ export class NotificationService {
       if (error) throw error;
       return { success: true };
     } catch (error) {
-      console.error('Error sending notification:', error);
+      productionLogger.error('Error sending notification', error, {
+        context: 'notification_service',
+      });
       return { success: false };
     }
   }
@@ -69,7 +72,9 @@ export class NotificationService {
       if (error) throw error;
       return { success: true };
     } catch (error) {
-      console.error('Error sending bulk notifications:', error);
+      productionLogger.error('Error sending bulk notifications', error, {
+        context: 'notification_service',
+      });
       return { success: false };
     }
   }

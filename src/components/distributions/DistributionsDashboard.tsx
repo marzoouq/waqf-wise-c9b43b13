@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { TrendingUp, DollarSign, Users, Clock, Calendar, CheckCircle2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { productionLogger } from '@/lib/logger/production-logger';
 
 const COLORS = ['hsl(var(--primary))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))'];
 
@@ -25,7 +26,7 @@ export function DistributionsDashboard() {
       if (error) throw error;
       setDistributions(data || []);
     } catch (error) {
-      console.error('Error loading distributions:', error);
+      productionLogger.error('Error loading distributions', error);
     } finally {
       setLoading(false);
     }

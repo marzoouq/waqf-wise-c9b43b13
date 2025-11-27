@@ -2,10 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { useEffect, useRef, useMemo } from "react";
+import { productionLogger } from "@/lib/logger/production-logger";
 
 export type AppRole = "nazer" | "admin" | "accountant" | "cashier" | "archivist" | "beneficiary" | "user";
-
-const IS_DEV = import.meta.env.DEV;
 
 export function useUserRole() {
   const { user } = useAuth();
@@ -26,13 +25,13 @@ export function useUserRole() {
           .eq("user_id", userId);
 
         if (error) {
-          if (IS_DEV) console.error('❌ useUserRole: Error fetching roles', error);
+          productionLogger.error('useUserRole: Error fetching roles', error);
           return [];
         }
         
         return (data || []).map(r => r.role as AppRole);
       } catch (err) {
-        if (IS_DEV) console.error('❌ useUserRole: Exception in queryFn', err);
+        productionLogger.error('useUserRole: Exception in queryFn', err);
         return [];
       }
     },
@@ -82,14 +81,12 @@ export function useUserRole() {
   const isBeneficiary = hasRole("beneficiary");
   const isUser = hasRole("user");
 
-  // Log state changes only in DEV and only when state actually changes
+  // Log state changes only when state actually changes
   useEffect(() => {
-    if (!IS_DEV) return;
-    
     const currentState = JSON.stringify({ roles, primaryRole, isLoading: isLoadingRoles, hasUser: !!userId });
     if (currentState !== lastLoggedState.current) {
       lastLoggedState.current = currentState;
-      // Removed console.log for production cleanliness
+      // State change tracked internally
     }
   }, [roles, primaryRole, isLoadingRoles, userId]);
 

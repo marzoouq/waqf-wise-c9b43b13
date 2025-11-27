@@ -6,6 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { Sparkles, CheckCircle2, AlertCircle, TrendingUp } from 'lucide-react';
 import { useBankMatching } from '@/hooks/useBankMatching';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { productionLogger } from '@/lib/logger/production-logger';
 
 interface MatchSuggestion {
   bankTransactionId: string;
@@ -32,7 +33,7 @@ export function SmartBankReconciliation({ statementId }: Props) {
       const result = await autoMatch({ statementId });
       setSuggestions(result.suggestions);
     } catch (error) {
-      console.error('Error auto-matching:', error);
+      productionLogger.error('Error auto-matching', error);
     } finally {
       setIsMatching(false);
     }
@@ -47,7 +48,7 @@ export function SmartBankReconciliation({ statementId }: Props) {
       });
       setSuggestions(suggestions.filter(s => s !== suggestion));
     } catch (error) {
-      console.error('Error accepting suggestion:', error);
+      productionLogger.error('Error accepting suggestion', error);
     }
   };
 

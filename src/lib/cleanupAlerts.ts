@@ -4,6 +4,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { productionLogger } from '@/lib/logger/production-logger';
 
 export interface CleanupStats {
   deletedAlerts: number;
@@ -120,7 +121,7 @@ export function cleanupLocalStorageErrors(): number {
     
     return logs.length - trimmedLogs.length;
   } catch (error) {
-    console.error('Error cleaning localStorage:', error);
+    productionLogger.error('Error cleaning localStorage', error);
     return 0;
   }
 }

@@ -6,6 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { productionLogger } from '@/lib/logger/production-logger';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -92,7 +93,7 @@ export function AutoJournalTemplateDialog({ open, onOpenChange, template }: Prop
       }
       onOpenChange(false);
     } catch (error) {
-      console.error('Error saving template:', error);
+      productionLogger.error('Error saving template', error);
     }
   };
 

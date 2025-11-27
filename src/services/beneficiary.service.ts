@@ -5,6 +5,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { productionLogger } from '@/lib/logger/production-logger';
 
 export interface BeneficiaryData {
   full_name: string;
@@ -63,7 +64,9 @@ export class BeneficiaryService {
         message: 'تم إضافة المستفيد بنجاح',
       };
     } catch (error) {
-      console.error('Error in BeneficiaryService.create:', error);
+      productionLogger.error('BeneficiaryService.create failed', error, {
+        context: 'beneficiary_service',
+      });
       return {
         success: false,
         message: 'فشل في إضافة المستفيد',
@@ -91,7 +94,9 @@ export class BeneficiaryService {
         message: 'تم تحديث البيانات بنجاح',
       };
     } catch (error) {
-      console.error('Error in BeneficiaryService.update:', error);
+      productionLogger.error('BeneficiaryService.update failed', error, {
+        context: 'beneficiary_service',
+      });
       return {
         success: false,
         message: 'فشل في تحديث البيانات',
@@ -143,7 +148,9 @@ export class BeneficiaryService {
         message: 'تم حذف المستفيد بنجاح',
       };
     } catch (error) {
-      console.error('Error in BeneficiaryService.delete:', error);
+      productionLogger.error('BeneficiaryService.delete failed', error, {
+        context: 'beneficiary_service',
+      });
       return {
         success: false,
         message: 'فشل في حذف المستفيد',
@@ -203,7 +210,9 @@ export class BeneficiaryService {
         message: 'تم تفعيل تسجيل الدخول بنجاح',
       };
     } catch (error) {
-      console.error('Error in BeneficiaryService.enableLogin:', error);
+      productionLogger.error('BeneficiaryService.enableLogin failed', error, {
+        context: 'beneficiary_service',
+      });
       return {
         success: false,
         message: 'فشل في تفعيل تسجيل الدخول',
@@ -251,7 +260,9 @@ export class BeneficiaryService {
         data,
       };
     } catch (error) {
-      console.error('Error in BeneficiaryService.search:', error);
+      productionLogger.error('BeneficiaryService.search failed', error, {
+        context: 'beneficiary_service',
+      });
       return {
         success: false,
         data: [],
