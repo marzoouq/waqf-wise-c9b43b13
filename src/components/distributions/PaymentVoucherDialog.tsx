@@ -119,7 +119,7 @@ export function PaymentVoucherDialog({
                 <Label htmlFor="voucherType">نوع السند *</Label>
                 <Select
                   value={formData.voucherType}
-                  onValueChange={(value) => setFormData({ ...formData, voucherType: value as any })}
+                  onValueChange={(value) => setFormData({ ...formData, voucherType: value as "receipt" | "payment" | "journal" })}
                 >
                   <SelectTrigger id="voucherType">
                     <SelectValue />
@@ -164,7 +164,7 @@ export function PaymentVoucherDialog({
                 <Label htmlFor="paymentMethod">طريقة الدفع</Label>
                 <Select
                   value={formData.paymentMethod}
-                  onValueChange={(value) => setFormData({ ...formData, paymentMethod: value as any })}
+                  onValueChange={(value) => setFormData({ ...formData, paymentMethod: value as "bank_transfer" | "cash" | "check" | "digital_wallet" })}
                 >
                   <SelectTrigger id="paymentMethod">
                     <SelectValue />

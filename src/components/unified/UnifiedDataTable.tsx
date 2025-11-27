@@ -12,9 +12,11 @@ import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapp
 import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
 import { ReactNode } from "react";
 
-export interface Column<T> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface Column<T = any> {
   key: string;
   label: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   render?: (value: any, row: T) => ReactNode;
   align?: "right" | "left" | "center";
   hideOnMobile?: boolean; // مخفي على الموبايل
@@ -22,7 +24,8 @@ export interface Column<T> {
   className?: string; // إضافة className للتخصيص
 }
 
-interface UnifiedDataTableProps<T> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+interface UnifiedDataTableProps<T = any> {
   title?: string;
   columns: Column<T>[];
   data: T[];
@@ -46,7 +49,8 @@ interface UnifiedDataTableProps<T> {
  * UnifiedDataTable - جدول بيانات موحد متقدم
  * بتصميم متسق مع دعم الترقيم، الإجراءات، والتوافق مع الموبايل
  */
-export function UnifiedDataTable<T extends Record<string, any>>({ 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function UnifiedDataTable<T extends { id?: string; [key: string]: any }>({
   title,
   columns, 
   data,

@@ -87,7 +87,7 @@ export function DistributionsTab() {
     {
       key: "status",
       label: "الحالة",
-      render: (_: any, row: Distribution) => getStatusBadge(row.status)
+      render: (_: unknown, row: Distribution) => getStatusBadge(row.status)
     }
   ];
 

@@ -142,7 +142,7 @@ export const ContractsTab = ({ onEdit }: Props) => {
             key: "properties",
             label: "العقار",
             hideOnTablet: true,
-            render: (_: any, row: Contract) => row.properties?.name || '-'
+            render: (_: unknown, row: Contract) => row.properties?.name || '-'
           },
           {
             key: "tenant_name",
@@ -185,7 +185,7 @@ export const ContractsTab = ({ onEdit }: Props) => {
           {
             key: "status",
             label: "الحالة",
-            render: (_: any, row: Contract) => (
+            render: (_: unknown, row: Contract) => (
               <ContractStatusBadge 
                 startDate={row.start_date}
                 endDate={row.end_date}

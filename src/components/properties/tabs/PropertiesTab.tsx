@@ -129,7 +129,7 @@ export const PropertiesTab = ({ onEdit }: Props) => {
             key: "units",
             label: "الوحدات",
             hideOnTablet: true,
-            render: (_: any, row: Property) => (
+            render: (_: unknown, row: Property) => (
               <span className="font-medium whitespace-nowrap">
                 {row.occupied}/{row.units}
               </span>

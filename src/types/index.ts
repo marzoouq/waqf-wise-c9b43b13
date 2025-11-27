@@ -1,3 +1,23 @@
+/**
+ * ملف تصدير مركزي لجميع الأنواع
+ * Central export file for all types
+ */
+
+// Re-exports from specialized type files
+export * from './table-rows';
+export * from './accounting';
+export * from './auth';
+export * from './errors';
+export * from './alerts';
+export * from './activity';
+export * from './audit';
+export * from './approval';
+export * from './beneficiary';
+export * from './loans';
+export * from './admin';
+export * from './reports.types';
+export * from './supabase-rpc';
+
 // Core Entity Types
 export interface Beneficiary {
   id: string;
