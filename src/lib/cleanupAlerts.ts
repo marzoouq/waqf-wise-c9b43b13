@@ -93,6 +93,8 @@ export async function cleanupAlerts(): Promise<CleanupStats> {
   }
 }
 
+import type { LocalErrorLog } from '@/types/error-log';
+
 /**
  * تنظيف localStorage من الأخطاء القديمة
  */
@@ -103,10 +105,10 @@ export function cleanupLocalStorageErrors(): number {
     
     if (!errorLogs) return 0;
 
-    const logs = JSON.parse(errorLogs);
+    const logs: LocalErrorLog[] = JSON.parse(errorLogs);
     const cutoffTime = Date.now() - 24 * 60 * 60 * 1000; // 24 ساعة
     
-    const recentLogs = logs.filter((log: any) => {
+    const recentLogs = logs.filter((log) => {
       const logTime = new Date(log.timestamp).getTime();
       return logTime > cutoffTime;
     });

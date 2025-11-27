@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import type { SystemErrorLog } from "@/types/system-error";
 
 export function useErrorNotifications(enabled: boolean = true) {
   // تتبع الأخطاء التي تم عرضها لتجنب التكرار
@@ -77,7 +78,7 @@ export function useErrorNotifications(enabled: boolean = true) {
           table: "system_error_logs",
         },
         (payload) => {
-      const newError = payload.new as any;
+          const newError = payload.new as SystemErrorLog;
           
           // تجاهل الأخطاء المكررة
           if (shownErrorsRef.current.has(newError.id)) return;

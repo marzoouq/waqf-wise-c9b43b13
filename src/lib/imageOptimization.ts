@@ -252,10 +252,10 @@ export function observeLCP(callback: (lcp: number) => void) {
   try {
     const observer = new PerformanceObserver((list) => {
       const entries = list.getEntries();
-      const lastEntry = entries[entries.length - 1] as any;
+      const lastEntry = entries[entries.length - 1] as PerformanceEntry & { renderTime?: number; loadTime?: number };
       
       if (lastEntry) {
-        callback(lastEntry.renderTime || lastEntry.loadTime);
+        callback(lastEntry.renderTime || lastEntry.loadTime || 0);
       }
     });
 

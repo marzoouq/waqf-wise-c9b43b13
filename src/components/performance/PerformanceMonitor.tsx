@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Activity, Zap, Clock } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { hasMemoryAPI } from '@/types/performance';
 
 interface PerformanceMetrics {
   fps: number;
@@ -58,12 +59,14 @@ export function PerformanceMonitor() {
 
     // قياس استهلاك الذاكرة (إن وُجد)
     const measureMemory = () => {
-      if ('memory' in performance) {
-        const memory = (performance as any).memory;
-        setMetrics((prev) => ({
-          ...prev,
-          memory: Math.round(memory.usedJSHeapSize / 1048576), // MB
-        }));
+      if (hasMemoryAPI(performance)) {
+        const memory = performance.memory;
+        if (memory) {
+          setMetrics((prev) => ({
+            ...prev,
+            memory: Math.round(memory.usedJSHeapSize / 1048576), // MB
+          }));
+        }
       }
     };
 

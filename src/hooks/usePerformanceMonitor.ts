@@ -4,6 +4,7 @@
  */
 
 import { useEffect, useRef } from 'react';
+import { hasMemoryAPI } from '@/types/performance';
 
 interface PerformanceMetrics {
   renderTime: number;
@@ -99,17 +100,19 @@ export function useMemoryMonitor() {
     if (!import.meta.env.DEV) return;
     
     const checkMemory = () => {
-      if ('memory' in performance) {
-        const memory = (performance as any).memory;
-        const usedMB = Math.round(memory.usedJSHeapSize / 1048576);
-        const totalMB = Math.round(memory.totalJSHeapSize / 1048576);
-        const limitMB = Math.round(memory.jsHeapSizeLimit / 1048576);
-        
-        if (usedMB > limitMB * 0.9) {
-          console.warn(`⚠️ High memory usage: ${usedMB}MB / ${limitMB}MB (${Math.round(usedMB / limitMB * 100)}%)`);
+      if (hasMemoryAPI(performance)) {
+        const memory = performance.memory;
+        if (memory) {
+          const usedMB = Math.round(memory.usedJSHeapSize / 1048576);
+          const totalMB = Math.round(memory.totalJSHeapSize / 1048576);
+          const limitMB = Math.round(memory.jsHeapSizeLimit / 1048576);
+          
+          if (usedMB > limitMB * 0.9) {
+            console.warn(`⚠️ High memory usage: ${usedMB}MB / ${limitMB}MB (${Math.round(usedMB / limitMB * 100)}%)`);
+          }
+          
+          console.log(`💾 Memory: ${usedMB}MB / ${totalMB}MB (Limit: ${limitMB}MB)`);
         }
-        
-        console.log(`💾 Memory: ${usedMB}MB / ${totalMB}MB (Limit: ${limitMB}MB)`);
       }
     };
     

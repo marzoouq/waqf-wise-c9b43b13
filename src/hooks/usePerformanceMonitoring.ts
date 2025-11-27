@@ -5,6 +5,7 @@
 
 import { useEffect, useRef } from 'react';
 import { productionLogger } from '@/lib/logger/production-logger';
+import { hasMemoryAPI } from '@/types/performance';
 
 interface PerformanceMonitoringOptions {
   componentName: string;
@@ -37,22 +38,25 @@ export function usePerformanceMonitoring({
     }
 
     // مراقبة الذاكرة
-    if (enableMemoryMonitoring && 'memory' in performance) {
+    if (enableMemoryMonitoring && hasMemoryAPI(performance)) {
+      const perfWithMemory = performance;
       const memoryInterval = setInterval(() => {
-        const memory = (performance as any).memory;
-        const usedMemoryMB = memory.usedJSHeapSize / 1048576; // Convert to MB
-        const totalMemoryMB = memory.totalJSHeapSize / 1048576;
-        const memoryUsagePercent = (usedMemoryMB / totalMemoryMB) * 100;
+        const memory = perfWithMemory.memory;
+        if (memory) {
+          const usedMemoryMB = memory.usedJSHeapSize / 1048576; // Convert to MB
+          const totalMemoryMB = memory.totalJSHeapSize / 1048576;
+          const memoryUsagePercent = (usedMemoryMB / totalMemoryMB) * 100;
 
-        // تحذير عند تجاوز 80% من الذاكرة
-        if (memoryUsagePercent > 80) {
-          productionLogger.warn('High memory usage detected', {
-            component: componentName,
-            usedMemoryMB: usedMemoryMB.toFixed(2),
-            totalMemoryMB: totalMemoryMB.toFixed(2),
-            usagePercent: memoryUsagePercent.toFixed(2),
-            context: 'memory_monitoring',
-          });
+          // تحذير عند تجاوز 80% من الذاكرة
+          if (memoryUsagePercent > 80) {
+            productionLogger.warn('High memory usage detected', {
+              component: componentName,
+              usedMemoryMB: usedMemoryMB.toFixed(2),
+              totalMemoryMB: totalMemoryMB.toFixed(2),
+              usagePercent: memoryUsagePercent.toFixed(2),
+              context: 'memory_monitoring',
+            });
+          }
         }
       }, memoryCheckInterval);
 
