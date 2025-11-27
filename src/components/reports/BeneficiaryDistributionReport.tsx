@@ -3,10 +3,18 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Users, TrendingUp, DollarSign, Download, Award } from 'lucide-react';
+import type { 
+  BeneficiaryReportData, 
+  DistributionReportData, 
+  CategoryDataItem, 
+  TribeDataItem, 
+  TypeDataItem,
+  CityDataItem 
+} from '@/types/reports.types';
 
 interface BeneficiaryDistributionReportProps {
-  beneficiaries: any[];
-  distributions: any[];
+  beneficiaries: BeneficiaryReportData[];
+  distributions: DistributionReportData[];
 }
 
 const COLORS = [
@@ -34,7 +42,7 @@ export function BeneficiaryDistributionReport({
     : 0;
 
   // التوزيع حسب الفئة
-  const byCategory = beneficiaries.reduce((acc, b) => {
+  const byCategory = beneficiaries.reduce<Record<string, CategoryDataItem>>((acc, b) => {
     const category = b.category || 'غير محدد';
     if (!acc[category]) {
       acc[category] = { name: category, count: 0, amount: 0 };
@@ -42,58 +50,58 @@ export function BeneficiaryDistributionReport({
     acc[category].count++;
     acc[category].amount += b.total_received || 0;
     return acc;
-  }, {} as Record<string, any>);
+  }, {});
 
-  const categoryData = Object.values(byCategory).map((item: any) => ({ 
+  const categoryData = Object.values(byCategory).map((item) => ({ 
     name: item.name, 
     count: item.count, 
     amount: item.amount 
   }));
 
   // التوزيع حسب القبيلة
-  const byTribe = beneficiaries.reduce((acc, b) => {
+  const byTribe = beneficiaries.reduce<Record<string, TribeDataItem>>((acc, b) => {
     const tribe = b.tribe || 'غير محدد';
     if (!acc[tribe]) {
       acc[tribe] = { name: tribe, count: 0 };
     }
     acc[tribe].count++;
     return acc;
-  }, {} as Record<string, any>);
+  }, {});
 
   const tribeData = Object.values(byTribe)
-    .sort((a: any, b: any) => b.count - a.count)
+    .sort((a, b) => b.count - a.count)
     .slice(0, 5)
-    .map((item: any) => ({ name: item.name, count: item.count }));
+    .map((item) => ({ name: item.name, count: item.count }));
 
   // التوزيع حسب النوع
-  const byType = beneficiaries.reduce((acc, b) => {
+  const byType = beneficiaries.reduce<Record<string, TypeDataItem>>((acc, b) => {
     const type = b.beneficiary_type || 'غير محدد';
     if (!acc[type]) {
       acc[type] = { name: type, value: 0 };
     }
     acc[type].value++;
     return acc;
-  }, {} as Record<string, any>);
+  }, {});
 
-  const typeData = Object.values(byType).map((item: any) => ({ 
+  const typeData = Object.values(byType).map((item) => ({ 
     name: item.name, 
-    value: item.value 
+    value: item.value
   }));
 
   // التوزيع حسب المدينة
-  const byCity = beneficiaries.reduce((acc, b) => {
+  const byCity = beneficiaries.reduce<Record<string, CityDataItem>>((acc, b) => {
     const city = b.city || 'غير محدد';
     if (!acc[city]) {
       acc[city] = { city, count: 0 };
     }
     acc[city].count++;
     return acc;
-  }, {} as Record<string, any>);
+  }, {});
 
   const cityData = Object.values(byCity)
-    .sort((a: any, b: any) => b.count - a.count)
+    .sort((a, b) => b.count - a.count)
     .slice(0, 10)
-    .map((item: any) => ({ city: item.city, count: item.count }));
+    .map((item) => ({ city: item.city, count: item.count }));
 
   // أعلى المستفيدين
   const topBeneficiaries = [...beneficiaries]
@@ -104,7 +112,7 @@ export function BeneficiaryDistributionReport({
   const frequencyAnalysis = beneficiaries.map(b => ({
     name: b.full_name,
     frequency: distributions.filter(d =>
-      d.distribution_details?.some((dd: any) => dd.beneficiary_id === b.id)
+      d.distribution_details?.some((dd) => dd.beneficiary_id === b.id)
     ).length,
   }))
     .filter(b => b.frequency > 0)

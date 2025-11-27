@@ -9,11 +9,17 @@ import { BeneficiarySelector } from './BeneficiarySelector';
 import { DeductionsConfig } from './DeductionsConfig';
 import { DistributionPreview } from './DistributionPreview';
 import { ApprovalSettings } from './ApprovalSettings';
+import type { 
+  DistributionWizardFormData, 
+  DeductionsValues, 
+  ApprovalSettingsValues,
+  DistributionPattern 
+} from '@/types/distribution';
 
 interface DistributionWizardProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onComplete: (data: any) => void;
+  onComplete: (data: DistributionWizardFormData) => void;
 }
 
 const steps = [
@@ -26,7 +32,7 @@ const steps = [
 
 export function DistributionWizard({ open, onOpenChange, onComplete }: DistributionWizardProps) {
   const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState<any>({
+  const [formData, setFormData] = useState<DistributionWizardFormData>({
     pattern: 'equal',
     beneficiaries: [],
     deductions: {
@@ -62,8 +68,20 @@ export function DistributionWizard({ open, onOpenChange, onComplete }: Distribut
     setCurrentStep(1);
   };
 
-  const updateFormData = (key: string, value: any) => {
-    setFormData({ ...formData, [key]: value });
+  const updatePattern = (value: DistributionPattern) => {
+    setFormData({ ...formData, pattern: value });
+  };
+
+  const updateBeneficiaries = (value: string[]) => {
+    setFormData({ ...formData, beneficiaries: value });
+  };
+
+  const updateDeductions = (value: DeductionsValues) => {
+    setFormData({ ...formData, deductions: value });
+  };
+
+  const updateApprovalSettings = (value: ApprovalSettingsValues) => {
+    setFormData({ ...formData, approvalSettings: value });
   };
 
   const canProceed = () => {
@@ -142,7 +160,7 @@ export function DistributionWizard({ open, onOpenChange, onComplete }: Distribut
               <h3 className="text-lg font-semibold mb-4">اختر نمط التوزيع</h3>
               <DistributionPatternSelector
                 value={formData.pattern}
-                onChange={value => updateFormData('pattern', value)}
+                onChange={updatePattern}
               />
             </div>
           )}
@@ -152,7 +170,7 @@ export function DistributionWizard({ open, onOpenChange, onComplete }: Distribut
               <h3 className="text-lg font-semibold mb-4">اختر المستفيدين</h3>
               <BeneficiarySelector
                 selected={formData.beneficiaries}
-                onChange={value => updateFormData('beneficiaries', value)}
+                onChange={updateBeneficiaries}
               />
             </div>
           )}
@@ -162,7 +180,7 @@ export function DistributionWizard({ open, onOpenChange, onComplete }: Distribut
               <h3 className="text-lg font-semibold mb-4">نسب الاستقطاع</h3>
               <DeductionsConfig
                 values={formData.deductions}
-                onChange={value => updateFormData('deductions', value)}
+                onChange={updateDeductions}
               />
             </div>
           )}
@@ -179,7 +197,7 @@ export function DistributionWizard({ open, onOpenChange, onComplete }: Distribut
               <h3 className="text-lg font-semibold mb-4">إعدادات الموافقة</h3>
               <ApprovalSettings
                 values={formData.approvalSettings}
-                onChange={value => updateFormData('approvalSettings', value)}
+                onChange={updateApprovalSettings}
               />
             </div>
           )}

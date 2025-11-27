@@ -62,7 +62,7 @@ export function ChartOfAccounts() {
       setIsDialogOpen(false);
       resetForm();
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error(error.message || 'فشل إضافة الحساب');
     },
   });

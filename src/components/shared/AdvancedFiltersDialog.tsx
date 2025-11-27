@@ -21,6 +21,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 
+export type FilterValue = string | number | null | undefined;
+export type FiltersRecord = Record<string, FilterValue>;
+
 export interface FilterConfig {
   key: string;
   label: string;
@@ -30,8 +33,8 @@ export interface FilterConfig {
 
 interface AdvancedFiltersDialogProps {
   filters: FilterConfig[];
-  activeFilters: Record<string, any>;
-  onApplyFilters: (filters: Record<string, any>) => void;
+  activeFilters: FiltersRecord;
+  onApplyFilters: (filters: FiltersRecord) => void;
   onClearFilters: () => void;
 }
 
@@ -42,7 +45,7 @@ export function AdvancedFiltersDialog({
   onClearFilters,
 }: AdvancedFiltersDialogProps) {
   const [open, setOpen] = useState(false);
-  const [localFilters, setLocalFilters] = useState<Record<string, any>>(activeFilters);
+  const [localFilters, setLocalFilters] = useState<FiltersRecord>(activeFilters);
 
   const activeFilterCount = Object.values(activeFilters).filter(
     (v) => v !== null && v !== undefined && v !== ""
@@ -59,7 +62,7 @@ export function AdvancedFiltersDialog({
     setOpen(false);
   };
 
-  const handleFilterChange = (key: string, value: any) => {
+  const handleFilterChange = (key: string, value: FilterValue) => {
     setLocalFilters((prev) => ({
       ...prev,
       [key]: value,
@@ -94,7 +97,7 @@ export function AdvancedFiltersDialog({
               
               {filter.type === "select" && filter.options && (
                 <Select
-                  value={localFilters[filter.key] || ""}
+                  value={String(localFilters[filter.key] || "")}
                   onValueChange={(value) => handleFilterChange(filter.key, value)}
                 >
                   <SelectTrigger id={filter.key}>
@@ -114,7 +117,7 @@ export function AdvancedFiltersDialog({
                 <Input
                   id={filter.key}
                   type="text"
-                  value={localFilters[filter.key] || ""}
+                  value={String(localFilters[filter.key] ?? "")}
                   onChange={(e) => handleFilterChange(filter.key, e.target.value)}
                   placeholder={`أدخل ${filter.label}`}
                 />
@@ -124,7 +127,7 @@ export function AdvancedFiltersDialog({
                 <Input
                   id={filter.key}
                   type="number"
-                  value={localFilters[filter.key] || ""}
+                  value={localFilters[filter.key] ?? ""}
                   onChange={(e) => handleFilterChange(filter.key, e.target.value)}
                   placeholder={`أدخل ${filter.label}`}
                 />
@@ -134,7 +137,7 @@ export function AdvancedFiltersDialog({
                 <Input
                   id={filter.key}
                   type="date"
-                  value={localFilters[filter.key] || ""}
+                  value={String(localFilters[filter.key] ?? "")}
                   onChange={(e) => handleFilterChange(filter.key, e.target.value)}
                 />
               )}

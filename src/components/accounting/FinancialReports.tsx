@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { FileText, Download, TrendingUp, TrendingDown } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { Badge } from '@/components/ui/badge';
+import type { TrialBalanceItem, AccountWithBalance } from '@/types/accounting';
 
 /**
  * مكون التقارير المالية
@@ -23,7 +24,7 @@ export function FinancialReports() {
         .from('trial_balance')
         .select('*');
       if (error) throw error;
-      return data || [];
+      return (data || []) as TrialBalanceItem[];
     },
   });
 
@@ -38,7 +39,7 @@ export function FinancialReports() {
         .eq('is_active', true);
       
       if (error) throw error;
-      return data || [];
+      return (data || []) as AccountWithBalance[];
     },
   });
 
@@ -95,7 +96,7 @@ export function FinancialReports() {
                     </tr>
                   </thead>
                   <tbody>
-                    {trialBalance.map((item: any, index: number) => (
+                    {trialBalance.map((item, index) => (
                       <tr key={index} className="border-t hover:bg-muted/50">
                         <td className="p-3 font-mono">{item.code}</td>
                         <td className="p-3">{item.name_ar}</td>
@@ -116,12 +117,12 @@ export function FinancialReports() {
                       <td colSpan={2} className="p-3">الإجمالي</td>
                       <td className="p-3 text-left font-mono">
                         {trialBalance
-                          .reduce((sum: number, item: any) => sum + (item.total_debit || 0), 0)
+                          .reduce((sum, item) => sum + (item.total_debit || 0), 0)
                           .toLocaleString('ar-SA', { minimumFractionDigits: 2 })}
                       </td>
                       <td className="p-3 text-left font-mono">
                         {trialBalance
-                          .reduce((sum: number, item: any) => sum + (item.total_credit || 0), 0)
+                          .reduce((sum, item) => sum + (item.total_credit || 0), 0)
                           .toLocaleString('ar-SA', { minimumFractionDigits: 2 })}
                       </td>
                       <td></td>

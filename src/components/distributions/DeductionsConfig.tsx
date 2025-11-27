@@ -2,16 +2,11 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
+import type { DeductionsValues } from '@/types/distribution';
 
 interface DeductionsConfigProps {
-  values: {
-    nazer: number;
-    reserve: number;
-    development: number;
-    maintenance: number;
-    investment: number;
-  };
-  onChange: (values: any) => void;
+  values: DeductionsValues;
+  onChange: (values: DeductionsValues) => void;
 }
 
 export function DeductionsConfig({ values, onChange }: DeductionsConfigProps) {

@@ -3,6 +3,7 @@ import { useFinancialAnalytics } from '@/hooks/useFinancialAnalytics';
 import { TrendingUp, TrendingDown, Activity, DollarSign } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
+import type { FinancialRatioKPI } from '@/types/reports.types';
 
 const ratioInfo: Record<string, { label: string; description: string; goodAbove?: boolean }> = {
   current_ratio: {
@@ -57,7 +58,7 @@ export function FinancialRatiosReport() {
     return acc;
   }, {});
 
-  const getStatus = (kpi: any) => {
+  const getStatus = (kpi: FinancialRatioKPI) => {
     if (!kpi.kpi_target) return 'neutral';
     const info = ratioInfo[kpi.kpi_name];
     if (!info) return 'neutral';

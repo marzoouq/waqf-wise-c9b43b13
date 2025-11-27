@@ -164,3 +164,29 @@ export interface JournalLineData {
     code: string;
   };
 }
+
+// Types for financial reports
+export interface TrialBalanceItem {
+  code: string;
+  name_ar: string;
+  account_type: string;
+  total_debit: number;
+  total_credit: number;
+  balance: number;
+}
+
+export interface AccountWithBalance {
+  id: string;
+  code: string;
+  name_ar: string;
+  account_type: string;
+  account_nature: string;
+  current_balance: number | null;
+}
+
+export interface SavedSearch {
+  id: string;
+  search_name: string;
+  search_criteria: Record<string, unknown>;
+  created_at: string;
+}

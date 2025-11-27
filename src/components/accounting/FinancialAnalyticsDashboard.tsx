@@ -47,7 +47,7 @@ export function FinancialAnalyticsDashboard() {
     }
   };
 
-  const getKPIStatus = (kpi: any) => {
+  const getKPIStatus = (kpi: FinancialKPI) => {
     if (!kpi.kpi_target) return 'neutral';
     
     const isGoodAbove = ['current_ratio', 'quick_ratio', 'profit_margin', 'roa', 'roe'].includes(kpi.kpi_name);
