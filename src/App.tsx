@@ -97,6 +97,8 @@ const GovernanceDecisions = lazy(() => import("./pages/GovernanceDecisions"));
 const DecisionDetails = lazy(() => import("./pages/DecisionDetails"));
 const RolesManagement = lazy(() => import("./pages/RolesManagement"));
 const KnowledgeBase = lazy(() => import("./pages/KnowledgeBase"));
+const PermissionsManagement = lazy(() => import("./pages/PermissionsManagement"));
+const Unauthorized = lazy(() => import("./pages/Unauthorized"));
 const TestDataManager = lazy(() => import("./pages/TestDataManager"));
 const ComprehensiveTestingDashboard = lazy(() => import("./pages/ComprehensiveTestingDashboard"));
 const DeveloperGuide = lazy(() => import("./pages/DeveloperGuide"));
@@ -164,6 +166,7 @@ const App = () => {
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/install" element={<Install />} />
+                <Route path="/unauthorized" element={<Unauthorized />} />
                 
                 {/* Beneficiary Dashboard - مستقل خارج MainLayout */}
                 <Route 
@@ -396,6 +399,14 @@ const App = () => {
               </ProtectedRoute>
             } 
           />
+          <Route 
+            path="/settings/permissions" 
+            element={
+              <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+                <PermissionsManagement />
+              </ProtectedRoute>
+            } 
+          />
           <Route path="/notifications" element={<Notifications />} />
           <Route 
             path="/beneficiary/requests" 
@@ -477,14 +488,6 @@ const App = () => {
             element={
               <ProtectedRoute requiredRoles={["admin", "nazer"]}>
                 <SupportManagement />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/system-errors" 
-            element={
-              <ProtectedRoute requiredRoles={["admin"]}>
-                <SystemErrorLogs />
               </ProtectedRoute>
             } 
           />

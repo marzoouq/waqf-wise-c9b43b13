@@ -147,6 +147,8 @@ const menuGroups = [
     roles: ["admin"],
     subItems: [
       { icon: Shield, label: "المستخدمون", path: "/users", roles: ["admin", "nazer"] },
+      { icon: Shield, label: "الأدوار", path: "/settings/roles", roles: ["admin", "nazer"] },
+      { icon: Shield, label: "الصلاحيات", path: "/settings/permissions", roles: ["admin", "nazer"] },
       { icon: Bell, label: "الإشعارات", path: "/notifications", roles: ["all"] },
       { icon: Activity, label: "لوحة المراقبة", path: "/system-monitoring", roles: ["admin", "nazer"] },
       { icon: Code, label: "أدوات المطور", path: "/developer-tools", roles: ["admin"] },
