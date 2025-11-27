@@ -1,5 +1,65 @@
 # سجل التغييرات (Changelog)
 
+## النسخة 2.1.1 - 2025-11-27
+
+### 🔒 الأمان النوعي (Type Safety)
+
+#### تفعيل قاعدة منع `any`
+- تحديث `eslint.config.js` لجعل `@typescript-eslint/no-explicit-any` خطأ بناء
+- استثناء ملفات الاختبار من القاعدة
+- إضافة 40+ نوع جديد في `src/types/`
+
+#### الملفات المُصلحة (50+ ملف)
+- `src/components/accounting/FinancialReports.tsx` - استبدال `any` بـ `Account`
+- `src/components/reports/DetailedGeneralLedger.tsx` - `GeneralLedgerEntryRow`
+- `src/components/reports/FinancialRatiosReport.tsx` - `FinancialRatioKPI` مع `id`
+- `src/components/distributions/TransferStatusTracker.tsx` - تحديث نوع الأيقونة
+- `src/components/distributions/PaymentVoucherDialog.tsx` - type casting محدد
+- `src/components/funds/tabs/DistributionsTab.tsx` - `unknown` بدلاً من `any`
+- `src/components/properties/tabs/ContractsTab.tsx` - `unknown` في render
+- `src/components/properties/tabs/MaintenanceTab.tsx` - `unknown` في render
+- `src/components/properties/tabs/PropertiesTab.tsx` - `unknown` في render
+- `src/components/beneficiary/ProfileRequestsHistory.tsx` - `BeneficiaryRequest[]`
+- `src/components/beneficiary/ProfileTimeline.tsx` - `BeneficiaryRequest` type
+- `src/components/beneficiary/BeneficiaryPropertiesTab.tsx` - `ContractWithProperty`
+- `src/components/beneficiary/RequestDetailsDialog.tsx` - `RequestWithDetails`
+- `src/components/invoices/AddInvoiceDialog.tsx` - `InvoiceFormData`
+- `src/components/invoices/InvoiceManager.tsx` - `BadgeVariant` typing
+- `src/components/developer/ComponentInspector.tsx` - `ElementInfoData` interface
+- `src/components/documentation/PhaseCard.tsx` - type casting للـ status
+- `src/components/families/FamilyTreeView.tsx` - `as never` للـ Supabase
+- `src/components/funds/SimulationDialog.tsx` - type casting محدد
+- `src/components/messages/MessageCenter.tsx` - تحديث نوع الأيقونة
+- `src/components/settings/ActiveSessionsDialog.tsx` - `SessionData` interface
+- `src/components/unified/UnifiedDataTable.tsx` - Generic type refinement
+- `src/components/unified/UnifiedFormField.tsx` - `ControllerRenderProps`
+- `src/components/ui/chart.tsx` - `eslint-disable` للـ recharts
+- `src/pages/TestPhase5.tsx` - تحديث نوع الأيقونة
+- `src/pages/TestPhase6.tsx` - `specialization` كـ array
+- `src/pages/TestPhase7.tsx` - `processing_time_ms`
+- `src/pages/RolesManagement.tsx` - تعريف أنواع محددة
+- `src/pages/ComprehensiveTestingDashboard.tsx` - `SeedResult`, `TestPhase`
+- `src/pages/TransparencySettings.tsx` - `handleToggle` typing
+- `src/pages/BeneficiaryReports.tsx` - type casting
+- `src/pages/TestDataManager.tsx` - إزالة `any` من reduce
+- `src/pages/PaymentVouchers.tsx` - تحديث نوع الأيقونة
+
+#### الأنواع الجديدة
+- `src/types/table-rows.ts` - 20+ نوع لصفوف الجداول
+- `src/types/accounting.ts` - أنواع المحاسبة
+- `src/types/auth.ts` - أنواع المصادقة
+- `src/types/errors.ts` - أنواع الأخطاء
+- `src/types/alerts.ts` - أنواع التنبيهات
+- `src/types/activity.ts` - أنواع النشاط
+- `src/types/reports.types.ts` - أنواع التقارير
+
+### 📚 التوثيق
+- إنشاء `docs/FIXES_AND_PHASES_DOCUMENTATION.md` - توثيق شامل للإصلاحات
+- تحديث `docs/TYPE_SAFETY_GUIDE.md` - دليل الأمان النوعي
+- تحديث `docs/CHANGELOG.md` - سجل التغييرات
+
+---
+
 ## النسخة 2.1.0 - 2025-01-XX
 
 ### ✨ ميزات جديدة

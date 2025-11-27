@@ -176,10 +176,57 @@ const externalLibData: any = externalLib.getData();
 
 ## 📊 إحصائيات الإصلاح
 
-- **الملفات المُصلحة:** 50+
-- **استخدامات `any` المُزالة:** 100+
-- **الأنواع الجديدة المُضافة:** 40+
-- **Type Guards المُضافة:** 10+
+| المقياس | القيمة |
+|---------|--------|
+| **الملفات المُصلحة** | 50+ |
+| **استخدامات `any` المُزالة** | 100+ |
+| **الأنواع الجديدة المُضافة** | 40+ |
+| **Type Guards المُضافة** | 10+ |
+| **مكونات محدثة** | 35+ |
+| **صفحات محدثة** | 15+ |
+
+## 📁 الملفات المُصلحة بالتفصيل
+
+### مكونات المحاسبة
+- `FinancialReports.tsx` - استبدال `any` بـ `Account`
+- `DetailedGeneralLedger.tsx` - `GeneralLedgerEntryRow`
+- `FinancialRatiosReport.tsx` - `FinancialRatioKPI` مع `id`
+
+### مكونات التوزيعات
+- `TransferStatusTracker.tsx` - `React.ComponentType<{ className?: string }>`
+- `PaymentVoucherDialog.tsx` - type casting: `"receipt" | "payment" | "journal"`
+- `DistributionsTab.tsx` - `unknown` في render
+
+### مكونات العقارات
+- `ContractsTab.tsx` - `unknown` في render functions
+- `MaintenanceTab.tsx` - `unknown` في render functions
+- `PropertiesTab.tsx` - `unknown` في render functions
+- `AIAssistantDialog.tsx` - `PropertyData` interface
+- `PropertyAnalyticsCard.tsx` - typed props
+- `RentalPaymentDialog.tsx` - `status: undefined as string | undefined`
+
+### مكونات المستفيدين
+- `ProfileRequestsHistory.tsx` - `BeneficiaryRequest[]`
+- `ProfileTimeline.tsx` - `BeneficiaryRequest` type
+- `BeneficiaryPropertiesTab.tsx` - `ContractWithProperty` interface
+- `RequestDetailsDialog.tsx` - `RequestWithDetails` type
+- `ContractsTable.tsx` - `unknown` في render
+
+### مكونات الفواتير
+- `AddInvoiceDialog.tsx` - `InvoiceFormData`
+- `InvoiceManager.tsx` - `BadgeVariant` typing
+
+### صفحات الاختبار
+- `TestPhase5.tsx` - icon type update
+- `TestPhase6.tsx` - `specialization` as array
+- `TestPhase7.tsx` - `processing_time_ms`
+- `ComprehensiveTestingDashboard.tsx` - `SeedResult`, `TestPhase`
+- `TestDataManager.tsx` - remove `any` from reduce
+
+### مكونات UI الموحدة
+- `UnifiedDataTable.tsx` - Generic `T` refinement
+- `UnifiedFormField.tsx` - `ControllerRenderProps`
+- `chart.tsx` - `eslint-disable` for recharts payload
 
 ## 🔒 فوائد الأمان النوعي
 
