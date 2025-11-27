@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { DistributionDetail } from "@/types/distributions";
+import { DistributionDetail } from "@/types/distribution/index";
 
 export function useDistributionDetails(distributionId?: string) {
   const { data: details = [], isLoading } = useQuery({

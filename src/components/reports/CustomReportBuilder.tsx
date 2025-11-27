@@ -25,7 +25,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import type { CustomReportFilter } from "@/types/reports";
+import type { CustomReportFilter } from "@/types/reports/index";
 import type { Json } from "@/integrations/supabase/types";
 
 export function CustomReportBuilder() {

@@ -10,7 +10,7 @@ import type {
   TribeDataItem, 
   TypeDataItem,
   CityDataItem 
-} from '@/types/reports.types';
+} from '@/types/reports/index';
 
 interface BeneficiaryDistributionReportProps {
   beneficiaries: BeneficiaryReportData[];

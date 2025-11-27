@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { WaqfDistributionSettings } from "@/types/distributions";
+import { WaqfDistributionSettings } from "@/types/distribution/index";
 
 export function useDistributionSettings() {
   const { toast } = useToast();

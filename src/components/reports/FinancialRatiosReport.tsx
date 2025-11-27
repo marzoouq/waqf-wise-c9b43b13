@@ -3,7 +3,7 @@ import { useFinancialAnalytics } from '@/hooks/useFinancialAnalytics';
 import { TrendingUp, TrendingDown, Activity, DollarSign } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import type { FinancialRatioKPI } from '@/types/reports.types';
+import type { FinancialRatioKPI } from '@/types/reports/index';
 
 const ratioInfo: Record<string, { label: string; description: string; goodAbove?: boolean }> = {
   current_ratio: {
