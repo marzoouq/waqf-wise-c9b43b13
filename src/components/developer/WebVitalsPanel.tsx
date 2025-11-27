@@ -135,8 +135,8 @@ export function WebVitalsPanel() {
                 لا توجد بيانات متاحة حالياً
               </p>
             ) : (
-              history.slice(-10).map((entry, index) => (
-                <div key={index} className="flex items-center justify-between text-sm border-b pb-2">
+              history.slice(-10).map((entry) => (
+                <div key={`vital-${entry.timestamp}-${entry.name}`} className="flex items-center justify-between text-sm border-b pb-2">
                   <span className="text-muted-foreground">
                     {new Date(entry.timestamp).toLocaleTimeString('ar-SA')}
                   </span>

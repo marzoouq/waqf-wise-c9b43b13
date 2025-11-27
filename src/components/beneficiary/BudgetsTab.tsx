@@ -184,8 +184,8 @@ export function BudgetsTab() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {budgetData.investments.map((investment, index) => (
-              <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
+            {budgetData.investments.map((investment) => (
+              <div key={`investment-${investment.name}`} className="flex items-center justify-between p-4 border rounded-lg">
                 <div>
                   <h4 className="font-medium">{investment.name}</h4>
                   <p className="text-sm text-muted-foreground">

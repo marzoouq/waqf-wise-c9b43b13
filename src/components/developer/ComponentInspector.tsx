@@ -218,8 +218,8 @@ export function ComponentInspector() {
                 <div>
                   <h3 className="font-semibold mb-2">الخصائص</h3>
                   <div className="space-y-1 text-sm font-mono">
-                    {elementInfo.attributes.map((attr: ElementAttribute, index: number) => (
-                      <div key={index} className="flex justify-between border-b pb-1">
+                    {elementInfo.attributes.map((attr: ElementAttribute) => (
+                      <div key={`attr-${attr.name}`} className="flex justify-between border-b pb-1">
                         <span className="text-muted-foreground">{attr.name}:</span>
                         <span
                           className="cursor-pointer hover:text-primary max-w-xs truncate"

@@ -301,9 +301,9 @@ const KnowledgeBase = () => {
                   "قالب تقرير مالي",
                   "نموذج عقد إيجار",
                   "دليل المحاسب السريع"
-                ].map((item, index) => (
+                ].map((item) => (
                   <div 
-                    key={index}
+                    key={`download-${item}`}
                     className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
                   >
                     <div className="flex items-center gap-3">

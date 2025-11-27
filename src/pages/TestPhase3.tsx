@@ -85,8 +85,8 @@ export default function TestPhase3() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {phase3Features.map((feature, index) => (
-              <Card key={index}>
+            {phase3Features.map((feature) => (
+              <Card key={`feature-${feature.title}`}>
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
                     <CardTitle className="text-sm font-medium">

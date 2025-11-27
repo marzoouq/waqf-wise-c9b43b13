@@ -170,8 +170,8 @@ export default function SystemMaintenance() {
                       <AlertDescription>
                         <strong>أخطاء:</strong>
                         <ul className="list-disc list-inside mt-2">
-                          {result.errors.map((error: string, index: number) => (
-                            <li key={index} className="text-sm">{error}</li>
+                          {result.errors.map((error: string) => (
+                            <li key={`error-${error}`} className="text-sm">{error}</li>
                           ))}
                         </ul>
                       </AlertDescription>
