@@ -1,11 +1,49 @@
+/**
+ * أدوات تصدير التقارير للمطورين
+ */
+
+// أنواع البيانات المدعومة للتصدير
+interface ExportableRecord {
+  [key: string]: string | number | boolean | null | undefined;
+}
+
 interface ExportData {
   timestamp: string;
   type: string;
-  data: any[];
+  data: ExportableRecord[];
+}
+
+interface WebVitalsData {
+  lcp?: number;
+  lcp_rating?: string;
+  fcp?: number;
+  fcp_rating?: string;
+  cls?: number;
+  cls_rating?: string;
+  inp?: number;
+  inp_rating?: string;
+  ttfb?: number;
+  ttfb_rating?: string;
+}
+
+interface NetworkRequest {
+  method: string;
+  url: string;
+  status: number;
+  duration: number;
+  timestamp: number;
+}
+
+interface ErrorLog {
+  error_type: string;
+  error_message: string;
+  severity: string;
+  status: string;
+  created_at: string;
 }
 
 export const reportExporter = {
-  exportToJSON: (data: any[], filename: string = 'report') => {
+  exportToJSON: (data: ExportableRecord[], filename: string = 'report') => {
     const exportData: ExportData = {
       timestamp: new Date().toISOString(),
       type: 'json',
@@ -19,7 +57,7 @@ export const reportExporter = {
     downloadBlob(blob, `${filename}-${Date.now()}.json`);
   },
 
-  exportToCSV: (data: any[], filename: string = 'report') => {
+  exportToCSV: (data: ExportableRecord[], filename: string = 'report') => {
     if (!data || data.length === 0) {
       throw new Error('No data to export');
     }
@@ -48,13 +86,13 @@ export const reportExporter = {
     downloadBlob(blob, `${filename}-${Date.now()}.csv`);
   },
 
-  exportWebVitals: (vitals: any) => {
-    const data = [
-      { metric: 'LCP', value: vitals.lcp, rating: vitals.lcp_rating, unit: 'ms' },
-      { metric: 'FCP', value: vitals.fcp, rating: vitals.fcp_rating, unit: 'ms' },
-      { metric: 'CLS', value: vitals.cls, rating: vitals.cls_rating, unit: '' },
-      { metric: 'INP', value: vitals.inp, rating: vitals.inp_rating, unit: 'ms' },
-      { metric: 'TTFB', value: vitals.ttfb, rating: vitals.ttfb_rating, unit: 'ms' },
+  exportWebVitals: (vitals: WebVitalsData) => {
+    const data: ExportableRecord[] = [
+      { metric: 'LCP', value: vitals.lcp ?? 0, rating: vitals.lcp_rating ?? '', unit: 'ms' },
+      { metric: 'FCP', value: vitals.fcp ?? 0, rating: vitals.fcp_rating ?? '', unit: 'ms' },
+      { metric: 'CLS', value: vitals.cls ?? 0, rating: vitals.cls_rating ?? '', unit: '' },
+      { metric: 'INP', value: vitals.inp ?? 0, rating: vitals.inp_rating ?? '', unit: 'ms' },
+      { metric: 'TTFB', value: vitals.ttfb ?? 0, rating: vitals.ttfb_rating ?? '', unit: 'ms' },
     ];
 
     return {
@@ -63,8 +101,8 @@ export const reportExporter = {
     };
   },
 
-  exportNetworkStats: (requests: any[]) => {
-    const data = requests.map(req => ({
+  exportNetworkStats: (requests: NetworkRequest[]) => {
+    const data: ExportableRecord[] = requests.map(req => ({
       method: req.method,
       url: req.url,
       status: req.status,
@@ -78,8 +116,8 @@ export const reportExporter = {
     };
   },
 
-  exportErrors: (errors: any[]) => {
-    const data = errors.map(err => ({
+  exportErrors: (errors: ErrorLog[]) => {
+    const data: ExportableRecord[] = errors.map(err => ({
       type: err.error_type,
       message: err.error_message,
       severity: err.severity,

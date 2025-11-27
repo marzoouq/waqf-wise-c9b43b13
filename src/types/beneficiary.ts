@@ -1,4 +1,4 @@
-import { Database } from "@/integrations/supabase/types";
+import type { Json } from "@/integrations/supabase/types";
 
 // Notification preferences interface
 export interface NotificationPreferences {
@@ -10,6 +10,50 @@ export interface NotificationPreferences {
   payment_alerts?: boolean;
   request_updates?: boolean;
   general_announcements?: boolean;
+}
+
+// مستندات التحقق
+export interface VerificationDocument {
+  id?: string;
+  type: string;
+  name: string;
+  url?: string;
+  uploadedAt?: string;
+  verified?: boolean;
+}
+
+// تفاصيل الحالة الاجتماعية
+export interface SocialStatusDetails {
+  marital_status?: string;
+  spouse_name?: string;
+  spouse_occupation?: string;
+  dependents_count?: number;
+  living_situation?: string;
+  [key: string]: string | number | boolean | undefined;
+}
+
+// مصادر الدخل
+export interface IncomeSource {
+  source: string;
+  amount: number;
+  frequency?: string;
+  notes?: string;
+}
+
+// الإعاقات
+export interface Disability {
+  type: string;
+  severity?: string;
+  description?: string;
+  needs_assistance?: boolean;
+}
+
+// الحالات الطبية
+export interface MedicalCondition {
+  condition: string;
+  severity?: string;
+  treatment?: string;
+  diagnosed_date?: string;
 }
 
 // Full Beneficiary interface for application use
@@ -54,7 +98,7 @@ export interface Beneficiary {
   last_notification_at: string | null;
   beneficiary_number: string | null;
   beneficiary_type: string | null;
-  verification_documents: any | null;
+  verification_documents: Json | null;
   verification_notes: string | null;
   last_verification_date: string | null;
   verification_method: string | null;
@@ -63,10 +107,10 @@ export interface Beneficiary {
   eligibility_notes: string | null;
   last_review_date: string | null;
   next_review_date: string | null;
-  social_status_details: any | null;
-  income_sources: any | null;
-  disabilities: any | null;
-  medical_conditions: any | null;
+  social_status_details: Json | null;
+  income_sources: Json | null;
+  disabilities: Json | null;
+  medical_conditions: Json | null;
   created_at: string;
   updated_at: string;
 }
@@ -99,4 +143,30 @@ export interface BeneficiaryFormData {
   employmentStatus?: string;
   housingType?: string;
   notes?: string;
+}
+
+// Helper functions for type conversion
+export function parseVerificationDocuments(data: Json | null): VerificationDocument[] {
+  if (!data || !Array.isArray(data)) return [];
+  return data as unknown as VerificationDocument[];
+}
+
+export function parseSocialStatusDetails(data: Json | null): SocialStatusDetails | null {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return null;
+  return data as unknown as SocialStatusDetails;
+}
+
+export function parseIncomeSources(data: Json | null): IncomeSource[] {
+  if (!data || !Array.isArray(data)) return [];
+  return data as unknown as IncomeSource[];
+}
+
+export function parseDisabilities(data: Json | null): Disability[] {
+  if (!data || !Array.isArray(data)) return [];
+  return data as unknown as Disability[];
+}
+
+export function parseMedicalConditions(data: Json | null): MedicalCondition[] {
+  if (!data || !Array.isArray(data)) return [];
+  return data as unknown as MedicalCondition[];
 }

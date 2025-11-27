@@ -1,6 +1,23 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { handleError, showSuccess } from '@/lib/errors';
+import type { Json } from '@/integrations/supabase/types';
+
+// أنواع مساعدة لقراءة البيانات
+export interface VerificationData {
+  national_id?: string;
+  document_type?: string;
+  issue_date?: string;
+  [key: string]: string | number | boolean | undefined;
+}
+
+export interface VerificationDocument {
+  id?: string;
+  name: string;
+  type: string;
+  url?: string;
+  verified?: boolean;
+}
 
 interface IdentityVerification {
   id: string;
@@ -8,13 +25,38 @@ interface IdentityVerification {
   verification_type: string;
   verification_method: string;
   verification_status: string;
-  verification_data: any;
+  verification_data: Json | null;
   verified_by: string | null;
   verified_at: string | null;
   expiry_date: string | null;
   notes: string | null;
-  documents: any;
+  documents: Json | null;
   created_at: string;
+}
+
+// نوع الإدخال للتحقق الجديد
+interface CreateVerificationInput {
+  beneficiary_id: string;
+  verification_type: string;
+  verification_method: string;
+  verification_status?: string;
+  verification_data?: Json;
+  verified_by?: string;
+  verified_at?: string;
+  expiry_date?: string;
+  notes?: string;
+  documents?: Json;
+}
+
+// دوال مساعدة للتحويل
+export function parseVerificationData(data: Json | null): VerificationData | null {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return null;
+  return data as unknown as VerificationData;
+}
+
+export function parseVerificationDocuments(data: Json | null): VerificationDocument[] {
+  if (!data || !Array.isArray(data)) return [];
+  return data as unknown as VerificationDocument[];
 }
 
 /**
@@ -34,14 +76,14 @@ export function useIdentityVerification(beneficiaryId: string) {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data as IdentityVerification[];
+      return (data || []) as IdentityVerification[];
     },
     enabled: !!beneficiaryId,
   });
 
   // إنشاء تحقق جديد
   const createVerification = useMutation({
-    mutationFn: async (verification: Omit<IdentityVerification, 'id' | 'created_at' | 'updated_at'>) => {
+    mutationFn: async (verification: CreateVerificationInput) => {
       const { data, error } = await supabase
         .from('identity_verifications')
         .insert([verification])

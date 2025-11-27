@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useProjectDocumentation } from "@/hooks/useProjectDocumentation";
+import { useProjectDocumentation, parseTasks } from "@/hooks/useProjectDocumentation";
 import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
 import { PhaseCard } from "@/components/documentation/PhaseCard";
 import { PhaseFilter } from "@/components/documentation/PhaseFilter";
@@ -116,15 +116,18 @@ export default function ProjectDocumentation() {
               <Skeleton className="h-[600px] w-full" />
             ) : phases && phases.length > 0 ? (
               <ProgressSummary
-                phases={phases.map((p) => ({
-                  phase_number: p.phase_number,
-                  phase_name: p.phase_name,
-                  category: p.category,
-                  status: p.status,
-                  completion_percentage: p.completion_percentage,
-                  completed_tasks: p.tasks.filter((t: any) => t.completed).length,
-                  total_tasks: p.tasks.length,
-                }))}
+                phases={phases.map((p) => {
+                  const tasks = parseTasks(p.tasks);
+                  return {
+                    phase_number: p.phase_number,
+                    phase_name: p.phase_name,
+                    category: p.category,
+                    status: p.status,
+                    completion_percentage: p.completion_percentage,
+                    completed_tasks: tasks.filter((t) => t.completed).length,
+                    total_tasks: tasks.length,
+                  };
+                })}
               />
             ) : (
               <div className="text-center py-12">

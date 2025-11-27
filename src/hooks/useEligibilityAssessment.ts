@@ -2,13 +2,21 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { handleError, showSuccess } from '@/lib/errors';
 
+interface CriteriaScores {
+  income?: number;
+  family_size?: number;
+  needs?: number;
+  verification?: number;
+  [key: string]: number | undefined;
+}
+
 interface EligibilityAssessment {
   id: string;
   beneficiary_id: string;
   assessment_date: string;
   total_score: number;
   eligibility_status: string;
-  criteria_scores: any;
+  criteria_scores: CriteriaScores;
   recommendations: string | null;
   assessed_by: string | null;
   created_at: string;

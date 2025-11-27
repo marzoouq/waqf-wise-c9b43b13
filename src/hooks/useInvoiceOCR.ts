@@ -114,8 +114,8 @@ export const useInvoiceOCR = () => {
         data: data.data,
         imageUrl: uploadedImageUrl,
       };
-    } catch (err: any) {
-      const errorMessage = err.message || 'حدث خطأ أثناء معالجة الصورة';
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'حدث خطأ أثناء معالجة الصورة';
       setError(errorMessage);
       toast.error(errorMessage);
       return {

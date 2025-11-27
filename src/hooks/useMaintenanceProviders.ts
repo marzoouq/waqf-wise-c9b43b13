@@ -39,7 +39,7 @@ export function useMaintenanceProviders() {
   });
 
   const addProvider = useMutation({
-    mutationFn: async (provider: any) => {
+    mutationFn: async (provider: Omit<MaintenanceProvider, 'id' | 'created_at' | 'updated_at'>) => {
       const { data, error } = await supabase
         .from("maintenance_providers")
         .insert([provider])
