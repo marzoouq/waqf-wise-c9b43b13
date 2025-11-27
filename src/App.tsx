@@ -71,7 +71,6 @@ const BeneficiaryRequests = lazy(() => import("./pages/BeneficiaryRequests"));
 const BeneficiaryAccountStatement = lazy(() => import("./pages/BeneficiaryAccountStatement"));
 const BeneficiaryReports = lazy(() => import("./pages/BeneficiaryReports"));
 const StaffRequestsManagement = lazy(() => import("./pages/StaffRequestsManagement"));
-const LoansManagement = lazy(() => import("./pages/LoansManagement"));
 const EmergencyAidManagement = lazy(() => import("./pages/EmergencyAidManagement"));
 const NotificationSettingsPage = lazy(() => import("./pages/NotificationSettings"));
 const CustomReportsPage = lazy(() => import("./pages/CustomReports"));
@@ -99,11 +98,6 @@ const GovernanceDecisions = lazy(() => import("./pages/GovernanceDecisions"));
 const DecisionDetails = lazy(() => import("./pages/DecisionDetails"));
 const RolesManagement = lazy(() => import("./pages/RolesManagement"));
 const KnowledgeBase = lazy(() => import("./pages/KnowledgeBase"));
-const TestPhase3 = lazy(() => import("./pages/TestPhase3"));
-const TestPhase4 = lazy(() => import("./pages/TestPhase4"));
-const TestPhase5 = lazy(() => import("./pages/TestPhase5"));
-const TestPhase6 = lazy(() => import("./pages/TestPhase6"));
-const TestPhase7 = lazy(() => import("./pages/TestPhase7"));
 const TestDataManager = lazy(() => import("./pages/TestDataManager"));
 const ComprehensiveTestingDashboard = lazy(() => import("./pages/ComprehensiveTestingDashboard"));
 const DeveloperGuide = lazy(() => import("./pages/DeveloperGuide"));
@@ -438,14 +432,6 @@ const App = () => {
           />
           <Route path="/requests" element={<Requests />} />
           <Route 
-            path="/loans" 
-            element={
-              <ProtectedRoute requiredRoles={["admin", "nazer", "accountant", "cashier"]}>
-                <LoansManagement />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
             path="/emergency-aid" 
             element={
               <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
@@ -570,40 +556,6 @@ const App = () => {
                 <Route path="/knowledge-base" element={<KnowledgeBase />} />
                 
                 {/* Testing Pages */}
-                <Route 
-                  path="/test-phase3" 
-                  element={
-                    <ProtectedRoute requiredRole="admin">
-                      <TestPhase3 />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/test-phase4" 
-                  element={
-                    <ProtectedRoute requiredRole="admin">
-                      <TestPhase4 />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/test-phase5" 
-                  element={
-                    <TestPhase5 />
-                  } 
-                />
-                <Route 
-                  path="/test-phase6" 
-                  element={
-                    <TestPhase6 />
-                  } 
-                />
-                <Route 
-                  path="/test-phase7" 
-                  element={
-                    <TestPhase7 />
-                  } 
-                />
                 <Route 
                   path="/test-data-manager" 
                   element={
