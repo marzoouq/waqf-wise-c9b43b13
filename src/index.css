@@ -2,34 +2,45 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* 
+ * نظام التصميم - النسخة 2.2.0
+ * Design System v2.2.0
+ * جميع الألوان بصيغة HSL
+ */
 
 @layer base {
   :root {
+    /* ألوان الخلفية والنص */
     --background: 48 20% 97%;
     --foreground: 150 25% 15%;
 
+    /* البطاقات */
     --card: 0 0% 100%;
     --card-foreground: 150 25% 15%;
 
+    /* النوافذ المنبثقة */
     --popover: 0 0% 100%;
     --popover-foreground: 150 25% 15%;
 
+    /* اللون الأساسي */
     --primary: 150 45% 35%;
     --primary-foreground: 0 0% 100%;
     --primary-hover: 150 50% 30%;
+    --primary-light: 150 45% 95%;
 
+    /* اللون الثانوي */
     --secondary: 150 25% 92%;
     --secondary-foreground: 150 45% 25%;
 
+    /* ألوان خافتة */
     --muted: 48 15% 94%;
     --muted-foreground: 150 10% 45%;
 
+    /* لون التمييز */
     --accent: 43 90% 55%;
     --accent-foreground: 150 30% 20%;
 
+    /* ألوان الحالة */
     --success: 150 60% 45%;
     --success-foreground: 0 0% 100%;
     --success-light: 150 60% 95%;
@@ -46,12 +57,15 @@ All colors MUST be HSL.
     --info-foreground: 0 0% 100%;
     --info-light: 210 100% 95%;
 
+    /* الحدود والإدخال */
     --border: 150 15% 88%;
     --input: 150 15% 90%;
     --ring: 150 45% 35%;
 
+    /* نصف القطر */
     --radius: 0.75rem;
 
+    /* الشريط الجانبي */
     --sidebar-background: 150 40% 20%;
     --sidebar-foreground: 150 15% 95%;
     --sidebar-primary: 150 50% 40%;
@@ -61,16 +75,33 @@ All colors MUST be HSL.
     --sidebar-border: 150 30% 25%;
     --sidebar-ring: 150 50% 50%;
 
-    /* Custom Properties */
+    /* التدرجات */
     --gradient-primary: linear-gradient(135deg, hsl(150 45% 35%), hsl(150 55% 45%));
     --gradient-accent: linear-gradient(135deg, hsl(43 90% 55%), hsl(38 92% 50%));
     --gradient-hero: linear-gradient(135deg, hsl(150 50% 25%), hsl(150 45% 35%));
+    --gradient-success: linear-gradient(135deg, hsl(150 60% 40%), hsl(150 65% 50%));
+    --gradient-warning: linear-gradient(135deg, hsl(38 92% 45%), hsl(43 90% 55%));
+    --gradient-destructive: linear-gradient(135deg, hsl(0 72% 46%), hsl(0 72% 56%));
+    --gradient-glass: linear-gradient(135deg, hsl(0 0% 100% / 0.1), hsl(0 0% 100% / 0.05));
     
+    /* الظلال */
     --shadow-soft: 0 2px 8px hsl(150 30% 20% / 0.08);
     --shadow-medium: 0 4px 16px hsl(150 30% 20% / 0.12);
     --shadow-strong: 0 8px 32px hsl(150 30% 20% / 0.16);
+    --shadow-glow: 0 0 20px hsl(150 45% 35% / 0.3);
     
+    /* الانتقالات */
+    --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* المسافات */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
   }
 
   .dark {
@@ -86,6 +117,7 @@ All colors MUST be HSL.
     --primary: 150 50% 45%;
     --primary-foreground: 0 0% 100%;
     --primary-hover: 150 55% 50%;
+    --primary-light: 150 50% 20%;
 
     --secondary: 150 20% 20%;
     --secondary-foreground: 150 15% 95%;
@@ -124,6 +156,9 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 150 15% 90%;
     --sidebar-border: 150 25% 20%;
     --sidebar-ring: 150 55% 55%;
+
+    --gradient-glass: linear-gradient(135deg, hsl(0 0% 100% / 0.05), hsl(0 0% 100% / 0.02));
+    --shadow-glow: 0 0 20px hsl(150 50% 45% / 0.3);
   }
 }
 
@@ -131,16 +166,27 @@ All colors MUST be HSL.
   * {
     @apply border-border;
   }
-  body {
-    @apply bg-background text-foreground;
+  
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    font-feature-settings: "liga" 1, "calt" 1;
   }
-}
+  
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Cairo', system-ui, sans-serif;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 
-/* Smooth scrolling for the entire app */
-html {
-  scroll-behavior: smooth;
-  -webkit-text-size-adjust: 100%;
-  text-size-adjust: 100%;
+  /* تحسين الخطوط العربية */
+  :lang(ar) {
+    font-family: 'Cairo', 'Noto Sans Arabic', system-ui, sans-serif;
+    line-height: 1.8;
+  }
 }
 
 /* Custom scrollbar styles */
