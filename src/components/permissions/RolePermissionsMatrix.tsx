@@ -73,7 +73,7 @@ export function RolePermissionsMatrix({ role, permissions }: RolePermissionsMatr
       });
       setModifications(new Map());
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "خطأ",
         description: error.message || "فشل تحديث الصلاحيات",

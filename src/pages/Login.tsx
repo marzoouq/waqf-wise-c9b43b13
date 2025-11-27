@@ -54,10 +54,11 @@ export default function Login() {
         description: 'مرحباً بك في منصة إدارة الوقف',
       });
       navigate('/dashboard');
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'البيانات المدخلة غير صحيحة';
       toast({
         title: 'خطأ في تسجيل الدخول',
-        description: error.message || 'البيانات المدخلة غير صحيحة',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {

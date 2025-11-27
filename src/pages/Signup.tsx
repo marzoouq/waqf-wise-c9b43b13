@@ -48,10 +48,11 @@ export default function Signup() {
         description: 'يمكنك الآن تسجيل الدخول',
       });
       navigate('/login');
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'حدث خطأ أثناء إنشاء الحساب';
       toast({
         title: 'خطأ في إنشاء الحساب',
-        description: error.message || 'حدث خطأ أثناء إنشاء الحساب',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {

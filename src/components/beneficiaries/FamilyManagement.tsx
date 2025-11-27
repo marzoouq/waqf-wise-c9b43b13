@@ -81,7 +81,7 @@ export function FamilyManagement() {
         description: 'تم إنشاء العائلة بنجاح',
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: 'خطأ',
         description: error.message || 'فشل إنشاء العائلة',

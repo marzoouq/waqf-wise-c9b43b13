@@ -63,7 +63,7 @@ export function EligibilityAssessmentDialog({
         description: `تم تقييم أهلية المستفيد: ${data.status}`,
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: 'خطأ في التقييم',
         description: error.message || 'فشل تقييم الأهلية',

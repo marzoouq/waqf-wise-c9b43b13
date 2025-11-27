@@ -115,7 +115,7 @@ const PermissionsManagement = () => {
       });
       setModifications(new Map());
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "خطأ",
         description: error.message || "فشل تحديث الصلاحيات",

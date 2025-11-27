@@ -10,6 +10,8 @@ import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
 import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
+import type { EmergencyAid } from "@/types/loans";
+import type { BadgeVariantMap } from "@/types/table-rows";
 
 export default function EmergencyAidManagement() {
   const { emergencyAids, isLoading } = useEmergencyAid();
@@ -22,11 +24,11 @@ export default function EmergencyAidManagement() {
     totalAmount: emergencyAids.reduce((sum, a) => sum + a.amount, 0),
   };
 
-  const columns: Column<any>[] = [
+  const columns: Column<EmergencyAid>[] = [
     {
       key: "beneficiaries",
       label: "المستفيد",
-      render: (_: any, row: any) => row.beneficiaries?.full_name || 'غير محدد'
+      render: (_: unknown, row: EmergencyAid) => row.beneficiaries?.full_name || 'غير محدد'
     },
     {
       key: "amount",
@@ -44,7 +46,7 @@ export default function EmergencyAidManagement() {
       key: "urgency_level",
       label: "الأولوية",
       render: (value: string) => {
-        const variants: Record<string, any> = {
+        const variants: BadgeVariantMap = {
           critical: 'destructive',
           high: 'default',
           medium: 'secondary',
@@ -63,7 +65,7 @@ export default function EmergencyAidManagement() {
       key: "status",
       label: "الحالة",
       render: (value: string) => {
-        const variants: Record<string, any> = {
+        const variants: BadgeVariantMap = {
           pending: 'outline',
           approved: 'default',
           rejected: 'destructive',

@@ -103,7 +103,7 @@ export function UserPermissionsOverride({ userId, userName }: UserPermissionsOve
       setSelectedPermission(null);
       setOverrideNotes("");
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "خطأ",
         description: error.message || "فشل إضافة استثناء الصلاحية",
@@ -131,7 +131,7 @@ export function UserPermissionsOverride({ userId, userName }: UserPermissionsOve
         description: "تم إزالة استثناء الصلاحية بنجاح",
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "خطأ",
         description: error.message || "فشل إزالة استثناء الصلاحية",

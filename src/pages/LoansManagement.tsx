@@ -3,13 +3,14 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, DollarSign, TrendingUp, AlertCircle, CheckCircle } from "lucide-react";
-import { useLoans } from "@/hooks/useLoans";
+import { useLoans, type Loan } from "@/hooks/useLoans";
 import { UnifiedDataTable, type Column } from "@/components/unified/UnifiedDataTable";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
 import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
+import type { BadgeVariantMap } from "@/types/table-rows";
 
 export default function LoansManagement() {
   const { loans, isLoading } = useLoans();
@@ -22,7 +23,7 @@ export default function LoansManagement() {
     totalAmount: loans.reduce((sum, l) => sum + (l.loan_amount || 0), 0),
   };
 
-  const columns: Column<any>[] = [
+  const columns: Column<Loan>[] = [
     {
       key: "loan_number",
       label: "رقم القرض",
@@ -31,7 +32,7 @@ export default function LoansManagement() {
     {
       key: "beneficiaries",
       label: "المستفيد",
-      render: (_: any, row: any) => row.beneficiaries?.full_name || 'غير محدد'
+      render: (_: unknown, row: Loan) => row.beneficiaries?.full_name || 'غير محدد'
     },
     {
       key: "loan_amount",
@@ -66,7 +67,7 @@ export default function LoansManagement() {
       key: "status",
       label: "الحالة",
       render: (value: string) => {
-        const variants: Record<string, any> = {
+        const variants: BadgeVariantMap = {
           'نشط': 'default',
           'مسدد': 'secondary',
           'متأخر': 'destructive',

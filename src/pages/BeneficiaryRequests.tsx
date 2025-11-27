@@ -113,7 +113,7 @@ export default function BeneficiaryRequests() {
         description: '',
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error(error.message || 'فشل تقديم الطلب');
     },
   });

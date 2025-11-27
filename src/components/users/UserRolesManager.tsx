@@ -37,6 +37,7 @@ export function UserRolesManager({ userId }: { userId: string }) {
     mutationFn: async (role: RoleName) => {
       const { error } = await supabase
         .from('user_roles')
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .insert({ user_id: userId, role: role as any });
 
       if (error) throw error;
@@ -48,7 +49,7 @@ export function UserRolesManager({ userId }: { userId: string }) {
         description: 'تم إضافة الدور بنجاح',
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: 'خطأ',
         description: error.message || 'فشل إضافة الدور',
@@ -64,6 +65,7 @@ export function UserRolesManager({ userId }: { userId: string }) {
         .from('user_roles')
         .delete()
         .eq('user_id', userId)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .eq('role', role as any);
 
       if (error) throw error;
@@ -75,7 +77,7 @@ export function UserRolesManager({ userId }: { userId: string }) {
         description: 'تم حذف الدور بنجاح',
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: 'خطأ',
         description: error.message || 'فشل حذف الدور',
