@@ -62,7 +62,7 @@ const AccountingStats = () => {
         const Icon = stat.icon;
         return (
           <Card
-            key={index}
+            key={`stat-${stat.title}`}
             className="shadow-soft hover:shadow-lg transition-all duration-300 cursor-pointer group"
           >
             <CardHeader className="pb-2 sm:pb-3">

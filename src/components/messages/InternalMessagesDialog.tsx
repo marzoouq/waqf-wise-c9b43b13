@@ -56,8 +56,6 @@ export function InternalMessagesDialog({
         // تحديد الأدوار المتاحة للمراسلة بناءً على دور المستخدم
         let allowedRoles: ('accountant' | 'admin' | 'archivist' | 'beneficiary' | 'cashier' | 'nazer' | 'user')[];
         
-        console.log('📌 Current user role:', currentUserRole?.role);
-        
         if (currentUserRole?.role === 'beneficiary') {
           // المستفيد يمكنه مراسلة الناظر والمشرف فقط
           allowedRoles = ['admin', 'nazer'];
@@ -65,8 +63,6 @@ export function InternalMessagesDialog({
           // الإداريون يمكنهم مراسلة الجميع
           allowedRoles = ['admin', 'nazer', 'accountant', 'cashier', 'beneficiary', 'archivist'];
         }
-        
-        console.log('📌 Allowed roles:', allowedRoles);
         
         const { data: userRoles, error: rolesError } = await supabase
           .from('user_roles')
@@ -76,12 +72,9 @@ export function InternalMessagesDialog({
 
         if (rolesError) throw rolesError;
         
-        console.log('📌 User roles found:', userRoles?.length, userRoles);
 
         if (userRoles && userRoles.length > 0) {
           const userIds = userRoles.map(ur => ur.user_id);
-          
-          console.log('📌 User IDs to fetch profiles for:', userIds.length);
           
           // جلب بيانات المستخدمين
           const { data: profiles, error: profilesError } = await supabase
@@ -90,8 +83,6 @@ export function InternalMessagesDialog({
             .in('user_id', userIds);
 
           if (profilesError) throw profilesError;
-          
-          console.log('📌 Profiles found:', profiles?.length, profiles);
 
           // دمج البيانات وترجمة الأدوار
           const roleTranslations: Record<string, string> = {
@@ -130,10 +121,8 @@ export function InternalMessagesDialog({
             return a.name.localeCompare(b.name, 'ar');
           }) || [];
 
-          console.log('📧 Recipients loaded:', recipientsList.length, recipientsList);
           setRecipients(recipientsList);
         } else {
-          console.log('⚠️ No user roles found');
           setRecipients([]);
         }
       } catch (error) {

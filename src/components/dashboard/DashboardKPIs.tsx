@@ -23,7 +23,7 @@ export function DashboardKPIs({ kpis }: DashboardKPIsProps) {
       {kpis.map((kpi, index) => {
         const Icon = kpi.icon;
         return (
-          <Card key={index}>
+          <Card key={`kpi-${kpi.title}`}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>

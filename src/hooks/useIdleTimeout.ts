@@ -27,7 +27,6 @@ export function useIdleTimeout({ onIdle, idleTime, enabled }: UseIdleTimeoutOpti
 
     // إنشاء مؤقت جديد
     timeoutRef.current = setTimeout(() => {
-      console.log('⏰ انتهت مهلة الخمول - سيتم تسجيل الخروج');
       onIdle();
     }, idleTime);
   }, [enabled, idleTime, onIdle]);
@@ -59,8 +58,6 @@ export function useIdleTimeout({ onIdle, idleTime, enabled }: UseIdleTimeoutOpti
       window.addEventListener(event, handleActivity, { passive: true });
     });
 
-    console.log(`✅ نظام الخروج التلقائي مفعّل: ${idleTime / 1000} ثانية`);
-
     // التنظيف
     return () => {
       events.forEach(event => {
@@ -71,8 +68,6 @@ export function useIdleTimeout({ onIdle, idleTime, enabled }: UseIdleTimeoutOpti
         clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
       }
-
-      console.log('🧹 تم تنظيف نظام الخروج التلقائي');
     };
   }, [enabled, handleActivity, resetTimer, idleTime]);
 
