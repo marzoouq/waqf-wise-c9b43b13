@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 import { errorTracker } from '@/lib/errors';
-import { debug } from '@/lib/debug';
+import { productionLogger } from '@/lib/logger/production-logger';
 
 interface Props {
   children: ReactNode;
@@ -52,7 +52,7 @@ export class SelfHealingComponent extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    debug.warn('Component error caught:', { error, errorInfo });
+    productionLogger.warn('Component error caught', { error, errorInfo });
 
     // تسجيل الخطأ
     errorTracker.logError(
@@ -82,7 +82,7 @@ export class SelfHealingComponent extends Component<Props, State> {
   private scheduleRetry = (): void => {
     const delay = this.props.retryDelay || 2000;
     
-    debug.recovery(`Scheduling auto-retry in ${delay}ms...`);
+    productionLogger.info(`Scheduling auto-retry in ${delay}ms...`);
     this.setState({ isRetrying: true });
 
     this.retryTimeoutId = setTimeout(() => {
@@ -91,7 +91,7 @@ export class SelfHealingComponent extends Component<Props, State> {
   };
 
   private handleRetry = (): void => {
-    debug.recovery('Attempting component recovery...');
+    productionLogger.info('Attempting component recovery...');
     
     this.setState((prevState) => ({
       hasError: false,
