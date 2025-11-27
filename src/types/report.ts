@@ -1,37 +1,14 @@
 /**
- * أنواع التقارير
+ * أنواع التقارير - ملف توافقي
+ * @deprecated استخدم @/types/reports/index.ts بدلاً من هذا الملف
+ * 
+ * هذا الملف موجود للتوافق مع الكود القديم فقط
+ * جميع الأنواع الآن في @/types/reports/index.ts
  */
 
-import type { Json } from "@/integrations/supabase/types";
-
-export interface ReportTemplateConfig {
-  layout?: string;
-  columns?: string[];
-  groupBy?: string;
-  sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
-  pageSize?: number;
-  showTotals?: boolean;
-  [key: string]: Json | undefined;
-}
-
-export interface ReportFilters {
-  dateFrom?: string;
-  dateTo?: string;
-  status?: string;
-  category?: string;
-  [key: string]: Json | undefined;
-}
-
-export interface ReportTemplate {
-  id?: string;
-  template_name: string;
-  report_type: string;
-  description?: string;
-  template_config?: Json;
-  filters?: Json;
-  columns?: Json;
-  is_public?: boolean;
-}
-
-export type ReportData = Record<string, unknown>;
+export {
+  type ReportTemplateConfig,
+  type ReportFilters,
+  type ReportTemplate,
+  type ReportData,
+} from './reports/index';
