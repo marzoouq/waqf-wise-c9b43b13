@@ -4,13 +4,21 @@
  */
 
 import { toast } from 'sonner';
-import { errorTracker } from './tracker';
+import { errorTracker, trackError } from './tracker';
 import { getErrorMessage, getErrorTitle } from './messages';
 import type { ErrorContext, ErrorSeverity } from './types';
 
+// تصدير الأنواع
 export * from './types';
+export * from './tracker-types';
 export * from './messages';
-export { errorTracker };
+
+// تصدير الأدوات
+export { shouldIgnoreError, cleanUrl, cleanErrorMessage } from './tracker-utils';
+export { IGNORE_ERROR_PATTERNS, DEFAULT_CONFIG } from './tracker-config';
+
+// تصدير Error Tracker
+export { errorTracker, trackError };
 
 /**
  * معالجة خطأ وعرض toast
