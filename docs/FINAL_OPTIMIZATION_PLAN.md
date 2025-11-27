@@ -141,17 +141,23 @@
 | الجدول | الوصف |
 |--------|-------|
 | `document_versions` | إصدارات المستندات مع trigger تلقائي |
-| `scheduled_reports` | جدولة التقارير الدورية |
+| `scheduled_report_jobs` | جدولة التقارير الدورية |
 
-### Cron Jobs
+### Cron Jobs النشطة (6)
 | الوظيفة | الجدولة | الوصف |
 |---------|---------|-------|
 | `contract-renewal-alerts-daily` | `0 8 * * *` | فحص يومي للعقود المنتهية |
+| `check-contracts-expiring` | `0 9 * * *` | إشعارات انتهاء العقود |
+| `check-rental-payments-due` | `0 9 * * *` | تذكير دفعات الإيجار |
+| `cleanup-alerts-weekly` | `0 3 * * 0` | تنظيف التنبيهات أسبوعياً |
+| `cleanup-old-alerts` | `0 3 * * 0` | حذف التنبيهات القديمة |
+| `daily-system-cleanup` | `0 2 * * *` | تنظيف النظام يومياً |
 
-### React Hooks الجديدة
+### React Hooks الجديدة (4)
 - `useIntelligentSearch` - البحث الذكي مع حفظ السجل
 - `useAutoClassify` - التصنيف التلقائي للمستندات
 - `useDocumentVersions` - إدارة إصدارات المستندات
+- `useScheduledReports` - إدارة التقارير المجدولة
 
 ### المكونات الجديدة
 - `IntelligentSearchBar` - شريط بحث ذكي متقدم
