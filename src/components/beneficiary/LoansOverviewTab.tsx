@@ -161,7 +161,7 @@ export function LoansOverviewTab() {
           </CardHeader>
           <CardContent className="space-y-4">
             {loansData.otherLoans.map((loan, index) => (
-              <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
+              <div key={`loan-${loan.beneficiary}-${index}`} className="flex items-center justify-between p-4 border rounded-lg">
                 <div>
                   <h4 className="font-medium">
                     {settings?.show_other_beneficiaries_names ? loan.beneficiary : "مستفيد آخر"}

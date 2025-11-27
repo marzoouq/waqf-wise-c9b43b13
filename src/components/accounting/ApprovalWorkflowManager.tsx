@@ -119,9 +119,9 @@ export function ApprovalWorkflowManager() {
                   <div className="space-y-2">
                     {approval.approval_steps
                       .sort((a, b) => (a.level || 0) - (b.level || 0))
-                      .map((step, index) => (
+                      .map((step) => (
                         <div
-                          key={index}
+                          key={`step-${step.level}-${step.approver_role}`}
                           className={`flex items-center gap-3 p-2 rounded ${
                             step.action
                               ? "bg-muted/50"

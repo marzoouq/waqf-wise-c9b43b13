@@ -74,11 +74,11 @@ export const QuickActions = ({
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-2 sm:gap-3 md:gap-4">
-          {actions.map((action, index) => {
+          {actions.map((action) => {
             const Icon = action.icon;
             return (
               <Button
-                key={index}
+                key={action.label}
                 variant="outline"
                 className="h-auto p-2 sm:p-3 md:p-4 flex flex-col items-center gap-1.5 sm:gap-2 md:gap-3 hover:scale-105 transition-transform"
                 onClick={action.onClick}

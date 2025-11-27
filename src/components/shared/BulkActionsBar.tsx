@@ -47,9 +47,9 @@ export function BulkActionsBar({
             </Button>
           )}
 
-          {customActions.map((action, index) => (
+          {customActions.map((action) => (
             <Button
-              key={index}
+              key={action.action}
               size="sm"
               variant={action.variant || "outline"}
               onClick={() => onCustomAction?.(action.action)}

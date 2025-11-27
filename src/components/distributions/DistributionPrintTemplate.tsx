@@ -139,8 +139,8 @@ export const DistributionPrintTemplate = ({ distribution, details }: Distributio
               </tr>
             </thead>
             <tbody>
-              {details.map((detail, index) => (
-                <tr key={index}>
+              {details.map((detail) => (
+                <tr key={detail.beneficiary_name}>
                   <td>{detail.beneficiary_name}</td>
                   <td>{detail.beneficiary_type}</td>
                   <td>{detail.allocated_amount.toLocaleString()} ر.س</td>

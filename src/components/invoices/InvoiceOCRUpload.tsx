@@ -198,7 +198,7 @@ export const InvoiceOCRUpload = ({ onDataExtracted, onCancel }: InvoiceOCRUpload
                   <h4 className="font-semibold mb-2">البنود ({extractedData.items.length})</h4>
                   <div className="space-y-2">
                     {extractedData.items.map((item, index) => (
-                      <div key={index} className="p-2 bg-background rounded text-sm">
+                      <div key={`item-${index}-${item.description}`} className="p-2 bg-background rounded text-sm">
                         <p><strong>{item.description}</strong></p>
                         <p>الكمية: {item.quantity} × {item.unit_price} ريال = {item.total} ريال</p>
                       </div>

@@ -11,7 +11,7 @@ export function AnimatedList({ children, staggerDelay = 0.05 }: AnimatedListProp
     <>
       {children.map((child, index) => (
         <motion.div
-          key={index}
+          key={`animated-item-${index}`}
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3, delay: index * staggerDelay }}

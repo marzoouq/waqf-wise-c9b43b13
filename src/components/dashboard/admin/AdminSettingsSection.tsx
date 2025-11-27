@@ -164,11 +164,11 @@ export function AdminSettingsSection() {
 
       {/* Settings Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {settingsCategories.map((category, index) => {
+        {settingsCategories.map((category) => {
           const Icon = category.icon;
           return (
             <Card 
-              key={index} 
+              key={category.title}
               className="cursor-pointer hover:shadow-md transition-all duration-200 group"
               onClick={category.action}
             >

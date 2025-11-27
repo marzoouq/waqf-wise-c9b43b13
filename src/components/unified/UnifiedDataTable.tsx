@@ -133,8 +133,8 @@ export function UnifiedDataTable<T extends { id?: string; [key: string]: any }>(
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {data.map((row, index) => (
-                      <TableRow key={index} className="hover:bg-muted/50 transition-colors">
+                    {data.map((row) => (
+                      <TableRow key={row.id || JSON.stringify(row)} className="hover:bg-muted/50 transition-colors">
                         {columns.map((column) => (
                           <TableCell 
                             key={column.key}

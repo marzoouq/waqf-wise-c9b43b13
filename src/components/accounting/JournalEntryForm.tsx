@@ -204,7 +204,7 @@ export function JournalEntryForm() {
 
           <div className="space-y-2">
             {lines.map((line, index) => (
-              <div key={index} className="grid grid-cols-12 gap-2 items-end">
+              <div key={`line-${index}-${line.account_id || 'new'}`} className="grid grid-cols-12 gap-2 items-end">
                 <div className="col-span-4 space-y-1">
                   <Label className="text-xs">الحساب</Label>
                   <Select

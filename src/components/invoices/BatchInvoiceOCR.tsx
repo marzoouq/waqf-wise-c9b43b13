@@ -149,9 +149,9 @@ export const BatchInvoiceOCR = ({ onComplete, onCancel }: BatchInvoiceOCRProps) 
 
             {/* قائمة الملفات */}
             <div className="space-y-2 max-h-96 overflow-y-auto">
-              {results.map((result, index) => (
+              {results.map((result) => (
                 <div
-                  key={index}
+                  key={result.file.name}
                   className="flex items-center gap-3 p-3 border rounded-lg bg-muted/30"
                 >
                   {getStatusIcon(result.status)}

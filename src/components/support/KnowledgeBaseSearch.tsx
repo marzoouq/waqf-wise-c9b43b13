@@ -62,9 +62,9 @@ export function KnowledgeBaseSearch({
               <span>عمليات البحث الشائعة</span>
             </div>
             <div className="flex flex-wrap gap-2">
-              {searches.map((search, index) => (
+              {searches.map((search) => (
                 <Badge
-                  key={index}
+                  key={search}
                   variant="outline"
                   className="cursor-pointer hover:bg-accent transition-colors"
                   onClick={() => onChange(search)}

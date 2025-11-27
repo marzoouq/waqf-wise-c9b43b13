@@ -254,7 +254,7 @@ export function CustomReportBuilder() {
             ) : (
               <div className="space-y-3">
                 {filters.map((filter, index) => (
-                  <div key={index} className="flex items-end gap-2">
+                  <div key={`filter-${index}-${filter.field}`} className="flex items-end gap-2">
                     <div className="flex-1 grid grid-cols-3 gap-2">
                       <div className="space-y-2">
                         <Label>الحقل</Label>

@@ -201,12 +201,12 @@ export function EligibilityAssessmentDialog({
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {getCriteriaScore(beneficiary).map((criterion, index) => {
+                {getCriteriaScore(beneficiary).map((criterion) => {
                   const Icon = criterion.icon;
                   const percentage = (criterion.score / criterion.maxScore) * 100;
 
                   return (
-                    <div key={index} className="space-y-2">
+                    <div key={criterion.label} className="space-y-2">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <Icon className="h-4 w-4 text-muted-foreground" />

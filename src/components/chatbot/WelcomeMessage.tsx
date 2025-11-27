@@ -73,7 +73,7 @@ export function WelcomeMessage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-5xl">
         {features.map((feature, index) => (
           <Card
-            key={index}
+            key={feature.title}
             className={cn(
               "p-6 border-2 border-primary/20 bg-gradient-to-br from-background to-muted/50",
               "hover:border-primary/40 hover:shadow-2xl transition-all duration-300",

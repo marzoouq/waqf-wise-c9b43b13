@@ -149,8 +149,8 @@ export default function SystemMaintenance() {
                       </CardHeader>
                       <CardContent>
                         <div className="space-y-2">
-                          {(result.processed_payments as Array<{ payment_number: string }>).map((payment, index: number) => (
-                            <div key={index} className="flex items-center justify-between p-2 bg-muted rounded-lg">
+                          {(result.processed_payments as Array<{ payment_number: string }>).map((payment) => (
+                            <div key={payment.payment_number} className="flex items-center justify-between p-2 bg-muted rounded-lg">
                               <span className="font-medium">{payment.payment_number}</span>
                               <div className="flex gap-2 text-xs text-muted-foreground">
                                 <span>✓ فاتورة</span>

@@ -105,8 +105,8 @@ export function BudgetsTab() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {budgetData.categories.map((category, index) => (
-              <div key={index} className="space-y-2">
+            {budgetData.categories.map((category) => (
+              <div key={category.name} className="space-y-2">
                 <div className="flex justify-between">
                   <span className="font-medium">{category.name}</span>
                   <span className="text-sm text-muted-foreground">

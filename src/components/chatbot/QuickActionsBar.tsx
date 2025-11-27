@@ -31,7 +31,7 @@ export function QuickActionsBar({ actions }: QuickActionsBarProps) {
       <div className="flex flex-wrap gap-2">
         {actions.map((action, index) => (
           <Button
-            key={index}
+            key={action.label}
             variant="outline"
             size="sm"
             onClick={() => navigate(action.link)}

@@ -96,8 +96,8 @@ export function FinancialReports() {
                     </tr>
                   </thead>
                   <tbody>
-                    {trialBalance.map((item, index) => (
-                      <tr key={index} className="border-t hover:bg-muted/50">
+                    {trialBalance.map((item) => (
+                      <tr key={item.code} className="border-t hover:bg-muted/50">
                         <td className="p-3 font-mono">{item.code}</td>
                         <td className="p-3">{item.name_ar}</td>
                         <td className="p-3 text-left font-mono">
@@ -150,9 +150,9 @@ export function FinancialReports() {
                 <div className="space-y-2">
                   {accounts
                     .filter(acc => acc.account_type === 'revenue')
-                    .map((acc, index) => (
+                    .map((acc) => (
                       <div
-                        key={index}
+                        key={acc.id}
                         className="flex items-center justify-between p-2 rounded hover:bg-muted"
                       >
                         <span className="text-sm">
@@ -181,9 +181,9 @@ export function FinancialReports() {
                 <div className="space-y-2">
                   {accounts
                     .filter(acc => acc.account_type === 'expense')
-                    .map((acc, index) => (
+                    .map((acc) => (
                       <div
-                        key={index}
+                        key={acc.id}
                         className="flex items-center justify-between p-2 rounded hover:bg-muted"
                       >
                         <span className="text-sm">

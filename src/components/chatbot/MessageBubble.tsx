@@ -156,8 +156,8 @@ export function MessageBubble({ message, messageType, createdAt }: MessageBubble
         {/* عرض الإحصائيات إذا كانت موجودة */}
         {stats.length > 0 && (
           <div className="grid grid-cols-2 gap-2 w-full max-w-md">
-            {stats.map((stat, index) => (
-              <StatCard key={index} {...stat} />
+            {stats.map((stat) => (
+              <StatCard key={stat.label} {...stat} />
             ))}
           </div>
         )}
