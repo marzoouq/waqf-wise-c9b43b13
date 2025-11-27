@@ -79,7 +79,7 @@ export default function StaffRequestsManagement() {
       setSelectedRequest(null);
       setReviewNotes('');
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث الطلب');
     },
   });

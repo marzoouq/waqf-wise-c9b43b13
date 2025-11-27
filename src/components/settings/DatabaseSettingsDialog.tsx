@@ -35,7 +35,7 @@ export function DatabaseSettingsDialog({
     try {
       setIsExporting(true);
       await createBackup({});
-    } catch (error: any) {
+    } catch (error) {
       console.error('Backup error:', error);
     } finally {
       setIsExporting(false);
@@ -80,7 +80,7 @@ export function DatabaseSettingsDialog({
       
       setSelectedFile(null);
       onOpenChange(false);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Restore error:', error);
     }
   };

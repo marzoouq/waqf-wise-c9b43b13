@@ -131,7 +131,7 @@ const RolesManagement = () => {
       setAddRoleDialogOpen(false);
       setSelectedUser(null);
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "خطأ",
         description: error.message || "فشلت إضافة الدور",
@@ -158,7 +158,7 @@ const RolesManagement = () => {
         description: "تم حذف الدور بنجاح",
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "خطأ",
         description: error.message || "فشل حذف الدور",

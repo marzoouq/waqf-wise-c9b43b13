@@ -2,7 +2,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, FileText, Download, Eye, Trash2 } from "lucide-react";
-import { useCustomReports } from "@/hooks/useCustomReports";
+import { useCustomReports, type ReportTemplate } from "@/hooks/useCustomReports";
 import { UnifiedDataTable, type Column } from "@/components/unified/UnifiedDataTable";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
@@ -11,7 +11,7 @@ import { ar } from "date-fns/locale";
 export default function CustomReports() {
   const { templates: reports, isLoading, deleteTemplate } = useCustomReports();
 
-  const columns: Column<any>[] = [
+  const columns: Column<ReportTemplate>[] = [
     {
       key: "name",
       label: "اسم التقرير",
@@ -49,8 +49,8 @@ export default function CustomReports() {
       )
     },
     {
-      key: "is_scheduled",
-      label: "مجدول",
+      key: "is_favorite",
+      label: "مفضل",
       hideOnTablet: true,
       render: (value: boolean) => (
         value ? <Badge variant="outline">نعم</Badge> : <span className="text-muted-foreground">لا</span>
@@ -60,12 +60,12 @@ export default function CustomReports() {
       key: "created_at",
       label: "تاريخ الإنشاء",
       hideOnMobile: true,
-      render: (value: string) => format(new Date(value), 'dd/MM/yyyy', { locale: ar })
+      render: (value: string) => value ? format(new Date(value), 'dd/MM/yyyy', { locale: ar }) : '-'
     },
     {
       key: "actions",
       label: "الإجراءات",
-      render: (_: any, row: any) => (
+      render: (_: unknown, row: ReportTemplate) => (
         <div className="flex items-center gap-1">
           <Button variant="ghost" size="icon" title="عرض">
             <Eye className="h-4 w-4" />

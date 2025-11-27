@@ -88,7 +88,7 @@ export function IdentityVerificationDialog({
       });
       onOpenChange(false);
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: 'خطأ في التحقق',
         description: error.message || 'فشل التحقق من الهوية',
@@ -143,17 +143,17 @@ export function IdentityVerificationDialog({
                 <div>
                   <span className="font-medium">الحالة الحالية:</span>
                   <div className="flex items-center gap-2 mt-1">
-                    {getStatusIcon((beneficiary as any).verification_status || 'pending')}
+                    {getStatusIcon(beneficiary.verification_status || 'pending')}
                     <Badge variant="outline">
-                      {(beneficiary as any).verification_status || 'غير موثق'}
+                      {beneficiary.verification_status || 'غير موثق'}
                     </Badge>
                   </div>
                 </div>
                 <div>
                   <span className="font-medium">آخر تحقق:</span>
                   <p className="text-muted-foreground">
-                    {(beneficiary as any).last_verification_date
-                      ? new Date((beneficiary as any).last_verification_date).toLocaleDateString('ar-SA')
+                    {beneficiary.last_verification_date
+                      ? new Date(beneficiary.last_verification_date).toLocaleDateString('ar-SA')
                       : '-'}
                   </p>
                 </div>

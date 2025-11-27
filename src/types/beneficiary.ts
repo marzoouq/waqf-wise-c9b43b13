@@ -100,8 +100,11 @@ export interface Beneficiary {
   beneficiary_type: string | null;
   verification_documents: Json | null;
   verification_notes: string | null;
+  verification_status: string | null;
   last_verification_date: string | null;
   verification_method: string | null;
+  verified_at: string | null;
+  verified_by: string | null;
   risk_score: number | null;
   eligibility_status: string | null;
   eligibility_notes: string | null;
