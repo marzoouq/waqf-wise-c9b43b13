@@ -145,7 +145,7 @@ export function JournalEntryForm() {
         { account_id: '', description: '', debit_amount: 0, credit_amount: 0 },
       ]);
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error(error.message || 'فشل حفظ القيد');
     },
   });

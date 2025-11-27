@@ -2,13 +2,11 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Switch } from '@/components/ui/switch';
 import { Card } from '@/components/ui/card';
+import type { ApprovalSettingsValues, ApprovalWorkflowType } from '@/types/distribution';
 
 interface ApprovalSettingsProps {
-  values: {
-    workflow: string;
-    autoNotify: boolean;
-  };
-  onChange: (values: any) => void;
+  values: ApprovalSettingsValues;
+  onChange: (values: ApprovalSettingsValues) => void;
 }
 
 export function ApprovalSettings({ values, onChange }: ApprovalSettingsProps) {
@@ -18,7 +16,7 @@ export function ApprovalSettings({ values, onChange }: ApprovalSettingsProps) {
         <Label>مسار الموافقة</Label>
         <RadioGroup
           value={values.workflow}
-          onValueChange={(workflow) => onChange({ ...values, workflow })}
+          onValueChange={(workflow) => onChange({ ...values, workflow: workflow as ApprovalWorkflowType })}
         >
           <Card className="p-4">
             <div className="flex items-start gap-3">

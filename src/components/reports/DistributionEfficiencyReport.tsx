@@ -3,9 +3,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Clock, TrendingUp, TrendingDown, Download, Award, AlertTriangle } from 'lucide-react';
+import type { DistributionReportData, MonthlyEfficiencyData } from '@/types/reports.types';
 
 interface DistributionEfficiencyReportProps {
-  distributions: any[];
+  distributions: DistributionReportData[];
 }
 
 export function DistributionEfficiencyReport({ distributions }: DistributionEfficiencyReportProps) {
@@ -58,7 +59,7 @@ export function DistributionEfficiencyReport({ distributions }: DistributionEffi
     : 0;
 
   // تحليل حسب الشهر
-  const monthlyEfficiency = distributions.reduce((acc, dist) => {
+  const monthlyEfficiency = distributions.reduce<Record<string, MonthlyEfficiencyData>>((acc, dist) => {
     const month = new Date(dist.created_at).toLocaleDateString('ar-SA', { month: 'long' });
     if (!acc[month]) {
       acc[month] = {
@@ -87,11 +88,11 @@ export function DistributionEfficiencyReport({ distributions }: DistributionEffi
     
     acc[month].count++;
     return acc;
-  }, {} as Record<string, any>);
+  }, {});
 
-  const efficiencyChartData = Object.values(monthlyEfficiency).map((m: any) => ({
+  const efficiencyChartData = Object.values(monthlyEfficiency).map((m) => ({
     ...m,
-    avgApprovalTime: m.avgApprovalTime / m.count,
+    avgApprovalTime: m.count > 0 ? m.avgApprovalTime / m.count : 0,
   }));
 
   // تحليل الاختناقات
