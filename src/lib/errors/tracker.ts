@@ -506,20 +506,35 @@ class ErrorTracker {
         }
       }
       
+      // تجاهل رسائل [object Object]
+      if (cleanMessage === '[object Object]' || cleanMessage.includes('[object Object]')) {
+        continue;
+      }
+      
+      // تنظيف additional_data للتأكد من قابليتها للتسلسل JSON
+      let cleanAdditionalData: Record<string, unknown> | undefined;
+      if (report.additional_data && Object.keys(report.additional_data).length > 0) {
+        try {
+          // تنظيف البيانات الإضافية من الكائنات غير القابلة للتسلسل
+          const sanitized = JSON.parse(JSON.stringify(report.additional_data));
+          cleanAdditionalData = sanitized;
+        } catch {
+          cleanAdditionalData = { raw: String(report.additional_data) };
+        }
+      }
+      
       const cleanReport: ErrorReport = {
         error_type: report.error_type || 'unknown_error',
-        error_message: cleanMessage,
+        error_message: cleanMessage.substring(0, 2000), // حد أقصى 2000 حرف
         severity: report.severity,
         url: this.cleanUrl(report.url || window.location.href),
-        user_agent: report.user_agent || navigator.userAgent,
+        user_agent: (report.user_agent || navigator.userAgent).substring(0, 500),
       };
       
       // إضافة الحقول الاختيارية فقط إذا كانت موجودة
-      if (report.error_stack) cleanReport.error_stack = report.error_stack;
+      if (report.error_stack) cleanReport.error_stack = report.error_stack.substring(0, 10000);
       if (report.user_id) cleanReport.user_id = report.user_id;
-      if (report.additional_data && Object.keys(report.additional_data).length > 0) {
-        cleanReport.additional_data = report.additional_data;
-      }
+      if (cleanAdditionalData) cleanReport.additional_data = cleanAdditionalData;
       
       try {
         // 🔒 الحصول على session للمصادقة
@@ -535,9 +550,18 @@ class ErrorTracker {
           setTimeout(() => reject(new Error('Request timeout')), 15000)
         );
         
-        // ✅ إرسال البيانات النظيفة
+        // ✅ تحويل البيانات إلى JSON string صريحة
+        let bodyString: string;
+        try {
+          bodyString = JSON.stringify(cleanReport);
+        } catch (jsonError) {
+          console.warn('Failed to stringify error report, skipping', jsonError);
+          continue;
+        }
+        
+        // ✅ إرسال البيانات كـ JSON string
         const invokePromise = supabase.functions.invoke('log-error', {
-          body: cleanReport,
+          body: bodyString,
           headers: {
             Authorization: `Bearer ${session.access_token}`,
             'Content-Type': 'application/json'
