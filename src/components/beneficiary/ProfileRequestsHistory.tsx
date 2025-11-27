@@ -31,7 +31,7 @@ export function ProfileRequestsHistory({ beneficiaryId }: ProfileRequestsHistory
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return (data || []) as any[];
+      return (data || []) as BeneficiaryRequest[];
     },
     staleTime: 60 * 1000,
   });

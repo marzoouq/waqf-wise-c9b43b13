@@ -141,7 +141,7 @@ export const PhaseCard = ({ phase }: PhaseCardProps) => {
               <div className="space-y-4">
                 <div>
                   <label className="text-sm font-medium mb-2 block">الحالة</label>
-                  <Select value={status} onValueChange={(value) => setStatus(value as any)}>
+                  <Select value={status} onValueChange={(value) => setStatus(value as "planned" | "in_progress" | "completed" | "blocked")}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>

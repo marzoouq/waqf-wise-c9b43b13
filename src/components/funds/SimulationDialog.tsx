@@ -119,7 +119,7 @@ export function SimulationDialog({ open, onOpenChange }: SimulationDialogProps) 
       description="محاكاة توزيع متقدمة باستخدام 5 أنماط مختلفة"
       size="xl"
     >
-      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
+      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'single' | 'comparison')}>
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="single">محاكاة واحدة</TabsTrigger>
           <TabsTrigger value="comparison">مقارنة السيناريوهات</TabsTrigger>
@@ -321,7 +321,7 @@ export function SimulationDialog({ open, onOpenChange }: SimulationDialogProps) 
               <SmartRecommendations 
                 scenarios={scenarios} 
                 onSelectScenario={(pattern) => {
-                  form.setValue('pattern', pattern as any);
+                  form.setValue('pattern', pattern as 'shariah' | 'equal' | 'need_based' | 'custom' | 'hybrid');
                   setActiveTab('single');
                 }}
               />

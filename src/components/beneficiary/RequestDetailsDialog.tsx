@@ -26,6 +26,13 @@ import {
   CheckCircle,
   XCircle,
 } from "lucide-react";
+import { Database } from "@/integrations/supabase/types";
+
+// نوع الطلب مع البيانات المرتبطة
+type RequestWithDetails = Database['public']['Tables']['beneficiary_requests']['Row'] & {
+  request_types?: { name_ar: string; description: string | null } | null;
+  beneficiaries?: { full_name: string; national_id: string } | null;
+};
 
 interface RequestDetailsDialogProps {
   requestId: string;
@@ -41,7 +48,7 @@ export function RequestDetailsDialog({
   const [activeTab, setActiveTab] = useState("details");
 
   // Fetch request details
-  const { data: request, isLoading } = useQuery({
+  const { data: request, isLoading } = useQuery<RequestWithDetails>({
     queryKey: ["request-details", requestId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -49,7 +56,7 @@ export function RequestDetailsDialog({
         .select(
           `
           *,
-          request_types (name_ar, icon, description),
+          request_types (name_ar, description),
           beneficiaries (full_name, national_id)
         `
         )
@@ -57,7 +64,7 @@ export function RequestDetailsDialog({
         .single();
 
       if (error) throw error;
-      return data;
+      return data as RequestWithDetails;
     },
     enabled: isOpen && !!requestId,
   });
@@ -150,8 +157,8 @@ export function RequestDetailsDialog({
             {getPriorityBadge(request.priority)}
           </DialogTitle>
           <DialogDescription>
-            {(request as any).request_types?.name_ar} • تم التقديم في{" "}
-            {new Date(request.submitted_at).toLocaleDateString("ar-SA")}
+            {request.request_types?.name_ar} • تم التقديم في{" "}
+            {new Date(request.submitted_at || request.created_at).toLocaleDateString("ar-SA")}
           </DialogDescription>
         </DialogHeader>
 

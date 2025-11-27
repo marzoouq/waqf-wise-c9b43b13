@@ -17,7 +17,7 @@ import { ar } from 'date-fns/locale';
 import { Database } from '@/integrations/supabase/types';
 
 type BeneficiaryRequest = Database['public']['Tables']['beneficiary_requests']['Row'] & {
-  request_types?: { name: string } | null;
+  request_types?: { name_ar: string } | null;
 };
 
 interface ProfileTimelineProps {
@@ -70,7 +70,7 @@ export function ProfileTimeline({ beneficiaryId }: ProfileTimelineProps) {
         .limit(10);
 
       if (requests) {
-        (requests as any[]).forEach((request) => {
+        (requests as BeneficiaryRequest[]).forEach((request) => {
           timelineEvents.push({
             id: request.id,
             type: 'request',
