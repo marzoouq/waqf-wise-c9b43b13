@@ -6,19 +6,64 @@
 import { supabase } from '@/integrations/supabase/client';
 
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+type Severity = 'low' | 'medium' | 'high' | 'critical';
 
 interface LogOptions {
   context?: string;
   metadata?: Record<string, unknown>;
-  severity?: 'low' | 'medium' | 'high' | 'critical';
+  severity?: Severity;
+}
+
+interface LogEntry {
+  level: LogLevel;
+  message: string;
+  data?: unknown;
+  timestamp: string;
 }
 
 const IS_DEV = import.meta.env.DEV;
 const IS_PROD = import.meta.env.PROD;
 
+/**
+ * تحويل مستوى الـ log إلى severity
+ */
+function mapLevelToSeverity(level: LogLevel): Severity {
+  switch (level) {
+    case 'error':
+      return 'high';
+    case 'warn':
+      return 'medium';
+    case 'info':
+      return 'low';
+    case 'debug':
+      return 'low';
+    default:
+      return 'low';
+  }
+}
+
+/**
+ * تحويل مستوى الـ log إلى error_type
+ */
+function mapLevelToErrorType(level: LogLevel): string {
+  switch (level) {
+    case 'error':
+      return 'error';
+    case 'warn':
+      return 'warning';
+    case 'info':
+      return 'info';
+    case 'debug':
+      return 'debug';
+    default:
+      return 'unknown';
+  }
+}
+
 class ProductionLogger {
-  private queue: Array<{ level: LogLevel; message: string; data?: unknown; timestamp: string }> = [];
-  private flushInterval: NodeJS.Timeout | null = null;
+  private queue: LogEntry[] = [];
+  private flushInterval: ReturnType<typeof setInterval> | null = null;
+  private isProcessing = false;
 
   constructor() {
     if (IS_PROD) {
@@ -31,7 +76,7 @@ class ProductionLogger {
    */
   debug(message: string, data?: unknown): void {
     if (IS_DEV) {
-      console.log(`🐛 ${message}`, data);
+      console.log(`🐛 ${message}`, data !== undefined ? data : '');
     }
   }
 
@@ -40,7 +85,7 @@ class ProductionLogger {
    */
   info(message: string, data?: unknown): void {
     if (IS_DEV) {
-      console.info(`ℹ️ ${message}`, data);
+      console.info(`ℹ️ ${message}`, data !== undefined ? data : '');
     }
     this.addToQueue('info', message, data);
   }
@@ -50,12 +95,12 @@ class ProductionLogger {
    */
   warn(message: string, data?: unknown, options?: LogOptions): void {
     if (IS_DEV) {
-      console.warn(`⚠️ ${message}`, data);
+      console.warn(`⚠️ ${message}`, data !== undefined ? data : '');
     }
     this.addToQueue('warn', message, data);
     
     if (IS_PROD && options?.severity === 'high') {
-      this.sendToServer('warning', message, data, options);
+      this.sendToServer('warn', message, data, options);
     }
   }
 
@@ -68,7 +113,7 @@ class ProductionLogger {
       : error;
 
     if (IS_DEV) {
-      console.error(`❌ ${message}`, errorData);
+      console.error(`❌ ${message}`, errorData !== undefined ? errorData : '');
     }
 
     this.addToQueue('error', message, errorData);
@@ -83,7 +128,7 @@ class ProductionLogger {
    */
   success(message: string, data?: unknown): void {
     if (IS_DEV) {
-      console.log(`✅ ${message}`, data);
+      console.log(`✅ ${message}`, data !== undefined ? data : '');
     }
     this.addToQueue('info', `SUCCESS: ${message}`, data);
   }
@@ -117,30 +162,54 @@ class ProductionLogger {
   }
 
   /**
-   * إرسال جميع الـ logs المتراكمة
+   * إرسال جميع الـ logs المتراكمة - بالتنسيق الصحيح
    */
   private async flush(): Promise<void> {
     // تعطيل في بيئة التطوير
-    if (import.meta.env.DEV) {
+    if (IS_DEV) {
       this.queue = [];
       return;
     }
 
-    if (this.queue.length === 0) return;
+    if (this.queue.length === 0 || this.isProcessing) return;
 
+    this.isProcessing = true;
     const logsToSend = [...this.queue];
     this.queue = [];
 
     try {
-      // إرسال الـ logs واحدة تلو الأخرى
+      // إرسال الـ logs بالتنسيق الصحيح
       for (const log of logsToSend.slice(0, 10)) {
-        await supabase.functions.invoke('log-error', {
-          body: log,
-        }).catch(() => {});
+        try {
+          await supabase.functions.invoke('log-error', {
+            body: {
+              error_type: mapLevelToErrorType(log.level),
+              error_message: log.message,
+              severity: mapLevelToSeverity(log.level),
+              url: typeof window !== 'undefined' ? window.location.href : 'server',
+              user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : 'server',
+              additional_data: {
+                original_level: log.level,
+                timestamp: log.timestamp,
+                data: log.data,
+              },
+            },
+          });
+        } catch (logError) {
+          // تسجيل فشل الإرسال في console فقط في DEV
+          if (IS_DEV) {
+            console.warn('Failed to send log to server:', logError);
+          }
+        }
       }
     } catch (error) {
-      // في حالة فشل الإرسال، أعد الـ logs للـ queue
+      // في حالة فشل الإرسال الكامل، أعد الـ logs للـ queue
       this.queue.unshift(...logsToSend);
+      if (IS_DEV) {
+        console.warn('Failed to flush logs:', error);
+      }
+    } finally {
+      this.isProcessing = false;
     }
   }
 
@@ -148,25 +217,25 @@ class ProductionLogger {
    * إرسال log فوري للسيرفر (للأخطاء الحرجة)
    */
   private async sendToServer(
-    level: string,
+    level: LogLevel,
     message: string,
     data?: unknown,
     options?: LogOptions
   ): Promise<void> {
     // تعطيل في بيئة التطوير
-    if (import.meta.env.DEV) return;
+    if (IS_DEV) return;
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const user = session?.user;
+      const { data: sessionData } = await supabase.auth.getSession();
+      const user = sessionData?.session?.user;
       
       await supabase.functions.invoke('log-error', {
         body: {
-          error_type: level,
+          error_type: mapLevelToErrorType(level),
           error_message: message,
-          severity: options?.severity || 'medium',
-          url: window.location.href,
-          user_agent: navigator.userAgent,
+          severity: options?.severity || mapLevelToSeverity(level),
+          url: typeof window !== 'undefined' ? window.location.href : 'server',
+          user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : 'server',
           user_id: user?.id,
           additional_data: {
             context: options?.context,
@@ -176,7 +245,10 @@ class ProductionLogger {
         },
       });
     } catch (error) {
-      // Silent fail - لا نريد أن يؤثر فشل الـ logging على التطبيق
+      // تسجيل فشل الإرسال - لكن لا نريد أن يؤثر على التطبيق
+      if (IS_DEV) {
+        console.warn('Failed to send error to server:', error);
+      }
     }
   }
 
@@ -186,6 +258,7 @@ class ProductionLogger {
   cleanup(): void {
     if (this.flushInterval) {
       clearInterval(this.flushInterval);
+      this.flushInterval = null;
     }
     this.flush();
   }

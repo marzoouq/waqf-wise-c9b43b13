@@ -11,7 +11,39 @@ export * from './errors';
 export * from './alerts';
 export * from './activity';
 export * from './audit';
-export * from './approval';
+// تجنب إعادة تصدير الأنواع المكررة من approvals
+export type {
+  DistributionApprovalInsert,
+  LoanApprovalInsert,
+  PaymentApprovalInsert,
+  ApprovalStatus,
+  BaseApproval,
+  LoanApprovalRow,
+  LoanWithApprovals,
+  LoanForApproval,
+  PaymentApprovalRow,
+  PaymentWithApprovals,
+  PaymentForApproval,
+  DistributionWithApprovals,
+  DistributionForApproval,
+  JournalEntryWithApproval,
+  JournalForApproval,
+  RequestWithBeneficiary,
+  RequestForApproval,
+  ApprovalProgress,
+  ApprovalAction,
+  ApprovalDialogProps,
+  StatusBadgeConfig,
+  StatusConfigMap,
+  LucideIcon,
+  JournalApproval,
+  JournalEntryWithLines,
+} from './approvals';
+export {
+  calculateProgress,
+  getNextPendingApproval,
+  areAllApprovalsCompleted,
+} from './approvals';
 export * from './beneficiary';
 export * from './loans';
 export * from './admin';

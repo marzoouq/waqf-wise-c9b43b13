@@ -11814,6 +11814,7 @@ export type Database = {
       }
       cleanup_old_alerts: { Args: never; Returns: undefined }
       cleanup_old_error_logs: { Args: never; Returns: undefined }
+      cleanup_old_records: { Args: never; Returns: undefined }
       create_auto_journal_entry: {
         Args: {
           p_amount: number

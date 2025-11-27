@@ -1,9 +1,44 @@
 /**
  * أنواع موحدة لنظام الموافقات
+ * يتضمن جميع أنواع الموافقات والإدراج
  */
 
 import { Database } from '@/integrations/supabase/types';
 import { BeneficiaryRow, JournalEntryRow } from './supabase-helpers';
+
+// ========== أنواع الإدراج (من approval.ts السابق) ==========
+
+export interface DistributionApprovalInsert {
+  distribution_id: string;
+  approver_id: string;
+  approver_name: string;
+  level: number;
+  status: 'موافق' | 'مرفوض';
+  notes?: string;
+  approved_at: string;
+}
+
+export interface LoanApprovalInsert {
+  loan_id: string;
+  approver_id: string;
+  approver_name: string;
+  level: number;
+  status: 'موافق' | 'مرفوض';
+  notes?: string;
+  approved_at: string;
+}
+
+export interface PaymentApprovalInsert {
+  payment_id: string;
+  approver_id: string;
+  approver_name: string;
+  level: number;
+  status: 'موافق' | 'مرفوض';
+  notes?: string;
+  approved_at: string;
+}
+
+// ==========================================================
 
 type Tables = Database['public']['Tables'];
 
@@ -22,7 +57,7 @@ export interface BaseApproval {
 }
 
 // موافقات القروض
-export type LoanRow = Tables['loans']['Row'];
+export type LoanTableRow = Tables['loans']['Row'];
 
 export interface LoanApprovalRow {
   id: string;
@@ -36,7 +71,7 @@ export interface LoanApprovalRow {
   created_at: string;
 }
 
-export interface LoanWithApprovals extends LoanRow {
+export interface LoanWithApprovals extends LoanTableRow {
   beneficiaries: BeneficiaryRow;
   loan_approvals: LoanApprovalRow[];
 }
