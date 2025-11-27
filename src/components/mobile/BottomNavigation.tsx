@@ -28,7 +28,7 @@ const navigationItems: NavigationItem[] = [
     id: 'requests',
     label: 'الطلبات',
     icon: FileText,
-    path: '/beneficiary-requests',
+    path: '/requests',
   },
   {
     id: 'notifications',
