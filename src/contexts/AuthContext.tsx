@@ -1,8 +1,42 @@
-import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '@/types/auth';
 import { useToast } from '@/hooks/use-toast';
+import { productionLogger } from '@/lib/logger/production-logger';
+
+// خريطة الصلاحيات لكل دور
+const ROLE_PERMISSIONS: Record<string, string[]> = {
+  nazer: [
+    'view_dashboard', 'manage_beneficiaries', 'manage_distributions', 
+    'approve_payments', 'view_reports', 'manage_settings', 'manage_users',
+    'view_all_data', 'export_data', 'manage_properties', 'manage_contracts'
+  ],
+  admin: [
+    'view_dashboard', 'manage_beneficiaries', 'manage_distributions',
+    'view_reports', 'manage_settings', 'manage_users', 'view_all_data',
+    'export_data', 'manage_properties', 'manage_contracts'
+  ],
+  accountant: [
+    'view_dashboard', 'manage_distributions', 'view_reports',
+    'export_data', 'manage_journal_entries', 'view_beneficiaries'
+  ],
+  cashier: [
+    'view_dashboard', 'process_payments', 'view_beneficiaries',
+    'view_distributions'
+  ],
+  archivist: [
+    'view_dashboard', 'manage_documents', 'view_beneficiaries',
+    'upload_files', 'manage_archive'
+  ],
+  beneficiary: [
+    'view_own_profile', 'submit_requests', 'view_own_payments',
+    'upload_own_documents'
+  ],
+  user: [
+    'view_dashboard'
+  ]
+};
 
 interface AuthContextType {
   user: User | null;
@@ -11,8 +45,9 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, fullName: string) => Promise<void>;
   signOut: () => Promise<void>;
-  hasPermission: (permission: string) => boolean;
-  isRole: (roleName: string) => boolean;
+  hasPermission: (permission: string) => Promise<boolean>;
+  isRole: (roleName: string) => Promise<boolean>;
+  checkPermissionSync: (permission: string, userRoles: string[]) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -24,6 +59,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
   const initRef = useRef(false);
+  const rolesCache = useRef<string[]>([]);
+
+  // جلب أدوار المستخدم من قاعدة البيانات
+  const fetchUserRoles = useCallback(async (userId: string): Promise<string[]> => {
+    try {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId);
+
+      if (error) {
+        productionLogger.error('Error fetching user roles', error);
+        return [];
+      }
+
+      const roles = (data || []).map(r => r.role);
+      rolesCache.current = roles;
+      return roles;
+    } catch (err) {
+      productionLogger.error('Exception fetching user roles', err);
+      return [];
+    }
+  }, []);
 
   useEffect(() => {
     // Prevent double initialization
@@ -37,8 +95,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       if (newSession?.user) {
         fetchProfile(newSession.user.id);
+        fetchUserRoles(newSession.user.id);
       } else {
         setProfile(null);
+        rolesCache.current = [];
         setIsLoading(false);
       }
     });
@@ -50,6 +110,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       if (currentSession?.user) {
         fetchProfile(currentSession.user.id);
+        fetchUserRoles(currentSession.user.id);
       } else {
         setIsLoading(false);
       }
@@ -59,7 +120,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       subscription.unsubscribe();
       initRef.current = false;
     };
-  }, []);
+  }, [fetchUserRoles]);
 
   const fetchProfile = async (userId: string) => {
     try {
@@ -90,7 +151,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (createError) {
               // معالجة أخطاء FK (23503): user_id غير موجود
               if (createError.code === '23503') {
-                console.warn('FK violation - retrying after delay');
+                productionLogger.warn('FK violation - retrying after delay');
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 const { data: retryProfile } = await supabase
                   .from('profiles')
@@ -124,7 +185,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const err = insertError as { code?: string; message?: string };
             // لا نعرض أخطاء FK وUnique للمستخدم
             if (!['23503', '23505'].includes(err.code || '')) {
-              console.error('Error creating profile:', err);
+              productionLogger.error('Error creating profile', insertError);
             }
           }
         }
@@ -135,7 +196,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const err = error as { code?: string; message?: string };
       // نعرض toast فقط للأخطاء غير المتوقعة
       if (!['23505', '23503', 'PGRST116'].includes(err.code || '')) {
-        console.error('Error fetching profile:', err);
+        productionLogger.error('Error fetching profile', error);
         toast({
           title: 'خطأ',
           description: 'فشل تحميل بيانات المستخدم',
@@ -204,6 +265,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
       setSession(null);
       setProfile(null);
+      rolesCache.current = [];
       
       toast({
         title: "تم تسجيل الخروج",
@@ -221,18 +283,64 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
       setSession(null);
       setProfile(null);
+      rolesCache.current = [];
       throw error;
     }
   };
 
-  const hasPermission = (permission: string): boolean => {
-    // Permissions نستخدم useUserRole hook بدلاً من profile
-    return true; // مؤقتاً، سنستخدم useUserRole في المكونات
+  /**
+   * التحقق من صلاحية معينة - async version
+   */
+  const hasPermission = async (permission: string): Promise<boolean> => {
+    if (!user) return false;
+
+    // استخدام الـ cache إذا كان متوفراً
+    let roles = rolesCache.current;
+    
+    // إذا لم يكن هناك cache، جلب الأدوار
+    if (roles.length === 0) {
+      roles = await fetchUserRoles(user.id);
+    }
+
+    // التحقق من الصلاحية في كل دور
+    for (const role of roles) {
+      const permissions = ROLE_PERMISSIONS[role] || [];
+      if (permissions.includes(permission) || permissions.includes('view_all_data')) {
+        return true;
+      }
+    }
+
+    return false;
   };
 
-  const isRole = (roleName: string): boolean => {
-    // Roles نستخدم useUserRole hook بدلاً من profile
-    return false; // مؤقتاً، سنستخدم useUserRole في المكونات
+  /**
+   * التحقق من صلاحية معينة - sync version (للاستخدام في المكونات)
+   */
+  const checkPermissionSync = (permission: string, userRoles: string[]): boolean => {
+    for (const role of userRoles) {
+      const permissions = ROLE_PERMISSIONS[role] || [];
+      if (permissions.includes(permission) || permissions.includes('view_all_data')) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  /**
+   * التحقق من دور معين - async version
+   */
+  const isRole = async (roleName: string): Promise<boolean> => {
+    if (!user) return false;
+
+    // استخدام الـ cache إذا كان متوفراً
+    let roles = rolesCache.current;
+    
+    // إذا لم يكن هناك cache، جلب الأدوار
+    if (roles.length === 0) {
+      roles = await fetchUserRoles(user.id);
+    }
+
+    return roles.includes(roleName);
   };
 
   const value = {
@@ -244,6 +352,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signOut,
     hasPermission,
     isRole,
+    checkPermissionSync,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -256,3 +365,6 @@ export function useAuth() {
   }
   return context;
 }
+
+// تصدير خريطة الصلاحيات للاستخدام في أماكن أخرى
+export { ROLE_PERMISSIONS };

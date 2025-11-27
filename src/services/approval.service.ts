@@ -5,7 +5,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
-import type { DistributionApprovalInsert, LoanApprovalInsert } from '@/types/approval';
+import type { DistributionApprovalInsert, LoanApprovalInsert } from '@/types/approvals';
 
 export interface ApprovalData {
   reference_id: string;
