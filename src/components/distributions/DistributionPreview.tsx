@@ -1,7 +1,7 @@
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import type { DistributionPreviewData, DeductionsValues } from '@/types/distribution';
+import type { DistributionPreviewData, DeductionsValues } from '@/types/distribution/index';
 
 interface DistributionPreviewProps {
   data: DistributionPreviewData;

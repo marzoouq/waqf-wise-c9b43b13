@@ -47,7 +47,7 @@ export {
 export * from './beneficiary';
 export * from './loans';
 export * from './admin';
-export * from './reports.types';
+export * from './reports/index';
 export * from './supabase-rpc';
 
 // Core Entity Types

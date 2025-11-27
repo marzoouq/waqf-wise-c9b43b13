@@ -2,7 +2,7 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Switch } from '@/components/ui/switch';
 import { Card } from '@/components/ui/card';
-import type { ApprovalSettingsValues, ApprovalWorkflowType } from '@/types/distribution';
+import type { ApprovalSettingsValues, ApprovalWorkflowType } from '@/types/distribution/index';
 
 interface ApprovalSettingsProps {
   values: ApprovalSettingsValues;
