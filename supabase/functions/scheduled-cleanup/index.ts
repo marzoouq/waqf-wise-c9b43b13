@@ -12,17 +12,18 @@ import {
   unauthorizedResponse 
 } from '../_shared/cors.ts';
 
+interface CleanupDetails {
+  health_checks: number;
+  error_logs: number;
+  alerts: number;
+  audit_logs: number;
+  notifications: number;
+}
+
 interface CleanupResult {
   success: boolean;
-  total_deleted?: number;
-  details?: {
-    health_checks: number;
-    error_logs: number;
-    alerts: number;
-    audit_logs: number;
-    notifications: number;
-  };
-  error?: string;
+  total_deleted: number;
+  details: CleanupDetails;
 }
 
 Deno.serve(async (req) => {
@@ -58,19 +59,23 @@ Deno.serve(async (req) => {
 
     const result = data as CleanupResult;
     
-    console.log('Cleanup completed:', result);
+    console.log('Cleanup completed:', JSON.stringify(result));
 
-    // تسجيل في audit_logs
-    await supabase.from('audit_logs').insert({
-      action_type: 'SCHEDULED_CLEANUP',
-      table_name: 'multiple',
-      description: `تنظيف مجدول: تم حذف ${result.total_deleted || 0} سجل`,
-      severity: 'info',
-    });
+    // تسجيل في audit_logs (الدالة تسجل تلقائياً، لكن نضيف ملخص إضافي)
+    if (result.total_deleted > 0) {
+      await supabase.from('audit_logs').insert({
+        action_type: 'SCHEDULED_CLEANUP',
+        table_name: 'multiple',
+        description: `تنظيف مجدول: حذف ${result.total_deleted} سجل (health_checks: ${result.details?.health_checks || 0}, error_logs: ${result.details?.error_logs || 0}, alerts: ${result.details?.alerts || 0})`,
+        severity: 'info',
+      });
+    }
 
     return jsonResponse({
-      ...result,
-      message: `تم التنظيف بنجاح: ${result.total_deleted || 0} سجل محذوف`,
+      success: true,
+      total_deleted: result.total_deleted,
+      details: result.details,
+      message: `تم التنظيف بنجاح: ${result.total_deleted} سجل محذوف`,
     });
 
   } catch (error) {
