@@ -1,6 +1,7 @@
 # المرحلة الأولى: إصلاح نظام الـ Logger
 
 ## 📅 تاريخ التنفيذ: 2025-11-27
+## 🔄 آخر تحديث: 2025-11-27 (إصلاح tracker.ts)
 
 ## 🐛 المشكلة المُكتشفة
 
@@ -172,16 +173,42 @@ npm run test -- --filter production-logger
 ## 📁 الملفات المُعدلة
 
 1. `src/lib/logger/production-logger.ts` - إصلاح التنسيق
-2. `src/__tests__/unit/production-logger.test.ts` - اختبارات شاملة
+2. `src/lib/errors/tracker.ts` - إصلاح إرسال object بدلاً من JSON string
+3. `src/__tests__/unit/production-logger.test.ts` - اختبارات شاملة
+4. `src/__tests__/integration/phase1-2-integration.test.ts` - اختبارات تكامل
 
 ---
 
-## ✅ حالة المرحلة: مكتملة
+## 🔧 إصلاح tracker.ts (2025-11-27)
+
+### المشكلة
+كان `tracker.ts` يرسل JSON string بدلاً من object:
+```typescript
+// ❌ قبل
+const bodyString = JSON.stringify(cleanReport);
+const invokePromise = supabase.functions.invoke('log-error', {
+  body: bodyString,  // JSON string - قد يسبب double-stringify
+});
+```
+
+### الحل
+```typescript
+// ✅ بعد
+const invokePromise = supabase.functions.invoke('log-error', {
+  body: cleanReport,  // object - Supabase client يقوم بالـ serialization
+});
+```
+
+---
+
+## ✅ حالة المرحلة: مكتملة ومُختبرة
 
 - [x] إضافة `mapLevelToSeverity()`
 - [x] إضافة `mapLevelToErrorType()`
 - [x] تحديث `flush()` بالتنسيق الصحيح
 - [x] تحديث `sendToServer()` بالتنسيق الصحيح
 - [x] إزالة silent catches
-- [x] إضافة اختبارات شاملة
+- [x] إصلاح `tracker.ts` لإرسال object
+- [x] إضافة اختبارات وحدوية
+- [x] إضافة اختبارات تكامل
 - [x] توثيق التغييرات
