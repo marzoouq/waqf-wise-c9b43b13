@@ -3649,6 +3649,53 @@ export type Database = {
           },
         ]
       }
+      document_versions: {
+        Row: {
+          change_description: string | null
+          created_at: string
+          created_by: string | null
+          document_id: string
+          file_path: string
+          file_size: number | null
+          id: string
+          is_current: boolean | null
+          metadata: Json | null
+          version_number: number
+        }
+        Insert: {
+          change_description?: string | null
+          created_at?: string
+          created_by?: string | null
+          document_id: string
+          file_path: string
+          file_size?: number | null
+          id?: string
+          is_current?: boolean | null
+          metadata?: Json | null
+          version_number?: number
+        }
+        Update: {
+          change_description?: string | null
+          created_at?: string
+          created_by?: string | null
+          document_id?: string
+          file_path?: string
+          file_size?: number | null
+          id?: string
+          is_current?: boolean | null
+          metadata?: Json | null
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_versions_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       documentation_changelog: {
         Row: {
           change_type: string
