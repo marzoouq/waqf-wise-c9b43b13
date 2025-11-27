@@ -1,8 +1,8 @@
 # سجل الإصلاحات المنهجية - منصة إدارة الوقف
 
 > **تاريخ التوثيق:** 2025-11-27  
-> **الإصدار:** 2.3.0  
-> **حالة الأخطاء:** ✅ تم حل 20/20 خطأ
+> **الإصدار:** 2.4.0  
+> **حالة الأخطاء:** ✅ تم حل 20/20 خطأ + إصلاحات أداء
 
 ---
 
@@ -16,6 +16,7 @@
 | 4 | DOM Warning - Password | إضافة form wrapper | `LeakedPasswordCheck.tsx` | ✅ مكتمل |
 | 5 | أخطاء تاريخية (20 خطأ) | تحديث حالة الأخطاء في قاعدة البيانات | `system_error_logs` table | ✅ مكتمل |
 | 6 | Console.log Spam | تحسين logging مع DEV check و useEffect | `useUserRole.ts` | ✅ مكتمل |
+| 7 | React Query Re-renders | useMemo لـ userId + تحسين dependencies | `useUserRole.ts` | ✅ مكتمل |
 
 ---
 
@@ -84,6 +85,44 @@ useEffect(() => {
 - ✅ Console نظيف من الـ spam
 - ✅ أداء محسّن
 - ✅ debugging فعّال في DEV فقط
+
+---
+
+## 🔧 الإصلاح #7: تحسين React Query Re-renders
+
+### المشكلة
+- خطأ React: "Should have a queue. This is likely a bug in React"
+- يحدث أثناء Hot Module Replacement (HMR)
+- re-renders غير ضرورية في useUserRole
+
+### السبب الجذري
+- `user?.id` يُقيَّم في كل render مما يسبب object identity changes
+- dependencies غير ثابتة في useQuery و useEffect
+
+### الحل المطبق
+```typescript
+// قبل
+const { data: roles = [] } = useQuery({
+  queryKey: ["user-roles", user?.id],
+  enabled: !!user,
+});
+useEffect(() => { ... }, [user?.id, refetch]);
+
+// بعد: استخدام useMemo لتثبيت userId
+const userId = useMemo(() => user?.id, [user?.id]);
+
+const { data: roles = [] } = useQuery({
+  queryKey: ["user-roles", userId],
+  enabled: !!userId,
+});
+useEffect(() => { ... }, [userId, refetch]);
+```
+
+### الفوائد
+1. ✅ تقليل re-renders غير ضرورية
+2. ✅ استقرار React Query queryKey
+3. ✅ تحسين أداء realtime subscription
+4. ✅ تجنب أخطاء HMR
 
 ---
 
