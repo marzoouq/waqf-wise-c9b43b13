@@ -260,7 +260,6 @@ export const generateInvoicePDF = async (
     margin: { left: margin, right: margin },
   });
 
-  // @ts-expect-error - jspdf-autotable adds lastAutoTable property
   yPos = doc.lastAutoTable?.finalY ? doc.lastAutoTable.finalY + 15 : yPos;
 
   // الملخص المالي والـ QR Code في نفس المستوى
