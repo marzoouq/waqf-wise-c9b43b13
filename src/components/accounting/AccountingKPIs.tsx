@@ -3,6 +3,7 @@ import { FileText, TrendingUp, TrendingDown, Clock, ArrowUp, ArrowDown } from "l
 import { formatCurrency } from "@/lib/utils";
 import { useJournalEntries } from "@/hooks/useJournalEntries";
 import { useMemo } from "react";
+import type { JournalEntryLine } from "@/types/financial";
 
 interface KPICardProps {
   title: string;
@@ -66,7 +67,7 @@ export function AccountingKPIs() {
     
     postedEntries.forEach(entry => {
       if (entry.journal_entry_lines) {
-        entry.journal_entry_lines.forEach((line: any) => {
+        (entry.journal_entry_lines as JournalEntryLine[]).forEach((line) => {
           totalDebit += line.debit_amount || 0;
           totalCredit += line.credit_amount || 0;
         });

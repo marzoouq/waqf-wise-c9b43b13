@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { generateInvoicePDF } from "@/lib/generateInvoicePDF";
 import { generateReceiptPDF } from "@/lib/generateReceiptPDF";
+import type { OrganizationSettings } from "@/hooks/useOrganizationSettings";
 
 interface Props {
   onEdit: (payment: RentalPayment) => void;
@@ -90,7 +91,7 @@ export const PaymentsTab = ({ onEdit }: Props) => {
           .single();
 
         if (orgSettings) {
-          await generateInvoicePDF(invoiceData, invoiceData.invoice_lines || [], orgSettings as any);
+          await generateInvoicePDF(invoiceData, invoiceData.invoice_lines || [], orgSettings as OrganizationSettings | null);
           
           toast({
             title: "تم التوليد",
@@ -156,7 +157,7 @@ export const PaymentsTab = ({ onEdit }: Props) => {
           .single();
 
         if (orgSettings) {
-          await generateReceiptPDF(receiptData, orgSettings as any);
+          await generateReceiptPDF(receiptData, orgSettings as OrganizationSettings | null);
           
           toast({
             title: "تم التوليد",

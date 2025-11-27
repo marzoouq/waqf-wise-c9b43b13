@@ -80,7 +80,7 @@ export function JournalEntryForm() {
   };
 
   // تحديث سطر
-  const updateLine = (index: number, field: keyof JournalLine, value: any) => {
+  const updateLine = (index: number, field: keyof JournalLine, value: string | number) => {
     const newLines = [...lines];
     newLines[index] = { ...newLines[index], [field]: value };
     setLines(newLines);

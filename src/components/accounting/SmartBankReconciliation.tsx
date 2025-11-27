@@ -7,6 +7,16 @@ import { Sparkles, CheckCircle2, AlertCircle, TrendingUp } from 'lucide-react';
 import { useBankMatching } from '@/hooks/useBankMatching';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
+interface MatchSuggestion {
+  bankTransactionId: string;
+  journalEntryId: string;
+  confidence: number;
+  bankDescription?: string;
+  journalDescription?: string;
+  amount?: number;
+  reason?: string;
+}
+
 interface Props {
   statementId: string;
 }
@@ -14,7 +24,7 @@ interface Props {
 export function SmartBankReconciliation({ statementId }: Props) {
   const { autoMatch, manualMatch, matches, isLoading } = useBankMatching();
   const [isMatching, setIsMatching] = useState(false);
-  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [suggestions, setSuggestions] = useState<MatchSuggestion[]>([]);
 
   const handleAutoMatch = async () => {
     setIsMatching(true);
@@ -28,7 +38,7 @@ export function SmartBankReconciliation({ statementId }: Props) {
     }
   };
 
-  const handleAcceptSuggestion = async (suggestion: any) => {
+  const handleAcceptSuggestion = async (suggestion: MatchSuggestion) => {
     try {
       await manualMatch({
         bankTransactionId: suggestion.bankTransactionId,
