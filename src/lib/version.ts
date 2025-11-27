@@ -2,11 +2,11 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.2.0
+ * @version 2.3.0
  * @date 2025-11-27
  */
 
-export const APP_VERSION = '2.2.0';
+export const APP_VERSION = '2.3.0';
 export const APP_VERSION_DATE = '2025-11-27';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
@@ -16,9 +16,10 @@ export const VERSION_INFO = {
   name: APP_VERSION_NAME,
   changelog: '/docs/CHANGELOG.md',
   features: [
+    'تحديث Lovable AI Gateway',
+    'معالجة أخطاء Rate Limit و Payment',
+    'تحديث التوثيق والوثائق',
     'نظام الأمان النوعي الصارم',
-    'نظام التصميم المحسّن v2.2.0',
-    '40+ نوع بيانات جديد',
     'تحسينات الأداء والاستجابة',
     'دعم محسّن للغة العربية',
   ],
