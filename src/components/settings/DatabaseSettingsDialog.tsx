@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { productionLogger } from "@/lib/logger/production-logger";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -36,7 +37,7 @@ export function DatabaseSettingsDialog({
       setIsExporting(true);
       await createBackup({});
     } catch (error) {
-      console.error('Backup error:', error);
+      productionLogger.error('Backup error:', error);
     } finally {
       setIsExporting(false);
     }
@@ -81,7 +82,7 @@ export function DatabaseSettingsDialog({
       setSelectedFile(null);
       onOpenChange(false);
     } catch (error) {
-      console.error('Restore error:', error);
+      productionLogger.error('Restore error:', error);
     }
   };
 

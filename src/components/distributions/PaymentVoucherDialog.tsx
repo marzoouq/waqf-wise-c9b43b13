@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { productionLogger } from "@/lib/logger/production-logger";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -93,7 +94,7 @@ export function PaymentVoucherDialog({
         notes: "",
       });
     } catch (error) {
-      console.error('Error creating voucher:', error);
+      productionLogger.error('Error creating voucher:', error);
       toast({
         title: "خطأ",
         description: "فشل إنشاء السند. يرجى المحاولة مرة أخرى",

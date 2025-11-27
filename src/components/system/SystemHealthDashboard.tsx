@@ -4,6 +4,7 @@
  */
 
 import { useQuery } from "@tanstack/react-query";
+import { productionLogger } from "@/lib/logger/production-logger";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -103,7 +104,7 @@ export function SystemHealthDashboard() {
       refetch();
     } catch (error) {
       toast.error("فشل في حل التنبيهات");
-      console.error(error);
+      productionLogger.error("فشل في حل التنبيهات:", error);
     }
   };
 
@@ -124,7 +125,7 @@ export function SystemHealthDashboard() {
       refetch();
     } catch (error) {
       toast.error("فشل في مسح الأخطاء");
-      console.error(error);
+      productionLogger.error("فشل في مسح الأخطاء:", error);
     }
   };
 
@@ -143,7 +144,7 @@ export function SystemHealthDashboard() {
       refetch();
     } catch (error) {
       toast.error("فشل التنظيف الفوري");
-      console.error(error);
+      productionLogger.error("فشل التنظيف الفوري:", error);
     }
   };
 

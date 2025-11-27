@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { productionLogger } from '@/lib/logger/production-logger';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -163,7 +164,7 @@ export default function ComprehensiveTestingDashboard() {
         toast.error('حدث خطأ أثناء إضافة البيانات');
       }
     } catch (error) {
-      console.error('Error seeding data:', error);
+      productionLogger.error('Error seeding data:', error);
       toast.error('فشل في إضافة البيانات');
     } finally {
       setIsSeeding(false);
@@ -189,7 +190,7 @@ export default function ComprehensiveTestingDashboard() {
         })));
       }
     } catch (error) {
-      console.error('Error clearing data:', error);
+      productionLogger.error('Error clearing data:', error);
       toast.error('فشل في حذف البيانات');
     } finally {
       setIsClearing(false);

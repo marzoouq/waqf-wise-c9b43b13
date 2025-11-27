@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { productionLogger } from '@/lib/logger/production-logger';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -46,7 +47,7 @@ export function TransferStatusTracker({ transferFileId }: TransferStatusTrackerP
       if (error) throw error;
       setTransfers(data || []);
     } catch (error) {
-      console.error('Error loading transfers:', error);
+      productionLogger.error('Error loading transfers:', error);
     } finally {
       setLoading(false);
     }

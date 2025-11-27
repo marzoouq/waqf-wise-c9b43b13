@@ -1,4 +1,5 @@
 import { Card, CardContent } from '@/components/ui/card';
+import { productionLogger } from '@/lib/logger/production-logger';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, Plus, HelpCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -88,14 +89,14 @@ export function EmptySupportState({ onRefresh }: EmptySupportStateProps) {
         .insert(testTickets);
 
       if (insertError) {
-        console.error('Insert error:', insertError);
+        productionLogger.error('Insert error:', insertError);
         throw insertError;
       }
 
       toast.success('تم إنشاء 5 تذاكر تجريبية بنجاح');
       onRefresh?.();
     } catch (error) {
-      console.error('Error generating test data:', error);
+      productionLogger.error('Error generating test data:', error);
       toast.error('حدث خطأ أثناء إنشاء البيانات التجريبية');
     } finally {
       setIsGenerating(false);
