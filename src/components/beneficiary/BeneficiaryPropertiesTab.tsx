@@ -9,6 +9,22 @@ import { ar } from "date-fns/locale";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { MaskedValue } from "@/components/shared/MaskedValue";
 
+// نوع العقد مع بيانات العقار
+interface ContractWithProperty {
+  id: string;
+  contract_number: string;
+  tenant_name: string;
+  monthly_rent: number;
+  start_date: string;
+  end_date: string;
+  status: string;
+  properties?: {
+    name: string;
+    type: string;
+    location: string;
+  } | null;
+}
+
 export function BeneficiaryPropertiesTab() {
   const { settings } = useVisibilitySettings();
   
@@ -27,7 +43,7 @@ export function BeneficiaryPropertiesTab() {
   });
 
   // جلب العقود النشطة
-  const { data: contracts = [], isLoading: contractsLoading } = useQuery({
+  const { data: contracts = [], isLoading: contractsLoading } = useQuery<ContractWithProperty[]>({
     queryKey: ["contracts-for-beneficiary"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -36,7 +52,7 @@ export function BeneficiaryPropertiesTab() {
           *,
           properties (
             name,
-            property_type,
+            type,
             location
           )
         `)
@@ -44,7 +60,7 @@ export function BeneficiaryPropertiesTab() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data;
+      return data as ContractWithProperty[];
     },
   });
 
@@ -211,7 +227,7 @@ export function BeneficiaryPropertiesTab() {
                     <TableRow key={contract.id}>
                       <TableCell className="font-medium">{contract.contract_number}</TableCell>
                       <TableCell>
-                        {(contract.properties as any)?.name || "—"}
+                        {contract.properties?.name || "—"}
                       </TableCell>
                       <TableCell>
                         {settings?.mask_tenant_info ? "مستأجر" : contract.tenant_name}

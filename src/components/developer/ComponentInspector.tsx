@@ -5,10 +5,39 @@ import { Button } from "@/components/ui/button";
 import { Crosshair, X } from "lucide-react";
 import { toast } from "sonner";
 
+interface ElementAttribute {
+  name: string;
+  value: string;
+}
+
+interface ElementInfoData {
+  tagName: string;
+  className: string;
+  id: string;
+  textContent?: string;
+  dimensions: {
+    width: number;
+    height: number;
+    x: number;
+    y: number;
+  };
+  styles: {
+    display: string;
+    position: string;
+    backgroundColor: string;
+    color: string;
+    fontSize: string;
+    fontFamily: string;
+    margin: string;
+    padding: string;
+  };
+  attributes: ElementAttribute[];
+}
+
 export function ComponentInspector() {
   const [inspecting, setInspecting] = useState(false);
   const [selectedElement, setSelectedElement] = useState<HTMLElement | null>(null);
-  const [elementInfo, setElementInfo] = useState<any>(null);
+  const [elementInfo, setElementInfo] = useState<ElementInfoData | null>(null);
 
   useEffect(() => {
     if (!inspecting) return;
@@ -44,6 +73,7 @@ export function ComponentInspector() {
         tagName: target.tagName.toLowerCase(),
         className: typeof target.className === 'string' 
           ? target.className 
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           : (target.className as any)?.baseVal || '',
         id: target.id,
         textContent: target.textContent?.substring(0, 100),
@@ -188,7 +218,7 @@ export function ComponentInspector() {
                 <div>
                   <h3 className="font-semibold mb-2">الخصائص</h3>
                   <div className="space-y-1 text-sm font-mono">
-                    {elementInfo.attributes.map((attr: any, index: number) => (
+                    {elementInfo.attributes.map((attr: ElementAttribute, index: number) => (
                       <div key={index} className="flex justify-between border-b pb-1">
                         <span className="text-muted-foreground">{attr.name}:</span>
                         <span

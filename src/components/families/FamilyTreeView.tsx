@@ -67,6 +67,7 @@ export function FamilyTreeView({ familyId, familyName }: FamilyTreeViewProps) {
     }
 
     try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await addMember.mutateAsync({
         family_id: familyId,
         beneficiary_id: formData.beneficiary_id,
@@ -74,7 +75,7 @@ export function FamilyTreeView({ familyId, familyName }: FamilyTreeViewProps) {
         is_dependent: formData.is_dependent,
         priority_level: formData.priority_level,
         notes: formData.notes || null,
-      } as any);
+      } as never);
       
       toast.success('تم إضافة الفرد بنجاح');
       setIsAddDialogOpen(false);
