@@ -17,7 +17,7 @@ export function DistributionAnalysisReport() {
     queryFn: async () => {
       const { data: distributions, error } = await supabase
         .from('distributions')
-        .select('*')
+        .select('id, distribution_date, total_amount, beneficiaries_count, status')
         .order('distribution_date', { ascending: true });
       
       if (error) throw error;

@@ -77,7 +77,7 @@ export function AdvancedFamilyManagement({ familyId }: AdvancedFamilyManagementP
       // جلب بيانات العائلة الأساسية
       const { data: familyData, error: familyError } = await supabase
         .from('families')
-        .select('*')
+        .select('id, family_name, tribe, total_members, status, notes, created_at')
         .eq('id', familyId)
         .single();
 

@@ -22,7 +22,7 @@ export function FinancialReports() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('trial_balance')
-        .select('*');
+        .select('code, name_ar, total_debit, total_credit, balance');
       if (error) throw error;
       return (data || []) as TrialBalanceItem[];
     },

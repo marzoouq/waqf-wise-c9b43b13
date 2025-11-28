@@ -72,7 +72,7 @@ export const PaymentsTab = ({ onEdit }: Props) => {
       // البحث عن المستند المؤرشف في Storage
       const { data: documentData } = await supabase
         .from('documents')
-        .select('*')
+        .select('id, name, file_path')
         .eq('name', `Invoice-${invoiceData.invoice_number}.pdf`)
         .single();
 
@@ -87,7 +87,7 @@ export const PaymentsTab = ({ onEdit }: Props) => {
         // fallback: توليد PDF فوري
         const { data: orgSettings } = await supabase
           .from('organization_settings')
-          .select('*')
+          .select('id, organization_name_ar, organization_name_en, address_ar, phone, email, logo_url, vat_registration_number, commercial_registration_number')
           .single();
 
         if (orgSettings) {
@@ -122,7 +122,7 @@ export const PaymentsTab = ({ onEdit }: Props) => {
       // جلب بيانات سند القبض
       const { data: receiptData, error: receiptError } = await supabase
         .from('payments')
-        .select('*')
+        .select('id, payment_number, payment_date, amount, description, payment_method, beneficiary_id, reference_number, payer_name')
         .eq('id', payment.receipt_id)
         .single();
 
@@ -138,7 +138,7 @@ export const PaymentsTab = ({ onEdit }: Props) => {
       // البحث عن المستند المؤرشف
       const { data: documentData } = await supabase
         .from('documents')
-        .select('*')
+        .select('id, name, file_path')
         .eq('name', `Receipt-${receiptData.payment_number}.pdf`)
         .single();
 
@@ -153,7 +153,7 @@ export const PaymentsTab = ({ onEdit }: Props) => {
         // fallback: توليد PDF فوري
         const { data: orgSettings } = await supabase
           .from('organization_settings')
-          .select('*')
+          .select('id, organization_name_ar, organization_name_en, address_ar, phone, email, logo_url, vat_registration_number, commercial_registration_number')
           .single();
 
         if (orgSettings) {

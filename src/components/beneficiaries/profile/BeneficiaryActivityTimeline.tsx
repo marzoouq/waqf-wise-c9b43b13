@@ -31,7 +31,7 @@ export function BeneficiaryActivityTimeline({ beneficiaryId }: BeneficiaryActivi
     queryFn: async () => {
       const { data, error } = await supabase
         .from('beneficiary_activity_log')
-        .select('*')
+        .select('id, action_type, action_description, performed_by_name, created_at, old_values, new_values')
         .eq('beneficiary_id', beneficiaryId)
         .order('created_at', { ascending: false })
         .limit(50);

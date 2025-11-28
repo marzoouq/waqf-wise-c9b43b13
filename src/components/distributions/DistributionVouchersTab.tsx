@@ -51,7 +51,7 @@ export function DistributionVouchersTab({ distributionId }: DistributionVouchers
     queryFn: async () => {
       const { data, error } = await supabase
         .from('payment_vouchers_with_details')
-        .select('*')
+        .select('id, voucher_number, voucher_type, beneficiary_id, amount, status, created_at, description, payment_method, bank_account_id, reference_number, notes, approved_by, approved_at, paid_by, paid_at')
         .eq('distribution_id', distributionId)
         .order('created_at', { ascending: false });
 

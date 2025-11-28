@@ -32,7 +32,7 @@ export function FundsPerformanceReport() {
     queryFn: async () => {
       const { data: funds, error } = await supabase
         .from('funds')
-        .select('*')
+        .select('id, name, category, allocated_amount, spent_amount, beneficiaries_count')
         .eq('is_active', true);
       
       if (error) throw error;

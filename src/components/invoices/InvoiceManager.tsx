@@ -14,7 +14,7 @@ export function InvoiceManager() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('invoices')
-        .select('*')
+        .select('id, invoice_number, invoice_date, customer_name, total_amount, status, zatca_status, is_zatca_compliant, created_at')
         .order('created_at', { ascending: false });
 
       if (error) throw error;

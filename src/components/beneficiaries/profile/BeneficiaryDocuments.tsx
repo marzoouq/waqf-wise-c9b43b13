@@ -31,7 +31,7 @@ export function BeneficiaryDocuments({ beneficiaryId }: BeneficiaryDocumentsProp
     queryFn: async () => {
       const { data, error } = await supabase
         .from('beneficiary_attachments')
-        .select('*')
+        .select('id, file_name, file_type, file_size, description, is_verified, uploaded_by_name, created_at')
         .eq('beneficiary_id', beneficiaryId)
         .order('created_at', { ascending: false });
 

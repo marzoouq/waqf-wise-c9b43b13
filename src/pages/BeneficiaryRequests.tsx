@@ -67,7 +67,7 @@ export default function BeneficiaryRequests() {
 
       const { data, error } = await supabase
         .from('beneficiary_requests')
-        .select('*')
+        .select('id, request_number, request_type_id, description, amount, status, created_at, reviewed_at, decision_notes')
         .eq('beneficiary_id', beneficiary.id)
         .order('created_at', { ascending: false });
 

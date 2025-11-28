@@ -28,7 +28,7 @@ export function AdminAlertsPanel() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('system_alerts')
-        .select('*')
+        .select('id, alert_type, severity, title, description, status, created_at, acknowledged_at, resolved_at')
         .in('status', ['active', 'acknowledged'])
         .order('created_at', { ascending: false })
         .limit(20);

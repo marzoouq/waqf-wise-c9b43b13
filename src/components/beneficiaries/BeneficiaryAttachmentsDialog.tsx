@@ -32,7 +32,7 @@ export function BeneficiaryAttachmentsDialog({
       
       const { data, error } = await supabase
         .from('beneficiary_attachments')
-        .select('*')
+        .select('id, file_name, file_path, file_type, file_size, mime_type, created_at')
         .eq('beneficiary_id', beneficiary.id)
         .order('created_at', { ascending: false });
       

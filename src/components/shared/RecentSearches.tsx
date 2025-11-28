@@ -25,7 +25,7 @@ export function RecentSearches({ searchType, onSelectSearch }: RecentSearchesPro
 
       const { data, error } = await supabase
         .from('search_history')
-        .select('*')
+        .select('id, search_query, filters, results_count, created_at')
         .eq('user_id', user.id)
         .eq('search_type', searchType)
         .order('created_at', { ascending: false })
