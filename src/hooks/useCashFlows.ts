@@ -34,7 +34,7 @@ export function useCashFlows(fiscalYearId?: string) {
       // استدعاء الدالة باستخدام SQL الخام
       const { data, error } = await supabase
         .from('cash_flows')
-        .select('*')
+        .select('id, fiscal_year_id, period_start, period_end, operating_activities, investing_activities, financing_activities, net_cash_flow, opening_cash, closing_cash, created_at, updated_at')
         .order('period_start', { ascending: false })
         .limit(1);
 

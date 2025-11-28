@@ -43,7 +43,7 @@ export function useCustomReports() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('custom_report_templates')
-        .select('*')
+        .select('id, name, description, report_type, configuration, created_by, is_public, is_favorite, created_at, updated_at')
         .order('created_at', { ascending: false });
       
       if (error) throw error;
@@ -160,7 +160,7 @@ export function useCustomReports() {
     
     // مثال: جلب بيانات المستفيدين
     if (template.report_type === 'beneficiaries') {
-      let queryBuilder = supabase.from('beneficiaries').select('*');
+      let queryBuilder = supabase.from('beneficiaries').select('id, full_name, national_id, phone, email, category, status, beneficiary_type, account_balance, total_received, total_payments, created_at');
       
       if (config.filters) {
         Object.entries(config.filters).forEach(([key, value]) => {

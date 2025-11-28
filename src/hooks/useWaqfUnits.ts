@@ -59,7 +59,7 @@ export function useWaqfUnits() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('waqf_units')
-        .select('*')
+        .select('id, code, name, description, waqf_type, location, acquisition_date, acquisition_value, current_value, annual_return, documents, is_active, notes, created_at, updated_at')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -71,7 +71,7 @@ export function useWaqfUnits() {
   const getWaqfUnitWithDetails = async (id: string) => {
     const { data: unit, error: unitError } = await supabase
       .from('waqf_units')
-      .select('*')
+      .select('id, code, name, description, waqf_type, location, acquisition_date, acquisition_value, current_value, annual_return, documents, is_active, notes, created_at, updated_at')
       .eq('id', id)
       .single();
 

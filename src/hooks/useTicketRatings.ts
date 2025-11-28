@@ -8,7 +8,7 @@ export function useTicketRating(ticketId: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('support_ticket_ratings')
-        .select('*')
+        .select('id, ticket_id, rating, feedback, response_speed_rating, solution_quality_rating, staff_friendliness_rating, rated_by, created_at')
         .eq('ticket_id', ticketId)
         .maybeSingle();
 

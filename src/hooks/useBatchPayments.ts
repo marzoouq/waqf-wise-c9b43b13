@@ -28,7 +28,7 @@ export function useBatchPayments(distributionId?: string) {
     queryFn: async () => {
       let query = supabase
         .from('payment_schedules')
-        .select('*')
+        .select('id, distribution_id, scheduled_date, scheduled_amount, status, batch_number, processed_at, error_message, notes, created_at, updated_at')
         .order('scheduled_date', { ascending: true });
 
       if (distributionId) {

@@ -82,7 +82,7 @@ export function useApprovalWorkflows() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('approval_workflows')
-        .select('*')
+        .select('id, workflow_name, entity_type, approval_levels, conditions, is_active, created_at, created_by, updated_at')
         .order('created_at', { ascending: false });
 
       if (error) throw error;

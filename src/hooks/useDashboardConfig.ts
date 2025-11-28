@@ -33,7 +33,7 @@ export function useDashboardConfigs() {
       
       const { data, error } = await supabase
         .from('dashboard_configurations')
-        .select('*')
+        .select('id, user_id, dashboard_name, layout_config, is_default, is_shared, created_at, updated_at')
         .or(`user_id.eq.${user?.id},is_shared.eq.true`)
         .order('is_default', { ascending: false });
 

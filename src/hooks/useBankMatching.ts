@@ -85,7 +85,7 @@ export function useBankMatching() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('bank_matching_rules')
-        .select('*')
+        .select('id, rule_name, description, conditions, account_mapping, priority, is_active, match_count, last_matched_at, created_at, updated_at')
         .eq('is_active', true)
         .order('priority', { ascending: false });
 
@@ -106,7 +106,7 @@ export function useBankMatching() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('bank_reconciliation_matches')
-        .select('*')
+        .select('id, bank_transaction_id, journal_entry_id, match_type, confidence_score, matching_rule_id, matched_at, matched_by, notes')
         .order('matched_at', { ascending: false });
 
       if (error) throw error;
@@ -118,7 +118,7 @@ export function useBankMatching() {
     mutationFn: async ({ statementId }: { statementId: string }) => {
       const { data: transactions, error: txError } = await supabase
         .from('bank_transactions')
-        .select('*')
+        .select('id, statement_id, transaction_date, amount, description, transaction_type, reference_number, is_matched, journal_entry_id, created_at')
         .eq('statement_id', statementId)
         .eq('is_matched', false);
 
@@ -275,7 +275,7 @@ export function useBankMatching() {
     mutationFn: async (matchId: string) => {
       const { data: match, error: fetchError } = await supabase
         .from('bank_reconciliation_matches')
-        .select('*')
+        .select('id, bank_transaction_id, journal_entry_id')
         .eq('id', matchId)
         .single();
 

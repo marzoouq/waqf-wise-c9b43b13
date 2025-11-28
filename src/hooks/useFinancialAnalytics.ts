@@ -62,7 +62,7 @@ export function useFinancialAnalytics(fiscalYearId?: string) {
     queryFn: async () => {
       let query = supabase
         .from('financial_kpis')
-        .select('*')
+        .select('id, kpi_name, kpi_category, kpi_value, kpi_target, period_start, period_end, fiscal_year_id, metadata, created_at')
         .order('created_at', { ascending: false });
 
       if (fiscalYearId) {
@@ -101,7 +101,7 @@ export function useFinancialAnalytics(fiscalYearId?: string) {
     }) => {
       const { data: accounts, error: accountsError } = await supabase
         .from('accounts')
-        .select('*')
+        .select('id, code, account_type, current_balance')
         .eq('is_active', true);
 
       if (accountsError) throw accountsError;

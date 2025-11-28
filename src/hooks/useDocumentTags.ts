@@ -16,7 +16,7 @@ export function useDocumentTags(documentId?: string) {
   return useQuery({
     queryKey: ['document-tags', documentId],
     queryFn: async () => {
-      let query = supabase.from('document_tags').select('*');
+      let query = supabase.from('document_tags').select('id, document_id, tag_name, tag_type, confidence_score, created_at, created_by');
       
       if (documentId) {
         query = query.eq('document_id', documentId);
@@ -111,7 +111,7 @@ export function useSmartSearch() {
         // البحث النصي العادي
         const { data, error } = await supabase
           .from('documents')
-          .select('*')
+          .select('id, name, description, file_type, file_path, file_size, folder_id, created_at, updated_at')
           .or(`name.ilike.%${query}%,description.ilike.%${query}%`);
 
         if (error) throw error;

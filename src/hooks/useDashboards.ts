@@ -48,7 +48,7 @@ export function useDashboards() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('dashboards')
-        .select('*')
+        .select('id, dashboard_name, dashboard_name_ar, description, layout_config, is_default, is_system, created_by, created_at, updated_at')
         .order('is_default', { ascending: false });
 
       if (error) throw error;
@@ -71,7 +71,7 @@ export function useDashboards() {
 
         const { data, error } = await supabase
           .from('dashboard_widgets')
-          .select('*')
+          .select('id, dashboard_id, widget_name, widget_name_ar, widget_type, data_source, config, position_x, position_y, width, height, is_visible, refresh_interval, created_at, updated_at')
           .eq('dashboard_id', dashboardId)
           .eq('is_visible', true)
           .order('position_y', { ascending: true })

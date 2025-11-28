@@ -29,7 +29,7 @@ export function useSavedFilters(filterType: string) {
 
       const { data, error } = await supabase
         .from('saved_filters')
-        .select('*')
+        .select('id, name, filter_type, filter_criteria, is_favorite, created_at, updated_at')
         .eq('user_id', user.id)
         .eq('filter_type', filterType)
         .order('is_favorite', { ascending: false })

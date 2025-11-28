@@ -34,7 +34,7 @@ export function useEligibilityAssessment(beneficiaryId: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('eligibility_assessments')
-        .select('*')
+        .select('id, beneficiary_id, assessment_date, total_score, eligibility_status, criteria_scores, recommendations, assessed_by, created_at')
         .eq('beneficiary_id', beneficiaryId)
         .order('assessment_date', { ascending: false });
 

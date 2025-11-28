@@ -23,7 +23,7 @@ export function useAIInsights() {
     queryFn: async (): Promise<AIInsight[]> => {
       const { data, error } = await supabase
         .from('smart_alerts')
-        .select('*')
+        .select('id, title, description, alert_type, severity, data, created_at, is_dismissed')
         .order('created_at', { ascending: false })
         .limit(20);
 

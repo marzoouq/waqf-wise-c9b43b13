@@ -25,7 +25,7 @@ export function useTranslation() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('translations')
-        .select('*');
+        .select('key, ar, en, fr');
       
       if (error) throw error;
       return data as Translation[];
