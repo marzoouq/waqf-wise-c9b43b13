@@ -138,9 +138,14 @@ class ProductionLogger {
    */
   private addToQueue(level: LogLevel, message: string, data?: unknown): void {
     if (IS_PROD) {
+      // تجاهل الرسائل الفارغة
+      if (!message || typeof message !== 'string' || message.trim() === '') {
+        return;
+      }
+
       this.queue.push({
         level,
-        message,
+        message: message.trim(),
         data,
         timestamp: new Date().toISOString(),
       });
@@ -180,14 +185,25 @@ class ProductionLogger {
     try {
       // إرسال الـ logs بالتنسيق الصحيح
       for (const log of logsToSend.slice(0, 10)) {
+        // تجاهل logs بدون رسالة صالحة
+        if (!log.message || typeof log.message !== 'string' || log.message.trim() === '') {
+          continue;
+        }
+
         try {
+          const errorType = mapLevelToErrorType(log.level) || 'unknown';
+          const errorMessage = log.message.trim() || 'No message';
+          const severity = mapLevelToSeverity(log.level) || 'low';
+          const url = (typeof window !== 'undefined' ? window.location.href : 'server') || 'unknown';
+          const userAgent = (typeof navigator !== 'undefined' ? navigator.userAgent : 'server') || 'unknown';
+
           await supabase.functions.invoke('log-error', {
             body: {
-              error_type: mapLevelToErrorType(log.level),
-              error_message: log.message,
-              severity: mapLevelToSeverity(log.level),
-              url: typeof window !== 'undefined' ? window.location.href : 'server',
-              user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : 'server',
+              error_type: errorType,
+              error_message: errorMessage,
+              severity: severity,
+              url: url,
+              user_agent: userAgent,
               additional_data: {
                 original_level: log.level,
                 timestamp: log.timestamp,

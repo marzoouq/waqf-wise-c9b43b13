@@ -8,19 +8,19 @@ import {
   rateLimitResponse 
 } from '../_shared/cors.ts';
 
-// Schema للتحقق من صحة المدخلات - الأخطاء الحقيقية
+// Schema للتحقق من صحة المدخلات - مع قيم افتراضية
 const errorReportSchema = z.object({
-  error_type: z.string().min(1).max(100),
-  error_message: z.string().min(1).max(2000),
+  error_type: z.string().min(1).max(100).default('unknown_error'),
+  error_message: z.string().min(1).max(2000).default('No message provided'),
   error_stack: z.string().max(10000).optional(),
-  severity: z.enum(['low', 'medium', 'high', 'critical']),
-  url: z.string().max(2000),
-  user_agent: z.string().max(500),
+  severity: z.enum(['low', 'medium', 'high', 'critical']).default('medium'),
+  url: z.string().max(2000).default('unknown'),
+  user_agent: z.string().max(500).default('unknown'),
   user_id: z.string().uuid().optional(),
   additional_data: z.record(z.unknown()).optional()
 });
 
-// Schema للرسائل العامة (INFO, DEBUG, etc.) - اختياري
+// Schema للرسائل العامة (INFO, DEBUG, etc.)
 const generalLogSchema = z.object({
   level: z.enum(['info', 'debug', 'warn', 'error']).optional(),
   message: z.string().optional(),
@@ -68,44 +68,69 @@ Deno.serve(async (req) => {
       }
     }
 
-    // ✅ 2. التحقق من صحة المدخلات - مع دعم الرسائل العامة
-    let errorReport: ErrorReport;
+    // ✅ 2. قراءة البيانات مع معالجة آمنة
+    let rawData: Record<string, unknown> = {};
     try {
-      const rawData = await req.json();
-      console.log('📥 Received data:', JSON.stringify(rawData, null, 2));
-      
-      // أولاً: تحقق إذا كانت رسالة عامة (INFO, DEBUG) وليست خطأ حقيقي
-      const generalLog = generalLogSchema.safeParse(rawData);
-      if (generalLog.success && rawData.level && rawData.level !== 'error') {
-        // رسالة INFO/DEBUG عادية - نقبلها بدون تسجيل في جدول الأخطاء
-        console.log(`ℹ️ General ${rawData.level} log received - not an error, skipping storage`);
+      const bodyText = await req.text();
+      if (!bodyText || bodyText.trim() === '') {
+        console.warn('⚠️ Empty request body received');
         return jsonResponse({
           success: true,
-          message: `${rawData.level} log acknowledged`,
+          message: 'Empty body received - ignored',
           stored: false,
         });
       }
-      
-      // ثانياً: محاولة تحليل كخطأ حقيقي
-      const parseResult = errorReportSchema.safeParse(rawData);
-      
-      if (!parseResult.success) {
-        // إذا لم يكن خطأ بالصيغة المتوقعة، نتجاهله بدون إرجاع خطأ
-        console.warn('⚠️ Data does not match error schema - ignoring:', parseResult.error.issues.map(i => i.path.join('.')));
-        return jsonResponse({
-          success: true,
-          message: 'Data received but not stored (invalid error format)',
-          stored: false,
-        });
-      }
-      
-      errorReport = parseResult.data;
+      rawData = JSON.parse(bodyText);
     } catch (parseError) {
       console.error('❌ Failed to parse JSON:', parseError);
-      return errorResponse('بيانات JSON غير صالحة', 400);
+      return jsonResponse({
+        success: true,
+        message: 'Invalid JSON received - ignored',
+        stored: false,
+      });
     }
 
-    // 🚦 3. Rate Limiting الذكي - منع الحلقات اللانهائية
+    console.log('📥 Received data keys:', Object.keys(rawData));
+    
+    // ✅ 3. أولاً: تحقق إذا كانت رسالة عامة (INFO, DEBUG) وليست خطأ حقيقي
+    const generalLog = generalLogSchema.safeParse(rawData);
+    if (generalLog.success && rawData.level && rawData.level !== 'error') {
+      console.log(`ℹ️ General ${rawData.level} log received - not an error, skipping storage`);
+      return jsonResponse({
+        success: true,
+        message: `${rawData.level} log acknowledged`,
+        stored: false,
+      });
+    }
+
+    // ✅ 4. إضافة قيم افتراضية للحقول الناقصة
+    const normalizedData = {
+      error_type: rawData.error_type || 'unknown_error',
+      error_message: rawData.error_message || rawData.message || 'No message provided',
+      error_stack: rawData.error_stack,
+      severity: rawData.severity || 'medium',
+      url: rawData.url || 'unknown',
+      user_agent: rawData.user_agent || 'unknown',
+      user_id: rawData.user_id,
+      additional_data: rawData.additional_data || rawData.data,
+    };
+    
+    // ✅ 5. محاولة تحليل كخطأ باستخدام safeParse
+    const parseResult = errorReportSchema.safeParse(normalizedData);
+    
+    if (!parseResult.success) {
+      console.warn('⚠️ Data does not match error schema after normalization:', 
+        parseResult.error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join(', '));
+      return jsonResponse({
+        success: true,
+        message: 'Data received but not stored (invalid error format)',
+        stored: false,
+      });
+    }
+    
+    let errorReport = parseResult.data;
+
+    // 🚦 6. Rate Limiting الذكي - منع الحلقات اللانهائية
     if (userId) {
       const oneMinuteAgo = new Date(Date.now() - 60 * 1000).toISOString();
       
@@ -127,7 +152,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    // 🧹 4. تنظيف رسائل الخطأ من HTML tags
+    // 🧹 7. تنظيف رسائل الخطأ من HTML tags
     errorReport.error_message = errorReport.error_message
       .replace(/<[^>]*>/g, '')
       .substring(0, 2000);
@@ -136,7 +161,7 @@ Deno.serve(async (req) => {
       errorReport.error_stack = errorReport.error_stack.substring(0, 10000);
     }
 
-    // 🧹 5. تنظيف URL من query parameters الطويلة
+    // 🧹 8. تنظيف URL من query parameters الطويلة
     try {
       const urlObj = new URL(errorReport.url);
       urlObj.searchParams.delete('__lovable_token');
@@ -147,7 +172,7 @@ Deno.serve(async (req) => {
       errorReport.url = errorReport.url.substring(0, 1000);
     }
 
-    // تسجيل الخطأ في قاعدة البيانات
+    // ✅ 9. تسجيل الخطأ في قاعدة البيانات
     const { data: errorLog, error: insertError } = await supabase
       .from('system_error_logs')
       .insert({

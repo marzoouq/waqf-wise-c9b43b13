@@ -377,10 +377,10 @@ class ErrorTracker {
       
       const cleanReport: ErrorReport = {
         error_type: report.error_type || 'unknown_error',
-        error_message: cleanMessage.substring(0, 2000),
-        severity: report.severity,
-        url: cleanUrl(report.url || window.location.href),
-        user_agent: (report.user_agent || navigator.userAgent).substring(0, 500),
+        error_message: (cleanMessage || 'No message').substring(0, 2000),
+        severity: report.severity || 'medium',
+        url: cleanUrl(report.url || window.location.href) || 'unknown',
+        user_agent: ((report.user_agent || navigator.userAgent) || 'unknown').substring(0, 500),
       };
       
       if (report.error_stack) cleanReport.error_stack = report.error_stack.substring(0, 10000);
