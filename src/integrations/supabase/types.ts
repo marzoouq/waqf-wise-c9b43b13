@@ -10793,6 +10793,7 @@ export type Database = {
           resolved_at: string | null
           resolved_by: string | null
           severity: string
+          source: string | null
           status: string | null
           title: string
         }
@@ -10809,6 +10810,7 @@ export type Database = {
           resolved_at?: string | null
           resolved_by?: string | null
           severity: string
+          source?: string | null
           status?: string | null
           title: string
         }
@@ -10825,6 +10827,7 @@ export type Database = {
           resolved_at?: string | null
           resolved_by?: string | null
           severity?: string
+          source?: string | null
           status?: string | null
           title?: string
         }
