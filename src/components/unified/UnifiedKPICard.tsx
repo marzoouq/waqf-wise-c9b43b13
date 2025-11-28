@@ -1,39 +1,91 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { LucideIcon } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { TrendingUp, TrendingDown, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface UnifiedKPICardProps {
   title: string;
   value: string | number;
-  icon: LucideIcon;
-  trend?: string;
   subtitle?: string;
-  variant?: "default" | "success" | "warning" | "danger";
+  icon: LucideIcon;
+  /** يمكن أن يكون اتجاه ('up' | 'down' | 'neutral') أو نص مثل '+5%' */
+  trend?: 'up' | 'down' | 'neutral' | string;
+  trendValue?: string;
+  variant?: 'primary' | 'success' | 'warning' | 'info' | 'destructive' | 'default' | 'danger';
   loading?: boolean;
+  onClick?: () => void;
+  className?: string;
 }
 
 const variantStyles = {
-  default: {
-    border: "border-l-primary",
-    text: "text-primary",
-    bg: "bg-primary/10",
+  primary: {
+    border: 'border-l-primary',
+    text: 'text-primary',
+    bg: 'bg-primary/5 hover:bg-primary/10',
+    icon: 'text-primary group-hover:scale-110'
   },
   success: {
-    border: "border-l-[hsl(var(--chart-2))]",
-    text: "text-[hsl(var(--chart-2))]",
-    bg: "bg-[hsl(var(--chart-2))]/10",
+    border: 'border-l-[hsl(var(--chart-2))]',
+    text: 'text-[hsl(var(--chart-2))]',
+    bg: 'bg-[hsl(var(--chart-2))]/5 hover:bg-[hsl(var(--chart-2))]/10',
+    icon: 'text-[hsl(var(--chart-2))] group-hover:scale-110'
   },
   warning: {
-    border: "border-l-[hsl(var(--chart-4))]",
-    text: "text-[hsl(var(--chart-4))]",
-    bg: "bg-[hsl(var(--chart-4))]/10",
+    border: 'border-l-[hsl(var(--chart-4))]',
+    text: 'text-[hsl(var(--chart-4))]',
+    bg: 'bg-[hsl(var(--chart-4))]/5 hover:bg-[hsl(var(--chart-4))]/10',
+    icon: 'text-[hsl(var(--chart-4))] group-hover:scale-110'
+  },
+  info: {
+    border: 'border-l-[hsl(var(--chart-1))]',
+    text: 'text-[hsl(var(--chart-1))]',
+    bg: 'bg-[hsl(var(--chart-1))]/5 hover:bg-[hsl(var(--chart-1))]/10',
+    icon: 'text-[hsl(var(--chart-1))] group-hover:scale-110'
+  },
+  destructive: {
+    border: 'border-l-destructive',
+    text: 'text-destructive',
+    bg: 'bg-destructive/5 hover:bg-destructive/10',
+    icon: 'text-destructive group-hover:scale-110'
   },
   danger: {
-    border: "border-l-[hsl(var(--chart-3))]",
-    text: "text-[hsl(var(--chart-3))]",
-    bg: "bg-[hsl(var(--chart-3))]/10",
+    border: 'border-l-[hsl(var(--chart-3))]',
+    text: 'text-[hsl(var(--chart-3))]',
+    bg: 'bg-[hsl(var(--chart-3))]/5 hover:bg-[hsl(var(--chart-3))]/10',
+    icon: 'text-[hsl(var(--chart-3))] group-hover:scale-110'
   },
+  default: {
+    border: 'border-l-muted-foreground',
+    text: 'text-foreground',
+    bg: 'bg-muted/30 hover:bg-muted/50',
+    icon: 'text-muted-foreground group-hover:scale-110'
+  }
 };
+
+/**
+ * تحليل قيمة trend لتحديد الاتجاه والنص
+ */
+function parseTrend(trend?: string): { direction: 'up' | 'down' | 'neutral'; text: string } | null {
+  if (!trend) return null;
+  
+  // إذا كان أحد القيم المحددة
+  if (trend === 'up' || trend === 'down' || trend === 'neutral') {
+    return { direction: trend, text: '' };
+  }
+  
+  // إذا كان نص يحتوي على + أو أرقام موجبة
+  if (trend.includes('+') || /^[0-9]/.test(trend)) {
+    return { direction: 'up', text: trend };
+  }
+  
+  // إذا كان نص يحتوي على -
+  if (trend.includes('-')) {
+    return { direction: 'down', text: trend };
+  }
+  
+  // قيمة ثابتة أو نص آخر
+  return { direction: 'neutral', text: trend };
+}
 
 /**
  * UnifiedKPICard - بطاقة KPI موحدة
@@ -42,62 +94,74 @@ const variantStyles = {
 export function UnifiedKPICard({ 
   title, 
   value, 
-  icon: Icon, 
+  subtitle, 
+  icon: Icon,
   trend,
-  subtitle,
-  variant = "default",
-  loading = false
+  trendValue,
+  variant = 'default',
+  loading = false,
+  onClick,
+  className
 }: UnifiedKPICardProps) {
   const styles = variantStyles[variant];
+  const parsedTrend = parseTrend(trend);
 
   if (loading) {
     return (
-      <Card className="overflow-hidden">
-        <CardContent className="p-6">
-          <div className="animate-pulse space-y-3">
-            <div className="h-4 bg-muted rounded w-24" />
-            <div className="h-8 bg-muted rounded w-32" />
-            <div className="h-3 bg-muted rounded w-20" />
-          </div>
+      <Card className={cn("animate-pulse", className)}>
+        <CardHeader className="pb-2">
+          <Skeleton className="h-4 w-24" />
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-8 w-20 mb-2" />
+          <Skeleton className="h-3 w-16" />
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card className={cn(
-      "overflow-hidden hover:shadow-lg transition-all duration-300",
-      "border-l-4",
-      styles.border
-    )}>
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between">
-          {/* Content */}
-          <div className="space-y-2 flex-1">
-            <p className="text-sm font-medium text-muted-foreground">
-              {title}
-            </p>
-            <p className={cn(
-              "text-2xl md:text-3xl font-bold tabular-nums",
-              styles.text
-            )}>
-              {value}
-            </p>
-            {(trend || subtitle) && (
-              <p className="text-xs text-muted-foreground">
-                {trend || subtitle}
-              </p>
-            )}
-          </div>
-
-          {/* Icon */}
-          <div className={cn(
-            "h-14 w-14 rounded-full flex items-center justify-center",
-            styles.bg
-          )}>
-            <Icon className={cn("h-7 w-7", styles.text)} />
-          </div>
+    <Card 
+      className={cn(
+        "group transition-all duration-300",
+        "border-l-4",
+        styles.border,
+        styles.bg,
+        onClick && "cursor-pointer hover:shadow-lg hover:scale-[1.02]",
+        className
+      )}
+      onClick={onClick}
+    >
+      <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+        <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
+          {title}
+        </CardTitle>
+        <Icon className={cn(
+          "h-3 w-3 sm:h-4 sm:w-4 transition-transform",
+          styles.icon
+        )} />
+      </CardHeader>
+      <CardContent>
+        <div className={cn(
+          "text-lg sm:text-xl md:text-2xl font-bold mb-1",
+          styles.text
+        )}>
+          {value}
         </div>
+        {subtitle && (
+          <p className="text-[10px] sm:text-xs text-muted-foreground">
+            {subtitle}
+          </p>
+        )}
+        {parsedTrend && (
+          <div className="flex items-center gap-1 mt-2">
+            {parsedTrend.direction === 'up' && <TrendingUp className="h-3 w-3 text-[hsl(var(--chart-2))]" />}
+            {parsedTrend.direction === 'down' && <TrendingDown className="h-3 w-3 text-destructive" />}
+            <span className="text-xs text-muted-foreground">
+              {parsedTrend.text || trendValue || 'مقارنة بالشهر السابق'}
+            </span>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

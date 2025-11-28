@@ -2,8 +2,8 @@ import { lazy, Suspense } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart3, Users, Bell } from "lucide-react";
 import { ChatbotQuickCard } from "@/components/dashboard/ChatbotQuickCard";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { ChartSkeleton } from "@/components/dashboard";
+import { KPISkeleton } from "@/components/dashboard/KPISkeleton";
 
 // Import critical components directly for better FCP/LCP
 import { AdminKPIs } from "@/components/dashboard/admin/AdminKPIs";
@@ -24,33 +24,6 @@ const RecentJournalEntries = lazy(() => import("@/components/dashboard/RecentJou
 const VouchersStatsCard = lazy(() => import("@/components/dashboard/VouchersStatsCard").then(m => ({ default: m.VouchersStatsCard })));
 const PropertyStatsCard = lazy(() => import("@/components/dashboard/PropertyStatsCard").then(m => ({ default: m.PropertyStatsCard })));
 const ExpiringContractsCard = lazy(() => import("@/components/dashboard/ExpiringContractsCard").then(m => ({ default: m.ExpiringContractsCard })));
-
-const KPISkeleton = () => (
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-4 sm:mb-6 md:mb-8">
-    {[...Array(8)].map((_, i) => (
-      <Card key={i} className="shadow-soft">
-        <CardHeader className="pb-2 sm:pb-3">
-          <Skeleton className="h-3 sm:h-4 w-24 sm:w-32" />
-        </CardHeader>
-        <CardContent>
-          <Skeleton className="h-6 sm:h-8 w-20 sm:w-24 mb-1 sm:mb-2" />
-          <Skeleton className="h-2 sm:h-3 w-16 sm:w-20" />
-        </CardContent>
-      </Card>
-    ))}
-  </div>
-);
-
-const ChartSkeleton = () => (
-  <Card className="shadow-soft">
-    <CardHeader className="pb-2 sm:pb-4">
-      <Skeleton className="h-4 sm:h-6 w-32 sm:w-40" />
-    </CardHeader>
-    <CardContent>
-      <Skeleton className="h-[200px] sm:h-[250px] md:h-[300px] w-full" />
-    </CardContent>
-  </Card>
-);
 
 interface DashboardTabsProps {
   onOpenBeneficiaryDialog: () => void;

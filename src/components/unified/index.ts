@@ -9,3 +9,6 @@ export { UnifiedFormField, FormGrid, FormSection } from './UnifiedFormField';
 export type { UnifiedFormFieldProps, FieldType, SelectOption } from './UnifiedFormField';
 export { UnifiedFormActions } from './UnifiedFormActions';
 export { UnifiedFormSection } from './UnifiedFormSection';
+
+// Re-export for backward compatibility
+export type { LucideIcon } from 'lucide-react';
