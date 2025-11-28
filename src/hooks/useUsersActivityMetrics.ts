@@ -82,9 +82,9 @@ export function useUsersActivityMetrics() {
 
         return {
           day: format(day, "EEEE", { locale: ar }),
-          activeUsers: uniqueActiveUsers || Math.floor(Math.random() * 20) + 30, // fallback
+          activeUsers: uniqueActiveUsers,
           newUsers: dayNewUsers,
-          logins: dayLogins || Math.floor(Math.random() * 50) + 80, // fallback
+          logins: dayLogins,
         };
       });
 

@@ -151,7 +151,7 @@ export function ScenarioComparison({ scenarios, onExport }: ScenarioComparisonPr
 
                         return (
                           <div
-                            key={sIndex}
+                            key={`${scenario.pattern}-${comparison.beneficiary}-${sIndex}`}
                             className={`flex items-center justify-between p-2 rounded-lg ${
                               isMax ? 'bg-emerald-50 dark:bg-emerald-950' : 
                               isMin ? 'bg-red-50 dark:bg-red-950' : 
