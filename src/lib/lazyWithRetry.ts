@@ -6,7 +6,7 @@
  * https://web.dev/articles/code-splitting-with-dynamic-imports
  */
 
-import { lazy, ComponentType } from 'react';
+import React, { lazy, ComponentType } from 'react';
 
 export interface LazyRetryOptions {
   retries?: number;
