@@ -5,10 +5,15 @@ import { componentTagger } from "lovable-tagger";
 import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
+export default defineConfig(({ mode }) => {
+  // ✅ فرض وضع الإنتاج دائماً للبناء
+  const isProduction = true; // Force production optimizations
+  
+  return {
   define: {
     'import.meta.env.VITE_APP_VERSION': JSON.stringify('2.5.0'),
     'import.meta.env.VITE_BUILD_TIME': JSON.stringify(new Date().toISOString()),
+    'process.env.NODE_ENV': JSON.stringify('production'),
   },
   server: {
     host: "::",
@@ -255,4 +260,4 @@ export default defineConfig(({ mode }) => ({
       }
     }
   }
-}));
+}});
