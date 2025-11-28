@@ -9,7 +9,6 @@ import {
 import { Beneficiary } from "@/types/beneficiary";
 import { PrintableBeneficiariesList } from "./PrintableBeneficiariesList";
 import { createRoot } from "react-dom/client";
-import * as XLSX from "xlsx";
 
 interface BeneficiariesPrintButtonProps {
   beneficiaries: Beneficiary[];
@@ -37,7 +36,10 @@ export function BeneficiariesPrintButton({ beneficiaries }: BeneficiariesPrintBu
     }, 500);
   };
 
-  const handleExportExcel = () => {
+  const handleExportExcel = async () => {
+    // Dynamic import for XLSX
+    const XLSX = await import("xlsx");
+    
     const data = beneficiaries.map((b, index) => ({
       'م': index + 1,
       'الاسم الكامل': b.full_name,

@@ -1,5 +1,3 @@
-import * as XLSX from "xlsx";
-
 // Dynamic imports for jsPDF
 type JsPDF = any;
 type AutoTable = any;
@@ -62,11 +60,14 @@ export const exportToPDF = async (
   doc.save(`${filename}.pdf`);
 };
 
-export const exportToExcel = (
+export const exportToExcel = async (
   data: Record<string, unknown>[],
   filename: string,
   sheetName: string = "Sheet1"
 ) => {
+  // Dynamic import for XLSX
+  const XLSX = await import("xlsx");
+  
   const worksheet = XLSX.utils.json_to_sheet(data);
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);

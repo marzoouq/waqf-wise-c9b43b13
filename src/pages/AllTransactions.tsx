@@ -13,7 +13,6 @@ import { LoadingState } from "@/components/shared/LoadingState";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
-import * as XLSX from "xlsx";
 
 interface UnifiedTransaction {
   source: string;
@@ -91,7 +90,10 @@ export default function AllTransactions() {
   const paginatedTransactions = filteredTransactions.slice(startIndex, endIndex);
 
   // تصدير إلى Excel
-  const handleExportExcel = () => {
+  const handleExportExcel = async () => {
+    // Dynamic import for XLSX
+    const XLSX = await import("xlsx");
+    
     const exportData = filteredTransactions.map((t) => ({
       "التاريخ": format(new Date(t.transaction_date), "dd/MM/yyyy", { locale: ar }),
       "المصدر": t.source_name_ar,
