@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { productionLogger } from '@/lib/logger/production-logger';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -7,9 +7,10 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, LogIn, Smartphone } from 'lucide-react';
+import { Loader2, LogIn, Smartphone, Fingerprint } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
+import { useBiometricAuth } from '@/hooks/useBiometricAuth';
 
 export default function Login() {
   const [identifier, setIdentifier] = useState('');
@@ -19,6 +20,19 @@ export default function Login() {
   const { signIn } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { isSupported: isBiometricSupported, isAuthenticating, authenticateWithBiometric } = useBiometricAuth();
+
+  // محاولة تسجيل الدخول بالبصمة تلقائياً
+  const handleBiometricLogin = async () => {
+    const result = await authenticateWithBiometric(identifier);
+    if (result.success && result.userId) {
+      // الحصول على session للمستخدم
+      toast({
+        title: 'تم التحقق بالبصمة',
+        description: 'يرجى إدخال كلمة المرور لإتمام الدخول',
+      });
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -128,6 +142,28 @@ export default function Login() {
                     </>
                   )}
                 </Button>
+                
+                {isBiometricSupported && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    onClick={handleBiometricLogin}
+                    disabled={isAuthenticating}
+                  >
+                    {isAuthenticating ? (
+                      <>
+                        <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                        جاري التحقق...
+                      </>
+                    ) : (
+                      <>
+                        <Fingerprint className="ml-2 h-4 w-4" />
+                        الدخول بالبصمة
+                      </>
+                    )}
+                  </Button>
+                )}
               </CardFooter>
             </form>
           </TabsContent>
@@ -182,6 +218,29 @@ export default function Login() {
                     </>
                   )}
                 </Button>
+                
+                {isBiometricSupported && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    onClick={handleBiometricLogin}
+                    disabled={isAuthenticating}
+                  >
+                    {isAuthenticating ? (
+                      <>
+                        <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                        جاري التحقق...
+                      </>
+                    ) : (
+                      <>
+                        <Fingerprint className="ml-2 h-4 w-4" />
+                        الدخول بالبصمة
+                      </>
+                    )}
+                  </Button>
+                )}
+                
                 <div className="text-center text-xs text-muted-foreground">
                   إذا كنت مستفيداً جديداً، يرجى التواصل مع الإدارة لإنشاء حساب
                 </div>
