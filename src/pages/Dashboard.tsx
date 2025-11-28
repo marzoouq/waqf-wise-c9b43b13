@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { DashboardTabs } from "@/components/dashboard/DashboardTabs";
 import { DashboardDialogs } from "@/components/dashboard/DashboardDialogs";
