@@ -25,7 +25,36 @@
   - `src/components/dashboard/index.ts` ← يصدر من unified + skeletons
 
 #### ✅ المرحلة 2: إكمال التصديرات
-- `src/components/shared/index.ts` ← تصدير جميع المكونات (31 مكون)
+- `src/components/shared/index.ts`:
+  - تصدير **45+ مكون** (من 13 سابقاً)
+  - تنظيم حسب الفئات (Error Handling, Layout, Performance, etc.)
+  - إضافة Memoized Components كاملة
+  - إضافة Performance Utilities
+  
+- `src/services/index.ts`:
+  - تصدير **10 خدمات** (من 5 سابقاً)
+  - Core Services: Notification, Request, Voucher, Report, BankValidation
+  - Financial Services: Distribution, Payment, Budget
+  - Workflow Services: Approval
+  - Beneficiary Services: Beneficiary
+
+- **إصلاح Circular Dependency:**
+  - تحديث `Dashboard.tsx` للاستيراد المباشر بدلاً من barrel export
+
+#### ✅ المرحلة 3: إصلاح البيانات الثابتة
+- **Hooks جديدة:**
+  - `src/hooks/useSystemPerformanceMetrics.ts` ← جلب من `audit_logs`
+  - `src/hooks/useUsersActivityMetrics.ts` ← جلب من `login_attempts` + `profiles` + `activities`
+
+- **مكونات محدثة (بيانات حقيقية + تحديث تلقائي):**
+  - `SystemPerformanceChart.tsx`:
+    - بيانات من `audit_logs` لآخر 24 ساعة
+    - تجميع حسب 4 ساعات
+    - زر تحديث + loading state
+  - `UsersActivityChart.tsx`:
+    - بيانات من `login_attempts` + `activities` + `profiles`
+    - إحصائيات 7 أيام
+    - زر تحديث + loading state
 
 ---
 

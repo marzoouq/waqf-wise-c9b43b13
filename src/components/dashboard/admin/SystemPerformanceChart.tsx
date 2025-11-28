@@ -1,25 +1,65 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp } from "lucide-react";
+import { TrendingUp, RefreshCw } from "lucide-react";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
+import { useSystemPerformanceMetrics } from "@/hooks/useSystemPerformanceMetrics";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function SystemPerformanceChart() {
-  // بيانات محاكاة للأداء
-  const data = [
-    { time: '00:00', responseTime: 120, requests: 45, cpu: 35 },
-    { time: '04:00', responseTime: 95, requests: 32, cpu: 28 },
-    { time: '08:00', responseTime: 180, requests: 78, cpu: 52 },
-    { time: '12:00', responseTime: 220, requests: 95, cpu: 68 },
-    { time: '16:00', responseTime: 210, requests: 88, cpu: 65 },
-    { time: '20:00', responseTime: 165, requests: 62, cpu: 45 },
-  ];
+  const { data, isLoading, error, refetch, isFetching } = useSystemPerformanceMetrics();
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp className="h-5 w-5" />
+            أداء النظام (آخر 24 ساعة)
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-[300px] w-full" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp className="h-5 w-5" />
+            أداء النظام
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center justify-center h-[300px] text-muted-foreground">
+            <p>حدث خطأ في تحميل البيانات</p>
+            <Button variant="outline" onClick={() => refetch()} className="mt-2">
+              إعادة المحاولة
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="flex items-center gap-2">
           <TrendingUp className="h-5 w-5" />
           أداء النظام (آخر 24 ساعة)
         </CardTitle>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={() => refetch()}
+          disabled={isFetching}
+        >
+          <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
+        </Button>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
