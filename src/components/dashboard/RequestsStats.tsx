@@ -70,7 +70,7 @@ const RequestsStats = () => {
         title="إحصائيات الطلبات"
         actions={
           <button
-            onClick={() => navigate('/requests')}
+            onClick={() => navigate('/staff/requests')}
             className="text-sm text-primary hover:underline"
           >
             عرض الكل
