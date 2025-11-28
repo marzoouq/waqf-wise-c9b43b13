@@ -29,7 +29,7 @@ export function useAdvancedSearch(searchType: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('search_history')
-        .select('*')
+        .select('id, search_query, search_type, filters, results_count, created_at')
         .eq('search_type', searchType)
         .order('created_at', { ascending: false })
         .limit(10);

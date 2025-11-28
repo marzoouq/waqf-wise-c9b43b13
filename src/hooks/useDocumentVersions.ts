@@ -26,7 +26,7 @@ export function useDocumentVersions(documentId: string | undefined) {
       
       const { data, error } = await supabase
         .from('document_versions')
-        .select('*')
+        .select('id, document_id, version_number, file_path, file_size, change_description, created_by, created_at, is_current, metadata')
         .eq('document_id', documentId)
         .order('version_number', { ascending: false });
 
@@ -105,7 +105,7 @@ export function useDocumentVersions(documentId: string | undefined) {
       // جلب الإصدار المطلوب
       const { data: version, error: versionError } = await supabase
         .from('document_versions')
-        .select('*')
+        .select('id, document_id, version_number, file_path')
         .eq('id', versionId)
         .single();
 

@@ -71,7 +71,7 @@ export function useIdentityVerification(beneficiaryId: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('identity_verifications')
-        .select('*')
+        .select('id, beneficiary_id, verification_type, verification_method, verification_status, verification_data, verified_by, verified_at, expiry_date, notes, documents, created_at')
         .eq('beneficiary_id', beneficiaryId)
         .order('created_at', { ascending: false });
 

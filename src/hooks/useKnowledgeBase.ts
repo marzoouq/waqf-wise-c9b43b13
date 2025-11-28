@@ -15,7 +15,7 @@ export function useKnowledgeBase() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('kb_articles')
-        .select('*')
+        .select('id, title, content, summary, slug, category, tags, status, is_featured, sort_order, views_count, helpful_count, not_helpful_count, author_id, created_at, updated_at, published_at, metadata')
         .eq('status', 'published')
         .order('sort_order', { ascending: true })
         .order('created_at', { ascending: false });
@@ -31,7 +31,7 @@ export function useKnowledgeBase() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('kb_articles')
-        .select('*')
+        .select('id, title, content, summary, slug, category, tags, status, is_featured, sort_order, views_count, helpful_count, not_helpful_count, author_id, created_at, updated_at, published_at, metadata')
         .eq('status', 'published')
         .eq('is_featured', true)
         .order('sort_order', { ascending: true })
@@ -48,7 +48,7 @@ export function useKnowledgeBase() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('kb_faqs')
-        .select('*')
+        .select('id, question, answer, category, sort_order, is_active, views_count, helpful_count, created_at, updated_at')
         .eq('is_active', true)
         .order('sort_order', { ascending: true });
 
@@ -61,7 +61,7 @@ export function useKnowledgeBase() {
   const searchArticles = async (searchTerm: string) => {
     const { data, error } = await supabase
       .from('kb_articles')
-      .select('*')
+      .select('id, title, content, summary, slug, category, tags, views_count, created_at, updated_at')
       .eq('status', 'published')
       .or(`title.ilike.%${searchTerm}%,content.ilike.%${searchTerm}%,summary.ilike.%${searchTerm}%`)
       .order('views_count', { ascending: false })
@@ -145,7 +145,7 @@ export function useArticle(id: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('kb_articles')
-        .select('*')
+        .select('id, title, content, summary, slug, category, tags, status, is_featured, sort_order, views_count, helpful_count, not_helpful_count, author_id, created_at, updated_at, published_at, metadata')
         .eq('id', id)
         .single();
 

@@ -20,7 +20,7 @@ export function useAgentAvailability(userId?: string) {
 
       const { data, error } = await supabase
         .from('support_agent_availability')
-        .select('*')
+        .select('id, user_id, is_available, current_load, max_capacity, skills, priority_level')
         .eq('user_id', userId)
         .maybeSingle();
 
@@ -93,7 +93,7 @@ export function useAgentStats(userId?: string, dateRange?: { from: string; to: s
     queryFn: async () => {
       let query = supabase
         .from('support_agent_stats')
-        .select('*');
+        .select('id, user_id, date, total_assigned, total_resolved, total_closed, avg_response_minutes, avg_resolution_minutes, customer_satisfaction_avg, created_at');
 
       if (userId) {
         query = query.eq('user_id', userId);
@@ -143,7 +143,7 @@ export function useAssignmentSettings() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('support_assignment_settings')
-        .select('*')
+        .select('id, assignment_type, auto_assign, max_tickets_per_agent, created_at, updated_at')
         .single();
 
       if (error && error.code !== 'PGRST116') throw error;

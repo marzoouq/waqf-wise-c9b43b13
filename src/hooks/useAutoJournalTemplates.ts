@@ -45,7 +45,7 @@ export function useAutoJournalTemplates() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('auto_journal_templates')
-        .select('*')
+        .select('id, trigger_event, template_name, description, debit_accounts, credit_accounts, is_active, priority, created_at, created_by, updated_at')
         .order('priority', { ascending: false });
 
       if (error) throw error;

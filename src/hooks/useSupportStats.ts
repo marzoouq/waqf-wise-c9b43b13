@@ -82,7 +82,7 @@ export function useSupportStats() {
       try {
       const { data, error } = await supabase
         .from('support_tickets')
-        .select('*')
+        .select('id, ticket_number, subject, status, priority, category, is_overdue, sla_due_at, created_at')
         .eq('is_overdue', true)
         .order('sla_due_at', { ascending: true });
 
@@ -134,7 +134,7 @@ export function useSupportStats() {
 
       const { data, error } = await supabase
         .from('support_statistics')
-        .select('*')
+        .select('id, date, total_tickets, new_tickets, resolved_tickets, closed_tickets, reopened_tickets, avg_first_response_minutes, avg_resolution_minutes, sla_compliance_rate, avg_rating, total_ratings, active_agents, total_responses, created_at')
         .gte('date', thirtyDaysAgo.toISOString().split('T')[0])
         .order('date', { ascending: true });
 

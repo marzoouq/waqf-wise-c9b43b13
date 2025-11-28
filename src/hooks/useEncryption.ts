@@ -245,7 +245,7 @@ export function useEncryption() {
     try {
       let query = supabase
         .from('deleted_files_audit')
-        .select('*')
+        .select('id, original_file_id, file_name, file_path, file_size, file_category, deleted_by, deleted_at, deletion_reason, can_restore, restore_until, permanent_deletion_at, metadata')
         .order('deleted_at', { ascending: false });
 
       if (canRestore) {
@@ -270,7 +270,7 @@ export function useEncryption() {
     try {
       let query = supabase
         .from('sensitive_data_access_log')
-        .select('*')
+        .select('id, user_id, user_email, table_name, record_id, column_name, access_type, ip_address, user_agent, access_reason, was_granted, denial_reason, accessed_at, session_id, metadata')
         .order('accessed_at', { ascending: false })
         .limit(100);
 
