@@ -12,7 +12,7 @@ export function useBackup() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("backup_logs")
-        .select("*")
+        .select("id, backup_type, status, file_path, file_size, tables_included, started_at, completed_at, error_message, created_at")
         .order("created_at", { ascending: false })
         .limit(20);
 
@@ -27,7 +27,7 @@ export function useBackup() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("backup_schedules")
-        .select("*")
+        .select("id, schedule_name, backup_type, frequency, tables_included, retention_days, is_active, include_storage, last_backup_at, next_backup_at, created_at, updated_at")
         .eq("is_active", true);
 
       if (error) throw error;

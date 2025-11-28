@@ -52,7 +52,7 @@ export function useDistributionApprovals(distributionId?: string) {
     queryFn: async () => {
       let query = supabase
         .from("distribution_approvals")
-        .select("*")
+        .select("id, distribution_id, level, approver_id, approver_name, status, notes, approved_at, created_at, updated_at")
         .order("level", { ascending: true });
 
       if (distributionId) {

@@ -28,9 +28,10 @@ export const useBeneficiaryProfile = (userId?: string) => {
       }
 
       // جلب بيانات المستفيد
+      // جلب بيانات المستفيد الكاملة
       const { data: beneficiaryData, error: beneficiaryError } = await supabase
         .from("beneficiaries")
-        .select("*")
+        .select("id, full_name, national_id, phone, email, category, status, beneficiary_type, beneficiary_number, gender, date_of_birth, marital_status, family_id, family_name, family_size, address, city, nationality, bank_name, bank_account_number, iban, account_balance, total_received, total_payments, pending_amount, pending_requests, verification_status, eligibility_status, relationship, notes, tribe, priority_level, monthly_income, employment_status, housing_type, number_of_sons, number_of_daughters, number_of_wives, is_head_of_family, user_id, can_login, last_login_at, parent_beneficiary_id, tags, username, login_enabled_at, last_activity_at, last_notification_at, last_verification_date, next_review_date, last_review_date, risk_score, verification_method, verification_notes, verified_at, verified_by, eligibility_notes, notification_preferences, verification_documents, social_status_details, income_sources, disabilities, medical_conditions, created_at, updated_at")
         .eq("user_id", userId)
         .single();
 

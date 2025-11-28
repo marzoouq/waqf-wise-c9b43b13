@@ -17,7 +17,7 @@ export const useRequestTypes = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('request_types')
-        .select('*')
+        .select('id, name_ar, name_en, description, category, sla_hours, is_active, created_at')
         .eq('is_active', true)
         .order('name_ar', { ascending: true });
 

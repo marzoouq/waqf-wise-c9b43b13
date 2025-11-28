@@ -27,7 +27,7 @@ export function useBankAccounts() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("bank_accounts")
-        .select("*")
+        .select("id, account_id, bank_name, account_number, iban, swift_code, currency, current_balance, is_active, created_at, updated_at")
         .order("bank_name", { ascending: true });
 
       if (error) throw error;

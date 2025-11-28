@@ -31,7 +31,7 @@ export function useAnnualDisclosures() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("annual_disclosures")
-        .select("*")
+        .select("id, year, waqf_name, fiscal_year_id, disclosure_date, opening_balance, closing_balance, total_revenues, total_expenses, administrative_expenses, maintenance_expenses, development_expenses, other_expenses, net_income, nazer_percentage, nazer_share, charity_percentage, charity_share, corpus_percentage, corpus_share, sons_count, daughters_count, wives_count, total_beneficiaries, status, published_at, published_by, bank_statement_url, beneficiaries_details, expenses_breakdown, created_at, updated_at")
         .order("year", { ascending: false });
 
       if (error) throw error;
@@ -45,7 +45,7 @@ export function useAnnualDisclosures() {
       const currentYear = new Date().getFullYear();
       const { data, error } = await supabase
         .from("annual_disclosures")
-        .select("*")
+        .select("id, year, waqf_name, fiscal_year_id, disclosure_date, opening_balance, closing_balance, total_revenues, total_expenses, administrative_expenses, maintenance_expenses, development_expenses, other_expenses, net_income, nazer_percentage, nazer_share, charity_percentage, charity_share, corpus_percentage, corpus_share, sons_count, daughters_count, wives_count, total_beneficiaries, status, published_at, published_by, bank_statement_url, beneficiaries_details, expenses_breakdown, created_at, updated_at")
         .eq("year", currentYear)
         .maybeSingle();
 
@@ -144,7 +144,7 @@ export function useDisclosureBeneficiaries(disclosureId?: string) {
 
       const { data, error } = await supabase
         .from("disclosure_beneficiaries")
-        .select("*")
+        .select("id, disclosure_id, beneficiary_id, beneficiary_name, beneficiary_type, relationship, allocated_amount, payments_count, created_at")
         .eq("disclosure_id", disclosureId)
         .order("allocated_amount", { ascending: false });
 
