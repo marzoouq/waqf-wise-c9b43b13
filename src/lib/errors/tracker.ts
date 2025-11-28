@@ -451,6 +451,13 @@ class ErrorTracker {
 
   private async createSystemAlert(report: ErrorReport): Promise<void> {
     try {
+      // التحقق من وجود جلسة مصادقة قبل إنشاء التنبيه
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        productionLogger.warn('Skipping system alert creation - no auth session');
+        return;
+      }
+
       const { error } = await supabase.from('system_alerts').insert([{
         alert_type: report.error_type,
         severity: report.severity,
