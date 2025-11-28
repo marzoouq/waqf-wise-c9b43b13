@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { productionLogger } from '@/lib/logger/production-logger';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -22,7 +22,7 @@ export default function Login() {
   const { toast } = useToast();
   const { isSupported: isBiometricSupported, isAuthenticating, authenticateWithBiometric } = useBiometricAuth();
 
-  // محاولة تسجيل الدخول بالبصمة تلقائياً
+  // محاولة تسجيل الدخول بالبصمة - التوجيه عبر RoleBasedRedirect
   const handleBiometricLogin = async () => {
     const result = await authenticateWithBiometric();
     if (result.success) {
@@ -30,7 +30,8 @@ export default function Login() {
         title: 'تم تسجيل الدخول بنجاح',
         description: 'مرحباً بك في منصة إدارة الوقف',
       });
-      navigate('/dashboard');
+      // التوجيه للصفحة الوسيطة التي ستحدد لوحة التحكم المناسبة
+      navigate('/redirect');
     }
   };
 
@@ -68,7 +69,8 @@ export default function Login() {
         title: 'تم تسجيل الدخول بنجاح',
         description: 'مرحباً بك في منصة إدارة الوقف',
       });
-      navigate('/dashboard');
+      // التوجيه للصفحة الوسيطة التي ستحدد لوحة التحكم المناسبة
+      navigate('/redirect');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'البيانات المدخلة غير صحيحة';
       toast({
