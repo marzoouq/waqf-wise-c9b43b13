@@ -50,7 +50,7 @@ export class ApprovalService {
       // 2. التحقق من اكتمال جميع الموافقات
       const { data: approvals } = await supabase
         .from('distribution_approvals')
-        .select('*')
+        .select('id, distribution_id, approver_id, approver_name, level, status, notes, approved_at')
         .eq('distribution_id', distributionId);
 
       const allApproved = approvals?.length === 3 && 
@@ -171,7 +171,7 @@ export class ApprovalService {
       // التحقق من اكتمال الموافقات
       const { data: approvals } = await supabase
         .from('loan_approvals')
-        .select('*')
+        .select('id, loan_id, approver_id, approver_name, level, status, notes, approved_at')
         .eq('loan_id', loanId);
 
       const allApproved = approvals?.length >= 2 && 
@@ -233,7 +233,7 @@ export class ApprovalService {
     if (referenceType === 'distribution') {
       const { data, error } = await supabase
         .from('distribution_approvals')
-        .select('*')
+        .select('id, distribution_id, approver_id, approver_name, level, status, notes, approved_at, created_at')
         .eq('distribution_id', referenceId)
         .order('level', { ascending: true });
       if (error) throw error;
@@ -241,7 +241,7 @@ export class ApprovalService {
     } else if (referenceType === 'loan') {
       const { data, error } = await supabase
         .from('loan_approvals')
-        .select('*')
+        .select('id, loan_id, approver_id, approver_name, level, status, notes, approved_at, created_at')
         .eq('loan_id', referenceId)
         .order('level', { ascending: true });
       if (error) throw error;
@@ -249,7 +249,7 @@ export class ApprovalService {
     } else {
       const { data, error } = await supabase
         .from('payment_approvals')
-        .select('*')
+        .select('id, payment_id, approver_id, approver_name, level, status, notes, approved_at, created_at')
         .eq('payment_id', referenceId)
         .order('level', { ascending: true });
       if (error) throw error;

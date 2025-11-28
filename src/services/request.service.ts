@@ -190,7 +190,7 @@ export class RequestService {
   static async getWorkflow(requestId: string) {
     const { data, error } = await supabase
       .from('request_workflows')
-      .select('*')
+      .select('id, request_id, workflow_status, current_step, assigned_to, assigned_at, due_date, sla_hours, escalated_at, escalation_level, created_at, updated_at')
       .eq('request_id', requestId)
       .single();
 
