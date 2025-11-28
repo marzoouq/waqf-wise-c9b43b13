@@ -24,7 +24,7 @@ export function BeneficiarySelector({ selected, onChange }: BeneficiarySelectorP
     try {
       const { data, error } = await supabase
         .from('beneficiaries')
-        .select('*')
+        .select('id, full_name, national_id, category')
         .eq('status', 'active')
         .order('full_name');
 

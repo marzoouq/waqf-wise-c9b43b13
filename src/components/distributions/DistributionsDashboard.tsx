@@ -20,7 +20,7 @@ export function DistributionsDashboard() {
     try {
       const { data, error } = await supabase
         .from('distributions')
-        .select('*')
+        .select('id, created_at, total_amount, status, pattern')
         .order('created_at', { ascending: false });
 
       if (error) throw error;

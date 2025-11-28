@@ -126,7 +126,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select('id, user_id, email, full_name, avatar_url, phone, position, is_active, created_at, updated_at, last_login_at')
         .eq('user_id', userId)
         .maybeSingle();
 
@@ -145,7 +145,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 email: user.email || '',
                 full_name: user.user_metadata?.full_name || user.email || 'مستخدم جديد'
               })
-              .select('*')
+              .select('id, user_id, email, full_name, avatar_url, phone, position, is_active, created_at, updated_at, last_login_at')
               .single();
             
             if (createError) {
@@ -155,7 +155,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 const { data: retryProfile } = await supabase
                   .from('profiles')
-                  .select('*')
+                  .select('id, user_id, email, full_name, avatar_url, phone, position, is_active, created_at, updated_at, last_login_at')
                   .eq('user_id', userId)
                   .maybeSingle();
                 
@@ -168,7 +168,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               else if (createError.code === '23505') {
                 const { data: existingProfile } = await supabase
                   .from('profiles')
-                  .select('*')
+                  .select('id, user_id, email, full_name, avatar_url, phone, position, is_active, created_at, updated_at, last_login_at')
                   .eq('user_id', userId)
                   .maybeSingle();
                 

@@ -46,7 +46,7 @@ export function AdvancedSearch({ onSearch }: AdvancedSearchProps) {
 
       const { data, error } = await supabase
         .from('saved_searches')
-        .select('*')
+        .select('id, name, search_criteria, usage_count, user_id, created_at')
         .eq('user_id', user.id)
         .order('usage_count', { ascending: false });
 
