@@ -1,12 +1,32 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, UserPlus, Smartphone } from 'lucide-react';
+import { Loader2, UserPlus, Smartphone, Check, X } from 'lucide-react';
+import { z } from 'zod';
+
+// ✅ مخطط التحقق من كلمة المرور القوية
+const passwordSchema = z.string()
+  .min(8, 'يجب أن تكون 8 أحرف على الأقل')
+  .regex(/[A-Z]/, 'يجب أن تحتوي على حرف كبير واحد على الأقل')
+  .regex(/[a-z]/, 'يجب أن تحتوي على حرف صغير واحد على الأقل')
+  .regex(/[0-9]/, 'يجب أن تحتوي على رقم واحد على الأقل');
+
+// قائمة كلمات المرور الشائعة الممنوعة
+const commonPasswords = [
+  '12345678', 'password', 'qwertyui', '123456789', 'password1',
+  'admin123', 'welcome1', 'letmein1', 'monkey12', 'dragon12'
+];
+
+interface PasswordRequirement {
+  label: string;
+  met: boolean;
+}
 
 export default function Signup() {
   const [fullName, setFullName] = useState('');
@@ -17,6 +37,40 @@ export default function Signup() {
   const { signUp } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // ✅ حساب قوة كلمة المرور
+  const passwordStrength = useMemo(() => {
+    if (!password) return 0;
+    
+    let strength = 0;
+    if (password.length >= 8) strength += 25;
+    if (/[A-Z]/.test(password)) strength += 25;
+    if (/[a-z]/.test(password)) strength += 25;
+    if (/[0-9]/.test(password)) strength += 15;
+    if (/[^A-Za-z0-9]/.test(password)) strength += 10;
+    
+    return Math.min(100, strength);
+  }, [password]);
+
+  // ✅ متطلبات كلمة المرور
+  const passwordRequirements: PasswordRequirement[] = useMemo(() => [
+    { label: '8 أحرف على الأقل', met: password.length >= 8 },
+    { label: 'حرف كبير (A-Z)', met: /[A-Z]/.test(password) },
+    { label: 'حرف صغير (a-z)', met: /[a-z]/.test(password) },
+    { label: 'رقم (0-9)', met: /[0-9]/.test(password) },
+  ], [password]);
+
+  const getStrengthColor = () => {
+    if (passwordStrength < 50) return 'bg-destructive';
+    if (passwordStrength < 75) return 'bg-yellow-500';
+    return 'bg-green-500';
+  };
+
+  const getStrengthLabel = () => {
+    if (passwordStrength < 50) return 'ضعيفة';
+    if (passwordStrength < 75) return 'متوسطة';
+    return 'قوية';
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,10 +84,22 @@ export default function Signup() {
       return;
     }
 
-    if (password.length < 6) {
+    // ✅ التحقق من كلمة المرور باستخدام Zod
+    const passwordValidation = passwordSchema.safeParse(password);
+    if (!passwordValidation.success) {
       toast({
-        title: 'خطأ',
-        description: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل',
+        title: 'كلمة المرور ضعيفة',
+        description: passwordValidation.error.errors[0].message,
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // ✅ التحقق من كلمات المرور الشائعة
+    if (commonPasswords.includes(password.toLowerCase())) {
+      toast({
+        title: 'كلمة المرور شائعة جداً',
+        description: 'يرجى اختيار كلمة مرور أكثر تعقيداً',
         variant: 'destructive',
       });
       return;
@@ -104,8 +170,46 @@ export default function Signup() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 disabled={isLoading}
-                minLength={6}
+                minLength={8}
               />
+              
+              {/* ✅ مؤشر قوة كلمة المرور */}
+              {password && (
+                <div className="space-y-2 mt-2">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-muted-foreground">قوة كلمة المرور:</span>
+                    <span className={`font-medium ${
+                      passwordStrength < 50 ? 'text-destructive' : 
+                      passwordStrength < 75 ? 'text-yellow-600' : 'text-green-600'
+                    }`}>
+                      {getStrengthLabel()}
+                    </span>
+                  </div>
+                  <Progress 
+                    value={passwordStrength} 
+                    className="h-2"
+                  />
+                  
+                  {/* ✅ متطلبات كلمة المرور */}
+                  <div className="grid grid-cols-2 gap-1 mt-2">
+                    {passwordRequirements.map((req, index) => (
+                      <div 
+                        key={index}
+                        className={`flex items-center gap-1 text-xs ${
+                          req.met ? 'text-green-600' : 'text-muted-foreground'
+                        }`}
+                      >
+                        {req.met ? (
+                          <Check className="h-3 w-3" />
+                        ) : (
+                          <X className="h-3 w-3" />
+                        )}
+                        {req.label}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">تأكيد كلمة المرور</Label>
@@ -116,15 +220,18 @@ export default function Signup() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
                 disabled={isLoading}
-                minLength={6}
+                minLength={8}
               />
+              {confirmPassword && password !== confirmPassword && (
+                <p className="text-xs text-destructive">كلمتا المرور غير متطابقتين</p>
+              )}
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button
               type="submit"
               className="w-full"
-              disabled={isLoading}
+              disabled={isLoading || passwordStrength < 75}
             >
               {isLoading ? (
                 <>

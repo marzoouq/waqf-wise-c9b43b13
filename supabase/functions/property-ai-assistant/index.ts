@@ -4,6 +4,7 @@ import {
   handleCors, 
   jsonResponse, 
   errorResponse,
+  unauthorizedResponse,
   rateLimitResponse 
 } from '../_shared/cors.ts';
 
@@ -12,6 +13,29 @@ serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
+    // ✅ التحقق من المصادقة - إصلاح أمني
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.error('Missing Authorization header');
+      return unauthorizedResponse('غير مصرح - يرجى تسجيل الدخول');
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    
+    const supabaseAuth = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+    );
+
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(token);
+    
+    if (authError || !user) {
+      console.error('Auth error:', authError);
+      return unauthorizedResponse('رمز غير صالح أو منتهي الصلاحية');
+    }
+
+    console.log('Authenticated user for property AI:', user.id);
+
     const { action, data } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     

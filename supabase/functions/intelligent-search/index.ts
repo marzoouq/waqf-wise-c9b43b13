@@ -1,12 +1,36 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { handleCors, jsonResponse, errorResponse } from '../_shared/cors.ts';
+import { handleCors, jsonResponse, errorResponse, unauthorizedResponse } from '../_shared/cors.ts';
 
 serve(async (req) => {
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
 
   try {
+    // ✅ التحقق من المصادقة - إصلاح أمني
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.error('Missing Authorization header');
+      return unauthorizedResponse('غير مصرح - يرجى تسجيل الدخول');
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    
+    const supabaseAuth = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+    );
+
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(token);
+    
+    if (authError || !user) {
+      console.error('Auth error:', authError);
+      return unauthorizedResponse('رمز غير صالح أو منتهي الصلاحية');
+    }
+
+    console.log('Authenticated user for search:', user.id);
+
+    // استخدام service role للبحث
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
@@ -89,12 +113,12 @@ serve(async (req) => {
       });
     }
 
-    // البحث في المستفيدين
+    // البحث في المستفيدين (إخفاء البيانات الحساسة)
     if (searchType === 'all' || searchType === 'beneficiaries') {
       const { data: beneficiaries } = await supabase
         .from('beneficiaries')
-        .select('id, full_name, national_id, phone, category, status')
-        .or(`full_name.ilike.%${searchTerm}%,national_id.ilike.%${searchTerm}%,phone.ilike.%${searchTerm}%`)
+        .select('id, full_name, category, status')
+        .or(`full_name.ilike.%${searchTerm}%`)
         .limit(limit);
 
       beneficiaries?.forEach(ben => {
@@ -105,8 +129,6 @@ serve(async (req) => {
           description: `${ben.category} - ${ben.status}`,
           relevanceScore: ben.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ? 0.9 : 0.6,
           metadata: {
-            nationalId: ben.national_id,
-            phone: ben.phone,
             status: ben.status
           }
         });
@@ -147,8 +169,8 @@ serve(async (req) => {
     if (searchType === 'all' || searchType === 'properties') {
       const { data: properties } = await supabase
         .from('properties')
-        .select('id, name, property_type, address, status')
-        .or(`name.ilike.%${searchTerm}%,address.ilike.%${searchTerm}%`)
+        .select('id, name, type, location, status')
+        .or(`name.ilike.%${searchTerm}%,location.ilike.%${searchTerm}%`)
         .limit(limit);
 
       properties?.forEach(prop => {
@@ -156,10 +178,10 @@ serve(async (req) => {
           id: prop.id,
           type: 'property',
           title: prop.name,
-          description: `${prop.property_type} - ${prop.address || ''}`,
+          description: `${prop.type} - ${prop.location || ''}`,
           relevanceScore: prop.name?.toLowerCase().includes(searchTerm.toLowerCase()) ? 0.85 : 0.6,
           metadata: {
-            propertyType: prop.property_type,
+            propertyType: prop.type,
             status: prop.status
           }
         });
@@ -169,12 +191,13 @@ serve(async (req) => {
     // ترتيب النتائج حسب الصلة
     results.sort((a, b) => b.relevanceScore - a.relevanceScore);
 
-    // تسجيل البحث
+    // تسجيل البحث مع معرف المستخدم
     await supabase
       .from('audit_logs')
       .insert({
         action_type: 'intelligent_search',
         description: `بحث ذكي: "${searchTerm}"`,
+        user_id: user.id,
         new_values: {
           query: searchTerm,
           searchType,
