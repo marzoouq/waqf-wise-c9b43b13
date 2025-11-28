@@ -42,7 +42,7 @@ const Install = () => {
 
   return (
     <PageErrorBoundary pageName="تثبيت التطبيق">
-      <div className="container max-w-4xl mx-auto p-6 space-y-6">
+      <main className="container max-w-4xl mx-auto p-6 space-y-6">
       <Card>
         <CardHeader>
           <CardTitle className="text-3xl">📱 ثبّت تطبيق الوقف</CardTitle>
@@ -118,7 +118,7 @@ const Install = () => {
           )}
         </CardContent>
       </Card>
-      </div>
+      </main>
     </PageErrorBoundary>
   );
 };

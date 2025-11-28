@@ -109,8 +109,9 @@ export default function BeneficiarySupport() {
 
   return (
     <PageErrorBoundary pageName="الدعم الفني">
-      <MobileOptimizedLayout>
-      <div className="space-y-6 pb-20">
+      <main>
+        <MobileOptimizedLayout>
+        <div className="space-y-6 pb-20">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -262,7 +263,8 @@ export default function BeneficiarySupport() {
           </TabsContent>
         </Tabs>
       </div>
-    </MobileOptimizedLayout>
+      </MobileOptimizedLayout>
+      </main>
     </PageErrorBoundary>
   );
 }
