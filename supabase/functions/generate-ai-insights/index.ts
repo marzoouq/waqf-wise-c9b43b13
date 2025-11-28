@@ -1,12 +1,36 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { handleCors, jsonResponse, errorResponse } from '../_shared/cors.ts';
+import { handleCors, jsonResponse, errorResponse, unauthorizedResponse } from '../_shared/cors.ts';
 
 serve(async (req) => {
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
 
   try {
+    // ✅ التحقق من المصادقة - إصلاح أمني
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.error('Missing Authorization header');
+      return unauthorizedResponse('غير مصرح - يرجى تسجيل الدخول');
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    
+    const supabaseAuth = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+    );
+
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(token);
+    
+    if (authError || !user) {
+      console.error('Auth error:', authError);
+      return unauthorizedResponse('رمز غير صالح أو منتهي الصلاحية');
+    }
+
+    console.log('Authenticated user:', user.id);
+
+    // استخدام service role للعمليات الداخلية
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
@@ -107,7 +131,7 @@ serve(async (req) => {
     
     const analysis = aiData.choices?.[0]?.message?.content || 'لم يتم إنشاء تحليل';
 
-    // حفظ التقرير
+    // حفظ التقرير مع معرف المستخدم
     const { data: report } = await supabase
       .from('custom_reports')
       .insert({
@@ -119,7 +143,7 @@ serve(async (req) => {
           dataSnapshot: data ? data.slice(0, 10) : [],
           generatedAt: new Date().toISOString(),
         },
-        created_by: req.headers.get('user-id'),
+        created_by: user.id,
       })
       .select()
       .single();

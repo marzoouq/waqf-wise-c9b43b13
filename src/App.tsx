@@ -101,12 +101,9 @@ const RolesManagement = lazyWithRetry(() => import("./pages/RolesManagement"));
 const KnowledgeBase = lazyWithRetry(() => import("./pages/KnowledgeBase"));
 const PermissionsManagement = lazyWithRetry(() => import("./pages/PermissionsManagement"));
 const Unauthorized = lazyWithRetry(() => import("./pages/Unauthorized"));
-const TestDataManager = lazyWithRetry(() => import("./pages/TestDataManager"));
-const ComprehensiveTestingDashboard = lazyWithRetry(() => import("./pages/ComprehensiveTestingDashboard"));
 const DeveloperGuide = lazyWithRetry(() => import("./pages/DeveloperGuide"));
 const DeveloperTools = lazyWithRetry(() => import("./pages/DeveloperTools"));
 const ProjectDocumentation = lazyWithRetry(() => import("./pages/ProjectDocumentation"));
-const DesignPreview = lazyWithRetry(() => import("./pages/DesignPreview"));
 const NotFound = lazyWithRetry(() => import("./pages/NotFound"));
 
 // Configure QueryClient with optimized defaults and error handling
@@ -392,7 +389,7 @@ const App = () => {
                 </ProtectedRoute>
               } 
             />
-            <Route path="/design-preview" element={<DesignPreview />} />
+            {/* صفحة DesignPreview محذوفة للإنتاج */}
             <Route path="/transparency-settings" element={<TransparencySettings />} />
           <Route 
             path="/settings/roles" 
@@ -560,21 +557,7 @@ const App = () => {
                 {/* Knowledge Base */}
                 <Route path="/knowledge-base" element={<KnowledgeBase />} />
                 
-                {/* Testing Pages */}
-                <Route 
-                  path="/test-data-manager" 
-                  element={
-                    <TestDataManager />
-                  } 
-                />
-                <Route 
-                  path="/comprehensive-testing" 
-                  element={
-                    <ProtectedRoute requiredRole="admin">
-                      <ComprehensiveTestingDashboard />
-                    </ProtectedRoute>
-                  } 
-                />
+                {/* صفحات الاختبار محذوفة للإنتاج */}
                 <Route 
                   path="/developer-guide" 
                   element={
