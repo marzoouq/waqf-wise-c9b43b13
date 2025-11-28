@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, Bell, Shield, Database, Palette, Globe, Settings as SettingsIcon, Building2, Calendar, Eye, BookOpen } from "lucide-react";
+import { User, Bell, Shield, Database, Palette, Globe, Settings as SettingsIcon, Building2, Calendar, Eye, BookOpen, Fingerprint } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { ProfileDialog } from "@/components/settings/ProfileDialog";
@@ -16,6 +16,7 @@ import { PushNotificationsSettings } from "@/components/settings/PushNotificatio
 import { LeakedPasswordCheck } from "@/components/settings/LeakedPasswordCheck";
 import { LanguageSelector } from "@/components/settings/LanguageSelector";
 import { RolesSettingsDialog } from "@/components/settings/RolesSettingsDialog";
+import { BiometricSettings } from "@/components/settings/BiometricSettings";
 import { useToast } from "@/hooks/use-toast";
 import { useUserRole } from "@/hooks/useUserRole";
 import { MobileOptimizedLayout, MobileOptimizedHeader, MobileOptimizedGrid } from "@/components/layout/MobileOptimizedLayout";
@@ -299,7 +300,11 @@ const Settings = () => {
         />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <BiometricSettings />
         <PushNotificationsSettings />
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <LeakedPasswordCheck />
       </div>
       </MobileOptimizedLayout>
