@@ -17,7 +17,7 @@ export function ProfilePaymentsHistory({ beneficiaryId }: ProfilePaymentsHistory
     queryFn: async () => {
       const { data, error } = await supabase
         .from('payments')
-        .select('*')
+        .select('id, amount, description, payment_date, payment_method, beneficiary_id')
         .eq('beneficiary_id', beneficiaryId)
         .order('payment_date', { ascending: false });
 

@@ -40,7 +40,7 @@ export function TransferStatusTracker({ transferFileId }: TransferStatusTrackerP
     try {
       const { data, error } = await supabase
         .from('bank_transfer_details')
-        .select('*')
+        .select('id, beneficiary_name, iban, amount, status, reference_number, error_message, processed_at')
         .eq('transfer_file_id', transferFileId)
         .order('created_at', { ascending: false });
 

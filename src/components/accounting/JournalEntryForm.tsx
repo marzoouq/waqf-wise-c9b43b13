@@ -37,7 +37,7 @@ export function JournalEntryForm() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('accounts')
-        .select('*')
+        .select('id, code, name_ar, account_type, account_nature')
         .eq('is_header', false)
         .eq('is_active', true)
         .order('code');
@@ -53,7 +53,7 @@ export function JournalEntryForm() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('fiscal_years')
-        .select('*')
+        .select('id, name, start_date, end_date, is_active')
         .eq('is_active', true)
         .single();
 

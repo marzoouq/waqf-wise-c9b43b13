@@ -17,7 +17,7 @@ export function DistributionTimelineTab({ distribution }: DistributionTimelineTa
       
       const { data, error } = await supabase
         .from('distribution_approvals')
-        .select('*')
+        .select('id, distribution_id, level, status, approver_name, notes, approved_at, created_at')
         .eq('distribution_id', distribution.id)
         .order('level', { ascending: true });
       
@@ -34,7 +34,7 @@ export function DistributionTimelineTab({ distribution }: DistributionTimelineTa
       
       const { data, error } = await supabase
         .from('approval_history')
-        .select('*')
+        .select('id, action, notes, performed_by_name, created_at')
         .eq('reference_id', distribution.id)
         .eq('approval_type', 'distribution')
         .order('created_at', { ascending: false });

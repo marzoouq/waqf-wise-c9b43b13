@@ -29,7 +29,7 @@ export default function BeneficiaryReports() {
       
       const { data, error } = await supabase
         .from('beneficiaries')
-        .select('*')
+        .select('id, full_name, beneficiary_number, status, user_id')
         .eq('user_id', user.id)
         .single();
 

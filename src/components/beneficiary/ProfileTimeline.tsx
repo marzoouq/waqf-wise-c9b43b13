@@ -43,7 +43,7 @@ export function ProfileTimeline({ beneficiaryId }: ProfileTimelineProps) {
       // جلب المدفوعات
       const { data: payments } = await supabase
         .from('payments')
-        .select('*')
+        .select('id, amount, description, payment_date')
         .eq('beneficiary_id', beneficiaryId)
         .order('payment_date', { ascending: false })
         .limit(10);
@@ -85,7 +85,7 @@ export function ProfileTimeline({ beneficiaryId }: ProfileTimelineProps) {
       // جلب سجل النشاط
       const { data: activities } = await supabase
         .from('beneficiary_activity_log')
-        .select('*')
+        .select('id, action_type, action_description, created_at')
         .eq('beneficiary_id', beneficiaryId)
         .order('created_at', { ascending: false })
         .limit(10);

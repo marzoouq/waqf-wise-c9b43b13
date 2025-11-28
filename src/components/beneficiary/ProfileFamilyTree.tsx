@@ -17,7 +17,7 @@ export function ProfileFamilyTree({ beneficiaryId }: ProfileFamilyTreeProps) {
       // جلب بيانات المستفيد الحالي
       const { data: beneficiary, error: benError } = await supabase
         .from('beneficiaries')
-        .select('*')
+        .select('id, full_name, family_name, category, relationship, is_head_of_family, gender, date_of_birth, status, number_of_sons, number_of_daughters, number_of_wives, family_size')
         .eq('id', beneficiaryId)
         .single();
 
@@ -29,7 +29,7 @@ export function ProfileFamilyTree({ beneficiaryId }: ProfileFamilyTreeProps) {
       if (beneficiary.family_name) {
         const { data: members, error: membersError } = await supabase
           .from('beneficiaries')
-          .select('*')
+          .select('id, full_name, family_name, category, relationship, is_head_of_family, gender, date_of_birth, status')
           .eq('family_name', beneficiary.family_name)
           .neq('id', beneficiaryId)
           .order('is_head_of_family', { ascending: false });
@@ -42,7 +42,7 @@ export function ProfileFamilyTree({ beneficiaryId }: ProfileFamilyTreeProps) {
       // جلب الأبناء المباشرين
       const { data: children, error: childrenError } = await supabase
         .from('beneficiaries')
-        .select('*')
+        .select('id, full_name, family_name, category, relationship, is_head_of_family, gender, date_of_birth, status')
         .eq('parent_beneficiary_id', beneficiaryId);
 
       if (!childrenError && children) {

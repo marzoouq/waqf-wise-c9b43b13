@@ -45,7 +45,7 @@ export function FamilyManagement() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('families')
-        .select('*')
+        .select('id, family_name, head_of_family_id, tribe, total_members, status, notes, created_at')
         .order('created_at', { ascending: false });
 
       if (error) throw error;

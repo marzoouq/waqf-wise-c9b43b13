@@ -26,7 +26,7 @@ export function RevenueExpenseChartUnified() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('journal_entries')
-        .select('*')
+        .select('id, entry_date, entry_number, description, status')
         .order('entry_date', { ascending: true })
         .limit(100);
       

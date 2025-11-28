@@ -17,7 +17,7 @@ export function BudgetVarianceReport() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('fiscal_years')
-        .select('*')
+        .select('id, name, start_date, end_date')
         .order('start_date', { ascending: false });
       if (error) throw error;
       return data;

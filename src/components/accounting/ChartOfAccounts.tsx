@@ -39,7 +39,7 @@ export function ChartOfAccounts() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('accounts')
-        .select('*')
+        .select('id, code, name_ar, name_en, account_type, account_nature, parent_id, is_header, current_balance, is_active')
         .order('code', { ascending: true });
 
       if (error) throw error;
