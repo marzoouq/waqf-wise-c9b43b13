@@ -1,0 +1,25 @@
+-- تحديث جميع إعدادات الشفافية للمستفيدين
+UPDATE beneficiary_visibility_settings
+SET
+  show_overview = true,
+  show_profile = true,
+  show_requests = false,
+  show_distributions = true,
+  show_statements = true,
+  show_properties = true,
+  show_documents = false,
+  show_bank_accounts = true,
+  show_financial_reports = true,
+  show_approvals_log = true,
+  show_disclosures = true,
+  show_governance = true,
+  show_budgets = true,
+  show_family_tree = true,
+  show_other_beneficiaries_names = true,
+  show_total_beneficiaries_count = true,
+  show_beneficiary_categories = true,
+  show_beneficiaries_statistics = true,
+  mask_iban = true,
+  mask_phone_numbers = true,
+  mask_national_ids = true,
+  updated_at = now();

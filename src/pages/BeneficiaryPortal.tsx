@@ -9,14 +9,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { 
-  User, FileText, CreditCard, Upload, MessageSquare, 
+  User, FileText, CreditCard, MessageSquare, 
   TrendingUp, Clock, CheckCircle, AlertCircle, Users, Landmark,
-  Home, DollarSign, Building2, File, BarChart3, Shield
+  DollarSign, Building2, Shield
 } from "lucide-react";
 import { BeneficiaryProfileTab } from "@/components/beneficiary/BeneficiaryProfileTab";
-import { BeneficiaryRequestsTab } from "@/components/beneficiary/BeneficiaryRequestsTab";
 import { BeneficiaryStatementsTab } from "@/components/beneficiary/BeneficiaryStatementsTab";
-import { BeneficiaryDocumentsTab } from "@/components/beneficiary/BeneficiaryDocumentsTab";
 import { BeneficiaryDistributionsTab } from "@/components/beneficiary/BeneficiaryDistributionsTab";
 import { BeneficiaryPropertiesTab } from "@/components/beneficiary/BeneficiaryPropertiesTab";
 import { WaqfSummaryTab } from "@/components/beneficiary/WaqfSummaryTab";
@@ -156,14 +154,8 @@ export default function BeneficiaryPortal() {
               )}
               {settings?.show_properties && (
                 <TabsTrigger value="properties">
-                  <FileText className="h-4 w-4 ml-2" />
+                  <Building2 className="h-4 w-4 ml-2" />
                   العقارات
-                </TabsTrigger>
-              )}
-              {settings?.show_documents && (
-                <TabsTrigger value="documents">
-                  <Upload className="h-4 w-4 ml-2" />
-                  المستندات
                 </TabsTrigger>
               )}
               {settings?.show_family_tree && (
@@ -247,21 +239,21 @@ export default function BeneficiaryPortal() {
                 </Card>
               </div>
 
-              {/* Quick Actions */}
+          {/* Quick Actions - للاطلاع فقط */}
               <Card>
                 <CardHeader>
                   <CardTitle>إجراءات سريعة</CardTitle>
-                  <CardDescription>الإجراءات الأكثر استخداماً</CardDescription>
+                  <CardDescription>روابط الاطلاع السريع على بيانات الوقف</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid gap-4 md:grid-cols-3">
                     <Button 
                       variant="outline" 
                       className="h-auto py-6 flex-col gap-2"
-                      onClick={() => setActiveTab("requests")}
+                      onClick={() => setActiveTab("distributions")}
                     >
-                      <FileText className="h-6 w-6" />
-                      <span>تقديم طلب جديد</span>
+                      <TrendingUp className="h-6 w-6" />
+                      <span>عرض التوزيعات</span>
                     </Button>
                     <Button 
                       variant="outline" 
@@ -274,10 +266,10 @@ export default function BeneficiaryPortal() {
                     <Button 
                       variant="outline" 
                       className="h-auto py-6 flex-col gap-2"
-                      onClick={() => setActiveTab("documents")}
+                      onClick={() => setActiveTab("properties")}
                     >
-                      <Upload className="h-6 w-6" />
-                      <span>رفع مستند</span>
+                      <Building2 className="h-6 w-6" />
+                      <span>عرض العقارات</span>
                     </Button>
                   </div>
                 </CardContent>
@@ -287,11 +279,6 @@ export default function BeneficiaryPortal() {
             {/* Profile Tab */}
             <TabsContent value="profile">
               <BeneficiaryProfileTab beneficiary={beneficiary} />
-            </TabsContent>
-
-            {/* Requests Tab */}
-            <TabsContent value="requests">
-              <BeneficiaryRequestsTab beneficiaryId={beneficiary.id} />
             </TabsContent>
 
             {/* Distributions Tab */}
@@ -367,13 +354,6 @@ export default function BeneficiaryPortal() {
             {settings?.show_own_loans && (
               <TabsContent value="loans">
                 <LoansOverviewTab />
-              </TabsContent>
-            )}
-
-            {/* Documents Tab */}
-            {settings?.show_documents && (
-              <TabsContent value="documents">
-                <BeneficiaryDocumentsTab beneficiaryId={beneficiary.id} />
               </TabsContent>
             )}
           </Tabs>
