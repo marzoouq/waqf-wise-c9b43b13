@@ -18,18 +18,18 @@ if (typeof window !== 'undefined') {
 
 const rootElement = document.getElementById("root")!;
 
-// تنظيف كامل لـ root قبل render
-rootElement.innerHTML = '';
-
-// Remove loading spinner immediately when React mounts
-const loadingElement = document.getElementById("app-loading");
-if (loadingElement) {
-  loadingElement.remove();
-}
-
-// التحقق من الإصدار أولاً قبل render
+// التحقق من الإصدار أولاً قبل أي عرض
 checkAndForceUpdate().then((needsUpdate) => {
   if (!needsUpdate) {
+    // الآن فقط - بعد التأكد من عدم وجود تحديث - نزيل الـ spinner ونعرض التطبيق
+    rootElement.innerHTML = '';
+    
+    const loadingElement = document.getElementById("app-loading");
+    if (loadingElement) {
+      loadingElement.remove();
+    }
+    
     createRoot(rootElement).render(<App />);
   }
+  // إذا needsUpdate = true، الصفحة ستُعاد تحميلها تلقائياً والـ spinner يبقى ظاهراً
 });
