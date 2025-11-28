@@ -8,11 +8,13 @@ import { SettingsProvider } from "./contexts/SettingsContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import MainLayout from "./components/layout/MainLayout";
 import { GlobalErrorBoundary } from "./components/shared/GlobalErrorBoundary";
+import { LazyErrorBoundary } from "./components/shared/LazyErrorBoundary";
 import { LoadingState } from "./components/shared/LoadingState";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { GlobalMonitoring } from "./components/developer/GlobalMonitoring";
 import { IdleTimeoutManager } from "./components/auth/IdleTimeoutManager";
 import { useAlertCleanup } from "./hooks/useAlertCleanup";
+import { lazyWithRetry } from "./lib/lazyWithRetry";
 import "@/lib/errors/tracker";
 import "@/lib/selfHealing";
 
@@ -34,77 +36,77 @@ const ReactQueryDevtools =
       )
     : null;
 
-// Lazy load pages for better performance
-const Login = lazy(() => import("./pages/Login"));
-const Signup = lazy(() => import("./pages/Signup"));
-const Dashboard = lazy(() => import("./pages/Dashboard"));
-const BeneficiaryDashboard = lazy(() => import("./pages/BeneficiaryDashboard"));
-const BeneficiarySupport = lazy(() => import("./pages/BeneficiarySupport"));
-const AccountantDashboard = lazy(() => import("./pages/AccountantDashboard"));
-const NazerDashboard = lazy(() => import("./pages/NazerDashboard"));
-const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
-const CashierDashboard = lazy(() => import("./pages/CashierDashboard"));
-const ArchivistDashboard = lazy(() => import("./pages/ArchivistDashboard"));
-const Beneficiaries = lazy(() => import("./pages/Beneficiaries"));
-const BeneficiaryProfile = lazy(() => import("./pages/BeneficiaryProfile"));
-const Properties = lazy(() => import("./pages/Properties"));
-// PropertyUnits page removed - integrated into Properties page
-const Funds = lazy(() => import("./pages/Funds"));
-const Archive = lazy(() => import("./pages/Archive"));
-const Accounting = lazy(() => import("./pages/Accounting"));
-const Budgets = lazy(() => import("./pages/Budgets"));
-const Reports = lazy(() => import("./pages/Reports"));
-const Settings = lazy(() => import("./pages/Settings"));
-const TransparencySettings = lazy(() => import("./pages/TransparencySettings"));
-const Invoices = lazy(() => import("./pages/Invoices"));
-const Approvals = lazy(() => import("./pages/Approvals"));
-const Payments = lazy(() => import("./pages/Payments"));
-const Loans = lazy(() => import("./pages/Loans"));
-const PaymentVouchers = lazy(() => import("./pages/PaymentVouchers"));
-const WaqfUnits = lazy(() => import("./pages/WaqfUnits"));
-const Install = lazy(() => import("./pages/Install"));
-const Notifications = lazy(() => import("./pages/Notifications"));
-const Requests = lazy(() => import("./pages/Requests"));
-const BeneficiaryRequests = lazy(() => import("./pages/BeneficiaryRequests"));
-const BeneficiaryAccountStatement = lazy(() => import("./pages/BeneficiaryAccountStatement"));
-const BeneficiaryReports = lazy(() => import("./pages/BeneficiaryReports"));
-const StaffRequestsManagement = lazy(() => import("./pages/StaffRequestsManagement"));
-const EmergencyAidManagement = lazy(() => import("./pages/EmergencyAidManagement"));
-const NotificationSettingsPage = lazy(() => import("./pages/NotificationSettings"));
-const CustomReportsPage = lazy(() => import("./pages/CustomReports"));
-const IntegrationsManagement = lazy(() => import("./pages/IntegrationsManagement"));
-const SecurityDashboard = lazy(() => import("./pages/SecurityDashboard"));
-const PerformanceDashboard = lazy(() => import("./pages/PerformanceDashboard"));
-const Families = lazy(() => import("./pages/Families"));
-const FamilyDetails = lazy(() => import("./pages/FamilyDetails"));
-const Users = lazy(() => import("./pages/Users"));
-const AuditLogs = lazy(() => import("./pages/AuditLogs"));
-const AIInsights = lazy(() => import("./pages/AIInsights"));
-const Chatbot = lazy(() => import("./pages/Chatbot"));
-const Support = lazy(() => import("./pages/Support"));
-const SupportManagement = lazy(() => import("./pages/SupportManagement"));
-const SystemErrorLogs = lazy(() => import("./pages/SystemErrorLogs"));
-const SystemMonitoring = lazy(() => import("./pages/SystemMonitoring"));
-const SystemTesting = lazy(() => import("./pages/SystemTesting"));
-const AdvancedSettings = lazy(() => import("./pages/AdvancedSettings"));
-const SystemMaintenance = lazy(() => import("./pages/SystemMaintenance"));
-const AllTransactions = lazy(() => import("./pages/AllTransactions"));
-const BeneficiaryPortal = lazy(() => import("./pages/BeneficiaryPortal"));
-const BankTransfers = lazy(() => import("./pages/BankTransfers"));
-const Messages = lazy(() => import("./pages/Messages"));
-const GovernanceDecisions = lazy(() => import("./pages/GovernanceDecisions"));
-const DecisionDetails = lazy(() => import("./pages/DecisionDetails"));
-const RolesManagement = lazy(() => import("./pages/RolesManagement"));
-const KnowledgeBase = lazy(() => import("./pages/KnowledgeBase"));
-const PermissionsManagement = lazy(() => import("./pages/PermissionsManagement"));
-const Unauthorized = lazy(() => import("./pages/Unauthorized"));
-const TestDataManager = lazy(() => import("./pages/TestDataManager"));
-const ComprehensiveTestingDashboard = lazy(() => import("./pages/ComprehensiveTestingDashboard"));
-const DeveloperGuide = lazy(() => import("./pages/DeveloperGuide"));
-const DeveloperTools = lazy(() => import("./pages/DeveloperTools"));
-const ProjectDocumentation = lazy(() => import("./pages/ProjectDocumentation"));
-const DesignPreview = lazy(() => import("./pages/DesignPreview"));
-const NotFound = lazy(() => import("./pages/NotFound"));
+// Lazy load pages with retry mechanism for better reliability
+// Using lazyWithRetry for critical pages, standard lazy for less critical ones
+const Login = lazyWithRetry(() => import("./pages/Login"));
+const Signup = lazyWithRetry(() => import("./pages/Signup"));
+const Dashboard = lazyWithRetry(() => import("./pages/Dashboard"));
+const BeneficiaryDashboard = lazyWithRetry(() => import("./pages/BeneficiaryDashboard"));
+const BeneficiarySupport = lazyWithRetry(() => import("./pages/BeneficiarySupport"));
+const AccountantDashboard = lazyWithRetry(() => import("./pages/AccountantDashboard"));
+const NazerDashboard = lazyWithRetry(() => import("./pages/NazerDashboard"));
+const AdminDashboard = lazyWithRetry(() => import("./pages/AdminDashboard"));
+const CashierDashboard = lazyWithRetry(() => import("./pages/CashierDashboard"));
+const ArchivistDashboard = lazyWithRetry(() => import("./pages/ArchivistDashboard"));
+const Beneficiaries = lazyWithRetry(() => import("./pages/Beneficiaries"));
+const BeneficiaryProfile = lazyWithRetry(() => import("./pages/BeneficiaryProfile"));
+const Properties = lazyWithRetry(() => import("./pages/Properties"));
+const Funds = lazyWithRetry(() => import("./pages/Funds"));
+const Archive = lazyWithRetry(() => import("./pages/Archive"));
+const Accounting = lazyWithRetry(() => import("./pages/Accounting"));
+const Budgets = lazyWithRetry(() => import("./pages/Budgets"));
+const Reports = lazyWithRetry(() => import("./pages/Reports"));
+const Settings = lazyWithRetry(() => import("./pages/Settings"));
+const TransparencySettings = lazyWithRetry(() => import("./pages/TransparencySettings"));
+const Invoices = lazyWithRetry(() => import("./pages/Invoices"));
+const Approvals = lazyWithRetry(() => import("./pages/Approvals"));
+const Payments = lazyWithRetry(() => import("./pages/Payments"));
+const Loans = lazyWithRetry(() => import("./pages/Loans"));
+const PaymentVouchers = lazyWithRetry(() => import("./pages/PaymentVouchers"));
+const WaqfUnits = lazyWithRetry(() => import("./pages/WaqfUnits"));
+const Install = lazyWithRetry(() => import("./pages/Install"));
+const Notifications = lazyWithRetry(() => import("./pages/Notifications"));
+const Requests = lazyWithRetry(() => import("./pages/Requests"));
+const BeneficiaryRequests = lazyWithRetry(() => import("./pages/BeneficiaryRequests"));
+const BeneficiaryAccountStatement = lazyWithRetry(() => import("./pages/BeneficiaryAccountStatement"));
+const BeneficiaryReports = lazyWithRetry(() => import("./pages/BeneficiaryReports"));
+const StaffRequestsManagement = lazyWithRetry(() => import("./pages/StaffRequestsManagement"));
+const EmergencyAidManagement = lazyWithRetry(() => import("./pages/EmergencyAidManagement"));
+const NotificationSettingsPage = lazyWithRetry(() => import("./pages/NotificationSettings"));
+const CustomReportsPage = lazyWithRetry(() => import("./pages/CustomReports"));
+const IntegrationsManagement = lazyWithRetry(() => import("./pages/IntegrationsManagement"));
+const SecurityDashboard = lazyWithRetry(() => import("./pages/SecurityDashboard"));
+const PerformanceDashboard = lazyWithRetry(() => import("./pages/PerformanceDashboard"));
+const Families = lazyWithRetry(() => import("./pages/Families"));
+const FamilyDetails = lazyWithRetry(() => import("./pages/FamilyDetails"));
+const Users = lazyWithRetry(() => import("./pages/Users"));
+const AuditLogs = lazyWithRetry(() => import("./pages/AuditLogs"));
+const AIInsights = lazyWithRetry(() => import("./pages/AIInsights"));
+const Chatbot = lazyWithRetry(() => import("./pages/Chatbot"));
+const Support = lazyWithRetry(() => import("./pages/Support"));
+const SupportManagement = lazyWithRetry(() => import("./pages/SupportManagement"));
+const SystemErrorLogs = lazyWithRetry(() => import("./pages/SystemErrorLogs"));
+const SystemMonitoring = lazyWithRetry(() => import("./pages/SystemMonitoring"));
+const SystemTesting = lazyWithRetry(() => import("./pages/SystemTesting"));
+const AdvancedSettings = lazyWithRetry(() => import("./pages/AdvancedSettings"));
+const SystemMaintenance = lazyWithRetry(() => import("./pages/SystemMaintenance"));
+const AllTransactions = lazyWithRetry(() => import("./pages/AllTransactions"));
+const BeneficiaryPortal = lazyWithRetry(() => import("./pages/BeneficiaryPortal"));
+const BankTransfers = lazyWithRetry(() => import("./pages/BankTransfers"));
+const Messages = lazyWithRetry(() => import("./pages/Messages"));
+const GovernanceDecisions = lazyWithRetry(() => import("./pages/GovernanceDecisions"));
+const DecisionDetails = lazyWithRetry(() => import("./pages/DecisionDetails"));
+const RolesManagement = lazyWithRetry(() => import("./pages/RolesManagement"));
+const KnowledgeBase = lazyWithRetry(() => import("./pages/KnowledgeBase"));
+const PermissionsManagement = lazyWithRetry(() => import("./pages/PermissionsManagement"));
+const Unauthorized = lazyWithRetry(() => import("./pages/Unauthorized"));
+const TestDataManager = lazyWithRetry(() => import("./pages/TestDataManager"));
+const ComprehensiveTestingDashboard = lazyWithRetry(() => import("./pages/ComprehensiveTestingDashboard"));
+const DeveloperGuide = lazyWithRetry(() => import("./pages/DeveloperGuide"));
+const DeveloperTools = lazyWithRetry(() => import("./pages/DeveloperTools"));
+const ProjectDocumentation = lazyWithRetry(() => import("./pages/ProjectDocumentation"));
+const DesignPreview = lazyWithRetry(() => import("./pages/DesignPreview"));
+const NotFound = lazyWithRetry(() => import("./pages/NotFound"));
 
 // Configure QueryClient with optimized defaults and error handling
 const queryClient = new QueryClient({
@@ -158,6 +160,7 @@ const App = () => {
               >
                 {/* Auto logout after 1 minute of inactivity (except nazer & admin) */}
                 <IdleTimeoutManager />
+            <LazyErrorBoundary>
             <Suspense fallback={<LoadingState size="lg" fullScreen />}>
               <Routes>
                 {/* Public routes */}
@@ -611,6 +614,7 @@ const App = () => {
               />
             </Routes>
           </Suspense>
+            </LazyErrorBoundary>
         </BrowserRouter>
       </TooltipProvider>
       
