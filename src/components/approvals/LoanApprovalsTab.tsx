@@ -14,7 +14,7 @@ import { useApprovalHistory } from "@/hooks/useApprovalHistory";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { LoanForApproval, LoanApprovalRow, calculateProgress, getNextPendingApproval, StatusConfigMap, BadgeVariant } from "@/types/approvals";
+import { LoanForApproval, LoanApprovalRow, calculateProgress, getNextPendingApproval, StatusConfigMap, BadgeVariant } from "@/types";
 
 export function LoanApprovalsTab() {
   const { toast } = useToast();

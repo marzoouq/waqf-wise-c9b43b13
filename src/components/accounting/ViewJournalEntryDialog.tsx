@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/table";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
-import { BadgeVariant, JournalEntryWithLines } from "@/types/approvals";
+import { BadgeVariant, JournalEntryWithLines } from "@/types";
 
 type JournalEntry = {
   id: string;
