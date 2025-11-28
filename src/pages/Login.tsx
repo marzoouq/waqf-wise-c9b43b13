@@ -24,13 +24,13 @@ export default function Login() {
 
   // محاولة تسجيل الدخول بالبصمة تلقائياً
   const handleBiometricLogin = async () => {
-    const result = await authenticateWithBiometric(identifier);
-    if (result.success && result.userId) {
-      // الحصول على session للمستخدم
+    const result = await authenticateWithBiometric();
+    if (result.success) {
       toast({
-        title: 'تم التحقق بالبصمة',
-        description: 'يرجى إدخال كلمة المرور لإتمام الدخول',
+        title: 'تم تسجيل الدخول بنجاح',
+        description: 'مرحباً بك في منصة إدارة الوقف',
       });
+      navigate('/dashboard');
     }
   };
 
