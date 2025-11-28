@@ -38,6 +38,7 @@ const ReactQueryDevtools =
 
 // Lazy load pages with retry mechanism for better reliability
 // Using lazyWithRetry for critical pages, standard lazy for less critical ones
+const LandingPage = lazyWithRetry(() => import("./pages/LandingPage"));
 const Login = lazyWithRetry(() => import("./pages/Login"));
 const Signup = lazyWithRetry(() => import("./pages/Signup"));
 const Dashboard = lazyWithRetry(() => import("./pages/Dashboard"));
@@ -164,6 +165,7 @@ const App = () => {
             <Suspense fallback={<LoadingState size="lg" fullScreen />}>
               <Routes>
                 {/* Public routes */}
+                <Route path="/" element={<LandingPage />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/install" element={<Install />} />
@@ -194,7 +196,7 @@ const App = () => {
                   <ProtectedRoute>
                     <MainLayout>
               <Routes>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route index element={<Navigate to="/dashboard" replace />} />
           
           {/* لوحات التحكم المحمية حسب الأدوار */}
           <Route path="/dashboard" element={<Dashboard />} />
