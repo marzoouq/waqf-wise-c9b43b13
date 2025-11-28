@@ -240,20 +240,29 @@ export function useBiometricAuth() {
         },
       });
 
-      if (authError || !authData?.success) {
+      if (authError) {
+        console.error('Edge function error:', authError);
+        throw new Error('فشل في الاتصال بالخادم');
+      }
+
+      if (!authData?.success) {
         throw new Error(authData?.error || 'فشل في إنشاء الجلسة');
       }
 
       // تسجيل الدخول باستخدام OTP token
-      if (authData.token) {
+      if (authData.token_hash && authData.email) {
         const { error: verifyError } = await supabase.auth.verifyOtp({
-          token_hash: authData.token,
+          email: authData.email,
+          token_hash: authData.token_hash,
           type: 'magiclink',
         });
 
         if (verifyError) {
+          console.error('Verify OTP error:', verifyError);
           throw new Error('فشل في تأكيد الجلسة');
         }
+      } else {
+        throw new Error('بيانات المصادقة غير مكتملة');
       }
 
       toast({
