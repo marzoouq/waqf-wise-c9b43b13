@@ -225,7 +225,7 @@ export class BeneficiaryService {
    */
   static async search(criteria: Record<string, string>) {
     try {
-      let query = supabase.from('beneficiaries').select('*');
+      let query = supabase.from('beneficiaries').select('id, full_name, national_id, phone, category, status, bank_name, iban, gender, marital_status, tribe, city, created_at');
 
       if (criteria.category) {
         query = query.eq('category', criteria.category as string);
