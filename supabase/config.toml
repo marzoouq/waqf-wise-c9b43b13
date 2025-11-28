@@ -71,3 +71,51 @@ verify_jwt = false
 
 [functions.intelligent-search]
 verify_jwt = true
+
+[functions.property-ai-assistant]
+verify_jwt = true
+
+[functions.biometric-auth]
+verify_jwt = true
+
+[functions.auto-create-journal]
+verify_jwt = true
+
+[functions.backup-database]
+verify_jwt = true
+
+[functions.cleanup-sensitive-files]
+verify_jwt = true
+
+[functions.create-beneficiary-accounts]
+verify_jwt = true
+
+[functions.generate-distribution-summary]
+verify_jwt = true
+
+[functions.generate-scheduled-report]
+verify_jwt = true
+
+[functions.notify-admins]
+verify_jwt = true
+
+[functions.notify-disclosure-published]
+verify_jwt = true
+
+[functions.reset-user-password]
+verify_jwt = true
+
+[functions.restore-database]
+verify_jwt = true
+
+[functions.scheduled-cleanup]
+verify_jwt = true
+
+[functions.send-notification]
+verify_jwt = true
+
+[functions.support-auto-escalate]
+verify_jwt = true
+
+[functions.zatca-submit]
+verify_jwt = true
