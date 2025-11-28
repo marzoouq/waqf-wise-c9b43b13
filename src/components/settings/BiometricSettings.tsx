@@ -3,12 +3,12 @@
  * يسمح للمستخدم بتسجيل وإدارة البصمات
  */
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useBiometricAuth } from '@/hooks/useBiometricAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Fingerprint, Trash2, Smartphone, Monitor, Loader2, AlertCircle, ShieldCheck } from 'lucide-react';
+import { Fingerprint, Trash2, Smartphone, Monitor, Loader2, AlertCircle, ShieldCheck, ExternalLink } from 'lucide-react';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -23,8 +23,12 @@ export function BiometricSettings() {
     removeCredential,
     fetchCredentials,
   } = useBiometricAuth();
+  
+  const [isInIframe, setIsInIframe] = useState(false);
 
   useEffect(() => {
+    // التحقق من أننا داخل iframe
+    setIsInIframe(window !== window.parent);
     fetchCredentials();
   }, [fetchCredentials]);
 
@@ -34,6 +38,43 @@ export function BiometricSettings() {
     }
     return <Monitor className="h-4 w-4" />;
   };
+
+  // رسالة خاصة عند التشغيل في iframe
+  if (isInIframe) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Fingerprint className="h-5 w-5" />
+            المصادقة بالبصمة
+          </CardTitle>
+          <CardDescription>
+            تسجيل الدخول باستخدام بصمة الإصبع أو Face ID
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>افتح التطبيق في نافذة مستقلة</AlertTitle>
+            <AlertDescription className="space-y-3">
+              <p>
+                لأسباب أمنية، المصادقة بالبصمة لا تعمل داخل نافذة المعاينة.
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.open(window.location.href, '_blank')}
+                className="gap-2"
+              >
+                <ExternalLink className="h-4 w-4" />
+                فتح في نافذة جديدة
+              </Button>
+            </AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (!isSupported) {
     return (
@@ -52,7 +93,7 @@ export function BiometricSettings() {
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>غير مدعوم</AlertTitle>
             <AlertDescription>
-              جهازك أو المتصفح لا يدعم المصادقة بالبصمة. جرب استخدام متصفح حديث مثل Chrome أو Safari.
+              جهازك أو المتصفح لا يدعم المصادقة بالبصمة. جرب استخدام متصفح حديث مثل Chrome أو Safari على جهاز يدعم البصمة أو Face ID.
             </AlertDescription>
           </Alert>
         </CardContent>
