@@ -22,7 +22,7 @@ export function useFolders() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("folders")
-        .select("*")
+        .select("id, name, description, files_count, created_at, updated_at")
         .order("created_at", { ascending: false });
 
       if (error) throw error;

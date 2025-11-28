@@ -56,7 +56,7 @@ export function useLoanPayments(loanId?: string) {
     queryFn: async () => {
       let query = supabase
         .from('loan_payments')
-        .select('*')
+        .select('id, loan_id, installment_id, payment_number, payment_amount, payment_date, payment_method, journal_entry_id, notes, created_at')
         .order('created_at', { ascending: false });
 
       if (loanId) {
@@ -88,7 +88,7 @@ export function useLoanPayments(loanId?: string) {
       if (payment.installment_id) {
         const { data: installment, error: installmentFetchError } = await supabase
           .from('loan_installments')
-          .select('*')
+          .select('id, loan_id, installment_number, due_date, total_amount, paid_amount, remaining_amount, status, paid_at')
           .eq('id', payment.installment_id)
           .single();
 

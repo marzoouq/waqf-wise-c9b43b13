@@ -65,7 +65,7 @@ export function useDistributions() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("distributions")
-        .select("*")
+        .select("id, month, total_amount, beneficiaries_count, status, distribution_date, distribution_type, period_start, period_end, total_revenues, total_expenses, net_revenues, nazer_share, waqif_charity, waqf_corpus, distributable_amount, notes, journal_entry_id, created_at, updated_at")
         .order("distribution_date", { ascending: false });
 
       if (error) throw error;

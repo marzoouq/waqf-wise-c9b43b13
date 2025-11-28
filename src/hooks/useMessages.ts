@@ -37,7 +37,7 @@ export function useMessages() {
 
       const { data, error } = await supabase
         .from('messages_with_users')
-        .select('*')
+        .select('id, sender_id, receiver_id, subject, body, is_read, read_at, priority, created_at, sender_name, receiver_name')
         .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
         .order('created_at', { ascending: false });
 

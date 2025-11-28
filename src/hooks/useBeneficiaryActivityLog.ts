@@ -44,7 +44,7 @@ export function useBeneficiaryActivityLog(beneficiaryId?: string) {
 
       const { data, error: queryError } = await supabase
         .from("beneficiary_activity_log")
-        .select("*")
+        .select("id, beneficiary_id, action_type, action_description, old_values, new_values, performed_by, performed_by_name, ip_address, user_agent, created_at")
         .eq("beneficiary_id", beneficiaryId)
         .order("created_at", { ascending: false })
         .limit(100);

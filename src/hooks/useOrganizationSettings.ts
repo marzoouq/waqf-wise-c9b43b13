@@ -45,7 +45,7 @@ export const useOrganizationSettings = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("organization_settings")
-        .select("*")
+        .select("id, organization_name_ar, organization_name_en, vat_registration_number, commercial_registration_number, address_ar, address_en, city, postal_code, country, phone, email, logo_url, governance_type, nazer_name, nazer_title, nazer_appointment_date, nazer_contact_phone, nazer_contact_email, waqf_type, waqf_establishment_date, waqf_registration_number, waqf_deed_url, created_at, updated_at")
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();

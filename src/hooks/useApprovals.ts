@@ -19,7 +19,7 @@ export function useApprovals() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('approvals')
-        .select('*')
+        .select('id, journal_entry_id, approver_name, status, notes, approved_at, created_at, updated_at')
         .order('created_at', { ascending: false });
       
       if (error) throw error;

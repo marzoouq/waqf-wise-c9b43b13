@@ -55,7 +55,7 @@ export function usePayments() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("payments")
-        .select("*")
+        .select("id, payment_type, payment_number, payment_date, amount, payment_method, payer_name, reference_number, description, notes, journal_entry_id, status, created_at, updated_at")
         .order("payment_date", { ascending: false });
 
       if (error) throw error;

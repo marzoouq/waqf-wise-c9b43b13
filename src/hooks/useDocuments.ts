@@ -27,7 +27,7 @@ export function useDocuments() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("documents")
-        .select("*")
+        .select("id, name, description, file_type, file_size, file_size_bytes, category, folder_id, uploaded_at, created_at")
         .order("uploaded_at", { ascending: false });
 
       if (error) throw error;

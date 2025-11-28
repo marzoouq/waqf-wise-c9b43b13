@@ -50,7 +50,7 @@ export function useFunds() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("funds")
-        .select("*")
+        .select("id, name, allocated_amount, spent_amount, percentage, beneficiaries_count, category, description, is_active, created_at, updated_at")
         .eq("is_active", true)
         .order("created_at", { ascending: false });
 

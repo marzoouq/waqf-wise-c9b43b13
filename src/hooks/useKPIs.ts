@@ -32,9 +32,8 @@ export function useKPIs(category?: string) {
     queryFn: async () => {
       let query = supabase
         .from("kpi_definitions")
-        .select("*")
-        .eq("is_active", true)
-        .order("sort_order", { ascending: true });
+        .select("id, kpi_name, kpi_code, description, calculation_formula, data_source, target_value, unit, chart_type, is_active, category, created_at")
+        .eq("is_active", true);
 
       if (category) {
         query = query.eq("category", category);

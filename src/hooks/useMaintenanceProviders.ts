@@ -29,7 +29,7 @@ export function useMaintenanceProviders() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("maintenance_providers")
-        .select("*")
+        .select("id, provider_name, contact_person, phone, email, address, specialization, rating, total_jobs, active_jobs, average_cost, average_response_time, is_active, notes, created_at, updated_at")
         .eq("is_active", true)
         .order("rating", { ascending: false });
       

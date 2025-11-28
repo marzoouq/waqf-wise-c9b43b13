@@ -31,7 +31,7 @@ export function useActiveSessions() {
 
       const { data, error } = await supabase
         .from("user_sessions")
-        .select("*")
+        .select("id, user_id, session_token, ip_address, user_agent, device_info, is_active, last_activity_at, created_at")
         .eq("user_id", user.id)
         .eq("is_active", true)
         .order("last_activity_at", { ascending: false });

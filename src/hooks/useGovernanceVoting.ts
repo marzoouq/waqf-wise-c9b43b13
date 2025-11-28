@@ -14,7 +14,7 @@ export function useGovernanceVoting(decisionId: string) {
       try {
         const { data, error } = await supabase
           .from("governance_votes")
-          .select("*")
+          .select("id, decision_id, voter_id, voter_name, voter_type, beneficiary_id, vote, vote_reason, voted_at")
           .eq("decision_id", decisionId)
           .order("voted_at", { ascending: false });
         
@@ -40,7 +40,7 @@ export function useGovernanceVoting(decisionId: string) {
       
       const { data, error } = await supabase
         .from("governance_votes")
-        .select("*")
+        .select("id, decision_id, voter_id, voter_name, voter_type, beneficiary_id, vote, vote_reason, voted_at")
         .eq("decision_id", decisionId)
         .eq("voter_id", user.id)
         .single();

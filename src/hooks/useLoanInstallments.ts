@@ -51,7 +51,7 @@ export function useLoanInstallments(loanId?: string) {
     queryFn: async () => {
       let query = supabase
         .from('loan_installments')
-        .select('*')
+        .select('id, loan_id, installment_number, due_date, principal_amount, interest_amount, total_amount, paid_amount, remaining_amount, status, paid_at, created_at')
         .order('installment_number', { ascending: true });
 
       if (loanId) {

@@ -78,7 +78,7 @@ export function useInvoices() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("invoices")
-        .select("*")
+        .select("id, invoice_number, invoice_date, invoice_time, due_date, customer_name, customer_email, customer_phone, customer_address, customer_city, customer_vat_number, subtotal, tax_amount, tax_rate, total_amount, status, notes, qr_code_data, journal_entry_id, created_at, updated_at")
         .order("invoice_date", { ascending: false });
 
       if (error) throw error;

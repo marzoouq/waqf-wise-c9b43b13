@@ -132,7 +132,7 @@ export function useBudgets(fiscalYearId?: string) {
       // حساب الانحرافات لكل ميزانية
       const { data: budgetsData, error: budgetsError } = await supabase
         .from("budgets")
-        .select("*")
+        .select("id, account_id, fiscal_year_id, period_type, period_number, budgeted_amount, actual_amount, variance_amount")
         .eq("fiscal_year_id", fiscalYearId);
 
       if (budgetsError) throw budgetsError;

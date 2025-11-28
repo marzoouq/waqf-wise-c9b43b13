@@ -54,7 +54,7 @@ export function useChatbot() {
       
       const { data, error } = await supabase
         .from("chatbot_conversations")
-        .select("*")
+        .select("id, message, message_type, created_at, quick_reply_id")
         .eq("user_id", userId)
         .order("created_at", { ascending: true })
         .limit(100);
@@ -71,7 +71,7 @@ export function useChatbot() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("chatbot_quick_replies")
-        .select("*")
+        .select("id, text, icon, prompt, category, order_index, created_at, is_active")
         .eq("is_active", true)
         .order("order_index");
 

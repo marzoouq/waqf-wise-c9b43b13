@@ -17,7 +17,7 @@ export function useGovernanceDecisions() {
       try {
         const { data, error } = await supabase
           .from("governance_decisions")
-          .select("*")
+          .select("id, meeting_id, board_id, decision_number, decision_date, decision_title, decision_text, decision_type, requires_voting, voting_participants_type, custom_voters, voting_method, voting_quorum, pass_threshold, votes_for, votes_against, votes_abstain, total_votes, voting_completed, decision_status, implementation_deadline, responsible_person_name, implementation_plan, implementation_progress, implementation_notes, implemented_at, attachments, notes, created_at, updated_at")
           .order("decision_date", { ascending: false });
         
         if (error) {
