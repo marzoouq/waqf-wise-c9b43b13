@@ -1,12 +1,11 @@
 import { Shield, LayoutDashboard, TrendingUp, Building2, Bell, Vote, Mail } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Suspense, useState } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
 import { Button } from "@/components/ui/button";
 import { AdminSendMessageDialog } from "@/components/messages/AdminSendMessageDialog";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
+import { ChartSkeleton, SectionSkeleton } from "@/components/dashboard";
 import PendingApprovalsSection from "@/components/dashboard/nazer/PendingApprovalsSection";
 import NazerKPIs from "@/components/dashboard/nazer/NazerKPIs";
 import SmartAlertsSection from "@/components/dashboard/nazer/SmartAlertsSection";
@@ -17,36 +16,6 @@ import RevenueExpenseChart from "@/components/dashboard/RevenueExpenseChart";
 import BudgetComparisonChart from "@/components/dashboard/BudgetComparisonChart";
 import { AIInsightsWidget } from "@/components/dashboard/AIInsightsWidget";
 import { GovernanceSection } from "@/components/governance/GovernanceSection";
-
-const ChartSkeleton = () => (
-  <Card>
-    <CardHeader>
-      <Skeleton className="h-6 w-32" />
-    </CardHeader>
-    <CardContent>
-      <Skeleton className="h-64 w-full" />
-    </CardContent>
-  </Card>
-);
-
-const SectionSkeleton = () => (
-  <Card>
-    <CardHeader>
-      <Skeleton className="h-6 w-40" />
-    </CardHeader>
-    <CardContent className="space-y-3">
-      {[...Array(3)].map((_, i) => (
-        <div key={i} className="flex items-center gap-4">
-          <Skeleton className="h-12 w-12 rounded-lg" />
-          <div className="flex-1 space-y-2">
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-3 w-2/3" />
-          </div>
-        </div>
-      ))}
-    </CardContent>
-  </Card>
-);
 
 export default function NazerDashboard() {
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
