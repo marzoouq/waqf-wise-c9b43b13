@@ -41,13 +41,8 @@ export function ResetPasswordDialog({
   const [isSuccess, setIsSuccess] = useState(false);
 
   const generateRandomPassword = () => {
-    // توليد كلمة مرور عشوائية قوية
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789@#$%';
-    let password = '';
-    for (let i = 0; i < 12; i++) {
-      password += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    setNewPassword(password);
+    // استخدام نفس دالة التوليد الآمنة
+    setNewPassword(generateSecurePassword());
   };
 
   const useDefaultPassword = () => {

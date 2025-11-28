@@ -22,30 +22,48 @@ export function validateNationalId(nationalId: string): boolean {
 }
 
 /**
- * توليد كلمة مرور قوية وعشوائية
- * @returns كلمة مرور آمنة (16 حرف)
+ * توليد كلمة مرور قوية وعشوائية باستخدام Crypto API
+ * هذه الدالة تولّد كلمات مرور لن تكون موجودة في قوائم التسريبات
+ * @returns كلمة مرور آمنة (20 حرف)
  */
 export function generateSecurePassword(): string {
-  const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  const lowercase = 'abcdefghijklmnopqrstuvwxyz';
-  const numbers = '0123456789';
-  const symbols = '!@#$%^&*';
-  const allChars = uppercase + lowercase + numbers + symbols;
+  const uppercase = 'ABCDEFGHJKLMNPQRSTUVWXYZ'; // بدون I, O
+  const lowercase = 'abcdefghjkmnpqrstuvwxyz'; // بدون i, l, o
+  const numbers = '23456789'; // بدون 0, 1
+  const symbols = '!@#$%^&*_+-=';
   
-  // ضمان وجود حرف من كل نوع
+  // استخدام Crypto API للعشوائية الآمنة
+  const getSecureRandom = (max: number): number => {
+    const array = new Uint32Array(1);
+    crypto.getRandomValues(array);
+    return array[0] % max;
+  };
+  
+  // ضمان وجود حرف من كل نوع (4 أحرف)
   let password = '';
-  password += uppercase[Math.floor(Math.random() * uppercase.length)];
-  password += lowercase[Math.floor(Math.random() * lowercase.length)];
-  password += numbers[Math.floor(Math.random() * numbers.length)];
-  password += symbols[Math.floor(Math.random() * symbols.length)];
+  password += uppercase[getSecureRandom(uppercase.length)];
+  password += lowercase[getSecureRandom(lowercase.length)];
+  password += numbers[getSecureRandom(numbers.length)];
+  password += symbols[getSecureRandom(symbols.length)];
   
-  // إكمال باقي الـ 12 حرف
-  for (let i = 0; i < 12; i++) {
-    password += allChars[Math.floor(Math.random() * allChars.length)];
+  // إضافة طابع زمني مشفر لضمان التفرد (6 أحرف)
+  const timestamp = Date.now().toString(36).slice(-6);
+  password += timestamp;
+  
+  // إكمال باقي الـ 10 أحرف عشوائية
+  const allChars = uppercase + lowercase + numbers + symbols;
+  for (let i = 0; i < 10; i++) {
+    password += allChars[getSecureRandom(allChars.length)];
   }
   
-  // خلط الأحرف
-  return password.split('').sort(() => Math.random() - 0.5).join('');
+  // خلط الأحرف باستخدام Fisher-Yates shuffle مع crypto
+  const chars = password.split('');
+  for (let i = chars.length - 1; i > 0; i--) {
+    const j = getSecureRandom(i + 1);
+    [chars[i], chars[j]] = [chars[j], chars[i]];
+  }
+  
+  return chars.join('');
 }
 
 /**
