@@ -11,8 +11,7 @@ import {
   Calendar,
   TrendingUp,
   LayoutDashboard,
-  Eye,
-  Briefcase
+  Eye
 } from "lucide-react";
 import { BeneficiaryProfileCard } from "@/components/beneficiary/BeneficiaryProfileCard";
 import { QuickActionsCard } from "@/components/beneficiary/QuickActionsCard";
@@ -27,23 +26,14 @@ import { ChatbotQuickCard } from "@/components/dashboard/ChatbotQuickCard";
 
 import { InternalMessagesDialog } from "@/components/messages/InternalMessagesDialog";
 import { ChangePasswordDialog } from "@/components/beneficiary/ChangePasswordDialog";
-import { DocumentUploadDialog } from "@/components/beneficiary/DocumentUploadDialog";
-import { EmergencyRequestForm } from "@/components/beneficiary/EmergencyRequestForm";
-import { LoanRequestForm } from "@/components/beneficiary/LoanRequestForm";
-import { DataUpdateForm } from "@/components/beneficiary/DataUpdateForm";
-import { AddFamilyMemberForm } from "@/components/beneficiary/AddFamilyMemberForm";
 import { FinancialTransparencyTab } from "@/components/beneficiary/FinancialTransparencyTab";
 import { useBeneficiaryProfile } from "@/hooks/useBeneficiaryProfile";
-import { useBeneficiaryAttachments } from "@/hooks/useBeneficiaryAttachments";
 import { useAuth } from "@/hooks/useAuth";
-import { useRequestTypes } from "@/hooks/useRequests";
 import { formatCurrency } from "@/lib/utils";
-import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { Badge } from "@/components/ui/badge";
-import { logger } from "@/lib/logger";
 
 interface Request {
   id: string;
@@ -55,25 +45,14 @@ interface Request {
 
 const BeneficiaryDashboard = () => {
   const { user } = useAuth();
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const { beneficiary, payments, loading } = useBeneficiaryProfile(user?.id);
-  const { attachments } = useBeneficiaryAttachments(beneficiary?.id);
-  const { requestTypes } = useRequestTypes();
-
-  // دالة مساعدة للحصول على UUID نوع الطلب من الاسم الإنجليزي
-  const getRequestTypeId = (nameEn: string): string => {
-    const type = requestTypes?.find(t => t.name_en === nameEn);
-    return type?.id || "";
-  };
 
   const [messagesOpen, setMessagesOpen] = useState(false);
-  const [documentUploadOpen, setDocumentUploadOpen] = useState(false);
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
-  const [servicesTab, setServicesTab] = useState("history");
 
-  // جلب الطلبات
+  // جلب الطلبات للعرض فقط
   const { data: requests = [] } = useQuery({
     queryKey: ["beneficiary-requests", beneficiary?.id],
     queryFn: async () => {
@@ -91,55 +70,6 @@ const BeneficiaryDashboard = () => {
     enabled: !!beneficiary?.id,
   });
 
-  // Create request mutation
-  const createRequestMutation = useMutation({
-    mutationFn: async (newRequest: {
-      beneficiary_id: string;
-      request_type_id: string;
-      description: string;
-      amount?: number;
-      priority?: string;
-      status?: string;
-    }) => {
-      const { data, error } = await supabase
-        .from("beneficiary_requests")
-        .insert(newRequest)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["beneficiary-requests"] });
-      toast({
-        title: "تم بنجاح",
-        description: "تم إرسال الطلب بنجاح",
-      });
-      setServicesTab("history");
-    },
-    onError: (error: Error) => {
-      const errorMessage = error.message || "حدث خطأ أثناء إرسال الطلب";
-      
-      // تحسين رسائل الخطأ للمستخدم
-      let userFriendlyMessage = errorMessage;
-      
-      if (errorMessage.includes("duplicate") || errorMessage.includes("unique")) {
-        userFriendlyMessage = "يوجد طلب مشابه قيد المعالجة بالفعل. يرجى الانتظار حتى يتم معالجته.";
-      } else if (errorMessage.includes("foreign key") || errorMessage.includes("not found")) {
-        userFriendlyMessage = "حدث خطأ في البيانات. يرجى المحاولة مرة أخرى أو التواصل مع الدعم.";
-      } else if (errorMessage.includes("network") || errorMessage.includes("fetch")) {
-        userFriendlyMessage = "مشكلة في الاتصال بالإنترنت. يرجى التحقق من الاتصال والمحاولة مرة أخرى.";
-      }
-      
-      toast({
-        title: "تعذر إرسال الطلب",
-        description: userFriendlyMessage,
-        variant: "destructive",
-      });
-    },
-  });
-
   const stats = {
     totalPayments: payments.reduce((sum, p) => sum + Number(p.amount), 0),
     paymentsCount: payments.length,
@@ -149,113 +79,6 @@ const BeneficiaryDashboard = () => {
     averagePayment: payments.length > 0 
       ? payments.reduce((sum, p) => sum + Number(p.amount), 0) / payments.length 
       : 0,
-  };
-
-  const handleEmergencyRequest = async (data: Record<string, unknown>) => {
-    try {
-      const requestTypeId = getRequestTypeId("Emergency Aid");
-      
-      if (!requestTypeId) {
-        toast({
-          title: "خطأ",
-          description: "نوع الطلب غير متوفر حالياً",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      await createRequestMutation.mutateAsync({
-        beneficiary_id: beneficiary?.id || "",
-        request_type_id: requestTypeId,
-        description: (data.description as string) || (data.emergency_reason as string),
-        amount: data.amount as number,
-        priority: "عاجل",
-        status: "قيد المراجعة",
-      });
-    } catch (error) {
-      logger.error(error, { context: "submit_emergency_request", severity: "medium" });
-    }
-  };
-
-  const handleLoanRequest = async (data: Record<string, unknown>) => {
-    try {
-      const requestTypeId = getRequestTypeId("Loan");
-      
-      if (!requestTypeId) {
-        toast({
-          title: "خطأ",
-          description: "نوع الطلب غير متوفر حالياً",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      await createRequestMutation.mutateAsync({
-        beneficiary_id: beneficiary?.id || "",
-        request_type_id: requestTypeId,
-        description: (data.description as string) || `طلب قرض بمبلغ ${data.amount}`,
-        amount: (data.amount as number) || (data.loan_amount as number),
-        priority: "عادية",
-        status: "قيد المراجعة",
-      });
-    } catch (error) {
-      logger.error(error, { context: "submit_loan_request", severity: "medium" });
-    }
-  };
-
-  const handleDataUpdate = async (data: Record<string, unknown>) => {
-    try {
-      const requestTypeId = getRequestTypeId("Data Update");
-      
-      if (!requestTypeId) {
-        toast({
-          title: "خطأ",
-          description: "نوع الطلب غير متوفر حالياً",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      await createRequestMutation.mutateAsync({
-        beneficiary_id: beneficiary?.id || "",
-        request_type_id: requestTypeId,
-        description: `طلب تحديث البيانات: ${JSON.stringify(data)}`,
-        priority: "عادية",
-        status: "قيد المراجعة",
-      });
-    } catch (error) {
-      logger.error(error, { context: "submit_data_update_request", severity: "medium" });
-    }
-  };
-
-  const handleAddFamily = async (data: Record<string, unknown>) => {
-    try {
-      const requestTypeId = getRequestTypeId("Add Newborn");
-      
-      if (!requestTypeId) {
-        toast({
-          title: "خطأ",
-          description: "نوع الطلب غير متوفر حالياً",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      await createRequestMutation.mutateAsync({
-        beneficiary_id: beneficiary?.id || "",
-        request_type_id: requestTypeId,
-        description: `طلب إضافة فرد جديد للعائلة: ${JSON.stringify(data)}`,
-        priority: "عادية",
-        status: "قيد المراجعة",
-      });
-    } catch (error) {
-      logger.error(error, { context: "submit_add_family_member_request", severity: "medium" });
-    }
-  };
-
-  const handleRequestSuccess = () => {
-    queryClient.invalidateQueries({ queryKey: ["beneficiary-requests"] });
-    setServicesTab("history");
   };
 
   if (loading) return <LoadingState message="جاري تحميل البيانات..." />;
@@ -336,7 +159,7 @@ const BeneficiaryDashboard = () => {
           />
         </UnifiedStatsGrid>
 
-        {/* التبويبات الرئيسية - 3 فقط */}
+        {/* التبويبات الرئيسية - للاطلاع فقط */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <TabsList className="grid w-full grid-cols-3 h-12">
             <TabsTrigger value="overview" className="text-sm gap-2">
@@ -349,10 +172,10 @@ const BeneficiaryDashboard = () => {
               <span className="hidden sm:inline">الشفافية المالية</span>
               <span className="sm:hidden">شفافية</span>
             </TabsTrigger>
-            <TabsTrigger value="services" className="text-sm gap-2">
-              <Briefcase className="h-4 w-4" />
-              <span className="hidden sm:inline">الخدمات والطلبات</span>
-              <span className="sm:hidden">خدمات</span>
+            <TabsTrigger value="history" className="text-sm gap-2">
+              <FileText className="h-4 w-4" />
+              <span className="hidden sm:inline">سجل الطلبات</span>
+              <span className="sm:hidden">السجل</span>
             </TabsTrigger>
           </TabsList>
 
@@ -361,25 +184,8 @@ const BeneficiaryDashboard = () => {
             {/* المساعد الذكي */}
             <ChatbotQuickCard />
 
-            {/* الإجراءات السريعة */}
+            {/* الإجراءات السريعة - للاطلاع فقط */}
             <QuickActionsCard
-              onEmergencyRequest={() => {
-                setActiveTab("services");
-                setServicesTab("emergency");
-              }}
-              onLoanRequest={() => {
-                setActiveTab("services");
-                setServicesTab("loan");
-              }}
-              onDataUpdate={() => {
-                setActiveTab("services");
-                setServicesTab("update");
-              }}
-              onAddFamily={() => {
-                setActiveTab("services");
-                setServicesTab("family");
-              }}
-              onUploadDocument={() => setDocumentUploadOpen(true)}
               onMessages={() => setMessagesOpen(true)}
             />
 
@@ -401,123 +207,63 @@ const BeneficiaryDashboard = () => {
             <FinancialTransparencyTab />
           </TabsContent>
 
-          {/* الخدمات والطلبات */}
-          <TabsContent value="services">
-            <Tabs 
-              value={servicesTab} 
-              onValueChange={setServicesTab} 
-              orientation="vertical" 
-              className="flex flex-col md:flex-row gap-4"
-            >
-              <TabsList className="flex flex-row md:flex-col h-auto w-full md:w-48 gap-1 overflow-x-auto md:overflow-visible">
-                <TabsTrigger value="history" className="w-full justify-start whitespace-nowrap">
-                  <FileText className="h-4 w-4 ml-2" />
-                  سجل الطلبات
-                </TabsTrigger>
-                <TabsTrigger value="emergency" className="w-full justify-start whitespace-nowrap">
-                  <DollarSign className="h-4 w-4 ml-2" />
-                  طلب فزعة
-                </TabsTrigger>
-                <TabsTrigger value="loan" className="w-full justify-start whitespace-nowrap">
-                  <FileText className="h-4 w-4 ml-2" />
-                  طلب قرض
-                </TabsTrigger>
-                <TabsTrigger value="update" className="w-full justify-start whitespace-nowrap">
-                  <User className="h-4 w-4 ml-2" />
-                  تحديث البيانات
-                </TabsTrigger>
-                <TabsTrigger value="family" className="w-full justify-start whitespace-nowrap">
-                  <User className="h-4 w-4 ml-2" />
-                  إضافة فرد
-                </TabsTrigger>
-              </TabsList>
-
-              <div className="flex-1">
-                <TabsContent value="history">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>سجل الطلبات</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      {requests.length === 0 ? (
-                        <p className="text-center text-muted-foreground py-8">
-                          لا توجد طلبات حالياً
-                        </p>
-                      ) : (
-                        <div className="space-y-4">
-                          {requests.map((request) => (
-                            <div 
-                              key={request.id} 
-                              className="flex flex-col md:flex-row md:items-center justify-between p-4 border rounded-lg gap-3"
-                            >
-                              <div className="flex-1">
-                                <p className="font-medium">{request.description}</p>
-                                <p className="text-sm text-muted-foreground">
-                                  {new Date(request.created_at).toLocaleDateString("ar-SA")}
-                                </p>
-                                {request.amount && (
-                                  <p className="text-sm text-muted-foreground mt-1">
-                                    المبلغ: <span className="font-semibold">{formatCurrency(request.amount)}</span>
-                                  </p>
-                                )}
-                              </div>
-                              <Badge
-                                variant={
-                                  request.status === "موافق" 
-                                    ? "default" 
-                                    : request.status === "مرفوض" 
-                                    ? "destructive" 
-                                    : "secondary"
-                                }
-                              >
-                                {request.status}
-                              </Badge>
-                            </div>
-                          ))}
+          {/* سجل الطلبات - للعرض فقط */}
+          <TabsContent value="history">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  سجل الطلبات السابقة
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {requests.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">
+                    لا توجد طلبات سابقة
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    {requests.map((request) => (
+                      <div 
+                        key={request.id} 
+                        className="flex flex-col md:flex-row md:items-center justify-between p-4 border rounded-lg gap-3"
+                      >
+                        <div className="flex-1">
+                          <p className="font-medium">{request.description}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {new Date(request.created_at).toLocaleDateString("ar-SA")}
+                          </p>
+                          {request.amount && (
+                            <p className="text-sm text-muted-foreground mt-1">
+                              المبلغ: <span className="font-semibold">{formatCurrency(request.amount)}</span>
+                            </p>
+                          )}
                         </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-
-                <TabsContent value="emergency">
-                  <EmergencyRequestForm onSubmit={handleEmergencyRequest} />
-                </TabsContent>
-
-                <TabsContent value="loan">
-                  <LoanRequestForm onSubmit={handleLoanRequest} />
-                </TabsContent>
-
-                <TabsContent value="update">
-                  <DataUpdateForm 
-                    onSubmit={handleDataUpdate} 
-                    isLoading={createRequestMutation.isPending}
-                    currentData={{
-                      phone: beneficiary?.phone,
-                      email: beneficiary?.email || undefined,
-                      address: beneficiary?.address || undefined,
-                    }}
-                  />
-                </TabsContent>
-
-                <TabsContent value="family">
-                  <AddFamilyMemberForm onSubmit={handleAddFamily} />
-                </TabsContent>
-              </div>
-            </Tabs>
+                        <Badge
+                          variant={
+                            request.status === "موافق" 
+                              ? "default" 
+                              : request.status === "مرفوض" 
+                              ? "destructive" 
+                              : "secondary"
+                          }
+                        >
+                          {request.status}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
 
         {/* Dialogs */}
         <InternalMessagesDialog open={messagesOpen} onOpenChange={setMessagesOpen} />
         <ChangePasswordDialog open={passwordDialogOpen} onOpenChange={setPasswordDialogOpen} />
-        <DocumentUploadDialog 
-          open={documentUploadOpen} 
-          onOpenChange={setDocumentUploadOpen}
-          beneficiaryId={beneficiary.id}
-        />
-        </div>
-      </UnifiedDashboardLayout>
+      </div>
+    </UnifiedDashboardLayout>
   );
 };
 

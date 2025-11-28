@@ -30,8 +30,21 @@ const ROLE_PERMISSIONS: Record<string, string[]> = {
     'upload_files', 'manage_archive'
   ],
   beneficiary: [
-    'view_own_profile', 'submit_requests', 'view_own_payments',
-    'upload_own_documents'
+    // صلاحيات العرض فقط للمستفيدين من الدرجة الأولى
+    'view_own_profile',
+    'view_own_payments',
+    'view_waqf_summary',
+    'view_properties',
+    'view_distributions',
+    'view_governance',
+    'view_budgets',
+    'view_family_tree',
+    'view_disclosures',
+    'view_bank_accounts',
+    'view_financial_reports',
+    'view_approvals_log',
+    'view_statements',
+    // إزالة صلاحيات الكتابة: 'submit_requests', 'upload_own_documents'
   ],
   user: [
     'view_dashboard'

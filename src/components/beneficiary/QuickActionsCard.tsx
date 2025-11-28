@@ -1,76 +1,62 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
-  FileText, 
-  DollarSign, 
   MessageSquare, 
-  Upload,
-  UserPlus,
-  FileCheck,
-  Bell,
   Calendar,
   HelpCircle,
-  BarChart3
+  BarChart3,
+  Eye,
+  Building,
+  FileText,
+  TrendingUp
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface QuickActionsCardProps {
-  onEmergencyRequest: () => void;
-  onLoanRequest: () => void;
-  onDataUpdate: () => void;
-  onAddFamily: () => void;
-  onUploadDocument: () => void;
+  onEmergencyRequest?: () => void;
+  onLoanRequest?: () => void;
+  onDataUpdate?: () => void;
+  onAddFamily?: () => void;
+  onUploadDocument?: () => void;
   onMessages: () => void;
 }
 
 export function QuickActionsCard({
-  onEmergencyRequest,
-  onLoanRequest,
-  onDataUpdate,
-  onAddFamily,
-  onUploadDocument,
   onMessages,
 }: QuickActionsCardProps) {
   const navigate = useNavigate();
   
+  // إجراءات الاطلاع فقط للمستفيدين من الدرجة الأولى
   const actions = [
     {
-      icon: DollarSign,
-      label: "طلب فزعة طارئة",
-      description: "تقديم طلب فزعة طارئة",
-      onClick: onEmergencyRequest,
-      color: "text-destructive",
-      bg: "bg-destructive-light hover:bg-destructive-light/80",
+      icon: Eye,
+      label: "عرض الشفافية المالية",
+      description: "الاطلاع على البيانات المالية للوقف",
+      onClick: () => navigate("/beneficiary-portal?tab=waqf"),
+      color: "text-primary",
+      bg: "bg-primary/10 hover:bg-primary/20",
     },
     {
-      icon: FileText,
-      label: "طلب قرض",
-      description: "تقديم طلب قرض جديد",
-      onClick: onLoanRequest,
-      color: "text-info",
-      bg: "bg-info-light hover:bg-info-light/80",
-    },
-    {
-      icon: FileCheck,
-      label: "تحديث البيانات",
-      description: "تعديل البيانات الشخصية",
-      onClick: onDataUpdate,
+      icon: Building,
+      label: "عرض العقارات",
+      description: "الاطلاع على عقارات الوقف",
+      onClick: () => navigate("/beneficiary-portal?tab=properties"),
       color: "text-success",
       bg: "bg-success-light hover:bg-success-light/80",
     },
     {
-      icon: UserPlus,
-      label: "إضافة فرد",
-      description: "إضافة فرد جديد للعائلة",
-      onClick: onAddFamily,
-      color: "text-secondary-foreground",
-      bg: "bg-secondary hover:bg-secondary/80",
+      icon: TrendingUp,
+      label: "التوزيعات",
+      description: "عرض توزيعات الغلة",
+      onClick: () => navigate("/beneficiary-portal?tab=distributions"),
+      color: "text-info",
+      bg: "bg-info-light hover:bg-info-light/80",
     },
     {
-      icon: Upload,
-      label: "رفع مستند",
-      description: "رفع مستندات جديدة",
-      onClick: onUploadDocument,
+      icon: FileText,
+      label: "كشف الحساب",
+      description: "عرض كشف حسابك الشخصي",
+      onClick: () => navigate("/beneficiary-portal?tab=statements"),
       color: "text-warning",
       bg: "bg-warning-light hover:bg-warning-light/80",
     },
