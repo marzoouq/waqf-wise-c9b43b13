@@ -148,19 +148,8 @@ export default defineConfig(({ mode }) => ({
   },
   
   build: {
-    // Aggressive minification
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: mode === 'production',
-        drop_debugger: true,
-        pure_funcs: mode === 'production' ? ['console.log', 'console.info', 'console.debug'] : [],
-        passes: 2
-      },
-      mangle: {
-        safari10: true
-      }
-    },
+    // Use esbuild for minification (faster and built-in)
+    minify: true,
     
     // Chunk size optimization
     chunkSizeWarningLimit: 500,
