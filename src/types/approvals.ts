@@ -283,8 +283,7 @@ export function areAllApprovalsCompleted(approvals: BaseApproval[]): boolean {
   );
 }
 
-// أنواع إضافية للمكونات
-export type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
+// أنواع إضافية للمكونات - BadgeVariant موجود في table-rows.ts
 export type LucideIcon = React.ComponentType<{ className?: string }>;
 
 export interface JournalApproval {

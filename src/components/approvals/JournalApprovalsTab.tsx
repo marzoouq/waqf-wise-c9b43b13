@@ -8,7 +8,7 @@ import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { useState } from "react";
 import ViewJournalEntryDialog from "@/components/accounting/ViewJournalEntryDialog";
-import { JournalApproval, StatusConfigMap, BadgeVariant, JournalEntryWithLines } from "@/types/approvals";
+import { JournalApproval, StatusConfigMap, BadgeVariant, JournalEntryWithLines } from "@/types";
 import { LucideIcon } from "lucide-react";
 
 export function JournalApprovalsTab() {

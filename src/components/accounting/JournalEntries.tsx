@@ -9,7 +9,7 @@ import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import AddJournalEntryDialog from "./AddJournalEntryDialog";
 import ViewJournalEntryDialog from "./ViewJournalEntryDialog";
-import { BadgeVariant } from "@/types/approvals";
+import { BadgeVariant } from "@/types";
 import { ExportButton } from "@/components/shared/ExportButton";
 import { useAccountingFilters } from "@/hooks/useAccountingFilters";
 import { AccountingFilters } from "./AccountingFilters";
