@@ -5,6 +5,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { productionLogger } from '@/lib/logger/production-logger';
+import { safeJsonParse } from '@/lib/utils/safeJson';
 import { ErrorReport } from './types';
 import { 
   DEFAULT_CONFIG, 
@@ -101,7 +102,8 @@ class ErrorTracker {
       const pending = localStorage.getItem(this.config.localStorageKey);
       if (!pending) return;
 
-      const errors = JSON.parse(pending) as ErrorReport[];
+      const errors = safeJsonParse<ErrorReport[]>(pending, [], this.config.localStorageKey);
+      if (errors.length === 0) return;
       const cleanedErrors = errors.filter(error => {
         if (error.additional_data?.request_url) {
           const url = String(error.additional_data.request_url);
@@ -129,7 +131,8 @@ class ErrorTracker {
       const pending = localStorage.getItem(this.config.localStorageKey);
       if (!pending) return;
 
-      const errors = JSON.parse(pending) as ErrorReport[];
+      const errors = safeJsonParse<ErrorReport[]>(pending, [], this.config.localStorageKey);
+      if (errors.length === 0) return;
       const filteredErrors = errors.filter(error => {
         if (error.additional_data?.request_url) {
           const url = String(error.additional_data.request_url);
