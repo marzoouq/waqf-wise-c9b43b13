@@ -1,45 +1,18 @@
-import { useState, useEffect } from "react";
-import { useUserRole } from "@/hooks/useUserRole";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { DashboardTabs } from "@/components/dashboard/DashboardTabs";
-import { KPISkeleton } from "@/components/dashboard/KPISkeleton";
 import { DashboardDialogs } from "@/components/dashboard/DashboardDialogs";
 
+/**
+ * لوحة التحكم العامة - للمستخدمين بدون دور محدد
+ * التوجيه حسب الدور يتم الآن عبر RoleBasedRedirect في App.tsx
+ */
 const Dashboard = () => {
-  const navigate = useNavigate();
-  const { isBeneficiary, isAccountant, isNazer, isAdmin, isCashier, isArchivist, isLoading: roleLoading } = useUserRole();
-  
   const [isBeneficiaryDialogOpen, setIsBeneficiaryDialogOpen] = useState(false);
   const [isPropertyDialogOpen, setIsPropertyDialogOpen] = useState(false);
   const [isDistributionDialogOpen, setIsDistributionDialogOpen] = useState(false);
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
-
-  // Role-based routing
-  useEffect(() => {
-    if (isBeneficiary) {
-      navigate("/beneficiary-dashboard", { replace: true });
-    } else if (isAccountant) {
-      navigate("/accountant-dashboard", { replace: true });
-    } else if (isNazer) {
-      navigate("/nazer-dashboard", { replace: true });
-    } else if (isAdmin) {
-      navigate("/admin-dashboard", { replace: true });
-    } else if (isCashier) {
-      navigate("/cashier-dashboard", { replace: true });
-    } else if (isArchivist) {
-      navigate("/archivist-dashboard", { replace: true });
-    }
-  }, [isBeneficiary, isAccountant, isNazer, isAdmin, isCashier, isArchivist, navigate]);
-
-  if (roleLoading) {
-    return (
-      <MobileOptimizedLayout>
-        <KPISkeleton />
-      </MobileOptimizedLayout>
-    );
-  }
 
   return (
     <DashboardLayout onMessageClick={() => setMessageDialogOpen(true)}>

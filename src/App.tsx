@@ -11,6 +11,7 @@ import { GlobalErrorBoundary } from "./components/shared/GlobalErrorBoundary";
 import { LazyErrorBoundary } from "./components/shared/LazyErrorBoundary";
 import { LoadingState } from "./components/shared/LoadingState";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+import { RoleBasedRedirect } from "./components/auth/RoleBasedRedirect";
 import { GlobalMonitoring } from "./components/developer/GlobalMonitoring";
 import { IdleTimeoutManager } from "./components/auth/IdleTimeoutManager";
 import { useAlertCleanup } from "./hooks/useAlertCleanup";
@@ -167,6 +168,9 @@ const App = () => {
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/install" element={<Install />} />
                 <Route path="/unauthorized" element={<Unauthorized />} />
+                
+                {/* صفحة التوجيه الذكي - تحدد لوحة التحكم حسب الدور */}
+                <Route path="/redirect" element={<RoleBasedRedirect />} />
                 
                 {/* Beneficiary Dashboard - مستقل خارج MainLayout */}
                 <Route 
