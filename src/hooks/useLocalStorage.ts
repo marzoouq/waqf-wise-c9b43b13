@@ -2,6 +2,38 @@ import { useState, useEffect, useCallback } from 'react';
 import { productionLogger } from '@/lib/logger/production-logger';
 
 /**
+ * تحليل JSON آمن خاص بالـ hook
+ */
+function safeParseJson<T>(value: string | null, defaultValue: T, key: string): T {
+  if (!value || value === 'undefined' || value === 'null') {
+    return defaultValue;
+  }
+
+  const trimmed = value.trim();
+  
+  // التحقق من أن القيمة تبدأ بـ [ أو { (JSON صالح)
+  // أو إذا كانت قيمة نصية بسيطة مثل "string" أو رقم
+  if (!trimmed.startsWith('[') && !trimmed.startsWith('{') && !trimmed.startsWith('"')) {
+    // قد تكون قيمة بسيطة غير JSON - محاولة إرجاعها كما هي
+    productionLogger.warn(`[useLocalStorage] Non-JSON value for key "${key}"`);
+    return trimmed as unknown as T;
+  }
+
+  try {
+    return JSON.parse(trimmed) as T;
+  } catch {
+    productionLogger.warn(`[useLocalStorage] Failed to parse JSON for key "${key}"`);
+    // مسح البيانات التالفة
+    try {
+      localStorage.removeItem(key);
+    } catch {
+      // تجاهل
+    }
+    return defaultValue;
+  }
+}
+
+/**
  * Hook لتخزين البيانات في LocalStorage
  * مع مزامنة تلقائية بين التبويبات
  * 
@@ -22,14 +54,7 @@ export function useLocalStorage<T>(
       const item = window.localStorage.getItem(key);
       if (!item) return initialValue;
       
-      // Try to parse as JSON first
-      try {
-        return JSON.parse(item) as T;
-      } catch {
-        // If not valid JSON, return the raw value if it matches the type
-        // This handles cases where values were stored as plain strings
-        return item as unknown as T;
-      }
+      return safeParseJson<T>(item, initialValue, key);
     } catch (error) {
       productionLogger.warn(`Error reading localStorage key "${key}"`, error);
       return initialValue;

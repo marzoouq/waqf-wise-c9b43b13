@@ -6,6 +6,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { errorTracker } from './errors';
 import { productionLogger } from '@/lib/logger/production-logger';
+import { safeJsonParse } from '@/lib/utils/safeJson';
 
 interface RetryConfig {
   maxAttempts: number;
@@ -215,7 +216,11 @@ export class AutoRecovery {
         return;
       }
 
-      const operations = JSON.parse(pendingData);
+      const operations = safeJsonParse<unknown[]>(pendingData, [], 'pending_operations');
+      if (operations.length === 0) {
+        productionLogger.debug('✅ No valid pending data to sync');
+        return;
+      }
       productionLogger.info(`📦 Found ${operations.length} pending operations`);
 
       for (const operation of operations) {
