@@ -150,9 +150,9 @@ const MainLayout = ({ children }: MainLayoutProps) => {
               "flex-1 overflow-auto flex flex-col",
               isMobile && "pb-20" // Add padding for bottom navigation on mobile
             )}>
-              <div className="flex-1">
+              <main className="flex-1">
                 {children}
-              </div>
+              </main>
               <AppVersionFooter />
             </div>
           </SidebarInset>

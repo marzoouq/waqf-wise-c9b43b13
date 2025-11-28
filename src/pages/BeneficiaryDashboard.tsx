@@ -118,8 +118,9 @@ const BeneficiaryDashboard = () => {
   }
 
   return (
-    <UnifiedDashboardLayout role="beneficiary">
-      <div className="space-y-6 pb-20">
+    <main>
+      <UnifiedDashboardLayout role="beneficiary">
+        <div className="space-y-6 pb-20">
         {/* بطاقة الملف الشخصي */}
         <BeneficiaryProfileCard
           beneficiary={beneficiary}
@@ -262,8 +263,9 @@ const BeneficiaryDashboard = () => {
         {/* Dialogs */}
         <InternalMessagesDialog open={messagesOpen} onOpenChange={setMessagesOpen} />
         <ChangePasswordDialog open={passwordDialogOpen} onOpenChange={setPasswordDialogOpen} />
-      </div>
-    </UnifiedDashboardLayout>
+        </div>
+      </UnifiedDashboardLayout>
+    </main>
   );
 };
 

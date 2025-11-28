@@ -6,7 +6,8 @@ import { ShieldAlert, ArrowRight } from 'lucide-react';
 export default function Unauthorized() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted p-4">
-      <Card className="w-full max-w-md">
+      <main>
+        <Card className="w-full max-w-md">
         <CardHeader className="text-center space-y-4">
           <div className="mx-auto w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center">
             <ShieldAlert className="h-8 w-8 text-destructive" />
@@ -28,6 +29,7 @@ export default function Unauthorized() {
           </Button>
         </CardContent>
       </Card>
+      </main>
     </div>
   );
 }
