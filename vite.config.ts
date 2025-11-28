@@ -6,8 +6,8 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
-  // ✅ فرض وضع الإنتاج دائماً للبناء
-  const isProduction = true; // Force production optimizations
+  // ✅ استخدام الـ mode الممرر من الأمر (build:dev الآن يُرسل production)
+  const isProduction = mode === 'production';
   
   return {
   define: {
