@@ -37,3 +37,6 @@ export { useDistributionEngine } from './useDistributionEngine';
 export { useDistributionDetails } from './useDistributionDetails';
 export { useDistributionSettings } from './useDistributionSettings';
 export { useBatchPayments } from './useBatchPayments';
+
+// Phase 5: Biometric Authentication
+export { useBiometricAuth } from './useBiometricAuth';

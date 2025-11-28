@@ -2,28 +2,28 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.3.0
- * @date 2025-11-27
+ * @version 2.5.0
+ * @date 2025-11-28
  */
 
-export const APP_VERSION = '2.3.0';
-export const APP_VERSION_DATE = '2025-11-27';
+export const APP_VERSION = '2.5.0';
+export const APP_VERSION_DATE = '2025-11-28';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
 export const VERSION_INFO = {
   version: APP_VERSION,
   date: APP_VERSION_DATE,
   name: APP_VERSION_NAME,
-  changelog: '/docs/CHANGELOG.md',
+  changelog: '/docs/CHANGELOG_v2.5.0.md',
   features: [
+    'المصادقة بالبصمة (WebAuthn)',
+    'دعم Face ID و Touch ID',
+    'إدارة الأجهزة المسجلة',
     'البحث الذكي الشامل',
     'التصنيف التلقائي للمستندات',
     'تنبيهات تجديد العقود',
     'إصدارات المستندات',
     'التقارير المجدولة',
-    'تحديث Lovable AI Gateway',
-    'معالجة أخطاء Rate Limit و Payment',
-    'دعم PWA محسّن',
   ],
 } as const;
 
