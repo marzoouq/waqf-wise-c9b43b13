@@ -5,6 +5,8 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { productionLogger } from '@/lib/logger/production-logger';
+import type { LocalErrorLog } from '@/types/error-log';
+import { safeJsonParse } from '@/lib/utils/safeJson';
 
 export interface CleanupStats {
   deletedAlerts: number;
@@ -93,9 +95,6 @@ export async function cleanupAlerts(): Promise<CleanupStats> {
     return stats;
   }
 }
-
-import type { LocalErrorLog } from '@/types/error-log';
-import { safeJsonParse } from '@/lib/utils/safeJson';
 
 /**
  * تنظيف localStorage من الأخطاء القديمة
