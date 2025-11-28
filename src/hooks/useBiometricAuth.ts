@@ -178,8 +178,8 @@ export function useBiometricAuth() {
     }
   }, [isSupported, toast, fetchCredentials]);
 
-  // التحقق بالبصمة
-  const authenticateWithBiometric = useCallback(async (email: string): Promise<{ success: boolean; userId?: string }> => {
+  // التحقق بالبصمة وتسجيل الدخول تلقائياً
+  const authenticateWithBiometric = useCallback(async (): Promise<{ success: boolean; userId?: string }> => {
     if (!isSupported) {
       return { success: false };
     }
@@ -232,14 +232,32 @@ export function useBiometricAuth() {
         throw new Error('البصمة غير مسجلة');
       }
 
-      // تحديث آخر استخدام
-      await supabase
-        .from('webauthn_credentials')
-        .update({ last_used_at: new Date().toISOString() })
-        .eq('credential_id', usedCredentialId);
+      // استدعاء Edge Function لإنشاء جلسة
+      const { data: authData, error: authError } = await supabase.functions.invoke('biometric-auth', {
+        body: {
+          credentialId: usedCredentialId,
+          userId: matchedCredential.user_id,
+        },
+      });
+
+      if (authError || !authData?.success) {
+        throw new Error(authData?.error || 'فشل في إنشاء الجلسة');
+      }
+
+      // تسجيل الدخول باستخدام OTP token
+      if (authData.token) {
+        const { error: verifyError } = await supabase.auth.verifyOtp({
+          token_hash: authData.token,
+          type: 'magiclink',
+        });
+
+        if (verifyError) {
+          throw new Error('فشل في تأكيد الجلسة');
+        }
+      }
 
       toast({
-        title: 'تم التحقق بنجاح',
+        title: 'تم تسجيل الدخول بنجاح',
         description: 'مرحباً بك مجدداً',
       });
 
