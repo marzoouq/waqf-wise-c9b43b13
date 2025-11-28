@@ -3,7 +3,8 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { useNavigate } from "react-router-dom";
 import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { DashboardTabs, KPISkeleton } from "@/components/dashboard";
+import { DashboardTabs } from "@/components/dashboard/DashboardTabs";
+import { KPISkeleton } from "@/components/dashboard/KPISkeleton";
 import { DashboardDialogs } from "@/components/dashboard/DashboardDialogs";
 
 const Dashboard = () => {

@@ -1,26 +1,65 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users } from "lucide-react";
+import { Users, RefreshCw } from "lucide-react";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
+import { useUsersActivityMetrics } from "@/hooks/useUsersActivityMetrics";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function UsersActivityChart() {
-  // بيانات محاكاة لنشاط المستخدمين
-  const data = [
-    { day: 'السبت', activeUsers: 45, newUsers: 5, logins: 120 },
-    { day: 'الأحد', activeUsers: 52, newUsers: 8, logins: 145 },
-    { day: 'الاثنين', activeUsers: 48, newUsers: 3, logins: 132 },
-    { day: 'الثلاثاء', activeUsers: 55, newUsers: 7, logins: 158 },
-    { day: 'الأربعاء', activeUsers: 50, newUsers: 4, logins: 140 },
-    { day: 'الخميس', activeUsers: 42, newUsers: 6, logins: 115 },
-    { day: 'الجمعة', activeUsers: 38, newUsers: 2, logins: 95 },
-  ];
+  const { data, isLoading, error, refetch, isFetching } = useUsersActivityMetrics();
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            نشاط المستخدمين (آخر 7 أيام)
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-[300px] w-full" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            نشاط المستخدمين
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center justify-center h-[300px] text-muted-foreground">
+            <p>حدث خطأ في تحميل البيانات</p>
+            <Button variant="outline" onClick={() => refetch()} className="mt-2">
+              إعادة المحاولة
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="flex items-center gap-2">
           <Users className="h-5 w-5" />
           نشاط المستخدمين (آخر 7 أيام)
         </CardTitle>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={() => refetch()}
+          disabled={isFetching}
+        >
+          <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
+        </Button>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
