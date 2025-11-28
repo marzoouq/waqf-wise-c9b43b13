@@ -8,7 +8,7 @@ import {
   rateLimitResponse 
 } from '../_shared/cors.ts';
 
-// Schema للتحقق من صحة المدخلات
+// Schema للتحقق من صحة المدخلات - الأخطاء الحقيقية
 const errorReportSchema = z.object({
   error_type: z.string().min(1).max(100),
   error_message: z.string().min(1).max(2000),
@@ -18,6 +18,14 @@ const errorReportSchema = z.object({
   user_agent: z.string().max(500),
   user_id: z.string().uuid().optional(),
   additional_data: z.record(z.unknown()).optional()
+});
+
+// Schema للرسائل العامة (INFO, DEBUG, etc.) - اختياري
+const generalLogSchema = z.object({
+  level: z.enum(['info', 'debug', 'warn', 'error']).optional(),
+  message: z.string().optional(),
+  data: z.record(z.unknown()).optional(),
+  timestamp: z.string().optional(),
 });
 
 type ErrorReport = z.infer<typeof errorReportSchema>;
@@ -60,19 +68,41 @@ Deno.serve(async (req) => {
       }
     }
 
-    // ✅ 2. التحقق من صحة المدخلات
+    // ✅ 2. التحقق من صحة المدخلات - مع دعم الرسائل العامة
     let errorReport: ErrorReport;
     try {
       const rawData = await req.json();
       console.log('📥 Received data:', JSON.stringify(rawData, null, 2));
-      errorReport = errorReportSchema.parse(rawData);
-    } catch (validationError) {
-      console.error('❌ Validation failed:', validationError);
-      return errorResponse(
-        'بيانات غير صالحة',
-        400,
-        validationError instanceof Error ? validationError.message : String(validationError)
-      );
+      
+      // أولاً: تحقق إذا كانت رسالة عامة (INFO, DEBUG) وليست خطأ حقيقي
+      const generalLog = generalLogSchema.safeParse(rawData);
+      if (generalLog.success && rawData.level && rawData.level !== 'error') {
+        // رسالة INFO/DEBUG عادية - نقبلها بدون تسجيل في جدول الأخطاء
+        console.log(`ℹ️ General ${rawData.level} log received - not an error, skipping storage`);
+        return jsonResponse({
+          success: true,
+          message: `${rawData.level} log acknowledged`,
+          stored: false,
+        });
+      }
+      
+      // ثانياً: محاولة تحليل كخطأ حقيقي
+      const parseResult = errorReportSchema.safeParse(rawData);
+      
+      if (!parseResult.success) {
+        // إذا لم يكن خطأ بالصيغة المتوقعة، نتجاهله بدون إرجاع خطأ
+        console.warn('⚠️ Data does not match error schema - ignoring:', parseResult.error.issues.map(i => i.path.join('.')));
+        return jsonResponse({
+          success: true,
+          message: 'Data received but not stored (invalid error format)',
+          stored: false,
+        });
+      }
+      
+      errorReport = parseResult.data;
+    } catch (parseError) {
+      console.error('❌ Failed to parse JSON:', parseError);
+      return errorResponse('بيانات JSON غير صالحة', 400);
     }
 
     // 🚦 3. Rate Limiting الذكي - منع الحلقات اللانهائية
