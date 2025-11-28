@@ -102,7 +102,7 @@ const Settings = () => {
       title: "الإشعارات",
       description: "تخصيص إعدادات التنبيهات والإشعارات",
       icon: Bell,
-      color: "bg-warning/10 text-warning",
+      color: "bg-warning/10 text-warning-foreground",
     },
     {
       id: 4,
@@ -116,14 +116,14 @@ const Settings = () => {
       title: "قاعدة البيانات",
       description: "إعدادات النسخ الاحتياطي والاستعادة",
       icon: Database,
-      color: "bg-accent/10 text-accent",
+      color: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
     },
     {
       id: 6,
       title: "المظهر",
       description: "تخصيص الألوان والثيم",
       icon: Palette,
-      color: "bg-primary/10 text-primary",
+      color: "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400",
     },
     {
       id: 7,
@@ -137,14 +137,14 @@ const Settings = () => {
       title: "إعدادات النظام",
       description: "إدارة الإعدادات العامة والمتقدمة",
       icon: SettingsIcon,
-      color: "bg-primary/10 text-primary",
+      color: "bg-slate-100 text-slate-700 dark:bg-slate-800/50 dark:text-slate-300",
     },
     {
       id: 9,
       title: "إعدادات الدفعات",
       description: "تخصيص عرض الدفعات والإيجارات",
       icon: Calendar,
-      color: "bg-info-light text-info",
+      color: "bg-info/10 text-info",
     },
     {
       id: 10,
@@ -158,7 +158,7 @@ const Settings = () => {
       title: "إعدادات الشفافية",
       description: "التحكم في ما يراه المستفيدون من الدرجة الأولى",
       icon: Eye,
-      color: "bg-info/10 text-info",
+      color: "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400",
       requiredRole: "nazer",
     },
     {
@@ -166,7 +166,7 @@ const Settings = () => {
       title: "دليل المطور",
       description: "دليل شامل للبنية المعمارية والميزات والتوثيق",
       icon: BookOpen,
-      color: "bg-purple-500/10 text-purple-600 dark:text-purple-400",
+      color: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
       requiredRole: "admin",
     },
   ];
