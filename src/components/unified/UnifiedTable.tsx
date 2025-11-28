@@ -123,7 +123,7 @@ function TableSkeleton({ columns, rows }: { columns: number; rows: number }) {
         <TableHeader>
           <TableRow>
             {[...Array(columns)].map((_, i) => (
-              <TableHead key={i}>
+              <TableHead key={`skeleton-head-${i}`}>
                 <Skeleton className="h-4 w-20" />
               </TableHead>
             ))}
@@ -131,9 +131,9 @@ function TableSkeleton({ columns, rows }: { columns: number; rows: number }) {
         </TableHeader>
         <TableBody>
           {[...Array(rows)].map((_, rowIndex) => (
-            <TableRow key={rowIndex}>
+            <TableRow key={`skeleton-row-${rowIndex}`}>
               {[...Array(columns)].map((_, colIndex) => (
-                <TableCell key={colIndex}>
+                <TableCell key={`skeleton-cell-${rowIndex}-${colIndex}`}>
                   <Skeleton className="h-4 w-full" />
                 </TableCell>
               ))}
