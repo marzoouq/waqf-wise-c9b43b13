@@ -26,7 +26,6 @@ import {
 } from "@/components/ui/select";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-import * as XLSX from "xlsx";
 import { format } from "date-fns";
 import { formatCurrency } from "@/lib/utils";
 
@@ -72,7 +71,10 @@ export default function Budgets() {
     await calculateVariances(selectedFiscalYear);
   };
 
-  const handleExport = () => {
+  const handleExport = async () => {
+    // Dynamic import for XLSX
+    const XLSX = await import("xlsx");
+    
     const exportData = budgets.map(b => ({
       "الحساب": `${b.accounts?.code} - ${b.accounts?.name_ar}`,
       "نوع الفترة": b.period_type,

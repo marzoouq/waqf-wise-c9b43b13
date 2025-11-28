@@ -11,7 +11,6 @@ import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
 import { TrialBalanceRow } from "@/types/supabase-helpers";
 import { EmptyAccountingState } from "./EmptyAccountingState";
 import { LoadingState } from "@/components/shared/LoadingState";
-import * as XLSX from "xlsx";
 
 export function TrialBalanceReport() {
   const { trialBalance, isLoading } = useFinancialReports();
@@ -31,7 +30,10 @@ export function TrialBalanceReport() {
     window.print();
   };
 
-  const handleExport = () => {
+  const handleExport = async () => {
+    // Dynamic import for XLSX
+    const XLSX = await import("xlsx");
+    
     const exportData = trialBalance.map(acc => ({
       'رمز الحساب': acc.code,
       'اسم الحساب': acc.name,

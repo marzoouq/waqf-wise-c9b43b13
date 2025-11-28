@@ -16,7 +16,6 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useBeneficiaryProfile } from "@/hooks/useBeneficiaryProfile";
 import { useAuth } from "@/hooks/useAuth";
-import * as XLSX from "xlsx";
 import { Contract } from "@/hooks/useContracts";
 
 interface ReportsMenuProps {
@@ -204,6 +203,9 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
         };
       });
 
+      // Dynamic import for XLSX
+      const XLSX = await import("xlsx");
+      
       const worksheet = XLSX.utils.json_to_sheet(data);
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "العقارات");

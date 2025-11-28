@@ -1,6 +1,5 @@
 import { useCallback } from "react";
 import { toast } from "sonner";
-import * as XLSX from "xlsx";
 import { Database } from "@/integrations/supabase/types";
 import { logger } from "@/lib/logger";
 
@@ -16,8 +15,11 @@ export interface ExcelExportOptions {
 }
 
 export function useExportToExcel() {
-  const exportToExcel = useCallback((options: ExcelExportOptions) => {
+  const exportToExcel = useCallback(async (options: ExcelExportOptions) => {
     try {
+      // Dynamic import for XLSX
+      const XLSX = await import("xlsx");
+      
       const workbook = XLSX.utils.book_new();
 
       options.sheets.forEach(sheet => {

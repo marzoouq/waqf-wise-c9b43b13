@@ -29,7 +29,6 @@ import {
   Calculator,
   Download,
 } from "lucide-react";
-import * as XLSX from "xlsx";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
@@ -158,7 +157,10 @@ export default function Loans() {
         <div className="flex gap-2">
           <Button 
             variant="outline"
-            onClick={() => {
+            onClick={async () => {
+              // Dynamic import for XLSX
+              const XLSX = await import("xlsx");
+              
               const exportData = filteredLoans.map((loan) => ({
                 "رقم القرض": loan.loan_number,
                 "المستفيد": loan.beneficiary?.full_name,
