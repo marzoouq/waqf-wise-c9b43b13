@@ -1,7 +1,6 @@
 import { AnnualDisclosure } from "@/hooks/useAnnualDisclosures";
 import { logger } from "@/lib/logger";
 import { Database } from "@/integrations/supabase/types";
-import 'jspdf-autotable';
 
 type DisclosureBeneficiary = Database['public']['Tables']['disclosure_beneficiaries']['Row'];
 
