@@ -353,6 +353,13 @@ export class HealthMonitor {
    */
   private async createHealthAlert(checks: Record<string, boolean>): Promise<void> {
     try {
+      // التحقق من وجود جلسة مصادقة قبل إنشاء التنبيه
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        productionLogger.warn('Skipping health alert creation - no auth session');
+        return;
+      }
+
       const failedChecks = Object.entries(checks)
         .filter(([_, status]) => !status)
         .map(([name]) => name);
