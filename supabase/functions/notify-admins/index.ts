@@ -63,11 +63,11 @@ Deno.serve(async (req) => {
     const payload: NotificationPayload = await req.json();
     console.log('📨 Received notification request:', payload);
 
-    // الحصول على جميع المسؤولين
+    // الحصول على جميع المسؤولين (admin و nazer هم الأدوار الإدارية العليا)
     const { data: admins, error: adminsError } = await supabase
       .from('user_roles')
       .select('user_id')
-      .in('role', ['admin', 'super_admin']);
+      .in('role', ['admin', 'nazer']);
 
     if (adminsError) {
       console.error('❌ Error fetching admins:', adminsError);

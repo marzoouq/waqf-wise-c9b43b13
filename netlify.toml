@@ -97,7 +97,7 @@
 
 # Build settings
 [build]
-  command = "npm run build"
+  command = "npx vite build --mode production"
   publish = "dist"
 
 [build.environment]
