@@ -31,7 +31,7 @@ export function SystemHealthIndicator() {
 
     // الاستماع لحالة الشبكة
     const handleOnline = () => {
-      productionLogger.debug('Network back online');
+      if (import.meta.env.DEV) productionLogger.debug('Network back online');
       setStatus('healthy');
       checkHealth();
     };
@@ -80,7 +80,7 @@ export function SystemHealthIndicator() {
         setStatus('degraded');
       } else {
         setStatus('healthy');
-        productionLogger.debug('All systems healthy');
+        if (import.meta.env.DEV) productionLogger.debug('All systems healthy');
       }
 
       setLastCheck(new Date());

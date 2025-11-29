@@ -47,7 +47,7 @@ export function initCriticalResourceHints(): void {
     document.head.appendChild(link);
   });
 
-  productionLogger.debug('✅ Critical resource hints initialized');
+  if (import.meta.env.DEV) productionLogger.debug('✅ Critical resource hints initialized');
 }
 
 /**
@@ -69,7 +69,7 @@ export function prefetchNextRoutes(currentPath: string): void {
     document.head.appendChild(link);
   });
 
-  if (nextRoutes.length > 0) {
+  if (nextRoutes.length > 0 && import.meta.env.DEV) {
     productionLogger.debug(`📦 Prefetched ${nextRoutes.length} routes from ${currentPath}`);
   }
 }
@@ -131,7 +131,7 @@ export function preloadChunks(chunkNames: string[]): void {
   });
 
   // لا نحتاج لتحميل مسبق للـ chunks الموجودة بالفعل
-  productionLogger.debug(`📦 ${chunkUrls.length} chunks already loaded`);
+  if (import.meta.env.DEV) productionLogger.debug(`📦 ${chunkUrls.length} chunks already loaded`);
 }
 
 /**
