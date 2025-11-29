@@ -1,9 +1,10 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertTriangle, RefreshCcw, Home } from 'lucide-react';
+import { AlertTriangle, RefreshCcw, Home, Trash2 } from 'lucide-react';
 import { logger } from '@/lib/logger';
 import { supabase } from '@/integrations/supabase/client';
+import { clearAllCaches } from '@/lib/clearCache';
 
 interface Props {
   children: ReactNode;
@@ -14,6 +15,7 @@ interface State {
   error: Error | null;
   errorInfo: ErrorInfo | null;
   errorCount: number;
+  isClearing: boolean;
 }
 
 /**
@@ -27,6 +29,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
       error: null,
       errorInfo: null,
       errorCount: 0,
+      isClearing: false,
     };
   }
 
@@ -88,14 +91,24 @@ export class GlobalErrorBoundary extends Component<Props, State> {
     });
   };
 
-  handleHardRefresh = () => {
-    // مسح الـ cache وإعادة تحميل الصفحة
-    if ('caches' in window) {
-      caches.keys().then((names) => {
-        names.forEach((name) => caches.delete(name));
-      });
+  handleHardRefresh = async () => {
+    this.setState({ isClearing: true });
+    
+    try {
+      // مسح الـ cache بشكل شامل
+      await clearAllCaches();
+      
+      // مسح التخزين المحلي للإصدار لإجبار إعادة التحقق
+      localStorage.removeItem('waqf_app_version');
+      sessionStorage.clear();
+      
+      // إعادة تحميل الصفحة
+      window.location.reload();
+    } catch (error) {
+      console.error('Error clearing cache:', error);
+      // إعادة التحميل على أي حال
+      window.location.reload();
     }
-    window.location.reload();
   };
 
   handleGoHome = () => {
@@ -158,21 +171,25 @@ export class GlobalErrorBoundary extends Component<Props, State> {
 
               {/* أزرار الإجراءات */}
               <div className="flex flex-col gap-3">
-                {this.state.error?.message?.includes('Failed to fetch') && (
-                  <Button 
-                    onClick={this.handleHardRefresh} 
-                    className="w-full gap-2 bg-warning hover:bg-warning/90 text-warning-foreground"
-                  >
-                    <RefreshCcw className="w-4 h-4" />
-                    مسح ذاكرة التخزين وإعادة التحميل
-                  </Button>
-                )}
+                {/* زر مسح الذاكرة المؤقتة - دائماً متاح */}
+                <Button 
+                  onClick={this.handleHardRefresh} 
+                  className="w-full gap-2 bg-primary hover:bg-primary/90"
+                  disabled={this.state.isClearing}
+                >
+                  {this.state.isClearing ? (
+                    <RefreshCcw className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="w-4 h-4" />
+                  )}
+                  {this.state.isClearing ? 'جاري المسح...' : 'مسح ذاكرة التخزين وإعادة التحميل'}
+                </Button>
                 <div className="flex gap-3 justify-center pt-2">
-                  <Button onClick={this.handleReset} variant="default" size="lg">
+                  <Button onClick={this.handleReset} variant="outline" size="lg" disabled={this.state.isClearing}>
                     <RefreshCcw className="w-4 h-4 ml-2" />
                     إعادة المحاولة
                   </Button>
-                  <Button onClick={this.handleGoHome} variant="outline" size="lg">
+                  <Button onClick={this.handleGoHome} variant="ghost" size="lg" disabled={this.state.isClearing}>
                     <Home className="w-4 h-4 ml-2" />
                     العودة للرئيسية
                   </Button>

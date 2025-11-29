@@ -1,5 +1,6 @@
 /**
  * نظام التحقق من الإصدار وتحديث الكاش تلقائياً
+ * Enhanced version checking with automatic cache busting
  */
 
 import { APP_VERSION, isNewerVersion } from './version';
@@ -7,6 +8,23 @@ import { clearAllCaches } from './clearCache';
 import { productionLogger } from './logger/production-logger';
 
 const VERSION_STORAGE_KEY = 'waqf_app_version';
+const CACHE_BUST_KEY = 'waqf_cache_bust_count';
+const MAX_CACHE_BUST_RETRIES = 3;
+
+/**
+ * فحص أخطاء تحميل الـ chunks
+ */
+function isChunkLoadError(error: unknown): boolean {
+  if (error instanceof Error) {
+    const msg = error.message.toLowerCase();
+    return (
+      msg.includes('failed to fetch dynamically imported module') ||
+      msg.includes('loading chunk') ||
+      msg.includes('loading css chunk')
+    );
+  }
+  return false;
+}
 
 /**
  * التحقق من الإصدار وتنظيف الكاش إذا لزم الأمر
@@ -27,8 +45,16 @@ export async function checkAndUpdateVersion(): Promise<boolean> {
         preserved[key] = localStorage.getItem(key);
       });
       
-      // تنظيف الكاش
+      // تنظيف الكاش بشكل عميق
       await clearAllCaches();
+      
+      // مسح sessionStorage أيضاً (ما عدا البيانات الضرورية)
+      try {
+        sessionStorage.removeItem('chunk_load_failures');
+        sessionStorage.removeItem(CACHE_BUST_KEY);
+      } catch {
+        // Ignore storage errors
+      }
       
       // استعادة البيانات المهمة
       Object.entries(preserved).forEach(([key, value]) => {
@@ -48,6 +74,27 @@ export async function checkAndUpdateVersion(): Promise<boolean> {
     // في حالة الخطأ، احفظ الإصدار الحالي على الأقل
     localStorage.setItem(VERSION_STORAGE_KEY, APP_VERSION);
     return false;
+  }
+}
+
+/**
+ * معالجة أخطاء تحميل الـ chunks بإعادة التحميل
+ */
+export async function handleChunkLoadError(error: unknown): Promise<void> {
+  if (!isChunkLoadError(error)) return;
+  
+  const bustCount = parseInt(sessionStorage.getItem(CACHE_BUST_KEY) || '0', 10);
+  
+  if (bustCount < MAX_CACHE_BUST_RETRIES) {
+    sessionStorage.setItem(CACHE_BUST_KEY, String(bustCount + 1));
+    productionLogger.info(`🔄 إعادة تحميل الصفحة (محاولة ${bustCount + 1}/${MAX_CACHE_BUST_RETRIES})`);
+    
+    // مسح الكاش وإعادة التحميل
+    await clearAllCaches();
+    window.location.reload();
+  } else {
+    sessionStorage.removeItem(CACHE_BUST_KEY);
+    productionLogger.error('❌ فشل تحميل التطبيق بعد عدة محاولات');
   }
 }
 
