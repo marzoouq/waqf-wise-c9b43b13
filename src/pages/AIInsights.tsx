@@ -6,6 +6,7 @@ import { useAIInsights } from "@/hooks/useAIInsights";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EnhancedEmptyState } from "@/components/shared/EnhancedEmptyState";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
+import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import type { LucideIcon } from "lucide-react";
 
 const categoryIcons: Record<string, LucideIcon> = {
@@ -30,39 +31,35 @@ export default function AIInsights() {
 
   return (
     <PageErrorBoundary pageName="الرؤى الذكية">
-      <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-6 md:p-8 lg:p-10 space-y-8">
-        <header className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Sparkles className="h-10 w-10 text-primary" />
-            <div>
-              <h1 className="text-3xl font-bold text-gradient-primary">
-                الرؤى الذكية بالـ AI
-              </h1>
-              <p className="text-muted-foreground">
-                تحليلات ذكية وتوصيات مدعومة بالذكاء الاصطناعي
-              </p>
+      <MobileOptimizedLayout>
+        <MobileOptimizedHeader
+          title="الرؤى الذكية بالـ AI"
+          description="تحليلات ذكية وتوصيات مدعومة بالذكاء الاصطناعي"
+          icon={<Sparkles className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
+          actions={
+            <div className="flex flex-wrap gap-2">
+              <Button
+                size="sm"
+                onClick={() => generateInsights('beneficiaries')}
+                disabled={isGenerating}
+              >
+                <RefreshCw className={`h-4 w-4 ml-2 ${isGenerating ? 'animate-spin' : ''}`} />
+                <span className="hidden sm:inline">توليد رؤى المستفيدين</span>
+                <span className="sm:hidden">مستفيدين</span>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => generateInsights('financial')}
+                disabled={isGenerating}
+              >
+                <RefreshCw className={`h-4 w-4 ml-2 ${isGenerating ? 'animate-spin' : ''}`} />
+                <span className="hidden sm:inline">توليد رؤى مالية</span>
+                <span className="sm:hidden">مالية</span>
+              </Button>
             </div>
-          </div>
-
-          <div className="flex gap-2">
-            <Button
-              onClick={() => generateInsights('beneficiaries')}
-              disabled={isGenerating}
-            >
-              <RefreshCw className={`h-4 w-4 ml-2 ${isGenerating ? 'animate-spin' : ''}`} />
-              توليد رؤى المستفيدين
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => generateInsights('financial')}
-              disabled={isGenerating}
-            >
-              <RefreshCw className={`h-4 w-4 ml-2 ${isGenerating ? 'animate-spin' : ''}`} />
-              توليد رؤى مالية
-            </Button>
-          </div>
-        </header>
+          }
+        />
 
         {!insights || insights.length === 0 ? (
           <EnhancedEmptyState
@@ -127,8 +124,7 @@ export default function AIInsights() {
             })}
           </div>
         )}
-      </div>
-    </div>
+      </MobileOptimizedLayout>
     </PageErrorBoundary>
   );
 }

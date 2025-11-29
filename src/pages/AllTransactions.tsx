@@ -132,23 +132,23 @@ export default function AllTransactions() {
   return (
     <PageErrorBoundary pageName="جميع المعاملات">
       <MobileOptimizedLayout>
-      <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">جميع المعاملات المالية</h1>
-            <p className="text-muted-foreground mt-2">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">جميع المعاملات المالية</h1>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
               عرض موحد لجميع المدفوعات والمقبوضات والإيجارات والتوزيعات
             </p>
           </div>
-          <Button onClick={handleExportExcel} className="gap-2">
+          <Button onClick={handleExportExcel} className="gap-2" size="sm">
             <Download className="h-4 w-4" />
-            تصدير Excel
+            <span className="hidden sm:inline">تصدير Excel</span>
+            <span className="sm:hidden">تصدير</span>
           </Button>
         </div>
 
         {/* إحصائيات */}
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">إجمالي الوارد</CardTitle>
@@ -377,8 +377,7 @@ export default function AllTransactions() {
             )}
           </CardContent>
         </Card>
-      </div>
-    </MobileOptimizedLayout>
+      </MobileOptimizedLayout>
     </PageErrorBoundary>
   );
 }

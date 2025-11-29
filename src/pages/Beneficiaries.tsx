@@ -7,6 +7,7 @@ import { useSavedSearches } from "@/hooks/useSavedSearches";
 import { useBeneficiariesFilters } from "@/hooks/useBeneficiariesFilters";
 import { SearchCriteria } from "@/components/beneficiaries/AdvancedSearchDialog";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
+import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
 import {
   BeneficiariesHeader,
   BeneficiariesSearchBar,
@@ -86,8 +87,7 @@ const Beneficiaries = () => {
 
   return (
     <PageErrorBoundary pageName="المستفيدون">
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto p-6 md:p-8 lg:p-10 space-y-6 md:space-y-8">
+      <MobileOptimizedLayout>
           <BeneficiariesHeader
             filteredBeneficiaries={filteredBeneficiaries}
             onAddBeneficiary={handleAddBeneficiary}
@@ -145,8 +145,7 @@ const Beneficiaries = () => {
             onAdvancedSearch={handleAdvancedSearch}
             onSuccessCallback={() => queryClient.invalidateQueries({ queryKey: ["beneficiaries"] })}
           />
-        </div>
-      </div>
+      </MobileOptimizedLayout>
     </PageErrorBoundary>
   );
 };
