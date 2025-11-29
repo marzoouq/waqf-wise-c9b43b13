@@ -10,8 +10,10 @@ import { toast } from "@/hooks/use-toast";
 import { exportToPDF, exportToExcel } from "@/lib/exportHelpers";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ExportDataItem = Record<string, any>;
+
 interface ExportButtonProps {
-  data: any[];
+  data: ExportDataItem[];
   filename: string;
   title: string;
   headers: string[];
@@ -32,7 +34,7 @@ export const ExportButton = ({
   const handleExportPDF = () => {
     try {
       const tableData = data.map(item => 
-        headers.map(header => item[header] || "-")
+        headers.map(header => String(item[header] ?? "-"))
       );
       exportToPDF(title, headers, tableData, `${filename}.pdf`);
       toast({

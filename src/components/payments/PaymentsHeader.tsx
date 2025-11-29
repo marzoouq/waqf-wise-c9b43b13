@@ -1,11 +1,11 @@
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ExportButton } from "@/components/shared/ExportButton";
+import type { Payment } from "@/types/payments";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface PaymentsHeaderProps {
   onAddPayment: () => void;
-  payments: any[];
+  payments: Payment[];
 }
 
 export function PaymentsHeader({ onAddPayment, payments }: PaymentsHeaderProps) {
