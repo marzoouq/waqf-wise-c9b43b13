@@ -6,32 +6,37 @@
 
 ## ملخص الاختبارات والإصلاحات
 
-### 1. إصلاح useAccountantKPIs.ts
-**المشكلة:** الـ hook كان يعمل بشكل صحيح لكن تم التأكد من توافق قيم الحالات
+### 1. إصلاح ApproveJournalDialog.tsx
+**المشكلة:** خطأ في Query Key للـ invalidation
 
-**الملف:** `src/hooks/useAccountantKPIs.ts`
+**الملف:** `src/components/accounting/ApproveJournalDialog.tsx`
 
-**الاستعلامات المُتحققة:**
-- `approvals.status = 'pending'` ✅
-- `journal_entries.status = 'draft'` ✅
-- `journal_entries.status = 'posted'` ✅
-- `journal_entries.status = 'cancelled'` ✅
+**الإصلاح:**
+```typescript
+// قبل (خطأ)
+queryClient.invalidateQueries({ queryKey: ['recent_entries_accountant'] });
+
+// بعد (صحيح)
+queryClient.invalidateQueries({ queryKey: ['recent_journal_entries'] });
+queryClient.invalidateQueries({ queryKey: ['accountant-kpis'] });
+queryClient.invalidateQueries({ queryKey: ['accounting-stats'] });
+```
 
 ---
 
-## البيانات المضافة للاختبار
+### 2. إصلاح AccountantDashboard.tsx
+**المشكلة:** تعريف محلي مكرر لـ `JournalApproval` interface
 
-### 1. قيود اليوم
-| رقم القيد | الوصف | الحالة |
-|-----------|-------|--------|
-| JE-TODAY-001 | قيد مصروفات اليوم - رواتب | draft |
-| JE-TODAY-002 | قيد إيرادات اليوم - تحصيل إيجار | posted |
+**الإصلاح:** استخدام النوع المشترك من `@/types/approvals`
 
-### 2. موافقات معلقة إضافية
-| القيد | المراجع | الملاحظة |
-|-------|---------|----------|
-| JE-TODAY-001 | محمد المحاسب | قيد رواتب يحتاج موافقة |
-| قيد عشوائي | أحمد المدقق | مراجعة قيد |
+---
+
+### 3. إصلاح بيانات غير متناسقة
+**المشكلة:** موافقة معلقة لقيد محاسبي مرحّل بالفعل
+
+| approval_id | entry_number | حالة القيد | قبل | بعد |
+|-------------|--------------|------------|-----|-----|
+| 30dc1376-... | JE-2024-003 | posted | pending | approved |
 
 ---
 
@@ -39,7 +44,7 @@
 
 | المؤشر | القيمة |
 |--------|--------|
-| **موافقات معلقة** | 3 |
+| **موافقات معلقة** | 2 |
 | **قيود مسودة** | 13 |
 | **قيود مرحّلة** | 18 |
 | **قيود ملغية** | 0 |
@@ -48,50 +53,15 @@
 
 ---
 
-## المكونات المُختبرة
+## Query Keys المستخدمة
 
-### ✅ AccountantDashboard.tsx
-- عرض KPIs
-- تبويب النظرة العامة
-- تبويب الموافقات المعلقة
-- تبويب القيود الأخيرة
-- حوار الموافقة على القيود
-
-### ✅ AccountingStats.tsx
-- إجمالي القيود
-- القيود المرحّلة
-- المسودات
-- الملغية
-
-### ✅ RecentJournalEntries.tsx
-- عرض آخر 5 قيود
-- عرض الحالة (مسودة/مرحّل/ملغى)
-- التاريخ والوصف
-
-### ✅ ApproveJournalDialog.tsx
-- عرض تفاصيل القيد
-- الموافقة مع الملاحظات
-- الرفض مع سبب إلزامي
-- تحديث حالة القيد تلقائياً
-
----
-
-## الهيكل البرمجي
-
-```
-src/
-├── pages/
-│   └── AccountantDashboard.tsx
-├── hooks/
-│   ├── useAccountantKPIs.ts
-│   └── useAccountingStats.ts
-├── components/
-│   ├── dashboard/
-│   │   ├── AccountingStats.tsx
-│   │   └── RecentJournalEntries.tsx
-│   └── accounting/
-│       └── ApproveJournalDialog.tsx
-```
+| Query Key | المكون |
+|-----------|--------|
+| `accountant-kpis` | useAccountantKPIs |
+| `accounting-stats` | useAccountingStats |
+| `pending_approvals` | AccountantDashboard |
+| `recent_journal_entries` | RecentJournalEntries |
+| `journal_entries` | useJournalEntries |
 
 ---
 
@@ -100,27 +70,6 @@ src/
 | الدور | البريد الإلكتروني | كلمة المرور |
 |-------|------------------|-------------|
 | المحاسب | accountant@waqf.sa | Test@123456 |
-
----
-
-## اختبارات التكامل
-
-### ✅ KPIs
-- [x] موافقات معلقة تعمل
-- [x] قيود مسودة تعمل
-- [x] قيود مرحّلة تعمل
-- [x] قيود اليوم تعمل
-
-### ✅ الموافقات
-- [x] عرض قائمة الموافقات المعلقة
-- [x] فتح حوار الموافقة
-- [x] الموافقة على القيد
-- [x] رفض القيد
-
-### ✅ القيود الأخيرة
-- [x] عرض آخر 5 قيود
-- [x] عرض الحالة بشكل صحيح
-- [x] عرض التاريخ بالعربية
 
 ---
 
@@ -134,20 +83,10 @@ src/
 
 ---
 
-## قيم حالات الموافقات (approvals.status)
+## قيم حالات الموافقات
 
 | القيمة | الوصف |
 |--------|-------|
 | pending | قيد المراجعة |
 | approved | موافق عليه |
 | rejected | مرفوض |
-
----
-
-## توصيات للتطوير المستقبلي
-
-1. **إضافة فلترة**: فلترة القيود حسب التاريخ أو الحالة
-2. **التصدير**: إمكانية تصدير القيود إلى Excel
-3. **البحث**: بحث متقدم في القيود
-4. **الإشعارات**: إشعارات فورية للموافقات الجديدة
-5. **التقارير**: ربط مع نظام التقارير المالية

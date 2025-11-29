@@ -13,35 +13,11 @@ import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
 import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 import { SectionSkeleton } from "@/components/dashboard";
 import { AdminSendMessageDialog } from "@/components/messages/AdminSendMessageDialog";
+import { JournalApproval } from "@/types/approvals";
 
 // Lazy load components
 const AccountingStats = lazy(() => import("@/components/dashboard/AccountingStats"));
 const RecentJournalEntries = lazy(() => import("@/components/dashboard/RecentJournalEntries"));
-
-interface JournalApproval {
-  id: string;
-  journal_entry_id: string;
-  approver_name: string;
-  status: string;
-  notes: string | null;
-  created_at: string;
-  approved_at: string | null;
-  updated_at: string;
-  journal_entry: {
-    id: string;
-    entry_number: string;
-    entry_date: string;
-    description: string;
-    status: string;
-    reference_type: string;
-    reference_id: string;
-    fiscal_year_id: string;
-    posted_at: string | null;
-    created_at: string;
-    created_by: string | null;
-    updated_at: string;
-  };
-}
 
 const AccountantDashboard = () => {
   const [selectedApproval, setSelectedApproval] = useState<JournalApproval | null>(null);
