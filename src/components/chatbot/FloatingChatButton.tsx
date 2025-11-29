@@ -45,6 +45,8 @@ export function FloatingChatButton() {
           "group animate-bounce hover:animate-none"
         )}
         size="icon"
+        aria-label="فتح المساعد الذكي"
+        title="المساعد الذكي"
       >
         <Bot className="h-7 w-7 group-hover:animate-pulse text-primary-foreground" />
         <span className="absolute -top-2 -right-2 flex h-4 w-4">
@@ -108,6 +110,8 @@ export function FloatingChatButton() {
                 size="icon"
                 onClick={() => setIsOpen(false)}
                 className="h-8 w-8"
+                aria-label="إغلاق المحادثة"
+                title="إغلاق"
               >
                 <X className="h-4 w-4" />
               </Button>

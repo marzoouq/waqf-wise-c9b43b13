@@ -123,7 +123,7 @@ const AuditLogs = () => {
               setFilters({ ...filters, tableName: value === "all" ? "" : value })
             }
           >
-            <SelectTrigger>
+            <SelectTrigger aria-label="اختر الجدول">
               <SelectValue placeholder="الجدول" />
             </SelectTrigger>
             <SelectContent>
@@ -142,7 +142,7 @@ const AuditLogs = () => {
               setFilters({ ...filters, actionType: value === "all" ? "" : value })
             }
           >
-            <SelectTrigger>
+            <SelectTrigger aria-label="اختر نوع العملية">
               <SelectValue placeholder="نوع العملية" />
             </SelectTrigger>
             <SelectContent>
@@ -159,7 +159,7 @@ const AuditLogs = () => {
               setFilters({ ...filters, severity: value === "all" ? "" : value })
             }
           >
-            <SelectTrigger>
+            <SelectTrigger aria-label="اختر مستوى الخطورة">
               <SelectValue placeholder="مستوى الخطورة" />
             </SelectTrigger>
             <SelectContent>
