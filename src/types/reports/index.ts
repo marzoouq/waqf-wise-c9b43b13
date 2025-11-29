@@ -13,12 +13,15 @@ export interface BeneficiaryReportData {
   id: string;
   full_name: string;
   national_id: string;
+  phone: string;
+  email?: string | null;
   category: string;
   status: string;
   tribe?: string | null;
   beneficiary_type?: string | null;
   city?: string | null;
   total_received?: number | null;
+  created_at: string;
 }
 
 export interface DistributionReportData {

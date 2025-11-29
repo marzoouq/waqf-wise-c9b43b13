@@ -5,11 +5,12 @@ import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, Cart
 import { TrendingUp, DollarSign, Users, Clock, Calendar, CheckCircle2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { productionLogger } from '@/lib/logger/production-logger';
+import { Distribution, MonthlyDistributionData, PatternDistributionData } from '@/types/distributions';
 
 const COLORS = ['hsl(var(--primary))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))'];
 
 export function DistributionsDashboard() {
-  const [distributions, setDistributions] = useState<any[]>([]);
+  const [distributions, setDistributions] = useState<Distribution[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -20,7 +21,7 @@ export function DistributionsDashboard() {
     try {
       const { data, error } = await supabase
         .from('distributions')
-        .select('id, created_at, total_amount, status, pattern')
+        .select('id, created_at, total_amount, status, month, notes, distribution_type, beneficiaries_count, distribution_date')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -50,14 +51,14 @@ export function DistributionsDashboard() {
 
   // تحليل حسب الشهر
   const monthlyData = distributions.reduce((acc, d) => {
-    const month = new Date(d.created_at).toLocaleDateString('ar-SA', { month: 'short', year: 'numeric' });
-    if (!acc[month]) {
-      acc[month] = { month, count: 0, amount: 0 };
+    const monthKey = d.month || new Date(d.created_at).toLocaleDateString('ar-SA', { month: 'short', year: 'numeric' });
+    if (!acc[monthKey]) {
+      acc[monthKey] = { month: monthKey, count: 0, amount: 0 };
     }
-    acc[month].count++;
-    acc[month].amount += d.total_amount || 0;
+    acc[monthKey].count++;
+    acc[monthKey].amount += d.total_amount || 0;
     return acc;
-  }, {} as Record<string, any>);
+  }, {} as Record<string, MonthlyDistributionData>);
 
   const monthlyChartData = Object.values(monthlyData).slice(-6);
 
@@ -69,17 +70,17 @@ export function DistributionsDashboard() {
     { name: 'ملغي', value: distributions.filter(d => d.status === 'cancelled').length },
   ].filter(s => s.value > 0);
 
-  // تحليل حسب النمط
-  const patternData = distributions.reduce((acc, d) => {
-    const pattern = d.pattern || 'غير محدد';
-    if (!acc[pattern]) {
-      acc[pattern] = { name: pattern, count: 0 };
+  // تحليل حسب النوع
+  const typeData = distributions.reduce((acc, d) => {
+    const type = d.distribution_type || 'غير محدد';
+    if (!acc[type]) {
+      acc[type] = { name: type, count: 0 };
     }
-    acc[pattern].count++;
+    acc[type].count++;
     return acc;
-  }, {} as Record<string, any>);
+  }, {} as Record<string, PatternDistributionData>);
 
-  const patternChartData = Object.values(patternData);
+  const typeChartData = Object.values(typeData);
 
   if (loading) {
     return (
@@ -178,9 +179,9 @@ export function DistributionsDashboard() {
             </Card>
 
             <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4">التوزيع حسب النمط</h3>
+              <h3 className="text-lg font-semibold mb-4">التوزيع حسب النوع</h3>
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={patternChartData}>
+                <BarChart data={typeChartData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
                   <YAxis />

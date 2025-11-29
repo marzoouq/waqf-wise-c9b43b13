@@ -8,7 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { NotificationService } from '@/services/notification.service';
-import { Bell, Mail, MessageSquare, Smartphone, Send, Plus, Edit2, Trash2 } from 'lucide-react';
+import { Bell, Mail, MessageSquare, Smartphone, Send, Plus, Edit2, Trash2, LucideIcon } from 'lucide-react';
 
 type NotificationChannel = 'app' | 'email' | 'sms' | 'whatsapp' | 'push';
 
@@ -22,7 +22,7 @@ interface NotificationTemplate {
   variables: string[];
 }
 
-const channelIcons: Record<NotificationChannel, any> = {
+const channelIcons: Record<NotificationChannel, LucideIcon> = {
   app: Bell,
   email: Mail,
   sms: MessageSquare,

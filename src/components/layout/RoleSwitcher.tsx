@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ChevronDown, Shield, User, Calculator, Wallet, Archive, Users } from "lucide-react";
+import { ChevronDown, Shield, User, Calculator, Wallet, Archive, Users, LucideIcon } from "lucide-react";
 import { ROLE_LABELS } from "@/lib/role-labels";
 
 export function RoleSwitcher() {
@@ -29,7 +29,7 @@ export function RoleSwitcher() {
     beneficiary: "/beneficiary-dashboard",
   };
 
-  const roleIcons: Record<string, any> = {
+  const roleIcons: Record<string, LucideIcon> = {
     nazer: Shield,
     admin: Shield,
     accountant: Calculator,

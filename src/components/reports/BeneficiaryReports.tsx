@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { UnifiedDataTable, Column } from "@/components/unified/UnifiedDataTable";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { BeneficiaryReportData } from "@/types/reports/index";
 
 export function BeneficiaryReports() {
   const { toast } = useToast();
@@ -18,11 +19,11 @@ export function BeneficiaryReports() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("beneficiaries")
-        .select("*")
+        .select("id, full_name, national_id, phone, email, category, status, city, tribe, created_at")
         .order("created_at", { ascending: false});
 
       if (error) throw error;
-      return data;
+      return data as BeneficiaryReportData[];
     },
   });
 
@@ -65,7 +66,7 @@ export function BeneficiaryReports() {
     });
   };
 
-  const columns: Column<any>[] = [
+  const columns: Column<BeneficiaryReportData>[] = [
     {
       key: "full_name",
       label: "الاسم الكامل",
