@@ -1,3 +1,4 @@
+import { useState, useCallback } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Building, FileText, DollarSign, Wrench } from "lucide-react";
@@ -6,6 +7,7 @@ import { ContractsTab } from "@/components/properties/tabs/ContractsTab";
 import { PaymentsTab } from "@/components/properties/tabs/PaymentsTab";
 import { MaintenanceTab } from "@/components/properties/tabs/MaintenanceTab";
 import { PropertyUnitsManagement } from "@/components/properties/PropertyUnitsManagement";
+import { PropertySelector } from "@/components/properties/PropertySelector";
 import { type Property } from "@/hooks/useProperties";
 import { type Contract } from "@/hooks/useContracts";
 import { type RentalPayment } from "@/hooks/useRentalPayments";
@@ -29,10 +31,25 @@ export const PropertiesTabs = memo(({
   onEditPayment,
   onEditMaintenance,
 }: PropertiesTabsProps) => {
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string>("");
+
+  const handlePropertySelect = useCallback((property: Property) => {
+    setSelectedPropertyId(property.id);
+    onTabChange("units");
+  }, [onTabChange]);
+
+  const handleTabChange = useCallback((value: string) => {
+    // إذا انتقل من الوحدات لتبويب آخر، مسح الاختيار
+    if (value !== "units") {
+      setSelectedPropertyId("");
+    }
+    onTabChange(value);
+  }, [onTabChange]);
+
   return (
     <Card className="shadow-soft">
       <CardContent className="pt-6">
-        <Tabs value={activeTab} onValueChange={onTabChange}>
+        <Tabs value={activeTab} onValueChange={handleTabChange}>
           <TabsList className="grid w-full grid-cols-5 mb-6">
             <TabsTrigger value="properties" className="gap-2">
               <Building className="h-4 w-4" />
@@ -57,11 +74,20 @@ export const PropertiesTabs = memo(({
           </TabsList>
 
           <TabsContent value="properties">
-            <PropertiesTab onEdit={onEditProperty} />
+            <PropertiesTab 
+              onEdit={onEditProperty} 
+              onSelectProperty={handlePropertySelect}
+            />
           </TabsContent>
 
           <TabsContent value="units">
-            <PropertyUnitsManagement />
+            <div className="space-y-4">
+              <PropertySelector
+                selectedPropertyId={selectedPropertyId}
+                onSelect={setSelectedPropertyId}
+              />
+              <PropertyUnitsManagement propertyId={selectedPropertyId} />
+            </div>
           </TabsContent>
 
           <TabsContent value="contracts">

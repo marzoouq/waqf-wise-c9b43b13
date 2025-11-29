@@ -1,8 +1,7 @@
 import { useState, useMemo } from "react";
-import { Search, MapPin, DollarSign, Home, Building, Edit, Trash2 } from "lucide-react";
+import { Search, MapPin, DollarSign, Home, Building, Edit, Trash2, Eye } from "lucide-react";
 import { useProperties } from "@/hooks/useProperties";
 import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { StatCard } from "@/components/dashboard/DashboardStats";
@@ -11,9 +10,10 @@ import { type Property } from "@/hooks/useProperties";
 
 interface Props {
   onEdit: (property: Property) => void;
+  onSelectProperty?: (property: Property) => void;
 }
 
-export const PropertiesTab = ({ onEdit }: Props) => {
+export const PropertiesTab = ({ onEdit, onSelectProperty }: Props) => {
   const [searchQuery, setSearchQuery] = useState("");
   const { properties, isLoading, deleteProperty } = useProperties();
 
@@ -167,6 +167,17 @@ export const PropertiesTab = ({ onEdit }: Props) => {
         emptyMessage="لا توجد عقارات"
         actions={(property: Property) => (
           <div className="flex gap-1">
+            {onSelectProperty && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onSelectProperty(property)}
+                title="عرض الوحدات"
+                className="hover:bg-info/10"
+              >
+                <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
+              </Button>
+            )}
             <Button
               variant="ghost"
               size="sm"
