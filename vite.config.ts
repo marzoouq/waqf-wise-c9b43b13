@@ -10,6 +10,9 @@ export default defineConfig(({ mode }) => {
   const isProduction = mode === 'production';
   
   return {
+  // ✅ تقليل مخرجات البناء - إظهار التحذيرات والأخطاء فقط
+  logLevel: 'warn',
+  
   define: {
     'import.meta.env.VITE_APP_VERSION': JSON.stringify('2.5.0'),
     'import.meta.env.VITE_BUILD_TIME': JSON.stringify(new Date().toISOString()),
@@ -159,10 +162,11 @@ export default defineConfig(({ mode }) => {
     // Use esbuild for minification (faster and built-in)
     minify: true,
     
-    // Chunk size optimization
-    chunkSizeWarningLimit: 500,
+    // ✅ تقليل مخرجات البناء
+    chunkSizeWarningLimit: 1000, // زيادة الحد لتقليل التحذيرات
     cssCodeSplit: true,
     sourcemap: false,
+    reportCompressedSize: false, // إيقاف حساب gzip لتسريع البناء
     
     rollupOptions: {
       output: {
