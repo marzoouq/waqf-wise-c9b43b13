@@ -12,6 +12,8 @@ import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { useToast } from '@/hooks/use-toast';
+import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
+import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
@@ -174,30 +176,27 @@ export default function BeneficiaryReports() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6 space-y-6 print:p-0">
-      {/* Header */}
-      <div className="flex items-center justify-between print:hidden">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <FileText className="h-8 w-8" />
-            التقارير والتحليلات
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            تقارير تفصيلية عن حسابك والمدفوعات
-          </p>
+    <PageErrorBoundary pageName="التقارير والتحليلات">
+      <MobileOptimizedLayout className="print:p-0">
+        <div className="print:hidden">
+          <MobileOptimizedHeader
+            title="التقارير والتحليلات"
+            description="تقارير تفصيلية عن حسابك والمدفوعات"
+            icon={<FileText className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
+            actions={
+              <div className="flex gap-2">
+                <Button onClick={printReport} variant="outline" size="sm" className="min-h-[44px]">
+                  <Printer className="h-4 w-4 sm:ml-2" />
+                  <span className="hidden sm:inline">طباعة</span>
+                </Button>
+                <Button onClick={exportAnnualReport} size="sm" className="min-h-[44px]">
+                  <Download className="h-4 w-4 sm:ml-2" />
+                  <span className="hidden sm:inline">تصدير PDF</span>
+                </Button>
+              </div>
+            }
+          />
         </div>
-        
-        <div className="flex gap-2">
-          <Button onClick={printReport} variant="outline">
-            <Printer className="h-4 w-4 ml-2" />
-            طباعة
-          </Button>
-          <Button onClick={exportAnnualReport}>
-            <Download className="h-4 w-4 ml-2" />
-            تصدير PDF
-          </Button>
-        </div>
-      </div>
 
       {/* خيارات التقرير */}
       <Card className="print:hidden">
@@ -405,6 +404,7 @@ export default function BeneficiaryReports() {
           </ResponsiveContainer>
         </CardContent>
       </Card>
-    </div>
+      </MobileOptimizedLayout>
+    </PageErrorBoundary>
   );
 }

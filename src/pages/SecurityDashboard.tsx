@@ -1,4 +1,5 @@
-import { PageHeader } from "@/components/layout/PageHeader";
+import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
@@ -102,11 +103,13 @@ export default function SecurityDashboard() {
   ];
 
   return (
-    <div className="container-custom py-6 space-y-6">
-      <PageHeader
-        title="لوحة الأمان"
-        description="مراقبة الأحداث الأمنية ومحاولات الدخول"
-      />
+    <PageErrorBoundary pageName="لوحة الأمان">
+      <MobileOptimizedLayout>
+        <MobileOptimizedHeader
+          title="لوحة الأمان"
+          description="مراقبة الأحداث الأمنية ومحاولات الدخول"
+          icon={<Shield className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
+        />
 
       {/* الإحصائيات */}
       <UnifiedStatsGrid columns={4}>
@@ -156,6 +159,7 @@ export default function SecurityDashboard() {
           />
         </CardContent>
       </Card>
-    </div>
+      </MobileOptimizedLayout>
+    </PageErrorBoundary>
   );
 }

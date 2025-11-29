@@ -1,4 +1,5 @@
-import { PageHeader } from "@/components/layout/PageHeader";
+import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -6,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { BankIntegration, PaymentGateway, GovernmentIntegration } from "@/types/integrations";
-import { Building2, CreditCard, Shield, Settings } from "lucide-react";
+import { Building2, CreditCard, Shield, Settings, Link } from "lucide-react";
 
 export default function IntegrationsManagement() {
   const { data: bankIntegrations = [] } = useQuery({
@@ -46,11 +47,13 @@ export default function IntegrationsManagement() {
   });
 
   return (
-    <div className="container-custom py-6 space-y-6">
-      <PageHeader
-        title="التكاملات الخارجية"
-        description="إدارة تكاملات البنوك والدفع والأنظمة الحكومية"
-      />
+    <PageErrorBoundary pageName="التكاملات الخارجية">
+      <MobileOptimizedLayout>
+        <MobileOptimizedHeader
+          title="التكاملات الخارجية"
+          description="إدارة تكاملات البنوك والدفع والأنظمة الحكومية"
+          icon={<Link className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
+        />
 
       {/* تكاملات البنوك */}
       <Card>
@@ -151,6 +154,7 @@ export default function IntegrationsManagement() {
           </div>
         </CardContent>
       </Card>
-    </div>
+      </MobileOptimizedLayout>
+    </PageErrorBoundary>
   );
 }

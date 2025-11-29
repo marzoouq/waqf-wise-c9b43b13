@@ -5,6 +5,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BookOpen, Search, FileText, HelpCircle, Video, Download } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 const KnowledgeBase = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -157,16 +160,13 @@ const KnowledgeBase = () => {
   );
 
   return (
-    <div className="min-h-screen p-6 space-y-6" dir="rtl">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">قاعدة المعرفة</h1>
-          <p className="text-muted-foreground">
-            دليل شامل ومقالات مساعدة لاستخدام النظام
-          </p>
-        </div>
-        <BookOpen className="h-12 w-12 text-primary" />
-      </div>
+    <PageErrorBoundary pageName="قاعدة المعرفة">
+      <MobileOptimizedLayout>
+        <MobileOptimizedHeader
+          title="قاعدة المعرفة"
+          description="دليل شامل ومقالات مساعدة لاستخدام النظام"
+          icon={<BookOpen className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
+        />
 
       <Card>
         <CardHeader>
@@ -186,24 +186,27 @@ const KnowledgeBase = () => {
       </Card>
 
       <Tabs defaultValue="articles" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="articles">
-            <FileText className="h-4 w-4 ml-2" />
-            المقالات ({filteredArticles.length})
-          </TabsTrigger>
-          <TabsTrigger value="faqs">
-            <HelpCircle className="h-4 w-4 ml-2" />
-            الأسئلة الشائعة ({filteredFAQs.length})
-          </TabsTrigger>
-          <TabsTrigger value="videos">
-            <Video className="h-4 w-4 ml-2" />
-            شروحات فيديو
-          </TabsTrigger>
-          <TabsTrigger value="downloads">
-            <Download className="h-4 w-4 ml-2" />
-            التنزيلات
-          </TabsTrigger>
-        </TabsList>
+        <ScrollArea className="w-full">
+          <TabsList className="inline-flex w-full min-w-max h-auto p-1">
+            <TabsTrigger value="articles" className="text-xs sm:text-sm min-h-[44px]">
+              <FileText className="h-4 w-4 ml-1" />
+              <span className="hidden sm:inline">المقالات</span> ({filteredArticles.length})
+            </TabsTrigger>
+            <TabsTrigger value="faqs" className="text-xs sm:text-sm min-h-[44px]">
+              <HelpCircle className="h-4 w-4 ml-1" />
+              <span className="hidden sm:inline">الأسئلة الشائعة</span> ({filteredFAQs.length})
+            </TabsTrigger>
+            <TabsTrigger value="videos" className="text-xs sm:text-sm min-h-[44px]">
+              <Video className="h-4 w-4 ml-1" />
+              <span className="hidden sm:inline">شروحات فيديو</span>
+            </TabsTrigger>
+            <TabsTrigger value="downloads" className="text-xs sm:text-sm min-h-[44px]">
+              <Download className="h-4 w-4 ml-1" />
+              <span className="hidden sm:inline">التنزيلات</span>
+            </TabsTrigger>
+          </TabsList>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
 
         <TabsContent value="articles" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
@@ -320,7 +323,8 @@ const KnowledgeBase = () => {
           </Card>
         </TabsContent>
       </Tabs>
-    </div>
+      </MobileOptimizedLayout>
+    </PageErrorBoundary>
   );
 };
 

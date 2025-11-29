@@ -6,6 +6,7 @@ import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { 
@@ -123,72 +124,75 @@ export default function BeneficiaryPortal() {
 
           {/* Main Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-12 mb-6">
+            <ScrollArea className="w-full">
+              <TabsList className="inline-flex w-full min-w-max mb-6 h-auto p-1">
               {settings?.show_overview && (
-                <TabsTrigger value="overview">
-                  <TrendingUp className="h-4 w-4 ml-2" />
-                  نظرة عامة
+                <TabsTrigger value="overview" className="text-xs sm:text-sm min-h-[44px]">
+                  <TrendingUp className="h-4 w-4 ml-1" />
+                  <span className="hidden sm:inline">نظرة عامة</span>
                 </TabsTrigger>
               )}
               {settings?.show_profile && (
-                <TabsTrigger value="profile">
-                  <User className="h-4 w-4 ml-2" />
-                  الملف
+                <TabsTrigger value="profile" className="text-xs sm:text-sm min-h-[44px]">
+                  <User className="h-4 w-4 ml-1" />
+                  <span className="hidden sm:inline">الملف</span>
                 </TabsTrigger>
               )}
               {settings?.show_requests && (
-                <TabsTrigger value="requests">
-                  <FileText className="h-4 w-4 ml-2" />
-                  الطلبات
+                <TabsTrigger value="requests" className="text-xs sm:text-sm min-h-[44px]">
+                  <FileText className="h-4 w-4 ml-1" />
+                  <span className="hidden sm:inline">الطلبات</span>
                 </TabsTrigger>
               )}
               {settings?.show_distributions && (
-                <TabsTrigger value="distributions">
-                  <TrendingUp className="h-4 w-4 ml-2" />
-                  التوزيعات
+                <TabsTrigger value="distributions" className="text-xs sm:text-sm min-h-[44px]">
+                  <TrendingUp className="h-4 w-4 ml-1" />
+                  <span className="hidden sm:inline">التوزيعات</span>
                 </TabsTrigger>
               )}
               {settings?.show_statements && (
-                <TabsTrigger value="statements">
-                  <CreditCard className="h-4 w-4 ml-2" />
-                  كشف الحساب
+                <TabsTrigger value="statements" className="text-xs sm:text-sm min-h-[44px]">
+                  <CreditCard className="h-4 w-4 ml-1" />
+                  <span className="hidden sm:inline">كشف الحساب</span>
                 </TabsTrigger>
               )}
               {settings?.show_properties && (
-                <TabsTrigger value="properties">
-                  <Building2 className="h-4 w-4 ml-2" />
-                  العقارات
+                <TabsTrigger value="properties" className="text-xs sm:text-sm min-h-[44px]">
+                  <Building2 className="h-4 w-4 ml-1" />
+                  <span className="hidden sm:inline">العقارات</span>
                 </TabsTrigger>
               )}
               {settings?.show_family_tree && (
-                <TabsTrigger value="family">
-                  <Users className="h-4 w-4 ml-2" />
-                  العائلة
+                <TabsTrigger value="family" className="text-xs sm:text-sm min-h-[44px]">
+                  <Users className="h-4 w-4 ml-1" />
+                  <span className="hidden sm:inline">العائلة</span>
                 </TabsTrigger>
               )}
-              <TabsTrigger value="waqf">
-                <Landmark className="h-4 w-4 ml-2" />
-                الوقف
+              <TabsTrigger value="waqf" className="text-xs sm:text-sm min-h-[44px]">
+                <Landmark className="h-4 w-4 ml-1" />
+                <span className="hidden sm:inline">الوقف</span>
               </TabsTrigger>
               {settings?.show_governance && (
-                <TabsTrigger value="governance">
-                  <Shield className="h-4 w-4 ml-2" />
-                  الحوكمة
+                <TabsTrigger value="governance" className="text-xs sm:text-sm min-h-[44px]">
+                  <Shield className="h-4 w-4 ml-1" />
+                  <span className="hidden sm:inline">الحوكمة</span>
                 </TabsTrigger>
               )}
               {settings?.show_budgets && (
-                <TabsTrigger value="budgets">
-                  <DollarSign className="h-4 w-4 ml-2" />
-                  الميزانيات
+                <TabsTrigger value="budgets" className="text-xs sm:text-sm min-h-[44px]">
+                  <DollarSign className="h-4 w-4 ml-1" />
+                  <span className="hidden sm:inline">الميزانيات</span>
                 </TabsTrigger>
               )}
               {settings?.show_own_loans && (
-                <TabsTrigger value="loans">
-                  <CreditCard className="h-4 w-4 ml-2" />
-                  القروض
+                <TabsTrigger value="loans" className="text-xs sm:text-sm min-h-[44px]">
+                  <CreditCard className="h-4 w-4 ml-1" />
+                  <span className="hidden sm:inline">القروض</span>
                 </TabsTrigger>
               )}
-            </TabsList>
+              </TabsList>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
 
             {/* Overview Tab */}
             <TabsContent value="overview" className="space-y-6">

@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import MainLayout from '@/components/layout/MainLayout';
+import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
 import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PushNotificationsSetup } from '@/components/settings/PushNotificationsSetup';
@@ -23,34 +24,35 @@ export default function AdvancedSettings() {
 
   return (
     <PageErrorBoundary pageName="الإعدادات المتقدمة">
-      <MainLayout>
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">الإعدادات المتقدمة</h1>
-          <p className="text-muted-foreground">
-            إعدادات النظام المتقدمة والمميزات الإضافية
-          </p>
-        </div>
+      <MobileOptimizedLayout>
+        <MobileOptimizedHeader
+          title="الإعدادات المتقدمة"
+          description="إعدادات النظام المتقدمة والمميزات الإضافية"
+          icon={<Settings className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
+        />
 
         <Tabs defaultValue="notifications" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
-            <TabsTrigger value="notifications" className="flex items-center gap-2">
-              <Bell className="h-4 w-4" />
-              الإشعارات
-            </TabsTrigger>
-            <TabsTrigger value="reports" className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              التقارير المجدولة
-            </TabsTrigger>
-            <TabsTrigger value="backup" className="flex items-center gap-2">
-              <Database className="h-4 w-4" />
-              النسخ الاحتياطي
-            </TabsTrigger>
-            <TabsTrigger value="security" className="flex items-center gap-2">
-              <Shield className="h-4 w-4" />
-              الأمان
-            </TabsTrigger>
-          </TabsList>
+          <ScrollArea className="w-full">
+            <TabsList className="inline-flex w-full min-w-max md:grid md:grid-cols-4 h-auto p-1">
+              <TabsTrigger value="notifications" className="flex items-center gap-2 text-xs sm:text-sm min-h-[44px]">
+                <Bell className="h-4 w-4" />
+                <span className="hidden sm:inline">الإشعارات</span>
+              </TabsTrigger>
+              <TabsTrigger value="reports" className="flex items-center gap-2 text-xs sm:text-sm min-h-[44px]">
+                <Calendar className="h-4 w-4" />
+                <span className="hidden sm:inline">التقارير المجدولة</span>
+              </TabsTrigger>
+              <TabsTrigger value="backup" className="flex items-center gap-2 text-xs sm:text-sm min-h-[44px]">
+                <Database className="h-4 w-4" />
+                <span className="hidden sm:inline">النسخ الاحتياطي</span>
+              </TabsTrigger>
+              <TabsTrigger value="security" className="flex items-center gap-2 text-xs sm:text-sm min-h-[44px]">
+                <Shield className="h-4 w-4" />
+                <span className="hidden sm:inline">الأمان</span>
+              </TabsTrigger>
+            </TabsList>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
 
           <TabsContent value="notifications" className="space-y-6">
             <PushNotificationsSetup />
@@ -324,8 +326,7 @@ export default function AdvancedSettings() {
             </Card>
           </TabsContent>
         </Tabs>
-      </div>
-    </MainLayout>
+      </MobileOptimizedLayout>
     </PageErrorBoundary>
   );
 }
