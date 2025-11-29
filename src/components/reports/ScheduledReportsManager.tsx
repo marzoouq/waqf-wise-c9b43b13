@@ -30,7 +30,7 @@ import { useCustomReports } from '@/hooks/useCustomReports';
 import { Calendar, Clock, Mail, Play, Trash2, Plus } from 'lucide-react';
 import { Database } from '@/integrations/supabase/types';
 
-type ScheduledReport = Database['public']['Tables']['scheduled_reports']['Row'];
+type ScheduledReport = Database['public']['Tables']['scheduled_report_jobs']['Row'];
 type ReportTemplate = Database['public']['Tables']['custom_report_templates']['Row'];
 import { LoadingState } from '@/components/shared/LoadingState';
 import { format } from 'date-fns';

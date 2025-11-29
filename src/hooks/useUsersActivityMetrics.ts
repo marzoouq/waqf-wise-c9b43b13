@@ -22,10 +22,10 @@ export function useUsersActivityMetrics() {
       
       // جلب محاولات تسجيل الدخول
       const { data: loginAttempts, error: loginError } = await supabase
-        .from("login_attempts")
-        .select("attempted_at, success, email")
-        .gte("attempted_at", weekAgo.toISOString())
-        .order("attempted_at", { ascending: true });
+        .from("login_attempts_log")
+        .select("created_at, success, user_email")
+        .gte("created_at", weekAgo.toISOString())
+        .order("created_at", { ascending: true });
 
       if (loginError) {
         console.error("Error fetching login attempts:", loginError);
@@ -60,7 +60,7 @@ export function useUsersActivityMetrics() {
         
         // عد عمليات الدخول الناجحة في هذا اليوم
         const dayLogins = (loginAttempts || []).filter(attempt => {
-          const attemptDate = parseISO(attempt.attempted_at);
+          const attemptDate = parseISO(attempt.created_at);
           return attemptDate >= dayStart && attemptDate <= dayEnd && attempt.success;
         }).length;
 

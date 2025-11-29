@@ -6094,36 +6094,6 @@ export type Database = {
           },
         ]
       }
-      login_attempts: {
-        Row: {
-          attempted_at: string
-          created_at: string | null
-          email: string
-          id: string
-          ip_address: string
-          success: boolean
-          user_agent: string | null
-        }
-        Insert: {
-          attempted_at?: string
-          created_at?: string | null
-          email: string
-          id?: string
-          ip_address: string
-          success?: boolean
-          user_agent?: string | null
-        }
-        Update: {
-          attempted_at?: string
-          created_at?: string | null
-          email?: string
-          id?: string
-          ip_address?: string
-          success?: boolean
-          user_agent?: string | null
-        }
-        Relationships: []
-      }
       login_attempts_log: {
         Row: {
           created_at: string | null
@@ -8071,13 +8041,6 @@ export type Database = {
             referencedRelation: "report_templates"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "report_execution_log_scheduled_report_id_fkey"
-            columns: ["scheduled_report_id"]
-            isOneToOne: false
-            referencedRelation: "scheduled_reports"
-            referencedColumns: ["id"]
-          },
         ]
       }
       report_generation_log: {
@@ -8768,45 +8731,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      scheduled_reports: {
-        Row: {
-          created_at: string | null
-          created_by: string | null
-          frequency: string
-          id: string
-          is_active: boolean | null
-          name: string
-          next_run: string
-          recipients: string[]
-          report_type: string
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          created_by?: string | null
-          frequency: string
-          id?: string
-          is_active?: boolean | null
-          name: string
-          next_run: string
-          recipients: string[]
-          report_type: string
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          created_by?: string | null
-          frequency?: string
-          id?: string
-          is_active?: boolean | null
-          name?: string
-          next_run?: string
-          recipients?: string[]
-          report_type?: string
-          updated_at?: string | null
-        }
-        Relationships: []
       }
       search_history: {
         Row: {
