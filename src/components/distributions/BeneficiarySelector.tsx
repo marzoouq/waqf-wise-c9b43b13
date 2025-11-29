@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { Search, Users } from 'lucide-react';
 import { productionLogger } from '@/lib/logger/production-logger';
+import { BeneficiarySelectorItem } from '@/types/beneficiary';
 
 interface BeneficiarySelectorProps {
   selected: string[];
@@ -12,7 +13,7 @@ interface BeneficiarySelectorProps {
 }
 
 export function BeneficiarySelector({ selected, onChange }: BeneficiarySelectorProps) {
-  const [beneficiaries, setBeneficiaries] = useState<any[]>([]);
+  const [beneficiaries, setBeneficiaries] = useState<BeneficiarySelectorItem[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
 

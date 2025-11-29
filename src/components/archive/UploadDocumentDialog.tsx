@@ -25,6 +25,7 @@ import { useDocumentUpload } from "@/hooks/useDocumentUpload";
 import { useFolders } from "@/hooks/useFolders";
 import { Upload, Loader2, FileText } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { DocumentUploadData } from "@/types/documents";
 
 const uploadSchema = z.object({
   name: z
@@ -42,7 +43,7 @@ type UploadFormValues = z.infer<typeof uploadSchema>;
 interface UploadDocumentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onUpload?: (data: any) => void;
+  onUpload?: (data: DocumentUploadData & { file: File }) => void;
 }
 
 const DOCUMENT_CATEGORIES = [

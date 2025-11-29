@@ -56,7 +56,7 @@ export function LoanScheduleTable({ loanId }: LoanScheduleTableProps) {
       key: "status",
       label: "الحالة",
       render: (value: string) => {
-        const variants: Record<string, any> = {
+        const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
           paid: 'secondary',
           pending: 'outline',
           overdue: 'destructive',
@@ -67,7 +67,7 @@ export function LoanScheduleTable({ loanId }: LoanScheduleTableProps) {
           overdue: 'متأخر',
           waived: 'معفى',
         };
-        return <Badge variant={variants[value]}>{labels[value]}</Badge>;
+        return <Badge variant={variants[value] || 'outline'}>{labels[value] || value}</Badge>;
       }
     },
   ];

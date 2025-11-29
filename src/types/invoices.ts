@@ -31,3 +31,32 @@ export interface InvoiceWithLines {
   invoice: InvoiceInsert;
   lines: InvoiceLineInsert[];
 }
+
+// OCR Result types
+export interface InvoiceOCRResult {
+  invoice_number?: string;
+  vendor_name?: string;
+  vendor_tax_id?: string;
+  invoice_date?: string;
+  due_date?: string;
+  subtotal?: number;
+  tax_amount?: number;
+  total_amount?: number;
+  currency?: string;
+  line_items?: InvoiceOCRLineItem[];
+  overall_confidence: number;
+}
+
+export interface InvoiceOCRLineItem {
+  description: string;
+  quantity: number;
+  unit_price: number;
+  total: number;
+}
+
+export interface BatchProcessingResult {
+  file: File;
+  status: 'pending' | 'processing' | 'success' | 'error';
+  data?: InvoiceOCRResult;
+  error?: string;
+}

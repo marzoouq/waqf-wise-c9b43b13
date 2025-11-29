@@ -173,3 +173,11 @@ export function parseMedicalConditions(data: Json | null): MedicalCondition[] {
   if (!data || !Array.isArray(data)) return [];
   return data as unknown as MedicalCondition[];
 }
+
+// Beneficiary selector item for distribution
+export interface BeneficiarySelectorItem {
+  id: string;
+  full_name: string;
+  national_id: string;
+  category: string;
+}

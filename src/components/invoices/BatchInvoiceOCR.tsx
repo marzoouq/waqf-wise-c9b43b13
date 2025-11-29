@@ -5,13 +5,7 @@ import { Progress } from '@/components/ui/progress';
 import { Upload, Loader2, CheckCircle, XCircle, FileImage } from 'lucide-react';
 import { useInvoiceOCR } from '@/hooks/useInvoiceOCR';
 import { toast } from 'sonner';
-
-interface BatchProcessingResult {
-  file: File;
-  status: 'pending' | 'processing' | 'success' | 'error';
-  data?: any;
-  error?: string;
-}
+import { BatchProcessingResult, InvoiceOCRResult } from '@/types/invoices';
 
 interface BatchInvoiceOCRProps {
   onComplete: (results: BatchProcessingResult[]) => void;
