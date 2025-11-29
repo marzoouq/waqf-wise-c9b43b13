@@ -4,52 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '@/types/auth';
 import { useToast } from '@/hooks/use-toast';
 import { productionLogger } from '@/lib/logger/production-logger';
-
-// خريطة الصلاحيات لكل دور
-const ROLE_PERMISSIONS: Record<string, string[]> = {
-  nazer: [
-    'view_dashboard', 'manage_beneficiaries', 'manage_distributions', 
-    'approve_payments', 'view_reports', 'manage_settings', 'manage_users',
-    'view_all_data', 'export_data', 'manage_properties', 'manage_contracts'
-  ],
-  admin: [
-    'view_dashboard', 'manage_beneficiaries', 'manage_distributions',
-    'view_reports', 'manage_settings', 'manage_users', 'view_all_data',
-    'export_data', 'manage_properties', 'manage_contracts'
-  ],
-  accountant: [
-    'view_dashboard', 'manage_distributions', 'view_reports',
-    'export_data', 'manage_journal_entries', 'view_beneficiaries'
-  ],
-  cashier: [
-    'view_dashboard', 'process_payments', 'view_beneficiaries',
-    'view_distributions'
-  ],
-  archivist: [
-    'view_dashboard', 'manage_documents', 'view_beneficiaries',
-    'upload_files', 'manage_archive'
-  ],
-  beneficiary: [
-    // صلاحيات العرض فقط للمستفيدين من الدرجة الأولى
-    'view_own_profile',
-    'view_own_payments',
-    'view_waqf_summary',
-    'view_properties',
-    'view_distributions',
-    'view_governance',
-    'view_budgets',
-    'view_family_tree',
-    'view_disclosures',
-    'view_bank_accounts',
-    'view_financial_reports',
-    'view_approvals_log',
-    'view_statements',
-    // إزالة صلاحيات الكتابة: 'submit_requests', 'upload_own_documents'
-  ],
-  user: [
-    'view_dashboard'
-  ]
-};
+import { ROLE_PERMISSIONS, checkPermission, type Permission } from '@/config/permissions';
 
 interface AuthContextType {
   user: User | null;
@@ -315,28 +270,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       roles = await fetchUserRoles(user.id);
     }
 
-    // التحقق من الصلاحية في كل دور
-    for (const role of roles) {
-      const permissions = ROLE_PERMISSIONS[role] || [];
-      if (permissions.includes(permission) || permissions.includes('view_all_data')) {
-        return true;
-      }
-    }
-
-    return false;
+    // استخدام دالة checkPermission من config
+    return checkPermission(permission as Permission, roles);
   };
 
   /**
    * التحقق من صلاحية معينة - sync version (للاستخدام في المكونات)
    */
   const checkPermissionSync = (permission: string, userRoles: string[]): boolean => {
-    for (const role of userRoles) {
-      const permissions = ROLE_PERMISSIONS[role] || [];
-      if (permissions.includes(permission) || permissions.includes('view_all_data')) {
-        return true;
-      }
-    }
-    return false;
+    return checkPermission(permission as Permission, userRoles);
   };
 
   /**

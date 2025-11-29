@@ -8,70 +8,29 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { useContactForm, type ContactFormData } from "@/hooks/useContactForm";
 
 export default function Contact() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ContactFormData>({
     name: '',
     email: '',
     phone: '',
     subject: '',
     message: ''
   });
+  
+  const { sendMessage, isSending } = useContactForm();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsSubmitting(true);
     
     try {
-      // حفظ الرسالة في قاعدة البيانات
-      const { error: messageError } = await supabase
-        .from('contact_messages' as any)
-        .insert({
-          sender_name: formData.name,
-          sender_email: formData.email,
-          sender_phone: formData.phone || null,
-          subject: formData.subject,
-          message: formData.message,
-        });
-
-      if (messageError) throw messageError;
-
-      // إرسال إشعار للمشرفين
-      const { data: admins } = await supabase
-        .from('profiles')
-        .select('user_id')
-        .or('role.eq.admin,role.eq.supervisor,role.eq.nazer');
-
-      if (admins && admins.length > 0) {
-        const notificationData = admins
-          .filter(admin => admin.user_id)
-          .map(admin => ({
-            user_id: admin.user_id!,
-            title: 'رسالة جديدة من التواصل',
-            message: `رسالة من ${formData.name}: ${formData.subject}`,
-            type: 'info' as const,
-            priority: 'medium',
-            reference_type: 'contact_message',
-            action_url: '/admin/messages',
-            is_read: false,
-          }));
-
-        if (notificationData.length > 0) {
-          await supabase.from('notifications').insert(notificationData);
-        }
-      }
-
+      await sendMessage(formData);
       setIsSubmitted(true);
-      toast.success("تم إرسال رسالتك بنجاح، سنتواصل معك قريباً");
       setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
     } catch (error) {
       console.error('Error sending message:', error);
-      toast.error("حدث خطأ أثناء إرسال الرسالة");
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -232,8 +191,8 @@ export default function Contact() {
                     />
                   </div>
 
-                  <Button type="submit" className="w-full" disabled={isSubmitting}>
-                    {isSubmitting ? (
+                  <Button type="submit" className="w-full" disabled={isSending}>
+                    {isSending ? (
                       "جاري الإرسال..."
                     ) : (
                       <>

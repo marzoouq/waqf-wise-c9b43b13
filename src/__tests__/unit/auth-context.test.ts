@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ROLE_PERMISSIONS } from '@/contexts/AuthContext';
+import { ROLE_PERMISSIONS } from '@/config/permissions';
 
 // Mock Supabase client
 vi.mock('@/integrations/supabase/client', () => ({

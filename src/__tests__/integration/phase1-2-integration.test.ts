@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { ROLE_PERMISSIONS } from '@/contexts/AuthContext';
+import { ROLE_PERMISSIONS } from '@/config/permissions';
 
 // ======== Phase 1: Logger Integration Tests ========
 
