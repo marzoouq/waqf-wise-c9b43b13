@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { Upload, FileText, Trash2, Eye } from "lucide-react";
-import { DocumentUploadDialog } from "@/components/beneficiary/DocumentUploadDialog";
+import { DocumentUploadDialog } from "./DocumentUploadDialog";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 

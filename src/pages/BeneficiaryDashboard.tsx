@@ -13,20 +13,21 @@ import {
   LayoutDashboard,
   Eye
 } from "lucide-react";
-import { BeneficiaryProfileCard } from "@/components/beneficiary/BeneficiaryProfileCard";
-import { QuickActionsCard } from "@/components/beneficiary/QuickActionsCard";
+import {
+  BeneficiaryProfileCard,
+  QuickActionsCard,
+  AnnualDisclosureCard,
+  PropertyStatsCards,
+  ActivityTimeline,
+  YearlyComparison,
+  ChangePasswordDialog,
+  FinancialTransparencyTab
+} from "@/components/beneficiary";
 import { UnifiedDashboardLayout } from "@/components/dashboard/UnifiedDashboardLayout";
 import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
 import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
-import { AnnualDisclosureCard } from "@/components/beneficiary/AnnualDisclosureCard";
-import { PropertyStatsCards } from "@/components/beneficiary/PropertyStatsCards";
-import { ActivityTimeline } from "@/components/beneficiary/ActivityTimeline";
-import { YearlyComparison } from "@/components/beneficiary/YearlyComparison";
 import { ChatbotQuickCard } from "@/components/dashboard/ChatbotQuickCard";
-
 import { InternalMessagesDialog } from "@/components/messages/InternalMessagesDialog";
-import { ChangePasswordDialog } from "@/components/beneficiary/ChangePasswordDialog";
-import { FinancialTransparencyTab } from "@/components/beneficiary/FinancialTransparencyTab";
 import { useBeneficiaryProfile } from "@/hooks/useBeneficiaryProfile";
 import { useAuth } from "@/hooks/useAuth";
 import { formatCurrency } from "@/lib/utils";

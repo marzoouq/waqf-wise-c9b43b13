@@ -7,13 +7,15 @@ import { useBeneficiaries } from '@/hooks/useBeneficiaries';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
-import { ProfileHeader } from '@/components/beneficiary/ProfileHeader';
-import { ProfileStats } from '@/components/beneficiary/ProfileStats';
-import { ProfileTimeline } from '@/components/beneficiary/ProfileTimeline';
-import { ProfilePaymentsHistory } from '@/components/beneficiary/ProfilePaymentsHistory';
-import { ProfileRequestsHistory } from '@/components/beneficiary/ProfileRequestsHistory';
-import { ProfileFamilyTree } from '@/components/beneficiary/ProfileFamilyTree';
-import { ProfileDocumentsGallery } from '@/components/beneficiary/ProfileDocumentsGallery';
+import {
+  ProfileHeader,
+  ProfileStats,
+  ProfileTimeline,
+  ProfilePaymentsHistory,
+  ProfileRequestsHistory,
+  ProfileFamilyTree,
+  ProfileDocumentsGallery
+} from '@/components/beneficiary';
 import { BeneficiaryIntegrationPanel } from '@/components/beneficiaries/BeneficiaryIntegrationPanel';
 import BeneficiaryDialog from '@/components/beneficiaries/BeneficiaryDialog';
 
