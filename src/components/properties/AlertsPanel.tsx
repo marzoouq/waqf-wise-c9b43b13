@@ -26,7 +26,8 @@ export function AlertsPanel() {
       if (error) throw error;
       return (data || []) as SystemAlert[];
     },
-    refetchInterval: 60000
+    staleTime: 60 * 1000,
+    refetchInterval: false, // تعطيل التحديث التلقائي لتحسين LCP
   });
 
   const getSeverityConfig = (severity: string): SeverityConfig => {

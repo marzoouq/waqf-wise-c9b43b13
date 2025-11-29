@@ -56,8 +56,8 @@ export default function ArchivistDashboard() {
       };
     },
     staleTime: 60 * 1000,
-    refetchInterval: 60 * 1000,
-    refetchOnWindowFocus: true,
+    refetchInterval: false, // تعطيل التحديث التلقائي لتحسين LCP
+    refetchOnWindowFocus: false,
   });
 
   // Fetch recent documents with filters
@@ -82,9 +82,9 @@ export default function ArchivistDashboard() {
       if (error) throw error;
       return data || [];
     },
-    staleTime: 30 * 1000,
-    refetchInterval: 30 * 1000,
-    refetchOnWindowFocus: true,
+    staleTime: 60 * 1000,
+    refetchInterval: false, // تعطيل التحديث التلقائي لتحسين LCP
+    refetchOnWindowFocus: false,
   });
 
   return (
