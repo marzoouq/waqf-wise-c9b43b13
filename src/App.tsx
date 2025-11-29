@@ -16,6 +16,7 @@ import { GlobalMonitoring } from "./components/developer/GlobalMonitoring";
 import { IdleTimeoutManager } from "./components/auth/IdleTimeoutManager";
 import { useAlertCleanup } from "./hooks/useAlertCleanup";
 import { lazyWithRetry } from "./lib/lazyWithRetry";
+import { UpdateNotifier } from "./components/system/UpdateNotifier";
 import "@/lib/errors/tracker";
 import "@/lib/selfHealing";
 
@@ -151,6 +152,8 @@ const App = () => {
                 <Sonner />
                 {/* Global monitoring for admins only */}
                 <GlobalMonitoring />
+                {/* Update notifier for PWA */}
+                <UpdateNotifier />
               <BrowserRouter
                 future={{
                   v7_startTransition: true,

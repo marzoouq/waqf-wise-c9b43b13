@@ -1,6 +1,7 @@
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
+import { checkAndUpdateVersion } from "./lib/versionCheck";
 
 const rootElement = document.getElementById("root")!;
 
@@ -9,6 +10,9 @@ const loadingElement = document.getElementById("app-loading");
 if (loadingElement) {
   loadingElement.remove();
 }
+
+// فحص الإصدار وتنظيف الكاش إذا لزم الأمر (غير معطل للتطبيق)
+checkAndUpdateVersion().catch(console.error);
 
 // عرض التطبيق فوراً لتحسين FCP
 rootElement.innerHTML = '';
