@@ -27,7 +27,7 @@ export default defineConfig(({ mode }) => {
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: 'autoUpdate',
-      injectRegister: 'script-defer',
+      injectRegister: 'auto',
       includeAssets: ['favicon.ico', 'robots.txt', 'placeholder.svg'],
       
       manifest: {
@@ -68,6 +68,7 @@ export default defineConfig(({ mode }) => {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,woff}'],
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api/, /^\/functions/],
+        cacheId: `waqf-v2.5.0`,
         
         runtimeCaching: [
           {

@@ -72,3 +72,34 @@ export async function clearOldCaches(): Promise<void> {
     }
   }
 }
+
+/**
+ * تنظيف ذكي - يحافظ على بيانات المستخدم الأساسية
+ */
+export async function smartCacheClear(): Promise<void> {
+  const keysToPreserve = [
+    'waqf_app_version',
+    'theme',
+    'vite-ui-theme',
+    'language',
+    'i18nextLng',
+  ];
+  
+  // حفظ البيانات المهمة
+  const preserved: Record<string, string | null> = {};
+  keysToPreserve.forEach(key => {
+    preserved[key] = localStorage.getItem(key);
+  });
+  
+  // تنظيف كل شيء
+  await clearAllCaches();
+  localStorage.clear();
+  sessionStorage.clear();
+  
+  // استعادة البيانات المهمة
+  Object.entries(preserved).forEach(([key, value]) => {
+    if (value) localStorage.setItem(key, value);
+  });
+  
+  productionLogger.info('✅ تم التنظيف الذكي مع الحفاظ على الإعدادات');
+}
