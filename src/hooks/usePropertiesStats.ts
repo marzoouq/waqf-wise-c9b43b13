@@ -4,12 +4,17 @@ import { supabase } from "@/integrations/supabase/client";
 export interface PropertyStats {
   totalProperties: number;
   activeProperties: number;
-  occupiedProperties: number;
-  vacantProperties: number;
+  occupiedUnits: number;
+  vacantUnits: number;
+  totalUnits: number;
+  occupancyRate: number;
   totalMonthlyRevenue: number;
   totalAnnualRevenue: number;
   maintenanceRequests: number;
   expiringContracts: number;
+  // للتوافق مع الكود السابق
+  occupiedProperties: number;
+  vacantProperties: number;
 }
 
 export function usePropertiesStats() {
@@ -22,6 +27,13 @@ export function usePropertiesStats() {
         .select("*");
 
       if (propertiesError) throw propertiesError;
+
+      // Get all property units for accurate occupancy calculation
+      const { data: units, error: unitsError } = await supabase
+        .from("property_units")
+        .select("*");
+
+      if (unitsError) throw unitsError;
 
       // Get active contracts
       const { data: contracts, error: contractsError } = await supabase
@@ -52,22 +64,37 @@ export function usePropertiesStats() {
       if (expiringError) throw expiringError;
 
       const totalProperties = properties?.length || 0;
-      const activeProperties = properties?.filter(p => p.status === "مؤجر").length || 0;
-      const occupiedProperties = contracts?.length || 0;
-      const vacantProperties = totalProperties - occupiedProperties;
+      const activeProperties = properties?.filter(p => p.status === "مؤجر" || p.status === "active").length || 0;
       
-      const totalMonthlyRevenue = properties?.reduce((sum, p) => sum + (p.monthly_revenue || 0), 0) || 0;
+      // حساب الإشغال من جدول الوحدات
+      const totalUnits = units?.length || 0;
+      const occupiedUnits = units?.filter(u => u.occupancy_status === 'مشغول').length || 0;
+      const vacantUnits = totalUnits - occupiedUnits;
+      const occupancyRate = totalUnits > 0 ? Math.round((occupiedUnits / totalUnits) * 100) : 0;
+
+      // حساب الإيرادات من العقود النشطة
+      const contractsRevenue = contracts?.reduce((sum, c) => sum + (Number(c.monthly_rent) || 0), 0) || 0;
+      
+      // أو من العقارات إذا لم تكن هناك عقود
+      const propertiesRevenue = properties?.reduce((sum, p) => sum + (p.monthly_revenue || 0), 0) || 0;
+      
+      const totalMonthlyRevenue = contractsRevenue > 0 ? contractsRevenue : propertiesRevenue;
       const totalAnnualRevenue = totalMonthlyRevenue * 12;
 
       return {
         totalProperties,
         activeProperties,
-        occupiedProperties,
-        vacantProperties,
+        totalUnits,
+        occupiedUnits,
+        vacantUnits,
+        occupancyRate,
         totalMonthlyRevenue,
         totalAnnualRevenue,
         maintenanceRequests: maintenance?.length || 0,
         expiringContracts: expiringContracts?.length || 0,
+        // للتوافق مع الكود السابق
+        occupiedProperties: contracts?.length || occupiedUnits,
+        vacantProperties: totalProperties - (contracts?.length || 0),
       };
     },
     staleTime: 30 * 1000, // 30 seconds

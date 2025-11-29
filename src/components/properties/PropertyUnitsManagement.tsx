@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,11 +12,20 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Plus,
   Search,
   Building2,
   Home,
-  DoorOpen,
   Maximize2,
   BedDouble,
   Droplet,
@@ -31,6 +40,7 @@ import { PropertyUnitDialog } from "./PropertyUnitDialog";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EnhancedEmptyState } from "@/components/shared/EnhancedEmptyState";
 import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
+import { useToast } from "@/hooks/use-toast";
 import type { Database } from "@/integrations/supabase/types";
 
 type DbPropertyUnit = Database['public']['Tables']['property_units']['Row'];
@@ -43,8 +53,11 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedUnit, setSelectedUnit] = useState<DbPropertyUnit | undefined>();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [unitToDelete, setUnitToDelete] = useState<DbPropertyUnit | null>(null);
   
-  const { units, isLoading } = usePropertyUnits(propertyId);
+  const { units, isLoading, deleteUnit } = usePropertyUnits(propertyId);
+  const { toast } = useToast();
 
   // Show message if no propertyId selected
   if (!propertyId) {
@@ -54,7 +67,7 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
           <EnhancedEmptyState
             icon={Building2}
             title="إدارة الوحدات العقارية"
-            description="حدد عقاراً من تبويب العقارات لإدارة وحداته"
+            description="اختر عقاراً من القائمة أعلاه لإدارة وحداته"
           />
         </CardContent>
       </Card>
@@ -76,12 +89,38 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
     setDialogOpen(false);
   };
 
+  const handleDeleteClick = (unit: DbPropertyUnit) => {
+    setUnitToDelete(unit);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!unitToDelete) return;
+    
+    try {
+      await deleteUnit(unitToDelete.id);
+      toast({
+        title: "تم الحذف",
+        description: `تم حذف الوحدة ${unitToDelete.unit_number} بنجاح`,
+      });
+    } catch (error) {
+      toast({
+        title: "خطأ",
+        description: "حدث خطأ أثناء حذف الوحدة",
+        variant: "destructive",
+      });
+    } finally {
+      setDeleteDialogOpen(false);
+      setUnitToDelete(null);
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     const statusColors: Record<string, string> = {
-      'متاح': 'bg-success-light text-success border-success/30',
-      'مشغول': 'bg-info-light text-info border-info/30',
-      'صيانة': 'bg-warning-light text-warning border-warning/30',
-      'غير متاح': 'bg-gray-50 text-gray-700 border-gray-200',
+      'متاح': 'bg-success/10 text-success border-success/30',
+      'مشغول': 'bg-info/10 text-info border-info/30',
+      'صيانة': 'bg-warning/10 text-warning border-warning/30',
+      'غير متاح': 'bg-muted text-muted-foreground border-border',
     };
     return (
       <Badge variant="outline" className={statusColors[status] || ''}>
@@ -90,9 +129,20 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
     );
   };
 
+  const getOccupancyBadge = (status: string | null) => {
+    if (status === 'مشغول') {
+      return <Badge variant="outline" className="bg-info/10 text-info">مشغول</Badge>;
+    }
+    return <Badge variant="outline" className="bg-success/10 text-success">شاغر</Badge>;
+  };
+
   if (isLoading) {
     return <LoadingState message="جاري تحميل الوحدات..." />;
   }
+
+  const occupiedCount = units.filter(u => u.occupancy_status === 'مشغول').length;
+  const availableCount = units.filter(u => u.status === 'متاح').length;
+  const maintenanceCount = units.filter(u => u.status === 'صيانة').length;
 
   return (
     <>
@@ -102,6 +152,7 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
             <CardTitle className="flex items-center gap-2">
               <Building2 className="h-5 w-5" />
               إدارة الوحدات
+              <Badge variant="secondary">{units.length} وحدة</Badge>
             </CardTitle>
             <Button onClick={() => setDialogOpen(true)} size="sm">
               <Plus className="h-4 w-4 ml-2" />
@@ -130,32 +181,26 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
               </div>
               <p className="text-xl font-bold">{units.length}</p>
             </div>
-            <div className="bg-success-light rounded-lg p-3 border border-success/30">
+            <div className="bg-success/10 rounded-lg p-3 border border-success/30">
               <div className="flex items-center gap-2 mb-1">
                 <CheckCircle2 className="h-4 w-4 text-success" />
                 <span className="text-xs text-muted-foreground">متاح</span>
               </div>
-              <p className="text-xl font-bold">
-                {units.filter(u => u.status === 'متاح').length}
-              </p>
+              <p className="text-xl font-bold">{availableCount}</p>
             </div>
-            <div className="bg-info-light rounded-lg p-3 border border-info/30">
+            <div className="bg-info/10 rounded-lg p-3 border border-info/30">
               <div className="flex items-center gap-2 mb-1">
                 <Home className="h-4 w-4 text-info" />
                 <span className="text-xs text-muted-foreground">مشغول</span>
               </div>
-              <p className="text-xl font-bold">
-                {units.filter(u => u.occupancy_status === 'مشغول').length}
-              </p>
+              <p className="text-xl font-bold">{occupiedCount}</p>
             </div>
-            <div className="bg-warning-light rounded-lg p-3 border border-warning/30">
+            <div className="bg-warning/10 rounded-lg p-3 border border-warning/30">
               <div className="flex items-center gap-2 mb-1">
                 <XCircle className="h-4 w-4 text-warning" />
                 <span className="text-xs text-muted-foreground">صيانة</span>
               </div>
-              <p className="text-xl font-bold">
-                {units.filter(u => u.status === 'صيانة').length}
-              </p>
+              <p className="text-xl font-bold">{maintenanceCount}</p>
             </div>
           </div>
 
@@ -183,6 +228,7 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
                     <TableHead className="text-xs sm:text-sm hidden lg:table-cell">الغرف</TableHead>
                     <TableHead className="text-xs sm:text-sm hidden md:table-cell">الإيجار</TableHead>
                     <TableHead className="text-xs sm:text-sm">الحالة</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden md:table-cell">الإشغال</TableHead>
                     <TableHead className="text-center text-xs sm:text-sm">الإجراءات</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -229,14 +275,27 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
                         ) : '-'}
                       </TableCell>
                       <TableCell className="text-xs sm:text-sm">{getStatusBadge(unit.status)}</TableCell>
+                      <TableCell className="text-xs sm:text-sm hidden md:table-cell">
+                        {getOccupancyBadge(unit.occupancy_status)}
+                      </TableCell>
                       <TableCell>
-                        <div className="flex items-center justify-center gap-2">
+                        <div className="flex items-center justify-center gap-1">
                           <Button 
                             variant="ghost" 
                             size="sm"
                             onClick={() => handleEdit(unit)}
+                            title="تعديل"
                           >
                             <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => handleDeleteClick(unit)}
+                            title="حذف"
+                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                          >
+                            <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                           </Button>
                         </div>
                       </TableCell>
@@ -255,6 +314,28 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
         propertyId={propertyId}
         unit={selectedUnit}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
+            <AlertDialogDescription>
+              هل أنت متأكد من حذف الوحدة "{unitToDelete?.unit_number}"؟ 
+              لا يمكن التراجع عن هذا الإجراء.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>إلغاء</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              حذف
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
