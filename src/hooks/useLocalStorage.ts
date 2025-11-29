@@ -3,6 +3,7 @@ import { productionLogger } from '@/lib/logger/production-logger';
 
 /**
  * تحليل JSON آمن خاص بالـ hook
+ * يدعم القيم النصية البسيطة مثل "ar" أو "en" بدون تحذيرات
  */
 function safeParseJson<T>(value: string | null, defaultValue: T, key: string): T {
   if (!value || value === 'undefined' || value === 'null') {
@@ -11,19 +12,27 @@ function safeParseJson<T>(value: string | null, defaultValue: T, key: string): T
 
   const trimmed = value.trim();
   
-  // التحقق من أن القيمة تبدأ بـ [ أو { (JSON صالح)
-  // أو إذا كانت قيمة نصية بسيطة مثل "string" أو رقم
-  if (!trimmed.startsWith('[') && !trimmed.startsWith('{') && !trimmed.startsWith('"')) {
-    // قد تكون قيمة بسيطة غير JSON - محاولة إرجاعها كما هي
-    productionLogger.warn(`[useLocalStorage] Non-JSON value for key "${key}"`);
-    return trimmed as unknown as T;
+  // إذا كانت القيمة فارغة
+  if (!trimmed) {
+    return defaultValue;
   }
 
+  // محاولة تحليل JSON أولاً
   try {
     return JSON.parse(trimmed) as T;
   } catch {
-    productionLogger.warn(`[useLocalStorage] Failed to parse JSON for key "${key}"`);
-    // مسح البيانات التالفة
+    // إذا فشل التحليل، تحقق إن كانت قيمة نصية بسيطة صالحة
+    // مثل: ar, en, true, false, أرقام
+    const isSimpleValue = /^[a-zA-Z0-9_-]+$/.test(trimmed) || 
+                          /^-?\d+(\.\d+)?$/.test(trimmed);
+    
+    if (isSimpleValue) {
+      // قيمة بسيطة صالحة - إرجاعها بدون تحذير
+      return trimmed as unknown as T;
+    }
+    
+    // قيمة غير صالحة - تسجيل تحذير ومسح
+    productionLogger.warn(`[useLocalStorage] Invalid value for key "${key}", resetting`);
     try {
       localStorage.removeItem(key);
     } catch {
