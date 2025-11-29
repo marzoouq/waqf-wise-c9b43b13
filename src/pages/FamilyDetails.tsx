@@ -1,10 +1,11 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useFamilies } from '@/hooks/useFamilies';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { FamilyTreeView } from '@/components/families/FamilyTreeView';
 import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
+import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
 
 /**
  * صفحة تفاصيل العائلة وشجرة الأفراد
@@ -22,38 +23,39 @@ export default function FamilyDetails() {
 
   if (!family) {
     return (
-      <div className="container mx-auto p-6 md:p-8">
-        <div className="text-center">
+      <MobileOptimizedLayout>
+        <div className="text-center py-12">
           <h2 className="text-2xl font-bold mb-4">العائلة غير موجودة</h2>
-          <Button onClick={() => navigate('/families')}>
+          <Button onClick={() => navigate('/families')} size="lg" className="min-h-[44px]">
             <ArrowRight className="ml-2 h-4 w-4" />
             العودة للعائلات
           </Button>
         </div>
-      </div>
+      </MobileOptimizedLayout>
     );
   }
 
   return (
     <PageErrorBoundary pageName="تفاصيل العائلة">
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto p-6 md:p-8 lg:p-10 space-y-6">
-          {/* Header */}
-          <div className="flex items-center justify-between">
+      <MobileOptimizedLayout>
+        <MobileOptimizedHeader
+          title={`عائلة ${family.family_name}`}
+          description="شجرة العائلة والأفراد"
+          icon={<Users className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
+          actions={
             <Button
-              variant="ghost"
+              variant="outline"
               onClick={() => navigate('/families')}
-              className="gap-2"
+              className="gap-2 min-h-[44px]"
             >
               <ArrowRight className="h-4 w-4" />
-              العودة
+              <span className="hidden sm:inline">العودة</span>
             </Button>
-          </div>
+          }
+        />
 
-          {/* Family Tree */}
-          <FamilyTreeView familyId={family.id} familyName={family.family_name} />
-        </div>
-      </div>
+        <FamilyTreeView familyId={family.id} familyName={family.family_name} />
+      </MobileOptimizedLayout>
     </PageErrorBoundary>
   );
 }

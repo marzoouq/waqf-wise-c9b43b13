@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-import { UnifiedPageContainer } from "@/components/unified/UnifiedPageContainer";
+import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Code, Activity, AlertCircle, Network, Database, Wrench, Crosshair, Smartphone } from "lucide-react";
 import { DeveloperOverview } from "@/components/developer/DeveloperOverview";
 import { WebVitalsPanel } from "@/components/developer/WebVitalsPanel";
@@ -24,57 +25,52 @@ export default function DeveloperTools() {
 
   return (
     <PageErrorBoundary pageName="أدوات المطور">
-      <UnifiedPageContainer maxWidth="full">
-        <div className="space-y-6">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
-                <Code className="w-8 h-8 text-primary" />
-                لوحة تحكم المطور
-              </h1>
-              <p className="text-muted-foreground mt-2">
-                أدوات متقدمة لمراقبة وتحليل أداء التطبيق
-              </p>
-            </div>
-          </div>
+      <MobileOptimizedLayout>
+        <MobileOptimizedHeader
+          title="لوحة تحكم المطور"
+          description="أدوات متقدمة لمراقبة وتحليل أداء التطبيق"
+          icon={<Code className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
+        />
 
           {/* Main Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-8 h-auto">
-              <TabsTrigger value="overview" className="flex items-center gap-2 py-3">
-                <Activity className="w-4 h-4" />
-                <span className="hidden sm:inline">نظرة عامة</span>
-              </TabsTrigger>
-              <TabsTrigger value="performance" className="flex items-center gap-2 py-3">
-                <Activity className="w-4 h-4" />
-                <span className="hidden sm:inline">الأداء</span>
-              </TabsTrigger>
-              <TabsTrigger value="errors" className="flex items-center gap-2 py-3">
-                <AlertCircle className="w-4 h-4" />
-                <span className="hidden sm:inline">الأخطاء</span>
-              </TabsTrigger>
-              <TabsTrigger value="network" className="flex items-center gap-2 py-3">
-                <Network className="w-4 h-4" />
-                <span className="hidden sm:inline">الشبكة</span>
-              </TabsTrigger>
-              <TabsTrigger value="storage" className="flex items-center gap-2 py-3">
-                <Database className="w-4 h-4" />
-                <span className="hidden sm:inline">التخزين</span>
-              </TabsTrigger>
-              <TabsTrigger value="tools" className="flex items-center gap-2 py-3">
-                <Wrench className="w-4 h-4" />
-                <span className="hidden sm:inline">الأدوات</span>
-              </TabsTrigger>
-              <TabsTrigger value="inspector" className="flex items-center gap-2 py-3">
-                <Crosshair className="w-4 h-4" />
-                <span className="hidden sm:inline">الفحص</span>
-              </TabsTrigger>
-              <TabsTrigger value="responsive" className="flex items-center gap-2 py-3">
-                <Smartphone className="w-4 h-4" />
-                <span className="hidden sm:inline">الاستجابة</span>
-              </TabsTrigger>
-            </TabsList>
+            <ScrollArea className="w-full">
+              <TabsList className="inline-flex w-full min-w-max h-auto p-1">
+                <TabsTrigger value="overview" className="flex items-center gap-1 py-3 text-xs sm:text-sm min-h-[44px]">
+                  <Activity className="w-4 h-4" />
+                  <span className="hidden sm:inline">نظرة عامة</span>
+                </TabsTrigger>
+                <TabsTrigger value="performance" className="flex items-center gap-1 py-3 text-xs sm:text-sm min-h-[44px]">
+                  <Activity className="w-4 h-4" />
+                  <span className="hidden sm:inline">الأداء</span>
+                </TabsTrigger>
+                <TabsTrigger value="errors" className="flex items-center gap-1 py-3 text-xs sm:text-sm min-h-[44px]">
+                  <AlertCircle className="w-4 h-4" />
+                  <span className="hidden sm:inline">الأخطاء</span>
+                </TabsTrigger>
+                <TabsTrigger value="network" className="flex items-center gap-1 py-3 text-xs sm:text-sm min-h-[44px]">
+                  <Network className="w-4 h-4" />
+                  <span className="hidden sm:inline">الشبكة</span>
+                </TabsTrigger>
+                <TabsTrigger value="storage" className="flex items-center gap-1 py-3 text-xs sm:text-sm min-h-[44px]">
+                  <Database className="w-4 h-4" />
+                  <span className="hidden sm:inline">التخزين</span>
+                </TabsTrigger>
+                <TabsTrigger value="tools" className="flex items-center gap-1 py-3 text-xs sm:text-sm min-h-[44px]">
+                  <Wrench className="w-4 h-4" />
+                  <span className="hidden sm:inline">الأدوات</span>
+                </TabsTrigger>
+                <TabsTrigger value="inspector" className="flex items-center gap-1 py-3 text-xs sm:text-sm min-h-[44px]">
+                  <Crosshair className="w-4 h-4" />
+                  <span className="hidden sm:inline">الفحص</span>
+                </TabsTrigger>
+                <TabsTrigger value="responsive" className="flex items-center gap-1 py-3 text-xs sm:text-sm min-h-[44px]">
+                  <Smartphone className="w-4 h-4" />
+                  <span className="hidden sm:inline">الاستجابة</span>
+                </TabsTrigger>
+              </TabsList>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
 
             <TabsContent value="overview" className="space-y-6 mt-6">
               <DeveloperOverview />
@@ -108,8 +104,7 @@ export default function DeveloperTools() {
               <ResponsiveTester />
             </TabsContent>
           </Tabs>
-        </div>
-      </UnifiedPageContainer>
+      </MobileOptimizedLayout>
     </PageErrorBoundary>
   );
 }
