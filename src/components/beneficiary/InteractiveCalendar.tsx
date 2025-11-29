@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock, Calendar as CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
@@ -9,16 +9,18 @@ interface InteractiveCalendarProps {
 }
 
 export function InteractiveCalendar({ beneficiaryId }: InteractiveCalendarProps) {
-  const [currentTime, setCurrentTime] = useState(new Date());
+  // التاريخ والوقت ثابتين عند تحميل المكون - لا نحتاج تحديث كل ثانية
+  const currentDate = useMemo(() => new Date(), []);
 
-  // تحديث الوقت كل ثانية
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
+  const formattedDate = useMemo(() => 
+    format(currentDate, "EEEE، d MMMM yyyy", { locale: ar }), 
+    [currentDate]
+  );
 
-    return () => clearInterval(timer);
-  }, []);
+  const formattedTime = useMemo(() => 
+    format(currentDate, "HH:mm"), 
+    [currentDate]
+  );
 
   return (
     <Card>
@@ -36,7 +38,7 @@ export function InteractiveCalendar({ beneficiaryId }: InteractiveCalendarProps)
             <div>
               <p className="text-sm text-muted-foreground">التاريخ الميلادي</p>
               <p className="text-2xl font-bold">
-                {format(currentTime, "EEEE، d MMMM yyyy", { locale: ar })}
+                {formattedDate}
               </p>
             </div>
           </div>
@@ -47,7 +49,7 @@ export function InteractiveCalendar({ beneficiaryId }: InteractiveCalendarProps)
             <div>
               <p className="text-sm text-muted-foreground">الوقت الحالي</p>
               <p className="text-2xl font-bold">
-                {format(currentTime, "HH:mm:ss")}
+                {formattedTime}
               </p>
             </div>
           </div>

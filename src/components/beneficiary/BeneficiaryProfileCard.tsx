@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { useState, useMemo, useCallback } from "react";
+import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Phone, Mail, MapPin, Calendar, MessageSquare, Lock, Clock } from "lucide-react";
+import { Phone, Mail, MapPin, Calendar, MessageSquare } from "lucide-react";
 import { Beneficiary } from "@/types/beneficiary";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
@@ -22,26 +22,18 @@ export function BeneficiaryProfileCard({
   onMessages, 
   onChangePassword 
 }: BeneficiaryProfileCardProps) {
-  const [currentTime, setCurrentTime] = useState(new Date());
+  // التاريخ الثابت - لا نحتاج تحديث كل ثانية
+  const currentDate = useMemo(() => new Date(), []);
 
-  // تحديث الوقت كل ثانية
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
-
-  const getInitials = (name: string) => {
+  const getInitials = useCallback((name: string) => {
     const names = name.split(" ");
     if (names.length >= 2) {
       return names[0].charAt(0) + names[1].charAt(0);
     }
     return name.charAt(0) + (name.charAt(1) || "");
-  };
+  }, []);
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = useCallback((status: string) => {
     switch (status.toLowerCase()) {
       case "نشط":
       case "active":
@@ -52,17 +44,19 @@ export function BeneficiaryProfileCard({
       default:
         return "outline";
     }
-  };
+  }, []);
 
-  const getCategoryColor = (category: string) => {
+  const categoryColor = useMemo(() => {
     const colors: Record<string, string> = {
       "أبناء": "bg-info-light text-info border-info/20",
       "بنات": "bg-accent-light text-accent border-accent/20",
       "زوجات": "bg-secondary text-secondary-foreground border-secondary/20",
       "خيرية": "bg-success-light text-success border-success/20",
     };
-    return colors[category] || "bg-muted";
-  };
+    return colors[beneficiary.category] || "bg-muted";
+  }, [beneficiary.category]);
+
+  const initials = useMemo(() => getInitials(beneficiary.full_name), [beneficiary.full_name, getInitials]);
 
   return (
     <Card className="overflow-hidden border-primary/20 shadow-lg">
@@ -71,31 +65,27 @@ export function BeneficiaryProfileCard({
           {/* Avatar */}
           <Avatar className="h-24 w-24 ring-4 ring-primary/20 shadow-md">
             <AvatarFallback className="bg-primary text-primary-foreground text-2xl font-bold">
-              {getInitials(beneficiary.full_name)}
+              {initials}
             </AvatarFallback>
           </Avatar>
 
           {/* Main Info */}
           <div className="flex-1 text-center md:text-right space-y-3">
-            {/* التاريخ والوقت والإشعارات */}
+            {/* التاريخ والإشعارات */}
             <div className="flex items-center justify-center md:justify-between gap-2 mb-2 flex-wrap">
               <div className="flex items-center gap-2">
                 <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-muted/50 rounded-lg">
                   <Calendar className="h-4 w-4 text-primary" />
                   <span className="text-xs font-medium">
-                    {format(currentTime, "d MMM yyyy", { locale: ar })}
-                  </span>
-                  <Clock className="h-4 w-4 text-primary mr-2" />
-                  <span className="text-xs font-mono font-semibold">
-                    {format(currentTime, "HH:mm:ss")}
+                    {format(currentDate, "d MMM yyyy", { locale: ar })}
                   </span>
                 </div>
 
-                {/* التاريخ والوقت للموبايل */}
+                {/* التاريخ للموبايل */}
                 <div className="sm:hidden flex items-center gap-1.5 px-2 py-1 bg-muted/50 rounded-lg">
-                  <Clock className="h-3.5 w-3.5 text-primary" />
-                  <span className="text-xs font-mono font-semibold">
-                    {format(currentTime, "HH:mm")}
+                  <Calendar className="h-3.5 w-3.5 text-primary" />
+                  <span className="text-xs font-medium">
+                    {format(currentDate, "d/M", { locale: ar })}
                   </span>
                 </div>
               </div>
@@ -118,7 +108,7 @@ export function BeneficiaryProfileCard({
               <Badge variant="outline" className="text-sm font-medium border-primary/30">
                 رقم العضوية: {beneficiary.beneficiary_number || "غير محدد"}
               </Badge>
-              <Badge className={getCategoryColor(beneficiary.category)}>
+              <Badge className={categoryColor}>
                 {beneficiary.category}
               </Badge>
               <Badge variant={getStatusColor(beneficiary.status)}>
