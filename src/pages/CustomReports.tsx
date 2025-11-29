@@ -1,9 +1,10 @@
-import { PageHeader } from "@/components/layout/PageHeader";
+import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, FileText, Download, Eye, Trash2 } from "lucide-react";
 import { useCustomReports, type ReportTemplate } from "@/hooks/useCustomReports";
 import { UnifiedDataTable, type Column } from "@/components/unified/UnifiedDataTable";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
@@ -87,24 +88,25 @@ export default function CustomReports() {
   ];
 
   return (
-    <div className="container-custom py-6 space-y-6">
-      <PageHeader
+    <PageErrorBoundary pageName="التقارير المخصصة">
+    <MobileOptimizedLayout>
+      <MobileOptimizedHeader
         title="التقارير المخصصة"
         description="إنشاء وإدارة التقارير المخصصة حسب احتياجاتك"
+        icon={<FileText className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
+        actions={
+          <Button size="sm">
+            <Plus className="ml-2 h-4 w-4" />
+            <span className="hidden sm:inline">تقرير جديد</span>
+            <span className="sm:hidden">جديد</span>
+          </Button>
+        }
       />
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>قائمة التقارير</CardTitle>
-              <CardDescription>جميع التقارير المخصصة المحفوظة</CardDescription>
-            </div>
-            <Button>
-              <Plus className="ml-2 h-4 w-4" />
-              تقرير جديد
-            </Button>
-          </div>
+            <CardTitle>قائمة التقارير</CardTitle>
+            <CardDescription>جميع التقارير المخصصة المحفوظة</CardDescription>
         </CardHeader>
         <CardContent>
           <UnifiedDataTable
@@ -116,6 +118,7 @@ export default function CustomReports() {
           />
         </CardContent>
       </Card>
-    </div>
+    </MobileOptimizedLayout>
+    </PageErrorBoundary>
   );
 }

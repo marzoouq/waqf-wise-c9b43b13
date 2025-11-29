@@ -223,16 +223,13 @@ const Families = () => {
 
   return (
     <PageErrorBoundary pageName="العائلات">
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto p-6 md:p-8 lg:p-10 space-y-6 md:space-y-8">
+      <MobileOptimizedLayout>
       {/* Header */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex-1 min-w-0">
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground break-words">سجل العائلات</h1>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-1 sm:mt-2">
-            إدارة العائلات وربط أفرادها ببعضهم البعض
-          </p>
-        </div>
+      <MobileOptimizedHeader
+        title="سجل العائلات"
+        description="إدارة العائلات وربط أفرادها ببعضهم البعض"
+        icon={<Users className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
+        actions={
         <div className="flex gap-2">
           <AdvancedFiltersDialog
             filters={filterConfigs}
@@ -260,7 +257,8 @@ const Families = () => {
             إضافة عائلة
           </Button>
         </div>
-      </div>
+        }
+      />
 
       {/* Stats Cards */}
       <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
@@ -545,8 +543,7 @@ const Families = () => {
           familyName={selectedFamilyForMembers.family_name}
         />
       )}
-        </div>
-      </div>
+      </MobileOptimizedLayout>
     </PageErrorBoundary>
   );
 };

@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { PageHeader } from "@/components/layout/PageHeader";
+import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { AlertCircle, Clock, CheckCircle, XCircle } from "lucide-react";
 import { useEmergencyAid } from "@/hooks/useEmergencyAid";
 import { UnifiedDataTable, type Column } from "@/components/unified/UnifiedDataTable";
@@ -89,10 +89,12 @@ export default function EmergencyAidManagement() {
   ];
 
   return (
-    <div className="container-custom py-6 space-y-6">
-      <PageHeader
+    <PageErrorBoundary pageName="إدارة الفزعات">
+    <MobileOptimizedLayout>
+      <MobileOptimizedHeader
         title="إدارة الفزعات"
         description="إدارة طلبات الفزعات الطارئة للمستفيدين"
+        icon={<AlertCircle className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
       />
 
       {/* الإحصائيات */}
@@ -143,6 +145,7 @@ export default function EmergencyAidManagement() {
           />
         </CardContent>
       </Card>
-    </div>
+    </MobileOptimizedLayout>
+    </PageErrorBoundary>
   );
 }

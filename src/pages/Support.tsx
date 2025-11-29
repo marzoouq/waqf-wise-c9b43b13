@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
+import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { 
@@ -82,20 +84,29 @@ export default function Support() {
 
   return (
     <PageErrorBoundary pageName="الدعم الفني">
-      <div className="space-y-6 p-6">
-        <div className="flex items-center justify-end">
-          <Button onClick={() => setCreateDialogOpen(true)}>
-            <Plus className="h-4 w-4 ml-2" />
-            تذكرة جديدة
-          </Button>
-        </div>
+      <MobileOptimizedLayout>
+        <MobileOptimizedHeader
+          title="الدعم الفني"
+          description="تذاكر الدعم وقاعدة المعرفة والأسئلة الشائعة"
+          icon={<Ticket className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
+          actions={
+            <Button onClick={() => setCreateDialogOpen(true)} size="sm">
+              <Plus className="h-4 w-4 ml-2" />
+              <span className="hidden sm:inline">تذكرة جديدة</span>
+              <span className="sm:hidden">جديد</span>
+            </Button>
+          }
+        />
 
-        <Tabs defaultValue="tickets" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="tickets">تذاكري</TabsTrigger>
-            <TabsTrigger value="knowledge">قاعدة المعرفة</TabsTrigger>
-            <TabsTrigger value="faq">الأسئلة الشائعة</TabsTrigger>
-          </TabsList>
+        <Tabs defaultValue="tickets" className="space-y-4 sm:space-y-6">
+          <ScrollArea className="w-full whitespace-nowrap">
+            <TabsList className="inline-flex w-full min-w-max">
+              <TabsTrigger value="tickets" className="text-xs sm:text-sm">تذاكري</TabsTrigger>
+              <TabsTrigger value="knowledge" className="text-xs sm:text-sm">قاعدة المعرفة</TabsTrigger>
+              <TabsTrigger value="faq" className="text-xs sm:text-sm">الأسئلة الشائعة</TabsTrigger>
+            </TabsList>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
 
           <TabsContent value="tickets" className="space-y-4">
             <Card>
@@ -296,7 +307,7 @@ export default function Support() {
           onOpenChange={(open) => !open && setSelectedArticleId(null)}
           onRate={(id, helpful) => rateArticle.mutate({ id, helpful })}
         />
-      </div>
+      </MobileOptimizedLayout>
     </PageErrorBoundary>
   );
 }

@@ -21,6 +21,7 @@ import { useBulkSelection } from "@/hooks/useBulkSelection";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { toast } from "sonner";
+import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 
 export default function WaqfUnits() {
   const { waqfUnits, isLoading } = useWaqfUnits();
@@ -110,16 +111,13 @@ export default function WaqfUnits() {
 
   return (
     <PageErrorBoundary pageName="أقلام الوقف">
-      <div className="space-y-6 p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">أقلام الوقف</h1>
-          <p className="text-muted-foreground mt-2">
-            إدارة ومتابعة أقلام الوقف وأصوله
-          </p>
-        </div>
-        <div className="flex gap-2">
+      <MobileOptimizedLayout>
+      <MobileOptimizedHeader
+        title="أقلام الوقف"
+        description="إدارة ومتابعة أقلام الوقف وأصوله"
+        icon={<Building2 className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
+        actions={
+          <div className="flex gap-2">
           {filteredUnits.length > 0 && (
             <ExportButton
               data={filteredUnits.map(u => ({
@@ -138,12 +136,14 @@ export default function WaqfUnits() {
               headers={['الكود', 'الاسم', 'النوع', 'الموقع', 'قيمة الاستحواذ', 'القيمة الحالية', 'العائد السنوي', 'تاريخ الاستحواذ', 'الحالة']}
             />
           )}
-          <Button onClick={() => setIsDialogOpen(true)} className="gap-2">
+            <Button onClick={() => setIsDialogOpen(true)} className="gap-2" size="sm">
             <Plus className="h-4 w-4" />
-            إضافة قلم وقف
+            <span className="hidden sm:inline">إضافة قلم وقف</span>
+            <span className="sm:hidden">إضافة</span>
           </Button>
         </div>
-      </div>
+        }
+      />
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -390,7 +390,7 @@ export default function WaqfUnits() {
         onClearSelection={clearSelection}
         onExport={handleBulkExport}
       />
-      </div>
+      </MobileOptimizedLayout>
     </PageErrorBoundary>
   );
 }

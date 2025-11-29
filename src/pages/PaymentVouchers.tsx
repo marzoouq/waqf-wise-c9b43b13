@@ -9,6 +9,8 @@ import { PaymentVoucherDialog } from "@/components/distributions/PaymentVoucherD
 import { Receipt, Search, FileText, CheckCircle, XCircle, Clock, DollarSign } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ar } from "date-fns/locale";
+import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
+import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 
 export default function PaymentVouchers() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -80,23 +82,20 @@ export default function PaymentVouchers() {
   };
 
   return (
-    <div className="container mx-auto p-4 md:p-6 space-y-6">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Receipt className="h-8 w-8" />
-            سندات الدفع والقبض
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            إدارة سندات الصرف والقبض والقيود اليومية
-          </p>
-        </div>
-        <Button onClick={() => setShowCreateDialog(true)} size="lg">
-          <Receipt className="ml-2 h-5 w-5" />
-          إنشاء سند جديد
-        </Button>
-      </div>
+    <PageErrorBoundary pageName="سندات الدفع والقبض">
+    <MobileOptimizedLayout>
+      <MobileOptimizedHeader
+        title="سندات الدفع والقبض"
+        description="إدارة سندات الصرف والقبض والقيود اليومية"
+        icon={<Receipt className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
+        actions={
+          <Button onClick={() => setShowCreateDialog(true)} size="sm">
+            <Receipt className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
+            <span className="hidden sm:inline">إنشاء سند جديد</span>
+            <span className="sm:hidden">جديد</span>
+          </Button>
+        }
+      />
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -291,6 +290,7 @@ export default function PaymentVouchers() {
         onOpenChange={setShowCreateDialog}
         onSuccess={refetch}
       />
-    </div>
+    </MobileOptimizedLayout>
+    </PageErrorBoundary>
   );
 }
