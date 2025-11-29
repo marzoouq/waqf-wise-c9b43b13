@@ -5,6 +5,7 @@
 
 import { logError } from './errors';
 import type { AppError } from '@/types/errors';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface LogOptions {
   context?: string;
@@ -14,6 +15,18 @@ export interface LogOptions {
 }
 
 const IS_DEV = import.meta.env.DEV;
+
+// قائمة انتظار للـ logs للإرسال دفعة واحدة
+let logQueue: Array<{
+  level: string;
+  message: string;
+  options?: LogOptions;
+  timestamp: string;
+}> = [];
+
+let flushTimeout: ReturnType<typeof setTimeout> | null = null;
+const FLUSH_INTERVAL = 5000; // 5 ثواني
+const MAX_QUEUE_SIZE = 50;
 
 /**
  * Logger موحد للتطبيق
@@ -31,6 +44,11 @@ class Logger {
       userId: options?.userId,
       ...options?.metadata,
     });
+
+    // إرسال للسيرفر في الإنتاج
+    if (!IS_DEV) {
+      this.queueLog('error', errorMessage, options);
+    }
   }
 
   /**
@@ -56,9 +74,9 @@ class Logger {
       console.warn(`⚠️ ${message}`, options?.metadata);
     }
     
-    // في الإنتاج، يمكن إرسال التحذيرات للسيرفر
+    // في الإنتاج، إرسال التحذيرات للسيرفر
     if (!IS_DEV && options?.severity === 'high') {
-      this.sendToServer('warning', message, options);
+      this.queueLog('warning', message, options);
     }
   }
 
@@ -83,23 +101,83 @@ class Logger {
   }
 
   /**
-   * إرسال اللوج للسيرفر (للإنتاج)
+   * إضافة log لقائمة الانتظار
    */
-  private sendToServer(
-    level: string,
-    message: string,
-    options?: LogOptions
-  ): void {
-    // يمكن تفعيل هذا لإرسال اللوجات للسيرفر
-    // مثلاً باستخدام supabase.functions.invoke('log-message', { body: ... })
-    if (!IS_DEV) {
-      // TODO: Implement server-side logging when needed
+  private queueLog(level: string, message: string, options?: LogOptions): void {
+    logQueue.push({
+      level,
+      message,
+      options,
+      timestamp: new Date().toISOString(),
+    });
+
+    // إرسال فوري إذا امتلأت القائمة
+    if (logQueue.length >= MAX_QUEUE_SIZE) {
+      this.flushLogs();
+      return;
     }
+
+    // جدولة الإرسال إذا لم يكن مجدولاً
+    if (!flushTimeout) {
+      flushTimeout = setTimeout(() => this.flushLogs(), FLUSH_INTERVAL);
+    }
+  }
+
+  /**
+   * إرسال اللوجات للسيرفر
+   */
+  private async flushLogs(): Promise<void> {
+    if (flushTimeout) {
+      clearTimeout(flushTimeout);
+      flushTimeout = null;
+    }
+
+    if (logQueue.length === 0) return;
+
+    const logsToSend = [...logQueue];
+    logQueue = [];
+
+    try {
+      // إرسال للسيرفر عبر audit_logs table
+      const { data: user } = await supabase.auth.getUser();
+      
+      const auditEntries = logsToSend.map(log => ({
+        action_type: `log_${log.level}`,
+        description: log.message,
+        severity: log.options?.severity || 'low',
+        user_id: user?.user?.id || null,
+        user_email: user?.user?.email || null,
+        table_name: log.options?.context || null,
+        new_values: log.options?.metadata ? JSON.parse(JSON.stringify(log.options.metadata)) : null,
+        created_at: log.timestamp,
+      }));
+
+      await supabase.from('audit_logs').insert(auditEntries);
+    } catch (error) {
+      // في حالة الفشل، إعادة المحاولة لاحقاً
+      if (IS_DEV) {
+        console.error('Failed to send logs to server:', error);
+      }
+    }
+  }
+
+  /**
+   * إجبار إرسال اللوجات المتبقية (عند إغلاق التطبيق)
+   */
+  flush(): void {
+    this.flushLogs();
   }
 }
 
 // Singleton instance
 export const logger = new Logger();
+
+// إرسال اللوجات عند إغلاق الصفحة
+if (typeof window !== 'undefined') {
+  window.addEventListener('beforeunload', () => {
+    logger.flush();
+  });
+}
 
 /**
  * Helper للاستخدام السريع

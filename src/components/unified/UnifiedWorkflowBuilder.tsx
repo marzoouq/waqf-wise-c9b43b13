@@ -39,7 +39,7 @@ interface WorkflowConfig {
 
 export function UnifiedWorkflowBuilder() {
   const { toast } = useToast();
-  const { workflows: dbWorkflows, isLoading } = useApprovalWorkflows();
+  const { workflows: dbWorkflows, isLoading, createWorkflow } = useApprovalWorkflows();
   const [editingWorkflow, setEditingWorkflow] = useState<WorkflowConfig | null>(null);
   const [isCreating, setIsCreating] = useState(false);
 
@@ -107,13 +107,33 @@ export function UnifiedWorkflowBuilder() {
       return;
     }
 
-    // TODO: حفظ في قاعدة البيانات عبر mutation
-    toast({
-      title: 'تم الحفظ',
-      description: 'تم حفظ مسار الموافقات بنجاح',
-    });
-    setIsCreating(false);
-    setEditingWorkflow(null);
+    try {
+      // تحويل البيانات للشكل المطلوب
+      const workflowData = {
+        workflow_name: editingWorkflow.name,
+        entity_type: editingWorkflow.entityType,
+        approval_levels: editingWorkflow.levels.map(l => ({
+          level: l.level,
+          role: l.role,
+          required: l.required ?? true,
+          canSkip: l.canSkip,
+          autoEscalateAfter: l.autoEscalateAfter,
+          conditions: l.conditions,
+        })),
+        conditions: undefined,
+        is_active: editingWorkflow.isActive,
+      };
+
+      await createWorkflow(workflowData);
+      setIsCreating(false);
+      setEditingWorkflow(null);
+    } catch (error) {
+      toast({
+        title: 'خطأ',
+        description: 'فشل في حفظ مسار الموافقات',
+        variant: 'destructive',
+      });
+    }
   };
 
   // عرض نموذج الإنشاء/التعديل

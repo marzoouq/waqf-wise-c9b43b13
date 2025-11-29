@@ -16,6 +16,15 @@ export interface VoucherData {
   created_by?: string;
 }
 
+export interface DistributionLineItem {
+  beneficiary_id: string;
+  beneficiary_name: string;
+  amount: number;
+  percentage?: number;
+  iban?: string;
+  bank_name?: string;
+}
+
 /**
  * خدمة إدارة سندات الصرف والقبض
  * التوليد التلقائي للأرقام والقيود المحاسبية
@@ -189,7 +198,77 @@ export class VoucherService {
   }
 
   /**
-   * توليد سندات من توزيع (مبسط - بحاجة لهيكل distribution_lines)
+   * الحصول على بنود التوزيع للمستفيدين
+   */
+  private static async getDistributionLines(distributionId: string): Promise<DistributionLineItem[]> {
+    // جلب بيانات التوزيع
+    const { data: distribution, error: distError } = await supabase
+      .from("distributions")
+      .select("*")
+      .eq("id", distributionId)
+      .single();
+
+    if (distError) throw distError;
+    if (!distribution) throw new Error("التوزيع غير موجود");
+
+    // جلب المستفيدين المرتبطين بالتوزيع من payment_vouchers
+    const { data: existingVouchers } = await supabase
+      .from("payment_vouchers")
+      .select("beneficiary_id, amount")
+      .eq("distribution_id", distributionId);
+
+    // إذا كانت هناك سندات موجودة، استخدمها
+    if (existingVouchers && existingVouchers.length > 0) {
+      const beneficiaryIds = existingVouchers
+        .map(v => v.beneficiary_id)
+        .filter((id): id is string => id !== null);
+
+      const { data: beneficiaries } = await supabase
+        .from("beneficiaries")
+        .select("id, full_name, iban, bank_name")
+        .in("id", beneficiaryIds);
+
+      return existingVouchers.map(voucher => {
+        const beneficiary = beneficiaries?.find(b => b.id === voucher.beneficiary_id);
+        return {
+          beneficiary_id: voucher.beneficiary_id || '',
+          beneficiary_name: beneficiary?.full_name || 'غير معروف',
+          amount: voucher.amount,
+          iban: beneficiary?.iban || undefined,
+          bank_name: beneficiary?.bank_name || undefined,
+        };
+      });
+    }
+
+    // إذا لم توجد سندات، جلب المستفيدين النشطين وتوزيع المبلغ بالتساوي
+    const { data: beneficiaries, error: beneficiariesError } = await supabase
+      .from("beneficiaries")
+      .select("id, full_name, iban, bank_name, category")
+      .eq("status", "active")
+      .limit(100);
+
+    if (beneficiariesError) throw beneficiariesError;
+    if (!beneficiaries || beneficiaries.length === 0) {
+      throw new Error("لا يوجد مستفيدين نشطين للتوزيع");
+    }
+
+    // توزيع المبلغ بالتساوي
+    const totalAmount = distribution.total_amount || 0;
+    const amountPerBeneficiary = Math.floor(totalAmount / beneficiaries.length);
+    const remainder = totalAmount - (amountPerBeneficiary * beneficiaries.length);
+
+    return beneficiaries.map((b, index) => ({
+      beneficiary_id: b.id,
+      beneficiary_name: b.full_name,
+      amount: amountPerBeneficiary + (index === 0 ? remainder : 0), // إضافة الباقي للأول
+      percentage: (amountPerBeneficiary / totalAmount) * 100,
+      iban: b.iban || undefined,
+      bank_name: b.bank_name || undefined,
+    }));
+  }
+
+  /**
+   * توليد سندات من توزيع مع دعم بنود التوزيع المتعددة
    */
   static async generateVouchersFromDistribution(distributionId: string) {
     try {
@@ -203,26 +282,62 @@ export class VoucherService {
       if (distError) throw distError;
       if (!distribution) throw new Error("التوزيع غير موجود");
 
-      // TODO: Add actual distribution lines logic when table exists
-      // For now, create a single voucher for testing
-      const voucherData: VoucherData = {
-        voucher_type: "payment",
-        amount: distribution.total_amount || 0,
-        description: `توزيع بتاريخ ${distribution.distribution_date}`,
-        distribution_id: distributionId,
-        payment_method: "bank_transfer",
-      };
+      // الحصول على بنود التوزيع
+      const lines = await this.getDistributionLines(distributionId);
 
-      const result = await this.create(voucherData);
+      if (lines.length === 0) {
+        throw new Error("لا توجد بنود للتوزيع");
+      }
+
+      // إنشاء سند لكل مستفيد
+      const createdVouchers = [];
+      let successCount = 0;
+      let failCount = 0;
+
+      for (const line of lines) {
+        try {
+          const voucherData: VoucherData = {
+            voucher_type: "payment",
+            amount: line.amount,
+            beneficiary_id: line.beneficiary_id,
+            description: `توزيع بتاريخ ${distribution.distribution_date} - ${line.beneficiary_name}`,
+            distribution_id: distributionId,
+            payment_method: line.iban ? "bank_transfer" : "cash",
+            notes: line.iban ? `IBAN: ${line.iban}` : undefined,
+          };
+
+          const result = await this.create(voucherData);
+          createdVouchers.push(result.data);
+          successCount++;
+        } catch (error) {
+          failCount++;
+          logger.error(error, {
+            context: "generate_voucher_for_beneficiary",
+            severity: "medium",
+            metadata: { beneficiary_id: line.beneficiary_id },
+          });
+        }
+      }
+
+      // تحديث حالة التوزيع
+      await supabase
+        .from("distributions")
+        .update({ 
+          status: "completed",
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", distributionId);
 
       await this.logActivity(
-        `تم توليد سند من التوزيع بتاريخ ${distribution.distribution_date}`
+        `تم توليد ${successCount} سند من التوزيع بتاريخ ${distribution.distribution_date}${failCount > 0 ? ` (${failCount} فشل)` : ''}`
       );
 
       return {
         success: true,
-        count: 1,
-        vouchers: [result.data],
+        count: successCount,
+        failedCount: failCount,
+        vouchers: createdVouchers,
+        totalAmount: lines.reduce((sum, l) => sum + l.amount, 0),
       };
     } catch (error) {
       logger.error(error, {
@@ -231,5 +346,22 @@ export class VoucherService {
       });
       throw error;
     }
+  }
+
+  /**
+   * معاينة بنود التوزيع قبل التوليد
+   */
+  static async previewDistributionLines(distributionId: string): Promise<{
+    lines: DistributionLineItem[];
+    totalAmount: number;
+    beneficiaryCount: number;
+  }> {
+    const lines = await this.getDistributionLines(distributionId);
+    
+    return {
+      lines,
+      totalAmount: lines.reduce((sum, l) => sum + l.amount, 0),
+      beneficiaryCount: lines.length,
+    };
   }
 }
