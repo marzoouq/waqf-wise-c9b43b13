@@ -1,8 +1,9 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useUserRole, AppRole } from '@/hooks/useUserRole';
 import { Loader2 } from 'lucide-react';
 import { checkPermission, type Permission } from '@/config/permissions';
+
+type AppRole = "nazer" | "admin" | "accountant" | "cashier" | "archivist" | "beneficiary" | "user";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -12,10 +13,10 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children, requiredPermission, requiredRole, requiredRoles }: ProtectedRouteProps) {
-  const { user, isLoading: authLoading } = useAuth();
-  const { hasRole, roles, isLoading: rolesLoading } = useUserRole();
+  const { user, isLoading: authLoading, roles, rolesLoading, hasRole } = useAuth();
 
-  const isLoading = authLoading || rolesLoading;
+  // التحميل فقط عند الضرورة
+  const isLoading = authLoading || (!!user && rolesLoading);
 
   if (isLoading) {
     return (
@@ -31,8 +32,8 @@ export function ProtectedRoute({ children, requiredPermission, requiredRole, req
 
   // ✅ التحقق من الصلاحية المطلوبة
   if (requiredPermission) {
-    const hasPermission = checkPermission(requiredPermission, roles);
-    if (!hasPermission) {
+    const hasPermissionCheck = checkPermission(requiredPermission, roles);
+    if (!hasPermissionCheck) {
       return <Navigate to="/unauthorized" replace />;
     }
   }
