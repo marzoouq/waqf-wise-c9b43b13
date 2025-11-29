@@ -89,7 +89,7 @@ export function usePendingApprovals() {
           });
         }
 
-        // جلب موافقات القيود المحاسبية
+        // جلب موافقات القيود المحاسبية (جدول approvals يستخدم 'pending' بالإنجليزية)
         const { data: journalApprovals, error: journalError } = await supabase
           .from('approvals')
           .select(`
@@ -100,7 +100,7 @@ export function usePendingApprovals() {
               description
             )
           `)
-          .eq('status', 'معلق')
+          .eq('status', 'pending')
           .limit(5);
 
         if (journalError) throw journalError;
