@@ -27,7 +27,7 @@ export function SelfHealingToolsPanel() {
   const [isHealthMonitorRunning, setIsHealthMonitorRunning] = useState(true);
 
   // 📊 إحصائيات ديناميكية حقيقية من قاعدة البيانات
-  const { data: stats, isLoading: statsLoading } = useQuery({
+  const { data: stats, isLoading: statsLoading, refetch: refetchStats } = useQuery({
     queryKey: ['self-healing-stats'],
     queryFn: async () => {
       // إجمالي الأخطاء
@@ -65,7 +65,8 @@ export function SelfHealingToolsPanel() {
         activeAlerts,
       };
     },
-    refetchInterval: 60000, // تحديث كل دقيقة
+    staleTime: 60 * 1000,
+    refetchInterval: false, // تعطيل التحديث التلقائي لتحسين LCP
   });
 
   // حالة الأدوات

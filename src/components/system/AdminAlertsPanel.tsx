@@ -23,7 +23,7 @@ interface SystemAlert {
 export function AdminAlertsPanel() {
   const queryClient = useQueryClient();
 
-  const { data: alerts = [], isLoading } = useQuery({
+  const { data: alerts = [], isLoading, refetch } = useQuery({
     queryKey: ['admin-alerts'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -36,7 +36,8 @@ export function AdminAlertsPanel() {
       if (error) throw error;
       return data as SystemAlert[];
     },
-    refetchInterval: 30000, // كل 30 ثانية
+    staleTime: 60 * 1000,
+    refetchInterval: false, // تعطيل التحديث التلقائي لتحسين LCP
   });
 
   const acknowledgeMutation = useMutation({

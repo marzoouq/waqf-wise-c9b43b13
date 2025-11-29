@@ -68,6 +68,6 @@ export function useSystemPerformanceMetrics() {
       return dataPoints;
     },
     staleTime: 5 * 60 * 1000, // 5 دقائق
-    refetchInterval: 5 * 60 * 1000, // تحديث كل 5 دقائق
+    refetchInterval: false, // تعطيل التحديث التلقائي لتحسين LCP
   });
 }

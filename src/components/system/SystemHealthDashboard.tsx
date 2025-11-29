@@ -78,7 +78,8 @@ export function SystemHealthDashboard() {
           : 100,
       };
     },
-    refetchInterval: 10000, // تحديث كل 10 ثواني
+    staleTime: 60 * 1000, // البيانات صالحة لمدة دقيقة
+    refetchInterval: false, // تعطيل التحديث التلقائي لتحسين الأداء
   });
 
   // جلب إحصائيات Deduplication من Error Tracker

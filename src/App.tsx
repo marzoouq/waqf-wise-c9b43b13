@@ -17,6 +17,7 @@ import { IdleTimeoutManager } from "./components/auth/IdleTimeoutManager";
 import { useAlertCleanup } from "./hooks/useAlertCleanup";
 import { lazyWithRetry } from "./lib/lazyWithRetry";
 import { UpdateNotifier } from "./components/system/UpdateNotifier";
+import { LCPOptimizer } from "./components/performance/LCPOptimizer";
 import "@/lib/errors/tracker";
 import "@/lib/selfHealing";
 
@@ -158,6 +159,8 @@ const App = () => {
             <SettingsProvider>
               <TooltipProvider>
                 <Sonner />
+                {/* LCP Optimizer - تحسين أداء التحميل */}
+                <LCPOptimizer />
                 {/* Global monitoring for admins only */}
                 <GlobalMonitoring />
                 {/* Update notifier for PWA */}

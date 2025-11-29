@@ -14,6 +14,7 @@ import {
   Zap,
   Shield,
   Bell,
+  RefreshCw,
 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -31,8 +32,8 @@ export default function SystemMonitoring() {
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("overview");
 
-  // جلب إحصائيات عامة
-  const { data: stats, isLoading: statsLoading } = useQuery({
+  // جلب إحصائيات عامة - تحديث يدوي فقط لتحسين الأداء
+  const { data: stats, isLoading: statsLoading, refetch: refetchStats } = useQuery({
     queryKey: ["system-stats"],
     queryFn: async () => {
       const [errorsResult, alertsResult, healthResult, fixAttemptsResult] = await Promise.all([
@@ -63,11 +64,12 @@ export default function SystemMonitoring() {
         totalFixAttempts: fixAttemptsResult.count || 0,
       };
     },
-    refetchInterval: 30000, // تحديث كل 30 ثانية
+    staleTime: 60 * 1000, // البيانات صالحة لمدة دقيقة
+    refetchInterval: false, // تعطيل التحديث التلقائي لتحسين LCP
   });
 
-  // جلب الأخطاء الأخيرة
-  const { data: recentErrors } = useQuery({
+  // جلب الأخطاء الأخيرة - تحديث يدوي فقط
+  const { data: recentErrors, refetch: refetchErrors } = useQuery({
     queryKey: ["recent-errors"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -79,11 +81,12 @@ export default function SystemMonitoring() {
       if (error) throw error;
       return data;
     },
-    refetchInterval: 10000,
+    staleTime: 30 * 1000,
+    refetchInterval: false,
   });
 
-  // جلب التنبيهات النشطة
-  const { data: activeAlerts } = useQuery({
+  // جلب التنبيهات النشطة - تحديث يدوي فقط
+  const { data: activeAlerts, refetch: refetchAlerts } = useQuery({
     queryKey: ["active-alerts"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -95,11 +98,12 @@ export default function SystemMonitoring() {
       if (error) throw error;
       return data;
     },
-    refetchInterval: 10000,
+    staleTime: 30 * 1000,
+    refetchInterval: false,
   });
 
-  // جلب محاولات الإصلاح
-  const { data: fixAttempts } = useQuery({
+  // جلب محاولات الإصلاح - تحديث يدوي فقط
+  const { data: fixAttempts, refetch: refetchFixes } = useQuery({
     queryKey: ["fix-attempts"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -111,8 +115,17 @@ export default function SystemMonitoring() {
       if (error) throw error;
       return data;
     },
-    refetchInterval: 15000,
+    staleTime: 30 * 1000,
+    refetchInterval: false,
   });
+
+  // دالة لتحديث جميع البيانات يدوياً
+  const refreshAllData = () => {
+    refetchStats();
+    refetchErrors();
+    refetchAlerts();
+    refetchFixes();
+  };
 
   // حل تنبيه
   const resolveAlertMutation = useMutation({
@@ -147,10 +160,16 @@ export default function SystemMonitoring() {
             نظام متكامل لكشف وإصلاح الأخطاء تلقائياً
           </p>
         </div>
-        <Button variant="outline">
-          <Settings className="h-4 w-4 ml-2" />
-          الإعدادات
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={refreshAllData}>
+            <RefreshCw className="h-4 w-4 ml-2" />
+            تحديث
+          </Button>
+          <Button variant="outline">
+            <Settings className="h-4 w-4 ml-2" />
+            الإعدادات
+          </Button>
+        </div>
       </div>
 
       {/* الإحصائيات السريعة */}
