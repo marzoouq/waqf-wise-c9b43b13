@@ -2442,6 +2442,60 @@ export type Database = {
         }
         Relationships: []
       }
+      contact_messages: {
+        Row: {
+          created_at: string
+          id: string
+          is_read: boolean
+          message: string
+          read_at: string | null
+          read_by: string | null
+          replied_at: string | null
+          replied_by: string | null
+          reply_message: string | null
+          sender_email: string
+          sender_name: string
+          sender_phone: string | null
+          status: string
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message: string
+          read_at?: string | null
+          read_by?: string | null
+          replied_at?: string | null
+          replied_by?: string | null
+          reply_message?: string | null
+          sender_email: string
+          sender_name: string
+          sender_phone?: string | null
+          status?: string
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message?: string
+          read_at?: string | null
+          read_by?: string | null
+          replied_at?: string | null
+          replied_by?: string | null
+          reply_message?: string | null
+          sender_email?: string
+          sender_name?: string
+          sender_phone?: string | null
+          status?: string
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       contract_attachments: {
         Row: {
           contract_id: string

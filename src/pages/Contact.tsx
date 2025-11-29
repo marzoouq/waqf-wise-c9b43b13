@@ -8,21 +8,71 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Contact() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    subject: '',
+    message: ''
+  });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // محاكاة إرسال النموذج
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-    toast.success("تم إرسال رسالتك بنجاح، سنتواصل معك قريباً");
+    try {
+      // حفظ الرسالة في قاعدة البيانات
+      const { error: messageError } = await supabase
+        .from('contact_messages' as any)
+        .insert({
+          sender_name: formData.name,
+          sender_email: formData.email,
+          sender_phone: formData.phone || null,
+          subject: formData.subject,
+          message: formData.message,
+        });
+
+      if (messageError) throw messageError;
+
+      // إرسال إشعار للمشرفين
+      const { data: admins } = await supabase
+        .from('profiles')
+        .select('user_id')
+        .or('role.eq.admin,role.eq.supervisor,role.eq.nazer');
+
+      if (admins && admins.length > 0) {
+        const notificationData = admins
+          .filter(admin => admin.user_id)
+          .map(admin => ({
+            user_id: admin.user_id!,
+            title: 'رسالة جديدة من التواصل',
+            message: `رسالة من ${formData.name}: ${formData.subject}`,
+            type: 'info' as const,
+            priority: 'medium',
+            reference_type: 'contact_message',
+            action_url: '/admin/messages',
+            is_read: false,
+          }));
+
+        if (notificationData.length > 0) {
+          await supabase.from('notifications').insert(notificationData);
+        }
+      }
+
+      setIsSubmitted(true);
+      toast.success("تم إرسال رسالتك بنجاح، سنتواصل معك قريباً");
+      setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast.error("حدث خطأ أثناء إرسال الرسالة");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -127,22 +177,47 @@ export default function Contact() {
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="name">الاسم الكامل</Label>
-                      <Input id="name" placeholder="أدخل اسمك" required />
+                      <Input 
+                        id="name" 
+                        placeholder="أدخل اسمك" 
+                        required 
+                        value={formData.name}
+                        onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                      />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="email">البريد الإلكتروني</Label>
-                      <Input id="email" type="email" placeholder="example@email.com" required />
+                      <Input 
+                        id="email" 
+                        type="email" 
+                        placeholder="example@email.com" 
+                        required 
+                        value={formData.email}
+                        onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                      />
                     </div>
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="phone">رقم الهاتف (اختياري)</Label>
-                    <Input id="phone" type="tel" placeholder="+966 5X XXX XXXX" />
+                    <Input 
+                      id="phone" 
+                      type="tel" 
+                      placeholder="+966 5X XXX XXXX" 
+                      value={formData.phone}
+                      onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                    />
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="subject">الموضوع</Label>
-                    <Input id="subject" placeholder="موضوع الرسالة" required />
+                    <Input 
+                      id="subject" 
+                      placeholder="موضوع الرسالة" 
+                      required 
+                      value={formData.subject}
+                      onChange={(e) => setFormData(prev => ({ ...prev, subject: e.target.value }))}
+                    />
                   </div>
 
                   <div className="space-y-2">
@@ -152,6 +227,8 @@ export default function Contact() {
                       placeholder="اكتب رسالتك هنا..." 
                       rows={5}
                       required 
+                      value={formData.message}
+                      onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
                     />
                   </div>
 
