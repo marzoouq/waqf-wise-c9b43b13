@@ -13,19 +13,21 @@ import {
   TrendingUp, Clock, CheckCircle, AlertCircle, Users, Landmark,
   DollarSign, Building2, Shield
 } from "lucide-react";
-import { BeneficiaryProfileTab } from "@/components/beneficiary/BeneficiaryProfileTab";
-import { BeneficiaryStatementsTab } from "@/components/beneficiary/BeneficiaryStatementsTab";
-import { BeneficiaryDistributionsTab } from "@/components/beneficiary/BeneficiaryDistributionsTab";
-import { BeneficiaryPropertiesTab } from "@/components/beneficiary/BeneficiaryPropertiesTab";
-import { WaqfSummaryTab } from "@/components/beneficiary/WaqfSummaryTab";
-import { FamilyTreeTab } from "@/components/beneficiary/FamilyTreeTab";
-import { BankAccountsTab } from "@/components/beneficiary/BankAccountsTab";
-import { FinancialReportsTab } from "@/components/beneficiary/FinancialReportsTab";
-import { ApprovalsLogTab } from "@/components/beneficiary/ApprovalsLogTab";
-import { DisclosuresTab } from "@/components/beneficiary/DisclosuresTab";
-import { GovernanceTab } from "@/components/beneficiary/GovernanceTab";
-import { BudgetsTab } from "@/components/beneficiary/BudgetsTab";
-import { LoansOverviewTab } from "@/components/beneficiary/LoansOverviewTab";
+import {
+  BeneficiaryProfileTab,
+  BeneficiaryStatementsTab,
+  BeneficiaryDistributionsTab,
+  BeneficiaryPropertiesTab,
+  WaqfSummaryTab,
+  FamilyTreeTab,
+  BankAccountsTab,
+  FinancialReportsTab,
+  ApprovalsLogTab,
+  DisclosuresTab,
+  GovernanceTab,
+  BudgetsTab,
+  LoansOverviewTab
+} from "@/components/beneficiary";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
