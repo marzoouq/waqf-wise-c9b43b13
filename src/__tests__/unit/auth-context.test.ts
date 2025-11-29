@@ -80,7 +80,7 @@ describe('ROLE_PERMISSIONS', () => {
       const beneficiaryPermissions = ROLE_PERMISSIONS.beneficiary;
       
       expect(beneficiaryPermissions).toContain('view_own_profile');
-      expect(beneficiaryPermissions).toContain('submit_requests');
+      expect(beneficiaryPermissions).toContain('view_own_payments');
       expect(beneficiaryPermissions).not.toContain('manage_users');
       expect(beneficiaryPermissions).not.toContain('manage_settings');
     });

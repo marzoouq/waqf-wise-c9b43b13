@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Search, UserPlus, Shield, Edit, Trash2, CheckCircle, XCircle, Download, Key, AlertCircle } from "lucide-react";
+import { Search, Shield, Edit, Trash2, CheckCircle, XCircle, Download, Key, AlertCircle } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
@@ -23,22 +21,13 @@ import { Database } from "@/integrations/supabase/types";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { useAuth } from "@/hooks/useAuth";
 import { ROLE_LABELS } from "@/lib/role-labels";
+import { 
+  useUsersManagement, 
+  type UserProfile 
+} from "@/hooks/useUsersManagement";
 
 // Use Database enum for AppRole (DB only has 7 roles)
 type AppRole = Database['public']['Enums']['app_role'];
-
-interface UserProfile {
-  id: string;
-  user_id: string;
-  full_name: string;
-  email: string;
-  phone?: string;
-  position?: string;
-  is_active: boolean;
-  last_login_at?: string;
-  created_at: string;
-  user_roles?: Array<{ role: string }>;
-}
 
 const roleColors: Record<AppRole, string> = {
   nazer: "bg-primary/10 text-primary border-primary/30",
@@ -52,8 +41,18 @@ const roleColors: Record<AppRole, string> = {
 
 const Users = () => {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   const { user: currentUser } = useAuth();
+  
+  // استخدام hook إدارة المستخدمين
+  const {
+    users,
+    isLoading,
+    deleteUser: deleteUserMutation,
+    updateRoles: updateRolesMutation,
+    updateStatus: updateStatusMutation,
+    resetPassword: resetPasswordMutation,
+  } = useUsersManagement();
+  
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -64,6 +63,17 @@ const Users = () => {
   const [selectedUserForReset, setSelectedUserForReset] = useState<UserProfile | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<UserProfile | null>(null);
+
+  // Filter users
+  const filteredUsers = users.filter(user => {
+    const matchesSearch = user.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         user.email.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesRole = roleFilter === "all" || 
+                       user.user_roles?.some(r => r.role === roleFilter);
+
+    return matchesSearch && matchesRole;
+  });
 
   // Export users to CSV
   const exportUsers = () => {
@@ -90,87 +100,6 @@ const Users = () => {
       description: `تم تصدير ${filteredUsers.length} مستخدم بنجاح`,
     });
   };
-
-  // Fetch all users with their roles
-  const { data: users = [], isLoading } = useQuery({
-    queryKey: ["users"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-
-      // Fetch roles for each user
-      const usersWithRoles = await Promise.all(
-        (data || []).map(async (profile) => {
-          const { data: rolesData } = await supabase
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", profile.user_id);
-
-          return {
-            ...profile,
-            user_roles: rolesData || [],
-          };
-        })
-      );
-
-      return usersWithRoles as UserProfile[];
-    },
-  });
-
-  // Toggle user active status
-  const toggleActiveMutation = useMutation({
-    mutationFn: async ({ userId, isActive }: { userId: string; isActive: boolean }) => {
-      const { error } = await supabase
-        .from("profiles")
-        .update({ is_active: isActive })
-        .eq("user_id", userId);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["users"] });
-      toast({
-        title: "تم التحديث",
-        description: "تم تحديث حالة المستخدم بنجاح",
-      });
-    },
-  });
-
-  // Delete user mutation
-  const deleteUserMutation = useMutation({
-    mutationFn: async (userId: string) => {
-      // Delete user roles first
-      await supabase.from("user_roles").delete().eq("user_id", userId);
-      
-      // Delete profile
-      const { error } = await supabase
-        .from("profiles")
-        .delete()
-        .eq("user_id", userId);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["users"] });
-      setDeleteDialogOpen(false);
-      setUserToDelete(null);
-      toast({
-        title: "تم الحذف",
-        description: "تم حذف المستخدم بنجاح",
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "خطأ",
-        description: "فشل حذف المستخدم",
-        variant: "destructive",
-      });
-    },
-  });
 
   const handleDeleteClick = (user: UserProfile) => {
     // منع حذف المستخدم الحالي
@@ -199,66 +128,14 @@ const Users = () => {
 
   const handleDeleteConfirm = () => {
     if (userToDelete) {
-      deleteUserMutation.mutate(userToDelete.user_id);
+      deleteUserMutation.mutate(userToDelete.user_id, {
+        onSuccess: () => {
+          setDeleteDialogOpen(false);
+          setUserToDelete(null);
+        }
+      });
     }
   };
-
-  // Reset user password
-  const resetPasswordMutation = useMutation({
-    mutationFn: async ({ userId, password }: { userId: string; password: string }) => {
-      const { data, error } = await supabase.functions.invoke('reset-user-password', {
-        body: { user_id: userId, new_password: password }
-      });
-      
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      setResetPasswordDialogOpen(false);
-      setNewPassword("");
-      setSelectedUserForReset(null);
-      toast({
-        title: "تم التحديث",
-        description: "تم تعيين كلمة المرور الجديدة بنجاح",
-      });
-    },
-    onError: (error) => {
-      const errorMessage = error instanceof Error ? error.message : "فشل تحديث كلمة المرور";
-      toast({
-        title: "خطأ",
-        description: errorMessage,
-        variant: "destructive",
-      });
-    }
-  });
-
-  // Update user roles
-  const updateRolesMutation = useMutation({
-    mutationFn: async ({ userId, roles }: { userId: string; roles: AppRole[] }) => {
-      // حذف الأدوار الحالية
-      await supabase.from("user_roles").delete().eq("user_id", userId);
-
-      // إضافة الأدوار الجديدة
-      const rolesToInsert = roles.map(role => ({ 
-        user_id: userId, 
-        role: role
-      }));
-
-      const { error } = await supabase
-        .from("user_roles")
-        .insert(rolesToInsert);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["users"] });
-      setEditDialogOpen(false);
-      toast({
-        title: "تم التحديث",
-        description: "تم تحديث أدوار المستخدم بنجاح",
-      });
-    },
-  });
 
   const handleEditRoles = (user: UserProfile) => {
     setSelectedUser(user);
@@ -271,6 +148,10 @@ const Users = () => {
       updateRolesMutation.mutate({
         userId: selectedUser.user_id,
         roles: selectedRoles,
+      }, {
+        onSuccess: () => {
+          setEditDialogOpen(false);
+        }
       });
     } else if (!selectedUser?.user_id) {
       toast({
@@ -288,17 +169,6 @@ const Users = () => {
       setSelectedRoles([...selectedRoles, role]);
     }
   };
-
-  // Filter users
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = user.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesRole = roleFilter === "all" || 
-                       user.user_roles?.some(r => r.role === roleFilter);
-
-    return matchesSearch && matchesRole;
-  });
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل المستخدمين..." />;
@@ -409,7 +279,7 @@ const Users = () => {
                             <Switch
                               checked={user.is_active}
                               onCheckedChange={(checked) =>
-                                toggleActiveMutation.mutate({
+                                updateStatusMutation.mutate({
                                   userId: user.user_id,
                                   isActive: checked,
                                 })
@@ -586,6 +456,12 @@ const Users = () => {
                   resetPasswordMutation.mutate({
                     userId: selectedUserForReset.user_id,
                     password: newPassword
+                  }, {
+                    onSuccess: () => {
+                      setResetPasswordDialogOpen(false);
+                      setNewPassword("");
+                      setSelectedUserForReset(null);
+                    }
                   });
                 }
               }}
