@@ -1,11 +1,13 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Landmark, Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
 
 export function LandingHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const navLinks = [
     { label: "الرئيسية", href: "#hero" },
@@ -13,6 +15,32 @@ export function LandingHeader() {
     { label: "عن المنصة", href: "#stats" },
     { label: "كيف يعمل", href: "#how-it-works" },
   ];
+
+  const handleNavClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    
+    const sectionId = href.replace("#", "");
+    
+    // إذا لم نكن في الصفحة الرئيسية، انتقل إليها أولاً
+    if (location.pathname !== "/") {
+      navigate("/" + href);
+      setIsMenuOpen(false);
+      return;
+    }
+    
+    // إذا كنا في الصفحة الرئيسية، انتقل للقسم مباشرة
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    
+    setIsMenuOpen(false);
+  }, [location.pathname, navigate]);
+
+  const toggleMenu = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    setIsMenuOpen(prev => !prev);
+  }, []);
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/50">
@@ -35,6 +63,7 @@ export function LandingHeader() {
               <a
                 key={link.href}
                 href={link.href}
+                onClick={(e) => handleNavClick(e, link.href)}
                 className="px-3 lg:px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-accent"
               >
                 {link.label}
@@ -58,9 +87,11 @@ export function LandingHeader() {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2 rounded-lg hover:bg-accent transition-colors"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            type="button"
+            className="md:hidden p-2 rounded-lg hover:bg-accent transition-colors touch-manipulation"
+            onClick={toggleMenu}
             aria-label="Toggle menu"
+            aria-expanded={isMenuOpen}
           >
             {isMenuOpen ? (
               <X className="w-6 h-6 text-foreground" />
@@ -74,7 +105,7 @@ export function LandingHeader() {
         <div
           className={cn(
             "md:hidden overflow-hidden transition-all duration-300 ease-in-out",
-            isMenuOpen ? "max-h-96 pb-4" : "max-h-0"
+            isMenuOpen ? "max-h-[400px] pb-4 opacity-100" : "max-h-0 opacity-0"
           )}
         >
           <nav className="flex flex-col gap-1 pt-2">
@@ -82,8 +113,8 @@ export function LandingHeader() {
               <a
                 key={link.href}
                 href={link.href}
-                className="px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg transition-colors"
-                onClick={() => setIsMenuOpen(false)}
+                onClick={(e) => handleNavClick(e, link.href)}
+                className="px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg transition-colors active:bg-accent/80"
               >
                 {link.label}
               </a>
