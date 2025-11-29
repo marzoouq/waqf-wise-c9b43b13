@@ -53,8 +53,10 @@ export function ApproveJournalDialog({ open, onOpenChange, approval }: ApproveJo
       });
 
       queryClient.invalidateQueries({ queryKey: ['pending_approvals'] });
-      queryClient.invalidateQueries({ queryKey: ['recent_entries_accountant'] });
+      queryClient.invalidateQueries({ queryKey: ['recent_journal_entries'] });
       queryClient.invalidateQueries({ queryKey: ['journal_entries'] });
+      queryClient.invalidateQueries({ queryKey: ['accountant-kpis'] });
+      queryClient.invalidateQueries({ queryKey: ['accounting-stats'] });
       
       onOpenChange(false);
       setNotes("");
@@ -110,8 +112,10 @@ export function ApproveJournalDialog({ open, onOpenChange, approval }: ApproveJo
       });
 
       queryClient.invalidateQueries({ queryKey: ['pending_approvals'] });
-      queryClient.invalidateQueries({ queryKey: ['recent_entries_accountant'] });
+      queryClient.invalidateQueries({ queryKey: ['recent_journal_entries'] });
       queryClient.invalidateQueries({ queryKey: ['journal_entries'] });
+      queryClient.invalidateQueries({ queryKey: ['accountant-kpis'] });
+      queryClient.invalidateQueries({ queryKey: ['accounting-stats'] });
       
       onOpenChange(false);
       setNotes("");
