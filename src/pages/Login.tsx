@@ -72,9 +72,42 @@ export default function Login() {
       // التوجيه للصفحة الوسيطة التي ستحدد لوحة التحكم المناسبة
       navigate('/redirect');
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'البيانات المدخلة غير صحيحة';
+      // تحليل نوع الخطأ وعرض رسالة مناسبة
+      let errorTitle = 'خطأ في تسجيل الدخول';
+      let errorMessage = 'البيانات المدخلة غير صحيحة';
+      
+      if (error instanceof Error) {
+        const msg = error.message.toLowerCase();
+        
+        if (msg.includes('invalid_credentials') || msg.includes('invalid login credentials')) {
+          errorTitle = 'بيانات الدخول غير صحيحة';
+          errorMessage = loginType === 'beneficiary' 
+            ? 'رقم الهوية أو كلمة المرور غير صحيحة. تأكد من البيانات وحاول مرة أخرى'
+            : 'البريد الإلكتروني أو كلمة المرور غير صحيحة. تأكد من البيانات وحاول مرة أخرى';
+        } else if (msg.includes('email not confirmed')) {
+          errorTitle = 'البريد الإلكتروني غير مؤكد';
+          errorMessage = 'يرجى تأكيد بريدك الإلكتروني أولاً من خلال الرابط المرسل إليك';
+        } else if (msg.includes('too many requests') || msg.includes('rate limit')) {
+          errorTitle = 'محاولات كثيرة';
+          errorMessage = 'لقد قمت بمحاولات كثيرة. يرجى الانتظار قليلاً ثم المحاولة مجدداً';
+        } else if (msg.includes('network') || msg.includes('fetch')) {
+          errorTitle = 'خطأ في الاتصال';
+          errorMessage = 'تأكد من اتصالك بالإنترنت وحاول مرة أخرى';
+        } else if (msg.includes('session') || msg.includes('expired') || msg.includes('bad_jwt')) {
+          errorTitle = 'انتهت الجلسة';
+          errorMessage = 'انتهت صلاحية جلستك. يرجى تسجيل الدخول مرة أخرى';
+          // تنظيف localStorage عند أخطاء الجلسة
+          const keysToClean = Object.keys(localStorage).filter(key => 
+            key.includes('supabase') || key.includes('sb-')
+          );
+          keysToClean.forEach(key => localStorage.removeItem(key));
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       toast({
-        title: 'خطأ في تسجيل الدخول',
+        title: errorTitle,
         description: errorMessage,
         variant: 'destructive',
       });
