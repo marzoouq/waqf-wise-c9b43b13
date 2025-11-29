@@ -1,11 +1,70 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useWebVitals } from "@/hooks/developer/useWebVitals";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Activity, Gauge, Zap, Clock } from "lucide-react";
+import { useState, useEffect } from "react";
+import { onLCP, onFCP, onCLS, onINP, onTTFB } from 'web-vitals';
+
+interface VitalsData {
+  lcp: number | null;
+  fcp: number | null;
+  cls: number | null;
+  inp: number | null;
+  ttfb: number | null;
+  lcp_rating: string;
+  fcp_rating: string;
+  cls_rating: string;
+  inp_rating: string;
+  ttfb_rating: string;
+}
+
+interface VitalEntry {
+  name: string;
+  value: number;
+  rating: string;
+  timestamp: number;
+}
 
 export function WebVitalsPanel() {
-  const { vitals, history } = useWebVitals();
+  const [vitals, setVitals] = useState<VitalsData>({
+    lcp: null,
+    fcp: null,
+    cls: null,
+    inp: null,
+    ttfb: null,
+    lcp_rating: 'good',
+    fcp_rating: 'good',
+    cls_rating: 'good',
+    inp_rating: 'good',
+    ttfb_rating: 'good',
+  });
+  const [history, setHistory] = useState<VitalEntry[]>([]);
+
+  useEffect(() => {
+    const handleMetric = (metric: { name: string; value: number; rating: string }) => {
+      setVitals((prev) => ({
+        ...prev,
+        [metric.name.toLowerCase()]: metric.value,
+        [`${metric.name.toLowerCase()}_rating`]: metric.rating,
+      }));
+
+      setHistory((prev) => [
+        ...prev,
+        {
+          name: metric.name,
+          value: metric.value,
+          rating: metric.rating,
+          timestamp: Date.now(),
+        },
+      ]);
+    };
+
+    onLCP(handleMetric);
+    onFCP(handleMetric);
+    onCLS(handleMetric);
+    onINP(handleMetric);
+    onTTFB(handleMetric);
+  }, []);
 
   const getRatingBadge = (rating: string) => {
     switch (rating) {
@@ -135,8 +194,8 @@ export function WebVitalsPanel() {
                 لا توجد بيانات متاحة حالياً
               </p>
             ) : (
-              history.slice(-10).map((entry) => (
-                <div key={`vital-${entry.timestamp}-${entry.name}`} className="flex items-center justify-between text-sm border-b pb-2">
+              history.slice(-10).map((entry, index) => (
+                <div key={`vital-${entry.timestamp}-${index}`} className="flex items-center justify-between text-sm border-b pb-2">
                   <span className="text-muted-foreground">
                     {new Date(entry.timestamp).toLocaleTimeString('ar-SA')}
                   </span>

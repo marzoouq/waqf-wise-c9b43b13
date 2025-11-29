@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useErrorNotifications } from "@/hooks/developer/useErrorNotifications";
-import { usePerformanceBudget } from "@/hooks/developer/usePerformanceBudget";
 
 /**
  * مكون عام لمراقبة الأداء والأخطاء على كامل التطبيق
@@ -16,15 +15,6 @@ export function GlobalMonitoring() {
   // تفعيل مراقبة الأخطاء - دائماً استدعاء الـ Hook
   useErrorNotifications(shouldMonitor);
 
-  // تفعيل مراقبة الأداء - دائماً استدعاء الـ Hook
-  const { violations } = usePerformanceBudget({
-    lcp: 2500,
-    fcp: 1800,
-    cls: 0.1,
-    ttfb: 800,
-    inp: 200,
-  }, shouldMonitor);
-
   useEffect(() => {
     if (shouldMonitor) {
       const userType = isNazer ? 'الناظر' : 'المشرف';
@@ -34,14 +24,7 @@ export function GlobalMonitoring() {
 ╚══════════════════════════════════════════════╝
 
 ✅ الإشعارات الفورية للأخطاء
-✅ تنبيهات الأداء التلقائية
 ✅ المراقبة على كامل التطبيق
-
-📊 الميزات النشطة:
-  • إشعارات الأخطاء الحرجة فوراً
-  • تنبيهات عند تجاوز حدود الأداء
-  • مراقبة Web Vitals مباشرة
-  • تتبع شامل للنظام
 
 🎯 الوصول السريع:
   • /developer-tools - لوحة المطور الكاملة
