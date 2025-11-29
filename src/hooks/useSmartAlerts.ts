@@ -76,30 +76,33 @@ export function useSmartAlerts() {
           });
         }
 
-        // 3. قروض مستحقة قريبًا
+        // 3. قروض مستحقة أو متأخرة
         const { data: dueLoans } = await supabase
           .from('loan_installments')
           .select(`
             id,
             installment_number,
             principal_amount,
+            total_amount,
             due_date,
+            status,
             loans(loan_number, beneficiaries(full_name))
           `)
-          .eq('status', 'pending')
-          .gte('due_date', format(today, 'yyyy-MM-dd'))
+          .in('status', ['overdue', 'pending', 'معلق'])
           .lte('due_date', format(new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd'))
           .limit(5);
 
         if (dueLoans) {
           dueLoans.forEach(installment => {
             const daysUntilDue = differenceInDays(new Date(installment.due_date), today);
+            const isOverdue = installment.status === 'overdue' || daysUntilDue < 0;
+            const amount = installment.total_amount || installment.principal_amount || 0;
             allAlerts.push({
               id: installment.id,
               type: 'loan_due',
-              title: `قسط قرض مستحق قريبًا`,
-              description: `قرض ${installment.loans?.loan_number} - ${installment.loans?.beneficiaries?.full_name} - ${daysUntilDue} يوم`,
-              severity: daysUntilDue <= 7 ? 'high' : 'medium',
+              title: isOverdue ? `قسط قرض متأخر` : `قسط قرض مستحق قريبًا`,
+              description: `قرض ${installment.loans?.loan_number} - ${installment.loans?.beneficiaries?.full_name} - ${amount.toLocaleString('ar-SA')} ر.س`,
+              severity: isOverdue || daysUntilDue <= 7 ? 'high' : 'medium',
               date: new Date(installment.due_date),
               actionUrl: '/loans'
             });
