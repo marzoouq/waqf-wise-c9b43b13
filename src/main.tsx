@@ -19,5 +19,4 @@ requestIdleCallback(() => {
   import('./lib/debugTools').then(({ initDebugTools }) => initDebugTools());
   import('./lib/monitoring/web-vitals').then(({ initWebVitals }) => initWebVitals());
   import('./lib/imageOptimization').then(({ optimizeLCP }) => optimizeLCP());
-  import('./lib/versionManager').then(({ checkAndForceUpdate }) => checkAndForceUpdate());
 }, { timeout: 2000 });

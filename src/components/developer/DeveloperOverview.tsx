@@ -1,12 +1,72 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, AlertTriangle, XCircle, Activity } from "lucide-react";
-import { usePerformanceMetrics } from "@/hooks/developer/usePerformanceMetrics";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { ImageOptimizationPanel } from "./ImageOptimizationPanel";
+import { useState, useEffect } from "react";
+
+interface SystemHealth {
+  overall: "healthy" | "warning" | "critical";
+  score: number;
+  database: boolean;
+  storage: boolean;
+  network: boolean;
+  activeErrors: number;
+  networkRequests: number;
+}
 
 export function DeveloperOverview() {
-  const { systemHealth, vitals } = usePerformanceMetrics();
+  const [systemHealth, setSystemHealth] = useState<SystemHealth>({
+    overall: "healthy",
+    score: 100,
+    database: true,
+    storage: true,
+    network: navigator.onLine,
+    activeErrors: 0,
+    networkRequests: 0,
+  });
+
+  useEffect(() => {
+    const checkHealth = () => {
+      let score = 100;
+      let status: "healthy" | "warning" | "critical" = "healthy";
+
+      // Check storage
+      let storageHealth = true;
+      try {
+        localStorage.setItem("health_test", "ok");
+        localStorage.removeItem("health_test");
+      } catch {
+        storageHealth = false;
+        score -= 30;
+      }
+
+      // Check network
+      const networkHealth = navigator.onLine;
+      if (!networkHealth) {
+        score -= 40;
+      }
+
+      // Determine overall status
+      if (score >= 80) status = "healthy";
+      else if (score >= 50) status = "warning";
+      else status = "critical";
+
+      setSystemHealth({
+        overall: status,
+        score: Math.max(0, score),
+        database: true,
+        storage: storageHealth,
+        network: networkHealth,
+        activeErrors: 0,
+        networkRequests: 0,
+      });
+    };
+
+    checkHealth();
+    const interval = setInterval(checkHealth, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   const getHealthColor = (status: string) => {
     switch (status) {
@@ -59,7 +119,7 @@ export function DeveloperOverview() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {vitals.lcp ? `${(vitals.lcp / 1000).toFixed(1)}s` : "N/A"}
+              N/A
             </div>
             <p className="text-xs text-muted-foreground mt-2">
               LCP - Largest Contentful Paint

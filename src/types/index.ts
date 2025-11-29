@@ -48,7 +48,6 @@ export * from './beneficiary';
 export * from './loans';
 export * from './admin';
 export * from './reports/index';
-export * from './supabase-rpc';
 
 // Core Entity Types
 export interface Beneficiary {
