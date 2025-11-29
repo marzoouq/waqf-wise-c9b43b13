@@ -7,6 +7,7 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { Bell, Check } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
+import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 
 const Notifications = () => {
   const { 
@@ -27,44 +28,42 @@ const Notifications = () => {
 
   return (
     <PageErrorBoundary pageName="الإشعارات">
-      <div className="container mx-auto p-6 max-w-4xl">
+      <MobileOptimizedLayout>
+        <MobileOptimizedHeader
+          title="الإشعارات"
+          description={unreadCount > 0 
+            ? `لديك ${unreadCount} إشعار غير مقروء`
+            : "جميع الإشعارات مقروءة"
+          }
+          icon={<Bell className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
+          actions={
+            unreadCount > 0 ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => markAllAsRead()}
+                disabled={isMarkingAllAsRead}
+                className="gap-2"
+              >
+                <Check className="h-4 w-4" />
+                <span className="hidden sm:inline">تعليم الكل كمقروء</span>
+                <span className="sm:hidden">تعليم الكل</span>
+              </Button>
+            ) : null
+          }
+        />
+
         <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="flex items-center gap-2">
-                  <Bell className="w-6 h-6" />
-                  الإشعارات
-                </CardTitle>
-                <CardDescription>
-                  {unreadCount > 0 
-                    ? `لديك ${unreadCount} إشعار غير مقروء`
-                    : "جميع الإشعارات مقروءة"
-                  }
-                </CardDescription>
-              </div>
-              {unreadCount > 0 && (
-                <Button
-                  variant="outline"
-                  onClick={() => markAllAsRead()}
-                  disabled={isMarkingAllAsRead}
-                >
-                  <Check className="w-4 h-4 ml-2" />
-                  تعليم الكل كمقروء
-                </Button>
-              )}
-            </div>
-          </CardHeader>
-          <CardContent>
+          <CardContent className="p-2 sm:p-6">
             <Tabs defaultValue="all" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="all">
+              <TabsList className="grid w-full grid-cols-3 mb-4">
+                <TabsTrigger value="all" className="text-xs sm:text-sm">
                   الكل ({notifications.length})
                 </TabsTrigger>
-                <TabsTrigger value="unread">
+                <TabsTrigger value="unread" className="text-xs sm:text-sm">
                   غير مقروءة ({unreadCount})
                 </TabsTrigger>
-                <TabsTrigger value="read">
+                <TabsTrigger value="read" className="text-xs sm:text-sm">
                   مقروءة ({readNotifications.length})
                 </TabsTrigger>
               </TabsList>
@@ -77,7 +76,7 @@ const Notifications = () => {
                     description="سيتم عرض جميع الإشعارات هنا"
                   />
                 ) : (
-                  <div className="border rounded-lg overflow-hidden">
+                  <div className="border rounded-lg overflow-hidden divide-y">
                     {notifications.map((notification) => (
                       <NotificationItem
                         key={notification.id}
@@ -97,7 +96,7 @@ const Notifications = () => {
                     description="جميع الإشعارات مقروءة"
                   />
                 ) : (
-                  <div className="border rounded-lg overflow-hidden">
+                  <div className="border rounded-lg overflow-hidden divide-y">
                     {unreadNotifications.map((notification) => (
                       <NotificationItem
                         key={notification.id}
@@ -117,7 +116,7 @@ const Notifications = () => {
                     description="لم تقرأ أي إشعارات بعد"
                   />
                 ) : (
-                  <div className="border rounded-lg overflow-hidden">
+                  <div className="border rounded-lg overflow-hidden divide-y">
                     {readNotifications.map((notification) => (
                       <NotificationItem
                         key={notification.id}
@@ -131,7 +130,7 @@ const Notifications = () => {
             </Tabs>
           </CardContent>
         </Card>
-      </div>
+      </MobileOptimizedLayout>
     </PageErrorBoundary>
   );
 };

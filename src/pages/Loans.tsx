@@ -145,49 +145,50 @@ export default function Loans() {
 
   return (
     <PageErrorBoundary pageName="إدارة القروض">
-      <div className="container mx-auto p-6 space-y-6 animate-fade-in">
+      <MobileOptimizedLayout>
       {/* Header */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">إدارة القروض</h1>
-          <p className="text-muted-foreground">
-            إدارة القروض وجداول الأقساط والمدفوعات
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button 
-            variant="outline"
-            onClick={async () => {
-              // Dynamic import for XLSX
-              const XLSX = await import("xlsx");
-              
-              const exportData = filteredLoans.map((loan) => ({
-                "رقم القرض": loan.loan_number,
-                "المستفيد": loan.beneficiary?.full_name,
-                "الهوية الوطنية": loan.beneficiary?.national_id,
-                "مبلغ القرض": loan.loan_amount,
-                "نسبة الفائدة": loan.interest_rate + "%",
-                "المدة (شهر)": loan.term_months,
-                "القسط الشهري": loan.monthly_installment,
-                "تاريخ البداية": format(new Date(loan.start_date), "dd/MM/yyyy"),
-                "الحالة": loan.status,
-              }));
-              const ws = XLSX.utils.json_to_sheet(exportData);
-              const wb = XLSX.utils.book_new();
-              XLSX.utils.book_append_sheet(wb, ws, "القروض");
-              XLSX.writeFile(wb, `قروض_${format(new Date(), "yyyy-MM-dd")}.xlsx`);
-            }}
-            className="gap-2"
-          >
-            <Download className="h-4 w-4" />
-            تصدير Excel
-          </Button>
-          <Button onClick={() => setIsDialogOpen(true)} className="gap-2">
-            <Plus className="h-4 w-4" />
-            إضافة قرض جديد
-          </Button>
-        </div>
-      </div>
+      <MobileOptimizedHeader
+        title="إدارة القروض"
+        description="إدارة القروض وجداول الأقساط والمدفوعات"
+        icon={<FileText className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
+        actions={
+          <div className="flex gap-2">
+            <Button 
+              variant="outline"
+              size="sm"
+              onClick={async () => {
+                // Dynamic import for XLSX
+                const XLSX = await import("xlsx");
+                
+                const exportData = filteredLoans.map((loan) => ({
+                  "رقم القرض": loan.loan_number,
+                  "المستفيد": loan.beneficiary?.full_name,
+                  "الهوية الوطنية": loan.beneficiary?.national_id,
+                  "مبلغ القرض": loan.loan_amount,
+                  "نسبة الفائدة": loan.interest_rate + "%",
+                  "المدة (شهر)": loan.term_months,
+                  "القسط الشهري": loan.monthly_installment,
+                  "تاريخ البداية": format(new Date(loan.start_date), "dd/MM/yyyy"),
+                  "الحالة": loan.status,
+                }));
+                const ws = XLSX.utils.json_to_sheet(exportData);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "القروض");
+                XLSX.writeFile(wb, `قروض_${format(new Date(), "yyyy-MM-dd")}.xlsx`);
+              }}
+              className="gap-1"
+            >
+              <Download className="h-4 w-4" />
+              <span className="hidden sm:inline">تصدير</span>
+            </Button>
+            <Button size="sm" onClick={() => setIsDialogOpen(true)} className="gap-1">
+              <Plus className="h-4 w-4" />
+              <span className="hidden sm:inline">إضافة قرض</span>
+              <span className="sm:hidden">جديد</span>
+            </Button>
+          </div>
+        }
+      />
 
       {/* Statistics Cards */}
       {isLoading ? (
@@ -437,7 +438,7 @@ export default function Loans() {
           loanNumber={selectedLoan.loan_number}
         />
       )}
-      </div>
+      </MobileOptimizedLayout>
     </PageErrorBoundary>
   );
 }

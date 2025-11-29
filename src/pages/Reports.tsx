@@ -35,44 +35,54 @@ const Reports = () => {
 
       <div className="space-y-6">
         <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-9 gap-1">
-            <TabsTrigger value="dashboard" className="gap-2">
-              <BarChart3 className="h-4 w-4" />
-              لوحة التحكم
-            </TabsTrigger>
-            <TabsTrigger value="scheduled" className="gap-2">
-              <Calendar className="h-4 w-4" />
-              جدولة
-            </TabsTrigger>
-            <TabsTrigger value="builder" className="gap-2">
-              <Settings className="h-4 w-4" />
-              منشئ التقارير
-            </TabsTrigger>
-            <TabsTrigger value="beneficiaries" className="gap-2">
-              <Users className="h-4 w-4" />
-              المستفيدون
-            </TabsTrigger>
-            <TabsTrigger value="properties" className="gap-2">
-              <Building2 className="h-4 w-4" />
-              العقارات
-            </TabsTrigger>
-            <TabsTrigger value="financial" className="gap-2">
-              <DollarSign className="h-4 w-4" />
-              المالية
-            </TabsTrigger>
-            <TabsTrigger value="analysis" className="gap-2">
-              <FileText className="h-4 w-4" />
-              التحليلات
-            </TabsTrigger>
-            <TabsTrigger value="invoices" className="gap-2">
-              <Receipt className="h-4 w-4" />
-              الفواتير
-            </TabsTrigger>
-            <TabsTrigger value="zatca" className="gap-2">
-              <ShieldCheck className="h-4 w-4" />
-              ZATCA
-            </TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto pb-2 -mx-3 px-3 sm:mx-0 sm:px-0">
+            <TabsList className="inline-flex w-full min-w-max sm:grid sm:grid-cols-3 lg:grid-cols-9 gap-1">
+              <TabsTrigger value="dashboard" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
+                <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">لوحة التحكم</span>
+                <span className="sm:hidden">لوحة</span>
+              </TabsTrigger>
+              <TabsTrigger value="scheduled" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
+                <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">جدولة</span>
+                <span className="sm:hidden">جدول</span>
+              </TabsTrigger>
+              <TabsTrigger value="builder" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
+                <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">منشئ التقارير</span>
+                <span className="sm:hidden">منشئ</span>
+              </TabsTrigger>
+              <TabsTrigger value="beneficiaries" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
+                <Users className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">المستفيدون</span>
+                <span className="sm:hidden">مستفيد</span>
+              </TabsTrigger>
+              <TabsTrigger value="properties" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
+                <Building2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">العقارات</span>
+                <span className="sm:hidden">عقار</span>
+              </TabsTrigger>
+              <TabsTrigger value="financial" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
+                <DollarSign className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">المالية</span>
+                <span className="sm:hidden">مالي</span>
+              </TabsTrigger>
+              <TabsTrigger value="analysis" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
+                <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">التحليلات</span>
+                <span className="sm:hidden">تحليل</span>
+              </TabsTrigger>
+              <TabsTrigger value="invoices" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
+                <Receipt className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">الفواتير</span>
+                <span className="sm:hidden">فاتورة</span>
+              </TabsTrigger>
+              <TabsTrigger value="zatca" className="gap-1 px-2 sm:px-3 text-xs sm:text-sm">
+                <ShieldCheck className="h-3 w-3 sm:h-4 sm:w-4" />
+                ZATCA
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="dashboard">
             <InteractiveDashboard />

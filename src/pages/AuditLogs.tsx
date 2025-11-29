@@ -91,32 +91,32 @@ const AuditLogs = () => {
 
   return (
     <PageErrorBoundary pageName="سجل العمليات">
-      <div className="container mx-auto p-6 space-y-6">
+      <div className="container mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
-            <Shield className="h-8 w-8 text-primary" />
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground flex items-center gap-2">
+            <Shield className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
             سجل العمليات
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-muted-foreground mt-1 text-sm sm:text-base">
             تتبع جميع العمليات والأنشطة في النظام
           </p>
         </div>
-        <Button variant="outline" onClick={exportLogs} className="gap-2">
+        <Button variant="outline" onClick={exportLogs} size="sm" className="gap-2 self-start sm:self-auto">
           <Download className="h-4 w-4" />
-          تصدير
+          <span className="hidden sm:inline">تصدير</span>
         </Button>
       </div>
 
       {/* Filters */}
-      <Card className="p-6">
-        <div className="flex items-center gap-2 mb-4">
-          <Filter className="h-5 w-5 text-muted-foreground" />
-          <h2 className="text-lg font-semibold">الفلاتر</h2>
+      <Card className="p-3 sm:p-6">
+        <div className="flex items-center gap-2 mb-3 sm:mb-4">
+          <Filter className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
+          <h2 className="text-base sm:text-lg font-semibold">الفلاتر</h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
           <Select
             value={filters.tableName || "all"}
             onValueChange={(value) =>

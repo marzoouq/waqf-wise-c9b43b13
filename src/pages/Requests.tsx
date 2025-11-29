@@ -311,12 +311,12 @@ const Requests = () => {
 
       {/* Filters */}
       <Card>
-        <CardHeader>
-          <CardTitle>البحث والتصفية</CardTitle>
-          <CardDescription>ابحث عن طلب أو صفي حسب الحالة</CardDescription>
+        <CardHeader className="pb-2 sm:pb-4">
+          <CardTitle className="text-base sm:text-lg">البحث والتصفية</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">ابحث عن طلب أو صفي حسب الحالة</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="flex gap-4">
+        <CardContent className="p-3 sm:p-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
             <div className="relative flex-1">
               <Search className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
@@ -326,26 +326,28 @@ const Requests = () => {
                 className="pr-10"
               />
             </div>
-            <AdvancedFiltersDialog
-              filters={filterConfigs}
-              activeFilters={advancedFilters}
-              onApplyFilters={setAdvancedFilters}
-              onClearFilters={() => setAdvancedFilters({})}
-            />
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[200px]">
-                <Filter className="ml-2 h-4 w-4" />
-                <SelectValue placeholder="جميع الحالات" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">جميع الحالات</SelectItem>
-                <SelectItem value="معلق">معلق</SelectItem>
-                <SelectItem value="قيد المعالجة">قيد المعالجة</SelectItem>
-                <SelectItem value="قيد المراجعة">قيد المراجعة</SelectItem>
-                <SelectItem value="موافق">موافق</SelectItem>
-                <SelectItem value="مرفوض">مرفوض</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="flex gap-2">
+              <AdvancedFiltersDialog
+                filters={filterConfigs}
+                activeFilters={advancedFilters}
+                onApplyFilters={setAdvancedFilters}
+                onClearFilters={() => setAdvancedFilters({})}
+              />
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-full sm:w-[180px]">
+                  <Filter className="ml-2 h-4 w-4" />
+                  <SelectValue placeholder="جميع الحالات" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">جميع الحالات</SelectItem>
+                  <SelectItem value="معلق">معلق</SelectItem>
+                  <SelectItem value="قيد المعالجة">قيد المعالجة</SelectItem>
+                  <SelectItem value="قيد المراجعة">قيد المراجعة</SelectItem>
+                  <SelectItem value="موافق">موافق</SelectItem>
+                  <SelectItem value="مرفوض">مرفوض</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </CardContent>
       </Card>
