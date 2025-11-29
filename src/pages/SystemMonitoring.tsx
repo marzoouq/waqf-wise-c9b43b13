@@ -44,26 +44,26 @@ export default function SystemMonitoring() {
 
   return (
     <PageErrorBoundary pageName="مراقبة النظام">
-      <div className="container mx-auto p-6 space-y-6">
+      <div className="container mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
         {/* العنوان */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div>
-            <h1 className="text-3xl font-bold flex items-center gap-2">
-              <Shield className="h-8 w-8 text-primary" />
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold flex items-center gap-2">
+              <Shield className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
               مراقبة النظام
             </h1>
-            <p className="text-muted-foreground mt-1">
+            <p className="text-muted-foreground mt-1 text-sm sm:text-base">
               نظام متكامل لكشف وإصلاح الأخطاء تلقائياً
             </p>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={refreshAllData}>
-              <RefreshCw className="h-4 w-4 ml-2" />
-              تحديث
+          <div className="flex gap-2 self-start sm:self-auto">
+            <Button variant="outline" size="sm" onClick={refreshAllData} className="gap-1">
+              <RefreshCw className="h-4 w-4" />
+              <span className="hidden sm:inline">تحديث</span>
             </Button>
-            <Button variant="outline">
-              <Settings className="h-4 w-4 ml-2" />
-              الإعدادات
+            <Button variant="outline" size="sm" className="gap-1">
+              <Settings className="h-4 w-4" />
+              <span className="hidden sm:inline">الإعدادات</span>
             </Button>
           </div>
         </div>
@@ -127,20 +127,22 @@ export default function SystemMonitoring() {
 
         {/* التبويبات الرئيسية */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="overview">نظرة عامة</TabsTrigger>
-            <TabsTrigger value="alerts">
-              التنبيهات
-              {stats?.activeAlerts && stats.activeAlerts > 0 && (
-                <Badge variant="destructive" className="mr-2">
-                  {stats.activeAlerts}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="errors">الأخطاء</TabsTrigger>
-            <TabsTrigger value="fixes">الإصلاح التلقائي</TabsTrigger>
-            <TabsTrigger value="tools">أدوات التحكم</TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto pb-2 -mx-3 px-3 sm:mx-0 sm:px-0">
+            <TabsList className="inline-flex w-full min-w-max sm:grid sm:grid-cols-5 gap-1">
+              <TabsTrigger value="overview" className="text-xs sm:text-sm px-3 sm:px-4">نظرة عامة</TabsTrigger>
+              <TabsTrigger value="alerts" className="text-xs sm:text-sm px-3 sm:px-4 gap-1">
+                التنبيهات
+                {stats?.activeAlerts && stats.activeAlerts > 0 && (
+                  <Badge variant="destructive" className="mr-1 text-[10px] h-5">
+                    {stats.activeAlerts}
+                  </Badge>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="errors" className="text-xs sm:text-sm px-3 sm:px-4">الأخطاء</TabsTrigger>
+              <TabsTrigger value="fixes" className="text-xs sm:text-sm px-3 sm:px-4">الإصلاح</TabsTrigger>
+              <TabsTrigger value="tools" className="text-xs sm:text-sm px-3 sm:px-4">أدوات</TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* نظرة عامة */}
           <TabsContent value="overview" className="space-y-4">

@@ -12,6 +12,7 @@ import { usePropertiesDialogs } from "@/hooks/usePropertiesDialogs";
 import { usePropertiesStats } from "@/hooks/usePropertiesStats";
 import { logger } from "@/lib/logger";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
+import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Building2, TrendingUp, Wrench, AlertCircle } from "lucide-react";
 
@@ -75,8 +76,7 @@ const Properties = () => {
 
   return (
     <PageErrorBoundary pageName="العقارات">
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto p-6 md:p-8 lg:p-10 space-y-6 md:space-y-8">
+      <MobileOptimizedLayout>
         <PropertiesHeader
           activeTab={activeTab}
           properties={properties}
@@ -185,7 +185,6 @@ const Properties = () => {
             onEditMaintenance={editMaintenance}
           />
         )}
-        </div>
 
         <PropertyDialog
           open={propertyDialogOpen}
@@ -223,7 +222,7 @@ const Properties = () => {
           open={providersDialogOpen}
           onOpenChange={setProvidersDialogOpen}
         />
-      </div>
+      </MobileOptimizedLayout>
     </PageErrorBoundary>
   );
 };

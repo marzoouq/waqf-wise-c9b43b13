@@ -1,21 +1,18 @@
-import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
+import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { MessageCenter } from "@/components/messages/MessageCenter";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
+import { MessageSquare } from "lucide-react";
 
 export default function Messages() {
   return (
     <PageErrorBoundary pageName="الرسائل">
       <MobileOptimizedLayout>
-        <div className="space-y-6">
-          <div>
-            <h1 className="text-3xl font-bold">الرسائل الداخلية</h1>
-            <p className="text-muted-foreground mt-2">
-              تواصل مع الإدارة والموظفين
-            </p>
-          </div>
-
-          <MessageCenter />
-        </div>
+        <MobileOptimizedHeader
+          title="الرسائل الداخلية"
+          description="تواصل مع الإدارة والموظفين"
+          icon={<MessageSquare className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
+        />
+        <MessageCenter />
       </MobileOptimizedLayout>
     </PageErrorBoundary>
   );
