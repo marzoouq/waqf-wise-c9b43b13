@@ -49,21 +49,7 @@ export * from './loans';
 export * from './admin';
 export * from './reports/index';
 
-// Core Entity Types
-export interface Beneficiary {
-  id: string;
-  full_name: string;
-  national_id: string;
-  phone: string;
-  email?: string;
-  family_name?: string;
-  relationship?: string;
-  category: string;
-  status: string;
-  notes?: string;
-  created_at: string;
-  updated_at: string;
-}
+// Core Entity Types (Beneficiary is exported from './beneficiary')
 
 export interface Property {
   id: string;
