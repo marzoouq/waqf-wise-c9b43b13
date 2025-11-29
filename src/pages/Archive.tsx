@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { Database } from "@/integrations/supabase/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Search, FolderOpen, FileText, Download, Upload, Eye, Edit, Trash2 } from "lucide-react";
+import { Plus, Search, FolderOpen, FileText, Download, Upload, Eye, Trash2, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { UploadDocumentDialog } from "@/components/archive/UploadDocumentDialog";
@@ -14,8 +14,8 @@ import { Badge } from "@/components/ui/badge";
 import { useDocuments } from "@/hooks/useDocuments";
 import { useFolders } from "@/hooks/useFolders";
 import { useArchiveStats } from "@/hooks/useArchiveStats";
+import { useDocumentUpload } from "@/hooks/useDocumentUpload";
 import { LoadingState } from "@/components/shared/LoadingState";
-import { EmptyState } from "@/components/shared/EmptyState";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
@@ -33,56 +33,75 @@ const Archive = () => {
   const [selectedDocument, setSelectedDocument] = useState<(Document & { file_path: string }) | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [documentToDelete, setDocumentToDelete] = useState<Document | null>(null);
+  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
 
-  const { documents, isLoading: documentsLoading, addDocument, updateDocument, deleteDocument } = useDocuments();
+  const { documents, isLoading: documentsLoading } = useDocuments();
   const { folders, isLoading: foldersLoading, addFolder } = useFolders();
   const { stats, isLoading: statsLoading } = useArchiveStats();
+  const { deleteDocumentWithFile } = useDocumentUpload();
 
   const isLoading = documentsLoading || foldersLoading || statsLoading;
 
   const filteredDocuments = useMemo(() => {
-    if (!searchQuery.trim()) return documents;
+    let filtered = documents;
     
-    const query = searchQuery.toLowerCase();
-    return documents.filter(
-      (doc) =>
-        doc.name.toLowerCase().includes(query) ||
-        doc.category.toLowerCase().includes(query) ||
-        doc.description?.toLowerCase().includes(query)
-    );
-  }, [documents, searchQuery]);
-
-  const handleUploadDocument = async (data: Omit<Database['public']['Tables']['documents']['Insert'], 'id' | 'created_at'>) => {
-    await addDocument(data);
-    setUploadDialogOpen(false);
-  };
+    // Filter by folder
+    if (selectedFolderId) {
+      filtered = filtered.filter(doc => doc.folder_id === selectedFolderId);
+    }
+    
+    // Filter by search
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (doc) =>
+          doc.name.toLowerCase().includes(query) ||
+          doc.category.toLowerCase().includes(query) ||
+          doc.description?.toLowerCase().includes(query)
+      );
+    }
+    
+    return filtered;
+  }, [documents, searchQuery, selectedFolderId]);
 
   const handleCreateFolder = async (data: Database['public']['Tables']['folders']['Insert']) => {
     await addFolder(data);
     setFolderDialogOpen(false);
   };
 
-  const handlePreviewDocument = (doc: Database['public']['Tables']['documents']['Row']) => {
+  const handlePreviewDocument = (doc: Document) => {
     const documentForPreview = {
       ...doc,
-      file_path: `/documents/${doc.id}`,
+      file_path: (doc as any).file_path || `/documents/${doc.id}`,
     };
     setSelectedDocument(documentForPreview);
     setPreviewDialogOpen(true);
   };
 
-  const handleDeleteClick = (doc: Database['public']['Tables']['documents']['Row']) => {
+  const handleDeleteClick = (doc: Document) => {
     setDocumentToDelete(doc);
     setDeleteDialogOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
     if (documentToDelete) {
-      await deleteDocument(documentToDelete.id);
+      await deleteDocumentWithFile({
+        id: documentToDelete.id,
+        storagePath: (documentToDelete as any).storage_path,
+      });
       setDeleteDialogOpen(false);
       setDocumentToDelete(null);
     }
   };
+
+  const handleDownloadDocument = async (doc: Document) => {
+    const filePath = (doc as any).file_path;
+    if (filePath) {
+      window.open(filePath, '_blank');
+    }
+  };
+
+  const selectedFolder = folders?.find(f => f.id === selectedFolderId);
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل الأرشيف..." />;
@@ -146,8 +165,12 @@ const Archive = () => {
           </Card>
         </div>
 
-        <Tabs defaultValue="documents" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
+        <Tabs defaultValue="folders" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="folders">
+              <FolderOpen className="h-4 w-4 ml-2" />
+              المجلدات
+            </TabsTrigger>
             <TabsTrigger value="documents">
               <FileText className="h-4 w-4 ml-2" />
               المستندات
@@ -157,6 +180,135 @@ const Archive = () => {
               الميزات الذكية
             </TabsTrigger>
           </TabsList>
+
+          {/* Folders Tab */}
+          <TabsContent value="folders" className="space-y-4">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button onClick={() => setFolderDialogOpen(true)} className="flex-1 sm:flex-none">
+                <Plus className="ml-2 h-4 w-4" />
+                إنشاء مجلد جديد
+              </Button>
+              <Button onClick={() => setUploadDialogOpen(true)} variant="outline" className="flex-1 sm:flex-none">
+                <Upload className="ml-2 h-4 w-4" />
+                رفع مستند
+              </Button>
+            </div>
+
+            {/* Breadcrumb Navigation */}
+            {selectedFolderId && (
+              <div className="flex items-center gap-2 text-sm">
+                <Button
+                  variant="link"
+                  className="p-0 h-auto text-primary"
+                  onClick={() => setSelectedFolderId(null)}
+                >
+                  الأرشيف
+                </Button>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                <span className="font-medium">{selectedFolder?.name}</span>
+              </div>
+            )}
+
+            {/* Folders Grid */}
+            {!selectedFolderId && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {folders && folders.length > 0 ? (
+                  folders.map((folder) => (
+                    <Card
+                      key={folder.id}
+                      className="cursor-pointer hover:bg-muted/50 transition-colors"
+                      onClick={() => setSelectedFolderId(folder.id)}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 rounded-lg bg-primary/10">
+                            <FolderOpen className="h-6 w-6 text-primary" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-medium truncate">{folder.name}</h3>
+                            <p className="text-xs text-muted-foreground">
+                              {folder.files_count || 0} ملفات
+                            </p>
+                          </div>
+                        </div>
+                        {folder.description && (
+                          <p className="text-xs text-muted-foreground mt-2 line-clamp-2">
+                            {folder.description}
+                          </p>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))
+                ) : (
+                  <div className="col-span-full text-center py-12">
+                    <FolderOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">لا توجد مجلدات. أنشئ مجلداً جديداً لتنظيم مستنداتك</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Documents in Selected Folder */}
+            {selectedFolderId && (
+              <div className="space-y-4">
+                <div className="relative">
+                  <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="البحث في المستندات..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pr-10"
+                  />
+                </div>
+
+                {filteredDocuments.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {filteredDocuments.map((doc) => (
+                      <Card key={doc.id} className="hover:bg-muted/50 transition-colors">
+                        <CardContent className="p-4">
+                          <div className="flex items-start gap-3">
+                            <FileText className="h-8 w-8 text-primary flex-shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-medium truncate">{doc.name}</h4>
+                              <div className="flex items-center gap-2 mt-1">
+                                <Badge variant="outline" className="text-xs">{doc.file_type}</Badge>
+                                <span className="text-xs text-muted-foreground">{doc.file_size}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex gap-1 mt-3">
+                            <Button size="sm" variant="ghost" onClick={() => handlePreviewDocument(doc)}>
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button size="sm" variant="ghost" onClick={() => handleDownloadDocument(doc)}>
+                              <Download className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-destructive"
+                              onClick={() => handleDeleteClick(doc)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">لا توجد مستندات في هذا المجلد</p>
+                    <Button onClick={() => setUploadDialogOpen(true)} variant="outline" className="mt-4">
+                      <Upload className="ml-2 h-4 w-4" />
+                      رفع مستند
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+          </TabsContent>
 
           <TabsContent value="documents" className="space-y-4">
             <div className="flex flex-col sm:flex-row gap-3">
@@ -168,9 +320,9 @@ const Archive = () => {
                 <Plus className="ml-2 h-4 w-4" />
                 إنشاء مجلد
               </Button>
-              {filteredDocuments.length > 0 && (
+              {documents.length > 0 && (
                 <ExportButton
-                  data={filteredDocuments.map(doc => ({
+                  data={documents.map(doc => ({
                     'اسم المستند': doc.name,
                     'الفئة': doc.category,
                     'النوع': doc.file_type,
@@ -285,7 +437,6 @@ const Archive = () => {
         <UploadDocumentDialog
           open={uploadDialogOpen}
           onOpenChange={setUploadDialogOpen}
-          onUpload={handleUploadDocument}
         />
 
         <CreateFolderDialog

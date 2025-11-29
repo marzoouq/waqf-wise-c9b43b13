@@ -16,6 +16,8 @@ export interface Document {
   folder_id: string | null;
   uploaded_at: string;
   created_at: string;
+  file_path: string | null;
+  storage_path: string | null;
 }
 
 export function useDocuments() {
@@ -27,7 +29,7 @@ export function useDocuments() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("documents")
-        .select("id, name, description, file_type, file_size, file_size_bytes, category, folder_id, uploaded_at, created_at")
+        .select("id, name, description, file_type, file_size, file_size_bytes, category, folder_id, uploaded_at, created_at, file_path, storage_path")
         .order("uploaded_at", { ascending: false });
 
       if (error) throw error;
