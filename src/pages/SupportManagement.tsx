@@ -314,7 +314,7 @@ export default function SupportManagement() {
                   {isLoading ? (
                     <LoadingState message="جاري تحميل التذاكر..." />
                   ) : !tickets || tickets.length === 0 ? (
-                    <EmptySupportState onRefresh={handleRefresh} />
+                    <EmptySupportState />
                   ) : (
                     <div className="space-y-2">
                       {tickets.map((ticket) => {
