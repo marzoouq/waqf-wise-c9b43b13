@@ -18,6 +18,7 @@ import { useAlertCleanup } from "./hooks/useAlertCleanup";
 import { lazyWithRetry } from "./lib/lazyWithRetry";
 import { UpdateNotifier } from "./components/system/UpdateNotifier";
 import { LCPOptimizer } from "./components/performance/LCPOptimizer";
+import { CriticalResourceLoader } from "./components/performance/CriticalResourceLoader";
 import "@/lib/errors/tracker";
 import "@/lib/selfHealing";
 
@@ -173,6 +174,8 @@ const App = () => {
               >
                 {/* Auto logout after 1 minute of inactivity (except nazer & admin) */}
                 <IdleTimeoutManager />
+                {/* Critical Resource Loader - تحميل مسبق للموارد */}
+                <CriticalResourceLoader />
             <LazyErrorBoundary>
             <Suspense fallback={<LoadingState size="lg" fullScreen />}>
               <Routes>

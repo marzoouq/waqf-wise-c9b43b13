@@ -46,6 +46,13 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap"></noscript>
     
+    <!-- Performance: Prefetch critical routes -->
+    <link rel="prefetch" href="/login" as="document">
+    <link rel="prefetch" href="/dashboard" as="document">
+    
+    <!-- Performance: Modulepreload for faster JS execution -->
+    <link rel="modulepreload" href="/src/main.tsx">
+    
     <!-- Critical CSS inline for faster LCP -->
     <style>
       /* Reset and base styles */
