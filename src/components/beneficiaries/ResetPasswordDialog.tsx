@@ -83,7 +83,7 @@ export function ResetPasswordDialog({
         return;
       }
 
-      productionLogger.debug('Password reset successful', data);
+      if (import.meta.env.DEV) productionLogger.debug('Password reset successful', data);
       toast.success('تم إعادة تعيين كلمة المرور بنجاح');
       setIsSuccess(true);
       
