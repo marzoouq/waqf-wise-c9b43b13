@@ -1,6 +1,11 @@
 /**
  * ملف تصدير مركزي لجميع الأنواع
  * Central export file for all types
+ * 
+ * ملاحظة: بعض الأنواع تُعرّف في hooks لأنها مرتبطة بالـ query
+ * - Property: من src/hooks/useProperties.ts
+ * - Contract: من src/types/contracts.ts
+ * - للأنواع المشتقة من DB استخدم: src/types/supabase-helpers.ts
  */
 
 // Re-exports from specialized type files
@@ -11,6 +16,8 @@ export * from './errors';
 export * from './alerts';
 export * from './activity';
 export * from './audit';
+export * from './contracts'; // Contract, ContractInsert
+
 // تجنب إعادة تصدير الأنواع المكررة من approvals
 export type {
   DistributionApprovalInsert,
@@ -49,8 +56,14 @@ export * from './loans';
 export * from './admin';
 export * from './reports/index';
 
-// Core Entity Types (Beneficiary is exported from './beneficiary')
+// ============================================
+// Core Entity Types - الأنواع الأساسية
+// ============================================
 
+/**
+ * @deprecated استخدم `import { type Property } from '@/hooks/useProperties'`
+ * هذا التعريف للتوافق مع الكود القديم فقط
+ */
 export interface Property {
   id: string;
   name: string;
