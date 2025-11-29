@@ -3246,36 +3246,42 @@ export type Database = {
           category: string
           created_at: string
           description: string | null
+          file_path: string | null
           file_size: string
           file_size_bytes: number | null
           file_type: string
           folder_id: string | null
           id: string
           name: string
+          storage_path: string | null
           uploaded_at: string
         }
         Insert: {
           category: string
           created_at?: string
           description?: string | null
+          file_path?: string | null
           file_size: string
           file_size_bytes?: number | null
           file_type: string
           folder_id?: string | null
           id?: string
           name: string
+          storage_path?: string | null
           uploaded_at?: string
         }
         Update: {
           category?: string
           created_at?: string
           description?: string | null
+          file_path?: string | null
           file_size?: string
           file_size_bytes?: number | null
           file_type?: string
           folder_id?: string | null
           id?: string
           name?: string
+          storage_path?: string | null
           uploaded_at?: string
         }
         Relationships: [

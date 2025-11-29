@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -20,7 +21,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
+import { useDocumentUpload } from "@/hooks/useDocumentUpload";
+import { useFolders } from "@/hooks/useFolders";
+import { Upload, Loader2, FileText } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 
 const uploadSchema = z.object({
   name: z
@@ -29,6 +33,7 @@ const uploadSchema = z.object({
     .max(100, { message: "اسم المستند يجب ألا يتجاوز 100 حرف" }),
   category: z.string().min(1, { message: "الفئة مطلوبة" }),
   description: z.string().optional(),
+  folder_id: z.string().optional(),
   file: z.instanceof(FileList).refine((files) => files?.length > 0, "الملف مطلوب"),
 });
 
@@ -37,15 +42,26 @@ type UploadFormValues = z.infer<typeof uploadSchema>;
 interface UploadDocumentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onUpload: (data: UploadFormValues) => void;
+  onUpload?: (data: any) => void;
 }
+
+const DOCUMENT_CATEGORIES = [
+  { value: "contracts", label: "العقود" },
+  { value: "legal", label: "المستندات القانونية" },
+  { value: "reports", label: "التقارير المالية" },
+  { value: "governance", label: "محاضر الاجتماعات" },
+  { value: "beneficiary", label: "مستندات المستفيدين" },
+  { value: "receipts", label: "سندات القبض والصرف" },
+  { value: "other", label: "أخرى" },
+];
 
 export function UploadDocumentDialog({
   open,
   onOpenChange,
-  onUpload,
 }: UploadDocumentDialogProps) {
-  const { toast } = useToast();
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const { uploadDocument, isUploading } = useDocumentUpload();
+  const { folders } = useFolders();
 
   const form = useForm<UploadFormValues>({
     resolver: zodResolver(uploadSchema),
@@ -53,47 +69,51 @@ export function UploadDocumentDialog({
       name: "",
       category: "",
       description: "",
+      folder_id: "",
     },
   });
+
+  const handleFileChange = (files: FileList | null) => {
+    if (files && files[0]) {
+      setSelectedFile(files[0]);
+      // Auto-fill name from file name if empty
+      if (!form.getValues('name')) {
+        const fileName = files[0].name.replace(/\.[^/.]+$/, '');
+        form.setValue('name', fileName);
+      }
+    }
+  };
 
   const handleSubmit = async (data: UploadFormValues) => {
     const file = data.file[0];
     const maxSize = 10 * 1024 * 1024; // 10MB
     
     if (file.size > maxSize) {
-      toast({
-        title: "خطأ في حجم الملف",
-        description: "حجم الملف يجب ألا يتجاوز 10 ميجابايت",
-        variant: "destructive",
-      });
+      form.setError('file', { message: 'حجم الملف يجب ألا يتجاوز 10 ميجابايت' });
       return;
     }
 
-    // Format file size
-    const formatFileSize = (bytes: number): string => {
-      if (bytes < 1024) return `${bytes} B`;
-      if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-      return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-    };
-
-    // Get file extension
-    const fileExtension = file.name.split(".").pop()?.toUpperCase() || "FILE";
-
-    const documentData = {
-      name: data.name,
-      description: data.description || "",
-      category: data.category,
-      file_type: fileExtension,
-      file_size: formatFileSize(file.size),
-    };
-
     try {
-      await onUpload(documentData);
+      await uploadDocument({
+        file,
+        name: data.name,
+        category: data.category,
+        description: data.description,
+        folder_id: data.folder_id || undefined,
+      });
+      
       form.reset();
+      setSelectedFile(null);
       onOpenChange(false);
     } catch (error) {
-      // Error is handled by the mutation's onError callback
+      // Error handled by hook
     }
+  };
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
   return (
@@ -101,45 +121,62 @@ export function UploadDocumentDialog({
       open={open} 
       onOpenChange={onOpenChange}
       title="رفع مستند جديد"
-      description="قم بإدخال بيانات المستند واختر الملف"
+      description="قم بإدخال بيانات المستند واختر الملف للرفع إلى الأرشيف"
       size="md"
     >
-
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="file"
-              render={({ field: { onChange, value, ...field } }) => (
-                <FormItem>
-                  <FormLabel>الملف *</FormLabel>
-                  <FormControl>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="file"
+            render={({ field: { onChange, value, ...field } }) => (
+              <FormItem>
+                <FormLabel>الملف *</FormLabel>
+                <FormControl>
+                  <div className="space-y-2">
                     <Input
                       type="file"
                       accept=".pdf,.png,.jpg,.jpeg,.doc,.docx"
-                      onChange={(e) => onChange(e.target.files)}
+                      onChange={(e) => {
+                        onChange(e.target.files);
+                        handleFileChange(e.target.files);
+                      }}
                       {...field}
+                      className="cursor-pointer"
                     />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    {selectedFile && (
+                      <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
+                        <FileText className="h-5 w-5 text-primary" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">{selectedFile.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {formatFileSize(selectedFile.size)}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>اسم المستند *</FormLabel>
-                  <FormControl>
-                    <Input placeholder="مثال: عقد إيجار - مبنى النخيل" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>اسم المستند *</FormLabel>
+                <FormControl>
+                  <Input placeholder="مثال: عقد إيجار - مبنى النخيل" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FormField
               control={form.control}
               name="category"
@@ -153,10 +190,11 @@ export function UploadDocumentDialog({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="عقود الإيجار">عقود الإيجار</SelectItem>
-                      <SelectItem value="مستندات المستفيدين">مستندات المستفيدين</SelectItem>
-                      <SelectItem value="سندات القبض والصرف">سندات القبض والصرف</SelectItem>
-                      <SelectItem value="التقارير المالية">التقارير المالية</SelectItem>
+                      {DOCUMENT_CATEGORIES.map((cat) => (
+                        <SelectItem key={cat.value} value={cat.value}>
+                          {cat.label}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -166,35 +204,85 @@ export function UploadDocumentDialog({
 
             <FormField
               control={form.control}
-              name="description"
+              name="folder_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>الوصف</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="أضف وصفاً للمستند (اختياري)"
-                      className="resize-none"
-                      rows={3}
-                      {...field}
-                    />
-                  </FormControl>
+                  <FormLabel>المجلد</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="اختر المجلد (اختياري)" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="">بدون مجلد</SelectItem>
+                      {folders?.map((folder) => (
+                        <SelectItem key={folder.id} value={folder.id}>
+                          {folder.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
             />
+          </div>
 
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-              >
-                إلغاء
-              </Button>
-              <Button type="submit">رفع المستند</Button>
-            </DialogFooter>
-          </form>
-        </Form>
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>الوصف</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="أضف وصفاً للمستند (اختياري)"
+                    className="resize-none"
+                    rows={3}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {isUploading && (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                جاري رفع المستند...
+              </div>
+              <Progress value={undefined} className="h-2" />
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={isUploading}
+            >
+              إلغاء
+            </Button>
+            <Button type="submit" disabled={isUploading}>
+              {isUploading ? (
+                <>
+                  <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                  جاري الرفع...
+                </>
+              ) : (
+                <>
+                  <Upload className="ml-2 h-4 w-4" />
+                  رفع المستند
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </form>
+      </Form>
     </ResponsiveDialog>
   );
 }
