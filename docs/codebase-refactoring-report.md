@@ -310,23 +310,58 @@ src/lib/utils/
 |-----------|--------|---------|
 | `useArchivistDashboard` | `ArchivistDashboard.tsx` | إحصائيات الأرشيف والمستندات الأخيرة |
 | `useContactForm` | `Contact.tsx` | إرسال رسائل التواصل والإشعارات |
-| `useUsersManagement` | `Users.tsx` | حذف/تحديث أدوار المستخدمين |
+| `useUsersManagement` | `Users.tsx` | جلب/حذف/تحديث أدوار المستخدمين |
 
 **الملفات الجديدة:**
 ```
 src/hooks/
 ├── useArchivistDashboard.ts   # 110 سطر
 ├── useContactForm.ts          # 90 سطر
-└── useUsersManagement.ts      # 145 سطر
+└── useUsersManagement.ts      # 220 سطر (موسّع)
+```
+
+**محتوى useUsersManagement.ts:**
+```typescript
+// Hooks متعددة للإدارة
+export function useUsersQuery()        // جلب قائمة المستخدمين مع أدوارهم
+export function useDeleteUser()        // حذف مستخدم
+export function useUpdateUserRoles()   // تحديث أدوار المستخدم
+export function useUpdateUserStatus()  // تفعيل/تعطيل المستخدم
+export function useResetUserPassword() // إعادة تعيين كلمة المرور
+
+// Hook موحد
+export function useUsersManagement()   // يجمع كل الوظائف
 ```
 
 **الفوائد:**
-- فصل المنطق عن UI
-- إعادة استخدام الكود
-- سهولة الاختبار
-- صيانة أفضل
+- ✅ فصل المنطق عن UI
+- ✅ إعادة استخدام الكود
+- ✅ سهولة الاختبار
+- ✅ صيانة أفضل
 
-### 5.3 تحديث barrel exports
+### 5.3 تحديث صفحة Users.tsx
+
+**قبل:**
+- استيراد مباشر لـ `supabase`, `useQuery`, `useMutation`
+- تعريف mutations داخل الـ component
+- 613 سطر
+
+**بعد:**
+- استيراد `useUsersManagement` hook
+- استخدام الـ hooks المُعدّة مسبقاً
+- ~483 سطر (تقليل 130 سطر)
+
+**التغييرات:**
+```typescript
+// قبل
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+
+// بعد
+import { useUsersManagement, type UserProfile } from "@/hooks/useUsersManagement";
+```
+
+### 5.4 تحديث barrel exports
 
 **الملف:** `src/hooks/index.ts`
 
@@ -335,8 +370,49 @@ src/hooks/
 // Phase 6: Codebase Audit Improvements
 export { useArchivistDashboard, useArchivistStats, useRecentDocuments } from './useArchivistDashboard';
 export { useContactForm } from './useContactForm';
-export { useUsersManagement, useDeleteUser, useUpdateUserRoles, useUpdateUserStatus } from './useUsersManagement';
+export { 
+  useUsersManagement, 
+  useUsersQuery,
+  useDeleteUser, 
+  useUpdateUserRoles, 
+  useUpdateUserStatus,
+  useResetUserPassword,
+  type UserProfile 
+} from './useUsersManagement';
 ```
+
+### 5.5 تحديث الاختبارات
+
+**الملف:** `src/__tests__/unit/auth-context.test.ts`
+
+**التغيير:**
+```typescript
+// تصحيح توقع الصلاحيات
+expect(beneficiaryPermissions).toContain('view_own_payments');
+// بدلاً من 'submit_requests' (غير موجودة)
+```
+
+---
+
+## ✅ ملخص المرحلة الأولى (مكتملة 100%)
+
+| العنصر | الحالة | الوصف |
+|--------|--------|-------|
+| نقل ROLE_PERMISSIONS | ✅ | إلى `src/config/permissions.ts` |
+| توحيد useAuth | ✅ | يُصدّر من AuthContext و hooks/useAuth.ts |
+| useArchivistDashboard | ✅ | hook كامل مع sub-hooks |
+| useContactForm | ✅ | hook لإرسال رسائل التواصل |
+| useUsersManagement | ✅ | hook موسّع مع 6 وظائف |
+| تحديث Users.tsx | ✅ | استخدام hooks بدلاً من Supabase مباشر |
+| تحديث الاختبارات | ✅ | تصحيح توقعات الصلاحيات |
+| تحديث barrel exports | ✅ | جميع الـ exports مُضافة |
+
+### الاختبارات المنفذة
+
+1. ✅ Console logs - لا توجد أخطاء
+2. ✅ Network requests - تعمل بشكل صحيح
+3. ✅ Build - يُبنى بدون أخطاء
+4. ✅ TypeScript - لا توجد أخطاء أنواع
 
 ---
 

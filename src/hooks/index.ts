@@ -42,4 +42,12 @@ export { useBiometricAuth } from './useBiometricAuth';
 // Phase 6: Codebase Audit Improvements
 export { useArchivistDashboard, useArchivistStats, useRecentDocuments } from './useArchivistDashboard';
 export { useContactForm } from './useContactForm';
-export { useUsersManagement, useDeleteUser, useUpdateUserRoles, useUpdateUserStatus } from './useUsersManagement';
+export { 
+  useUsersManagement, 
+  useUsersQuery,
+  useDeleteUser, 
+  useUpdateUserRoles, 
+  useUpdateUserStatus,
+  useResetUserPassword,
+  type UserProfile 
+} from './useUsersManagement';
