@@ -1,11 +1,9 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Archive, FolderOpen, FileText, Upload, Search, Clock, Mail } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
@@ -14,6 +12,7 @@ import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
 import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 import { SectionSkeleton } from "@/components/dashboard";
 import { AdminSendMessageDialog } from "@/components/messages/AdminSendMessageDialog";
+import { useArchivistDashboard } from "@/hooks/useArchivistDashboard";
 
 export default function ArchivistDashboard() {
   const navigate = useNavigate();
@@ -21,71 +20,11 @@ export default function ArchivistDashboard() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
 
-  // Fetch archive statistics
-  const { data: stats, isLoading: statsLoading } = useQuery({
-    queryKey: ["archivist-stats"],
-    queryFn: async () => {
-      const today = new Date().toISOString().split('T')[0];
-
-      const [foldersRes, documentsRes, allDocsRes] = await Promise.all([
-        supabase.from('folders').select('*', { count: 'exact', head: true }),
-        supabase.from('documents').select('*', { count: 'exact', head: true }),
-        supabase.from('documents').select('uploaded_at, file_size')
-      ]);
-
-      const todayUploads = allDocsRes.data?.filter((doc) => 
-        doc.uploaded_at?.startsWith(today)
-      ).length || 0;
-
-      // حساب المساحة من file_size (نص مثل "1.5 MB")
-      let totalMB = 0;
-      allDocsRes.data?.forEach((doc) => {
-        if (doc.file_size) {
-          const match = doc.file_size.match(/(\d+\.?\d*)/);
-          if (match) {
-            totalMB += parseFloat(match[1]);
-          }
-        }
-      });
-
-      return {
-        totalFolders: foldersRes.count || 0,
-        totalDocuments: documentsRes.count || 0,
-        todayUploads,
-        totalSize: `${totalMB.toFixed(1)} MB`
-      };
-    },
-    staleTime: 60 * 1000,
-    refetchInterval: false, // تعطيل التحديث التلقائي لتحسين LCP
-    refetchOnWindowFocus: false,
-  });
-
-  // Fetch recent documents with filters
-  const { data: recentDocuments = [], isLoading: docsLoading } = useQuery({
-    queryKey: ["recent-documents", selectedCategory, searchTerm],
-    queryFn: async () => {
-      let query = supabase
-        .from('documents')
-        .select('*, folders(name)')
-        .order('uploaded_at', { ascending: false })
-        .limit(10);
-
-      if (selectedCategory !== 'all') {
-        query = query.eq('category', selectedCategory);
-      }
-
-      if (searchTerm) {
-        query = query.ilike('name', `%${searchTerm}%`);
-      }
-
-      const { data, error } = await query;
-      if (error) throw error;
-      return data || [];
-    },
-    staleTime: 60 * 1000,
-    refetchInterval: false, // تعطيل التحديث التلقائي لتحسين LCP
-    refetchOnWindowFocus: false,
-  });
+  // استخدام hook موحد لبيانات لوحة التحكم
+  const { stats, statsLoading, recentDocuments, docsLoading } = useArchivistDashboard(
+    selectedCategory,
+    searchTerm
+  );
 
   return (
     <UnifiedDashboardLayout

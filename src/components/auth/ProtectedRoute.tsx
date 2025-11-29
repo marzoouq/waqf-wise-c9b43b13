@@ -1,26 +1,14 @@
 import { Navigate } from 'react-router-dom';
-import { useAuth, ROLE_PERMISSIONS } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole, AppRole } from '@/hooks/useUserRole';
 import { Loader2 } from 'lucide-react';
+import { checkPermission, type Permission } from '@/config/permissions';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredPermission?: string;
+  requiredPermission?: Permission;
   requiredRole?: AppRole;
   requiredRoles?: AppRole[];
-}
-
-/**
- * التحقق من صلاحية معينة بناءً على الأدوار
- */
-function checkPermission(permission: string, roles: AppRole[]): boolean {
-  for (const role of roles) {
-    const permissions = ROLE_PERMISSIONS[role] || [];
-    if (permissions.includes(permission) || permissions.includes('view_all_data')) {
-      return true;
-    }
-  }
-  return false;
 }
 
 export function ProtectedRoute({ children, requiredPermission, requiredRole, requiredRoles }: ProtectedRouteProps) {
