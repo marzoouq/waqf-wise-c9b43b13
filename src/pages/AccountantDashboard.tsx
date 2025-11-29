@@ -197,20 +197,16 @@ const AccountantDashboard = () => {
           </TabsContent>
 
         <TabsContent value="entries" className="space-y-4">
-          <Suspense fallback={<SectionSkeleton />}>
-            <RecentJournalEntries />
-          </Suspense>
-        </TabsContent>
-
-        {/* Quick Actions - Inside Stats Tab */}
-        <TabsContent value="stats" className="space-y-3 sm:space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>الإحصائيات المحاسبية</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5 text-primary" />
+                آخر القيود المحاسبية
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <Suspense fallback={<SectionSkeleton />}>
-                <AccountingStats />
+                <RecentJournalEntries />
               </Suspense>
             </CardContent>
           </Card>
