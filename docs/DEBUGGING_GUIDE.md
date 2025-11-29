@@ -346,9 +346,13 @@ location.reload();
 
 ## 📚 مراجع إضافية
 
+- [دليل التطوير الآمن](./SAFE_DEVELOPMENT_GUIDE.md) - المنهجية الآمنة للتحديثات
+- [تقرير إعادة الهيكلة](./codebase-refactoring-report.md) - جميع مراحل التطوير
+- [تقرير تحسين الأداء](./performance-optimization-report.md) - مؤشرات الأداء
 - [دليل Lovable للتصحيح](https://docs.lovable.dev/tips-tricks/troubleshooting)
 - [React DevTools](https://react.dev/learn/react-developer-tools)
 - [Chrome DevTools](https://developer.chrome.com/docs/devtools/)
+- [Web Vitals](https://web.dev/vitals/)
 
 ---
 
