@@ -416,6 +416,120 @@ expect(beneficiaryPermissions).toContain('view_own_payments');
 
 ---
 
+## ✅ المرحلة الثانية: توسيع طبقة Services (مكتملة 100%)
+
+**تاريخ التنفيذ:** 2025-11-29
+
+### الهدف
+توسيع طبقة Services لتشمل جميع الدومينات الرئيسية في التطبيق.
+
+### الوضع قبل التحسين
+
+```
+src/services/
+├── index.ts
+├── notification.service.ts
+├── report.service.ts
+├── request.service.ts
+└── voucher.service.ts
+```
+
+**4 services فقط** - تغطية محدودة
+
+### الوضع بعد التحسين
+
+```
+src/services/
+├── index.ts                    # Barrel exports موحد
+├── notification.service.ts     # ✅ موجود مسبقاً
+├── report.service.ts           # ✅ موجود مسبقاً
+├── request.service.ts          # ✅ موجود مسبقاً
+├── voucher.service.ts          # ✅ موجود مسبقاً
+├── beneficiary.service.ts      # ✨ جديد - 270 سطر
+├── property.service.ts         # ✨ جديد - 215 سطر
+├── distribution.service.ts     # ✨ جديد - 230 سطر
+└── accounting.service.ts       # ✨ جديد - 280 سطر
+```
+
+**8 services** - تغطية شاملة
+
+### Services الجديدة
+
+#### 1. BeneficiaryService
+```typescript
+// الوظائف المتوفرة
+static async getAll(filters?)           // جلب مع الفلاتر والـ pagination
+static async getById(id)                // جلب واحد
+static async getByNationalId(id)        // جلب بالهوية
+static async create(beneficiary)        // إضافة
+static async update(id, updates)        // تحديث
+static async delete(id)                 // حذف
+static async updateStatus(id, status)   // تغيير الحالة
+static async verify(id, verifiedBy)     // التحقق
+static async getStats()                 // الإحصائيات
+static async getFamilyMembers(id)       // أفراد العائلة
+static async advancedSearch(params)     // بحث متقدم
+```
+
+#### 2. PropertyService
+```typescript
+static async getAll(filters?)           // جلب العقارات
+static async getById(id)                // جلب واحد
+static async create(property)           // إضافة
+static async update(id, updates)        // تحديث
+static async delete(id)                 // حذف
+static async getStats()                 // إحصائيات
+static async updateOccupancy(id, occupied)  // تحديث الإشغال
+static async getByType(type)            // جلب حسب النوع
+static async getVacant()                // العقارات الشاغرة
+static calculateExpectedRevenue(props)  // حساب الإيراد المتوقع
+```
+
+#### 3. DistributionService
+```typescript
+static async getAll(status?)            // جلب التوزيعات
+static async getById(id)                // جلب واحد
+static async create(distribution)       // إنشاء
+static async update(id, updates)        // تحديث
+static async delete(id)                 // حذف (مسودات فقط)
+static async approve(id, approvedBy)    // موافقة
+static async reject(id, reason)         // رفض
+static async getSummary()               // ملخص
+static simulate(params)                 // محاكاة توزيع
+static async getByBeneficiary(id)       // توزيعات مستفيد
+```
+
+#### 4. AccountingService
+```typescript
+static async getJournalEntries(filters?) // جلب القيود
+static async getJournalEntryById(id)     // جلب قيد واحد
+static async createJournalEntry(entry, lines)  // إنشاء قيد
+static async postJournalEntry(id, postedBy)    // ترحيل
+static async cancelJournalEntry(id)      // إلغاء
+static async getChartOfAccounts()        // شجرة الحسابات
+static async getAccountById(id)          // جلب حساب
+static async getFinancialSummary()       // ملخص مالي
+```
+
+### الفوائد المحققة
+
+| الفائدة | الوصف |
+|---------|-------|
+| **فصل المنطق** | Business Logic منفصل عن UI |
+| **إعادة الاستخدام** | يمكن استخدام Services من أي hook أو component |
+| **قابلية الاختبار** | سهولة كتابة Unit Tests للـ Services |
+| **Type Safety** | استخدام أنواع من Database Schema |
+| **صيانة أفضل** | كل دومين في ملف منفصل |
+
+### الاختبارات المنفذة
+
+1. ✅ البناء ناجح - لا أخطاء TypeScript
+2. ✅ Console logs - لا أخطاء
+3. ✅ Barrel exports تعمل
+4. ✅ Type inference صحيح
+
+---
+
 ## ⚠️ المرحلة 3: ملاحظات مجلد Types
 
 ### التكرار المكتشف
