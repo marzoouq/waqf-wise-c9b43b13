@@ -6,21 +6,19 @@ export function LandingFooter() {
 
   const links = {
     platform: [
-      { label: "المميزات", href: "#features" },
-      { label: "كيف يعمل", href: "#how-it-works" },
-      { label: "الأسعار", href: "#" },
-      { label: "الأسئلة الشائعة", href: "#" },
+      { label: "المميزات", href: "#features", isAnchor: true },
+      { label: "كيف يعمل", href: "#how-it-works", isAnchor: true },
+      { label: "الأسئلة الشائعة", href: "/faq", isAnchor: false },
     ],
     support: [
-      { label: "مركز المساعدة", href: "#" },
-      { label: "التوثيق", href: "#" },
-      { label: "تواصل معنا", href: "#" },
-      { label: "الدعم الفني", href: "#" },
+      { label: "مركز المساعدة", href: "/faq", isAnchor: false },
+      { label: "تواصل معنا", href: "/contact", isAnchor: false },
+      { label: "الدعم الفني", href: "/contact", isAnchor: false },
     ],
     legal: [
-      { label: "سياسة الخصوصية", href: "#" },
-      { label: "شروط الاستخدام", href: "#" },
-      { label: "سياسة الأمان", href: "#" },
+      { label: "سياسة الخصوصية", href: "/privacy", isAnchor: false },
+      { label: "شروط الاستخدام", href: "/terms", isAnchor: false },
+      { label: "سياسة الأمان", href: "/security-policy", isAnchor: false },
     ],
   };
 
@@ -75,12 +73,21 @@ export function LandingFooter() {
             <ul className="space-y-3">
               {links.platform.map((link) => (
                 <li key={link.label}>
-                  <a
-                    href={link.href}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {link.label}
-                  </a>
+                  {link.isAnchor ? (
+                    <a
+                      href={link.href}
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {link.label}
+                    </a>
+                  ) : (
+                    <Link
+                      to={link.href}
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -92,12 +99,21 @@ export function LandingFooter() {
             <ul className="space-y-3">
               {links.support.map((link) => (
                 <li key={link.label}>
-                  <a
-                    href={link.href}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {link.label}
-                  </a>
+                  {link.isAnchor ? (
+                    <a
+                      href={link.href}
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {link.label}
+                    </a>
+                  ) : (
+                    <Link
+                      to={link.href}
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -109,12 +125,21 @@ export function LandingFooter() {
             <ul className="space-y-3">
               {links.legal.map((link) => (
                 <li key={link.label}>
-                  <a
-                    href={link.href}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {link.label}
-                  </a>
+                  {link.isAnchor ? (
+                    <a
+                      href={link.href}
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {link.label}
+                    </a>
+                  ) : (
+                    <Link
+                      to={link.href}
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
