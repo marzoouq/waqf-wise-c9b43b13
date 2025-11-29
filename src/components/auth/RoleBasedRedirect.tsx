@@ -1,7 +1,8 @@
 import { Navigate } from 'react-router-dom';
-import { useUserRole, AppRole } from '@/hooks/useUserRole';
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
+
+export type AppRole = "nazer" | "admin" | "accountant" | "cashier" | "archivist" | "beneficiary" | "user";
 
 /**
  * خريطة التوجيه حسب الدور
@@ -52,16 +53,17 @@ export function getDashboardForRoles(roles: AppRole[]): string {
  * يستخدم بعد تسجيل الدخول للتوجيه المباشر إلى لوحة التحكم المناسبة
  */
 export function RoleBasedRedirect() {
-  const { user, isLoading: authLoading } = useAuth();
-  const { roles, isLoading: rolesLoading } = useUserRole();
+  const { user, isLoading: authLoading, roles, rolesLoading } = useAuth();
 
-  // إظهار مؤشر التحميل أثناء جلب البيانات
-  if (authLoading || rolesLoading) {
+  // إظهار مؤشر التحميل فقط عند التحميل الفعلي
+  const isLoading = authLoading || (!!user && rolesLoading);
+  
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center space-y-4">
           <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
-          <p className="text-muted-foreground text-sm">جاري التحقق من الصلاحيات...</p>
+          <p className="text-muted-foreground text-sm">جاري التحميل...</p>
         </div>
       </div>
     );
@@ -73,7 +75,7 @@ export function RoleBasedRedirect() {
   }
 
   // الحصول على المسار المناسب
-  const targetDashboard = getDashboardForRoles(roles);
+  const targetDashboard = getDashboardForRoles(roles as AppRole[]);
   
   return <Navigate to={targetDashboard} replace />;
 }

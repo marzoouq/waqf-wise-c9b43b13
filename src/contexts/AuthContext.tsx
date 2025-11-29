@@ -10,12 +10,15 @@ interface AuthContextType {
   user: User | null;
   profile: Profile | null;
   isLoading: boolean;
+  roles: string[];
+  rolesLoading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, fullName: string) => Promise<void>;
   signOut: () => Promise<void>;
   hasPermission: (permission: string) => Promise<boolean>;
   isRole: (roleName: string) => Promise<boolean>;
   checkPermissionSync: (permission: string, userRoles: string[]) => boolean;
+  hasRole: (role: string) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -24,13 +27,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [roles, setRoles] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [rolesLoading, setRolesLoading] = useState(true);
   const { toast } = useToast();
   const initRef = useRef(false);
   const rolesCache = useRef<string[]>([]);
 
   // جلب أدوار المستخدم من قاعدة البيانات
   const fetchUserRoles = useCallback(async (userId: string): Promise<string[]> => {
+    setRolesLoading(true);
     try {
       const { data, error } = await supabase
         .from('user_roles')
@@ -39,14 +45,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (error) {
         productionLogger.error('Error fetching user roles', error);
+        setRolesLoading(false);
         return [];
       }
 
-      const roles = (data || []).map(r => r.role);
-      rolesCache.current = roles;
-      return roles;
+      const fetchedRoles = (data || []).map(r => r.role);
+      rolesCache.current = fetchedRoles;
+      setRoles(fetchedRoles);
+      setRolesLoading(false);
+      return fetchedRoles;
     } catch (err) {
       productionLogger.error('Exception fetching user roles', err);
+      setRolesLoading(false);
       return [];
     }
   }, []);
@@ -67,11 +77,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
       setSession(null);
       setProfile(null);
+      setRoles([]);
       rolesCache.current = [];
+      setRolesLoading(false);
     } catch (err) {
       productionLogger.error('Error cleaning up invalid session', err);
     }
   }, []);
+
+  // جلب البيانات بشكل متوازي
+  const fetchUserData = useCallback(async (userId: string) => {
+    // جلب profile و roles بشكل متوازي
+    await Promise.all([
+      fetchProfile(userId),
+      fetchUserRoles(userId)
+    ]);
+  }, [fetchUserRoles]);
 
   useEffect(() => {
     // Prevent double initialization
@@ -85,8 +106,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(null);
         setSession(null);
         setProfile(null);
+        setRoles([]);
         rolesCache.current = [];
         setIsLoading(false);
+        setRolesLoading(false);
         return;
       }
 
@@ -95,6 +118,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         productionLogger.warn('Token refresh failed, cleaning up session');
         cleanupInvalidSession();
         setIsLoading(false);
+        setRolesLoading(false);
         return;
       }
 
@@ -102,15 +126,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(newSession?.user ?? null);
       
       if (newSession?.user) {
-        // استخدام setTimeout لتجنب deadlock
+        // استخدام setTimeout لتجنب deadlock - جلب البيانات بشكل متوازي
         setTimeout(() => {
-          fetchProfile(newSession.user.id);
-          fetchUserRoles(newSession.user.id);
+          fetchUserData(newSession.user.id);
         }, 0);
       } else {
         setProfile(null);
+        setRoles([]);
         rolesCache.current = [];
         setIsLoading(false);
+        setRolesLoading(false);
       }
     });
 
@@ -134,10 +159,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(currentSession?.user ?? null);
       
       if (currentSession?.user) {
-        fetchProfile(currentSession.user.id);
-        fetchUserRoles(currentSession.user.id);
+        // جلب البيانات بشكل متوازي
+        fetchUserData(currentSession.user.id);
       } else {
         setIsLoading(false);
+        setRolesLoading(false);
       }
     }).catch((err) => {
       // معالجة أخطاء غير متوقعة
@@ -150,7 +176,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       subscription.unsubscribe();
       initRef.current = false;
     };
-  }, [fetchUserRoles, cleanupInvalidSession]);
+  }, [fetchUserData, cleanupInvalidSession]);
 
   const fetchProfile = async (userId: string) => {
     try {
@@ -295,7 +321,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
       setSession(null);
       setProfile(null);
+      setRoles([]);
       rolesCache.current = [];
+      setRolesLoading(false);
       
       toast({
         title: "تم تسجيل الخروج",
@@ -313,9 +341,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
       setSession(null);
       setProfile(null);
+      setRoles([]);
       rolesCache.current = [];
+      setRolesLoading(false);
       throw error;
     }
+  };
+
+  /**
+   * التحقق من دور معين - sync version
+   */
+  const hasRole = (role: string): boolean => {
+    return roles.includes(role);
   };
 
   /**
@@ -364,12 +401,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     user,
     profile,
     isLoading,
+    roles,
+    rolesLoading,
     signIn,
     signUp,
     signOut,
     hasPermission,
     isRole,
     checkPermissionSync,
+    hasRole,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
