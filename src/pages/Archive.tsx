@@ -72,7 +72,7 @@ const Archive = () => {
   const handlePreviewDocument = (doc: Document) => {
     const documentForPreview = {
       ...doc,
-      file_path: (doc as any).file_path || `/documents/${doc.id}`,
+      file_path: doc.file_path || `/documents/${doc.id}`,
     };
     setSelectedDocument(documentForPreview);
     setPreviewDialogOpen(true);
@@ -87,7 +87,7 @@ const Archive = () => {
     if (documentToDelete) {
       await deleteDocumentWithFile({
         id: documentToDelete.id,
-        storagePath: (documentToDelete as any).storage_path,
+        storagePath: documentToDelete.file_path,
       });
       setDeleteDialogOpen(false);
       setDocumentToDelete(null);
@@ -95,7 +95,7 @@ const Archive = () => {
   };
 
   const handleDownloadDocument = async (doc: Document) => {
-    const filePath = (doc as any).file_path;
+    const filePath = doc.file_path;
     if (filePath) {
       window.open(filePath, '_blank');
     }
