@@ -1,11 +1,7 @@
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { Shield, Search, Plus, Trash2, UserCog, History } from "lucide-react";
@@ -33,17 +29,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { AppRole } from "@/hooks/useUserRole";
-
-interface UserWithRoles {
-  id: string;
-  user_id: string;
-  email: string;
-  full_name: string;
-  avatar_url: string | null;
-  roles: AppRole[];
-  roles_array: AppRole[];
-  roles_count: number;
-}
+import { useRolesManagement } from "@/hooks/useRolesManagement";
 
 const ROLE_LABELS: Record<AppRole, string> = {
   admin: "المشرف",
@@ -66,115 +52,26 @@ const ROLE_COLORS: Record<AppRole, string> = {
 };
 
 const RolesManagement = () => {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [roleFilter, setRoleFilter] = useState<string>("all");
-  const [addRoleDialogOpen, setAddRoleDialogOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<UserWithRoles | null>(null);
-  const [newRole, setNewRole] = useState<AppRole>("user");
-  const [auditDialogOpen, setAuditDialogOpen] = useState(false);
-
-  // جلب المستخدمين مع أدوارهم من الـ cache الآمن
-  const { data: users = [], isLoading } = useQuery({
-    queryKey: ["users-profiles-cache"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("users_profiles_cache")
-        .select("*")
-        .order("user_created_at", { ascending: false });
-        
-      if (error) throw error;
-      return (data || []).map(u => ({
-        id: u.user_id,
-        user_id: u.user_id,
-        full_name: u.full_name || u.email || '',
-        email: u.email || '',
-        avatar_url: '',
-        roles: Array.isArray(u.roles) ? u.roles : [],
-        roles_array: Array.isArray(u.roles) ? u.roles : [],
-        roles_count: Array.isArray(u.roles) ? u.roles.length : 0,
-      })) as UserWithRoles[];
-    },
-    staleTime: 30 * 1000,
-  });
-
-  // جلب سجل الأدوار
-  const { data: auditLogs = [] } = useQuery({
-    queryKey: ["user-roles-audit"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("user_roles_audit")
-        .select("*")
-        .order("changed_at", { ascending: false })
-        .limit(50);
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  // إضافة دور
-  const addRoleMutation = useMutation({
-    mutationFn: async ({ userId, role }: { userId: string; role: AppRole }) => {
-      const { error } = await supabase
-        .from("user_roles")
-        .insert({ user_id: userId, role });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["users-with-roles"] });
-      queryClient.invalidateQueries({ queryKey: ["user-roles-audit"] });
-      toast({
-        title: "تمت الإضافة",
-        description: "تم إضافة الدور بنجاح",
-      });
-      setAddRoleDialogOpen(false);
-      setSelectedUser(null);
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "خطأ",
-        description: error.message || "فشلت إضافة الدور",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // حذف دور
-  const removeRoleMutation = useMutation({
-    mutationFn: async ({ userId, role }: { userId: string; role: AppRole }) => {
-      const { error } = await supabase
-        .from("user_roles")
-        .delete()
-        .eq("user_id", userId)
-        .eq("role", role);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["users-with-roles"] });
-      queryClient.invalidateQueries({ queryKey: ["user-roles-audit"] });
-      toast({
-        title: "تم الحذف",
-        description: "تم حذف الدور بنجاح",
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "خطأ",
-        description: error.message || "فشل حذف الدور",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const filteredUsers = users.filter((user) => {
-    const matchesSearch =
-      user.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesRole =
-      roleFilter === "all" || user.roles_array?.includes(roleFilter as AppRole);
-    return matchesSearch && matchesRole;
-  });
+  const {
+    filteredUsers,
+    auditLogs,
+    searchQuery,
+    setSearchQuery,
+    roleFilter,
+    setRoleFilter,
+    addRoleDialogOpen,
+    selectedUser,
+    newRole,
+    setNewRole,
+    openAddRoleDialog,
+    closeAddRoleDialog,
+    auditDialogOpen,
+    setAuditDialogOpen,
+    isLoading,
+    isAddingRole,
+    addRole,
+    removeRole,
+  } = useRolesManagement();
 
   return (
     <PageErrorBoundary pageName="إدارة الأدوار">
@@ -211,10 +108,7 @@ const RolesManagement = () => {
                   ))}
                 </SelectContent>
               </Select>
-              <Button
-                variant="outline"
-                onClick={() => setAuditDialogOpen(true)}
-              >
+              <Button variant="outline" onClick={() => setAuditDialogOpen(true)}>
                 <History className="h-4 w-4 ml-2" />
                 سجل التغييرات
               </Button>
@@ -283,10 +177,7 @@ const RolesManagement = () => {
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => {
-                                setSelectedUser(user);
-                                setAddRoleDialogOpen(true);
-                              }}
+                              onClick={() => openAddRoleDialog(user)}
                             >
                               <Plus className="h-4 w-4" />
                             </Button>
@@ -302,7 +193,7 @@ const RolesManagement = () => {
         </Card>
 
         {/* Dialog إضافة دور */}
-        <Dialog open={addRoleDialogOpen} onOpenChange={setAddRoleDialogOpen}>
+        <Dialog open={addRoleDialogOpen} onOpenChange={(open) => !open && closeAddRoleDialog()}>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>إضافة دور جديد</DialogTitle>
@@ -320,22 +211,13 @@ const RolesManagement = () => {
                 <div className="mt-2 flex flex-wrap gap-2">
                   {selectedUser?.roles_array && selectedUser.roles_array.length > 0 ? (
                     selectedUser.roles_array.map((role) => (
-                      <Badge
-                        key={role}
-                        className={ROLE_COLORS[role]}
-                        variant="outline"
-                      >
+                      <Badge key={role} className={ROLE_COLORS[role]} variant="outline">
                         {ROLE_LABELS[role]}
                         <Button
                           size="sm"
                           variant="ghost"
                           className="h-4 w-4 p-0 mr-2 hover:bg-transparent"
-                          onClick={() =>
-                            removeRoleMutation.mutate({
-                              userId: selectedUser.id,
-                              role,
-                            })
-                          }
+                          onClick={() => removeRole(selectedUser.id, role)}
                         >
                           <Trash2 className="h-3 w-3" />
                         </Button>
@@ -365,20 +247,10 @@ const RolesManagement = () => {
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setAddRoleDialogOpen(false)}>
+              <Button variant="outline" onClick={closeAddRoleDialog}>
                 إلغاء
               </Button>
-              <Button
-                onClick={() => {
-                  if (selectedUser) {
-                    addRoleMutation.mutate({
-                      userId: selectedUser.id,
-                      role: newRole,
-                    });
-                  }
-                }}
-                disabled={addRoleMutation.isPending}
-              >
+              <Button onClick={addRole} disabled={isAddingRole}>
                 إضافة
               </Button>
             </DialogFooter>
@@ -393,10 +265,7 @@ const RolesManagement = () => {
             </DialogHeader>
             <div className="space-y-3">
               {auditLogs.map((log) => (
-                <div
-                  key={log.id}
-                  className="p-4 border rounded-lg flex items-start gap-3"
-                >
+                <div key={log.id} className="p-4 border rounded-lg flex items-start gap-3">
                   <div
                     className={`h-8 w-8 rounded-full flex items-center justify-center ${
                       log.action === "added" ? "bg-success/10" : "bg-destructive/10"

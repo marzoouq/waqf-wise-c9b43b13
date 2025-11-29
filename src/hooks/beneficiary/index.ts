@@ -13,3 +13,5 @@ export { useBeneficiariesFilters } from '../useBeneficiariesFilters';
 export { useFamilies } from '../useFamilies';
 export { useTribes } from '../useTribes';
 export { useEligibilityAssessment } from '../useEligibilityAssessment';
+export { useWaqfSummary } from '../useWaqfSummary';
+export { useMyBeneficiaryRequests } from '../useMyBeneficiaryRequests';

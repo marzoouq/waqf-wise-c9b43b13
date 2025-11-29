@@ -46,6 +46,8 @@ export { useBeneficiariesFilters } from './useBeneficiariesFilters';
 export { useFamilies } from './useFamilies';
 export { useTribes } from './useTribes';
 export { useEligibilityAssessment } from './useEligibilityAssessment';
+export { useWaqfSummary } from './useWaqfSummary';
+export { useMyBeneficiaryRequests } from './useMyBeneficiaryRequests';
 
 // ==================== Accounting ====================
 export { useJournalEntries } from './useJournalEntries';
@@ -165,6 +167,9 @@ export { useProfile } from './useProfile';
 export { useAlertCleanup } from './useAlertCleanup';
 export { useSelfHealing } from './useSelfHealing';
 export { useQueryPrefetch } from './useQueryPrefetch';
+export { useSystemMonitoring } from './useSystemMonitoring';
+export { usePermissionsManagement } from './usePermissionsManagement';
+export { useRolesManagement } from './useRolesManagement';
 
 // ==================== Governance ====================
 export { useGovernanceDecisions } from './useGovernanceDecisions';

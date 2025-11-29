@@ -1,38 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Building2, TrendingUp, Users, Landmark, DollarSign } from "lucide-react";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { MaskedValue } from "@/components/shared/MaskedValue";
+import { useWaqfSummary } from "@/hooks/useWaqfSummary";
 
 export function WaqfSummaryTab() {
   const { settings } = useVisibilitySettings();
-
-  const { data: summary } = useQuery({
-    queryKey: ["waqf-summary"],
-    queryFn: async () => {
-      const [propertiesResult, fundsResult, beneficiariesResult, bankResult] = await Promise.all([
-        supabase.from("properties").select("*", { count: "exact" }),
-        supabase.from("funds").select("allocated_amount"),
-        supabase.from("beneficiaries").select("*", { count: "exact" }).eq("status", "نشط"),
-        supabase.from("bank_accounts").select("current_balance"),
-      ]);
-
-      const totalPropertyValue = propertiesResult.data?.reduce((sum, p) => sum + (p.monthly_revenue || 0) * 12, 0) || 0;
-      const totalFunds = fundsResult.data?.reduce((sum, f) => sum + (f.allocated_amount || 0), 0) || 0;
-      const totalBankBalance = bankResult.data?.reduce((sum, b) => sum + b.current_balance, 0) || 0;
-
-      return {
-        propertiesCount: propertiesResult.count || 0,
-        totalPropertyValue,
-        totalFunds,
-        beneficiariesCount: beneficiariesResult.count || 0,
-        totalBankBalance,
-        totalWaqfValue: totalPropertyValue + totalBankBalance,
-      };
-    },
-    enabled: settings?.show_overview || false,
-  });
+  const { summary } = useWaqfSummary(settings?.show_overview || false);
 
   if (!settings?.show_overview) {
     return (
