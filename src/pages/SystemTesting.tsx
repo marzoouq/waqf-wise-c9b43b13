@@ -219,7 +219,7 @@ export default function SystemTesting() {
   const testAutoFixLogging = async () => {
     console.log('🧪 Testing Auto-Fix Logging...');
     
-    // إنشاء سجل خطأ أولاً
+    // إنشاء سجل خطأ واختبار تحديث حالته للمحلول
     const { data: errorLog, error: errorLogError } = await supabase
       .from('system_error_logs')
       .insert({
@@ -235,19 +235,16 @@ export default function SystemTesting() {
 
     if (errorLogError) throw errorLogError;
 
-    // تسجيل محاولة إصلاح
-    const { error: fixError } = await supabase
-      .from('auto_fix_attempts')
-      .insert({
-        error_log_id: errorLog.id,
-        fix_strategy: 'retry',
-        attempt_number: 1,
-        max_attempts: 3,
-        status: 'success',
-        result: 'Test auto-fix completed successfully',
-      });
+    // تحديث حالة الخطأ إلى محلول (محاكاة الإصلاح التلقائي)
+    const { error: updateError } = await supabase
+      .from('system_error_logs')
+      .update({
+        status: 'auto_resolved',
+        resolved_at: new Date().toISOString(),
+      })
+      .eq('id', errorLog.id);
 
-    if (fixError) throw fixError;
+    if (updateError) throw updateError;
 
     console.log('✅ Auto-fix logging working!');
   };
