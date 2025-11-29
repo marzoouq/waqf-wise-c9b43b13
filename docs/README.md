@@ -155,6 +155,33 @@ window.waqfDebug.reconnectDB()    // إعادة الاتصال
 
 ---
 
+## 📚 التوثيق الكامل
+
+### الأدلة الرئيسية
+| الملف | الوصف |
+|-------|-------|
+| [user-guide.md](./user-guide.md) | دليل المستخدم الشامل |
+| [DEPLOYMENT.md](./DEPLOYMENT.md) | دليل النشر |
+| [SAFE_DEVELOPMENT_GUIDE.md](./SAFE_DEVELOPMENT_GUIDE.md) | دليل التطوير الآمن |
+| [DEBUGGING_GUIDE.md](./DEBUGGING_GUIDE.md) | دليل التصحيح |
+| [INTEGRATIONS_GUIDE.md](./INTEGRATIONS_GUIDE.md) | دليل التكاملات |
+
+### التقارير الفنية
+| الملف | الوصف |
+|-------|-------|
+| [codebase-refactoring-report.md](./codebase-refactoring-report.md) | تقرير الهيكلة والإصلاحات |
+| [performance-optimization-report.md](./performance-optimization-report.md) | تقرير الأداء |
+| [CLEANUP_LOG.md](./CLEANUP_LOG.md) | سجل التنظيف |
+
+### تقارير الاختبار
+| الملف | الوصف |
+|-------|-------|
+| [testing/README.md](./testing/README.md) | فهرس الاختبارات |
+| [testing/beneficiary-portal.md](./testing/beneficiary-portal.md) | اختبار بوابة المستفيدين |
+| [testing/dashboards.md](./testing/dashboards.md) | اختبار لوحات التحكم |
+
+---
+
 ## 📞 الدعم
 
 - البريد: support@waqf.sa
