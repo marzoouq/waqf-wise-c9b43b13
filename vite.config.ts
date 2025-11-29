@@ -72,10 +72,7 @@ export default defineConfig(({ mode }) => {
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/zsacuvrcohmraoldilph\.supabase\.co\/functions\/v1\/log-error$/i,
-            handler: 'NetworkOnly',
-            options: {
-              networkTimeoutSeconds: 15
-            }
+            handler: 'NetworkOnly'
           },
           {
             urlPattern: /^https:\/\/zsacuvrcohmraoldilph\.supabase\.co\/rest\/.*/i,
