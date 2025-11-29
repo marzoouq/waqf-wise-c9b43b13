@@ -11320,6 +11320,15 @@ export type Database = {
       }
       is_staff: { Args: never; Returns: boolean }
       is_staff_only: { Args: never; Returns: boolean }
+      log_access_attempt: {
+        Args: {
+          p_action: string
+          p_details?: Json
+          p_success: boolean
+          p_table_name: string
+        }
+        Returns: undefined
+      }
       log_audit_event: {
         Args: {
           p_action_type: string
