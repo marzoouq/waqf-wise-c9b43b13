@@ -8,7 +8,7 @@ import type { Database } from '@/integrations/supabase/types';
 export type ReportTemplate = Database['public']['Tables']['report_templates']['Row'];
 export type ReportTemplateInsert = Database['public']['Tables']['report_templates']['Insert'];
 export type KPIDefinition = Database['public']['Tables']['kpi_definitions']['Row'];
-export type ScheduledReport = Database['public']['Tables']['scheduled_reports']['Row'];
+export type ScheduledReport = Database['public']['Tables']['scheduled_report_jobs']['Row'];
 
 // Dashboard types (new tables)
 export interface Dashboard {
