@@ -108,6 +108,14 @@ const DeveloperTools = lazyWithRetry(() => import("./pages/DeveloperTools"));
 const ProjectDocumentation = lazyWithRetry(() => import("./pages/ProjectDocumentation"));
 const NotFound = lazyWithRetry(() => import("./pages/NotFound"));
 
+// Public pages - Legal & Info
+const PrivacyPolicy = lazyWithRetry(() => import("./pages/PrivacyPolicy"));
+const TermsOfUse = lazyWithRetry(() => import("./pages/TermsOfUse"));
+const SecurityPolicyPage = lazyWithRetry(() => import("./pages/SecurityPolicy"));
+const FAQ = lazyWithRetry(() => import("./pages/FAQ"));
+const Contact = lazyWithRetry(() => import("./pages/Contact"));
+const LandingPageSettings = lazyWithRetry(() => import("./pages/LandingPageSettings"));
+
 // Configure QueryClient with optimized defaults and error handling
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -171,6 +179,13 @@ const App = () => {
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/install" element={<Install />} />
                 <Route path="/unauthorized" element={<Unauthorized />} />
+                
+                {/* صفحات قانونية ومعلوماتية */}
+                <Route path="/privacy" element={<PrivacyPolicy />} />
+                <Route path="/terms" element={<TermsOfUse />} />
+                <Route path="/security-policy" element={<SecurityPolicyPage />} />
+                <Route path="/faq" element={<FAQ />} />
+                <Route path="/contact" element={<Contact />} />
                 
                 {/* صفحة التوجيه الذكي - تحدد لوحة التحكم حسب الدور */}
                 <Route path="/redirect" element={<RoleBasedRedirect />} />
@@ -399,7 +414,15 @@ const App = () => {
             {/* صفحة DesignPreview محذوفة للإنتاج */}
             <Route path="/transparency-settings" element={<TransparencySettings />} />
           <Route 
-            path="/settings/roles" 
+            path="/settings/landing-page" 
+            element={
+              <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+                <LandingPageSettings />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/settings/roles"
             element={
               <ProtectedRoute requiredRoles={["admin", "nazer"]}>
                 <RolesManagement />
