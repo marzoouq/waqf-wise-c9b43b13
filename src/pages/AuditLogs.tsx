@@ -25,7 +25,7 @@ import { ar } from "date-fns/locale";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-import { cleanFilters } from '@/utils/cleanFilters';
+import { cleanFilters } from '@/lib/utils/cleanFilters';
 
 const AuditLogs = () => {
   const [filters, setFilters] = useState({

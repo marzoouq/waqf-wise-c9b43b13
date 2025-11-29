@@ -29,7 +29,7 @@ import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import type { SupportFilters } from '@/types/support';
 import { Database } from '@/integrations/supabase/types';
-import { cleanFilters } from '@/utils/cleanFilters';
+import { cleanFilters } from '@/lib/utils/cleanFilters';
 
 type SupportTicket = Database['public']['Tables']['support_tickets']['Row'];
 
