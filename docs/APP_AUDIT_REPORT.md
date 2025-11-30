@@ -2,6 +2,65 @@
 ## App Comprehensive Audit Report
 
 **تاريخ الفحص:** 2025-11-30
+**آخر تحديث:** 2025-11-30
+
+---
+
+## 0. إصلاحات التحديث المباشر (Live Update Fixes) - جديد
+
+### المشاكل المكتشفة:
+- ❌ `refetchOnWindowFocus: false` في App.tsx - يمنع التحديث عند العودة للنافذة
+- ❌ `refetchOnMount: false` في App.tsx - يمنع التحديث عند mount
+- ❌ استخدام `window.location.href` للتنقل الداخلي - يسبب إعادة تحميل كاملة
+- ❌ استخدام `<a href>` بدلاً من `<Link>` - يسبب إعادة تحميل الصفحة
+
+### الإصلاحات المطبقة:
+
+#### 1. تعديل QueryClient في App.tsx:
+```typescript
+// قبل
+refetchOnWindowFocus: false,
+refetchOnMount: false,
+staleTime: 5 * 60 * 1000,
+
+// بعد ✅
+refetchOnWindowFocus: true,
+refetchOnMount: true,
+staleTime: 2 * 60 * 1000, // تقليل للتحديث الأسرع
+```
+
+#### 2. إصلاح التنقل في NotificationsCenter.tsx:
+```typescript
+// قبل
+window.location.href = notification.action_url;
+
+// بعد ✅
+navigate(notification.action_url);
+```
+
+#### 3. إصلاح التنقل في AccountantDashboard.tsx:
+```typescript
+// قبل
+onClick={() => window.location.href = '/accounting'}
+
+// بعد ✅
+onClick={() => navigate('/accounting')}
+```
+
+#### 4. إصلاح الروابط في SystemMonitoring.tsx:
+```typescript
+// قبل
+<a href="/system-errors">سجل الأخطاء</a>
+
+// بعد ✅
+<Link to="/system-errors">سجل الأخطاء</Link>
+```
+
+### الملفات المُعدّلة:
+- `src/App.tsx` - تفعيل التحديث التلقائي
+- `src/components/beneficiary/NotificationsCenter.tsx` - useNavigate
+- `src/pages/AccountantDashboard.tsx` - useNavigate
+- `src/pages/SystemMonitoring.tsx` - Link component
 
 ---
 
@@ -154,6 +213,7 @@ docs/
 
 | المجال | الحالة | النسبة |
 |--------|-------|--------|
+| التحديث المباشر | ✅ مكتمل | 100% |
 | إدارة الجلسات | ✅ مكتمل | 100% |
 | واجهة الجوال | ✅ مكتمل | 100% |
 | تحسين الأداء | ✅ مكتمل | 95% |

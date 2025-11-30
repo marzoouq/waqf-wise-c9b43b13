@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Bell, Check, X, AlertCircle, Info, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,6 +15,7 @@ import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 
 export function NotificationsCenter() {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
 
@@ -93,7 +95,8 @@ export function NotificationsCenter() {
                       markAsRead(notification.id);
                     }
                     if (notification.action_url) {
-                      window.location.href = notification.action_url;
+                      setOpen(false);
+                      navigate(notification.action_url);
                     }
                   }}
                 >
@@ -133,7 +136,7 @@ export function NotificationsCenter() {
                 className="w-full"
                 onClick={() => {
                   setOpen(false);
-                  window.location.href = "/notifications";
+                  navigate("/notifications");
                 }}
               >
                 عرض جميع الإشعارات

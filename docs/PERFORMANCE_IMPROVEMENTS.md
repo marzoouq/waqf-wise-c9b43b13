@@ -1,16 +1,73 @@
 # تحسينات الأداء - Performance Improvements
 
 ## تاريخ التحديث: 2025-11-30
+## آخر تحديث: 2025-11-30
 
 ---
 
 ## ملخص التحسينات
 
-تم إجراء تحسينات شاملة على أداء التطبيق خاصة على واجهة الجوال والتنقل وإدارة الجلسات.
+تم إجراء تحسينات شاملة على أداء التطبيق خاصة على واجهة الجوال والتنقل وإدارة الجلسات والتحديث المباشر.
 
 ---
 
-## 0. إدارة الجلسات (Session Management) - جديد
+## 0. إصلاح التحديث المباشر (Live Updates Fix) - جديد
+
+### المشكلة الرئيسية:
+التطبيق لم يكن يتحدث تلقائياً بسبب إعدادات QueryClient التالية:
+- `refetchOnWindowFocus: false` - منع التحديث عند العودة للنافذة
+- `refetchOnMount: false` - منع التحديث عند تحميل المكون
+- `staleTime: 5 minutes` - وقت طويل قبل اعتبار البيانات قديمة
+
+### الملفات المُعدّلة:
+
+#### 1. src/App.tsx - QueryClient Configuration
+```typescript
+// قبل ❌
+refetchOnWindowFocus: false,
+refetchOnMount: false,
+staleTime: 5 * 60 * 1000, // 5 دقائق
+
+// بعد ✅
+refetchOnWindowFocus: true,  // تفعيل التحديث عند العودة للنافذة
+refetchOnMount: true,        // تفعيل التحديث عند mount
+staleTime: 2 * 60 * 1000,   // 2 دقائق - أسرع
+```
+
+#### 2. استبدال window.location.href بـ useNavigate
+**المشكلة:** استخدام `window.location.href` يسبب إعادة تحميل كامل للتطبيق
+
+**الملفات المُصلحة:**
+- `src/components/beneficiary/NotificationsCenter.tsx`
+- `src/pages/AccountantDashboard.tsx`
+
+```typescript
+// قبل ❌
+window.location.href = '/accounting';
+
+// بعد ✅
+const navigate = useNavigate();
+navigate('/accounting');
+```
+
+#### 3. استبدال <a href> بـ <Link>
+**الملفات المُصلحة:**
+- `src/pages/SystemMonitoring.tsx`
+
+```typescript
+// قبل ❌
+<a href="/system-errors">سجل الأخطاء</a>
+
+// بعد ✅
+<Link to="/system-errors">سجل الأخطاء</Link>
+```
+
+### ملاحظة:
+مكونات ErrorBoundary تستخدم `window.location.href` وهذا صحيح لأنها تحتاج إعادة تحميل كاملة في حالة الأخطاء.
+
+---
+
+## 1. إدارة الجلسات (Session Management)
 
 ### الملفات: 
 - `src/hooks/useSessionCleanup.ts` (جديد)
