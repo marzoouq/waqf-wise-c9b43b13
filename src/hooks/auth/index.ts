@@ -10,3 +10,4 @@ export { useLeakedPassword } from '../useLeakedPassword';
 export { useIdleTimeout } from '../useIdleTimeout';
 export { usePermissions } from '../usePermissions';
 export { useUserRole } from '../useUserRole';
+export { useSessionCleanup, cleanupSession, checkPendingCleanup } from '../useSessionCleanup';

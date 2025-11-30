@@ -1,0 +1,143 @@
+/**
+ * Hook لمسح الجلسة عند إغلاق التطبيق
+ * يمنع تعارض الجلسات عند دخول مستخدم آخر
+ */
+
+import { useEffect, useCallback, useRef } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { productionLogger } from '@/lib/logger/production-logger';
+
+const SESSION_CLEANUP_KEY = 'waqf_session_cleanup_pending';
+const LAST_ACTIVE_KEY = 'waqf_last_active_timestamp';
+
+/**
+ * تنظيف كامل للجلسة والبيانات المؤقتة
+ */
+export const cleanupSession = async (options?: { keepTheme?: boolean }) => {
+  const keysToKeep = options?.keepTheme ? [
+    'theme',
+    'vite-ui-theme',
+    'language',
+  ] : [];
+
+  // حفظ القيم التي نريد الاحتفاظ بها
+  const savedValues: Record<string, string> = {};
+  keysToKeep.forEach(key => {
+    const value = localStorage.getItem(key);
+    if (value) savedValues[key] = value;
+  });
+
+  // تنظيف localStorage
+  const keysToRemove: string[] = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && !keysToKeep.includes(key)) {
+      keysToRemove.push(key);
+    }
+  }
+  keysToRemove.forEach(key => localStorage.removeItem(key));
+
+  // تنظيف sessionStorage
+  sessionStorage.clear();
+
+  // استعادة القيم المحفوظة
+  Object.entries(savedValues).forEach(([key, value]) => {
+    localStorage.setItem(key, value);
+  });
+
+  // تسجيل الخروج من Supabase
+  try {
+    await supabase.auth.signOut({ scope: 'local' });
+  } catch (err) {
+    productionLogger.warn('Session cleanup signOut error', { error: err });
+  }
+};
+
+/**
+ * التحقق من وجود تنظيف معلق من جلسة سابقة
+ */
+export const checkPendingCleanup = async () => {
+  const pendingCleanup = localStorage.getItem(SESSION_CLEANUP_KEY);
+  if (pendingCleanup === 'true') {
+    localStorage.removeItem(SESSION_CLEANUP_KEY);
+    await cleanupSession({ keepTheme: true });
+    return true;
+  }
+  return false;
+};
+
+/**
+ * Hook لإدارة تنظيف الجلسة
+ */
+export function useSessionCleanup() {
+  const cleanupTriggered = useRef(false);
+
+  // تحديث وقت آخر نشاط
+  const updateLastActive = useCallback(() => {
+    localStorage.setItem(LAST_ACTIVE_KEY, Date.now().toString());
+  }, []);
+
+  // معالج إغلاق الصفحة
+  const handleBeforeUnload = useCallback(() => {
+    // تعيين علامة للتنظيف في الجلسة القادمة
+    localStorage.setItem(SESSION_CLEANUP_KEY, 'true');
+    updateLastActive();
+  }, [updateLastActive]);
+
+  // معالج تغيير حالة الرؤية
+  const handleVisibilityChange = useCallback(() => {
+    if (document.visibilityState === 'hidden') {
+      updateLastActive();
+    }
+  }, [updateLastActive]);
+
+  // معالج pagehide للأجهزة المحمولة
+  const handlePageHide = useCallback((event: PageTransitionEvent) => {
+    if (event.persisted) {
+      // الصفحة في bfcache، لا نفعل شيء
+      return;
+    }
+    // تعيين علامة للتنظيف
+    localStorage.setItem(SESSION_CLEANUP_KEY, 'true');
+  }, []);
+
+  useEffect(() => {
+    // التحقق من وجود تنظيف معلق عند بدء التطبيق
+    const init = async () => {
+      const hadPendingCleanup = await checkPendingCleanup();
+      if (hadPendingCleanup) {
+        productionLogger.info('Cleaned up pending session from previous visit');
+      }
+    };
+    
+    init();
+
+    // إضافة المستمعين
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('pagehide', handlePageHide);
+
+    // تحديث وقت آخر نشاط
+    updateLastActive();
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('pagehide', handlePageHide);
+    };
+  }, [handleBeforeUnload, handleVisibilityChange, handlePageHide, updateLastActive]);
+
+  // دالة التنظيف اليدوي
+  const forceCleanup = useCallback(async () => {
+    if (cleanupTriggered.current) return;
+    cleanupTriggered.current = true;
+    
+    await cleanupSession({ keepTheme: true });
+    
+    cleanupTriggered.current = false;
+  }, []);
+
+  return { forceCleanup, updateLastActive };
+}
+
+export default useSessionCleanup;

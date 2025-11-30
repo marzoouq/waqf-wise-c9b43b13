@@ -1,3 +1,4 @@
+import { memo, useCallback } from "react";
 import { Search, Filter, Save, Shield, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,7 +26,7 @@ interface BeneficiariesSearchBarProps {
   onLoadSearch: (search: SavedSearch) => void;
 }
 
-export function BeneficiariesSearchBar({
+export const BeneficiariesSearchBar = memo(function BeneficiariesSearchBar({
   searchQuery,
   onSearchChange,
   onAdvancedSearchClick,
@@ -33,6 +34,10 @@ export function BeneficiariesSearchBar({
   savedSearches,
   onLoadSearch,
 }: BeneficiariesSearchBarProps) {
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    onSearchChange(e.target.value);
+  }, [onSearchChange]);
+
   return (
     <Card className="shadow-soft">
       <CardContent className="pt-3 sm:pt-6 p-3 sm:p-6">
@@ -42,7 +47,7 @@ export function BeneficiariesSearchBar({
             <Input
               placeholder="البحث (الاسم، رقم الهوية، العائلة...)"
               value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
+              onChange={handleSearchChange}
               className="pr-9 sm:pr-10 text-sm sm:text-base"
             />
           </div>
@@ -90,4 +95,4 @@ export function BeneficiariesSearchBar({
       </CardContent>
     </Card>
   );
-}
+});

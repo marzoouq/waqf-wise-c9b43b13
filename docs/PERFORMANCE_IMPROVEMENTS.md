@@ -6,7 +6,41 @@
 
 ## ملخص التحسينات
 
-تم إجراء تحسينات شاملة على أداء التطبيق خاصة على واجهة الجوال والتنقل.
+تم إجراء تحسينات شاملة على أداء التطبيق خاصة على واجهة الجوال والتنقل وإدارة الجلسات.
+
+---
+
+## 0. إدارة الجلسات (Session Management) - جديد
+
+### الملفات: 
+- `src/hooks/useSessionCleanup.ts` (جديد)
+- `src/components/auth/SessionManager.tsx` (جديد)
+
+**المشكلة:**
+- عدم مسح الجلسة عند إغلاق التطبيق
+- تعارض بيانات عند دخول مستفيد آخر
+
+**الحل:**
+```typescript
+// معالج إغلاق الصفحة
+const handleBeforeUnload = useCallback(() => {
+  localStorage.setItem(SESSION_CLEANUP_KEY, 'true');
+}, []);
+
+// التحقق من التنظيف المعلق عند بدء التطبيق
+const checkPendingCleanup = async () => {
+  const pendingCleanup = localStorage.getItem(SESSION_CLEANUP_KEY);
+  if (pendingCleanup === 'true') {
+    await cleanupSession({ keepTheme: true });
+  }
+};
+```
+
+**التحسينات:**
+- تنظيف تلقائي للجلسة عند إغلاق التطبيق
+- الاحتفاظ بإعدادات الثيم واللغة
+- معالج `pagehide` للأجهزة المحمولة
+- تتبع وقت آخر نشاط
 
 ---
 
