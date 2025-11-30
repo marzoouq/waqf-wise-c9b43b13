@@ -16,7 +16,7 @@ const navigationItems: NavigationItem[] = [
     id: 'home',
     label: 'الرئيسية',
     icon: Home,
-    path: '/',
+    path: '/redirect',
   },
   {
     id: 'beneficiaries',
