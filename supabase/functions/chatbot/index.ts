@@ -475,7 +475,7 @@ serve(async (req) => {
       return errorResponse('API Key not configured', 500);
     }
 
-    const aiResponse = await fetch('https://api.lovable.app/v1/ai/chat/completions', {
+    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
