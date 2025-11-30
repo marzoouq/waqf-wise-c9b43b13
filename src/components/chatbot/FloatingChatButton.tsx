@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, memo } from "react";
 import { Bot, X, Maximize2, Minimize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -6,12 +6,14 @@ import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { ChatbotInterface } from "./ChatbotInterface";
 import { cn } from "@/lib/utils";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useIsMobile } from "@/hooks/use-mobile";
 
-export function FloatingChatButton() {
+export const FloatingChatButton = memo(function FloatingChatButton() {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   // إخفاء الزر في صفحات معينة
   const hiddenPaths = [
@@ -33,37 +35,40 @@ export function FloatingChatButton() {
 
   return (
     <>
-      {/* الزر العائم المحسّن */}
+      {/* الزر العائم - بدون حركات ثقيلة على الجوال */}
       <Button
         onClick={() => setIsOpen(true)}
         className={cn(
-          "fixed bottom-6 left-6 h-16 w-16 rounded-full shadow-2xl z-50",
-          "bg-gradient-to-br from-primary via-primary/90 to-primary/80",
-          "hover:scale-110 hover:rotate-12 transition-all duration-300",
-          "border-4 border-primary-foreground/30",
-          "ring-4 ring-primary/20 ring-offset-2",
-          "group animate-bounce hover:animate-none"
+          "fixed z-50 rounded-full shadow-xl",
+          "bg-gradient-to-br from-primary to-primary/80",
+          "border-2 border-primary-foreground/20",
+          // موقع مختلف للجوال لتجنب التداخل مع شريط التنقل
+          isMobile 
+            ? "bottom-20 left-4 h-12 w-12" 
+            : "bottom-6 left-6 h-14 w-14 hover:scale-105 transition-transform",
         )}
         size="icon"
         aria-label="فتح المساعد الذكي"
         title="المساعد الذكي"
       >
-        <Bot className="h-7 w-7 group-hover:animate-pulse text-primary-foreground" />
-        <span className="absolute -top-2 -right-2 flex h-4 w-4">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success/60 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-4 w-4 bg-success border-2 border-white dark:border-black shadow-lg"></span>
-        </span>
-        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary to-primary/50 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-300" />
+        <Bot className={cn(
+          "text-primary-foreground",
+          isMobile ? "h-5 w-5" : "h-6 w-6"
+        )} />
+        {/* مؤشر أخضر صغير بدون حركة */}
+        <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-success border-2 border-background" />
       </Button>
 
       {/* نافذة الشات */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent
           className={cn(
-            "transition-all duration-300 p-0 gap-0",
-            isExpanded
-              ? "max-w-7xl h-[95vh]"
-              : "max-w-4xl h-[85vh]"
+            "p-0 gap-0",
+            isMobile 
+              ? "max-w-full h-[90vh] mx-2" 
+              : isExpanded
+                ? "max-w-7xl h-[95vh]"
+                : "max-w-4xl h-[85vh]"
           )}
         >
           <VisuallyHidden>
@@ -91,19 +96,21 @@ export function FloatingChatButton() {
                 <Maximize2 className="h-4 w-4" />
               </Button>
               
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsExpanded(!isExpanded)}
-                className="h-8 w-8"
-                title={isExpanded ? "تصغير" : "توسيع"}
-              >
-                {isExpanded ? (
-                  <Minimize2 className="h-4 w-4" />
-                ) : (
-                  <Maximize2 className="h-4 w-4" />
-                )}
-              </Button>
+              {!isMobile && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="h-8 w-8"
+                  title={isExpanded ? "تصغير" : "توسيع"}
+                >
+                  {isExpanded ? (
+                    <Minimize2 className="h-4 w-4" />
+                  ) : (
+                    <Maximize2 className="h-4 w-4" />
+                  )}
+                </Button>
+              )}
               
               <Button
                 variant="ghost"
@@ -124,4 +131,4 @@ export function FloatingChatButton() {
       </Dialog>
     </>
   );
-}
+});
