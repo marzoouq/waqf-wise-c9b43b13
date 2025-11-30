@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -257,9 +258,9 @@ export default function SystemMonitoring() {
               <CardContent>
                 <p className="text-center text-muted-foreground">
                   راجع صفحة{" "}
-                  <a href="/system-errors" className="text-primary underline">
+                  <Link to="/system-errors" className="text-primary underline hover:text-primary/80 transition-colors">
                     سجل الأخطاء
-                  </a>{" "}
+                  </Link>{" "}
                   للتفاصيل الكاملة
                 </p>
               </CardContent>

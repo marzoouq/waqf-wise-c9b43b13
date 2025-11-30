@@ -54,15 +54,15 @@ const ReactQueryDevtools =
       )
     : null;
 
-// Configure QueryClient
+// Configure QueryClient - تحسين التحديث المباشر
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000,
+      staleTime: 2 * 60 * 1000, // 2 دقائق بدلاً من 5 للتحديث الأسرع
       gcTime: 10 * 60 * 1000,
-      refetchOnWindowFocus: false,
+      refetchOnWindowFocus: true, // ✅ تفعيل التحديث عند العودة للنافذة
       refetchOnReconnect: true,
-      refetchOnMount: false,
+      refetchOnMount: true, // ✅ تفعيل التحديث عند mount
       structuralSharing: true,
       networkMode: 'online',
       retry: (failureCount, error: unknown) => {

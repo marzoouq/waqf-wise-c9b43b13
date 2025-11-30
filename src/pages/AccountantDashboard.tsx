@@ -1,4 +1,5 @@
 import { useState, lazy, Suspense } from "react";
+import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,6 +21,7 @@ const AccountingStats = lazy(() => import("@/components/dashboard/AccountingStat
 const RecentJournalEntries = lazy(() => import("@/components/dashboard/RecentJournalEntries"));
 
 const AccountantDashboard = () => {
+  const navigate = useNavigate();
   const [selectedApproval, setSelectedApproval] = useState<JournalApproval | null>(null);
   const [isApprovalDialogOpen, setIsApprovalDialogOpen] = useState(false);
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
@@ -221,7 +223,7 @@ const AccountantDashboard = () => {
                 <Button 
                   variant="outline" 
                   className="w-full text-xs sm:text-sm"
-                  onClick={() => window.location.href = '/accounting'}
+                  onClick={() => navigate('/accounting')}
                 >
                   <FileText className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
                   قيد جديد
@@ -229,7 +231,7 @@ const AccountantDashboard = () => {
                 <Button 
                   variant="outline" 
                   className="w-full text-xs sm:text-sm"
-                  onClick={() => window.location.href = '/reports'}
+                  onClick={() => navigate('/reports')}
                 >
                   <FileCheck className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
                   التقارير
@@ -237,7 +239,7 @@ const AccountantDashboard = () => {
                 <Button 
                   variant="outline" 
                   className="w-full text-xs sm:text-sm"
-                  onClick={() => window.location.href = '/approvals'}
+                  onClick={() => navigate('/approvals')}
                 >
                   <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
                   الموافقات
@@ -245,7 +247,7 @@ const AccountantDashboard = () => {
                 <Button 
                   variant="outline" 
                   className="w-full text-xs sm:text-sm"
-                  onClick={() => window.location.href = '/accounting'}
+                  onClick={() => navigate('/accounting')}
                 >
                   <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
                   الحسابات
