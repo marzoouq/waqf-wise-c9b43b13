@@ -1,5 +1,6 @@
+import { memo, useMemo } from 'react';
 import { Home, Users, FileText, Bell, MoreHorizontal } from 'lucide-react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 
@@ -8,6 +9,7 @@ interface NavigationItem {
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   path: string;
+  matchPaths?: string[]; // مسارات إضافية للتطابق
   badge?: number;
 }
 
@@ -17,6 +19,7 @@ const navigationItems: NavigationItem[] = [
     label: 'الرئيسية',
     icon: Home,
     path: '/redirect',
+    matchPaths: ['/dashboard', '/nazer-dashboard', '/admin-dashboard', '/accountant-dashboard', '/beneficiary-dashboard'],
   },
   {
     id: 'beneficiaries',
@@ -45,69 +48,78 @@ const navigationItems: NavigationItem[] = [
 ];
 
 /**
- * شريط التنقل السفلي للجوال
- * يظهر فقط على الشاشات الصغيرة (< 768px)
+ * شريط التنقل السفلي للجوال - محسّن للأداء
  */
-export function BottomNavigation() {
+export const BottomNavigation = memo(function BottomNavigation() {
+  const location = useLocation();
+
+  // تحديد العنصر النشط
+  const isItemActive = useMemo(() => {
+    return (item: NavigationItem) => {
+      if (location.pathname === item.path) return true;
+      if (item.matchPaths?.some(p => location.pathname.startsWith(p))) return true;
+      return false;
+    };
+  }, [location.pathname]);
+
   return (
     <nav 
       className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-background border-t border-border shadow-lg"
       style={{
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
       }}
+      role="navigation"
+      aria-label="التنقل السفلي"
     >
       <div className="flex items-center justify-around h-16 max-w-screen-xl mx-auto">
-        {navigationItems.map((item) => (
-          <NavLink
-            key={item.id}
-            to={item.path}
-            end={item.path === '/'}
-            className={({ isActive }) =>
-              cn(
+        {navigationItems.map((item) => {
+          const isActive = isItemActive(item);
+          return (
+            <NavLink
+              key={item.id}
+              to={item.path}
+              className={cn(
                 "flex flex-col items-center justify-center flex-1 h-full relative",
-                "transition-all duration-200 active:scale-95",
-                "min-w-[60px] px-1",
+                "transition-colors duration-150",
+                "min-w-[60px] px-1 touch-manipulation",
                 isActive
                   ? "text-primary"
-                  : "text-muted-foreground hover:text-foreground"
-              )
-            }
-          >
-            {({ isActive }) => (
-              <>
-                {/* Active indicator */}
-                {isActive && (
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-primary rounded-full" />
+                  : "text-muted-foreground active:text-foreground"
+              )}
+              aria-current={isActive ? "page" : undefined}
+            >
+              {/* Active indicator */}
+              {isActive && (
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-primary rounded-full" />
+              )}
+              
+              <div className="relative">
+                <item.icon className={cn(
+                  "h-5 w-5",
+                  isActive && "scale-110"
+                )} />
+                
+                {/* Badge for notifications/requests */}
+                {item.badge && item.badge > 0 && (
+                  <Badge
+                    variant="destructive"
+                    className="absolute -top-2 -right-2 h-4 min-w-[16px] px-1 text-[10px] flex items-center justify-center rounded-full"
+                  >
+                    {item.badge > 9 ? '9+' : item.badge}
+                  </Badge>
                 )}
-                
-                <div className="relative">
-                  <item.icon className={cn(
-                    "h-5 w-5 transition-transform duration-200",
-                    isActive && "scale-110"
-                  )} />
-                  
-                  {/* Badge for notifications/requests */}
-                  {item.badge && item.badge > 0 && (
-                    <Badge
-                      variant="destructive"
-                      className="absolute -top-2 -right-2 h-4 min-w-[16px] px-1 text-[10px] flex items-center justify-center rounded-full"
-                    >
-                      {item.badge > 9 ? '9+' : item.badge}
-                    </Badge>
-                  )}
-                </div>
-                
-                <span className={cn(
-                  "text-[10px] mt-1 font-medium transition-all duration-200",
-                  isActive && "font-bold"
-                )}>
-                  {item.label}
-                </span>
-              </>
-            )}
-          </NavLink>
-        ))}
+              </div>
+              
+              <span className={cn(
+                "text-[10px] mt-1",
+                isActive ? "font-bold" : "font-medium"
+              )}>
+                {item.label}
+              </span>
+            </NavLink>
+          );
+        })}
       </div>
     </nav>
   );
-}
+});
