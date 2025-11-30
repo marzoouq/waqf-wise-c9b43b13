@@ -1,9 +1,10 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, memo } from 'react';
 import { Search, Filter, Clock, CheckCircle, XCircle, AlertCircle, GitBranch, MessageSquare, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useRequests } from '@/hooks/useRequests';
@@ -44,6 +45,7 @@ import { useTableSort } from '@/hooks/useTableSort';
 import { useBulkSelection } from '@/hooks/useBulkSelection';
 import { toast } from 'sonner';
 import { getRequestTypeName, getBeneficiaryName } from '@/types/request.types';
+import { RequestMobileCard } from '@/components/requests/RequestMobileCard';
 
 // Type for request data from the hook (with partial relations)
 interface RequestData {
@@ -62,6 +64,7 @@ interface RequestData {
 }
 
 const Requests = () => {
+  const isMobile = useIsMobile();
   const { requests, isLoading, deleteRequest } = useRequests();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -254,57 +257,57 @@ const Requests = () => {
         </Card>
 
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+          <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
               معلق
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-warning">{stats.pending}</div>
+          <CardContent className="p-3 sm:p-6 pt-0">
+            <div className="text-lg sm:text-xl md:text-2xl font-bold text-warning">{stats.pending}</div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+          <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
               قيد المعالجة
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-primary">{stats.inProgress}</div>
+          <CardContent className="p-3 sm:p-6 pt-0">
+            <div className="text-lg sm:text-xl md:text-2xl font-bold text-primary">{stats.inProgress}</div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+        <Card className="hidden sm:block">
+          <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
               موافق عليه
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-success">{stats.approved}</div>
+          <CardContent className="p-3 sm:p-6 pt-0">
+            <div className="text-lg sm:text-xl md:text-2xl font-bold text-success">{stats.approved}</div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+        <Card className="hidden md:block">
+          <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
               مرفوض
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-destructive">{stats.rejected}</div>
+          <CardContent className="p-3 sm:p-6 pt-0">
+            <div className="text-lg sm:text-xl md:text-2xl font-bold text-destructive">{stats.rejected}</div>
           </CardContent>
         </Card>
 
-        <Card className="border-destructive">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-destructive">
+        <Card className="border-destructive hidden md:block">
+          <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6">
+            <CardTitle className="text-xs sm:text-sm font-medium text-destructive">
               متأخر
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-destructive">{stats.overdue}</div>
+          <CardContent className="p-3 sm:p-6 pt-0">
+            <div className="text-lg sm:text-xl md:text-2xl font-bold text-destructive">{stats.overdue}</div>
           </CardContent>
         </Card>
       </div>
@@ -352,29 +355,84 @@ const Requests = () => {
         </CardContent>
       </Card>
 
-      {/* Requests Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>قائمة الطلبات</CardTitle>
-          <CardDescription>
-            عرض جميع الطلبات ({filteredRequests.length})
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+      {/* Requests - Mobile or Desktop */}
+      {isMobile ? (
+        // Mobile Card View
+        <div className="space-y-3">
+          <Card className="shadow-soft">
+            <CardHeader className="py-3 px-4">
+              <CardTitle className="text-base">قائمة الطلبات ({filteredRequests.length})</CardTitle>
+            </CardHeader>
+          </Card>
+          
           {paginatedRequests.length === 0 ? (
-            <EnhancedEmptyState
-              icon={AlertCircle}
-              title="لا توجد طلبات"
-              description={
-                searchQuery || statusFilter !== 'all'
-                  ? 'لا توجد نتائج مطابقة لبحثك. جرب تغيير معايير البحث أو الفلتر.'
-                  : 'لم يتم تقديم أي طلبات بعد. سيتم عرض الطلبات هنا عند تقديمها من المستفيدين.'
-              }
-            />
+            <Card className="shadow-soft">
+              <CardContent className="p-6 text-center text-muted-foreground">
+                {searchQuery || statusFilter !== 'all'
+                  ? 'لا توجد نتائج مطابقة لبحثك'
+                  : 'لا توجد طلبات حالياً'}
+              </CardContent>
+            </Card>
           ) : (
-            <div className="space-y-4">
-            <div className="rounded-md border overflow-x-auto">
-              <Table>
+            <>
+              <div className="space-y-2">
+                {paginatedRequests.map((request) => (
+                  <RequestMobileCard
+                    key={request.id}
+                    request={request}
+                    onViewDetails={(r) => {
+                      setSelectedRequest(r);
+                      setApprovalDialogOpen(true);
+                    }}
+                    onViewComments={(r) => {
+                      setSelectedRequest(r);
+                      setCommentsDialogOpen(true);
+                    }}
+                    onDelete={handleDeleteClick}
+                  />
+                ))}
+              </div>
+              
+              {totalPages > 1 && (
+                <Card className="shadow-soft mt-3">
+                  <CardContent className="p-3">
+                    <Pagination
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      totalItems={filteredRequests.length}
+                      itemsPerPage={itemsPerPage}
+                      onPageChange={setCurrentPage}
+                    />
+                  </CardContent>
+                </Card>
+              )}
+            </>
+          )}
+        </div>
+      ) : (
+        // Desktop Table View
+        <Card>
+          <CardHeader>
+            <CardTitle>قائمة الطلبات</CardTitle>
+            <CardDescription>
+              عرض جميع الطلبات ({filteredRequests.length})
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {paginatedRequests.length === 0 ? (
+              <EnhancedEmptyState
+                icon={AlertCircle}
+                title="لا توجد طلبات"
+                description={
+                  searchQuery || statusFilter !== 'all'
+                    ? 'لا توجد نتائج مطابقة لبحثك. جرب تغيير معايير البحث أو الفلتر.'
+                    : 'لم يتم تقديم أي طلبات بعد. سيتم عرض الطلبات هنا عند تقديمها من المستفيدين.'
+                }
+              />
+            ) : (
+              <div className="space-y-4">
+              <div className="rounded-md border overflow-x-auto">
+                <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-[50px]">
@@ -539,6 +597,7 @@ const Requests = () => {
           )}
         </CardContent>
       </Card>
+      )}
 
       {/* Request Approval Dialog */}
       {selectedRequest && (
