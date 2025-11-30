@@ -15,14 +15,16 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, memo, useCallback, useState } from "react";
 import { toast } from "sonner";
 import { RealtimeNotification, NotificationPayload } from "@/types/notifications";
 
-export const NotificationsBell = () => {
+export const NotificationsBell = memo(function NotificationsBell() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const [isOpen, setIsOpen] = useState(false);
+  
   const { 
     notifications, 
     isLoading, 
@@ -44,7 +46,6 @@ export const NotificationsBell = () => {
         table: 'notifications',
         filter: `user_id=eq.${user.id}`
       }, (payload: unknown) => {
-        // إظهار toast للإشعار الجديد
         const typedPayload = payload as NotificationPayload;
         const newNotification = typedPayload.new;
         toast.info(newNotification.title, {
@@ -68,14 +69,20 @@ export const NotificationsBell = () => {
     };
   }, [user?.id, queryClient]);
 
-  const handleNotificationClick = (notification: RealtimeNotification) => {
+  const handleNotificationClick = useCallback((notification: RealtimeNotification) => {
     if (notification.action_url) {
       navigate(notification.action_url);
+      setIsOpen(false);
     }
-  };
+  }, [navigate]);
+
+  const handleViewAll = useCallback(() => {
+    navigate("/notifications");
+    setIsOpen(false);
+  }, [navigate]);
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
         <Button 
           variant="ghost" 
@@ -94,19 +101,20 @@ export const NotificationsBell = () => {
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-96 p-0">
-        <div className="flex items-center justify-between p-4 border-b">
-          <h3 className="font-semibold">الإشعارات</h3>
+      <DropdownMenuContent align="end" className="w-80 sm:w-96 p-0">
+        <div className="flex items-center justify-between p-3 sm:p-4 border-b">
+          <h3 className="font-semibold text-sm sm:text-base">الإشعارات</h3>
           {unreadCount > 0 && (
             <Button
               variant="ghost"
               size="sm"
               onClick={() => markAllAsRead()}
               disabled={isMarkingAllAsRead}
-              className="h-8 text-xs"
+              className="h-7 sm:h-8 text-xs"
             >
-              <Check className="w-4 h-4 ml-1" />
-              تعليم الكل كمقروء
+              <Check className="w-3 h-3 sm:w-4 sm:h-4 ml-1" />
+              <span className="hidden sm:inline">تعليم الكل كمقروء</span>
+              <span className="sm:hidden">الكل مقروء</span>
             </Button>
           )}
         </div>
@@ -116,12 +124,12 @@ export const NotificationsBell = () => {
             <LoadingState message="جاري تحميل الإشعارات..." />
           </div>
         ) : notifications.length === 0 ? (
-          <div className="p-8 text-center text-muted-foreground">
-            <Bell className="w-12 h-12 mx-auto mb-2 opacity-50" />
-            <p>لا توجد إشعارات</p>
+          <div className="p-6 sm:p-8 text-center text-muted-foreground">
+            <Bell className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 opacity-50" />
+            <p className="text-sm">لا توجد إشعارات</p>
           </div>
         ) : (
-          <ScrollArea className="h-96">
+          <ScrollArea className="h-72 sm:h-96">
             {notifications.map((notification) => (
               <NotificationItem
                 key={notification.id}
@@ -139,8 +147,8 @@ export const NotificationsBell = () => {
             <div className="p-2">
               <Button
                 variant="ghost"
-                className="w-full"
-                onClick={() => navigate("/notifications")}
+                className="w-full text-sm"
+                onClick={handleViewAll}
               >
                 عرض جميع الإشعارات
               </Button>
@@ -150,4 +158,4 @@ export const NotificationsBell = () => {
       </DropdownMenuContent>
     </DropdownMenu>
   );
-};
+});
