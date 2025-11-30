@@ -50,9 +50,8 @@ export default function LandingPageSettings() {
       queryClient.invalidateQueries({ queryKey: ['landing-page-settings'] });
       toast.success('تم حفظ الإعدادات بنجاح');
     },
-    onError: (error) => {
+    onError: () => {
       toast.error('فشل حفظ الإعدادات');
-      console.error(error);
     }
   });
 

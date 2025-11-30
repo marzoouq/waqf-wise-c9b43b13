@@ -19,6 +19,7 @@ import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { RoleBasedRedirect } from "./components/auth/RoleBasedRedirect";
 import { GlobalMonitoring } from "./components/developer/GlobalMonitoring";
 import { IdleTimeoutManager } from "./components/auth/IdleTimeoutManager";
+import { SessionManager } from "./components/auth/SessionManager";
 import { useAlertCleanup } from "./hooks/useAlertCleanup";
 import { UpdateNotifier } from "./components/system/UpdateNotifier";
 import { LCPOptimizer } from "./components/performance/LCPOptimizer";
@@ -100,6 +101,7 @@ const App = () => {
                     v7_relativeSplatPath: true,
                   }}
                 >
+                  <SessionManager />
                   <IdleTimeoutManager />
                   <CriticalResourceLoader />
                   <LazyErrorBoundary>

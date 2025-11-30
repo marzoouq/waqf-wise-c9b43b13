@@ -29,8 +29,8 @@ export default function Contact() {
       await sendMessage(formData);
       setIsSubmitted(true);
       setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
-    } catch (error) {
-      console.error('Error sending message:', error);
+    } catch {
+      // Error handled silently
     }
   };
 

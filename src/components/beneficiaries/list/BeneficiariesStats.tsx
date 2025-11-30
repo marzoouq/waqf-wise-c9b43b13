@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Users, UserCheck, UserX, Home } from "lucide-react";
 import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
@@ -9,7 +10,7 @@ interface BeneficiariesStatsProps {
   families: number;
 }
 
-export function BeneficiariesStats({ total, active, suspended, families }: BeneficiariesStatsProps) {
+export const BeneficiariesStats = memo(function BeneficiariesStats({ total, active, suspended, families }: BeneficiariesStatsProps) {
   return (
     <UnifiedStatsGrid columns={{ sm: 2, md: 4 }}>
       <UnifiedKPICard
@@ -45,4 +46,4 @@ export function BeneficiariesStats({ total, active, suspended, families }: Benef
       />
     </UnifiedStatsGrid>
   );
-}
+});
