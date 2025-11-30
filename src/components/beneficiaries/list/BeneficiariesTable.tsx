@@ -1,6 +1,8 @@
+import { memo, useMemo } from "react";
 import { MoreVertical, Eye, Edit, FileText, Activity, Key, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,7 +11,10 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { UnifiedDataTable } from "@/components/unified/UnifiedDataTable";
+import { Pagination } from "@/components/ui/pagination";
 import { Beneficiary } from "@/types/beneficiary";
+import { BeneficiaryMobileCard } from "./BeneficiaryMobileCard";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface BeneficiariesTableProps {
   beneficiaries: Beneficiary[];
@@ -28,7 +33,7 @@ interface BeneficiariesTableProps {
   onDelete: (id: string) => void;
 }
 
-export function BeneficiariesTable({
+export const BeneficiariesTable = memo(function BeneficiariesTable({
   beneficiaries,
   isLoading,
   searchQuery,
@@ -44,9 +49,10 @@ export function BeneficiariesTable({
   onEnableLogin,
   onDelete,
 }: BeneficiariesTableProps) {
+  const isMobile = useIsMobile();
   
   // Define columns with responsive visibility
-  const columns = [
+  const columns = useMemo(() => [
     {
       key: "beneficiary_number",
       label: "رقم المستفيد",
@@ -129,9 +135,9 @@ export function BeneficiariesTable({
       hideOnTablet: true,
       render: () => <span className="font-semibold text-primary">-</span>
     }
-  ];
+  ], []);
 
-  // Actions dropdown for each row
+  // Actions dropdown for each row (desktop)
   const renderActions = (beneficiary: Beneficiary) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -174,6 +180,80 @@ export function BeneficiariesTable({
     </DropdownMenu>
   );
 
+  // Loading skeleton for mobile
+  if (isLoading && isMobile) {
+    return (
+      <div className="space-y-3">
+        {[...Array(5)].map((_, i) => (
+          <Card key={i} className="shadow-soft">
+            <CardContent className="p-3">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-full bg-muted animate-pulse" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 bg-muted rounded animate-pulse w-32" />
+                  <div className="h-3 bg-muted rounded animate-pulse w-24" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
+  // Mobile card view
+  if (isMobile) {
+    return (
+      <div className="space-y-3">
+        <Card className="shadow-soft">
+          <CardHeader className="py-3 px-4">
+            <CardTitle className="text-base">قائمة المستفيدين</CardTitle>
+          </CardHeader>
+        </Card>
+        
+        {beneficiaries.length === 0 ? (
+          <Card className="shadow-soft">
+            <CardContent className="p-6 text-center text-muted-foreground">
+              {searchQuery ? "لا توجد نتائج تطابق البحث" : "لا يوجد مستفيدين حالياً. قم بإضافة مستفيد جديد."}
+            </CardContent>
+          </Card>
+        ) : (
+          <>
+            <div className="space-y-2">
+              {beneficiaries.map((beneficiary) => (
+                <BeneficiaryMobileCard
+                  key={beneficiary.id}
+                  beneficiary={beneficiary}
+                  onViewProfile={onViewProfile}
+                  onEdit={onEdit}
+                  onViewAttachments={onViewAttachments}
+                  onViewActivity={onViewActivity}
+                  onEnableLogin={onEnableLogin}
+                  onDelete={onDelete}
+                />
+              ))}
+            </div>
+            
+            {totalPages > 1 && (
+              <Card className="shadow-soft mt-3">
+                <CardContent className="p-3">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={onPageChange}
+                    itemsPerPage={itemsPerPage}
+                    totalItems={totalItems}
+                  />
+                </CardContent>
+              </Card>
+            )}
+          </>
+        )}
+      </div>
+    );
+  }
+
+  // Desktop table view
   return (
     <UnifiedDataTable
       title="قائمة المستفيدين"
@@ -189,7 +269,7 @@ export function BeneficiariesTable({
         onPageChange
       }}
       actions={renderActions}
-      showMobileScrollHint={true}
+      showMobileScrollHint={false}
     />
   );
-}
+});
