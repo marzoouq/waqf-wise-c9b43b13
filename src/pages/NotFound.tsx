@@ -1,19 +1,16 @@
-import { useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { Link } from "react-router-dom";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 
 const NotFound = () => {
-  const location = useLocation();
-
   return (
     <PageErrorBoundary pageName="الصفحة غير موجودة">
-      <main className="flex min-h-screen items-center justify-center bg-gray-100">
+      <main className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center">
           <h1 className="mb-4 text-4xl font-bold">404</h1>
-          <p className="mb-4 text-xl text-muted-foreground">Oops! Page not found</p>
-          <a href="/" className="text-primary underline hover:text-primary-hover">
-            Return to Home
-          </a>
+          <p className="mb-4 text-xl text-muted-foreground">الصفحة غير موجودة</p>
+          <Link to="/redirect" className="text-primary underline hover:text-primary/80">
+            العودة للرئيسية
+          </Link>
         </div>
       </main>
     </PageErrorBoundary>
