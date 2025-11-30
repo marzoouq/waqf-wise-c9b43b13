@@ -181,6 +181,11 @@ export function useBiometricAuth() {
   // التحقق بالبصمة وتسجيل الدخول تلقائياً
   const authenticateWithBiometric = useCallback(async (): Promise<{ success: boolean; userId?: string }> => {
     if (!isSupported) {
+      toast({
+        title: 'غير مدعوم',
+        description: 'جهازك لا يدعم المصادقة بالبصمة',
+        variant: 'destructive',
+      });
       return { success: false };
     }
 
@@ -194,32 +199,61 @@ export function useBiometricAuth() {
         .limit(50);
 
       if (fetchError || !userCredentials?.length) {
-        throw new Error('لا توجد بصمة مسجلة');
+        throw new Error('لا توجد بصمة مسجلة. يرجى تسجيل البصمة أولاً من الإعدادات');
       }
 
       // إنشاء challenge
       const challenge = crypto.getRandomValues(new Uint8Array(32));
 
-      // إعدادات المصادقة
+      // الحصول على hostname الحالي
+      const currentHostname = window.location.hostname;
+      
+      // إعدادات المصادقة - استخدام نفس rpId المستخدم في التسجيل
       const publicKeyCredentialRequestOptions: PublicKeyCredentialRequestOptions = {
         challenge,
         timeout: 60000,
-        rpId: window.location.hostname,
+        rpId: currentHostname,
         userVerification: 'required',
         allowCredentials: userCredentials.map(cred => ({
           id: base64ToArrayBuffer(cred.credential_id),
           type: 'public-key' as const,
-          transports: ['internal'] as AuthenticatorTransport[],
+          transports: ['internal', 'hybrid'] as AuthenticatorTransport[],
         })),
       };
 
       // طلب المصادقة
-      const assertion = await navigator.credentials.get({
-        publicKey: publicKeyCredentialRequestOptions,
-      }) as PublicKeyCredential;
+      let assertion: PublicKeyCredential | null = null;
+      
+      try {
+        assertion = await navigator.credentials.get({
+          publicKey: publicKeyCredentialRequestOptions,
+        }) as PublicKeyCredential;
+      } catch (webauthnError) {
+        console.error('WebAuthn get error:', webauthnError);
+        
+        // إذا فشل بسبب rpId، نحاول بدون rpId (للسماح بالمرونة)
+        if (webauthnError instanceof Error && webauthnError.name === 'SecurityError') {
+          const fallbackOptions: PublicKeyCredentialRequestOptions = {
+            challenge,
+            timeout: 60000,
+            userVerification: 'required',
+            allowCredentials: userCredentials.map(cred => ({
+              id: base64ToArrayBuffer(cred.credential_id),
+              type: 'public-key' as const,
+              transports: ['internal', 'hybrid'] as AuthenticatorTransport[],
+            })),
+          };
+          
+          assertion = await navigator.credentials.get({
+            publicKey: fallbackOptions,
+          }) as PublicKeyCredential;
+        } else {
+          throw webauthnError;
+        }
+      }
 
       if (!assertion) {
-        throw new Error('فشل في المصادقة');
+        throw new Error('فشل في المصادقة - لم يتم التعرف على البصمة');
       }
 
       // البحث عن credential المستخدم
@@ -229,7 +263,7 @@ export function useBiometricAuth() {
       );
 
       if (!matchedCredential) {
-        throw new Error('البصمة غير مسجلة');
+        throw new Error('البصمة غير مسجلة في هذا الجهاز');
       }
 
       // استدعاء Edge Function لإنشاء جلسة
@@ -237,12 +271,13 @@ export function useBiometricAuth() {
         body: {
           credentialId: usedCredentialId,
           userId: matchedCredential.user_id,
+          challenge: arrayBufferToBase64(challenge.buffer),
         },
       });
 
       if (authError) {
         console.error('Edge function error:', authError);
-        throw new Error('فشل في الاتصال بالخادم');
+        throw new Error('فشل في الاتصال بالخادم. يرجى المحاولة مرة أخرى');
       }
 
       if (!authData?.success) {
@@ -259,7 +294,7 @@ export function useBiometricAuth() {
 
         if (verifyError) {
           console.error('Verify OTP error:', verifyError);
-          throw new Error('فشل في تأكيد الجلسة');
+          throw new Error('فشل في تأكيد الجلسة. يرجى المحاولة مرة أخرى');
         }
       } else {
         throw new Error('بيانات المصادقة غير مكتملة');
@@ -272,7 +307,24 @@ export function useBiometricAuth() {
 
       return { success: true, userId: matchedCredential.user_id };
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'فشل في المصادقة بالبصمة';
+      console.error('Biometric auth error:', error);
+      
+      let errorMessage = 'فشل في المصادقة بالبصمة';
+      
+      if (error instanceof Error) {
+        if (error.name === 'NotAllowedError') {
+          errorMessage = 'تم إلغاء المصادقة أو رفض الإذن';
+        } else if (error.name === 'SecurityError') {
+          errorMessage = 'خطأ أمني - تأكد من أنك تستخدم نفس الجهاز المسجل';
+        } else if (error.name === 'InvalidStateError') {
+          errorMessage = 'البصمة غير مسجلة في هذا الجهاز';
+        } else if (error.name === 'AbortError') {
+          errorMessage = 'تم إلغاء عملية المصادقة';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       toast({
         title: 'فشل التحقق',
         description: errorMessage,
