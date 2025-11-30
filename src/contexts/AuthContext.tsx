@@ -33,9 +33,64 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { toast } = useToast();
   const initRef = useRef(false);
   const rolesCache = useRef<string[]>([]);
+  const ROLES_CACHE_KEY = 'waqf_user_roles';
+
+  // استرجاع الأدوار من الـ cache
+  const getCachedRoles = useCallback((userId: string): string[] | null => {
+    try {
+      const cached = localStorage.getItem(ROLES_CACHE_KEY);
+      if (cached) {
+        const { userId: cachedUserId, roles: cachedRoles, timestamp } = JSON.parse(cached);
+        // صالح لمدة 5 دقائق
+        if (cachedUserId === userId && Date.now() - timestamp < 5 * 60 * 1000) {
+          return cachedRoles;
+        }
+      }
+    } catch {
+      // تجاهل أخطاء localStorage
+    }
+    return null;
+  }, []);
+
+  // حفظ الأدوار في الـ cache
+  const setCachedRoles = useCallback((userId: string, roles: string[]) => {
+    try {
+      localStorage.setItem(ROLES_CACHE_KEY, JSON.stringify({
+        userId,
+        roles,
+        timestamp: Date.now()
+      }));
+    } catch {
+      // تجاهل أخطاء localStorage
+    }
+  }, []);
 
   // جلب أدوار المستخدم من قاعدة البيانات
   const fetchUserRoles = useCallback(async (userId: string): Promise<string[]> => {
+    // محاولة استخدام الـ cache أولاً للتحميل السريع
+    const cached = getCachedRoles(userId);
+    if (cached && cached.length > 0) {
+      rolesCache.current = cached;
+      setRoles(cached);
+      setRolesLoading(false);
+      // جلب الأدوار في الخلفية للتحديث
+      supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .then(({ data }) => {
+          if (data) {
+            const freshRoles = data.map(r => r.role);
+            if (JSON.stringify(freshRoles) !== JSON.stringify(cached)) {
+              rolesCache.current = freshRoles;
+              setRoles(freshRoles);
+              setCachedRoles(userId, freshRoles);
+            }
+          }
+        });
+      return cached;
+    }
+
     setRolesLoading(true);
     try {
       const { data, error } = await supabase
@@ -52,6 +107,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const fetchedRoles = (data || []).map(r => r.role);
       rolesCache.current = fetchedRoles;
       setRoles(fetchedRoles);
+      setCachedRoles(userId, fetchedRoles);
       setRolesLoading(false);
       return fetchedRoles;
     } catch (err) {
@@ -59,14 +115,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setRolesLoading(false);
       return [];
     }
-  }, []);
+  }, [getCachedRoles, setCachedRoles]);
 
   // تنظيف الجلسات التالفة
   const cleanupInvalidSession = useCallback(async () => {
     try {
       // إزالة tokens القديمة من localStorage
       const keysToClean = Object.keys(localStorage).filter(key => 
-        key.includes('supabase') || key.includes('sb-')
+        key.includes('supabase') || key.includes('sb-') || key === ROLES_CACHE_KEY
       );
       keysToClean.forEach(key => localStorage.removeItem(key));
       
@@ -178,6 +234,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, [fetchUserData, cleanupInvalidSession]);
 
+  // جلب الملف الشخصي - مُحسّن (الـ trigger يُنشئ الملف تلقائياً)
   const fetchProfile = async (userId: string) => {
     try {
       const { data, error } = await supabase
@@ -187,78 +244,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .maybeSingle();
 
       if (error && error.code !== 'PGRST116') {
-        throw error;
+        productionLogger.error('Error fetching profile', error);
       }
       
+      // الـ trigger ينشئ الـ profile تلقائياً، لذا إذا لم يوجد ننتظر قليلاً ونعيد المحاولة
       if (!data) {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          try {
-            const { data: newProfile, error: createError } = await supabase
-              .from('profiles')
-              .insert({
-                user_id: userId,
-                email: user.email || '',
-                full_name: user.user_metadata?.full_name || user.email || 'مستخدم جديد'
-              })
-              .select('id, user_id, email, full_name, avatar_url, phone, position, is_active, created_at, updated_at, last_login_at')
-              .single();
-            
-            if (createError) {
-              // معالجة أخطاء FK (23503): user_id غير موجود
-              if (createError.code === '23503') {
-                productionLogger.warn('FK violation - retrying after delay');
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                const { data: retryProfile } = await supabase
-                  .from('profiles')
-                  .select('id, user_id, email, full_name, avatar_url, phone, position, is_active, created_at, updated_at, last_login_at')
-                  .eq('user_id', userId)
-                  .maybeSingle();
-                
-                if (retryProfile) {
-                  setProfile(retryProfile);
-                  return;
-                }
-              } 
-              // معالجة Unique constraint (23505): profile موجود مسبقاً
-              else if (createError.code === '23505') {
-                const { data: existingProfile } = await supabase
-                  .from('profiles')
-                  .select('id, user_id, email, full_name, avatar_url, phone, position, is_active, created_at, updated_at, last_login_at')
-                  .eq('user_id', userId)
-                  .maybeSingle();
-                
-                if (existingProfile) {
-                  setProfile(existingProfile);
-                  return;
-                }
-              }
-              throw createError;
-            }
-            
-            setProfile(newProfile);
-          } catch (insertError: unknown) {
-            const err = insertError as { code?: string; message?: string };
-            // لا نعرض أخطاء FK وUnique للمستخدم
-            if (!['23503', '23505'].includes(err.code || '')) {
-              productionLogger.error('Error creating profile', insertError);
-            }
-          }
+        // انتظار قصير للـ trigger
+        await new Promise(resolve => setTimeout(resolve, 200));
+        const { data: retryData } = await supabase
+          .from('profiles')
+          .select('id, user_id, email, full_name, avatar_url, phone, position, is_active, created_at, updated_at, last_login_at')
+          .eq('user_id', userId)
+          .maybeSingle();
+        
+        if (retryData) {
+          setProfile(retryData);
         }
       } else {
         setProfile(data);
       }
-    } catch (error: unknown) {
-      const err = error as { code?: string; message?: string };
-      // نعرض toast فقط للأخطاء غير المتوقعة
-      if (!['23505', '23503', 'PGRST116'].includes(err.code || '')) {
-        productionLogger.error('Error fetching profile', error);
-        toast({
-          title: 'خطأ',
-          description: 'فشل تحميل بيانات المستخدم',
-          variant: 'destructive',
-        });
-      }
+    } catch (error) {
+      productionLogger.error('Exception fetching profile', error);
     } finally {
       setIsLoading(false);
     }
