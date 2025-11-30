@@ -1,4 +1,6 @@
-const AppVersionFooter = () => {
+import { memo } from "react";
+
+const AppVersionFooter = memo(function AppVersionFooter() {
   const version = import.meta.env.VITE_APP_VERSION;
   const buildTime = import.meta.env.VITE_BUILD_TIME;
 
@@ -12,6 +14,6 @@ const AppVersionFooter = () => {
       )}
     </footer>
   );
-};
+});
 
 export default AppVersionFooter;

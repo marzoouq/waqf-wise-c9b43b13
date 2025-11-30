@@ -1,3 +1,4 @@
+import { memo, useMemo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -10,7 +11,25 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { ChevronDown, Shield, User, Calculator, Wallet, Archive, Users, LucideIcon } from "lucide-react";
 import { ROLE_LABELS } from "@/lib/role-labels";
 
-export function RoleSwitcher() {
+const roleRoutes: Record<string, string> = {
+  nazer: "/nazer-dashboard",
+  admin: "/admin-dashboard",
+  accountant: "/accountant-dashboard",
+  cashier: "/cashier-dashboard",
+  archivist: "/archivist-dashboard",
+  beneficiary: "/beneficiary-dashboard",
+};
+
+const roleIcons: Record<string, LucideIcon> = {
+  nazer: Shield,
+  admin: Shield,
+  accountant: Calculator,
+  cashier: Wallet,
+  archivist: Archive,
+  beneficiary: Users,
+};
+
+export const RoleSwitcher = memo(function RoleSwitcher() {
   const { roles, primaryRole } = useUserRole();
   const navigate = useNavigate();
   const location = useLocation();
@@ -20,32 +39,7 @@ export function RoleSwitcher() {
     return null;
   }
 
-  const roleRoutes: Record<string, string> = {
-    nazer: "/nazer-dashboard",
-    admin: "/admin-dashboard",
-    accountant: "/accountant-dashboard",
-    cashier: "/cashier-dashboard",
-    archivist: "/archivist-dashboard",
-    beneficiary: "/beneficiary-dashboard",
-  };
-
-  const roleIcons: Record<string, LucideIcon> = {
-    nazer: Shield,
-    admin: Shield,
-    accountant: Calculator,
-    cashier: Wallet,
-    archivist: Archive,
-    beneficiary: Users,
-  };
-
-  const handleRoleSwitch = (role: string) => {
-    const route = roleRoutes[role];
-    if (route && route !== location.pathname) {
-      navigate(route);
-    }
-  };
-
-  const getCurrentRoleFromPath = () => {
+  const currentRole = useMemo(() => {
     const path = location.pathname;
     for (const [role, route] of Object.entries(roleRoutes)) {
       if (path.startsWith(route)) {
@@ -53,9 +47,15 @@ export function RoleSwitcher() {
       }
     }
     return primaryRole;
-  };
+  }, [location.pathname, primaryRole]);
 
-  const currentRole = getCurrentRoleFromPath();
+  const handleRoleSwitch = useCallback((role: string) => {
+    const route = roleRoutes[role];
+    if (route && route !== location.pathname) {
+      navigate(route);
+    }
+  }, [location.pathname, navigate]);
+
   const CurrentIcon = roleIcons[currentRole] || User;
 
   return (
@@ -63,11 +63,11 @@ export function RoleSwitcher() {
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm" className="gap-2">
           <CurrentIcon className="h-4 w-4" />
-          <span>{ROLE_LABELS[currentRole as keyof typeof ROLE_LABELS] || "المستخدم"}</span>
+          <span className="hidden sm:inline">{ROLE_LABELS[currentRole as keyof typeof ROLE_LABELS] || "المستخدم"}</span>
           <ChevronDown className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
+      <DropdownMenuContent align="end" className="w-48 sm:w-56">
         {roles.map((role) => {
           const Icon = roleIcons[role] || User;
           const isActive = role === currentRole;
@@ -85,4 +85,4 @@ export function RoleSwitcher() {
       </DropdownMenuContent>
     </DropdownMenu>
   );
-}
+});
