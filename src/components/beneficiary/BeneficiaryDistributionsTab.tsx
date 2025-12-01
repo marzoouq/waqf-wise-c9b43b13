@@ -69,7 +69,7 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{distributions.length}</div>
+            <div className="text-xl sm:text-2xl font-bold">{distributions.length}</div>
             <p className="text-xs text-muted-foreground mt-1">عدد التوزيعات الكلي</p>
           </CardContent>
         </Card>
@@ -80,7 +80,7 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
             <TrendingUp className="h-4 w-4 text-success" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-xl sm:text-2xl font-bold">
               <MaskedValue
                 value={totalReceived.toLocaleString("ar-SA")}
                 type="amount"
@@ -97,7 +97,7 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
             <Clock className="h-4 w-4 text-warning" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{pendingAmount.toLocaleString("ar-SA")} ريال</div>
+            <div className="text-xl sm:text-2xl font-bold">{pendingAmount.toLocaleString("ar-SA")} ريال</div>
             <p className="text-xs text-muted-foreground mt-1">قيد الانتظار</p>
           </CardContent>
         </Card>

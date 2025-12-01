@@ -127,8 +127,8 @@ interface JournalEntryWithLines {
                 <TrendingUp className="h-6 w-6 text-success" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">إجمالي المستلم</p>
-                <p className="text-2xl font-bold">
+                <p className="text-xs sm:text-sm text-muted-foreground">إجمالي المستلم</p>
+                <p className="text-xl sm:text-2xl font-bold">
                   <MaskedValue
                     value={totalReceived.toLocaleString("ar-SA")}
                     type="amount"
@@ -142,8 +142,8 @@ interface JournalEntryWithLines {
                 <TrendingDown className="h-6 w-6 text-info" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">عدد المدفوعات</p>
-                <p className="text-2xl font-bold">{payments.length}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">عدد المدفوعات</p>
+                <p className="text-xl sm:text-2xl font-bold">{payments.length}</p>
               </div>
             </div>
           </div>
