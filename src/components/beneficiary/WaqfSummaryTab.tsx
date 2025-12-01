@@ -85,10 +85,10 @@ export function WaqfSummaryTab() {
           </Card>
         )}
 
-        {/* الدخل الشهري */}
+        {/* إجمالي مخصصات الصناديق */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">الدخل الشهري</CardTitle>
+            <CardTitle className="text-sm font-medium">إجمالي مخصصات الصناديق</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -99,7 +99,7 @@ export function WaqfSummaryTab() {
                 masked={settings?.mask_exact_amounts || false}
               />
             </div>
-            <p className="text-xs text-muted-foreground mt-1">إجمالي التوزيعات</p>
+            <p className="text-xs text-muted-foreground mt-1">مجموع المبالغ المخصصة</p>
           </CardContent>
         </Card>
       </div>

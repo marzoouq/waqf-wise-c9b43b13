@@ -59,7 +59,6 @@ export default function NazerKPIs() {
         : data.totalAssets,
       icon: Building2,
       variant: "default" as const,
-      trend: "+8.3% من الشهر السابق"
     },
     {
       title: "إجمالي الإيرادات",
@@ -68,7 +67,6 @@ export default function NazerKPIs() {
         : data.totalRevenue,
       icon: TrendingUp,
       variant: "success" as const,
-      trend: "+5.2% من الشهر السابق"
     },
     {
       title: "المستفيدون النشطون",
@@ -84,7 +82,6 @@ export default function NazerKPIs() {
         : data.availableBudget,
       icon: Wallet,
       variant: "success" as const,
-      trend: "+15.7% من الشهر السابق"
     },
     {
       title: "العقارات النشطة",
@@ -98,7 +95,6 @@ export default function NazerKPIs() {
       value: data.occupiedProperties,
       icon: Building2,
       variant: "default" as const,
-      trend: "+12.5% من الشهر السابق"
     },
     {
       title: "القروض المستحقة",
@@ -114,7 +110,6 @@ export default function NazerKPIs() {
         : data.monthlyReturn,
       icon: PieChart,
       variant: "default" as const,
-      trend: "+6.8% من الشهر السابق"
     }
   ];
 
@@ -133,7 +128,6 @@ export default function NazerKPIs() {
             value={kpi.value}
             icon={kpi.icon}
             variant={kpi.variant}
-            trend={kpi.trend}
             subtitle={kpi.subtitle}
           />
         ))}
