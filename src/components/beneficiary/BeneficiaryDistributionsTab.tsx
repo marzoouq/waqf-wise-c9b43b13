@@ -3,11 +3,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { TrendingUp, Clock, CheckCircle2, DollarSign, LucideIcon } from "lucide-react";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { MaskedValue } from "@/components/shared/MaskedValue";
+import { useIsMobile } from "@/hooks/useIsMobile";
+import { MobileDistributionCard } from "./MobileDistributionCard";
 
 interface BeneficiaryDistributionsTabProps {
   beneficiaryId: string;
@@ -17,6 +20,7 @@ type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
 
 export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistributionsTabProps) {
   const { settings } = useVisibilitySettings();
+  const isMobile = useIsMobile();
   
   // استخدام payments بدلاً من distribution_allocations
   const { data: distributions = [], isLoading } = useQuery({
@@ -58,112 +62,131 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
   return (
     <div className="space-y-6">
       {/* Summary Cards */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">إجمالي التوزيعات</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium">إجمالي التوزيعات</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{distributions.length}</div>
-            <p className="text-xs text-muted-foreground mt-1">عدد التوزيعات الكلي</p>
+            <div className="text-xl sm:text-2xl font-bold">{distributions.length}</div>
+            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">عدد التوزيعات الكلي</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">المبالغ المدفوعة</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium">المبالغ المدفوعة</CardTitle>
             <TrendingUp className="h-4 w-4 text-success" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-xl sm:text-2xl font-bold">
               <MaskedValue
                 value={totalReceived.toLocaleString("ar-SA")}
                 type="amount"
                 masked={settings?.mask_exact_amounts || false}
-              /> ريال
+              /> <span className="text-sm sm:text-base">ريال</span>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">إجمالي ما تم استلامه</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">إجمالي ما تم استلامه</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="sm:col-span-2 lg:col-span-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">المبالغ المعلقة</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium">المبالغ المعلقة</CardTitle>
             <Clock className="h-4 w-4 text-warning" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{pendingAmount.toLocaleString("ar-SA")} ريال</div>
-            <p className="text-xs text-muted-foreground mt-1">قيد الانتظار</p>
+            <div className="text-xl sm:text-2xl font-bold">{pendingAmount.toLocaleString("ar-SA")} <span className="text-sm sm:text-base">ريال</span></div>
+            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">قيد الانتظار</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Distributions Table */}
+      {/* Distributions Table/Cards */}
       <Card>
         <CardHeader>
-          <CardTitle>سجل التوزيعات</CardTitle>
-          <CardDescription>جميع التوزيعات والمبالغ المخصصة لك</CardDescription>
+          <CardTitle className="text-base sm:text-lg">سجل التوزيعات</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">جميع التوزيعات والمبالغ المخصصة لك</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-right">رقم التوزيع</TableHead>
-                  <TableHead className="text-right">التاريخ</TableHead>
-                  <TableHead className="text-right">المبلغ المخصص</TableHead>
-                  <TableHead className="text-right">الخصومات</TableHead>
-                  <TableHead className="text-right">صافي المبلغ</TableHead>
-                  <TableHead className="text-right">حالة الدفع</TableHead>
-                  <TableHead className="text-right">تاريخ الدفع</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoading ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center">جاري التحميل...</TableCell>
-                  </TableRow>
-                ) : distributions.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
-                      لا توجد توزيعات بعد
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  distributions.map((payment) => (
-                    <TableRow key={payment.id}>
-                      <TableCell className="font-medium">{payment.reference_number || "—"}</TableCell>
-                      <TableCell>
-                        {payment.payment_date && format(new Date(payment.payment_date), "dd/MM/yyyy", { locale: ar })}
-                      </TableCell>
-                      <TableCell className="font-semibold">
-                        <MaskedValue
-                          value={Number(payment.amount || 0).toLocaleString("ar-SA")}
-                          type="amount"
-                          masked={settings?.mask_exact_amounts || false}
-                        /> ريال
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">—</TableCell>
-                      <TableCell className="font-bold text-success">
-                        <MaskedValue
-                          value={Number(payment.amount || 0).toLocaleString("ar-SA")}
-                          type="amount"
-                          masked={settings?.mask_exact_amounts || false}
-                        /> ريال
-                      </TableCell>
-                      <TableCell>{getPaymentStatusBadge(payment.status || "معلق")}</TableCell>
-                      <TableCell>
-                        {payment.payment_date 
-                          ? format(new Date(payment.payment_date), "dd/MM/yyyy", { locale: ar })
-                          : "—"}
-                      </TableCell>
+          {isMobile ? (
+            <div className="space-y-3">
+              {isLoading ? (
+                <div className="text-center py-8 text-muted-foreground">جاري التحميل...</div>
+              ) : distributions.length === 0 ? (
+                <div className="text-center text-muted-foreground py-8">
+                  لا توجد توزيعات بعد
+                </div>
+              ) : (
+                distributions.map((payment) => (
+                  <MobileDistributionCard key={payment.id} payment={payment} />
+                ))
+              )}
+            </div>
+          ) : (
+            <ScrollArea className="w-full">
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-right">رقم التوزيع</TableHead>
+                      <TableHead className="text-right">التاريخ</TableHead>
+                      <TableHead className="text-right">المبلغ المخصص</TableHead>
+                      <TableHead className="text-right">الخصومات</TableHead>
+                      <TableHead className="text-right">صافي المبلغ</TableHead>
+                      <TableHead className="text-right">حالة الدفع</TableHead>
+                      <TableHead className="text-right">تاريخ الدفع</TableHead>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
+                  </TableHeader>
+                  <TableBody>
+                    {isLoading ? (
+                      <TableRow>
+                        <TableCell colSpan={7} className="text-center">جاري التحميل...</TableCell>
+                      </TableRow>
+                    ) : distributions.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                          لا توجد توزيعات بعد
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      distributions.map((payment) => (
+                        <TableRow key={payment.id}>
+                          <TableCell className="font-medium">{payment.reference_number || "—"}</TableCell>
+                          <TableCell>
+                            {payment.payment_date && format(new Date(payment.payment_date), "dd/MM/yyyy", { locale: ar })}
+                          </TableCell>
+                          <TableCell className="font-semibold">
+                            <MaskedValue
+                              value={Number(payment.amount || 0).toLocaleString("ar-SA")}
+                              type="amount"
+                              masked={settings?.mask_exact_amounts || false}
+                            /> ريال
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">—</TableCell>
+                          <TableCell className="font-bold text-success">
+                            <MaskedValue
+                              value={Number(payment.amount || 0).toLocaleString("ar-SA")}
+                              type="amount"
+                              masked={settings?.mask_exact_amounts || false}
+                            /> ريال
+                          </TableCell>
+                          <TableCell>{getPaymentStatusBadge(payment.status || "معلق")}</TableCell>
+                          <TableCell>
+                            {payment.payment_date 
+                              ? format(new Date(payment.payment_date), "dd/MM/yyyy", { locale: ar })
+                              : "—"}
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+          )}
         </CardContent>
       </Card>
     </div>
