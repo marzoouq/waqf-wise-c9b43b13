@@ -92,14 +92,13 @@ class ProductionLogger {
   }
 
   /**
-   * تسجيل تحذير
+   * تسجيل تحذير (لا يُرسل للسيرفر إلا للتحذيرات الحرجة)
    */
   warn(message: string, data?: unknown, options?: LogOptions): void {
     if (IS_DEV) {
       console.warn(`⚠️ ${message}`, data !== undefined ? data : '');
     }
-    this.addToQueue('warn', message, data);
-    
+    // ✅ لا نضيف للـ queue - فقط إرسال مباشر للتحذيرات الحرجة
     if (IS_PROD && options?.severity === 'high') {
       this.sendToServer('warn', message, data, options);
     }
@@ -184,8 +183,11 @@ class ProductionLogger {
     this.queue = [];
 
     try {
+      // ✅ فلترة: إرسال الأخطاء فقط (errors only)
+      const errorsOnly = logsToSend.filter(log => log.level === 'error');
+      
       // إرسال الـ logs بالتنسيق الصحيح
-      for (const log of logsToSend.slice(0, 10)) {
+      for (const log of errorsOnly.slice(0, 10)) {
         // تجاهل logs بدون رسالة صالحة
         if (!log.message || typeof log.message !== 'string' || log.message.trim() === '') {
           continue;

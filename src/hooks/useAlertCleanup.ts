@@ -5,7 +5,6 @@
 
 import { useEffect, useRef } from 'react';
 import { runFullCleanup } from '@/lib/cleanupAlerts';
-import { productionLogger } from '@/lib/logger/production-logger';
 
 const CLEANUP_INTERVAL = 6 * 60 * 60 * 1000; // 6 ساعات
 const CLEANUP_KEY = 'last_alert_cleanup';
@@ -28,22 +27,28 @@ export function useAlertCleanup() {
           }
         }
 
-        productionLogger.info('Starting automatic alert cleanup...');
+        if (import.meta.env.DEV) {
+          console.log('Starting automatic alert cleanup...');
+        }
         
         const stats = await runFullCleanup();
         
-        productionLogger.info('Alert cleanup completed', {
-          deletedAlerts: stats.deletedAlerts,
-          mergedDuplicates: stats.mergedDuplicates,
-          trimmedActive: stats.trimmedActive,
-          localStorageDeleted: stats.localStorageDeleted,
-          errors: stats.errors.length,
-        });
+        if (import.meta.env.DEV) {
+          console.log('Alert cleanup completed', {
+            deletedAlerts: stats.deletedAlerts,
+            mergedDuplicates: stats.mergedDuplicates,
+            trimmedActive: stats.trimmedActive,
+            localStorageDeleted: stats.localStorageDeleted,
+            errors: stats.errors.length,
+          });
+        }
 
         // حفظ وقت آخر تنظيف
         localStorage.setItem(CLEANUP_KEY, now.toString());
       } catch (error) {
-        productionLogger.error('Alert cleanup failed', error);
+        if (import.meta.env.DEV) {
+          console.error('Alert cleanup failed', error);
+        }
       }
     };
 
