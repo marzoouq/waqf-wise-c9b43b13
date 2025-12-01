@@ -259,29 +259,8 @@ export default function HistoricalArchive() {
                         {format(new Date(entry.entry_date), "dd/MM/yyyy")}
                       </p>
                     </div>
-                    <div className="space-y-2">
-                      {entry.journal_entry_lines?.map((line: any) => (
-                        <div
-                          key={line.id}
-                          className="flex justify-between text-sm border-t pt-2"
-                        >
-                          <span className="text-muted-foreground">
-                            {line.accounts?.code} - {line.accounts?.name_ar}
-                          </span>
-                          <div className="flex gap-4">
-                            {line.debit_amount > 0 && (
-                              <span className="text-green-600">
-                                مدين: {line.debit_amount.toLocaleString("ar-SA")}
-                              </span>
-                            )}
-                            {line.credit_amount > 0 && (
-                              <span className="text-blue-600">
-                                دائن: {line.credit_amount.toLocaleString("ar-SA")}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      ))}
+                    <div className="text-sm text-muted-foreground">
+                      حالة القيد: {entry.status}
                     </div>
                   </Card>
                 ))}
