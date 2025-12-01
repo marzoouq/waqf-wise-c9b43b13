@@ -62,8 +62,8 @@ export function LoansOverviewTab() {
               <div key={loan.id} className="space-y-4 p-4 border rounded-lg">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground">مبلغ القرض</p>
-                    <p className="text-2xl font-bold">
+                    <p className="text-xs sm:text-sm text-muted-foreground">مبلغ القرض</p>
+                    <p className="text-xl sm:text-2xl font-bold">
                       <MaskedValue
                         value={(loan.principal_amount || 0).toLocaleString("ar-SA")}
                         type="amount"
@@ -81,7 +81,7 @@ export function LoansOverviewTab() {
                   </Badge>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 text-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm">
                   <div>
                     <p className="text-muted-foreground">المدفوع</p>
                     <p className="font-medium text-success">
@@ -113,7 +113,7 @@ export function LoansOverviewTab() {
                 </div>
 
                 {loan.start_date && loan.due_date && (
-                  <div className="grid grid-cols-2 gap-4 text-sm text-muted-foreground">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
                     <div>
                       <span className="font-medium">تاريخ البداية: </span>
                       {format(new Date(loan.start_date), "dd/MM/yyyy", { locale: ar })}
@@ -193,18 +193,18 @@ export function LoansOverviewTab() {
             <CardTitle>إحصائيات عامة</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
               <div className="p-4 border rounded-lg text-center">
-                <p className="text-sm text-muted-foreground mb-2">إجمالي القروض</p>
-                <p className="text-2xl font-bold">{statistics.totalLoans}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground mb-2">إجمالي القروض</p>
+                <p className="text-xl sm:text-2xl font-bold">{statistics.totalLoans}</p>
               </div>
               <div className="p-4 border rounded-lg text-center">
-                <p className="text-sm text-muted-foreground mb-2">القروض النشطة</p>
-                <p className="text-2xl font-bold text-primary">{statistics.activeLoans}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground mb-2">القروض النشطة</p>
+                <p className="text-xl sm:text-2xl font-bold text-primary">{statistics.activeLoans}</p>
               </div>
               <div className="p-4 border rounded-lg text-center">
-                <p className="text-sm text-muted-foreground mb-2">مجموع المبالغ</p>
-                <p className="text-xl font-bold">
+                <p className="text-xs sm:text-sm text-muted-foreground mb-2">مجموع المبالغ</p>
+                <p className="text-base sm:text-xl font-bold">
                   <MaskedValue
                     value={statistics.totalAmount.toLocaleString("ar-SA")}
                     type="amount"
@@ -213,8 +213,8 @@ export function LoansOverviewTab() {
                 </p>
               </div>
               <div className="p-4 border rounded-lg text-center">
-                <p className="text-sm text-muted-foreground mb-2">الفزعات</p>
-                <p className="text-xl font-bold text-success">
+                <p className="text-xs sm:text-sm text-muted-foreground mb-2">الفزعات</p>
+                <p className="text-base sm:text-xl font-bold text-success">
                   <MaskedValue
                     value={totalAidAmount.toLocaleString("ar-SA")}
                     type="amount"

@@ -28,7 +28,7 @@ export function WaqfSummaryTab() {
             <Landmark className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-xl sm:text-2xl font-bold">
               <MaskedValue
                 value={summary?.totalWaqfValue.toLocaleString("ar-SA")}
                 type="amount"
@@ -46,7 +46,7 @@ export function WaqfSummaryTab() {
             <Building2 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{summary?.propertiesCount}</div>
+            <div className="text-xl sm:text-2xl font-bold">{summary?.propertiesCount}</div>
             <p className="text-xs text-muted-foreground mt-1">عقار في الوقف</p>
           </CardContent>
         </Card>
@@ -59,7 +59,7 @@ export function WaqfSummaryTab() {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{summary?.beneficiariesCount}</div>
+              <div className="text-xl sm:text-2xl font-bold">{summary?.beneficiariesCount}</div>
               <p className="text-xs text-muted-foreground mt-1">مستفيد نشط</p>
             </CardContent>
           </Card>
@@ -73,7 +73,7 @@ export function WaqfSummaryTab() {
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-xl sm:text-2xl font-bold">
                 <MaskedValue
                   value={summary?.totalBankBalance.toLocaleString("ar-SA")}
                   type="amount"
@@ -92,7 +92,7 @@ export function WaqfSummaryTab() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-xl sm:text-2xl font-bold">
               <MaskedValue
                 value={(summary?.totalFunds || 0).toLocaleString("ar-SA")}
                 type="amount"
