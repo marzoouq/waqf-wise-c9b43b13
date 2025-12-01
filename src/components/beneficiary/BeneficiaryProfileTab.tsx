@@ -31,14 +31,14 @@ export function BeneficiaryProfileTab({ beneficiary }: BeneficiaryProfileTabProp
             تعديل
           </Button>
         </CardHeader>
-        <CardContent className="grid gap-6 md:grid-cols-2">
+        <CardContent className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2">
           <div>
             <label className="text-sm font-medium text-muted-foreground">الاسم الكامل</label>
-            <p className="text-lg mt-1">{beneficiary.full_name}</p>
+            <p className="text-base sm:text-lg mt-1">{beneficiary.full_name}</p>
           </div>
           <div>
             <label className="text-sm font-medium text-muted-foreground">رقم الهوية</label>
-            <p className="text-lg mt-1">
+            <p className="text-base sm:text-lg mt-1">
               <MaskedValue
                 value={beneficiary.national_id}
                 type="national_id"
@@ -48,11 +48,11 @@ export function BeneficiaryProfileTab({ beneficiary }: BeneficiaryProfileTabProp
           </div>
           <div>
             <label className="text-sm font-medium text-muted-foreground">رقم المستفيد</label>
-            <p className="text-lg mt-1">{beneficiary.beneficiary_number || "—"}</p>
+            <p className="text-base sm:text-lg mt-1">{beneficiary.beneficiary_number || "—"}</p>
           </div>
           <div>
             <label className="text-sm font-medium text-muted-foreground">تاريخ الميلاد</label>
-            <p className="text-lg mt-1">
+            <p className="text-base sm:text-lg mt-1">
               {beneficiary.date_of_birth 
                 ? format(new Date(beneficiary.date_of_birth), "dd MMMM yyyy", { locale: ar })
                 : "—"}
@@ -60,15 +60,15 @@ export function BeneficiaryProfileTab({ beneficiary }: BeneficiaryProfileTabProp
           </div>
           <div>
             <label className="text-sm font-medium text-muted-foreground">الجنس</label>
-            <p className="text-lg mt-1">{beneficiary.gender === 'male' ? 'ذكر' : beneficiary.gender === 'female' ? 'أنثى' : '—'}</p>
+            <p className="text-base sm:text-lg mt-1">{beneficiary.gender === 'male' ? 'ذكر' : beneficiary.gender === 'female' ? 'أنثى' : '—'}</p>
           </div>
           <div>
             <label className="text-sm font-medium text-muted-foreground">الحالة الاجتماعية</label>
-            <p className="text-lg mt-1">{beneficiary.marital_status || "—"}</p>
+            <p className="text-base sm:text-lg mt-1">{beneficiary.marital_status || "—"}</p>
           </div>
           <div>
             <label className="text-sm font-medium text-muted-foreground">الجنسية</label>
-            <p className="text-lg mt-1">{beneficiary.nationality || "—"}</p>
+            <p className="text-base sm:text-lg mt-1">{beneficiary.nationality || "—"}</p>
           </div>
           <div>
             <label className="text-sm font-medium text-muted-foreground">الفئة</label>
@@ -82,12 +82,12 @@ export function BeneficiaryProfileTab({ beneficiary }: BeneficiaryProfileTabProp
         <CardHeader>
           <CardTitle>معلومات التواصل</CardTitle>
         </CardHeader>
-        <CardContent className="grid gap-4 md:grid-cols-2">
+        <CardContent className="grid gap-4 grid-cols-1 sm:grid-cols-2">
           <div className="flex items-center gap-3">
             <Phone className="h-5 w-5 text-muted-foreground" />
             <div>
               <label className="text-sm font-medium text-muted-foreground">الهاتف</label>
-              <p className="text-lg">
+              <p className="text-base sm:text-lg">
                 <MaskedValue
                   value={beneficiary.phone}
                   type="phone"
@@ -100,21 +100,21 @@ export function BeneficiaryProfileTab({ beneficiary }: BeneficiaryProfileTabProp
             <Mail className="h-5 w-5 text-muted-foreground" />
             <div>
               <label className="text-sm font-medium text-muted-foreground">البريد الإلكتروني</label>
-              <p className="text-lg">{beneficiary.email || "—"}</p>
+              <p className="text-base sm:text-lg">{beneficiary.email || "—"}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <MapPin className="h-5 w-5 text-muted-foreground" />
             <div>
               <label className="text-sm font-medium text-muted-foreground">المدينة</label>
-              <p className="text-lg">{beneficiary.city || "—"}</p>
+              <p className="text-base sm:text-lg">{beneficiary.city || "—"}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <MapPin className="h-5 w-5 text-muted-foreground" />
             <div>
               <label className="text-sm font-medium text-muted-foreground">العنوان</label>
-              <p className="text-lg">{beneficiary.address || "—"}</p>
+              <p className="text-base sm:text-lg">{beneficiary.address || "—"}</p>
             </div>
           </div>
         </CardContent>
@@ -125,17 +125,17 @@ export function BeneficiaryProfileTab({ beneficiary }: BeneficiaryProfileTabProp
         <CardHeader>
           <CardTitle>المعلومات البنكية</CardTitle>
         </CardHeader>
-        <CardContent className="grid gap-4 md:grid-cols-2">
+        <CardContent className="grid gap-4 grid-cols-1 sm:grid-cols-2">
           <div className="flex items-center gap-3">
             <CreditCard className="h-5 w-5 text-muted-foreground" />
             <div>
               <label className="text-sm font-medium text-muted-foreground">البنك</label>
-              <p className="text-lg">{beneficiary.bank_name || "—"}</p>
+              <p className="text-base sm:text-lg">{beneficiary.bank_name || "—"}</p>
             </div>
           </div>
           <div>
             <label className="text-sm font-medium text-muted-foreground">رقم الحساب</label>
-            <p className="text-lg font-mono">
+            <p className="text-base sm:text-lg font-mono">
               <MaskedValue
                 value={beneficiary.bank_account_number || "—"}
                 type="iban"
@@ -143,9 +143,9 @@ export function BeneficiaryProfileTab({ beneficiary }: BeneficiaryProfileTabProp
               />
             </p>
           </div>
-          <div className="md:col-span-2">
+          <div className="sm:col-span-2">
             <label className="text-sm font-medium text-muted-foreground">رقم الآيبان</label>
-            <p className="text-lg font-mono">
+            <p className="text-base sm:text-lg font-mono">
               <MaskedValue
                 value={beneficiary.iban || "—"}
                 type="iban"
@@ -161,25 +161,25 @@ export function BeneficiaryProfileTab({ beneficiary }: BeneficiaryProfileTabProp
         <CardHeader>
           <CardTitle>المعلومات العائلية</CardTitle>
         </CardHeader>
-        <CardContent className="grid gap-4 md:grid-cols-2">
+        <CardContent className="grid gap-4 grid-cols-1 sm:grid-cols-2">
           <div className="flex items-center gap-3">
             <Users className="h-5 w-5 text-muted-foreground" />
             <div>
               <label className="text-sm font-medium text-muted-foreground">حجم الأسرة</label>
-              <p className="text-lg">{beneficiary.family_size || "—"}</p>
+              <p className="text-base sm:text-lg">{beneficiary.family_size || "—"}</p>
             </div>
           </div>
           <div>
             <label className="text-sm font-medium text-muted-foreground">عدد الأبناء</label>
-            <p className="text-lg">{beneficiary.number_of_sons || 0}</p>
+            <p className="text-base sm:text-lg">{beneficiary.number_of_sons || 0}</p>
           </div>
           <div>
             <label className="text-sm font-medium text-muted-foreground">عدد البنات</label>
-            <p className="text-lg">{beneficiary.number_of_daughters || 0}</p>
+            <p className="text-base sm:text-lg">{beneficiary.number_of_daughters || 0}</p>
           </div>
           <div>
             <label className="text-sm font-medium text-muted-foreground">عدد الزوجات</label>
-            <p className="text-lg">{beneficiary.number_of_wives || 0}</p>
+            <p className="text-base sm:text-lg">{beneficiary.number_of_wives || 0}</p>
           </div>
         </CardContent>
       </Card>

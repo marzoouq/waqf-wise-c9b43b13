@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
@@ -35,8 +34,13 @@ import { ar } from "date-fns/locale";
 
 export default function BeneficiaryPortal() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("overview");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get("tab") || "overview";
   const { settings, isLoading: settingsLoading } = useVisibilitySettings();
+
+  const handleTabChange = (value: string) => {
+    setSearchParams({ tab: value });
+  };
 
   // جلب بيانات المستفيد الحالي
   const { data: beneficiary, isLoading } = useQuery({
@@ -123,9 +127,13 @@ export default function BeneficiaryPortal() {
           </div>
 
           {/* Main Tabs */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <ScrollArea className="w-full">
-              <TabsList className="inline-flex w-full min-w-max mb-6 h-auto p-1">
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+            <div className="relative">
+              {/* تدرج يمين */}
+              <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
+              
+              <ScrollArea className="w-full">
+                <TabsList className="inline-flex w-full min-w-max mb-6 h-auto p-1 gap-1">
               {settings?.show_overview && (
                 <TabsTrigger value="overview" className="text-xs sm:text-sm min-h-[44px]">
                   <TrendingUp className="h-4 w-4 sm:ml-1" />
@@ -190,21 +198,25 @@ export default function BeneficiaryPortal() {
                   <span className="text-xs sm:text-sm">القروض</span>
                 </TabsTrigger>
               )}
-              </TabsList>
-              <ScrollBar orientation="horizontal" />
-            </ScrollArea>
+                </TabsList>
+                <ScrollBar orientation="horizontal" className="h-2 bg-muted/30" />
+              </ScrollArea>
+              
+              {/* تدرج يسار */}
+              <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+            </div>
 
             {/* Overview Tab */}
             <TabsContent value="overview" className="space-y-6">
               {/* KPIs */}
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">إجمالي المستلم</CardTitle>
                     <TrendingUp className="h-4 w-4 text-success" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{Number(stats.total_received || 0).toLocaleString("ar-SA")} ريال</div>
+                    <div className="text-xl sm:text-2xl font-bold">{Number(stats.total_received || 0).toLocaleString("ar-SA")} ريال</div>
                     <p className="text-xs text-muted-foreground mt-1">من جميع المدفوعات</p>
                   </CardContent>
                 </Card>
@@ -215,7 +227,7 @@ export default function BeneficiaryPortal() {
                     <CreditCard className="h-4 w-4 text-primary" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{Number(beneficiary.account_balance || 0).toLocaleString("ar-SA")} ريال</div>
+                    <div className="text-xl sm:text-2xl font-bold">{Number(beneficiary.account_balance || 0).toLocaleString("ar-SA")} ريال</div>
                     <p className="text-xs text-muted-foreground mt-1">الرصيد المتاح</p>
                   </CardContent>
                 </Card>
@@ -226,7 +238,7 @@ export default function BeneficiaryPortal() {
                     <Clock className="h-4 w-4 text-warning" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{stats.pending_requests || 0}</div>
+                    <div className="text-xl sm:text-2xl font-bold">{stats.pending_requests || 0}</div>
                     <p className="text-xs text-muted-foreground mt-1">
                       {Number(stats.pending_amount || 0).toLocaleString("ar-SA")} ريال
                     </p>
@@ -239,7 +251,7 @@ export default function BeneficiaryPortal() {
                     <CheckCircle className="h-4 w-4 text-info" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{stats.total_requests || 0}</div>
+                    <div className="text-xl sm:text-2xl font-bold">{stats.total_requests || 0}</div>
                     <p className="text-xs text-muted-foreground mt-1">جميع الطلبات</p>
                   </CardContent>
                 </Card>
@@ -256,7 +268,7 @@ export default function BeneficiaryPortal() {
                     <Button 
                       variant="outline" 
                       className="h-auto py-4 flex-col gap-2 min-h-[44px]"
-                      onClick={() => setActiveTab("distributions")}
+                      onClick={() => setSearchParams({ tab: "distributions" })}
                     >
                       <TrendingUp className="h-6 w-6" />
                       <span className="text-sm">عرض التوزيعات</span>
@@ -264,7 +276,7 @@ export default function BeneficiaryPortal() {
                     <Button 
                       variant="outline" 
                       className="h-auto py-4 flex-col gap-2 min-h-[44px]"
-                      onClick={() => setActiveTab("statements")}
+                      onClick={() => setSearchParams({ tab: "statements" })}
                     >
                       <CreditCard className="h-6 w-6" />
                       <span className="text-sm">عرض كشف الحساب</span>
@@ -272,7 +284,7 @@ export default function BeneficiaryPortal() {
                     <Button 
                       variant="outline" 
                       className="h-auto py-4 flex-col gap-2 min-h-[44px]"
-                      onClick={() => setActiveTab("properties")}
+                      onClick={() => setSearchParams({ tab: "properties" })}
                     >
                       <Building2 className="h-6 w-6" />
                       <span className="text-sm">عرض العقارات</span>

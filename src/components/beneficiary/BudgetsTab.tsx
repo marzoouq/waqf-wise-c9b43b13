@@ -50,8 +50,8 @@ export function BudgetsTab() {
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">إجمالي الميزانية</p>
-                  <p className="text-2xl font-bold">
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-1">إجمالي الميزانية</p>
+                  <p className="text-xl sm:text-2xl font-bold">
                     <MaskedValue
                       value={annualBudget.total.toLocaleString("ar-SA")}
                       type="amount"
@@ -60,8 +60,8 @@ export function BudgetsTab() {
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">المُنفق</p>
-                  <p className="text-2xl font-bold text-destructive">
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-1">المُنفق</p>
+                  <p className="text-xl sm:text-2xl font-bold text-destructive">
                     <MaskedValue
                       value={annualBudget.spent.toLocaleString("ar-SA")}
                       type="amount"
@@ -70,8 +70,8 @@ export function BudgetsTab() {
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">المتبقي</p>
-                  <p className="text-2xl font-bold text-success">
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-1">المتبقي</p>
+                  <p className="text-xl sm:text-2xl font-bold text-success">
                     <MaskedValue
                       value={annualBudget.remaining.toLocaleString("ar-SA")}
                       type="amount"
@@ -154,8 +154,8 @@ export function BudgetsTab() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
                 <div className="p-4 border rounded-lg">
-                  <p className="text-sm text-muted-foreground mb-2">إجمالي الاحتياطي</p>
-                  <p className="text-xl font-bold">
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-2">إجمالي الاحتياطي</p>
+                  <p className="text-base sm:text-xl font-bold">
                     <MaskedValue
                       value={reserveTotals.total.toLocaleString("ar-SA")}
                       type="amount"
@@ -164,8 +164,8 @@ export function BudgetsTab() {
                   </p>
                 </div>
                 <div className="p-4 border rounded-lg">
-                  <p className="text-sm text-muted-foreground mb-2">مستثمر</p>
-                  <p className="text-xl font-bold text-primary">
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-2">مستثمر</p>
+                  <p className="text-base sm:text-xl font-bold text-primary">
                     <MaskedValue
                       value={reserveTotals.invested.toLocaleString("ar-SA")}
                       type="amount"
@@ -174,8 +174,8 @@ export function BudgetsTab() {
                   </p>
                 </div>
                 <div className="p-4 border rounded-lg">
-                  <p className="text-sm text-muted-foreground mb-2">سائل</p>
-                  <p className="text-xl font-bold text-success">
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-2">سائل</p>
+                  <p className="text-base sm:text-xl font-bold text-success">
                     <MaskedValue
                       value={reserveTotals.liquid.toLocaleString("ar-SA")}
                       type="amount"
