@@ -27,7 +27,6 @@ export function HistoricalDistributionsCard({ beneficiaryId }: HistoricalDistrib
           )
         `)
         .eq("beneficiary_id", beneficiaryId)
-        .eq("is_historical", true)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
