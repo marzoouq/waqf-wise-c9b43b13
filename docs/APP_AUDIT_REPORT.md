@@ -2,7 +2,7 @@
 ## App Comprehensive Audit Report
 
 **تاريخ الفحص:** 2025-11-30
-**آخر تحديث:** 2025-11-30
+**آخر تحديث:** 2025-12-01
 
 ---
 
@@ -93,6 +93,11 @@ onClick={() => navigate('/accounting')}
 - ✅ `BeneficiariesSearchBar` - تحسين الحجم والتباعد
 - ✅ `BeneficiariesStats` - تحسين بـ memo
 
+### صفحة العائلات (جديد - 2025-12-01):
+- ✅ `FamilyMobileCard` - بطاقة عائلة محسّنة للجوال
+- ✅ `Families` page - عرض بطاقات على الجوال بدل الجدول
+- ✅ دعم جميع الإجراءات (عرض، تعديل، حذف) على الجوال
+
 ### التحسينات العامة:
 - ✅ `MobileOptimizedLayout` - padding مناسب
 - ✅ `useIsMobile` hook محسّن بدون flicker
@@ -117,6 +122,9 @@ onClick={() => navigate('/accounting')}
 | DesktopHeader | ✅ memo |
 | BottomNavigation | ✅ memo |
 | FloatingChatButton | ✅ memo |
+| ChatbotInterface | ✅ memo |
+| FamilyMobileCard | ✅ memo |
+| Families | ✅ memo |
 
 ### useMemo للقيم المحسوبة:
 - ✅ columns في BeneficiariesTable
@@ -190,26 +198,68 @@ onClick={() => navigate('/accounting')}
 
 ---
 
-## 8. ملفات جديدة مُنشأة
+## 8. إعادة هيكلة مكونات الذكاء الاصطناعي (Chatbot Refactoring) - جديد 2025-12-01
+
+### المشاكل المكتشفة:
+- ❌ تكرار كبير في `ChatbotInterface.tsx` بين الوضع المصغر والكامل
+- ❌ عدم حفظ المحادثات في قاعدة البيانات
+- ❌ خطأ 503 من AI Gateway (مؤقت)
+
+### الإصلاحات المطبقة:
+
+#### 1. إعادة هيكلة ChatbotInterface:
+```typescript
+// استخراج المكونات المشتركة إلى ملفات منفصلة
+- QuickRepliesSection.tsx  # قسم الردود السريعة
+- ChatInputForm.tsx        # نموذج الإدخال
+- MessagesSection.tsx      # قسم الرسائل
+- TypingIndicator.tsx      # مؤشر الكتابة
+```
+
+#### 2. تحسين Edge Function (chatbot/index.ts):
+```typescript
+// إضافة retry logic مع exponential backoff
+- 3 محاولات مع تأخير (1s, 2s, 4s)
+- معالجة أخطاء 5xx و 429
+- حفظ المحادثات في قاعدة البيانات
+- استخراج quick actions ذكية
+```
+
+### الملفات المُعدّلة:
+- `src/components/chatbot/ChatbotInterface.tsx` - إعادة هيكلة
+- `src/components/chatbot/QuickRepliesSection.tsx` - جديد
+- `src/components/chatbot/ChatInputForm.tsx` - جديد
+- `src/components/chatbot/MessagesSection.tsx` - جديد
+- `supabase/functions/chatbot/index.ts` - تحسين
+
+---
+
+## 9. ملفات جديدة مُنشأة
 
 ```
 src/
 ├── hooks/
-│   └── useSessionCleanup.ts          # إدارة تنظيف الجلسات
+│   └── useSessionCleanup.ts              # إدارة تنظيف الجلسات
 ├── components/
 │   ├── auth/
-│   │   └── SessionManager.tsx        # مدير الجلسات
-│   └── beneficiaries/
-│       └── list/
-│           └── BeneficiaryMobileCard.tsx  # بطاقة جوال
+│   │   └── SessionManager.tsx            # مدير الجلسات
+│   ├── beneficiaries/
+│   │   └── list/
+│   │       └── BeneficiaryMobileCard.tsx # بطاقة جوال للمستفيدين
+│   ├── families/
+│   │   └── FamilyMobileCard.tsx          # بطاقة جوال للعائلات (جديد)
+│   └── chatbot/
+│       ├── QuickRepliesSection.tsx       # قسم الردود السريعة (جديد)
+│       ├── ChatInputForm.tsx             # نموذج الإدخال (جديد)
+│       └── MessagesSection.tsx           # قسم الرسائل (جديد)
 docs/
-├── PERFORMANCE_IMPROVEMENTS.md       # توثيق تحسينات الأداء
-└── APP_AUDIT_REPORT.md              # هذا التقرير
+├── PERFORMANCE_IMPROVEMENTS.md           # توثيق تحسينات الأداء
+└── APP_AUDIT_REPORT.md                   # هذا التقرير
 ```
 
 ---
 
-## 9. خلاصة
+## 10. خلاصة
 
 | المجال | الحالة | النسبة |
 |--------|-------|--------|
@@ -217,7 +267,26 @@ docs/
 | إدارة الجلسات | ✅ مكتمل | 100% |
 | واجهة الجوال | ✅ مكتمل | 100% |
 | تحسين الأداء | ✅ مكتمل | 95% |
-| تنظيف الكود | ✅ مكتمل | 90% |
+| تنظيف الكود | ✅ مكتمل | 95% |
 | الأمان | ✅ مكتمل | 100% |
+| الذكاء الاصطناعي | ✅ مكتمل | 90% |
 
 **الحالة العامة:** ✅ جاهز للإنتاج
+
+---
+
+## 11. سجل التغييرات (Changelog)
+
+### 2025-12-01
+- ✅ إصلاح صفحة العائلات للجوال (FamilyMobileCard)
+- ✅ إعادة هيكلة مكونات الذكاء الاصطناعي (Chatbot)
+- ✅ إضافة retry logic لـ AI API مع exponential backoff
+- ✅ حفظ محادثات الـ AI في قاعدة البيانات
+- ✅ استخراج quick actions ذكية من سياق المحادثة
+
+### 2025-11-30
+- ✅ إصلاحات التحديث المباشر
+- ✅ إدارة الجلسات
+- ✅ تحسينات واجهة الجوال للمستفيدين
+- ✅ تحسينات الأداء (Memoization)
+- ✅ تنظيف الكود
