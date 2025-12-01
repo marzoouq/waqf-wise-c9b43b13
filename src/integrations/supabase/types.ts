@@ -4980,6 +4980,156 @@ export type Database = {
         }
         Relationships: []
       }
+      heir_distributions: {
+        Row: {
+          beneficiary_id: string | null
+          created_at: string | null
+          distribution_date: string
+          fiscal_year_id: string | null
+          heir_type: string
+          id: string
+          is_historical: boolean | null
+          journal_entry_id: string | null
+          notes: string | null
+          share_amount: number
+          updated_at: string | null
+        }
+        Insert: {
+          beneficiary_id?: string | null
+          created_at?: string | null
+          distribution_date: string
+          fiscal_year_id?: string | null
+          heir_type: string
+          id?: string
+          is_historical?: boolean | null
+          journal_entry_id?: string | null
+          notes?: string | null
+          share_amount?: number
+          updated_at?: string | null
+        }
+        Update: {
+          beneficiary_id?: string | null
+          created_at?: string | null
+          distribution_date?: string
+          fiscal_year_id?: string | null
+          heir_type?: string
+          id?: string
+          is_historical?: boolean | null
+          journal_entry_id?: string | null
+          notes?: string | null
+          share_amount?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "heir_distributions_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "heir_distributions_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_account_statement"
+            referencedColumns: ["beneficiary_id"]
+          },
+          {
+            foreignKeyName: "heir_distributions_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_statistics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "heir_distributions_fiscal_year_id_fkey"
+            columns: ["fiscal_year_id"]
+            isOneToOne: false
+            referencedRelation: "fiscal_years"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "heir_distributions_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
+            referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      historical_invoices: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          description: string | null
+          document_path: string | null
+          fiscal_year_id: string | null
+          id: string
+          invoice_date: string
+          invoice_number: string
+          is_historical: boolean | null
+          journal_entry_id: string | null
+          subtotal: number
+          total_amount: number
+          updated_at: string | null
+          vat_amount: number | null
+          vendor_name: string
+          vendor_tax_id: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          document_path?: string | null
+          fiscal_year_id?: string | null
+          id?: string
+          invoice_date: string
+          invoice_number: string
+          is_historical?: boolean | null
+          journal_entry_id?: string | null
+          subtotal?: number
+          total_amount?: number
+          updated_at?: string | null
+          vat_amount?: number | null
+          vendor_name: string
+          vendor_tax_id?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          document_path?: string | null
+          fiscal_year_id?: string | null
+          id?: string
+          invoice_date?: string
+          invoice_number?: string
+          is_historical?: boolean | null
+          journal_entry_id?: string | null
+          subtotal?: number
+          total_amount?: number
+          updated_at?: string | null
+          vat_amount?: number | null
+          vendor_name?: string
+          vendor_tax_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "historical_invoices_fiscal_year_id_fkey"
+            columns: ["fiscal_year_id"]
+            isOneToOne: false
+            referencedRelation: "fiscal_years"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "historical_invoices_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
+            referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       identity_verifications: {
         Row: {
           beneficiary_id: string
@@ -5348,6 +5498,7 @@ export type Database = {
           entry_type: Database["public"]["Enums"]["entry_type"] | null
           fiscal_year_id: string
           id: string
+          is_historical: boolean | null
           posted: boolean | null
           posted_at: string | null
           reference_id: string | null
@@ -5366,6 +5517,7 @@ export type Database = {
           entry_type?: Database["public"]["Enums"]["entry_type"] | null
           fiscal_year_id: string
           id?: string
+          is_historical?: boolean | null
           posted?: boolean | null
           posted_at?: string | null
           reference_id?: string | null
@@ -5384,6 +5536,7 @@ export type Database = {
           entry_type?: Database["public"]["Enums"]["entry_type"] | null
           fiscal_year_id?: string
           id?: string
+          is_historical?: boolean | null
           posted?: boolean | null
           posted_at?: string | null
           reference_id?: string | null
@@ -6810,6 +6963,54 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      opening_balances: {
+        Row: {
+          account_id: string | null
+          balance_date: string
+          closing_balance: number | null
+          created_at: string | null
+          fiscal_year_id: string | null
+          id: string
+          opening_balance: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          account_id?: string | null
+          balance_date: string
+          closing_balance?: number | null
+          created_at?: string | null
+          fiscal_year_id?: string | null
+          id?: string
+          opening_balance?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          account_id?: string | null
+          balance_date?: string
+          closing_balance?: number | null
+          created_at?: string | null
+          fiscal_year_id?: string | null
+          id?: string
+          opening_balance?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "opening_balances_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opening_balances_fiscal_year_id_fkey"
+            columns: ["fiscal_year_id"]
+            isOneToOne: false
+            referencedRelation: "fiscal_years"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       organization_settings: {
         Row: {

@@ -72,22 +72,23 @@ class ProductionLogger {
   }
 
   /**
-   * تسجيل رسالة debug (للتطوير فقط)
+   * تسجيل رسالة debug (للتطوير فقط - لا تُرسل للسيرفر أبداً)
    */
   debug(message: string, data?: unknown): void {
     if (IS_DEV) {
       console.log(`🐛 ${message}`, data !== undefined ? data : '');
     }
+    // Debug للتطوير فقط - لا ترسل للسيرفر
   }
 
   /**
-   * تسجيل رسالة معلوماتية
+   * تسجيل رسالة معلوماتية (لا تُرسل للسيرفر - معلومات فقط)
    */
   info(message: string, data?: unknown): void {
     if (IS_DEV) {
       console.info(`ℹ️ ${message}`, data !== undefined ? data : '');
     }
-    this.addToQueue('info', message, data);
+    // لا ترسل info للسيرفر - معلومات فقط وليست أخطاء
   }
 
   /**
@@ -124,13 +125,13 @@ class ProductionLogger {
   }
 
   /**
-   * تسجيل نجاح عملية (للإحصائيات)
+   * تسجيل نجاح عملية (للإحصائيات - لا تُرسل للسيرفر)
    */
   success(message: string, data?: unknown): void {
     if (IS_DEV) {
       console.log(`✅ ${message}`, data !== undefined ? data : '');
     }
-    this.addToQueue('info', `SUCCESS: ${message}`, data);
+    // لا ترسل success للسيرفر - معلومات فقط
   }
 
   /**
