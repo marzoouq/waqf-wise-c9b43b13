@@ -475,19 +475,25 @@ serve(async (req) => {
       return errorResponse('API Key not configured', 500);
     }
 
-    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${lovableApiKey}`,
-      },
-      body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
-        messages: [
-          {
-            role: 'system',
-            content: `أنت مساعد ذكي لمنصة إدارة الأوقاف. ساعد المستخدم بالإجابة على أسئلته بناءً على البيانات المتاحة.
-            
+    // دالة للاستدعاء مع إعادة المحاولة
+    const callAIWithRetry = async (maxRetries = 3, baseDelay = 1000) => {
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          console.log(`🤖 AI API attempt ${attempt}/${maxRetries}`);
+          
+          const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${lovableApiKey}`,
+            },
+            body: JSON.stringify({
+              model: 'google/gemini-2.5-flash',
+              messages: [
+                {
+                  role: 'system',
+                  content: `أنت مساعد ذكي لمنصة إدارة الأوقاف. ساعد المستخدم بالإجابة على أسئلته بناءً على البيانات المتاحة.
+                  
 البيانات المتاحة:
 ${contextSummary}
 
@@ -497,23 +503,67 @@ ${contextSummary}
 3. إذا طُلبت بيانات غير متوفرة، أخبر المستخدم
 4. قدم روابط مباشرة للصفحات المناسبة عند الحاجة
 5. استخدم الأرقام والإحصائيات من البيانات المتاحة`
-          },
-          {
-            role: 'user',
-            content: message
-          }
-        ],
-        max_tokens: 1000,
-      }),
-    });
+                },
+                {
+                  role: 'user',
+                  content: message
+                }
+              ],
+              max_tokens: 1000,
+            }),
+          });
 
-    if (!aiResponse.ok) {
-      const errorText = await aiResponse.text();
-      console.error('AI API Error:', errorText);
-      return errorResponse(`AI API Error: ${aiResponse.status}`, 500);
+          // التحقق من حالة الاستجابة
+          if (aiResponse.ok) {
+            return await aiResponse.json();
+          }
+
+          const errorText = await aiResponse.text();
+          console.error(`AI API Error (attempt ${attempt}):`, aiResponse.status, errorText);
+
+          // أخطاء قابلة لإعادة المحاولة (5xx, 429)
+          if (aiResponse.status >= 500 || aiResponse.status === 429) {
+            if (attempt < maxRetries) {
+              const delay = baseDelay * Math.pow(2, attempt - 1);
+              console.log(`⏳ Retrying in ${delay}ms...`);
+              await new Promise(resolve => setTimeout(resolve, delay));
+              continue;
+            }
+          }
+
+          // أخطاء غير قابلة لإعادة المحاولة
+          throw new Error(`AI API Error: ${aiResponse.status}`);
+          
+        } catch (fetchError) {
+          console.error(`Fetch error (attempt ${attempt}):`, fetchError);
+          
+          if (attempt < maxRetries) {
+            const delay = baseDelay * Math.pow(2, attempt - 1);
+            console.log(`⏳ Retrying after fetch error in ${delay}ms...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+            continue;
+          }
+          
+          throw fetchError;
+        }
+      }
+      
+      throw new Error('AI service temporarily unavailable');
+    };
+
+    let aiData;
+    try {
+      aiData = await callAIWithRetry(3, 1000);
+    } catch (aiError) {
+      console.error('AI API failed after retries:', aiError);
+      return jsonResponse({
+        success: true,
+        response: 'عذراً، خدمة الذكاء الاصطناعي غير متاحة حالياً. يرجى المحاولة مرة أخرى بعد قليل.',
+        context: contextData,
+        error: 'AI_TEMPORARILY_UNAVAILABLE'
+      });
     }
 
-    const aiData = await aiResponse.json();
     const responseText = aiData.choices?.[0]?.message?.content || 'عذراً، لم أتمكن من معالجة طلبك.';
 
     return jsonResponse({
