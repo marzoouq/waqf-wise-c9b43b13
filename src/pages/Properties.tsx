@@ -160,31 +160,14 @@ const Properties = () => {
           </div>
         )}
 
-        {activeTab === "properties" && (
-          <div className="grid gap-6 lg:grid-cols-3 mb-6">
-            <div className="lg:col-span-2">
-              <PropertiesTabs
-                activeTab={activeTab}
-                onTabChange={setActiveTab}
-                onEditProperty={editProperty}
-                onEditContract={editContract}
-                onEditPayment={editPayment}
-                onEditMaintenance={editMaintenance}
-              />
-            </div>
-          </div>
-        )}
-        
-        {activeTab !== "properties" && (
-          <PropertiesTabs
-            activeTab={activeTab}
-            onTabChange={setActiveTab}
-            onEditProperty={editProperty}
-            onEditContract={editContract}
-            onEditPayment={editPayment}
-            onEditMaintenance={editMaintenance}
-          />
-        )}
+        <PropertiesTabs
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          onEditProperty={editProperty}
+          onEditContract={editContract}
+          onEditPayment={editPayment}
+          onEditMaintenance={editMaintenance}
+        />
 
         <PropertyDialog
           open={propertyDialogOpen}
