@@ -101,7 +101,7 @@ export function BeneficiaryPropertiesTab() {
             <Building2 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{properties.length}</div>
+            <div className="text-xl sm:text-2xl font-bold">{properties.length}</div>
             <p className="text-xs text-muted-foreground mt-1">عقارات الوقف</p>
           </CardContent>
         </Card>
@@ -112,7 +112,7 @@ export function BeneficiaryPropertiesTab() {
             <Home className="h-4 w-4 text-success" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{contracts.length}</div>
+            <div className="text-xl sm:text-2xl font-bold">{contracts.length}</div>
             <p className="text-xs text-muted-foreground mt-1">عقود نشطة</p>
           </CardContent>
         </Card>
@@ -125,7 +125,7 @@ export function BeneficiaryPropertiesTab() {
           <CardContent>
             {settings?.show_property_revenues ? (
               <>
-                <div className="text-2xl font-bold">
+                <div className="text-xl sm:text-2xl font-bold">
                   <MaskedValue
                     value={contracts.reduce((sum, c) => sum + Number(c.monthly_rent || 0), 0).toLocaleString("ar-SA")}
                     type="amount"
