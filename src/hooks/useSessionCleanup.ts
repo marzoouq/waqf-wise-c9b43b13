@@ -5,7 +5,6 @@
 
 import { useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { productionLogger } from '@/lib/logger/production-logger';
 
 const SESSION_CLEANUP_KEY = 'waqf_session_cleanup_pending';
 const LAST_ACTIVE_KEY = 'waqf_last_active_timestamp';
@@ -49,7 +48,9 @@ export const cleanupSession = async (options?: { keepTheme?: boolean }) => {
   try {
     await supabase.auth.signOut({ scope: 'local' });
   } catch (err) {
-    productionLogger.warn('Session cleanup signOut error', { error: err });
+    if (import.meta.env.DEV) {
+      console.warn('Session cleanup signOut error', { error: err });
+    }
   }
 };
 
@@ -105,8 +106,8 @@ export function useSessionCleanup() {
     // التحقق من وجود تنظيف معلق عند بدء التطبيق
     const init = async () => {
       const hadPendingCleanup = await checkPendingCleanup();
-      if (hadPendingCleanup) {
-        productionLogger.info('Cleaned up pending session from previous visit');
+      if (hadPendingCleanup && import.meta.env.DEV) {
+        console.log('Cleaned up pending session from previous visit');
       }
     };
     

@@ -79,14 +79,18 @@ class ErrorTracker {
           }
         });
 
-        productionLogger.info('Loaded Error Tracker settings from DB', {
-          dedupWindow: `${this.config.deduplicationWindow / 60000}min`,
-          maxSameError: this.config.maxSameErrorCount,
-          maxConsecutive: this.config.maxConsecutiveErrors,
-        });
+        if (import.meta.env.DEV) {
+          console.log('Loaded Error Tracker settings from DB', {
+            dedupWindow: `${this.config.deduplicationWindow / 60000}min`,
+            maxSameError: this.config.maxSameErrorCount,
+            maxConsecutive: this.config.maxConsecutiveErrors,
+          });
+        }
       }
     } catch (error) {
-      productionLogger.warn('Failed to load settings from DB, using defaults', error);
+      if (import.meta.env.DEV) {
+        console.warn('Failed to load settings from DB, using defaults', error);
+      }
     }
   }
 
@@ -119,7 +123,9 @@ class ErrorTracker {
         } else {
           localStorage.removeItem(this.config.localStorageKey);
         }
-        productionLogger.info(`Cleaned ${errors.length - cleanedErrors.length} old auth errors`);
+        if (import.meta.env.DEV) {
+          console.log(`Cleaned ${errors.length - cleanedErrors.length} old auth errors`);
+        }
       }
     } catch (error) {
       productionLogger.error('Failed to cleanup old errors', error);
@@ -144,7 +150,9 @@ class ErrorTracker {
       
       if (filteredErrors.length > 0) {
         this.errorQueue.push(...filteredErrors);
-        productionLogger.info(`Loaded ${filteredErrors.length} pending errors`);
+        if (import.meta.env.DEV) {
+          console.log(`Loaded ${filteredErrors.length} pending errors`);
+        }
       } else {
         localStorage.removeItem(this.config.localStorageKey);
       }
@@ -324,7 +332,9 @@ class ErrorTracker {
         if (dedupEntry.count >= this.config.maxSameErrorCount) {
           dedupEntry.resolved = true;
           this.autoResolveError(errorKey);
-          productionLogger.info(`Auto-resolved repeated error: ${errorKey}`);
+          if (import.meta.env.DEV) {
+            console.log(`Auto-resolved repeated error: ${errorKey}`);
+          }
         }
         return;
       }
@@ -353,10 +363,11 @@ class ErrorTracker {
     this.errorQueue.push(report);
     this.processQueue();
 
-    productionLogger.error(`Error tracked: ${report.error_type}`, report, {
-      severity: report.severity,
-      context: 'error_tracker',
-    });
+    // ✅ لا نرسل productionLogger.error هنا لتجنب التكرار
+    // tracker يرسل الخطأ مباشرة للـ edge function
+    if (import.meta.env.DEV) {
+      console.error(`[ErrorTracker] ${report.error_type}:`, report.error_message);
+    }
   }
 
   private async processQueue(): Promise<void> {

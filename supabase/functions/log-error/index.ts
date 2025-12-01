@@ -92,13 +92,25 @@ Deno.serve(async (req) => {
 
     console.log('📥 Received data keys:', Object.keys(rawData));
     
-    // ✅ 3. أولاً: تحقق إذا كانت رسالة عامة (INFO, DEBUG) وليست خطأ حقيقي
-    const generalLog = generalLogSchema.safeParse(rawData);
-    if (generalLog.success && rawData.level && rawData.level !== 'error') {
-      console.log(`ℹ️ General ${rawData.level} log received - not an error, skipping storage`);
+    // ✅ 3. فحص محسّن: تحقق من error_type أيضاً (ليس فقط level)
+    const nonErrorTypes = ['info', 'debug', 'warning'];
+    
+    // فحص level (للتوافق القديم)
+    if (rawData.level && nonErrorTypes.includes(String(rawData.level))) {
+      console.log(`ℹ️ Non-error log (level: ${rawData.level}) - skipping storage`);
       return jsonResponse({
         success: true,
         message: `${rawData.level} log acknowledged`,
+        stored: false,
+      });
+    }
+    
+    // ✅ فحص error_type (التنسيق الجديد من production-logger)
+    if (rawData.error_type && nonErrorTypes.includes(String(rawData.error_type))) {
+      console.log(`ℹ️ Non-error log (type: ${rawData.error_type}) - skipping storage`);
+      return jsonResponse({
+        success: true,
+        message: `${rawData.error_type} log acknowledged`,
         stored: false,
       });
     }
