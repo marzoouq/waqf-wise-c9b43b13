@@ -97,7 +97,7 @@ export default function HistoricalArchive() {
       } else if (dist.heir_type === "ابن") {
         acc.sons += dist.share_amount;
         acc.sonsCount += 1;
-      } else if (dist.heir_type === "ابنة") {
+      } else if (dist.heir_type === "بنت" || dist.heir_type === "ابنة") {
         acc.daughters += dist.share_amount;
         acc.daughtersCount += 1;
       }
