@@ -128,66 +128,66 @@ export default function BeneficiaryPortal() {
               <TabsList className="inline-flex w-full min-w-max mb-6 h-auto p-1">
               {settings?.show_overview && (
                 <TabsTrigger value="overview" className="text-xs sm:text-sm min-h-[44px]">
-                  <TrendingUp className="h-4 w-4 ml-1" />
-                  <span className="hidden sm:inline">نظرة عامة</span>
+                  <TrendingUp className="h-4 w-4 sm:ml-1" />
+                  <span className="text-xs sm:text-sm">عامة</span>
                 </TabsTrigger>
               )}
               {settings?.show_profile && (
                 <TabsTrigger value="profile" className="text-xs sm:text-sm min-h-[44px]">
-                  <User className="h-4 w-4 ml-1" />
-                  <span className="hidden sm:inline">الملف</span>
+                  <User className="h-4 w-4 sm:ml-1" />
+                  <span className="text-xs sm:text-sm">الملف</span>
                 </TabsTrigger>
               )}
               {settings?.show_requests && (
                 <TabsTrigger value="requests" className="text-xs sm:text-sm min-h-[44px]">
-                  <FileText className="h-4 w-4 ml-1" />
-                  <span className="hidden sm:inline">الطلبات</span>
+                  <FileText className="h-4 w-4 sm:ml-1" />
+                  <span className="text-xs sm:text-sm">الطلبات</span>
                 </TabsTrigger>
               )}
               {settings?.show_distributions && (
                 <TabsTrigger value="distributions" className="text-xs sm:text-sm min-h-[44px]">
-                  <TrendingUp className="h-4 w-4 ml-1" />
-                  <span className="hidden sm:inline">التوزيعات</span>
+                  <TrendingUp className="h-4 w-4 sm:ml-1" />
+                  <span className="text-xs sm:text-sm">التوزيعات</span>
                 </TabsTrigger>
               )}
               {settings?.show_statements && (
                 <TabsTrigger value="statements" className="text-xs sm:text-sm min-h-[44px]">
-                  <CreditCard className="h-4 w-4 ml-1" />
-                  <span className="hidden sm:inline">كشف الحساب</span>
+                  <CreditCard className="h-4 w-4 sm:ml-1" />
+                  <span className="text-xs sm:text-sm">الكشف</span>
                 </TabsTrigger>
               )}
               {settings?.show_properties && (
                 <TabsTrigger value="properties" className="text-xs sm:text-sm min-h-[44px]">
-                  <Building2 className="h-4 w-4 ml-1" />
-                  <span className="hidden sm:inline">العقارات</span>
+                  <Building2 className="h-4 w-4 sm:ml-1" />
+                  <span className="text-xs sm:text-sm">العقارات</span>
                 </TabsTrigger>
               )}
               {settings?.show_family_tree && (
                 <TabsTrigger value="family" className="text-xs sm:text-sm min-h-[44px]">
-                  <Users className="h-4 w-4 ml-1" />
-                  <span className="hidden sm:inline">العائلة</span>
+                  <Users className="h-4 w-4 sm:ml-1" />
+                  <span className="text-xs sm:text-sm">العائلة</span>
                 </TabsTrigger>
               )}
               <TabsTrigger value="waqf" className="text-xs sm:text-sm min-h-[44px]">
-                <Landmark className="h-4 w-4 ml-1" />
-                <span className="hidden sm:inline">الوقف</span>
+                <Landmark className="h-4 w-4 sm:ml-1" />
+                <span className="text-xs sm:text-sm">الوقف</span>
               </TabsTrigger>
               {settings?.show_governance && (
                 <TabsTrigger value="governance" className="text-xs sm:text-sm min-h-[44px]">
-                  <Shield className="h-4 w-4 ml-1" />
-                  <span className="hidden sm:inline">الحوكمة</span>
+                  <Shield className="h-4 w-4 sm:ml-1" />
+                  <span className="text-xs sm:text-sm">الحوكمة</span>
                 </TabsTrigger>
               )}
               {settings?.show_budgets && (
                 <TabsTrigger value="budgets" className="text-xs sm:text-sm min-h-[44px]">
-                  <DollarSign className="h-4 w-4 ml-1" />
-                  <span className="hidden sm:inline">الميزانيات</span>
+                  <DollarSign className="h-4 w-4 sm:ml-1" />
+                  <span className="text-xs sm:text-sm">الميزانيات</span>
                 </TabsTrigger>
               )}
               {settings?.show_own_loans && (
                 <TabsTrigger value="loans" className="text-xs sm:text-sm min-h-[44px]">
-                  <CreditCard className="h-4 w-4 ml-1" />
-                  <span className="hidden sm:inline">القروض</span>
+                  <CreditCard className="h-4 w-4 sm:ml-1" />
+                  <span className="text-xs sm:text-sm">القروض</span>
                 </TabsTrigger>
               )}
               </TabsList>
@@ -252,30 +252,30 @@ export default function BeneficiaryPortal() {
                   <CardDescription>روابط الاطلاع السريع على بيانات الوقف</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid gap-4 md:grid-cols-3">
+                  <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
                     <Button 
                       variant="outline" 
-                      className="h-auto py-6 flex-col gap-2"
+                      className="h-auto py-4 flex-col gap-2 min-h-[44px]"
                       onClick={() => setActiveTab("distributions")}
                     >
                       <TrendingUp className="h-6 w-6" />
-                      <span>عرض التوزيعات</span>
+                      <span className="text-sm">عرض التوزيعات</span>
                     </Button>
                     <Button 
                       variant="outline" 
-                      className="h-auto py-6 flex-col gap-2"
+                      className="h-auto py-4 flex-col gap-2 min-h-[44px]"
                       onClick={() => setActiveTab("statements")}
                     >
                       <CreditCard className="h-6 w-6" />
-                      <span>عرض كشف الحساب</span>
+                      <span className="text-sm">عرض كشف الحساب</span>
                     </Button>
                     <Button 
                       variant="outline" 
-                      className="h-auto py-6 flex-col gap-2"
+                      className="h-auto py-4 flex-col gap-2 min-h-[44px]"
                       onClick={() => setActiveTab("properties")}
                     >
                       <Building2 className="h-6 w-6" />
-                      <span>عرض العقارات</span>
+                      <span className="text-sm">عرض العقارات</span>
                     </Button>
                   </div>
                 </CardContent>
