@@ -116,10 +116,10 @@ const Properties = () => {
               </CardHeader>
               <CardContent className="p-3 sm:p-6 pt-0">
                 <div className="text-xl sm:text-2xl font-bold text-success">
-                  {stats.totalMonthlyRevenue.toLocaleString('ar-SA')} ريال
+                  {(stats.totalMonthlyRevenue || 0).toLocaleString('ar-SA')} ريال
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {stats.totalAnnualRevenue.toLocaleString('ar-SA')} ريال سنوياً
+                  {(stats.totalAnnualRevenue || 0).toLocaleString('ar-SA')} ريال سنوياً
                 </p>
               </CardContent>
             </Card>
