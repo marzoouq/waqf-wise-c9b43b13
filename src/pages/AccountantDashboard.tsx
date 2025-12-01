@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { FileText, DollarSign, AlertCircle, CheckCircle, XCircle, TrendingUp, FileCheck, FileClock, LayoutDashboard, Mail } from "lucide-react";
 import { useAccountantKPIs } from "@/hooks/useAccountantKPIs";
 import { ApproveJournalDialog } from "@/components/accounting/ApproveJournalDialog";
@@ -113,29 +114,32 @@ const AccountantDashboard = () => {
 
       {/* Tabs for organized view */}
       <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3 h-auto p-1 bg-muted/50">
-          <TabsTrigger 
-            value="overview" 
-            className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
-          >
-            <LayoutDashboard className="h-4 w-4" />
-            <span className="hidden sm:inline">نظرة عامة</span>
-          </TabsTrigger>
-          <TabsTrigger 
-            value="approvals"
-            className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
-          >
-            <AlertCircle className="h-4 w-4" />
-            <span className="hidden sm:inline">الموافقات</span>
-          </TabsTrigger>
-          <TabsTrigger 
-            value="entries"
-            className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
-          >
-            <FileText className="h-4 w-4" />
-            <span className="hidden sm:inline">القيود الأخيرة</span>
-          </TabsTrigger>
-        </TabsList>
+        <ScrollArea className="w-full whitespace-nowrap">
+          <TabsList className="inline-flex h-auto p-1 bg-muted/50">
+            <TabsTrigger 
+              value="overview" 
+              className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm px-3 sm:px-4"
+            >
+              <LayoutDashboard className="h-4 w-4" />
+              <span className="text-xs sm:text-sm">نظرة عامة</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="approvals"
+              className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm px-3 sm:px-4"
+            >
+              <AlertCircle className="h-4 w-4" />
+              <span className="text-xs sm:text-sm">الموافقات</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="entries"
+              className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm px-3 sm:px-4"
+            >
+              <FileText className="h-4 w-4" />
+              <span className="text-xs sm:text-sm">القيود الأخيرة</span>
+            </TabsTrigger>
+          </TabsList>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
 
         <TabsContent value="overview" className="space-y-4">
           <Suspense fallback={<SectionSkeleton />}>
