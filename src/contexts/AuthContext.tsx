@@ -30,9 +30,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [roles, setRoles] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [rolesLoading, setRolesLoading] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false); // ✅ جديد: التهيئة اكتملت
   const { toast } = useToast();
   const initRef = useRef(false);
-  const initialLoadDone = useRef(false); // ✅ تتبع التحميل الأولي
   const rolesCache = useRef<string[]>([]);
   const ROLES_CACHE_KEY = 'waqf_user_roles';
 
@@ -42,7 +42,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const cached = localStorage.getItem(ROLES_CACHE_KEY);
       if (cached) {
         const { userId: cachedUserId, roles: cachedRoles, timestamp } = JSON.parse(cached);
-        // صالح لمدة 5 دقائق
         if (cachedUserId === userId && Date.now() - timestamp < 5 * 60 * 1000) {
           return cachedRoles;
         }
@@ -54,11 +53,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // حفظ الأدوار في الـ cache
-  const setCachedRoles = useCallback((userId: string, roles: string[]) => {
+  const setCachedRoles = useCallback((userId: string, newRoles: string[]) => {
     try {
       localStorage.setItem(ROLES_CACHE_KEY, JSON.stringify({
         userId,
-        roles,
+        roles: newRoles,
         timestamp: Date.now()
       }));
     } catch {
@@ -68,7 +67,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // جلب أدوار المستخدم من قاعدة البيانات
   const fetchUserRoles = useCallback(async (userId: string): Promise<string[]> => {
-    // محاولة استخدام الـ cache أولاً للتحميل السريع
     const cached = getCachedRoles(userId);
     if (cached && cached.length > 0) {
       rolesCache.current = cached;
@@ -121,16 +119,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // تنظيف الجلسات التالفة
   const cleanupInvalidSession = useCallback(async () => {
     try {
-      // إزالة tokens القديمة من localStorage
       const keysToClean = Object.keys(localStorage).filter(key => 
         key.includes('supabase') || key.includes('sb-') || key === ROLES_CACHE_KEY
       );
       keysToClean.forEach(key => localStorage.removeItem(key));
       
-      // تسجيل الخروج من Supabase
       await supabase.auth.signOut({ scope: 'local' });
       
-      // تنظيف الحالة
       setUser(null);
       setSession(null);
       setProfile(null);
@@ -142,17 +137,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // جلب البيانات بشكل متوازي
-  const fetchUserData = useCallback(async (userId: string) => {
-    // جلب profile و roles بشكل متوازي
-    await Promise.all([
-      fetchProfile(userId),
-      fetchUserRoles(userId)
-    ]);
-  }, [fetchUserRoles]);
-
-  // جلب الملف الشخصي - مُحسّن (الـ trigger يُنشئ الملف تلقائياً)
-  const fetchProfile = async (userId: string) => {
+  // جلب الملف الشخصي
+  const fetchProfile = useCallback(async (userId: string) => {
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -164,9 +150,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         productionLogger.error('Error fetching profile', error);
       }
       
-      // الـ trigger ينشئ الـ profile تلقائياً، لذا إذا لم يوجد ننتظر قليلاً ونعيد المحاولة
       if (!data) {
-        // انتظار قصير للـ trigger
         await new Promise(resolve => setTimeout(resolve, 200));
         const { data: retryData } = await supabase
           .from('profiles')
@@ -182,22 +166,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (error) {
       productionLogger.error('Exception fetching profile', error);
+    }
+  }, []);
+
+  // جلب البيانات بشكل متوازي
+  const fetchUserData = useCallback(async (userId: string) => {
+    try {
+      await Promise.all([
+        fetchProfile(userId),
+        fetchUserRoles(userId)
+      ]);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [fetchProfile, fetchUserRoles]);
 
   useEffect(() => {
-    // Prevent double initialization
     if (initRef.current) return;
     initRef.current = true;
 
-    // ✅ جلب الجلسة أولاً قبل إعداد المستمع
+    let isMounted = true;
+
     const initializeAuth = async () => {
       try {
+        // ✅ جلب الجلسة الحالية
         const { data: { session: currentSession }, error } = await supabase.auth.getSession();
         
-        // معالجة أخطاء الجلسة التالفة
+        if (!isMounted) return;
+
         if (error) {
           const errorMsg = error.message?.toLowerCase() || '';
           if (errorMsg.includes('invalid') || 
@@ -207,39 +203,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             productionLogger.warn('Invalid session detected, cleaning up', error.message);
             await cleanupInvalidSession();
             setIsLoading(false);
-            initialLoadDone.current = true;
+            setIsInitialized(true);
             return;
           }
         }
 
+        // ✅ تحديث الحالة
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
         
         if (currentSession?.user) {
-          // جلب البيانات بشكل متوازي
           await fetchUserData(currentSession.user.id);
         } else {
           setIsLoading(false);
           setRolesLoading(false);
         }
         
-        initialLoadDone.current = true;
+        setIsInitialized(true);
       } catch (err) {
+        if (!isMounted) return;
         productionLogger.error('Unexpected error getting session', err);
         await cleanupInvalidSession();
         setIsLoading(false);
-        initialLoadDone.current = true;
+        setIsInitialized(true);
       }
     };
 
-    // ✅ إعداد المستمع لتغييرات الجلسة (بعد التحميل الأولي)
+    // ✅ إعداد المستمع لتغييرات الجلسة
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, newSession) => {
-      // ✅ تجاهل الحدث الأولي إذا لم يكتمل التحميل الأولي بعد
-      if (!initialLoadDone.current && event === 'INITIAL_SESSION') {
+      if (!isMounted) return;
+      
+      // ✅ تجاهل الأحداث قبل اكتمال التهيئة الأولية
+      if (event === 'INITIAL_SESSION') {
         return;
       }
 
-      // معالجة حدث تسجيل الخروج
       if (event === 'SIGNED_OUT') {
         setUser(null);
         setSession(null);
@@ -251,7 +249,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // معالجة خطأ تجديد الـ token
       if (event === 'TOKEN_REFRESHED' && !newSession) {
         productionLogger.warn('Token refresh failed, cleaning up session');
         cleanupInvalidSession();
@@ -260,29 +257,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // تحديث الجلسة والمستخدم
-      setSession(newSession);
-      setUser(newSession?.user ?? null);
-      
+      // ✅ SIGNED_IN أو TOKEN_REFRESHED مع جلسة صالحة
       if (newSession?.user) {
-        // استخدام setTimeout لتجنب deadlock - جلب البيانات بشكل متوازي
-        setTimeout(() => {
-          fetchUserData(newSession.user.id);
-        }, 0);
-      } else if (initialLoadDone.current) {
-        // ✅ فقط إذا اكتمل التحميل الأولي
-        setProfile(null);
-        setRoles([]);
-        rolesCache.current = [];
-        setIsLoading(false);
-        setRolesLoading(false);
+        setSession(newSession);
+        setUser(newSession.user);
+        
+        // جلب البيانات فقط إذا كان التهيئة اكتملت (لتجنب التكرار)
+        if (event === 'SIGNED_IN') {
+          setIsLoading(true);
+          setTimeout(() => {
+            fetchUserData(newSession.user.id);
+          }, 0);
+        }
       }
     });
 
-    // بدء التهيئة
+    // ✅ بدء التهيئة
     initializeAuth();
 
     return () => {
+      isMounted = false;
       subscription.unsubscribe();
       initRef.current = false;
     };
@@ -313,7 +307,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      // تنظيف localStorage (الاحتفاظ فقط بإعدادات الثيم)
       const keysToKeep = [
         'theme',
         'vite-ui-theme',
@@ -332,16 +325,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       
       keysToRemove.forEach(key => localStorage.removeItem(key));
-
-      // تنظيف sessionStorage
       sessionStorage.clear();
 
-      // تسجيل الخروج من Supabase
       const { error } = await supabase.auth.signOut();
       
       if (error) throw error;
 
-      // تنظيف الحالة المحلية
       setUser(null);
       setSession(null);
       setProfile(null);
@@ -361,7 +350,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         variant: "destructive",
       });
       
-      // محاولة التنظيف على أي حال
       setUser(null);
       setSession(null);
       setProfile(null);
@@ -372,48 +360,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  /**
-   * التحقق من دور معين - sync version
-   */
   const hasRole = (role: string): boolean => {
     return roles.includes(role);
   };
 
-  /**
-   * التحقق من صلاحية معينة - async version
-   */
   const hasPermission = async (permission: string): Promise<boolean> => {
     if (!user) return false;
 
-    // استخدام الـ cache إذا كان متوفراً
     let currentRoles = rolesCache.current;
     
-    // إذا لم يكن هناك cache، جلب الأدوار
     if (currentRoles.length === 0) {
       currentRoles = await fetchUserRoles(user.id);
     }
 
-    // استخدام دالة checkPermission من config
     return checkPermission(permission as Permission, currentRoles);
   };
 
-  /**
-   * التحقق من صلاحية معينة - sync version (للاستخدام في المكونات)
-   */
   const checkPermissionSync = (permission: string, userRoles: string[]): boolean => {
     return checkPermission(permission as Permission, userRoles);
   };
 
-  /**
-   * التحقق من دور معين - async version
-   */
   const isRole = async (roleName: string): Promise<boolean> => {
     if (!user) return false;
 
-    // استخدام الـ cache إذا كان متوفراً
     let currentRoles = rolesCache.current;
     
-    // إذا لم يكن هناك cache، جلب الأدوار
     if (currentRoles.length === 0) {
       currentRoles = await fetchUserRoles(user.id);
     }
@@ -421,10 +392,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return currentRoles.includes(roleName);
   };
 
+  // ✅ إظهار التحميل حتى تكتمل التهيئة
+  const effectiveIsLoading = !isInitialized || isLoading;
+
   const value = {
     user,
     profile,
-    isLoading,
+    isLoading: effectiveIsLoading,
     roles,
     rolesLoading,
     signIn,
@@ -447,5 +421,4 @@ export function useAuth() {
   return context;
 }
 
-// تصدير خريطة الصلاحيات للاستخدام في أماكن أخرى
 export { ROLE_PERMISSIONS };
