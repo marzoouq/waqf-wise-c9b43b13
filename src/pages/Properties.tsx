@@ -21,6 +21,7 @@ const Properties = () => {
   const [providersDialogOpen, setProvidersDialogOpen] = useState(false);
   const [aiAction, setAiAction] = useState<"analyze_property" | "suggest_maintenance" | "predict_revenue" | "optimize_contracts" | "alert_insights">("analyze_property");
   const [selectedPropertyForAI, setSelectedPropertyForAI] = useState<any>(null);
+  
   const { addProperty, updateProperty, properties } = useProperties();
   const { data: stats, isLoading: statsLoading } = usePropertiesStats();
   const [activeTab, setActiveTab] = useState("properties");
@@ -115,10 +116,10 @@ const Properties = () => {
               </CardHeader>
               <CardContent className="p-3 sm:p-6 pt-0">
                 <div className="text-xl sm:text-2xl font-bold text-success">
-                  {(stats.totalMonthlyRevenue || 0).toLocaleString('ar-SA')} ريال
+                  {stats.totalMonthlyRevenue.toLocaleString('ar-SA')} ريال
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {(stats.totalAnnualRevenue || 0).toLocaleString('ar-SA')} ريال سنوياً
+                  {stats.totalAnnualRevenue.toLocaleString('ar-SA')} ريال سنوياً
                 </p>
               </CardContent>
             </Card>

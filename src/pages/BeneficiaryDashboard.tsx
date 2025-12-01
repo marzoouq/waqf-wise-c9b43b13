@@ -21,8 +21,7 @@ import {
   ActivityTimeline,
   YearlyComparison,
   ChangePasswordDialog,
-  FinancialTransparencyTab,
-  HistoricalDistributionsCard
+  FinancialTransparencyTab
 } from "@/components/beneficiary";
 import { UnifiedDashboardLayout } from "@/components/dashboard/UnifiedDashboardLayout";
 import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
@@ -186,9 +185,6 @@ const BeneficiaryDashboard = () => {
           <TabsContent value="overview" className="space-y-6">
             {/* المساعد الذكي */}
             <ChatbotQuickCard />
-
-            {/* التوزيعات التاريخية */}
-            <HistoricalDistributionsCard beneficiaryId={beneficiary.id} />
 
             {/* الإجراءات السريعة - للاطلاع فقط */}
             <QuickActionsCard

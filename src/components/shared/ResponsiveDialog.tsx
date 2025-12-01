@@ -1,4 +1,4 @@
-import { ReactNode, useMemo } from 'react';
+import { ReactNode } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -42,17 +42,13 @@ export function ResponsiveDialog({
 }: ResponsiveDialogProps) {
   const isDesktop = useMediaQuery('(min-width: 768px)');
 
-  // استخدام useMemo لتجنب إعادة الحساب غير الضرورية
-  const sizeClasses = useMemo(() => ({
+  const sizeClasses = {
     sm: 'max-w-sm',
     md: 'max-w-md',
     lg: 'max-w-lg',
     xl: 'max-w-xl',
     full: 'max-w-full',
-  }), []);
-
-  // استخدام useMemo لمحتوى الـ dialog/drawer لتحسين الأداء
-  const content = useMemo(() => children, [children]);
+  };
 
   if (isDesktop) {
     return (
@@ -62,7 +58,7 @@ export function ResponsiveDialog({
             <DialogTitle>{title}</DialogTitle>
             <DialogDescription>{description}</DialogDescription>
           </DialogHeader>
-          {content}
+          {children}
         </DialogContent>
       </Dialog>
     );
@@ -76,7 +72,7 @@ export function ResponsiveDialog({
             <DrawerTitle>{title}</DrawerTitle>
             <DrawerDescription>{description}</DrawerDescription>
           </DrawerHeader>
-          {content}
+          {children}
         </div>
       </DrawerContent>
     </Drawer>

@@ -30,7 +30,6 @@ import {
   LoansOverviewTab
 } from "@/components/beneficiary";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
-import { useIsMobile } from "@/hooks/useIsMobile";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 
@@ -38,7 +37,6 @@ export default function BeneficiaryPortal() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
   const { settings, isLoading: settingsLoading } = useVisibilitySettings();
-  const isMobile = useIsMobile();
 
   // جلب بيانات المستفيد الحالي
   const { data: beneficiary, isLoading } = useQuery({
@@ -108,181 +106,176 @@ export default function BeneficiaryPortal() {
     <PageErrorBoundary pageName="بوابة المستفيد">
       <MobileOptimizedLayout>
         <div className="space-y-6">
-          {/* Header - محسّن للجوال */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex-1 min-w-0">
-              <h1 className="text-2xl sm:text-3xl font-bold truncate">مرحباً، {beneficiary.full_name}</h1>
-              <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold">مرحباً، {beneficiary.full_name}</h1>
+              <p className="text-muted-foreground mt-1">
                 آخر تسجيل دخول: {beneficiary.last_login_at 
-                  ? format(new Date(beneficiary.last_login_at), isMobile ? "dd/MM/yyyy" : "dd MMMM yyyy - HH:mm", { locale: ar })
+                  ? format(new Date(beneficiary.last_login_at), "dd MMMM yyyy - HH:mm", { locale: ar })
                   : "—"}
               </p>
             </div>
-            <Button 
-              onClick={() => navigate("/messages")} 
-              variant="outline"
-              size={isMobile ? "sm" : "default"}
-              className="w-full sm:w-auto"
-            >
+            <Button onClick={() => navigate("/messages")} variant="outline">
               <MessageSquare className="h-4 w-4 ml-2" />
               الرسائل
             </Button>
           </div>
 
-          {/* Main Tabs - محسّن للجوال */}
+          {/* Main Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <ScrollArea className="w-full whitespace-nowrap">
-              <TabsList className="inline-flex w-auto mb-6 h-auto p-1 gap-1">
+            <ScrollArea className="w-full">
+              <TabsList className="inline-flex w-full min-w-max mb-6 h-auto p-1">
               {settings?.show_overview && (
-                <TabsTrigger value="overview" className="flex-col sm:flex-row gap-1 px-3 py-2 min-h-[44px]">
-                  <TrendingUp className="h-4 w-4" />
-                  <span className="text-[10px] sm:text-sm">نظرة عامة</span>
+                <TabsTrigger value="overview" className="text-xs sm:text-sm min-h-[44px]">
+                  <TrendingUp className="h-4 w-4 ml-1" />
+                  <span className="hidden sm:inline">نظرة عامة</span>
                 </TabsTrigger>
               )}
               {settings?.show_profile && (
-                <TabsTrigger value="profile" className="flex-col sm:flex-row gap-1 px-3 py-2 min-h-[44px]">
-                  <User className="h-4 w-4" />
-                  <span className="text-[10px] sm:text-sm">الملف</span>
+                <TabsTrigger value="profile" className="text-xs sm:text-sm min-h-[44px]">
+                  <User className="h-4 w-4 ml-1" />
+                  <span className="hidden sm:inline">الملف</span>
                 </TabsTrigger>
               )}
               {settings?.show_requests && (
-                <TabsTrigger value="requests" className="flex-col sm:flex-row gap-1 px-3 py-2 min-h-[44px]">
-                  <FileText className="h-4 w-4" />
-                  <span className="text-[10px] sm:text-sm">الطلبات</span>
+                <TabsTrigger value="requests" className="text-xs sm:text-sm min-h-[44px]">
+                  <FileText className="h-4 w-4 ml-1" />
+                  <span className="hidden sm:inline">الطلبات</span>
                 </TabsTrigger>
               )}
               {settings?.show_distributions && (
-                <TabsTrigger value="distributions" className="flex-col sm:flex-row gap-1 px-3 py-2 min-h-[44px]">
-                  <TrendingUp className="h-4 w-4" />
-                  <span className="text-[10px] sm:text-sm">التوزيعات</span>
+                <TabsTrigger value="distributions" className="text-xs sm:text-sm min-h-[44px]">
+                  <TrendingUp className="h-4 w-4 ml-1" />
+                  <span className="hidden sm:inline">التوزيعات</span>
                 </TabsTrigger>
               )}
               {settings?.show_statements && (
-                <TabsTrigger value="statements" className="flex-col sm:flex-row gap-1 px-3 py-2 min-h-[44px]">
-                  <CreditCard className="h-4 w-4" />
-                  <span className="text-[10px] sm:text-sm">كشف الحساب</span>
+                <TabsTrigger value="statements" className="text-xs sm:text-sm min-h-[44px]">
+                  <CreditCard className="h-4 w-4 ml-1" />
+                  <span className="hidden sm:inline">كشف الحساب</span>
                 </TabsTrigger>
               )}
               {settings?.show_properties && (
-                <TabsTrigger value="properties" className="flex-col sm:flex-row gap-1 px-3 py-2 min-h-[44px]">
-                  <Building2 className="h-4 w-4" />
-                  <span className="text-[10px] sm:text-sm">العقارات</span>
+                <TabsTrigger value="properties" className="text-xs sm:text-sm min-h-[44px]">
+                  <Building2 className="h-4 w-4 ml-1" />
+                  <span className="hidden sm:inline">العقارات</span>
                 </TabsTrigger>
               )}
               {settings?.show_family_tree && (
-                <TabsTrigger value="family" className="flex-col sm:flex-row gap-1 px-3 py-2 min-h-[44px]">
-                  <Users className="h-4 w-4" />
-                  <span className="text-[10px] sm:text-sm">العائلة</span>
+                <TabsTrigger value="family" className="text-xs sm:text-sm min-h-[44px]">
+                  <Users className="h-4 w-4 ml-1" />
+                  <span className="hidden sm:inline">العائلة</span>
                 </TabsTrigger>
               )}
-              <TabsTrigger value="waqf" className="flex-col sm:flex-row gap-1 px-3 py-2 min-h-[44px]">
-                <Landmark className="h-4 w-4" />
-                <span className="text-[10px] sm:text-sm">الوقف</span>
+              <TabsTrigger value="waqf" className="text-xs sm:text-sm min-h-[44px]">
+                <Landmark className="h-4 w-4 ml-1" />
+                <span className="hidden sm:inline">الوقف</span>
               </TabsTrigger>
               {settings?.show_governance && (
-                <TabsTrigger value="governance" className="flex-col sm:flex-row gap-1 px-3 py-2 min-h-[44px]">
-                  <Shield className="h-4 w-4" />
-                  <span className="text-[10px] sm:text-sm">الحوكمة</span>
+                <TabsTrigger value="governance" className="text-xs sm:text-sm min-h-[44px]">
+                  <Shield className="h-4 w-4 ml-1" />
+                  <span className="hidden sm:inline">الحوكمة</span>
                 </TabsTrigger>
               )}
               {settings?.show_budgets && (
-                <TabsTrigger value="budgets" className="flex-col sm:flex-row gap-1 px-3 py-2 min-h-[44px]">
-                  <DollarSign className="h-4 w-4" />
-                  <span className="text-[10px] sm:text-sm">الميزانيات</span>
+                <TabsTrigger value="budgets" className="text-xs sm:text-sm min-h-[44px]">
+                  <DollarSign className="h-4 w-4 ml-1" />
+                  <span className="hidden sm:inline">الميزانيات</span>
                 </TabsTrigger>
               )}
               {settings?.show_own_loans && (
-                <TabsTrigger value="loans" className="flex-col sm:flex-row gap-1 px-3 py-2 min-h-[44px]">
-                  <CreditCard className="h-4 w-4" />
-                  <span className="text-[10px] sm:text-sm">القروض</span>
+                <TabsTrigger value="loans" className="text-xs sm:text-sm min-h-[44px]">
+                  <CreditCard className="h-4 w-4 ml-1" />
+                  <span className="hidden sm:inline">القروض</span>
                 </TabsTrigger>
               )}
               </TabsList>
-              <ScrollBar orientation="horizontal" className="h-2" />
+              <ScrollBar orientation="horizontal" />
             </ScrollArea>
 
             {/* Overview Tab */}
-            <TabsContent value="overview" className="space-y-6 animate-fade-in">
-              {/* KPIs - محسّن للجوال */}
-              <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-                <Card className="hover-scale">
+            <TabsContent value="overview" className="space-y-6">
+              {/* KPIs */}
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-xs sm:text-sm font-medium">إجمالي المستلم</CardTitle>
-                    <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-success" />
+                    <CardTitle className="text-sm font-medium">إجمالي المستلم</CardTitle>
+                    <TrendingUp className="h-4 w-4 text-success" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-xl sm:text-2xl font-bold">{Number(stats.total_received || 0).toLocaleString("ar-SA")} <span className="text-sm sm:text-base">ريال</span></div>
-                    <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">من جميع المدفوعات</p>
+                    <div className="text-2xl font-bold">{Number(stats.total_received || 0).toLocaleString("ar-SA")} ريال</div>
+                    <p className="text-xs text-muted-foreground mt-1">من جميع المدفوعات</p>
                   </CardContent>
                 </Card>
 
-                <Card className="hover-scale">
+                <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-xs sm:text-sm font-medium">الرصيد الحالي</CardTitle>
-                    <CreditCard className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                    <CardTitle className="text-sm font-medium">الرصيد الحالي</CardTitle>
+                    <CreditCard className="h-4 w-4 text-primary" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-xl sm:text-2xl font-bold">{Number(beneficiary.account_balance || 0).toLocaleString("ar-SA")} <span className="text-sm sm:text-base">ريال</span></div>
-                    <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">الرصيد المتاح</p>
+                    <div className="text-2xl font-bold">{Number(beneficiary.account_balance || 0).toLocaleString("ar-SA")} ريال</div>
+                    <p className="text-xs text-muted-foreground mt-1">الرصيد المتاح</p>
                   </CardContent>
                 </Card>
 
-                <Card className="hover-scale">
+                <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-xs sm:text-sm font-medium">الطلبات المعلقة</CardTitle>
-                    <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-warning" />
+                    <CardTitle className="text-sm font-medium">الطلبات المعلقة</CardTitle>
+                    <Clock className="h-4 w-4 text-warning" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-xl sm:text-2xl font-bold">{stats.pending_requests || 0}</div>
-                    <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
+                    <div className="text-2xl font-bold">{stats.pending_requests || 0}</div>
+                    <p className="text-xs text-muted-foreground mt-1">
                       {Number(stats.pending_amount || 0).toLocaleString("ar-SA")} ريال
                     </p>
                   </CardContent>
                 </Card>
 
-                <Card className="hover-scale">
+                <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-xs sm:text-sm font-medium">إجمالي الطلبات</CardTitle>
-                    <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-info" />
+                    <CardTitle className="text-sm font-medium">إجمالي الطلبات</CardTitle>
+                    <CheckCircle className="h-4 w-4 text-info" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-xl sm:text-2xl font-bold">{stats.total_requests || 0}</div>
-                    <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">جميع الطلبات</p>
+                    <div className="text-2xl font-bold">{stats.total_requests || 0}</div>
+                    <p className="text-xs text-muted-foreground mt-1">جميع الطلبات</p>
                   </CardContent>
                 </Card>
               </div>
 
-              {/* Quick Actions - محسّن للجوال */}
-              <Card className="animate-fade-in">
+          {/* Quick Actions - للاطلاع فقط */}
+              <Card>
                 <CardHeader>
-                  <CardTitle className="text-base sm:text-lg">إجراءات سريعة</CardTitle>
-                  <CardDescription className="text-xs sm:text-sm">روابط الاطلاع السريع على بيانات الوقف</CardDescription>
+                  <CardTitle>إجراءات سريعة</CardTitle>
+                  <CardDescription>روابط الاطلاع السريع على بيانات الوقف</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-3">
+                  <div className="grid gap-4 md:grid-cols-3">
                     <Button 
                       variant="outline" 
-                      className="h-auto py-4 sm:py-6 flex-col gap-2 hover-scale"
+                      className="h-auto py-6 flex-col gap-2"
                       onClick={() => setActiveTab("distributions")}
                     >
-                      <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6" />
-                      <span className="text-xs sm:text-sm">عرض التوزيعات</span>
+                      <TrendingUp className="h-6 w-6" />
+                      <span>عرض التوزيعات</span>
                     </Button>
                     <Button 
                       variant="outline" 
-                      className="h-auto py-4 sm:py-6 flex-col gap-2 hover-scale"
+                      className="h-auto py-6 flex-col gap-2"
                       onClick={() => setActiveTab("statements")}
                     >
-                      <CreditCard className="h-5 w-5 sm:h-6 sm:w-6" />
-                      <span className="text-xs sm:text-sm">عرض كشف الحساب</span>
+                      <CreditCard className="h-6 w-6" />
+                      <span>عرض كشف الحساب</span>
                     </Button>
                     <Button 
                       variant="outline" 
-                      className="h-auto py-4 sm:py-6 flex-col gap-2 hover-scale"
+                      className="h-auto py-6 flex-col gap-2"
                       onClick={() => setActiveTab("properties")}
                     >
-                      <Building2 className="h-5 w-5 sm:h-6 sm:w-6" />
-                      <span className="text-xs sm:text-sm">عرض العقارات</span>
+                      <Building2 className="h-6 w-6" />
+                      <span>عرض العقارات</span>
                     </Button>
                   </div>
                 </CardContent>

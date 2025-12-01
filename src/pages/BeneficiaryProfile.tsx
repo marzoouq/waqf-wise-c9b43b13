@@ -16,8 +16,7 @@ import {
   ProfilePaymentsHistory,
   ProfileRequestsHistory,
   ProfileFamilyTree,
-  ProfileDocumentsGallery,
-  HistoricalDistributionsCard
+  ProfileDocumentsGallery
 } from '@/components/beneficiary';
 import { BeneficiaryIntegrationPanel } from '@/components/beneficiaries/BeneficiaryIntegrationPanel';
 import BeneficiaryDialog from '@/components/beneficiaries/BeneficiaryDialog';
@@ -110,7 +109,6 @@ export default function BeneficiaryProfile() {
         <ScrollArea className="w-full whitespace-nowrap print:hidden">
           <TabsList className="inline-flex w-full min-w-max">
             <TabsTrigger value="timeline" className="text-xs sm:text-sm">الخط الزمني</TabsTrigger>
-            <TabsTrigger value="distributions" className="text-xs sm:text-sm">التوزيعات</TabsTrigger>
             <TabsTrigger value="payments" className="text-xs sm:text-sm">المدفوعات</TabsTrigger>
             <TabsTrigger value="requests" className="text-xs sm:text-sm">الطلبات</TabsTrigger>
             <TabsTrigger value="family" className="text-xs sm:text-sm">العائلة</TabsTrigger>
@@ -121,10 +119,6 @@ export default function BeneficiaryProfile() {
 
           <TabsContent value="timeline">
             <ProfileTimeline beneficiaryId={beneficiary.id} />
-          </TabsContent>
-
-          <TabsContent value="distributions">
-            <HistoricalDistributionsCard beneficiaryId={beneficiary.id} />
           </TabsContent>
 
           <TabsContent value="payments">

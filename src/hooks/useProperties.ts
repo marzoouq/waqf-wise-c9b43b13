@@ -42,9 +42,8 @@ export function useProperties() {
       if (error) throw error;
       return data as Property[];
     },
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    refetchOnWindowFocus: true,
-    refetchOnMount: true,
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnWindowFocus: false,
   });
 
   // Real-time subscription

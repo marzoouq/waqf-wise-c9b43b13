@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Plus, Clock, CheckCircle2, XCircle, AlertCircle, FileText, Eye, LucideIcon } from "lucide-react";
 import { RequestSubmissionDialog } from "./RequestSubmissionDialog";
 import { RequestDetailsDialog } from "./RequestDetailsDialog";
@@ -13,8 +12,6 @@ import { RequestAttachmentsUploader } from "./RequestAttachmentsUploader";
 import { SLAIndicator } from "./SLAIndicator";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
-import { useIsMobile } from "@/hooks/useIsMobile";
-import { MobileRequestCard } from "./MobileRequestCard";
 
 interface BeneficiaryRequestsTabProps {
   beneficiaryId: string;
@@ -30,7 +27,6 @@ type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
 export function BeneficiaryRequestsTab({ beneficiaryId }: BeneficiaryRequestsTabProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
-  const isMobile = useIsMobile();
 
   const { data: requests = [], isLoading } = useQuery({
     queryKey: ["beneficiary-requests", beneficiaryId],
@@ -87,116 +83,89 @@ export function BeneficiaryRequestsTab({ beneficiaryId }: BeneficiaryRequestsTab
   return (
     <div className="space-y-6">
       <Card>
-        <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle className="text-base sm:text-lg">طلباتي ({requests.length})</CardTitle>
-            <CardDescription className="text-xs sm:text-sm">جميع الطلبات المقدمة مع حالتها الحالية</CardDescription>
+            <CardTitle>طلباتي ({requests.length})</CardTitle>
+            <CardDescription>جميع الطلبات المقدمة مع حالتها الحالية</CardDescription>
           </div>
-          <Button 
-            onClick={() => setIsDialogOpen(true)}
-            size={isMobile ? "sm" : "default"}
-            className="w-full sm:w-auto"
-          >
+          <Button onClick={() => setIsDialogOpen(true)}>
             <Plus className="h-4 w-4 ml-2" />
             طلب جديد
           </Button>
         </CardHeader>
         <CardContent>
-          {isMobile ? (
-            <div className="space-y-3">
-              {isLoading ? (
-                <div className="text-center py-8 text-muted-foreground">جاري التحميل...</div>
-              ) : requests.length === 0 ? (
-                <div className="text-center text-muted-foreground py-8">
-                  لا توجد طلبات مقدمة بعد
-                </div>
-              ) : (
-                requests.map((request) => (
-                  <MobileRequestCard 
-                    key={request.id} 
-                    request={request}
-                    onView={setSelectedRequestId}
-                  />
-                ))
-              )}
-            </div>
-          ) : (
-            <ScrollArea className="w-full">
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="text-right">رقم الطلب</TableHead>
-                      <TableHead className="text-right">النوع</TableHead>
-                      <TableHead className="text-right">المبلغ</TableHead>
-                      <TableHead className="text-right">الأولوية</TableHead>
-                      <TableHead className="text-right">SLA</TableHead>
-                      <TableHead className="text-right">المرفقات</TableHead>
-                      <TableHead className="text-right">تاريخ التقديم</TableHead>
-                      <TableHead className="text-right">الحالة</TableHead>
-                      <TableHead className="text-right">الإجراءات</TableHead>
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-right">رقم الطلب</TableHead>
+                  <TableHead className="text-right">النوع</TableHead>
+                  <TableHead className="text-right">المبلغ</TableHead>
+                  <TableHead className="text-right">الأولوية</TableHead>
+                  <TableHead className="text-right">SLA</TableHead>
+                  <TableHead className="text-right">المرفقات</TableHead>
+                  <TableHead className="text-right">تاريخ التقديم</TableHead>
+                  <TableHead className="text-right">الحالة</TableHead>
+                  <TableHead className="text-right">الإجراءات</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={9} className="text-center">جاري التحميل...</TableCell>
+                  </TableRow>
+                ) : requests.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={9} className="text-center text-muted-foreground py-8">
+                      لا توجد طلبات مقدمة بعد
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  requests.map((request) => (
+                    <TableRow key={request.id}>
+                      <TableCell className="font-medium">{request.request_number || "—"}</TableCell>
+                      <TableCell>
+                        {(request.request_types as RequestType | null)?.name_ar || "—"}
+                      </TableCell>
+                      <TableCell>
+                        {request.amount 
+                          ? `${Number(request.amount).toLocaleString("ar-SA")} ريال`
+                          : "—"}
+                      </TableCell>
+                      <TableCell>{getPriorityBadge(request.priority)}</TableCell>
+                      <TableCell>
+                        <SLAIndicator
+                          slaDueAt={request.sla_due_at}
+                          status={request.status || "معلق"}
+                          showLabel={true}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <RequestAttachmentsUploader
+                          requestId={request.id}
+                          attachmentsCount={request.attachments_count || 0}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        {request.created_at && format(new Date(request.created_at), "dd/MM/yyyy", { locale: ar })}
+                      </TableCell>
+                      <TableCell>{getStatusBadge(request.status || "معلق")}</TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setSelectedRequestId(request.id)}
+                        >
+                          <Eye className="h-4 w-4 ml-1" />
+                          عرض
+                        </Button>
+                      </TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {isLoading ? (
-                      <TableRow>
-                        <TableCell colSpan={9} className="text-center">جاري التحميل...</TableCell>
-                      </TableRow>
-                    ) : requests.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={9} className="text-center text-muted-foreground py-8">
-                          لا توجد طلبات مقدمة بعد
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      requests.map((request) => (
-                        <TableRow key={request.id}>
-                          <TableCell className="font-medium">{request.request_number || "—"}</TableCell>
-                          <TableCell>
-                            {(request.request_types as RequestType | null)?.name_ar || "—"}
-                          </TableCell>
-                          <TableCell>
-                            {request.amount 
-                              ? `${Number(request.amount).toLocaleString("ar-SA")} ريال`
-                              : "—"}
-                          </TableCell>
-                          <TableCell>{getPriorityBadge(request.priority)}</TableCell>
-                          <TableCell>
-                            <SLAIndicator
-                              slaDueAt={request.sla_due_at}
-                              status={request.status || "معلق"}
-                              showLabel={true}
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <RequestAttachmentsUploader
-                              requestId={request.id}
-                              attachmentsCount={request.attachments_count || 0}
-                            />
-                          </TableCell>
-                          <TableCell>
-                            {request.created_at && format(new Date(request.created_at), "dd/MM/yyyy", { locale: ar })}
-                          </TableCell>
-                          <TableCell>{getStatusBadge(request.status || "معلق")}</TableCell>
-                          <TableCell>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setSelectedRequestId(request.id)}
-                            >
-                              <Eye className="h-4 w-4 ml-1" />
-                              عرض
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-              <ScrollBar orientation="horizontal" />
-            </ScrollArea>
-          )}
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
 
