@@ -32,6 +32,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [rolesLoading, setRolesLoading] = useState(true);
   const { toast } = useToast();
   const initRef = useRef(false);
+  const initialLoadDone = useRef(false); // ✅ تتبع التحميل الأولي
   const rolesCache = useRef<string[]>([]);
   const ROLES_CACHE_KEY = 'waqf_user_roles';
 
@@ -150,90 +151,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     ]);
   }, [fetchUserRoles]);
 
-  useEffect(() => {
-    // Prevent double initialization
-    if (initRef.current) return;
-    initRef.current = true;
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, newSession) => {
-      // معالجة حدث تسجيل الخروج
-      if (event === 'SIGNED_OUT') {
-        setUser(null);
-        setSession(null);
-        setProfile(null);
-        setRoles([]);
-        rolesCache.current = [];
-        setIsLoading(false);
-        setRolesLoading(false);
-        return;
-      }
-
-      // معالجة خطأ تجديد الـ token
-      if (event === 'TOKEN_REFRESHED' && !newSession) {
-        productionLogger.warn('Token refresh failed, cleaning up session');
-        cleanupInvalidSession();
-        setIsLoading(false);
-        setRolesLoading(false);
-        return;
-      }
-
-      setSession(newSession);
-      setUser(newSession?.user ?? null);
-      
-      if (newSession?.user) {
-        // استخدام setTimeout لتجنب deadlock - جلب البيانات بشكل متوازي
-        setTimeout(() => {
-          fetchUserData(newSession.user.id);
-        }, 0);
-      } else {
-        setProfile(null);
-        setRoles([]);
-        rolesCache.current = [];
-        setIsLoading(false);
-        setRolesLoading(false);
-      }
-    });
-
-    // Check current session with error handling
-    supabase.auth.getSession().then(({ data: { session: currentSession }, error }) => {
-      // معالجة أخطاء الجلسة التالفة
-      if (error) {
-        const errorMsg = error.message?.toLowerCase() || '';
-        if (errorMsg.includes('invalid') || 
-            errorMsg.includes('bad_jwt') || 
-            errorMsg.includes('missing sub claim') ||
-            errorMsg.includes('expired')) {
-          productionLogger.warn('Invalid session detected, cleaning up', error.message);
-          cleanupInvalidSession();
-          setIsLoading(false);
-          return;
-        }
-      }
-
-      setSession(currentSession);
-      setUser(currentSession?.user ?? null);
-      
-      if (currentSession?.user) {
-        // جلب البيانات بشكل متوازي
-        fetchUserData(currentSession.user.id);
-      } else {
-        setIsLoading(false);
-        setRolesLoading(false);
-      }
-    }).catch((err) => {
-      // معالجة أخطاء غير متوقعة
-      productionLogger.error('Unexpected error getting session', err);
-      cleanupInvalidSession();
-      setIsLoading(false);
-    });
-
-    return () => {
-      subscription.unsubscribe();
-      initRef.current = false;
-    };
-  }, [fetchUserData, cleanupInvalidSession]);
-
   // جلب الملف الشخصي - مُحسّن (الـ trigger يُنشئ الملف تلقائياً)
   const fetchProfile = async (userId: string) => {
     try {
@@ -269,6 +186,107 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    // Prevent double initialization
+    if (initRef.current) return;
+    initRef.current = true;
+
+    // ✅ جلب الجلسة أولاً قبل إعداد المستمع
+    const initializeAuth = async () => {
+      try {
+        const { data: { session: currentSession }, error } = await supabase.auth.getSession();
+        
+        // معالجة أخطاء الجلسة التالفة
+        if (error) {
+          const errorMsg = error.message?.toLowerCase() || '';
+          if (errorMsg.includes('invalid') || 
+              errorMsg.includes('bad_jwt') || 
+              errorMsg.includes('missing sub claim') ||
+              errorMsg.includes('expired')) {
+            productionLogger.warn('Invalid session detected, cleaning up', error.message);
+            await cleanupInvalidSession();
+            setIsLoading(false);
+            initialLoadDone.current = true;
+            return;
+          }
+        }
+
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
+        
+        if (currentSession?.user) {
+          // جلب البيانات بشكل متوازي
+          await fetchUserData(currentSession.user.id);
+        } else {
+          setIsLoading(false);
+          setRolesLoading(false);
+        }
+        
+        initialLoadDone.current = true;
+      } catch (err) {
+        productionLogger.error('Unexpected error getting session', err);
+        await cleanupInvalidSession();
+        setIsLoading(false);
+        initialLoadDone.current = true;
+      }
+    };
+
+    // ✅ إعداد المستمع لتغييرات الجلسة (بعد التحميل الأولي)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, newSession) => {
+      // ✅ تجاهل الحدث الأولي إذا لم يكتمل التحميل الأولي بعد
+      if (!initialLoadDone.current && event === 'INITIAL_SESSION') {
+        return;
+      }
+
+      // معالجة حدث تسجيل الخروج
+      if (event === 'SIGNED_OUT') {
+        setUser(null);
+        setSession(null);
+        setProfile(null);
+        setRoles([]);
+        rolesCache.current = [];
+        setIsLoading(false);
+        setRolesLoading(false);
+        return;
+      }
+
+      // معالجة خطأ تجديد الـ token
+      if (event === 'TOKEN_REFRESHED' && !newSession) {
+        productionLogger.warn('Token refresh failed, cleaning up session');
+        cleanupInvalidSession();
+        setIsLoading(false);
+        setRolesLoading(false);
+        return;
+      }
+
+      // تحديث الجلسة والمستخدم
+      setSession(newSession);
+      setUser(newSession?.user ?? null);
+      
+      if (newSession?.user) {
+        // استخدام setTimeout لتجنب deadlock - جلب البيانات بشكل متوازي
+        setTimeout(() => {
+          fetchUserData(newSession.user.id);
+        }, 0);
+      } else if (initialLoadDone.current) {
+        // ✅ فقط إذا اكتمل التحميل الأولي
+        setProfile(null);
+        setRoles([]);
+        rolesCache.current = [];
+        setIsLoading(false);
+        setRolesLoading(false);
+      }
+    });
+
+    // بدء التهيئة
+    initializeAuth();
+
+    return () => {
+      subscription.unsubscribe();
+      initRef.current = false;
+    };
+  }, [fetchUserData, cleanupInvalidSession]);
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({
@@ -368,15 +386,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!user) return false;
 
     // استخدام الـ cache إذا كان متوفراً
-    let roles = rolesCache.current;
+    let currentRoles = rolesCache.current;
     
     // إذا لم يكن هناك cache، جلب الأدوار
-    if (roles.length === 0) {
-      roles = await fetchUserRoles(user.id);
+    if (currentRoles.length === 0) {
+      currentRoles = await fetchUserRoles(user.id);
     }
 
     // استخدام دالة checkPermission من config
-    return checkPermission(permission as Permission, roles);
+    return checkPermission(permission as Permission, currentRoles);
   };
 
   /**
@@ -393,14 +411,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!user) return false;
 
     // استخدام الـ cache إذا كان متوفراً
-    let roles = rolesCache.current;
+    let currentRoles = rolesCache.current;
     
     // إذا لم يكن هناك cache، جلب الأدوار
-    if (roles.length === 0) {
-      roles = await fetchUserRoles(user.id);
+    if (currentRoles.length === 0) {
+      currentRoles = await fetchUserRoles(user.id);
     }
 
-    return roles.includes(roleName);
+    return currentRoles.includes(roleName);
   };
 
   const value = {
