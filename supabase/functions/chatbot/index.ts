@@ -552,24 +552,51 @@ ${contextSummary}
     };
 
     let aiData;
+    let responseText: string;
+    
     try {
       aiData = await callAIWithRetry(3, 1000);
+      responseText = aiData.choices?.[0]?.message?.content || 'عذراً، لم أتمكن من معالجة طلبك.';
     } catch (aiError) {
       console.error('AI API failed after retries:', aiError);
-      return jsonResponse({
-        success: true,
-        response: 'عذراً، خدمة الذكاء الاصطناعي غير متاحة حالياً. يرجى المحاولة مرة أخرى بعد قليل.',
-        context: contextData,
-        error: 'AI_TEMPORARILY_UNAVAILABLE'
-      });
+      responseText = 'عذراً، خدمة الذكاء الاصطناعي غير متاحة حالياً. يرجى المحاولة مرة أخرى بعد قليل.';
     }
 
-    const responseText = aiData.choices?.[0]?.message?.content || 'عذراً، لم أتمكن من معالجة طلبك.';
+    // حفظ رسالة المستخدم
+    await supabase.from('chatbot_conversations').insert({
+      user_id: userId,
+      message: message,
+      message_type: 'user',
+      quick_reply_id: quickReplyId || null,
+    });
+
+    // حفظ رد الذكاء الاصطناعي
+    await supabase.from('chatbot_conversations').insert({
+      user_id: userId,
+      message: responseText,
+      message_type: 'bot',
+    });
+
+    // استخراج إجراءات سريعة من السياق
+    const quickActions = [];
+    if (contextData.beneficiaries) {
+      quickActions.push({ label: 'المستفيدون', icon: '👥', link: '/beneficiaries', count: contextData.beneficiaries.total });
+    }
+    if (contextData.properties) {
+      quickActions.push({ label: 'العقارات', icon: '🏢', link: '/properties', count: contextData.properties.total });
+    }
+    if (contextData.requests) {
+      quickActions.push({ label: 'الطلبات', icon: '📋', link: '/requests', count: contextData.requests.pending });
+    }
+    if (contextData.distributions) {
+      quickActions.push({ label: 'التوزيعات', icon: '💰', link: '/funds', count: contextData.distributions.total });
+    }
 
     return jsonResponse({
       success: true,
       response: responseText,
       context: contextData,
+      quickActions,
     });
 
   } catch (error) {
