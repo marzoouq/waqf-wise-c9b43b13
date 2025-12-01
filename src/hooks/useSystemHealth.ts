@@ -48,21 +48,21 @@ export function useSystemHealth() {
         database: {
           status: dbError ? 'down' : responseTime < 100 ? 'healthy' : 'degraded',
           responseTime,
-          connections: 10, // محاكاة
+          connections: 0, // غير متوفر
         },
         storage: {
           status: 'healthy',
           usedSpace: totalUsed,
-          totalSpace: 10 * 1024 * 1024 * 1024, // 10GB
+          totalSpace: 0, // غير متوفر
         },
         uptime: {
-          days: 45,
-          hours: 12,
-          minutes: 30,
+          days: 0,
+          hours: 0,
+          minutes: 0,
         },
         performance: {
           avgResponseTime: responseTime,
-          requestsPerMinute: 120,
+          requestsPerMinute: 0, // غير متوفر
         },
       };
     },
