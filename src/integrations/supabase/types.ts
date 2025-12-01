@@ -5498,6 +5498,7 @@ export type Database = {
           entry_type: Database["public"]["Enums"]["entry_type"] | null
           fiscal_year_id: string
           id: string
+          is_historical: boolean | null
           posted: boolean | null
           posted_at: string | null
           reference_id: string | null
@@ -5516,6 +5517,7 @@ export type Database = {
           entry_type?: Database["public"]["Enums"]["entry_type"] | null
           fiscal_year_id: string
           id?: string
+          is_historical?: boolean | null
           posted?: boolean | null
           posted_at?: string | null
           reference_id?: string | null
@@ -5534,6 +5536,7 @@ export type Database = {
           entry_type?: Database["public"]["Enums"]["entry_type"] | null
           fiscal_year_id?: string
           id?: string
+          is_historical?: boolean | null
           posted?: boolean | null
           posted_at?: string | null
           reference_id?: string | null
