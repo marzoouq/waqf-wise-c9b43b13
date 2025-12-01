@@ -48,7 +48,7 @@ export function BudgetsTab() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="grid grid-cols-3 gap-4 text-center">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">إجمالي الميزانية</p>
                   <p className="text-2xl font-bold">
@@ -152,7 +152,7 @@ export function BudgetsTab() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-3 gap-4 text-center">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
                 <div className="p-4 border rounded-lg">
                   <p className="text-sm text-muted-foreground mb-2">إجمالي الاحتياطي</p>
                   <p className="text-xl font-bold">

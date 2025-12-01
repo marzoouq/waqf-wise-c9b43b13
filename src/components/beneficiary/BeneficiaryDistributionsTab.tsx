@@ -3,11 +3,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { TrendingUp, Clock, CheckCircle2, DollarSign, LucideIcon } from "lucide-react";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { MaskedValue } from "@/components/shared/MaskedValue";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { MobileDistributionCard } from "./cards/MobileDistributionCard";
 
 interface BeneficiaryDistributionsTabProps {
   beneficiaryId: string;
@@ -17,6 +20,7 @@ type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
 
 export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistributionsTabProps) {
   const { settings } = useVisibilitySettings();
+  const isMobile = useIsMobile();
   
   // استخدام payments بدلاً من distribution_allocations
   const { data: distributions = [], isLoading } = useQuery({
@@ -58,7 +62,7 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
   return (
     <div className="space-y-6">
       {/* Summary Cards */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">إجمالي التوزيعات</CardTitle>
@@ -99,71 +103,82 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
         </Card>
       </div>
 
-      {/* Distributions Table */}
+      {/* Distributions Table/Cards */}
       <Card>
         <CardHeader>
           <CardTitle>سجل التوزيعات</CardTitle>
           <CardDescription>جميع التوزيعات والمبالغ المخصصة لك</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-right">رقم التوزيع</TableHead>
-                  <TableHead className="text-right">التاريخ</TableHead>
-                  <TableHead className="text-right">المبلغ المخصص</TableHead>
-                  <TableHead className="text-right">الخصومات</TableHead>
-                  <TableHead className="text-right">صافي المبلغ</TableHead>
-                  <TableHead className="text-right">حالة الدفع</TableHead>
-                  <TableHead className="text-right">تاريخ الدفع</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoading ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center">جاري التحميل...</TableCell>
-                  </TableRow>
-                ) : distributions.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
-                      لا توجد توزيعات بعد
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  distributions.map((payment) => (
-                    <TableRow key={payment.id}>
-                      <TableCell className="font-medium">{payment.reference_number || "—"}</TableCell>
-                      <TableCell>
-                        {payment.payment_date && format(new Date(payment.payment_date), "dd/MM/yyyy", { locale: ar })}
-                      </TableCell>
-                      <TableCell className="font-semibold">
-                        <MaskedValue
-                          value={Number(payment.amount || 0).toLocaleString("ar-SA")}
-                          type="amount"
-                          masked={settings?.mask_exact_amounts || false}
-                        /> ريال
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">—</TableCell>
-                      <TableCell className="font-bold text-success">
-                        <MaskedValue
-                          value={Number(payment.amount || 0).toLocaleString("ar-SA")}
-                          type="amount"
-                          masked={settings?.mask_exact_amounts || false}
-                        /> ريال
-                      </TableCell>
-                      <TableCell>{getPaymentStatusBadge(payment.status || "معلق")}</TableCell>
-                      <TableCell>
-                        {payment.payment_date 
-                          ? format(new Date(payment.payment_date), "dd/MM/yyyy", { locale: ar })
-                          : "—"}
-                      </TableCell>
+          {isLoading ? (
+            <div className="text-center py-8">جاري التحميل...</div>
+          ) : distributions.length === 0 ? (
+            <div className="text-center text-muted-foreground py-8">
+              لا توجد توزيعات بعد
+            </div>
+          ) : isMobile ? (
+            // عرض البطاقات على الجوال
+            <div className="grid gap-4">
+              {distributions.map((payment) => (
+                <MobileDistributionCard
+                  key={payment.id}
+                  distribution={payment}
+                  masked={settings?.mask_exact_amounts || false}
+                />
+              ))}
+            </div>
+          ) : (
+            // عرض الجدول على الديسكتوب
+            <ScrollArea className="w-full">
+              <div className="rounded-md border">
+                <Table className="min-w-max">
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-right">رقم التوزيع</TableHead>
+                      <TableHead className="text-right">التاريخ</TableHead>
+                      <TableHead className="text-right">المبلغ المخصص</TableHead>
+                      <TableHead className="text-right">الخصومات</TableHead>
+                      <TableHead className="text-right">صافي المبلغ</TableHead>
+                      <TableHead className="text-right">حالة الدفع</TableHead>
+                      <TableHead className="text-right">تاريخ الدفع</TableHead>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
+                  </TableHeader>
+                  <TableBody>
+                    {distributions.map((payment) => (
+                      <TableRow key={payment.id}>
+                        <TableCell className="font-medium">{payment.reference_number || "—"}</TableCell>
+                        <TableCell>
+                          {payment.payment_date && format(new Date(payment.payment_date), "dd/MM/yyyy", { locale: ar })}
+                        </TableCell>
+                        <TableCell className="font-semibold">
+                          <MaskedValue
+                            value={Number(payment.amount || 0).toLocaleString("ar-SA")}
+                            type="amount"
+                            masked={settings?.mask_exact_amounts || false}
+                          /> ريال
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">—</TableCell>
+                        <TableCell className="font-bold text-success">
+                          <MaskedValue
+                            value={Number(payment.amount || 0).toLocaleString("ar-SA")}
+                            type="amount"
+                            masked={settings?.mask_exact_amounts || false}
+                          /> ريال
+                        </TableCell>
+                        <TableCell>{getPaymentStatusBadge(payment.status || "معلق")}</TableCell>
+                        <TableCell>
+                          {payment.payment_date 
+                            ? format(new Date(payment.payment_date), "dd/MM/yyyy", { locale: ar })
+                            : "—"}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+          )}
         </CardContent>
       </Card>
     </div>

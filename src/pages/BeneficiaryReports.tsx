@@ -203,7 +203,7 @@ export default function BeneficiaryReports() {
         <CardHeader>
           <CardTitle>إعدادات التقرير</CardTitle>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="text-sm font-medium mb-2 block">السنة المالية</label>
             <Select value={selectedYear} onValueChange={setSelectedYear}>
@@ -244,7 +244,7 @@ export default function BeneficiaryReports() {
         <CardHeader>
           <CardTitle>معلومات المستفيد</CardTitle>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <CardContent className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           <div>
             <p className="text-sm text-muted-foreground">الاسم الكامل</p>
             <p className="font-semibold">{beneficiary?.full_name}</p>
@@ -261,7 +261,7 @@ export default function BeneficiaryReports() {
       </Card>
 
       {/* الإحصائيات السنوية */}
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">

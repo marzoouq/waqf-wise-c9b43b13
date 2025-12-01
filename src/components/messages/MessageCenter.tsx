@@ -141,9 +141,9 @@ export function MessageCenter() {
   };
 
   return (
-    <div className="grid gap-4 md:grid-cols-[300px_1fr]">
+    <div className="grid gap-4 grid-cols-1 lg:grid-cols-[300px_1fr]">
       {/* قائمة الرسائل */}
-      <Card>
+      <Card className="lg:col-span-1">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <Mail className="h-5 w-5" />
@@ -306,7 +306,7 @@ export function MessageCenter() {
       </Card>
 
       {/* محتوى الرسالة */}
-      <Card>
+      <Card className="lg:col-span-1">
         <CardHeader>
           <CardTitle>
             {selectedMessage ? selectedMessage.subject : "اختر رسالة لعرضها"}
