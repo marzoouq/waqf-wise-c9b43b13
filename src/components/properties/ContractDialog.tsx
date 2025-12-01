@@ -23,7 +23,7 @@ interface Props {
 
 export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
   const { addContract, updateContract } = useContracts();
-  const { properties } = useProperties();
+  const { properties, isLoading: propertiesLoading } = useProperties();
   const [selectedPropertyId, setSelectedPropertyId] = useState<string>("");
   const { units, isLoading: unitsLoading } = usePropertyUnits(selectedPropertyId);
   const [selectedUnits, setSelectedUnits] = useState<string[]>([]);
@@ -287,16 +287,23 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
                 value={formData.property_id}
                 onValueChange={(value) => setFormData({ ...formData, property_id: value })}
                 required
+                disabled={propertiesLoading}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="اختر العقار" />
+                  <SelectValue placeholder={propertiesLoading ? "جاري التحميل..." : properties?.length === 0 ? "لا توجد عقارات" : "اختر العقار"} />
                 </SelectTrigger>
                 <SelectContent>
-                  {properties?.map((property) => (
-                    <SelectItem key={property.id} value={property.id}>
-                      {property.name}
-                    </SelectItem>
-                  ))}
+                  {properties?.length === 0 && !propertiesLoading ? (
+                    <div className="p-2 text-center text-sm text-muted-foreground">
+                      لا توجد عقارات متاحة
+                    </div>
+                  ) : (
+                    properties?.map((property) => (
+                      <SelectItem key={property.id} value={property.id}>
+                        {property.name}
+                      </SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
             </div>
