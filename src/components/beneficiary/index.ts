@@ -85,3 +85,6 @@ export { AccountStatementView } from './AccountStatementView';
 export { PropertiesListView } from './PropertiesListView';
 export { PropertyAccordionView } from './PropertyAccordionView';
 export { PropertyUnitsGrid } from './PropertyUnitsGrid';
+
+// ==================== Historical Components ====================
+export { HistoricalDistributionsCard } from './HistoricalDistributionsCard';
