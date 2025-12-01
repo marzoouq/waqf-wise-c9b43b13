@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Users, Search, MoreVertical, Edit, Trash2, Eye, Download } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -8,7 +8,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { useFamilies } from '@/hooks/useFamilies';
 import { LoadingState } from '@/components/shared/LoadingState';
-import { EmptyState } from '@/components/shared/EmptyState';
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import {
   Table,
@@ -37,6 +36,7 @@ import {
 import FamilyDialog from '@/components/families/FamilyDialog';
 import { FamiliesErrorState } from '@/components/families/FamiliesErrorState';
 import { FamilyMembersDialog } from '@/components/families/FamilyMembersDialog';
+import { FamilyMobileCard } from '@/components/families/FamilyMobileCard';
 import { Family } from '@/types';
 import { toast } from 'sonner';
 import { Database } from '@/integrations/supabase/types';
@@ -46,21 +46,20 @@ type FamilyWithHead = Family & {
     full_name: string;
   };
 };
-import { ScrollableTableWrapper } from '@/components/shared/ScrollableTableWrapper';
-import { MobileScrollHint } from '@/components/shared/MobileScrollHint';
 import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
 import { Pagination } from '@/components/shared/Pagination';
 import { EnhancedEmptyState } from '@/components/shared/EnhancedEmptyState';
 import { ExportButton } from '@/components/shared/ExportButton';
-import { PAGINATION } from '@/lib/constants';
-import { SortableTableHeader, SortDirection } from '@/components/shared/SortableTableHeader';
+import { SortableTableHeader } from '@/components/shared/SortableTableHeader';
 import { BulkActionsBar } from '@/components/shared/BulkActionsBar';
 import { AdvancedFiltersDialog, FilterConfig } from '@/components/shared/AdvancedFiltersDialog';
 import { useTableSort } from '@/hooks/useTableSort';
 import { useBulkSelection } from '@/hooks/useBulkSelection';
+import { useIsMobile } from '@/hooks/use-mobile';
 
-const Families = () => {
+const Families = memo(() => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const { families, isLoading, error, refetch, addFamily, updateFamily, deleteFamily } = useFamilies();
   const [searchQuery, setSearchQuery] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -342,7 +341,36 @@ const Families = () => {
                 onClick: handleAddFamily
               } : undefined}
             />
+          ) : isMobile ? (
+            // عرض بطاقات للجوال
+            <div className="space-y-3">
+              {paginatedFamilies.map((family) => (
+                <FamilyMobileCard
+                  key={family.id}
+                  family={family as FamilyWithHead}
+                  isSelected={isSelected(family.id)}
+                  onToggleSelection={() => toggleSelection(family.id)}
+                  onEdit={() => handleEditFamily(family)}
+                  onDelete={() => handleDeleteClick(family)}
+                  onViewMembers={() => {
+                    setSelectedFamilyForMembers(family);
+                    setMembersDialogOpen(true);
+                  }}
+                />
+              ))}
+              <div className="pt-4 border-t">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  totalItems={filteredFamilies.length}
+                  itemsPerPage={itemsPerPage}
+                  onPageChange={setCurrentPage}
+                  onItemsPerPageChange={handleItemsPerPageChange}
+                />
+              </div>
+            </div>
           ) : (
+            // عرض الجدول للشاشات الكبيرة
             <div className="space-y-4">
             <div className="rounded-md border overflow-x-auto">
               <Table>
@@ -546,7 +574,9 @@ const Families = () => {
       </MobileOptimizedLayout>
     </PageErrorBoundary>
   );
-};
+});
+
+Families.displayName = 'Families';
 
 export default Families;
 
