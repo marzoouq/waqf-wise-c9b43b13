@@ -1,12 +1,15 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Calendar, Users, AlertCircle } from "lucide-react";
+import { FileText, Calendar, Users, AlertCircle, Inbox } from "lucide-react";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
+import { useGovernanceData } from "@/hooks/useGovernanceData";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function GovernanceTab() {
   const { settings } = useVisibilitySettings();
+  const { meetings, decisions, auditReports, isLoading, hasMeetings, hasDecisions, hasAuditReports } = useGovernanceData();
 
   if (!settings?.show_governance) {
     return (
@@ -18,157 +21,136 @@ export function GovernanceTab() {
     );
   }
 
-  const governanceData = {
-    meetings: [
-      {
-        id: "1",
-        title: "اجتماع مجلس الإدارة الربعي",
-        date: new Date(2024, 10, 15),
-        attendees: 8,
-        decisions: 5,
-      },
-      {
-        id: "2",
-        title: "اجتماع مراجعة الميزانية السنوية",
-        date: new Date(2024, 9, 20),
-        attendees: 12,
-        decisions: 8,
-      },
-    ],
-    nazerDecisions: [
-      {
-        id: "1",
-        title: "الموافقة على توزيع الغلة السنوية",
-        date: new Date(2024, 10, 10),
-        status: "نافذ",
-      },
-      {
-        id: "2",
-        title: "اعتماد ميزانية الصيانة",
-        date: new Date(2024, 9, 15),
-        status: "نافذ",
-      },
-    ],
-    policyChanges: [
-      {
-        id: "1",
-        title: "تحديث سياسة القروض الحسنة",
-        date: new Date(2024, 10, 5),
-        impact: "متوسط",
-      },
-    ],
-    auditReports: [
-      {
-        id: "1",
-        title: "تقرير المراجعة السنوية 2024",
-        date: new Date(2024, 9, 1),
-        status: "مكتمل",
-      },
-    ],
-  };
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-6 w-48" />
+          </CardHeader>
+          <CardContent>
+            <Skeleton className="h-24 w-full" />
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       {settings?.show_governance_meetings && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              اجتماعات مجلس الإدارة
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {governanceData.meetings.map((meeting) => (
-              <div key={meeting.id} className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="flex items-center gap-3">
-                  <Calendar className="h-5 w-5 text-primary" />
-                  <div>
-                    <h4 className="font-medium">{meeting.title}</h4>
-                    <p className="text-sm text-muted-foreground">
-                      {format(meeting.date, "dd MMMM yyyy", { locale: ar })}
-                    </p>
+        hasMeetings ? (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                اجتماعات مجلس الإدارة
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {meetings.map((meeting) => (
+                <div key={meeting.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <Calendar className="h-5 w-5 text-primary" />
+                    <div>
+                    <h4 className="font-medium">{meeting.title || "اجتماع"}</h4>
+                      <p className="text-sm text-muted-foreground">
+                        {meeting.date ? format(new Date(meeting.date), "dd MMMM yyyy", { locale: ar }) : ""}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right text-sm">
+                  {meeting.attendees && (
+                      <p className="text-muted-foreground">{meeting.attendees} حاضر</p>
+                    )}
                   </div>
                 </div>
-                <div className="text-right text-sm">
-                  <p className="text-muted-foreground">{meeting.attendees} حاضر</p>
-                  <p className="text-muted-foreground">{meeting.decisions} قرار</p>
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+              ))}
+            </CardContent>
+          </Card>
+        ) : (
+          <Card>
+            <CardContent className="p-12 text-center">
+              <Inbox className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <p className="text-muted-foreground">لا توجد اجتماعات مسجلة</p>
+            </CardContent>
+          </Card>
+        )
       )}
 
       {settings?.show_nazer_decisions && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              قرارات الناظر
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {governanceData.nazerDecisions.map((decision) => (
-              <div key={decision.id} className="flex items-center justify-between p-4 border rounded-lg">
-                <div>
-                  <h4 className="font-medium">{decision.title}</h4>
-                  <p className="text-sm text-muted-foreground">
-                    {format(decision.date, "dd MMMM yyyy", { locale: ar })}
-                  </p>
+        hasDecisions ? (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                قرارات الناظر
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {decisions.map((decision) => (
+                <div key={decision.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div>
+                    <h4 className="font-medium">{decision.title}</h4>
+                    <p className="text-sm text-muted-foreground">
+                      {decision.date ? format(new Date(decision.date), "dd MMMM yyyy", { locale: ar }) : ""}
+                    </p>
+                  </div>
+                  <Badge className="bg-success">{decision.status || "نافذ"}</Badge>
                 </div>
-                <Badge className="bg-success">{decision.status}</Badge>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+              ))}
+            </CardContent>
+          </Card>
+        ) : (
+          <Card>
+            <CardContent className="p-12 text-center">
+              <Inbox className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <p className="text-muted-foreground">لا توجد قرارات مُعلنة</p>
+            </CardContent>
+          </Card>
+        )
       )}
 
       {settings?.show_policy_changes && (
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <AlertCircle className="h-5 w-5" />
-              التغييرات في السياسات
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {governanceData.policyChanges.map((policy) => (
-              <div key={policy.id} className="flex items-center justify-between p-4 border rounded-lg">
-                <div>
-                  <h4 className="font-medium">{policy.title}</h4>
-                  <p className="text-sm text-muted-foreground">
-                    {format(policy.date, "dd MMMM yyyy", { locale: ar })}
-                  </p>
-                </div>
-                <Badge variant="secondary">{policy.impact}</Badge>
-              </div>
-            ))}
+          <CardContent className="p-12 text-center">
+            <Inbox className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <p className="text-muted-foreground">لا توجد تغييرات في السياسات</p>
           </CardContent>
         </Card>
       )}
 
       {settings?.show_audit_reports && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              تقارير المراجعة
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {governanceData.auditReports.map((report) => (
-              <div key={report.id} className="flex items-center justify-between p-4 border rounded-lg">
-                <div>
-                  <h4 className="font-medium">{report.title}</h4>
-                  <p className="text-sm text-muted-foreground">
-                    {format(report.date, "dd MMMM yyyy", { locale: ar })}
-                  </p>
+        hasAuditReports ? (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                تقارير المراجعة
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {auditReports.map((report) => (
+                <div key={report.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div>
+                    <h4 className="font-medium">{report.title}</h4>
+                    <p className="text-sm text-muted-foreground">
+                      {report.date ? format(new Date(report.date), "dd MMMM yyyy", { locale: ar }) : ""}
+                    </p>
+                  </div>
+                  <Badge className="bg-success">{report.status || "مكتمل"}</Badge>
                 </div>
-                <Badge className="bg-success">{report.status}</Badge>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+              ))}
+            </CardContent>
+          </Card>
+        ) : (
+          <Card>
+            <CardContent className="p-12 text-center">
+              <Inbox className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <p className="text-muted-foreground">لا توجد تقارير مراجعة</p>
+            </CardContent>
+          </Card>
+        )
       )}
     </div>
   );
