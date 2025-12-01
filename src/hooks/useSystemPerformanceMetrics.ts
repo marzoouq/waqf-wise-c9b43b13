@@ -48,20 +48,12 @@ export function useSystemPerformanceMetrics() {
         });
 
         const requests = periodLogs.length;
-        
-        // محاكاة وقت الاستجابة بناءً على عدد الطلبات (كلما زادت الطلبات زاد وقت الاستجابة)
-        const baseResponseTime = 100;
-        const responseTime = Math.min(baseResponseTime + (requests * 2), 500);
-        
-        // محاكاة استخدام CPU بناءً على الطلبات
-        const baseCpu = 20;
-        const cpu = Math.min(baseCpu + (requests * 0.5), 95);
 
         return {
           time: format(hour, "HH:mm", { locale: ar }),
-          responseTime: Math.round(responseTime),
+          responseTime: 0, // غير متوفر - يتطلب قياس حقيقي
           requests,
-          cpu: Math.round(cpu),
+          cpu: 0, // غير متوفر - يتطلب قياس حقيقي
         };
       });
 
