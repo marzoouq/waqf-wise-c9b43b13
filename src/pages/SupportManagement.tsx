@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import MainLayout from '@/components/layout/MainLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
@@ -65,7 +64,6 @@ export default function SupportManagement() {
 
   return (
     <PageErrorBoundary pageName="إدارة الدعم الفني">
-      <MainLayout>
         <div className="space-y-4 sm:space-y-6">
           <div className="flex items-center justify-end">
             <Button variant="outline" onClick={() => setSettingsOpen(true)}>
@@ -345,7 +343,6 @@ export default function SupportManagement() {
             onOpenChange={setSettingsOpen}
           />
         </div>
-      </MainLayout>
     </PageErrorBoundary>
   );
 }
