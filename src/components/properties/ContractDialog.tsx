@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -53,8 +53,8 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
     notes: "",
   });
 
-  // دالة حساب تلقائية للتفاصيل
-  const calculateContractDetails = () => {
+  // دالة حساب تلقائية للتفاصيل - محسّنة لمنع الحلقات
+  const calculateContractDetails = useCallback(() => {
     if (!formData.start_date || !totalAmount || !contractDuration) return;
     
     const startDate = new Date(formData.start_date);
@@ -63,24 +63,31 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
     // حساب تاريخ النهاية تلقائياً
     const endDate = new Date(startDate);
     endDate.setMonth(startDate.getMonth() + durationInMonths);
+    const calculatedEndDate = endDate.toISOString().split('T')[0];
     
     // حساب الإيجار الشهري تلقائياً
     const monthlyRent = parseFloat(totalAmount) / durationInMonths;
+    const calculatedMonthlyRent = monthlyRent.toFixed(2);
     
-    // تحديث الحقول تلقائياً
-    setFormData(prev => ({
-      ...prev,
-      end_date: endDate.toISOString().split('T')[0],
-      monthly_rent: monthlyRent.toFixed(2),
-    }));
-  };
+    // تحديث فقط إذا كانت القيم مختلفة
+    setFormData(prev => {
+      if (prev.end_date === calculatedEndDate && prev.monthly_rent === calculatedMonthlyRent) {
+        return prev; // لا تحديث إذا كانت القيم مماثلة
+      }
+      return {
+        ...prev,
+        end_date: calculatedEndDate,
+        monthly_rent: calculatedMonthlyRent,
+      };
+    });
+  }, [formData.start_date, totalAmount, contractDuration, durationUnit]);
 
-  // تشغيل الحساب عند تغيير أي حقل
+  // تشغيل الحساب عند تغيير أي حقل (مرة واحدة فقط عند التغيير الفعلي)
   useEffect(() => {
-    if (!contract) {
+    if (!contract && formData.start_date && totalAmount && contractDuration) {
       calculateContractDetails();
     }
-  }, [formData.start_date, totalAmount, contractDuration, durationUnit]);
+  }, [contract, formData.start_date, totalAmount, contractDuration, durationUnit, calculateContractDetails]);
 
   useEffect(() => {
     if (contract) {

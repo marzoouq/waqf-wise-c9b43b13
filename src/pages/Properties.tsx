@@ -21,7 +21,6 @@ const Properties = () => {
   const [providersDialogOpen, setProvidersDialogOpen] = useState(false);
   const [aiAction, setAiAction] = useState<"analyze_property" | "suggest_maintenance" | "predict_revenue" | "optimize_contracts" | "alert_insights">("analyze_property");
   const [selectedPropertyForAI, setSelectedPropertyForAI] = useState<any>(null);
-  
   const { addProperty, updateProperty, properties } = useProperties();
   const { data: stats, isLoading: statsLoading } = usePropertiesStats();
   const [activeTab, setActiveTab] = useState("properties");
