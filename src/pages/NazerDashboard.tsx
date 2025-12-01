@@ -1,5 +1,6 @@
 import { Shield, LayoutDashboard, TrendingUp, Building2, Bell, Vote, Mail } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Suspense, useState } from "react";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
 import { Button } from "@/components/ui/button";
@@ -37,43 +38,46 @@ export default function NazerDashboard() {
         </div>
 
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-grid h-auto p-1 bg-muted/50">
-            <TabsTrigger 
-              value="overview" 
-              className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
-            >
-              <LayoutDashboard className="h-4 w-4" />
-              <span className="hidden sm:inline">نظرة عامة</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="governance" 
-              className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
-            >
-              <Vote className="h-4 w-4" />
-              <span className="hidden sm:inline">الحوكمة</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="financial" 
-              className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
-            >
-              <TrendingUp className="h-4 w-4" />
-              <span className="hidden sm:inline">المالية</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="properties" 
-              className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
-            >
-              <Building2 className="h-4 w-4" />
-              <span className="hidden sm:inline">العقارات</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="alerts" 
-              className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
-            >
-              <Bell className="h-4 w-4" />
-              <span className="hidden sm:inline">التنبيهات</span>
-            </TabsTrigger>
-          </TabsList>
+          <ScrollArea className="w-full whitespace-nowrap">
+            <TabsList className="inline-flex h-auto p-1 bg-muted/50">
+              <TabsTrigger 
+                value="overview" 
+                className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm px-3 sm:px-4"
+              >
+                <LayoutDashboard className="h-4 w-4" />
+                <span className="text-xs sm:text-sm">نظرة عامة</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="governance" 
+                className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm px-3 sm:px-4"
+              >
+                <Vote className="h-4 w-4" />
+                <span className="text-xs sm:text-sm">الحوكمة</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="financial" 
+                className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm px-3 sm:px-4"
+              >
+                <TrendingUp className="h-4 w-4" />
+                <span className="text-xs sm:text-sm">المالية</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="properties" 
+                className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm px-3 sm:px-4"
+              >
+                <Building2 className="h-4 w-4" />
+                <span className="text-xs sm:text-sm">العقارات</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="alerts" 
+                className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm px-3 sm:px-4"
+              >
+                <Bell className="h-4 w-4" />
+                <span className="text-xs sm:text-sm">التنبيهات</span>
+              </TabsTrigger>
+            </TabsList>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6 mt-6">
