@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -17,6 +17,7 @@ import {
   DollarSign,
   CreditCard as LoanIcon,
   Menu,
+  Home,
 } from "lucide-react";
 
 interface SidebarItem {
@@ -55,6 +56,7 @@ interface BeneficiarySidebarProps {
 export function BeneficiarySidebar({ activeTab, onTabChange, beneficiaryName }: BeneficiarySidebarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const handleItemClick = (tab: string) => {
     onTabChange(tab);
@@ -77,6 +79,23 @@ export function BeneficiarySidebar({ activeTab, onTabChange, beneficiaryName }: 
           </div>
         </div>
       </div>
+
+      {/* Return to Home Button */}
+      <div className="px-3 pt-4 pb-2">
+        <Button
+          variant="outline"
+          className="w-full justify-start gap-3"
+          onClick={() => {
+            navigate('/beneficiary-dashboard');
+            setMobileOpen(false);
+          }}
+        >
+          <Home className="h-5 w-5" />
+          <span>العودة للرئيسية</span>
+        </Button>
+      </div>
+
+      <Separator className="mx-3" />
 
       {/* Navigation Items */}
       <ScrollArea className="flex-1 px-3 py-4">

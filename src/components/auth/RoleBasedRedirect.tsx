@@ -2,12 +2,13 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
 
-export type AppRole = "nazer" | "admin" | "accountant" | "cashier" | "archivist" | "beneficiary" | "user";
+export type AppRole = "nazer" | "admin" | "accountant" | "cashier" | "archivist" | "beneficiary" | "waqf_heir" | "user";
 
 /**
  * خريطة التوجيه حسب الدور
  */
 const ROLE_DASHBOARD_MAP: Record<AppRole, string> = {
+  waqf_heir: '/beneficiary-dashboard',
   beneficiary: '/beneficiary-dashboard',
   nazer: '/nazer-dashboard',
   admin: '/admin-dashboard',
@@ -26,6 +27,7 @@ const ROLE_PRIORITY: AppRole[] = [
   'accountant',
   'cashier',
   'archivist',
+  'waqf_heir',
   'beneficiary',
   'user',
 ];
