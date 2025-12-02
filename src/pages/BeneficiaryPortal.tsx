@@ -29,6 +29,7 @@ import {
   YearlyComparison,
 } from "@/components/beneficiary";
 import { ChatbotQuickCard } from "@/components/dashboard/ChatbotQuickCard";
+import { Suspense } from "react";
 import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
 import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 import { BeneficiarySidebar } from "@/components/beneficiary/BeneficiarySidebar";
@@ -134,6 +135,11 @@ export default function BeneficiaryPortal() {
                   onMessages={() => navigate("/messages")}
                   onChangePassword={() => {}}
                 />
+
+                {/* المساعد الذكي */}
+                <Suspense fallback={<div className="h-32 bg-muted animate-pulse rounded-lg" />}>
+                  <ChatbotQuickCard />
+                </Suspense>
 
                 {/* الإحصائيات المحسنة */}
                 <UnifiedStatsGrid columns={4}>
