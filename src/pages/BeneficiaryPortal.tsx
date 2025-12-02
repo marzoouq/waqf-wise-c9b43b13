@@ -1,14 +1,12 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { 
-  User, FileText, CreditCard, MessageSquare, 
-  TrendingUp, Clock, CheckCircle, AlertCircle, Users, Landmark,
-  DollarSign, Building2, Shield
+  CreditCard, Clock, CheckCircle, AlertCircle, DollarSign
 } from "lucide-react";
 import {
   BeneficiaryProfileTab,
