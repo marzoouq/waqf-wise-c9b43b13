@@ -23,8 +23,16 @@ import {
   DisclosuresTab,
   GovernanceTab,
   BudgetsTab,
-  LoansOverviewTab
+  LoansOverviewTab,
+  BeneficiaryProfileCard,
+  AnnualDisclosureCard,
+  PropertyStatsCards,
+  ActivityTimeline,
+  YearlyComparison,
 } from "@/components/beneficiary";
+import { ChatbotQuickCard } from "@/components/dashboard/ChatbotQuickCard";
+import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
+import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 import { BeneficiarySidebar } from "@/components/beneficiary/BeneficiarySidebar";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { format } from "date-fns";
@@ -136,90 +144,56 @@ export default function BeneficiaryPortal() {
             {/* Tab Content */}
             {activeTab === "overview" && (
               <div className="space-y-6">
-              {/* KPIs */}
-              <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">إجمالي المستلم</CardTitle>
-                    <TrendingUp className="h-4 w-4 text-success" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-xl sm:text-2xl font-bold">{Number(stats.total_received || 0).toLocaleString("ar-SA")} ريال</div>
-                    <p className="text-xs text-muted-foreground mt-1">من جميع المدفوعات</p>
-                  </CardContent>
-                </Card>
+                {/* بطاقة الملف الشخصي */}
+                <BeneficiaryProfileCard
+                  beneficiary={beneficiary as any}
+                  onMessages={() => navigate("/messages")}
+                  onChangePassword={() => {}}
+                />
 
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">الرصيد الحالي</CardTitle>
-                    <CreditCard className="h-4 w-4 text-primary" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-xl sm:text-2xl font-bold">{Number(beneficiary.account_balance || 0).toLocaleString("ar-SA")} ريال</div>
-                    <p className="text-xs text-muted-foreground mt-1">الرصيد المتاح</p>
-                  </CardContent>
-                </Card>
+                {/* الإحصائيات المحسنة */}
+                <UnifiedStatsGrid columns={4}>
+                  <UnifiedKPICard
+                    title="إجمالي المستلم"
+                    value={`${Number(stats.total_received || 0).toLocaleString("ar-SA")} ريال`}
+                    icon={DollarSign}
+                    variant="default"
+                  />
+                  <UnifiedKPICard
+                    title="الرصيد الحالي"
+                    value={`${Number(beneficiary.account_balance || 0).toLocaleString("ar-SA")} ريال`}
+                    icon={CreditCard}
+                    variant="success"
+                  />
+                  <UnifiedKPICard
+                    title="الطلبات المعلقة"
+                    value={stats.pending_requests || 0}
+                    icon={Clock}
+                    variant="warning"
+                    subtitle={`${Number(stats.pending_amount || 0).toLocaleString("ar-SA")} ريال`}
+                  />
+                  <UnifiedKPICard
+                    title="إجمالي الطلبات"
+                    value={stats.total_requests || 0}
+                    icon={CheckCircle}
+                    variant="default"
+                  />
+                </UnifiedStatsGrid>
 
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">الطلبات المعلقة</CardTitle>
-                    <Clock className="h-4 w-4 text-warning" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-xl sm:text-2xl font-bold">{stats.pending_requests || 0}</div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {Number(stats.pending_amount || 0).toLocaleString("ar-SA")} ريال
-                    </p>
-                  </CardContent>
-                </Card>
+                {/* المساعد الذكي */}
+                <ChatbotQuickCard />
 
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">إجمالي الطلبات</CardTitle>
-                    <CheckCircle className="h-4 w-4 text-info" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-xl sm:text-2xl font-bold">{stats.total_requests || 0}</div>
-                    <p className="text-xs text-muted-foreground mt-1">جميع الطلبات</p>
-                  </CardContent>
-                </Card>
-              </div>
+                {/* إحصائيات العقارات */}
+                <PropertyStatsCards />
 
-          {/* Quick Actions - للاطلاع فقط */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>إجراءات سريعة</CardTitle>
-                  <CardDescription>روابط الاطلاع السريع على بيانات الوقف</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
-                    <Button 
-                      variant="outline" 
-                      className="h-auto py-4 flex-col gap-2 min-h-[44px]"
-                      onClick={() => setSearchParams({ tab: "distributions" })}
-                    >
-                      <TrendingUp className="h-6 w-6" />
-                      <span className="text-sm">عرض التوزيعات</span>
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      className="h-auto py-4 flex-col gap-2 min-h-[44px]"
-                      onClick={() => setSearchParams({ tab: "statements" })}
-                    >
-                      <CreditCard className="h-6 w-6" />
-                      <span className="text-sm">عرض كشف الحساب</span>
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      className="h-auto py-4 flex-col gap-2 min-h-[44px]"
-                      onClick={() => setSearchParams({ tab: "properties" })}
-                    >
-                      <Building2 className="h-6 w-6" />
-                      <span className="text-sm">عرض العقارات</span>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+                {/* الإفصاح السنوي */}
+                <AnnualDisclosureCard />
+
+                {/* سجل النشاط */}
+                <ActivityTimeline beneficiaryId={beneficiary.id} />
+
+                {/* المقارنة السنوية */}
+                <YearlyComparison beneficiaryId={beneficiary.id} />
               </div>
             )}
 

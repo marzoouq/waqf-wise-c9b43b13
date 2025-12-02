@@ -6,7 +6,6 @@
 import { Route } from "react-router-dom";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import {
-  BeneficiaryDashboard,
   BeneficiarySupport,
   BeneficiaryRequests,
   BeneficiaryAccountStatement,
@@ -24,7 +23,7 @@ export const beneficiaryStandaloneRoutes = [
     path="/beneficiary-dashboard" 
     element={
       <ProtectedRoute requiredRoles={["beneficiary", "waqf_heir"]}>
-        <BeneficiaryDashboard />
+        <BeneficiaryPortal />
       </ProtectedRoute>
     } 
   />,

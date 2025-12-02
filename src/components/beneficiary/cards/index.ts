@@ -3,7 +3,6 @@
  * Beneficiary Card Components
  */
 
-export { QuickActionsCard } from '../QuickActionsCard';
 export { NotificationsCard } from '../NotificationsCard';
 export { AnnualDisclosureCard } from '../AnnualDisclosureCard';
 export { PropertyStatsCards } from '../PropertyStatsCards';

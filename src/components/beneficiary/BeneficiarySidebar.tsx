@@ -17,7 +17,9 @@ import {
   DollarSign,
   CreditCard as LoanIcon,
   Menu,
-  Home,
+  MessageSquare,
+  HelpCircle,
+  BarChart3,
 } from "lucide-react";
 
 interface SidebarItem {
@@ -31,7 +33,6 @@ interface SidebarItem {
 const sidebarItems: SidebarItem[] = [
   { id: "overview", label: "نظرة عامة", icon: TrendingUp, tab: "overview" },
   { id: "profile", label: "الملف الشخصي", icon: User, tab: "profile" },
-  { id: "requests", label: "الطلبات", icon: FileText, tab: "requests" },
   { id: "distributions", label: "التوزيعات", icon: DollarSign, tab: "distributions" },
   { id: "statements", label: "كشف الحساب", icon: CreditCard, tab: "statements" },
   { id: "properties", label: "العقارات", icon: Building2, tab: "properties" },
@@ -40,6 +41,9 @@ const sidebarItems: SidebarItem[] = [
   { id: "governance", label: "الحوكمة", icon: Shield, tab: "governance" },
   { id: "budgets", label: "الميزانيات", icon: DollarSign, tab: "budgets" },
   { id: "loans", label: "القروض", icon: LoanIcon, tab: "loans" },
+  { id: "messages", label: "الرسائل", icon: MessageSquare, href: "/messages" },
+  { id: "reports", label: "التقارير", icon: BarChart3, href: "/beneficiary/reports" },
+  { id: "support", label: "الدعم الفني", icon: HelpCircle, href: "/beneficiary-support" },
 ];
 
 interface BeneficiarySidebarProps {
@@ -80,22 +84,6 @@ export function BeneficiarySidebar({ activeTab, onTabChange, beneficiaryName }: 
         </div>
       </div>
 
-      {/* Return to Home Button */}
-      <div className="px-3 pt-4 pb-2">
-        <Button
-          variant="outline"
-          className="w-full justify-start gap-3"
-          onClick={() => {
-            navigate('/beneficiary-dashboard');
-            setMobileOpen(false);
-          }}
-        >
-          <Home className="h-5 w-5" />
-          <span>العودة للرئيسية</span>
-        </Button>
-      </div>
-
-      <Separator className="mx-3" />
 
       {/* Navigation Items */}
       <ScrollArea className="flex-1 px-3 py-4">
@@ -103,6 +91,26 @@ export function BeneficiarySidebar({ activeTab, onTabChange, beneficiaryName }: 
           {sidebarItems.map((item) => {
             const isActive = activeTab === item.tab;
             const Icon = item.icon;
+
+            // إذا كان العنصر يحتوي على رابط خارجي
+            if (item.href) {
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    navigate(item.href!);
+                    setMobileOpen(false);
+                  }}
+                  className={cn(
+                    "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                    "hover:bg-accent/50 active:bg-accent text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <Icon className="h-5 w-5 flex-shrink-0" />
+                  <span className="flex-1 text-right">{item.label}</span>
+                </button>
+              );
+            }
 
             return (
               <button
