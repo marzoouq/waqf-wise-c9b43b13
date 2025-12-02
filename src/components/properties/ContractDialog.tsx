@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -53,8 +53,8 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
     notes: "",
   });
 
-  // دالة حساب تلقائية للتفاصيل
-  const calculateContractDetails = () => {
+  // ✅ دالة حساب تلقائية للتفاصيل - مغلفة بـ useCallback لمنع الحلقة اللانهائية
+  const calculateContractDetails = useCallback(() => {
     if (!formData.start_date || !totalAmount || !contractDuration) return;
     
     const startDate = new Date(formData.start_date);
@@ -67,20 +67,28 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
     // حساب الإيجار الشهري تلقائياً
     const monthlyRent = parseFloat(totalAmount) / durationInMonths;
     
-    // تحديث الحقول تلقائياً
-    setFormData(prev => ({
-      ...prev,
-      end_date: endDate.toISOString().split('T')[0],
-      monthly_rent: monthlyRent.toFixed(2),
-    }));
-  };
+    const newEndDate = endDate.toISOString().split('T')[0];
+    const newMonthlyRent = monthlyRent.toFixed(2);
+    
+    // ✅ تحديث فقط إذا تغيرت القيم فعلاً - لمنع الحلقة اللانهائية
+    setFormData(prev => {
+      if (prev.end_date === newEndDate && prev.monthly_rent === newMonthlyRent) {
+        return prev; // لا تغيير - يمنع re-render غير ضروري
+      }
+      return {
+        ...prev,
+        end_date: newEndDate,
+        monthly_rent: newMonthlyRent,
+      };
+    });
+  }, [formData.start_date, totalAmount, contractDuration, durationUnit]);
 
   // تشغيل الحساب عند تغيير أي حقل
   useEffect(() => {
     if (!contract) {
       calculateContractDetails();
     }
-  }, [formData.start_date, totalAmount, contractDuration, durationUnit]);
+  }, [contract, calculateContractDetails]);
 
   useEffect(() => {
     if (contract) {
