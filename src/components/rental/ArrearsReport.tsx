@@ -10,8 +10,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { AlertCircle, Mail, Phone, DollarSign } from "lucide-react";
-import { differenceInDays, format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { differenceInDays, format, arLocale as ar } from "@/lib/date";
 import { useToast } from "@/hooks/use-toast";
 
 interface RentalPayment {

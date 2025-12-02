@@ -11,8 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Download, Filter, TrendingUp, TrendingDown, DollarSign, FileText, ChevronLeft, ChevronRight } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { format, arLocale as ar } from "@/lib/date";
 
 interface UnifiedTransaction {
   source: string;

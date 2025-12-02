@@ -6,8 +6,7 @@ import { useCustomReports, type ReportTemplate } from "@/hooks/useCustomReports"
 import { UnifiedDataTable, type Column } from "@/components/unified/UnifiedDataTable";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { Badge } from "@/components/ui/badge";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { format, arLocale as ar } from "@/lib/date";
 
 export default function CustomReports() {
   const { templates: reports, isLoading, deleteTemplate } = useCustomReports();

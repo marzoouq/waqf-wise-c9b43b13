@@ -20,8 +20,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Search, Filter, Download, Shield, AlertCircle, Info, AlertTriangle } from "lucide-react";
 import { useAuditLogs } from "@/hooks/useAuditLogs";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { format, arLocale as ar } from "@/lib/date";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";

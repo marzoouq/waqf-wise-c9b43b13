@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/select";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-import { format } from "date-fns";
+import { format } from "@/lib/date";
 import { formatCurrency } from "@/lib/utils";
 
 export default function Budgets() {

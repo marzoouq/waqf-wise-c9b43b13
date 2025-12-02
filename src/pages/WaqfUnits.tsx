@@ -18,8 +18,7 @@ import { BulkActionsBar } from "@/components/shared/BulkActionsBar";
 import { AdvancedFiltersDialog, FilterConfig } from "@/components/shared/AdvancedFiltersDialog";
 import { useTableSort } from "@/hooks/useTableSort";
 import { useBulkSelection } from "@/hooks/useBulkSelection";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { format, arLocale as ar } from "@/lib/date";
 import { toast } from "sonner";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 

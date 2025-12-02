@@ -36,8 +36,7 @@ import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 import { BeneficiarySidebar } from "@/components/beneficiary/BeneficiarySidebar";
 import { BeneficiaryBottomNavigation } from "@/components/mobile/BeneficiaryBottomNavigation";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { format, arLocale as ar } from "@/lib/date";
 
 export default function BeneficiaryPortal() {
   const navigate = useNavigate();

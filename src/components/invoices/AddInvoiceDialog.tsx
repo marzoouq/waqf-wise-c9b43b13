@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
 import { Plus, Trash2, Loader2, AlertCircle, FileImage } from "lucide-react";
-import { format } from "date-fns";
+import { format } from "@/lib/date";
 import { generateZATCAQRData, formatZATCACurrency, validateVATNumber } from "@/lib/zatca";
 import { useOrganizationSettings } from "@/hooks/useOrganizationSettings";
 import { validateZATCAInvoice, formatValidationErrors } from "@/lib/validateZATCAInvoice";
