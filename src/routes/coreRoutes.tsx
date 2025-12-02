@@ -56,7 +56,7 @@ export const coreRoutes = [
     key="beneficiaries-profile"
     path="/beneficiaries/:id" 
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant", "beneficiary"]}>
+      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant", "beneficiary", "waqf_heir"]}>
         <BeneficiaryProfile />
       </ProtectedRoute>
     } 
@@ -154,7 +154,7 @@ export const coreRoutes = [
     key="payments"
     path="/payments" 
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant", "cashier", "beneficiary"]}>
+      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant", "cashier", "beneficiary", "waqf_heir"]}>
         <Payments />
       </ProtectedRoute>
     } 
@@ -273,7 +273,7 @@ export const coreRoutes = [
     key="governance-decisions"
     path="/governance/decisions" 
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "beneficiary"]}>
+      <ProtectedRoute requiredRoles={["admin", "nazer", "beneficiary", "waqf_heir"]}>
         <GovernanceDecisions />
       </ProtectedRoute>
     } 
@@ -282,7 +282,7 @@ export const coreRoutes = [
     key="decision-details"
     path="/governance/decisions/:id" 
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "beneficiary"]}>
+      <ProtectedRoute requiredRoles={["admin", "nazer", "beneficiary", "waqf_heir"]}>
         <DecisionDetails />
       </ProtectedRoute>
     } 
@@ -311,7 +311,7 @@ export const coreRoutes = [
     key="notifications-settings"
     path="/notifications/settings" 
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant", "cashier", "beneficiary"]}>
+      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant", "cashier", "beneficiary", "waqf_heir"]}>
         <NotificationSettingsPage />
       </ProtectedRoute>
     } 

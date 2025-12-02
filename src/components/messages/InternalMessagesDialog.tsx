@@ -54,14 +54,14 @@ export function InternalMessagesDialog({
         if (currentRoleError) throw currentRoleError;
 
         // تحديد الأدوار المتاحة للمراسلة بناءً على دور المستخدم
-        let allowedRoles: ('accountant' | 'admin' | 'archivist' | 'beneficiary' | 'cashier' | 'nazer' | 'user')[];
+        let allowedRoles: ('accountant' | 'admin' | 'archivist' | 'beneficiary' | 'waqf_heir' | 'cashier' | 'nazer' | 'user')[];
         
-        if (currentUserRole?.role === 'beneficiary') {
-          // المستفيد يمكنه مراسلة الناظر والمشرف فقط
+        if (currentUserRole?.role === 'beneficiary' || currentUserRole?.role === 'waqf_heir') {
+          // المستفيد أو وارث الوقف يمكنه مراسلة الناظر والمشرف فقط
           allowedRoles = ['admin', 'nazer'];
         } else {
           // الإداريون يمكنهم مراسلة الجميع
-          allowedRoles = ['admin', 'nazer', 'accountant', 'cashier', 'beneficiary', 'archivist'];
+          allowedRoles = ['admin', 'nazer', 'accountant', 'cashier', 'beneficiary', 'waqf_heir', 'archivist'];
         }
         
         const { data: userRoles, error: rolesError } = await supabase

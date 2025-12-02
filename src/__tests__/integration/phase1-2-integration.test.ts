@@ -101,7 +101,7 @@ describe('Phase 1: Logger System Integration', () => {
 describe('Phase 2: Auth System Integration', () => {
   describe('ROLE_PERMISSIONS Structure', () => {
     it('جميع الأدوار معرفة بشكل صحيح', () => {
-      const requiredRoles = ['nazer', 'admin', 'accountant', 'cashier', 'archivist', 'beneficiary', 'user'];
+      const requiredRoles = ['nazer', 'admin', 'accountant', 'cashier', 'archivist', 'beneficiary', 'waqf_heir', 'user'];
       
       requiredRoles.forEach(role => {
         expect(ROLE_PERMISSIONS[role]).toBeDefined();
