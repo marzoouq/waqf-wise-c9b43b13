@@ -91,7 +91,7 @@ export function useContractForm(contract?: Contract | null) {
     }));
   }, [contract, formData.start_date, totalAmount, contractDuration, durationUnit]);
 
-  // تعبئة البيانات عند التعديل
+  // تعبئة البيانات عند التعديل فقط
   useEffect(() => {
     if (contract) {
       setFormData({
@@ -130,9 +130,8 @@ export function useContractForm(contract?: Contract | null) {
       }
       
       setTotalAmount((contract.monthly_rent * months).toString());
-    } else {
-      setFormData(getInitialFormData());
     }
+    // لا نعيد تهيئة النموذج هنا - التهيئة تتم في useState فقط
   }, [contract]);
 
   const updateFormData = useCallback((updates: Partial<ContractFormData>) => {
@@ -146,6 +145,7 @@ export function useContractForm(contract?: Contract | null) {
     setContractDuration(1);
     setDurationUnit('سنوات');
     setTotalAmount('');
+    prevCalcInputs.current = ''; // إعادة تعيين مفتاح الحساب
   }, []);
 
   const toggleUnit = useCallback((unitId: string) => {
