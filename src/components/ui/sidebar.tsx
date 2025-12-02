@@ -136,7 +136,14 @@ const Sidebar = React.forwardRef<
     collapsible?: "offcanvas" | "icon" | "none";
   }
 >(({ side = "left", variant = "sidebar", collapsible = "offcanvas", className, children, ...props }, ref) => {
-  const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
+  const { isMobile: currentIsMobile, state, openMobile, setOpenMobile } = useSidebar();
+  
+  // ✅ تثبيت قيمة isMobile عند أول mount لمنع التبديل بين Sheet و div
+  const initialIsMobileRef = React.useRef<boolean | null>(null);
+  if (initialIsMobileRef.current === null) {
+    initialIsMobileRef.current = currentIsMobile;
+  }
+  const isMobile = initialIsMobileRef.current;
 
   if (collapsible === "none") {
     return (
