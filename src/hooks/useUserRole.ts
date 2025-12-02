@@ -1,7 +1,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useMemo } from "react";
 
-export type AppRole = "nazer" | "admin" | "accountant" | "cashier" | "archivist" | "beneficiary" | "user";
+export type AppRole = "nazer" | "admin" | "accountant" | "cashier" | "archivist" | "beneficiary" | "waqf_heir" | "user";
 
 /**
  * Hook للحصول على أدوار المستخدم من AuthContext
@@ -22,6 +22,7 @@ export function useUserRole() {
   const isCashier = hasRole("cashier");
   const isArchivist = hasRole("archivist");
   const isBeneficiary = hasRole("beneficiary");
+  const isWaqfHeir = hasRole("waqf_heir");
   const isUser = hasRole("user");
 
   return {
@@ -35,6 +36,7 @@ export function useUserRole() {
     isCashier,
     isArchivist,
     isBeneficiary,
+    isWaqfHeir,
     isUser,
   };
 }

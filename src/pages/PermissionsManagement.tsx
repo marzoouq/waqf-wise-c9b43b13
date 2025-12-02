@@ -31,6 +31,7 @@ const ROLE_LABELS: Record<AppRole, string> = {
   cashier: "موظف الصرف",
   archivist: "الأرشيفي",
   beneficiary: "مستفيد",
+  waqf_heir: "وارث الوقف",
   user: "مستخدم",
 };
 

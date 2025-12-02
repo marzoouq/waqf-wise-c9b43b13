@@ -49,7 +49,7 @@ export interface UserSession {
   ended_at: string | null;
 }
 
-export type RoleName = 'nazer' | 'admin' | 'accountant' | 'disbursement_officer' | 'archivist' | 'beneficiary';
+export type RoleName = 'nazer' | 'admin' | 'accountant' | 'disbursement_officer' | 'archivist' | 'beneficiary' | 'waqf_heir';
 
 export const ROLE_NAMES_AR: Record<RoleName, string> = {
   nazer: 'الناظر',
@@ -58,4 +58,5 @@ export const ROLE_NAMES_AR: Record<RoleName, string> = {
   disbursement_officer: 'موظف الصرف',
   archivist: 'أرشيفي',
   beneficiary: 'مستفيد',
+  waqf_heir: 'وارث الوقف',
 };

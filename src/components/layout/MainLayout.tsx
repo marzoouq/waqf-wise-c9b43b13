@@ -165,7 +165,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   const { profile } = useProfile();
   const [searchOpen, setSearchOpen] = useState(false);
   const isMobile = useIsMobile();
-  const { isBeneficiary } = useUserRole();
+  const { isBeneficiary, isWaqfHeir } = useUserRole();
   
   // حساب القيم مرة واحدة
   const { displayName, displayEmail, userInitial } = useMemo(() => ({
@@ -220,7 +220,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
         </div>
         
         {/* Mobile Bottom Navigation */}
-        {isBeneficiary ? (
+        {(isBeneficiary || isWaqfHeir) ? (
           <BeneficiaryBottomNavigation />
         ) : (
           <BottomNavigation />

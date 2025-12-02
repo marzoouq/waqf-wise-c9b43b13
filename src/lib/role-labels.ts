@@ -10,6 +10,7 @@ export type AppRole =
   | 'cashier'
   | 'archivist'
   | 'beneficiary'
+  | 'waqf_heir'
   | 'user'
   | 'manager'
   | 'finance'
@@ -28,6 +29,7 @@ export const ROLE_LABELS: Record<AppRole, string> = {
   cashier: 'موظف صرف',
   archivist: 'أرشيفي',
   beneficiary: 'مستفيد',
+  waqf_heir: 'وارث الوقف',
   user: 'مستخدم',
   
   // أدوار الموافقات
@@ -48,6 +50,7 @@ export const ROLE_COLORS: Record<AppRole, string> = {
   cashier: 'bg-yellow-100 text-yellow-700 border-yellow-300',
   archivist: 'bg-gray-100 text-gray-700 border-gray-300',
   beneficiary: 'bg-pink-100 text-pink-700 border-pink-300',
+  waqf_heir: 'bg-amber-100 text-amber-700 border-amber-300',
   user: 'bg-slate-100 text-slate-700 border-slate-300',
   manager: 'bg-indigo-100 text-indigo-700 border-indigo-300',
   finance: 'bg-cyan-100 text-cyan-700 border-cyan-300',
@@ -61,7 +64,7 @@ export const ROLE_COLORS: Record<AppRole, string> = {
  */
 export const APPROVAL_ROLES = ['accountant', 'manager', 'nazer', 'finance'] as const;
 export const WORKFLOW_ROLES = ['reviewer', 'accountant', 'nazer', 'financial_manager', 'executor'] as const;
-export const SYSTEM_ROLES = ['nazer', 'admin', 'accountant', 'cashier', 'archivist', 'beneficiary', 'user'] as const;
+export const SYSTEM_ROLES = ['nazer', 'admin', 'accountant', 'cashier', 'archivist', 'beneficiary', 'waqf_heir', 'user'] as const;
 
 /**
  * Entity Type Labels - تسميات أنواع الكيانات
