@@ -80,8 +80,7 @@ export function useSessionCleanup() {
 
   // معالج إغلاق الصفحة
   const handleBeforeUnload = useCallback(() => {
-    // تعيين علامة للتنظيف في الجلسة القادمة
-    localStorage.setItem(SESSION_CLEANUP_KEY, 'true');
+    // فقط تحديث وقت آخر نشاط - لا نضع علامة تنظيف عند التحديث
     updateLastActive();
   }, [updateLastActive]);
 
@@ -98,9 +97,9 @@ export function useSessionCleanup() {
       // الصفحة في bfcache، لا نفعل شيء
       return;
     }
-    // تعيين علامة للتنظيف
-    localStorage.setItem(SESSION_CLEANUP_KEY, 'true');
-  }, []);
+    // فقط تحديث وقت آخر نشاط
+    updateLastActive();
+  }, [updateLastActive]);
 
   useEffect(() => {
     // التحقق من وجود تنظيف معلق عند بدء التطبيق

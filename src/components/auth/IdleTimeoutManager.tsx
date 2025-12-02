@@ -24,7 +24,7 @@ export function IdleTimeoutManager() {
 
     // عرض إشعار
     toast.warning("تم تسجيل خروجك تلقائياً", {
-      description: "لم يتم اكتشاف أي نشاط لمدة دقيقة",
+      description: "لم يتم اكتشاف أي نشاط لمدة 5 دقائق",
       duration: 5000,
     });
 
@@ -57,7 +57,7 @@ export function IdleTimeoutManager() {
   // تفعيل نظام الخروج التلقائي
   const { resetTimer } = useIdleTimeout({
     onIdle: handleIdleLogout,
-    idleTime: 60 * 1000, // دقيقة واحدة
+    idleTime: 5 * 60 * 1000, // 5 دقائق
     enabled: !roleLoading && !!user && !isNazer && !isAdmin, // لجميع المستخدمين عدا الناظر والمشرف
   });
 
