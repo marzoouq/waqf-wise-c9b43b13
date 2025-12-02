@@ -1,15 +1,33 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { toast } from 'sonner';
-import { RefreshCw, Download } from 'lucide-react';
+import { RefreshCw, Download, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { APP_VERSION } from '@/lib/version';
+import { handleSWRegistrationError, cleanupOldServiceWorkers } from '@/lib/sw-cleanup';
 
 /**
  * مكون إشعار التحديثات - يظهر إشعار عند توفر تحديث جديد
  * ويقوم بتحديث تلقائي بعد فترة قصيرة
  */
 export function UpdateNotifier() {
+  const [pwaAvailable, setPwaAvailable] = useState(true);
+  
+  // فحص توفر PWA عند التحميل
+  useEffect(() => {
+    fetch('/sw.js', { method: 'HEAD', cache: 'no-store' })
+      .then(res => {
+        if (!res.ok) {
+          setPwaAvailable(false);
+          cleanupOldServiceWorkers();
+        }
+      })
+      .catch(() => {
+        setPwaAvailable(false);
+        cleanupOldServiceWorkers();
+      });
+  }, []);
+  
   const {
     needRefresh: [needRefresh],
     updateServiceWorker,
@@ -31,11 +49,24 @@ export function UpdateNotifier() {
         duration: 3000,
       });
     },
-    onRegisterError(error) {
+    async onRegisterError(error) {
       console.error('❌ فشل تسجيل Service Worker:', error);
-      toast.error('حدث خطأ في تحميل التحديثات. جرب تحديث الصفحة.', {
-        duration: 5000,
-      });
+      
+      // معالجة خطأ "Not found"
+      const handled = await handleSWRegistrationError(error);
+      
+      if (handled) {
+        // تم تنظيف SW القديم، لا داعي لإظهار خطأ
+        toast.info('تم تنظيف الكاش القديم. التطبيق يعمل بشكل طبيعي.', {
+          icon: <AlertTriangle className="h-4 w-4" />,
+          duration: 4000,
+        });
+        setPwaAvailable(false);
+      } else {
+        toast.error('حدث خطأ في تحميل التحديثات. جرب تحديث الصفحة.', {
+          duration: 5000,
+        });
+      }
     },
   });
 
@@ -45,7 +76,7 @@ export function UpdateNotifier() {
 
   // عرض إشعار التحديث وتحديث تلقائي بعد 5 ثواني
   useEffect(() => {
-    if (needRefresh) {
+    if (needRefresh && pwaAvailable) {
       // إظهار إشعار
       const toastId = toast.info(
         <div className="flex flex-col gap-2">
@@ -82,7 +113,7 @@ export function UpdateNotifier() {
 
       return () => clearTimeout(timer);
     }
-  }, [needRefresh, handleUpdate]);
+  }, [needRefresh, handleUpdate, pwaAvailable]);
 
   return null;
 }
