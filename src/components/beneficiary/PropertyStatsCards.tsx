@@ -114,29 +114,29 @@ export function PropertyStatsCards() {
                   value={property.id}
                   className="border border-border/50 rounded-lg overflow-hidden"
                 >
-                  <AccordionTrigger className="px-4 hover:no-underline hover:bg-muted/50">
-                    <div className="flex items-center justify-between w-full pr-4">
-                      <div className="text-left">
-                        <h4 className="font-semibold text-base">{property.name}</h4>
-                        <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
-                          <MapPin className="h-3 w-3" />
+                  <AccordionTrigger className="px-3 sm:px-4 hover:no-underline hover:bg-muted/50">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full pr-3 sm:pr-4 gap-2 sm:gap-0">
+                      <div className="text-left flex-1 min-w-0">
+                        <h4 className="font-semibold text-xs sm:text-sm lg:text-base truncate">{property.name}</h4>
+                        <p className="text-[10px] sm:text-xs text-muted-foreground flex items-center gap-1 mt-0.5 sm:mt-1 truncate">
+                          <MapPin className="h-2.5 w-2.5 sm:h-3 sm:w-3 shrink-0" />
                           {property.location}
                         </p>
                       </div>
-                      <div className="flex gap-2 flex-wrap">
-                        <Badge variant="outline" className="text-xs">
+                      <div className="flex gap-1.5 sm:gap-2 flex-wrap shrink-0">
+                        <Badge variant="outline" className="text-[10px] sm:text-xs">
                           {property.total_units || 0} وحدة
                         </Badge>
-                        <Badge className="bg-success-light text-success border-success text-xs">
+                        <Badge className="bg-success-light text-success border-success text-[10px] sm:text-xs">
                           {property.occupied_units || 0} مشغول
                         </Badge>
-                        <Badge variant="secondary" className="text-xs">
+                        <Badge variant="secondary" className="text-[10px] sm:text-xs">
                           {(property.total_units || 0) - (property.occupied_units || 0)} شاغر
                         </Badge>
                       </div>
                     </div>
                   </AccordionTrigger>
-                  <AccordionContent className="px-4 pb-4">
+                  <AccordionContent className="px-3 sm:px-4 pb-3 sm:pb-4">
                     <PropertyUnitsDisplay propertyId={property.id} />
                   </AccordionContent>
                 </AccordionItem>
@@ -212,7 +212,7 @@ function PropertyUnitsDisplay({ propertyId }: { propertyId: string }) {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-2">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 mt-2">
       {units.map((unit) => {
         const contract = contracts?.find((c) => c.id === unit.current_contract_id);
         const isOccupied = unit.occupancy_status === "مشغول";
@@ -224,32 +224,32 @@ function PropertyUnitsDisplay({ propertyId }: { propertyId: string }) {
               isOccupied ? "border-l-success" : "border-l-border"
             }`}
           >
-            <CardContent className="p-3">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <h5 className="font-semibold text-sm">{unit.unit_number}</h5>
+            <CardContent className="p-2 sm:p-3">
+              <div className="space-y-1.5 sm:space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <h5 className="font-semibold text-xs sm:text-sm truncate flex-1 min-w-0">{unit.unit_number}</h5>
                   <Badge
                     variant={isOccupied ? "default" : "secondary"}
-                    className="text-xs"
+                    className="text-[10px] sm:text-xs shrink-0"
                   >
                     {unit.occupancy_status}
                   </Badge>
                 </div>
-                <div className="space-y-1 text-xs text-muted-foreground">
-                  <p>النوع: {unit.unit_type || "غير محدد"}</p>
+                <div className="space-y-0.5 sm:space-y-1 text-[10px] sm:text-xs text-muted-foreground">
+                  <p className="truncate">النوع: {unit.unit_type || "غير محدد"}</p>
                   {unit.floor_number && <p>الطابق: {unit.floor_number}</p>}
                   {unit.area && <p>المساحة: {unit.area} م²</p>}
                   {unit.annual_rent && (
-                    <p className="text-primary font-medium">
+                    <p className="text-primary font-medium truncate">
                       {formatCurrency(unit.annual_rent / 12)}/شهر
                     </p>
                   )}
                   {contract && (
-                    <div className="pt-1 border-t mt-2">
-                      <p className="font-medium text-foreground">
+                    <div className="pt-1 border-t mt-1.5 sm:mt-2">
+                      <p className="font-medium text-foreground truncate">
                         المستأجر: {contract.tenant_name}
                       </p>
-                     <p className="text-success font-medium">
+                     <p className="text-success font-medium truncate">
                         {formatCurrency(contract.monthly_rent)}/شهر
                       </p>
                     </div>
