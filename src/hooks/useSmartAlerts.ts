@@ -22,19 +22,64 @@ export function useSmartAlerts() {
         const allAlerts: SmartAlert[] = [];
         const today = new Date();
 
-        // 1. عقود قرب الانتهاء
-        const { data: expiringContracts, error: contractsError } = await supabase
-          .from('contracts')
-          .select('id, contract_number, tenant_name, end_date, properties(name)')
-          .eq('status', 'نشط')
-          .gte('end_date', format(today, 'yyyy-MM-dd'))
-          .lte('end_date', format(new Date(today.getTime() + 60 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd'))
-          .limit(5);
+        // تنفيذ جميع الاستعلامات بشكل متوازي
+        const [
+          expiringContractsResult,
+          overduePaymentsResult,
+          dueLoansResult,
+          overdueRequestsResult
+        ] = await Promise.all([
+          supabase
+            .from('contracts')
+            .select('id, contract_number, tenant_name, end_date, properties(name)')
+            .eq('status', 'نشط')
+            .gte('end_date', format(today, 'yyyy-MM-dd'))
+            .lte('end_date', format(new Date(today.getTime() + 60 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd'))
+            .limit(5),
+          supabase
+            .from('rental_payments')
+            .select(`
+              id,
+              payment_number,
+              amount_due,
+              due_date,
+              contracts(tenant_name, properties(name))
+            `)
+            .eq('status', 'متأخر')
+            .limit(5),
+          supabase
+            .from('loan_installments')
+            .select(`
+              id,
+              installment_number,
+              principal_amount,
+              total_amount,
+              due_date,
+              status,
+              loans(loan_number, beneficiaries(full_name))
+            `)
+            .in('status', ['overdue', 'pending', 'معلق'])
+            .lte('due_date', format(new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd'))
+            .limit(5),
+          supabase
+            .from('beneficiary_requests')
+            .select(`
+              id,
+              request_number,
+              sla_due_at,
+              beneficiaries(full_name)
+            `)
+            .eq('is_overdue', true)
+            .eq('status', 'قيد المراجعة')
+            .limit(5)
+        ]);
 
-        if (contractsError) throw contractsError;
+        // معالجة الأخطاء
+        if (expiringContractsResult.error) throw expiringContractsResult.error;
 
-        if (expiringContracts) {
-          expiringContracts.forEach(contract => {
+        // معالجة عقود قرب الانتهاء
+        if (expiringContractsResult.data) {
+          expiringContractsResult.data.forEach(contract => {
             const daysRemaining = differenceInDays(new Date(contract.end_date), today);
             allAlerts.push({
               id: contract.id,
@@ -48,21 +93,9 @@ export function useSmartAlerts() {
           });
         }
 
-        // 2. إيجارات متأخرة
-        const { data: overduePayments } = await supabase
-          .from('rental_payments')
-          .select(`
-            id,
-            payment_number,
-            amount_due,
-            due_date,
-            contracts(tenant_name, properties(name))
-          `)
-          .eq('status', 'متأخر')
-          .limit(5);
-
-        if (overduePayments) {
-          overduePayments.forEach(payment => {
+        // معالجة إيجارات متأخرة
+        if (overduePaymentsResult.data) {
+          overduePaymentsResult.data.forEach(payment => {
             const daysOverdue = differenceInDays(today, new Date(payment.due_date));
             allAlerts.push({
               id: payment.id,
@@ -76,24 +109,9 @@ export function useSmartAlerts() {
           });
         }
 
-        // 3. قروض مستحقة أو متأخرة
-        const { data: dueLoans } = await supabase
-          .from('loan_installments')
-          .select(`
-            id,
-            installment_number,
-            principal_amount,
-            total_amount,
-            due_date,
-            status,
-            loans(loan_number, beneficiaries(full_name))
-          `)
-          .in('status', ['overdue', 'pending', 'معلق'])
-          .lte('due_date', format(new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd'))
-          .limit(5);
-
-        if (dueLoans) {
-          dueLoans.forEach(installment => {
+        // معالجة قروض مستحقة أو متأخرة
+        if (dueLoansResult.data) {
+          dueLoansResult.data.forEach(installment => {
             const daysUntilDue = differenceInDays(new Date(installment.due_date), today);
             const isOverdue = installment.status === 'overdue' || daysUntilDue < 0;
             const amount = installment.total_amount || installment.principal_amount || 0;
@@ -109,21 +127,9 @@ export function useSmartAlerts() {
           });
         }
 
-        // 4. طلبات متأخرة
-        const { data: overdueRequests } = await supabase
-          .from('beneficiary_requests')
-          .select(`
-            id,
-            request_number,
-            sla_due_at,
-            beneficiaries(full_name)
-          `)
-          .eq('is_overdue', true)
-          .eq('status', 'قيد المراجعة')
-          .limit(5);
-
-        if (overdueRequests) {
-          overdueRequests.forEach(request => {
+        // معالجة طلبات متأخرة
+        if (overdueRequestsResult.data) {
+          overdueRequestsResult.data.forEach(request => {
             allAlerts.push({
               id: request.id,
               type: 'request_overdue',

@@ -19,18 +19,40 @@ export function useNazerKPIs() {
     queryKey: ["nazer-kpis"],
     queryFn: async (): Promise<NazerKPIData> => {
       try {
-        // جلب الأصول والإيرادات
-        const { data: accountsData, error: accountsError } = await supabase
-          .from('journal_entry_lines')
-          .select('debit_amount, credit_amount, accounts(account_type)');
+        // تنفيذ جميع الاستعلامات بشكل متوازي
+        const currentMonth = new Date().getMonth() + 1;
+        const currentYear = new Date().getFullYear();
 
-        if (accountsError) throw accountsError;
+        const [
+          accountsResult,
+          beneficiariesResult,
+          propertiesResult,
+          contractsResult,
+          loansResult,
+          bankAccountsResult,
+          monthlyDataResult
+        ] = await Promise.all([
+          supabase.from('journal_entry_lines').select('debit_amount, credit_amount, accounts(account_type)'),
+          supabase.from('beneficiaries').select('*', { count: 'exact', head: true }).eq('status', 'نشط'),
+          supabase.from('properties').select('*', { count: 'exact', head: true }).eq('status', 'نشط'),
+          supabase.from('contracts').select('*', { count: 'exact', head: true }).eq('status', 'نشط'),
+          supabase.from('loans').select('*', { count: 'exact', head: true }).in('status', ['active', 'defaulted']),
+          supabase.from('bank_accounts').select('current_balance').eq('is_active', true),
+          supabase.from('journal_entry_lines')
+            .select('credit_amount, debit_amount, journal_entries!inner(entry_date), accounts!inner(account_type)')
+            .eq('accounts.account_type', 'revenue')
+            .gte('journal_entries.entry_date', `${currentYear}-${String(currentMonth).padStart(2, '0')}-01`)
+            .lte('journal_entries.entry_date', `${currentYear}-${String(currentMonth).padStart(2, '0')}-31`)
+        ]);
+
+        // معالجة النتائج
+        if (accountsResult.error) throw accountsResult.error;
 
         let totalAssets = 0;
         let totalRevenue = 0;
 
-        if (accountsData) {
-          accountsData.forEach(line => {
+        if (accountsResult.data) {
+          accountsResult.data.forEach(line => {
             if (line.accounts?.account_type === 'asset') {
               totalAssets += (line.debit_amount || 0) - (line.credit_amount || 0);
             } else if (line.accounts?.account_type === 'revenue') {
@@ -39,51 +61,11 @@ export function useNazerKPIs() {
           });
         }
 
-        // جلب المستفيدين النشطين
-        const { count: beneficiariesCount } = await supabase
-          .from('beneficiaries')
-          .select('*', { count: 'exact', head: true })
-          .eq('status', 'نشط');
-
-        // جلب العقارات
-        const { count: propertiesCount } = await supabase
-          .from('properties')
-          .select('*', { count: 'exact', head: true })
-          .eq('status', 'نشط');
-
-        const { count: occupiedCount } = await supabase
-          .from('contracts')
-          .select('*', { count: 'exact', head: true })
-          .eq('status', 'نشط');
-
-        // جلب القروض المستحقة
-        const { count: loansCount } = await supabase
-          .from('loans')
-          .select('*', { count: 'exact', head: true })
-          .in('status', ['active', 'defaulted']);
-
-        // جلب الحسابات البنكية
-        const { data: bankAccounts } = await supabase
-          .from('bank_accounts')
-          .select('current_balance')
-          .eq('is_active', true);
-
-        const availableBudget = bankAccounts?.reduce((sum, acc) => sum + (acc.current_balance || 0), 0) || 0;
-
-        // حساب العائد الشهري
-        const currentMonth = new Date().getMonth() + 1;
-        const currentYear = new Date().getFullYear();
-        
-        const { data: monthlyData } = await supabase
-          .from('journal_entry_lines')
-          .select('credit_amount, debit_amount, journal_entries!inner(entry_date), accounts!inner(account_type)')
-          .eq('accounts.account_type', 'revenue')
-          .gte('journal_entries.entry_date', `${currentYear}-${String(currentMonth).padStart(2, '0')}-01`)
-          .lte('journal_entries.entry_date', `${currentYear}-${String(currentMonth).padStart(2, '0')}-31`);
+        const availableBudget = bankAccountsResult.data?.reduce((sum, acc) => sum + (acc.current_balance || 0), 0) || 0;
 
         let monthlyReturn = 0;
-        if (monthlyData) {
-          monthlyData.forEach(line => {
+        if (monthlyDataResult.data) {
+          monthlyDataResult.data.forEach(line => {
             monthlyReturn += (line.credit_amount || 0) - (line.debit_amount || 0);
           });
         }
@@ -91,10 +73,10 @@ export function useNazerKPIs() {
         return {
           totalAssets,
           totalRevenue,
-          activeBeneficiaries: beneficiariesCount || 0,
-          activeProperties: propertiesCount || 0,
-          occupiedProperties: occupiedCount || 0,
-          pendingLoans: loansCount || 0,
+          activeBeneficiaries: beneficiariesResult.count || 0,
+          activeProperties: propertiesResult.count || 0,
+          occupiedProperties: contractsResult.count || 0,
+          pendingLoans: loansResult.count || 0,
           availableBudget,
           monthlyReturn
         };

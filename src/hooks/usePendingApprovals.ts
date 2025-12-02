@@ -20,26 +20,59 @@ export function usePendingApprovals() {
       try {
         const allApprovals: PendingApproval[] = [];
 
-        // جلب موافقات التوزيعات
-        const { data: distApprovals, error: distError } = await supabase
-          .from('distribution_approvals')
-          .select(`
-            id,
-            created_at,
-            distributions(
-              month,
-              total_amount,
-              beneficiaries_count
-            )
-          `)
-          .eq('status', 'معلق')
-          .eq('level', 3)
-          .limit(5);
+        // تنفيذ جميع الاستعلامات بشكل متوازي
+        const [distApprovalsResult, reqApprovalsResult, journalApprovalsResult] = await Promise.all([
+          supabase
+            .from('distribution_approvals')
+            .select(`
+              id,
+              created_at,
+              distributions(
+                month,
+                total_amount,
+                beneficiaries_count
+              )
+            `)
+            .eq('status', 'معلق')
+            .eq('level', 3)
+            .limit(5),
+          supabase
+            .from('request_approvals')
+            .select(`
+              id,
+              created_at,
+              beneficiary_requests(
+                request_number,
+                amount,
+                priority,
+                beneficiaries(full_name)
+              )
+            `)
+            .eq('status', 'معلق')
+            .eq('level', 3)
+            .limit(5),
+          supabase
+            .from('approvals')
+            .select(`
+              id,
+              created_at,
+              journal_entries(
+                entry_number,
+                description
+              )
+            `)
+            .eq('status', 'pending')
+            .limit(5)
+        ]);
 
-        if (distError) throw distError;
+        // معالجة الأخطاء
+        if (distApprovalsResult.error) throw distApprovalsResult.error;
+        if (reqApprovalsResult.error) throw reqApprovalsResult.error;
+        if (journalApprovalsResult.error) throw journalApprovalsResult.error;
 
-        if (distApprovals) {
-          distApprovals.forEach(app => {
+        // معالجة موافقات التوزيعات
+        if (distApprovalsResult.data) {
+          distApprovalsResult.data.forEach(app => {
             if (app.distributions) {
               allApprovals.push({
                 id: app.id,
@@ -54,27 +87,9 @@ export function usePendingApprovals() {
           });
         }
 
-        // جلب موافقات الطلبات
-        const { data: reqApprovals, error: reqError } = await supabase
-          .from('request_approvals')
-          .select(`
-            id,
-            created_at,
-            beneficiary_requests(
-              request_number,
-              amount,
-              priority,
-              beneficiaries(full_name)
-            )
-          `)
-          .eq('status', 'معلق')
-          .eq('level', 3)
-          .limit(5);
-
-        if (reqError) throw reqError;
-
-        if (reqApprovals) {
-          reqApprovals.forEach(app => {
+        // معالجة موافقات الطلبات
+        if (reqApprovalsResult.data) {
+          reqApprovalsResult.data.forEach(app => {
             if (app.beneficiary_requests && app.beneficiary_requests.beneficiaries) {
               allApprovals.push({
                 id: app.id,
@@ -89,24 +104,9 @@ export function usePendingApprovals() {
           });
         }
 
-        // جلب موافقات القيود المحاسبية (جدول approvals يستخدم 'pending' بالإنجليزية)
-        const { data: journalApprovals, error: journalError } = await supabase
-          .from('approvals')
-          .select(`
-            id,
-            created_at,
-            journal_entries(
-              entry_number,
-              description
-            )
-          `)
-          .eq('status', 'pending')
-          .limit(5);
-
-        if (journalError) throw journalError;
-
-        if (journalApprovals) {
-          journalApprovals.forEach(app => {
+        // معالجة موافقات القيود المحاسبية
+        if (journalApprovalsResult.data) {
+          journalApprovalsResult.data.forEach(app => {
             if (app.journal_entries) {
               allApprovals.push({
                 id: app.id,
