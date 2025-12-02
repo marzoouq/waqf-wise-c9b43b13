@@ -24,6 +24,13 @@ export const IGNORE_ERROR_PATTERNS: RegExp[] = [
   /Invalid login credentials/i,
   /Database error saving new user/i,
   /manual_log/i,
+  // ✅ تجاهل أخطاء Service Worker
+  /sw\.js/i,
+  /service.worker/i,
+  /serviceWorker/i,
+  /workbox/i,
+  /Service Worker/i,
+  /precache/i,
 ];
 
 // الإعدادات الافتراضية
