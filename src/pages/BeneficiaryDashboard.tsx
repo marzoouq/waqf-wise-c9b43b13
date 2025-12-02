@@ -163,19 +163,19 @@ const BeneficiaryDashboard = () => {
 
         {/* التبويبات الرئيسية - للاطلاع فقط */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid w-full grid-cols-3 h-12">
-            <TabsTrigger value="overview" className="text-sm gap-2">
-              <LayoutDashboard className="h-4 w-4" />
+          <TabsList className="grid w-full grid-cols-3 h-10 sm:h-12">
+            <TabsTrigger value="overview" className="text-xs sm:text-sm gap-1 sm:gap-2 px-2 sm:px-3">
+              <LayoutDashboard className="h-3 w-3 sm:h-4 sm:w-4" />
               <span className="hidden sm:inline">نظرة عامة</span>
               <span className="sm:hidden">عامة</span>
             </TabsTrigger>
-            <TabsTrigger value="transparency" className="text-sm gap-2">
-              <Eye className="h-4 w-4" />
+            <TabsTrigger value="transparency" className="text-xs sm:text-sm gap-1 sm:gap-2 px-2 sm:px-3">
+              <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
               <span className="hidden sm:inline">الشفافية المالية</span>
               <span className="sm:hidden">شفافية</span>
             </TabsTrigger>
-            <TabsTrigger value="history" className="text-sm gap-2">
-              <FileText className="h-4 w-4" />
+            <TabsTrigger value="history" className="text-xs sm:text-sm gap-1 sm:gap-2 px-2 sm:px-3">
+              <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
               <span className="hidden sm:inline">سجل الطلبات</span>
               <span className="sm:hidden">السجل</span>
             </TabsTrigger>
@@ -212,31 +212,31 @@ const BeneficiaryDashboard = () => {
           {/* سجل الطلبات - للعرض فقط */}
           <TabsContent value="history">
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5" />
+              <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+                  <FileText className="h-4 w-4 sm:h-5 sm:w-5" />
                   سجل الطلبات السابقة
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-3 sm:p-6">
                 {requests.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-8">
+                  <p className="text-center text-muted-foreground py-6 sm:py-8 text-xs sm:text-sm">
                     لا توجد طلبات سابقة
                   </p>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     {requests.map((request) => (
                       <div 
                         key={request.id} 
-                        className="flex flex-col md:flex-row md:items-center justify-between p-4 border rounded-lg gap-3"
+                        className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 border rounded-lg gap-2 sm:gap-3"
                       >
-                        <div className="flex-1">
-                          <p className="font-medium">{request.description}</p>
-                          <p className="text-sm text-muted-foreground">
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-xs sm:text-sm truncate">{request.description}</p>
+                          <p className="text-[10px] sm:text-xs text-muted-foreground">
                             {new Date(request.created_at).toLocaleDateString("ar-SA")}
                           </p>
                           {request.amount && (
-                            <p className="text-sm text-muted-foreground mt-1">
+                            <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1">
                               المبلغ: <span className="font-semibold">{formatCurrency(request.amount)}</span>
                             </p>
                           )}
@@ -249,6 +249,7 @@ const BeneficiaryDashboard = () => {
                               ? "destructive" 
                               : "secondary"
                           }
+                          className="text-[10px] sm:text-xs shrink-0"
                         >
                           {request.status}
                         </Badge>

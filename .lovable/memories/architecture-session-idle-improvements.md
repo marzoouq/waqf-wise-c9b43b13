@@ -42,10 +42,35 @@
 4. **Text overflow handling**: `truncate` + `min-w-0` for proper text wrapping
 5. **Flexible layouts**: `flex-1 min-w-0` patterns for responsive content
 
+#### PropertyStatsCards.tsx - 100% Mobile Optimized
+- Added responsive AccordionTrigger with flexible layout: `flex-col sm:flex-row`
+- Responsive text sizes in property titles: `text-xs sm:text-sm lg:text-base`
+- Responsive location text: `text-[10px] sm:text-xs`
+- Responsive icon sizes: `h-2.5 w-2.5 sm:h-3 sm:w-3`
+- Responsive Badge sizes: `text-[10px] sm:text-xs`
+- Responsive padding: `px-3 sm:px-4`, `p-2 sm:p-3`
+- PropertyUnitsDisplay grid: `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`
+- Added `truncate` and `min-w-0` for text overflow
+- Responsive spacing: `gap-1.5 sm:gap-2`, `gap-2 sm:gap-3`
+
+#### BeneficiaryDashboard.tsx - 100% Mobile Optimized
+- TabsList height: `h-10 sm:h-12`
+- TabsTrigger responsive: `text-xs sm:text-sm`, `gap-1 sm:gap-2`, `px-2 sm:px-3`
+- Icon sizes: `h-3 w-3 sm:h-4 sm:w-4`
+- CardHeader responsive padding: `p-4 sm:p-6`
+- CardTitle responsive: `text-sm sm:text-base`
+- CardContent responsive padding: `p-3 sm:p-6`
+- Request cards: responsive padding `p-3 sm:p-4`, responsive text `text-xs sm:text-sm`
+- Badge sizes: `text-[10px] sm:text-xs`
+- Empty state: `py-6 sm:py-8`, `text-xs sm:text-sm`
+
 ### Testing Coverage
 - ✅ Page refresh no longer logs out users
 - ✅ Idle timeout correctly set to 5 minutes
 - ✅ FamilyTreeTab fully responsive on all screen sizes
 - ✅ GovernanceTab fully responsive on all screen sizes
+- ✅ PropertyStatsCards fully responsive on all screen sizes
+- ✅ BeneficiaryDashboard fully responsive on all screen sizes
 - ✅ All mobile touch targets appropriately sized
 - ✅ Text overflow handled gracefully on small screens
+- ✅ 100% responsive coverage for Beneficiary Portal
