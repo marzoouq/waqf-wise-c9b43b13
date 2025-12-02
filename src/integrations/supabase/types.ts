@@ -9929,6 +9929,7 @@ export type Database = {
           metadata: Json | null
           occurrence_count: number | null
           related_error_type: string | null
+          resolution_notes: string | null
           resolved_at: string | null
           resolved_by: string | null
           severity: string
@@ -9946,6 +9947,7 @@ export type Database = {
           metadata?: Json | null
           occurrence_count?: number | null
           related_error_type?: string | null
+          resolution_notes?: string | null
           resolved_at?: string | null
           resolved_by?: string | null
           severity: string
@@ -9963,6 +9965,7 @@ export type Database = {
           metadata?: Json | null
           occurrence_count?: number | null
           related_error_type?: string | null
+          resolution_notes?: string | null
           resolved_at?: string | null
           resolved_by?: string | null
           severity?: string
@@ -11789,6 +11792,15 @@ export type Database = {
           email: string
           role: string
           status: string
+        }[]
+      }
+      smart_cleanup_monitoring_data: {
+        Args: never
+        Returns: {
+          alerts_archived: number
+          alerts_merged: number
+          errors_resolved: number
+          health_checks_deleted: number
         }[]
       }
       update_loan_balance_after_payment: {

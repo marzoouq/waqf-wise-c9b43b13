@@ -469,12 +469,36 @@ class ErrorTracker {
         return;
       }
 
+      // ✅ فحص وجود تنبيه مشابه نشط قبل الإنشاء (Deduplication)
+      const { data: existingAlert } = await supabase
+        .from('system_alerts')
+        .select('id, occurrence_count')
+        .eq('alert_type', report.error_type)
+        .eq('status', 'active')
+        .maybeSingle();
+
+      if (existingAlert) {
+        // ⬆️ زيادة العداد فقط بدل إنشاء تنبيه جديد
+        const { error: updateError } = await supabase
+          .from('system_alerts')
+          .update({ 
+            occurrence_count: (existingAlert.occurrence_count || 1) + 1,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', existingAlert.id);
+
+        if (updateError) productionLogger.error('Failed to update alert count', updateError);
+        return;
+      }
+
+      // إنشاء تنبيه جديد فقط إذا لم يوجد مشابه
       const { error } = await supabase.from('system_alerts').insert([{
         alert_type: report.error_type,
         severity: report.severity,
         title: `خطأ ${report.severity === 'critical' ? 'حرج' : 'عالي'}: ${report.error_type}`,
         description: report.error_message,
         status: 'active',
+        occurrence_count: 1,
         metadata: JSON.parse(JSON.stringify({
           url: report.url,
           user_agent: report.user_agent,
@@ -495,9 +519,8 @@ class ErrorTracker {
       const { error } = await supabase
         .from('system_error_logs')
         .update({ 
-          status: 'auto_resolved',
-          resolved_at: new Date().toISOString(),
-          resolved_by: 'system'
+          status: 'resolved',
+          resolved_at: new Date().toISOString()
         })
         .eq('error_type', errorKey.split('-')[0])
         .eq('status', 'new');

@@ -246,16 +246,28 @@ export class AutoRecovery {
 
 /**
  * 4. مراقب الصحة النشط - Active Health Monitor
+ * تم تحسينه لتقليل تراكم البيانات
  */
 export class HealthMonitor {
-  private checkInterval: number = 120000; // 2 دقيقة
+  private checkInterval: number = 300000; // ⬆️ 5 دقائق بدل 2
   private intervalId: NodeJS.Timeout | null = null;
   private autoRecovery = new AutoRecovery();
+  
+  // إضافات للتحكم بالتسجيل
+  private lastRecordedStatus: string | null = null;
+  private lastRecordTime: number = 0;
+  private todayRecords: number = 0;
+  private lastResetDate: string = '';
+  private readonly maxRecordsPerDay: number = 50;
+  private readonly minRecordInterval: number = 3600000; // ساعة واحدة
 
   start(): void {
     if (this.intervalId) {
       return;
     }
+
+    // إعادة تعيين العداد اليومي
+    this.resetDailyCounter();
 
     // Start immediate check
     this.performHealthCheck();
@@ -273,7 +285,17 @@ export class HealthMonitor {
     }
   }
 
+  private resetDailyCounter(): void {
+    const today = new Date().toDateString();
+    if (this.lastResetDate !== today) {
+      this.todayRecords = 0;
+      this.lastResetDate = today;
+    }
+  }
+
   private async performHealthCheck(): Promise<void> {
+    this.resetDailyCounter();
+    
     const checks = {
       database: await this.checkDatabase(),
       storage: await this.checkStorage(),
@@ -281,6 +303,7 @@ export class HealthMonitor {
     };
 
     const allHealthy = Object.values(checks).every((status) => status);
+    const currentStatus = allHealthy ? 'healthy' : 'degraded';
 
     if (!allHealthy) {
       productionLogger.warn('⚠️ Health check failed, attempting recovery...');
@@ -289,21 +312,34 @@ export class HealthMonitor {
       productionLogger.debug('✅ All systems healthy');
     }
 
-    // تسجيل في قاعدة البيانات
-    try {
-      await supabase.from('system_health_checks').insert({
-        check_type: 'comprehensive',
-        check_name: 'Full System Health Check',
-        status: allHealthy ? 'healthy' : 'degraded',
-        details: checks,
-      });
+    // ✅ تسجيل ذكي: فقط عند التغيير أو مرور ساعة وعدم تجاوز الحد اليومي
+    const now = Date.now();
+    const statusChanged = this.lastRecordedStatus !== currentStatus;
+    const hourPassed = now - this.lastRecordTime > this.minRecordInterval;
+    const belowDailyLimit = this.todayRecords < this.maxRecordsPerDay;
+    
+    const shouldRecord = belowDailyLimit && (statusChanged || (!allHealthy) || hourPassed);
 
-      // إنشاء تنبيه للمسؤولين عند فشل الفحص
-      if (!allHealthy) {
-        await this.createHealthAlert(checks);
+    if (shouldRecord) {
+      try {
+        await supabase.from('system_health_checks').insert({
+          check_type: 'comprehensive',
+          check_name: 'Full System Health Check',
+          status: currentStatus,
+          details: checks,
+        });
+        
+        this.lastRecordedStatus = currentStatus;
+        this.lastRecordTime = now;
+        this.todayRecords++;
+
+        // إنشاء تنبيه للمسؤولين عند فشل الفحص (فقط عند التغيير)
+        if (!allHealthy && statusChanged) {
+          await this.createHealthAlert(checks);
+        }
+      } catch (error) {
+        productionLogger.error('Failed to log health check:', error);
       }
-    } catch (error) {
-      productionLogger.error('Failed to log health check:', error);
     }
   }
 
