@@ -242,7 +242,7 @@ serve(async (req) => {
     if (quickReplyId === 'properties' || messageText.includes('عقار') || messageText.includes('إيجار') || messageText.includes('عقد')) {
       const { data: properties, count } = await supabase
         .from('properties')
-        .select('id, name, status, property_type, contracts(id, status, monthly_rent, start_date, end_date)', { count: 'exact' });
+        .select('id, name, status, type, contracts(id, status, monthly_rent, start_date, end_date)', { count: 'exact' });
       
       const occupied = properties?.filter(p => p.status === 'occupied').length || 0;
       const vacant = properties?.filter(p => p.status === 'vacant').length || 0;
@@ -269,7 +269,7 @@ serve(async (req) => {
       
       // أنواع العقارات
       const propertyTypes = properties?.reduce((acc: Record<string, number>, p) => {
-        acc[p.property_type] = (acc[p.property_type] || 0) + 1;
+        acc[p.type] = (acc[p.type] || 0) + 1;
         return acc;
       }, {}) || {};
       
