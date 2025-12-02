@@ -36,6 +36,7 @@ const roleColors: Record<AppRole, string> = {
   cashier: "bg-success/10 text-success border-success/30",
   archivist: "bg-warning/10 text-warning border-warning/30",
   beneficiary: "bg-accent/10 text-accent border-accent/30",
+  waqf_heir: "bg-amber-100 text-amber-700 border-amber-300",
   user: "bg-muted/10 text-muted-foreground border-border/30",
 };
 

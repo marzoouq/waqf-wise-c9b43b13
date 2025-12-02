@@ -11521,6 +11521,7 @@ export type Database = {
       }
       is_staff: { Args: never; Returns: boolean }
       is_staff_only: { Args: never; Returns: boolean }
+      is_waqf_heir: { Args: { _user_id?: string }; Returns: boolean }
       log_access_attempt: {
         Args: {
           p_action: string
@@ -11663,6 +11664,7 @@ export type Database = {
         | "cashier"
         | "archivist"
         | "beneficiary"
+        | "waqf_heir"
       entry_status: "draft" | "posted" | "cancelled"
       entry_type: "manual" | "auto" | "adjustment" | "opening" | "closing"
     }
@@ -11802,6 +11804,7 @@ export const Constants = {
         "cashier",
         "archivist",
         "beneficiary",
+        "waqf_heir",
       ],
       entry_status: ["draft", "posted", "cancelled"],
       entry_type: ["manual", "auto", "adjustment", "opening", "closing"],

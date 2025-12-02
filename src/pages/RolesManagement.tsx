@@ -26,6 +26,7 @@ const ROLE_LABELS: Record<AppRole, string> = {
   cashier: "موظف الصرف",
   archivist: "الأرشيفي",
   beneficiary: "مستفيد",
+  waqf_heir: "وارث الوقف",
   user: "مستخدم",
 };
 
@@ -36,6 +37,7 @@ const ROLE_COLORS: Record<AppRole, string> = {
   cashier: "bg-warning text-warning-foreground",
   archivist: "bg-info text-info-foreground",
   beneficiary: "bg-accent text-accent-foreground",
+  waqf_heir: "bg-amber-500 text-amber-50",
   user: "bg-muted text-muted-foreground",
 };
 
