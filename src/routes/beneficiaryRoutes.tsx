@@ -36,15 +36,6 @@ export const beneficiaryStandaloneRoutes = [
       </ProtectedRoute>
     } 
   />,
-  <Route
-    key="beneficiary-portal"
-    path="/beneficiary-portal"
-    element={
-      <ProtectedRoute requiredRoles={["beneficiary", "waqf_heir"]}>
-        <BeneficiaryPortal />
-      </ProtectedRoute>
-    } 
-  />,
 ];
 
 /**
