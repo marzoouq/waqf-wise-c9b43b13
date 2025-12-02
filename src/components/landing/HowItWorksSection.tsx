@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { UserPlus, Settings, PieChart, CheckCircle } from "lucide-react";
 
 const steps = [
@@ -34,32 +33,15 @@ export function HowItWorksSection() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
-          <motion.span
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4"
-          >
+          <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4 animate-fade-in">
             كيف يعمل
-          </motion.span>
-          <motion.h2
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4"
-          >
+          </span>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4">
             ابدأ في 4 خطوات بسيطة
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="text-muted-foreground text-base sm:text-lg"
-          >
+          </h2>
+          <p className="text-muted-foreground text-base sm:text-lg">
             نظام سهل الاستخدام يمكنك البدء به في دقائق
-          </motion.p>
+          </p>
         </div>
 
         {/* Steps */}
@@ -69,13 +51,10 @@ export function HowItWorksSection() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-6 lg:gap-8">
             {steps.map((step, index) => (
-              <motion.div
+              <div
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="relative group"
+                className="relative group animate-fade-in"
+                style={{ animationDelay: `${index * 100}ms` }}
               >
                 {/* Step Number */}
                 <div className="absolute -top-2 -right-2 sm:-top-3 sm:-right-3 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm sm:text-base font-bold shadow-lg z-10">
@@ -104,7 +83,7 @@ export function HowItWorksSection() {
                     <div className="w-0.5 h-8 bg-gradient-to-b from-primary/40 to-primary/20" />
                   </div>
                 )}
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
