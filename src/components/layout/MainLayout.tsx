@@ -13,9 +13,7 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { RoleSwitcher } from "./RoleSwitcher";
-import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -164,7 +162,6 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   const { user, signOut } = useAuth();
   const { profile } = useProfile();
   const [searchOpen, setSearchOpen] = useState(false);
-  const isMobile = useIsMobile();
   const { isBeneficiary, isWaqfHeir } = useUserRole();
   
   // حساب القيم مرة واحدة
@@ -204,10 +201,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
             />
 
             {/* Page Content with padding for mobile bottom navigation */}
-            <div className={cn(
-              "flex-1 overflow-auto flex flex-col",
-              isMobile && "pb-20"
-            )}>
+            <div className="flex-1 overflow-auto flex flex-col pb-20 md:pb-0">
               <main className="flex-1">
                 {children}
               </main>
@@ -219,12 +213,14 @@ const MainLayout = ({ children }: MainLayoutProps) => {
           <FloatingChatButton />
         </div>
         
-        {/* Mobile Bottom Navigation */}
-        {(isBeneficiary || isWaqfHeir) ? (
-          <BeneficiaryBottomNavigation />
-        ) : (
-          <BottomNavigation />
-        )}
+        {/* Mobile Bottom Navigation - استخدام CSS بدلاً من conditional rendering */}
+        <div className="md:hidden">
+          {(isBeneficiary || isWaqfHeir) ? (
+            <BeneficiaryBottomNavigation />
+          ) : (
+            <BottomNavigation />
+          )}
+        </div>
         
         {/* Global Search */}
         <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
