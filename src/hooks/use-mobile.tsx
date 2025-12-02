@@ -1,20 +1,17 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const MOBILE_BREAKPOINT = 768;
 
 /**
  * Hook محسّن لاكتشاف الجوال
- * - يستخدم قيمة أولية من matchMedia لتجنب الوميض
- * - يستخدم useCallback لتحسين الأداء
+ * ✅ يستخدم قيمة أولية من matchMedia
+ * ✅ لا يُعيد setIsMobile في useEffect لمنع re-render غير ضروري
  */
 export function useIsMobile() {
-  // تحديد القيمة الأولية مباشرة لتجنب الوميض
-  const getInitialValue = useCallback(() => {
+  const [isMobile, setIsMobile] = useState(() => {
     if (typeof window === "undefined") return false;
-    return window.innerWidth < MOBILE_BREAKPOINT;
-  }, []);
-
-  const [isMobile, setIsMobile] = useState(getInitialValue);
+    return window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`).matches;
+  });
 
   useEffect(() => {
     const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
@@ -23,8 +20,7 @@ export function useIsMobile() {
       setIsMobile(e.matches);
     };
 
-    // تعيين القيمة الأولية
-    setIsMobile(mql.matches);
+    // ❌ إزالة setIsMobile(mql.matches) - القيمة الأولية صحيحة من useState
     
     mql.addEventListener("change", handleChange);
     return () => mql.removeEventListener("change", handleChange);
@@ -35,6 +31,7 @@ export function useIsMobile() {
 
 /**
  * Hook للتحقق من حجم الشاشة
+ * ✅ لا يُعيد setMatches في useEffect لمنع re-render غير ضروري
  */
 export function useMediaQuery(query: string) {
   const [matches, setMatches] = useState(() => {
@@ -46,7 +43,8 @@ export function useMediaQuery(query: string) {
     const mql = window.matchMedia(query);
     const handleChange = (e: MediaQueryListEvent) => setMatches(e.matches);
     
-    setMatches(mql.matches);
+    // ❌ إزالة setMatches(mql.matches) - القيمة الأولية صحيحة من useState
+    
     mql.addEventListener("change", handleChange);
     return () => mql.removeEventListener("change", handleChange);
   }, [query]);
