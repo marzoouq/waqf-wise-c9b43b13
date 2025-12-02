@@ -12,8 +12,7 @@ import {
 } from "lucide-react";
 import { useSmartAlerts } from "@/hooks/useSmartAlerts";
 import { useNavigate } from "react-router-dom";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { format, arLocale as ar } from "@/lib/date";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 

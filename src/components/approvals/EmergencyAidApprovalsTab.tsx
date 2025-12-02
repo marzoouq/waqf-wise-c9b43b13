@@ -9,8 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, XCircle, Clock, AlertCircle } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { format, arLocale as ar } from "@/lib/date";
 import {
   Dialog,
   DialogContent,

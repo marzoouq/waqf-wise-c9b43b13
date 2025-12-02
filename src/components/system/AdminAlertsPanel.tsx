@@ -5,8 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Bell, CheckCircle, AlertTriangle, XCircle, Clock } from 'lucide-react';
 import { toast } from 'sonner';
-import { formatDistanceToNow } from 'date-fns';
-import { ar } from 'date-fns/locale';
+import { formatRelative } from "@/lib/date";
 
 interface SystemAlert {
   id: string;
@@ -168,10 +167,7 @@ export function AdminAlertsPanel() {
                     </p>
                     <p className="text-xs text-muted-foreground">
                       منذ{' '}
-                      {formatDistanceToNow(new Date(alert.created_at), {
-                        locale: ar,
-                        addSuffix: false,
-                      })}
+                      {formatRelative(alert.created_at)}
                     </p>
                   </div>
                 </div>

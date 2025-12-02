@@ -7,8 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle2, XCircle, Clock, User } from "lucide-react";
 import { useDistributionApprovals } from "@/hooks/useDistributionApprovals";
 import { useAuth } from "@/hooks/useAuth";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { format, arLocale as ar } from "@/lib/date";
 
 interface ApprovalFlowDialogProps {
   open: boolean;

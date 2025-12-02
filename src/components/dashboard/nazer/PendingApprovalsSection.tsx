@@ -4,8 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Clock, FileText, TrendingUp, DollarSign, AlertCircle } from "lucide-react";
 import { usePendingApprovals } from "@/hooks/usePendingApprovals";
 import { useNavigate } from "react-router-dom";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { format, arLocale as ar } from "@/lib/date";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 

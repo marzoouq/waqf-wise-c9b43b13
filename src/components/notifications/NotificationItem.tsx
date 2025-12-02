@@ -1,6 +1,5 @@
 import { Bell, CheckCircle, AlertCircle, DollarSign, FileText, Users } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
-import { ar } from "date-fns/locale";
+import { formatRelative } from "@/lib/date";
 import { cn } from "@/lib/utils";
 import type { Notification } from "@/hooks/useNotifications";
 
@@ -80,10 +79,7 @@ export const NotificationItem = ({ notification, onMarkAsRead, onClick }: Notifi
             {notification.message}
           </p>
           <p className="text-[10px] sm:text-xs text-muted-foreground mt-1 sm:mt-2">
-            {formatDistanceToNow(new Date(notification.created_at), {
-              addSuffix: true,
-              locale: ar,
-            })}
+            {formatRelative(notification.created_at)}
           </p>
         </div>
       </div>

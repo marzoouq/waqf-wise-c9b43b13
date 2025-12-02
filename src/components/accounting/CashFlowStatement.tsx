@@ -5,8 +5,7 @@ import { Printer, FileDown, TrendingUp, TrendingDown, Activity } from "lucide-re
 import { useCashFlows } from "@/hooks/useCashFlows";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyAccountingState } from "./EmptyAccountingState";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { format, arLocale as ar } from "@/lib/date";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { formatCurrency, formatNumber } from "@/lib/utils";

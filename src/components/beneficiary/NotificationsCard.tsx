@@ -4,8 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Bell, CheckCircle2, AlertCircle, Info, ChevronLeft } from "lucide-react";
 import { useNotifications, Notification } from "@/hooks/useNotifications";
 import { useNavigate } from "react-router-dom";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { format, arLocale as ar } from "@/lib/date";
 
 export function NotificationsCard() {
   const navigate = useNavigate();

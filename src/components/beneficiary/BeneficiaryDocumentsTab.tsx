@@ -7,8 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Upload, FileText, Trash2, Eye } from "lucide-react";
 import { DocumentUploadDialog } from "./DocumentUploadDialog";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { format, arLocale as ar } from "@/lib/date";
 
 interface BeneficiaryDocumentsTabProps {
   beneficiaryId: string;

@@ -7,8 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { PaymentVoucherDialog } from "@/components/distributions/PaymentVoucherDialog";
 import { Receipt, Search, FileText, CheckCircle, XCircle, Clock, DollarSign } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
-import { ar } from "date-fns/locale";
+import { formatRelative } from "@/lib/date";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 
@@ -254,10 +253,7 @@ export default function PaymentVouchers() {
                         <span>المرجع: {voucher.reference_number}</span>
                       )}
                       <span>
-                        {formatDistanceToNow(new Date(voucher.created_at), {
-                          addSuffix: true,
-                          locale: ar,
-                        })}
+                        {formatRelative(voucher.created_at)}
                       </span>
                     </div>
                   </div>

@@ -10,8 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, XCircle, Upload } from "lucide-react";
 import { BankStatementRow } from "@/types/supabase-helpers";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { format, arLocale as ar } from "@/lib/date";
 
 interface BankReconciliationDialogProps {
   open: boolean;

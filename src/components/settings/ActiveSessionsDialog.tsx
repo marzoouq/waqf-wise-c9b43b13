@@ -27,8 +27,7 @@ import {
   AlertTriangle
 } from "lucide-react";
 import { useActiveSessions } from "@/hooks/useActiveSessions";
-import { format, formatDistanceToNow } from "date-fns";
-import { ar } from "date-fns/locale";
+import { formatDate, formatRelative } from "@/lib/date";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -291,14 +290,11 @@ function SessionCard({ session, isCurrent, onEnd, isEnding }: SessionCardProps) 
               <div className="flex items-center gap-2">
                 <Clock className="h-3 w-3" />
                 <span>
-                  آخر نشاط: {formatDistanceToNow(new Date(session.last_activity_at), {
-                    addSuffix: true,
-                    locale: ar,
-                  })}
+                  آخر نشاط: {formatRelative(session.last_activity_at)}
                 </span>
               </div>
               <div className="text-xs opacity-70">
-                تسجيل الدخول: {format(new Date(session.created_at), "PPp", { locale: ar })}
+                تسجيل الدخول: {formatDate(session.created_at, "PPp")}
               </div>
             </div>
           </div>

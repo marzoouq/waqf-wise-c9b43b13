@@ -4,8 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { FileText, Download, CheckCircle, XCircle, Clock, User, Calendar, DollarSign, Building2, LucideIcon } from "lucide-react";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { format, arLocale as ar } from "@/lib/date";
 
 type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
 

@@ -3,8 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { FileText, Calendar, Users, AlertCircle, Inbox } from "lucide-react";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { useGovernanceData } from "@/hooks/useGovernanceData";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { format, arLocale as ar } from "@/lib/date";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useIsMobile } from "@/hooks/use-mobile";
 
