@@ -2,7 +2,7 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import { checkAndUpdateVersion } from "./lib/versionCheck";
-import { cleanupOldServiceWorkers } from "./lib/sw-cleanup";
+import { unregisterAllServiceWorkers } from "./lib/sw-cleanup";
 
 const rootElement = document.getElementById("root")!;
 
@@ -12,8 +12,12 @@ if (loadingElement) {
   loadingElement.remove();
 }
 
-// تنظيف Service Workers القديمة إذا لم يكن sw.js متاحاً (non-blocking)
-cleanupOldServiceWorkers().catch(console.error);
+// ❌ إزالة جميع Service Workers فوراً (PWA معطّل)
+unregisterAllServiceWorkers().then(wasUnregistered => {
+  if (wasUnregistered) {
+    console.log('✅ تم حذف Service Workers القديمة - يُنصح بتحديث الصفحة');
+  }
+}).catch(console.error);
 
 // فحص الإصدار وتنظيف الكاش إذا لزم الأمر (غير معطل للتطبيق)
 checkAndUpdateVersion().catch(console.error);
