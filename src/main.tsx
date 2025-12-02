@@ -2,6 +2,7 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import { checkAndUpdateVersion } from "./lib/versionCheck";
+import { cleanupOldServiceWorkers } from "./lib/sw-cleanup";
 
 const rootElement = document.getElementById("root")!;
 
@@ -10,6 +11,9 @@ const loadingElement = document.getElementById("app-loading");
 if (loadingElement) {
   loadingElement.remove();
 }
+
+// تنظيف Service Workers القديمة إذا لم يكن sw.js متاحاً (non-blocking)
+cleanupOldServiceWorkers().catch(console.error);
 
 // فحص الإصدار وتنظيف الكاش إذا لزم الأمر (غير معطل للتطبيق)
 checkAndUpdateVersion().catch(console.error);
