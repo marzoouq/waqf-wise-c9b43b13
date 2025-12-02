@@ -16,8 +16,11 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import type { FiscalYear } from "@/hooks/useFiscalYears";
 import type { ClosingPreview } from "@/types/fiscal-year-closing";
+import { FiscalYearClosingStats } from "./FiscalYearClosingStats";
+import { formatCurrency } from "@/lib/utils";
 
 interface AutomaticClosingDialogProps {
   open: boolean;
@@ -36,15 +39,12 @@ export function AutomaticClosingDialog({
   const { data: preview, isLoading } = useQuery({
     queryKey: ["closing-preview", fiscalYear.id],
     queryFn: async () => {
-      // TODO: استدعاء Edge Function للحصول على المعاينة
-      // const { data, error } = await supabase.functions.invoke("auto-close-fiscal-year", {
-      //   body: { fiscal_year_id: fiscalYear.id, preview_only: true }
-      // });
-      // if (error) throw error;
-      // return data as ClosingPreview;
+      const { data, error } = await supabase.functions.invoke("auto-close-fiscal-year", {
+        body: { fiscal_year_id: fiscalYear.id, preview_only: true }
+      });
       
-      // مؤقتاً نرجع null
-      return null as ClosingPreview | null;
+      if (error) throw error;
+      return data as ClosingPreview;
     },
     enabled: open,
   });
@@ -52,15 +52,21 @@ export function AutomaticClosingDialog({
   const handleConfirm = async () => {
     setConfirming(true);
     try {
-      // TODO: استدعاء Edge Function للتأكيد
-      // const { error } = await supabase.functions.invoke("auto-close-fiscal-year", {
-      //   body: { fiscal_year_id: fiscalYear.id, preview_only: false }
-      // });
-      // if (error) throw error;
+      const { data, error } = await supabase.functions.invoke("auto-close-fiscal-year", {
+        body: { fiscal_year_id: fiscalYear.id, preview_only: false }
+      });
       
-      onOpenChange(false);
+      if (error) throw error;
+      
+      if (data?.success) {
+        toast.success("تم إقفال السنة المالية بنجاح");
+        onOpenChange(false);
+      } else {
+        throw new Error(data?.error || "فشل الإقفال");
+      }
     } catch (error) {
       console.error("Error confirming closing:", error);
+      toast.error("حدث خطأ أثناء إقفال السنة المالية");
     } finally {
       setConfirming(false);
     }
@@ -84,39 +90,94 @@ export function AutomaticClosingDialog({
             </div>
           )}
 
-          {!isLoading && (
+          {!isLoading && preview && (
             <>
-              <Alert>
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>
-                  الإقفال التلقائي قيد التطوير. سيتم إضافة المعاينة التفصيلية قريباً.
-                </AlertDescription>
-              </Alert>
+              {preview.warnings && preview.warnings.length > 0 && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    <ul className="list-disc mr-4">
+                      {preview.warnings.map((warning, idx) => (
+                        <li key={idx}>{warning}</li>
+                      ))}
+                    </ul>
+                  </AlertDescription>
+                </Alert>
+              )}
 
-              <div className="bg-muted/50 p-4 rounded-lg">
-                <h3 className="font-semibold mb-2">ميزات الإقفال التلقائي:</h3>
-                <ul className="space-y-2">
-                  <li className="flex items-center gap-2">
+              <div className="space-y-6">
+                <FiscalYearClosingStats
+                  totalRevenues={preview.summary.total_revenues}
+                  totalExpenses={preview.summary.total_expenses}
+                  netIncome={preview.summary.net_income}
+                  waqfCorpus={preview.waqf_corpus}
+                  nazerShare={preview.summary.nazer_share}
+                  waqifShare={preview.summary.waqif_share}
+                />
+
+                <div className="bg-muted/50 p-4 rounded-lg">
+                  <h3 className="font-semibold mb-3">قيد الإقفال المقترح:</h3>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">رقم القيد:</span>
+                      <span className="font-medium">{preview.closing_entry.entry_number}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">التاريخ:</span>
+                      <span className="font-medium">{preview.closing_entry.entry_date}</span>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 border rounded-lg overflow-hidden">
+                    <table className="w-full text-sm">
+                      <thead className="bg-muted">
+                        <tr>
+                          <th className="text-right p-2">الحساب</th>
+                          <th className="text-right p-2">مدين</th>
+                          <th className="text-right p-2">دائن</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {preview.closing_entry.lines.map((line, idx) => (
+                          <tr key={idx} className="border-t">
+                            <td className="p-2">{line.account_name}</td>
+                            <td className="p-2 text-green-600">
+                              {line.debit_amount > 0 ? formatCurrency(line.debit_amount) : '-'}
+                            </td>
+                            <td className="p-2 text-red-600">
+                              {line.credit_amount > 0 ? formatCurrency(line.credit_amount) : '-'}
+                            </td>
+                          </tr>
+                        ))}
+                        <tr className="border-t font-bold bg-muted/50">
+                          <td className="p-2">الإجمالي</td>
+                          <td className="p-2 text-green-600">
+                            {formatCurrency(preview.closing_entry.total_debit)}
+                          </td>
+                          <td className="p-2 text-red-600">
+                            {formatCurrency(preview.closing_entry.total_credit)}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {preview.can_close ? (
+                  <Alert>
                     <CheckCircle2 className="h-4 w-4 text-green-600" />
-                    <span>حساب تلقائي لجميع الإيرادات والمصروفات</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-green-600" />
-                    <span>توزيع الحصص (ناظر، واقف، مستفيدين)</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-green-600" />
-                    <span>حساب الضرائب والزكاة</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-green-600" />
-                    <span>إنشاء قيد الإقفال تلقائياً</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-green-600" />
-                    <span>حساب رقبة الوقف</span>
-                  </li>
-                </ul>
+                    <AlertDescription>
+                      جميع الفحوصات تمت بنجاح. يمكنك الآن تأكيد الإقفال.
+                    </AlertDescription>
+                  </Alert>
+                ) : (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      لا يمكن إقفال السنة المالية حالياً. يرجى مراجعة التحذيرات أعلاه.
+                    </AlertDescription>
+                  </Alert>
+                )}
               </div>
             </>
           )}
@@ -125,7 +186,10 @@ export function AutomaticClosingDialog({
             <Button variant="outline" onClick={() => onOpenChange(false)}>
               إلغاء
             </Button>
-            <Button onClick={handleConfirm} disabled={confirming || isLoading}>
+            <Button 
+              onClick={handleConfirm} 
+              disabled={confirming || isLoading || !preview?.can_close}
+            >
               {confirming && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
               تأكيد الإقفال التلقائي
             </Button>
