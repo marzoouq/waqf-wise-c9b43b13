@@ -31,6 +31,12 @@ export function UpdateNotifier() {
         duration: 3000,
       });
     },
+    onRegisterError(error) {
+      console.error('❌ فشل تسجيل Service Worker:', error);
+      toast.error('حدث خطأ في تحميل التحديثات. جرب تحديث الصفحة.', {
+        duration: 5000,
+      });
+    },
   });
 
   const handleUpdate = useCallback(() => {
