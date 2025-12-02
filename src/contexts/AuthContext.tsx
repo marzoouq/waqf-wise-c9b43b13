@@ -151,7 +151,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       
       if (!data) {
-        await new Promise(resolve => setTimeout(resolve, 200));
+        // ✅ إعادة المحاولة فوراً بدون تأخير
         const { data: retryData } = await supabase
           .from('profiles')
           .select('id, user_id, email, full_name, avatar_url, phone, position, is_active, created_at, updated_at, last_login_at')

@@ -38,30 +38,9 @@ export async function checkAndUpdateVersion(): Promise<boolean> {
     if (!storedVersion || isNewerVersion(APP_VERSION, storedVersion)) {
       productionLogger.info(`🔄 تحديث التطبيق: ${storedVersion || 'جديد'} → ${APP_VERSION}`);
       
-      // حفظ البيانات المهمة قبل التنظيف
-      const keysToPreserve = ['theme', 'vite-ui-theme', 'language', 'i18nextLng'];
-      const preserved: Record<string, string | null> = {};
-      keysToPreserve.forEach(key => {
-        preserved[key] = localStorage.getItem(key);
-      });
-      
-      // تنظيف الكاش بشكل عميق
-      await clearAllCaches();
-      
-      // مسح sessionStorage أيضاً (ما عدا البيانات الضرورية)
-      try {
-        sessionStorage.removeItem('chunk_load_failures');
-        sessionStorage.removeItem(CACHE_BUST_KEY);
-      } catch {
-        // Ignore storage errors
-      }
-      
-      // استعادة البيانات المهمة
-      Object.entries(preserved).forEach(([key, value]) => {
-        if (value) localStorage.setItem(key, value);
-      });
-      
-      // حفظ الإصدار الجديد
+      // ✅ نكتفي بتحديث رقم الإصدار فقط
+      // Vite يستخدم content hashing في أسماء الملفات (index-DzDkFqAu.js)
+      // مما يضمن تحميل الملفات الجديدة تلقائياً بدون الحاجة لمسح الكاش
       localStorage.setItem(VERSION_STORAGE_KEY, APP_VERSION);
       
       productionLogger.info(`✅ تم تحديث التطبيق للإصدار ${APP_VERSION}`);
