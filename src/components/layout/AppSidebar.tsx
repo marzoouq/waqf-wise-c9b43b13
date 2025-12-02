@@ -181,14 +181,14 @@ const AppSidebar = () => {
     return menuGroups.filter(group => {
       // التحقق من صلاحية الوصول للمجموعة الرئيسية
       const hasGroupAccess = group.roles.includes('all') || 
-        group.roles.some(role => hasRole(role as 'admin' | 'accountant' | 'archivist' | 'cashier' | 'beneficiary' | 'nazer'));
+        group.roles.some(role => hasRole(role as 'admin' | 'accountant' | 'archivist' | 'cashier' | 'beneficiary' | 'waqf_heir' | 'nazer'));
 
       if (!hasGroupAccess) return false;
 
       // تصفية العناصر الفرعية
       if (group.subItems && group.subItems.length > 0) {
         const filteredSubItems = group.subItems.filter(subItem => 
-          subItem.roles.includes('all') || subItem.roles.some(role => hasRole(role as 'admin' | 'accountant' | 'archivist' | 'cashier' | 'beneficiary' | 'nazer'))
+          subItem.roles.includes('all') || subItem.roles.some(role => hasRole(role as 'admin' | 'accountant' | 'archivist' | 'cashier' | 'beneficiary' | 'waqf_heir' | 'nazer'))
         );
         // إظهار المجموعة فقط إذا كان هناك عناصر فرعية متاحة
         return filteredSubItems.length > 0;
@@ -251,7 +251,7 @@ const AppSidebar = () => {
 
                 // إذا كانت المجموعة تحتوي على عناصر فرعية - استخدام Collapsible
                 const filteredSubItems = group.subItems.filter(subItem => 
-                  subItem.roles.includes('all') || subItem.roles.some(role => hasRole(role as 'admin' | 'accountant' | 'archivist' | 'cashier' | 'beneficiary' | 'nazer'))
+                  subItem.roles.includes('all') || subItem.roles.some(role => hasRole(role as 'admin' | 'accountant' | 'archivist' | 'cashier' | 'beneficiary' | 'waqf_heir' | 'nazer'))
                 );
 
                 return (

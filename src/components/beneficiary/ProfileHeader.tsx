@@ -18,13 +18,13 @@ interface ProfileHeaderProps {
 
 export function ProfileHeader({ beneficiary }: ProfileHeaderProps) {
   const { user } = useAuth();
-  const { isBeneficiary } = useUserRole();
+  const { isBeneficiary, isWaqfHeir } = useUserRole();
   const queryClient = useQueryClient();
   const [editPhoneOpen, setEditPhoneOpen] = useState(false);
   
   // Check if current user is the beneficiary owner
   const isOwner = user?.id === beneficiary.user_id;
-  const canEditPhone = isBeneficiary && isOwner;
+  const canEditPhone = (isBeneficiary || isWaqfHeir) && isOwner;
 
   const handlePhoneUpdateSuccess = () => {
     queryClient.invalidateQueries({ queryKey: ["beneficiaries"] });
