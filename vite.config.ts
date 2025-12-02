@@ -252,6 +252,31 @@ export default defineConfig(({ mode }) => {
               return 'ui-utils';
             }
             
+            // Command menu (cmdk) - used in GlobalSearch
+            if (id.includes('cmdk')) {
+              return 'ui-command';
+            }
+            
+            // Drawer (vaul) - used in ResponsiveDialog
+            if (id.includes('vaul')) {
+              return 'ui-drawer';
+            }
+            
+            // QR Code generation
+            if (id.includes('qrcode')) {
+              return 'qr-lib';
+            }
+            
+            // Markdown rendering
+            if (id.includes('react-markdown') || id.includes('remark-gfm')) {
+              return 'markdown-lib';
+            }
+            
+            // Monitoring (Sentry)
+            if (id.includes('@sentry')) {
+              return 'monitoring';
+            }
+            
             // Small utilities and everything else
             return 'vendor';
           }
