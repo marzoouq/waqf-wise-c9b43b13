@@ -17,6 +17,7 @@ const roleRoutes: Record<string, string> = {
   accountant: "/accountant-dashboard",
   cashier: "/cashier-dashboard",
   archivist: "/archivist-dashboard",
+  waqf_heir: "/beneficiary-dashboard",
   beneficiary: "/beneficiary-dashboard",
 };
 
@@ -26,6 +27,7 @@ const roleIcons: Record<string, LucideIcon> = {
   accountant: Calculator,
   cashier: Wallet,
   archivist: Archive,
+  waqf_heir: Users,
   beneficiary: Users,
 };
 
