@@ -7,25 +7,26 @@ import { useState, useEffect } from "react";
  * @returns boolean indicating if query matches
  */
 export function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = useState(false);
+  const [matches, setMatches] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia(query).matches;
+  });
 
   useEffect(() => {
     const media = window.matchMedia(query);
     
     // Set initial value
-    if (media.matches !== matches) {
-      setMatches(media.matches);
-    }
+    setMatches(media.matches);
 
     // Create listener
-    const listener = () => setMatches(media.matches);
+    const listener = (e: MediaQueryListEvent) => setMatches(e.matches);
     
     // Add listener
     media.addEventListener("change", listener);
 
     // Cleanup
     return () => media.removeEventListener("change", listener);
-  }, [matches, query]);
+  }, [query]); // ✅ فقط query - بدون matches لمنع الحلقة اللانهائية
 
   return matches;
 }

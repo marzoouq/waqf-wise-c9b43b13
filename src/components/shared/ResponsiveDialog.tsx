@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, useMemo } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -16,6 +16,15 @@ import {
 } from '@/components/ui/drawer';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { cn } from '@/lib/utils';
+
+// ✅ نقل sizeClasses خارج المكون (ثابت - لا يتغير)
+const SIZE_CLASSES = {
+  sm: 'max-w-sm',
+  md: 'max-w-md',
+  lg: 'max-w-lg',
+  xl: 'max-w-xl',
+  full: 'max-w-full',
+} as const;
 
 interface ResponsiveDialogProps {
   open: boolean;
@@ -42,18 +51,16 @@ export function ResponsiveDialog({
 }: ResponsiveDialogProps) {
   const isDesktop = useMediaQuery('(min-width: 768px)');
 
-  const sizeClasses = {
-    sm: 'max-w-sm',
-    md: 'max-w-md',
-    lg: 'max-w-lg',
-    xl: 'max-w-xl',
-    full: 'max-w-full',
-  };
+  // ✅ استخدام useMemo للـ className لمنع إعادة الحساب في كل render
+  const dialogClassName = useMemo(() => 
+    cn(SIZE_CLASSES[size], 'max-h-[90vh] overflow-y-auto', className),
+    [size, className]
+  );
 
   if (isDesktop) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className={cn(sizeClasses[size], 'max-h-[90vh] overflow-y-auto', className)}>
+        <DialogContent className={dialogClassName}>
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
             <DialogDescription>{description}</DialogDescription>
