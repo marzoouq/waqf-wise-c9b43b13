@@ -147,18 +147,6 @@ export default function BeneficiaryPortal() {
                   <ChatbotQuickCard />
                 </Suspense>
 
-                {/* رسالة عدم وجود بيانات مالية */}
-                <Card>
-                  <CardContent className="py-8">
-                    <p className="text-center text-muted-foreground">
-                      لا توجد بيانات مالية متاحة حالياً
-                    </p>
-                  </CardContent>
-                </Card>
-
-                {/* المساعد الذكي */}
-                <ChatbotQuickCard />
-
                 {/* إحصائيات العقارات */}
                 <PropertyStatsCards />
 
