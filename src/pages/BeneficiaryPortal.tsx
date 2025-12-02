@@ -1,11 +1,8 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { 
@@ -28,6 +25,7 @@ import {
   BudgetsTab,
   LoansOverviewTab
 } from "@/components/beneficiary";
+import { BeneficiarySidebar } from "@/components/beneficiary/BeneficiarySidebar";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
@@ -81,8 +79,8 @@ export default function BeneficiaryPortal() {
 
   if (!beneficiary) {
     return (
-      <MobileOptimizedLayout>
-        <Card>
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <Card className="max-w-md w-full">
           <CardContent className="p-6 text-center">
             <AlertCircle className="h-12 w-12 mx-auto mb-4 text-destructive" />
             <h3 className="text-lg font-semibold mb-2">خطأ في الوصول</h3>
@@ -90,7 +88,7 @@ export default function BeneficiaryPortal() {
             <Button onClick={() => navigate("/auth")}>العودة لتسجيل الدخول</Button>
           </CardContent>
         </Card>
-      </MobileOptimizedLayout>
+      </div>
     );
   }
 
@@ -108,106 +106,36 @@ export default function BeneficiaryPortal() {
 
   return (
     <PageErrorBoundary pageName="بوابة المستفيد">
-      <MobileOptimizedLayout>
-        <div className="space-y-6">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold">مرحباً، {beneficiary.full_name}</h1>
-              <p className="text-muted-foreground mt-1">
-                آخر تسجيل دخول: {beneficiary.last_login_at 
-                  ? format(new Date(beneficiary.last_login_at), "dd MMMM yyyy - HH:mm", { locale: ar })
-                  : "—"}
-              </p>
-            </div>
-            <Button onClick={() => navigate("/messages")} variant="outline">
-              <MessageSquare className="h-4 w-4 ml-2" />
-              الرسائل
-            </Button>
-          </div>
+      <div className="flex min-h-screen bg-background">
+        {/* Sidebar */}
+        <BeneficiarySidebar
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          beneficiaryName={beneficiary.full_name}
+        />
 
-          {/* Main Tabs */}
-          <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-            <div className="relative">
-              {/* تدرج يمين */}
-              <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
-              
-              <ScrollArea className="w-full">
-                <TabsList className="inline-flex w-full min-w-max mb-6 h-auto p-1 gap-1">
-              {settings?.show_overview && (
-                <TabsTrigger value="overview" className="text-xs sm:text-sm min-h-[44px]">
-                  <TrendingUp className="h-4 w-4 sm:ml-1" />
-                  <span className="text-xs sm:text-sm">عامة</span>
-                </TabsTrigger>
-              )}
-              {settings?.show_profile && (
-                <TabsTrigger value="profile" className="text-xs sm:text-sm min-h-[44px]">
-                  <User className="h-4 w-4 sm:ml-1" />
-                  <span className="text-xs sm:text-sm">الملف</span>
-                </TabsTrigger>
-              )}
-              {settings?.show_requests && (
-                <TabsTrigger value="requests" className="text-xs sm:text-sm min-h-[44px]">
-                  <FileText className="h-4 w-4 sm:ml-1" />
-                  <span className="text-xs sm:text-sm">الطلبات</span>
-                </TabsTrigger>
-              )}
-              {settings?.show_distributions && (
-                <TabsTrigger value="distributions" className="text-xs sm:text-sm min-h-[44px]">
-                  <TrendingUp className="h-4 w-4 sm:ml-1" />
-                  <span className="text-xs sm:text-sm">التوزيعات</span>
-                </TabsTrigger>
-              )}
-              {settings?.show_statements && (
-                <TabsTrigger value="statements" className="text-xs sm:text-sm min-h-[44px]">
-                  <CreditCard className="h-4 w-4 sm:ml-1" />
-                  <span className="text-xs sm:text-sm">الكشف</span>
-                </TabsTrigger>
-              )}
-              {settings?.show_properties && (
-                <TabsTrigger value="properties" className="text-xs sm:text-sm min-h-[44px]">
-                  <Building2 className="h-4 w-4 sm:ml-1" />
-                  <span className="text-xs sm:text-sm">العقارات</span>
-                </TabsTrigger>
-              )}
-              {settings?.show_family_tree && (
-                <TabsTrigger value="family" className="text-xs sm:text-sm min-h-[44px]">
-                  <Users className="h-4 w-4 sm:ml-1" />
-                  <span className="text-xs sm:text-sm">العائلة</span>
-                </TabsTrigger>
-              )}
-              <TabsTrigger value="waqf" className="text-xs sm:text-sm min-h-[44px]">
-                <Landmark className="h-4 w-4 sm:ml-1" />
-                <span className="text-xs sm:text-sm">الوقف</span>
-              </TabsTrigger>
-              {settings?.show_governance && (
-                <TabsTrigger value="governance" className="text-xs sm:text-sm min-h-[44px]">
-                  <Shield className="h-4 w-4 sm:ml-1" />
-                  <span className="text-xs sm:text-sm">الحوكمة</span>
-                </TabsTrigger>
-              )}
-              {settings?.show_budgets && (
-                <TabsTrigger value="budgets" className="text-xs sm:text-sm min-h-[44px]">
-                  <DollarSign className="h-4 w-4 sm:ml-1" />
-                  <span className="text-xs sm:text-sm">الميزانيات</span>
-                </TabsTrigger>
-              )}
-              {settings?.show_own_loans && (
-                <TabsTrigger value="loans" className="text-xs sm:text-sm min-h-[44px]">
-                  <CreditCard className="h-4 w-4 sm:ml-1" />
-                  <span className="text-xs sm:text-sm">القروض</span>
-                </TabsTrigger>
-              )}
-                </TabsList>
-                <ScrollBar orientation="horizontal" className="h-2 bg-muted/30" />
-              </ScrollArea>
-              
-              {/* تدرج يسار */}
-              <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+        {/* Main Content - مع padding للسايدبار على Desktop */}
+        <main className="flex-1 lg:mr-64 p-4 sm:p-6 lg:p-8">
+          <div className="max-w-7xl mx-auto space-y-6">
+            {/* Header */}
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-bold">مرحباً، {beneficiary.full_name}</h1>
+                <p className="text-muted-foreground mt-1 text-sm">
+                  آخر تسجيل دخول: {beneficiary.last_login_at 
+                    ? format(new Date(beneficiary.last_login_at), "dd MMMM yyyy - HH:mm", { locale: ar })
+                    : "—"}
+                </p>
+              </div>
+              <Button onClick={() => navigate("/messages")} variant="outline" size="sm">
+                <MessageSquare className="h-4 w-4 ml-2" />
+                الرسائل
+              </Button>
             </div>
 
-            {/* Overview Tab */}
-            <TabsContent value="overview" className="space-y-6">
+            {/* Tab Content */}
+            {activeTab === "overview" && (
+              <div className="space-y-6">
               {/* KPIs */}
               <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                 <Card>
@@ -292,91 +220,76 @@ export default function BeneficiaryPortal() {
                   </div>
                 </CardContent>
               </Card>
-            </TabsContent>
+              </div>
+            )}
 
             {/* Profile Tab */}
-            <TabsContent value="profile">
+            {activeTab === "profile" && (
               <BeneficiaryProfileTab beneficiary={beneficiary} />
-            </TabsContent>
+            )}
 
             {/* Distributions Tab */}
-            <TabsContent value="distributions">
+            {activeTab === "distributions" && (
               <BeneficiaryDistributionsTab beneficiaryId={beneficiary.id} />
-            </TabsContent>
+            )}
 
             {/* Statements Tab */}
-            <TabsContent value="statements">
+            {activeTab === "statements" && (
               <BeneficiaryStatementsTab beneficiaryId={beneficiary.id} />
-            </TabsContent>
+            )}
 
             {/* Properties Tab */}
-            <TabsContent value="properties">
+            {activeTab === "properties" && (
               <BeneficiaryPropertiesTab />
-            </TabsContent>
+            )}
 
             {/* Waqf Summary Tab */}
-            <TabsContent value="waqf">
+            {activeTab === "waqf" && (
               <WaqfSummaryTab />
-            </TabsContent>
+            )}
 
             {/* Family Tree Tab */}
-            {settings?.show_family_tree && (
-              <TabsContent value="family">
-                <FamilyTreeTab beneficiaryId={beneficiary.id} />
-              </TabsContent>
+            {settings?.show_family_tree && activeTab === "family" && (
+              <FamilyTreeTab beneficiaryId={beneficiary.id} />
             )}
 
             {/* Bank Accounts Tab */}
-            {settings?.show_bank_accounts && (
-              <TabsContent value="bank">
-                <BankAccountsTab />
-              </TabsContent>
+            {settings?.show_bank_accounts && activeTab === "bank" && (
+              <BankAccountsTab />
             )}
 
             {/* Financial Reports Tab */}
-            {settings?.show_financial_reports && (
-              <TabsContent value="reports">
-                <FinancialReportsTab />
-              </TabsContent>
+            {settings?.show_financial_reports && activeTab === "reports" && (
+              <FinancialReportsTab />
             )}
 
             {/* Approvals Log Tab */}
-            {settings?.show_approvals_log && (
-              <TabsContent value="approvals">
-                <ApprovalsLogTab />
-              </TabsContent>
+            {settings?.show_approvals_log && activeTab === "approvals" && (
+              <ApprovalsLogTab />
             )}
 
             {/* Disclosures Tab */}
-            {settings?.show_disclosures && (
-              <TabsContent value="disclosures">
-                <DisclosuresTab />
-              </TabsContent>
+            {settings?.show_disclosures && activeTab === "disclosures" && (
+              <DisclosuresTab />
             )}
 
             {/* Governance Tab */}
-            {settings?.show_governance && (
-              <TabsContent value="governance">
-                <GovernanceTab />
-              </TabsContent>
+            {settings?.show_governance && activeTab === "governance" && (
+              <GovernanceTab />
             )}
 
             {/* Budgets Tab */}
-            {settings?.show_budgets && (
-              <TabsContent value="budgets">
-                <BudgetsTab />
-              </TabsContent>
+            {settings?.show_budgets && activeTab === "budgets" && (
+              <BudgetsTab />
             )}
 
             {/* Loans Overview Tab */}
-            {settings?.show_own_loans && (
-              <TabsContent value="loans">
-                <LoansOverviewTab />
-              </TabsContent>
+            {settings?.show_own_loans && activeTab === "loans" && (
+              <LoansOverviewTab />
             )}
-          </Tabs>
-        </div>
-      </MobileOptimizedLayout>
+          </div>
+        </main>
+      </div>
     </PageErrorBoundary>
   );
 }
