@@ -25,8 +25,8 @@ const beneficiaryNavigationItems: NavigationItem[] = [
     id: 'portal',
     label: 'بوابتي',
     icon: User,
-    path: '/beneficiary-portal',
-    matchPaths: ['/beneficiary-portal'],
+    path: '/beneficiary-dashboard',
+    matchPaths: ['/beneficiary-dashboard', '/beneficiary-portal'],
   },
   {
     id: 'requests',
