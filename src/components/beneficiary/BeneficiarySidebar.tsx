@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import {
   TrendingUp,
   User,
@@ -28,21 +29,22 @@ interface SidebarItem {
   icon: React.ComponentType<{ className?: string }>;
   href?: string;
   tab?: string;
+  visibilityKey?: keyof ReturnType<typeof useVisibilitySettings>['settings'];
 }
 
 const sidebarItems: SidebarItem[] = [
-  { id: "overview", label: "نظرة عامة", icon: TrendingUp, tab: "overview" },
-  { id: "profile", label: "الملف الشخصي", icon: User, tab: "profile" },
-  { id: "distributions", label: "التوزيعات", icon: DollarSign, tab: "distributions" },
-  { id: "statements", label: "كشف الحساب", icon: CreditCard, tab: "statements" },
-  { id: "properties", label: "العقارات", icon: Building2, tab: "properties" },
-  { id: "family", label: "العائلة", icon: Users, tab: "family" },
+  { id: "overview", label: "نظرة عامة", icon: TrendingUp, tab: "overview", visibilityKey: "show_overview" },
+  { id: "profile", label: "الملف الشخصي", icon: User, tab: "profile", visibilityKey: "show_profile" },
+  { id: "distributions", label: "التوزيعات", icon: DollarSign, tab: "distributions", visibilityKey: "show_distributions" },
+  { id: "statements", label: "كشف الحساب", icon: CreditCard, tab: "statements", visibilityKey: "show_statements" },
+  { id: "properties", label: "العقارات", icon: Building2, tab: "properties", visibilityKey: "show_properties" },
+  { id: "family", label: "العائلة", icon: Users, tab: "family", visibilityKey: "show_family_tree" },
   { id: "waqf", label: "الوقف", icon: Landmark, tab: "waqf" },
-  { id: "governance", label: "الحوكمة", icon: Shield, tab: "governance" },
-  { id: "budgets", label: "الميزانيات", icon: DollarSign, tab: "budgets" },
-  { id: "loans", label: "القروض", icon: LoanIcon, tab: "loans" },
+  { id: "governance", label: "الحوكمة", icon: Shield, tab: "governance", visibilityKey: "show_governance" },
+  { id: "budgets", label: "الميزانيات", icon: DollarSign, tab: "budgets", visibilityKey: "show_budgets" },
+  { id: "loans", label: "القروض", icon: LoanIcon, tab: "loans", visibilityKey: "show_own_loans" },
   { id: "messages", label: "الرسائل", icon: MessageSquare, href: "/messages" },
-  { id: "reports", label: "التقارير", icon: BarChart3, href: "/beneficiary/reports" },
+  { id: "reports", label: "التقارير", icon: BarChart3, href: "/beneficiary/reports", visibilityKey: "show_financial_reports" },
   { id: "support", label: "الدعم الفني", icon: HelpCircle, href: "/beneficiary-support" },
 ];
 
@@ -61,11 +63,20 @@ export function BeneficiarySidebar({ activeTab, onTabChange, beneficiaryName }: 
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const { settings } = useVisibilitySettings();
 
   const handleItemClick = (tab: string) => {
     onTabChange(tab);
     setMobileOpen(false); // إغلاق القائمة على الجوال بعد الاختيار
   };
+
+  // تصفية العناصر حسب إعدادات الشفافية
+  const visibleItems = sidebarItems.filter((item) => {
+    // العناصر بدون visibilityKey تظهر دائماً
+    if (!item.visibilityKey) return true;
+    // التحقق من إعدادات الشفافية
+    return settings?.[item.visibilityKey] === true;
+  });
 
   const SidebarContent = () => (
     <div className="h-full flex flex-col">
@@ -88,7 +99,7 @@ export function BeneficiarySidebar({ activeTab, onTabChange, beneficiaryName }: 
       {/* Navigation Items */}
       <ScrollArea className="flex-1 px-3 py-4">
         <div className="space-y-1">
-          {sidebarItems.map((item) => {
+          {visibleItems.map((item) => {
             const isActive = activeTab === item.tab;
             const Icon = item.icon;
 
