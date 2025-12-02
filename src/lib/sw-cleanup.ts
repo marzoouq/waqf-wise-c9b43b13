@@ -1,7 +1,19 @@
 /**
- * تنظيف Service Workers القديمة
- * يُستخدم عندما يكون sw.js غير متاح على الخادم
+ * تنظيف Service Workers و Workbox Caches
+ * حل شامل لأخطاء workbox-*.js
  */
+
+/**
+ * قائمة أسماء caches التي يجب حذفها
+ */
+const WORKBOX_CACHE_PATTERNS = [
+  'workbox-',
+  'precache',
+  'runtime-',
+  'sw-',
+  'waqf-',
+  'cache-',
+];
 
 /**
  * إلغاء تسجيل جميع Service Workers
@@ -29,6 +41,48 @@ export async function unregisterAllServiceWorkers(): Promise<boolean> {
 }
 
 /**
+ * حذف جميع caches المتعلقة بـ Workbox و Service Workers
+ */
+export async function clearAllWorkboxCaches(): Promise<number> {
+  if (!('caches' in window)) return 0;
+  
+  try {
+    const cacheNames = await caches.keys();
+    let deletedCount = 0;
+    
+    for (const cacheName of cacheNames) {
+      const shouldDelete = WORKBOX_CACHE_PATTERNS.some(pattern => 
+        cacheName.toLowerCase().includes(pattern.toLowerCase())
+      );
+      
+      if (shouldDelete) {
+        await caches.delete(cacheName);
+        console.log('🗑️ تم حذف cache:', cacheName);
+        deletedCount++;
+      }
+    }
+    
+    return deletedCount;
+  } catch (error) {
+    console.error('❌ خطأ في حذف caches:', error);
+    return 0;
+  }
+}
+
+/**
+ * تنظيف شامل لـ Service Workers و Caches
+ */
+export async function fullServiceWorkerCleanup(): Promise<{
+  swUnregistered: boolean;
+  cachesDeleted: number;
+}> {
+  const swUnregistered = await unregisterAllServiceWorkers();
+  const cachesDeleted = await clearAllWorkboxCaches();
+  
+  return { swUnregistered, cachesDeleted };
+}
+
+/**
  * فحص توفر ملف sw.js وتنظيف SWs القديمة إذا لم يكن متاحاً
  */
 export async function cleanupOldServiceWorkers(): Promise<void> {
@@ -43,12 +97,12 @@ export async function cleanupOldServiceWorkers(): Promise<void> {
     
     if (!response.ok) {
       console.log('⚠️ ملف sw.js غير متاح (HTTP', response.status, ')');
-      await unregisterAllServiceWorkers();
+      await fullServiceWorkerCleanup();
     }
   } catch (error) {
-    // خطأ في الشبكة أو الملف غير موجود
-    console.log('⚠️ لا يمكن الوصول لـ sw.js، جارِ التنظيف...');
-    await unregisterAllServiceWorkers();
+    // خطأ في الشبكة أو الملف غير موجود - تنظيف كامل
+    console.log('⚠️ لا يمكن الوصول لـ sw.js، جارِ التنظيف الشامل...');
+    await fullServiceWorkerCleanup();
   }
 }
 
@@ -60,12 +114,14 @@ export async function handleSWRegistrationError(error: Error): Promise<boolean> 
   const isNotFoundError = 
     error.message?.includes('Not found') || 
     error.message?.includes('404') ||
-    error.message?.includes('Failed to update');
+    error.message?.includes('Failed to update') ||
+    error.message?.includes('workbox') ||
+    error.message?.includes('Failed to fetch');
   
   if (isNotFoundError) {
-    console.log('🔧 خطأ "Not found" في SW، جارِ التنظيف...');
-    const cleaned = await unregisterAllServiceWorkers();
-    return cleaned;
+    console.log('🔧 خطأ في SW، جارِ التنظيف الشامل...');
+    const result = await fullServiceWorkerCleanup();
+    return result.swUnregistered || result.cachesDeleted > 0;
   }
   
   return false;
