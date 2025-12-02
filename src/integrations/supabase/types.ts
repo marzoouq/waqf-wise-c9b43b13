@@ -4073,6 +4073,135 @@ export type Database = {
           },
         ]
       }
+      fiscal_year_closings: {
+        Row: {
+          administrative_expenses: number | null
+          closed_by: string | null
+          closed_by_name: string | null
+          closing_balance: number
+          closing_date: string
+          closing_journal_entry_id: string | null
+          closing_type: string
+          created_at: string
+          development_expenses: number | null
+          expense_breakdown: Json | null
+          fiscal_year_id: string
+          heir_distributions: Json | null
+          heirs_count: number | null
+          id: string
+          maintenance_expenses: number | null
+          nazer_percentage: number | null
+          nazer_share: number | null
+          net_income: number
+          net_vat: number | null
+          notes: string | null
+          opening_balance: number | null
+          other_expenses: number | null
+          other_revenues: number | null
+          rental_revenues: number | null
+          revenue_breakdown: Json | null
+          total_beneficiary_distributions: number | null
+          total_expenses: number
+          total_revenues: number
+          total_vat_collected: number | null
+          total_vat_paid: number | null
+          updated_at: string
+          waqf_corpus: number
+          waqif_percentage: number | null
+          waqif_share: number | null
+          zakat_amount: number | null
+        }
+        Insert: {
+          administrative_expenses?: number | null
+          closed_by?: string | null
+          closed_by_name?: string | null
+          closing_balance?: number
+          closing_date?: string
+          closing_journal_entry_id?: string | null
+          closing_type: string
+          created_at?: string
+          development_expenses?: number | null
+          expense_breakdown?: Json | null
+          fiscal_year_id: string
+          heir_distributions?: Json | null
+          heirs_count?: number | null
+          id?: string
+          maintenance_expenses?: number | null
+          nazer_percentage?: number | null
+          nazer_share?: number | null
+          net_income?: number
+          net_vat?: number | null
+          notes?: string | null
+          opening_balance?: number | null
+          other_expenses?: number | null
+          other_revenues?: number | null
+          rental_revenues?: number | null
+          revenue_breakdown?: Json | null
+          total_beneficiary_distributions?: number | null
+          total_expenses?: number
+          total_revenues?: number
+          total_vat_collected?: number | null
+          total_vat_paid?: number | null
+          updated_at?: string
+          waqf_corpus?: number
+          waqif_percentage?: number | null
+          waqif_share?: number | null
+          zakat_amount?: number | null
+        }
+        Update: {
+          administrative_expenses?: number | null
+          closed_by?: string | null
+          closed_by_name?: string | null
+          closing_balance?: number
+          closing_date?: string
+          closing_journal_entry_id?: string | null
+          closing_type?: string
+          created_at?: string
+          development_expenses?: number | null
+          expense_breakdown?: Json | null
+          fiscal_year_id?: string
+          heir_distributions?: Json | null
+          heirs_count?: number | null
+          id?: string
+          maintenance_expenses?: number | null
+          nazer_percentage?: number | null
+          nazer_share?: number | null
+          net_income?: number
+          net_vat?: number | null
+          notes?: string | null
+          opening_balance?: number | null
+          other_expenses?: number | null
+          other_revenues?: number | null
+          rental_revenues?: number | null
+          revenue_breakdown?: Json | null
+          total_beneficiary_distributions?: number | null
+          total_expenses?: number
+          total_revenues?: number
+          total_vat_collected?: number | null
+          total_vat_paid?: number | null
+          updated_at?: string
+          waqf_corpus?: number
+          waqif_percentage?: number | null
+          waqif_share?: number | null
+          zakat_amount?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fiscal_year_closings_closing_journal_entry_id_fkey"
+            columns: ["closing_journal_entry_id"]
+            isOneToOne: false
+            referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fiscal_year_closings_fiscal_year_id_fkey"
+            columns: ["fiscal_year_id"]
+            isOneToOne: true
+            referencedRelation: "fiscal_years"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fiscal_years: {
         Row: {
           created_at: string
@@ -10530,6 +10659,7 @@ export type Database = {
           created_at: string | null
           current_balance: number
           distribution_id: string | null
+          fiscal_year_id: string | null
           id: string
           reserve_type: string
           updated_at: string | null
@@ -10539,6 +10669,7 @@ export type Database = {
           created_at?: string | null
           current_balance?: number
           distribution_id?: string | null
+          fiscal_year_id?: string | null
           id?: string
           reserve_type: string
           updated_at?: string | null
@@ -10548,6 +10679,7 @@ export type Database = {
           created_at?: string | null
           current_balance?: number
           distribution_id?: string | null
+          fiscal_year_id?: string | null
           id?: string
           reserve_type?: string
           updated_at?: string | null
@@ -10573,6 +10705,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "payment_vouchers_with_details"
             referencedColumns: ["distribution_id_ref"]
+          },
+          {
+            foreignKeyName: "waqf_reserves_fiscal_year_id_fkey"
+            columns: ["fiscal_year_id"]
+            isOneToOne: false
+            referencedRelation: "fiscal_years"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -11198,6 +11337,10 @@ export type Database = {
           son_share: number
           wife_share: number
         }[]
+      }
+      calculate_fiscal_year_summary: {
+        Args: { p_fiscal_year_id: string }
+        Returns: Json
       }
       calculate_loan_schedule:
         | {

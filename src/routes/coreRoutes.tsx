@@ -15,6 +15,7 @@ import {
   WaqfUnits,
   Archive,
   Accounting,
+  FiscalYearsManagement,
   Budgets,
   Invoices,
   Payments,
@@ -133,8 +134,17 @@ export const coreRoutes = [
     } 
   />,
   <Route 
+    key="fiscal-years"
+    path="/fiscal-years" 
+    element={
+      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+        <FiscalYearsManagement />
+      </ProtectedRoute>
+    } 
+  />,
+  <Route 
     key="budgets"
-    path="/budgets" 
+    path="/budgets"
     element={
       <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
         <Budgets />
