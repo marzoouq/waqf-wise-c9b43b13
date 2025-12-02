@@ -99,16 +99,33 @@
   </head>
 
   <body>
-    <!-- ❌ إزالة Service Workers القديمة فوراً قبل تحميل React -->
+    <!-- ❌ إزالة Service Workers و Workbox Caches فوراً قبل تحميل React -->
     <script>
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-          for (let registration of registrations) {
-            registration.unregister();
-            console.log('🗑️ Service Worker removed:', registration.scope);
-          }
-        });
-      }
+      (function() {
+        // 1. إلغاء تسجيل جميع Service Workers
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            registrations.forEach(function(registration) {
+              registration.unregister();
+              console.log('🗑️ SW removed:', registration.scope);
+            });
+          });
+        }
+        
+        // 2. حذف جميع Workbox/SW caches
+        if ('caches' in window) {
+          caches.keys().then(function(names) {
+            names.forEach(function(name) {
+              if (name.includes('workbox') || name.includes('precache') || 
+                  name.includes('runtime') || name.includes('sw-') || 
+                  name.includes('waqf-') || name.includes('cache')) {
+                caches.delete(name);
+                console.log('🗑️ Cache deleted:', name);
+              }
+            });
+          });
+        }
+      })();
     </script>
     
     <div id="root">
