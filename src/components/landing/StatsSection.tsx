@@ -1,5 +1,4 @@
-import { motion, useMotionValue, useTransform, animate } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Users, Building2, Banknote, CalendarDays } from "lucide-react";
 
 interface StatItemProps {
@@ -8,40 +7,56 @@ interface StatItemProps {
   suffix: string;
   label: string;
   color: string;
+  delay: number;
 }
 
-function AnimatedCounter({ value }: { value: number }) {
+function AnimatedCounter({ value, delay }: { value: number; delay: number }) {
   const [displayValue, setDisplayValue] = useState(0);
-  const count = useMotionValue(0);
-  const rounded = useTransform(count, (latest) => Math.round(latest));
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const ref = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
-    const controls = animate(count, value, {
-      duration: 2,
-      ease: "easeOut",
-    });
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !hasAnimated) {
+          setHasAnimated(true);
+          setTimeout(() => {
+            let start = 0;
+            const duration = 1500;
+            const startTime = performance.now();
+            
+            const animate = (currentTime: number) => {
+              const elapsed = currentTime - startTime;
+              const progress = Math.min(elapsed / duration, 1);
+              const easeOut = 1 - Math.pow(1 - progress, 3);
+              const current = Math.round(easeOut * value);
+              setDisplayValue(current);
+              
+              if (progress < 1) {
+                requestAnimationFrame(animate);
+              }
+            };
+            
+            requestAnimationFrame(animate);
+          }, delay);
+        }
+      },
+      { threshold: 0.5 }
+    );
 
-    const unsubscribe = rounded.on("change", (latest) => {
-      setDisplayValue(latest);
-    });
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
 
-    return () => {
-      controls.stop();
-      unsubscribe();
-    };
-  }, [value, count, rounded]);
+    return () => observer.disconnect();
+  }, [value, delay, hasAnimated]);
 
-  return <span>{displayValue.toLocaleString("ar-SA")}</span>;
+  return <span ref={ref}>{displayValue.toLocaleString("ar-SA")}</span>;
 }
 
-function StatItem({ icon: Icon, value, suffix, label, color }: StatItemProps) {
+function StatItem({ icon: Icon, value, suffix, label, color, delay }: StatItemProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      className="relative group"
-    >
+    <div className="relative group animate-fade-in" style={{ animationDelay: `${delay}ms` }}>
       <div className="flex flex-col items-center text-center p-6 sm:p-8">
         {/* Icon */}
         <div
@@ -52,14 +67,14 @@ function StatItem({ icon: Icon, value, suffix, label, color }: StatItemProps) {
 
         {/* Value */}
         <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-2">
-          <AnimatedCounter value={value} />
+          <AnimatedCounter value={value} delay={delay} />
           <span className="text-primary">{suffix}</span>
         </div>
 
         {/* Label */}
         <p className="text-muted-foreground text-sm sm:text-base">{label}</p>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -97,48 +112,27 @@ const stats = [
 export function StatsSection() {
   return (
     <section id="stats" className="py-16 sm:py-24 relative overflow-hidden">
-      {/* Background */}
+      {/* Background - Optimized */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
-      
-      {/* Decorative Elements */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl" />
 
       <div className="container relative mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
-          <motion.span
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4"
-          >
+          <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4 animate-fade-in">
             إحصائيات
-          </motion.span>
-          <motion.h2
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4"
-          >
+          </span>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4">
             أرقام تتحدث عن نجاحنا
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="text-muted-foreground text-base sm:text-lg"
-          >
+          </h2>
+          <p className="text-muted-foreground text-base sm:text-lg">
             نفخر بثقة عملائنا وبالنتائج التي حققناها معهم
-          </motion.p>
+          </p>
         </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
           {stats.map((stat, index) => (
-            <StatItem key={index} {...stat} />
+            <StatItem key={index} {...stat} delay={index * 100} />
           ))}
         </div>
       </div>
