@@ -21,7 +21,6 @@ import { GlobalMonitoring } from "./components/developer/GlobalMonitoring";
 import { IdleTimeoutManager } from "./components/auth/IdleTimeoutManager";
 import { SessionManager } from "./components/auth/SessionManager";
 import { useAlertCleanup } from "./hooks/useAlertCleanup";
-import { UpdateNotifier } from "./components/system/UpdateNotifier";
 import { LCPOptimizer } from "./components/performance/LCPOptimizer";
 import { CriticalResourceLoader } from "./components/performance/CriticalResourceLoader";
 import "@/lib/errors/tracker";
@@ -94,7 +93,6 @@ const App = () => {
                 <Sonner />
                 <LCPOptimizer />
                 <GlobalMonitoring />
-                <UpdateNotifier />
                 <BrowserRouter
                   future={{
                     v7_startTransition: true,

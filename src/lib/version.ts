@@ -6,7 +6,7 @@
  * @date 2025-11-28
  */
 
-export const APP_VERSION = '2.6.3';
+export const APP_VERSION = '2.6.4';
 export const APP_VERSION_DATE = '2025-12-02';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
@@ -14,11 +14,11 @@ export const VERSION_INFO = {
   version: APP_VERSION,
   date: APP_VERSION_DATE,
   name: APP_VERSION_NAME,
-  changelog: '/docs/CHANGELOG_v2.5.0.md',
+  changelog: '/docs/CHANGELOG_v2.6.4.md',
   features: [
-    'المصادقة بالبصمة (WebAuthn)',
-    'دعم Face ID و Touch ID',
-    'إدارة الأجهزة المسجلة',
+    'تحسين كبير في سرعة التحميل (تقليل 70٪)',
+    'إزالة مسح الكاش المتكرر',
+    'تحسين تهيئة المصادقة',
     'البحث الذكي الشامل',
     'التصنيف التلقائي للمستندات',
     'تنبيهات تجديد العقود',
