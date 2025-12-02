@@ -1,4 +1,4 @@
-import { ReactNode, useMemo } from 'react';
+import { ReactNode, useMemo, useRef, useEffect, useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -14,7 +14,6 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from '@/components/ui/drawer';
-import { useMediaQuery } from '@/hooks/use-media-query';
 import { cn } from '@/lib/utils';
 
 // ✅ نقل sizeClasses خارج المكون (ثابت - لا يتغير)
@@ -25,6 +24,12 @@ const SIZE_CLASSES = {
   xl: 'max-w-xl',
   full: 'max-w-full',
 } as const;
+
+// ✅ دالة للتحقق من حجم الشاشة بدون hook
+const getIsDesktop = () => {
+  if (typeof window === 'undefined') return true;
+  return window.innerWidth >= 768;
+};
 
 interface ResponsiveDialogProps {
   open: boolean;
@@ -39,6 +44,7 @@ interface ResponsiveDialogProps {
 /**
  * Dialog/Drawer محسّن للجوال
  * يعرض Drawer على الجوال و Dialog على الشاشات الكبيرة
+ * ✅ يثبت نوع المكون عند الفتح لمنع التبديل أثناء العرض
  */
 export function ResponsiveDialog({
   open,
@@ -49,7 +55,18 @@ export function ResponsiveDialog({
   className,
   size = 'md',
 }: ResponsiveDialogProps) {
-  const isDesktop = useMediaQuery('(min-width: 768px)');
+  // ✅ تثبيت قيمة isDesktop عند فتح المحاورة لمنع التبديل أثناء العرض
+  const [isDesktop, setIsDesktop] = useState(getIsDesktop);
+  const wasOpenRef = useRef(false);
+
+  // ✅ تحديث isDesktop فقط عند الفتح (وليس أثناء العرض)
+  useEffect(() => {
+    if (open && !wasOpenRef.current) {
+      // عند الفتح لأول مرة، تحديث القيمة
+      setIsDesktop(getIsDesktop());
+    }
+    wasOpenRef.current = open;
+  }, [open]);
 
   // ✅ استخدام useMemo للـ className لمنع إعادة الحساب في كل render
   const dialogClassName = useMemo(() => 

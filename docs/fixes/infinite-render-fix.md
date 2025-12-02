@@ -114,7 +114,7 @@ useEffect(() => {
 
 **الملف:** `src/components/shared/ResponsiveDialog.tsx`
 
-**المشكلة:**
+**المشكلة الأولى:**
 ```typescript
 // ❌ الكود القديم - كائن جديد في كل render
 const sizeClasses = {
@@ -124,7 +124,19 @@ const sizeClasses = {
 };
 ```
 
-**الحل:**
+**المشكلة الثانية (الأخطر):**
+```typescript
+// ❌ التبديل بين Dialog و Drawer أثناء العرض يسبب crash في vaul
+const isDesktop = useMediaQuery('(min-width: 768px)');
+
+// إذا تغير isDesktop أثناء عرض المحاورة، يحدث خطأ في setRef
+if (isDesktop) {
+  return <Dialog ... />;
+}
+return <Drawer ... />;
+```
+
+**الحل الشامل:**
 ```typescript
 // ✅ نقل الكائن الثابت خارج المكون
 const SIZE_CLASSES = {
@@ -132,6 +144,24 @@ const SIZE_CLASSES = {
   md: 'max-w-md',
   // ...
 } as const;
+
+// ✅ دالة للتحقق من حجم الشاشة بدون hook
+const getIsDesktop = () => {
+  if (typeof window === 'undefined') return true;
+  return window.innerWidth >= 768;
+};
+
+// ✅ تثبيت قيمة isDesktop عند فتح المحاورة لمنع التبديل أثناء العرض
+const [isDesktop, setIsDesktop] = useState(getIsDesktop);
+const wasOpenRef = useRef(false);
+
+useEffect(() => {
+  if (open && !wasOpenRef.current) {
+    // عند الفتح لأول مرة فقط، تحديث القيمة
+    setIsDesktop(getIsDesktop());
+  }
+  wasOpenRef.current = open;
+}, [open]);
 
 // ✅ استخدام useMemo للـ className
 const dialogClassName = useMemo(() => 
