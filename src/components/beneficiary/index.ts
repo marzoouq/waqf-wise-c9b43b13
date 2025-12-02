@@ -75,6 +75,7 @@ export { InteractiveCalendar } from './InteractiveCalendar';
 export { ContractsTable } from './ContractsTable';
 export { BeneficiaryCertificate } from './BeneficiaryCertificate';
 export { BeneficiarySettingsDropdown } from './BeneficiarySettingsDropdown';
+export { BeneficiarySidebar } from './BeneficiarySidebar';
 export { EmptyPaymentsState } from './EmptyPaymentsState';
 export { ErrorReportingGuide } from './ErrorReportingGuide';
 export { ReportsMenu } from './ReportsMenu';
