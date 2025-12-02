@@ -5,7 +5,6 @@ import {
   PDFTableData, 
   ExcelRowData, 
   BeneficiaryExport,
-  PropertyExport,
   PaymentExport,
   InvoiceExport 
 } from "@/types/export";
@@ -71,17 +70,6 @@ export function formatBeneficiariesForExport(beneficiaries: BeneficiaryExport[])
   }));
 }
 
-export function formatPropertiesForExport(properties: PropertyExport[]): ExcelRowData[] {
-  return properties.map((p) => ({
-    "اسم العقار": p.property_name,
-    "النوع": p.property_type,
-    "الموقع": p.location,
-    "المساحة": p.area || "-",
-    "القيمة المقدرة": p.estimated_value || "-",
-    "الإيرادات السنوية": p.annual_revenue || "-",
-    "الحالة": p.status,
-  }));
-}
 
 export function formatPaymentsForExport(payments: PaymentExport[]): ExcelRowData[] {
   return payments.map((p) => ({

@@ -38,12 +38,6 @@ export interface BeneficiaryTableRow extends TableRow {
   status: string;
 }
 
-export interface PropertyTableRow extends TableRow {
-  property_name: string;
-  property_type: string;
-  location: string;
-  status: string;
-}
 
 export interface PaymentTableRow extends TableRow {
   payment_number: string;
