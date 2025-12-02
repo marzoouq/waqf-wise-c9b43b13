@@ -22,6 +22,7 @@ export { lazyWithRetry } from './lazyWithRetry';
 export { generateDisclosurePDF } from './generateDisclosurePDF';
 export { generateInvoicePDF } from './generateInvoicePDF';
 export { generateReceiptPDF } from './generateReceiptPDF';
+export { generateFiscalYearPDF } from './generateFiscalYearPDF';
 
 // ==================== Banking & ZATCA ====================
 export * from './bankFileGenerators';

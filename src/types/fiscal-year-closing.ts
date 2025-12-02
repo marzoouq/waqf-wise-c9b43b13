@@ -91,6 +91,8 @@ export interface FiscalYearSummary {
   vat_collected: number;
   beneficiary_distributions: number;
   net_income: number;
+  nazer_share: number;
+  waqif_share: number;
 }
 
 export interface ClosingPreview {

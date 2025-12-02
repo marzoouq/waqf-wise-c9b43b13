@@ -31,6 +31,7 @@ import {
   AlertTriangle,
   TrendingUp,
   Code,
+  Calendar,
 } from "lucide-react";
 import {
   Sidebar,
@@ -87,6 +88,7 @@ const menuGroups = [
     roles: ["admin", "accountant", "nazer", "cashier"],
     subItems: [
       { icon: Calculator, label: "المحاسبة", path: "/accounting", roles: ["admin", "accountant", "nazer"] },
+      { icon: Calendar, label: "السنوات المالية", path: "/fiscal-years", roles: ["admin", "accountant", "nazer"] },
       { icon: TrendingUp, label: "الميزانيات", path: "/budgets", roles: ["admin", "accountant", "nazer"] },
       { icon: FileText, label: "سندات الدفع", path: "/payment-vouchers", roles: ["admin", "accountant", "cashier", "nazer"] },
       { icon: CreditCard, label: "المدفوعات", path: "/payments", roles: ["admin", "accountant", "cashier", "nazer"] },
