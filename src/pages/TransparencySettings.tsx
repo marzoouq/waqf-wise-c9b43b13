@@ -15,15 +15,20 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function TransparencySettings() {
   const navigate = useNavigate();
-  const { settings, isLoading, updateSettings, isUpdating } = useVisibilitySettings();
   const { isNazer, isAdmin } = useUserRole();
+  
+  // إدارة الدور النشط (المستفيدون أو الورثة)
+  const [activeRole, setActiveRole] = useState<'beneficiary' | 'waqf_heir'>('beneficiary');
+  
+  // جلب الإعدادات حسب الدور النشط
+  const { settings, isLoading, updateSettings, isUpdating } = useVisibilitySettings(activeRole);
   const [localSettings, setLocalSettings] = useState(settings);
 
   useEffect(() => {
     if (settings) {
       setLocalSettings(settings);
     }
-  }, [settings]);
+  }, [settings, activeRole]);
 
   if (!isNazer && !isAdmin) {
     return (
@@ -68,8 +73,8 @@ export default function TransparencySettings() {
     <PageErrorBoundary>
       <MobileOptimizedLayout>
         <MobileOptimizedHeader
-          title="إعدادات الشفافية للمستفيدين"
-          description="التحكم الكامل في البيانات المتاحة للمستفيدين من الدرجة الأولى (50 صلاحية)"
+          title="إعدادات الشفافية"
+          description="التحكم الكامل في البيانات المتاحة للمستفيدين والورثة"
           actions={
             <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
               <ArrowRight className="h-4 w-4 ml-2" />
@@ -79,11 +84,51 @@ export default function TransparencySettings() {
         />
 
         <div className="space-y-6 p-6">
+          {/* تبويب اختيار الفئة: المستفيدون أو الورثة */}
+          <Card className="p-4">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <h3 className="font-semibold text-lg mb-1">
+                  {activeRole === 'beneficiary' ? 'إعدادات المستفيدين' : 'إعدادات الورثة'}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {activeRole === 'beneficiary' 
+                    ? 'التحكم في ما يراه المستفيدون من الدرجة الأولى (14 مستفيد)'
+                    : 'التحكم في الشفافية الكاملة لورثة الوقف (2 وارث)'}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant={activeRole === 'beneficiary' ? 'default' : 'outline'}
+                  onClick={() => setActiveRole('beneficiary')}
+                  size="sm"
+                >
+                  <Users className="h-4 w-4 ml-2" />
+                  المستفيدون
+                </Button>
+                <Button
+                  variant={activeRole === 'waqf_heir' ? 'default' : 'outline'}
+                  onClick={() => setActiveRole('waqf_heir')}
+                  size="sm"
+                >
+                  <Shield className="h-4 w-4 ml-2" />
+                  الورثة
+                </Button>
+              </div>
+            </div>
+          </Card>
+
           <Alert>
             <Eye className="h-4 w-4" />
             <AlertDescription>
-              هذه الإعدادات تتحكم في ما يراه <strong>المستفيدون من الدرجة الأولى (14 مستفيد)</strong> في بوابة المستفيدين.
-              تم تنظيم الصلاحيات في 8 فئات لسهولة الإدارة.
+              {activeRole === 'beneficiary' ? (
+                <>هذه الإعدادات تتحكم في ما يراه <strong>المستفيدون من الدرجة الأولى (14 مستفيد)</strong> في بوابة المستفيدين.</>
+              ) : (
+                <>
+                  <strong>الشفافية الكاملة للورثة:</strong> يمكنك التحكم في جميع البيانات المتاحة لورثة الوقف.
+                  الإعدادات الافتراضية تمنح الورثة وصول كامل لجميع البيانات (شفافية 100%).
+                </>
+              )}
             </AlertDescription>
           </Alert>
 

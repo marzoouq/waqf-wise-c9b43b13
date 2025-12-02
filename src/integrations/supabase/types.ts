@@ -1889,6 +1889,7 @@ export type Database = {
           show_support_tickets: boolean | null
           show_total_beneficiaries_count: boolean | null
           show_trial_balance: boolean | null
+          target_role: string | null
           updated_at: string | null
           updated_by: string | null
         }
@@ -1952,6 +1953,7 @@ export type Database = {
           show_support_tickets?: boolean | null
           show_total_beneficiaries_count?: boolean | null
           show_trial_balance?: boolean | null
+          target_role?: string | null
           updated_at?: string | null
           updated_by?: string | null
         }
@@ -2015,6 +2017,7 @@ export type Database = {
           show_support_tickets?: boolean | null
           show_total_beneficiaries_count?: boolean | null
           show_trial_balance?: boolean | null
+          target_role?: string | null
           updated_at?: string | null
           updated_by?: string | null
         }
@@ -11452,6 +11455,7 @@ export type Database = {
           show_support_tickets: boolean | null
           show_total_beneficiaries_count: boolean | null
           show_trial_balance: boolean | null
+          target_role: string | null
           updated_at: string | null
           updated_by: string | null
         }

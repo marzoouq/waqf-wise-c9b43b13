@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useUserRole } from "@/hooks/useUserRole";
 
 export interface VisibilitySettings {
   id: string;
@@ -81,26 +82,32 @@ export interface VisibilitySettings {
   allow_print: boolean;
 }
 
-export function useVisibilitySettings() {
+export function useVisibilitySettings(targetRole?: 'beneficiary' | 'waqf_heir') {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { isWaqfHeir } = useUserRole();
+  
+  // تحديد الدور المستهدف: إذا لم يتم تحديده، استخدم دور المستخدم الحالي
+  const effectiveRole = targetRole || (isWaqfHeir ? 'waqf_heir' : 'beneficiary');
 
   const { data: settings, isLoading } = useQuery({
-    queryKey: ["visibility-settings"],
+    queryKey: ["visibility-settings", effectiveRole],
     queryFn: async () => {
-      // جلب السجل الأول فقط
+      // جلب السجل حسب الدور المستهدف
       const { data, error } = await supabase
         .from("beneficiary_visibility_settings")
         .select("*")
+        .eq('target_role', effectiveRole)
         .order('created_at', { ascending: true })
         .limit(1)
         .maybeSingle();
 
       if (error) throw error;
       
-      // إذا لم يكن هناك سجل، استخدم القيم الافتراضية
+      // إذا لم يكن هناك سجل، استخدم القيم الافتراضية حسب الدور
       if (!data) {
         const defaultSettings = {
+          target_role: effectiveRole,
           show_overview: true,
           show_profile: true,
           show_requests: true,
@@ -187,10 +194,10 @@ export function useVisibilitySettings() {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["visibility-settings"] });
+      queryClient.invalidateQueries({ queryKey: ["visibility-settings", effectiveRole] });
       toast({
         title: "تم الحفظ",
-        description: "تم تحديث إعدادات الشفافية بنجاح",
+        description: `تم تحديث إعدادات الشفافية ${effectiveRole === 'waqf_heir' ? 'للورثة' : 'للمستفيدين'} بنجاح`,
       });
     },
     onError: (error: Error) => {
