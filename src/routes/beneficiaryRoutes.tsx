@@ -23,7 +23,7 @@ export const beneficiaryStandaloneRoutes = [
     key="beneficiary-dashboard"
     path="/beneficiary-dashboard" 
     element={
-      <ProtectedRoute requiredRole="beneficiary">
+      <ProtectedRoute requiredRoles={["beneficiary", "waqf_heir"]}>
         <BeneficiaryDashboard />
       </ProtectedRoute>
     } 
@@ -32,7 +32,7 @@ export const beneficiaryStandaloneRoutes = [
     key="beneficiary-support"
     path="/beneficiary-support" 
     element={
-      <ProtectedRoute requiredRole="beneficiary">
+      <ProtectedRoute requiredRoles={["beneficiary", "waqf_heir"]}>
         <BeneficiarySupport />
       </ProtectedRoute>
     } 
@@ -47,7 +47,7 @@ export const beneficiaryProtectedRoutes = [
     key="beneficiary-requests"
     path="/beneficiary/requests" 
     element={
-      <ProtectedRoute requiredRole="beneficiary">
+      <ProtectedRoute requiredRoles={["beneficiary", "waqf_heir"]}>
         <BeneficiaryRequests />
       </ProtectedRoute>
     } 
@@ -56,7 +56,7 @@ export const beneficiaryProtectedRoutes = [
     key="beneficiary-account-statement"
     path="/beneficiary/account-statement" 
     element={
-      <ProtectedRoute requiredRole="beneficiary">
+      <ProtectedRoute requiredRoles={["beneficiary", "waqf_heir"]}>
         <BeneficiaryAccountStatement />
       </ProtectedRoute>
     } 
@@ -65,7 +65,7 @@ export const beneficiaryProtectedRoutes = [
     key="beneficiary-reports"
     path="/beneficiary/reports" 
     element={
-      <ProtectedRoute requiredRole="beneficiary">
+      <ProtectedRoute requiredRoles={["beneficiary", "waqf_heir"]}>
         <BeneficiaryReports />
       </ProtectedRoute>
     } 
@@ -74,7 +74,7 @@ export const beneficiaryProtectedRoutes = [
     key="beneficiary-portal"
     path="/beneficiary-portal"
     element={
-      <ProtectedRoute requiredRole="beneficiary">
+      <ProtectedRoute requiredRoles={["beneficiary", "waqf_heir"]}>
         <BeneficiaryPortal />
       </ProtectedRoute>
     } 
@@ -83,7 +83,7 @@ export const beneficiaryProtectedRoutes = [
     key="beneficiary-settings"
     path="/beneficiary-settings"
     element={
-      <ProtectedRoute requiredRole="beneficiary">
+      <ProtectedRoute requiredRoles={["beneficiary", "waqf_heir"]}>
         <BeneficiarySettings />
       </ProtectedRoute>
     } 
