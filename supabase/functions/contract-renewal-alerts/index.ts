@@ -35,7 +35,7 @@ serve(async (req) => {
         property_id,
         properties (
           name,
-          property_type,
+          type,
           address
         )
       `)
@@ -80,7 +80,7 @@ serve(async (req) => {
           ? `⚠️ عقد ينتهي خلال ${daysRemaining} يوم!`
           : `📅 تنبيه: عقد ينتهي خلال ${daysRemaining} يوم`;
 
-      const props = contract.properties as { name?: string; property_type?: string; address?: string }[] | { name?: string; property_type?: string; address?: string } | null;
+      const props = contract.properties as { name?: string; type?: string; address?: string }[] | { name?: string; type?: string; address?: string } | null;
       const propertyName = Array.isArray(props) ? props[0]?.name : props?.name;
         
       const alertMessage = `

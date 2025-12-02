@@ -183,7 +183,7 @@ export interface ContractWithPropertyRow {
   status: string;
   properties?: {
     name: string;
-    property_type?: string;
+    type?: string;
     address?: string;
   };
 }
