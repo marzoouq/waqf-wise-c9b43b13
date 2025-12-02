@@ -27,7 +27,6 @@ export const AccountantDashboard = lazyWithRetry(() => import("@/pages/Accountan
 export const CashierDashboard = lazyWithRetry(() => import("@/pages/CashierDashboard"));
 export const ArchivistDashboard = lazyWithRetry(() => import("@/pages/ArchivistDashboard"));
 export const AdminDashboard = lazyWithRetry(() => import("@/pages/AdminDashboard"));
-export const BeneficiaryDashboard = lazyWithRetry(() => import("@/pages/BeneficiaryDashboard"));
 
 // ==================== صفحات المستفيدين ====================
 export const Beneficiaries = lazyWithRetry(() => import("@/pages/Beneficiaries"));

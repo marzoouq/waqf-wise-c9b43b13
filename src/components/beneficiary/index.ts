@@ -51,7 +51,6 @@ export { EditEmailDialog } from './EditEmailDialog';
 export { EditPhoneDialog } from './EditPhoneDialog';
 
 // ==================== Card Components ====================
-export { QuickActionsCard } from './QuickActionsCard';
 export { NotificationsCard } from './NotificationsCard';
 export { AnnualDisclosureCard } from './AnnualDisclosureCard';
 export { PropertyStatsCards } from './PropertyStatsCards';
