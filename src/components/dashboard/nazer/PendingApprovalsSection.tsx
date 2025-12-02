@@ -101,45 +101,48 @@ export default function PendingApprovalsSection() {
 
   return (
     <Card className="mb-6">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <Clock className="h-5 w-5" />
-            الموافقات المعلقة
-            <Badge variant="secondary">{approvals.length}</Badge>
+      <CardHeader className="pb-3 p-3 sm:p-6">
+        <div className="flex items-center justify-between gap-2">
+          <CardTitle className="flex items-center gap-1 sm:gap-2 text-sm sm:text-base">
+            <Clock className="h-4 w-4 sm:h-5 sm:w-5" />
+            <span className="hidden sm:inline">الموافقات المعلقة</span>
+            <span className="sm:hidden">الموافقات</span>
+            <Badge variant="secondary" className="text-xs">{approvals.length}</Badge>
           </CardTitle>
           <Button 
             variant="outline" 
             size="sm"
             onClick={() => navigate('/approvals')}
+            className="text-xs sm:text-sm"
           >
             عرض الكل
           </Button>
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
+      <CardContent className="p-3 sm:p-6">
+        <div className="space-y-2 sm:space-y-3">
           {approvals.map((approval) => {
             const Icon = getTypeIcon(approval.type);
             return (
               <div 
                 key={approval.id}
-                className="flex items-center gap-4 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors cursor-pointer"
+                className="flex items-center gap-2 sm:gap-4 p-2 sm:p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors cursor-pointer"
                 onClick={() => navigate('/approvals')}
               >
-                <div className={`p-3 rounded-lg ${getTypeColor(approval.type)}`}>
-                  <Icon className="h-5 w-5" />
+                <div className={`p-2 sm:p-3 rounded-lg ${getTypeColor(approval.type)}`}>
+                  <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h4 className="font-medium text-sm truncate">{approval.title}</h4>
-                    <Badge className={getPriorityColor(approval.priority)} variant="secondary">
+                  <div className="flex items-center gap-1 sm:gap-2 mb-1">
+                    <h4 className="font-medium text-xs sm:text-sm truncate">{approval.title}</h4>
+                    <Badge className={`${getPriorityColor(approval.priority)} text-[10px] sm:text-xs`} variant="secondary">
                       {approval.priority === 'high' ? 'عاجل' : approval.priority === 'medium' ? 'متوسط' : 'عادي'}
                     </Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground truncate">{approval.description}</p>
-                  <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
-                    <span>{format(approval.date, 'dd MMM yyyy', { locale: ar })}</span>
+                  <p className="text-[10px] sm:text-sm text-muted-foreground truncate">{approval.description}</p>
+                  <div className="flex items-center gap-2 sm:gap-3 mt-1 text-[10px] sm:text-xs text-muted-foreground">
+                    <span className="hidden sm:inline">{format(approval.date, 'dd MMM yyyy', { locale: ar })}</span>
+                    <span className="sm:hidden">{format(approval.date, 'dd/MM', { locale: ar })}</span>
                     {approval.amount && (
                       <span className="font-medium">
                         {approval.amount.toLocaleString('ar-SA')} ر.س

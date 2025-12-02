@@ -97,34 +97,36 @@ export default function SmartAlertsSection() {
 
   return (
     <Card className="mb-6">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2">
-          <AlertTriangle className="h-5 w-5" />
-          التنبيهات الذكية
-          <Badge variant="secondary">{alerts.length}</Badge>
-        </CardTitle>
+      <CardHeader className="pb-3 p-3 sm:p-6">
+        <div className="flex items-center justify-between gap-2">
+          <CardTitle className="flex items-center gap-1 sm:gap-2 text-sm sm:text-base">
+            <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5" />
+            <span className="hidden sm:inline">التنبيهات الذكية</span>
+            <span className="sm:hidden">التنبيهات</span>
+            <Badge variant="secondary" className="text-xs">{alerts.length}</Badge>
+          </CardTitle>
+        </div>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
+      <CardContent className="p-3 sm:p-6">
+        <div className="space-y-2 sm:space-y-3">
           {alerts.map((alert) => {
             const Icon = getAlertIcon(alert.type);
             return (
               <div 
                 key={alert.id}
-                className={`flex items-start gap-3 p-3 rounded-lg border ${getSeverityColor(alert.severity)} cursor-pointer hover:opacity-80 transition-opacity`}
+                className={`flex items-start gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg border ${getSeverityColor(alert.severity)} cursor-pointer hover:opacity-80 transition-opacity`}
                 onClick={() => navigate(alert.actionUrl)}
               >
-                <div className="p-2 rounded-full bg-background/50">
-                  <Icon className="h-5 w-5" />
+                <div className="p-1.5 sm:p-2 rounded-full bg-background/50 shrink-0">
+                  <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h4 className="font-medium text-sm">{alert.title}</h4>
-                  </div>
-                  <p className="text-sm opacity-90 mb-2">{alert.description}</p>
-                  <div className="flex items-center gap-2 text-xs opacity-75">
+                  <h4 className="font-medium text-xs sm:text-sm mb-1">{alert.title}</h4>
+                  <p className="text-[10px] sm:text-sm opacity-90 mb-1 sm:mb-2 line-clamp-2">{alert.description}</p>
+                  <div className="flex items-center gap-1 sm:gap-2 text-[10px] sm:text-xs opacity-75">
                     <Calendar className="h-3 w-3" />
-                    <span>{format(alert.date, 'dd MMMM yyyy', { locale: ar })}</span>
+                    <span className="hidden sm:inline">{format(alert.date, 'dd MMMM yyyy', { locale: ar })}</span>
+                    <span className="sm:hidden">{format(alert.date, 'dd/MM', { locale: ar })}</span>
                   </div>
                 </div>
               </div>

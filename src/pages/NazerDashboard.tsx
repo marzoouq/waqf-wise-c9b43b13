@@ -85,7 +85,7 @@ export default function NazerDashboard() {
               <NazerKPIs />
             </Suspense>
 
-            <div className="grid gap-6 lg:grid-cols-2">
+            <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
               <Suspense fallback={<ChartSkeleton />}>
                 <PendingApprovalsSection />
               </Suspense>
@@ -109,7 +109,7 @@ export default function NazerDashboard() {
               <GovernanceSection />
             </Suspense>
 
-            <div className="grid gap-6 lg:grid-cols-2">
+            <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
               <Suspense fallback={<ChartSkeleton />}>
                 <PendingApprovalsSection />
               </Suspense>
@@ -125,7 +125,7 @@ export default function NazerDashboard() {
 
           {/* Financial Tab */}
           <TabsContent value="financial" className="space-y-6 mt-6">
-            <div className="grid gap-6 lg:grid-cols-2">
+            <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
               <Suspense fallback={<ChartSkeleton />}>
                 <RevenueDistributionChart />
               </Suspense>
