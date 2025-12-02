@@ -17,16 +17,6 @@ export interface BeneficiaryExport {
   notes: string | null;
 }
 
-export interface PropertyExport {
-  property_name: string;
-  property_type: string;
-  location: string;
-  area: number | null;
-  status: string;
-  estimated_value: number | null;
-  annual_revenue: number | null;
-  description: string | null;
-}
 
 export interface PaymentExport {
   payment_number: string;
