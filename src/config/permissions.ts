@@ -54,6 +54,7 @@ export type RoleName =
   | 'cashier' 
   | 'archivist' 
   | 'beneficiary' 
+  | 'waqf_heir'
   | 'user';
 
 /**
@@ -121,6 +122,21 @@ export const ROLE_PERMISSIONS: Record<RoleName, Permission[]> = {
     'view_approvals_log',
     'view_statements',
   ],
+  waqf_heir: [
+    'view_own_profile',
+    'view_own_payments',
+    'view_waqf_summary',
+    'view_properties',
+    'view_distributions',
+    'view_governance',
+    'view_budgets',
+    'view_family_tree',
+    'view_disclosures',
+    'view_bank_accounts',
+    'view_financial_reports',
+    'view_approvals_log',
+    'view_statements',
+  ],
   user: [
     'view_dashboard'
   ]
@@ -170,5 +186,6 @@ export const AVAILABLE_ROLES: { name: RoleName; label: string; description: stri
   { name: 'cashier', label: 'أمين الصندوق', description: 'معالجة المدفوعات' },
   { name: 'archivist', label: 'الأرشيفي', description: 'إدارة المستندات والأرشيف' },
   { name: 'beneficiary', label: 'المستفيد', description: 'عرض البيانات الشخصية فقط' },
+  { name: 'waqf_heir', label: 'وارث الوقف', description: 'وصول كامل لبيانات الوقف للشفافية' },
   { name: 'user', label: 'مستخدم', description: 'صلاحيات أساسية' },
 ];
