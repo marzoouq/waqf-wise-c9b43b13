@@ -5,8 +5,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { 
-  CreditCard, Clock, CheckCircle, AlertCircle, DollarSign
+  CreditCard, Clock, CheckCircle, AlertCircle, DollarSign, Lock
 } from "lucide-react";
 import {
   BeneficiaryProfileTab,
@@ -43,6 +44,12 @@ export default function BeneficiaryPortal() {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get("tab") || "overview";
   const { settings, isLoading: settingsLoading } = useVisibilitySettings();
+
+  // التحقق من إذن الوصول للتبويب النشط
+  const isTabVisible = (tabKey: keyof typeof settings) => {
+    if (!settings) return false;
+    return settings[tabKey] === true;
+  };
 
   const handleTabChange = (value: string) => {
     setSearchParams({ tab: value });
@@ -127,7 +134,7 @@ export default function BeneficiaryPortal() {
           <div className="max-w-7xl mx-auto space-y-6">
 
             {/* Tab Content */}
-            {activeTab === "overview" && (
+            {activeTab === "overview" && settings?.show_overview && (
               <div className="space-y-6">
                 {/* بطاقة الملف الشخصي */}
                 <BeneficiaryProfileCard
@@ -188,23 +195,47 @@ export default function BeneficiaryPortal() {
             )}
 
             {/* Profile Tab */}
-            {activeTab === "profile" && (
+            {activeTab === "profile" && settings?.show_profile && (
               <BeneficiaryProfileTab beneficiary={beneficiary} />
+            )}
+            {activeTab === "profile" && !settings?.show_profile && (
+              <Alert>
+                <Lock className="h-4 w-4" />
+                <AlertDescription>غير مصرح لك بالوصول لهذا القسم</AlertDescription>
+              </Alert>
             )}
 
             {/* Distributions Tab */}
-            {activeTab === "distributions" && (
+            {activeTab === "distributions" && settings?.show_distributions && (
               <BeneficiaryDistributionsTab beneficiaryId={beneficiary.id} />
+            )}
+            {activeTab === "distributions" && !settings?.show_distributions && (
+              <Alert>
+                <Lock className="h-4 w-4" />
+                <AlertDescription>غير مصرح لك بالوصول لهذا القسم</AlertDescription>
+              </Alert>
             )}
 
             {/* Statements Tab */}
-            {activeTab === "statements" && (
+            {activeTab === "statements" && settings?.show_statements && (
               <BeneficiaryStatementsTab beneficiaryId={beneficiary.id} />
+            )}
+            {activeTab === "statements" && !settings?.show_statements && (
+              <Alert>
+                <Lock className="h-4 w-4" />
+                <AlertDescription>غير مصرح لك بالوصول لهذا القسم</AlertDescription>
+              </Alert>
             )}
 
             {/* Properties Tab */}
-            {activeTab === "properties" && (
+            {activeTab === "properties" && settings?.show_properties && (
               <BeneficiaryPropertiesTab />
+            )}
+            {activeTab === "properties" && !settings?.show_properties && (
+              <Alert>
+                <Lock className="h-4 w-4" />
+                <AlertDescription>غير مصرح لك بالوصول لهذا القسم</AlertDescription>
+              </Alert>
             )}
 
             {/* Waqf Summary Tab */}
@@ -215,6 +246,12 @@ export default function BeneficiaryPortal() {
             {/* Family Tree Tab */}
             {settings?.show_family_tree && activeTab === "family" && (
               <FamilyTreeTab beneficiaryId={beneficiary.id} />
+            )}
+            {!settings?.show_family_tree && activeTab === "family" && (
+              <Alert>
+                <Lock className="h-4 w-4" />
+                <AlertDescription>غير مصرح لك بالوصول لهذا القسم</AlertDescription>
+              </Alert>
             )}
 
             {/* Bank Accounts Tab */}
@@ -241,15 +278,33 @@ export default function BeneficiaryPortal() {
             {settings?.show_governance && activeTab === "governance" && (
               <GovernanceTab />
             )}
+            {!settings?.show_governance && activeTab === "governance" && (
+              <Alert>
+                <Lock className="h-4 w-4" />
+                <AlertDescription>غير مصرح لك بالوصول لهذا القسم</AlertDescription>
+              </Alert>
+            )}
 
             {/* Budgets Tab */}
             {settings?.show_budgets && activeTab === "budgets" && (
               <BudgetsTab />
             )}
+            {!settings?.show_budgets && activeTab === "budgets" && (
+              <Alert>
+                <Lock className="h-4 w-4" />
+                <AlertDescription>غير مصرح لك بالوصول لهذا القسم</AlertDescription>
+              </Alert>
+            )}
 
             {/* Loans Overview Tab */}
             {settings?.show_own_loans && activeTab === "loans" && (
               <LoansOverviewTab />
+            )}
+            {!settings?.show_own_loans && activeTab === "loans" && (
+              <Alert>
+                <Lock className="h-4 w-4" />
+                <AlertDescription>غير مصرح لك بالوصول لهذا القسم</AlertDescription>
+              </Alert>
             )}
           </div>
         </main>
