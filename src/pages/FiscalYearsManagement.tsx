@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useFiscalYears } from "@/hooks/useFiscalYears";
 import { useFiscalYearClosings } from "@/hooks/useFiscalYearClosings";
-import { CalendarIcon, Lock, Unlock, FileCheck, FileX, TrendingUp, AlertCircle } from "lucide-react";
+import { CalendarIcon, Lock, Unlock, FileCheck, FileX, TrendingUp, AlertCircle, TestTube } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
@@ -18,6 +18,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { FiscalYearSummaryCard } from "@/components/fiscal-years/FiscalYearSummaryCard";
 import { ManualClosingDialog } from "@/components/fiscal-years/ManualClosingDialog";
 import { AutomaticClosingDialog } from "@/components/fiscal-years/AutomaticClosingDialog";
+import { FiscalYearTestPanel } from "@/components/fiscal-years/FiscalYearTestPanel";
 
 export default function FiscalYearsManagement() {
   const { fiscalYears, isLoading: loadingYears } = useFiscalYears();
@@ -25,6 +26,7 @@ export default function FiscalYearsManagement() {
   const [selectedYearId, setSelectedYearId] = useState<string | null>(null);
   const [manualClosingOpen, setManualClosingOpen] = useState(false);
   const [autoClosingOpen, setAutoClosingOpen] = useState(false);
+  const [showTests, setShowTests] = useState(false);
 
   const selectedYear = fiscalYears?.find(y => y.id === selectedYearId);
   const selectedClosing = closings?.find(c => c.fiscal_year_id === selectedYearId);
@@ -50,9 +52,28 @@ export default function FiscalYearsManagement() {
   return (
     <MobileOptimizedLayout>
       <div className="mb-6">
-        <h1 className="text-3xl font-bold">إدارة السنوات المالية</h1>
-        <p className="text-muted-foreground">إقفال ومراجعة السنوات المالية</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">إدارة السنوات المالية</h1>
+            <p className="text-muted-foreground">إقفال ومراجعة السنوات المالية</p>
+          </div>
+          <Button 
+            variant="outline" 
+            onClick={() => setShowTests(!showTests)}
+            className="gap-2"
+          >
+            <TestTube className="h-4 w-4" />
+            {showTests ? "إخفاء الاختبارات" : "عرض الاختبارات"}
+          </Button>
+        </div>
       </div>
+
+      {/* لوحة الاختبارات */}
+      {showTests && (
+        <div className="mb-6">
+          <FiscalYearTestPanel />
+        </div>
+      )}
 
         <div className="space-y-6">
           {/* تنبيه للسنة النشطة */}
