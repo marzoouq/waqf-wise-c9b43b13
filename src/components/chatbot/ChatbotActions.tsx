@@ -12,8 +12,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { format, arLocale as ar } from "@/lib/date";
 
 interface ChatMessage {
   id: string;

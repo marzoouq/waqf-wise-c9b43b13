@@ -9,8 +9,7 @@ import {
 } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useNotifications } from "@/hooks/useNotifications";
-import { formatDistanceToNow } from "date-fns";
-import { ar } from "date-fns/locale";
+import { formatRelative } from "@/lib/date";
 
 export function NotificationCenter() {
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
@@ -84,10 +83,7 @@ export function NotificationCenter() {
                         {notification.message}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {formatDistanceToNow(new Date(notification.created_at), {
-                          addSuffix: true,
-                          locale: ar,
-                        })}
+                        {formatRelative(notification.created_at)}
                       </p>
                     </div>
                     {!notification.is_read && (

@@ -8,8 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { MessageSquare, Send, Trash2, Lock } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
-import { ar } from "date-fns/locale";
+import { formatRelative } from "@/lib/date";
 
 interface RequestCommentsDialogProps {
   open: boolean;
@@ -120,10 +119,7 @@ export function RequestCommentsDialog({
                             </span>
                           )}
                           <span className="text-xs text-muted-foreground">
-                            {formatDistanceToNow(new Date(comment.created_at), {
-                              addSuffix: true,
-                              locale: ar,
-                            })}
+                            {formatRelative(comment.created_at)}
                           </span>
                         </div>
                         <p className="text-sm whitespace-pre-wrap">{comment.comment}</p>

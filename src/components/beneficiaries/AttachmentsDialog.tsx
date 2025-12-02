@@ -9,8 +9,7 @@ import { useBeneficiaryAttachments } from "@/hooks/useBeneficiaryAttachments";
 import { Upload, FileText, Trash2, Download, CheckCircle, XCircle } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { format, arLocale as ar } from "@/lib/date";
 
 interface AttachmentsDialogProps {
   open: boolean;

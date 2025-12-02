@@ -10,8 +10,7 @@ import { DistributionTimelineTab } from "@/components/distributions/Distribution
 import { useDistributions, Distribution } from "@/hooks/useDistributions";
 import { ExportButton } from "@/components/shared/ExportButton";
 import { UnifiedDataTable } from "@/components/unified/UnifiedDataTable";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { format, arLocale as ar } from "@/lib/date";
 import {
   Dialog,
   DialogContent,

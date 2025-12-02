@@ -11,8 +11,7 @@ import {
   ChevronLeft,
   Clock
 } from "lucide-react";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { format, arLocale as ar } from "@/lib/date";
 import { useNavigate } from "react-router-dom";
 import type { GovernanceDecision } from "@/types/governance";
 

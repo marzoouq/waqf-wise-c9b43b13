@@ -3,8 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Download, FileText, Calendar } from "lucide-react";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { format, arLocale as ar } from "@/lib/date";
 import { toast } from "sonner";
 import { productionLogger } from "@/lib/logger/production-logger";
 

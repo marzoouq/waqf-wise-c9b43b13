@@ -10,8 +10,7 @@ import { RequestSubmissionDialog } from "./RequestSubmissionDialog";
 import { RequestDetailsDialog } from "./RequestDetailsDialog";
 import { RequestAttachmentsUploader } from "./RequestAttachmentsUploader";
 import { SLAIndicator } from "./SLAIndicator";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { format, arLocale as ar } from "@/lib/date";
 
 interface BeneficiaryRequestsTabProps {
   beneficiaryId: string;

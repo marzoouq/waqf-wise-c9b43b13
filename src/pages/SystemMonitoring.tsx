@@ -17,8 +17,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
-import { formatDistanceToNow } from "date-fns";
-import { ar } from "date-fns/locale";
+import { formatRelative } from "@/lib/date";
 import { SystemError, SystemAlert } from "@/types/monitoring";
 import { AdminAlertsPanel } from "@/components/system/AdminAlertsPanel";
 import { SelfHealingToolsPanel } from "@/components/system/SelfHealingToolsPanel";
@@ -183,10 +182,7 @@ export default function SystemMonitoring() {
                           </p>
                           <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
                             <Clock className="h-3 w-3" />
-                            {formatDistanceToNow(new Date(error.created_at), {
-                              addSuffix: true,
-                              locale: ar,
-                            })}
+                            {formatRelative(error.created_at)}
                           </p>
                         </div>
                         <Badge variant="outline">{error.status}</Badge>

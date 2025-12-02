@@ -16,8 +16,7 @@ import {
   TableRow,
   TableFooter,
 } from "@/components/ui/table";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { format, arLocale as ar } from "@/lib/date";
 import { BadgeVariant, JournalEntryWithLines } from "@/types";
 
 type JournalEntry = {

@@ -4,8 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, XCircle, Clock } from "lucide-react";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { format, arLocale as ar } from "@/lib/date";
 
 export function ApprovalsLogTab() {
   const { settings } = useVisibilitySettings();

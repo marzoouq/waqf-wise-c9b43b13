@@ -17,8 +17,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { AlertTriangle, CheckCircle, Clock, XCircle, TrendingUp, AlertCircle } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
-import { ar } from "date-fns/locale";
+import { formatRelative } from "@/lib/date";
 import { useToast } from "@/hooks/use-toast";
 
 export default function SystemErrorLogs() {
@@ -253,10 +252,7 @@ export default function SystemErrorLogs() {
                                 </div>
                                 <p className="font-medium">{log.error_message}</p>
                                 <p className="text-sm text-muted-foreground mt-1">
-                                  {formatDistanceToNow(new Date(log.created_at), {
-                                    addSuffix: true,
-                                    locale: ar,
-                                  })}
+                                  {formatRelative(log.created_at)}
                                 </p>
                               </div>
                             </div>

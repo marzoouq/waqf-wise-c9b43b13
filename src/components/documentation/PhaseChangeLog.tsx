@@ -1,7 +1,6 @@
 import { usePhaseChangelog } from "@/hooks/useProjectDocumentation";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { format, arLocale as ar } from "@/lib/date";
 import { Clock, User, FileText, CheckCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 

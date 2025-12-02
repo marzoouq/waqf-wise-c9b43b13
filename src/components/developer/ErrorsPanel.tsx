@@ -4,8 +4,7 @@ import { Button } from "@/components/ui/button";
 import { AlertCircle, CheckCircle, XCircle, RefreshCw, Trash2, Filter } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { format, arLocale as ar } from "@/lib/date";
 import { useState } from "react";
 import { toast } from "sonner";
 import {

@@ -4,8 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Download, Printer, Scale } from "lucide-react";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { format, arLocale as ar } from "@/lib/date";
 import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
 import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
 import { TrialBalanceRow } from "@/types/supabase-helpers";

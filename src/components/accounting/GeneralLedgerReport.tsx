@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { format } from "date-fns";
+import { format } from "@/lib/date";
 import { FileText, Printer, Book } from "lucide-react";
 import { AccountRow, GeneralLedgerEntry } from "@/types/supabase-helpers";
 import { EmptyAccountingState } from "./EmptyAccountingState";

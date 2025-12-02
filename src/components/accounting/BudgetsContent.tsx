@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { format } from "date-fns";
+import { format } from "@/lib/date";
 import { formatCurrency } from "@/lib/utils";
 import { EmptyAccountingState } from "./EmptyAccountingState";
 import { AccountingErrorState } from "./AccountingErrorState";

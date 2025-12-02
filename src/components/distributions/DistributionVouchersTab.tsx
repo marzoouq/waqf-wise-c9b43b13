@@ -9,8 +9,7 @@ import { PaymentVoucherDialog } from "./PaymentVoucherDialog";
 import { VoucherDetailsDialog } from "./VoucherDetailsDialog";
 import { BankTransferGenerator } from "./BankTransferGenerator";
 import { Receipt, Eye, Plus, FileText, CheckCircle, XCircle, Clock, AlertCircle, LucideIcon } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
-import { ar } from "date-fns/locale";
+import { formatRelative } from "@/lib/date";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface DistributionVouchersTabProps {
@@ -191,10 +190,7 @@ export function DistributionVouchersTab({ distributionId }: DistributionVouchers
                       </TableCell>
                       <TableCell>{getStatusBadge(voucher.status)}</TableCell>
                       <TableCell className="text-sm text-muted-foreground">
-                        {formatDistanceToNow(new Date(voucher.created_at), {
-                          addSuffix: true,
-                          locale: ar,
-                        })}
+                        {formatRelative(voucher.created_at)}
                       </TableCell>
                       <TableCell className="text-left">
                         <Button

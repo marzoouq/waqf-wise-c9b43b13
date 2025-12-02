@@ -22,8 +22,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { PhaseChangeLog } from "./PhaseChangeLog";
 import { Calendar, FileText, History, User } from "lucide-react";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { format, arLocale as ar } from "@/lib/date";
 import { useState } from "react";
 import { useUpdatePhaseStatus, parseTasks } from "@/hooks/useProjectDocumentation";
 import type { ProjectPhase } from "@/hooks/useProjectDocumentation";

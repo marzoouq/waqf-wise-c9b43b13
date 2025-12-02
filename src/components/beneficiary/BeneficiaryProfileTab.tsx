@@ -2,8 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Edit, Phone, Mail, MapPin, CreditCard, Users, Calendar } from "lucide-react";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { format, arLocale as ar } from "@/lib/date";
 import type { Database } from "@/integrations/supabase/types";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { MaskedValue } from "@/components/shared/MaskedValue";
