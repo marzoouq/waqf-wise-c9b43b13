@@ -11473,6 +11473,7 @@ export type Database = {
           source: string
         }[]
       }
+      get_waqf_public_stats: { Args: never; Returns: Json }
       grant_user_permission: {
         Args: {
           p_expires_at?: string

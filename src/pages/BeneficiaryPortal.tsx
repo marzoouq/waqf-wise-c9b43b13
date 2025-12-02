@@ -32,6 +32,7 @@ import { ChatbotQuickCard } from "@/components/dashboard/ChatbotQuickCard";
 import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
 import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 import { BeneficiarySidebar } from "@/components/beneficiary/BeneficiarySidebar";
+import { BeneficiaryBottomNavigation } from "@/components/mobile/BeneficiaryBottomNavigation";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
@@ -121,7 +122,7 @@ export default function BeneficiaryPortal() {
         />
 
         {/* Main Content - مع padding للسايدبار على Desktop */}
-        <main className="flex-1 lg:mr-64 p-4 sm:p-6 lg:p-8">
+        <main className="flex-1 lg:mr-64 p-4 sm:p-6 lg:p-8 pb-20 md:pb-8">
           <div className="max-w-7xl mx-auto space-y-6">
 
             {/* Tab Content */}
@@ -246,6 +247,9 @@ export default function BeneficiaryPortal() {
             )}
           </div>
         </main>
+        
+        {/* Mobile Bottom Navigation */}
+        <BeneficiaryBottomNavigation />
       </div>
     </PageErrorBoundary>
   );
