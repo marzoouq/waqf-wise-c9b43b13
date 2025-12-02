@@ -46,6 +46,12 @@ export default defineConfig(({ mode }) => {
     sourcemap: false,
     reportCompressedSize: false, // إيقاف حساب gzip لتسريع البناء
     
+    // ✅ تفعيل Long-term caching headers
+    assetsInlineLimit: 4096, // Inline assets < 4KB
+    modulePreload: {
+      polyfill: false, // Modern browsers only
+    },
+    
     rollupOptions: {
       output: {
         manualChunks: (id) => {
