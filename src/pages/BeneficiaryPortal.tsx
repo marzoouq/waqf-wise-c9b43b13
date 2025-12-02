@@ -125,21 +125,6 @@ export default function BeneficiaryPortal() {
         {/* Main Content - مع padding للسايدبار على Desktop */}
         <main className="flex-1 lg:mr-64 p-4 sm:p-6 lg:p-8">
           <div className="max-w-7xl mx-auto space-y-6">
-            {/* Header */}
-            <div className="flex items-center justify-between flex-wrap gap-4">
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-bold">مرحباً، {beneficiary.full_name}</h1>
-                <p className="text-muted-foreground mt-1 text-sm">
-                  آخر تسجيل دخول: {beneficiary.last_login_at 
-                    ? format(new Date(beneficiary.last_login_at), "dd MMMM yyyy - HH:mm", { locale: ar })
-                    : "—"}
-                </p>
-              </div>
-              <Button onClick={() => navigate("/messages")} variant="outline" size="sm">
-                <MessageSquare className="h-4 w-4 ml-2" />
-                الرسائل
-              </Button>
-            </div>
 
             {/* Tab Content */}
             {activeTab === "overview" && (
