@@ -53,11 +53,35 @@ export default function NazerKPIs() {
 
   const kpiCards = [
     {
+      title: "إجمالي الأصول",
+      value: typeof data.totalAssets === 'number' 
+        ? data.totalAssets.toLocaleString('ar-SA')
+        : '0',
+      icon: Building2,
+      variant: "default" as const,
+    },
+    {
+      title: "إجمالي الإيرادات",
+      value: typeof data.totalRevenue === 'number' 
+        ? data.totalRevenue.toLocaleString('ar-SA')
+        : '0',
+      icon: TrendingUp,
+      variant: "success" as const,
+    },
+    {
       title: "المستفيدون النشطون",
       value: data.activeBeneficiaries,
       icon: Users,
       variant: "default" as const,
       subtitle: "عدد المستفيدين"
+    },
+    {
+      title: "الميزانية المتاحة",
+      value: typeof data.availableBudget === 'number' 
+        ? data.availableBudget.toLocaleString('ar-SA')
+        : '0',
+      icon: Wallet,
+      variant: "success" as const,
     },
     {
       title: "العقارات النشطة",
@@ -78,6 +102,14 @@ export default function NazerKPIs() {
       icon: CreditCard,
       variant: "danger" as const,
       subtitle: "القروض النشطة"
+    },
+    {
+      title: "العائد الشهري",
+      value: typeof data.monthlyReturn === 'number' 
+        ? data.monthlyReturn.toLocaleString('ar-SA')
+        : '0',
+      icon: PieChart,
+      variant: "default" as const,
     }
   ];
 
