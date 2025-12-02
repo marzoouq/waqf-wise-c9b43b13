@@ -8,6 +8,8 @@ import { NotificationsBell } from "./NotificationsBell";
 import { FloatingChatButton } from "@/components/chatbot/FloatingChatButton";
 import { GlobalSearch } from "@/components/shared/GlobalSearch";
 import { BottomNavigation } from "@/components/mobile/BottomNavigation";
+import { BeneficiaryBottomNavigation } from "@/components/mobile/BeneficiaryBottomNavigation";
+import { useUserRole } from "@/hooks/useUserRole";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
@@ -163,6 +165,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   const { profile } = useProfile();
   const [searchOpen, setSearchOpen] = useState(false);
   const isMobile = useIsMobile();
+  const { isBeneficiary } = useUserRole();
   
   // حساب القيم مرة واحدة
   const { displayName, displayEmail, userInitial } = useMemo(() => ({
@@ -217,7 +220,11 @@ const MainLayout = ({ children }: MainLayoutProps) => {
         </div>
         
         {/* Mobile Bottom Navigation */}
-        <BottomNavigation />
+        {isBeneficiary ? (
+          <BeneficiaryBottomNavigation />
+        ) : (
+          <BottomNavigation />
+        )}
         
         {/* Global Search */}
         <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />

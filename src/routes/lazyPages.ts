@@ -78,6 +78,7 @@ export const DecisionDetails = lazyWithRetry(() => import("@/pages/DecisionDetai
 
 // ==================== الإعدادات ====================
 export const Settings = lazyWithRetry(() => import("@/pages/Settings"));
+export const BeneficiarySettings = lazyWithRetry(() => import("@/pages/BeneficiarySettings"));
 export const TransparencySettings = lazyWithRetry(() => import("@/pages/TransparencySettings"));
 export const LandingPageSettings = lazyWithRetry(() => import("@/pages/LandingPageSettings"));
 export const NotificationSettingsPage = lazyWithRetry(() => import("@/pages/NotificationSettings"));

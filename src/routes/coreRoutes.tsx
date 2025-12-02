@@ -63,7 +63,15 @@ export const coreRoutes = [
   />,
   
   // العائلات
-  <Route key="families" path="/families" element={<Families />} />,
+  <Route 
+    key="families"
+    path="/families" 
+    element={
+      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+        <Families />
+      </ProtectedRoute>
+    } 
+  />,
   <Route 
     key="family-details"
     path="/families/:id" 
@@ -84,8 +92,24 @@ export const coreRoutes = [
       </ProtectedRoute>
     } 
   />,
-  <Route key="funds" path="/funds" element={<Funds />} />,
-  <Route key="waqf-units" path="/waqf-units" element={<WaqfUnits />} />,
+  <Route 
+    key="funds"
+    path="/funds" 
+    element={
+      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+        <Funds />
+      </ProtectedRoute>
+    } 
+  />,
+  <Route 
+    key="waqf-units"
+    path="/waqf-units" 
+    element={
+      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+        <WaqfUnits />
+      </ProtectedRoute>
+    } 
+  />,
   
   // الأرشيف
   <Route 
@@ -144,7 +168,15 @@ export const coreRoutes = [
       </ProtectedRoute>
     } 
   />,
-  <Route key="loans" path="/loans" element={<Loans />} />,
+  <Route 
+    key="loans"
+    path="/loans" 
+    element={
+      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+        <Loans />
+      </ProtectedRoute>
+    } 
+  />,
   <Route 
     key="bank-transfers"
     path="/bank-transfers" 
@@ -154,7 +186,15 @@ export const coreRoutes = [
       </ProtectedRoute>
     } 
   />,
-  <Route key="all-transactions" path="/all-transactions" element={<AllTransactions />} />,
+  <Route 
+    key="all-transactions"
+    path="/all-transactions" 
+    element={
+      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+        <AllTransactions />
+      </ProtectedRoute>
+    } 
+  />,
   <Route 
     key="approvals"
     path="/approvals" 
@@ -166,7 +206,15 @@ export const coreRoutes = [
   />,
   
   // التقارير
-  <Route key="reports" path="/reports" element={<Reports />} />,
+  <Route 
+    key="reports"
+    path="/reports" 
+    element={
+      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+        <Reports />
+      </ProtectedRoute>
+    } 
+  />,
   <Route 
     key="reports-custom"
     path="/reports/custom" 
@@ -178,7 +226,15 @@ export const coreRoutes = [
   />,
   
   // الطلبات
-  <Route key="requests" path="/requests" element={<Requests />} />,
+  <Route 
+    key="requests"
+    path="/requests" 
+    element={
+      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant", "cashier"]}>
+        <Requests />
+      </ProtectedRoute>
+    } 
+  />,
   <Route 
     key="staff-requests"
     path="/staff/requests" 
@@ -233,8 +289,24 @@ export const coreRoutes = [
   />,
   
   // الإعدادات
-  <Route key="settings" path="/settings" element={<Settings />} />,
-  <Route key="transparency-settings" path="/transparency-settings" element={<TransparencySettings />} />,
+  <Route 
+    key="settings"
+    path="/settings" 
+    element={
+      <ProtectedRoute requiredRoles={["admin", "nazer"]}>
+        <Settings />
+      </ProtectedRoute>
+    } 
+  />,
+  <Route 
+    key="transparency-settings"
+    path="/transparency-settings" 
+    element={
+      <ProtectedRoute requiredRole="nazer">
+        <TransparencySettings />
+      </ProtectedRoute>
+    } 
+  />,
   <Route 
     key="notifications-settings"
     path="/notifications/settings" 

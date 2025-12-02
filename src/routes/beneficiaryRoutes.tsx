@@ -12,6 +12,7 @@ import {
   BeneficiaryAccountStatement,
   BeneficiaryReports,
   BeneficiaryPortal,
+  BeneficiarySettings,
 } from "./lazyPages";
 
 /**
@@ -75,6 +76,15 @@ export const beneficiaryProtectedRoutes = [
     element={
       <ProtectedRoute requiredRole="beneficiary">
         <BeneficiaryPortal />
+      </ProtectedRoute>
+    } 
+  />,
+  <Route
+    key="beneficiary-settings"
+    path="/beneficiary-settings"
+    element={
+      <ProtectedRoute requiredRole="beneficiary">
+        <BeneficiarySettings />
       </ProtectedRoute>
     } 
   />,
