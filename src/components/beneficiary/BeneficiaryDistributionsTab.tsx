@@ -38,8 +38,6 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
     },
   });
 
-  const totalReceived = distributions.reduce((sum, d) => sum + Number(d.amount || 0), 0);
-  const pendingAmount = 0; // سيتم حسابه من الطلبات المعلقة
 
   const getPaymentStatusBadge = (status: string) => {
     const config: Record<string, { icon: LucideIcon; variant: BadgeVariant }> = {
@@ -61,47 +59,14 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
 
   return (
     <div className="space-y-6">
-      {/* Summary Cards */}
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">إجمالي التوزيعات</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl sm:text-2xl font-bold">{distributions.length}</div>
-            <p className="text-xs text-muted-foreground mt-1">عدد التوزيعات الكلي</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">المبالغ المدفوعة</CardTitle>
-            <TrendingUp className="h-4 w-4 text-success" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl sm:text-2xl font-bold">
-              <MaskedValue
-                value={totalReceived.toLocaleString("ar-SA")}
-                type="amount"
-                masked={settings?.mask_exact_amounts || false}
-              /> ريال
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">إجمالي ما تم استلامه</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">المبالغ المعلقة</CardTitle>
-            <Clock className="h-4 w-4 text-warning" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl sm:text-2xl font-bold">{pendingAmount.toLocaleString("ar-SA")} ريال</div>
-            <p className="text-xs text-muted-foreground mt-1">قيد الانتظار</p>
-          </CardContent>
-        </Card>
-      </div>
+      {/* رسالة عدم وجود بيانات مالية */}
+      <Card>
+        <CardContent className="py-8">
+          <p className="text-center text-muted-foreground">
+            لا توجد معلومات مالية متاحة حالياً
+          </p>
+        </CardContent>
+      </Card>
 
       {/* Distributions Table/Cards */}
       <Card>
@@ -150,21 +115,9 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
                         <TableCell>
                           {payment.payment_date && format(new Date(payment.payment_date), "dd/MM/yyyy", { locale: ar })}
                         </TableCell>
-                        <TableCell className="font-semibold">
-                          <MaskedValue
-                            value={Number(payment.amount || 0).toLocaleString("ar-SA")}
-                            type="amount"
-                            masked={settings?.mask_exact_amounts || false}
-                          /> ريال
-                        </TableCell>
+                        <TableCell className="font-semibold">—</TableCell>
                         <TableCell className="text-muted-foreground">—</TableCell>
-                        <TableCell className="font-bold text-success">
-                          <MaskedValue
-                            value={Number(payment.amount || 0).toLocaleString("ar-SA")}
-                            type="amount"
-                            masked={settings?.mask_exact_amounts || false}
-                          /> ريال
-                        </TableCell>
+                        <TableCell className="font-bold">—</TableCell>
                         <TableCell>{getPaymentStatusBadge(payment.status || "معلق")}</TableCell>
                         <TableCell>
                           {payment.payment_date 

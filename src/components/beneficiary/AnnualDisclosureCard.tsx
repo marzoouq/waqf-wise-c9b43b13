@@ -87,48 +87,9 @@ export const AnnualDisclosureCard = () => {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* إحصائيات سريعة */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div className="p-3 bg-success-light rounded-lg border border-success/20">
-              <div className="flex items-center gap-2 mb-1">
-                <TrendingUp className="h-3 w-3 text-success" />
-                <p className="text-xs text-success">إجمالي الإيرادات</p>
-              </div>
-              <p className="text-lg font-bold text-success">
-                {latestDisclosure.total_revenues.toLocaleString()}
-              </p>
-            </div>
-
-            <div className="p-3 bg-destructive-light rounded-lg border border-destructive/20">
-              <div className="flex items-center gap-2 mb-1">
-                <DollarSign className="h-3 w-3 text-destructive" />
-                <p className="text-xs text-destructive">إجمالي المصروفات</p>
-              </div>
-              <p className="text-lg font-bold text-destructive">
-                {latestDisclosure.total_expenses.toLocaleString()}
-              </p>
-            </div>
-
-            <div className="p-3 bg-info-light rounded-lg border border-info/20">
-              <div className="flex items-center gap-2 mb-1">
-                <DollarSign className="h-3 w-3 text-info" />
-                <p className="text-xs text-info">صافي الدخل</p>
-              </div>
-              <p className="text-lg font-bold text-info">
-                {latestDisclosure.net_income.toLocaleString()}
-              </p>
-            </div>
-
-            <div className="p-3 bg-warning-light rounded-lg border border-warning">
-              <div className="flex items-center gap-2 mb-1">
-                <Users className="h-3 w-3 text-warning" />
-                <p className="text-xs text-warning">المستفيدون</p>
-              </div>
-              <p className="text-lg font-bold text-warning-foreground">
-                {latestDisclosure.total_beneficiaries}
-              </p>
-            </div>
-          </div>
+          <p className="text-center text-muted-foreground py-4">
+            لا توجد معلومات مالية متاحة في الإفصاح السنوي
+          </p>
 
           {/* تاريخ الإفصاح */}
           <div className="flex items-center gap-2 text-sm text-muted-foreground">

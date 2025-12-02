@@ -56,13 +56,7 @@ export function MobileStatementCard({ payment, masked = false }: MobileStatement
               <DollarSign className="h-3 w-3" />
               المبلغ
             </div>
-            <p className="text-sm font-bold">
-              <MaskedValue
-                value={Number(payment.amount).toLocaleString("ar-SA")}
-                type="amount"
-                masked={masked}
-              /> ريال
-            </p>
+            <p className="text-sm font-bold">—</p>
           </div>
         </div>
 
