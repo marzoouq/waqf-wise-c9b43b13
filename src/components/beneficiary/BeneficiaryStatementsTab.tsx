@@ -36,9 +36,6 @@ export function BeneficiaryStatementsTab({ beneficiaryId }: BeneficiaryStatement
     },
   });
 
-  const totalReceived = payments
-    .filter(p => p.status === 'مدفوع')
-    .reduce((sum, p) => sum + Number(p.amount), 0);
 
   const handleExport = async () => {
 interface JournalEntryLine {
@@ -121,32 +118,9 @@ interface JournalEntryWithLines {
           )}
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
-            <div className="flex items-center gap-4 p-4 rounded-lg border bg-card">
-              <div className="p-3 rounded-full bg-success/10">
-                <TrendingUp className="h-6 w-6 text-success" />
-              </div>
-              <div>
-                <p className="text-xs sm:text-sm text-muted-foreground">إجمالي المستلم</p>
-                <p className="text-xl sm:text-2xl font-bold">
-                  <MaskedValue
-                    value={totalReceived.toLocaleString("ar-SA")}
-                    type="amount"
-                    masked={settings?.mask_exact_amounts || false}
-                  /> ريال
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-4 p-4 rounded-lg border bg-card">
-              <div className="p-3 rounded-full bg-info/10">
-                <TrendingDown className="h-6 w-6 text-info" />
-              </div>
-              <div>
-                <p className="text-xs sm:text-sm text-muted-foreground">عدد المدفوعات</p>
-                <p className="text-xl sm:text-2xl font-bold">{payments.length}</p>
-              </div>
-            </div>
-          </div>
+          <p className="text-center text-muted-foreground py-4">
+            لا توجد معلومات مالية متاحة
+          </p>
         </CardContent>
       </Card>
 
@@ -198,13 +172,7 @@ interface JournalEntryWithLines {
                           {payment.payment_date && format(new Date(payment.payment_date), "dd/MM/yyyy", { locale: ar })}
                         </TableCell>
                         <TableCell>{payment.description || "—"}</TableCell>
-                        <TableCell className="font-semibold">
-                          <MaskedValue
-                            value={Number(payment.amount).toLocaleString("ar-SA")}
-                            type="amount"
-                            masked={settings?.mask_exact_amounts || false}
-                          /> ريال
-                        </TableCell>
+                        <TableCell className="font-semibold">—</TableCell>
                         <TableCell>{payment.payment_method || "—"}</TableCell>
                         <TableCell>
                           <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${

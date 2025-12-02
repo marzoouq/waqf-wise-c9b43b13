@@ -148,34 +148,14 @@ export default function BeneficiaryPortal() {
                   <ChatbotQuickCard />
                 </Suspense>
 
-                {/* الإحصائيات المحسنة */}
-                <UnifiedStatsGrid columns={4}>
-                  <UnifiedKPICard
-                    title="إجمالي المستلم"
-                    value={`${Number(stats.total_received || 0).toLocaleString("ar-SA")} ريال`}
-                    icon={DollarSign}
-                    variant="default"
-                  />
-                  <UnifiedKPICard
-                    title="الرصيد الحالي"
-                    value={`${Number(beneficiary.account_balance || 0).toLocaleString("ar-SA")} ريال`}
-                    icon={CreditCard}
-                    variant="success"
-                  />
-                  <UnifiedKPICard
-                    title="الطلبات المعلقة"
-                    value={stats.pending_requests || 0}
-                    icon={Clock}
-                    variant="warning"
-                    subtitle={`${Number(stats.pending_amount || 0).toLocaleString("ar-SA")} ريال`}
-                  />
-                  <UnifiedKPICard
-                    title="إجمالي الطلبات"
-                    value={stats.total_requests || 0}
-                    icon={CheckCircle}
-                    variant="default"
-                  />
-                </UnifiedStatsGrid>
+                {/* رسالة عدم وجود بيانات مالية */}
+                <Card>
+                  <CardContent className="py-8">
+                    <p className="text-center text-muted-foreground">
+                      لا توجد بيانات مالية متاحة حالياً
+                    </p>
+                  </CardContent>
+                </Card>
 
                 {/* المساعد الذكي */}
                 <ChatbotQuickCard />

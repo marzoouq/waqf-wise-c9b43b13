@@ -62,13 +62,7 @@ export function MobileDistributionCard({ distribution, masked = false }: MobileD
               <DollarSign className="h-3 w-3" />
               المبلغ
             </div>
-            <p className="text-sm font-bold text-success">
-              <MaskedValue
-                value={Number(distribution.amount || 0).toLocaleString("ar-SA")}
-                type="amount"
-                masked={masked}
-              /> ريال
-            </p>
+            <p className="text-sm font-bold">—</p>
           </div>
         </div>
       </CardContent>
