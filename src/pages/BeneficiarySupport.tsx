@@ -19,6 +19,7 @@ import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { useNavigate } from "react-router-dom";
 import { useSupportTickets } from "@/hooks/useSupportTickets";
+import { BeneficiaryBottomNavigation } from "@/components/mobile/BeneficiaryBottomNavigation";
 
 export default function BeneficiarySupport() {
   const { user } = useAuth();
@@ -109,9 +110,9 @@ export default function BeneficiarySupport() {
 
   return (
     <PageErrorBoundary pageName="الدعم الفني">
-      <main>
+      <main className="pb-20 md:pb-8">
         <MobileOptimizedLayout>
-        <div className="space-y-6 pb-20">
+        <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
@@ -269,6 +270,9 @@ export default function BeneficiarySupport() {
       </div>
       </MobileOptimizedLayout>
       </main>
+      
+      {/* Mobile Bottom Navigation */}
+      <BeneficiaryBottomNavigation />
     </PageErrorBoundary>
   );
 }

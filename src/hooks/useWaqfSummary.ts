@@ -19,35 +19,30 @@ export function useWaqfSummary(enabled: boolean = true) {
   const { data: summary, isLoading, error, refetch } = useQuery({
     queryKey: ["waqf-summary"],
     queryFn: async (): Promise<WaqfSummaryData> => {
-      const [propertiesResult, fundsResult, beneficiariesResult, bankResult] = await Promise.all([
-        supabase.from("properties").select("*", { count: "exact" }),
-        supabase.from("funds").select("allocated_amount"),
-        supabase.from("beneficiaries").select("*", { count: "exact" }).eq("status", "نشط"),
-        supabase.from("bank_accounts").select("current_balance"),
-      ]);
+      // استخدام function الجديدة للحصول على البيانات العامة دون RLS
+      const { data: publicStats, error: publicError } = await supabase
+        .rpc('get_waqf_public_stats');
 
-      const totalPropertyValue = propertiesResult.data?.reduce(
-        (sum, p) => sum + (p.monthly_revenue || 0) * 12, 
-        0
-      ) || 0;
-      
-      const totalFunds = fundsResult.data?.reduce(
-        (sum, f) => sum + (f.allocated_amount || 0), 
-        0
-      ) || 0;
-      
-      const totalBankBalance = bankResult.data?.reduce(
-        (sum, b) => sum + b.current_balance, 
-        0
-      ) || 0;
+      if (publicError) {
+        console.error('Error fetching public stats:', publicError);
+        throw publicError;
+      }
+
+      const stats = publicStats as {
+        beneficiaries_count: number;
+        properties_count: number;
+        total_property_value: number;
+        total_funds: number;
+        total_bank_balance: number;
+      };
 
       return {
-        propertiesCount: propertiesResult.count || 0,
-        totalPropertyValue,
-        totalFunds,
-        beneficiariesCount: beneficiariesResult.count || 0,
-        totalBankBalance,
-        totalWaqfValue: totalPropertyValue + totalBankBalance,
+        propertiesCount: stats.properties_count || 0,
+        totalPropertyValue: stats.total_property_value || 0,
+        totalFunds: stats.total_funds || 0,
+        beneficiariesCount: stats.beneficiaries_count || 0,
+        totalBankBalance: stats.total_bank_balance || 0,
+        totalWaqfValue: (stats.total_property_value || 0) + (stats.total_bank_balance || 0),
       };
     },
     enabled,
