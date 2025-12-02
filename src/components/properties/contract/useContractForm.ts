@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Contract } from "@/hooks/useContracts";
 
 export interface ContractFormData {
@@ -54,11 +54,26 @@ export function useContractForm(contract?: Contract | null) {
   const [selectedPropertyId, setSelectedPropertyId] = useState<string>("");
   const [selectedUnits, setSelectedUnits] = useState<string[]>([]);
 
-  // حساب تلقائي للتفاصيل
-  const calculateContractDetails = useCallback(() => {
-    if (!formData.start_date || !totalAmount || !contractDuration) return;
+  // منع إعادة الحساب المتكررة
+  const prevCalcInputs = useRef<string>('');
+
+  // حساب تلقائي للتفاصيل - بدون تبعيات على formData
+  useEffect(() => {
+    // تخطي الحساب في وضع التعديل
+    if (contract) return;
     
-    const startDate = new Date(formData.start_date);
+    // التحقق من وجود جميع المدخلات
+    const startDateValue = formData.start_date;
+    if (!startDateValue || !totalAmount || !contractDuration) return;
+    
+    // إنشاء مفتاح للمدخلات الحالية
+    const inputsKey = `${startDateValue}-${totalAmount}-${contractDuration}-${durationUnit}`;
+    
+    // تخطي إذا لم تتغير المدخلات
+    if (prevCalcInputs.current === inputsKey) return;
+    prevCalcInputs.current = inputsKey;
+    
+    const startDate = new Date(startDateValue);
     const durationInMonths = durationUnit === 'سنوات' ? contractDuration * 12 : contractDuration;
     
     const endDate = new Date(startDate);
@@ -69,24 +84,12 @@ export function useContractForm(contract?: Contract | null) {
     const newEndDate = endDate.toISOString().split('T')[0];
     const newMonthlyRent = monthlyRent.toFixed(2);
     
-    setFormData(prev => {
-      if (prev.end_date === newEndDate && prev.monthly_rent === newMonthlyRent) {
-        return prev;
-      }
-      return {
-        ...prev,
-        end_date: newEndDate,
-        monthly_rent: newMonthlyRent,
-      };
-    });
-  }, [formData.start_date, totalAmount, contractDuration, durationUnit]);
-
-  // تشغيل الحساب عند تغيير أي حقل
-  useEffect(() => {
-    if (!contract) {
-      calculateContractDetails();
-    }
-  }, [contract, calculateContractDetails]);
+    setFormData(prev => ({
+      ...prev,
+      end_date: newEndDate,
+      monthly_rent: newMonthlyRent,
+    }));
+  }, [contract, formData.start_date, totalAmount, contractDuration, durationUnit]);
 
   // تعبئة البيانات عند التعديل
   useEffect(() => {
