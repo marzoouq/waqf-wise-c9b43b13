@@ -13,6 +13,7 @@
 | [تحسين الأداء](./performance-optimization-report.md) | تقرير تحسين Promise.all للاستعلامات | ✅ مكتمل |
 | [تحسين Landing](./landing-page-optimization.md) | تقرير تحسين LCP وإزالة framer-motion | ✅ مكتمل |
 | [تحسين قاعدة البيانات](../database/monitoring-optimization.md) | إصلاح تراكم بيانات المراقبة | ✅ مكتمل |
+| [إصلاح Infinite Render](../fixes/infinite-render-fix.md) | إصلاح خطأ React #185 في العقارات والعقود | ✅ مكتمل |
 
 ---
 
