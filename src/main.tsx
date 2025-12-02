@@ -25,10 +25,3 @@ checkAndUpdateVersion().catch(console.error);
 // عرض التطبيق فوراً لتحسين FCP
 rootElement.innerHTML = '';
 createRoot(rootElement).render(<App />);
-
-// تهيئة أدوات التصحيح ومراقبة الأداء بعد العرض الأولي (non-blocking)
-requestIdleCallback(() => {
-  import('./lib/debugTools').then(({ initDebugTools }) => initDebugTools());
-  import('./lib/monitoring/web-vitals').then(({ initWebVitals }) => initWebVitals());
-  import('./lib/imageOptimization').then(({ optimizeLCP }) => optimizeLCP());
-}, { timeout: 2000 });
