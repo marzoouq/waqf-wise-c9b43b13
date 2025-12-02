@@ -1,7 +1,6 @@
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { useBeneficiaryActivityLog } from "@/hooks/useBeneficiaryActivityLog";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { formatDate } from "@/lib/date";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Activity, UserPlus, Edit, Trash2, DollarSign, FileText } from "lucide-react";
@@ -79,7 +78,7 @@ export function ActivityLogDialog({ open, onOpenChange, beneficiaryId, beneficia
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <span>{activity.performed_by_name}</span>
                         <span>•</span>
-                        <span>{format(new Date(activity.created_at), "dd MMMM yyyy - hh:mm a", { locale: ar })}</span>
+                        <span>{formatDate(activity.created_at, "dd MMMM yyyy - hh:mm a")}</span>
                       </div>
                       {activity.new_values && (
                         <details className="mt-2">

@@ -5,8 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, Eye, FileText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { formatDate } from "@/lib/date";
 import AddJournalEntryDialog from "./AddJournalEntryDialog";
 import ViewJournalEntryDialog from "./ViewJournalEntryDialog";
 import { BadgeVariant } from "@/types";
@@ -74,7 +73,7 @@ const JournalEntries = () => {
       label: "التاريخ",
       render: (_, entry) => (
         <span className="text-xs sm:text-sm whitespace-nowrap">
-          {format(new Date(entry.entry_date), "dd MMM yyyy", { locale: ar })}
+          {formatDate(entry.entry_date, "dd MMM yyyy")}
         </span>
       ),
       hideOnMobile: true,
@@ -98,7 +97,7 @@ const JournalEntries = () => {
       render: (_, entry) => (
         <span className="text-xs sm:text-sm whitespace-nowrap">
           {entry.posted_at
-            ? format(new Date(entry.posted_at), "dd MMM yyyy", { locale: ar })
+            ? formatDate(entry.posted_at, "dd MMM yyyy")
             : "-"}
         </span>
       ),
@@ -119,10 +118,10 @@ const JournalEntries = () => {
             <ExportButton
               data={entries.map(e => ({
                 'رقم القيد': e.entry_number,
-                'التاريخ': format(new Date(e.entry_date), 'yyyy/MM/dd', { locale: ar }),
+                'التاريخ': formatDate(e.entry_date, 'yyyy/MM/dd'),
                 'الوصف': e.description,
                 'الحالة': e.status === 'posted' ? 'مرحّل' : e.status === 'draft' ? 'مسودة' : 'ملغى',
-                'تاريخ الترحيل': e.posted_at ? format(new Date(e.posted_at), 'yyyy/MM/dd HH:mm', { locale: ar }) : '-',
+                'تاريخ الترحيل': e.posted_at ? formatDate(e.posted_at, 'yyyy/MM/dd HH:mm') : '-',
               }))}
               filename="القيود_المحاسبية"
               title="القيود المحاسبية"

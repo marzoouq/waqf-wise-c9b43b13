@@ -2,8 +2,7 @@
  * دوال تنسيق البيانات
  */
 
-import { format } from 'date-fns';
-import { ar } from 'date-fns/locale';
+import { formatDate as formatDateFromLib } from '@/lib/date';
 
 /**
  * تنسيق العملة بالريال السعودي
@@ -21,8 +20,7 @@ export function formatCurrency(amount: number): string {
  * تنسيق التاريخ
  */
 export function formatDate(date: string | Date, formatString: string = 'dd/MM/yyyy'): string {
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-  return format(dateObj, formatString, { locale: ar });
+  return formatDateFromLib(date, formatString);
 }
 
 /**

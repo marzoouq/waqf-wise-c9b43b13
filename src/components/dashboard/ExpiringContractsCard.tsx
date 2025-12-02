@@ -3,8 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AlertTriangle, Calendar, Eye } from "lucide-react";
 import { useContracts } from "@/hooks/useContracts";
-import { differenceInDays, format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { differenceInDays, formatDate } from "@/lib/date";
 import { useNavigate } from "react-router-dom";
 
 export const ExpiringContractsCard = () => {
@@ -156,7 +155,7 @@ export const ExpiringContractsCard = () => {
                   </div>
                   <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
                     <Calendar className="h-3 w-3" />
-                    {format(new Date(contract.end_date), "dd MMM yyyy", { locale: ar })}
+                    {formatDate(contract.end_date, "dd MMM yyyy")}
                   </div>
                 </div>
                 <Button

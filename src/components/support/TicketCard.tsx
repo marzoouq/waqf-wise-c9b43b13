@@ -1,6 +1,5 @@
 import { Badge } from '@/components/ui/badge';
-import { format } from 'date-fns';
-import { ar } from 'date-fns/locale';
+import { formatDate } from '@/lib/date';
 import { cn } from '@/lib/utils';
 
 interface TicketCardProps {
@@ -75,7 +74,7 @@ export function TicketCard({
           <Badge>{statusLabels[status] || status}</Badge>
         )}
         <p className="text-xs text-muted-foreground">
-          {format(new Date(createdAt), 'PP', { locale: ar })}
+          {formatDate(createdAt, 'PP')}
         </p>
       </div>
     </div>

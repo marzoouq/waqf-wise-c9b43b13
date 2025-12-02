@@ -112,8 +112,11 @@ export default defineConfig(({ mode }) => {
               return 'validation';
             }
             
-            // Date utilities
+            // Date utilities - فصل locale عن الدوال الأساسية
             if (id.includes('date-fns')) {
+              if (id.includes('locale')) {
+                return 'date-locale';
+              }
               return 'date-utils';
             }
             

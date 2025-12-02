@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { AlertCircle, CheckCircle, Clock, XCircle } from "lucide-react";
-import { differenceInDays } from "date-fns";
+import { differenceInDays } from "@/lib/date";
 
 interface ContractStatusBadgeProps {
   startDate: string;

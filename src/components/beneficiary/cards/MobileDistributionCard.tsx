@@ -1,8 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, Clock, Calendar, DollarSign } from "lucide-react";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { formatDate } from "@/lib/date";
 import { MaskedValue } from "@/components/shared/MaskedValue";
 
 interface MobileDistributionCardProps {
@@ -53,7 +52,7 @@ export function MobileDistributionCard({ distribution, masked = false }: MobileD
               التاريخ
             </div>
             <p className="text-sm font-medium">
-              {format(new Date(distribution.payment_date), "dd/MM/yyyy", { locale: ar })}
+              {formatDate(distribution.payment_date, "dd/MM/yyyy")}
             </p>
           </div>
 

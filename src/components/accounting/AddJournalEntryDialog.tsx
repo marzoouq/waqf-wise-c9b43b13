@@ -30,8 +30,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { format } from "@/lib/date";
+import { arLocale } from "@/lib/date";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Plus, Trash2 } from "lucide-react";
@@ -279,7 +279,7 @@ const AddJournalEntryDialog = ({ open, onOpenChange }: Props) => {
                             )}
                           >
                             {field.value ? (
-                              format(field.value, "PPP", { locale: ar })
+                              format(field.value, "PPP")
                             ) : (
                               <span>اختر التاريخ</span>
                             )}

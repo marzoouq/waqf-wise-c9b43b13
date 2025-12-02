@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { formatDate } from "@/lib/date";
 import { Bot, Copy, Check, User, TrendingUp, Users, DollarSign, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -164,7 +163,7 @@ export function MessageBubble({ message, messageType, createdAt }: MessageBubble
         
         <div className="flex items-center gap-2 px-2">
           <span className="text-xs text-muted-foreground">
-            {format(new Date(createdAt), "h:mm a", { locale: ar })}
+            {formatDate(createdAt, "h:mm a")}
           </span>
           
           {messageType === "bot" && (

@@ -1,8 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, DollarSign, FileText, CreditCard } from "lucide-react";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { formatDate } from "@/lib/date";
 import { MaskedValue } from "@/components/shared/MaskedValue";
 
 interface MobileStatementCardProps {
@@ -47,7 +46,7 @@ export function MobileStatementCard({ payment, masked = false }: MobileStatement
               التاريخ
             </div>
             <p className="text-sm font-medium">
-              {format(new Date(payment.payment_date), "dd/MM/yyyy", { locale: ar })}
+              {formatDate(payment.payment_date, "dd/MM/yyyy")}
             </p>
           </div>
 
