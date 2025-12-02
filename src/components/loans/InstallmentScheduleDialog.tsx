@@ -2,8 +2,7 @@ import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { useLoanInstallments } from "@/hooks/useLoanInstallments";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { formatDate } from "@/lib/date";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { Calendar, DollarSign, CheckCircle2, Clock, AlertCircle } from "lucide-react";
 
@@ -94,9 +93,7 @@ export function InstallmentScheduleDialog({
                         القسط #{installment.installment_number}
                       </TableCell>
                       <TableCell>
-                        {format(new Date(installment.due_date), "dd/MM/yyyy", {
-                          locale: ar,
-                        })}
+                        {formatDate(installment.due_date, "dd/MM/yyyy")}
                       </TableCell>
                       <TableCell>
                         {installment.principal_amount.toLocaleString('ar-SA')} ريال

@@ -1,5 +1,4 @@
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { formatDate } from "@/lib/date";
 
 interface Contract {
   id: string;
@@ -94,7 +93,7 @@ export const ContractPrintTemplate = ({ contract }: ContractPrintTemplateProps) 
       <div className="contract-header">
         <div className="contract-title">عقد إيجار</div>
         <p>رقم العقد: {contract.contract_number}</p>
-        <p>التاريخ: {format(new Date(), "dd MMMM yyyy", { locale: ar })}</p>
+        <p>التاريخ: {formatDate(new Date(), "dd MMMM yyyy")}</p>
       </div>
 
       <div className="contract-section">
@@ -125,11 +124,11 @@ export const ContractPrintTemplate = ({ contract }: ContractPrintTemplateProps) 
         <div className="section-title">بيانات العقد</div>
         <div className="info-row">
           <span className="info-label">تاريخ البداية:</span>
-          <span className="info-value">{format(new Date(contract.start_date), "dd/MM/yyyy", { locale: ar })}</span>
+          <span className="info-value">{formatDate(contract.start_date, "dd/MM/yyyy")}</span>
         </div>
         <div className="info-row">
           <span className="info-label">تاريخ النهاية:</span>
-          <span className="info-value">{format(new Date(contract.end_date), "dd/MM/yyyy", { locale: ar })}</span>
+          <span className="info-value">{formatDate(contract.end_date, "dd/MM/yyyy")}</span>
         </div>
         <div className="info-row">
           <span className="info-label">الإيجار الشهري:</span>

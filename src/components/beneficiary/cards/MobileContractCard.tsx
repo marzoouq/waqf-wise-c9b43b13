@@ -1,8 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FileText, User, DollarSign, Calendar } from "lucide-react";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { formatDate } from "@/lib/date";
 import { MaskedValue } from "@/components/shared/MaskedValue";
 
 interface MobileContractCardProps {
@@ -82,12 +81,12 @@ export function MobileContractCard({
           <div className="flex items-center gap-4 text-xs text-muted-foreground pt-2 border-t">
             <div className="flex items-center gap-1">
               <Calendar className="h-3 w-3" />
-              {format(new Date(contract.start_date), "dd/MM/yyyy", { locale: ar })}
+              {formatDate(contract.start_date, "dd/MM/yyyy")}
             </div>
             <span>←</span>
             <div className="flex items-center gap-1">
               <Calendar className="h-3 w-3" />
-              {format(new Date(contract.end_date), "dd/MM/yyyy", { locale: ar })}
+              {formatDate(contract.end_date, "dd/MM/yyyy")}
             </div>
           </div>
         </div>

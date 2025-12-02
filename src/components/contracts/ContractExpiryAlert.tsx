@@ -2,8 +2,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { AlertTriangle, Calendar, RefreshCw } from "lucide-react";
-import { differenceInDays, format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { differenceInDays, formatDate } from "@/lib/date";
 
 interface Contract {
   id: string;
@@ -67,7 +66,7 @@ export const ContractExpiryAlert = ({ contracts, onRenewClick }: ContractExpiryA
                         <div className="text-sm text-muted-foreground">{contract.tenant_name}</div>
                         <div className="text-xs flex items-center gap-1 mt-1">
                           <Calendar className="h-3 w-3" />
-                          {format(new Date(contract.end_date), "dd MMMM yyyy", { locale: ar })}
+                          {formatDate(contract.end_date, "dd MMMM yyyy")}
                           <span className="font-bold text-destructive">({daysRemaining} يوم)</span>
                         </div>
                       </div>

@@ -1,8 +1,7 @@
 import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock, Calendar as CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { formatFullDate, formatTime } from "@/lib/date";
 
 interface InteractiveCalendarProps {
   beneficiaryId: string;
@@ -12,15 +11,9 @@ export function InteractiveCalendar({ beneficiaryId }: InteractiveCalendarProps)
   // التاريخ والوقت ثابتين عند تحميل المكون - لا نحتاج تحديث كل ثانية
   const currentDate = useMemo(() => new Date(), []);
 
-  const formattedDate = useMemo(() => 
-    format(currentDate, "EEEE، d MMMM yyyy", { locale: ar }), 
-    [currentDate]
-  );
+  const formattedDate = useMemo(() => formatFullDate(currentDate), [currentDate]);
 
-  const formattedTime = useMemo(() => 
-    format(currentDate, "HH:mm"), 
-    [currentDate]
-  );
+  const formattedTime = useMemo(() => formatTime(currentDate), [currentDate]);
 
   return (
     <Card>

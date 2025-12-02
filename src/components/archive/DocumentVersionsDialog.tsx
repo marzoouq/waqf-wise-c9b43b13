@@ -6,8 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useDocumentVersions } from '@/hooks/useDocumentVersions';
 import { History, RotateCcw, FileText, Check } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
-import { format } from 'date-fns';
-import { ar } from 'date-fns/locale';
+import { formatDate } from '@/lib/date';
 
 interface DocumentVersionsDialogProps {
   open: boolean;
@@ -73,7 +72,7 @@ export function DocumentVersionsDialog({
                         </p>
                         <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                           <span>
-                            {format(new Date(version.created_at), 'PPpp', { locale: ar })}
+                            {formatDate(version.created_at, 'PPpp')}
                           </span>
                           <span>{formatFileSize(version.file_size)}</span>
                           {version.created_by && (

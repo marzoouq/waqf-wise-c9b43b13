@@ -2,8 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { UnifiedDataTable, type Column } from "@/components/unified/UnifiedDataTable";
 import { Badge } from "@/components/ui/badge";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { formatDate } from "@/lib/date";
 import { LoanSchedule } from "@/types/loans";
 
 interface LoanScheduleTableProps {
@@ -35,7 +34,7 @@ export function LoanScheduleTable({ loanId }: LoanScheduleTableProps) {
     {
       key: "due_date",
       label: "تاريخ الاستحقاق",
-      render: (value: string) => format(new Date(value), 'dd/MM/yyyy', { locale: ar })
+      render: (value: string) => formatDate(value, 'dd/MM/yyyy')
     },
     {
       key: "total_amount",

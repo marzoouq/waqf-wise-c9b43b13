@@ -8,8 +8,7 @@ import {
 } from "@/components/ui/popover";
 import { useNotifications } from "@/hooks/useNotifications";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { formatDistanceToNow } from "date-fns";
-import { ar } from "date-fns/locale";
+import { formatRelative } from "@/lib/date";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function NotificationsBell() {
@@ -71,10 +70,7 @@ export function NotificationsBell() {
                         {notification.message}
                       </p>
                       <p className="text-xs text-muted-foreground mt-2">
-                        {formatDistanceToNow(new Date(notification.created_at), {
-                          addSuffix: true,
-                          locale: ar,
-                        })}
+                        {formatRelative(notification.created_at)}
                       </p>
                     </div>
                     {!notification.is_read && (

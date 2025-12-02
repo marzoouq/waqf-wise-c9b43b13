@@ -1,5 +1,4 @@
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { formatDate } from "@/lib/date";
 
 interface PaymentReceipt {
   payment_number: string;
@@ -116,7 +115,7 @@ export const PaymentReceiptTemplate = ({ payment }: PaymentReceiptTemplateProps)
         <div className="receipt-header">
           <div className="receipt-title">سند قبض</div>
           <p>رقم السند: {payment.payment_number}</p>
-          <p>التاريخ: {format(new Date(payment.payment_date), "dd MMMM yyyy", { locale: ar })}</p>
+          <p>التاريخ: {formatDate(payment.payment_date, "dd MMMM yyyy")}</p>
         </div>
 
         <div className="receipt-body">
