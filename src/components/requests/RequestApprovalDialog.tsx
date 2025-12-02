@@ -7,8 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle2, XCircle, Clock, User } from "lucide-react";
 import { useRequestApprovals } from "@/hooks/useRequestApprovals";
 import { useAuth } from "@/hooks/useAuth";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { format, arLocale as ar } from "@/lib/date";
 
 interface RequestApprovalDialogProps {
   open: boolean;

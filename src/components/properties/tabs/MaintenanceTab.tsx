@@ -7,8 +7,7 @@ import { MaintenanceScheduleCalendar } from "@/components/maintenance/Maintenanc
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { format, arLocale as ar } from "@/lib/date";
 import { type MaintenanceRequest } from "@/hooks/useMaintenanceRequests";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { ExportButton } from "@/components/shared/ExportButton";

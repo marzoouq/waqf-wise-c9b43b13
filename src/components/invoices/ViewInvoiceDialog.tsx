@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { logger } from "@/lib/logger";
 import { InvoiceStatusActions } from "./InvoiceStatusActions";
-import { format } from "date-fns";
+import { format } from "@/lib/date";
 
 interface ViewInvoiceDialogProps {
   invoiceId: string | null;

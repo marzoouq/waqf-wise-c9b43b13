@@ -7,8 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SecurityEvent, LoginAttempt } from "@/types/security";
 import { Shield, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
 import { UnifiedDataTable, type Column } from "@/components/unified/UnifiedDataTable";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { format, arLocale as ar } from "@/lib/date";
 import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
 import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 

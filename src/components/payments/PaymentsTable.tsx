@@ -1,8 +1,7 @@
 import { Receipt, CreditCard, Edit, Trash2, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { format, arLocale as ar } from "@/lib/date";
 import { UnifiedDataTable, type Column } from "@/components/unified/UnifiedDataTable";
 
 interface Payment {

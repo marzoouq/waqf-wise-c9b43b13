@@ -10,8 +10,7 @@ import { useLoanPayments } from "@/hooks/useLoanPayments";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { format, arLocale as ar } from "@/lib/date";
 import { cn } from "@/lib/utils";
 import { logger } from "@/lib/logger";
 

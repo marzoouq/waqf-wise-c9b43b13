@@ -24,8 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
+import { format, arLocale as ar } from "@/lib/date";
 import { Pagination } from "@/components/ui/pagination";
 import { useInvoices } from "@/hooks/useInvoices";
 import InvoiceStatusBadge from "@/components/invoices/InvoiceStatusBadge";
