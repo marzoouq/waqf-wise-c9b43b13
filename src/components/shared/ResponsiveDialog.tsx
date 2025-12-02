@@ -1,4 +1,4 @@
-import { ReactNode, useMemo, useRef, useEffect, useState } from 'react';
+import { ReactNode, useMemo, useRef } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -44,7 +44,7 @@ interface ResponsiveDialogProps {
 /**
  * Dialog/Drawer محسّن للجوال
  * يعرض Drawer على الجوال و Dialog على الشاشات الكبيرة
- * ✅ يثبت نوع المكون عند الفتح لمنع التبديل أثناء العرض
+ * ✅ يثبت نوع المكون عند أول mount لمنع التبديل
  */
 export function ResponsiveDialog({
   open,
@@ -55,18 +55,12 @@ export function ResponsiveDialog({
   className,
   size = 'md',
 }: ResponsiveDialogProps) {
-  // ✅ تثبيت قيمة isDesktop عند فتح المحاورة لمنع التبديل أثناء العرض
-  const [isDesktop, setIsDesktop] = useState(getIsDesktop);
-  const wasOpenRef = useRef(false);
-
-  // ✅ تحديث isDesktop فقط عند الفتح (وليس أثناء العرض)
-  useEffect(() => {
-    if (open && !wasOpenRef.current) {
-      // عند الفتح لأول مرة، تحديث القيمة
-      setIsDesktop(getIsDesktop());
-    }
-    wasOpenRef.current = open;
-  }, [open]);
+  // ✅ تثبيت قيمة isDesktop عند أول mount فقط - لا يتغير أبداً
+  const isDesktopRef = useRef<boolean | null>(null);
+  if (isDesktopRef.current === null) {
+    isDesktopRef.current = getIsDesktop();
+  }
+  const isDesktop = isDesktopRef.current;
 
   // ✅ استخدام useMemo للـ className لمنع إعادة الحساب في كل render
   const dialogClassName = useMemo(() => 

@@ -48,7 +48,15 @@ const SidebarProvider = React.forwardRef<
     onOpenChange?: (open: boolean) => void;
   }
 >(({ defaultOpen = true, open: openProp, onOpenChange: setOpenProp, className, style, children, ...props }, ref) => {
-  const isMobile = useIsMobile();
+  const currentIsMobile = useIsMobile();
+  
+  // ✅ تثبيت قيمة isMobile عند أول mount لمنع التبديل بين المكونات
+  const isMobileRef = React.useRef<boolean | null>(null);
+  if (isMobileRef.current === null) {
+    isMobileRef.current = currentIsMobile;
+  }
+  const isMobile = isMobileRef.current;
+  
   const [openMobile, setOpenMobile] = React.useState(false);
 
   // This is the internal state of the sidebar.
@@ -136,14 +144,8 @@ const Sidebar = React.forwardRef<
     collapsible?: "offcanvas" | "icon" | "none";
   }
 >(({ side = "left", variant = "sidebar", collapsible = "offcanvas", className, children, ...props }, ref) => {
-  const { isMobile: currentIsMobile, state, openMobile, setOpenMobile } = useSidebar();
-  
-  // ✅ تثبيت قيمة isMobile عند أول mount لمنع التبديل بين Sheet و div
-  const initialIsMobileRef = React.useRef<boolean | null>(null);
-  if (initialIsMobileRef.current === null) {
-    initialIsMobileRef.current = currentIsMobile;
-  }
-  const isMobile = initialIsMobileRef.current;
+  // ✅ isMobile ثابت الآن من SidebarProvider
+  const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
 
   if (collapsible === "none") {
     return (
