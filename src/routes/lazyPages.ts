@@ -48,6 +48,7 @@ export const WaqfUnits = lazyWithRetry(() => import("@/pages/WaqfUnits"));
 
 // ==================== المحاسبة والمالية ====================
 export const Accounting = lazyWithRetry(() => import("@/pages/Accounting"));
+export const FiscalYearsManagement = lazyWithRetry(() => import("@/pages/FiscalYearsManagement"));
 export const Budgets = lazyWithRetry(() => import("@/pages/Budgets"));
 export const Invoices = lazyWithRetry(() => import("@/pages/Invoices"));
 export const Payments = lazyWithRetry(() => import("@/pages/Payments"));
