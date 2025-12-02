@@ -1,4 +1,4 @@
-import { ReactNode, useState, memo, useMemo, lazy, Suspense } from "react";
+import { ReactNode, useState, memo, useMemo } from "react";
 // ⚠️ IMPORTANT: Always import from AppSidebar.tsx (not Sidebar.tsx)
 import AppSidebar from "./AppSidebar";
 import AppVersionFooter from "./AppVersionFooter";
@@ -6,9 +6,7 @@ import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/s
 import { Menu, LogOut, Search } from "lucide-react";
 import { NotificationsBell } from "./NotificationsBell";
 import { FloatingChatButton } from "@/components/chatbot/FloatingChatButton";
-
-// Lazy load GlobalSearch for better bundle size
-const GlobalSearch = lazy(() => import("@/components/shared/GlobalSearch").then(module => ({ default: module.GlobalSearch })));
+import { GlobalSearch } from "@/components/shared/GlobalSearch";
 import { BottomNavigation } from "@/components/mobile/BottomNavigation";
 import { BeneficiaryBottomNavigation } from "@/components/mobile/BeneficiaryBottomNavigation";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -228,10 +226,8 @@ const MainLayout = ({ children }: MainLayoutProps) => {
           <BottomNavigation />
         )}
         
-        {/* Global Search - Lazy loaded */}
-        <Suspense fallback={null}>
-          <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
-        </Suspense>
+        {/* Global Search */}
+        <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
       </SidebarProvider>
     </div>
   );
