@@ -54,19 +54,21 @@ export default function NazerKPIs() {
   const kpiCards = [
     {
       title: "إجمالي الأصول",
-      value: typeof data.totalAssets === 'number' 
+      value: (typeof data.totalAssets === 'number' && data.totalAssets > 0)
         ? data.totalAssets.toLocaleString('ar-SA')
-        : '0',
+        : '—',
       icon: Building2,
       variant: "default" as const,
+      subtitle: data.totalAssets === 0 ? "غير متاح" : undefined
     },
     {
       title: "إجمالي الإيرادات",
-      value: typeof data.totalRevenue === 'number' 
+      value: (typeof data.totalRevenue === 'number' && data.totalRevenue > 0)
         ? data.totalRevenue.toLocaleString('ar-SA')
-        : '0',
+        : '—',
       icon: TrendingUp,
       variant: "success" as const,
+      subtitle: data.totalRevenue === 0 ? "غير متاح" : undefined
     },
     {
       title: "المستفيدون النشطون",
@@ -77,11 +79,12 @@ export default function NazerKPIs() {
     },
     {
       title: "الميزانية المتاحة",
-      value: typeof data.availableBudget === 'number' 
+      value: (typeof data.availableBudget === 'number' && data.availableBudget > 0)
         ? data.availableBudget.toLocaleString('ar-SA')
-        : '0',
+        : '—',
       icon: Wallet,
       variant: "success" as const,
+      subtitle: data.availableBudget === 0 ? "غير متاح" : undefined
     },
     {
       title: "العقارات النشطة",
@@ -105,11 +108,12 @@ export default function NazerKPIs() {
     },
     {
       title: "العائد الشهري",
-      value: typeof data.monthlyReturn === 'number' 
+      value: (typeof data.monthlyReturn === 'number' && data.monthlyReturn > 0)
         ? data.monthlyReturn.toLocaleString('ar-SA')
-        : '0',
+        : '—',
       icon: PieChart,
       variant: "default" as const,
+      subtitle: data.monthlyReturn === 0 ? "غير متاح" : undefined
     }
   ];
 
