@@ -119,11 +119,11 @@ export function AttachmentsDialog({ open, onOpenChange, beneficiaryId, beneficia
                   />
                 </div>
 
-                <div className="flex gap-2">
-                  <Button onClick={handleSubmit} disabled={!selectedFile || !formData.file_type}>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <Button onClick={handleSubmit} disabled={!selectedFile || !formData.file_type} className="w-full sm:w-auto">
                     رفع المرفق
                   </Button>
-                  <Button variant="outline" onClick={() => setShowUploadForm(false)}>إلغاء</Button>
+                  <Button variant="outline" onClick={() => setShowUploadForm(false)} className="w-full sm:w-auto">إلغاء</Button>
                 </div>
               </div>
             )}
@@ -138,43 +138,44 @@ export function AttachmentsDialog({ open, onOpenChange, beneficiaryId, beneficia
               <div className="space-y-3">
                 {attachments.map((attachment) => (
                   <div key={attachment.id} className="border rounded-lg p-4">
-                    <div className="flex items-start justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                       <div className="flex items-start gap-3 flex-1">
-                        <FileText className="h-5 w-5 text-muted-foreground mt-1" />
+                        <FileText className="h-5 w-5 text-muted-foreground mt-1 shrink-0" />
                         <div className="flex-1 space-y-1">
-                          <div className="flex items-center gap-2">
-                            <h4 className="font-semibold">{attachment.file_name}</h4>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h4 className="font-semibold text-sm sm:text-base">{attachment.file_name}</h4>
                             {attachment.is_verified ? (
-                              <Badge variant="default" className="gap-1">
+                              <Badge variant="default" className="gap-1 text-xs">
                                 <CheckCircle className="h-3 w-3" />
                                 موثق
                               </Badge>
                             ) : (
-                              <Badge variant="secondary" className="gap-1">
+                              <Badge variant="secondary" className="gap-1 text-xs">
                                 <XCircle className="h-3 w-3" />
                                 غير موثق
                               </Badge>
                             )}
                           </div>
-                          <p className="text-sm text-muted-foreground">{getFileTypeLabel(attachment.file_type)}</p>
+                          <p className="text-xs sm:text-sm text-muted-foreground">{getFileTypeLabel(attachment.file_type)}</p>
                           {attachment.description && (
-                            <p className="text-sm">{attachment.description}</p>
+                            <p className="text-xs sm:text-sm">{attachment.description}</p>
                           )}
-                           <p className="text-xs text-muted-foreground">
-                            رفع بتاريخ: {format(new Date(attachment.created_at), "dd MMMM yyyy", { locale: ar })}
+                           <p className="text-[10px] sm:text-xs text-muted-foreground">
+                            رفع: {format(new Date(attachment.created_at), "dd MMM yyyy", { locale: ar })}
                           </p>
                         </div>
                       </div>
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="icon">
-                          <Download className="h-4 w-4" />
+                      <div className="flex gap-2 sm:shrink-0">
+                        <Button variant="outline" size="icon" className="h-8 w-8 sm:h-10 sm:w-10">
+                          <Download className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>
                         <Button
                           variant="destructive"
                           size="icon"
+                          className="h-8 w-8 sm:h-10 sm:w-10"
                           onClick={() => setDeleteConfirm(attachment.id)}
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>
                       </div>
                     </div>

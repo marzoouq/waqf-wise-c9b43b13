@@ -57,7 +57,7 @@ export function ActivityLogDialog({ open, onOpenChange, beneficiaryId, beneficia
       title={`سجل النشاط: ${beneficiaryName}`}
       size="xl"
     >
-      <ScrollArea className="h-[600px] pr-4">
+      <ScrollArea className="h-[400px] sm:h-[600px] pr-4">
           {isLoading ? (
             <div className="text-center py-8">جاري التحميل...</div>
           ) : activities.length === 0 ? (

@@ -242,7 +242,7 @@ const BeneficiaryDialog = ({
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             {/* Personal Information Section */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-foreground border-r-4 border-r-primary pr-3">
+              <h3 className="text-base sm:text-lg font-semibold text-foreground border-r-4 border-r-primary pr-3">
                 المعلومات الشخصية
               </h3>
 
@@ -357,7 +357,7 @@ const BeneficiaryDialog = ({
 
             {/* Classification Section */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-foreground border-r-4 border-r-accent pr-3">
+              <h3 className="text-base sm:text-lg font-semibold text-foreground border-r-4 border-r-accent pr-3">
                 التصنيف والحالة
               </h3>
 
@@ -447,11 +447,11 @@ const BeneficiaryDialog = ({
 
             {/* Family Information Section */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-foreground border-r-4 border-r-secondary pr-3">
+              <h3 className="text-base sm:text-lg font-semibold text-foreground border-r-4 border-r-secondary pr-3">
                 معلومات العائلة
               </h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="numberOfSons"
