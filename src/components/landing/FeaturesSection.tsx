@@ -58,7 +58,7 @@ export function FeaturesSection() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
-          <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4 animate-fade-in">
+          <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
             المميزات
           </span>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4">
@@ -74,8 +74,7 @@ export function FeaturesSection() {
           {features.map((feature, index) => (
             <div
               key={index}
-              className="group relative p-6 sm:p-8 rounded-2xl bg-card border border-border/50 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 animate-fade-in"
-              style={{ animationDelay: `${index * 50}ms` }}
+              className="group relative p-6 sm:p-8 rounded-2xl bg-card border border-border/50 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300"
             >
               {/* Icon */}
               <div

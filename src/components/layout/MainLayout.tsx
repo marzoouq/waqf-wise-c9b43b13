@@ -1,6 +1,10 @@
-import { ReactNode, useState, memo, useMemo } from "react";
+import { ReactNode, useState, memo, useMemo, lazy, Suspense } from "react";
 // ⚠️ IMPORTANT: Always import from AppSidebar.tsx (not Sidebar.tsx)
 import AppSidebar from "./AppSidebar";
+import { GlobalMonitoring } from "@/components/developer/GlobalMonitoring";
+import { BackgroundMonitor } from "@/components/developer/BackgroundMonitor";
+import { IdleTimeoutManager } from "@/components/auth/IdleTimeoutManager";
+import { SessionManager } from "@/components/auth/SessionManager";
 import AppVersionFooter from "./AppVersionFooter";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { Menu, LogOut, Search } from "lucide-react";
@@ -175,6 +179,12 @@ const MainLayout = ({ children }: MainLayoutProps) => {
 
   return (
     <div dir="rtl">
+      {/* مكونات المراقبة والجلسات - فقط للصفحات المحمية */}
+      <GlobalMonitoring />
+      <BackgroundMonitor />
+      <SessionManager />
+      <IdleTimeoutManager />
+      
       <SidebarProvider>
         <div className="min-h-screen flex w-full bg-background">
           {/* Hide sidebar on mobile, show bottom navigation instead */}
