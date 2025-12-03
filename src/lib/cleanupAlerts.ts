@@ -55,12 +55,16 @@ export async function cleanupAlerts(): Promise<CleanupStats> {
       stats.errors.push(`Error updating useAuth alerts: ${updateError.message}`);
     }
 
-    // 3. حذف الأخطاء المكررة القديمة من error_logs
-    const { error: errorLogError } = await supabase
+    // 3. حذف الأخطاء المحلولة القديمة من error_logs (أكثر من 24 ساعة)
+    const { error: errorLogError, count: errorLogCount } = await supabase
       .from('system_error_logs')
-      .delete()
-      .lt('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
+      .delete({ count: 'exact' })
+      .lt('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
       .eq('status', 'resolved');
+
+    if (!errorLogError && errorLogCount) {
+      stats.deletedAlerts += errorLogCount;
+    }
 
     if (errorLogError) {
       stats.errors.push(`Error deleting old error logs: ${errorLogError.message}`);

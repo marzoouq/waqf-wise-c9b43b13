@@ -16,7 +16,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { AlertTriangle, CheckCircle, Clock, XCircle, TrendingUp, AlertCircle } from "lucide-react";
+import { AlertTriangle, CheckCircle, Clock, XCircle, TrendingUp, AlertCircle, Trash2 } from "lucide-react";
 import { formatRelative } from "@/lib/date";
 import { useToast } from "@/hooks/use-toast";
 
@@ -25,6 +25,32 @@ export default function SystemErrorLogs() {
   const queryClient = useQueryClient();
   const [selectedError, setSelectedError] = useState<any>(null);
   const [resolutionNotes, setResolutionNotes] = useState("");
+
+  // حذف جميع الأخطاء المحلولة
+  const deleteResolvedMutation = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from("system_error_logs")
+        .delete()
+        .eq("status", "resolved");
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["system-error-logs"] });
+      toast({
+        title: "تم الحذف",
+        description: "تم حذف جميع الأخطاء المحلولة بنجاح",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "خطأ",
+        description: "فشل في حذف الأخطاء المحلولة",
+        variant: "destructive",
+      });
+    },
+  });
 
   // جلب سجلات الأخطاء
   const { data: errorLogs, isLoading } = useQuery({
@@ -210,9 +236,23 @@ export default function SystemErrorLogs() {
 
       {/* سجلات الأخطاء */}
       <Card>
-        <CardHeader>
-          <CardTitle>سجلات الأخطاء</CardTitle>
-          <CardDescription>جميع الأخطاء المسجلة في النظام</CardDescription>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>سجلات الأخطاء</CardTitle>
+            <CardDescription>جميع الأخطاء المسجلة في النظام</CardDescription>
+          </div>
+          {stats.resolved > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => deleteResolvedMutation.mutate()}
+              disabled={deleteResolvedMutation.isPending}
+              className="text-destructive hover:text-destructive"
+            >
+              <Trash2 className="h-4 w-4 ml-2" />
+              حذف المحلولة ({stats.resolved})
+            </Button>
+          )}
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="all">
