@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { productionLogger } from '@/lib/logger/production-logger';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -17,12 +17,20 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [loginType, setLoginType] = useState<'staff' | 'beneficiary'>('staff');
-  const { signIn } = useAuth();
+  const [loginSuccess, setLoginSuccess] = useState(false);
+  const { signIn, user, isLoading: authLoading, roles } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { isSupported: isBiometricSupported, isAuthenticating, authenticateWithBiometric } = useBiometricAuth();
 
-  // محاولة تسجيل الدخول بالبصمة - التوجيه عبر RoleBasedRedirect
+  // ✅ التوجيه التلقائي عند اكتمال المصادقة
+  useEffect(() => {
+    if (loginSuccess && user && !authLoading && roles.length > 0) {
+      navigate('/redirect', { replace: true });
+    }
+  }, [loginSuccess, user, authLoading, roles, navigate]);
+
+  // محاولة تسجيل الدخول بالبصمة
   const handleBiometricLogin = async () => {
     const result = await authenticateWithBiometric();
     if (result.success) {
@@ -30,8 +38,7 @@ export default function Login() {
         title: 'تم تسجيل الدخول بنجاح',
         description: 'مرحباً بك في منصة إدارة الوقف',
       });
-      // التوجيه للصفحة الوسيطة التي ستحدد لوحة التحكم المناسبة
-      navigate('/redirect');
+      setLoginSuccess(true);
     }
   };
 
@@ -69,8 +76,8 @@ export default function Login() {
         title: 'تم تسجيل الدخول بنجاح',
         description: 'مرحباً بك في منصة إدارة الوقف',
       });
-      // التوجيه للصفحة الوسيطة التي ستحدد لوحة التحكم المناسبة
-      navigate('/redirect');
+      // ✅ تفعيل التوجيه التلقائي عبر useEffect
+      setLoginSuccess(true);
     } catch (error) {
       // تحليل نوع الخطأ وعرض رسالة مناسبة
       let errorTitle = 'خطأ في تسجيل الدخول';
