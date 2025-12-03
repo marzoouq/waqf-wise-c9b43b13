@@ -20,7 +20,7 @@ import { format, arLocale as ar } from "@/lib/date";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { ExportButton } from "@/components/shared/ExportButton";
-import { UnifiedTable, UnifiedTableColumn } from "@/components/unified/UnifiedTable";
+import { UnifiedDataTable, Column } from "@/components/unified/UnifiedDataTable";
 
 type Document = Database['public']['Tables']['documents']['Row'];
 
@@ -348,12 +348,12 @@ const Archive = () => {
               />
             </div>
 
-            <UnifiedTable
+            <UnifiedDataTable
               columns={[
                 {
                   key: 'name',
                   label: 'اسم المستند',
-                  render: (doc) => (
+                  render: (_value, doc) => (
                     <div className="flex items-center gap-2">
                       <FileText className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                       <span className="truncate">{doc.name}</span>
@@ -363,68 +363,62 @@ const Archive = () => {
                 {
                   key: 'category',
                   label: 'الفئة',
-                  headerClassName: 'hidden md:table-cell',
-                  className: 'hidden md:table-cell',
-                  render: (doc) => <Badge variant="outline">{doc.category}</Badge>,
+                  hideOnMobile: true,
+                  render: (_value, doc) => <Badge variant="outline">{doc.category}</Badge>,
                 },
                 {
                   key: 'file_size',
                   label: 'الحجم',
-                  headerClassName: 'hidden lg:table-cell',
-                  className: 'hidden lg:table-cell text-muted-foreground text-sm',
-                  render: (doc) => doc.file_size || '-',
+                  hideOnMobile: true,
+                  hideOnTablet: true,
+                  render: (_value, doc) => doc.file_size || '-',
                 },
                 {
                   key: 'created_at',
                   label: 'تاريخ الرفع',
-                  headerClassName: 'hidden lg:table-cell',
-                  className: 'hidden lg:table-cell text-muted-foreground text-sm',
-                  render: (doc) => format(new Date(doc.created_at), 'dd/MM/yyyy', { locale: ar }),
+                  hideOnMobile: true,
+                  hideOnTablet: true,
+                  render: (_value, doc) => format(new Date(doc.created_at), 'dd/MM/yyyy', { locale: ar }),
                 },
-                {
-                  key: 'actions',
-                  label: 'الإجراءات',
-                  headerClassName: 'text-center',
-                  render: (doc) => (
-                    <div className="flex justify-center gap-1">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handlePreviewDocument(doc);
-                        }}
-                        title="عرض"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteClick(doc);
-                        }}
-                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                        title="حذف"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        disabled
-                        title="وظيفة التنزيل قيد التطوير"
-                      >
-                        <Download className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ),
-                },
-              ] as UnifiedTableColumn<Document>[]}
+              ] as Column<Document>[]}
               data={filteredDocuments}
               loading={isLoading}
               emptyMessage="لا توجد مستندات. ابدأ برفع المستندات لإدارتها وأرشفتها"
+              actions={(doc) => (
+                <div className="flex justify-center gap-1">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handlePreviewDocument(doc);
+                    }}
+                    title="عرض"
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteClick(doc);
+                    }}
+                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                    title="حذف"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    disabled
+                    title="وظيفة التنزيل قيد التطوير"
+                  >
+                    <Download className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
             />
           </TabsContent>
 

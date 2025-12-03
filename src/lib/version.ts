@@ -2,8 +2,8 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.5.0
- * @date 2025-11-28
+ * @version 2.6.4
+ * @date 2025-12-02
  */
 
 export const APP_VERSION = '2.6.4';

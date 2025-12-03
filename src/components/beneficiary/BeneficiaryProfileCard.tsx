@@ -7,7 +7,7 @@ import { Phone, Mail, MapPin, Calendar, MessageSquare } from "lucide-react";
 import { Beneficiary } from "@/types/beneficiary";
 import { format, arLocale as ar } from "@/lib/date";
 import { BeneficiarySettingsDropdown } from "./BeneficiarySettingsDropdown";
-import { NotificationsBell } from "./NotificationsBell";
+import { NotificationsBell } from "@/components/layout/NotificationsBell";
 import { SystemHealthIndicator } from "./SystemHealthIndicator";
 
 interface BeneficiaryProfileCardProps {
