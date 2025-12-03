@@ -119,3 +119,6 @@ verify_jwt = true
 
 [functions.zatca-submit]
 verify_jwt = true
+
+[functions.update-user-email]
+verify_jwt = true

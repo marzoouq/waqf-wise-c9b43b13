@@ -45,9 +45,10 @@ export type Permission =
   | 'view_bank_accounts'
   | 'view_financial_reports'
   | 'view_approvals_log'
-  | 'view_statements';
+  | 'view_statements'
+  | 'edit_user_email';
 
-export type RoleName = 
+export type RoleName =
   | 'nazer' 
   | 'admin' 
   | 'accountant' 
@@ -72,7 +73,8 @@ export const ROLE_PERMISSIONS: Record<RoleName, Permission[]> = {
     'view_all_data', 
     'export_data', 
     'manage_properties', 
-    'manage_contracts'
+    'manage_contracts',
+    'edit_user_email'
   ],
   admin: [
     'view_dashboard', 
@@ -84,7 +86,8 @@ export const ROLE_PERMISSIONS: Record<RoleName, Permission[]> = {
     'view_all_data',
     'export_data', 
     'manage_properties', 
-    'manage_contracts'
+    'manage_contracts',
+    'edit_user_email'
   ],
   accountant: [
     'view_dashboard', 
