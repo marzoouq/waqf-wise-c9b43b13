@@ -262,9 +262,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setSession(newSession);
         setUser(newSession.user);
         
-        // جلب البيانات فقط إذا كان التهيئة اكتملت (لتجنب التكرار)
-        if (event === 'SIGNED_IN') {
-          setIsLoading(true);
+        // ✅ جلب البيانات فقط عند SIGNED_IN وإذا لم تكن البيانات محملة بالفعل
+        if (event === 'SIGNED_IN' && rolesCache.current.length === 0) {
+          // ✅ لا نضع isLoading = true إذا كانت التهيئة اكتملت لتجنب التعليق
+          if (!isInitialized) {
+            setIsLoading(true);
+          }
           setTimeout(() => {
             fetchUserData(newSession.user.id);
           }, 0);
