@@ -582,13 +582,30 @@ class ErrorTracker {
   }
 }
 
-// تصدير singleton
-export const errorTracker = ErrorTracker.getInstance();
+// ✅ تأجيل إنشاء singleton حتى الاستخدام الفعلي
+let _errorTrackerInstance: ErrorTracker | null = null;
+
+export function getErrorTracker(): ErrorTracker {
+  if (!_errorTrackerInstance) {
+    _errorTrackerInstance = ErrorTracker.getInstance();
+  }
+  return _errorTrackerInstance;
+}
+
+// ✅ تصدير للتوافق الخلفي - لكن بتأجيل
+export const errorTracker = {
+  trackError: (report: ErrorReport) => getErrorTracker().trackError(report),
+  logError: (message: string, severity?: ErrorReport['severity'], data?: Record<string, unknown>) => 
+    getErrorTracker().logError(message, severity, data),
+  resetCircuitBreaker: () => getErrorTracker().resetCircuitBreaker(),
+  getStats: () => getErrorTracker().getStats(),
+  getDeduplicationStats: () => getErrorTracker().getDeduplicationStats(),
+};
 
 // تصدير للاستخدام المباشر
-export const trackError = (report: ErrorReport) => errorTracker.trackError(report);
+export const trackError = (report: ErrorReport) => getErrorTracker().trackError(report);
 export const logError = (
   message: string, 
   severity?: ErrorReport['severity'], 
   data?: Record<string, unknown>
-) => errorTracker.logError(message, severity, data);
+) => getErrorTracker().logError(message, severity, data);

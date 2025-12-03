@@ -448,8 +448,14 @@ export class SelfHealingManager {
   public healthMonitor = new HealthMonitor();
 
   private constructor() {
-    // بدء مراقب الصحة تلقائياً
-    this.healthMonitor.start();
+    // ✅ تأجيل بدء مراقب الصحة حتى بعد التحميل الأولي
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(() => {
+        setTimeout(() => this.healthMonitor.start(), 5000);
+      });
+    } else {
+      setTimeout(() => this.healthMonitor.start(), 7000);
+    }
     
     // معالجة الأحداث العامة
     this.setupGlobalHandlers();
@@ -494,14 +500,31 @@ export class SelfHealingManager {
   }
 }
 
-// تصدير مثيل واحد
-export const selfHealing = SelfHealingManager.getInstance();
+// ✅ تأجيل إنشاء singleton حتى الاستخدام الفعلي
+let _selfHealingInstance: SelfHealingManager | null = null;
+
+export function getSelfHealing(): SelfHealingManager {
+  if (!_selfHealingInstance) {
+    _selfHealingInstance = SelfHealingManager.getInstance();
+  }
+  return _selfHealingInstance;
+}
+
+// ✅ تصدير للتوافق الخلفي - لكن بتأجيل
+export const selfHealing = {
+  get retryHandler() { return getSelfHealing().retryHandler; },
+  get cache() { return getSelfHealing().cache; },
+  get autoRecovery() { return getSelfHealing().autoRecovery; },
+  get healthMonitor() { return getSelfHealing().healthMonitor; },
+  fetch: <T>(cacheKey: string, fetchFunction: () => Promise<T>, options?: { cacheTTL?: number }) => 
+    getSelfHealing().fetch(cacheKey, fetchFunction, options),
+};
 
 // واجهات مساعدة سهلة الاستخدام
 export const retryOperation = <T>(operation: () => Promise<T>) =>
-  selfHealing.retryHandler.execute(operation);
+  getSelfHealing().retryHandler.execute(operation);
 
 export const fetchWithFallback = <T>(
   cacheKey: string,
   operation: () => Promise<T>
-) => selfHealing.autoRecovery.executeWithFallback(cacheKey, operation);
+) => getSelfHealing().autoRecovery.executeWithFallback(cacheKey, operation);
