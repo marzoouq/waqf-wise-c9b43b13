@@ -11,3 +11,4 @@ export { useDeepDiagnostics } from './useDeepDiagnostics';
 export { useCodeHealthAnalyzer, registerIssue, getAllCodeIssues, clearAllCodeIssues } from './useCodeHealthAnalyzer';
 export { useRealTimeMonitor, getAllEvents } from './useRealTimeMonitor';
 export { useComponentProfiler, useProfiledComponent, startComponentRender, registerComponentMount, registerComponentUnmount, getAllComponentProfiles, resetComponentProfiles } from './useComponentProfiler';
+export { useAdvancedPerformanceAnalyzer } from './useAdvancedPerformanceAnalyzer';

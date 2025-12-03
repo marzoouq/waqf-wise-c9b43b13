@@ -14,3 +14,4 @@ export { BackgroundMonitor } from "./BackgroundMonitor";
 export { CodeHealthPanel } from "./CodeHealthPanel";
 export { RealTimeMonitorPanel } from "./RealTimeMonitorPanel";
 export { ComponentProfilerPanel } from "./ComponentProfilerPanel";
+export { AdvancedPerformancePanel } from "./AdvancedPerformancePanel";
