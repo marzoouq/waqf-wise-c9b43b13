@@ -21,15 +21,21 @@ import {
   FileText,
   Settings,
   Filter,
-  BarChart3
+  BarChart3,
+  Loader2
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useCustomReports, type ReportResult } from "@/hooks/useCustomReports";
+import { ReportResultsPreview } from "./ReportResultsPreview";
+import { exportToPDF, exportToExcel, exportToCSV } from "@/lib/export-utils";
 import type { CustomReportFilter } from "@/types/reports/index";
 import type { Json } from "@/integrations/supabase/types";
 
 export function CustomReportBuilder() {
   const { toast } = useToast();
+  const { executeDirectReport, REPORT_FIELDS } = useCustomReports();
+  
   const [reportName, setReportName] = useState("");
   const [reportDescription, setReportDescription] = useState("");
   const [reportType, setReportType] = useState<string>("");
@@ -37,6 +43,9 @@ export function CustomReportBuilder() {
   const [filters, setFilters] = useState<CustomReportFilter[]>([]);
   const [groupBy, setGroupBy] = useState<string>("");
   const [sortBy, setSortBy] = useState<string>("");
+  
+  const [isRunning, setIsRunning] = useState(false);
+  const [reportResult, setReportResult] = useState<ReportResult | null>(null);
 
   const reportTypes = [
     { value: "beneficiaries", label: "تقرير المستفيدين" },
@@ -47,13 +56,9 @@ export function CustomReportBuilder() {
     { value: "contracts", label: "تقرير العقود" },
   ];
 
-  const availableFields: Record<string, string[]> = {
-    beneficiaries: ["الاسم", "الفئة", "الحالة", "رقم الهوية", "الجوال", "المدينة"],
-    payments: ["رقم الدفعة", "التاريخ", "المبلغ", "الوصف", "الحالة"],
-    properties: ["اسم العقار", "النوع", "المساحة", "القيمة", "الحالة"],
-    distributions: ["رقم التوزيع", "التاريخ", "المبلغ الكلي", "عدد المستفيدين"],
-    loans: ["رقم القرض", "المبلغ", "المدة", "القسط الشهري", "الحالة"],
-    contracts: ["رقم العقد", "العقار", "المستأجر", "الإيجار الشهري", "تاريخ البداية", "تاريخ الانتهاء"],
+  // الحصول على الحقول المتاحة حسب نوع التقرير
+  const getAvailableFields = (type: string): string[] => {
+    return REPORT_FIELDS[type]?.map(f => f.label) || [];
   };
 
   const handleFieldToggle = (field: string) => {
@@ -115,13 +120,7 @@ export function CustomReportBuilder() {
       });
 
       // Reset form
-      setReportName("");
-      setReportDescription("");
-      setReportType("");
-      setSelectedFields([]);
-      setFilters([]);
-      setGroupBy("");
-      setSortBy("");
+      resetForm();
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'حدث خطأ أثناء الحفظ';
       toast({
@@ -132,13 +131,95 @@ export function CustomReportBuilder() {
     }
   };
 
-  const handleRunReport = () => {
-    toast({
-      title: "تشغيل التقرير",
-      description: "جاري إنشاء التقرير...",
-    });
-    // هنا يمكن إضافة منطق تشغيل التقرير
+  const handleRunReport = async () => {
+    if (!reportType || selectedFields.length === 0) {
+      toast({
+        variant: "destructive",
+        title: "خطأ",
+        description: "يرجى اختيار نوع التقرير والحقول المطلوبة",
+      });
+      return;
+    }
+
+    setIsRunning(true);
+    try {
+      const result = await executeDirectReport(reportType, selectedFields, sortBy);
+      setReportResult(result);
+      
+      toast({
+        title: "تم توليد التقرير",
+        description: `تم جلب ${result.totalCount} سجل`,
+      });
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'حدث خطأ أثناء تشغيل التقرير';
+      toast({
+        variant: "destructive",
+        title: "خطأ في التقرير",
+        description: errorMessage,
+      });
+    } finally {
+      setIsRunning(false);
+    }
   };
+
+  const resetForm = () => {
+    setReportName("");
+    setReportDescription("");
+    setReportType("");
+    setSelectedFields([]);
+    setFilters([]);
+    setGroupBy("");
+    setSortBy("");
+    setReportResult(null);
+  };
+
+  // دوال التصدير
+  const handleExportPDF = () => {
+    if (!reportResult) return;
+    
+    const headers = reportResult.columns.map(c => c.label);
+    const rows = reportResult.data.map(row => 
+      reportResult.columns.map(col => String(row[col.key] ?? '—'))
+    );
+    
+    exportToPDF(
+      reportName || 'تقرير مخصص',
+      headers,
+      rows,
+      { title: reportName || 'تقرير مخصص', subtitle: reportDescription }
+    );
+    
+    toast({ title: "تم التصدير", description: "تم تصدير التقرير بصيغة PDF" });
+  };
+
+  const handleExportExcel = () => {
+    if (!reportResult) return;
+    
+    const data = reportResult.data.map(row => {
+      const obj: Record<string, unknown> = {};
+      reportResult.columns.forEach(col => {
+        obj[col.label] = row[col.key];
+      });
+      return obj;
+    });
+    
+    exportToExcel(data, reportName || 'تقرير-مخصص');
+    toast({ title: "تم التصدير", description: "تم تصدير التقرير بصيغة Excel" });
+  };
+
+  const handleExportCSV = () => {
+    if (!reportResult) return;
+    
+    const headers = reportResult.columns.map(c => c.label);
+    const rows = reportResult.data.map(row => 
+      reportResult.columns.map(col => String(row[col.key] ?? ''))
+    );
+    
+    exportToCSV(headers, rows, reportName || 'تقرير-مخصص');
+    toast({ title: "تم التصدير", description: "تم تصدير التقرير بصيغة CSV" });
+  };
+
+  const availableFields = reportType ? getAvailableFields(reportType) : [];
 
   return (
     <div className="space-y-6">
@@ -174,7 +255,11 @@ export function CustomReportBuilder() {
 
           <div className="space-y-2">
             <Label htmlFor="report-type">نوع التقرير *</Label>
-            <Select value={reportType} onValueChange={setReportType}>
+            <Select value={reportType} onValueChange={(value) => {
+              setReportType(value);
+              setSelectedFields([]);
+              setReportResult(null);
+            }}>
               <SelectTrigger>
                 <SelectValue placeholder="اختر نوع التقرير" />
               </SelectTrigger>
@@ -201,7 +286,7 @@ export function CustomReportBuilder() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {availableFields[reportType]?.map((field) => (
+              {availableFields.map((field) => (
                 <div key={field} className="flex items-center gap-2">
                   <Checkbox
                     id={field}
@@ -266,7 +351,7 @@ export function CustomReportBuilder() {
                             <SelectValue placeholder="اختر" />
                           </SelectTrigger>
                           <SelectContent>
-                            {availableFields[reportType]?.map((field) => (
+                            {availableFields.map((field) => (
                               <SelectItem key={field} value={field}>
                                 {field}
                               </SelectItem>
@@ -369,8 +454,15 @@ export function CustomReportBuilder() {
       {/* أزرار الإجراءات */}
       {reportType && selectedFields.length > 0 && (
         <div className="flex gap-2 justify-end">
-          <Button variant="outline" onClick={handleRunReport}>
-            <Play className="h-4 w-4 ml-2" />
+          <Button variant="outline" onClick={resetForm}>
+            إعادة تعيين
+          </Button>
+          <Button variant="outline" onClick={handleRunReport} disabled={isRunning}>
+            {isRunning ? (
+              <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+            ) : (
+              <Play className="h-4 w-4 ml-2" />
+            )}
             تشغيل التقرير
           </Button>
           <Button onClick={handleSaveReport}>
@@ -378,6 +470,18 @@ export function CustomReportBuilder() {
             حفظ القالب
           </Button>
         </div>
+      )}
+
+      {/* معاينة النتائج */}
+      {reportResult && (
+        <ReportResultsPreview
+          result={reportResult}
+          reportName={reportName}
+          onClose={() => setReportResult(null)}
+          onExportPDF={handleExportPDF}
+          onExportExcel={handleExportExcel}
+          onExportCSV={handleExportCSV}
+        />
       )}
     </div>
   );
