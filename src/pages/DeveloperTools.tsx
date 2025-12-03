@@ -3,7 +3,7 @@ import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { Code, Activity, AlertCircle, Network, Database, Wrench, Crosshair, Smartphone, Search, HeartPulse, Radio, Layers } from "lucide-react";
+import { Code, Activity, AlertCircle, Network, Database, Wrench, Crosshair, Smartphone, Search, HeartPulse, Radio, Layers, Gauge } from "lucide-react";
 import { DeveloperOverview } from "@/components/developer/DeveloperOverview";
 import { WebVitalsPanel } from "@/components/developer/WebVitalsPanel";
 import { ErrorsPanel } from "@/components/developer/ErrorsPanel";
@@ -16,6 +16,7 @@ import { DeepDiagnosticsPanel } from "@/components/developer/DeepDiagnosticsPane
 import { CodeHealthPanel } from "@/components/developer/CodeHealthPanel";
 import { RealTimeMonitorPanel } from "@/components/developer/RealTimeMonitorPanel";
 import { ComponentProfilerPanel } from "@/components/developer/ComponentProfilerPanel";
+import { AdvancedPerformancePanel } from "@/components/developer/AdvancedPerformancePanel";
 
 export default function DeveloperTools() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -88,6 +89,10 @@ export default function DeveloperTools() {
                   <Layers className="w-4 h-4" />
                   <span className="hidden sm:inline">المكونات</span>
                 </TabsTrigger>
+                <TabsTrigger value="advanced-perf" className="flex items-center gap-1 py-3 text-xs sm:text-sm min-h-[44px]">
+                  <Gauge className="w-4 h-4" />
+                  <span className="hidden sm:inline">تحليل متقدم</span>
+                </TabsTrigger>
               </TabsList>
               <ScrollBar orientation="horizontal" />
             </ScrollArea>
@@ -138,6 +143,10 @@ export default function DeveloperTools() {
 
             <TabsContent value="profiler" className="space-y-6 mt-6">
               <ComponentProfilerPanel />
+            </TabsContent>
+
+            <TabsContent value="advanced-perf" className="space-y-6 mt-6">
+              <AdvancedPerformancePanel />
             </TabsContent>
           </Tabs>
       </MobileOptimizedLayout>
