@@ -19,6 +19,8 @@
 |---------|--------|
 | [SECURITY_FIX_PLAN.md](./SECURITY_FIX_PLAN.md) | خطة الأمان |
 | [AUDIT_REPORT.md](./AUDIT_REPORT.md) | تقرير التدقيق |
+| [HEADERS_SECURITY.md](./HEADERS_SECURITY.md) | أمان الـ Headers |
+| [SYSTEM_HEALTH_REPORT.md](./SYSTEM_HEALTH_REPORT.md) | تقرير صحة النظام |
 
 ## 🔧 الأدلة
 
@@ -26,7 +28,32 @@
 |---------|--------|
 | [DEBUGGING_GUIDE.md](./DEBUGGING_GUIDE.md) | دليل التصحيح |
 | [DEPLOYMENT.md](./DEPLOYMENT.md) | دليل النشر |
+| [INTEGRATIONS_GUIDE.md](./INTEGRATIONS_GUIDE.md) | دليل التكاملات |
+| [SAFE_DEVELOPMENT_GUIDE.md](./SAFE_DEVELOPMENT_GUIDE.md) | دليل التطوير الآمن |
+| [user-guide.md](./user-guide.md) | دليل المستخدم |
+| [api-reference.md](./api-reference.md) | مرجع الـ API |
+
+## 🏗️ التقني
+
+| الوثيقة | الوصف |
+|---------|--------|
+| [BENEFICIARY_PORTAL_REFACTOR.md](./BENEFICIARY_PORTAL_REFACTOR.md) | إعادة هيكلة بوابة المستفيدين |
+| [CACHE_STRATEGY.md](./CACHE_STRATEGY.md) | استراتيجية التخزين المؤقت |
+| [DATE_FNS_OPTIMIZATION.md](./DATE_FNS_OPTIMIZATION.md) | تحسين date-fns |
+| [FISCAL_YEAR_CLOSING_TECHNICAL.md](./FISCAL_YEAR_CLOSING_TECHNICAL.md) | إغلاق السنة المالية |
+| [REFACTORING_SUMMARY.md](./REFACTORING_SUMMARY.md) | ملخص إعادة الهيكلة |
+| [SERVICE_WORKER_CLEANUP.md](./SERVICE_WORKER_CLEANUP.md) | تنظيف Service Worker |
+| [WAQF_HEIR_IMPLEMENTATION.md](./WAQF_HEIR_IMPLEMENTATION.md) | تنفيذ وراثة الوقف |
+| [codebase-refactoring-report.md](./codebase-refactoring-report.md) | تقرير إعادة هيكلة الكود |
+
+## 📁 المجلدات الفرعية
+
+| المجلد | المحتوى |
+|--------|---------|
+| [database/](./database/) | توثيق قاعدة البيانات |
+| [fixes/](./fixes/) | سجل الإصلاحات التفصيلي |
+| [testing/](./testing/) | وثائق الاختبارات |
 
 ---
 
-**الحالة:** ✅ محدّث ومُنظم
+**الحالة:** ✅ محدّث ومُنظم (24 وثيقة)
