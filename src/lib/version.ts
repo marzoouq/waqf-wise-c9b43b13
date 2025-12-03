@@ -2,28 +2,26 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.6.4
- * @date 2025-12-02
+ * @version 2.6.5
+ * @date 2025-12-03
  */
 
-export const APP_VERSION = '2.6.4';
-export const APP_VERSION_DATE = '2025-12-02';
+export const APP_VERSION = '2.6.5';
+export const APP_VERSION_DATE = '2025-12-03';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
 export const VERSION_INFO = {
   version: APP_VERSION,
   date: APP_VERSION_DATE,
   name: APP_VERSION_NAME,
-  changelog: '/docs/CHANGELOG_v2.6.4.md',
+  changelog: '/docs/CHANGELOG.md',
   features: [
-    'تحسين كبير في سرعة التحميل (تقليل 70٪)',
-    'إزالة مسح الكاش المتكرر',
-    'تحسين تهيئة المصادقة',
-    'البحث الذكي الشامل',
-    'التصنيف التلقائي للمستندات',
-    'تنبيهات تجديد العقود',
-    'إصدارات المستندات',
-    'التقارير المجدولة',
+    'نظام التقارير المخصصة المتقدم',
+    'دعم 6 أنواع تقارير مختلفة',
+    'معاينة النتائج التفاعلية',
+    'تصدير PDF/Excel/CSV موحد',
+    'تنظيم 152 hook في 18 مجلد',
+    'توثيق الخدمات الشامل',
   ],
 } as const;
 
