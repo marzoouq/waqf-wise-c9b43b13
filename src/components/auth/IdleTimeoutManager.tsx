@@ -14,9 +14,12 @@ import { productionLogger } from "@/lib/logger/production-logger";
  * - ينظف الحالة تلقائياً عند الخروج
  */
 export function IdleTimeoutManager() {
-  const { user, signOut } = useAuth();
+  const { user, signOut, isLoading: authLoading } = useAuth();
   const { isNazer, isAdmin, isLoading: roleLoading } = useUserRole();
   const navigate = useNavigate();
+
+  // انتظار اكتمال تهيئة Auth قبل أي عمليات
+  if (authLoading || roleLoading) return null;
 
   // الخروج التلقائي وتنظيف الحالة
   const handleIdleLogout = async () => {
@@ -46,7 +49,8 @@ export function IdleTimeoutManager() {
       // إعادة التوجيه لصفحة تسجيل الدخول
       navigate('/login', { replace: true });
     } catch (error) {
-      productionLogger.error('خطأ أثناء الخروج التلقائي', error);
+      // تسجيل تحذير بدلاً من خطأ حرج - هذا سلوك متوقع أحياناً
+      productionLogger.warn('تحذير أثناء الخروج التلقائي - تم التجاوز', { error });
       
       // محاولة الخروج على مستوى Supabase مباشرة
       await supabase.auth.signOut();

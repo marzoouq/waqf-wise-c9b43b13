@@ -46,7 +46,7 @@ export async function cleanupAlerts(): Promise<CleanupStats> {
       .update({
         status: 'resolved',
         resolved_at: new Date().toISOString(),
-        resolved_by: 'system_auto_fix',
+        resolved_by: null, // إصلاح: استخدام null بدلاً من string لتوافق UUID
       })
       .like('description', '%useAuth must be used%')
       .neq('status', 'resolved');
