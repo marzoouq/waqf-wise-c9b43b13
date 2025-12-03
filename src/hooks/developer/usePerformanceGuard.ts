@@ -1,9 +1,14 @@
 /**
  * أداة حماية الأداء (Performance Guard)
  * تحذر من مشاكل الأداء قبل وقوعها
+ * محسّنة لتجنب التكرار وتقليل الحمل
  */
 import { useEffect, useCallback, useRef, useState } from 'react';
 import { productionLogger } from '@/lib/logger/production-logger';
+
+// منع التكرار في التسجيل
+const loggedIssues = new Set<string>();
+const LOG_COOLDOWN_MS = 30000; // 30 ثانية بين التسجيلات المتكررة
 
 interface PerformanceIssue {
   type: 'slow_render' | 'long_task' | 'layout_shift' | 'memory_pressure' | 'network_slow' | 'bundle_large';
@@ -53,11 +58,23 @@ export function usePerformanceGuard(enabled: boolean = true) {
   const [issues, setIssues] = useState<PerformanceIssue[]>([]);
   const longTaskCount = useRef(0);
 
-  // إضافة مشكلة جديدة
+  // إضافة مشكلة جديدة مع منع التكرار
   const addIssue = useCallback((issue: Omit<PerformanceIssue, 'timestamp'>) => {
+    const issueKey = `${issue.type}_${issue.message}`;
+    const now = Date.now();
+    
+    // التحقق من التكرار
+    if (loggedIssues.has(issueKey)) {
+      return; // تجاهل المشكلة المكررة
+    }
+    
+    // إضافة للسجل مع timeout للإزالة
+    loggedIssues.add(issueKey);
+    setTimeout(() => loggedIssues.delete(issueKey), LOG_COOLDOWN_MS);
+
     const newIssue: PerformanceIssue = {
       ...issue,
-      timestamp: Date.now(),
+      timestamp: now,
     };
 
     issuesRegistry.push(newIssue);
@@ -67,7 +84,7 @@ export function usePerformanceGuard(enabled: boolean = true) {
 
     setIssues([...issuesRegistry]);
 
-    // تسجيل المشكلة
+    // تسجيل المشكلة (مرة واحدة فقط)
     if (issue.severity === 'critical') {
       productionLogger.error(`🔴 ${issue.message}`, issue.details);
     } else if (issue.severity === 'warning') {
@@ -75,142 +92,147 @@ export function usePerformanceGuard(enabled: boolean = true) {
     }
   }, []);
 
-  // مراقبة Web Vitals
+  // مراقبة Web Vitals - مؤجلة لتحسين LCP
   useEffect(() => {
     if (!enabled || typeof PerformanceObserver === 'undefined') return;
 
     const observers: PerformanceObserver[] = [];
+    
+    // تأجيل بدء المراقبة لتجنب التأثير على التحميل الأولي (3 ثوان)
+    const startDelay = setTimeout(() => {
+      // مراقبة LCP
+      try {
+        const lcpObserver = new PerformanceObserver((list) => {
+          const entries = list.getEntries();
+          const lastEntry = entries[entries.length - 1] as PerformanceEntry & { startTime: number };
+          const lcp = lastEntry.startTime;
 
-    // مراقبة LCP
-    try {
-      const lcpObserver = new PerformanceObserver((list) => {
-        const entries = list.getEntries();
-        const lastEntry = entries[entries.length - 1] as PerformanceEntry & { startTime: number };
-        const lcp = lastEntry.startTime;
+          setMetrics(prev => ({ ...prev, lcp }));
 
-        setMetrics(prev => ({ ...prev, lcp }));
-
-        if (lcp > PERFORMANCE_THRESHOLDS.LCP_POOR) {
-          addIssue({
-            type: 'slow_render',
-            message: `LCP بطيء جداً: ${(lcp / 1000).toFixed(2)}s`,
-            severity: 'critical',
-            details: { lcp, threshold: PERFORMANCE_THRESHOLDS.LCP_POOR },
-          });
-        } else if (lcp > PERFORMANCE_THRESHOLDS.LCP_GOOD) {
-          addIssue({
-            type: 'slow_render',
-            message: `LCP يحتاج تحسين: ${(lcp / 1000).toFixed(2)}s`,
-            severity: 'warning',
-            details: { lcp, threshold: PERFORMANCE_THRESHOLDS.LCP_GOOD },
-          });
-        }
-      });
-      lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
-      observers.push(lcpObserver);
-    } catch (e) {
-      // غير مدعوم
-    }
-
-    // مراقبة FID
-    try {
-      const fidObserver = new PerformanceObserver((list) => {
-        const entries = list.getEntries();
-        entries.forEach((entry) => {
-          const fid = (entry as PerformanceEntry & { processingStart: number }).processingStart - entry.startTime;
-          setMetrics(prev => ({ ...prev, fid }));
-
-          if (fid > PERFORMANCE_THRESHOLDS.FID_POOR) {
+          if (lcp > PERFORMANCE_THRESHOLDS.LCP_POOR) {
             addIssue({
               type: 'slow_render',
-              message: `تأخر استجابة المستخدم: ${fid.toFixed(0)}ms`,
+              message: `LCP بطيء جداً: ${(lcp / 1000).toFixed(2)}s`,
               severity: 'critical',
-              details: { fid },
+              details: { lcp, threshold: PERFORMANCE_THRESHOLDS.LCP_POOR },
+            });
+          } else if (lcp > PERFORMANCE_THRESHOLDS.LCP_GOOD) {
+            addIssue({
+              type: 'slow_render',
+              message: `LCP يحتاج تحسين: ${(lcp / 1000).toFixed(2)}s`,
+              severity: 'warning',
+              details: { lcp, threshold: PERFORMANCE_THRESHOLDS.LCP_GOOD },
             });
           }
         });
-      });
-      fidObserver.observe({ type: 'first-input', buffered: true });
-      observers.push(fidObserver);
-    } catch (e) {
-      // غير مدعوم
-    }
+        lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
+        observers.push(lcpObserver);
+      } catch {
+        // غير مدعوم
+      }
 
-    // مراقبة CLS
-    try {
-      let clsValue = 0;
-      const clsObserver = new PerformanceObserver((list) => {
-        list.getEntries().forEach((entry) => {
-          if (!(entry as PerformanceEntry & { hadRecentInput: boolean }).hadRecentInput) {
-            clsValue += (entry as PerformanceEntry & { value: number }).value;
-            setMetrics(prev => ({ ...prev, cls: clsValue }));
+      // مراقبة FID
+      try {
+        const fidObserver = new PerformanceObserver((list) => {
+          const entries = list.getEntries();
+          entries.forEach((entry) => {
+            const fid = (entry as PerformanceEntry & { processingStart: number }).processingStart - entry.startTime;
+            setMetrics(prev => ({ ...prev, fid }));
 
-            if (clsValue > PERFORMANCE_THRESHOLDS.CLS_POOR) {
+            if (fid > PERFORMANCE_THRESHOLDS.FID_POOR) {
               addIssue({
-                type: 'layout_shift',
-                message: `تحريك تخطيط مفرط: ${clsValue.toFixed(3)}`,
+                type: 'slow_render',
+                message: `تأخر استجابة المستخدم: ${fid.toFixed(0)}ms`,
+                severity: 'critical',
+                details: { fid },
+              });
+            }
+          });
+        });
+        fidObserver.observe({ type: 'first-input', buffered: true });
+        observers.push(fidObserver);
+      } catch {
+        // غير مدعوم
+      }
+
+      // مراقبة CLS
+      try {
+        let clsValue = 0;
+        const clsObserver = new PerformanceObserver((list) => {
+          list.getEntries().forEach((entry) => {
+            if (!(entry as PerformanceEntry & { hadRecentInput: boolean }).hadRecentInput) {
+              clsValue += (entry as PerformanceEntry & { value: number }).value;
+              setMetrics(prev => ({ ...prev, cls: clsValue }));
+
+              if (clsValue > PERFORMANCE_THRESHOLDS.CLS_POOR) {
+                addIssue({
+                  type: 'layout_shift',
+                  message: `تحريك تخطيط مفرط: ${clsValue.toFixed(3)}`,
+                  severity: 'warning',
+                  details: { cls: clsValue },
+                });
+              }
+            }
+          });
+        });
+        clsObserver.observe({ type: 'layout-shift', buffered: true });
+        observers.push(clsObserver);
+      } catch {
+        // غير مدعوم
+      }
+
+      // مراقبة Long Tasks - برفع الحد الأدنى لتقليل الضوضاء
+      try {
+        const longTaskObserver = new PerformanceObserver((list) => {
+          list.getEntries().forEach((entry) => {
+            longTaskCount.current++;
+            setMetrics(prev => ({ ...prev, longTasks: longTaskCount.current }));
+
+            // فقط المهام الطويلة جداً (أكثر من 150ms)
+            if (entry.duration > 150) {
+              addIssue({
+                type: 'long_task',
+                message: `مهمة طويلة: ${entry.duration.toFixed(0)}ms`,
+                severity: entry.duration > 300 ? 'critical' : 'warning',
+                details: { duration: entry.duration, name: entry.name },
+              });
+            }
+          });
+        });
+        longTaskObserver.observe({ type: 'longtask', buffered: true });
+        observers.push(longTaskObserver);
+      } catch {
+        // غير مدعوم
+      }
+
+      // مراقبة FCP
+      try {
+        const fcpObserver = new PerformanceObserver((list) => {
+          const entries = list.getEntries();
+          const fcpEntry = entries.find(e => e.name === 'first-contentful-paint');
+          if (fcpEntry) {
+            const fcp = fcpEntry.startTime;
+            setMetrics(prev => ({ ...prev, fcp }));
+
+            if (fcp > PERFORMANCE_THRESHOLDS.FCP_POOR) {
+              addIssue({
+                type: 'slow_render',
+                message: `FCP بطيء: ${(fcp / 1000).toFixed(2)}s`,
                 severity: 'warning',
-                details: { cls: clsValue },
+                details: { fcp },
               });
             }
           }
         });
-      });
-      clsObserver.observe({ type: 'layout-shift', buffered: true });
-      observers.push(clsObserver);
-    } catch (e) {
-      // غير مدعوم
-    }
-
-    // مراقبة Long Tasks
-    try {
-      const longTaskObserver = new PerformanceObserver((list) => {
-        list.getEntries().forEach((entry) => {
-          longTaskCount.current++;
-          setMetrics(prev => ({ ...prev, longTasks: longTaskCount.current }));
-
-          if (entry.duration > 100) {
-            addIssue({
-              type: 'long_task',
-              message: `مهمة طويلة: ${entry.duration.toFixed(0)}ms`,
-              severity: entry.duration > 200 ? 'critical' : 'warning',
-              details: { duration: entry.duration, name: entry.name },
-            });
-          }
-        });
-      });
-      longTaskObserver.observe({ type: 'longtask', buffered: true });
-      observers.push(longTaskObserver);
-    } catch (e) {
-      // غير مدعوم
-    }
-
-    // مراقبة FCP
-    try {
-      const fcpObserver = new PerformanceObserver((list) => {
-        const entries = list.getEntries();
-        const fcpEntry = entries.find(e => e.name === 'first-contentful-paint');
-        if (fcpEntry) {
-          const fcp = fcpEntry.startTime;
-          setMetrics(prev => ({ ...prev, fcp }));
-
-          if (fcp > PERFORMANCE_THRESHOLDS.FCP_POOR) {
-            addIssue({
-              type: 'slow_render',
-              message: `FCP بطيء: ${(fcp / 1000).toFixed(2)}s`,
-              severity: 'warning',
-              details: { fcp },
-            });
-          }
-        }
-      });
-      fcpObserver.observe({ type: 'paint', buffered: true });
-      observers.push(fcpObserver);
-    } catch (e) {
-      // غير مدعوم
-    }
+        fcpObserver.observe({ type: 'paint', buffered: true });
+        observers.push(fcpObserver);
+      } catch {
+        // غير مدعوم
+      }
+    }, 3000); // تأخير 3 ثوان
 
     return () => {
+      clearTimeout(startDelay);
       observers.forEach(observer => observer.disconnect());
     };
   }, [enabled, addIssue]);
