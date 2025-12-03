@@ -1,4 +1,4 @@
-import BeneficiaryDialog from "@/components/beneficiaries/BeneficiaryDialog";
+import BeneficiaryDialog from "@/components/beneficiary/admin/BeneficiaryDialog";
 import { PropertyDialog } from "@/components/properties/PropertyDialog";
 import { DistributionDialog } from "@/components/funds/DistributionDialog";
 import { AdminSendMessageDialog } from "@/components/messages/AdminSendMessageDialog";

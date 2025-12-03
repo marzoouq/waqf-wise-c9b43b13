@@ -86,3 +86,7 @@ export { AccountStatementView } from './AccountStatementView';
 export { PropertiesListView } from './PropertiesListView';
 export { PropertyAccordionView } from './PropertyAccordionView';
 export { PropertyUnitsGrid } from './PropertyUnitsGrid';
+
+// ==================== Admin Components (للموظفين) ====================
+// يمكن الاستيراد من: @/components/beneficiary/admin
+export * from './admin';

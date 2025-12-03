@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Beneficiary } from "@/types/beneficiary";
-import { SearchCriteria } from "@/components/beneficiaries/AdvancedSearchDialog";
+import { SearchCriteria } from "@/components/beneficiary/admin/AdvancedSearchDialog";
 import { safeFilter } from "@/lib/utils/array-safe";
 
 export function useBeneficiariesFilters(
