@@ -4,8 +4,29 @@
  * 
  * يمكن الاستيراد من:
  * 1. المجلد الرئيسي: @/hooks
- * 2. المجلدات الفرعية: @/hooks/auth, @/hooks/beneficiary, etc.
+ * 2. المجلدات الفرعية حسب الفئة:
+ *    - @/hooks/auth - المصادقة والأمان
+ *    - @/hooks/beneficiary - المستفيدين
+ *    - @/hooks/accounting - المحاسبة
+ *    - @/hooks/property - العقارات
+ *    - @/hooks/distributions - التوزيعات
+ *    - @/hooks/payments - المدفوعات
+ *    - @/hooks/notifications - الإشعارات
+ *    - @/hooks/requests - الطلبات
+ *    - @/hooks/reports - التقارير
+ *    - @/hooks/archive - الأرشيف
+ *    - @/hooks/dashboard - لوحات التحكم
+ *    - @/hooks/system - النظام
+ *    - @/hooks/users - المستخدمين
+ *    - @/hooks/messages - الرسائل
+ *    - @/hooks/support - الدعم الفني
+ *    - @/hooks/ai - الذكاء الاصطناعي
+ *    - @/hooks/governance - الحوكمة
+ *    - @/hooks/ui - واجهة المستخدم
  * 3. الملفات المباشرة: @/hooks/useAuth
+ * 
+ * @version 2.6.4
+ * @lastUpdate 2025-12-03
  */
 
 // ==================== UI & Utility ====================
@@ -16,6 +37,7 @@ export { useKeyboardShortcuts } from './useKeyboardShortcuts';
 export { usePrint } from './usePrint';
 export { useExport } from './useExport';
 export { useExportToExcel } from './useExportToExcel';
+export { useUnifiedExport, formatBeneficiariesForExport, formatPaymentsForExport, formatInvoicesForExport, formatDisclosureForExport, formatPropertiesForExport, formatContractsForExport } from './useUnifiedExport';
 export { useLocalStorage } from './useLocalStorage';
 export { useDebouncedCallback } from './useDebouncedCallback';
 export { useTableSort } from './useTableSort';
