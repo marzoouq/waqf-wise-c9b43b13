@@ -64,14 +64,14 @@ export function useCodeHealthAnalyzer(enabled: boolean = true) {
 
   // الاستماع للتحديثات
   useEffect(() => {
-    if (!enabled) return;
-    
     const listener = (newIssues: CodeIssue[]) => {
       setIssues(newIssues);
     };
     
-    analysisListeners.push(listener);
-    setIssues(Array.from(issuesRegistry.values()));
+    if (enabled) {
+      analysisListeners.push(listener);
+      setIssues(Array.from(issuesRegistry.values()));
+    }
     
     return () => {
       analysisListeners = analysisListeners.filter(l => l !== listener);
@@ -614,15 +614,20 @@ export function useCodeHealthAnalyzer(enabled: boolean = true) {
 
   // تشغيل التحليل الدوري
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled) {
+      return;
+    }
     
-    // تشغيل فوري
-    runFullAnalysis();
+    // تشغيل فوري بعد تأخير قصير
+    const timeout = setTimeout(() => {
+      runFullAnalysis();
+    }, 1000);
     
     // تشغيل دوري كل 30 ثانية
     analysisInterval.current = setInterval(runFullAnalysis, 30000);
     
     return () => {
+      clearTimeout(timeout);
       if (analysisInterval.current) {
         clearInterval(analysisInterval.current);
       }
