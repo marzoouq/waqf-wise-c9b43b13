@@ -124,19 +124,11 @@ export function useCodeHealthAnalyzer(enabled: boolean = true) {
     }
   }, [enabled]);
 
-  // فحص أخطاء Console
+  // فحص أخطاء Console - يتم مرة واحدة فقط
   const checkConsoleErrors = () => {
-    // اعتراض الأخطاء الجديدة
-    const originalError = console.error;
-    console.error = (...args) => {
-      registerIssue({
-        type: 'error',
-        category: 'Console',
-        message: args.map(a => String(a)).join(' ').slice(0, 200),
-        details: 'خطأ في Console',
-      });
-      originalError.apply(console, args);
-    };
+    // لا نعترض console.error هنا لتجنب التكرار
+    // بدلاً من ذلك نفحص الأخطاء المسجلة مسبقاً
+    // تم نقل اعتراض الأخطاء إلى useEffect منفصل
   };
 
   // فحص DOM
