@@ -2,11 +2,11 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.6.7
+ * @version 2.6.8
  * @date 2025-12-03
  */
 
-export const APP_VERSION = '2.6.7';
+export const APP_VERSION = '2.6.8';
 export const APP_VERSION_DATE = '2025-12-03';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
@@ -16,10 +16,10 @@ export const VERSION_INFO = {
   name: APP_VERSION_NAME,
   changelog: '/docs/CHANGELOG.md',
   features: [
-    'إصلاح خطأ useLayoutEffect في صفحة الترحيب',
-    'تبسيط استراتيجية Vite chunks',
-    'دمج React مع vendor chunk لتحسين ترتيب التحميل',
-    'تحسين سرعة تحميل الصفحة الترحيبية',
+    'إصلاح نهائي لخطأ useLayoutEffect',
+    'دمج Radix UI مع vendor chunk',
+    'ضمان ترتيب تحميل صحيح للمكتبات',
+    'تحسين استقرار صفحة الترحيب',
   ],
 } as const;
 
