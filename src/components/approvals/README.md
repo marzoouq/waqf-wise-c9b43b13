@@ -2,7 +2,7 @@
 
 ## المكونات الموجودة
 
-### 1. `ApprovalWorkflowBuilder` (في `/accounting`)
+### `ApprovalWorkflowBuilder` (في `/accounting`)
 **الهدف**: عرض وإدارة مسارات الموافقات المحفوظة في قاعدة البيانات
 
 **الاستخدام**:
@@ -23,49 +23,9 @@ import { ApprovalWorkflowBuilder } from '@/components/accounting/ApprovalWorkflo
 
 ---
 
-### 2. `FlexibleWorkflowBuilder` (في `/approvals`)
-**الهدف**: إنشاء مسارات موافقات مخصصة بشكل تفاعلي (محلي)
-
-**الاستخدام**:
-```tsx
-import { FlexibleWorkflowBuilder } from '@/components/approvals/FlexibleWorkflowBuilder';
-
-<FlexibleWorkflowBuilder />
-```
-
-**المميزات**:
-- ✅ إنشاء مسارات موافقات مخصصة
-- ✅ محرر تفاعلي متقدم
-- ✅ دعم الشروط والتصعيد التلقائي
-- ⚠️ **لا يحفظ في قاعدة البيانات** (State محلي فقط)
-
-**موقع الاستخدام**:
-- لم يتم استخدامه حالياً في النظام الأساسي
-- متاح للاستخدام المستقبلي
-
----
-
-## الفرق الرئيسي
-
-| الميزة | ApprovalWorkflowBuilder | FlexibleWorkflowBuilder |
-|--------|------------------------|-------------------------|
-| **مصدر البيانات** | Supabase | State محلي |
-| **الحفظ** | قاعدة البيانات | Memory فقط |
-| **التعديل** | قراءة فقط | تفاعلي كامل |
-| **الاستخدام** | Production | Demo/Testing |
-
----
-
-## التوحيد المستقبلي
-
-### خطة الدمج (Phase 3):
-1. دمج محرر `FlexibleWorkflowBuilder` مع `ApprovalWorkflowBuilder`
-2. إضافة وظائف الحفظ إلى قاعدة البيانات
-3. توحيد واجهة المستخدم
-4. استخدام مكون واحد فقط
+## التطوير المستقبلي
 
 ### الأولويات:
-- [ ] دمج واجهة التحرير التفاعلية
+- [ ] إضافة واجهة التحرير التفاعلية
 - [ ] إضافة CRUD operations كاملة
-- [ ] حذف المكون المكرر
-- [ ] تحديث التوثيق
+- [ ] تحسين واجهة المستخدم
