@@ -213,7 +213,6 @@ import { useAuth } from '@/hooks/useAuth';
 | `useProfile` | الملف الشخصي |
 | `useAlertCleanup` | تنظيف التنبيهات |
 | `useSelfHealing` | الإصلاح التلقائي |
-| `useQueryPrefetch` | التحميل المسبق |
 
 ### 🏛️ governance/
 | Hook | الوظيفة |
@@ -251,9 +250,7 @@ import { useAuth } from '@/hooks/useAuth';
 | `useExport` | التصدير |
 | `useExportToExcel` | تصدير Excel |
 | `useLocalStorage` | التخزين المحلي |
-| `useSessionStorage` | تخزين الجلسة |
 | `useDebouncedCallback` | Debounce |
-| `useThrottledCallback` | Throttle |
 | `useTableSort` | ترتيب الجداول |
 | `useBulkSelection` | التحديد المتعدد |
 | `useCrudDialog` | محاورات CRUD |
