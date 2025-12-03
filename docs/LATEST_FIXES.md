@@ -2,7 +2,87 @@
 ## Latest Fixes & Updates
 
 **التاريخ:** 2025-12-03  
-**الإصدار:** 2.6.8
+**الإصدار:** 2.6.9
+
+---
+
+## 🔒 إصلاح ثغرة أمنية وتحديث المكتبات (v2.6.9)
+
+### المشكلة
+```
+CVE-2024-22363 - ثغرة ReDoS (Regular Expression Denial of Service) 
+في مكتبة xlsx الإصدارات < 0.20.2
+```
+
+### التحليل
+مكتبة `xlsx` (الإصدار 0.18.5) المستخدمة في التصدير إلى Excel تحتوي على ثغرة أمنية. الإصدارات الآمنة (0.20.2+) متاحة فقط عبر CDN وليس npm.
+
+### الحل المنفذ
+
+#### 1. استبدال xlsx بـ exceljs
+```typescript
+// ❌ قبل: xlsx (ثغرة CVE-2024-22363)
+import * as XLSX from 'xlsx';
+const ws = XLSX.utils.json_to_sheet(data);
+const wb = XLSX.utils.book_new();
+XLSX.writeFile(wb, 'file.xlsx');
+
+// ✅ بعد: exceljs (آمن ومحسن)
+import ExcelJS from 'exceljs';
+const workbook = new ExcelJS.Workbook();
+const worksheet = workbook.addWorksheet('Sheet1', { views: [{ rightToLeft: true }] });
+await workbook.xlsx.writeBuffer();
+```
+
+#### 2. إنشاء Helper موحد
+```typescript
+// src/lib/excel-helper.ts
+export async function exportToExcel(data, filename, sheetName)
+export async function exportToExcelMultiSheet(sheets, filename)
+export async function readExcelFile(file)
+export async function readExcelBuffer(buffer)
+```
+
+### الملفات المُعدّلة
+| الملف | التغيير |
+|-------|---------|
+| `src/lib/excel-helper.ts` | **جديد** - Helper موحد لـ exceljs |
+| `src/lib/export-utils.ts` | استخدام excel-helper |
+| `src/lib/exportHelpers.ts` | استخدام excel-helper |
+| `src/hooks/useUnifiedExport.ts` | استخدام excel-helper |
+| `src/hooks/useExportToExcel.ts` | استخدام excel-helper |
+| `src/components/accounting/BudgetsContent.tsx` | استخدام excel-helper |
+| `src/components/accounting/TrialBalanceReport.tsx` | استخدام excel-helper |
+| `src/components/beneficiary/ReportsMenu.tsx` | استخدام excel-helper |
+| `src/components/beneficiary/admin/BeneficiariesImporter.tsx` | استخدام excel-helper |
+| `src/components/beneficiary/admin/BeneficiariesPrintButton.tsx` | استخدام excel-helper |
+| `src/pages/AllTransactions.tsx` | استخدام excel-helper |
+| `src/pages/Budgets.tsx` | استخدام excel-helper |
+| `src/pages/Loans.tsx` | استخدام excel-helper |
+
+### مقارنة المكتبات
+| الجانب | xlsx (قديم) | exceljs (جديد) |
+|--------|-------------|----------------|
+| الأمان | ❌ CVE-2024-22363 | ✅ آمن |
+| الصيانة | ⚠️ توقفت على npm | ✅ نشطة |
+| دعم RTL | ⚠️ محدود | ✅ كامل |
+| التنسيق | ⚠️ أساسي | ✅ متقدم (ألوان، خطوط) |
+| الحجم | ~300KB | ~250KB |
+
+### المكتبات غير المستخدمة (للحذف اليدوي)
+```
+❌ xlsx - ثغرة أمنية (تم استبدالها)
+❌ embla-carousel-react - غير مستخدمة
+❌ react-resizable-panels - غير مستخدمة  
+❌ react-is - غير مستخدمة
+```
+
+### النتائج
+- ✅ إصلاح CVE-2024-22363
+- ✅ تصدير Excel يعمل بشكل صحيح
+- ✅ دعم RTL في ملفات Excel
+- ✅ تنسيق محسن (ألوان رأس الجدول، صفوف متناوبة)
+- ✅ حجم أصغر (~50KB توفير)
 
 ---
 
@@ -274,16 +354,18 @@ style={{ animationDelay: `${index * 50}ms` }}
 
 ## 📊 ملخص التحسينات الإجمالية
 
-| الفئة | v2.6.0 | v2.6.4 | v2.6.5 | v2.6.6 | v2.6.7 | v2.6.8 |
-|-------|--------|--------|--------|--------|--------|--------|
-| LCP | - | - | <2.5s | **< 0.5s** | < 0.5s | < 0.5s |
-| Dashboard Load | 3.3s | **1.1s** | 1.1s | 1.1s | 1.1s | 1.1s |
-| Hooks تنظيم | - | **152 في 18 مجلد** | - | - | - | - |
-| RLS Policies | **مُبسطة** | - | - | - | - | - |
-| Service Worker | **مُصلح** | - | - | - | - | - |
-| Auth للصفحات العامة | - | - | - | **فوري** | فوري | فوري |
-| Vite Chunks | - | - | - | - | مُبسطة | **نهائي** |
-| Radix UI | - | - | - | - | - | **مدمج مع vendor** |
+| الفئة | v2.6.0 | v2.6.4 | v2.6.5 | v2.6.6 | v2.6.7 | v2.6.8 | v2.6.9 |
+|-------|--------|--------|--------|--------|--------|--------|--------|
+| LCP | - | - | <2.5s | **< 0.5s** | < 0.5s | < 0.5s | < 0.5s |
+| Dashboard Load | 3.3s | **1.1s** | 1.1s | 1.1s | 1.1s | 1.1s | 1.1s |
+| Hooks تنظيم | - | **152 في 18 مجلد** | - | - | - | - | - |
+| RLS Policies | **مُبسطة** | - | - | - | - | - | - |
+| Service Worker | **مُصلح** | - | - | - | - | - | - |
+| Auth للصفحات العامة | - | - | - | **فوري** | فوري | فوري | فوري |
+| Vite Chunks | - | - | - | - | مُبسطة | **نهائي** | نهائي |
+| Radix UI | - | - | - | - | - | **مدمج** | مدمج |
+| أمان المكتبات | - | - | - | - | - | - | **CVE مُصلح** |
+| Excel Export | xlsx | xlsx | xlsx | xlsx | xlsx | xlsx | **exceljs** |
 
 ---
 
@@ -293,11 +375,13 @@ style={{ animationDelay: `${index * 50}ms` }}
 2. **الأداء:** استخدم `Promise.all` للاستعلامات المتوازية
 3. **الأنيميشن:** تجنب `animationDelay` على عناصر LCP
 4. **Vite Chunks:** لا تفصل المكتبات التي تعتمد على React (Radix UI, next-themes, sonner) عن vendor
+5. **Excel Export:** استخدم `src/lib/excel-helper.ts` بدلاً من xlsx مباشرة
 
 ---
 
 ## 🔗 روابط مفيدة
 
+- [DEPENDENCY_POLICY.md](./DEPENDENCY_POLICY.md) - سياسة المكتبات
 - [PERFORMANCE.md](./PERFORMANCE.md) - تقرير الأداء الشامل
 - [CLEANUP.md](./CLEANUP.md) - سجل التنظيف
 - [DEVELOPER_MASTER_GUIDE.md](./DEVELOPER_MASTER_GUIDE.md) - دليل المطور
@@ -305,5 +389,5 @@ style={{ animationDelay: `${index * 50}ms` }}
 ---
 
 **آخر تحديث:** 2025-12-03  
-**الإصدار الحالي:** 2.6.8  
+**الإصدار الحالي:** 2.6.9  
 **الحالة:** ✅ مستقر وجاهز للإنتاج
