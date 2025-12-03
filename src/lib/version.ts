@@ -18,8 +18,8 @@ export const VERSION_INFO = {
   features: [
     'إضافة صلاحية تغيير البريد الإلكتروني للمستخدمين (edit_user_email)',
     'إنشاء Edge Function لتحديث البريد في auth.users',
-    'إصلاح خطأ .single() باستخدام .maybeSingle() للتحقق من البريد',
-    'تكامل EditUserEmailDialog في صفحة إدارة المستخدمين',
+    'اختبار شامل للوحة المشرف (12 مكون، 17 صفحة، 15+ هوك)',
+    'تقرير اختبار موثق في docs/testing/ADMIN_DASHBOARD_TEST_REPORT.md',
   ],
 } as const;
 
