@@ -7,41 +7,39 @@ export function HeroSection() {
     <section
       id="hero"
       className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden"
+      style={{ contain: "layout" }}
     >
-      {/* Background Gradient - Optimized */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/10" />
+      {/* Background - Simple for faster paint */}
+      <div className="absolute inset-0 bg-background" />
 
       <div className="container relative mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
         <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-6 sm:mb-8 animate-fade-in">
+          {/* Badge - No animation for faster LCP */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-6 sm:mb-8">
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
             </span>
             نظام متكامل لإدارة الأوقاف الإسلامية
           </div>
 
-          {/* Main Heading - Immediate render */}
+          {/* Main Heading - LCP Element - No complex styles */}
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight mb-4 sm:mb-6">
             منصة إدارة{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-l from-primary to-primary/70">
-              الوقف الإلكترونية
-            </span>
+            <span className="text-primary">الوقف الإلكترونية</span>
           </h1>
 
-          {/* Description - Immediate render */}
+          {/* Description */}
           <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mb-8 sm:mb-10 leading-relaxed">
             نظام شامل ومتكامل لإدارة الأوقاف الإسلامية بكفاءة عالية وشفافية تامة،
             يدعم توزيع الغلة وإدارة المستفيدين والمحاسبة المتقدمة
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto animate-fade-in">
+          <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto">
             <Link to="/signup" className="w-full sm:w-auto">
               <Button
                 size="lg"
-                className="w-full sm:w-auto gap-2 shadow-xl shadow-primary/25 hover:shadow-2xl hover:shadow-primary/30 transition-all duration-300"
+                className="w-full sm:w-auto gap-2 shadow-lg hover:shadow-xl transition-shadow"
               >
                 ابدأ الآن مجاناً
                 <ArrowLeft className="w-4 h-4" />
@@ -60,7 +58,7 @@ export function HeroSection() {
           </div>
 
           {/* Trust Indicators */}
-          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 mt-12 sm:mt-16 pt-8 sm:pt-12 border-t border-border/50 animate-fade-in">
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 mt-12 sm:mt-16 pt-8 sm:pt-12 border-t border-border/50">
             <div className="flex items-center gap-2 text-muted-foreground">
               <Shield className="w-5 h-5 text-primary" />
               <span className="text-sm">آمن ومشفر</span>
@@ -77,21 +75,8 @@ export function HeroSection() {
         </div>
       </div>
 
-      {/* Bottom Wave */}
-      <div className="absolute bottom-0 left-0 right-0">
-        <svg
-          viewBox="0 0 1440 120"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-full h-auto"
-          preserveAspectRatio="none"
-        >
-          <path
-            d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z"
-            className="fill-background"
-          />
-        </svg>
-      </div>
+      {/* Simplified bottom border instead of SVG */}
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-border/30" />
     </section>
   );
 }
