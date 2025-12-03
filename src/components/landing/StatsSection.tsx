@@ -1,4 +1,3 @@
-import { useEffect, useState, useRef } from "react";
 import { Users, Building2, Banknote, CalendarDays } from "lucide-react";
 
 interface StatItemProps {
@@ -7,56 +6,11 @@ interface StatItemProps {
   suffix: string;
   label: string;
   color: string;
-  delay: number;
 }
 
-function AnimatedCounter({ value, delay }: { value: number; delay: number }) {
-  const [displayValue, setDisplayValue] = useState(0);
-  const [hasAnimated, setHasAnimated] = useState(false);
-  const ref = useRef<HTMLSpanElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !hasAnimated) {
-          setHasAnimated(true);
-          setTimeout(() => {
-            let start = 0;
-            const duration = 1500;
-            const startTime = performance.now();
-            
-            const animate = (currentTime: number) => {
-              const elapsed = currentTime - startTime;
-              const progress = Math.min(elapsed / duration, 1);
-              const easeOut = 1 - Math.pow(1 - progress, 3);
-              const current = Math.round(easeOut * value);
-              setDisplayValue(current);
-              
-              if (progress < 1) {
-                requestAnimationFrame(animate);
-              }
-            };
-            
-            requestAnimationFrame(animate);
-          }, delay);
-        }
-      },
-      { threshold: 0.5 }
-    );
-
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
-
-    return () => observer.disconnect();
-  }, [value, delay, hasAnimated]);
-
-  return <span ref={ref}>{displayValue.toLocaleString("ar-SA")}</span>;
-}
-
-function StatItem({ icon: Icon, value, suffix, label, color, delay }: StatItemProps) {
+function StatItem({ icon: Icon, value, suffix, label, color }: StatItemProps) {
   return (
-    <div className="relative group animate-fade-in" style={{ animationDelay: `${delay}ms` }}>
+    <div className="relative group">
       <div className="flex flex-col items-center text-center p-6 sm:p-8">
         {/* Icon */}
         <div
@@ -65,9 +19,9 @@ function StatItem({ icon: Icon, value, suffix, label, color, delay }: StatItemPr
           <Icon className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
         </div>
 
-        {/* Value */}
+        {/* Value - بدون animation للـ LCP */}
         <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-2">
-          <AnimatedCounter value={value} delay={delay} />
+          <span>{value.toLocaleString("ar-SA")}</span>
           <span className="text-primary">{suffix}</span>
         </div>
 
@@ -132,7 +86,7 @@ export function StatsSection() {
         {/* Stats Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
           {stats.map((stat, index) => (
-            <StatItem key={index} {...stat} delay={index * 100} />
+            <StatItem key={index} {...stat} />
           ))}
         </div>
       </div>
