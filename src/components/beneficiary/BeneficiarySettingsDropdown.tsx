@@ -24,7 +24,7 @@ import {
 import { useTheme } from "next-themes";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/lib/toast";
 import { EditEmailDialog } from "./EditEmailDialog";
 import { EditPhoneDialog } from "./EditPhoneDialog";
 import { NotificationPreferences } from "./NotificationPreferences";
@@ -43,7 +43,6 @@ export function BeneficiarySettingsDropdown({
 }: BeneficiarySettingsDropdownProps) {
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [editEmailOpen, setEditEmailOpen] = useState(false);
   const [editPhoneOpen, setEditPhoneOpen] = useState(false);
   const [notificationSettingsOpen, setNotificationSettingsOpen] = useState(false);

@@ -15,11 +15,10 @@ import {
   Search,
   Filter
 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/lib/toast";
 import { supabase } from "@/integrations/supabase/client";
 
 export function SmartArchiveFeatures() {
-  const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [ocrProgress, setOcrProgress] = useState(0);

@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/lib/toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Bell, Mail, MessageSquare, Smartphone } from "lucide-react";
 
@@ -20,7 +20,6 @@ export function NotificationPreferences({
   beneficiaryId,
   currentPreferences = { email: true, sms: false, push: false },
 }: NotificationPreferencesProps) {
-  const { toast } = useToast();
   const [preferences, setPreferences] = useState(currentPreferences);
   const [saving, setSaving] = useState(false);
 

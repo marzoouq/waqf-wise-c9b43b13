@@ -9,13 +9,11 @@ import { useState } from "react";
 import { ApprovalFlowDialog } from "@/components/funds/ApprovalFlowDialog";
 import { DistributionForApproval, calculateProgress, StatusConfigMap } from "@/types/approvals";
 import { useApprovalPermissions } from "@/hooks/useApprovalPermissions";
-import { useToast } from "@/hooks/use-toast";
 
 export function DistributionApprovalsTab() {
   const [selectedDistribution, setSelectedDistribution] = useState<DistributionForApproval | null>(null);
   const [isFlowDialogOpen, setIsFlowDialogOpen] = useState(false);
   const { canApproveLevel, userRole } = useApprovalPermissions();
-  const { toast } = useToast();
 
   const { data: distributions, isLoading } = useQuery<DistributionForApproval[]>({
     queryKey: ["distributions_with_approvals"],

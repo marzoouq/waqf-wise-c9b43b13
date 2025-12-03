@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Plus, Edit, Trash2, ToggleLeft, ToggleRight } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/lib/toast";
 import {
   Dialog,
   DialogContent,
@@ -16,7 +16,6 @@ import type { AutoJournalTemplate, AutoJournalTemplateRaw } from "@/types/auto-j
 import { parseAutoJournalTemplate } from "@/types/auto-journal";
 
 export function AutoJournalTemplates() {
-  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<AutoJournalTemplate | null>(null);
