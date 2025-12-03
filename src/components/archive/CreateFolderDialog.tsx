@@ -13,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/lib/toast";
 
 const folderSchema = z.object({
   name: z
@@ -39,8 +39,6 @@ export function CreateFolderDialog({
   onOpenChange,
   onCreate,
 }: CreateFolderDialogProps) {
-  const { toast } = useToast();
-
   const form = useForm<FolderFormValues>({
     resolver: zodResolver(folderSchema),
     defaultValues: {

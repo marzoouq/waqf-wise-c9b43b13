@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/lib/toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Phone } from "lucide-react";
 
@@ -25,7 +25,6 @@ interface EditPhoneDialogProps {
 }
 
 export function EditPhoneDialog({ open, onOpenChange, beneficiaryId, currentPhone, onSuccess }: EditPhoneDialogProps) {
-  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<PhoneFormValues>({
