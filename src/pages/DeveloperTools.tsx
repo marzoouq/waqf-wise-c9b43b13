@@ -3,7 +3,7 @@ import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { Code, Activity, AlertCircle, Network, Database, Wrench, Crosshair, Smartphone, Search } from "lucide-react";
+import { Code, Activity, AlertCircle, Network, Database, Wrench, Crosshair, Smartphone, Search, HeartPulse, Radio, Layers } from "lucide-react";
 import { DeveloperOverview } from "@/components/developer/DeveloperOverview";
 import { WebVitalsPanel } from "@/components/developer/WebVitalsPanel";
 import { ErrorsPanel } from "@/components/developer/ErrorsPanel";
@@ -13,6 +13,9 @@ import { ToolsPanel } from "@/components/developer/ToolsPanel";
 import { ComponentInspector } from "@/components/developer/ComponentInspector";
 import { ResponsiveTester } from "@/components/developer/ResponsiveTester";
 import { DeepDiagnosticsPanel } from "@/components/developer/DeepDiagnosticsPanel";
+import { CodeHealthPanel } from "@/components/developer/CodeHealthPanel";
+import { RealTimeMonitorPanel } from "@/components/developer/RealTimeMonitorPanel";
+import { ComponentProfilerPanel } from "@/components/developer/ComponentProfilerPanel";
 
 export default function DeveloperTools() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -69,9 +72,21 @@ export default function DeveloperTools() {
                   <Smartphone className="w-4 h-4" />
                   <span className="hidden sm:inline">الاستجابة</span>
                 </TabsTrigger>
-                <TabsTrigger value="diagnostics" className="flex items-center gap-1 py-3 text-xs sm:text-sm min-h-[44px]">
+              <TabsTrigger value="diagnostics" className="flex items-center gap-1 py-3 text-xs sm:text-sm min-h-[44px]">
                   <Search className="w-4 h-4" />
-                  <span className="hidden sm:inline">التشخيص العميق</span>
+                  <span className="hidden sm:inline">التشخيص</span>
+                </TabsTrigger>
+                <TabsTrigger value="health" className="flex items-center gap-1 py-3 text-xs sm:text-sm min-h-[44px]">
+                  <HeartPulse className="w-4 h-4" />
+                  <span className="hidden sm:inline">صحة الكود</span>
+                </TabsTrigger>
+                <TabsTrigger value="realtime" className="flex items-center gap-1 py-3 text-xs sm:text-sm min-h-[44px]">
+                  <Radio className="w-4 h-4" />
+                  <span className="hidden sm:inline">مباشر</span>
+                </TabsTrigger>
+                <TabsTrigger value="profiler" className="flex items-center gap-1 py-3 text-xs sm:text-sm min-h-[44px]">
+                  <Layers className="w-4 h-4" />
+                  <span className="hidden sm:inline">المكونات</span>
                 </TabsTrigger>
               </TabsList>
               <ScrollBar orientation="horizontal" />
@@ -111,6 +126,18 @@ export default function DeveloperTools() {
 
             <TabsContent value="diagnostics" className="space-y-6 mt-6">
               <DeepDiagnosticsPanel />
+            </TabsContent>
+
+            <TabsContent value="health" className="space-y-6 mt-6">
+              <CodeHealthPanel />
+            </TabsContent>
+
+            <TabsContent value="realtime" className="space-y-6 mt-6">
+              <RealTimeMonitorPanel />
+            </TabsContent>
+
+            <TabsContent value="profiler" className="space-y-6 mt-6">
+              <ComponentProfilerPanel />
             </TabsContent>
           </Tabs>
       </MobileOptimizedLayout>
