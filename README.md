@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-2.6.4-blue.svg)
+![Version](https://img.shields.io/badge/version-2.6.5-blue.svg)
 ![Type Safety](https://img.shields.io/badge/type--safety-99.5%25-green.svg)
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)
 ![License](https://img.shields.io/badge/license-Proprietary-red.svg)
@@ -168,7 +168,6 @@ npm run dev
 - ✅ **المصادقة الثنائية (2FA)** للحسابات الحساسة
 - ✅ **تسجيل العمليات** الكامل (Audit Logs)
 - ✅ **Rate Limiting** لحماية من الهجمات
-- ✅ **حماية تلقائية** للسياسات المحمية (Event Trigger)
 
 ### شفافية المستفيدين
 
@@ -176,10 +175,6 @@ npm run dev
 - ✅ **وصول قراءة** لجميع البيانات المالية
 - ✅ **اطلاع كامل** على العقارات والعقود
 - ✅ **متابعة شاملة** للتوزيعات
-- ✅ **حماية تلقائية** لحقوقهم
-- ✅ **توثيق كامل** في جداول الأمان
-
-📚 **للمزيد:** راجع `/docs/RLS_POLICIES_DOCUMENTATION.md`
 
 ---
 
@@ -191,23 +186,19 @@ npm run dev
 |---------|--------|
 | [`README.md`](README.md) | نظرة عامة على المشروع |
 | [`CHANGELOG.md`](CHANGELOG.md) | سجل التغييرات التفصيلي |
-| [`SECURITY.md`](SECURITY.md) | سياسات الأمان |
-| [`CONTRIBUTING.md`](CONTRIBUTING.md) | دليل المساهمة |
+| [`ARCHITECTURE.md`](ARCHITECTURE.md) | البنية المعمارية |
 
 ### 📁 الوثائق التفصيلية (`/docs`)
 
 | الوثيقة | المحتوى |
 |---------|---------|
-| [`ARCHITECTURE.md`](docs/ARCHITECTURE.md) | البنية المعمارية |
-| [`DEVELOPER_GUIDE.md`](docs/DEVELOPER_GUIDE.md) | دليل المطورين |
-| [`DEVELOPER_MASTER_GUIDE.md`](docs/DEVELOPER_MASTER_GUIDE.md) | الدليل الشامل |
-| [`RLS_POLICIES_DOCUMENTATION.md`](docs/RLS_POLICIES_DOCUMENTATION.md) | سياسات الأمان (RLS) |
-| [`TESTING.md`](docs/TESTING.md) | دليل الاختبارات |
-| [`TRANSPARENCY_SYSTEM_GUIDE.md`](docs/TRANSPARENCY_SYSTEM_GUIDE.md) | نظام الشفافية |
-| [`MAINTENANCE_PROCEDURES.md`](docs/MAINTENANCE_PROCEDURES.md) | إجراءات الصيانة |
-| [`SYSTEM_HEALTH_GUIDE.md`](docs/SYSTEM_HEALTH_GUIDE.md) | دليل صحة النظام |
-| [`TROUBLESHOOTING_GUIDE.md`](docs/TROUBLESHOOTING_GUIDE.md) | دليل حل المشكلات |
-| [`CLEANUP_LOG.md`](docs/CLEANUP_LOG.md) | سجل تنظيف الكود |
+| [`LATEST_FIXES.md`](docs/LATEST_FIXES.md) | آخر الإصلاحات (v2.6.5) |
+| [`DEVELOPER_MASTER_GUIDE.md`](docs/DEVELOPER_MASTER_GUIDE.md) | دليل المطور الشامل |
+| [`PERFORMANCE.md`](docs/PERFORMANCE.md) | تقرير الأداء |
+| [`CLEANUP.md`](docs/CLEANUP.md) | سجل التنظيف |
+| [`SECURITY_FIX_PLAN.md`](docs/SECURITY_FIX_PLAN.md) | خطة الأمان |
+| [`DEBUGGING_GUIDE.md`](docs/DEBUGGING_GUIDE.md) | دليل التصحيح |
+| [`DEPLOYMENT.md`](docs/DEPLOYMENT.md) | دليل النشر |
 
 ---
 
@@ -222,9 +213,6 @@ npm run test:coverage
 
 # اختبارات E2E
 npm run test:e2e
-
-# اختبار المكونات
-npm run test:components
 ```
 
 **التغطية الحالية:**
@@ -289,8 +277,8 @@ logger.info('Operation completed', { data });
 ```
 ✅ 22 مرحلة وظيفية مكتملة
 ✅ 112+ سياسة RLS
-✅ 47 ملف معالجة أخطاء
-✅ 100% معالجة موحدة
+✅ 152 Custom Hook منظم
+✅ 39 Edge Function
 ✅ Type Safety شامل (99.5%)
 ✅ RTL Support كامل
 ✅ Production Ready ⭐⭐⭐⭐⭐
@@ -300,11 +288,12 @@ logger.info('Operation completed', { data });
 
 ## ⚡ الأداء
 
-- ⚡ **زمن التحميل:** < 2 ثانية
-- 🔄 **معاودة تلقائية:** 2 محاولات
-- 💾 **تخزين ذكي:** QueryClient Cache
-- 🎯 **Exponential Backoff** للطلبات
-- 📦 **Progressive Loading** للبيانات الكبيرة
+| المقياس | القيمة |
+|---------|--------|
+| LCP (Landing) | <2.5s |
+| Dashboard Load | ~1.1s |
+| Initial Load | <1s |
+| Cache Hit Rate | 95% |
 
 ---
 
@@ -352,7 +341,7 @@ logger.info('Operation completed', { data });
 
 **مبني بـ ❤️ باستخدام React + TypeScript + Lovable Cloud**
 
-**النسخة: 2.6.4** | **الحالة: 🟢 جاهز للإنتاج**
+**النسخة: 2.6.5** | **الحالة: 🟢 جاهز للإنتاج**
 
 ---
 
