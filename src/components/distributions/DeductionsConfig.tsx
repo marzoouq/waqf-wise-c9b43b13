@@ -2,7 +2,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
-import type { DeductionsValues } from '@/types/distribution/index';
+import type { DeductionsValues } from '@/types/distributions';
 
 interface DeductionsConfigProps {
   values: DeductionsValues;

@@ -14,7 +14,7 @@ import type {
   DeductionsValues, 
   ApprovalSettingsValues,
   DistributionPattern 
-} from '@/types/distribution/index';
+} from '@/types/distributions';
 
 interface DistributionWizardProps {
   open: boolean;
