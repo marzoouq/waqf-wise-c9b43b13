@@ -16,7 +16,6 @@ export { useVisibilitySettings } from '../useVisibilitySettings';
 export { useProfile } from '../useProfile';
 export { useAlertCleanup } from '../useAlertCleanup';
 export { useSelfHealing } from '../useSelfHealing';
-export { useQueryPrefetch } from '../useQueryPrefetch';
 export { useSystemMonitoring } from '../useSystemMonitoring';
 export { usePermissionsManagement } from '../usePermissionsManagement';
 export { useRolesManagement } from '../useRolesManagement';
