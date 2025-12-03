@@ -4,8 +4,10 @@
  */
 
 import { Route } from "react-router-dom";
+import { Suspense } from "react";
+// ✅ تحميل فوري للصفحة الترحيبية (أهم صفحة للأداء)
+import LandingPageEager from "@/pages/LandingPage";
 import {
-  LandingPage,
   Login,
   Signup,
   Install,
@@ -17,15 +19,25 @@ import {
   Contact,
 } from "./lazyPages";
 
+// ✅ Fallback خفيف للصفحات الثانوية
+const LightFallback = () => (
+  <div className="min-h-screen flex items-center justify-center">
+    <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+  </div>
+);
+
 export const publicRoutes = [
-  <Route key="landing" path="/" element={<LandingPage />} />,
-  <Route key="login" path="/login" element={<Login />} />,
-  <Route key="signup" path="/signup" element={<Signup />} />,
-  <Route key="install" path="/install" element={<Install />} />,
-  <Route key="unauthorized" path="/unauthorized" element={<Unauthorized />} />,
-  <Route key="privacy" path="/privacy" element={<PrivacyPolicy />} />,
-  <Route key="terms" path="/terms" element={<TermsOfUse />} />,
-  <Route key="security-policy" path="/security-policy" element={<SecurityPolicyPage />} />,
-  <Route key="faq" path="/faq" element={<FAQ />} />,
-  <Route key="contact" path="/contact" element={<Contact />} />,
+  // ✅ الصفحة الترحيبية - تحميل فوري بدون Suspense
+  <Route key="landing" path="/" element={<LandingPageEager />} />,
+  
+  // باقي الصفحات العامة مع Suspense خفيف
+  <Route key="login" path="/login" element={<Suspense fallback={<LightFallback />}><Login /></Suspense>} />,
+  <Route key="signup" path="/signup" element={<Suspense fallback={<LightFallback />}><Signup /></Suspense>} />,
+  <Route key="install" path="/install" element={<Suspense fallback={<LightFallback />}><Install /></Suspense>} />,
+  <Route key="unauthorized" path="/unauthorized" element={<Suspense fallback={<LightFallback />}><Unauthorized /></Suspense>} />,
+  <Route key="privacy" path="/privacy" element={<Suspense fallback={<LightFallback />}><PrivacyPolicy /></Suspense>} />,
+  <Route key="terms" path="/terms" element={<Suspense fallback={<LightFallback />}><TermsOfUse /></Suspense>} />,
+  <Route key="security-policy" path="/security-policy" element={<Suspense fallback={<LightFallback />}><SecurityPolicyPage /></Suspense>} />,
+  <Route key="faq" path="/faq" element={<Suspense fallback={<LightFallback />}><FAQ /></Suspense>} />,
+  <Route key="contact" path="/contact" element={<Suspense fallback={<LightFallback />}><Contact /></Suspense>} />,
 ];

@@ -90,21 +90,21 @@ const App = () => {
                   }}
                 >
                   <LazyErrorBoundary>
-                    <Suspense fallback={<LoadingState size="lg" fullScreen />}>
-                      <Routes>
-                        {/* المسارات العامة */}
-                        {publicRoutes}
-                        
-                        {/* صفحة التوجيه الذكي */}
-                        <Route path="/redirect" element={<RoleBasedRedirect />} />
-                        
-                        {/* مسارات المستفيد المستقلة */}
-                        {beneficiaryStandaloneRoutes}
-                        
-                        {/* المسارات المحمية داخل MainLayout */}
-                        <Route
-                          path="/*"
-                          element={
+                    <Routes>
+                      {/* ✅ المسارات العامة - بدون Suspense للتحميل الفوري */}
+                      {publicRoutes}
+                      
+                      {/* صفحة التوجيه الذكي */}
+                      <Route path="/redirect" element={<RoleBasedRedirect />} />
+                      
+                      {/* مسارات المستفيد المستقلة */}
+                      {beneficiaryStandaloneRoutes}
+                      
+                      {/* ✅ المسارات المحمية داخل Suspense */}
+                      <Route
+                        path="/*"
+                        element={
+                          <Suspense fallback={<LoadingState size="lg" fullScreen />}>
                             <ProtectedRoute>
                               <MainLayout>
                                 <Routes>
@@ -122,10 +122,10 @@ const App = () => {
                                 </Routes>
                               </MainLayout>
                             </ProtectedRoute>
-                          }
-                        />
-                      </Routes>
-                    </Suspense>
+                          </Suspense>
+                        }
+                      />
+                    </Routes>
                   </LazyErrorBoundary>
                 </BrowserRouter>
               </TooltipProvider>
