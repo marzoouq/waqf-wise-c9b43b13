@@ -13,7 +13,7 @@ export default defineConfig(({ mode }) => {
   logLevel: 'warn',
   
   define: {
-    'import.meta.env.VITE_APP_VERSION': JSON.stringify('2.6.7'),
+    'import.meta.env.VITE_APP_VERSION': JSON.stringify('2.6.8'),
     'import.meta.env.VITE_BUILD_TIME': JSON.stringify(new Date().toISOString()),
     'process.env.NODE_ENV': JSON.stringify('production'),
   },
@@ -69,14 +69,7 @@ export default defineConfig(({ mode }) => {
               return 'react-forms';
             }
             
-            // Radix UI
-            if (id.includes('@radix-ui')) {
-              if (id.includes('dialog') || id.includes('dropdown-menu') || 
-                  id.includes('select') || id.includes('popover')) {
-                return 'radix-core';
-              }
-              return 'radix-extended';
-            }
+            // ✅ Radix UI يذهب لـ vendor مع React لضمان ترتيب التحميل الصحيح
             
             // React Query
             if (id.includes('@tanstack/react-query')) {
