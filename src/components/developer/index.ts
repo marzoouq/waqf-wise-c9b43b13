@@ -9,3 +9,8 @@ export { ResponsiveTester } from "./ResponsiveTester";
 export { DeepDiagnosticsPanel } from "./DeepDiagnosticsPanel";
 export { GlobalMonitoring } from "./GlobalMonitoring";
 export { BackgroundMonitor } from "./BackgroundMonitor";
+
+// أدوات التحليل المتقدمة الجديدة
+export { CodeHealthPanel } from "./CodeHealthPanel";
+export { RealTimeMonitorPanel } from "./RealTimeMonitorPanel";
+export { ComponentProfilerPanel } from "./ComponentProfilerPanel";
