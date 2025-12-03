@@ -6,7 +6,7 @@
  * @date 2025-12-03
  */
 
-export const APP_VERSION = '2.6.9';
+export const APP_VERSION = '2.6.10';
 export const APP_VERSION_DATE = '2025-12-03';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
@@ -16,10 +16,10 @@ export const VERSION_INFO = {
   name: APP_VERSION_NAME,
   changelog: '/docs/CHANGELOG.md',
   features: [
-    'استبدال xlsx بـ exceljs (إصلاح CVE-2024-22363)',
-    'تحسين أمان تصدير Excel',
-    'دعم تنسيق RTL في ملفات Excel',
-    'تحسين أداء قراءة وكتابة Excel',
+    'إصلاح مشكلة التحميل بعد تسجيل الدخول (Race Condition)',
+    'إضافة Timeout احتياطي لـ RoleBasedRedirect',
+    'تحسين AuthContext لمنع تكرار جلب البيانات',
+    'استخدام الأدوار المخزنة مؤقتاً كـ Fallback',
   ],
 } as const;
 

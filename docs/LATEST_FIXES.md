@@ -2,7 +2,76 @@
 ## Latest Fixes & Updates
 
 **التاريخ:** 2025-12-03  
-**الإصدار:** 2.6.9
+**الإصدار:** 2.6.10
+
+---
+
+## 🔐 إصلاح مشكلة التحميل بعد تسجيل الدخول (v2.6.10)
+
+### المشكلة
+شاشة "جاري التحميل..." تظهر للأبد بعد تسجيل الدخول بسبب Race Condition.
+
+### السبب الجذري
+1. `Login.tsx` يوجه إلى `/redirect` فوراً قبل اكتمال تحميل بيانات المستخدم
+2. `AuthContext` يعيد `isLoading=true` عند `SIGNED_IN` حتى لو البيانات محملة
+3. `RoleBasedRedirect` ينتظر للأبد بدون timeout
+
+### الحل المنفذ
+
+#### 1. إصلاح Login.tsx
+```typescript
+// ❌ قبل: توجيه فوري
+await signIn(identifier, password);
+navigate('/redirect');
+
+// ✅ بعد: انتظار اكتمال المصادقة
+const [loginSuccess, setLoginSuccess] = useState(false);
+
+useEffect(() => {
+  if (loginSuccess && user && !authLoading && roles.length > 0) {
+    navigate('/redirect');
+  }
+}, [loginSuccess, user, authLoading, roles]);
+```
+
+#### 2. إصلاح AuthContext.tsx
+```typescript
+// ✅ منع إعادة isLoading لـ true إذا البيانات محملة
+if (event === 'SIGNED_IN') {
+  if (!isInitialized || rolesCache.current.length === 0) {
+    setIsLoading(true);
+  }
+}
+```
+
+#### 3. إضافة Timeout في RoleBasedRedirect
+```typescript
+// ✅ timeout 5 ثواني + fallback للأدوار المخزنة
+const [loadingTooLong, setLoadingTooLong] = useState(false);
+
+useEffect(() => {
+  const timer = setTimeout(() => setLoadingTooLong(true), 5000);
+  return () => clearTimeout(timer);
+}, []);
+
+if (loadingTooLong && user) {
+  const cachedRoles = localStorage.getItem('waqf_user_roles');
+  // استخدام الأدوار المخزنة أو التوجيه للـ dashboard العام
+}
+```
+
+### الملفات المُعدّلة
+| الملف | التغيير |
+|-------|---------|
+| `src/pages/Login.tsx` | استخدام useEffect للتوجيه بدلاً من navigate فوري |
+| `src/contexts/AuthContext.tsx` | منع تكرار isLoading عند SIGNED_IN |
+| `src/components/auth/RoleBasedRedirect.tsx` | إضافة timeout + fallback |
+
+### النتائج
+- ✅ إصلاح Race Condition في تسجيل الدخول
+- ✅ منع التعليق في شاشة التحميل
+- ✅ Fallback للأدوار المخزنة مؤقتاً
+- ✅ تحسين تجربة المستخدم
 
 ---
 
