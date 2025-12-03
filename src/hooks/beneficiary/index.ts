@@ -10,6 +10,8 @@ export { useBeneficiaryAttachments } from '../useBeneficiaryAttachments';
 export { useBeneficiaryActivityLog } from '../useBeneficiaryActivityLog';
 export { useBeneficiaryCategories } from '../useBeneficiaryCategories';
 export { useBeneficiariesFilters } from '../useBeneficiariesFilters';
+export { useBeneficiaryEmergencyAid } from '../useBeneficiaryEmergencyAid';
+export { useBeneficiaryLoans } from '../useBeneficiaryLoans';
 export { useFamilies } from '../useFamilies';
 export { useTribes } from '../useTribes';
 export { useEligibilityAssessment } from '../useEligibilityAssessment';

@@ -43,6 +43,8 @@ export { useBeneficiaryAttachments } from './useBeneficiaryAttachments';
 export { useBeneficiaryActivityLog } from './useBeneficiaryActivityLog';
 export { useBeneficiaryCategories } from './useBeneficiaryCategories';
 export { useBeneficiariesFilters } from './useBeneficiariesFilters';
+export { useBeneficiaryEmergencyAid } from './useBeneficiaryEmergencyAid';
+export { useBeneficiaryLoans } from './useBeneficiaryLoans';
 export { useFamilies } from './useFamilies';
 export { useTribes } from './useTribes';
 export { useEligibilityAssessment } from './useEligibilityAssessment';
@@ -174,9 +176,12 @@ export { useRolesManagement } from './useRolesManagement';
 // ==================== Governance ====================
 export { useGovernanceDecisions } from './useGovernanceDecisions';
 export { useGovernanceVoting } from './useGovernanceVoting';
+export { useGovernanceData } from './useGovernanceData';
 export { useFunds } from './useFunds';
 export { useWaqfUnits } from './useWaqfUnits';
+export { useWaqfBudgets } from './useWaqfBudgets';
 export { useAnnualDisclosures, useDisclosureBeneficiaries } from './useAnnualDisclosures';
+export { useFiscalYearClosings } from './useFiscalYearClosings';
 
 // ==================== Reports ====================
 export { useReports } from './useReports';
