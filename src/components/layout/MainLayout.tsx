@@ -1,4 +1,4 @@
-import { ReactNode, useState, memo, useMemo, lazy, Suspense } from "react";
+import { ReactNode, useState, memo, useMemo, useEffect, lazy, Suspense } from "react";
 // ⚠️ IMPORTANT: Always import from AppSidebar.tsx (not Sidebar.tsx)
 import AppSidebar from "./AppSidebar";
 import { GlobalMonitoring } from "@/components/developer/GlobalMonitoring";
@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import { RoleSwitcher } from "./RoleSwitcher";
+import { useAlertCleanup } from "@/hooks/useAlertCleanup";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -167,6 +168,30 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   const { profile } = useProfile();
   const [searchOpen, setSearchOpen] = useState(false);
   const { isBeneficiary, isWaqfHeir } = useUserRole();
+  
+  // ✅ تنظيف التنبيهات - يعمل فقط للصفحات المحمية
+  useAlertCleanup();
+  
+  // ✅ تحميل كسول للتهيئة الثقيلة بعد التحميل الأولي
+  useEffect(() => {
+    const loadHeavyModules = async () => {
+      // تأخير التحميل حتى يصبح المتصفح فارغاً
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(async () => {
+          await import('@/lib/errors/tracker');
+          await import('@/lib/selfHealing');
+        });
+      } else {
+        // Fallback للمتصفحات القديمة
+        setTimeout(async () => {
+          await import('@/lib/errors/tracker');
+          await import('@/lib/selfHealing');
+        }, 2000);
+      }
+    };
+    
+    loadHeavyModules();
+  }, []);
   
   // حساب القيم مرة واحدة
   const { displayName, displayEmail, userInitial } = useMemo(() => ({

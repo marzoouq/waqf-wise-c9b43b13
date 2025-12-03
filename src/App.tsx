@@ -17,9 +17,7 @@ import { LazyErrorBoundary } from "./components/shared/LazyErrorBoundary";
 import { LoadingState } from "./components/shared/LoadingState";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { RoleBasedRedirect } from "./components/auth/RoleBasedRedirect";
-import { useAlertCleanup } from "./hooks/useAlertCleanup";
-import "@/lib/errors/tracker";
-import "@/lib/selfHealing";
+// ✅ نقل التهيئة الثقيلة إلى MainLayout للصفحات المحمية فقط
 
 // Import DevTools configuration
 import { DEVTOOLS_CONFIG } from "./lib/devtools";
@@ -76,8 +74,7 @@ const queryClient = new QueryClient({
 });
 
 const App = () => {
-  useAlertCleanup();
-  
+  // ✅ useAlertCleanup نُقل إلى MainLayout
   return (
     <GlobalErrorBoundary>
       <QueryClientProvider client={queryClient}>
