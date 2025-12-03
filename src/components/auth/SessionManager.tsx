@@ -12,10 +12,9 @@ export function SessionManager() {
   const { user, isLoading } = useAuth();
   const { updateLastActive } = useSessionCleanup();
 
-  // انتظار اكتمال تهيئة Auth قبل أي عمليات
-  if (isLoading) return null;
-
   useEffect(() => {
+    // لا تفعل شيء حتى يكتمل التحميل
+    if (isLoading) return;
     // التحقق من تنظيف معلق عند تحميل التطبيق
     const checkAndCleanup = async () => {
       const hadCleanup = await checkPendingCleanup();

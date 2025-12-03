@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useIdleTimeout } from "@/hooks/useIdleTimeout";
@@ -10,7 +10,7 @@ import { productionLogger } from "@/lib/logger/production-logger";
 /**
  * مكون لإدارة الخروج التلقائي للمستفيدين عند عدم النشاط
  * - يعمل فقط للمستفيدين
- * - مهلة: دقيقة واحدة (60 ثانية)
+ * - مهلة: 5 دقائق
  * - ينظف الحالة تلقائياً عند الخروج
  */
 export function IdleTimeoutManager() {
@@ -18,14 +18,14 @@ export function IdleTimeoutManager() {
   const { isNazer, isAdmin, isLoading: roleLoading } = useUserRole();
   const navigate = useNavigate();
 
-  // انتظار اكتمال تهيئة Auth قبل أي عمليات
-  if (authLoading || roleLoading) return null;
+  // حساب حالة التفعيل
+  const isReady = !authLoading && !roleLoading;
+  const shouldEnable = isReady && !!user && !isNazer && !isAdmin;
 
   // الخروج التلقائي وتنظيف الحالة
-  const handleIdleLogout = async () => {
+  const handleIdleLogout = useCallback(async () => {
     productionLogger.info('خروج تلقائي بسبب عدم النشاط');
 
-    // عرض إشعار
     toast.warning("تم تسجيل خروجك تلقائياً", {
       description: "لم يتم اكتشاف أي نشاط لمدة 5 دقائق",
       duration: 5000,
@@ -33,45 +33,36 @@ export function IdleTimeoutManager() {
 
     try {
       // تنظيف localStorage
-      const keysToKeep = ['theme']; // الاحتفاظ بإعدادات الثيم
+      const keysToKeep = ['theme'];
       Object.keys(localStorage).forEach(key => {
         if (!keysToKeep.includes(key)) {
           localStorage.removeItem(key);
         }
       });
 
-      // تنظيف sessionStorage
       sessionStorage.clear();
-
-      // تسجيل الخروج
       await signOut();
-
-      // إعادة التوجيه لصفحة تسجيل الدخول
       navigate('/login', { replace: true });
     } catch (error) {
-      // تسجيل تحذير بدلاً من خطأ حرج - هذا سلوك متوقع أحياناً
       productionLogger.warn('تحذير أثناء الخروج التلقائي - تم التجاوز', { error });
-      
-      // محاولة الخروج على مستوى Supabase مباشرة
       await supabase.auth.signOut();
       navigate('/login', { replace: true });
     }
-  };
+  }, [signOut, navigate]);
 
-  // تفعيل نظام الخروج التلقائي
-  const { resetTimer } = useIdleTimeout({
+  // تفعيل نظام الخروج التلقائي - يجب استدعاؤه دائماً (قبل أي return)
+  useIdleTimeout({
     onIdle: handleIdleLogout,
-    idleTime: 5 * 60 * 1000, // 5 دقائق
-    enabled: !roleLoading && !!user && !isNazer && !isAdmin, // لجميع المستخدمين عدا الناظر والمشرف
+    idleTime: 5 * 60 * 1000,
+    enabled: shouldEnable,
   });
 
-  // تنظيف إضافي عند فك التحميل (unmount)
+  // تنظيف إضافي عند فك التحميل
   useEffect(() => {
     return () => {
       // تنظيف صامت
     };
-  }, [isNazer, isAdmin, user]);
+  }, []);
 
-  // المكون لا يعرض أي UI
   return null;
 }
