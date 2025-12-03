@@ -209,10 +209,10 @@ export function WebVitalsPanel() {
         </CardContent>
       </Card>
 
-      {/* Recommendations */}
+      {/* Dynamic Recommendations based on current metrics */}
       <Card>
         <CardHeader>
-          <CardTitle>توصيات التحسين</CardTitle>
+          <CardTitle>توصيات التحسين للصفحة الحالية</CardTitle>
         </CardHeader>
         <CardContent>
           <ul className="space-y-2 text-sm">
@@ -246,10 +246,69 @@ export function WebVitalsPanel() {
              (!vitals.ttfb || vitals.ttfb <= 800) && (
               <li className="flex items-start gap-2 text-green-600">
                 <span>✅</span>
-                <span>أداء التطبيق ممتاز! جميع المقاييس ضمن الحدود المثالية</span>
+                <span>أداء الصفحة الحالية ممتاز!</span>
               </li>
             )}
           </ul>
+        </CardContent>
+      </Card>
+
+      {/* General Best Practices - Always Shown */}
+      <Card>
+        <CardHeader>
+          <CardTitle>أفضل ممارسات تحسين الأداء</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div className="space-y-2">
+              <h4 className="font-medium flex items-center gap-2">
+                <Gauge className="w-4 h-4 text-primary" />
+                LCP (أكبر عنصر) - الهدف: &lt;2.5s
+              </h4>
+              <ul className="space-y-1 text-muted-foreground mr-6">
+                <li>• استخدم lazy loading للصور</li>
+                <li>• ضغط الصور واستخدام WebP</li>
+                <li>• تحميل CSS المهم أولاً</li>
+                <li>• استخدام preload للموارد الحرجة</li>
+              </ul>
+            </div>
+            <div className="space-y-2">
+              <h4 className="font-medium flex items-center gap-2">
+                <Clock className="w-4 h-4 text-primary" />
+                TTFB (وقت الاستجابة) - الهدف: &lt;800ms
+              </h4>
+              <ul className="space-y-1 text-muted-foreground mr-6">
+                <li>• استخدام CDN</li>
+                <li>• تفعيل HTTP/2 أو HTTP/3</li>
+                <li>• تحسين استعلامات قاعدة البيانات</li>
+                <li>• تفعيل التخزين المؤقت</li>
+              </ul>
+            </div>
+            <div className="space-y-2">
+              <h4 className="font-medium flex items-center gap-2">
+                <Zap className="w-4 h-4 text-primary" />
+                FCP (أول رسم) - الهدف: &lt;1.8s
+              </h4>
+              <ul className="space-y-1 text-muted-foreground mr-6">
+                <li>• تقليل حجم JavaScript</li>
+                <li>• تأجيل تحميل السكريبتات غير الضرورية</li>
+                <li>• تقليل حجم CSS</li>
+                <li>• إزالة موارد render-blocking</li>
+              </ul>
+            </div>
+            <div className="space-y-2">
+              <h4 className="font-medium flex items-center gap-2">
+                <Activity className="w-4 h-4 text-primary" />
+                CLS (استقرار التخطيط) - الهدف: &lt;0.1
+              </h4>
+              <ul className="space-y-1 text-muted-foreground mr-6">
+                <li>• تحديد أبعاد الصور والفيديو</li>
+                <li>• حجز مساحة للإعلانات</li>
+                <li>• تجنب إدراج محتوى ديناميكي فوق المحتوى</li>
+                <li>• استخدام font-display: swap</li>
+              </ul>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>
