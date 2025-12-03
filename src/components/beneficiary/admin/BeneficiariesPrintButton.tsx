@@ -37,8 +37,7 @@ export function BeneficiariesPrintButton({ beneficiaries }: BeneficiariesPrintBu
   };
 
   const handleExportExcel = async () => {
-    // Dynamic import for XLSX
-    const XLSX = await import("xlsx");
+    const { exportToExcel } = await import("@/lib/excel-helper");
     
     const data = beneficiaries.map((b, index) => ({
       'م': index + 1,
@@ -52,24 +51,7 @@ export function BeneficiariesPrintButton({ beneficiaries }: BeneficiariesPrintBu
       'الحالة': b.status,
     }));
 
-    const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "المستفيدين");
-    
-    // ضبط عرض الأعمدة
-    ws['!cols'] = [
-      { wch: 5 },  // م
-      { wch: 30 }, // الاسم
-      { wch: 15 }, // الهوية
-      { wch: 10 }, // الجنسية
-      { wch: 12 }, // القرابة
-      { wch: 8 },  // الجنس
-      { wch: 15 }, // الجوال
-      { wch: 25 }, // البريد
-      { wch: 10 }, // الحالة
-    ];
-
-    XLSX.writeFile(wb, `كشف_المستفيدين_${new Date().getTime()}.xlsx`);
+    await exportToExcel(data, `كشف_المستفيدين_${new Date().getTime()}`, "المستفيدين");
   };
 
   return (

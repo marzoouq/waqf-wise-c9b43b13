@@ -5,7 +5,7 @@
 
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
-import * as XLSX from 'xlsx';
+import { exportToExcel as excelExport, exportToExcelMultiSheet as excelMultiExport } from './excel-helper';
 
 // تهيئة الخط العربي
 const setupArabicFont = (doc: jsPDF) => {
@@ -94,47 +94,24 @@ export function exportToPDF(
 /**
  * تصدير البيانات إلى Excel
  */
-export function exportToExcel(
+export async function exportToExcel(
   data: Record<string, unknown>[],
   fileName: string,
   sheetName: string = 'البيانات'
 ) {
-  // إنشاء workbook
-  const workbook = XLSX.utils.book_new();
-  
-  // تحويل البيانات إلى worksheet
-  const worksheet = XLSX.utils.json_to_sheet(data);
-  
-  // إضافة worksheet إلى workbook
-  XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
-  
-  // تحديد عرض الأعمدة
-  const columnWidths = Object.keys(data[0] || {}).map(() => ({ wch: 20 }));
-  worksheet['!cols'] = columnWidths;
-  
-  // حفظ الملف
-  const fullFileName = `${fileName}_${new Date().toISOString().split('T')[0]}.xlsx`;
-  XLSX.writeFile(workbook, fullFileName);
+  const fullFileName = `${fileName}_${new Date().toISOString().split('T')[0]}`;
+  await excelExport(data, fullFileName, sheetName);
 }
 
 /**
  * تصدير البيانات إلى Excel مع أوراق متعددة
  */
-export function exportToExcelMultiSheet(
+export async function exportToExcelMultiSheet(
   sheets: { name: string; data: Record<string, unknown>[] }[],
   fileName: string
 ) {
-  const workbook = XLSX.utils.book_new();
-  
-  sheets.forEach(sheet => {
-    const worksheet = XLSX.utils.json_to_sheet(sheet.data);
-    const columnWidths = Object.keys(sheet.data[0] || {}).map(() => ({ wch: 20 }));
-    worksheet['!cols'] = columnWidths;
-    XLSX.utils.book_append_sheet(workbook, worksheet, sheet.name);
-  });
-  
-  const fullFileName = `${fileName}_${new Date().toISOString().split('T')[0]}.xlsx`;
-  XLSX.writeFile(workbook, fullFileName);
+  const fullFileName = `${fileName}_${new Date().toISOString().split('T')[0]}`;
+  await excelMultiExport(sheets, fullFileName);
 }
 
 /**

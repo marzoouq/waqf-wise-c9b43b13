@@ -130,25 +130,9 @@ export function useUnifiedExport() {
    */
   const exportToExcel = useCallback(async (config: ExcelExportConfig) => {
     try {
-      const XLSX = await import("xlsx");
+      const { exportToExcel: excelExport } = await import("@/lib/excel-helper");
       
-      const worksheet = XLSX.utils.json_to_sheet(config.data);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, config.sheetName || "Sheet1");
-
-      // Set column widths
-      const maxWidth = config.data.reduce((acc, row) => {
-        Object.keys(row).forEach((key) => {
-          const value = String(row[key] || "");
-          const currentMax = typeof acc[key] === 'number' ? acc[key] : 10;
-          acc[key] = Math.max(currentMax, value.length);
-        });
-        return acc;
-      }, {} as Record<string, number>);
-
-      worksheet["!cols"] = Object.values(maxWidth).map((w) => ({ wch: (w as number) + 2 }));
-
-      XLSX.writeFile(workbook, `${config.filename}.xlsx`);
+      await excelExport(config.data, config.filename, config.sheetName || "Sheet1");
 
       toast.success("تم التصدير بنجاح", {
         description: `تم تصدير البيانات إلى ${config.filename}.xlsx`,
@@ -166,22 +150,9 @@ export function useUnifiedExport() {
    */
   const exportToMultiSheetExcel = useCallback(async (config: MultiSheetExcelConfig) => {
     try {
-      const XLSX = await import("xlsx");
+      const { exportToExcelMultiSheet } = await import("@/lib/excel-helper");
       
-      const workbook = XLSX.utils.book_new();
-
-      config.sheets.forEach(sheet => {
-        const worksheet = XLSX.utils.json_to_sheet(sheet.data);
-        
-        // تحسين عرض الأعمدة
-        const maxWidth = 20;
-        const cols = Object.keys(sheet.data[0] || {}).map(() => ({ wch: maxWidth }));
-        worksheet['!cols'] = cols;
-
-        XLSX.utils.book_append_sheet(workbook, worksheet, sheet.name);
-      });
-
-      XLSX.writeFile(workbook, config.filename);
+      await exportToExcelMultiSheet(config.sheets, config.filename);
 
       toast.success("تم التصدير بنجاح", {
         description: `تم تصدير البيانات إلى ${config.filename}`,

@@ -36,14 +36,10 @@ export function BeneficiariesImporter({ onSuccess }: BeneficiariesImporterProps)
     const reader = new FileReader();
     reader.onload = async (e) => {
       try {
-        // Dynamic import for XLSX
-        const XLSX = await import("xlsx");
+        // Dynamic import for excel-helper
+        const { readExcelBuffer } = await import("@/lib/excel-helper");
         
-        const data = new Uint8Array(e.target?.result as ArrayBuffer);
-        const workbook = XLSX.read(data, { type: "array" });
-        const sheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[sheetName];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+        const jsonData = await readExcelBuffer(e.target?.result as ArrayBuffer);
 
         const errors: string[] = [];
         const validData: ImportRow[] = [];

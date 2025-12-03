@@ -17,24 +17,9 @@ export interface ExcelExportOptions {
 export function useExportToExcel() {
   const exportToExcel = useCallback(async (options: ExcelExportOptions) => {
     try {
-      // Dynamic import for XLSX
-      const XLSX = await import("xlsx");
+      const { exportToExcelMultiSheet } = await import("@/lib/excel-helper");
       
-      const workbook = XLSX.utils.book_new();
-
-      options.sheets.forEach(sheet => {
-        const worksheet = XLSX.utils.json_to_sheet(sheet.data);
-        
-        // تحسين عرض الأعمدة
-        const maxWidth = 20;
-        const cols = Object.keys(sheet.data[0] || {}).map(() => ({ wch: maxWidth }));
-        worksheet['!cols'] = cols;
-
-        XLSX.utils.book_append_sheet(workbook, worksheet, sheet.name);
-      });
-
-      // تصدير الملف
-      XLSX.writeFile(workbook, options.filename);
+      await exportToExcelMultiSheet(options.sheets, options.filename);
 
       toast.success("تم التصدير بنجاح", {
         description: `تم تصدير البيانات إلى ${options.filename}`,

@@ -90,8 +90,7 @@ export default function AllTransactions() {
 
   // تصدير إلى Excel
   const handleExportExcel = async () => {
-    // Dynamic import for XLSX
-    const XLSX = await import("xlsx");
+    const { exportToExcel } = await import("@/lib/excel-helper");
     
     const exportData = filteredTransactions.map((t) => ({
       "التاريخ": format(new Date(t.transaction_date), "dd/MM/yyyy", { locale: ar }),
@@ -105,10 +104,7 @@ export default function AllTransactions() {
       "الحالة": t.status,
     }));
 
-    const ws = XLSX.utils.json_to_sheet(exportData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "المعاملات");
-    XLSX.writeFile(wb, `جميع_المعاملات_${format(new Date(), "yyyy-MM-dd")}.xlsx`);
+    await exportToExcel(exportData, `جميع_المعاملات_${format(new Date(), "yyyy-MM-dd")}`, "المعاملات");
   };
 
   const getStatusBadge = (status: string) => {
