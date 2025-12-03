@@ -14,7 +14,10 @@ src/services/
 ├── notification.service.ts     # خدمة الإشعارات
 ├── report.service.ts           # خدمة التقارير
 ├── request.service.ts          # خدمة الطلبات
-└── voucher.service.ts          # خدمة السندات
+├── voucher.service.ts          # خدمة السندات
+├── auth.service.ts             # خدمة المصادقة 🆕
+├── archive.service.ts          # خدمة الأرشيف 🆕
+└── loans.service.ts            # خدمة القروض 🆕
 ```
 
 ## 📋 الخدمات المتوفرة
@@ -128,6 +131,49 @@ VoucherService.generatePDF(id)                // PDF
 VoucherService.getByType(type)                // حسب النوع
 ```
 
+### 🔐 AuthService
+```typescript
+import { AuthService } from '@/services';
+
+AuthService.login(email, password)            // تسجيل الدخول
+AuthService.logout()                          // تسجيل الخروج
+AuthService.getSession()                      // الجلسة الحالية
+AuthService.getCurrentUser()                  // المستخدم الحالي
+AuthService.getUserProfile(userId)            // ملف المستخدم
+AuthService.getUserRoles(userId)              // أدوار المستخدم
+AuthService.hasRole(userId, role)             // التحقق من دور
+AuthService.updatePassword(password)          // تحديث كلمة المرور
+AuthService.requestPasswordReset(email)       // طلب إعادة تعيين
+```
+
+### 📁 ArchiveService
+```typescript
+import { ArchiveService } from '@/services';
+
+ArchiveService.getFolders(parentId?)          // جلب المجلدات
+ArchiveService.createFolder(data)             // إنشاء مجلد
+ArchiveService.updateFolder(id, data)         // تحديث مجلد
+ArchiveService.deleteFolder(id)               // حذف مجلد
+ArchiveService.getDocuments(folderId?)        // جلب المستندات
+ArchiveService.uploadDocument(data)           // رفع مستند
+ArchiveService.deleteDocument(id)             // حذف مستند
+ArchiveService.getStats()                     // إحصائيات الأرشيف
+```
+
+### 💳 LoansService
+```typescript
+import { LoansService } from '@/services';
+
+LoansService.getAll(filters?)                 // جلب القروض
+LoansService.getById(id)                      // جلب قرض
+LoansService.create(data)                     // إنشاء قرض
+LoansService.update(id, data)                 // تحديث قرض
+LoansService.delete(id)                       // حذف قرض
+LoansService.getInstallments(loanId)          // جلب الأقساط
+LoansService.recordPayment(data)              // تسجيل سداد
+LoansService.getStats()                       // إحصائيات القروض
+```
+
 ## 🔄 أمثلة الاستخدام
 
 ### في Hook
@@ -158,4 +204,5 @@ const handleSendNotification = async () => {
 
 ---
 
-**آخر تحديث:** 2025-11-29
+**آخر تحديث:** 2025-12-03
+**الإصدار:** 2.6.4
