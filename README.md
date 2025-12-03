@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-2.6.5-blue.svg)
+![Version](https://img.shields.io/badge/version-2.6.8-blue.svg)
 ![Type Safety](https://img.shields.io/badge/type--safety-99.5%25-green.svg)
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)
 ![License](https://img.shields.io/badge/license-Proprietary-red.svg)
@@ -192,7 +192,7 @@ npm run dev
 
 | الوثيقة | المحتوى |
 |---------|---------|
-| [`LATEST_FIXES.md`](docs/LATEST_FIXES.md) | آخر الإصلاحات (v2.6.5) |
+| [`LATEST_FIXES.md`](docs/LATEST_FIXES.md) | آخر الإصلاحات (v2.6.8) |
 | [`DEVELOPER_MASTER_GUIDE.md`](docs/DEVELOPER_MASTER_GUIDE.md) | دليل المطور الشامل |
 | [`PERFORMANCE.md`](docs/PERFORMANCE.md) | تقرير الأداء |
 | [`CLEANUP.md`](docs/CLEANUP.md) | سجل التنظيف |
@@ -341,7 +341,7 @@ logger.info('Operation completed', { data });
 
 **مبني بـ ❤️ باستخدام React + TypeScript + Lovable Cloud**
 
-**النسخة: 2.6.5** | **الحالة: 🟢 جاهز للإنتاج**
+**النسخة: 2.6.8** | **الحالة: 🟢 جاهز للإنتاج**
 
 ---
 

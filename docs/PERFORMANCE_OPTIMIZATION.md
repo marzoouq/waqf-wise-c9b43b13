@@ -1,8 +1,8 @@
-# تحسينات الأداء - الإصدار 2.6.7
+# تحسينات الأداء - الإصدار 2.6.8
 
 ## ملخص التحسينات
 
-تم تنفيذ تحسينات جذرية لسرعة تحميل الصفحة الترحيبية والصفحات العامة، مع إصلاح مشاكل تقسيم chunks.
+تم تنفيذ تحسينات جذرية لسرعة تحميل الصفحة الترحيبية والصفحات العامة، مع إصلاح نهائي لمشاكل تقسيم chunks.
 
 ## المشاكل التي تم حلها
 
@@ -63,31 +63,55 @@ import LandingPageEager from "@/pages/LandingPage";
 4. **تأجيل التهيئة** - استخدم `requestIdleCallback` للتهيئة غير الحرجة
 5. **AuthContext للصفحات العامة** - لا تنتظر التهيئة للصفحات التي لا تحتاج مصادقة
 
-## مشاكل Vite Chunks وحلولها (v2.6.7)
+## مشاكل Vite Chunks وحلولها (v2.6.7 - v2.6.8)
 
 ### المشكلة: خطأ useLayoutEffect
 ```
 Uncaught TypeError: Cannot read properties of undefined (reading 'useLayoutEffect')
 ```
 
-### السبب
+### السبب الأول (v2.6.7)
 فصل React إلى chunk منفصل (`react-core`) مع استثناء `react-is` جعله يذهب إلى `vendor`.
 المكتبات في `vendor` تُحمّل قبل `react-core` وتحتاج `react-is` الذي يعتمد على React.
 
-### الحل
+### الحل الأول (v2.6.7)
 ```javascript
 // ✅ إزالة react-core chunk
 // كل مكتبات React تذهب لـ vendor تلقائياً
-// هذا يضمن تحميلها معاً بالترتيب الصحيح
 ```
+
+### السبب الثاني (v2.6.8)
+فصل Radix UI إلى chunks منفصلة (`radix-core` و `radix-extended`) يجعلها تُحمّل أبجدياً قبل `vendor`.
+Radix UI يستخدم `React.forwardRef` و `React.useLayoutEffect` ويحتاج React أن يكون مُحمّلاً أولاً.
+
+### الحل النهائي (v2.6.8)
+```javascript
+// ✅ إزالة radix-core و radix-extended chunks
+// Radix UI يذهب لـ vendor مع React
+// هذا يضمن تحميلهم معاً بالترتيب الصحيح
+
+// ✅ Radix UI يذهب لـ vendor مع React لضمان ترتيب التحميل الصحيح
+```
+
+### القاعدة الذهبية
+> **لا تفصل المكتبات التي تعتمد على React عن React نفسه**
+> 
+> المكتبات التالية يجب أن تبقى في vendor:
+> - `@radix-ui/*`
+> - `next-themes`
+> - `sonner`
+> - `react-is`
+> - أي مكتبة تستخدم `React.forwardRef` أو `React.useLayoutEffect`
 
 ### أفضل الممارسات لـ Vite Chunks
 1. **لا تفصل React** - اتركه في vendor مع المكتبات التي تعتمد عليه
-2. **افصل المكتبات الكبيرة فقط** - مثل charts, pdf-lib, excel-lib
-3. **تجنب التعقيد** - chunks بسيطة أفضل من تحسينات نظرية
-4. **اختبر بعد التغيير** - أخطاء chunks قد لا تظهر في dev mode
+2. **لا تفصل Radix UI** - يعتمد على React APIs المتقدمة
+3. **افصل المكتبات الكبيرة المستقلة فقط** - مثل charts, pdf-lib, excel-lib
+4. **تجنب التعقيد** - chunks بسيطة أفضل من تحسينات نظرية
+5. **اختبر بعد التغيير** - أخطاء chunks قد لا تظهر في dev mode
 
 ## التاريخ
 
-- **2025-12-03**: الإصدار 2.6.7 - إصلاح خطأ useLayoutEffect، تبسيط chunks
+- **2025-12-03**: الإصدار 2.6.8 - إصلاح نهائي لـ useLayoutEffect (دمج Radix UI مع vendor)
+- **2025-12-03**: الإصدار 2.6.7 - إصلاح useLayoutEffect (دمج React مع vendor)
 - **2025-12-03**: الإصدار 2.6.6 - تحسينات الأداء الجذرية
