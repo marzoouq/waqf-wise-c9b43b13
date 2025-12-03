@@ -52,7 +52,7 @@ export function LandingHeader() {
               <Landmark className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground" />
             </div>
             <div className="hidden sm:block">
-              <h1 className="text-lg sm:text-xl font-bold text-foreground">منصة الوقف</h1>
+              <span className="block text-lg sm:text-xl font-bold text-foreground">منصة الوقف</span>
               <p className="text-xs text-muted-foreground">إدارة الأوقاف الإلكترونية</p>
             </div>
           </Link>
