@@ -13,7 +13,7 @@ export default defineConfig(({ mode }) => {
   logLevel: 'warn',
   
   define: {
-    'import.meta.env.VITE_APP_VERSION': JSON.stringify('2.6.4'),
+    'import.meta.env.VITE_APP_VERSION': JSON.stringify('2.6.7'),
     'import.meta.env.VITE_BUILD_TIME': JSON.stringify(new Date().toISOString()),
     'process.env.NODE_ENV': JSON.stringify('production'),
   },
@@ -56,29 +56,20 @@ export default defineConfig(({ mode }) => {
       output: {
         manualChunks: (id) => {
           if (id.includes('node_modules')) {
-            // Core React - MUST be first and most specific
-            if (id.match(/node_modules[\\/](react|react-dom|scheduler)[\\/]/) && 
-                !id.includes('react-router') && 
-                !id.includes('react-hook-') &&
-                !id.includes('react-day') &&
-                !id.includes('react-markdown') &&
-                !id.includes('react-is')) {
-              return 'react-core';
-            }
+            // ✅ React و react-dom و react-is يذهبون لـ vendor تلقائياً
+            // هذا يضمن تحميلهم معاً قبل أي مكتبة تعتمد عليهم
             
-            // React ecosystem libraries (after core React check)
+            // React Router - chunk منفصل
             if (id.includes('react-router')) {
               return 'react-router';
             }
+            
+            // React Forms
             if (id.includes('react-hook-form') || id.includes('@hookform')) {
               return 'react-forms';
             }
-            if (id.includes('react-day-picker') || id.includes('react-markdown') || 
-                id.includes('next-themes') || id.includes('sonner')) {
-              return 'react-ui-libs';
-            }
             
-            // Radix UI - critical UI components
+            // Radix UI
             if (id.includes('@radix-ui')) {
               if (id.includes('dialog') || id.includes('dropdown-menu') || 
                   id.includes('select') || id.includes('popover')) {
@@ -87,7 +78,7 @@ export default defineConfig(({ mode }) => {
               return 'radix-extended';
             }
             
-            // Query & State Management
+            // React Query
             if (id.includes('@tanstack/react-query')) {
               return 'react-query';
             }
@@ -107,19 +98,6 @@ export default defineConfig(({ mode }) => {
               return 'animations';
             }
             
-            // Form validation
-            if (id.includes('zod')) {
-              return 'validation';
-            }
-            
-            // Date utilities - فصل locale عن الدوال الأساسية
-            if (id.includes('date-fns')) {
-              if (id.includes('locale')) {
-                return 'date-locale';
-              }
-              return 'date-utils';
-            }
-            
             // PDF - lazy loaded
             if (id.includes('jspdf')) {
               return 'pdf-lib';
@@ -130,43 +108,12 @@ export default defineConfig(({ mode }) => {
               return 'excel-lib';
             }
             
-            // Icons
-            if (id.includes('lucide-react')) {
-              return 'icons';
-            }
-            
-            // Utility libraries
-            if (id.includes('clsx') || id.includes('tailwind-merge') || 
-                id.includes('class-variance-authority')) {
-              return 'ui-utils';
-            }
-            
-            // Command menu (cmdk) - used in GlobalSearch
-            if (id.includes('cmdk')) {
-              return 'ui-command';
-            }
-            
-            // Drawer (vaul) - used in ResponsiveDialog
-            if (id.includes('vaul')) {
-              return 'ui-drawer';
-            }
-            
-            // QR Code generation
-            if (id.includes('qrcode')) {
-              return 'qr-lib';
-            }
-            
-            // Markdown rendering
-            if (id.includes('react-markdown') || id.includes('remark-gfm')) {
-              return 'markdown-lib';
-            }
-            
             // Monitoring (Sentry)
             if (id.includes('@sentry')) {
               return 'monitoring';
             }
             
-            // Small utilities and everything else
+            // كل شيء آخر (بما في ذلك React, next-themes, sonner) → vendor
             return 'vendor';
           }
         },
