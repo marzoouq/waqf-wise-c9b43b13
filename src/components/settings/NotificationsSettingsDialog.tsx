@@ -3,7 +3,7 @@ import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/lib/toast";
 import { Card, CardContent } from "@/components/ui/card";
 import { Eye } from "lucide-react";
 import { NotificationsPreviewDialog } from "./NotificationsPreviewDialog";
@@ -17,7 +17,7 @@ export function NotificationsSettingsDialog({
   open,
   onOpenChange,
 }: NotificationsSettingsDialogProps) {
-  const { toast } = useToast();
+  
   const [previewOpen, setPreviewOpen] = useState(false);
   const [settings, setSettings] = useState({
     emailNotifications: true,

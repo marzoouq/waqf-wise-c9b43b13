@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/lib/toast";
 import { Save, RotateCcw, CheckCircle } from "lucide-react";
 import {
   Table,
@@ -30,7 +30,7 @@ interface RolePermissionState {
 }
 
 export function RolePermissionsMatrix({ role, permissions }: RolePermissionsMatrixProps) {
-  const { toast } = useToast();
+  
   const queryClient = useQueryClient();
   const [modifications, setModifications] = useState<Map<string, RolePermissionState>>(new Map());
 

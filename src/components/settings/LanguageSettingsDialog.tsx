@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/lib/toast";
 import { Card, CardContent } from "@/components/ui/card";
 import { Globe } from "lucide-react";
 
@@ -22,7 +22,7 @@ export function LanguageSettingsDialog({
   open,
   onOpenChange,
 }: LanguageSettingsDialogProps) {
-  const { toast } = useToast();
+  
   const [language, setLanguage] = useState("ar");
   const [timezone, setTimezone] = useState("Asia/Riyadh");
   const [dateFormat, setDateFormat] = useState("dd/MM/yyyy");

@@ -18,10 +18,10 @@ import {
 } from "@/components/ui/dialog";
 import { AlertTriangle, CheckCircle, Clock, XCircle, TrendingUp, AlertCircle, Trash2 } from "lucide-react";
 import { formatRelative } from "@/lib/date";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/lib/toast";
 
 export default function SystemErrorLogs() {
-  const { toast } = useToast();
+  
   const queryClient = useQueryClient();
   const [selectedError, setSelectedError] = useState<any>(null);
   const [resolutionNotes, setResolutionNotes] = useState("");

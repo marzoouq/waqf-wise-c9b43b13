@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/lib/toast";
 import { Card, CardContent } from "@/components/ui/card";
 import { Palette, Monitor, Sun, Moon } from "lucide-react";
 
@@ -15,7 +15,7 @@ export function AppearanceSettingsDialog({
   open,
   onOpenChange,
 }: AppearanceSettingsDialogProps) {
-  const { toast } = useToast();
+  
   const [theme, setTheme] = useState("system");
   const [accentColor, setAccentColor] = useState("blue");
 

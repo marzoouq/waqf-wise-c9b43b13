@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from "@/lib/toast";
 import { Loader2, LogIn, Smartphone, Fingerprint } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
@@ -19,7 +19,7 @@ export default function Login() {
   const [loginType, setLoginType] = useState<'staff' | 'beneficiary'>('staff');
   const { signIn } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
+  
   const { isSupported: isBiometricSupported, isAuthenticating, authenticateWithBiometric } = useBiometricAuth();
 
   // محاولة تسجيل الدخول بالبصمة - التوجيه عبر RoleBasedRedirect

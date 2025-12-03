@@ -13,7 +13,7 @@ import { format, arLocale as ar } from "@/lib/date";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/lib/toast";
 import { productionLogger } from "@/lib/logger/production-logger";
 
 interface InternalMessagesDialogProps {
@@ -26,7 +26,7 @@ export function InternalMessagesDialog({
   onOpenChange,
 }: InternalMessagesDialogProps) {
   const { user } = useAuth();
-  const { toast } = useToast();
+  
   const { inboxMessages, sentMessages, sendMessage, markAsRead, unreadCount } = useInternalMessages();
   const [activeTab, setActiveTab] = useState("inbox");
   const [replyToMessage, setReplyToMessage] = useState<typeof inboxMessages[0] | null>(null);

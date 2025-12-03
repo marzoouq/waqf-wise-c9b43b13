@@ -25,7 +25,7 @@ import { selfHealing, retryOperation, fetchWithFallback } from '@/lib/selfHealin
 import { errorTracker } from '@/lib/errors';
 import { supabase } from '@/integrations/supabase/client';
 import { SelfHealingComponent } from '@/components/shared/SelfHealingComponent';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from "@/lib/toast";
 
 interface TestResult {
   name: string;
@@ -35,7 +35,7 @@ interface TestResult {
 }
 
 export default function SystemTesting() {
-  const { toast } = useToast();
+  
   const [results, setResults] = useState<TestResult[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const [crashComponent, setCrashComponent] = useState(false);

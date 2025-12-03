@@ -11,7 +11,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/lib/toast";
 import { format, arLocale as ar } from "@/lib/date";
 
 interface ChatMessage {
@@ -28,7 +28,7 @@ interface ChatbotActionsProps {
 }
 
 export function ChatbotActions({ conversations, onClearHistory, hasConversations }: ChatbotActionsProps) {
-  const { toast } = useToast();
+  
 
   const handleExport = () => {
     try {

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/lib/toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Download, FileText, Loader2, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -15,7 +15,7 @@ interface BankTransferGeneratorProps {
 }
 
 export function BankTransferGenerator({ distributionId, onSuccess }: BankTransferGeneratorProps) {
-  const { toast } = useToast();
+  
   const [isLoading, setIsLoading] = useState(false);
   const [fileFormat, setFileFormat] = useState<BankFileFormat>("CSV");
   const [generatedFile, setGeneratedFile] = useState<GeneratedTransferFile | null>(null);

@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from "@/lib/toast";
 import { Loader2, UserPlus, Smartphone, Check, X } from 'lucide-react';
 import { z } from 'zod';
 
@@ -36,7 +36,7 @@ export default function Signup() {
   const [isLoading, setIsLoading] = useState(false);
   const { signUp } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
+  
 
   // ✅ حساب قوة كلمة المرور
   const passwordStrength = useMemo(() => {
