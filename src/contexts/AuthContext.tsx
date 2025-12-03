@@ -392,8 +392,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return currentRoles.includes(roleName);
   };
 
-  // ✅ إظهار التحميل حتى تكتمل التهيئة
-  const effectiveIsLoading = !isInitialized || isLoading;
+  // ✅ قائمة المسارات العامة التي لا تحتاج انتظار التهيئة
+  const PUBLIC_ROUTES = ['/', '/login', '/signup', '/install', '/unauthorized', '/privacy', '/terms', '/security-policy', '/faq', '/contact'];
+  
+  // ✅ التحقق إذا كان المسار الحالي عام
+  const isPublicRoute = typeof window !== 'undefined' && PUBLIC_ROUTES.includes(window.location.pathname);
+  
+  // ✅ إظهار التحميل فقط للصفحات المحمية
+  const effectiveIsLoading = isPublicRoute ? false : (!isInitialized || isLoading);
 
   const value = {
     user,
