@@ -4,6 +4,7 @@ import { useTableSort } from './useTableSort';
 import { useBulkSelection } from './useBulkSelection';
 import { Family } from '@/types';
 import { toast } from 'sonner';
+import type { FiltersRecord } from '@/components/shared/AdvancedFiltersDialog';
 
 export type FamilyWithHead = Family & {
   head_of_family?: {
@@ -22,7 +23,7 @@ export function useFamiliesPage() {
   const [selectedFamilyForMembers, setSelectedFamilyForMembers] = useState<Family | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(20);
-  const [advancedFilters, setAdvancedFilters] = useState<Record<string, any>>({});
+  const [advancedFilters, setAdvancedFilters] = useState<FiltersRecord>({});
 
   const handleItemsPerPageChange = useCallback((items: number) => {
     setItemsPerPage(items);

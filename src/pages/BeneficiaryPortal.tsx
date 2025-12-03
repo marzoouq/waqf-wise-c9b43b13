@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { 
   CreditCard, Clock, CheckCircle, AlertCircle, DollarSign, Lock
 } from "lucide-react";
+import type { Beneficiary } from "@/types/beneficiary";
 import {
   BeneficiaryProfileTab,
   BeneficiaryStatementsTab,
@@ -136,8 +137,8 @@ export default function BeneficiaryPortal() {
             {activeTab === "overview" && settings?.show_overview && (
               <div className="space-y-6">
                 {/* بطاقة الملف الشخصي */}
-                <BeneficiaryProfileCard
-                  beneficiary={beneficiary as any}
+              <BeneficiaryProfileCard
+                  beneficiary={beneficiary as Beneficiary}
                   onMessages={() => navigate("/messages")}
                   onChangePassword={() => {}}
                 />
