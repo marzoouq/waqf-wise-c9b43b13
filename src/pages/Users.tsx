@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Search, Shield, Edit, Trash2, CheckCircle, XCircle, Download, Key, AlertCircle } from "lucide-react";
+import { Search, Shield, Edit, Trash2, CheckCircle, XCircle, Download, Key, AlertCircle, Mail } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
@@ -24,6 +24,8 @@ import {
   useUsersManagement, 
   type UserProfile 
 } from "@/hooks/useUsersManagement";
+import { EditUserEmailDialog } from "@/components/users/EditUserEmailDialog";
+import { usePermissions } from "@/hooks/usePermissions";
 
 // Use Database enum for AppRole (DB only has 7 roles)
 type AppRole = Database['public']['Enums']['app_role'];
@@ -42,11 +44,13 @@ const roleColors: Record<AppRole, string> = {
 const Users = () => {
   const { toast } = useToast();
   const { user: currentUser } = useAuth();
+  const { hasPermission } = usePermissions();
   
   // استخدام hook إدارة المستخدمين
   const {
     users,
     isLoading,
+    refetch,
     deleteUser: deleteUserMutation,
     updateRoles: updateRolesMutation,
     updateStatus: updateStatusMutation,
@@ -63,6 +67,11 @@ const Users = () => {
   const [selectedUserForReset, setSelectedUserForReset] = useState<UserProfile | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<UserProfile | null>(null);
+  const [editEmailDialogOpen, setEditEmailDialogOpen] = useState(false);
+  const [selectedUserForEmail, setSelectedUserForEmail] = useState<UserProfile | null>(null);
+
+  // صلاحية تعديل البريد الإلكتروني
+  const canEditEmail = hasPermission("admin.edit_user_email");
 
   // Filter users
   const filteredUsers = users.filter(user => {
@@ -318,6 +327,28 @@ const Users = () => {
                             >
                               <Edit className="h-4 w-4" />
                             </Button>
+                            {canEditEmail && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  if (!user.user_id) {
+                                    toast({
+                                      title: "غير متاح",
+                                      description: "هذا المستخدم ليس لديه حساب مفعّل في النظام",
+                                      variant: "destructive",
+                                    });
+                                    return;
+                                  }
+                                  setSelectedUserForEmail(user);
+                                  setEditEmailDialogOpen(true);
+                                }}
+                                title={user.user_id ? "تعديل البريد الإلكتروني" : "غير متاح - لا يوجد حساب"}
+                                disabled={!user.user_id}
+                              >
+                                <Mail className="h-4 w-4" />
+                              </Button>
+                            )}
                             <Button
                               variant="ghost"
                               size="sm"
@@ -480,6 +511,13 @@ const Users = () => {
           description="هل أنت متأكد من حذف هذا المستخدم؟ سيتم حذف جميع البيانات المرتبطة به بشكل نهائي."
           itemName={userToDelete ? `${userToDelete.full_name} (${userToDelete.email})` : ""}
           isLoading={deleteUserMutation.isPending}
+        />
+
+        <EditUserEmailDialog
+          open={editEmailDialogOpen}
+          onOpenChange={setEditEmailDialogOpen}
+          user={selectedUserForEmail}
+          onSuccess={() => refetch()}
         />
       </MobileOptimizedLayout>
     </PageErrorBoundary>
