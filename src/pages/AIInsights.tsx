@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Sparkles, TrendingUp, AlertTriangle, Lightbulb, X, RefreshCw } from "lucide-react";
 import { useAIInsights } from "@/hooks/useAIInsights";
 import { LoadingState } from "@/components/shared/LoadingState";
-import { EnhancedEmptyState } from "@/components/shared/EnhancedEmptyState";
+import { EnhancedEmptyState } from "@/components/shared";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import type { LucideIcon } from "lucide-react";

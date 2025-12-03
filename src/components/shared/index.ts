@@ -1,9 +1,9 @@
 // Barrel exports for shared components
 
 // Error Handling
-export { default as ErrorBoundary } from './ErrorBoundary';
 export { GlobalErrorBoundary } from './GlobalErrorBoundary';
 export { PageErrorBoundary } from './PageErrorBoundary';
+export { LazyErrorBoundary } from './LazyErrorBoundary';
 export { ErrorState } from './ErrorState';
 export { SelfHealingComponent } from './SelfHealingComponent';
 
@@ -20,8 +20,7 @@ export { ResponsiveGrid } from './ResponsiveGrid';
 export { ResponsiveTable } from './ResponsiveTable';
 
 // Empty States
-export { EmptyState } from './EmptyState';
-export { EnhancedEmptyState } from './EnhancedEmptyState';
+export { EmptyState, EnhancedEmptyState } from './EmptyState';
 
 // Table Components
 export { SortableTableHeader } from './SortableTableHeader';
