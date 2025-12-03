@@ -11,12 +11,12 @@ import { LeakedPasswordCheck } from "@/components/settings/LeakedPasswordCheck";
 import { BiometricSettings } from "@/components/settings/BiometricSettings";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/lib/toast";
 import { MobileOptimizedLayout, MobileOptimizedHeader, MobileOptimizedGrid } from "@/components/layout/MobileOptimizedLayout";
 
 const BeneficiarySettings = () => {
   const { signOut } = useAuth();
-  const { toast } = useToast();
+  
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
   const [notificationsDialogOpen, setNotificationsDialogOpen] = useState(false);
   const [securityDialogOpen, setSecurityDialogOpen] = useState(false);

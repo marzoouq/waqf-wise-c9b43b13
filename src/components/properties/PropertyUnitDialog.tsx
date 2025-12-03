@@ -29,7 +29,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/lib/toast";
 import { useQueryClient } from "@tanstack/react-query";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -66,7 +66,7 @@ export function PropertyUnitDialog({
   propertyId,
   unit,
 }: PropertyUnitDialogProps) {
-  const { toast } = useToast();
+  
   const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
 

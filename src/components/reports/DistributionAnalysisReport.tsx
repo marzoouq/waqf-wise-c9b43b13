@@ -6,10 +6,10 @@ import { Download, TrendingUp } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { exportToExcel, exportToPDF } from '@/lib/exportHelpers';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from "@/lib/toast";
 
 export function DistributionAnalysisReport() {
-  const { toast } = useToast();
+  
 
   // تحليل التوزيعات
   const { data: distributionTrends, isLoading } = useQuery({

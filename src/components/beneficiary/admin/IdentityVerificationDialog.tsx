@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from "@/lib/toast";
 import { CheckCircle, AlertCircle, Clock, Shield } from 'lucide-react';
 import { Beneficiary } from '@/types/beneficiary';
 
@@ -40,7 +40,7 @@ export function IdentityVerificationDialog({
   onOpenChange,
   beneficiary,
 }: IdentityVerificationDialogProps) {
-  const { toast } = useToast();
+  
   const queryClient = useQueryClient();
   
   const [formData, setFormData] = useState({

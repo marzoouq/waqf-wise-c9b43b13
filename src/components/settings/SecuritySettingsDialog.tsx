@@ -13,7 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/lib/toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Shield, Lock, Key, Monitor } from "lucide-react";
@@ -40,7 +40,7 @@ export function SecuritySettingsDialog({
   open,
   onOpenChange,
 }: SecuritySettingsDialogProps) {
-  const { toast } = useToast();
+  
   const [isLoading, setIsLoading] = useState(false);
   const [twoFactorDialogOpen, setTwoFactorDialogOpen] = useState(false);
   const [activeSessionsDialogOpen, setActiveSessionsDialogOpen] = useState(false);

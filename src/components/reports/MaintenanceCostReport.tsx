@@ -7,7 +7,7 @@ import { LoadingState } from '@/components/shared/LoadingState';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { exportToExcel, exportToPDF } from '@/lib/exportHelpers';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from "@/lib/toast";
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
@@ -22,7 +22,7 @@ interface MaintenanceCostData {
 }
 
 export function MaintenanceCostReport() {
-  const { toast } = useToast();
+  
 
   // تحليل تكاليف الصيانة
   const { data: maintenanceData, isLoading } = useQuery<MaintenanceCostData[]>({

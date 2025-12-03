@@ -11,7 +11,7 @@ import { formatCurrency } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from "@/lib/toast";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
 import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
 
@@ -19,7 +19,7 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
 export default function BeneficiaryReports() {
   const { user } = useAuth();
-  const { toast } = useToast();
+  
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
   const [reportType, setReportType] = useState<'annual' | 'monthly' | 'quarterly'>('annual');
 

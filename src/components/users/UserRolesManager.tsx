@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from "@/lib/toast";
 import { Loader2, UserPlus, Trash2, Shield } from 'lucide-react';
 import { ROLE_NAMES_AR, type RoleName } from '@/types/auth';
 
@@ -15,7 +15,7 @@ import { ROLE_NAMES_AR, type RoleName } from '@/types/auth';
  */
 export function UserRolesManager({ userId }: { userId: string }) {
   const [selectedRole, setSelectedRole] = useState<RoleName>('nazer');
-  const { toast } = useToast();
+  
   const queryClient = useQueryClient();
 
   // جلب أدوار المستخدم الحالية
