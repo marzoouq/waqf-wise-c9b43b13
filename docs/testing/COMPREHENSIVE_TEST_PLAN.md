@@ -20,7 +20,7 @@
 | الدور | البريد الإلكتروني | كلمة المرور | الصفحة المتوقعة |
 |-------|------------------|-------------|-----------------|
 | الناظر | nazer@waqf.sa | Test@123456 | /nazer-dashboard |
-| المحاسب | accountant@waqf.sa | Test@123456 | /accountant-dashboard |
+| المحاسب | alkayala2@hotmail.com | Test@123456 | /accountant-dashboard |
 | أمين الصندوق | cashier@waqf.sa | Test@123456 | /cashier-dashboard |
 | الأرشيفي | archivist@waqf.sa | Test@123456 | /archivist-dashboard |
 | المشرف | admin@waqf.sa | Test@123456 | /admin-dashboard |

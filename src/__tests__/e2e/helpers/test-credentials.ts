@@ -16,7 +16,7 @@ export const TEST_CREDENTIALS: Record<string, TestCredentials> = {
     role: 'nazer',
   },
   accountant: {
-    identifier: 'accountant@waqf.sa',
+    identifier: 'alkayala2@hotmail.com', // المحاسب الفعلي
     password: 'Test@123456',
     role: 'accountant',
   },
