@@ -95,7 +95,7 @@ Deno.serve(async (req) => {
       .select("id")
       .eq("email", newEmail.toLowerCase())
       .neq("user_id", userId)
-      .single();
+      .maybeSingle();
 
     if (existingUser) {
       return new Response(
