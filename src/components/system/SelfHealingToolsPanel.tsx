@@ -17,12 +17,12 @@ import {
   AlertCircle
 } from "lucide-react";
 import { useSelfHealing } from "@/hooks/useSelfHealing";
-import { toast } from "@/lib/toast";
+import { useToast } from "@/hooks/use-toast";
 import { selfHealing } from "@/lib/selfHealing";
 import { supabase } from "@/integrations/supabase/client";
 
 export function SelfHealingToolsPanel() {
-  
+  const { toast } = useToast();
   const { clearCache, reconnectDatabase, syncPendingData } = useSelfHealing();
   const [isHealthMonitorRunning, setIsHealthMonitorRunning] = useState(true);
 

@@ -3,14 +3,14 @@ import { productionLogger } from "@/lib/logger/production-logger";
 import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { toast } from "@/lib/toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, FileText, CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 
 export default function SystemMaintenance() {
-  
+  const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
   const [result, setResult] = useState<any>(null);
 

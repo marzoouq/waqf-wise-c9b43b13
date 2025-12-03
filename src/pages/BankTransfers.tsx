@@ -3,7 +3,7 @@ import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { toast } from "@/lib/toast";
+import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Download, FileText, AlertCircle } from "lucide-react";
@@ -21,7 +21,7 @@ import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { format, arLocale as ar } from "@/lib/date";
 
 export default function BankTransfers() {
-  
+  const { toast } = useToast();
   const [selectedFormat, setSelectedFormat] = useState<string>("csv");
   const [selectedDistribution, setSelectedDistribution] = useState<string>("");
 

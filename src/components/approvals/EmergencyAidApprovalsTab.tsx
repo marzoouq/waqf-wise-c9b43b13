@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "@/lib/toast";
+import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, XCircle, Clock, AlertCircle } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { format, arLocale as ar } from "@/lib/date";
@@ -36,6 +36,7 @@ interface EmergencyRequest {
 }
 
 export function EmergencyAidApprovalsTab() {
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedRequest, setSelectedRequest] = useState<EmergencyRequest | null>(null);
   const [approvalNotes, setApprovalNotes] = useState("");

@@ -8,7 +8,7 @@ import { format, arLocale as ar } from "@/lib/date";
 import { useState } from "react";
 import { RequestWithBeneficiary, StatusConfigMap } from "@/types/approvals";
 import { RequestService } from "@/services";
-import { toast } from "@/lib/toast";
+import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -19,6 +19,7 @@ export function RequestApprovalsTab() {
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [notes, setNotes] = useState("");
   const [rejectionReason, setRejectionReason] = useState("");
+  const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const { data: requests, isLoading } = useQuery<RequestWithBeneficiary[]>({

@@ -7,7 +7,7 @@ import { LoadingState } from '@/components/shared/LoadingState';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { exportToExcel, exportToPDF } from '@/lib/exportHelpers';
-import { toast } from "@/lib/toast";
+import { useToast } from '@/hooks/use-toast';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 interface LoanAgingData {
@@ -22,7 +22,7 @@ interface LoanAgingData {
 }
 
 export function LoansAgingReport() {
-  
+  const { toast } = useToast();
 
   // بيانات أعمار الديون
   const { data: agingData, isLoading } = useQuery<LoanAgingData[]>({

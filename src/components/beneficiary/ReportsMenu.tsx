@@ -12,7 +12,7 @@ import {
   User,
   Info,
 } from "lucide-react";
-import { toast } from "@/lib/toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useBeneficiaryProfile } from "@/hooks/useBeneficiaryProfile";
 import { useAuth } from "@/hooks/useAuth";
@@ -23,6 +23,7 @@ interface ReportsMenuProps {
 }
 
 export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
+  const { toast } = useToast();
   const { user } = useAuth();
   const { beneficiary, payments } = useBeneficiaryProfile(user?.id);
 

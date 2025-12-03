@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { AlertCircle, Mail, Phone, DollarSign } from "lucide-react";
 import { differenceInDays, format, arLocale as ar } from "@/lib/date";
-import { toast } from "@/lib/toast";
+import { useToast } from "@/hooks/use-toast";
 
 interface RentalPayment {
   id: string;
@@ -31,7 +31,7 @@ interface ArrearsReportProps {
 }
 
 export const ArrearsReport = ({ payments }: ArrearsReportProps) => {
-  
+  const { toast } = useToast();
   const today = new Date();
 
   // حساب المتأخرات

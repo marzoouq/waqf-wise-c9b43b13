@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { toast } from "@/lib/toast";
+import { useToast } from '@/hooks/use-toast';
 import { NotificationService } from '@/services/notification.service';
 import { Bell, Mail, MessageSquare, Smartphone, Send, Plus, Edit2, Trash2, LucideIcon } from 'lucide-react';
 
@@ -52,7 +52,7 @@ const defaultTemplates: NotificationTemplate[] = [
 ];
 
 export function NotificationTemplateEditor() {
-  
+  const { toast } = useToast();
   const [templates, setTemplates] = useState<NotificationTemplate[]>(defaultTemplates);
   const [editingTemplate, setEditingTemplate] = useState<NotificationTemplate | null>(null);
   const [isCreating, setIsCreating] = useState(false);

@@ -40,7 +40,7 @@ import { PropertyUnitDialog } from "./PropertyUnitDialog";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EnhancedEmptyState } from "@/components/shared";
 import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
-import { toast } from "@/lib/toast";
+import { useToast } from "@/hooks/use-toast";
 import type { Database } from "@/integrations/supabase/types";
 
 type DbPropertyUnit = Database['public']['Tables']['property_units']['Row'];
@@ -57,7 +57,7 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
   const [unitToDelete, setUnitToDelete] = useState<DbPropertyUnit | null>(null);
   
   const { units, isLoading, deleteUnit } = usePropertyUnits(propertyId);
-  
+  const { toast } = useToast();
 
   // Show message if no propertyId selected
   if (!propertyId) {

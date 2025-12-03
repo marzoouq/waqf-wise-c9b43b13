@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/lib/toast";
+import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { CheckCircle, XCircle } from "lucide-react";
 import { JournalApproval } from "@/types/approvals";
@@ -16,6 +16,7 @@ interface ApproveJournalDialogProps {
 }
 
 export function ApproveJournalDialog({ open, onOpenChange, approval }: ApproveJournalDialogProps) {
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);

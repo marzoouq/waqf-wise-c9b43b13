@@ -24,7 +24,7 @@ import {
   TrendingUp,
   Users
 } from "lucide-react";
-import { toast } from "@/lib/toast";
+import { useToast } from "@/hooks/use-toast";
 import { useBeneficiaries } from "@/hooks/useBeneficiaries";
 
 interface SimulationResult {
@@ -48,7 +48,7 @@ interface DistributionSimulatorProps {
 }
 
 export function DistributionSimulator({ open, onOpenChange }: DistributionSimulatorProps) {
-  
+  const { toast } = useToast();
   const { beneficiaries } = useBeneficiaries();
   const [totalAmount, setTotalAmount] = useState<number>(100000);
   const [nazerPercentage, setNazerPercentage] = useState<number>(5);

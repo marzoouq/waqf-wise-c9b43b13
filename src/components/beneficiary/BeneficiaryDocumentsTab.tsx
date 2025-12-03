@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { toast } from "@/lib/toast";
+import { useToast } from "@/hooks/use-toast";
 import { Upload, FileText, Trash2, Eye } from "lucide-react";
 import { DocumentUploadDialog } from "./DocumentUploadDialog";
 import { format, arLocale as ar } from "@/lib/date";
@@ -14,6 +14,7 @@ interface BeneficiaryDocumentsTabProps {
 }
 
 export function BeneficiaryDocumentsTab({ beneficiaryId }: BeneficiaryDocumentsTabProps) {
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isUploadOpen, setIsUploadOpen] = useState(false);
 

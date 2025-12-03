@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ResponsiveDialog, DialogFooter } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Printer, CheckCircle, UserCheck } from "lucide-react";
-import { toast } from "@/lib/toast";
+import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import ApprovalDialog from "./ApprovalDialog";
 import {
@@ -35,6 +35,7 @@ type Props = {
 };
 
 const ViewJournalEntryDialog = ({ open, onOpenChange, entry }: Props) => {
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isApprovalDialogOpen, setIsApprovalDialogOpen] = useState(false);
 

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { toast } from "@/lib/toast";
+import { useToast } from "@/hooks/use-toast";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -40,6 +40,7 @@ const roleColors: Record<AppRole, string> = {
 };
 
 const Users = () => {
+  const { toast } = useToast();
   const { user: currentUser } = useAuth();
   
   // استخدام hook إدارة المستخدمين

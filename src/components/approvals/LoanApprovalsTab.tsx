@@ -7,7 +7,7 @@ import { CheckCircle, XCircle, Clock, Eye, DollarSign } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
 import { useState } from "react";
-import { toast } from "@/lib/toast";
+import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useApprovalHistory } from "@/hooks/useApprovalHistory";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { LoanForApproval, LoanApprovalRow, calculateProgress, getNextPendingApproval, StatusConfigMap, BadgeVariant } from "@/types";
 
 export function LoanApprovalsTab() {
+  const { toast } = useToast();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { addToHistory } = useApprovalHistory();

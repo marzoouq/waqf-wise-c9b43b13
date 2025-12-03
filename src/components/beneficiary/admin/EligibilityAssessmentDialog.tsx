@@ -14,7 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { toast } from "@/lib/toast";
+import { useToast } from '@/hooks/use-toast';
 import { Target, TrendingUp, Users, Home, Briefcase, Heart, Loader2 } from 'lucide-react';
 import { Beneficiary } from '@/types/beneficiary';
 
@@ -39,7 +39,7 @@ export function EligibilityAssessmentDialog({
   onOpenChange,
   beneficiary,
 }: EligibilityAssessmentDialogProps) {
-  
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [assessment, setAssessment] = useState<AssessmentResult | null>(null);
 

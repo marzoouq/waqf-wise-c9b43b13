@@ -14,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { HelpCircle, MessageSquare, Send, ArrowRight, Phone, Mail } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useBeneficiaryProfile } from "@/hooks/useBeneficiaryProfile";
-import { toast } from "@/lib/toast";
+import { useToast } from "@/hooks/use-toast";
 import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { useNavigate } from "react-router-dom";
@@ -24,7 +24,7 @@ import { BeneficiaryBottomNavigation } from "@/components/mobile/BeneficiaryBott
 export default function BeneficiarySupport() {
   const { user } = useAuth();
   const { beneficiary } = useBeneficiaryProfile(user?.id);
-  
+  const { toast } = useToast();
   const navigate = useNavigate();
   const { createTicket } = useSupportTickets();
   const [subject, setSubject] = useState("");

@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "@/lib/toast";
+import { useToast } from "@/hooks/use-toast";
 import { Search, Save, X, UserPlus, AlertCircle } from "lucide-react";
 import {
   Dialog,
@@ -55,7 +55,7 @@ const AVAILABLE_PERMISSIONS = [
 ];
 
 export function UserPermissionsOverride({ userId, userName }: UserPermissionsOverrideProps) {
-  
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPermission, setSelectedPermission] = useState<typeof AVAILABLE_PERMISSIONS[0] | null>(null);

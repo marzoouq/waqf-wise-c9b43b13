@@ -10,7 +10,7 @@ import { Card } from "@/components/ui/card";
 import { format, arLocale as ar } from "@/lib/date";
 import { type RentalPayment } from "@/hooks/useRentalPayments";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
-import { toast } from "@/lib/toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { generateInvoicePDF } from "@/lib/generateInvoicePDF";
 import { generateReceiptPDF } from "@/lib/generateReceiptPDF";
@@ -26,7 +26,7 @@ export const PaymentsTab = ({ onEdit }: Props) => {
   const [paymentToDelete, setPaymentToDelete] = useState<RentalPayment | null>(null);
   
   const { payments, isLoading, deletePayment } = useRentalPayments();
-  
+  const { toast } = useToast();
 
   const handleDeleteClick = (payment: RentalPayment) => {
     setPaymentToDelete(payment);

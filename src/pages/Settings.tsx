@@ -17,12 +17,13 @@ import { LeakedPasswordCheck } from "@/components/settings/LeakedPasswordCheck";
 import { LanguageSelector } from "@/components/settings/LanguageSelector";
 import { RolesSettingsDialog } from "@/components/settings/RolesSettingsDialog";
 import { BiometricSettings } from "@/components/settings/BiometricSettings";
-import { toast } from "@/lib/toast";
+import { useToast } from "@/hooks/use-toast";
 import { useUserRole } from "@/hooks/useUserRole";
 import { MobileOptimizedLayout, MobileOptimizedHeader, MobileOptimizedGrid } from "@/components/layout/MobileOptimizedLayout";
 
 const Settings = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { isNazer, isAdmin } = useUserRole();
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
   const [notificationsDialogOpen, setNotificationsDialogOpen] = useState(false);

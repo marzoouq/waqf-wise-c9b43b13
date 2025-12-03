@@ -7,7 +7,7 @@ import { LoadingState } from '@/components/shared/LoadingState';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Progress } from '@/components/ui/progress';
 import { exportToExcel, exportToPDF } from '@/lib/exportHelpers';
-import { toast } from "@/lib/toast";
+import { useToast } from '@/hooks/use-toast';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
@@ -24,7 +24,7 @@ interface FundPerformance {
 }
 
 export function FundsPerformanceReport() {
-  
+  const { toast } = useToast();
 
   // تحليل أداء المصارف
   const { data: fundPerformance, isLoading } = useQuery<FundPerformance[]>({

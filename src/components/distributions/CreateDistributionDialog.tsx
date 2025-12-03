@@ -16,7 +16,7 @@ import { Separator } from "@/components/ui/separator";
 import { Loader2, Calculator, Users, Bell } from "lucide-react";
 import { useBeneficiaries } from "@/hooks/useBeneficiaries";
 import { useDistributions } from "@/hooks/useDistributions";
-import { toast } from "@/lib/toast";
+import { useToast } from "@/hooks/use-toast";
 import { useDistributionSettings } from "@/hooks/useDistributionSettings";
 import { UnifiedFormField, FormGrid, FormSection } from "@/components/unified/UnifiedFormField";
 
@@ -43,6 +43,7 @@ export const CreateDistributionDialog = ({
   open,
   onOpenChange,
 }: CreateDistributionDialogProps) => {
+  const { toast } = useToast();
   const { beneficiaries, isLoading: loadingBeneficiaries } = useBeneficiaries();
   const { generateDistribution } = useDistributions();
   const { settings } = useDistributionSettings();

@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { toast } from "@/lib/toast";
+import { useToast } from "@/hooks/use-toast";
 
 interface StatCardProps {
   icon: React.ReactNode;
@@ -38,7 +38,7 @@ interface MessageBubbleProps {
 
 export function MessageBubble({ message, messageType, createdAt }: MessageBubbleProps) {
   const [copied, setCopied] = useState(false);
-  
+  const { toast } = useToast();
 
   const handleCopy = async () => {
     try {

@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useState, useRef, useCallb
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '@/types/auth';
-import { toast } from "@/lib/toast";
+import { useToast } from '@/hooks/use-toast';
 import { productionLogger } from '@/lib/logger/production-logger';
 import { ROLE_PERMISSIONS, checkPermission, type Permission } from '@/config/permissions';
 
@@ -31,7 +31,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [rolesLoading, setRolesLoading] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false); // ✅ جديد: التهيئة اكتملت
-  
+  const { toast } = useToast();
   const initRef = useRef(false);
   const rolesCache = useRef<string[]>([]);
   const ROLES_CACHE_KEY = 'waqf_user_roles';

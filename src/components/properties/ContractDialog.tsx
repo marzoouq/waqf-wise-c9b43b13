@@ -5,7 +5,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useContracts, Contract } from "@/hooks/useContracts";
 import { useProperties } from "@/hooks/useProperties";
 import { usePropertyUnits } from "@/hooks/usePropertyUnits";
-import { toast } from "@/lib/toast";
+import { toast } from "@/hooks/use-toast";
 import { Lightbulb } from "lucide-react";
 import { useContractForm } from "./contract/useContractForm";
 import { ContractTenantFields } from "./contract/ContractTenantFields";

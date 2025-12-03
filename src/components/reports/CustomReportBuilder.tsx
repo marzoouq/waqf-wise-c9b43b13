@@ -23,13 +23,13 @@ import {
   Filter,
   BarChart3
 } from "lucide-react";
-import { toast } from "@/lib/toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import type { CustomReportFilter } from "@/types/reports/index";
 import type { Json } from "@/integrations/supabase/types";
 
 export function CustomReportBuilder() {
-  
+  const { toast } = useToast();
   const [reportName, setReportName] = useState("");
   const [reportDescription, setReportDescription] = useState("");
   const [reportType, setReportType] = useState<string>("");

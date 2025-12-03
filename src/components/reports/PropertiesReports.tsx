@@ -6,7 +6,7 @@ import { Download, Building2 } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { exportToExcel, exportToPDF } from "@/lib/exportHelpers";
-import { toast } from "@/lib/toast";
+import { useToast } from "@/hooks/use-toast";
 import { PropertyRow, ContractRow } from "@/types/supabase-helpers";
 import {
   Table,
@@ -23,7 +23,7 @@ interface PropertyWithContracts extends PropertyRow {
 }
 
 export function PropertiesReports() {
-  
+  const { toast } = useToast();
 
   const { data: properties = [], isLoading } = useQuery<PropertyWithContracts[]>({
     queryKey: ["properties-report"],

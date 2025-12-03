@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { format } from "@/lib/date";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/lib/toast";
+import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { commonValidation } from "@/lib/validationSchemas";
 
@@ -35,7 +35,7 @@ interface AddReceiptDialogProps {
 }
 
 export function AddReceiptDialog({ open, onOpenChange }: AddReceiptDialogProps) {
-  
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
 

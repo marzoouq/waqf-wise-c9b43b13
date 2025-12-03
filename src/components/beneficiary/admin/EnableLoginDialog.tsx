@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/lib/toast";
+import { useToast } from "@/hooks/use-toast";
 import { Key, Mail, User, Info, RefreshCw } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { logger } from "@/lib/logger";
@@ -29,7 +29,7 @@ interface EnableLoginDialogProps {
 }
 
 export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }: EnableLoginDialogProps) {
-  
+  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [hasExistingAuth, setHasExistingAuth] = useState(false);
   const [showResetPassword, setShowResetPassword] = useState(false);

@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useGovernanceDecisions } from "@/hooks/useGovernanceDecisions";
-import { toast } from "@/lib/toast";
+import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
   DialogContent,
@@ -62,7 +62,7 @@ export function CreateDecisionDialog({
   meetingId 
 }: CreateDecisionDialogProps) {
   const { createDecision } = useGovernanceDecisions();
-  
+  const { toast } = useToast();
 
   const form = useForm<DecisionFormData>({
     resolver: zodResolver(decisionSchema),

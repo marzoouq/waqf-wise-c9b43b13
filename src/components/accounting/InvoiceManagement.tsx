@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Plus, FileText, Send, CheckCircle, ScanLine } from "lucide-react";
-import { toast } from "@/lib/toast";
+import { useToast } from "@/hooks/use-toast";
 import { formatCurrency } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -29,6 +29,7 @@ interface Invoice {
 }
 
 export function InvoiceManagement() {
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const [showOCRDialog, setShowOCRDialog] = useState(false);

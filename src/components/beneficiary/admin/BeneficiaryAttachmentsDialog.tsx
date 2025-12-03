@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { UnifiedFileUpload, UploadedFile } from "@/components/unified/UnifiedFileUpload";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/lib/toast";
+import { useToast } from "@/hooks/use-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Beneficiary } from "@/types/beneficiary";
 import { Loader2 } from "lucide-react";
@@ -20,7 +20,7 @@ export function BeneficiaryAttachmentsDialog({
   onOpenChange,
   beneficiary,
 }: BeneficiaryAttachmentsDialogProps) {
-  
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [isUploading, setIsUploading] = useState(false);

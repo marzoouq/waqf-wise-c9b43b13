@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
-import { toast } from "@/lib/toast";
+import { useToast } from "@/hooks/use-toast";
 import { usePayments } from "@/hooks/usePayments";
 import { supabase } from "@/integrations/supabase/client";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
@@ -26,6 +26,7 @@ interface PaymentWithContract extends Payment {
 const ITEMS_PER_PAGE = 20;
 
 const Payments = () => {
+  const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);

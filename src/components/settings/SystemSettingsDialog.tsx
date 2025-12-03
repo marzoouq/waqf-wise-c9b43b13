@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useSystemSettings } from "@/hooks/useSystemSettings";
 import { Settings, DollarSign, Bell, Shield, Globe, Save, RotateCcw } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
-import { toast } from "@/lib/toast";
+import { useToast } from "@/hooks/use-toast";
 
 interface SystemSettingsDialogProps {
   open: boolean;
@@ -19,7 +19,7 @@ interface SystemSettingsDialogProps {
 
 export function SystemSettingsDialog({ open, onOpenChange }: SystemSettingsDialogProps) {
   const { settings, isLoading, updateSetting, getSetting } = useSystemSettings();
-  
+  const { toast } = useToast();
   const [editedSettings, setEditedSettings] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
 

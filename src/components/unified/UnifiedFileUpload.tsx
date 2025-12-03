@@ -3,7 +3,7 @@ import { Upload, X, File, Image, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { toast } from "@/lib/toast";
+import { useToast } from "@/hooks/use-toast";
 
 export interface UploadedFile {
   id: string;
@@ -59,7 +59,7 @@ export function UnifiedFileUpload({
   const [isDragging, setIsDragging] = useState(false);
   const [files, setFiles] = useState<UploadedFile[]>(value);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+  const { toast } = useToast();
 
   const handleFiles = async (newFiles: FileList | null) => {
     if (!newFiles || newFiles.length === 0) return;

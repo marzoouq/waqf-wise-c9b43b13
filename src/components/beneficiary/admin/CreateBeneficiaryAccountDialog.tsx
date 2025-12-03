@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { toast } from "@/lib/toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { UserPlus, Copy, Eye, EyeOff } from "lucide-react";
 import { Beneficiary } from "@/types/beneficiary";
@@ -36,7 +36,7 @@ export function CreateBeneficiaryAccountDialog({
   beneficiary,
   onSuccess 
 }: CreateBeneficiaryAccountDialogProps) {
-  
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [createdAccount, setCreatedAccount] = useState<{ email: string; password: string } | null>(null);
   const [showPassword, setShowPassword] = useState(false);

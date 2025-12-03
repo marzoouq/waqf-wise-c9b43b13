@@ -9,7 +9,7 @@ import { Send, Mail, Users } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useBeneficiaries } from "@/hooks/useBeneficiaries";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/lib/toast";
+import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -23,7 +23,7 @@ export function AdminSendMessageDialog({
   onOpenChange,
 }: AdminSendMessageDialogProps) {
   const { user } = useAuth();
-  
+  const { toast } = useToast();
   const { beneficiaries } = useBeneficiaries();
   const [isLoading, setIsLoading] = useState(false);
   const [isBroadcast, setIsBroadcast] = useState(false);

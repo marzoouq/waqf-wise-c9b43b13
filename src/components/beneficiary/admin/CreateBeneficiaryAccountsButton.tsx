@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { UserPlus, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/lib/toast";
+import { useToast } from "@/hooks/use-toast";
 import { logger } from "@/lib/logger";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -38,7 +38,7 @@ interface EligibleBeneficiary {
 }
 
 export function CreateBeneficiaryAccountsButton() {
-  
+  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [loadingBeneficiaries, setLoadingBeneficiaries] = useState(false);
   const [showDialog, setShowDialog] = useState(false);

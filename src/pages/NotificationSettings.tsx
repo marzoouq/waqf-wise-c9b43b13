@@ -6,13 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/lib/toast";
+import { useToast } from "@/hooks/use-toast";
 import { NotificationSettings as NotificationSettingsType } from "@/types/notifications";
 import { MultiChannelNotifications } from "@/components/notifications/MultiChannelNotifications";
 import { Settings, Radio } from "lucide-react";
 
 export default function NotificationSettings() {
-  
+  const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const { data: settings, isLoading } = useQuery({

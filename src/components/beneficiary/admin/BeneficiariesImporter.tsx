@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Upload, FileSpreadsheet, AlertCircle, CheckCircle2 } from "lucide-react";
-import { toast } from "@/lib/toast";
+import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -27,7 +27,7 @@ export function BeneficiariesImporter({ onSuccess }: BeneficiariesImporterProps)
   const [previewData, setPreviewData] = useState<ImportRow[]>([]);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [importing, setImporting] = useState(false);
-  
+  const { toast } = useToast();
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
