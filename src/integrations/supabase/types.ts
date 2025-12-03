@@ -11663,6 +11663,10 @@ export type Database = {
       is_admin_or_nazer: { Args: never; Returns: boolean }
       is_archivist: { Args: never; Returns: boolean }
       is_beneficiary: { Args: never; Returns: boolean }
+      is_beneficiary_owner: {
+        Args: { _beneficiary_id: string }
+        Returns: boolean
+      }
       is_cashier: { Args: never; Returns: boolean }
       is_financial_staff: { Args: never; Returns: boolean }
       is_first_class_beneficiary: { Args: never; Returns: boolean }
