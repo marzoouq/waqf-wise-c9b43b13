@@ -26,11 +26,34 @@ const MAX_EVENTS = 500;
 const eventsBuffer: RealTimeEvent[] = [];
 let eventListeners: ((events: RealTimeEvent[]) => void)[] = [];
 
-// تسجيل حدث
+// Throttle helper
+function throttle<T extends (...args: unknown[]) => void>(fn: T, delay: number): T {
+  let lastCall = 0;
+  return ((...args: unknown[]) => {
+    const now = Date.now();
+    if (now - lastCall >= delay) {
+      lastCall = now;
+      fn(...args);
+    }
+  }) as T;
+}
+
+// تسجيل حدث (مع throttle ضمني)
+let lastLogTime = 0;
+const LOG_THROTTLE_MS = 100; // 100ms بين الأحداث
+
 function logEvent(event: Omit<RealTimeEvent, 'id' | 'timestamp'>) {
+  const now = Date.now();
+  
+  // تجاهل الأحداث المتكررة بسرعة (إلا الأخطاء)
+  if (event.type !== 'error' && now - lastLogTime < LOG_THROTTLE_MS) {
+    return;
+  }
+  lastLogTime = now;
+  
   const fullEvent: RealTimeEvent = {
     ...event,
-    id: `${event.type}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    id: `${event.type}-${now}-${Math.random().toString(36).substr(2, 9)}`,
     timestamp: new Date(),
   };
   
@@ -41,16 +64,21 @@ function logEvent(event: Omit<RealTimeEvent, 'id' | 'timestamp'>) {
     eventsBuffer.pop();
   }
   
-  // إشعار المستمعين
-  eventListeners.forEach(listener => listener([...eventsBuffer]));
+  // إشعار المستمعين (مع throttle)
+  notifyListeners();
 }
+
+// Throttled notification
+const notifyListeners = throttle(() => {
+  eventListeners.forEach(listener => listener([...eventsBuffer]));
+}, 500);
 
 export function useRealTimeMonitor(enabled: boolean = true) {
   const [events, setEvents] = useState<RealTimeEvent[]>([]);
   const [stats, setStats] = useState<MonitorStats | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const observerRef = useRef<MutationObserver | null>(null);
-  const networkObserverRef = useRef<PerformanceObserver | null>(null);
+  const cleanupRef = useRef<(() => void) | null>(null);
 
   // الاستماع للتحديثات
   useEffect(() => {
@@ -73,8 +101,10 @@ export function useRealTimeMonitor(enabled: boolean = true) {
     if (!enabled || isRecording) return;
     setIsRecording(true);
     
-    // 1. مراقبة النقرات
-    const clickHandler = (e: MouseEvent) => {
+    const cleanupFns: (() => void)[] = [];
+    
+    // 1. مراقبة النقرات (throttled)
+    const clickHandler = throttle((e: MouseEvent) => {
       const target = e.target as HTMLElement;
       logEvent({
         type: 'click',
@@ -82,15 +112,15 @@ export function useRealTimeMonitor(enabled: boolean = true) {
         metadata: {
           tagName: target.tagName,
           id: target.id,
-          className: target.className,
-          text: target.textContent?.slice(0, 50),
+          text: target.textContent?.slice(0, 30),
         },
       });
-    };
+    }, 200);
     document.addEventListener('click', clickHandler, true);
+    cleanupFns.push(() => document.removeEventListener('click', clickHandler, true));
 
-    // 2. مراقبة الإدخال
-    const inputHandler = (e: Event) => {
+    // 2. مراقبة الإدخال (throttled)
+    const inputHandler = throttle((e: Event) => {
       const target = e.target as HTMLInputElement;
       logEvent({
         type: 'input',
@@ -99,11 +129,11 @@ export function useRealTimeMonitor(enabled: boolean = true) {
           tagName: target.tagName,
           inputType: target.type,
           name: target.name,
-          hasValue: !!target.value,
         },
       });
-    };
+    }, 300);
     document.addEventListener('input', inputHandler, true);
+    cleanupFns.push(() => document.removeEventListener('input', inputHandler, true));
 
     // 3. مراقبة الأخطاء
     const errorHandler = (e: ErrorEvent) => {
@@ -113,134 +143,107 @@ export function useRealTimeMonitor(enabled: boolean = true) {
         metadata: {
           message: e.message,
           lineno: e.lineno,
-          colno: e.colno,
         },
       });
     };
     window.addEventListener('error', errorHandler);
+    cleanupFns.push(() => window.removeEventListener('error', errorHandler));
 
     // 4. مراقبة Promise rejections
     const rejectionHandler = (e: PromiseRejectionEvent) => {
       logEvent({
         type: 'error',
         target: 'Promise Rejection',
-        metadata: {
-          reason: String(e.reason),
-        },
+        metadata: { reason: String(e.reason).slice(0, 100) },
       });
     };
     window.addEventListener('unhandledrejection', rejectionHandler);
+    cleanupFns.push(() => window.removeEventListener('unhandledrejection', rejectionHandler));
 
     // 5. مراقبة التنقل
     const navigationHandler = () => {
       logEvent({
         type: 'navigation',
         target: window.location.pathname,
-        metadata: {
-          search: window.location.search,
-          hash: window.location.hash,
-        },
       });
     };
     window.addEventListener('popstate', navigationHandler);
+    cleanupFns.push(() => window.removeEventListener('popstate', navigationHandler));
 
-    // 6. مراقبة DOM mutations
-    observerRef.current = new MutationObserver((mutations) => {
-      mutations.forEach(mutation => {
-        if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-          logEvent({
-            type: 'mutation',
-            target: getElementSelector(mutation.target as HTMLElement),
-            metadata: {
-              addedNodes: mutation.addedNodes.length,
-              removedNodes: mutation.removedNodes.length,
-            },
-          });
-        }
-      });
-    });
+    // 6. مراقبة DOM mutations (محدودة جداً)
+    let mutationCount = 0;
+    const mutationHandler = throttle((mutations: MutationRecord[]) => {
+      // تجاهل أكثر من 10 mutations في الثانية
+      if (mutationCount > 10) return;
+      mutationCount++;
+      setTimeout(() => mutationCount--, 1000);
+      
+      const significantMutations = mutations.filter(m => 
+        m.addedNodes.length > 0 && 
+        (m.target as HTMLElement).tagName !== 'SCRIPT'
+      );
+      
+      if (significantMutations.length > 0) {
+        logEvent({
+          type: 'mutation',
+          target: getElementSelector(significantMutations[0].target as HTMLElement),
+          metadata: { count: significantMutations.length },
+        });
+      }
+    }, 500);
     
+    observerRef.current = new MutationObserver(mutationHandler);
     observerRef.current.observe(document.body, {
       childList: true,
-      subtree: true,
+      subtree: false, // تقليل المراقبة - فقط المستوى الأول
     });
+    cleanupFns.push(() => observerRef.current?.disconnect());
 
-    // 7. مراقبة طلبات الشبكة
-    try {
-      networkObserverRef.current = new PerformanceObserver((list) => {
-        list.getEntries().forEach((entry) => {
-          if (entry.entryType === 'resource') {
-            const resourceEntry = entry as PerformanceResourceTiming;
-            logEvent({
-              type: 'network',
-              target: resourceEntry.name,
-              duration: resourceEntry.duration,
-              metadata: {
-                initiatorType: resourceEntry.initiatorType,
-                transferSize: resourceEntry.transferSize,
-                encodedBodySize: resourceEntry.encodedBodySize,
-              },
-            });
-          }
-        });
-      });
-      
-      networkObserverRef.current.observe({ entryTypes: ['resource'] });
-    } catch (e) {
-      // بعض المتصفحات لا تدعم resource
-    }
-
-    // 8. اعتراض fetch
+    // 7. اعتراض fetch (محدود)
     const originalFetch = window.fetch;
+    let fetchCount = 0;
     window.fetch = async (...args) => {
       const startTime = performance.now();
-      const url = typeof args[0] === 'string' ? args[0] : args[0] instanceof URL ? args[0].href : (args[0] as Request).url;
+      const url = typeof args[0] === 'string' ? args[0] : (args[0] as Request).url;
       
       try {
         const response = await originalFetch(...args);
         const duration = performance.now() - startTime;
         
-        logEvent({
-          type: 'network',
-          target: url,
-          duration,
-          metadata: {
-            method: typeof args[1]?.method === 'string' ? args[1].method : 'GET',
-            status: response.status,
-            ok: response.ok,
-          },
-        });
+        // تسجيل فقط كل 5 طلبات لتقليل الضغط
+        fetchCount++;
+        if (fetchCount % 5 === 0 || duration > 1000) {
+          logEvent({
+            type: 'network',
+            target: url.split('?')[0].slice(-50), // اختصار URL
+            duration,
+            metadata: { status: response.status },
+          });
+        }
         
         return response;
       } catch (error) {
         logEvent({
           type: 'error',
-          target: url,
-          metadata: {
-            error: String(error),
-            type: 'fetch',
-          },
+          target: 'Fetch Error',
+          metadata: { url: url.slice(-50) },
         });
         throw error;
       }
     };
+    cleanupFns.push(() => { window.fetch = originalFetch; });
 
-    // تنظيف عند الإيقاف
-    return () => {
-      document.removeEventListener('click', clickHandler, true);
-      document.removeEventListener('input', inputHandler, true);
-      window.removeEventListener('error', errorHandler);
-      window.removeEventListener('unhandledrejection', rejectionHandler);
-      window.removeEventListener('popstate', navigationHandler);
-      observerRef.current?.disconnect();
-      networkObserverRef.current?.disconnect();
-      window.fetch = originalFetch;
+    // حفظ cleanup functions
+    cleanupRef.current = () => {
+      cleanupFns.forEach(fn => fn());
     };
   }, [enabled, isRecording]);
 
   // إيقاف التسجيل
   const stopRecording = useCallback(() => {
     setIsRecording(false);
+    cleanupRef.current?.();
+    cleanupRef.current = null;
   }, []);
 
   // حساب الإحصائيات
