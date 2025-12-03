@@ -54,14 +54,14 @@ export function useRealTimeMonitor(enabled: boolean = true) {
 
   // الاستماع للتحديثات
   useEffect(() => {
-    if (!enabled) return;
-    
     const listener = (newEvents: RealTimeEvent[]) => {
       setEvents(newEvents);
     };
     
-    eventListeners.push(listener);
-    setEvents([...eventsBuffer]);
+    if (enabled) {
+      eventListeners.push(listener);
+      setEvents([...eventsBuffer]);
+    }
     
     return () => {
       eventListeners = eventListeners.filter(l => l !== listener);
