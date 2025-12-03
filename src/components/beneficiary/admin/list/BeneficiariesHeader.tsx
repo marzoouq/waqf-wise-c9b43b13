@@ -1,9 +1,9 @@
 import { memo } from "react";
 import { Plus, MoreHorizontal, Printer, Upload, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { BeneficiariesPrintButton } from "@/components/beneficiaries/BeneficiariesPrintButton";
-import { BeneficiariesImporter } from "@/components/beneficiaries/BeneficiariesImporter";
-import { CreateBeneficiaryAccountsButton } from "@/components/beneficiaries/CreateBeneficiaryAccountsButton";
+import { BeneficiariesPrintButton } from "../BeneficiariesPrintButton";
+import { BeneficiariesImporter } from "../BeneficiariesImporter";
+import { CreateBeneficiaryAccountsButton } from "../CreateBeneficiaryAccountsButton";
 import { Beneficiary } from "@/types/beneficiary";
 import {
   DropdownMenu,

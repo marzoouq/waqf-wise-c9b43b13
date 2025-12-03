@@ -18,8 +18,8 @@ import {
   ProfileFamilyTree,
   ProfileDocumentsGallery
 } from '@/components/beneficiary';
-import { BeneficiaryIntegrationPanel } from '@/components/beneficiaries/BeneficiaryIntegrationPanel';
-import BeneficiaryDialog from '@/components/beneficiaries/BeneficiaryDialog';
+import { BeneficiaryIntegrationPanel } from '@/components/beneficiary/admin/BeneficiaryIntegrationPanel';
+import BeneficiaryDialog from '@/components/beneficiary/admin/BeneficiaryDialog';
 
 export default function BeneficiaryProfile() {
   const { id } = useParams<{ id: string }>();

@@ -5,7 +5,7 @@ import { Beneficiary } from "@/types/beneficiary";
 import { useBeneficiaries } from "@/hooks/useBeneficiaries";
 import { useSavedSearches } from "@/hooks/useSavedSearches";
 import { useBeneficiariesFilters } from "@/hooks/useBeneficiariesFilters";
-import { SearchCriteria } from "@/components/beneficiaries/AdvancedSearchDialog";
+import { SearchCriteria } from "@/components/beneficiary/admin/AdvancedSearchDialog";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
 import {
@@ -13,8 +13,8 @@ import {
   BeneficiariesSearchBar,
   BeneficiariesStats,
   BeneficiariesTable,
-} from "@/components/beneficiaries/list";
-import { BeneficiariesDialogs } from "@/components/beneficiaries/BeneficiariesDialogs";
+} from "@/components/beneficiary/admin/list";
+import { BeneficiariesDialogs } from "@/components/beneficiary/admin/BeneficiariesDialogs";
 import { PAGINATION } from "@/lib/constants";
 
 const ITEMS_PER_PAGE = PAGINATION.BENEFICIARIES_PAGE_SIZE;

@@ -1,3 +1,8 @@
+/**
+ * مكونات قائمة المستفيدين للإدارة
+ * Beneficiaries List Components for Admin
+ */
+
 export { BeneficiariesHeader } from './BeneficiariesHeader';
 export { BeneficiariesSearchBar } from './BeneficiariesSearchBar';
 export { BeneficiariesStats } from './BeneficiariesStats';
