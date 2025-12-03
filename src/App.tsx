@@ -18,6 +18,7 @@ import { LoadingState } from "./components/shared/LoadingState";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { RoleBasedRedirect } from "./components/auth/RoleBasedRedirect";
 import { GlobalMonitoring } from "./components/developer/GlobalMonitoring";
+import { BackgroundMonitor } from "./components/developer/BackgroundMonitor";
 import { IdleTimeoutManager } from "./components/auth/IdleTimeoutManager";
 import { SessionManager } from "./components/auth/SessionManager";
 import { useAlertCleanup } from "./hooks/useAlertCleanup";
@@ -93,6 +94,7 @@ const App = () => {
                 <Sonner />
                 <LCPOptimizer />
                 <GlobalMonitoring />
+                <BackgroundMonitor />
                 <BrowserRouter
                   future={{
                     v7_startTransition: true,

@@ -6,3 +6,6 @@ export { StorageInspector } from "./StorageInspector";
 export { ToolsPanel } from "./ToolsPanel";
 export { ComponentInspector } from "./ComponentInspector";
 export { ResponsiveTester } from "./ResponsiveTester";
+export { DeepDiagnosticsPanel } from "./DeepDiagnosticsPanel";
+export { GlobalMonitoring } from "./GlobalMonitoring";
+export { BackgroundMonitor } from "./BackgroundMonitor";

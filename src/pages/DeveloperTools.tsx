@@ -3,7 +3,7 @@ import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { Code, Activity, AlertCircle, Network, Database, Wrench, Crosshair, Smartphone } from "lucide-react";
+import { Code, Activity, AlertCircle, Network, Database, Wrench, Crosshair, Smartphone, Search } from "lucide-react";
 import { DeveloperOverview } from "@/components/developer/DeveloperOverview";
 import { WebVitalsPanel } from "@/components/developer/WebVitalsPanel";
 import { ErrorsPanel } from "@/components/developer/ErrorsPanel";
@@ -12,6 +12,7 @@ import { StorageInspector } from "@/components/developer/StorageInspector";
 import { ToolsPanel } from "@/components/developer/ToolsPanel";
 import { ComponentInspector } from "@/components/developer/ComponentInspector";
 import { ResponsiveTester } from "@/components/developer/ResponsiveTester";
+import { DeepDiagnosticsPanel } from "@/components/developer/DeepDiagnosticsPanel";
 
 export default function DeveloperTools() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -68,6 +69,10 @@ export default function DeveloperTools() {
                   <Smartphone className="w-4 h-4" />
                   <span className="hidden sm:inline">الاستجابة</span>
                 </TabsTrigger>
+                <TabsTrigger value="diagnostics" className="flex items-center gap-1 py-3 text-xs sm:text-sm min-h-[44px]">
+                  <Search className="w-4 h-4" />
+                  <span className="hidden sm:inline">التشخيص العميق</span>
+                </TabsTrigger>
               </TabsList>
               <ScrollBar orientation="horizontal" />
             </ScrollArea>
@@ -102,6 +107,10 @@ export default function DeveloperTools() {
 
             <TabsContent value="responsive" className="space-y-6 mt-6">
               <ResponsiveTester />
+            </TabsContent>
+
+            <TabsContent value="diagnostics" className="space-y-6 mt-6">
+              <DeepDiagnosticsPanel />
             </TabsContent>
           </Tabs>
       </MobileOptimizedLayout>
