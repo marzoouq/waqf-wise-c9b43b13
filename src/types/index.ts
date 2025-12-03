@@ -17,6 +17,7 @@ export * from './alerts';
 export * from './activity';
 export * from './audit';
 export * from './contracts'; // Contract, ContractInsert
+export * from './distributions'; // Distribution types - unified
 
 // تجنب إعادة تصدير الأنواع المكررة من approvals
 export type {
@@ -60,24 +61,6 @@ export * from './reports/index';
 // Core Entity Types - الأنواع الأساسية
 // ============================================
 
-/**
- * @deprecated استخدم `import { type Property } from '@/hooks/useProperties'`
- * هذا التعريف للتوافق مع الكود القديم فقط
- */
-export interface Property {
-  id: string;
-  name: string;
-  type: string;
-  location: string;
-  units: number;
-  occupied: number;
-  monthly_revenue: number;
-  status: string;
-  description?: string;
-  created_at: string;
-  updated_at: string;
-}
-
 export interface Payment {
   id: string;
   payment_type: "receipt" | "payment";
@@ -90,18 +73,6 @@ export interface Payment {
   description: string;
   notes?: string;
   journal_entry_id?: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface Distribution {
-  id: string;
-  month: string;
-  total_amount: number;
-  beneficiaries_count: number;
-  status: string;
-  distribution_date: string;
-  notes?: string;
   created_at: string;
   updated_at: string;
 }

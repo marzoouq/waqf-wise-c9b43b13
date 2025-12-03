@@ -9,3 +9,8 @@ export { RequestMobileCard } from './RequestMobileCard';
 export { RequestPrintTemplate } from './RequestPrintTemplate';
 export { RequestApprovalDialog } from './RequestApprovalDialog';
 export { RequestCommentsDialog } from './RequestCommentsDialog';
+
+// View Components (extracted from page)
+export { RequestsDesktopView } from './RequestsDesktopView';
+export { RequestsMobileView } from './RequestsMobileView';
+export { RequestsDialogs } from './RequestsDialogs';
