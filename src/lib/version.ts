@@ -2,7 +2,7 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.6.9
+ * @version 2.6.10
  * @date 2025-12-03
  */
 
@@ -16,10 +16,10 @@ export const VERSION_INFO = {
   name: APP_VERSION_NAME,
   changelog: '/docs/CHANGELOG.md',
   features: [
-    'إصلاح مشكلة التحميل بعد تسجيل الدخول (Race Condition)',
-    'إضافة Timeout احتياطي لـ RoleBasedRedirect',
-    'تحسين AuthContext لمنع تكرار جلب البيانات',
-    'استخدام الأدوار المخزنة مؤقتاً كـ Fallback',
+    'إضافة صلاحية تغيير البريد الإلكتروني للمستخدمين (edit_user_email)',
+    'إنشاء Edge Function لتحديث البريد في auth.users',
+    'إصلاح خطأ .single() باستخدام .maybeSingle() للتحقق من البريد',
+    'تكامل EditUserEmailDialog في صفحة إدارة المستخدمين',
   ],
 } as const;
 
