@@ -1,17 +1,17 @@
 import { render } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import ErrorBoundary from '../ErrorBoundary';
+import { PageErrorBoundary } from '../PageErrorBoundary';
 
 const ThrowError = () => {
   throw new Error('Test error');
 };
 
-describe('ErrorBoundary', () => {
+describe('PageErrorBoundary', () => {
   it('renders children when there is no error', () => {
     const { getByText } = render(
-      <ErrorBoundary>
+      <PageErrorBoundary pageName="اختبار">
         <div>محتوى صحيح</div>
-      </ErrorBoundary>
+      </PageErrorBoundary>
     );
 
     expect(getByText('محتوى صحيح')).toBeInTheDocument();
@@ -23,12 +23,12 @@ describe('ErrorBoundary', () => {
     console.error = vi.fn();
 
     const { getByText } = render(
-      <ErrorBoundary>
+      <PageErrorBoundary pageName="اختبار">
         <ThrowError />
-      </ErrorBoundary>
+      </PageErrorBoundary>
     );
 
-    expect(getByText(/حدث خطأ غير متوقع/)).toBeInTheDocument();
+    expect(getByText(/حدث خطأ/)).toBeInTheDocument();
 
     console.error = originalError;
   });

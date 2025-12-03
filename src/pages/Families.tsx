@@ -48,7 +48,7 @@ type FamilyWithHead = Family & {
 };
 import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
 import { Pagination } from '@/components/shared/Pagination';
-import { EnhancedEmptyState } from '@/components/shared/EnhancedEmptyState';
+import { EnhancedEmptyState } from '@/components/shared';
 import { ExportButton } from '@/components/shared/ExportButton';
 import { SortableTableHeader } from '@/components/shared/SortableTableHeader';
 import { BulkActionsBar } from '@/components/shared/BulkActionsBar';

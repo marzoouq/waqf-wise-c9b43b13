@@ -7,7 +7,7 @@ import { CreateDecisionDialog } from "@/components/governance/CreateDecisionDial
 import { DecisionCard } from "@/components/governance/DecisionCard";
 import { useGovernanceDecisions } from "@/hooks/useGovernanceDecisions";
 import { LoadingState } from "@/components/shared/LoadingState";
-import { EnhancedEmptyState } from "@/components/shared/EnhancedEmptyState";
+import { EnhancedEmptyState } from "@/components/shared";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { Database } from "@/integrations/supabase/types";
 import type { GovernanceDecision } from "@/types/governance";

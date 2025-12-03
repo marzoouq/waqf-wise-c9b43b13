@@ -36,7 +36,7 @@ import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layou
 import { ExportButton } from '@/components/shared/ExportButton';
 import { PrintButton } from '@/components/shared/PrintButton';
 import { Pagination } from '@/components/shared/Pagination';
-import { EnhancedEmptyState } from '@/components/shared/EnhancedEmptyState';
+import { EnhancedEmptyState } from '@/components/shared';
 import { PAGINATION } from '@/lib/constants';
 import { SortableTableHeader, SortDirection } from '@/components/shared/SortableTableHeader';
 import { BulkActionsBar } from '@/components/shared/BulkActionsBar';

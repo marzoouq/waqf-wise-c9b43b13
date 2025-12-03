@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useWaqfUnits, type WaqfUnit } from "@/hooks/useWaqfUnits";
 import { LoadingState } from "@/components/shared/LoadingState";
-import { EnhancedEmptyState } from "@/components/shared/EnhancedEmptyState";
+import { EnhancedEmptyState } from "@/components/shared";
 import { WaqfUnitDialog } from "@/components/waqf/WaqfUnitDialog";
 import { ExportButton } from "@/components/shared/ExportButton";
 import { SortableTableHeader } from "@/components/shared/SortableTableHeader";

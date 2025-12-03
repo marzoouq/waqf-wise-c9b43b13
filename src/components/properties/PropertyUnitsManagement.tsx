@@ -38,7 +38,7 @@ import {
 import { usePropertyUnits } from "@/hooks/usePropertyUnits";
 import { PropertyUnitDialog } from "./PropertyUnitDialog";
 import { LoadingState } from "@/components/shared/LoadingState";
-import { EnhancedEmptyState } from "@/components/shared/EnhancedEmptyState";
+import { EnhancedEmptyState } from "@/components/shared";
 import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
 import { useToast } from "@/hooks/use-toast";
 import type { Database } from "@/integrations/supabase/types";
