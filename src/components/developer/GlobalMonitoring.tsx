@@ -9,8 +9,11 @@ import { useErrorNotifications } from "@/hooks/developer/useErrorNotifications";
 export function GlobalMonitoring() {
   const { isAdmin, isNazer, isLoading } = useUserRole();
 
+  // انتظار اكتمال تهيئة Auth قبل أي عمليات
+  if (isLoading) return null;
+
   // تفعيل الميزات للناظر والمشرفين
-  const shouldMonitor = !isLoading && (isAdmin || isNazer);
+  const shouldMonitor = isAdmin || isNazer;
 
   // تفعيل مراقبة الأخطاء - دائماً استدعاء الـ Hook
   useErrorNotifications(shouldMonitor);
