@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { UnifiedDashboardLayout } from "@/components/dashboard/UnifiedDashboardLayout";
 import { DashboardTabs } from "@/components/dashboard/DashboardTabs";
 import { DashboardDialogs } from "@/components/dashboard/DashboardDialogs";
+import { Button } from "@/components/ui/button";
+import { Mail } from "lucide-react";
 
 /**
  * لوحة التحكم العامة - للمستخدمين بدون دور محدد
@@ -14,7 +16,15 @@ const Dashboard = () => {
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
 
   return (
-    <DashboardLayout onMessageClick={() => setMessageDialogOpen(true)}>
+    <UnifiedDashboardLayout 
+      role="user"
+      actions={
+        <Button onClick={() => setMessageDialogOpen(true)} className="gap-2">
+          <Mail className="h-4 w-4" />
+          <span className="hidden sm:inline">إرسال رسالة</span>
+        </Button>
+      }
+    >
       <DashboardTabs
         onOpenBeneficiaryDialog={() => setIsBeneficiaryDialogOpen(true)}
         onOpenPropertyDialog={() => setIsPropertyDialogOpen(true)}
@@ -31,7 +41,7 @@ const Dashboard = () => {
         messageDialogOpen={messageDialogOpen}
         setMessageDialogOpen={setMessageDialogOpen}
       />
-    </DashboardLayout>
+    </UnifiedDashboardLayout>
   );
 };
 
