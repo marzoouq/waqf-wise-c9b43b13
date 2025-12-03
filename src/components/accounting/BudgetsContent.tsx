@@ -71,8 +71,7 @@ export function BudgetsContent() {
 
   const handleExport = async () => {
     try {
-      // Dynamic import for XLSX
-      const XLSX = await import('xlsx');
+      const { exportToExcel } = await import('@/lib/excel-helper');
       
       const exportData = budgets.map(b => ({
         "الحساب": `${b.accounts?.code} - ${b.accounts?.name_ar}`,
@@ -86,10 +85,7 @@ export function BudgetsContent() {
           : "0%",
       }));
 
-      const ws = XLSX.utils.json_to_sheet(exportData);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "الميزانيات");
-      XLSX.writeFile(wb, `budgets-${format(new Date(), "yyyyMMdd")}.xlsx`);
+      await exportToExcel(exportData, `budgets-${format(new Date(), "yyyyMMdd")}`, "الميزانيات");
       
       toast.success("تم تصدير الميزانيات بنجاح");
     } catch (error) {

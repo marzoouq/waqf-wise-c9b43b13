@@ -157,8 +157,7 @@ export default function Loans() {
               variant="outline"
               size="sm"
               onClick={async () => {
-                // Dynamic import for XLSX
-                const XLSX = await import("xlsx");
+                const { exportToExcel } = await import("@/lib/excel-helper");
                 
                 const exportData = filteredLoans.map((loan) => ({
                   "رقم القرض": loan.loan_number,
@@ -171,10 +170,8 @@ export default function Loans() {
                   "تاريخ البداية": format(new Date(loan.start_date), "dd/MM/yyyy"),
                   "الحالة": loan.status,
                 }));
-                const ws = XLSX.utils.json_to_sheet(exportData);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "القروض");
-                XLSX.writeFile(wb, `قروض_${format(new Date(), "yyyy-MM-dd")}.xlsx`);
+                
+                await exportToExcel(exportData, `قروض_${format(new Date(), "yyyy-MM-dd")}`, "القروض");
               }}
               className="gap-1"
             >

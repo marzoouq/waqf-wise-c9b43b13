@@ -203,14 +203,10 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
         };
       });
 
-      // Dynamic import for XLSX
-      const XLSX = await import("xlsx");
+      // Dynamic import for excel-helper
+      const { exportToExcel } = await import("@/lib/excel-helper");
       
-      const worksheet = XLSX.utils.json_to_sheet(data);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "العقارات");
-
-      XLSX.writeFile(workbook, `properties-report-${Date.now()}.xlsx`);
+      await exportToExcel(data, `properties-report-${Date.now()}`, "العقارات");
 
       toast({
         title: "تم التصدير",

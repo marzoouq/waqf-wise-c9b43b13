@@ -30,8 +30,7 @@ export function TrialBalanceReport() {
   };
 
   const handleExport = async () => {
-    // Dynamic import for XLSX
-    const XLSX = await import("xlsx");
+    const { exportToExcel } = await import("@/lib/excel-helper");
     
     const exportData = trialBalance.map(acc => ({
       'رمز الحساب': acc.code,
@@ -50,10 +49,7 @@ export function TrialBalanceReport() {
       'الرصيد': difference < 0.01 ? 'متوازن' : `فرق: ${difference.toFixed(2)}`,
     });
 
-    const ws = XLSX.utils.json_to_sheet(exportData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "ميزان المراجعة");
-    XLSX.writeFile(wb, `trial-balance-${format(new Date(), "yyyyMMdd")}.xlsx`);
+    await exportToExcel(exportData, `trial-balance-${format(new Date(), "yyyyMMdd")}`, "ميزان المراجعة");
   };
 
   if (isLoading) {

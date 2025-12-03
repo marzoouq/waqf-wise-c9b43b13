@@ -65,26 +65,8 @@ export const exportToExcel = async (
   filename: string,
   sheetName: string = "Sheet1"
 ) => {
-  // Dynamic import for XLSX
-  const XLSX = await import("xlsx");
-  
-  const worksheet = XLSX.utils.json_to_sheet(data);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
-
-  // Set column widths
-  const maxWidth = data.reduce((acc, row) => {
-    Object.keys(row).forEach((key) => {
-      const value = String(row[key] || "");
-      const currentMax = typeof acc[key] === 'number' ? acc[key] as number : 10;
-      acc[key] = Math.max(currentMax, value.length);
-    });
-    return acc;
-  }, {} as Record<string, number>);
-
-  worksheet["!cols"] = Object.values(maxWidth).map((w) => ({ wch: (w as number) + 2 }));
-
-  XLSX.writeFile(workbook, `${filename}.xlsx`);
+  const { exportToExcel: excelExport } = await import("@/lib/excel-helper");
+  await excelExport(data, filename, sheetName);
 };
 
 export const exportFinancialStatementToPDF = async (

@@ -72,8 +72,7 @@ export default function Budgets() {
   };
 
   const handleExport = async () => {
-    // Dynamic import for XLSX
-    const XLSX = await import("xlsx");
+    const { exportToExcel } = await import("@/lib/excel-helper");
     
     const exportData = budgets.map(b => ({
       "الحساب": `${b.accounts?.code} - ${b.accounts?.name_ar}`,
@@ -87,10 +86,7 @@ export default function Budgets() {
         : "0%",
     }));
 
-    const ws = XLSX.utils.json_to_sheet(exportData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "الميزانيات");
-    XLSX.writeFile(wb, `budgets-${format(new Date(), "yyyyMMdd")}.xlsx`);
+    await exportToExcel(exportData, `budgets-${format(new Date(), "yyyyMMdd")}`, "الميزانيات");
   };
 
   const getVarianceColor = (variance: number | null) => {
