@@ -1,24 +1,23 @@
 /**
  * مراقب الخلفية - يعمل تلقائياً للكشف المبكر عن المشاكل
  * يحذر من المشاكل قبل أن تصبح حرجة
+ * محسّن لتجنب التكرار مع usePerformanceGuard
  */
 import { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { useUserRole } from '@/hooks/useUserRole';
 import { productionLogger } from '@/lib/logger/production-logger';
 
-// حدود التحذير
+// حدود التحذير - مرفوعة لتقليل الضوضاء
 const THRESHOLDS = {
-  MEMORY_WARNING: 70,
-  MEMORY_CRITICAL: 85,
-  RENDER_PER_SECOND: 10,
-  LONG_TASK_MS: 100,
-  NETWORK_TIMEOUT_MS: 10000,
+  MEMORY_WARNING: 75,
+  MEMORY_CRITICAL: 90,
+  LONG_TASK_MS: 200, // مرفوع من 100 لتقليل التنبيهات
 };
 
 // تتبع التحذيرات لتجنب التكرار
-const shownWarnings = new Set<string>();
-const WARN_COOLDOWN_MS = 60000; // تحذير واحد كل دقيقة لكل نوع
+const shownWarnings = new Map<string, number>();
+const WARN_COOLDOWN_MS = 120000; // تحذير واحد كل دقيقتين لكل نوع
 
 export function BackgroundMonitor() {
   const { isAdmin, isNazer, isLoading } = useUserRole();
@@ -30,12 +29,11 @@ export function BackgroundMonitor() {
 
     const showWarning = (key: string, message: string, severity: 'warning' | 'error' = 'warning') => {
       const now = Date.now();
-      const lastShown = shownWarnings.has(key) ? parseInt(localStorage.getItem(`warn_${key}`) || '0') : 0;
+      const lastShown = shownWarnings.get(key) || 0;
       
       if (now - lastShown < WARN_COOLDOWN_MS) return;
       
-      shownWarnings.add(key);
-      localStorage.setItem(`warn_${key}`, now.toString());
+      shownWarnings.set(key, now);
 
       if (severity === 'error') {
         toast.error(message, { duration: 8000 });
@@ -46,7 +44,7 @@ export function BackgroundMonitor() {
       }
     };
 
-    // مراقبة الذاكرة
+    // مراقبة الذاكرة فقط (Long Tasks يراقبها usePerformanceGuard)
     const checkMemory = () => {
       if (!('memory' in performance)) return;
 
@@ -64,69 +62,32 @@ export function BackgroundMonitor() {
       }
     };
 
-    // مراقبة Long Tasks
-    let longTaskObserver: PerformanceObserver | null = null;
-    try {
-      longTaskObserver = new PerformanceObserver((list) => {
-        list.getEntries().forEach((entry) => {
-          if (entry.duration > THRESHOLDS.LONG_TASK_MS) {
-            showWarning('long_task', `🐌 مهمة بطيئة: ${entry.duration.toFixed(0)}ms`);
-          }
-        });
-      });
-      longTaskObserver.observe({ type: 'longtask', buffered: true });
-    } catch (e) {
-      // غير مدعوم
-    }
-
-    // مراقبة Layout Shift المفرط
-    let clsValue = 0;
-    let clsObserver: PerformanceObserver | null = null;
-    try {
-      clsObserver = new PerformanceObserver((list) => {
-        list.getEntries().forEach((entry) => {
-          if (!(entry as PerformanceEntry & { hadRecentInput: boolean }).hadRecentInput) {
-            clsValue += (entry as PerformanceEntry & { value: number }).value;
-            if (clsValue > 0.25) {
-              showWarning('cls_high', `📐 تحريك تخطيط مفرط: ${clsValue.toFixed(3)}`);
-            }
-          }
-        });
-      });
-      clsObserver.observe({ type: 'layout-shift', buffered: true });
-    } catch (e) {
-      // غير مدعوم
-    }
-
     // مراقبة الشبكة
-    const checkNetwork = () => {
-      if (!navigator.onLine) {
-        showWarning('offline', '📡 لا يوجد اتصال بالإنترنت', 'error');
-      }
+    const handleOffline = () => {
+      showWarning('offline', '📡 انقطع الاتصال بالإنترنت', 'error');
+    };
+    
+    const handleOnline = () => {
+      toast.success('✅ تم استعادة الاتصال بالإنترنت');
     };
 
-    window.addEventListener('offline', () => {
-      showWarning('offline', '📡 انقطع الاتصال بالإنترنت', 'error');
-    });
+    window.addEventListener('offline', handleOffline);
+    window.addEventListener('online', handleOnline);
 
-    window.addEventListener('online', () => {
-      toast.success('✅ تم استعادة الاتصال بالإنترنت');
-    });
-
-    // بدء المراقبة الدورية
-    checkMemory();
-    checkNetwork();
-    intervalRef.current = setInterval(() => {
+    // بدء المراقبة الدورية - كل 60 ثانية بدلاً من 30
+    const timeoutId = setTimeout(() => {
       checkMemory();
-    }, 30000); // كل 30 ثانية
+      intervalRef.current = setInterval(checkMemory, 60000);
+    }, 5000); // تأخير 5 ثوان قبل البدء
 
     // تسجيل بدء المراقبة
     productionLogger.info('🔍 بدأت مراقبة الخلفية للكشف المبكر عن المشاكل');
 
     return () => {
+      clearTimeout(timeoutId);
       if (intervalRef.current) clearInterval(intervalRef.current);
-      longTaskObserver?.disconnect();
-      clsObserver?.disconnect();
+      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener('online', handleOnline);
     };
   }, [shouldMonitor]);
 
