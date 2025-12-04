@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -46,6 +46,31 @@ export function useChatbot() {
 
   const userId = session?.user?.id;
 
+  // جلب أدوار المستخدم
+  const { data: userRoles = [] } = useQuery({
+    queryKey: ["user_roles_chatbot", userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId);
+      if (error) throw error;
+      return data?.map(r => r.role) || [];
+    },
+    enabled: !!userId,
+  });
+
+  const isStaff = useMemo(() => 
+    userRoles.some(r => ['admin', 'nazer', 'accountant', 'cashier', 'archivist'].includes(r)),
+    [userRoles]
+  );
+
+  const isBeneficiary = useMemo(() => 
+    userRoles.some(r => ['beneficiary', 'waqf_heir'].includes(r)),
+    [userRoles]
+  );
+
   // جلب سجل المحادثات
   const { data: conversations = [], isLoading } = useQuery({
     queryKey: ["chatbot_conversations", userId],
@@ -66,7 +91,7 @@ export function useChatbot() {
   });
 
   // جلب الردود السريعة
-  const { data: quickReplies = [] } = useQuery({
+  const { data: allQuickReplies = [] } = useQuery({
     queryKey: ["chatbot_quick_replies"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -79,6 +104,22 @@ export function useChatbot() {
       return data as QuickReply[];
     },
   });
+
+  // فلترة الردود السريعة حسب دور المستخدم
+  const quickReplies = useMemo(() => {
+    if (isStaff) {
+      // الموظفون يرون الفئات: financial, properties, requests, distributions, help
+      return allQuickReplies.filter(r => 
+        ['financial', 'properties', 'requests', 'distributions', 'help'].includes(r.category)
+      );
+    } else if (isBeneficiary) {
+      // المستفيدون يرون الفئات: beneficiary, general
+      return allQuickReplies.filter(r => 
+        ['beneficiary', 'general'].includes(r.category)
+      );
+    }
+    return allQuickReplies;
+  }, [allQuickReplies, isStaff, isBeneficiary]);
 
   // إرسال رسالة
   const sendMessage = useMutation({
