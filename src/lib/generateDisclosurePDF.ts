@@ -11,6 +11,11 @@ const loadArabicFont = async (doc: JsPDF) => {
   try {
     const { regular: amiriRegular, bold: amiriBold } = await loadAmiriFonts();
     
+    // التحقق من صحة البيانات
+    if (!amiriRegular || amiriRegular.length < 1000) {
+      throw new Error('Font data is invalid or too small');
+    }
+    
     doc.addFileToVFS("Amiri-Regular.ttf", amiriRegular);
     doc.addFont("Amiri-Regular.ttf", "Amiri", "normal");
     
@@ -18,11 +23,17 @@ const loadArabicFont = async (doc: JsPDF) => {
     doc.addFont("Amiri-Bold.ttf", "Amiri", "bold");
     
     doc.setFont("Amiri", "normal");
+    
+    logger.info('Arabic font loaded successfully', { 
+      context: 'load_arabic_font_disclosure',
+      metadata: { fontSize: amiriRegular.length }
+    });
+    
     return true;
   } catch (error) {
     logger.error(error, { 
       context: 'load_arabic_font_disclosure', 
-      severity: 'low'
+      severity: 'high'
     });
     return false;
   }
