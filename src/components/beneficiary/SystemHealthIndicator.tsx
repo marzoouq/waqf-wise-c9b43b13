@@ -11,33 +11,30 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { Activity, AlertTriangle, WifiOff, CheckCircle2 } from 'lucide-react';
+import { AlertTriangle, WifiOff, CheckCircle2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { productionLogger } from '@/lib/logger/production-logger';
-import { retryWithBackoff, isRetryableError } from '@/lib/utils/retry';
 
 type HealthStatus = 'healthy' | 'degraded' | 'offline';
 
 export function SystemHealthIndicator() {
   const [status, setStatus] = useState<HealthStatus>('healthy');
   const [lastCheck, setLastCheck] = useState<Date>(new Date());
+  const [failureCount, setFailureCount] = useState(0);
 
   useEffect(() => {
-    // فحص فوري
-    checkHealth();
+    // فحص بعد 5 ثواني (لإعطاء وقت للتطبيق للتحميل)
+    const initialTimeout = setTimeout(checkHealth, 5000);
 
-    // فحص دوري كل 30 ثانية
-    const interval = setInterval(checkHealth, 30000);
+    // فحص دوري كل 60 ثانية
+    const interval = setInterval(checkHealth, 60000);
 
     // الاستماع لحالة الشبكة
     const handleOnline = () => {
-      if (import.meta.env.DEV) productionLogger.debug('Network back online');
       setStatus('healthy');
-      checkHealth();
+      setFailureCount(0);
     };
 
     const handleOffline = () => {
-      productionLogger.warn('Network offline');
       setStatus('offline');
     };
 
@@ -45,6 +42,7 @@ export function SystemHealthIndicator() {
     window.addEventListener('offline', handleOffline);
 
     return () => {
+      clearTimeout(initialTimeout);
       clearInterval(interval);
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
@@ -52,41 +50,43 @@ export function SystemHealthIndicator() {
   }, []);
 
   const checkHealth = async () => {
+    // إذا كان المتصفح غير متصل، لا نفحص
+    if (!navigator.onLine) {
+      setStatus('offline');
+      return;
+    }
+
     try {
-      // فحص سريع للاتصال بقاعدة البيانات مع إعادة محاولة تلقائية
-      const { error } = await retryWithBackoff(
-        async () => {
-          const result = await supabase
-            .from('beneficiaries')
-            .select('id')
-            .limit(1);
-          
-          // إذا كان هناك خطأ من Supabase، نرميه ليتم التعامل معه
-          if (result.error) {
-            throw result.error;
-          }
-          
-          return result;
-        },
-        {
-          maxRetries: 2,
-          baseDelay: 1000,
-          shouldRetry: isRetryableError
-        }
-      );
+      const { error } = await supabase
+        .from('activities')
+        .select('id')
+        .limit(1)
+        .maybeSingle();
 
       if (error) {
-        productionLogger.warn('Health check warning:', error);
-        setStatus('degraded');
+        // نحتاج 3 فشل متتالي قبل إظهار التحذير
+        setFailureCount(prev => {
+          const newCount = prev + 1;
+          if (newCount >= 3) {
+            setStatus('degraded');
+          }
+          return newCount;
+        });
       } else {
         setStatus('healthy');
-        if (import.meta.env.DEV) productionLogger.debug('All systems healthy');
+        setFailureCount(0);
       }
 
       setLastCheck(new Date());
-    } catch (error) {
-      productionLogger.warn('Health check failed after retries:', error);
-      setStatus('degraded');
+    } catch {
+      // أخطاء الشبكة المؤقتة - نحتاج 3 فشل متتالي
+      setFailureCount(prev => {
+        const newCount = prev + 1;
+        if (newCount >= 3) {
+          setStatus('degraded');
+        }
+        return newCount;
+      });
     }
   };
 
@@ -122,8 +122,8 @@ export function SystemHealthIndicator() {
   const config = getStatusConfig();
   const Icon = config.icon;
 
+  // لا نعرض شيء إذا كان كل شيء بخير
   if (status === 'healthy') {
-    // لا نعرض شيء إذا كان كل شيء بخير
     return null;
   }
 
