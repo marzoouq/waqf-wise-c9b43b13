@@ -12,3 +12,4 @@ export { ScheduledReportsManager } from './ScheduledReportsManager';
 export { ReportBuilder } from './ReportBuilder';
 export { KPIDashboard } from './KPIDashboard';
 export { InteractiveDashboard } from './InteractiveDashboard';
+export { ReportRefreshIndicator } from './ReportRefreshIndicator';
