@@ -41,8 +41,8 @@ const WaqfGovernanceGuide = () => {
           title="الدليل الإرشادي والحوكمة"
           description="اللائحة التنفيذية لوقف مرزوق على الثبيتي"
           icon={
-            <div className="p-2.5 rounded-xl bg-gradient-to-br from-red-500 to-red-600 shadow-lg shadow-red-500/25">
-              <ScrollText className="h-6 w-6 text-white" />
+            <div className="p-3 rounded-xl bg-gradient-to-br from-red-600 to-red-700 shadow-xl shadow-red-500/40 ring-2 ring-red-500/20">
+              <ScrollText className="h-7 w-7 text-white" />
             </div>
           }
         />
