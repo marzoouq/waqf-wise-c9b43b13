@@ -1,4 +1,4 @@
-// تحميل الخطوط العربية من CDN وتحويلها إلى Base64
+// تحميل الخطوط العربية من المجلد المحلي
 // يتم التخزين المؤقت لتحسين الأداء
 
 import { logger } from '@/lib/logger';
@@ -14,28 +14,43 @@ const fontCache: FontCache = {
 };
 
 /**
- * تحميل خط من رابط مباشر وتحويله إلى Base64
- * ملاحظة: jsPDF يدعم فقط ملفات TTF
+ * تحميل خط من رابط وتحويله إلى Base64
  */
 async function fetchFontAsBase64(url: string): Promise<string> {
   try {
     const response = await fetch(url);
+    
     if (!response.ok) {
-      throw new Error(`Failed to fetch font: ${response.statusText}`);
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
     
     const arrayBuffer = await response.arrayBuffer();
+    
+    if (arrayBuffer.byteLength < 1000) {
+      throw new Error('Font file too small, might be corrupted');
+    }
+    
     const bytes = new Uint8Array(arrayBuffer);
     
-    // تحويل إلى Base64
+    // تحويل إلى Base64 باستخدام طريقة أكثر موثوقية
     let binary = '';
-    for (let i = 0; i < bytes.byteLength; i++) {
+    const len = bytes.byteLength;
+    for (let i = 0; i < len; i++) {
       binary += String.fromCharCode(bytes[i]);
     }
     
-    return btoa(binary);
+    const base64 = btoa(binary);
+    
+    logger.info(`Font loaded: ${url}, size: ${len} bytes, base64 length: ${base64.length}`, {
+      context: 'font_load_success'
+    });
+    
+    return base64;
   } catch (error) {
-    logger.error(error, { context: 'load_font', severity: 'high' });
+    logger.error(`Failed to load font from ${url}`, { 
+      context: 'font_load_error',
+      metadata: { error: String(error) }
+    });
     throw error;
   }
 }
@@ -48,25 +63,21 @@ export async function loadAmiriRegular(): Promise<string> {
     return fontCache.regular;
   }
 
-  // رابط مباشر لخط Amiri Regular (TTF) من jsDelivr CDN
-  const fontUrl = 'https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/amiri/Amiri-Regular.ttf';
-  
-  fontCache.regular = await fetchFontAsBase64(fontUrl);
+  // تحميل من المجلد المحلي
+  fontCache.regular = await fetchFontAsBase64('/fonts/Amiri-Regular.ttf');
   return fontCache.regular;
 }
 
 /**
- * تحميل خط Amiri Bold
+ * تحميل خط Amiri Bold (يستخدم Regular كـ fallback)
  */
 export async function loadAmiriBold(): Promise<string> {
   if (fontCache.bold) {
     return fontCache.bold;
   }
 
-  // رابط مباشر لخط Amiri Bold (TTF) من jsDelivr CDN
-  const fontUrl = 'https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/amiri/Amiri-Bold.ttf';
-  
-  fontCache.bold = await fetchFontAsBase64(fontUrl);
+  // استخدام Regular لـ Bold أيضاً (لأن Bold غير متوفر حالياً)
+  fontCache.bold = await loadAmiriRegular();
   return fontCache.bold;
 }
 
@@ -74,12 +85,8 @@ export async function loadAmiriBold(): Promise<string> {
  * تحميل كلا الخطين مرة واحدة
  */
 export async function loadAmiriFonts(): Promise<{ regular: string; bold: string }> {
-  const [regular, bold] = await Promise.all([
-    loadAmiriRegular(),
-    loadAmiriBold(),
-  ]);
-
-  return { regular, bold };
+  const regular = await loadAmiriRegular();
+  return { regular, bold: regular }; // استخدام نفس الخط للعادي والعريض
 }
 
 /**
