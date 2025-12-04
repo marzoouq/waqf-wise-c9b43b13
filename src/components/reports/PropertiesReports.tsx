@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { ReportRefreshIndicator } from "./ReportRefreshIndicator";
+import { QUERY_CONFIG } from "@/lib/queryOptimization";
+import { useState, useEffect } from "react";
 
 interface PropertyWithContracts extends PropertyRow {
   contracts?: ContractRow[];
@@ -24,8 +27,10 @@ interface PropertyWithContracts extends PropertyRow {
 
 export function PropertiesReports() {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [lastUpdated, setLastUpdated] = useState<Date>();
 
-  const { data: properties = [], isLoading } = useQuery<PropertyWithContracts[]>({
+  const { data: properties = [], isLoading, isRefetching, dataUpdatedAt } = useQuery<PropertyWithContracts[]>({
     queryKey: ["properties-report"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -45,7 +50,44 @@ export function PropertiesReports() {
       if (error) throw error;
       return data as PropertyWithContracts[];
     },
+    ...QUERY_CONFIG.REPORTS,
   });
+
+  // تحديث وقت آخر تحديث
+  useEffect(() => {
+    if (dataUpdatedAt) {
+      setLastUpdated(new Date(dataUpdatedAt));
+    }
+  }, [dataUpdatedAt]);
+
+  // Real-time subscription
+  useEffect(() => {
+    const channel = supabase
+      .channel('properties-report-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'properties' },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["properties-report"] });
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'contracts' },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["properties-report"] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+
+  const handleRefresh = () => {
+    queryClient.invalidateQueries({ queryKey: ["properties-report"] });
+  };
 
   const handleExportPDF = () => {
     const headers = ["اسم العقار", "الموقع", "نوع العقار", "الحالة", "الإيجار الشهري"];
@@ -115,12 +157,17 @@ export function PropertiesReports() {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <CardTitle className="flex items-center gap-2">
           <Building2 className="h-5 w-5" />
           تقرير العقارات
         </CardTitle>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <ReportRefreshIndicator
+            lastUpdated={lastUpdated}
+            isRefetching={isRefetching}
+            onRefresh={handleRefresh}
+          />
           <Button onClick={handleExportPDF} variant="outline" size="sm">
             <Download className="h-4 w-4 ml-2" />
             PDF
