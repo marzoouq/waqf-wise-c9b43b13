@@ -318,6 +318,8 @@ export const useRentalPayments = (
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["rental_payments"] });
+      queryClient.invalidateQueries({ queryKey: ["rental-payments-collected"] });
+      queryClient.invalidateQueries({ queryKey: ["rental-payments-with-frequency"] });
       queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
       toast({
         title: "تم إضافة الدفعة",
@@ -456,6 +458,8 @@ export const useRentalPayments = (
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["rental_payments"] });
+      queryClient.invalidateQueries({ queryKey: ["rental-payments-collected"] });
+      queryClient.invalidateQueries({ queryKey: ["rental-payments-with-frequency"] });
       queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
       toast({
         title: "تم تحديث الدفعة",
@@ -484,6 +488,8 @@ export const useRentalPayments = (
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["rental_payments"] });
+      queryClient.invalidateQueries({ queryKey: ["rental-payments-collected"] });
+      queryClient.invalidateQueries({ queryKey: ["rental-payments-with-frequency"] });
       queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
       toast({
         title: "تم الحذف",
