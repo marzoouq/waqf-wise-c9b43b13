@@ -69,6 +69,32 @@ export const exportToExcel = async (
   await excelExport(data, filename, sheetName);
 };
 
+/**
+ * تصدير البيانات إلى CSV مع دعم اللغة العربية
+ */
+export const exportToCSV = (
+  headers: string[],
+  rows: (string | number | null | undefined)[][],
+  filename: string
+) => {
+  // إنشاء محتوى CSV
+  const csvContent = [
+    headers.join(','),
+    ...rows.map(row => row.map(cell => `"${cell ?? ''}"`).join(','))
+  ].join('\n');
+  
+  // إضافة BOM للدعم العربي
+  const BOM = '\uFEFF';
+  const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+  
+  // تحميل الملف
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `${filename}.csv`;
+  link.click();
+  URL.revokeObjectURL(link.href);
+};
+
 export const exportFinancialStatementToPDF = async (
   title: string,
   sections: { title: string; items: { label: string; amount: number }[] }[],

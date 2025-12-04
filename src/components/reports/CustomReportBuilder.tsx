@@ -28,7 +28,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useCustomReports, type ReportResult } from "@/hooks/useCustomReports";
 import { ReportResultsPreview } from "./ReportResultsPreview";
-import { exportToPDF, exportToExcel, exportToCSV } from "@/lib/export-utils";
+import { exportToPDF, exportToExcel, exportToCSV } from "@/lib/exportHelpers";
 import type { CustomReportFilter } from "@/types/reports/index";
 import type { Json } from "@/integrations/supabase/types";
 
@@ -186,7 +186,7 @@ export function CustomReportBuilder() {
       reportName || 'تقرير مخصص',
       headers,
       rows,
-      { title: reportName || 'تقرير مخصص', subtitle: reportDescription }
+      `custom-report-${new Date().toISOString().split('T')[0]}`
     );
     
     toast({ title: "تم التصدير", description: "تم تصدير التقرير بصيغة PDF" });
