@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,13 +7,19 @@ import { LoadingState } from '@/components/shared/LoadingState';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { exportToExcel, exportToPDF } from '@/lib/exportHelpers';
 import { useToast } from '@/hooks/use-toast';
+import { ReportRefreshIndicator } from './ReportRefreshIndicator';
+import { QUERY_CONFIG } from '@/lib/queryOptimization';
+import { useState, useEffect } from 'react';
 
 export function DistributionAnalysisReport() {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [lastUpdated, setLastUpdated] = useState<Date>();
 
   // تحليل التوزيعات
-  const { data: distributionTrends, isLoading } = useQuery({
+  const { data: distributionTrends, isLoading, isRefetching, dataUpdatedAt } = useQuery({
     queryKey: ['distribution-analysis'],
+    ...QUERY_CONFIG.REPORTS,
     queryFn: async () => {
       const { data: distributions, error } = await supabase
         .from('distributions')
@@ -50,9 +56,37 @@ export function DistributionAnalysisReport() {
     },
   });
 
+  // تحديث وقت آخر تحديث
+  useEffect(() => {
+    if (dataUpdatedAt) {
+      setLastUpdated(new Date(dataUpdatedAt));
+    }
+  }, [dataUpdatedAt]);
+
+  // Real-time subscription
+  useEffect(() => {
+    const channel = supabase
+      .channel('distribution-report-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'distributions' }, () => {
+        queryClient.invalidateQueries({ queryKey: ['distribution-analysis'] });
+        queryClient.invalidateQueries({ queryKey: ['distribution-status-stats'] });
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+
+  const handleRefresh = () => {
+    queryClient.invalidateQueries({ queryKey: ['distribution-analysis'] });
+    queryClient.invalidateQueries({ queryKey: ['distribution-status-stats'] });
+  };
+
   // إحصائيات التوزيعات حسب الحالة
   const { data: statusStats } = useQuery({
     queryKey: ['distribution-status-stats'],
+    ...QUERY_CONFIG.REPORTS,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('distributions')
@@ -164,12 +198,17 @@ export function DistributionAnalysisReport() {
 
       {/* الرسوم البيانية */}
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <CardTitle className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5" />
             تحليل التوزيعات حسب الوقت
           </CardTitle>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <ReportRefreshIndicator
+              lastUpdated={lastUpdated}
+              isRefetching={isRefetching}
+              onRefresh={handleRefresh}
+            />
             <Button onClick={handleExportPDF} variant="outline" size="sm">
               <Download className="h-4 w-4 ml-2" />
               PDF

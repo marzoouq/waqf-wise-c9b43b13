@@ -20,6 +20,7 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ReportRefreshIndicator } from './ReportRefreshIndicator';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   PieChart,
@@ -59,7 +60,7 @@ interface KPIDashboardProps {
 }
 
 export function KPIDashboard({ category, limit, className }: KPIDashboardProps) {
-  const { kpis, isLoading } = useKPIs(category);
+  const { kpis, isLoading, isRefetching, lastUpdated, refresh } = useKPIs(category);
 
   if (isLoading) {
     return (
@@ -92,7 +93,15 @@ export function KPIDashboard({ category, limit, className }: KPIDashboardProps) 
   }
 
   return (
-    <div className={cn('grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4', className)}>
+    <div className="space-y-4">
+      <div className="flex justify-end">
+        <ReportRefreshIndicator
+          lastUpdated={lastUpdated}
+          isRefetching={isRefetching}
+          onRefresh={refresh}
+        />
+      </div>
+      <div className={cn('grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4', className)}>
       {filteredKPIs.map((kpi: KPI) => {
         const IconComponent = iconMap[kpi.icon || 'PieChart'] || PieChart;
         const cardColor = colorMap[kpi.color || 'blue'] || colorMap.blue;
@@ -171,6 +180,7 @@ export function KPIDashboard({ category, limit, className }: KPIDashboardProps) 
           </Card>
         );
       })}
+      </div>
     </div>
   );
 }

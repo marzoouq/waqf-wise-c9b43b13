@@ -1,9 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { TrendingUp, TrendingDown, DollarSign } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { ReportRefreshIndicator } from "./ReportRefreshIndicator";
+import { QUERY_CONFIG } from "@/lib/queryOptimization";
+import { useState, useEffect } from "react";
 
 interface CashFlowData {
   month: string;
@@ -13,8 +16,12 @@ interface CashFlowData {
 }
 
 export function CashFlowReport() {
-  const { data: cashFlowData = [], isLoading } = useQuery({
+  const queryClient = useQueryClient();
+  const [lastUpdated, setLastUpdated] = useState<Date>();
+
+  const { data: cashFlowData = [], isLoading, isRefetching, dataUpdatedAt } = useQuery({
     queryKey: ["cash-flow-report"],
+    ...QUERY_CONFIG.REPORTS,
     queryFn: async () => {
       // جلب البيانات من unified_transactions_view
       const { data, error } = await supabase
@@ -59,6 +66,34 @@ export function CashFlowReport() {
       });
     },
   });
+
+  // تحديث وقت آخر تحديث
+  useEffect(() => {
+    if (dataUpdatedAt) {
+      setLastUpdated(new Date(dataUpdatedAt));
+    }
+  }, [dataUpdatedAt]);
+
+  // Real-time subscription
+  useEffect(() => {
+    const channel = supabase
+      .channel('cash-flow-report-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'payments' }, () => {
+        queryClient.invalidateQueries({ queryKey: ["cash-flow-report"] });
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'journal_entries' }, () => {
+        queryClient.invalidateQueries({ queryKey: ["cash-flow-report"] });
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+
+  const handleRefresh = () => {
+    queryClient.invalidateQueries({ queryKey: ["cash-flow-report"] });
+  };
 
   // حساب الإحصائيات
   const stats = {
@@ -120,8 +155,13 @@ export function CashFlowReport() {
 
       {/* الرسم البياني */}
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <CardTitle>التدفقات النقدية الشهرية</CardTitle>
+          <ReportRefreshIndicator
+            lastUpdated={lastUpdated}
+            isRefetching={isRefetching}
+            onRefresh={handleRefresh}
+          />
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={400}>

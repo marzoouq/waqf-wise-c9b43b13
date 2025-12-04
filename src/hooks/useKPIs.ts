@@ -1,6 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { productionLogger } from "@/lib/logger/production-logger";
+import { QUERY_CONFIG } from "@/lib/queryOptimization";
+import { useEffect } from "react";
 
 export interface KPI {
   id: string;
@@ -27,8 +29,11 @@ export interface KPI {
 }
 
 export function useKPIs(category?: string) {
-  const { data: kpis = [], isLoading } = useQuery({
+  const queryClient = useQueryClient();
+
+  const { data: kpis = [], isLoading, isRefetching, dataUpdatedAt } = useQuery({
     queryKey: ["kpis", category],
+    ...QUERY_CONFIG.REPORTS,
     queryFn: async () => {
       let query = supabase
         .from("kpi_definitions")
@@ -75,14 +80,41 @@ export function useKPIs(category?: string) {
 
       return kpisWithValues;
     },
-    staleTime: 10 * 60 * 1000,
-    gcTime: 15 * 60 * 1000,
-    refetchOnWindowFocus: false,
   });
+
+  // Real-time subscription for KPIs data sources
+  useEffect(() => {
+    const channel = supabase
+      .channel('kpis-data-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'distributions' }, () => {
+        queryClient.invalidateQueries({ queryKey: ["kpis"] });
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'beneficiaries' }, () => {
+        queryClient.invalidateQueries({ queryKey: ["kpis"] });
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'payments' }, () => {
+        queryClient.invalidateQueries({ queryKey: ["kpis"] });
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'contracts' }, () => {
+        queryClient.invalidateQueries({ queryKey: ["kpis"] });
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient, category]);
+
+  const handleRefresh = () => {
+    queryClient.invalidateQueries({ queryKey: ["kpis", category] });
+  };
 
   return {
     kpis,
     isLoading,
+    isRefetching,
+    lastUpdated: dataUpdatedAt ? new Date(dataUpdatedAt) : undefined,
+    refresh: handleRefresh,
   };
 }
 
