@@ -10,9 +10,14 @@ export interface PropertyStats {
   occupancyRate: number;
   // إحصائيات الإيرادات الفعلية للسنة المالية
   totalCollected: number;      // إجمالي المحصل
+  annualCollected: number;     // المحصل من العقود السنوية
+  monthlyCollected: number;    // المحصل من العقود الشهرية
   totalTax: number;            // إجمالي الضريبة
   totalNetRevenue: number;     // صافي الإيرادات
   fiscalYearName: string;      // اسم السنة المالية
+  // رقبة الوقف المرحلة
+  carryForwardWaqfCorpus: number;
+  carryForwardSourceYear: string;
   maintenanceRequests: number;
   expiringContracts: number;
   // للتوافق مع الكود السابق
@@ -93,6 +98,50 @@ export function usePropertiesStats() {
       const totalTax = payments?.reduce((sum, p) => sum + (Number(p.tax_amount) || 0), 0) || 0;
       const totalNetRevenue = payments?.reduce((sum, p) => sum + (Number(p.net_amount) || 0), 0) || 0;
 
+      // جلب تفاصيل المدفوعات حسب نوع العقد (سنوي/شهري)
+      let annualCollected = 0;
+      let monthlyCollected = 0;
+
+      if (payments && payments.length > 0 && fiscalYear) {
+        // جلب المدفوعات مع معلومات العقد
+        const { data: paymentsWithContracts } = await supabase
+          .from("rental_payments")
+          .select(`
+            amount_paid,
+            contract_id,
+            contracts!inner(payment_frequency)
+          `)
+          .eq("status", "مدفوع")
+          .gte("payment_date", fiscalYear.start_date)
+          .lte("payment_date", fiscalYear.end_date);
+
+        if (paymentsWithContracts) {
+          paymentsWithContracts.forEach((p: any) => {
+            const amount = Number(p.amount_paid) || 0;
+            if (p.contracts?.payment_frequency === 'شهرية') {
+              monthlyCollected += amount;
+            } else {
+              annualCollected += amount;
+            }
+          });
+        }
+      }
+
+      // جلب رقبة الوقف المرحلة من السنة السابقة
+      let carryForwardWaqfCorpus = 0;
+      const carryForwardSourceYear = "2024-2025";
+
+      if (fiscalYear) {
+        const { data: waqfReserve } = await supabase
+          .from("waqf_reserves")
+          .select("current_balance")
+          .eq("fiscal_year_id", fiscalYear.id)
+          .eq("reserve_type", "احتياطي")
+          .single();
+
+        carryForwardWaqfCorpus = waqfReserve?.current_balance || 0;
+      }
+
       // اسم السنة المالية
       const fiscalYearName = fiscalYear?.name || "غير محدد";
 
@@ -104,9 +153,13 @@ export function usePropertiesStats() {
         vacantUnits,
         occupancyRate,
         totalCollected,
+        annualCollected,
+        monthlyCollected,
         totalTax,
         totalNetRevenue,
         fiscalYearName,
+        carryForwardWaqfCorpus,
+        carryForwardSourceYear,
         maintenanceRequests: maintenance?.length || 0,
         expiringContracts: expiringContracts?.length || 0,
         occupiedProperties: contracts?.length || occupiedUnits,

@@ -14,7 +14,7 @@ import { logger } from "@/lib/logger";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, TrendingUp, Wrench, AlertCircle } from "lucide-react";
+import { Building2, TrendingUp, Wrench, AlertCircle, Wallet } from "lucide-react";
 
 const Properties = () => {
   const [aiDialogOpen, setAiDialogOpen] = useState(false);
@@ -91,7 +91,7 @@ const Properties = () => {
 
         {/* Statistics Cards */}
         {!statsLoading && stats && (
-          <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-5">
             <Card>
               <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6">
                 <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground flex items-center gap-2">
@@ -107,19 +107,43 @@ const Properties = () => {
               </CardContent>
             </Card>
 
+            {/* بطاقة إجمالي المحصّل مع التفاصيل */}
             <Card>
               <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6">
                 <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground flex items-center gap-2">
                   <TrendingUp className="h-4 w-4" />
-                  الإيرادات الشهرية
+                  إجمالي المحصّل
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-3 sm:p-6 pt-0">
                 <div className="text-xl sm:text-2xl font-bold text-success">
-                  {stats.totalMonthlyRevenue.toLocaleString('ar-SA')} ريال
+                  {stats.totalCollected.toLocaleString('ar-SA')} ريال
+                </div>
+                <div className="text-xs text-muted-foreground mt-1 space-y-0.5">
+                  {stats.annualCollected > 0 && (
+                    <p>سنوي: {stats.annualCollected.toLocaleString('ar-SA')} ر.س</p>
+                  )}
+                  {stats.monthlyCollected > 0 && (
+                    <p>شهري: {stats.monthlyCollected.toLocaleString('ar-SA')} ر.س</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* بطاقة رقبة الوقف المرحلة */}
+            <Card className="border-primary/30 bg-primary/5">
+              <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6">
+                <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground flex items-center gap-2">
+                  <Wallet className="h-4 w-4 text-primary" />
+                  رقبة الوقف المرحلة
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-3 sm:p-6 pt-0">
+                <div className="text-xl sm:text-2xl font-bold text-primary">
+                  {stats.carryForwardWaqfCorpus.toLocaleString('ar-SA')} ريال
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {stats.totalAnnualRevenue.toLocaleString('ar-SA')} ريال سنوياً
+                  من السنة المالية {stats.carryForwardSourceYear}
                 </p>
               </CardContent>
             </Card>
