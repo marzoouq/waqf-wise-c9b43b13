@@ -9,8 +9,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Wallet, TrendingUp, Calendar, ChevronLeft, CheckCircle2, Clock, Loader2 } from "lucide-react";
 import { formatDate } from "@/lib/date";
-import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
-import { MaskedValue } from "@/components/shared/MaskedValue";
 
 interface WaqfDistributionsSummaryCardProps {
   beneficiaryId: string;
@@ -33,8 +31,6 @@ interface HeirDistribution {
 
 export function WaqfDistributionsSummaryCard({ beneficiaryId }: WaqfDistributionsSummaryCardProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
-  const { settings } = useVisibilitySettings();
-  const masked = settings?.mask_exact_amounts || false;
 
   // جلب جميع توزيعات الوريث
   const { data: distributions = [], isLoading } = useQuery({
@@ -139,11 +135,9 @@ export function WaqfDistributionsSummaryCard({ beneficiaryId }: WaqfDistribution
             </div>
             <div className="text-2xl font-bold">
               {currentYearAmount > 0 ? (
-                masked ? (
-                  <MaskedValue value={String(currentYearAmount)} type="amount" masked={true} />
-                ) : (
-                  <>{currentYearAmount.toLocaleString("ar-SA")} ر.س</>
-                )
+                <>
+                  {currentYearAmount.toLocaleString("ar-SA")} ر.س
+                </>
               ) : (
                 <span className="text-muted-foreground text-lg">لم يتم التوزيع بعد</span>
               )}
@@ -162,11 +156,7 @@ export function WaqfDistributionsSummaryCard({ beneficiaryId }: WaqfDistribution
                   <ChevronLeft className="h-4 w-4 text-primary" />
                 </div>
                 <div className="text-2xl font-bold text-primary">
-                  {masked ? (
-                    <MaskedValue value={String(allYearsTotal)} type="amount" masked={true} />
-                  ) : (
-                    <>{allYearsTotal.toLocaleString("ar-SA")} ر.س</>
-                  )}
+                  {allYearsTotal.toLocaleString("ar-SA")} ر.س
                 </div>
                 <div className="text-xs text-muted-foreground">
                   اضغط لعرض التفاصيل
@@ -207,15 +197,11 @@ export function WaqfDistributionsSummaryCard({ beneficiaryId }: WaqfDistribution
                                     نشطة
                                   </>
                                 )}
-                              </Badge>
-                            </div>
-                            <span className="font-bold text-primary">
-                              {masked ? (
-                                <MaskedValue value={String(year.total)} type="amount" masked={true} />
-                              ) : (
-                                <>{year.total.toLocaleString("ar-SA")} ر.س</>
-                              )}
-                            </span>
+                            </Badge>
+                          </div>
+                          <span className="font-bold text-primary">
+                            {year.total.toLocaleString("ar-SA")} ر.س
+                          </span>
                           </div>
                         </CardHeader>
                         <CardContent className="p-0">
@@ -239,11 +225,7 @@ export function WaqfDistributionsSummaryCard({ beneficiaryId }: WaqfDistribution
                                     {formatDate(dist.distribution_date, "dd/MM/yyyy")}
                                   </TableCell>
                                   <TableCell className="font-semibold">
-                                    {masked ? (
-                                      <MaskedValue value={String(dist.share_amount || 0)} type="amount" masked={true} />
-                                    ) : (
-                                      <>{dist.share_amount?.toLocaleString("ar-SA")} ر.س</>
-                                    )}
+                                    {dist.share_amount?.toLocaleString("ar-SA")} ر.س
                                   </TableCell>
                                 </TableRow>
                               ))}
@@ -258,11 +240,7 @@ export function WaqfDistributionsSummaryCard({ beneficiaryId }: WaqfDistribution
                       <div className="flex items-center justify-between">
                         <span className="font-semibold">الإجمالي الكلي</span>
                         <span className="text-xl font-bold text-primary">
-                          {masked ? (
-                            <MaskedValue value={String(allYearsTotal)} type="amount" masked={true} />
-                          ) : (
-                            <>{allYearsTotal.toLocaleString("ar-SA")} ر.س</>
-                          )}
+                          {allYearsTotal.toLocaleString("ar-SA")} ر.س
                         </span>
                       </div>
                     </div>
