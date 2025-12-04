@@ -1,11 +1,33 @@
 import { AnnualDisclosure } from "@/hooks/useAnnualDisclosures";
 import { logger } from "@/lib/logger";
 import { Database } from "@/integrations/supabase/types";
+import { loadAmiriFonts } from "./fonts/loadArabicFonts";
 
 type DisclosureBeneficiary = Database['public']['Tables']['disclosure_beneficiaries']['Row'];
 
 // Dynamic import type
 type JsPDF = import('jspdf').jsPDF;
+
+const loadArabicFont = async (doc: JsPDF) => {
+  try {
+    const { regular: amiriRegular, bold: amiriBold } = await loadAmiriFonts();
+    
+    doc.addFileToVFS("Amiri-Regular.ttf", amiriRegular);
+    doc.addFont("Amiri-Regular.ttf", "Amiri", "normal");
+    
+    doc.addFileToVFS("Amiri-Bold.ttf", amiriBold);
+    doc.addFont("Amiri-Bold.ttf", "Amiri", "bold");
+    
+    doc.setFont("Amiri", "normal");
+    return true;
+  } catch (error) {
+    logger.error(error, { 
+      context: 'load_arabic_font_disclosure', 
+      severity: 'low'
+    });
+    return false;
+  }
+};
 
 export const generateDisclosurePDF = async (
   disclosure: AnnualDisclosure,
@@ -20,6 +42,9 @@ export const generateDisclosurePDF = async (
     const jsPDF = jsPDFModule.default;
     const doc = new jsPDF();
     
+    // تحميل الخط العربي
+    await loadArabicFont(doc);
+    
     // RTL support
     doc.setR2L(true);
     doc.setLanguage("ar");
@@ -27,6 +52,7 @@ export const generateDisclosurePDF = async (
     let yPos = 20;
 
     // العنوان الرئيسي
+    doc.setFont("Amiri", "bold");
     doc.setFontSize(20);
     doc.setTextColor(40, 40, 40);
     doc.text(`الإفصاح السنوي - ${disclosure.year}`, 105, yPos, { align: "center" });
@@ -39,6 +65,7 @@ export const generateDisclosurePDF = async (
     yPos += 15;
 
     // المعلومات المالية
+    doc.setFont("Amiri", "bold");
     doc.setFontSize(12);
     doc.setTextColor(40, 40, 40);
     doc.text("الملخص المالي السنوي", 200, yPos, { align: "right" });
@@ -55,6 +82,7 @@ export const generateDisclosurePDF = async (
       head: [["البيان", "المبلغ"]],
       body: financialData,
       styles: { 
+        font: "Amiri",
         halign: "right",
         fontSize: 10,
       },
@@ -67,6 +95,7 @@ export const generateDisclosurePDF = async (
     yPos = ((doc as any).lastAutoTable?.finalY ?? yPos) + 10;
 
     // نسب التوزيع
+    doc.setFont("Amiri", "bold");
     doc.text("نسب وحصص التوزيع", 200, yPos, { align: "right" });
     yPos += 7;
 
@@ -81,6 +110,7 @@ export const generateDisclosurePDF = async (
       head: [["النوع", "المبلغ", "النسبة"]],
       body: distributionData,
       styles: { 
+        font: "Amiri",
         halign: "right",
         fontSize: 10,
       },
@@ -93,6 +123,7 @@ export const generateDisclosurePDF = async (
     yPos = ((doc as any).lastAutoTable?.finalY ?? yPos) + 10;
 
     // إحصائيات المستفيدين
+    doc.setFont("Amiri", "bold");
     doc.text("إحصائيات المستفيدين", 200, yPos, { align: "right" });
     yPos += 7;
 
@@ -108,6 +139,7 @@ export const generateDisclosurePDF = async (
       head: [["الفئة", "العدد"]],
       body: beneficiaryStats,
       styles: { 
+        font: "Amiri",
         halign: "right",
         fontSize: 10,
       },
@@ -122,6 +154,7 @@ export const generateDisclosurePDF = async (
       doc.addPage();
       yPos = 20;
       
+      doc.setFont("Amiri", "bold");
       doc.setFontSize(14);
       doc.text("قائمة المستفيدين وحصصهم", 200, yPos, { align: "right" });
       yPos += 7;
@@ -139,6 +172,7 @@ export const generateDisclosurePDF = async (
         head: [["الاسم", "النوع", "القرابة", "المبلغ المخصص", "عدد الدفعات"]],
         body: beneficiariesData,
         styles: { 
+          font: "Amiri",
           halign: "right",
           fontSize: 9,
         },
@@ -155,6 +189,7 @@ export const generateDisclosurePDF = async (
       doc.addPage();
       yPos = 20;
       
+      doc.setFont("Amiri", "bold");
       doc.setFontSize(14);
       doc.text("تفصيل المصروفات", 200, yPos, { align: "right" });
       yPos += 7;
@@ -178,6 +213,7 @@ export const generateDisclosurePDF = async (
         head: [["نوع المصروف", "المبلغ"]],
         body: expensesData,
         styles: { 
+          font: "Amiri",
           halign: "right",
           fontSize: 10,
         },
@@ -192,6 +228,7 @@ export const generateDisclosurePDF = async (
     const pageCount = doc.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
+      doc.setFont("Amiri", "normal");
       doc.setFontSize(8);
       doc.setTextColor(150, 150, 150);
       doc.text(
