@@ -16,6 +16,8 @@ import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 import { SectionSkeleton } from "@/components/dashboard";
 import { AdminSendMessageDialog } from "@/components/messages/AdminSendMessageDialog";
 import { JournalApproval } from "@/types/approvals";
+import { BankBalanceCard } from "@/components/shared/BankBalanceCard";
+import { WaqfCorpusCard } from "@/components/shared/WaqfCorpusCard";
 
 // Lazy load components
 const AccountingStats = lazy(() => import("@/components/dashboard/AccountingStats"));
@@ -110,7 +112,13 @@ const AccountantDashboard = () => {
             subtitle="قيود جديدة اليوم"
           />
         </UnifiedStatsGrid>
-      )}
+        )}
+
+        {/* بطاقات الرصيد البنكي ورقبة الوقف */}
+        <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2">
+          <BankBalanceCard />
+          <WaqfCorpusCard />
+        </div>
 
       {/* Tabs for organized view */}
       <Tabs defaultValue="overview" className="space-y-4">

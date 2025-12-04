@@ -9,6 +9,8 @@ import NazerKPIs from "@/components/dashboard/nazer/NazerKPIs";
 import SmartAlertsSection from "@/components/dashboard/nazer/SmartAlertsSection";
 import QuickActionsGrid from "@/components/dashboard/nazer/QuickActionsGrid";
 import { AIInsightsWidget } from "@/components/dashboard/AIInsightsWidget";
+import { BankBalanceCard } from "@/components/shared/BankBalanceCard";
+import { WaqfCorpusCard } from "@/components/shared/WaqfCorpusCard";
 
 export default function NazerDashboard() {
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
@@ -27,6 +29,12 @@ export default function NazerDashboard() {
         <Suspense fallback={<SectionSkeleton />}>
           <NazerKPIs />
         </Suspense>
+
+        {/* بطاقات الرصيد البنكي ورقبة الوقف - تحديث مباشر */}
+        <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2">
+          <BankBalanceCard />
+          <WaqfCorpusCard />
+        </div>
 
         <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
           <Suspense fallback={<ChartSkeleton />}>

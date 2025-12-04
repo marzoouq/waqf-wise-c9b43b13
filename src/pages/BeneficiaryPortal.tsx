@@ -31,6 +31,8 @@ import {
   YearlyComparison,
 } from "@/components/beneficiary";
 import { WaqfDistributionsSummaryCard } from "@/components/beneficiary/cards/WaqfDistributionsSummaryCard";
+import { BankBalanceCard } from "@/components/shared/BankBalanceCard";
+import { WaqfCorpusCard } from "@/components/shared/WaqfCorpusCard";
 import { ChatbotQuickCard } from "@/components/dashboard/ChatbotQuickCard";
 import { Suspense } from "react";
 import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
@@ -148,6 +150,12 @@ export default function BeneficiaryPortal() {
                 <Suspense fallback={<div className="h-32 bg-muted animate-pulse rounded-lg" />}>
                   <ChatbotQuickCard />
                 </Suspense>
+
+                {/* بطاقات الرصيد البنكي ورقبة الوقف */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <BankBalanceCard compact />
+                  <WaqfCorpusCard compact />
+                </div>
 
                 {/* بطاقة إجمالي المحصل من الوقف */}
                 <WaqfDistributionsSummaryCard beneficiaryId={beneficiary.id} />
