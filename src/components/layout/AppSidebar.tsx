@@ -15,6 +15,7 @@ import {
   ClipboardList,
   Shield,
   Archive,
+  ScrollText,
   Bell,
   Mail,
   FolderOpen,
@@ -124,10 +125,11 @@ const menuGroups = [
     id: "archive",
     label: "الأرشيف والوثائق",
     icon: Archive,
-    roles: ["admin", "accountant", "nazer", "archivist"],
+    roles: ["admin", "accountant", "nazer", "archivist", "beneficiary", "waqf_heir"],
     subItems: [
       { icon: Archive, label: "الأرشيف", path: "/archive", roles: ["admin", "archivist", "nazer"] },
       { icon: Vote, label: "الحوكمة والقرارات", path: "/governance/decisions", roles: ["admin", "nazer"] },
+      { icon: ScrollText, label: "الدليل الإرشادي", path: "/governance/guide", roles: ["all"] },
     ]
   },
   {
