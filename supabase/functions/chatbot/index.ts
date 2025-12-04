@@ -34,7 +34,7 @@ serve(async (req) => {
       return unauthorizedResponse('رمز المصادقة غير صحيح');
     }
 
-    // 🔐 SECURITY: Check if user is staff (not beneficiary)
+    // 🔐 SECURITY: Check user role
     const { data: roles, error: roleError } = await supabase
       .from('user_roles')
       .select('role')
@@ -45,17 +45,72 @@ serve(async (req) => {
       return errorResponse('خطأ في التحقق من الصلاحيات', 500);
     }
 
-    const isStaff = roles?.some(r => ['admin', 'nazer', 'accountant', 'cashier', 'archivist'].includes(r.role));
-    if (!isStaff) {
-      console.error('❌ User is not staff:', { userId: user.id, roles });
-      return forbiddenResponse('هذه الخدمة متاحة للموظفين فقط');
+    const userRoles = roles?.map(r => r.role) || [];
+    const isStaff = userRoles.some(r => ['admin', 'nazer', 'accountant', 'cashier', 'archivist'].includes(r));
+    const isBeneficiary = userRoles.some(r => ['beneficiary', 'waqf_heir'].includes(r));
+
+    // السماح للموظفين والمستفيدين
+    if (!isStaff && !isBeneficiary) {
+      console.error('❌ User has no valid role:', { userId: user.id, roles: userRoles });
+      return forbiddenResponse('ليس لديك صلاحية للوصول لهذه الخدمة');
     }
 
-    console.log('✅ Authorized chatbot request from:', { userId: user.id, email: user.email });
+    console.log('✅ Authorized chatbot request from:', { userId: user.id, email: user.email, roles: userRoles, isStaff, isBeneficiary });
 
     const { message, userId, quickReplyId } = await req.json();
 
-    console.log('📨 Chatbot request:', { message, userId, quickReplyId });
+    console.log('📨 Chatbot request:', { message, userId, quickReplyId, isStaff, isBeneficiary });
+
+    // جلب بيانات المستفيد إذا كان المستخدم مستفيداً
+    let beneficiaryData: {
+      id: string;
+      full_name: string;
+      total_received: number;
+      pending_amount: number;
+      heir_type?: string;
+      distributions?: Array<{
+        share_amount: number;
+        distribution_date: string;
+        fiscal_year_name: string;
+      }>;
+    } | null = null;
+
+    if (isBeneficiary) {
+      // جلب بيانات المستفيد
+      const { data: beneficiary } = await supabase
+        .from('beneficiaries')
+        .select('id, full_name, total_received, pending_amount, account_balance')
+        .eq('user_id', user.id)
+        .single();
+
+      if (beneficiary) {
+        // جلب توزيعات الوريث
+        const { data: heirDistributions } = await supabase
+          .from('heir_distributions')
+          .select(`
+            share_amount,
+            heir_type,
+            distribution_date,
+            fiscal_years (name)
+          `)
+          .eq('beneficiary_id', beneficiary.id)
+          .order('distribution_date', { ascending: false })
+          .limit(10);
+
+        beneficiaryData = {
+          id: beneficiary.id,
+          full_name: beneficiary.full_name,
+          total_received: beneficiary.total_received || 0,
+          pending_amount: beneficiary.pending_amount || 0,
+          heir_type: heirDistributions?.[0]?.heir_type,
+          distributions: heirDistributions?.map(d => ({
+            share_amount: d.share_amount,
+            distribution_date: d.distribution_date,
+            fiscal_year_name: (d.fiscal_years as unknown as { name: string } | null)?.name || 'غير محدد'
+          }))
+        };
+      }
+    }
 
     // جلب البيانات السياقية الشاملة
     interface ContextData {
@@ -464,9 +519,51 @@ serve(async (req) => {
     }
 
     // بناء السياق للذكاء الاصطناعي
-    const contextSummary = Object.entries(contextData)
-      .map(([key, value]) => `${key}: ${JSON.stringify(value)}`)
-      .join('\n');
+    let contextSummary = '';
+    let systemPrompt = '';
+
+    if (isBeneficiary && beneficiaryData) {
+      // سياق خاص للمستفيد
+      contextSummary = `بيانات المستفيد:
+- الاسم: ${beneficiaryData.full_name}
+- نوع الوريث: ${beneficiaryData.heir_type || 'غير محدد'}
+- إجمالي المبالغ المستلمة: ${beneficiaryData.total_received?.toLocaleString('ar-SA')} ريال
+- المبالغ المعلقة: ${beneficiaryData.pending_amount?.toLocaleString('ar-SA')} ريال
+${beneficiaryData.distributions?.length ? `
+آخر التوزيعات:
+${beneficiaryData.distributions.map(d => 
+  `- ${d.fiscal_year_name}: ${d.share_amount?.toLocaleString('ar-SA')} ريال (${d.distribution_date})`
+).join('\n')}` : '- لا توجد توزيعات مسجلة'}`;
+
+      systemPrompt = `أنت مساعد ذكي لمنصة إدارة الأوقاف. أنت تتحدث مع مستفيد/وريث من ورثة الوقف.
+      
+${contextSummary}
+
+قواعد الرد:
+1. استخدم اللغة العربية الفصحى
+2. كن مختصراً وودوداً ومفيداً
+3. أجب فقط على الأسئلة المتعلقة ببيانات المستفيد الشخصية
+4. إذا سأل عن بيانات مستفيدين آخرين أو معلومات إدارية، أخبره بأن هذه المعلومات غير متاحة له
+5. يمكنك مساعدته في فهم توزيعاته وحصته من الوقف
+6. لا تكشف عن معلومات حساسة مثل أرقام الحسابات البنكية`;
+    } else {
+      // سياق للموظفين (كامل)
+      contextSummary = Object.entries(contextData)
+        .map(([key, value]) => `${key}: ${JSON.stringify(value)}`)
+        .join('\n');
+
+      systemPrompt = `أنت مساعد ذكي لمنصة إدارة الأوقاف. ساعد المستخدم بالإجابة على أسئلته بناءً على البيانات المتاحة.
+                  
+البيانات المتاحة:
+${contextSummary}
+
+قواعد الرد:
+1. استخدم اللغة العربية الفصحى
+2. كن مختصراً ومفيداً
+3. إذا طُلبت بيانات غير متوفرة، أخبر المستخدم
+4. قدم روابط مباشرة للصفحات المناسبة عند الحاجة
+5. استخدم الأرقام والإحصائيات من البيانات المتاحة`;
+    }
 
     // استخدام Lovable AI API
     const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
@@ -492,17 +589,7 @@ serve(async (req) => {
               messages: [
                 {
                   role: 'system',
-                  content: `أنت مساعد ذكي لمنصة إدارة الأوقاف. ساعد المستخدم بالإجابة على أسئلته بناءً على البيانات المتاحة.
-                  
-البيانات المتاحة:
-${contextSummary}
-
-قواعد الرد:
-1. استخدم اللغة العربية الفصحى
-2. كن مختصراً ومفيداً
-3. إذا طُلبت بيانات غير متوفرة، أخبر المستخدم
-4. قدم روابط مباشرة للصفحات المناسبة عند الحاجة
-5. استخدم الأرقام والإحصائيات من البيانات المتاحة`
+                  content: systemPrompt
                 },
                 {
                   role: 'user',
