@@ -239,6 +239,72 @@ Deno.serve(async (req) => {
 
     console.log('Fiscal year closed successfully');
 
+    // 8. إنشاء الإفصاح السنوي تلقائياً
+    console.log('Creating annual disclosure...');
+    
+    // حساب عدد الورثة حسب النوع
+    const sonsCount = heirDistributions?.filter((h: any) => h.heir_type === 'ابن').length || 0;
+    const daughtersCount = heirDistributions?.filter((h: any) => h.heir_type === 'ابنة' || h.heir_type === 'بنت').length || 0;
+    const wivesCount = heirDistributions?.filter((h: any) => h.heir_type === 'زوجة').length || 0;
+
+    // استخراج السنة من اسم السنة المالية
+    const yearMatch = fiscalYear.name.match(/\d{4}/);
+    const disclosureYear = yearMatch ? parseInt(yearMatch[0]) : new Date().getFullYear();
+
+    // الحصول على إعدادات الوقف
+    const { data: waqfSettings } = await supabase
+      .from('waqf_settings')
+      .select('waqf_name')
+      .limit(1)
+      .single();
+
+    const waqfName = waqfSettings?.waqf_name || 'وقف آل مرزوق';
+
+    // إنشاء الإفصاح السنوي
+    const { error: disclosureError } = await supabase
+      .from('annual_disclosures')
+      .insert({
+        fiscal_year_id,
+        year: disclosureYear,
+        waqf_name: waqfName,
+        disclosure_date: new Date().toISOString().split('T')[0],
+        total_revenues: summary.total_revenues,
+        total_expenses: summary.total_expenses,
+        net_income: netIncome,
+        nazer_percentage: nazerPercentage,
+        nazer_share: nazerShare,
+        corpus_percentage: corpusPercentage,
+        corpus_share: waqfCorpus,
+        charity_percentage: waqifPercentage,
+        charity_share: waqifShare,
+        total_beneficiaries: heirDistributions?.length || 0,
+        sons_count: sonsCount,
+        daughters_count: daughtersCount,
+        wives_count: wivesCount,
+        opening_balance: 0, // يمكن تحديثه لاحقاً
+        closing_balance: waqfCorpus,
+        administrative_expenses: summary.total_expenses * 0.3, // تقدير
+        maintenance_expenses: summary.total_expenses * 0.4,
+        development_expenses: summary.total_expenses * 0.2,
+        other_expenses: summary.total_expenses * 0.1,
+        beneficiaries_details: heirDistributions,
+        expenses_breakdown: {
+          administrative: summary.total_expenses * 0.3,
+          maintenance: summary.total_expenses * 0.4,
+          development: summary.total_expenses * 0.2,
+          other: summary.total_expenses * 0.1
+        },
+        status: 'draft',
+        published_at: null
+      });
+
+    if (disclosureError) {
+      console.error('Error creating annual disclosure:', disclosureError);
+      // لا نرمي خطأ هنا لأن الإقفال تم بنجاح
+    } else {
+      console.log('Annual disclosure created successfully');
+    }
+
     return new Response(
       JSON.stringify({ 
         success: true, 
