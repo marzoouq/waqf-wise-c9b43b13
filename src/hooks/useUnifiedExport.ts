@@ -4,10 +4,11 @@
  * يجمع جميع أدوات التصدير في مكان واحد:
  * - تصدير PDF
  * - تصدير Excel
+ * - تصدير CSV
  * - تصدير متعدد الصفحات
  * - تنسيق البيانات
  * 
- * @version 2.6.4
+ * @version 2.6.12
  */
 
 import { useCallback } from "react";
@@ -248,11 +249,46 @@ export function useUnifiedExport() {
     }
   }, []);
 
+  /**
+   * تصدير إلى CSV مع دعم اللغة العربية
+   */
+  const exportToCSV = useCallback((config: {
+    headers: string[];
+    rows: (string | number | null | undefined)[][];
+    filename: string;
+  }) => {
+    try {
+      const csvContent = [
+        config.headers.join(','),
+        ...config.rows.map(row => row.map(cell => `"${cell ?? ''}"`).join(','))
+      ].join('\n');
+      
+      const BOM = '\uFEFF';
+      const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+      
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `${config.filename}.csv`;
+      link.click();
+      URL.revokeObjectURL(link.href);
+
+      toast.success("تم التصدير بنجاح", {
+        description: `تم تصدير البيانات إلى ${config.filename}.csv`,
+      });
+    } catch (error) {
+      logger.error(error, { context: 'export_csv', severity: 'low' });
+      toast.error("فشل التصدير", {
+        description: getErrorMessage(error),
+      });
+    }
+  }, []);
+
   return {
     exportToPDF,
     exportToExcel,
     exportToMultiSheetExcel,
     exportFinancialStatement,
+    exportToCSV,
   };
 }
 
