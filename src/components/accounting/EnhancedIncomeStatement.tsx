@@ -1,9 +1,10 @@
 import { useFinancialReports } from "@/hooks/useFinancialReports";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, Printer, TrendingUp, TrendingDown } from "lucide-react";
+import { FileText, Printer, TrendingUp, TrendingDown } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
 import { Progress } from "@/components/ui/progress";
+import { exportFinancialStatementToPDF } from "@/lib/exportHelpers";
 
 export function EnhancedIncomeStatement() {
   const { incomeStatement, isLoading } = useFinancialReports();
@@ -23,6 +24,44 @@ export function EnhancedIncomeStatement() {
     ? (incomeStatement.netIncome / incomeStatement.revenue.total) * 100
     : 0;
 
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const handleExportPDF = async () => {
+    const sections = [
+      {
+        title: 'الإيرادات',
+        items: [
+          { label: 'إيرادات عقارية', amount: incomeStatement.revenue.property },
+          { label: 'إيرادات استثمارات', amount: incomeStatement.revenue.investment },
+          { label: 'إيرادات أخرى', amount: incomeStatement.revenue.other },
+        ]
+      },
+      {
+        title: 'المصروفات',
+        items: [
+          { label: 'مصروفات إدارية', amount: incomeStatement.expenses.administrative },
+          { label: 'مصروفات تشغيلية', amount: incomeStatement.expenses.operational },
+          { label: 'مصروفات المستفيدين', amount: incomeStatement.expenses.beneficiaries },
+        ]
+      }
+    ];
+
+    const totals = [
+      { label: 'إجمالي الإيرادات', amount: incomeStatement.revenue.total },
+      { label: 'إجمالي المصروفات', amount: incomeStatement.expenses.total },
+      { label: 'صافي الدخل', amount: incomeStatement.netIncome },
+    ];
+
+    await exportFinancialStatementToPDF(
+      `قائمة الدخل - ${format(new Date(), "dd/MM/yyyy")}`,
+      sections,
+      totals,
+      `income-statement-${format(new Date(), "yyyyMMdd")}`
+    );
+  };
+
   return (
     <Card>
       <CardHeader className="p-3 sm:p-4 md:p-6">
@@ -33,13 +72,13 @@ export function EnhancedIncomeStatement() {
               للفترة المنتهية في: {format(new Date(), "dd MMMM yyyy", { locale: ar })}
             </p>
           </div>
-          <div className="flex gap-2 flex-wrap">
-            <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+          <div className="flex gap-2 flex-wrap print:hidden">
+            <Button variant="outline" size="sm" className="text-xs sm:text-sm" onClick={handlePrint}>
               <Printer className="ml-2 h-3 w-3 sm:h-4 sm:w-4" />
               طباعة
             </Button>
-            <Button variant="outline" size="sm" className="text-xs sm:text-sm">
-              <Download className="ml-2 h-3 w-3 sm:h-4 sm:w-4" />
+            <Button variant="outline" size="sm" className="text-xs sm:text-sm" onClick={handleExportPDF}>
+              <FileText className="ml-2 h-3 w-3 sm:h-4 sm:w-4" />
               تصدير PDF
             </Button>
           </div>

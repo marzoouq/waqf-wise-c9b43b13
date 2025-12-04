@@ -2,8 +2,9 @@ import { useFinancialReports } from "@/hooks/useFinancialReports";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Download, Printer, CheckCircle, XCircle } from "lucide-react";
+import { Download, Printer, CheckCircle, XCircle, FileText } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
+import { exportFinancialStatementToPDF } from "@/lib/exportHelpers";
 
 export function EnhancedBalanceSheet() {
   const { balanceSheet, isLoading } = useFinancialReports();
@@ -23,6 +24,48 @@ export function EnhancedBalanceSheet() {
   const totalLiabilitiesAndEquity = balanceSheet.liabilities.total + balanceSheet.equity.total;
   const isBalanced = Math.abs(totalAssets - totalLiabilitiesAndEquity) < 0.01;
 
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const handleExportPDF = async () => {
+    const sections = [
+      {
+        title: 'الأصول',
+        items: [
+          { label: 'أصول متداولة', amount: balanceSheet.assets.current },
+          { label: 'أصول ثابتة', amount: balanceSheet.assets.fixed },
+        ]
+      },
+      {
+        title: 'الخصوم',
+        items: [
+          { label: 'خصوم متداولة', amount: balanceSheet.liabilities.current },
+          { label: 'خصوم طويلة الأجل', amount: balanceSheet.liabilities.longTerm },
+        ]
+      },
+      {
+        title: 'حقوق الملكية',
+        items: [
+          { label: 'رأس مال الوقف', amount: balanceSheet.equity.capital },
+          { label: 'الاحتياطيات', amount: balanceSheet.equity.reserves },
+        ]
+      }
+    ];
+
+    const totals = [
+      { label: 'إجمالي الأصول', amount: totalAssets },
+      { label: 'إجمالي الخصوم وحقوق الملكية', amount: totalLiabilitiesAndEquity },
+    ];
+
+    await exportFinancialStatementToPDF(
+      `قائمة المركز المالي - ${format(new Date(), "dd/MM/yyyy")}`,
+      sections,
+      totals,
+      `balance-sheet-${format(new Date(), "yyyyMMdd")}`
+    );
+  };
+
   return (
     <Card>
       <CardHeader className="p-3 sm:p-4 md:p-6">
@@ -33,13 +76,13 @@ export function EnhancedBalanceSheet() {
               كما في: {format(new Date(), "dd MMMM yyyy", { locale: ar })}
             </p>
           </div>
-          <div className="flex gap-2 flex-wrap">
-            <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+          <div className="flex gap-2 flex-wrap print:hidden">
+            <Button variant="outline" size="sm" className="text-xs sm:text-sm" onClick={handlePrint}>
               <Printer className="ml-2 h-3 w-3 sm:h-4 sm:w-4" />
               طباعة
             </Button>
-            <Button variant="outline" size="sm" className="text-xs sm:text-sm">
-              <Download className="ml-2 h-3 w-3 sm:h-4 sm:w-4" />
+            <Button variant="outline" size="sm" className="text-xs sm:text-sm" onClick={handleExportPDF}>
+              <FileText className="ml-2 h-3 w-3 sm:h-4 sm:w-4" />
               تصدير PDF
             </Button>
           </div>

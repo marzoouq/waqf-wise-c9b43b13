@@ -15,7 +15,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { format } from "@/lib/date";
-import { FileText, Printer, Book } from "lucide-react";
+import { FileText, Printer, Book, Download } from "lucide-react";
 import { AccountRow, GeneralLedgerEntry } from "@/types/supabase-helpers";
 import { EmptyAccountingState } from "./EmptyAccountingState";
 import { AccountingErrorState } from "./AccountingErrorState";
@@ -104,6 +104,42 @@ const GeneralLedgerReport = () => {
     window.print();
   };
 
+  const handleExportPDF = async () => {
+    if (!ledgerData || !selectedAccount) return;
+    
+    const { exportToPDF } = await import("@/lib/exportHelpers");
+    
+    const headers = ['التاريخ', 'رقم القيد', 'البيان', 'مدين', 'دائن', 'الرصيد'];
+    const data = ledgerData.map(line => [
+      format(new Date(line.journal_entry.entry_date), "dd/MM/yyyy"),
+      line.journal_entry.entry_number,
+      line.description || line.journal_entry.description || '',
+      Number(line.debit_amount) > 0 ? Number(line.debit_amount).toFixed(2) : '-',
+      Number(line.credit_amount) > 0 ? Number(line.credit_amount).toFixed(2) : '-',
+      line.balance.toFixed(2),
+    ]);
+
+    const title = `دفتر الأستاذ العام - ${selectedAccount.code} - ${selectedAccount.name_ar}`;
+    await exportToPDF(title, headers, data, `general-ledger-${selectedAccount.code}-${format(new Date(), "yyyyMMdd")}`);
+  };
+
+  const handleExportExcel = async () => {
+    if (!ledgerData || !selectedAccount) return;
+    
+    const { exportToExcel } = await import("@/lib/excel-helper");
+    
+    const exportData = ledgerData.map(line => ({
+      'التاريخ': format(new Date(line.journal_entry.entry_date), "dd/MM/yyyy"),
+      'رقم القيد': line.journal_entry.entry_number,
+      'البيان': line.description || line.journal_entry.description || '',
+      'مدين': Number(line.debit_amount) > 0 ? Number(line.debit_amount).toFixed(2) : '0.00',
+      'دائن': Number(line.credit_amount) > 0 ? Number(line.credit_amount).toFixed(2) : '0.00',
+      'الرصيد': line.balance.toFixed(2),
+    }));
+
+    await exportToExcel(exportData, `general-ledger-${selectedAccount.code}-${format(new Date(), "yyyyMMdd")}`, "دفتر الأستاذ");
+  };
+
   if (accountsError) {
     return <AccountingErrorState error={accountsError as Error} onRetry={refetch} />;
   }
@@ -152,11 +188,19 @@ const GeneralLedgerReport = () => {
             </div>
           </div>
 
-          {selectedAccountId && (
-            <div className="flex justify-end mb-4 print:hidden">
-              <Button variant="outline" onClick={handlePrint}>
+          {selectedAccountId && ledgerData && ledgerData.length > 0 && (
+            <div className="flex justify-end gap-2 mb-4 print:hidden flex-wrap">
+              <Button variant="outline" size="sm" onClick={handlePrint}>
                 <Printer className="h-4 w-4 ml-2" />
                 طباعة
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleExportPDF}>
+                <FileText className="h-4 w-4 ml-2" />
+                تصدير PDF
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleExportExcel}>
+                <Download className="h-4 w-4 ml-2" />
+                تصدير Excel
               </Button>
             </div>
           )}
