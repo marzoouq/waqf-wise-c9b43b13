@@ -30,6 +30,7 @@ import {
   ActivityTimeline,
   YearlyComparison,
 } from "@/components/beneficiary";
+import { WaqfDistributionsSummaryCard } from "@/components/beneficiary/cards/WaqfDistributionsSummaryCard";
 import { ChatbotQuickCard } from "@/components/dashboard/ChatbotQuickCard";
 import { Suspense } from "react";
 import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
@@ -137,7 +138,7 @@ export default function BeneficiaryPortal() {
             {activeTab === "overview" && settings?.show_overview && (
               <div className="space-y-6">
                 {/* بطاقة الملف الشخصي */}
-              <BeneficiaryProfileCard
+                <BeneficiaryProfileCard
                   beneficiary={beneficiary as Beneficiary}
                   onMessages={() => navigate("/messages")}
                   onChangePassword={() => {}}
@@ -147,6 +148,9 @@ export default function BeneficiaryPortal() {
                 <Suspense fallback={<div className="h-32 bg-muted animate-pulse rounded-lg" />}>
                   <ChatbotQuickCard />
                 </Suspense>
+
+                {/* بطاقة إجمالي المحصل من الوقف */}
+                <WaqfDistributionsSummaryCard beneficiaryId={beneficiary.id} />
 
                 {/* إحصائيات العقارات */}
                 <PropertyStatsCards />
