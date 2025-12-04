@@ -28,45 +28,39 @@ const FinancialStats = () => {
   const stats = [
     {
       title: "إجمالي الأصول",
-      value: "—",
+      value: formatCurrency(data.totalAssets),
       icon: Wallet,
       variant: "default" as const,
-      trend: "غير متاح",
     },
     {
       title: "إجمالي الالتزامات",
-      value: "—",
+      value: formatCurrency(data.totalLiabilities),
       icon: Calculator,
       variant: "warning" as const,
-      trend: "غير متاح",
     },
     {
       title: "حقوق الملكية",
-      value: "—",
+      value: formatCurrency(data.totalEquity),
       icon: PiggyBank,
       variant: "default" as const,
-      trend: "غير متاح",
     },
     {
       title: "إجمالي الإيرادات",
-      value: "—",
+      value: formatCurrency(data.totalRevenue),
       icon: TrendingUp,
       variant: "success" as const,
-      trend: "غير متاح",
     },
     {
       title: "إجمالي المصروفات",
-      value: "—",
+      value: formatCurrency(data.totalExpenses),
       icon: TrendingDown,
       variant: "danger" as const,
-      trend: "غير متاح",
     },
     {
       title: "صافي الدخل",
-      value: "—",
+      value: formatCurrency(data.netIncome),
       icon: TrendingUp,
-      variant: "default" as const,
-      trend: "غير متاح",
+      variant: data.netIncome >= 0 ? "success" as const : "danger" as const,
     },
   ];
 
@@ -78,7 +72,6 @@ const FinancialStats = () => {
           title={stat.title}
           value={stat.value}
           icon={stat.icon}
-          trend={stat.trend}
           variant={stat.variant}
         />
       ))}
