@@ -94,8 +94,11 @@ export const useContracts = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contracts"] });
       queryClient.invalidateQueries({ queryKey: ["rental_payments"] });
+      queryClient.invalidateQueries({ queryKey: ["rental-payments-collected"] });
+      queryClient.invalidateQueries({ queryKey: ["rental-payments-with-frequency"] });
       queryClient.invalidateQueries({ queryKey: ["property-units"] });
       queryClient.invalidateQueries({ queryKey: ["properties"] });
+      queryClient.invalidateQueries({ queryKey: ["properties-stats"] });
     },
     onError: (error) => {
       logger.error(error, { context: 'add_contract', severity: 'medium' });
