@@ -1,6 +1,6 @@
 # 🔌 مرجع API - منصة إدارة الوقف الإلكترونية
 
-**الإصدار:** 2.6.6 | **آخر تحديث:** 2025-12-03
+**الإصدار:** 2.6.11 | **آخر تحديث:** 2025-12-04
 
 ---
 
@@ -189,7 +189,38 @@ const { data: reports } = useReports();
 const { generate } = useReportGeneration();
 ```
 
-### 2.8 الأداء والتحسين
+### 2.8 لوحات التحكم و KPIs
+
+```typescript
+import {
+  useDashboardKPIs,
+  useNazerKPIs,
+  useAdminKPIs,
+  useUnifiedKPIs,
+  useKPIs
+} from '@/hooks';
+
+// Hook موحد لجميع KPIs (جديد v2.6.11)
+const { 
+  data: kpis, 
+  isLoading, 
+  refresh, 
+  lastUpdated 
+} = useUnifiedKPIs();
+// يشمل: totalBeneficiaries, activeBeneficiaries, totalProperties,
+// totalRevenue, totalExpenses, netIncome, pendingRequests, etc.
+
+// Real-time subscriptions تلقائية على 9 جداول
+// beneficiaries, properties, contracts, payments, 
+// journal_entries, loans, beneficiary_requests, families, funds
+
+// KPIs محددة لكل لوحة تحكم
+const { data: nazerKPIs } = useNazerKPIs();  // Real-time
+const { data: adminKPIs } = useAdminKPIs();  // Real-time
+const { data: dashKPIs } = useDashboardKPIs(); // Real-time
+```
+
+### 2.9 الأداء والتحسين
 
 ```typescript
 import { useQueryPrefetch, useAutoPrefetch } from '@/hooks/useQueryPrefetch';
@@ -228,19 +259,42 @@ import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
 </GlobalErrorBoundary>
 ```
 
-### 3.3 مكونات KPI
+### 3.3 مكونات KPI (محدّث v2.6.11)
 
 ```tsx
-import { UnifiedKPICard, UnifiedStatsGrid } from '@/components/unified';
+import { 
+  UnifiedKPICard, 
+  UnifiedStatsGrid, 
+  UnifiedDashboardKPIs 
+} from '@/components/unified';
+import { ReportRefreshIndicator } from '@/components/reports/ReportRefreshIndicator';
 
+// ✅ مكون KPIs موحد (جديد) - يضمن تطابق الأرقام
+<UnifiedDashboardKPIs 
+  variant="nazer"           // 'admin' | 'nazer' | 'accountant' | 'default'
+  title="إحصائيات الناظر"
+  description="نظرة شاملة على النظام"
+  showRefreshIndicator={true}
+/>
+
+// مكونات فردية
 <UnifiedStatsGrid columns={4}>
   <UnifiedKPICard
     title="إجمالي المستفيدين"
     value={14}
     icon={Users}
-    trend={{ value: 5, isPositive: true }}
+    variant="primary"       // 'primary' | 'success' | 'warning' | 'danger' | 'default'
+    trend="+5%"             // يُظهر سهم أخضر
+    subtitle="نشط"
   />
 </UnifiedStatsGrid>
+
+// مؤشر التحديث للتقارير
+<ReportRefreshIndicator
+  lastUpdated={new Date()}
+  isRefetching={false}
+  onRefresh={() => queryClient.invalidateQueries({ queryKey: ['reports'] })}
+/>
 ```
 
 ---

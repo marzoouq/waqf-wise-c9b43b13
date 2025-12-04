@@ -2,12 +2,12 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.6.10
- * @date 2025-12-03
+ * @version 2.6.11
+ * @date 2025-12-04
  */
 
-export const APP_VERSION = '2.6.10';
-export const APP_VERSION_DATE = '2025-12-03';
+export const APP_VERSION = '2.6.11';
+export const APP_VERSION_DATE = '2025-12-04';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
 export const VERSION_INFO = {
@@ -16,10 +16,11 @@ export const VERSION_INFO = {
   name: APP_VERSION_NAME,
   changelog: '/docs/CHANGELOG.md',
   features: [
-    'إضافة صلاحية تغيير البريد الإلكتروني للمستخدمين (edit_user_email)',
-    'إنشاء Edge Function لتحديث البريد في auth.users',
-    'اختبار شامل للوحة المشرف (12 مكون، 17 صفحة، 15+ هوك)',
-    'تقرير اختبار موثق في docs/testing/ADMIN_DASHBOARD_TEST_REPORT.md',
+    'نظام تقارير موحد مع تحديث مباشر (Real-time)',
+    'مكون KPIs موحد (UnifiedDashboardKPIs) لجميع لوحات التحكم',
+    'تفعيل Real-time subscriptions على 9 جداول رئيسية',
+    'مؤشر آخر تحديث وزر التحديث اليدوي في التقارير',
+    'تقليل staleTime من 1 ساعة إلى 2 دقيقة',
   ],
 } as const;
 
