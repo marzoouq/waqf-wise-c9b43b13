@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { QUERY_CONFIG } from '@/lib/queryOptimization';
 
 export interface DashboardKPIs {
   beneficiaries: number;
@@ -48,8 +49,6 @@ export function useDashboardKPIs() {
         activeContracts: activeContracts.count || 0,
       } as DashboardKPIs;
     },
-    staleTime: 60 * 60 * 1000, // 1 hour
-    refetchInterval: false,
-    refetchOnWindowFocus: false,
+    ...QUERY_CONFIG.DASHBOARD_KPIS,
   });
 }

@@ -32,17 +32,24 @@ export const CACHE_TIMES = {
  */
 export const QUERY_CONFIG = {
   DASHBOARD_KPIS: {
-    staleTime: CACHE_TIMES.STATIC, // 1 hour
-    gcTime: CACHE_TIMES.STATIC * 2,
-    refetchInterval: false, // Disabled
-    refetchOnWindowFocus: false,
+    staleTime: 2 * 60 * 1000, // 2 minutes - للتحديث السريع
+    gcTime: 5 * 60 * 1000,
+    refetchInterval: 5 * 60 * 1000, // تحديث كل 5 دقائق
+    refetchOnWindowFocus: true, // تحديث عند العودة للنافذة
     retry: 2,
   },
   ADMIN_KPIS: {
-    staleTime: CACHE_TIMES.STATIC, // 1 hour
-    gcTime: CACHE_TIMES.STATIC * 2,
-    refetchInterval: false, // Disabled
-    refetchOnWindowFocus: false,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 5 * 60 * 1000,
+    refetchInterval: 5 * 60 * 1000,
+    refetchOnWindowFocus: true,
+    retry: 2,
+  },
+  REPORTS: {
+    staleTime: 2 * 60 * 1000, // 2 minutes - للتقارير
+    gcTime: 10 * 60 * 1000,
+    refetchInterval: false, // يدوي فقط
+    refetchOnWindowFocus: true,
     retry: 2,
   },
   APPROVALS: {
