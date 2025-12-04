@@ -14,6 +14,8 @@ import { AdminKPIs } from "@/components/dashboard/admin/AdminKPIs";
 import { LazyTabContent } from "@/components/dashboard/admin/LazyTabContent";
 import { UnifiedDashboardLayout } from "@/components/dashboard/UnifiedDashboardLayout";
 import { ChartSkeleton, SectionSkeleton } from "@/components/dashboard";
+import { BankBalanceCard } from "@/components/shared/BankBalanceCard";
+import { WaqfCorpusCard } from "@/components/shared/WaqfCorpusCard";
 
 export default function AdminDashboard() {
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
@@ -73,6 +75,12 @@ export default function AdminDashboard() {
           <Suspense fallback={<SectionSkeleton />}>
             <AdminKPIs />
           </Suspense>
+
+          {/* بطاقات الرصيد البنكي ورقبة الوقف */}
+          <div className="grid gap-6 lg:grid-cols-2">
+            <BankBalanceCard />
+            <WaqfCorpusCard />
+          </div>
 
           <div className="grid gap-6 lg:grid-cols-2">
             <Suspense fallback={<ChartSkeleton />}>
