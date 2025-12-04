@@ -9,6 +9,7 @@ import AppVersionFooter from "./AppVersionFooter";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { Menu, LogOut, Search } from "lucide-react";
 import { NotificationsBell } from "./NotificationsBell";
+import { GovernanceGuideButton } from "./GovernanceGuideButton";
 import { FloatingChatButton } from "@/components/chatbot/FloatingChatButton";
 import { GlobalSearch } from "@/components/shared/GlobalSearch";
 import { BottomNavigation } from "@/components/mobile/BottomNavigation";
@@ -66,6 +67,7 @@ const MobileHeader = memo(function MobileHeader({
       >
         <Search className="h-4 w-4" aria-hidden="true" />
       </Button>
+      <GovernanceGuideButton />
       <NotificationsBell />
       
       <DropdownMenu>
@@ -132,6 +134,7 @@ const DesktopHeader = memo(function DesktopHeader({
               <span className="text-xs">Ctrl+K</span>
             </kbd>
           </Button>
+          <GovernanceGuideButton />
           <NotificationsBell />
           
           <DropdownMenu>
