@@ -207,6 +207,10 @@ export default function Login() {
                     )}
                   </Button>
                 )}
+                
+                <div className="text-center text-xs text-muted-foreground">
+                  حساب الموظفين يتم إنشاؤه من قبل الناظر أو المشرف
+                </div>
               </CardFooter>
             </form>
           </TabsContent>
