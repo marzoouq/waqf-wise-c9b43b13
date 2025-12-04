@@ -20,12 +20,13 @@ interface FiscalYearCorpus {
   waqf_corpus: number;
   opening_balance: number;
   closing_balance: number;
+  created_at: string;
   fiscal_years: {
     name: string;
     start_date: string;
     end_date: string;
     is_closed: boolean;
-  } | null;
+  };
 }
 
 export function WaqfCorpusCard({ className, compact = false }: WaqfCorpusCardProps) {
@@ -34,7 +35,7 @@ export function WaqfCorpusCard({ className, compact = false }: WaqfCorpusCardPro
   const [isLive, setIsLive] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  // جلب بيانات رقبة الوقف من جميع السنوات المالية
+  // جلب بيانات رقبة الوقف من جميع السنوات المالية المقفلة
   const { data: corpusData = [], isLoading } = useQuery({
     queryKey: ["waqf-corpus-realtime"],
     queryFn: async () => {
@@ -46,16 +47,22 @@ export function WaqfCorpusCard({ className, compact = false }: WaqfCorpusCardPro
           waqf_corpus,
           opening_balance,
           closing_balance,
-          fiscal_years (
+          created_at,
+          fiscal_years!inner (
             name,
             start_date,
             end_date,
             is_closed
           )
         `)
-        .order("fiscal_year_id", { ascending: false });
+        .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching waqf corpus:", error);
+        throw error;
+      }
+      
+      console.log("Waqf corpus data:", data);
       return (data || []) as FiscalYearCorpus[];
     },
   });
