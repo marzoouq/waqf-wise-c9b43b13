@@ -4,31 +4,28 @@
 
 import type { FiscalYearClosing } from "@/types/fiscal-year-closing";
 import { logger } from "@/lib/logger";
+import { loadAmiriFonts } from "./fonts/loadArabicFonts";
 
 type JsPDF = import('jspdf').jsPDF;
 
 const loadArabicFont = async (doc: JsPDF) => {
   try {
-    const response = await fetch('/fonts/amiri.zip');
-    if (response.ok) {
-      const blob = await response.blob();
-      const reader = new FileReader();
-      return new Promise((resolve) => {
-        reader.onloadend = () => {
-          const base64 = (reader.result as string).split(',')[1];
-          doc.addFileToVFS('Amiri-Regular.ttf', base64);
-          doc.addFont('Amiri-Regular.ttf', 'Amiri', 'normal');
-          doc.setFont('Amiri');
-          resolve(true);
-        };
-        reader.readAsDataURL(blob);
-      });
-    }
+    const { regular: amiriRegular, bold: amiriBold } = await loadAmiriFonts();
+    
+    doc.addFileToVFS("Amiri-Regular.ttf", amiriRegular);
+    doc.addFont("Amiri-Regular.ttf", "Amiri", "normal");
+    
+    doc.addFileToVFS("Amiri-Bold.ttf", amiriBold);
+    doc.addFont("Amiri-Bold.ttf", "Amiri", "bold");
+    
+    doc.setFont("Amiri", "normal");
+    return true;
   } catch (error) {
     logger.error(error, { 
       context: 'load_arabic_font_fiscal_year', 
       severity: 'low'
     });
+    return false;
   }
 };
 

@@ -1,12 +1,37 @@
+/**
+ * Export Helpers - أدوات التصدير الموحدة
+ * تدعم الخطوط العربية (Amiri) في جميع ملفات PDF
+ */
+
+import { loadAmiriFonts } from "./fonts/loadArabicFonts";
+import { logger } from "./logger";
+
 // Dynamic imports for jsPDF
 type JsPDF = any;
 type AutoTable = any;
 
-// Add Arabic font support for PDF (using a fallback for now)
-const configureArabicPDF = (doc: JsPDF) => {
-  // Note: For proper Arabic support, you would need to add a custom Arabic font
-  // For now, we'll use the default font with right-to-left text
-  doc.setLanguage("ar");
+/**
+ * تحميل وتهيئة الخط العربي في مستند PDF
+ */
+const loadArabicFontToPDF = async (doc: JsPDF): Promise<boolean> => {
+  try {
+    const { regular: amiriRegular, bold: amiriBold } = await loadAmiriFonts();
+    
+    doc.addFileToVFS("Amiri-Regular.ttf", amiriRegular);
+    doc.addFont("Amiri-Regular.ttf", "Amiri", "normal");
+    
+    doc.addFileToVFS("Amiri-Bold.ttf", amiriBold);
+    doc.addFont("Amiri-Bold.ttf", "Amiri", "bold");
+    
+    doc.setFont("Amiri", "normal");
+    doc.setLanguage("ar");
+    return true;
+  } catch (error) {
+    logger.error(error, { context: 'load_arabic_font_export', severity: 'low' });
+    // استخدام الخط الافتراضي كخطة بديلة
+    doc.setLanguage("ar");
+    return false;
+  }
 };
 
 export const exportToPDF = async (
@@ -24,13 +49,18 @@ export const exportToPDF = async (
   const autoTable = autoTableModule.default;
   
   const doc = new jsPDF();
-  configureArabicPDF(doc);
+  
+  // تحميل الخط العربي
+  const hasArabicFont = await loadArabicFontToPDF(doc);
+  const fontName = hasArabicFont ? "Amiri" : "helvetica";
 
   // Add title
+  doc.setFont(fontName, "bold");
   doc.setFontSize(16);
   doc.text(title, doc.internal.pageSize.width / 2, 15, { align: "center" });
 
   // Add date
+  doc.setFont(fontName, "normal");
   doc.setFontSize(10);
   const date = new Date().toLocaleDateString("ar-SA");
   doc.text(`التاريخ: ${date}`, doc.internal.pageSize.width - 20, 25, {
@@ -43,7 +73,7 @@ export const exportToPDF = async (
     body: data,
     startY: 35,
     styles: {
-      font: "helvetica",
+      font: fontName,
       fontSize: 10,
       halign: "right",
     },
@@ -104,13 +134,16 @@ export const exportFinancialStatementToPDF = async (
   const { default: jsPDF } = await import('jspdf');
   
   const doc = new jsPDF();
-  configureArabicPDF(doc);
+  
+  // تحميل الخط العربي
+  const hasArabicFont = await loadArabicFontToPDF(doc);
+  const fontName = hasArabicFont ? "Amiri" : "helvetica";
 
   let yPosition = 20;
 
   // Title
   doc.setFontSize(18);
-  doc.setFont("helvetica", "bold");
+  doc.setFont(fontName, "bold");
   doc.text(title, doc.internal.pageSize.width / 2, yPosition, {
     align: "center",
   });
@@ -118,7 +151,7 @@ export const exportFinancialStatementToPDF = async (
 
   // Date
   doc.setFontSize(10);
-  doc.setFont("helvetica", "normal");
+  doc.setFont(fontName, "normal");
   const date = new Date().toLocaleDateString("ar-SA");
   doc.text(`كما في: ${date}`, doc.internal.pageSize.width / 2, yPosition, {
     align: "center",
@@ -129,12 +162,12 @@ export const exportFinancialStatementToPDF = async (
   doc.setFontSize(11);
   sections.forEach((section) => {
     // Section title
-    doc.setFont("helvetica", "bold");
+    doc.setFont(fontName, "bold");
     doc.text(section.title, 20, yPosition);
     yPosition += 7;
 
     // Section items
-    doc.setFont("helvetica", "normal");
+    doc.setFont(fontName, "normal");
     section.items.forEach((item) => {
       const amountText = item.amount.toFixed(2);
       doc.text(item.label, 30, yPosition);
@@ -159,7 +192,7 @@ export const exportFinancialStatementToPDF = async (
   doc.line(20, yPosition, doc.internal.pageSize.width - 20, yPosition);
   yPosition += 7;
 
-  doc.setFont("helvetica", "bold");
+  doc.setFont(fontName, "bold");
   totals.forEach((total) => {
     const amountText = total.amount.toFixed(2);
     doc.text(total.label, 20, yPosition);

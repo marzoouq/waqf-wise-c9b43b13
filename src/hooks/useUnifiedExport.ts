@@ -2,13 +2,13 @@
  * Unified Export Hook - خطاف تصدير موحد
  * 
  * يجمع جميع أدوات التصدير في مكان واحد:
- * - تصدير PDF
+ * - تصدير PDF (مع دعم الخطوط العربية)
  * - تصدير Excel
  * - تصدير CSV
  * - تصدير متعدد الصفحات
  * - تنسيق البيانات
  * 
- * @version 2.6.12
+ * @version 2.6.13
  */
 
 import { useCallback } from "react";
@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { useToast } from "@/hooks/use-toast";
 import { logger } from "@/lib/logger";
 import { getErrorMessage } from "@/types/errors";
+import { loadAmiriFonts } from "@/lib/fonts/loadArabicFonts";
 import type { 
   PDFTableData, 
   ExcelRowData, 
@@ -59,13 +60,38 @@ export interface FinancialStatementConfig {
   totals: { label: string; amount: number }[];
 }
 
+// ==================== Helper Functions ====================
+
+/**
+ * تحميل الخط العربي إلى مستند PDF
+ */
+const loadArabicFontToPDF = async (doc: any): Promise<boolean> => {
+  try {
+    const { regular: amiriRegular, bold: amiriBold } = await loadAmiriFonts();
+    
+    doc.addFileToVFS("Amiri-Regular.ttf", amiriRegular);
+    doc.addFont("Amiri-Regular.ttf", "Amiri", "normal");
+    
+    doc.addFileToVFS("Amiri-Bold.ttf", amiriBold);
+    doc.addFont("Amiri-Bold.ttf", "Amiri", "bold");
+    
+    doc.setFont("Amiri", "normal");
+    doc.setLanguage("ar");
+    return true;
+  } catch (error) {
+    logger.error(error, { context: 'load_arabic_font_unified_export', severity: 'low' });
+    doc.setLanguage("ar");
+    return false;
+  }
+};
+
 // ==================== Main Hook ====================
 
 export function useUnifiedExport() {
   const { toast: shadcnToast } = useToast();
 
   /**
-   * تصدير إلى PDF
+   * تصدير إلى PDF مع دعم الخطوط العربية
    */
   const exportToPDF = useCallback(async (config: PDFExportConfig) => {
     try {
@@ -78,14 +104,19 @@ export function useUnifiedExport() {
       const autoTable = autoTableModule.default;
       
       const doc = new jsPDF();
-      doc.setLanguage("ar");
+      
+      // تحميل الخط العربي
+      const hasArabicFont = await loadArabicFontToPDF(doc);
+      const fontName = hasArabicFont ? "Amiri" : "helvetica";
 
       // Title
+      doc.setFont(fontName, "bold");
       doc.setFontSize(16);
       doc.text(config.title, doc.internal.pageSize.width / 2, 15, { align: "center" });
 
       // Date
       if (config.showDate !== false) {
+        doc.setFont(fontName, "normal");
         doc.setFontSize(10);
         const date = new Date().toLocaleDateString("ar-SA");
         doc.text(`التاريخ: ${date}`, doc.internal.pageSize.width - 20, 25, {
@@ -99,7 +130,7 @@ export function useUnifiedExport() {
         body: config.data,
         startY: 35,
         styles: {
-          font: "helvetica",
+          font: fontName,
           fontSize: 10,
           halign: "right",
         },
@@ -167,20 +198,23 @@ export function useUnifiedExport() {
   }, []);
 
   /**
-   * تصدير قائمة مالية إلى PDF
+   * تصدير قائمة مالية إلى PDF مع دعم الخطوط العربية
    */
   const exportFinancialStatement = useCallback(async (config: FinancialStatementConfig) => {
     try {
       const { default: jsPDF } = await import('jspdf');
       
       const doc = new jsPDF();
-      doc.setLanguage("ar");
+      
+      // تحميل الخط العربي
+      const hasArabicFont = await loadArabicFontToPDF(doc);
+      const fontName = hasArabicFont ? "Amiri" : "helvetica";
 
       let yPosition = 20;
 
       // Title
       doc.setFontSize(18);
-      doc.setFont("helvetica", "bold");
+      doc.setFont(fontName, "bold");
       doc.text(config.title, doc.internal.pageSize.width / 2, yPosition, {
         align: "center",
       });
@@ -188,7 +222,7 @@ export function useUnifiedExport() {
 
       // Date
       doc.setFontSize(10);
-      doc.setFont("helvetica", "normal");
+      doc.setFont(fontName, "normal");
       const date = new Date().toLocaleDateString("ar-SA");
       doc.text(`كما في: ${date}`, doc.internal.pageSize.width / 2, yPosition, {
         align: "center",
@@ -198,11 +232,11 @@ export function useUnifiedExport() {
       // Sections
       doc.setFontSize(11);
       config.sections.forEach((section) => {
-        doc.setFont("helvetica", "bold");
+        doc.setFont(fontName, "bold");
         doc.text(section.title, 20, yPosition);
         yPosition += 7;
 
-        doc.setFont("helvetica", "normal");
+        doc.setFont(fontName, "normal");
         section.items.forEach((item) => {
           const amountText = item.amount.toFixed(2);
           doc.text(item.label, 30, yPosition);
@@ -226,7 +260,7 @@ export function useUnifiedExport() {
       doc.line(20, yPosition, doc.internal.pageSize.width - 20, yPosition);
       yPosition += 7;
 
-      doc.setFont("helvetica", "bold");
+      doc.setFont(fontName, "bold");
       config.totals.forEach((total) => {
         const amountText = total.amount.toFixed(2);
         doc.text(total.label, 20, yPosition);
