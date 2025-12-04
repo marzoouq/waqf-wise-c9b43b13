@@ -61,17 +61,17 @@ export const AdminKPIs = memo(() => {
       },
       {
         title: "إجمالي الإيرادات",
-        value: "—",
+        value: formatCurrency(kpis.totalRevenue),
         icon: TrendingUp,
         variant: "success" as const,
-        trend: "غير متاح",
+        trend: `مصروفات: ${formatCurrency(kpis.totalExpenses)}`,
       },
       {
         title: "صافي الدخل",
-        value: "—",
-        icon: TrendingUp,
-        variant: "default" as const,
-        trend: "غير متاح",
+        value: formatCurrency(kpis.netIncome),
+        icon: kpis.netIncome >= 0 ? TrendingUp : TrendingDown,
+        variant: kpis.netIncome >= 0 ? "success" as const : "danger" as const,
+        trend: "بعد خصم المصروفات",
       },
     ];
   }, [kpis]);
