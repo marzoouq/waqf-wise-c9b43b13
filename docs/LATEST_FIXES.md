@@ -2,7 +2,81 @@
 ## Latest Fixes & Updates
 
 **التاريخ:** 2025-12-04  
-**الإصدار:** 2.6.11
+**الإصدار:** 2.6.12
+
+---
+
+## 📄 إصلاح وظائف PDF والطباعة الشاملة (v2.6.12)
+
+### المشكلة
+1. **ميزان المراجعة**: لا يدعم تصدير PDF، فقط Excel
+2. **دفتر الأستاذ العام**: لا يدعم تصدير PDF أو Excel
+3. **قائمة المركز المالي**: زر PDF غير مربوط بوظيفة
+4. **قائمة الدخل**: زر PDF غير مربوط بوظيفة
+
+### الحل المنفذ
+
+#### 1. ميزان المراجعة (TrialBalanceReport.tsx)
+```typescript
+// ✅ إضافة تصدير PDF
+const handleExportPDF = async () => {
+  const { exportToPDF } = await import("@/lib/exportHelpers");
+  const headers = ['رمز الحساب', 'اسم الحساب', 'مدين', 'دائن', 'الرصيد'];
+  const data = trialBalance.map(acc => [...]);
+  await exportToPDF(title, headers, data, filename);
+};
+
+// ✅ 3 أزرار: طباعة، PDF، Excel
+```
+
+#### 2. دفتر الأستاذ العام (GeneralLedgerReport.tsx)
+```typescript
+// ✅ إضافة تصدير PDF
+const handleExportPDF = async () => {
+  const { exportToPDF } = await import("@/lib/exportHelpers");
+  const headers = ['التاريخ', 'رقم القيد', 'البيان', 'مدين', 'دائن', 'الرصيد'];
+  await exportToPDF(title, headers, data, filename);
+};
+
+// ✅ إضافة تصدير Excel
+const handleExportExcel = async () => {
+  const { exportToExcel } = await import("@/lib/excel-helper");
+  await exportToExcel(exportData, filename, sheetName);
+};
+
+// ✅ 3 أزرار: طباعة، PDF، Excel
+```
+
+#### 3. قائمة المركز المالي (EnhancedBalanceSheet.tsx)
+```typescript
+// ✅ ربط زر PDF بوظيفة فعلية
+const handleExportPDF = async () => {
+  await exportFinancialStatementToPDF(title, sections, totals, filename);
+};
+
+// ✅ إضافة وظيفة الطباعة
+const handlePrint = () => window.print();
+```
+
+#### 4. قائمة الدخل (EnhancedIncomeStatement.tsx)
+```typescript
+// ✅ ربط زر PDF بوظيفة فعلية
+const handleExportPDF = async () => {
+  await exportFinancialStatementToPDF(title, sections, totals, filename);
+};
+
+// ✅ إضافة وظيفة الطباعة
+const handlePrint = () => window.print();
+```
+
+### ملخص التغييرات
+
+| التقرير | PDF | Excel | طباعة |
+|---------|-----|-------|-------|
+| ميزان المراجعة | ✅ جديد | ✅ موجود | ✅ موجود |
+| دفتر الأستاذ العام | ✅ جديد | ✅ جديد | ✅ موجود |
+| قائمة المركز المالي | ✅ مُصلَح | - | ✅ جديد |
+| قائمة الدخل | ✅ مُصلَح | - | ✅ جديد |
 
 ---
 

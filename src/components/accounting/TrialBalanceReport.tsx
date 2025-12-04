@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Download, Printer, Scale } from "lucide-react";
+import { Download, Printer, Scale, FileText } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
 import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
 import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
@@ -29,7 +29,7 @@ export function TrialBalanceReport() {
     window.print();
   };
 
-  const handleExport = async () => {
+  const handleExportExcel = async () => {
     const { exportToExcel } = await import("@/lib/excel-helper");
     
     const exportData = trialBalance.map(acc => ({
@@ -50,6 +50,35 @@ export function TrialBalanceReport() {
     });
 
     await exportToExcel(exportData, `trial-balance-${format(new Date(), "yyyyMMdd")}`, "ميزان المراجعة");
+  };
+
+  const handleExportPDF = async () => {
+    const { exportToPDF } = await import("@/lib/exportHelpers");
+    
+    const headers = ['رمز الحساب', 'اسم الحساب', 'مدين', 'دائن', 'الرصيد'];
+    const data = trialBalance.map(acc => [
+      acc.code,
+      acc.name,
+      acc.debit > 0 ? formatNumber(acc.debit) : '-',
+      acc.credit > 0 ? formatNumber(acc.credit) : '-',
+      formatNumber(acc.balance),
+    ]);
+    
+    // Add total row
+    data.push([
+      '',
+      'الإجمالي',
+      formatNumber(totalDebit),
+      formatNumber(totalCredit),
+      difference < 0.01 ? 'متوازن' : `فرق: ${formatNumber(difference)}`,
+    ]);
+
+    await exportToPDF(
+      `ميزان المراجعة - ${format(new Date(), "dd/MM/yyyy")}`,
+      headers,
+      data,
+      `trial-balance-${format(new Date(), "yyyyMMdd")}`
+    );
   };
 
   if (isLoading) {
@@ -76,12 +105,16 @@ export function TrialBalanceReport() {
               التاريخ: {format(new Date(), "dd MMMM yyyy", { locale: ar })}
             </p>
           </div>
-          <div className="flex gap-2 print:hidden">
+          <div className="flex gap-2 print:hidden flex-wrap">
             <Button variant="outline" size="sm" onClick={handlePrint}>
               <Printer className="ml-2 h-4 w-4" />
               طباعة
             </Button>
-            <Button variant="outline" size="sm" onClick={handleExport}>
+            <Button variant="outline" size="sm" onClick={handleExportPDF}>
+              <FileText className="ml-2 h-4 w-4" />
+              تصدير PDF
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleExportExcel}>
               <Download className="ml-2 h-4 w-4" />
               تصدير Excel
             </Button>
