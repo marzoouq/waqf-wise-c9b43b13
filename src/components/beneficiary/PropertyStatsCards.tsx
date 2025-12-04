@@ -1,15 +1,24 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { StatsCard } from "./StatsCard";
-import { Building2, Home, TrendingUp, DollarSign, Package, MapPin, ChevronDown, CheckCircle } from "lucide-react";
+import { Building2, Home, TrendingUp, DollarSign, Package, MapPin, CheckCircle, Landmark, Receipt, Wallet } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { formatCurrency } from "@/lib/utils";
 
+interface RentalPaymentWithContract {
+  amount_paid: number | null;
+  tax_amount: number | null;
+  contracts: {
+    payment_frequency: string | null;
+  } | null;
+}
+
 export function PropertyStatsCards() {
-  const { data: properties, isLoading } = useQuery({
+  // جلب بيانات العقارات
+  const { data: properties, isLoading: propertiesLoading } = useQuery({
     queryKey: ["properties-stats"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -29,24 +38,38 @@ export function PropertyStatsCards() {
     },
   });
 
-  const { data: contracts } = useQuery({
-    queryKey: ["active-contracts"],
+  // جلب المدفوعات الفعلية مع نوع الدفع من العقود
+  const { data: payments, isLoading: paymentsLoading } = useQuery({
+    queryKey: ["rental-payments-collected"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("contracts")
-        .select("id, monthly_rent, status")
-        .in("status", ["نشط", "active"]);
+        .from("rental_payments")
+        .select(`
+          amount_paid,
+          tax_amount,
+          contracts!inner (
+            payment_frequency
+          )
+        `)
+        .eq("status", "مدفوع");
 
       if (error) throw error;
-      return data || [];
+      return (data || []) as RentalPaymentWithContract[];
     },
   });
 
+  const isLoading = propertiesLoading || paymentsLoading;
+
   if (isLoading) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => (
+            <Skeleton key={i} className="h-32" />
+          ))}
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          {[...Array(5)].map((_, i) => (
             <Skeleton key={i} className="h-32" />
           ))}
         </div>
@@ -54,50 +77,125 @@ export function PropertyStatsCards() {
     );
   }
 
+  // إحصائيات العقارات
   const totalProperties = properties?.length || 0;
   const totalUnits = properties?.reduce((sum, p) => sum + (p.total_units || 0), 0) || 0;
   const occupiedUnits = properties?.reduce((sum, p) => sum + (p.occupied_units || 0), 0) || 0;
-  const vacantUnits = totalUnits - occupiedUnits;
   const occupancyRate = totalUnits > 0 ? (occupiedUnits / totalUnits) * 100 : 0;
-  const totalMonthlyRent = contracts?.reduce((sum, c) => sum + (c.monthly_rent || 0), 0) || 0;
+
+  // فصل المدفوعات حسب نوع الدفع (سنوي/شهري)
+  const annualPayments = payments?.filter(p => p.contracts?.payment_frequency === 'سنوي') || [];
+  const monthlyPayments = payments?.filter(p => p.contracts?.payment_frequency === 'شهري') || [];
+
+  // حساب الإيجارات المحصلة
+  const totalAnnualCollected = annualPayments.reduce((sum, p) => sum + (p.amount_paid || 0), 0);
+  const totalMonthlyCollected = monthlyPayments.reduce((sum, p) => sum + (p.amount_paid || 0), 0);
+  const totalCollected = totalAnnualCollected + totalMonthlyCollected;
+
+  // الضريبة المستقطعة
+  const totalTax = payments?.reduce((sum, p) => sum + (p.tax_amount || 0), 0) || 0;
+
+  // صافي الإيرادات
+  const netRevenue = totalCollected - totalTax;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* إحصائيات العقارات */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatsCard
-          title="إجمالي العقارات"
-          value={totalProperties}
-          icon={Building2}
-          colorClass="text-info"
-        />
-        <StatsCard
-          title="إجمالي الوحدات"
-          value={totalUnits}
-          colorClass="text-info"
-          icon={Home}
-        />
-        <StatsCard
-          title="الوحدات المشغولة"
-          value={occupiedUnits}
-          colorClass="text-success"
-          icon={CheckCircle}
-        />
-        <StatsCard
-          title="معدل الإشغال"
-          value={`${occupancyRate.toFixed(1)}%`}
-          icon={TrendingUp}
-          colorClass="text-warning"
-        />
-        <StatsCard
-          title="الإيجارات الشهرية"
-          value={formatCurrency(totalMonthlyRent)}
-          icon={DollarSign}
-          colorClass="text-accent"
-        />
+      <div>
+        <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
+          <Building2 className="h-4 w-4" />
+          إحصائيات العقارات
+        </h3>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+          <StatsCard
+            title="إجمالي العقارات"
+            value={totalProperties}
+            icon={Building2}
+            colorClass="text-info"
+          />
+          <StatsCard
+            title="إجمالي الوحدات"
+            value={totalUnits}
+            colorClass="text-info"
+            icon={Home}
+          />
+          <StatsCard
+            title="الوحدات المشغولة"
+            value={occupiedUnits}
+            colorClass="text-success"
+            icon={CheckCircle}
+          />
+          <StatsCard
+            title="معدل الإشغال"
+            value={`${occupancyRate.toFixed(1)}%`}
+            icon={TrendingUp}
+            colorClass="text-warning"
+          />
+        </div>
       </div>
 
-      {/* نظرة سريعة على العقارات - تصميم محسّن */}
+      {/* الإيرادات المحصلة */}
+      <div>
+        <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
+          <Wallet className="h-4 w-4" />
+          الإيرادات المحصلة
+        </h3>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+          <StatsCard
+            title="المبلغ المحصل"
+            value={formatCurrency(totalCollected)}
+            icon={DollarSign}
+            colorClass="text-success"
+          />
+          <StatsCard
+            title="الإيجارات السنوية"
+            value={formatCurrency(totalAnnualCollected)}
+            icon={Receipt}
+            colorClass="text-primary"
+            trend={annualPayments.length > 0 ? `${annualPayments.length} دفعة` : undefined}
+          />
+          <StatsCard
+            title="الإيجارات الشهرية"
+            value={formatCurrency(totalMonthlyCollected)}
+            icon={Receipt}
+            colorClass="text-accent"
+            trend={monthlyPayments.length > 0 ? `${monthlyPayments.length} دفعة` : undefined}
+          />
+          <StatsCard
+            title="صافي الإيرادات"
+            value={formatCurrency(netRevenue)}
+            icon={TrendingUp}
+            colorClass="text-success"
+            trend="بعد الضريبة"
+          />
+        </div>
+      </div>
+
+      {/* الاستقطاعات الحكومية */}
+      <div>
+        <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
+          <Landmark className="h-4 w-4" />
+          الاستقطاعات الحكومية
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <StatsCard
+            title="ضريبة القيمة المضافة"
+            value={formatCurrency(totalTax)}
+            icon={Landmark}
+            colorClass="text-destructive"
+            trend="هيئة الزكاة والضريبة والجمارك"
+          />
+          <StatsCard
+            title="الزكاة"
+            value={formatCurrency(0)}
+            icon={Landmark}
+            colorClass="text-muted-foreground"
+            trend="لم يتم احتسابها"
+          />
+        </div>
+      </div>
+
+      {/* نظرة سريعة على العقارات */}
       <Card className="border-primary/20">
         <CardHeader className="bg-gradient-to-br from-primary/5 to-background pb-3">
           <CardTitle className="flex items-center gap-2 text-lg">
