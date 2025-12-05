@@ -24,8 +24,7 @@ export interface PaymentWithContract {
   property_name?: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function usePaymentsWithContracts(payments: any[]) {
+export function usePaymentsWithContracts(payments: Array<{ id: string }>) {
   const [paymentsWithContracts, setPaymentsWithContracts] = useState<PaymentWithContract[]>([]);
 
   const { data, isLoading } = useQuery({
@@ -46,7 +45,8 @@ export function usePaymentsWithContracts(payments: any[]) {
     if (data) {
       setPaymentsWithContracts(data);
     } else if (payments.length > 0) {
-      setPaymentsWithContracts(payments as PaymentWithContract[]);
+      // Cast through unknown for compatibility with different payment types
+      setPaymentsWithContracts(payments as unknown as PaymentWithContract[]);
     }
   }, [data, payments]);
 
