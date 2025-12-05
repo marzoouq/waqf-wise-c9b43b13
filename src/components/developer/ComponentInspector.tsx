@@ -69,12 +69,21 @@ export function ComponentInspector() {
       const rect = target.getBoundingClientRect();
       const styles = window.getComputedStyle(target);
       
+      // Type guard للتعامل مع SVGAnimatedString
+      const getClassName = (el: Element): string => {
+        if (typeof el.className === 'string') {
+          return el.className;
+        }
+        // SVGAnimatedString for SVG elements
+        if (el.className && typeof el.className === 'object' && 'baseVal' in el.className) {
+          return (el.className as SVGAnimatedString).baseVal;
+        }
+        return '';
+      };
+      
       setElementInfo({
         tagName: target.tagName.toLowerCase(),
-        className: typeof target.className === 'string' 
-          ? target.className 
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          : (target.className as any)?.baseVal || '',
+        className: getClassName(target),
         id: target.id,
         textContent: target.textContent?.substring(0, 100),
         dimensions: {
