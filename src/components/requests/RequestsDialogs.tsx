@@ -6,16 +6,17 @@ import { memo } from 'react';
 import { RequestApprovalDialog } from './RequestApprovalDialog';
 import { RequestCommentsDialog } from './RequestCommentsDialog';
 import { DeleteConfirmDialog } from '@/components/shared/DeleteConfirmDialog';
+import type { FullRequest } from '@/types/request.types';
 
 interface RequestsDialogsProps {
-  selectedRequest: any | null;
+  selectedRequest: FullRequest | null;
   approvalDialogOpen: boolean;
   setApprovalDialogOpen: (open: boolean) => void;
   commentsDialogOpen: boolean;
   setCommentsDialogOpen: (open: boolean) => void;
   deleteDialogOpen: boolean;
   setDeleteDialogOpen: (open: boolean) => void;
-  requestToDelete: any | null;
+  requestToDelete: FullRequest | null;
   handleDeleteConfirm: () => void;
   isDeleting: boolean;
 }
