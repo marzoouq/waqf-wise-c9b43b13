@@ -8,6 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, UserPlus, Trash2, Shield } from 'lucide-react';
 import { ROLE_NAMES_AR, type RoleName } from '@/types/auth';
+import { Database } from '@/integrations/supabase/types';
+
+// نوع الدور من قاعدة البيانات
+type DbAppRole = Database['public']['Enums']['app_role'];
 
 /**
  * مكون إدارة أدوار المستخدمين
@@ -37,8 +41,7 @@ export function UserRolesManager({ userId }: { userId: string }) {
     mutationFn: async (role: RoleName) => {
       const { error } = await supabase
         .from('user_roles')
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .insert({ user_id: userId, role: role as any });
+        .insert({ user_id: userId, role: role as DbAppRole });
 
       if (error) throw error;
     },
@@ -65,8 +68,7 @@ export function UserRolesManager({ userId }: { userId: string }) {
         .from('user_roles')
         .delete()
         .eq('user_id', userId)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .eq('role', role as any);
+        .eq('role', role as DbAppRole);
 
       if (error) throw error;
     },
