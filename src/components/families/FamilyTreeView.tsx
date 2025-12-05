@@ -67,15 +67,14 @@ export function FamilyTreeView({ familyId, familyName }: FamilyTreeViewProps) {
     }
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await addMember.mutateAsync({
         family_id: familyId,
         beneficiary_id: formData.beneficiary_id,
+        relationship: formData.relationship_to_head,
         relationship_to_head: formData.relationship_to_head,
-        is_dependent: formData.is_dependent,
         priority_level: formData.priority_level,
-        notes: formData.notes || null,
-      } as never);
+        is_active: true,
+      });
       
       toast.success('تم إضافة الفرد بنجاح');
       setIsAddDialogOpen(false);
