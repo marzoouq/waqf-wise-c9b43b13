@@ -1,8 +1,100 @@
 # آخر الإصلاحات والتحديثات
 ## Latest Fixes & Updates
 
-**التاريخ:** 2025-12-04  
-**الإصدار:** 2.6.12
+**التاريخ:** 2025-12-05  
+**الإصدار:** 2.6.15
+
+---
+
+## 🔐 إصلاحات أمنية شاملة (v2.6.15)
+
+### المشكلة
+تم اكتشاف 5 ثغرات أمنية حرجة في Edge Functions:
+1. `backup-database` - لا تتحقق من صلاحيات المستخدم
+2. `restore-database` - لا تتحقق من صلاحيات المستخدم  
+3. `auto-close-fiscal-year` - بدون مصادقة
+4. `simulate-distribution` - بدون مصادقة
+5. `generate-ai-insights` - بدون تحقق من الأدوار
+
+### الحل المنفذ
+
+#### 1. تأمين backup-database
+```typescript
+// ✅ الأدوار المسموحة: admin, nazer
+const ALLOWED_ROLES = ['admin', 'nazer'];
+
+// التحقق من المصادقة
+const authHeader = req.headers.get('Authorization');
+const { data: { user } } = await supabaseAuth.auth.getUser(token);
+
+// التحقق من الأدوار
+const { data: userRoles } = await supabase
+  .from('user_roles').select('role').eq('user_id', user.id);
+
+// تسجيل المحاولات غير المصرح بها
+await supabase.from('audit_logs').insert({
+  action_type: 'UNAUTHORIZED_BACKUP_ATTEMPT',
+  severity: 'error'
+});
+```
+
+#### 2. تأمين restore-database
+```typescript
+// ✅ الأدوار المسموحة: admin فقط
+const ALLOWED_ROLES = ['admin'];
+// + audit logging
+```
+
+#### 3. تأمين auto-close-fiscal-year
+```typescript
+// ✅ الأدوار المسموحة: nazer فقط
+const ALLOWED_ROLES = ['nazer'];
+// + audit logging
+```
+
+#### 4. تأمين simulate-distribution
+```typescript
+// ✅ الأدوار المسموحة: admin, nazer, accountant
+const ALLOWED_ROLES = ['admin', 'nazer', 'accountant'];
+// + audit logging
+```
+
+#### 5. تأمين generate-ai-insights
+```typescript
+// ✅ الأدوار المسموحة: admin, nazer, accountant
+const ALLOWED_ROLES = ['admin', 'nazer', 'accountant'];
+// + audit logging
+```
+
+### تشديد سياسات RLS
+
+```sql
+-- contract_units: تم حذف السياسة العامة
+DROP POLICY "allow_read_contract_units" ON contract_units;
+CREATE POLICY "staff_view_contract_units" ON contract_units
+FOR SELECT USING (role IN ('admin', 'nazer', 'accountant', ...));
+
+-- tasks: تم حذف السياسة العامة
+DROP POLICY "Allow authenticated read on tasks" ON tasks;
+
+-- profiles: توحيد من 14 سياسة إلى 4
+-- user_roles: توحيد من 8 سياسات إلى 3
+```
+
+### ملخص التغييرات
+
+| الدالة | قبل | بعد |
+|--------|-----|-----|
+| backup-database | JWT فقط | JWT + admin/nazer + audit |
+| restore-database | JWT فقط | JWT + admin + audit |
+| auto-close-fiscal-year | لا مصادقة | JWT + nazer + audit |
+| simulate-distribution | لا مصادقة | JWT + admin/nazer/accountant + audit |
+| generate-ai-insights | JWT فقط | JWT + admin/nazer/accountant + audit |
+| contract-renewal-alerts | عام | JWT مطلوب |
+
+### التوثيق الجديد
+- ✅ إنشاء `docs/SECURITY.md` - دليل أمان شامل
+- ✅ تحديث الإصدار إلى 2.6.15
 
 ---
 
@@ -377,6 +469,6 @@ export async function readExcelBuffer(buffer)
 
 ---
 
-**آخر تحديث:** 2025-12-04  
-**الإصدار الحالي:** 2.6.11  
-**الحالة:** ✅ مستقر وجاهز للإنتاج
+**آخر تحديث:** 2025-12-05  
+**الإصدار الحالي:** 2.6.15  
+**الحالة:** ✅ مستقر وجاهز للإنتاج مع إصلاحات أمنية شاملة
