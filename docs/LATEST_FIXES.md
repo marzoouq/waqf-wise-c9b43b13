@@ -2,7 +2,44 @@
 ## Latest Fixes & Updates
 
 **التاريخ:** 2025-12-05  
-**الإصدار:** 2.6.26
+**الإصدار:** 2.6.27
+
+---
+
+## 🔒 إصلاح أمني حرج: تحويل سياسات RLS من public إلى authenticated (v2.6.27)
+
+### المشكلة
+- اكتشف فحص الأمان 15 خطأ حرج
+- جميع الجداول الحساسة كانت قابلة للقراءة من قبل `public` role
+- سياسات RLS كانت تستهدف `roles:{public}` بدلاً من `roles:{authenticated}`
+
+### الإصلاح
+تم تحديث سياسات RLS لـ 15 جدول حساس:
+
+| الجدول | السياسات الجديدة |
+|--------|-----------------|
+| `beneficiaries` | staff_view, staff_manage, beneficiary_view_own, waqf_heir_view |
+| `profiles` | user_view_own, user_update_own, staff_view_all, user_insert_own |
+| `bank_accounts` | financial_staff_view, financial_staff_manage |
+| `payments` | financial_staff_view, financial_staff_manage, beneficiary_view_own |
+| `loans` | financial_staff_view, financial_staff_manage, beneficiary_view_own |
+| `contracts` | staff_view, staff_manage, waqf_heir_view |
+| `distributions` | financial_staff_view, financial_staff_manage, waqf_heir_view |
+| `emergency_aid_requests` | staff_view, staff_manage, beneficiary_view_own, beneficiary_create |
+| `invoices` | financial_staff_view, financial_staff_manage, waqf_heir_view |
+| `rental_payments` | financial_staff_view, financial_staff_manage, waqf_heir_view |
+| `support_tickets` | user_view_own, user_create, staff_view_all, staff_manage |
+| `internal_messages` | user_view_own, user_send, user_update_own |
+| `families` | staff_view, staff_manage, member_view_own, waqf_heir_view |
+| `properties` | staff_view, staff_manage, waqf_heir_view |
+| `maintenance_requests` | staff_view, staff_manage |
+
+### النتيجة
+| المقياس | قبل | بعد |
+|---------|-----|-----|
+| سياسات مع `TO public` | 90+ | **0** |
+| أخطاء Security Scan | 15 | **0** |
+| السياسات الخطيرة | 4+ | **0** |
 
 ---
 
