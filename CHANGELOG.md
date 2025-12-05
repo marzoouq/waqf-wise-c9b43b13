@@ -4,6 +4,40 @@
 
 ---
 
+## [2.6.27] - 2025-12-05
+
+### 🔴 إصلاح أمني حرج - RLS Policies
+
+#### المشكلة
+- 90+ سياسة RLS كانت تستخدم `TO public` مما يسمح بالوصول بدون مصادقة
+- 15 خطأ أمني حرج في Security Scan
+
+#### الحل المنفذ
+| الجدول | السياسات المحولة |
+|--------|------------------|
+| `beneficiaries` | 5 سياسات → `TO authenticated` |
+| `profiles` | 4 سياسات → `TO authenticated` |
+| `bank_accounts` | 4 سياسات → `TO authenticated` |
+| `payments` | 4 سياسات → `TO authenticated` |
+| `loans` | 4 سياسات → `TO authenticated` |
+| `contracts` | 4 سياسات → `TO authenticated` |
+| `distributions` | 4 سياسات → `TO authenticated` |
+| `emergency_aid_requests` | 4 سياسات → `TO authenticated` |
+| `invoices` | 4 سياسات → `TO authenticated` |
+| `rental_payments` | 4 سياسات → `TO authenticated` |
+| `support_tickets` | 4 سياسات → `TO authenticated` |
+| `internal_messages` | 4 سياسات → `TO authenticated` |
+| `families` | 4 سياسات → `TO authenticated` |
+| `properties` | 4 سياسات → `TO authenticated` |
+| `maintenance_requests` | 4 سياسات → `TO authenticated` |
+
+#### النتائج
+- ✅ 0 أخطاء في Security Scan
+- ✅ 0 أخطاء في RLS Linter
+- ✅ جميع الجداول الحساسة محمية
+
+---
+
 ## [2.6.5] - 2025-12-03
 
 ### 🚀 تحسينات أداء الصفحة الترحيبية (LCP)
