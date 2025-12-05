@@ -4,31 +4,20 @@ import { useTableSort } from './useTableSort';
 import { useBulkSelection } from './useBulkSelection';
 import { FiltersRecord } from '@/components/shared/AdvancedFiltersDialog';
 import { toast } from 'sonner';
+import type { FullRequest } from '@/types/request.types';
 
-export interface RequestData {
-  id: string;
-  request_number: string;
-  beneficiary_id: string;
-  description: string;
-  amount: number;
-  status: string;
-  priority: string;
-  is_overdue: boolean;
-  submitted_at: string;
-  request_type?: { name_ar?: string; description?: string; name?: string } | null;
-  beneficiary?: { full_name?: string } | null;
-  [key: string]: unknown;
-}
+// Re-export for backwards compatibility
+export type RequestData = FullRequest;
 
 export function useRequestsPage() {
   const { requests, isLoading, deleteRequest } = useRequests();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [selectedRequest, setSelectedRequest] = useState<RequestData | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<FullRequest | null>(null);
   const [approvalDialogOpen, setApprovalDialogOpen] = useState(false);
   const [commentsDialogOpen, setCommentsDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [requestToDelete, setRequestToDelete] = useState<RequestData | null>(null);
+  const [requestToDelete, setRequestToDelete] = useState<FullRequest | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(20);
   const [advancedFilters, setAdvancedFilters] = useState<FiltersRecord>({});
@@ -80,7 +69,7 @@ export function useRequestsPage() {
     overdue: requests.filter(r => r.is_overdue).length,
   };
 
-  const handleDeleteClick = (request: RequestData) => {
+  const handleDeleteClick = (request: FullRequest) => {
     setRequestToDelete(request);
     setDeleteDialogOpen(true);
   };

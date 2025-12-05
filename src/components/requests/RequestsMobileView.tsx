@@ -6,16 +6,17 @@ import { memo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Pagination } from '@/components/shared/Pagination';
 import { RequestMobileCard } from './RequestMobileCard';
+import type { FullRequest } from '@/types/request.types';
 
 interface RequestsMobileViewProps {
-  paginatedRequests: any[];
-  filteredRequests: any[];
+  paginatedRequests: FullRequest[];
+  filteredRequests: FullRequest[];
   searchQuery: string;
   statusFilter: string;
-  setSelectedRequest: (request: any) => void;
+  setSelectedRequest: (request: FullRequest) => void;
   setApprovalDialogOpen: (open: boolean) => void;
   setCommentsDialogOpen: (open: boolean) => void;
-  handleDeleteClick: (request: any) => void;
+  handleDeleteClick: (request: FullRequest) => void;
   currentPage: number;
   setCurrentPage: (page: number) => void;
   totalPages: number;
@@ -54,15 +55,15 @@ export const RequestsMobileView = memo(({
     ) : (
       <>
         <div className="space-y-2">
-          {paginatedRequests.map((request: any) => (
+          {paginatedRequests.map((request) => (
             <RequestMobileCard
               key={request.id}
               request={request}
-              onViewDetails={(r: any) => {
+              onViewDetails={(r) => {
                 setSelectedRequest(r);
                 setApprovalDialogOpen(true);
               }}
-              onViewComments={(r: any) => {
+              onViewComments={(r) => {
                 setSelectedRequest(r);
                 setCommentsDialogOpen(true);
               }}

@@ -19,14 +19,14 @@ import {
 import { Pagination } from '@/components/shared/Pagination';
 import { EnhancedEmptyState } from '@/components/shared';
 import { SortableTableHeader } from '@/components/shared/SortableTableHeader';
-import { getRequestTypeName } from '@/types/request.types';
+import { getRequestTypeName, type FullRequest } from '@/types/request.types';
 import { RequestStatusBadge } from './RequestStatusBadge';
 
 type SortDirection = 'asc' | 'desc' | null;
 
 interface RequestsDesktopViewProps {
-  paginatedRequests: any[];
-  filteredRequests: any[];
+  paginatedRequests: FullRequest[];
+  filteredRequests: FullRequest[];
   searchQuery: string;
   statusFilter: string;
   isAllSelected: boolean;
@@ -35,10 +35,10 @@ interface RequestsDesktopViewProps {
   toggleSelection: (id: string) => void;
   sortConfig: { key: string | null; direction: SortDirection } | null;
   handleSort: (key: string, direction: SortDirection) => void;
-  setSelectedRequest: (request: any) => void;
+  setSelectedRequest: (request: FullRequest) => void;
   setApprovalDialogOpen: (open: boolean) => void;
   setCommentsDialogOpen: (open: boolean) => void;
-  handleDeleteClick: (request: any) => void;
+  handleDeleteClick: (request: FullRequest) => void;
   currentPage: number;
   setCurrentPage: (page: number) => void;
   totalPages: number;
@@ -140,7 +140,7 @@ export const RequestsDesktopView = memo(({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {paginatedRequests.map((request: any) => (
+                {paginatedRequests.map((request) => (
                   <TableRow
                     key={request.id}
                     className={`cursor-pointer hover:bg-muted/50 ${

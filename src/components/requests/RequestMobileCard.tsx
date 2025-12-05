@@ -11,26 +11,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { format, arLocale as ar } from "@/lib/date";
-import { getRequestTypeName, getBeneficiaryName } from "@/types/request.types";
+import { getRequestTypeName, getBeneficiaryName, type FullRequest } from "@/types/request.types";
 
 interface RequestMobileCardProps {
-  request: {
-    id: string;
-    request_number: string;
-    beneficiary_id: string;
-    description: string;
-    amount: number;
-    status: string;
-    priority: string;
-    is_overdue: boolean;
-    submitted_at: string;
-    request_type?: { name_ar?: string; description?: string; name?: string } | null;
-    beneficiary?: { full_name?: string } | null;
-    [key: string]: unknown;
-  };
-  onViewDetails: (request: RequestMobileCardProps['request']) => void;
-  onViewComments: (request: RequestMobileCardProps['request']) => void;
-  onDelete: (request: RequestMobileCardProps['request']) => void;
+  request: FullRequest;
+  onViewDetails: (request: FullRequest) => void;
+  onViewComments: (request: FullRequest) => void;
+  onDelete: (request: FullRequest) => void;
 }
 
 const getStatusConfig = (status: string) => {

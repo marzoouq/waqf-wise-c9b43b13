@@ -16,21 +16,23 @@ export interface RequestWithType extends Omit<BeneficiaryRequest, 'request_type'
 }
 
 /**
- * المستفيد المضمن في الطلب
+ * المستفيد المضمن في الطلب (مرن للتوافق مع Supabase)
  */
 export interface RequestBeneficiary {
-  id: string;
-  full_name: string;
+  id?: string;
+  full_name?: string;
   national_id?: string;
   phone?: string;
 }
 
 /**
  * الطلب الكامل مع جميع العلاقات
+ * Index signature للتوافق مع Supabase dynamic queries
  */
 export interface FullRequest extends Omit<BeneficiaryRequest, 'beneficiary' | 'request_type'> {
   beneficiary?: RequestBeneficiary | null;
-  request_type?: RequestType | null;
+  request_type?: RequestType | { name_ar?: string; description?: string; name?: string } | null;
+  [key: string]: unknown;
 }
 
 /**
