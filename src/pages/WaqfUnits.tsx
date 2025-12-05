@@ -15,7 +15,7 @@ import { WaqfUnitDialog } from "@/components/waqf/WaqfUnitDialog";
 import { ExportButton } from "@/components/shared/ExportButton";
 import { SortableTableHeader } from "@/components/shared/SortableTableHeader";
 import { BulkActionsBar } from "@/components/shared/BulkActionsBar";
-import { AdvancedFiltersDialog, FilterConfig } from "@/components/shared/AdvancedFiltersDialog";
+import { AdvancedFiltersDialog, FilterConfig, FiltersRecord } from "@/components/shared/AdvancedFiltersDialog";
 import { useTableSort } from "@/hooks/useTableSort";
 import { useBulkSelection } from "@/hooks/useBulkSelection";
 import { format, arLocale as ar } from "@/lib/date";
@@ -28,7 +28,8 @@ export default function WaqfUnits() {
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [selectedUnit, setSelectedUnit] = useState<WaqfUnit | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [advancedFilters, setAdvancedFilters] = useState<Record<string, any>>({});
+  // فلاتر متقدمة - is_active: 'true' | 'false'
+  const [advancedFilters, setAdvancedFilters] = useState<FiltersRecord>({});
 
   // Filter waqf units
   const filteredUnits = waqfUnits.filter((unit) => {
