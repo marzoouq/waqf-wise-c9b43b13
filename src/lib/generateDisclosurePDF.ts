@@ -7,6 +7,13 @@ type DisclosureBeneficiary = Database['public']['Tables']['disclosure_beneficiar
 
 type JsPDF = import('jspdf').jsPDF;
 
+// Type Augmentation for jspdf-autotable
+declare module 'jspdf' {
+  interface jsPDF {
+    lastAutoTable?: { finalY: number };
+  }
+}
+
 const loadArabicFont = async (doc: JsPDF) => {
   try {
     const { regular: amiriRegular, bold: amiriBold } = await loadAmiriFonts();
@@ -127,7 +134,7 @@ export const generateDisclosurePDF = async (
       margin: { left: 20, right: 20 },
     });
 
-    yPos = (doc as any).lastAutoTable?.finalY + 12;
+    yPos = doc.lastAutoTable?.finalY ?? yPos + 12;
 
     // نسب التوزيع
     doc.setFont(fontName, "bold");
@@ -163,7 +170,7 @@ export const generateDisclosurePDF = async (
       margin: { left: 20, right: 20 },
     });
 
-    yPos = (doc as any).lastAutoTable?.finalY + 12;
+    yPos = doc.lastAutoTable?.finalY ?? yPos + 12;
 
     // إحصائيات المستفيدين
     doc.setFont(fontName, "bold");

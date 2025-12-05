@@ -6,6 +6,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { FiscalYearClosing, FiscalYearSummary } from "@/types/fiscal-year-closing";
+import { Database } from "@/integrations/supabase/types";
+
+type FiscalYearClosingInsert = Database['public']['Tables']['fiscal_year_closings']['Insert'];
+type FiscalYearClosingUpdate = Database['public']['Tables']['fiscal_year_closings']['Update'];
 
 export function useFiscalYearClosings() {
   const queryClient = useQueryClient();
@@ -59,10 +63,10 @@ export function useFiscalYearClosings() {
 
   // إنشاء عملية إقفال جديدة
   const createClosing = useMutation({
-    mutationFn: async (closing: any) => {
+    mutationFn: async (closing: FiscalYearClosingInsert) => {
       const { data, error } = await supabase
         .from("fiscal_year_closings")
-        .insert(closing as any)
+        .insert(closing)
         .select()
         .single();
 
@@ -81,10 +85,10 @@ export function useFiscalYearClosings() {
 
   // تحديث عملية إقفال
   const updateClosing = useMutation({
-    mutationFn: async ({ id, updates }: { id: string; updates: any }) => {
+    mutationFn: async ({ id, updates }: { id: string; updates: FiscalYearClosingUpdate }) => {
       const { data, error } = await supabase
         .from("fiscal_year_closings")
-        .update(updates as any)
+        .update(updates)
         .eq("id", id)
         .select()
         .single();

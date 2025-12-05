@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Landmark, RefreshCw, Wifi } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { productionLogger } from "@/lib/logger/production-logger";
 
 interface BankBalanceCardProps {
   className?: string;
@@ -45,7 +46,7 @@ export function BankBalanceCard({ className, compact = false }: BankBalanceCardP
           filter: "code=eq.1.1.1",
         },
         (payload) => {
-          console.log("🏦 Bank balance updated:", payload);
+          productionLogger.info("Bank balance updated", { payload });
           setLastUpdated(new Date());
           setIsLive(true);
           queryClient.invalidateQueries({ queryKey: ["bank-balance-realtime"] });
