@@ -1,71 +1,13 @@
-import { useState } from "react";
-import { productionLogger } from "@/lib/logger/production-logger";
 import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { Loader2, FileText, CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-
-interface BackfillResult {
-  success: boolean;
-  message?: string;
-  processed?: number;
-  failed?: number;
-  cleaned_entries?: number;
-  processed_payments?: Array<{ payment_number: string }>;
-  errors?: string[];
-}
+import { useSystemMaintenanceData } from "@/hooks/system/useSystemMaintenanceData";
 
 export default function SystemMaintenance() {
-  const { toast } = useToast();
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [result, setResult] = useState<BackfillResult | null>(null);
-
-  const handleBackfillDocuments = async () => {
-    try {
-      setIsProcessing(true);
-      setResult(null);
-
-      toast({
-        title: "⏳ جاري المعالجة...",
-        description: "يتم الآن معالجة الدفعات المدفوعة وإنشاء المستندات المفقودة",
-      });
-
-      const { data, error } = await supabase.functions.invoke('backfill-rental-documents');
-
-      if (error) {
-        throw error;
-      }
-
-      setResult(data);
-
-      if (data.success) {
-        toast({
-          title: "✅ تمت المعالجة بنجاح",
-          description: data.message,
-        });
-      } else {
-        toast({
-          title: "⚠️ تحذير",
-          description: data.message || "حدثت بعض المشاكل أثناء المعالجة",
-          variant: "destructive",
-        });
-      }
-    } catch (error: unknown) {
-      productionLogger.error('Error calling backfill function:', error);
-      const errorMessage = error instanceof Error ? error.message : "فشل في معالجة المستندات";
-      toast({
-        title: "❌ خطأ",
-        description: errorMessage,
-        variant: "destructive",
-      });
-    } finally {
-      setIsProcessing(false);
-    }
-  };
+  const { isProcessing, result, handleBackfillDocuments } = useSystemMaintenanceData();
 
   return (
     <PageErrorBoundary pageName="صيانة النظام">
@@ -144,7 +86,7 @@ export default function SystemMaintenance() {
                     </Card>
                   </div>
 
-                  {result.cleaned_entries > 0 && (
+                  {result.cleaned_entries && result.cleaned_entries > 0 && (
                     <Alert>
                       <CheckCircle2 className="h-4 w-4" />
                       <AlertDescription>

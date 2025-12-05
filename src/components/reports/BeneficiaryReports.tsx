@@ -1,5 +1,3 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Download, Users } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
@@ -11,56 +9,17 @@ import { UnifiedDataTable, Column } from "@/components/unified/UnifiedDataTable"
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { BeneficiaryReportData } from "@/types/reports/index";
 import { ReportRefreshIndicator } from "./ReportRefreshIndicator";
-import { QUERY_CONFIG } from "@/lib/queryOptimization";
-import { useState, useEffect } from "react";
+import { useBeneficiaryReportsData } from "@/hooks/reports/useBeneficiaryReportsData";
 
 export function BeneficiaryReports() {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [lastUpdated, setLastUpdated] = useState<Date>();
-
-  const { data: beneficiaries = [], isLoading, isRefetching, dataUpdatedAt } = useQuery({
-    queryKey: ["beneficiaries-report"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("beneficiaries")
-        .select("id, full_name, national_id, phone, email, category, status, city, tribe, created_at")
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return data as BeneficiaryReportData[];
-    },
-    ...QUERY_CONFIG.REPORTS,
-  });
-
-  // تحديث وقت آخر تحديث
-  useEffect(() => {
-    if (dataUpdatedAt) {
-      setLastUpdated(new Date(dataUpdatedAt));
-    }
-  }, [dataUpdatedAt]);
-
-  // Real-time subscription للتحديث المباشر
-  useEffect(() => {
-    const channel = supabase
-      .channel('beneficiaries-report-changes')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'beneficiaries' },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ["beneficiaries-report"] });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
-
-  const handleRefresh = () => {
-    queryClient.invalidateQueries({ queryKey: ["beneficiaries-report"] });
-  };
+  const {
+    beneficiaries,
+    isLoading,
+    isRefetching,
+    lastUpdated,
+    handleRefresh,
+  } = useBeneficiaryReportsData();
 
   const handleExportPDF = () => {
     const headers = ["الاسم الكامل", "رقم الهوية", "الفئة", "الحالة", "المدينة"];
