@@ -17,3 +17,4 @@ export { useFamilies } from '../useFamilies';
 export { useFamiliesPage } from '../useFamiliesPage';
 export { useTribes } from '../useTribes';
 export { useMyBeneficiaryRequests } from '../useMyBeneficiaryRequests';
+export { useBeneficiaryAccountStatementData } from './useBeneficiaryAccountStatementData';

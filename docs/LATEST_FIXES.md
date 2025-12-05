@@ -2,7 +2,47 @@
 ## Latest Fixes & Updates
 
 **التاريخ:** 2025-12-05  
-**الإصدار:** 2.6.18
+**الإصدار:** 2.6.20
+
+---
+
+## 🔧 إكمال فصل الاهتمامات 100% (v2.6.19-2.6.20)
+
+### الإنجاز الرئيسي
+تم إكمال فصل الاهتمامات بالكامل - **0 صفحات تستورد Supabase مباشرة** و **0 صفحات تستخدم useQuery مباشرة**.
+
+### Hooks الجديدة (14 Hook)
+
+#### المرحلة 1 - v2.6.19 (9 Hooks):
+| Hook | الوصف | الصفحة |
+|------|-------|--------|
+| `useAccountantDashboardData` | بيانات لوحة المحاسب | AccountantDashboard |
+| `useUnifiedTransactions` | المعاملات الموحدة | AllTransactions |
+| `useBankTransfersData` | التحويلات البنكية | BankTransfers |
+| `useGovernanceDecisionDetails` | تفاصيل القرارات | DecisionDetails |
+| `useLandingPageSettings` | إعدادات الصفحة الرئيسية | LandingPageSettings |
+| `useNotificationSettingsData` | إعدادات الإشعارات | NotificationSettings |
+| `usePaymentVouchersData` | سندات الصرف | PaymentVouchers |
+| `usePerformanceMetrics` | مقاييس الأداء | PerformanceDashboard |
+| `useStaffRequestsData` | طلبات الموظفين | StaffRequestsManagement |
+
+#### المرحلة 2 - v2.6.20 (5 Hooks):
+| Hook | الوصف | الصفحة |
+|------|-------|--------|
+| `usePaymentsWithContracts` | المدفوعات مع العقود | Payments |
+| `useSystemErrorLogsData` | سجلات أخطاء النظام | SystemErrorLogs |
+| `useSystemMaintenanceData` | صيانة النظام | SystemMaintenance |
+| `useBeneficiaryAccountStatementData` | كشف حساب المستفيد | BeneficiaryAccountStatement |
+| `useBeneficiaryReportsData` | تقارير المستفيدين | BeneficiaryReports |
+
+### النتائج
+
+| المقياس | قبل | بعد |
+|---------|-----|------|
+| صفحات تستورد Supabase | 11 | **0** ✅ |
+| صفحات تستخدم useQuery مباشرة | 5 | **0** ✅ |
+| فصل الاهتمامات | 85% | **100%** ✅ |
+| إجمالي Hooks | 165+ | **179+** |
 
 ---
 
