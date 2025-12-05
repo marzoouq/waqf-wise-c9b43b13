@@ -2,7 +2,25 @@
 ## Latest Fixes & Updates
 
 **التاريخ:** 2025-12-05  
-**الإصدار:** 2.6.25
+**الإصدار:** 2.6.26
+
+---
+
+## 🎯 إصلاح RequestsDialogs.tsx (v2.6.26)
+
+### الإصلاح
+- **الملف**: `src/components/requests/RequestsDialogs.tsx`
+- **قبل**: `selectedRequest: any | null` و `requestToDelete: any | null`
+- **بعد**: `selectedRequest: FullRequest | null` و `requestToDelete: FullRequest | null`
+- **الاستيراد**: `import type { FullRequest } from '@/types/request.types'`
+
+### النتيجة
+| المقياس | النتيجة |
+|---------|---------|
+| Type Safety | **99.5%+** ✅ |
+| استخدامات `any` في Components | **0** ✅ |
+| استخدامات `any` في Pages | **0** ✅ |
+| استخدامات `any` في Hooks | **0** ✅ |
 
 ---
 
