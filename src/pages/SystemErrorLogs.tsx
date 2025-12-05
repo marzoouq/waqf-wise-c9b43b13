@@ -1,6 +1,4 @@
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useSystemErrorLogsData } from "@/hooks/system/useSystemErrorLogsData";
 import { Database } from "@/integrations/supabase/types";
 
 type SystemErrorRow = Database['public']['Tables']['system_error_logs']['Row'];
@@ -21,94 +19,22 @@ import {
 } from "@/components/ui/dialog";
 import { AlertTriangle, CheckCircle, Clock, XCircle, TrendingUp, AlertCircle, Trash2 } from "lucide-react";
 import { formatRelative } from "@/lib/date";
-import { useToast } from "@/hooks/use-toast";
 
 export default function SystemErrorLogs() {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [selectedError, setSelectedError] = useState<SystemErrorRow | null>(null);
-  const [resolutionNotes, setResolutionNotes] = useState("");
-
-  // حذف جميع الأخطاء المحلولة
-  const deleteResolvedMutation = useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase
-        .from("system_error_logs")
-        .delete()
-        .eq("status", "resolved");
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["system-error-logs"] });
-      toast({
-        title: "تم الحذف",
-        description: "تم حذف جميع الأخطاء المحلولة بنجاح",
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "خطأ",
-        description: "فشل في حذف الأخطاء المحلولة",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // جلب سجلات الأخطاء
-  const { data: errorLogs, isLoading } = useQuery({
-    queryKey: ["system-error-logs"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("system_error_logs")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(100);
-
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  // جلب التنبيهات النشطة
-  const { data: activeAlerts } = useQuery({
-    queryKey: ["system-alerts"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("system_alerts")
-        .select("*")
-        .eq("status", "active")
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  // تحديث حالة الخطأ
-  const updateErrorMutation = useMutation({
-    mutationFn: async ({ id, status, notes }: { id: string; status: string; notes?: string }) => {
-      const { error } = await supabase
-        .from("system_error_logs")
-        .update({
-          status,
-          resolved_at: status === "resolved" ? new Date().toISOString() : null,
-          resolution_notes: notes,
-        })
-        .eq("id", id);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["system-error-logs"] });
-      toast({
-        title: "تم التحديث",
-        description: "تم تحديث حالة الخطأ بنجاح",
-      });
-      setSelectedError(null);
-      setResolutionNotes("");
-    },
-  });
+  const {
+    errorLogs,
+    activeAlerts,
+    stats,
+    isLoading,
+    selectedError,
+    setSelectedError,
+    resolutionNotes,
+    setResolutionNotes,
+    deleteResolved,
+    isDeleting,
+    updateError,
+    isUpdating,
+  } = useSystemErrorLogsData();
 
   const getSeverityIcon = (severity: string) => {
     switch (severity) {
@@ -123,7 +49,7 @@ export default function SystemErrorLogs() {
     }
   };
 
-  const getSeverityColor = (severity: string) => {
+  const getSeverityColor = (severity: string): "destructive" | "default" | "secondary" | "outline" => {
     switch (severity) {
       case "critical":
         return "destructive";
@@ -147,15 +73,6 @@ export default function SystemErrorLogs() {
       default:
         return <AlertTriangle className="h-4 w-4 text-warning" />;
     }
-  };
-
-  // إحصائيات
-  const stats = {
-    total: errorLogs?.length || 0,
-    new: errorLogs?.filter((e) => e.status === "new").length || 0,
-    investigating: errorLogs?.filter((e) => e.status === "investigating").length || 0,
-    resolved: errorLogs?.filter((e) => e.status === "resolved").length || 0,
-    critical: errorLogs?.filter((e) => e.severity === "critical").length || 0,
   };
 
   return (
@@ -248,8 +165,8 @@ export default function SystemErrorLogs() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => deleteResolvedMutation.mutate()}
-              disabled={deleteResolvedMutation.isPending}
+              onClick={() => deleteResolved()}
+              disabled={isDeleting}
               className="text-destructive hover:text-destructive"
             >
               <Trash2 className="h-4 w-4 ml-2" />
@@ -355,7 +272,7 @@ export default function SystemErrorLogs() {
                               <Select
                                 value={log.status}
                                 onValueChange={(value) =>
-                                  updateErrorMutation.mutate({ id: log.id, status: value })
+                                  updateError({ id: log.id, status: value })
                                 }
                               >
                                 <SelectTrigger>
@@ -378,13 +295,13 @@ export default function SystemErrorLogs() {
 
                               <Button
                                 onClick={() =>
-                                  updateErrorMutation.mutate({
+                                  updateError({
                                     id: log.id,
                                     status: "resolved",
                                     notes: resolutionNotes,
                                   })
                                 }
-                                disabled={updateErrorMutation.isPending}
+                                disabled={isUpdating}
                                 className="w-full"
                               >
                                 حفظ وتحديث الحالة

@@ -1,7 +1,7 @@
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { usePayments } from "@/hooks/usePayments";
-import { supabase } from "@/integrations/supabase/client";
+import { usePaymentsWithContracts, PaymentWithContract } from "@/hooks/payments/usePaymentsWithContracts";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
 import { PaymentDialog } from "@/components/payments/PaymentDialog";
@@ -17,12 +17,6 @@ import { toPaymentReceipt } from '@/types/payment-receipt.types';
 
 type Payment = Database['public']['Tables']['payments']['Row'];
 
-interface PaymentWithContract extends Payment {
-  contract_number?: string;
-  tenant_name?: string;
-  property_name?: string;
-}
-
 const ITEMS_PER_PAGE = 20;
 
 const Payments = () => {
@@ -34,29 +28,9 @@ const Payments = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [paymentToDelete, setPaymentToDelete] = useState<Payment | null>(null);
   const [printPayment, setPrintPayment] = useState<Payment | null>(null);
-  const [paymentsWithContracts, setPaymentsWithContracts] = useState<PaymentWithContract[]>([]);
 
   const { payments, isLoading, addPayment, updatePayment, deletePayment } = usePayments();
-
-  // جلب معلومات العقود مع السندات
-  useEffect(() => {
-    const fetchPaymentsWithContracts = async () => {
-      const { data, error } = await supabase
-        .from("payments_with_contract_details")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (!error && data) {
-        setPaymentsWithContracts(data as PaymentWithContract[]);
-      } else {
-        setPaymentsWithContracts(payments as PaymentWithContract[]);
-      }
-    };
-
-    if (payments.length > 0) {
-      fetchPaymentsWithContracts();
-    }
-  }, [payments]);
+  const { paymentsWithContracts } = usePaymentsWithContracts(payments);
 
   // Memoize filtered payments
   const filteredPayments = useMemo(() => {
@@ -145,7 +119,7 @@ const Payments = () => {
       <MobileOptimizedLayout>
         <PaymentsHeader
           onAddPayment={handleAddPayment}
-          payments={filteredPayments}
+          payments={filteredPayments as unknown as Payment[]}
         />
 
         <PaymentsFilters

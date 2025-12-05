@@ -1,6 +1,4 @@
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,14 +11,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { formatCurrency } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
-
-interface Payment {
-  id: string;
-  amount: number;
-  payment_date: string;
-  description: string | null;
-  payment_method: string | null;
-}
+import { useBeneficiaryAccountStatementData } from '@/hooks/beneficiary/useBeneficiaryAccountStatementData';
 
 export default function BeneficiaryAccountStatement() {
   const { user } = useAuth();
@@ -29,75 +20,24 @@ export default function BeneficiaryAccountStatement() {
   const [searchTerm, setSearchTerm] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('all');
 
-  // جلب بيانات المستفيد
-  const { data: beneficiary } = useQuery({
-    queryKey: ['my-beneficiary', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-      
-      const { data, error } = await supabase
-        .from('beneficiaries')
-        .select('id, full_name, beneficiary_number, account_balance, total_received')
-        .eq('user_id', user.id)
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!user?.id,
-  });
-
-  // جلب المدفوعات
-  const { data: payments = [], isLoading } = useQuery({
-    queryKey: ['beneficiary-payments', beneficiary?.id, dateFrom, dateTo, paymentMethod],
-    queryFn: async () => {
-      if (!beneficiary?.id) return [];
-
-      let query = supabase
-        .from('payments')
-        .select('id, amount, payment_date, description, payment_method')
-        .eq('beneficiary_id', beneficiary.id)
-        .order('payment_date', { ascending: false });
-
-      if (dateFrom) {
-        query = query.gte('payment_date', dateFrom);
-      }
-      if (dateTo) {
-        query = query.lte('payment_date', dateTo);
-      }
-      if (paymentMethod && paymentMethod !== 'all') {
-        query = query.eq('payment_method', paymentMethod);
-      }
-
-      const { data, error } = await query;
-      if (error) throw error;
-
-      return data as Payment[];
-    },
-    enabled: !!beneficiary?.id,
-  });
+  const { beneficiary, payments, isLoading, calculateStats } = useBeneficiaryAccountStatementData(
+    user?.id,
+    { dateFrom, dateTo, paymentMethod }
+  );
 
   // تصفية المدفوعات حسب البحث
-  const filteredPayments = payments.filter(payment => {
-    if (!searchTerm) return true;
-    const searchLower = searchTerm.toLowerCase();
-    return (
-      payment.description?.toLowerCase().includes(searchLower) ||
-      payment.payment_method?.toLowerCase().includes(searchLower)
-    );
-  });
+  const filteredPayments = useMemo(() => {
+    return payments.filter(payment => {
+      if (!searchTerm) return true;
+      const searchLower = searchTerm.toLowerCase();
+      return (
+        payment.description?.toLowerCase().includes(searchLower) ||
+        payment.payment_method?.toLowerCase().includes(searchLower)
+      );
+    });
+  }, [payments, searchTerm]);
 
-  // حساب الإحصائيات
-  const stats = {
-    totalPayments: filteredPayments.reduce((sum, p) => sum + Number(p.amount), 0),
-    paymentsCount: filteredPayments.length,
-    avgPayment: filteredPayments.length > 0 
-      ? filteredPayments.reduce((sum, p) => sum + Number(p.amount), 0) / filteredPayments.length 
-      : 0,
-    largestPayment: filteredPayments.length > 0 
-      ? Math.max(...filteredPayments.map(p => Number(p.amount))) 
-      : 0,
-  };
+  const stats = calculateStats(filteredPayments);
 
   // تصدير PDF
   const exportToPDF = async () => {
@@ -107,7 +47,6 @@ export default function BeneficiaryAccountStatement() {
     ]);
     
     const jsPDF = jsPDFModule.default;
-    const autoTable = autoTableModule.default;
     const doc = new jsPDF();
     
     // Add Arabic font support
@@ -138,7 +77,7 @@ export default function BeneficiaryAccountStatement() {
       payment.payment_method || '-',
     ]);
     
-    doc.autoTable({
+    (doc as unknown as { autoTable: (options: unknown) => void }).autoTable({
       startY: 95,
       head: [['التاريخ', 'الوصف', 'المبلغ', 'طريقة الدفع']],
       body: tableData,
