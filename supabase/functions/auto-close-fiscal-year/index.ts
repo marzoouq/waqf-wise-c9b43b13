@@ -1,8 +1,13 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { corsHeaders } from '../_shared/cors.ts';
+import { 
+  handleCors, 
+  jsonResponse, 
+  errorResponse,
+  forbiddenResponse 
+} from '../_shared/cors.ts';
 
-const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+// ============ الأدوار المسموح لها بإقفال السنة المالية ============
+const ALLOWED_ROLES = ['nazer'];
 
 interface ClosingRequest {
   fiscal_year_id: string;
@@ -10,12 +15,60 @@ interface ClosingRequest {
 }
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    // ============ التحقق من المصادقة والصلاحيات ============
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.error('Fiscal year close attempt without authorization header');
+      return forbiddenResponse('مطلوب تسجيل الدخول لإقفال السنة المالية');
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    
+    const supabaseAuth = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+    );
+
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(token);
+    
+    if (authError || !user) {
+      console.error('Invalid token for fiscal year close:', authError?.message);
+      return forbiddenResponse('جلسة غير صالحة');
+    }
+
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    // التحقق من صلاحيات المستخدم
+    const { data: userRoles } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id);
+
+    const hasPermission = userRoles?.some(r => ALLOWED_ROLES.includes(r.role));
+    
+    if (!hasPermission) {
+      // تسجيل محاولة الوصول غير المصرح بها
+      await supabase.from('audit_logs').insert({
+        user_id: user.id,
+        user_email: user.email,
+        action_type: 'UNAUTHORIZED_FISCAL_CLOSE_ATTEMPT',
+        table_name: 'fiscal_years',
+        description: `محاولة إقفال سنة مالية غير مصرح بها من ${user.email}`,
+        severity: 'error'
+      });
+      return forbiddenResponse('ليس لديك صلاحية لإقفال السنة المالية. مطلوب دور ناظر.');
+    }
+
+    // ============ تنفيذ الإقفال ============
+    console.log(`Authorized fiscal year close by: ${user.email}`);
+
     const { fiscal_year_id, preview_only = false }: ClosingRequest = await req.json();
 
     console.log('Starting fiscal year closing:', { fiscal_year_id, preview_only });
@@ -151,9 +204,7 @@ Deno.serve(async (req) => {
     // إذا كان preview_only، نرجع المعاينة فقط
     if (preview_only) {
       console.log('Preview mode - returning preview data');
-      return new Response(JSON.stringify(response), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+      return jsonResponse(response);
     }
 
     // 7. تنفيذ الإقفال الفعلي
@@ -281,9 +332,9 @@ Deno.serve(async (req) => {
         sons_count: sonsCount,
         daughters_count: daughtersCount,
         wives_count: wivesCount,
-        opening_balance: 0, // يمكن تحديثه لاحقاً
+        opening_balance: 0,
         closing_balance: waqfCorpus,
-        administrative_expenses: summary.total_expenses * 0.3, // تقدير
+        administrative_expenses: summary.total_expenses * 0.3,
         maintenance_expenses: summary.total_expenses * 0.4,
         development_expenses: summary.total_expenses * 0.2,
         other_expenses: summary.total_expenses * 0.1,
@@ -300,32 +351,31 @@ Deno.serve(async (req) => {
 
     if (disclosureError) {
       console.error('Error creating annual disclosure:', disclosureError);
-      // لا نرمي خطأ هنا لأن الإقفال تم بنجاح
     } else {
       console.log('Annual disclosure created successfully');
     }
 
-    return new Response(
-      JSON.stringify({ 
-        success: true, 
-        message: 'تم إقفال السنة المالية بنجاح',
-        data: response 
-      }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    // تسجيل العملية في سجل التدقيق
+    await supabase.from('audit_logs').insert({
+      user_id: user.id,
+      user_email: user.email,
+      action_type: 'FISCAL_YEAR_CLOSED',
+      table_name: 'fiscal_years',
+      record_id: fiscal_year_id,
+      description: `تم إقفال السنة المالية ${fiscalYear.name} بواسطة ${user.email}`,
+      new_values: { waqf_corpus: waqfCorpus, net_income: netIncome },
+      severity: 'info'
+    });
+
+    return jsonResponse({ 
+      success: true, 
+      message: 'تم إقفال السنة المالية بنجاح',
+      data: response 
+    });
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'حدث خطأ أثناء إقفال السنة المالية';
     console.error('Error in auto-close-fiscal-year:', error);
-    return new Response(
-      JSON.stringify({ 
-        success: false, 
-        error: errorMessage
-      }),
-      { 
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
-    );
+    return errorResponse(errorMessage, 400);
   }
 });

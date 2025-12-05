@@ -2,12 +2,12 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.6.11
- * @date 2025-12-04
+ * @version 2.6.15
+ * @date 2025-12-05
  */
 
-export const APP_VERSION = '2.6.14';
-export const APP_VERSION_DATE = '2025-12-04';
+export const APP_VERSION = '2.6.15';
+export const APP_VERSION_DATE = '2025-12-05';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
 export const VERSION_INFO = {
@@ -16,11 +16,11 @@ export const VERSION_INFO = {
   name: APP_VERSION_NAME,
   changelog: '/docs/CHANGELOG.md',
   features: [
-    'نظام تقارير موحد مع تحديث مباشر (Real-time)',
-    'مكون KPIs موحد (UnifiedDashboardKPIs) لجميع لوحات التحكم',
-    'تفعيل Real-time subscriptions على 9 جداول رئيسية',
-    'مؤشر آخر تحديث وزر التحديث اليدوي في التقارير',
-    'تقليل staleTime من 1 ساعة إلى 2 دقيقة',
+    'إصلاحات أمنية شاملة لـ 5 Edge Functions',
+    'تأمين دوال النسخ الاحتياطي والاستعادة (admin/nazer فقط)',
+    'تأمين دوال إقفال السنة المالية ومحاكاة التوزيع',
+    'تشديد سياسات RLS على contract_units و tasks',
+    'تنظيف وتوحيد سياسات profiles و user_roles',
   ],
 } as const;
 
