@@ -2,11 +2,11 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.6.18
+ * @version 2.6.20
  * @date 2025-12-05
  */
 
-export const APP_VERSION = '2.6.18';
+export const APP_VERSION = '2.6.20';
 export const APP_VERSION_DATE = '2025-12-05';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
@@ -16,11 +16,11 @@ export const VERSION_INFO = {
   name: APP_VERSION_NAME,
   changelog: '/docs/CHANGELOG.md',
   features: [
-    'تقليل Coupling بإنشاء 3 Hooks جديدة',
-    'useBeneficiaryPortalData - بوابة المستفيد',
-    'useSecurityDashboardData - لوحة الأمان',
-    'useIntegrationsData - إدارة التكاملات',
-    'تحسين فصل المنطق عن العرض',
+    'إكمال فصل الاهتمامات 100%',
+    '0 صفحات تستورد Supabase مباشرة',
+    '0 صفحات تستخدم useQuery مباشرة',
+    'إنشاء 14 Hook جديدة في v2.6.19-2.6.20',
+    'تحسين بنية الكود والصيانة',
   ],
 } as const;
 

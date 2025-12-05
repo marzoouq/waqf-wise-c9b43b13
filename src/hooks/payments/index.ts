@@ -14,3 +14,5 @@ export { useLoanPayments } from '../useLoanPayments';
 export { useInvoices } from '../useInvoices';
 export { useInvoicesPage } from '../useInvoicesPage';
 export { useInvoiceOCR } from '../useInvoiceOCR';
+export { usePaymentVouchersData } from './usePaymentVouchersData';
+export { usePaymentsWithContracts } from './usePaymentsWithContracts';
