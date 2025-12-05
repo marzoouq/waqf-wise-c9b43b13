@@ -67,7 +67,7 @@ verify_jwt = true
 verify_jwt = true
 
 [functions.contract-renewal-alerts]
-verify_jwt = false
+verify_jwt = true
 
 [functions.intelligent-search]
 verify_jwt = true
