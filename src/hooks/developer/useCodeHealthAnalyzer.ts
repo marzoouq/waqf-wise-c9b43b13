@@ -342,7 +342,10 @@ export function useCodeHealthAnalyzer(enabled: boolean = true) {
 
     // فحص Layout Shifts
     const layoutShifts = performance.getEntriesByType('layout-shift');
-    const totalCLS = layoutShifts.reduce((sum, entry: any) => sum + (entry.value || 0), 0);
+    const totalCLS = layoutShifts.reduce((sum, entry) => {
+      const layoutShiftEntry = entry as PerformanceEntry & { value?: number };
+      return sum + (layoutShiftEntry.value || 0);
+    }, 0);
     if (totalCLS > 0.25) {
       registerIssue({
         type: 'warning',

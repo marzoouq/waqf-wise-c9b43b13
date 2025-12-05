@@ -16,11 +16,11 @@ export const VERSION_INFO = {
   name: APP_VERSION_NAME,
   changelog: '/docs/CHANGELOG.md',
   features: [
-    'إكمال فصل الاهتمامات 100%',
-    '0 صفحات تستورد Supabase مباشرة',
-    '0 صفحات تستخدم useQuery مباشرة',
-    'Type Safety 99.5%+ - إزالة 7 تعليقات eslint-disable',
-    'تحسين أنواع المكونات الموحدة',
+    'فصل الاهتمامات 100%',
+    'Type Safety 99.5%+',
+    'إزالة 7 تعليقات eslint-disable',
+    '0 صفحات/Hooks/Components تستخدم any',
+    'Best Practices 97%+',
   ],
 } as const;
 

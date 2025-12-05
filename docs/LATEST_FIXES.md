@@ -34,8 +34,13 @@
 - **قبل**: `payments: any[]`
 - **بعد**: `payments: Array<{ id: string }>`
 
-### ملاحظة
-تعليقات `eslint-disable` المتبقية في `chart.tsx` (مكون shadcn) طبيعية وضرورية لأنواع Recharts payload.
+#### 6. useCodeHealthAnalyzer.ts
+- **قبل**: `entry: any` في reduce function
+- **بعد**: `entry as PerformanceEntry & { value?: number }` - تحويل آمن للنوع
+
+### ملاحظات تقنية
+- تعليقات `eslint-disable` في `chart.tsx` (shadcn) ضرورية لأنواع Recharts
+- تعليقات `eslint-disable` في `supabaseHelpers.ts` ضرورية للاستعلامات الديناميكية
 
 ### النتيجة النهائية
 | المقياس | النتيجة |
@@ -46,6 +51,7 @@
 | تعليقات eslint-disable المُزالة | **7** |
 | صفحات بدون any | **100%** ✅ |
 | Hooks بدون any | **100%** ✅ |
+| Components بدون any | **100%** ✅ |
 
 ---
 
