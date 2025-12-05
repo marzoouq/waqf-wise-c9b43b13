@@ -1,6 +1,4 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { VotingInterface } from "@/components/governance/VotingInterface";
@@ -12,29 +10,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar, User, FileText, ArrowRight } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-import type { GovernanceDecision } from "@/types/governance";
-import { Database } from "@/integrations/supabase/types";
-
-type GovernanceDecisionRow = Database['public']['Tables']['governance_decisions']['Row'];
+import { useGovernanceDecisionDetails } from "@/hooks/governance/useGovernanceDecisionDetails";
 
 export default function DecisionDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const { data: decision, isLoading } = useQuery({
-    queryKey: ["governance-decision", id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("governance_decisions")
-        .select("*")
-        .eq("id", id)
-        .single();
-      
-      if (error) throw error;
-      return data as GovernanceDecisionRow;
-    },
-    enabled: !!id,
-  });
+  const { decision, isLoading } = useGovernanceDecisionDetails(id);
 
   if (isLoading) return <LoadingState message="جاري تحميل تفاصيل القرار..." />;
 

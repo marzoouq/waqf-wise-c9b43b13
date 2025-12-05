@@ -2,81 +2,14 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
 import { NotificationSettings as NotificationSettingsType } from "@/types/notifications";
 import { MultiChannelNotifications } from "@/components/notifications/MultiChannelNotifications";
 import { Settings, Radio } from "lucide-react";
+import { useNotificationSettingsData } from "@/hooks/notifications/useNotificationSettingsData";
 
 export default function NotificationSettings() {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-
-  const { data: settings, isLoading } = useQuery({
-    queryKey: ["notification-settings"],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return null;
-
-      const { data, error } = await supabase
-        .from("notification_settings")
-        .select("*")
-        .eq("user_id", user.id)
-        .single();
-
-      if (error && error.code !== 'PGRST116') throw error;
-      return data as NotificationSettingsType | null;
-    },
-  });
-
-  const updateSettings = useMutation({
-    mutationFn: async (updates: Partial<NotificationSettingsType>) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("User not authenticated");
-
-      if (settings?.id) {
-        const { data, error } = await supabase
-          .from("notification_settings")
-          .update(updates)
-          .eq("id", settings.id)
-          .select()
-          .single();
-
-        if (error) throw error;
-        return data;
-      } else {
-        const { data, error } = await supabase
-          .from("notification_settings")
-          .insert([{ ...updates, user_id: user.id }])
-          .select()
-          .single();
-
-        if (error) throw error;
-        return data;
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notification-settings"] });
-      toast({
-        title: "تم التحديث",
-        description: "تم تحديث إعدادات الإشعارات بنجاح",
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "خطأ",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const handleToggle = (field: keyof NotificationSettingsType, value: boolean) => {
-    updateSettings.mutate({ [field]: value });
-  };
+  const { settings, isLoading, handleToggle } = useNotificationSettingsData();
 
   if (isLoading) {
     return <div className="container-custom py-6">جاري التحميل...</div>;

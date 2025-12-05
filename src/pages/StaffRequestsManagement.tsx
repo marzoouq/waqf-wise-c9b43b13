@@ -1,7 +1,5 @@
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -11,22 +9,7 @@ import { CheckCircle, XCircle, Clock, FileText, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-
-interface RequestWithBeneficiary {
-  id: string;
-  request_number?: string;
-  request_type_id?: string;
-  amount?: number;
-  description: string;
-  status: string;
-  created_at: string;
-  decision_notes?: string;
-  beneficiary: {
-    full_name: string;
-    national_id: string;
-    phone: string;
-  };
-}
+import { useStaffRequestsData, RequestWithBeneficiary } from '@/hooks/requests/useStaffRequestsData';
 
 /**
  * صفحة إدارة طلبات المستفيدين للموظفين
@@ -36,53 +19,7 @@ export default function StaffRequestsManagement() {
   const [reviewNotes, setReviewNotes] = useState('');
   const [selectedTab, setSelectedTab] = useState('pending');
   
-  const queryClient = useQueryClient();
-
-  // جلب الطلبات
-  const { data: requests = [], isLoading } = useQuery({
-    queryKey: ['all-beneficiary-requests'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('beneficiary_requests')
-        .select(`
-          *,
-          beneficiary:beneficiaries(
-            full_name,
-            national_id,
-            phone
-          )
-        `)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return data as RequestWithBeneficiary[];
-    },
-  });
-
-  // تحديث حالة الطلب
-  const updateRequestStatus = useMutation({
-    mutationFn: async ({ requestId, status, notes }: { requestId: string; status: string; notes: string }) => {
-      const { error } = await supabase
-        .from('beneficiary_requests')
-        .update({
-          status,
-          decision_notes: notes,
-          reviewed_at: new Date().toISOString(),
-        })
-        .eq('id', requestId);
-
-      if (error) throw error;
-    },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['all-beneficiary-requests'] });
-      toast.success(variables.status === 'approved' ? 'تمت الموافقة على الطلب' : 'تم رفض الطلب');
-      setSelectedRequest(null);
-      setReviewNotes('');
-    },
-    onError: (error: Error) => {
-      toast.error(error.message || 'فشل تحديث الطلب');
-    },
-  });
+  const { requests, stats, isLoading, updateRequestStatus, filterRequests, isUpdating } = useStaffRequestsData();
 
   const handleApprove = () => {
     if (!selectedRequest) return;
@@ -90,6 +27,11 @@ export default function StaffRequestsManagement() {
       requestId: selectedRequest.id,
       status: 'approved',
       notes: reviewNotes,
+    }, {
+      onSuccess: () => {
+        setSelectedRequest(null);
+        setReviewNotes('');
+      }
     });
   };
 
@@ -102,15 +44,15 @@ export default function StaffRequestsManagement() {
       requestId: selectedRequest.id,
       status: 'rejected',
       notes: reviewNotes,
+    }, {
+      onSuccess: () => {
+        setSelectedRequest(null);
+        setReviewNotes('');
+      }
     });
   };
 
-  const filteredRequests = requests.filter(r => {
-    if (selectedTab === 'pending') return r.status === 'pending';
-    if (selectedTab === 'approved') return r.status === 'approved';
-    if (selectedTab === 'rejected') return r.status === 'rejected';
-    return true;
-  });
+  const filteredRequests = filterRequests(selectedTab);
 
   if (isLoading) {
     return <LoadingState size="lg" />;
@@ -136,7 +78,7 @@ export default function StaffRequestsManagement() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{requests.length}</div>
+              <div className="text-2xl font-bold">{stats.total}</div>
             </CardContent>
           </Card>
 
@@ -148,7 +90,7 @@ export default function StaffRequestsManagement() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-yellow-600">
-                {requests.filter(r => r.status === 'pending').length}
+                {stats.pending}
               </div>
             </CardContent>
           </Card>
@@ -161,7 +103,7 @@ export default function StaffRequestsManagement() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-600">
-                {requests.filter(r => r.status === 'approved').length}
+                {stats.approved}
               </div>
             </CardContent>
           </Card>
@@ -174,7 +116,7 @@ export default function StaffRequestsManagement() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-red-600">
-                {requests.filter(r => r.status === 'rejected').length}
+                {stats.rejected}
               </div>
             </CardContent>
           </Card>
@@ -190,7 +132,7 @@ export default function StaffRequestsManagement() {
               <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="all">الكل</TabsTrigger>
                 <TabsTrigger value="pending">
-                  قيد المعالجة ({requests.filter(r => r.status === 'pending').length})
+                  قيد المعالجة ({stats.pending})
                 </TabsTrigger>
                 <TabsTrigger value="approved">موافق عليها</TabsTrigger>
                 <TabsTrigger value="rejected">مرفوضة</TabsTrigger>
@@ -307,7 +249,7 @@ export default function StaffRequestsManagement() {
                     <div className="flex gap-3">
                       <Button
                         onClick={handleApprove}
-                        disabled={updateRequestStatus.isPending}
+                        disabled={isUpdating}
                         className="flex-1 bg-green-600 hover:bg-green-700"
                       >
                         <CheckCircle className="h-4 w-4 ml-2" />
@@ -315,7 +257,7 @@ export default function StaffRequestsManagement() {
                       </Button>
                       <Button
                         onClick={handleReject}
-                        disabled={updateRequestStatus.isPending}
+                        disabled={isUpdating}
                         variant="destructive"
                         className="flex-1"
                       >

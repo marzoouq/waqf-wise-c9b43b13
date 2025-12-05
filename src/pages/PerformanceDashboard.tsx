@@ -1,46 +1,14 @@
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { PerformanceMetric, SlowQueryLog } from "@/types/performance";
+import { SlowQueryLog } from "@/types/performance";
 import { Activity, Database, Zap, Clock } from "lucide-react";
 import { UnifiedDataTable, type Column } from "@/components/unified/UnifiedDataTable";
 import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
 import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
+import { usePerformanceMetrics } from "@/hooks/performance/usePerformanceMetrics";
 
 export default function PerformanceDashboard() {
-  const { data: metrics = [] } = useQuery({
-    queryKey: ["performance-metrics"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("performance_metrics")
-        .select("*")
-        .order("recorded_at", { ascending: false })
-        .limit(100);
-      if (error) throw error;
-      return data as PerformanceMetric[];
-    },
-  });
-
-  const { data: slowQueries = [], isLoading } = useQuery({
-    queryKey: ["slow-queries"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("slow_query_log")
-        .select("*")
-        .order("execution_time_ms", { ascending: false })
-        .limit(20);
-      if (error) throw error;
-      return data as SlowQueryLog[];
-    },
-  });
-
-  const latestMetrics = {
-    pageLoad: metrics.find(m => m.metric_name === 'page_load_time')?.metric_value || 0,
-    apiResponse: metrics.find(m => m.metric_name === 'api_response_time')?.metric_value || 0,
-    dbQuery: metrics.find(m => m.metric_name === 'database_query_time')?.metric_value || 0,
-    memoryUsage: metrics.find(m => m.metric_name === 'memory_usage')?.metric_value || 0,
-  };
+  const { slowQueries, latestMetrics, isLoading } = usePerformanceMetrics();
 
   const columns: Column<SlowQueryLog>[] = [
     {

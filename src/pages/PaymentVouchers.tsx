@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,37 +8,14 @@ import { Receipt, Search, FileText, CheckCircle, XCircle, Clock, DollarSign } fr
 import { formatRelative } from "@/lib/date";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
+import { usePaymentVouchersData } from "@/hooks/payments/usePaymentVouchersData";
 
 export default function PaymentVouchers() {
   const [searchTerm, setSearchTerm] = useState("");
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
 
-  const { data: vouchers, isLoading, refetch } = useQuery({
-    queryKey: ["payment-vouchers", searchTerm, selectedStatus],
-    queryFn: async () => {
-      let query = supabase
-        .from('payment_vouchers')
-        .select(`
-          *,
-          beneficiaries (full_name, national_id),
-          distributions (total_amount, distribution_date)
-        `)
-        .order('created_at', { ascending: false });
-
-      if (searchTerm) {
-        query = query.or(`voucher_number.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
-      }
-
-      if (selectedStatus !== "all") {
-        query = query.eq('status', selectedStatus);
-      }
-
-      const { data, error } = await query;
-      if (error) throw error;
-      return data;
-    },
-  });
+  const { vouchers, stats, isLoading, refetch } = usePaymentVouchersData(searchTerm, selectedStatus);
 
   const getStatusBadge = (status: string) => {
     type BadgeVariant = "default" | "secondary" | "outline" | "destructive";
@@ -70,14 +45,6 @@ export default function PaymentVouchers() {
       journal: "قيد يومية",
     };
     return types[type as keyof typeof types] || type;
-  };
-
-  const stats = {
-    total: vouchers?.length || 0,
-    draft: vouchers?.filter(v => v.status === 'draft').length || 0,
-    approved: vouchers?.filter(v => v.status === 'approved').length || 0,
-    paid: vouchers?.filter(v => v.status === 'paid').length || 0,
-    totalAmount: vouchers?.reduce((sum, v) => sum + v.amount, 0) || 0,
   };
 
   return (
