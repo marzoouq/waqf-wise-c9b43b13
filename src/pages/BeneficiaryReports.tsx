@@ -1,117 +1,31 @@
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileText, Download, Printer, Mail, TrendingUp, Calendar, DollarSign } from 'lucide-react';
+import { FileText, Download, Printer, TrendingUp, DollarSign } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
-import { useAuth } from '@/hooks/useAuth';
 import { formatCurrency } from '@/lib/utils';
 import { format } from 'date-fns';
-import { ar } from 'date-fns/locale';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { useToast } from '@/hooks/use-toast';
 import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
 import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
+import { useBeneficiaryPersonalReportsData } from '@/hooks/beneficiary/useBeneficiaryPersonalReportsData';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
 export default function BeneficiaryReports() {
-  const { user } = useAuth();
   const { toast } = useToast();
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
-  const [reportType, setReportType] = useState<'annual' | 'monthly' | 'quarterly'>('annual');
-
-  // جلب بيانات المستفيد
-  const { data: beneficiary } = useQuery({
-    queryKey: ['my-beneficiary', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-      
-      const { data, error } = await supabase
-        .from('beneficiaries')
-        .select('id, full_name, beneficiary_number, status, user_id')
-        .eq('user_id', user.id)
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!user?.id,
-  });
-
-  // جلب المدفوعات للسنة المحددة
-  const { data: payments = [], isLoading } = useQuery({
-    queryKey: ['beneficiary-yearly-payments', beneficiary?.id, selectedYear],
-    queryFn: async () => {
-      if (!beneficiary?.id) return [];
-
-      const { data, error } = await supabase
-        .from('payments')
-        .select('amount, payment_date, description')
-        .eq('beneficiary_id', beneficiary.id)
-        .gte('payment_date', `${selectedYear}-01-01`)
-        .lte('payment_date', `${selectedYear}-12-31`)
-        .order('payment_date', { ascending: true });
-
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!beneficiary?.id && !!selectedYear,
-  });
-
-  // جلب الطلبات
-  const { data: requests = [] } = useQuery({
-    queryKey: ['beneficiary-yearly-requests', beneficiary?.id, selectedYear],
-    queryFn: async () => {
-      if (!beneficiary?.id) return [];
-
-      const { data, error } = await supabase
-        .from('beneficiary_requests')
-        .select('status, amount, created_at')
-        .eq('beneficiary_id', beneficiary.id)
-        .gte('created_at', `${selectedYear}-01-01`)
-        .lte('created_at', `${selectedYear}-12-31`);
-
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!beneficiary?.id && !!selectedYear,
-  });
-
-  // إحصائيات السنة
-  const yearlyStats = {
-    totalReceived: payments.reduce((sum, p) => sum + Number(p.amount), 0),
-    paymentsCount: payments.length,
-    avgPayment: payments.length > 0 
-      ? payments.reduce((sum, p) => sum + Number(p.amount), 0) / payments.length 
-      : 0,
-    requestsCount: requests.length,
-    approvedRequests: requests.filter(r => r.status === 'approved').length,
-  };
-
-  // بيانات المخطط الشهري
-  const monthlyData = Array.from({ length: 12 }, (_, i) => {
-    const month = i + 1;
-    const monthPayments = payments.filter(p => {
-      const paymentMonth = new Date(p.payment_date).getMonth() + 1;
-      return paymentMonth === month;
-    });
-    
-    return {
-      month: format(new Date(2024, i, 1), 'MMM', { locale: ar }),
-      amount: monthPayments.reduce((sum, p) => sum + Number(p.amount), 0),
-      count: monthPayments.length,
-    };
-  });
-
-  // بيانات حالة الطلبات
-  const requestsStatusData = [
-    { name: 'معتمد', value: requests.filter(r => r.status === 'approved').length },
-    { name: 'قيد المراجعة', value: requests.filter(r => r.status === 'pending').length },
-    { name: 'مرفوض', value: requests.filter(r => r.status === 'rejected').length },
-  ].filter(item => item.value > 0);
+  const {
+    beneficiary,
+    yearlyStats,
+    monthlyData,
+    requestsStatusData,
+    isLoading,
+    selectedYear,
+    setSelectedYear,
+    reportType,
+    setReportType,
+  } = useBeneficiaryPersonalReportsData();
 
   // تصدير التقرير السنوي PDF
   const exportAnnualReport = async () => {
