@@ -11400,6 +11400,14 @@ export type Database = {
         Args: { p_file_category: string; p_uploaded_at: string }
         Returns: boolean
       }
+      check_is_admin_direct: {
+        Args: { check_user_id: string }
+        Returns: boolean
+      }
+      check_is_staff_direct: {
+        Args: { check_user_id: string }
+        Returns: boolean
+      }
       check_overdue_requests: { Args: never; Returns: undefined }
       check_rate_limit: {
         Args: {
