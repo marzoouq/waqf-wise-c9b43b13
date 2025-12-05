@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-2.6.8-blue.svg)
+![Version](https://img.shields.io/badge/version-2.6.27-blue.svg)
 ![Type Safety](https://img.shields.io/badge/type--safety-99.5%25-green.svg)
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)
 ![License](https://img.shields.io/badge/license-Proprietary-red.svg)
@@ -341,7 +341,7 @@ logger.info('Operation completed', { data });
 
 **مبني بـ ❤️ باستخدام React + TypeScript + Lovable Cloud**
 
-**النسخة: 2.6.8** | **الحالة: 🟢 جاهز للإنتاج**
+**النسخة: 2.6.27** | **الحالة: 🟢 جاهز للإنتاج**
 
 ---
 
