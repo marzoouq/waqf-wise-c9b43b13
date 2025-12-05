@@ -1,89 +1,22 @@
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { toast } from "sonner";
-import { Save, Globe, Mail, Phone, MapPin, FileText, HelpCircle, RefreshCw } from "lucide-react";
+import { Save, Globe, Mail, RefreshCw, FileText, HelpCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-
-interface LandingSetting {
-  id: string;
-  setting_key: string;
-  setting_value: string;
-  setting_type: string;
-  description: string;
-  is_active: boolean;
-}
+import { useLandingPageSettings } from "@/hooks/settings/useLandingPageSettings";
 
 export default function LandingPageSettings() {
-  const queryClient = useQueryClient();
-  const [editedSettings, setEditedSettings] = useState<Record<string, string>>({});
-
-  const { data: settings, isLoading } = useQuery({
-    queryKey: ['landing-page-settings'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('landing_page_settings')
-        .select('*')
-        .order('setting_key');
-      
-      if (error) throw error;
-      return data as LandingSetting[];
-    }
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: async ({ key, value }: { key: string; value: string }) => {
-      const { error } = await supabase
-        .from('landing_page_settings')
-        .update({ setting_value: value })
-        .eq('setting_key', key);
-      
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['landing-page-settings'] });
-      toast.success('تم حفظ الإعدادات بنجاح');
-    },
-    onError: () => {
-      toast.error('فشل حفظ الإعدادات');
-    }
-  });
-
-  const handleChange = (key: string, value: string) => {
-    setEditedSettings(prev => ({ ...prev, [key]: value }));
-  };
-
-  const handleSave = (key: string) => {
-    const value = editedSettings[key];
-    if (value !== undefined) {
-      // Wrap string values in quotes for JSONB
-      const jsonValue = JSON.stringify(value);
-      updateMutation.mutate({ key, value: jsonValue });
-    }
-  };
-
-  const getValue = (key: string): string => {
-    if (editedSettings[key] !== undefined) {
-      return editedSettings[key];
-    }
-    const setting = settings?.find(s => s.setting_key === key);
-    if (!setting) return '';
-    try {
-      return JSON.parse(setting.setting_value as string);
-    } catch {
-      return setting.setting_value as string;
-    }
-  };
-
-  const contactSettings = ['contact_email', 'contact_phone', 'contact_address'];
-  const socialSettings = ['social_twitter', 'social_linkedin'];
-  const textSettings = ['hero_title', 'hero_subtitle', 'footer_description'];
+  const {
+    isLoading,
+    handleChange,
+    handleSave,
+    getValue,
+    refreshSettings,
+    isSaving,
+  } = useLandingPageSettings();
 
   if (isLoading) {
     return (
@@ -107,7 +40,7 @@ export default function LandingPageSettings() {
         </div>
         <Button 
           variant="outline" 
-          onClick={() => queryClient.invalidateQueries({ queryKey: ['landing-page-settings'] })}
+          onClick={refreshSettings}
         >
           <RefreshCw className="h-4 w-4 ml-2" />
           تحديث
@@ -145,7 +78,7 @@ export default function LandingPageSettings() {
                   />
                   <Button 
                     onClick={() => handleSave('contact_email')}
-                    disabled={updateMutation.isPending}
+                    disabled={isSaving}
                   >
                     <Save className="h-4 w-4" />
                   </Button>
@@ -163,7 +96,7 @@ export default function LandingPageSettings() {
                   />
                   <Button 
                     onClick={() => handleSave('contact_phone')}
-                    disabled={updateMutation.isPending}
+                    disabled={isSaving}
                   >
                     <Save className="h-4 w-4" />
                   </Button>
@@ -180,7 +113,7 @@ export default function LandingPageSettings() {
                   />
                   <Button 
                     onClick={() => handleSave('contact_address')}
-                    disabled={updateMutation.isPending}
+                    disabled={isSaving}
                   >
                     <Save className="h-4 w-4" />
                   </Button>
@@ -213,7 +146,7 @@ export default function LandingPageSettings() {
                   />
                   <Button 
                     onClick={() => handleSave('social_twitter')}
-                    disabled={updateMutation.isPending}
+                    disabled={isSaving}
                   >
                     <Save className="h-4 w-4" />
                   </Button>
@@ -231,7 +164,7 @@ export default function LandingPageSettings() {
                   />
                   <Button 
                     onClick={() => handleSave('social_linkedin')}
-                    disabled={updateMutation.isPending}
+                    disabled={isSaving}
                   >
                     <Save className="h-4 w-4" />
                   </Button>
@@ -263,7 +196,7 @@ export default function LandingPageSettings() {
                   />
                   <Button 
                     onClick={() => handleSave('hero_title')}
-                    disabled={updateMutation.isPending}
+                    disabled={isSaving}
                   >
                     <Save className="h-4 w-4" />
                   </Button>
@@ -280,7 +213,7 @@ export default function LandingPageSettings() {
                   />
                   <Button 
                     onClick={() => handleSave('hero_subtitle')}
-                    disabled={updateMutation.isPending}
+                    disabled={isSaving}
                   >
                     <Save className="h-4 w-4" />
                   </Button>
@@ -298,7 +231,7 @@ export default function LandingPageSettings() {
                   />
                   <Button 
                     onClick={() => handleSave('footer_description')}
-                    disabled={updateMutation.isPending}
+                    disabled={isSaving}
                     className="self-start"
                   >
                     <Save className="h-4 w-4" />

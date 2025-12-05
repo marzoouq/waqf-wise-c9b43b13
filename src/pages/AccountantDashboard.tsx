@@ -1,7 +1,5 @@
 import { useState, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { FileText, DollarSign, AlertCircle, CheckCircle, XCircle, TrendingUp, FileCheck, FileClock, LayoutDashboard, Mail } from "lucide-react";
 import { useAccountantKPIs } from "@/hooks/useAccountantKPIs";
+import { useAccountantDashboardData } from "@/hooks/accounting/useAccountantDashboardData";
 import { ApproveJournalDialog } from "@/components/accounting/ApproveJournalDialog";
 import { UnifiedDashboardLayout } from "@/components/dashboard/UnifiedDashboardLayout";
 import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
@@ -30,25 +29,7 @@ const AccountantDashboard = () => {
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
   
   const { data: kpis, isLoading: kpisLoading } = useAccountantKPIs();
-
-  // Fetch pending approvals
-  const { data: pendingApprovals = [], isLoading: approvalsLoading } = useQuery({
-    queryKey: ["pending_approvals"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("approvals")
-        .select(`
-          *,
-          journal_entry:journal_entries(*)
-        `)
-        .eq("status", "pending")
-        .order("created_at", { ascending: false })
-        .limit(10);
-      
-      if (error) throw error;
-      return data;
-    },
-  });
+  const { pendingApprovals, isLoading: approvalsLoading } = useAccountantDashboardData();
 
   const getStatusBadge = (status: string) => {
     type BadgeVariant = "default" | "secondary" | "destructive" | "outline";

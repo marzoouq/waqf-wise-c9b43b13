@@ -4,33 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Download, Filter, TrendingUp, TrendingDown, DollarSign, FileText, ChevronLeft, ChevronRight } from "lucide-react";
+import { Download, TrendingUp, TrendingDown, DollarSign, FileText, ChevronLeft, ChevronRight } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { format, arLocale as ar } from "@/lib/date";
-
-interface UnifiedTransaction {
-  source: string;
-  source_name_ar: string;
-  source_name_en: string;
-  id: string;
-  transaction_date: string;
-  amount: number;
-  party_name: string;
-  transaction_type: string;
-  payment_method: string;
-  description: string;
-  status: string;
-  journal_entry_id: string | null;
-  reference_number: string;
-  created_at: string;
-  beneficiary_id: string | null;
-  contract_number: string | null;
-}
+import { useUnifiedTransactions, UnifiedTransaction } from "@/hooks/transactions/useUnifiedTransactions";
 
 export default function AllTransactions() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -40,18 +20,7 @@ export default function AllTransactions() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
-  const { data: transactions = [], isLoading } = useQuery({
-    queryKey: ["unified-transactions"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("unified_transactions_view")
-        .select("*")
-        .order("transaction_date", { ascending: false });
-
-      if (error) throw error;
-      return data as UnifiedTransaction[];
-    },
-  });
+  const { transactions, isLoading, calculateStats } = useUnifiedTransactions();
 
   // تصفية البيانات
   const filteredTransactions = transactions.filter((transaction) => {
@@ -69,18 +38,7 @@ export default function AllTransactions() {
   });
 
   // حساب الإحصائيات
-  const stats = {
-    totalIncome: filteredTransactions
-      .filter((t) => t.transaction_type === "قبض")
-      .reduce((sum, t) => sum + t.amount, 0),
-    totalExpense: filteredTransactions
-      .filter((t) => t.transaction_type === "صرف")
-      .reduce((sum, t) => sum + t.amount, 0),
-    totalTransactions: filteredTransactions.length,
-    netAmount: 0,
-  };
-
-  stats.netAmount = stats.totalIncome - stats.totalExpense;
+  const stats = calculateStats(filteredTransactions);
 
   // Pagination
   const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);

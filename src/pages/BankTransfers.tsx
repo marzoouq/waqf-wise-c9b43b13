@@ -4,8 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Download, FileText, AlertCircle } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
 import {
@@ -15,44 +13,16 @@ import {
   downloadFile,
   BankTransferRecord,
 } from "@/lib/bankFileGenerators";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { format, arLocale as ar } from "@/lib/date";
+import { useBankTransfersData } from "@/hooks/distributions/useBankTransfersData";
 
 export default function BankTransfers() {
   const { toast } = useToast();
   const [selectedFormat, setSelectedFormat] = useState<string>("csv");
   const [selectedDistribution, setSelectedDistribution] = useState<string>("");
 
-  // جلب التوزيعات المعتمدة
-  const { data: distributions = [], isLoading: loadingDistributions } = useQuery({
-    queryKey: ["approved-distributions"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("distributions")
-        .select(`
-          id,
-          distribution_date,
-          total_amount,
-          status,
-          distribution_details!inner(
-            beneficiary_id,
-            allocated_amount,
-            beneficiaries!inner(
-              full_name,
-              bank_account_number,
-              iban
-            )
-          )
-        `)
-        .eq("status", "معتمد")
-        .order("distribution_date", { ascending: false });
-
-      if (error) throw error;
-      return data;
-    },
-  });
+  const { distributions, isLoading } = useBankTransfersData();
 
   const handleExport = () => {
     if (!selectedDistribution) {
@@ -132,7 +102,7 @@ export default function BankTransfers() {
     }
   };
 
-  if (loadingDistributions) {
+  if (isLoading) {
     return <LoadingState />;
   }
 
