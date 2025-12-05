@@ -2,7 +2,68 @@
 ## Latest Fixes & Updates
 
 **التاريخ:** 2025-12-05  
-**الإصدار:** 2.6.17
+**الإصدار:** 2.6.18
+
+---
+
+## 🔧 تقليل Coupling وإنشاء Hooks جديدة (v2.6.18)
+
+### التحسينات المُنفذة
+
+تم إنشاء 3 Hooks جديدة لتقليل الاعتماد المباشر على Supabase في الصفحات:
+
+#### 1. `useBeneficiaryPortalData` - بوابة المستفيد
+```typescript
+// src/hooks/beneficiary/useBeneficiaryPortalData.ts
+export function useBeneficiaryPortalData() {
+  return { beneficiary, statistics, isLoading, error };
+}
+```
+**الملف المُحدّث:** `BeneficiaryPortal.tsx`
+
+#### 2. `useSecurityDashboardData` - لوحة الأمان
+```typescript
+// src/hooks/security/useSecurityDashboardData.ts
+export function useSecurityDashboardData() {
+  return { securityEvents, loginAttempts, stats, isLoading };
+}
+```
+**الملف المُحدّث:** `SecurityDashboard.tsx`
+
+#### 3. `useIntegrationsData` - إدارة التكاملات
+```typescript
+// src/hooks/system/useIntegrationsData.ts
+export function useIntegrationsData() {
+  return { bankIntegrations, paymentGateways, governmentIntegrations, isLoading };
+}
+```
+**الملف المُحدّث:** `IntegrationsManagement.tsx`
+
+### الملفات الجديدة
+
+| الملف | الوصف |
+|-------|-------|
+| `src/hooks/beneficiary/useBeneficiaryPortalData.ts` | Hook لبيانات بوابة المستفيد |
+| `src/hooks/security/useSecurityDashboardData.ts` | Hook لبيانات لوحة الأمان |
+| `src/hooks/security/index.ts` | Barrel export للأمان |
+| `src/hooks/system/useIntegrationsData.ts` | Hook لبيانات التكاملات |
+
+### الملفات المُحدّثة
+
+| الملف | التغيير |
+|-------|---------|
+| `BeneficiaryPortal.tsx` | استخدام `useBeneficiaryPortalData` |
+| `SecurityDashboard.tsx` | استخدام `useSecurityDashboardData` |
+| `IntegrationsManagement.tsx` | استخدام `useIntegrationsData` |
+| `src/hooks/beneficiary/index.ts` | تصدير Hook الجديد |
+| `src/hooks/system/index.ts` | تصدير Hook الجديد |
+
+### النتائج
+
+- ✅ تقليل Direct Supabase imports في 3 صفحات
+- ✅ فصل أفضل للمنطق عن العرض
+- ✅ تحسين قابلية إعادة الاستخدام
+- ✅ تحسين قابلية الاختبار
 
 ---
 

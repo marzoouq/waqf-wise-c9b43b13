@@ -2,48 +2,17 @@ import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layou
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { SecurityEvent, LoginAttempt } from "@/types/security";
+import { SecurityEvent } from "@/types/security";
 import { Shield, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
 import { UnifiedDataTable, type Column } from "@/components/unified/UnifiedDataTable";
 import { format, arLocale as ar } from "@/lib/date";
 import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
 import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
+import { useSecurityDashboardData } from "@/hooks/security/useSecurityDashboardData";
 
 export default function SecurityDashboard() {
-  const { data: securityEvents = [], isLoading } = useQuery({
-    queryKey: ["security-events"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("security_events_log")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(50);
-      if (error) throw error;
-      return data as SecurityEvent[];
-    },
-  });
-
-  const { data: loginAttempts = [] } = useQuery({
-    queryKey: ["login-attempts"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("login_attempts_log")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(20);
-      if (error) throw error;
-      return data as LoginAttempt[];
-    },
-  });
-
-  const stats = {
-    total: securityEvents.length,
-    warning: securityEvents.filter(e => e.severity === 'warning').length,
-    error: securityEvents.filter(e => e.severity === 'error').length,
-    resolved: securityEvents.filter(e => e.resolved).length,
-  };
+  // استخدام Hook المخصص لجلب البيانات
+  const { securityEvents, stats, isLoading } = useSecurityDashboardData();
 
   const columns: Column<SecurityEvent>[] = [
     {
@@ -64,7 +33,7 @@ export default function SecurityDashboard() {
       key: "severity",
       label: "الخطورة",
       render: (value: string) => {
-        const variants: Record<string, any> = {
+        const variants: Record<string, "secondary" | "default" | "destructive" | "outline"> = {
           info: "secondary",
           warning: "default",
           error: "destructive",

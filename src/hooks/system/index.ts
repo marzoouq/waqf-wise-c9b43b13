@@ -10,3 +10,4 @@ export { useUsersActivityMetrics } from '../useUsersActivityMetrics';
 export { useBackup } from '../useBackup';
 export { useSelfHealing } from '../useSelfHealing';
 export { useAuditLogs } from '../useAuditLogs';
+export { useIntegrationsData } from './useIntegrationsData';

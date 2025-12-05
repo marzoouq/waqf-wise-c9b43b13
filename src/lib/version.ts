@@ -2,11 +2,11 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.6.17
+ * @version 2.6.18
  * @date 2025-12-05
  */
 
-export const APP_VERSION = '2.6.17';
+export const APP_VERSION = '2.6.18';
 export const APP_VERSION_DATE = '2025-12-05';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
@@ -16,11 +16,11 @@ export const VERSION_INFO = {
   name: APP_VERSION_NAME,
   changelog: '/docs/CHANGELOG.md',
   features: [
-    'إصلاح useState<any> في SystemErrorLogs و SystemMaintenance',
-    'إصلاح as any في useFiscalYearClosings و ملفات PDF',
-    'تحسين Record<string, unknown> بدلاً من Record<string, any>',
-    'استبدال console.log بـ productionLogger',
-    'Type Augmentation لـ jspdf-autotable',
+    'تقليل Coupling بإنشاء 3 Hooks جديدة',
+    'useBeneficiaryPortalData - بوابة المستفيد',
+    'useSecurityDashboardData - لوحة الأمان',
+    'useIntegrationsData - إدارة التكاملات',
+    'تحسين فصل المنطق عن العرض',
   ],
 } as const;
 

@@ -3,6 +3,7 @@
  */
 
 export { useBeneficiaries } from '../useBeneficiaries';
+export { useBeneficiaryPortalData, type BeneficiaryStatistics } from './useBeneficiaryPortalData';
 export { useBeneficiaryProfile } from '../useBeneficiaryProfile';
 export { useBeneficiaryLoans } from '../useBeneficiaryLoans';
 export { useBeneficiaryRequests } from '../useBeneficiaryRequests';

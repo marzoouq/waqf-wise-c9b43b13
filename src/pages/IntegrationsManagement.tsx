@@ -4,47 +4,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { BankIntegration, PaymentGateway, GovernmentIntegration } from "@/types/integrations";
 import { Building2, CreditCard, Shield, Settings, Link } from "lucide-react";
+import { useIntegrationsData } from "@/hooks/system/useIntegrationsData";
 
 export default function IntegrationsManagement() {
-  const { data: bankIntegrations = [] } = useQuery({
-    queryKey: ["bank-integrations"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("bank_integrations")
-        .select("*")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data as BankIntegration[];
-    },
-  });
-
-  const { data: paymentGateways = [] } = useQuery({
-    queryKey: ["payment-gateways"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("payment_gateways")
-        .select("*")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data as PaymentGateway[];
-    },
-  });
-
-  const { data: governmentIntegrations = [] } = useQuery({
-    queryKey: ["government-integrations"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("government_integrations")
-        .select("*")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data as GovernmentIntegration[];
-    },
-  });
+  // استخدام Hook المخصص لجلب البيانات
+  const { bankIntegrations, paymentGateways, governmentIntegrations } = useIntegrationsData();
 
   return (
     <PageErrorBoundary pageName="التكاملات الخارجية">
