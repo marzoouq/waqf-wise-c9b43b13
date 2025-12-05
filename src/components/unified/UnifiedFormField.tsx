@@ -65,9 +65,8 @@ export interface UnifiedFormFieldProps<TFieldValues extends FieldValues> {
   step?: number; // for number
   maxLength?: number; // for text inputs
   
-  // Custom render - استخدام ControllerRenderProps للأنواع المحددة
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  render?: (field: ControllerRenderProps<TFieldValues, any>) => ReactNode;
+  // Custom render - استخدام ControllerRenderProps مع FieldPath للأنواع الآمنة
+  render?: (field: ControllerRenderProps<TFieldValues, FieldPath<TFieldValues>>) => ReactNode;
   
   // Grid layout
   className?: string;
