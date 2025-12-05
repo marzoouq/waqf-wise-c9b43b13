@@ -1,13 +1,22 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { handleCors, jsonResponse, errorResponse, unauthorizedResponse } from '../_shared/cors.ts';
+import { 
+  handleCors, 
+  jsonResponse, 
+  errorResponse, 
+  unauthorizedResponse,
+  forbiddenResponse 
+} from '../_shared/cors.ts';
+
+// ============ الأدوار المسموح لها بالتحليل الذكي ============
+const ALLOWED_ROLES = ['admin', 'nazer', 'accountant'];
 
 serve(async (req) => {
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
 
   try {
-    // ✅ التحقق من المصادقة - إصلاح أمني
+    // ✅ التحقق من المصادقة
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       console.error('Missing Authorization header');
@@ -35,6 +44,28 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
+
+    // ✅ التحقق من صلاحيات المستخدم
+    const { data: userRoles } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id);
+
+    const hasPermission = userRoles?.some(r => ALLOWED_ROLES.includes(r.role));
+    
+    if (!hasPermission) {
+      await supabase.from('audit_logs').insert({
+        user_id: user.id,
+        user_email: user.email,
+        action_type: 'UNAUTHORIZED_AI_INSIGHTS_ATTEMPT',
+        table_name: 'custom_reports',
+        description: `محاولة إنشاء تحليل ذكي غير مصرح بها من ${user.email}`,
+        severity: 'error'
+      });
+      return forbiddenResponse('ليس لديك صلاحية لإنشاء تحليلات ذكية. مطلوب دور مدير أو ناظر أو محاسب.');
+    }
+
+    console.log(`Authorized AI insights by: ${user.email}`);
 
     const { reportType, dataQuery, filters } = await req.json();
 
@@ -147,6 +178,17 @@ serve(async (req) => {
       })
       .select()
       .single();
+
+    // تسجيل العملية
+    await supabase.from('audit_logs').insert({
+      user_id: user.id,
+      user_email: user.email,
+      action_type: 'AI_INSIGHTS_GENERATED',
+      table_name: 'custom_reports',
+      record_id: report?.id,
+      description: `تم إنشاء تحليل ذكي من نوع ${reportType} بواسطة ${user.email}`,
+      severity: 'info'
+    });
 
     return jsonResponse({
       success: true,

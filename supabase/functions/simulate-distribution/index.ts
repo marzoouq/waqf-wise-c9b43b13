@@ -1,10 +1,14 @@
-// Edge Function: محاكاة توزيع متقدمة
+// Edge Function: محاكاة توزيع متقدمة - مؤمّنة
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.81.1';
 import { 
   handleCors, 
   jsonResponse, 
-  errorResponse 
+  errorResponse,
+  forbiddenResponse 
 } from '../_shared/cors.ts';
+
+// ============ الأدوار المسموح لها بمحاكاة التوزيع ============
+const ALLOWED_ROLES = ['admin', 'nazer', 'accountant'];
 
 interface SimulationParams {
   total_amount: number;
@@ -43,21 +47,66 @@ Deno.serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
+    // ============ التحقق من المصادقة والصلاحيات ============
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.error('Distribution simulation attempt without authorization header');
+      return forbiddenResponse('مطلوب تسجيل الدخول لمحاكاة التوزيع');
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    
+    const supabaseAuth = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+    );
+
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(token);
+    
+    if (authError || !user) {
+      console.error('Invalid token for distribution simulation:', authError?.message);
+      return forbiddenResponse('جلسة غير صالحة');
+    }
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
+
+    // التحقق من صلاحيات المستخدم
+    const { data: userRoles } = await supabaseClient
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id);
+
+    const hasPermission = userRoles?.some(r => ALLOWED_ROLES.includes(r.role));
+    
+    if (!hasPermission) {
+      // تسجيل محاولة الوصول غير المصرح بها
+      await supabaseClient.from('audit_logs').insert({
+        user_id: user.id,
+        user_email: user.email,
+        action_type: 'UNAUTHORIZED_SIMULATION_ATTEMPT',
+        table_name: 'distributions',
+        description: `محاولة محاكاة توزيع غير مصرح بها من ${user.email}`,
+        severity: 'error'
+      });
+      return forbiddenResponse('ليس لديك صلاحية لمحاكاة التوزيع. مطلوب دور مدير أو ناظر أو محاسب.');
+    }
+
+    // ============ تنفيذ المحاكاة ============
+    console.log(`Authorized distribution simulation by: ${user.email}`);
 
     const params: SimulationParams = await req.json();
 
     console.log('📊 بدء محاكاة التوزيع:', params);
 
     // 1. حساب الاستقطاعات
-    const nazer_share = params.total_amount * (params.nazer_percentage || 0.05); // 5% افتراضي
-    const reserve = params.total_amount * (params.reserve_percentage || 0.10); // 10% افتراضي
-    const waqf_corpus = params.total_amount * (params.waqf_corpus_percentage || 0.05); // 5% افتراضي
-    const maintenance = params.total_amount * (params.maintenance_percentage || 0.03); // 3% افتراضي
-    const development = params.total_amount * (params.development_percentage || 0.02); // 2% افتراضي
+    const nazer_share = params.total_amount * (params.nazer_percentage || 0.05);
+    const reserve = params.total_amount * (params.reserve_percentage || 0.10);
+    const waqf_corpus = params.total_amount * (params.waqf_corpus_percentage || 0.05);
+    const maintenance = params.total_amount * (params.maintenance_percentage || 0.03);
+    const development = params.total_amount * (params.development_percentage || 0.02);
 
     const total_deductions = nazer_share + reserve + waqf_corpus + maintenance + development;
     const distributable_amount = params.total_amount - total_deductions;
@@ -190,6 +239,17 @@ Deno.serve(async (req) => {
 
     console.log('✅ اكتملت المحاكاة:', summary);
 
+    // تسجيل العملية
+    await supabaseClient.from('audit_logs').insert({
+      user_id: user.id,
+      user_email: user.email,
+      action_type: 'DISTRIBUTION_SIMULATION',
+      table_name: 'distributions',
+      description: `محاكاة توزيع بمبلغ ${params.total_amount} ريال بواسطة ${user.email}`,
+      new_values: summary,
+      severity: 'info'
+    });
+
     return jsonResponse({
       success: true,
       summary,
@@ -198,6 +258,7 @@ Deno.serve(async (req) => {
         simulation_date: new Date().toISOString(),
         priority_levels: sortedPriorities,
         loan_deductions_count: loanDeductions.size,
+        simulated_by: user.email,
       },
     });
   } catch (error) {
