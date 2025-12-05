@@ -2,18 +2,43 @@ import { useState } from "react";
 import { productionLogger } from "@/lib/logger/production-logger";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { Brain, Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
+import type { SystemAlert } from "@/types/alerts";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+/** بيانات العقار للتحليل بالذكاء الاصطناعي */
+interface PropertyData {
+  id?: string;
+  name?: string;
+  type?: string;
+  location?: string;
+  area?: number;
+  monthly_rent?: number;
+  annual_rent?: number;
+  occupancy_rate?: number;
+  maintenance_cost?: number;
+  contracts?: Array<{
+    id: string;
+    tenant_name?: string;
+    start_date?: string;
+    end_date?: string;
+    monthly_rent?: number;
+  }>;
+  maintenance_history?: Array<{
+    date: string;
+    description: string;
+    cost: number;
+  }>;
+  alerts?: SystemAlert[];
+}
+
 interface AIAssistantDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  propertyData?: Record<string, any>;
+  propertyData?: PropertyData;
   actionType: "analyze_property" | "suggest_maintenance" | "predict_revenue" | "optimize_contracts" | "alert_insights";
 }
 
