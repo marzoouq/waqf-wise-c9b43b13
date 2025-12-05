@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { CheckCircle2, Clock, LucideIcon, Wallet, Calendar } from "lucide-react";
+import { CheckCircle2, Clock, Wallet, Calendar, Archive, CircleDot, TrendingUp } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { MaskedValue } from "@/components/shared/MaskedValue";
@@ -27,14 +27,11 @@ interface HeirDistribution {
   } | null;
 }
 
-type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
-
 export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistributionsTabProps) {
   const { settings } = useVisibilitySettings();
   const isMobile = useIsMobile();
   const masked = settings?.mask_exact_amounts || false;
   
-  // جلب توزيعات الوريث من heir_distributions
   const { data: distributions = [], isLoading } = useQuery({
     queryKey: ["beneficiary-heir-distributions", beneficiaryId],
     queryFn: async () => {
@@ -62,13 +59,13 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
   const getHeirTypeLabel = (type: string) => {
     const labels: Record<string, string> = {
       "son": "ابن",
-      "daughter": "ابنة",
+      "daughter": "بنت",
       "wife": "زوجة",
       "husband": "زوج",
       "father": "أب",
       "mother": "أم",
       "ابن": "ابن",
-      "ابنة": "ابنة",
+      "بنت": "بنت",
       "زوجة": "زوجة",
     };
     return labels[type] || type;
@@ -76,25 +73,85 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
 
   const getStatusBadge = (isClosed: boolean) => {
     return isClosed ? (
-      <Badge variant="secondary" className="gap-1">
-        <CheckCircle2 className="h-3 w-3" />
-        مقفلة
+      <Badge variant="secondary" className="gap-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+        <Archive className="h-3 w-3" />
+        مؤرشف
       </Badge>
     ) : (
-      <Badge variant="default" className="gap-1">
-        <Clock className="h-3 w-3" />
-        نشطة
+      <Badge variant="default" className="gap-1 bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 border-emerald-300">
+        <CircleDot className="h-3 w-3" />
+        حالي
       </Badge>
     );
   };
 
-  // حساب إجمالي التوزيعات
-  const totalDistributed = distributions.reduce((sum, d) => sum + (d.share_amount || 0), 0);
+  // فصل التوزيعات الحالية عن التاريخية
+  const currentDistributions = distributions.filter(d => !d.fiscal_years?.is_closed);
+  const historicalDistributions = distributions.filter(d => d.fiscal_years?.is_closed);
+  
+  const currentTotal = currentDistributions.reduce((sum, d) => sum + (d.share_amount || 0), 0);
+  const historicalTotal = historicalDistributions.reduce((sum, d) => sum + (d.share_amount || 0), 0);
+  const totalDistributed = currentTotal + historicalTotal;
 
   return (
     <div className="space-y-6">
       {/* بطاقة إجمالي المحصل من الوقف */}
       <WaqfDistributionsSummaryCard beneficiaryId={beneficiaryId} />
+
+      {/* ملخص التوزيعات */}
+      {distributions.length > 0 && (
+        <Card className="border-dashed">
+          <CardHeader className="py-3">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" />
+              ملخص التوزيعات
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div className="p-3 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800">
+                <div className="flex items-center justify-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 mb-1">
+                  <CircleDot className="h-3 w-3" />
+                  السنة الحالية
+                </div>
+                <p className="font-bold text-emerald-700 dark:text-emerald-300">
+                  {masked ? (
+                    <MaskedValue value={String(currentTotal)} type="amount" masked={true} />
+                  ) : (
+                    <>{currentTotal.toLocaleString("ar-SA")} ر.س</>
+                  )}
+                </p>
+              </div>
+              <div className="p-3 rounded-lg bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700">
+                <div className="flex items-center justify-center gap-1 text-xs text-slate-500 dark:text-slate-400 mb-1">
+                  <Archive className="h-3 w-3" />
+                  السنوات السابقة
+                </div>
+                <p className="font-bold text-slate-600 dark:text-slate-300">
+                  {masked ? (
+                    <MaskedValue value={String(historicalTotal)} type="amount" masked={true} />
+                  ) : (
+                    <>{historicalTotal.toLocaleString("ar-SA")} ر.س</>
+                  )}
+                </p>
+              </div>
+              <div className="p-3 rounded-lg bg-primary/10 border border-primary/20">
+                <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground mb-1">
+                  <Wallet className="h-3 w-3" />
+                  الإجمالي
+                </div>
+                <p className="font-bold text-primary">
+                  {masked ? (
+                    <MaskedValue value={String(totalDistributed)} type="amount" masked={true} />
+                  ) : (
+                    <>{totalDistributed.toLocaleString("ar-SA")} ر.س</>
+                  )}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* جدول التوزيعات التفصيلي */}
       <Card>
@@ -115,47 +172,57 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
           ) : isMobile ? (
             // عرض البطاقات على الجوال
             <div className="grid gap-4">
-              {distributions.map((dist) => (
-                <Card key={dist.id} className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-4 space-y-3">
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-1">
-                        <p className="text-xs text-muted-foreground">السنة المالية</p>
-                        <p className="font-semibold">{dist.fiscal_years?.name || "—"}</p>
-                      </div>
-                      {getStatusBadge(dist.fiscal_years?.is_closed || false)}
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3 pt-2 border-t">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                          <Calendar className="h-3 w-3" />
-                          تاريخ التوزيع
+              {distributions.map((dist) => {
+                const isClosed = dist.fiscal_years?.is_closed || false;
+                return (
+                  <Card 
+                    key={dist.id} 
+                    className={`hover:shadow-md transition-shadow ${
+                      isClosed 
+                        ? 'bg-slate-50/50 dark:bg-slate-900/30 border-slate-200 dark:border-slate-700' 
+                        : 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800'
+                    }`}
+                  >
+                    <CardContent className="p-4 space-y-3">
+                      <div className="flex items-start justify-between">
+                        <div className="space-y-1">
+                          <p className="text-xs text-muted-foreground">السنة المالية</p>
+                          <p className="font-semibold">{dist.fiscal_years?.name || "—"}</p>
                         </div>
-                        <p className="text-sm font-medium">
-                          {format(new Date(dist.distribution_date), "dd/MM/yyyy", { locale: ar })}
+                        {getStatusBadge(isClosed)}
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3 pt-2 border-t">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                            <Calendar className="h-3 w-3" />
+                            تاريخ التوزيع
+                          </div>
+                          <p className="text-sm font-medium">
+                            {format(new Date(dist.distribution_date), "dd/MM/yyyy", { locale: ar })}
+                          </p>
+                        </div>
+
+                        <div className="space-y-1">
+                          <p className="text-xs text-muted-foreground">نوع الوريث</p>
+                          <Badge variant="outline">{getHeirTypeLabel(dist.heir_type)}</Badge>
+                        </div>
+                      </div>
+
+                      <div className="pt-2 border-t">
+                        <p className="text-xs text-muted-foreground mb-1">المبلغ المستحق</p>
+                        <p className={`text-lg font-bold ${isClosed ? 'text-slate-600 dark:text-slate-300' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                          {masked ? (
+                            <MaskedValue value={String(dist.share_amount || 0)} type="amount" masked={true} />
+                          ) : (
+                            <>{dist.share_amount?.toLocaleString("ar-SA")} ر.س</>
+                          )}
                         </p>
                       </div>
-
-                      <div className="space-y-1">
-                        <p className="text-xs text-muted-foreground">نوع الوريث</p>
-                        <Badge variant="outline">{getHeirTypeLabel(dist.heir_type)}</Badge>
-                      </div>
-                    </div>
-
-                    <div className="pt-2 border-t">
-                      <p className="text-xs text-muted-foreground mb-1">المبلغ المستحق</p>
-                      <p className="text-lg font-bold text-primary">
-                        {masked ? (
-                          <MaskedValue value={String(dist.share_amount || 0)} type="amount" masked={true} />
-                        ) : (
-                          <>{dist.share_amount?.toLocaleString("ar-SA")} ر.س</>
-                        )}
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
           ) : (
             // عرض الجدول على الديسكتوب
@@ -168,33 +235,50 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
                       <TableHead className="text-right">تاريخ التوزيع</TableHead>
                       <TableHead className="text-right">نوع الوريث</TableHead>
                       <TableHead className="text-right">المبلغ المستحق</TableHead>
-                      <TableHead className="text-right">حالة السنة</TableHead>
+                      <TableHead className="text-right">الحالة</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {distributions.map((dist) => (
-                      <TableRow key={dist.id}>
-                        <TableCell className="font-medium">
-                          {dist.fiscal_years?.name || "—"}
-                        </TableCell>
-                        <TableCell>
-                          {format(new Date(dist.distribution_date), "dd/MM/yyyy", { locale: ar })}
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline">{getHeirTypeLabel(dist.heir_type)}</Badge>
-                        </TableCell>
-                        <TableCell className="font-bold text-primary">
-                          {masked ? (
-                            <MaskedValue value={String(dist.share_amount || 0)} type="amount" masked={true} />
-                          ) : (
-                            <>{dist.share_amount?.toLocaleString("ar-SA")} ر.س</>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {getStatusBadge(dist.fiscal_years?.is_closed || false)}
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    {distributions.map((dist) => {
+                      const isClosed = dist.fiscal_years?.is_closed || false;
+                      return (
+                        <TableRow 
+                          key={dist.id}
+                          className={
+                            isClosed 
+                              ? 'bg-slate-50/50 dark:bg-slate-900/20' 
+                              : 'bg-emerald-50/30 dark:bg-emerald-950/10'
+                          }
+                        >
+                          <TableCell className="font-medium">
+                            <div className="flex items-center gap-2">
+                              {isClosed ? (
+                                <Archive className="h-4 w-4 text-slate-400" />
+                              ) : (
+                                <CircleDot className="h-4 w-4 text-emerald-500" />
+                              )}
+                              {dist.fiscal_years?.name || "—"}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {format(new Date(dist.distribution_date), "dd/MM/yyyy", { locale: ar })}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline">{getHeirTypeLabel(dist.heir_type)}</Badge>
+                          </TableCell>
+                          <TableCell className={`font-bold ${isClosed ? 'text-slate-600 dark:text-slate-300' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                            {masked ? (
+                              <MaskedValue value={String(dist.share_amount || 0)} type="amount" masked={true} />
+                            ) : (
+                              <>{dist.share_amount?.toLocaleString("ar-SA")} ر.س</>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {getStatusBadge(isClosed)}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                     {/* صف الإجمالي */}
                     <TableRow className="bg-muted/50 font-bold">
                       <TableCell colSpan={3}>الإجمالي</TableCell>
