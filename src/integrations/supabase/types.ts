@@ -7908,6 +7908,7 @@ export type Database = {
           available_units: number | null
           created_at: string
           description: string | null
+          floors: number | null
           id: string
           location: string
           monthly_revenue: number
@@ -7930,6 +7931,7 @@ export type Database = {
           available_units?: number | null
           created_at?: string
           description?: string | null
+          floors?: number | null
           id?: string
           location: string
           monthly_revenue?: number
@@ -7952,6 +7954,7 @@ export type Database = {
           available_units?: number | null
           created_at?: string
           description?: string | null
+          floors?: number | null
           id?: string
           location?: string
           monthly_revenue?: number
