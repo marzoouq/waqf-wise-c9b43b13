@@ -9,10 +9,20 @@ import { Loader2, FileText, CheckCircle2, XCircle, AlertTriangle } from "lucide-
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 
+interface BackfillResult {
+  success: boolean;
+  message?: string;
+  processed?: number;
+  failed?: number;
+  cleaned_entries?: number;
+  processed_payments?: Array<{ payment_number: string }>;
+  errors?: string[];
+}
+
 export default function SystemMaintenance() {
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<BackfillResult | null>(null);
 
   const handleBackfillDocuments = async () => {
     try {

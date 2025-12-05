@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Database } from "@/integrations/supabase/types";
+
+type SystemErrorRow = Database['public']['Tables']['system_error_logs']['Row'];
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { Button } from "@/components/ui/button";
@@ -23,7 +26,7 @@ import { useToast } from "@/hooks/use-toast";
 export default function SystemErrorLogs() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [selectedError, setSelectedError] = useState<any>(null);
+  const [selectedError, setSelectedError] = useState<SystemErrorRow | null>(null);
   const [resolutionNotes, setResolutionNotes] = useState("");
 
   // حذف جميع الأخطاء المحلولة

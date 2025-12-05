@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Building2, RefreshCw, Wifi, ChevronLeft, CheckCircle2, Clock, TrendingUp } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { productionLogger } from "@/lib/logger/production-logger";
 
 interface WaqfCorpusCardProps {
   className?: string;
@@ -58,11 +59,9 @@ export function WaqfCorpusCard({ className, compact = false }: WaqfCorpusCardPro
         .order("created_at", { ascending: false });
 
       if (error) {
-        console.error("Error fetching waqf corpus:", error);
+        productionLogger.error("Error fetching waqf corpus", { error });
         throw error;
       }
-      
-      console.log("Waqf corpus data:", data);
       return (data || []) as FiscalYearCorpus[];
     },
   });
@@ -79,7 +78,7 @@ export function WaqfCorpusCard({ className, compact = false }: WaqfCorpusCardPro
           table: "fiscal_year_closings",
         },
         (payload) => {
-          console.log("🕌 Waqf corpus updated:", payload);
+          productionLogger.info("Waqf corpus updated", { payload });
           setLastUpdated(new Date());
           setIsLive(true);
           queryClient.invalidateQueries({ queryKey: ["waqf-corpus-realtime"] });

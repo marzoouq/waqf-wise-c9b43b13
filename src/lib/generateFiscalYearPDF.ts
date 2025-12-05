@@ -8,6 +8,13 @@ import { loadAmiriFonts } from "./fonts/loadArabicFonts";
 
 type JsPDF = import('jspdf').jsPDF;
 
+// Type Augmentation for jspdf-autotable
+declare module 'jspdf' {
+  interface jsPDF {
+    lastAutoTable?: { finalY: number };
+  }
+}
+
 const loadArabicFont = async (doc: JsPDF) => {
   try {
     const { regular: amiriRegular, bold: amiriBold } = await loadAmiriFonts();
@@ -114,7 +121,7 @@ export const generateFiscalYearPDF = async (
       margin: { left: 20, right: 20 },
     });
 
-    yPos = (doc as any).lastAutoTable.finalY + 15;
+    yPos = doc.lastAutoTable?.finalY ?? yPos + 15;
 
     // الحصص والاستقطاعات
     doc.setFontSize(14);
@@ -150,7 +157,7 @@ export const generateFiscalYearPDF = async (
       margin: { left: 20, right: 20 },
     });
 
-    yPos = (doc as any).lastAutoTable.finalY + 15;
+    yPos = doc.lastAutoTable?.finalY ?? yPos + 15;
 
     // المصروفات التفصيلية
     doc.setFontSize(14);
@@ -233,7 +240,7 @@ export const generateFiscalYearPDF = async (
 
     // توزيعات الورثة
     if (closing.heir_distributions && closing.heir_distributions.length > 0) {
-      yPos = (doc as any).lastAutoTable.finalY + 15;
+      yPos = doc.lastAutoTable?.finalY ?? yPos + 15;
       
       doc.setFontSize(14);
       doc.setFont(fontName, "bold");

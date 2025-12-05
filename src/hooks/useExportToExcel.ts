@@ -10,7 +10,7 @@ export interface ExcelExportOptions {
   filename: string;
   sheets: {
     name: string;
-    data: Record<string, any>[];
+    data: Record<string, unknown>[];
   }[];
 }
 

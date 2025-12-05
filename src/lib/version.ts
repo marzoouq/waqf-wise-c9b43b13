@@ -2,11 +2,11 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.6.16
+ * @version 2.6.17
  * @date 2025-12-05
  */
 
-export const APP_VERSION = '2.6.16';
+export const APP_VERSION = '2.6.17';
 export const APP_VERSION_DATE = '2025-12-05';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
@@ -16,10 +16,11 @@ export const VERSION_INFO = {
   name: APP_VERSION_NAME,
   changelog: '/docs/CHANGELOG.md',
   features: [
-    'توحيد أنواع الأدوار (RoleName) مع قاعدة البيانات',
-    'إزالة as any من UserRolesManager',
-    'تحسين Type Safety في Properties و ExportButton',
-    'إضافة دور cashier و user و beneficiary',
+    'إصلاح useState<any> في SystemErrorLogs و SystemMaintenance',
+    'إصلاح as any في useFiscalYearClosings و ملفات PDF',
+    'تحسين Record<string, unknown> بدلاً من Record<string, any>',
+    'استبدال console.log بـ productionLogger',
+    'Type Augmentation لـ jspdf-autotable',
   ],
 } as const;
 
