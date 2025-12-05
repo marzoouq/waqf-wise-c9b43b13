@@ -2,11 +2,11 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.6.15
+ * @version 2.6.16
  * @date 2025-12-05
  */
 
-export const APP_VERSION = '2.6.15';
+export const APP_VERSION = '2.6.16';
 export const APP_VERSION_DATE = '2025-12-05';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
@@ -16,11 +16,10 @@ export const VERSION_INFO = {
   name: APP_VERSION_NAME,
   changelog: '/docs/CHANGELOG.md',
   features: [
-    'إصلاحات أمنية شاملة لـ 5 Edge Functions',
-    'تأمين دوال النسخ الاحتياطي والاستعادة (admin/nazer فقط)',
-    'تأمين دوال إقفال السنة المالية ومحاكاة التوزيع',
-    'تشديد سياسات RLS على contract_units و tasks',
-    'تنظيف وتوحيد سياسات profiles و user_roles',
+    'توحيد أنواع الأدوار (RoleName) مع قاعدة البيانات',
+    'إزالة as any من UserRolesManager',
+    'تحسين Type Safety في Properties و ExportButton',
+    'إضافة دور cashier و user و beneficiary',
   ],
 } as const;
 

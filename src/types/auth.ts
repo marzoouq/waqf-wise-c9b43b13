@@ -1,5 +1,6 @@
 /**
  * أنواع المصادقة والأدوار
+ * Role types aligned with database enum: app_role
  */
 
 export interface Role {
@@ -49,14 +50,27 @@ export interface UserSession {
   ended_at: string | null;
 }
 
-export type RoleName = 'nazer' | 'admin' | 'accountant' | 'disbursement_officer' | 'archivist' | 'beneficiary' | 'waqf_heir';
+/**
+ * أسماء الأدوار - متطابقة مع قاعدة البيانات (app_role enum)
+ * Database roles: nazer, admin, accountant, cashier, archivist, user, waqf_heir, beneficiary
+ */
+export type RoleName = 
+  | 'nazer' 
+  | 'admin' 
+  | 'accountant' 
+  | 'cashier'           // موظف الصرف (was disbursement_officer)
+  | 'archivist' 
+  | 'user'              // مستخدم عادي
+  | 'beneficiary'       // مستفيد
+  | 'waqf_heir';        // وارث الوقف
 
 export const ROLE_NAMES_AR: Record<RoleName, string> = {
   nazer: 'الناظر',
   admin: 'المشرف',
   accountant: 'المحاسب',
-  disbursement_officer: 'موظف الصرف',
+  cashier: 'موظف الصرف',
   archivist: 'أرشيفي',
+  user: 'مستخدم',
   beneficiary: 'مستفيد',
   waqf_heir: 'وارث الوقف',
 };

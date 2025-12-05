@@ -2,7 +2,72 @@
 ## Latest Fixes & Updates
 
 **التاريخ:** 2025-12-05  
-**الإصدار:** 2.6.15
+**الإصدار:** 2.6.16
+
+---
+
+## 🔧 تحسينات Type Safety (v2.6.16)
+
+### المشكلة
+1. **عدم تطابق RoleName**: `src/types/auth.ts` لا يتطابق مع أدوار قاعدة البيانات
+2. **استخدام `as any`**: في `UserRolesManager.tsx` لتجاوز مشاكل الأنواع
+3. **استخدام `useState<any>`**: في `Properties.tsx`
+4. **استخدام `Record<string, any>`**: في `ExportButton.tsx`
+
+### الحل المنفذ
+
+#### 1. توحيد RoleName مع قاعدة البيانات
+```typescript
+// src/types/auth.ts
+// قبل
+export type RoleName = 'nazer' | 'admin' | 'accountant' | 'disbursement_officer' | 'archivist' | 'beneficiary' | 'waqf_heir';
+
+// بعد - متطابق مع app_role enum
+export type RoleName = 'nazer' | 'admin' | 'accountant' | 'cashier' | 'archivist' | 'user' | 'beneficiary' | 'waqf_heir';
+```
+
+#### 2. إزالة `as any` من UserRolesManager
+```typescript
+// استيراد نوع قاعدة البيانات
+type DbAppRole = Database['public']['Enums']['app_role'];
+
+// استخدام النوع الصحيح
+.insert({ user_id: userId, role: role as DbAppRole });
+.eq('role', role as DbAppRole);
+```
+
+#### 3. إصلاح useState<any> في Properties.tsx
+```typescript
+// قبل
+const [selectedPropertyForAI, setSelectedPropertyForAI] = useState<any>(null);
+
+// بعد
+const [selectedPropertyForAI, setSelectedPropertyForAI] = useState<Property | null>(null);
+```
+
+#### 4. تحسين ExportButton.tsx
+```typescript
+// قبل
+type ExportDataItem = Record<string, any>;
+
+// بعد
+type ExportDataItem = Record<string, unknown>;
+```
+
+### ملخص التغييرات
+
+| الملف | التغيير | الخطورة |
+|-------|---------|---------|
+| `src/types/auth.ts` | توحيد RoleName مع DB | حرج |
+| `UserRolesManager.tsx` | إزالة `as any` | حرج |
+| `Properties.tsx` | `Property \| null` | متوسط |
+| `ExportButton.tsx` | `Record<string, unknown>` | منخفض |
+
+### النتائج
+- ✅ تطابق كامل بين أنواع TypeScript وقاعدة البيانات
+- ✅ إزالة جميع `as any` من إدارة الأدوار
+- ✅ Type Safety محسّن في جميع الملفات المُصلحة
+- ✅ لا تعليقات `eslint-disable` غير ضرورية
 
 ---
 

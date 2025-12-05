@@ -9,11 +9,8 @@ import { Download, FileText, FileSpreadsheet } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { exportToPDF, exportToExcel } from "@/lib/exportHelpers";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type ExportDataItem = Record<string, any>;
-
-interface ExportButtonProps {
-  data: ExportDataItem[];
+interface ExportButtonProps<T extends object> {
+  data: T[];
   filename: string;
   title: string;
   headers: string[];
@@ -22,7 +19,7 @@ interface ExportButtonProps {
   className?: string;
 }
 
-export const ExportButton = ({
+export const ExportButton = <T extends object>({
   data,
   filename,
   title,
@@ -30,11 +27,11 @@ export const ExportButton = ({
   variant = "outline",
   size = "sm",
   className,
-}: ExportButtonProps) => {
+}: ExportButtonProps<T>) => {
   const handleExportPDF = () => {
     try {
       const tableData = data.map(item => 
-        headers.map(header => String(item[header] ?? "-"))
+        headers.map(header => String((item as Record<string, unknown>)[header] ?? "-"))
       );
       exportToPDF(title, headers, tableData, `${filename}.pdf`);
       toast({
@@ -52,7 +49,8 @@ export const ExportButton = ({
 
   const handleExportExcel = () => {
     try {
-      exportToExcel(data, `${filename}.xlsx`, title);
+      // Safe cast - T extends object so it's compatible with Record
+      exportToExcel(data as unknown as Record<string, unknown>[], `${filename}.xlsx`, title);
       toast({
         title: "تم التصدير",
         description: "تم تصدير البيانات إلى Excel بنجاح",
