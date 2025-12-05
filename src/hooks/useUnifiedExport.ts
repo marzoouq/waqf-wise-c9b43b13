@@ -62,10 +62,18 @@ export interface FinancialStatementConfig {
 
 // ==================== Helper Functions ====================
 
+// Type for jsPDF document
+interface PDFDocument {
+  addFileToVFS: (filename: string, data: string) => void;
+  addFont: (filename: string, fontName: string, fontStyle: string) => void;
+  setFont: (fontName: string, fontStyle: string) => void;
+  setLanguage: (lang: string) => void;
+}
+
 /**
  * تحميل الخط العربي إلى مستند PDF
  */
-const loadArabicFontToPDF = async (doc: any): Promise<boolean> => {
+const loadArabicFontToPDF = async (doc: PDFDocument): Promise<boolean> => {
   try {
     const { regular: amiriRegular, bold: amiriBold } = await loadAmiriFonts();
     

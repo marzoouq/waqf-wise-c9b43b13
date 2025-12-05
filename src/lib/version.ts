@@ -2,11 +2,11 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.6.21
+ * @version 2.6.22
  * @date 2025-12-05
  */
 
-export const APP_VERSION = '2.6.21';
+export const APP_VERSION = '2.6.22';
 export const APP_VERSION_DATE = '2025-12-05';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
@@ -19,8 +19,8 @@ export const VERSION_INFO = {
     'إكمال فصل الاهتمامات 100%',
     '0 صفحات تستورد Supabase مباشرة',
     '0 صفحات تستخدم useQuery مباشرة',
-    'إنشاء 14 Hook جديدة في v2.6.19-2.6.20',
-    'تحسين بنية الكود والصيانة',
+    'إنشاء 15 Hook جديدة',
+    'تحسين Type Safety وإزالة any',
   ],
 } as const;
 

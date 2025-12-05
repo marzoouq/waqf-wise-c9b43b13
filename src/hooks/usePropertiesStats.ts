@@ -116,7 +116,13 @@ export function usePropertiesStats() {
           .lte("payment_date", fiscalYear.end_date);
 
         if (paymentsWithContracts) {
-          paymentsWithContracts.forEach((p: any) => {
+          interface PaymentWithContract {
+            amount_paid: number | null;
+            contract_id: string | null;
+            contracts: { payment_frequency: string | null } | null;
+          }
+          
+          (paymentsWithContracts as PaymentWithContract[]).forEach((p) => {
             const amount = Number(p.amount_paid) || 0;
             if (p.contracts?.payment_frequency === 'شهرية') {
               monthlyCollected += amount;
