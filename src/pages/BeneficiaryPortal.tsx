@@ -1,14 +1,10 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { 
-  CreditCard, Clock, CheckCircle, AlertCircle, DollarSign, Lock
-} from "lucide-react";
+import { AlertCircle, Lock } from "lucide-react";
 import type { Beneficiary } from "@/types/beneficiary";
 import {
   BeneficiaryProfileTab,
@@ -35,18 +31,19 @@ import { BankBalanceCard } from "@/components/shared/BankBalanceCard";
 import { WaqfCorpusCard } from "@/components/shared/WaqfCorpusCard";
 import { ChatbotQuickCard } from "@/components/dashboard/ChatbotQuickCard";
 import { Suspense } from "react";
-import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
-import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 import { BeneficiarySidebar } from "@/components/beneficiary/BeneficiarySidebar";
 import { BeneficiaryBottomNavigation } from "@/components/mobile/BeneficiaryBottomNavigation";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
-import { format, arLocale as ar } from "@/lib/date";
+import { useBeneficiaryPortalData } from "@/hooks/beneficiary/useBeneficiaryPortalData";
 
 export default function BeneficiaryPortal() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get("tab") || "overview";
-  const { settings, isLoading: settingsLoading } = useVisibilitySettings();
+  const { settings } = useVisibilitySettings();
+
+  // استخدام Hook المخصص لجلب البيانات
+  const { beneficiary, statistics, isLoading } = useBeneficiaryPortalData();
 
   // التحقق من إذن الوصول للتبويب النشط
   const isTabVisible = (tabKey: keyof typeof settings) => {
@@ -57,39 +54,6 @@ export default function BeneficiaryPortal() {
   const handleTabChange = (value: string) => {
     setSearchParams({ tab: value });
   };
-
-  // جلب بيانات المستفيد الحالي
-  const { data: beneficiary, isLoading } = useQuery({
-    queryKey: ["current-beneficiary"],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("غير مصرح");
-
-      const { data, error } = await supabase
-        .from("beneficiaries")
-        .select("*")
-        .eq("user_id", user.id)
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  // جلب الإحصائيات
-  const { data: statistics } = useQuery({
-    queryKey: ["beneficiary-statistics", beneficiary?.id],
-    queryFn: async () => {
-      if (!beneficiary?.id) return null;
-      
-      const { data, error } = await supabase
-        .rpc('get_beneficiary_statistics', { p_beneficiary_id: beneficiary.id });
-
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!beneficiary?.id,
-  });
 
   if (isLoading) {
     return <LoadingState fullScreen />;
@@ -109,18 +73,6 @@ export default function BeneficiaryPortal() {
       </div>
     );
   }
-
-  const stats = (statistics as {
-    total_received: number;
-    pending_amount: number;
-    total_requests: number;
-    pending_requests: number;
-  }) || {
-    total_received: 0,
-    pending_amount: 0,
-    total_requests: 0,
-    pending_requests: 0,
-  };
 
   return (
     <PageErrorBoundary pageName="بوابة المستفيد">
