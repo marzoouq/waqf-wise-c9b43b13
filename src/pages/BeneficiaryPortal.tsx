@@ -26,6 +26,7 @@ import {
   ActivityTimeline,
   YearlyComparison,
 } from "@/components/beneficiary";
+import { FiscalYearNotPublishedBanner } from "@/components/beneficiary/FiscalYearNotPublishedBanner";
 import { WaqfDistributionsSummaryCard } from "@/components/beneficiary/cards/WaqfDistributionsSummaryCard";
 import { BankBalanceCard } from "@/components/shared/BankBalanceCard";
 import { WaqfCorpusCard } from "@/components/shared/WaqfCorpusCard";
@@ -87,6 +88,8 @@ export default function BeneficiaryPortal() {
         {/* Main Content - مع padding للسايدبار على Desktop */}
         <main className="flex-1 lg:mr-64 p-4 sm:p-6 lg:p-8 pb-20 md:pb-8">
           <div className="max-w-7xl mx-auto space-y-6">
+            {/* بانر حالة نشر السنة المالية */}
+            <FiscalYearNotPublishedBanner />
 
             {/* Tab Content */}
             {activeTab === "overview" && settings?.show_overview && (
