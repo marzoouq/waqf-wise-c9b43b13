@@ -1,4 +1,4 @@
-import { Mail, Coins, Globe } from "lucide-react";
+import { Mail, Coins, Globe, RefreshCw } from "lucide-react";
 import { Suspense, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { AdminSendMessageDialog } from "@/components/messages/AdminSendMessageDialog";
@@ -14,17 +14,27 @@ import { WaqfCorpusCard } from "@/components/shared/WaqfCorpusCard";
 import { DistributeRevenueDialog } from "@/components/nazer/DistributeRevenueDialog";
 import { PublishFiscalYearDialog } from "@/components/nazer/PublishFiscalYearDialog";
 import { FiscalYearPublishStatus } from "@/components/nazer/FiscalYearPublishStatus";
+import { CurrentFiscalYearCard, RevenueProgressCard } from "@/components/dashboard/shared";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function NazerDashboard() {
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
   const [distributeDialogOpen, setDistributeDialogOpen] = useState(false);
   const [publishDialogOpen, setPublishDialogOpen] = useState(false);
+  const queryClient = useQueryClient();
+
+  const handleRefresh = () => {
+    queryClient.invalidateQueries();
+  };
 
   return (
     <UnifiedDashboardLayout
       role="nazer"
       actions={
         <div className="flex items-center gap-2">
+          <Button onClick={handleRefresh} variant="ghost" size="icon" title="تحديث البيانات">
+            <RefreshCw className="h-4 w-4" />
+          </Button>
           <Button onClick={() => setDistributeDialogOpen(true)} className="gap-2" variant="default">
             <Coins className="h-4 w-4" />
             <span className="hidden sm:inline">توزيع الغلة</span>
@@ -43,6 +53,12 @@ export default function NazerDashboard() {
       <div className="space-y-6">
         {/* حالة نشر السنة المالية */}
         <FiscalYearPublishStatus onPublishClick={() => setPublishDialogOpen(true)} />
+
+        {/* السنة المالية وتقدم الإيرادات */}
+        <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
+          <CurrentFiscalYearCard />
+          <RevenueProgressCard />
+        </div>
 
         <Suspense fallback={<SectionSkeleton />}>
           <NazerKPIs />

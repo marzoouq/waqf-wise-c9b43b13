@@ -1,7 +1,7 @@
 import { lazy, Suspense, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Wallet, TrendingUp, TrendingDown, DollarSign, Receipt, Clock, CheckCircle, Mail } from "lucide-react";
+import { Wallet, TrendingUp, TrendingDown, DollarSign, Receipt, Clock, CheckCircle, Mail, RefreshCw } from "lucide-react";
 import { useCashierStats } from "@/hooks/useCashierStats";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,9 @@ import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
 import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 import { SectionSkeleton } from "@/components/dashboard";
 import { AdminSendMessageDialog } from "@/components/messages/AdminSendMessageDialog";
+import { BankBalanceCard } from "@/components/shared/BankBalanceCard";
+import { WaqfCorpusCard } from "@/components/shared/WaqfCorpusCard";
+import { useQueryClient } from "@tanstack/react-query";
 
 // Lazy load heavy components
 const RecentJournalEntries = lazy(() => import("@/components/dashboard/RecentJournalEntries"));
@@ -21,6 +24,11 @@ export default function CashierDashboard() {
   const [isReceiptDialogOpen, setIsReceiptDialogOpen] = useState(false);
   const [isVoucherDialogOpen, setIsVoucherDialogOpen] = useState(false);
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
+  const queryClient = useQueryClient();
+
+  const handleRefresh = () => {
+    queryClient.invalidateQueries();
+  };
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل بيانات أمين الصندوق..." />;
@@ -30,10 +38,15 @@ export default function CashierDashboard() {
     <UnifiedDashboardLayout
       role="cashier"
       actions={
-        <Button onClick={() => setMessageDialogOpen(true)} className="gap-2">
-          <Mail className="h-4 w-4" />
-          <span className="hidden sm:inline">إرسال رسالة</span>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button onClick={handleRefresh} variant="ghost" size="icon" title="تحديث البيانات">
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+          <Button onClick={() => setMessageDialogOpen(true)} className="gap-2">
+            <Mail className="h-4 w-4" />
+            <span className="hidden sm:inline">إرسال رسالة</span>
+          </Button>
+        </div>
       }
     >
       {/* KPI Cards */}
@@ -67,6 +80,12 @@ export default function CashierDashboard() {
           subtitle="في انتظار المعالجة"
         />
       </UnifiedStatsGrid>
+
+      {/* بطاقات الرصيد البنكي ورقبة الوقف */}
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2 mt-6 mb-4">
+        <BankBalanceCard />
+        <WaqfCorpusCard />
+      </div>
 
         {/* Tabs Section */}
         <Tabs defaultValue="overview" className="space-y-4">

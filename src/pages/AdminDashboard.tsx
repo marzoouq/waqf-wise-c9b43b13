@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Lock, Activity, Settings, Mail } from "lucide-react";
+import { LayoutDashboard, Users, Lock, Activity, Settings, Mail, RefreshCw } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Suspense, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -16,19 +16,31 @@ import { UnifiedDashboardLayout } from "@/components/dashboard/UnifiedDashboardL
 import { ChartSkeleton, SectionSkeleton } from "@/components/dashboard";
 import { BankBalanceCard } from "@/components/shared/BankBalanceCard";
 import { WaqfCorpusCard } from "@/components/shared/WaqfCorpusCard";
+import { CurrentFiscalYearCard, RevenueProgressCard } from "@/components/dashboard/shared";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function AdminDashboard() {
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("system");
+  const queryClient = useQueryClient();
+
+  const handleRefresh = () => {
+    queryClient.invalidateQueries();
+  };
 
   return (
     <UnifiedDashboardLayout
       role="admin"
       actions={
-        <Button onClick={() => setMessageDialogOpen(true)} className="gap-2">
-          <Mail className="h-4 w-4" />
-          <span className="hidden sm:inline">إرسال رسالة</span>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button onClick={handleRefresh} variant="ghost" size="icon" title="تحديث البيانات">
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+          <Button onClick={() => setMessageDialogOpen(true)} className="gap-2">
+            <Mail className="h-4 w-4" />
+            <span className="hidden sm:inline">إرسال رسالة</span>
+          </Button>
+        </div>
       }
     >
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -72,6 +84,12 @@ export default function AdminDashboard() {
 
         {/* System Tab */}
         <TabsContent value="system" className="space-y-6 mt-6">
+          {/* السنة المالية وتقدم الإيرادات */}
+          <div className="grid gap-6 lg:grid-cols-2">
+            <CurrentFiscalYearCard />
+            <RevenueProgressCard />
+          </div>
+
           <Suspense fallback={<SectionSkeleton />}>
             <AdminKPIs />
           </Suspense>
