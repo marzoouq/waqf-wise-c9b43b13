@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useFiscalYears } from "@/hooks/useFiscalYears";
 import { useFiscalYearClosings } from "@/hooks/useFiscalYearClosings";
-import { CalendarIcon, Lock, Unlock, FileCheck, FileX, TrendingUp, AlertCircle, TestTube } from "lucide-react";
+import { CalendarIcon, Lock, Unlock, FileCheck, FileX, TrendingUp, AlertCircle, TestTube, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format, arLocale as ar } from "@/lib/date";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -18,6 +18,7 @@ import { FiscalYearSummaryCard } from "@/components/fiscal-years/FiscalYearSumma
 import { ManualClosingDialog } from "@/components/fiscal-years/ManualClosingDialog";
 import { AutomaticClosingDialog } from "@/components/fiscal-years/AutomaticClosingDialog";
 import { FiscalYearTestPanel } from "@/components/fiscal-years/FiscalYearTestPanel";
+import { AddFiscalYearDialog } from "@/components/fiscal-years/AddFiscalYearDialog";
 
 export default function FiscalYearsManagement() {
   const { fiscalYears, isLoading: loadingYears } = useFiscalYears();
@@ -26,6 +27,7 @@ export default function FiscalYearsManagement() {
   const [manualClosingOpen, setManualClosingOpen] = useState(false);
   const [autoClosingOpen, setAutoClosingOpen] = useState(false);
   const [showTests, setShowTests] = useState(false);
+  const [addYearOpen, setAddYearOpen] = useState(false);
 
   const selectedYear = fiscalYears?.find(y => y.id === selectedYearId);
   const selectedClosing = closings?.find(c => c.fiscal_year_id === selectedYearId);
@@ -51,19 +53,28 @@ export default function FiscalYearsManagement() {
   return (
     <MobileOptimizedLayout>
       <div className="mb-6">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
             <h1 className="text-3xl font-bold">إدارة السنوات المالية</h1>
             <p className="text-muted-foreground">إقفال ومراجعة السنوات المالية</p>
           </div>
-          <Button 
-            variant="outline" 
-            onClick={() => setShowTests(!showTests)}
-            className="gap-2"
-          >
-            <TestTube className="h-4 w-4" />
-            {showTests ? "إخفاء الاختبارات" : "عرض الاختبارات"}
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              onClick={() => setAddYearOpen(true)}
+              className="gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              إضافة سنة مالية
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowTests(!showTests)}
+              className="gap-2"
+            >
+              <TestTube className="h-4 w-4" />
+              {showTests ? "إخفاء الاختبارات" : "عرض الاختبارات"}
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -257,6 +268,12 @@ export default function FiscalYearsManagement() {
             />
           </>
         )}
+
+        {/* نافذة إضافة سنة مالية */}
+        <AddFiscalYearDialog
+          open={addYearOpen}
+          onOpenChange={setAddYearOpen}
+        />
       </MobileOptimizedLayout>
   );
 }
