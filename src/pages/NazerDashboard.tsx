@@ -1,4 +1,4 @@
-import { Mail } from "lucide-react";
+import { Mail, Coins, Globe } from "lucide-react";
 import { Suspense, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { AdminSendMessageDialog } from "@/components/messages/AdminSendMessageDialog";
@@ -11,18 +11,33 @@ import QuickActionsGrid from "@/components/dashboard/nazer/QuickActionsGrid";
 import { AIInsightsWidget } from "@/components/dashboard/AIInsightsWidget";
 import { BankBalanceCard } from "@/components/shared/BankBalanceCard";
 import { WaqfCorpusCard } from "@/components/shared/WaqfCorpusCard";
+import { DistributeRevenueDialog } from "@/components/nazer/DistributeRevenueDialog";
+import { PublishFiscalYearDialog } from "@/components/nazer/PublishFiscalYearDialog";
+import { FiscalYearPublishStatus } from "@/components/nazer/FiscalYearPublishStatus";
 
 export default function NazerDashboard() {
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
+  const [distributeDialogOpen, setDistributeDialogOpen] = useState(false);
+  const [publishDialogOpen, setPublishDialogOpen] = useState(false);
 
   return (
     <UnifiedDashboardLayout
       role="nazer"
       actions={
-        <Button onClick={() => setMessageDialogOpen(true)} className="gap-2">
-          <Mail className="h-4 w-4" />
-          <span className="hidden sm:inline">إرسال رسالة</span>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button onClick={() => setDistributeDialogOpen(true)} className="gap-2" variant="default">
+            <Coins className="h-4 w-4" />
+            <span className="hidden sm:inline">توزيع الغلة</span>
+          </Button>
+          <Button onClick={() => setPublishDialogOpen(true)} className="gap-2" variant="outline">
+            <Globe className="h-4 w-4" />
+            <span className="hidden sm:inline">نشر السنة</span>
+          </Button>
+          <Button onClick={() => setMessageDialogOpen(true)} className="gap-2" variant="ghost">
+            <Mail className="h-4 w-4" />
+            <span className="hidden sm:inline">رسالة</span>
+          </Button>
+        </div>
       }
     >
       <div className="space-y-6">

@@ -122,3 +122,9 @@ verify_jwt = true
 
 [functions.update-user-email]
 verify_jwt = true
+
+[functions.distribute-revenue]
+verify_jwt = true
+
+[functions.publish-fiscal-year]
+verify_jwt = true
