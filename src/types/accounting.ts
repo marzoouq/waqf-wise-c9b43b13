@@ -53,6 +53,9 @@ export interface FiscalYear {
   end_date: string;
   is_active: boolean;
   is_closed: boolean;
+  is_published: boolean;
+  published_at: string | null;
+  published_by: string | null;
   created_at: string;
   updated_at: string;
 }
