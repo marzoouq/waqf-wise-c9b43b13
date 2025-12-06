@@ -4209,7 +4209,10 @@ export type Database = {
           id: string
           is_active: boolean
           is_closed: boolean
+          is_published: boolean | null
           name: string
+          published_at: string | null
+          published_by: string | null
           start_date: string
           updated_at: string
         }
@@ -4219,7 +4222,10 @@ export type Database = {
           id?: string
           is_active?: boolean
           is_closed?: boolean
+          is_published?: boolean | null
           name: string
+          published_at?: string | null
+          published_by?: string | null
           start_date: string
           updated_at?: string
         }
@@ -4229,7 +4235,10 @@ export type Database = {
           id?: string
           is_active?: boolean
           is_closed?: boolean
+          is_published?: boolean | null
           name?: string
+          published_at?: string | null
+          published_by?: string | null
           start_date?: string
           updated_at?: string
         }
@@ -11395,6 +11404,15 @@ export type Database = {
         Args: { property_id: string }
         Returns: number
       }
+      calculate_shariah_distribution: {
+        Args: { p_total_amount: number }
+        Returns: {
+          beneficiary_id: string
+          heir_type: string
+          share_amount: number
+          share_percentage: number
+        }[]
+      }
       calculate_sla_due_date: {
         Args: { p_request_type_id: string }
         Returns: string
@@ -11685,6 +11703,7 @@ export type Database = {
         Args: { user_uuid: string }
         Returns: boolean
       }
+      is_fiscal_year_published: { Args: { fy_id: string }; Returns: boolean }
       is_staff: { Args: never; Returns: boolean }
       is_staff_only: { Args: never; Returns: boolean }
       is_waqf_heir: { Args: { _user_id?: string }; Returns: boolean }
