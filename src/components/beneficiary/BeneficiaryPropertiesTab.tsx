@@ -4,13 +4,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { Building2, Home, MapPin, Calendar } from "lucide-react";
+import { Building2, Home, MapPin, Calendar, EyeOff } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
+import { useFiscalYearPublishStatus } from "@/hooks/useFiscalYearPublishStatus";
 import { MaskedValue } from "@/components/shared/MaskedValue";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MobilePropertyCard } from "./cards/MobilePropertyCard";
 import { MobileContractCard } from "./cards/MobileContractCard";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 // نوع العقد مع بيانات العقار
 interface ContractWithProperty {
@@ -30,9 +32,10 @@ interface ContractWithProperty {
 
 export function BeneficiaryPropertiesTab() {
   const { settings } = useVisibilitySettings();
+  const { isCurrentYearPublished, isLoading: publishStatusLoading } = useFiscalYearPublishStatus();
   const isMobile = useIsMobile();
   
-  // جلب العقارات
+  // جلب العقارات (العقارات تظهر دائماً)
   const { data: properties = [], isLoading: propertiesLoading } = useQuery({
     queryKey: ["properties-for-beneficiary"],
     queryFn: async () => {
@@ -46,14 +49,25 @@ export function BeneficiaryPropertiesTab() {
     },
   });
 
-  // جلب العقود النشطة
-  const { data: contracts = [], isLoading: contractsLoading } = useQuery<ContractWithProperty[]>({
-    queryKey: ["contracts-for-beneficiary"],
+  // جلب العقود النشطة - تظهر فقط عند نشر السنة المالية
+  const { data: contracts = [], isLoading: contractsLoading } = useQuery({
+    queryKey: ["contracts-for-beneficiary", isCurrentYearPublished],
     queryFn: async () => {
+      // إذا لم تكن السنة منشورة، لا نعرض العقود
+      if (!isCurrentYearPublished) {
+        return [] as ContractWithProperty[];
+      }
+
       const { data, error } = await supabase
         .from("contracts")
         .select(`
-          *,
+          id,
+          contract_number,
+          tenant_name,
+          monthly_rent,
+          start_date,
+          end_date,
+          status,
           properties (
             name,
             type,
@@ -64,8 +78,9 @@ export function BeneficiaryPropertiesTab() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as ContractWithProperty[];
+      return (data || []) as ContractWithProperty[];
     },
+    enabled: !publishStatusLoading,
   });
 
   const getPropertyTypeBadge = (type: string) => {
@@ -203,7 +218,17 @@ export function BeneficiaryPropertiesTab() {
 
       {/* Contracts Table/Cards */}
       {settings?.show_contracts_details && (
-        <Card>
+        <>
+          {/* تنبيه إذا كانت السنة غير منشورة */}
+          {!isCurrentYearPublished && (
+            <Alert className="border-amber-200 bg-amber-50 dark:bg-amber-950/20">
+              <EyeOff className="h-4 w-4 text-amber-600" />
+              <AlertDescription className="text-amber-700 dark:text-amber-300">
+                تفاصيل العقود للسنة المالية الحالية مخفية حتى يتم نشرها من قبل الناظر
+              </AlertDescription>
+            </Alert>
+          )}
+          <Card>
           <CardHeader>
             <CardTitle>عقود الإيجار النشطة</CardTitle>
             <CardDescription>العقود الحالية مع المستأجرين</CardDescription>
@@ -282,6 +307,7 @@ export function BeneficiaryPropertiesTab() {
             )}
           </CardContent>
         </Card>
+        </>
       )}
     </div>
   );

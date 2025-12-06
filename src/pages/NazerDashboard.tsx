@@ -41,6 +41,9 @@ export default function NazerDashboard() {
       }
     >
       <div className="space-y-6">
+        {/* حالة نشر السنة المالية */}
+        <FiscalYearPublishStatus onPublishClick={() => setPublishDialogOpen(true)} />
+
         <Suspense fallback={<SectionSkeleton />}>
           <NazerKPIs />
         </Suspense>
