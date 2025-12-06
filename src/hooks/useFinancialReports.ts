@@ -43,6 +43,7 @@ export interface BalanceSheetData {
     reserves: number;
     total: number;
   };
+  retainedEarnings: number;
 }
 
 export interface IncomeStatementData {
@@ -134,11 +135,16 @@ export function useFinancialReports(fiscalYearId?: string) {
       }
 
       // Calculate totals
-      const result: BalanceSheetData = {
+      const result: BalanceSheetData & { retainedEarnings: number } = {
         assets: { current: 0, fixed: 0, total: 0 },
         liabilities: { current: 0, longTerm: 0, total: 0 },
         equity: { capital: 0, reserves: 0, total: 0 },
+        retainedEarnings: 0,
       };
+
+      // Calculate revenues and expenses for net income
+      let totalRevenue = 0;
+      let totalExpenses = 0;
 
       accounts.data.forEach((account) => {
         const balance = balances.get(account.id) || 0;
@@ -157,12 +163,22 @@ export function useFinancialReports(fiscalYearId?: string) {
           } else {
             result.equity.reserves += balance;
           }
+        } else if (account.code.startsWith("4")) {
+          // Revenues - credit balance (negative in our system)
+          totalRevenue += Math.abs(balance);
+        } else if (account.code.startsWith("5")) {
+          // Expenses - debit balance (positive in our system)
+          totalExpenses += balance;
         }
       });
 
+      // Calculate net income (retained earnings)
+      result.retainedEarnings = totalRevenue - totalExpenses;
+
       result.assets.total = result.assets.current + result.assets.fixed;
       result.liabilities.total = result.liabilities.current + result.liabilities.longTerm;
-      result.equity.total = result.equity.capital + result.equity.reserves;
+      // Total equity includes capital + reserves + retained earnings
+      result.equity.total = result.equity.capital + result.equity.reserves + result.retainedEarnings;
 
       return result;
     },

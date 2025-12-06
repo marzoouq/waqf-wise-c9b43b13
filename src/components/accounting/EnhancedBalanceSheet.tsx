@@ -47,8 +47,9 @@ export function EnhancedBalanceSheet() {
       {
         title: 'حقوق الملكية',
         items: [
-          { label: 'رأس مال الوقف', amount: balanceSheet.equity.capital },
+          { label: 'رأس مال الوقف (رقبة الوقف)', amount: balanceSheet.equity.capital },
           { label: 'الاحتياطيات', amount: balanceSheet.equity.reserves },
+          { label: 'الأرباح المحتجزة (صافي الدخل)', amount: balanceSheet.retainedEarnings || 0 },
         ]
       }
     ];
@@ -139,13 +140,18 @@ export function EnhancedBalanceSheet() {
               <h4 className="font-semibold text-accent pt-4">حقوق الملكية:</h4>
               
               <div className="flex justify-between items-center pr-4">
-                <span>رأس مال الوقف:</span>
+                <span>رأس مال الوقف (رقبة الوقف):</span>
                 <span className="font-mono">{formatNumber(balanceSheet.equity.capital)}</span>
               </div>
               
               <div className="flex justify-between items-center pr-4">
                 <span>الاحتياطيات:</span>
                 <span className="font-mono">{formatNumber(balanceSheet.equity.reserves)}</span>
+              </div>
+              
+              <div className="flex justify-between items-center pr-4">
+                <span>الأرباح المحتجزة (صافي الدخل):</span>
+                <span className="font-mono">{formatNumber(balanceSheet.retainedEarnings || 0)}</span>
               </div>
               
               <div className="flex justify-between items-center font-semibold">
