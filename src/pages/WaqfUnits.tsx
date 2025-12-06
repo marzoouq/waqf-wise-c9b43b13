@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Search, Building2, DollarSign, TrendingUp, AlertCircle, Eye } from "lucide-react";
+import { Plus, Search, Building2, DollarSign, TrendingUp, AlertCircle, Eye, CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useWaqfUnits, type WaqfUnit } from "@/hooks/useWaqfUnits";
+import { useFiscalYears } from "@/hooks/useFiscalYears";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EnhancedEmptyState } from "@/components/shared";
 import { WaqfUnitDialog } from "@/components/waqf/WaqfUnitDialog";
@@ -25,14 +26,19 @@ import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layou
 
 export default function WaqfUnits() {
   const { waqfUnits, isLoading } = useWaqfUnits();
+  const { fiscalYears } = useFiscalYears();
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [selectedFiscalYear, setSelectedFiscalYear] = useState<string>("all");
   const [selectedUnit, setSelectedUnit] = useState<WaqfUnit | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
   const [selectedDetailsUnit, setSelectedDetailsUnit] = useState<WaqfUnit | null>(null);
   // فلاتر متقدمة - is_active: 'true' | 'false'
   const [advancedFilters, setAdvancedFilters] = useState<FiltersRecord>({});
+  
+  // الحصول على السنة المالية النشطة
+  const activeFiscalYear = fiscalYears.find(fy => fy.is_active);
 
   // Filter waqf units
   const filteredUnits = waqfUnits.filter((unit) => {
@@ -221,6 +227,20 @@ export default function WaqfUnits() {
             onApplyFilters={setAdvancedFilters}
             onClearFilters={() => setAdvancedFilters({})}
           />
+          <Select value={selectedFiscalYear} onValueChange={setSelectedFiscalYear}>
+            <SelectTrigger className="w-full md:w-56">
+              <CalendarDays className="h-4 w-4 ml-2" />
+              <SelectValue placeholder="السنة المالية" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">جميع السنوات</SelectItem>
+              {fiscalYears.map((fy) => (
+                <SelectItem key={fy.id} value={fy.id}>
+                  {fy.name} {fy.is_active && "(نشطة)"} {fy.is_closed && "(مغلقة)"}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Select value={typeFilter} onValueChange={setTypeFilter}>
             <SelectTrigger className="w-full md:w-48">
               <SelectValue placeholder="نوع الوقف" />
@@ -404,6 +424,7 @@ export default function WaqfUnits() {
         open={detailsDialogOpen}
         onOpenChange={setDetailsDialogOpen}
         waqfUnit={selectedDetailsUnit}
+        selectedFiscalYearId={selectedFiscalYear !== 'all' ? selectedFiscalYear : activeFiscalYear?.id}
       />
 
       {/* Bulk Actions Bar */}
