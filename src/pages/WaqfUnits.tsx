@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { Plus, Search, Building2, DollarSign, TrendingUp, AlertCircle } from "lucide-react";
+import { useState } from "react";
+import { Plus, Search, Building2, DollarSign, TrendingUp, AlertCircle, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -12,6 +12,7 @@ import { useWaqfUnits, type WaqfUnit } from "@/hooks/useWaqfUnits";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EnhancedEmptyState } from "@/components/shared";
 import { WaqfUnitDialog } from "@/components/waqf/WaqfUnitDialog";
+import { WaqfUnitDetailsDialog } from "@/components/waqf/WaqfUnitDetailsDialog";
 import { ExportButton } from "@/components/shared/ExportButton";
 import { SortableTableHeader } from "@/components/shared/SortableTableHeader";
 import { BulkActionsBar } from "@/components/shared/BulkActionsBar";
@@ -28,6 +29,8 @@ export default function WaqfUnits() {
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [selectedUnit, setSelectedUnit] = useState<WaqfUnit | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
+  const [selectedDetailsUnit, setSelectedDetailsUnit] = useState<WaqfUnit | null>(null);
   // فلاتر متقدمة - is_active: 'true' | 'false'
   const [advancedFilters, setAdvancedFilters] = useState<FiltersRecord>({});
 
@@ -353,7 +356,19 @@ export default function WaqfUnits() {
                         {unit.is_active ? "نشط" : "غير نشط"}
                       </Badge>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedDetailsUnit(unit);
+                          setDetailsDialogOpen(true);
+                        }}
+                        className="text-xs sm:text-sm gap-1"
+                      >
+                        <Eye className="h-4 w-4" />
+                        عرض
+                      </Button>
                       <Button
                         variant="outline"
                         size="sm"
@@ -382,6 +397,13 @@ export default function WaqfUnits() {
           if (!open) setSelectedUnit(null);
         }}
         waqfUnit={selectedUnit}
+      />
+
+      {/* Details Dialog */}
+      <WaqfUnitDetailsDialog
+        open={detailsDialogOpen}
+        onOpenChange={setDetailsDialogOpen}
+        waqfUnit={selectedDetailsUnit}
       />
 
       {/* Bulk Actions Bar */}
