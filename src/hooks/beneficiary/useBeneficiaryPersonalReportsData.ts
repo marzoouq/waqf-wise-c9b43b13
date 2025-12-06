@@ -1,6 +1,6 @@
 /**
  * Hook for BeneficiaryReports page (personal reports)
- * يجلب بيانات التقارير الشخصية للمستفيد
+ * يجلب بيانات التقارير الشخصية للمستفيد مع التوزيعات من heir_distributions
  */
 
 import { useState } from "react";
@@ -10,10 +10,11 @@ import { useAuth } from "@/hooks/useAuth";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 
-interface Payment {
-  amount: number;
-  payment_date: string;
-  description: string | null;
+interface HeirDistribution {
+  share_amount: number;
+  distribution_date: string;
+  heir_type: string;
+  notes: string | null;
 }
 
 interface Request {
@@ -65,22 +66,22 @@ export function useBeneficiaryPersonalReportsData() {
     enabled: !!user?.id,
   });
 
-  // جلب المدفوعات للسنة المحددة
-  const { data: payments = [], isLoading: isLoadingPayments } = useQuery({
-    queryKey: ['beneficiary-yearly-payments', beneficiary?.id, selectedYear],
+  // جلب التوزيعات من heir_distributions للسنة المحددة
+  const { data: distributions = [], isLoading: isLoadingDistributions } = useQuery({
+    queryKey: ['beneficiary-yearly-distributions', beneficiary?.id, selectedYear],
     queryFn: async () => {
       if (!beneficiary?.id) return [];
 
       const { data, error } = await supabase
-        .from('payments')
-        .select('amount, payment_date, description')
+        .from('heir_distributions')
+        .select('share_amount, distribution_date, heir_type, notes')
         .eq('beneficiary_id', beneficiary.id)
-        .gte('payment_date', `${selectedYear}-01-01`)
-        .lte('payment_date', `${selectedYear}-12-31`)
-        .order('payment_date', { ascending: true });
+        .gte('distribution_date', `${selectedYear}-01-01`)
+        .lte('distribution_date', `${selectedYear}-12-31`)
+        .order('distribution_date', { ascending: true });
 
       if (error) throw error;
-      return data as Payment[];
+      return data as HeirDistribution[];
     },
     enabled: !!beneficiary?.id && !!selectedYear,
   });
@@ -104,12 +105,12 @@ export function useBeneficiaryPersonalReportsData() {
     enabled: !!beneficiary?.id && !!selectedYear,
   });
 
-  // إحصائيات السنة
+  // إحصائيات السنة من التوزيعات
   const yearlyStats = {
-    totalReceived: payments.reduce((sum, p) => sum + Number(p.amount), 0),
-    paymentsCount: payments.length,
-    avgPayment: payments.length > 0 
-      ? payments.reduce((sum, p) => sum + Number(p.amount), 0) / payments.length 
+    totalReceived: distributions.reduce((sum, d) => sum + Number(d.share_amount), 0),
+    paymentsCount: distributions.length,
+    avgPayment: distributions.length > 0 
+      ? distributions.reduce((sum, d) => sum + Number(d.share_amount), 0) / distributions.length 
       : 0,
     requestsCount: requests.length,
     approvedRequests: requests.filter(r => r.status === 'approved').length,
@@ -118,15 +119,15 @@ export function useBeneficiaryPersonalReportsData() {
   // بيانات المخطط الشهري
   const monthlyData: MonthlyData[] = Array.from({ length: 12 }, (_, i) => {
     const month = i + 1;
-    const monthPayments = payments.filter(p => {
-      const paymentMonth = new Date(p.payment_date).getMonth() + 1;
-      return paymentMonth === month;
+    const monthDistributions = distributions.filter(d => {
+      const distMonth = new Date(d.distribution_date).getMonth() + 1;
+      return distMonth === month;
     });
     
     return {
       month: format(new Date(2024, i, 1), 'MMM', { locale: ar }),
-      amount: monthPayments.reduce((sum, p) => sum + Number(p.amount), 0),
-      count: monthPayments.length,
+      amount: monthDistributions.reduce((sum, d) => sum + Number(d.share_amount), 0),
+      count: monthDistributions.length,
     };
   });
 
@@ -139,12 +140,12 @@ export function useBeneficiaryPersonalReportsData() {
 
   return {
     beneficiary,
-    payments,
+    distributions,
     requests,
     yearlyStats,
     monthlyData,
     requestsStatusData,
-    isLoading: isLoadingPayments,
+    isLoading: isLoadingDistributions,
     selectedYear,
     setSelectedYear,
     reportType,
