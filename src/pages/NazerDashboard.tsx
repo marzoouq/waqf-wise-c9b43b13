@@ -73,6 +73,16 @@ export default function NazerDashboard() {
         open={messageDialogOpen}
         onOpenChange={setMessageDialogOpen}
       />
+
+      <DistributeRevenueDialog
+        open={distributeDialogOpen}
+        onOpenChange={setDistributeDialogOpen}
+      />
+
+      <PublishFiscalYearDialog
+        open={publishDialogOpen}
+        onOpenChange={setPublishDialogOpen}
+      />
     </UnifiedDashboardLayout>
   );
 }
