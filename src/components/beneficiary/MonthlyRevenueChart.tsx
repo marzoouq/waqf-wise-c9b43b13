@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { LoadingState } from "@/components/shared/LoadingState";
+import { EyeOff } from "lucide-react";
+import { useFiscalYearPublishStatus } from "@/hooks/useFiscalYearPublishStatus";
 
 interface MonthlyRevenue {
   month: string;
@@ -12,6 +15,20 @@ interface MonthlyRevenue {
 export function MonthlyRevenueChart() {
   const [data, setData] = useState<MonthlyRevenue[]>([]);
   const [loading, setLoading] = useState(true);
+  const { isCurrentYearPublished, isLoading: publishStatusLoading } = useFiscalYearPublishStatus();
+
+  // إذا لم تكن السنة منشورة، نعرض رسالة
+  if (!publishStatusLoading && !isCurrentYearPublished) {
+    return (
+      <Alert className="border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-800">
+        <EyeOff className="h-4 w-4 text-amber-600" />
+        <AlertTitle className="text-amber-800 dark:text-amber-200">الرسم البياني مخفي</AlertTitle>
+        <AlertDescription className="text-amber-700 dark:text-amber-300">
+          بيانات الإيرادات الشهرية مخفية حتى يتم نشر السنة المالية من قبل الناظر
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   useEffect(() => {
     const fetchRevenue = async () => {
