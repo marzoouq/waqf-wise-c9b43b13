@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Building2, MapPin, Calendar, TrendingUp, DollarSign, Home, Link2 } from "lucide-react";
+import { Building2, MapPin, Calendar, TrendingUp, DollarSign, Home, Link2, CalendarDays, CalendarRange, Calculator } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -16,6 +16,12 @@ import { format } from "@/lib/date";
 import type { WaqfUnit } from "@/hooks/useWaqfUnits";
 import { LinkPropertyDialog } from "./LinkPropertyDialog";
 
+interface ContractInfo {
+  monthly_rent: number;
+  payment_frequency: string;
+  status: string;
+}
+
 interface Property {
   id: string;
   name: string;
@@ -25,6 +31,7 @@ interface Property {
   occupied: number;
   monthly_revenue: number;
   status: string;
+  contracts?: ContractInfo[];
 }
 
 interface WaqfUnitDetailsDialogProps {
@@ -56,7 +63,14 @@ export function WaqfUnitDetailsDialog({
     try {
       const { data, error } = await supabase
         .from("properties")
-        .select("id, name, type, location, units, occupied, monthly_revenue, status")
+        .select(`
+          id, name, type, location, units, occupied, monthly_revenue, status,
+          contracts!contracts_property_id_fkey(
+            monthly_rent, 
+            payment_frequency, 
+            status
+          )
+        `)
         .eq("waqf_unit_id", waqfUnit.id);
 
       if (error) throw error;
@@ -75,7 +89,33 @@ export function WaqfUnitDetailsDialog({
 
   if (!waqfUnit) return null;
 
-  const totalMonthlyRevenue = properties.reduce((sum, p) => sum + (p.monthly_revenue || 0), 0);
+  // حساب الإيرادات من العقود النشطة
+  const calculateRevenues = () => {
+    let monthlyFromContracts = 0; // إيرادات من عقود شهرية
+    let annualFromContracts = 0; // إيرادات من عقود سنوية
+
+    properties.forEach((property) => {
+      const activeContracts = property.contracts?.filter(c => c.status === 'نشط') || [];
+      activeContracts.forEach((contract) => {
+        if (contract.payment_frequency === 'شهري') {
+          monthlyFromContracts += contract.monthly_rent || 0;
+        } else if (contract.payment_frequency === 'سنوي') {
+          annualFromContracts += contract.monthly_rent || 0;
+        }
+      });
+    });
+
+    // إجمالي الإيرادات السنوية = (الشهري × 12) + السنوي
+    const totalYearlyIncome = (monthlyFromContracts * 12) + annualFromContracts;
+
+    return {
+      monthlyRevenue: monthlyFromContracts,
+      annualRevenue: annualFromContracts,
+      totalYearlyIncome,
+    };
+  };
+
+  const revenues = calculateRevenues();
   const totalUnits = properties.reduce((sum, p) => sum + (p.units || 0), 0);
   const totalOccupied = properties.reduce((sum, p) => sum + (p.occupied || 0), 0);
   const occupancyRate = totalUnits > 0 ? Math.round((totalOccupied / totalUnits) * 100) : 0;
@@ -177,16 +217,52 @@ export function WaqfUnitDetailsDialog({
                       <span>{properties.length}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">الإيراد الشهري:</span>
-                      <span className="text-primary font-semibold">
-                        {totalMonthlyRevenue.toLocaleString("ar-SA")} ريال
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
                       <span className="text-muted-foreground">نسبة الإشغال:</span>
                       <span>{occupancyRate}%</span>
                     </div>
                   </div>
+                </Card>
+              </div>
+
+              {/* Revenue Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card className="p-4 border-blue-200 bg-blue-50/50 dark:border-blue-800 dark:bg-blue-950/20">
+                  <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 mb-2">
+                    <CalendarDays className="h-5 w-5" />
+                    <span className="font-semibold">الإيراد الشهري</span>
+                  </div>
+                  <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">
+                    {revenues.monthlyRevenue.toLocaleString("ar-SA")} ريال
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    من العقود الشهرية النشطة
+                  </p>
+                </Card>
+
+                <Card className="p-4 border-green-200 bg-green-50/50 dark:border-green-800 dark:bg-green-950/20">
+                  <div className="flex items-center gap-2 text-green-600 dark:text-green-400 mb-2">
+                    <CalendarRange className="h-5 w-5" />
+                    <span className="font-semibold">الإيراد السنوي</span>
+                  </div>
+                  <p className="text-2xl font-bold text-green-700 dark:text-green-300">
+                    {revenues.annualRevenue.toLocaleString("ar-SA")} ريال
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    من العقود السنوية النشطة
+                  </p>
+                </Card>
+
+                <Card className="p-4 border-primary/30 bg-primary/5">
+                  <div className="flex items-center gap-2 text-primary mb-2">
+                    <Calculator className="h-5 w-5" />
+                    <span className="font-semibold">إجمالي الإيرادات السنوية</span>
+                  </div>
+                  <p className="text-2xl font-bold text-primary">
+                    {revenues.totalYearlyIncome.toLocaleString("ar-SA")} ريال
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    (الشهري × 12) + السنوي
+                  </p>
                 </Card>
               </div>
             </TabsContent>
@@ -229,37 +305,49 @@ export function WaqfUnitDetailsDialog({
                         <TableHead className="text-right">النوع</TableHead>
                         <TableHead className="text-right">الموقع</TableHead>
                         <TableHead className="text-right">الوحدات</TableHead>
-                        <TableHead className="text-right">الإيراد الشهري</TableHead>
+                        <TableHead className="text-right">نوع الدفع</TableHead>
+                        <TableHead className="text-right">قيمة الإيجار</TableHead>
                         <TableHead className="text-right">الحالة</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {properties.map((property) => (
-                        <TableRow key={property.id}>
-                          <TableCell className="font-medium">{property.name}</TableCell>
-                          <TableCell>{property.type}</TableCell>
-                          <TableCell>{property.location}</TableCell>
-                          <TableCell>
-                            {property.occupied}/{property.units}
-                          </TableCell>
-                          <TableCell className="text-primary font-semibold">
-                            {(property.monthly_revenue || 0).toLocaleString("ar-SA")} ريال
-                          </TableCell>
-                          <TableCell>
-                            <Badge
-                              variant={
-                                property.status === "مؤجر"
-                                  ? "default"
-                                  : property.status === "شاغر"
-                                  ? "secondary"
-                                  : "outline"
-                              }
-                            >
-                              {property.status}
-                            </Badge>
-                          </TableCell>
-                        </TableRow>
-                      ))}
+                      {properties.map((property) => {
+                        const activeContract = property.contracts?.find(c => c.status === 'نشط');
+                        const paymentType = activeContract?.payment_frequency || '-';
+                        const rentAmount = activeContract?.monthly_rent || 0;
+                        
+                        return (
+                          <TableRow key={property.id}>
+                            <TableCell className="font-medium">{property.name}</TableCell>
+                            <TableCell>{property.type}</TableCell>
+                            <TableCell>{property.location}</TableCell>
+                            <TableCell>
+                              {property.occupied}/{property.units}
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant={paymentType === 'شهري' ? 'default' : paymentType === 'سنوي' ? 'secondary' : 'outline'}>
+                                {paymentType}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-primary font-semibold">
+                              {rentAmount.toLocaleString("ar-SA")} ريال
+                            </TableCell>
+                            <TableCell>
+                              <Badge
+                                variant={
+                                  property.status === "مؤجر"
+                                    ? "default"
+                                    : property.status === "شاغر"
+                                    ? "secondary"
+                                    : "outline"
+                                }
+                              >
+                                {property.status}
+                              </Badge>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
                     </TableBody>
                   </Table>
                 </Card>
