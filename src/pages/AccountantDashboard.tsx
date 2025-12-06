@@ -17,6 +17,9 @@ import { AdminSendMessageDialog } from "@/components/messages/AdminSendMessageDi
 import { JournalApproval } from "@/types/approvals";
 import { BankBalanceCard } from "@/components/shared/BankBalanceCard";
 import { WaqfCorpusCard } from "@/components/shared/WaqfCorpusCard";
+import { CurrentFiscalYearCard, RevenueProgressCard } from "@/components/dashboard/shared";
+import { useQueryClient } from "@tanstack/react-query";
+import { RefreshCw } from "lucide-react";
 
 // Lazy load components
 const AccountingStats = lazy(() => import("@/components/dashboard/AccountingStats"));
@@ -27,9 +30,14 @@ const AccountantDashboard = () => {
   const [selectedApproval, setSelectedApproval] = useState<JournalApproval | null>(null);
   const [isApprovalDialogOpen, setIsApprovalDialogOpen] = useState(false);
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
+  const queryClient = useQueryClient();
   
   const { data: kpis, isLoading: kpisLoading } = useAccountantKPIs();
   const { pendingApprovals, isLoading: approvalsLoading } = useAccountantDashboardData();
+
+  const handleRefresh = () => {
+    queryClient.invalidateQueries();
+  };
 
   const getStatusBadge = (status: string) => {
     type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
@@ -53,10 +61,15 @@ const AccountantDashboard = () => {
     <UnifiedDashboardLayout
       role="accountant"
       actions={
-        <Button onClick={() => setMessageDialogOpen(true)} className="gap-2">
-          <Mail className="h-4 w-4" />
-          <span className="hidden sm:inline">إرسال رسالة</span>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button onClick={handleRefresh} variant="ghost" size="icon" title="تحديث البيانات">
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+          <Button onClick={() => setMessageDialogOpen(true)} className="gap-2">
+            <Mail className="h-4 w-4" />
+            <span className="hidden sm:inline">إرسال رسالة</span>
+          </Button>
+        </div>
       }
     >
       {/* Statistics Cards */}
@@ -95,8 +108,14 @@ const AccountantDashboard = () => {
         </UnifiedStatsGrid>
         )}
 
+        {/* السنة المالية وتقدم الإيرادات */}
+        <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2 mt-4">
+          <CurrentFiscalYearCard />
+          <RevenueProgressCard />
+        </div>
+
         {/* بطاقات الرصيد البنكي ورقبة الوقف */}
-        <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2">
+        <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2 mt-4">
           <BankBalanceCard />
           <WaqfCorpusCard />
         </div>
