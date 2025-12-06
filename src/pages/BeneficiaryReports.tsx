@@ -17,6 +17,7 @@ export default function BeneficiaryReports() {
   const { toast } = useToast();
   const {
     beneficiary,
+    distributions,
     yearlyStats,
     monthlyData,
     requestsStatusData,
@@ -54,19 +55,19 @@ export default function BeneficiaryReports() {
     doc.text('الإحصائيات السنوية', 20, 75);
     doc.setFontSize(11);
     doc.text(`إجمالي المستلم: ${formatCurrency(yearlyStats.totalReceived)}`, 25, 85);
-    doc.text(`عدد المدفوعات: ${yearlyStats.paymentsCount}`, 25, 93);
-    doc.text(`متوسط الدفعة: ${formatCurrency(yearlyStats.avgPayment)}`, 25, 101);
+    doc.text(`عدد التوزيعات: ${yearlyStats.paymentsCount}`, 25, 93);
+    doc.text(`متوسط التوزيع: ${formatCurrency(yearlyStats.avgPayment)}`, 25, 101);
     doc.text(`عدد الطلبات: ${yearlyStats.requestsCount}`, 25, 109);
     doc.text(`الطلبات المعتمدة: ${yearlyStats.approvedRequests}`, 25, 117);
     
-    // جدول المدفوعات الشهرية
+    // جدول التوزيعات الشهرية
     const tableData = monthlyData
       .filter(m => m.amount > 0)
       .map(m => [m.month, m.count, formatCurrency(m.amount)]);
     
     doc.autoTable({
       startY: 130,
-      head: [['الشهر', 'عدد المدفوعات', 'المبلغ الإجمالي']],
+      head: [['الشهر', 'عدد التوزيعات', 'المبلغ الإجمالي']],
       body: tableData,
       styles: { font: 'helvetica', fontSize: 10 },
       headStyles: { fillColor: [71, 85, 105] },
@@ -194,7 +195,7 @@ export default function BeneficiaryReports() {
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <FileText className="h-4 w-4" />
-              عدد المدفوعات
+              عدد التوزيعات
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -206,7 +207,7 @@ export default function BeneficiaryReports() {
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
-              متوسط الدفعة
+              متوسط التوزيع
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -239,11 +240,11 @@ export default function BeneficiaryReports() {
 
       {/* المخططات */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* مخطط المدفوعات الشهرية */}
+        {/* مخطط التوزيعات الشهرية */}
         <Card>
           <CardHeader>
-            <CardTitle>المدفوعات الشهرية</CardTitle>
-            <CardDescription>توزيع المدفوعات على مدار السنة</CardDescription>
+            <CardTitle>التوزيعات الشهرية</CardTitle>
+            <CardDescription>توزيع المستحقات على مدار السنة</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -294,8 +295,8 @@ export default function BeneficiaryReports() {
       {/* مخطط الاتجاه الزمني */}
       <Card>
         <CardHeader>
-          <CardTitle>الاتجاه الزمني للمدفوعات</CardTitle>
-          <CardDescription>تطور المدفوعات خلال العام</CardDescription>
+          <CardTitle>الاتجاه الزمني للتوزيعات</CardTitle>
+          <CardDescription>تطور التوزيعات خلال العام</CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
