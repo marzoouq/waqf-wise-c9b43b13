@@ -3,9 +3,12 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Landmark, RefreshCw, Wifi } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Landmark, RefreshCw, Wifi, EyeOff } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { productionLogger } from "@/lib/logger/production-logger";
+import { useFiscalYearPublishStatus } from "@/hooks/useFiscalYearPublishStatus";
+import { useAuth } from "@/hooks/useAuth";
 
 interface BankBalanceCardProps {
   className?: string;
@@ -16,6 +19,12 @@ export function BankBalanceCard({ className, compact = false }: BankBalanceCardP
   const queryClient = useQueryClient();
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [isLive, setIsLive] = useState(false);
+  const { roles } = useAuth();
+  const { isCurrentYearPublished, isLoading: publishStatusLoading } = useFiscalYearPublishStatus();
+  
+  // التحقق من أن المستخدم مستفيد/وارث وليس موظف
+  const isBeneficiaryOrHeir = roles.some(r => ['beneficiary', 'waqf_heir'].includes(r)) && 
+                              !roles.some(r => ['admin', 'nazer', 'accountant', 'cashier'].includes(r));
 
   // جلب رصيد البنك من حساب النقدية والبنوك
   const { data: bankBalance, isLoading } = useQuery({
@@ -64,7 +73,20 @@ export function BankBalanceCard({ className, compact = false }: BankBalanceCardP
 
   const balance = bankBalance?.current_balance || 0;
 
-  if (isLoading) {
+  // إخفاء الرصيد للمستفيدين/الورثة إذا لم تكن السنة منشورة
+  if (isBeneficiaryOrHeir && !publishStatusLoading && !isCurrentYearPublished) {
+    return (
+      <Alert className={`border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-800 ${className}`}>
+        <EyeOff className="h-4 w-4 text-amber-600" />
+        <AlertTitle className="text-amber-800 dark:text-amber-200">الرصيد البنكي مخفي</AlertTitle>
+        <AlertDescription className="text-amber-700 dark:text-amber-300">
+          سيتم عرض الرصيد البنكي بعد اعتماد ونشر السنة المالية من قبل الناظر
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  if (isLoading || publishStatusLoading) {
     return (
       <Card className={className}>
         <CardHeader className={compact ? "pb-2" : ""}>
