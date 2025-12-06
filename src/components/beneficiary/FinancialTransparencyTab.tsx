@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Building2, FileText, TrendingUp, PieChart } from "lucide-react";
+import { Building2, FileText, TrendingUp, PieChart, EyeOff } from "lucide-react";
 import { PropertyAccordionView } from "./PropertyAccordionView";
 import { ContractsTable } from "./ContractsTable";
 import { MonthlyRevenueChart } from "./MonthlyRevenueChart";
@@ -7,14 +7,20 @@ import { DistributionPieChart } from "./DistributionPieChart";
 import { EmptyPaymentsState } from "./EmptyPaymentsState";
 import { useBeneficiaryProfile } from "@/hooks/useBeneficiaryProfile";
 import { useAuth } from "@/hooks/useAuth";
+import { useFiscalYearPublishStatus } from "@/hooks/useFiscalYearPublishStatus";
+import { FiscalYearNotPublishedBanner } from "./FiscalYearNotPublishedBanner";
 
 export function FinancialTransparencyTab() {
   const { user } = useAuth();
   const { payments } = useBeneficiaryProfile(user?.id);
+  const { isCurrentYearPublished } = useFiscalYearPublishStatus();
   const hasPayments = payments && payments.length > 0;
 
   return (
     <div className="space-y-6">
+      {/* بانر التنبيه إذا السنة غير منشورة */}
+      <FiscalYearNotPublishedBanner />
+      
       <Card className="bg-primary/5 border-primary/20">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -22,7 +28,9 @@ export function FinancialTransparencyTab() {
             الشفافية المالية الكاملة
           </CardTitle>
           <CardDescription>
-            اطلع على جميع بيانات الوقف المالية والعقارية - شفافية كاملة 100%
+            {isCurrentYearPublished 
+              ? "اطلع على جميع بيانات الوقف المالية والعقارية - شفافية كاملة 100%"
+              : "بعض البيانات المالية مخفية حتى يتم نشر السنة المالية من قبل الناظر"}
           </CardDescription>
         </CardHeader>
       </Card>

@@ -1,8 +1,10 @@
 import { useContracts } from "@/hooks/useContracts";
 import { Badge } from "@/components/ui/badge";
-import { FileText } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { FileText, EyeOff } from "lucide-react";
 import { UnifiedDataTable, type Column } from "@/components/unified/UnifiedDataTable";
 import { format, arLocale as ar } from "@/lib/date";
+import { useFiscalYearPublishStatus } from "@/hooks/useFiscalYearPublishStatus";
 
 interface Contract {
   id: string;
@@ -17,6 +19,20 @@ interface Contract {
 
 export function ContractsTable() {
   const { contracts, isLoading } = useContracts();
+  const { isCurrentYearPublished, isLoading: publishStatusLoading } = useFiscalYearPublishStatus();
+
+  // إذا لم تكن السنة منشورة، نعرض رسالة
+  if (!publishStatusLoading && !isCurrentYearPublished) {
+    return (
+      <Alert className="border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-800">
+        <EyeOff className="h-4 w-4 text-amber-600" />
+        <AlertTitle className="text-amber-800 dark:text-amber-200">العقود مخفية</AlertTitle>
+        <AlertDescription className="text-amber-700 dark:text-amber-300">
+          بيانات عقود الإيجار مخفية حتى يتم اعتمادها ونشرها من قبل الناظر
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   const columns: Column<Contract>[] = [
     {

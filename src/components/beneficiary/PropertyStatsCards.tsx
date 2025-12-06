@@ -1,12 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { StatsCard } from "./StatsCard";
-import { Building2, Home, TrendingUp, DollarSign, Package, MapPin, CheckCircle, Landmark, Receipt, Wallet } from "lucide-react";
+import { Building2, Home, TrendingUp, DollarSign, Package, MapPin, CheckCircle, Landmark, Receipt, Wallet, EyeOff } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { formatCurrency } from "@/lib/utils";
+import { useFiscalYearPublishStatus } from "@/hooks/useFiscalYearPublishStatus";
 
 interface RentalPaymentWithContract {
   amount_paid: number | null;
@@ -17,6 +19,8 @@ interface RentalPaymentWithContract {
 }
 
 export function PropertyStatsCards() {
+  const { isCurrentYearPublished, isLoading: publishStatusLoading } = useFiscalYearPublishStatus();
+  
   // جلب بيانات العقارات
   const { data: properties, isLoading: propertiesLoading } = useQuery({
     queryKey: ["properties-stats"],
@@ -58,7 +62,7 @@ export function PropertyStatsCards() {
     },
   });
 
-  const isLoading = propertiesLoading || paymentsLoading;
+  const isLoading = propertiesLoading || paymentsLoading || publishStatusLoading;
 
   if (isLoading) {
     return (
@@ -134,66 +138,78 @@ export function PropertyStatsCards() {
         </div>
       </div>
 
-      {/* الإيرادات المحصلة */}
-      <div>
-        <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
-          <Wallet className="h-4 w-4" />
-          الإيرادات المحصلة
-        </h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-          <StatsCard
-            title="المبلغ المحصل"
-            value={formatCurrency(totalCollected)}
-            icon={DollarSign}
-            colorClass="text-success"
-          />
-          <StatsCard
-            title="الإيجارات السنوية"
-            value={formatCurrency(totalAnnualCollected)}
-            icon={Receipt}
-            colorClass="text-primary"
-            trend={annualPayments.length > 0 ? `${annualPayments.length} دفعة` : undefined}
-          />
-          <StatsCard
-            title="الإيجارات الشهرية"
-            value={formatCurrency(totalMonthlyCollected)}
-            icon={Receipt}
-            colorClass="text-accent"
-            trend={monthlyPayments.length > 0 ? `${monthlyPayments.length} دفعة` : undefined}
-          />
-          <StatsCard
-            title="صافي الإيرادات"
-            value={formatCurrency(netRevenue)}
-            icon={TrendingUp}
-            colorClass="text-success"
-            trend="بعد الضريبة"
-          />
+      {/* الإيرادات المحصلة - مخفية حتى النشر */}
+      {isCurrentYearPublished ? (
+        <div>
+          <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
+            <Wallet className="h-4 w-4" />
+            الإيرادات المحصلة
+          </h3>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+            <StatsCard
+              title="المبلغ المحصل"
+              value={formatCurrency(totalCollected)}
+              icon={DollarSign}
+              colorClass="text-success"
+            />
+            <StatsCard
+              title="الإيجارات السنوية"
+              value={formatCurrency(totalAnnualCollected)}
+              icon={Receipt}
+              colorClass="text-primary"
+              trend={annualPayments.length > 0 ? `${annualPayments.length} دفعة` : undefined}
+            />
+            <StatsCard
+              title="الإيجارات الشهرية"
+              value={formatCurrency(totalMonthlyCollected)}
+              icon={Receipt}
+              colorClass="text-accent"
+              trend={monthlyPayments.length > 0 ? `${monthlyPayments.length} دفعة` : undefined}
+            />
+            <StatsCard
+              title="صافي الإيرادات"
+              value={formatCurrency(netRevenue)}
+              icon={TrendingUp}
+              colorClass="text-success"
+              trend="بعد الضريبة"
+            />
+          </div>
         </div>
-      </div>
+      ) : (
+        <Alert className="border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-800">
+          <EyeOff className="h-4 w-4 text-amber-600" />
+          <AlertTitle className="text-amber-800 dark:text-amber-200">الإيرادات مخفية</AlertTitle>
+          <AlertDescription className="text-amber-700 dark:text-amber-300">
+            بيانات الإيرادات والإيجارات مخفية حتى يتم اعتمادها ونشرها من قبل الناظر
+          </AlertDescription>
+        </Alert>
+      )}
 
-      {/* الاستقطاعات الحكومية */}
-      <div>
-        <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
-          <Landmark className="h-4 w-4" />
-          الاستقطاعات الحكومية
-        </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-          <StatsCard
-            title="ضريبة القيمة المضافة"
-            value={formatCurrency(totalTax)}
-            icon={Landmark}
-            colorClass="text-destructive"
-            trend="هيئة الزكاة والضريبة والجمارك"
-          />
-          <StatsCard
-            title="الزكاة"
-            value={formatCurrency(0)}
-            icon={Landmark}
-            colorClass="text-muted-foreground"
-            trend="لم يتم احتسابها"
-          />
+      {/* الاستقطاعات الحكومية - مخفية حتى النشر */}
+      {isCurrentYearPublished && (
+        <div>
+          <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
+            <Landmark className="h-4 w-4" />
+            الاستقطاعات الحكومية
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <StatsCard
+              title="ضريبة القيمة المضافة"
+              value={formatCurrency(totalTax)}
+              icon={Landmark}
+              colorClass="text-destructive"
+              trend="هيئة الزكاة والضريبة والجمارك"
+            />
+            <StatsCard
+              title="الزكاة"
+              value={formatCurrency(0)}
+              icon={Landmark}
+              colorClass="text-muted-foreground"
+              trend="لم يتم احتسابها"
+            />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* نظرة سريعة على العقارات */}
       <Card className="border-primary/20">
