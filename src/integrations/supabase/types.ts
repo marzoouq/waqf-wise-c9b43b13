@@ -1740,6 +1740,70 @@ export type Database = {
           },
         ]
       }
+      beneficiary_sessions: {
+        Row: {
+          beneficiary_id: string
+          created_at: string | null
+          current_page: string | null
+          current_section: string | null
+          id: string
+          ip_address: string | null
+          is_online: boolean | null
+          last_activity: string | null
+          session_start: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          beneficiary_id: string
+          created_at?: string | null
+          current_page?: string | null
+          current_section?: string | null
+          id?: string
+          ip_address?: string | null
+          is_online?: boolean | null
+          last_activity?: string | null
+          session_start?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          beneficiary_id?: string
+          created_at?: string | null
+          current_page?: string | null
+          current_section?: string | null
+          id?: string
+          ip_address?: string | null
+          is_online?: boolean | null
+          last_activity?: string | null
+          session_start?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beneficiary_sessions_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "beneficiary_sessions_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_account_statement"
+            referencedColumns: ["beneficiary_id"]
+          },
+          {
+            foreignKeyName: "beneficiary_sessions_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_statistics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       beneficiary_tags: {
         Row: {
           beneficiary_id: string

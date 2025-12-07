@@ -36,6 +36,7 @@ import { BeneficiarySidebar } from "@/components/beneficiary/BeneficiarySidebar"
 import { BeneficiaryBottomNavigation } from "@/components/mobile/BeneficiaryBottomNavigation";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { useBeneficiaryPortalData } from "@/hooks/beneficiary/useBeneficiaryPortalData";
+import { useBeneficiarySession } from "@/hooks/beneficiary/useBeneficiarySession";
 
 export default function BeneficiaryPortal() {
   const navigate = useNavigate();
@@ -45,6 +46,12 @@ export default function BeneficiaryPortal() {
 
   // استخدام Hook المخصص لجلب البيانات
   const { beneficiary, statistics, isLoading } = useBeneficiaryPortalData();
+
+  // تتبع جلسة المستفيد للناظر
+  useBeneficiarySession({
+    beneficiaryId: beneficiary?.id,
+    enabled: !!beneficiary?.id,
+  });
 
   // التحقق من إذن الوصول للتبويب النشط
   const isTabVisible = (tabKey: keyof typeof settings) => {
