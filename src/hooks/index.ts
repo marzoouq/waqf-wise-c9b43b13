@@ -23,221 +23,82 @@
  *    - @/hooks/ai - الذكاء الاصطناعي
  *    - @/hooks/governance - الحوكمة
  *    - @/hooks/ui - واجهة المستخدم
- * 3. الملفات المباشرة: @/hooks/useAuth
  * 
- * @version 2.6.32
+ * @version 2.6.33
  * @lastUpdate 2025-12-07
  */
 
 // ==================== UI & Utility ====================
-export * from './use-toast';
-export * from './use-mobile';
-export { useMediaQuery } from './use-media-query';
-export { useKeyboardShortcuts } from './useKeyboardShortcuts';
-export { usePrint } from './usePrint';
-export { useExport } from './useExport';
-export { useExportToExcel } from './useExportToExcel';
-export { useUnifiedExport, formatBeneficiariesForExport, formatPaymentsForExport, formatInvoicesForExport, formatDisclosureForExport, formatPropertiesForExport, formatContractsForExport } from './useUnifiedExport';
-export { useLocalStorage } from './useLocalStorage';
-export { useDebouncedCallback } from './useDebouncedCallback';
-export { useTableSort } from './useTableSort';
-export { useBulkSelection } from './useBulkSelection';
-export { useCrudDialog } from './useCrudDialog';
-export { useImageOptimization } from './useImageOptimization';
-export { useTranslation } from './useTranslation';
+export * from './ui';
 
 // ==================== Auth & Security ====================
-export { useAuth } from './useAuth';
-export { 
-  useBiometricAuth, 
-  useActiveSessions, 
-  useLeakedPassword, 
-  useIdleTimeout, 
-  usePermissions, 
-  useUserRole,
-  useSessionCleanup,
-  useProfile,
-  cleanupSession,
-  checkPendingCleanup,
-  type AppRole,
-  type Permission,
-  type BiometricCredential,
-  type ActiveSession,
-  type Profile,
-} from './auth';
+export * from './auth';
 
 // ==================== Beneficiary ====================
-export { useBeneficiaries } from './useBeneficiaries';
-export { useBeneficiaryProfile, useBeneficiaryLoans, useBeneficiaryEmergencyAid, useBeneficiaryId, useBeneficiaryPortalData } from './beneficiary';
-export { useBeneficiaryRequests } from './useBeneficiaryRequests';
-export { useBeneficiaryAttachments } from './useBeneficiaryAttachments';
-export { useBeneficiaryActivityLog } from './useBeneficiaryActivityLog';
-export { useBeneficiaryCategories } from './useBeneficiaryCategories';
-export { useBeneficiariesFilters } from './useBeneficiariesFilters';
-export { useFamilies } from './useFamilies';
-export { useTribes } from './useTribes';
-export { useEligibilityAssessment } from './useEligibilityAssessment';
-export { useWaqfSummary } from './useWaqfSummary';
-export { useMyBeneficiaryRequests } from './useMyBeneficiaryRequests';
+export * from './beneficiary';
 
 // ==================== Accounting ====================
-export { useJournalEntries } from './useJournalEntries';
-export { useAccounts } from './useAccounts';
-// useAccountingStats - تم دمجها في useAccountantKPIs (src/hooks/accounting/)
-export { useAccountingTabs } from './useAccountingTabs';
-export { useAccountingFilters } from './useAccountingFilters';
-export { useBudgets } from './useBudgets';
-export { useCashFlows } from './useCashFlows';
-export { useFiscalYears } from './useFiscalYears';
-export { useAutoJournalTemplates } from './useAutoJournalTemplates';
-export { useFinancialData } from './useFinancialData';
-export { useFinancialAnalytics } from './useFinancialAnalytics';
-export { useFinancialReports } from './useFinancialReports';
+export * from './accounting';
 
-// ==================== Fiscal Years (Unified) ====================
+// ==================== Fiscal Years ====================
 export * from './fiscal-years';
 
 // ==================== Distribution ====================
-export { useDistributions } from './useDistributions';
-export { useDistributionEngine } from './useDistributionEngine';
-export { useDistributionDetails } from './useDistributionDetails';
-export { useDistributionSettings } from './useDistributionSettings';
-export { useDistributionApprovals } from './useDistributionApprovals';
-export { useBatchPayments } from './useBatchPayments';
-export { useEmergencyAid } from './useEmergencyAid';
+export * from './distributions';
 
 // ==================== Property ====================
-export { useProperties } from './useProperties';
-export { usePropertiesDialogs } from './usePropertiesDialogs';
-export { usePropertiesStats } from './usePropertiesStats';
-export { usePropertyUnits } from './usePropertyUnits';
-export { useContracts } from './useContracts';
-export { useRentalPayments } from './useRentalPayments';
-export { useMaintenanceRequests } from './useMaintenanceRequests';
-export { useMaintenanceSchedules } from './useMaintenanceSchedules';
-export { useMaintenanceProviders } from './useMaintenanceProviders';
+export * from './property';
 
-// ==================== Banking ====================
-export { useBankAccounts } from './useBankAccounts';
-export { useBankReconciliation } from './useBankReconciliation';
-export { useBankMatching } from './useBankMatching';
-export { usePayments } from './usePayments';
-export { usePaymentVouchers } from './usePaymentVouchers';
-export { useInvoices } from './useInvoices';
-export { useInvoiceOCR } from './useInvoiceOCR';
+// ==================== Payments & Banking ====================
+export * from './payments';
 
 // ==================== Notifications ====================
-export { useNotifications } from './useNotifications';
-export { useRealtimeNotifications } from './useRealtimeNotifications';
-export { usePushNotifications } from './usePushNotifications';
-export { useNotificationSystem } from './useNotificationSystem';
-export { useDisclosureNotifications } from './useDisclosureNotifications';
-export { useSmartAlerts } from './useSmartAlerts';
-export { useSecurityAlerts } from './useSecurityAlerts';
+export * from './notifications';
 
 // ==================== Dashboard & KPIs ====================
-export { useDashboardKPIs } from './useDashboardKPIs';
-export { useDashboardConfigs } from './useDashboardConfig';
-export { useUnifiedKPIs } from './useUnifiedKPIs';
-export { useAccountantKPIs } from './accounting';
-export { useKPIs } from './useKPIs';
-export { useAIInsights } from './useAIInsights';
+export * from './dashboard';
 
-// Dashboard KPIs - نُقلت إلى مجلداتها الصحيحة
-export { useNazerKPIs, type NazerKPIData } from './dashboard/useNazerKPIs';
-export { useAdminKPIs } from './admin/useAdminKPIs';
-export { useCashierStats } from './dashboard/useCashierStats';
-export { useArchivistDashboard, useArchivistStats, useRecentDocuments } from './archive/useArchivistDashboard';
+// ==================== Admin ====================
+export * from './admin';
 
-// Dashboard Realtime Hooks
-export { useNazerDashboardRealtime, useNazerDashboardRefresh } from './dashboard/useNazerDashboardRealtime';
-export { useAdminDashboardRealtime, useAdminDashboardRefresh } from './dashboard/useAdminDashboardRealtime';
-export { useRevenueProgress } from './dashboard/useRevenueProgress';
+// ==================== System ====================
+export * from './system';
 
-// ==================== Admin Hooks ====================
-export { useUserStats, type UserStats } from './admin';
+// ==================== Users ====================
+export * from './users';
 
-// ==================== Search ====================
-export { useGlobalSearch } from './useGlobalSearch';
-export { useAdvancedSearch } from './useAdvancedSearch';
-export { useIntelligentSearch } from './useIntelligentSearch';
-export { useSavedSearches } from './useSavedSearches';
-export { useSavedFilters } from './useSavedFilters';
+// ==================== Messages ====================
+export * from './messages';
 
-// ==================== Support & Messages ====================
-export { useSupportTickets } from './useSupportTickets';
-export { useSupportStats } from './useSupportStats';
-export { useTicketComments } from './useTicketComments';
-export { useTicketRating } from './useTicketRatings';
-export { useMessages } from './useMessages';
-export { useInternalMessages } from './useInternalMessages';
-export { useChatbot } from './useChatbot';
-export { useKnowledgeBase } from './useKnowledgeBase';
-export { useContactForm } from './useContactForm';
-export { useAgentAvailability, useUpdateAvailability, useAgentStats, useEscalations, useAssignmentSettings } from './useAgentAvailability';
+// ==================== Support ====================
+export * from './support';
 
-// ==================== Archive & Documents ====================
-export { useDocuments } from './useDocuments';
-export { useDocumentUpload } from './useDocumentUpload';
-export { useDocumentVersions } from './useDocumentVersions';
-export { useDocumentTags } from './useDocumentTags';
-export { useFolders } from './useFolders';
-export { useArchiveStats } from './useArchiveStats';
-
-// ==================== Loans ====================
-export { useLoans } from './useLoans';
-export { useLoanInstallments } from './useLoanInstallments';
-export { useLoanPayments } from './useLoanPayments';
-
-// ==================== Approvals ====================
-export { useApprovals } from './useApprovals';
-export { useApprovalHistory } from './useApprovalHistory';
-export { useApprovalWorkflows } from './useApprovalWorkflows';
-export { useApprovalPermissions } from './useApprovalPermissions';
-export { usePendingApprovals } from './usePendingApprovals';
-export { useRequestApprovals } from './useRequestApprovals';
-
-// ==================== System & Admin ====================
-export { useSystemSettings } from './useSystemSettings';
-export { useSystemHealth } from './useSystemHealth';
-export { useSystemPerformanceMetrics } from './useSystemPerformanceMetrics';
-export { useAuditLogs } from './useAuditLogs';
-export { useActivities } from './useActivities';
-export { useBackup } from './useBackup';
-export { useUsersManagement, useUsersQuery, useDeleteUser, useUpdateUserRoles, useUpdateUserStatus, useResetUserPassword, type UserProfile } from './useUsersManagement';
-export { useUsersActivityMetrics } from './useUsersActivityMetrics';
-export { useOrganizationSettings } from './useOrganizationSettings';
-export { useVisibilitySettings } from './useVisibilitySettings';
-// useProfile - exported from ./auth
-export { useAlertCleanup } from './useAlertCleanup';
-export { useSelfHealing } from './useSelfHealing';
-export { useSystemMonitoring } from './useSystemMonitoring';
-export { usePermissionsManagement } from './usePermissionsManagement';
-export { useRolesManagement } from './useRolesManagement';
+// ==================== AI ====================
+export * from './ai';
 
 // ==================== Governance ====================
-export { useGovernanceDecisions } from './useGovernanceDecisions';
-export { useGovernanceVoting } from './useGovernanceVoting';
-export { useGovernanceData } from './useGovernanceData';
-export { useFunds } from './useFunds';
-export { useWaqfUnits } from './useWaqfUnits';
-export { useWaqfBudgets } from './useWaqfBudgets';
-export { useAnnualDisclosures, useDisclosureBeneficiaries } from './useAnnualDisclosures';
-export { useFiscalYearClosings } from './useFiscalYearClosings';
+export * from './governance';
+
+// ==================== Archive ====================
+export * from './archive';
 
 // ==================== Reports ====================
-export { useReports } from './useReports';
-export { useCustomReports } from './useCustomReports';
-export { useScheduledReports } from './useScheduledReports';
-export { useProjectDocumentation } from './useProjectDocumentation';
+export * from './reports';
 
 // ==================== Requests ====================
-export { useRequests } from './useRequests';
-export { useRequestAttachments } from './useRequestAttachments';
-export { useRequestComments } from './useRequestComments';
-export { useTasks } from './useTasks';
-export { useRequestsPage } from './useRequestsPage';
+export * from './requests';
 
-// ==================== Page Hooks ====================
-export { useFamiliesPage } from './useFamiliesPage';
-export { useInvoicesPage } from './useInvoicesPage';
+// ==================== Security ====================
+export * from './security';
+
+// ==================== Settings ====================
+export * from './settings';
+
+// ==================== Performance ====================
+export * from './performance';
+
+// ==================== Transactions ====================
+export * from './transactions';
+
+// ==================== Developer ====================
+export * from './developer';
