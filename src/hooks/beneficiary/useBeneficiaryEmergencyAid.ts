@@ -1,6 +1,11 @@
+/**
+ * useBeneficiaryEmergencyAid Hook
+ * Hook لجلب طلبات الفزعات الطارئة للمستفيد الحالي
+ */
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useBeneficiaryId } from "@/hooks/beneficiary/useBeneficiaryId";
+import { useBeneficiaryId } from "./useBeneficiaryId";
 import { EmergencyAid } from "@/types/loans";
 
 export function useBeneficiaryEmergencyAid() {

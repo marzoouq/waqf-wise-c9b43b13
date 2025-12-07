@@ -1,22 +1,28 @@
 /**
  * Beneficiary Hooks - خطافات المستفيدين
+ * جميع hooks المستفيدين مُصدَّرة من مكان واحد
  */
 
-export { useBeneficiaries } from '../useBeneficiaries';
-export { useBeneficiaryPortalData, type BeneficiaryStatistics } from './useBeneficiaryPortalData';
+// ==================== Core Beneficiary Hooks ====================
 export { useBeneficiaryId } from './useBeneficiaryId';
-export { useBeneficiaryProfile } from '../useBeneficiaryProfile';
-export { useBeneficiaryLoans } from '../useBeneficiaryLoans';
+export { useBeneficiaryPortalData, type BeneficiaryStatistics } from './useBeneficiaryPortalData';
+export { useBeneficiaryProfile } from './useBeneficiaryProfile';
+export { useBeneficiaryLoans } from './useBeneficiaryLoans';
+export { useBeneficiaryEmergencyAid } from './useBeneficiaryEmergencyAid';
+
+// ==================== Data Hooks ====================
+export { useBeneficiaryAccountStatementData } from './useBeneficiaryAccountStatementData';
+export { useBeneficiaryPersonalReportsData } from './useBeneficiaryPersonalReportsData';
+
+// ==================== External Re-exports ====================
+export { useBeneficiaries } from '../useBeneficiaries';
 export { useBeneficiaryRequests } from '../useBeneficiaryRequests';
 export { useBeneficiaryAttachments } from '../useBeneficiaryAttachments';
 export { useBeneficiaryActivityLog } from '../useBeneficiaryActivityLog';
 export { useBeneficiaryCategories } from '../useBeneficiaryCategories';
-export { useBeneficiaryEmergencyAid } from '../useBeneficiaryEmergencyAid';
 export { useBeneficiariesFilters } from '../useBeneficiariesFilters';
 export { useEligibilityAssessment } from '../useEligibilityAssessment';
 export { useFamilies } from '../useFamilies';
 export { useFamiliesPage } from '../useFamiliesPage';
 export { useTribes } from '../useTribes';
 export { useMyBeneficiaryRequests } from '../useMyBeneficiaryRequests';
-export { useBeneficiaryAccountStatementData } from './useBeneficiaryAccountStatementData';
-export { useBeneficiaryPersonalReportsData } from './useBeneficiaryPersonalReportsData';

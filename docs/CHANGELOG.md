@@ -1,6 +1,62 @@
 # 📝 سجل التغييرات | Changelog
 
-**الإصدار الحالي:** 2.6.27 | **آخر تحديث:** 2025-12-07
+**الإصدار الحالي:** 2.6.29 | **آخر تحديث:** 2025-12-07
+
+---
+
+## [2.6.29] - 2025-12-07
+
+### 🏗️ إعادة هيكلة لوحة المستفيد (Beneficiary Portal Refactoring)
+
+#### ✨ الميزات الجديدة
+- **Hook موحد `useBeneficiaryId`:** يمنع تكرار استعلامات beneficiary_id عبر الـ hooks
+- **مكون `TabContentWrapper`:** لتوحيد نمط العرض الشرطي للتبويبات
+- **ملفات التكوين المنفصلة:** `sidebarConfig.ts` و `bottomNavConfig.ts`
+- **مكون `PropertyUnitsDisplay` منفصل:** استخراج من PropertyStatsCards
+
+#### 🔧 التحسينات
+- نقل hooks المستفيدين إلى `src/hooks/beneficiary/`:
+  - `useBeneficiaryLoans.ts`
+  - `useBeneficiaryEmergencyAid.ts`
+  - `useBeneficiaryProfile.ts`
+- توحيد الألوان باستخدام semantic tokens (heir-son, heir-daughter, heir-wife)
+- دمج الاستعلامات المتتابعة باستخدام `Promise.all` في PropertyStatsCards
+- إصلاح Type Assertion في BeneficiaryStatementsTab
+- تحديث رقم الإصدار الديناميكي من `APP_VERSION`
+
+#### 📁 الملفات الجديدة
+```
+src/hooks/beneficiary/
+├── useBeneficiaryId.ts
+├── useBeneficiaryLoans.ts
+├── useBeneficiaryEmergencyAid.ts
+├── useBeneficiaryProfile.ts
+└── index.ts
+
+src/components/beneficiary/
+├── common/TabContentWrapper.tsx
+├── config/
+│   ├── sidebarConfig.ts
+│   ├── bottomNavConfig.ts
+│   └── index.ts
+└── properties/PropertyUnitsDisplay.tsx
+```
+
+#### 🗑️ الملفات المحذوفة
+- `src/hooks/useBeneficiaryLoans.ts` (نُقل)
+- `src/hooks/useBeneficiaryEmergencyAid.ts` (نُقل)
+- `src/hooks/useBeneficiaryProfile.ts` (نُقل)
+
+---
+
+## [2.6.28] - 2025-12-07
+
+### 🏗️ إعادة هيكلة لوحة الناظر (Nazer Dashboard Refactoring)
+
+#### 🔧 التحسينات
+- إزالة Realtime المكرر من `useNazerKPIs.ts`
+- استخراج Quick Actions إلى `quickActionsConfig.ts`
+- توحيد الألوان في `RevenueProgressCard.tsx`
 
 ---
 

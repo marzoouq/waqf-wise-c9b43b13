@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useBeneficiaryProfile } from "@/hooks/useBeneficiaryProfile";
+import { useBeneficiaryProfile } from "@/hooks/beneficiary";
 import { useAuth } from "@/hooks/useAuth";
 import { Contract } from "@/hooks/useContracts";
 
