@@ -1,0 +1,336 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import MainLayout from '@/components/layout/MainLayout';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { TenantDialog } from '@/components/tenants/TenantDialog';
+import { useTenants } from '@/hooks/property/useTenants';
+import { formatCurrency } from '@/lib/utils';
+import {
+  Users,
+  Plus,
+  Search,
+  MoreVertical,
+  Edit,
+  Trash2,
+  FileText,
+  Building,
+  Phone,
+  Mail,
+} from 'lucide-react';
+import type { Tenant, TenantInsert } from '@/types/tenants';
+
+const statusLabels: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' }> = {
+  active: { label: 'نشط', variant: 'default' },
+  inactive: { label: 'غير نشط', variant: 'secondary' },
+  blacklisted: { label: 'محظور', variant: 'destructive' },
+};
+
+export default function Tenants() {
+  const navigate = useNavigate();
+  const { tenants, isLoading, addTenant, updateTenant, deleteTenant, isAdding, isUpdating } = useTenants();
+  
+  const [searchQuery, setSearchQuery] = useState('');
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedTenant, setSelectedTenant] = useState<Tenant | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [tenantToDelete, setTenantToDelete] = useState<Tenant | null>(null);
+
+  const filteredTenants = tenants.filter(
+    (tenant) =>
+      tenant.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tenant.id_number.includes(searchQuery) ||
+      tenant.phone?.includes(searchQuery) ||
+      tenant.tenant_number?.includes(searchQuery)
+  );
+
+  const handleSubmit = async (data: TenantInsert) => {
+    if (selectedTenant) {
+      await updateTenant({ id: selectedTenant.id, ...data });
+    } else {
+      await addTenant(data);
+    }
+  };
+
+  const handleEdit = (tenant: Tenant) => {
+    setSelectedTenant(tenant);
+    setDialogOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (tenantToDelete) {
+      await deleteTenant(tenantToDelete.id);
+      setDeleteDialogOpen(false);
+      setTenantToDelete(null);
+    }
+  };
+
+  const openDeleteDialog = (tenant: Tenant) => {
+    setTenantToDelete(tenant);
+    setDeleteDialogOpen(true);
+  };
+
+  return (
+    <MainLayout>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 className="text-2xl font-bold flex items-center gap-2">
+              <Users className="h-6 w-6" />
+              إدارة المستأجرين
+            </h1>
+            <p className="text-muted-foreground">
+              قائمة المستأجرين وحساباتهم
+            </p>
+          </div>
+          <Button
+            onClick={() => {
+              setSelectedTenant(null);
+              setDialogOpen(true);
+            }}
+          >
+            <Plus className="ml-2 h-4 w-4" />
+            إضافة مستأجر
+          </Button>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">إجمالي المستأجرين</p>
+                  <p className="text-2xl font-bold">{tenants.length}</p>
+                </div>
+                <Users className="h-8 w-8 text-muted-foreground" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">المستأجرين النشطين</p>
+                  <p className="text-2xl font-bold">
+                    {tenants.filter((t) => t.status === 'active').length}
+                  </p>
+                </div>
+                <Building className="h-8 w-8 text-green-500" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">إجمالي الذمم المستحقة</p>
+                  <p className="text-2xl font-bold text-destructive">
+                    {formatCurrency(
+                      tenants.reduce((sum, t) => sum + Math.max(0, t.current_balance), 0)
+                    )}
+                  </p>
+                </div>
+                <FileText className="h-8 w-8 text-destructive" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Search */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Search className="h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="بحث بالاسم، رقم الهوية، الجوال..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="max-w-sm"
+              />
+            </div>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <div className="space-y-2">
+                {[1, 2, 3].map((i) => (
+                  <Skeleton key={i} className="h-16 w-full" />
+                ))}
+              </div>
+            ) : filteredTenants.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                لا يوجد مستأجرين
+              </div>
+            ) : (
+              <div className="rounded-md border overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>رقم المستأجر</TableHead>
+                      <TableHead>الاسم</TableHead>
+                      <TableHead>رقم الهوية</TableHead>
+                      <TableHead>التواصل</TableHead>
+                      <TableHead>الحالة</TableHead>
+                      <TableHead className="text-left">الرصيد</TableHead>
+                      <TableHead className="w-12"></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredTenants.map((tenant) => (
+                      <TableRow
+                        key={tenant.id}
+                        className="cursor-pointer hover:bg-muted/50"
+                        onClick={() => navigate(`/tenants/${tenant.id}`)}
+                      >
+                        <TableCell className="font-mono text-sm">
+                          {tenant.tenant_number}
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {tenant.full_name}
+                        </TableCell>
+                        <TableCell>{tenant.id_number}</TableCell>
+                        <TableCell>
+                          <div className="flex flex-col gap-1">
+                            {tenant.phone && (
+                              <div className="flex items-center gap-1 text-sm">
+                                <Phone className="h-3 w-3" />
+                                {tenant.phone}
+                              </div>
+                            )}
+                            {tenant.email && (
+                              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                                <Mail className="h-3 w-3" />
+                                {tenant.email}
+                              </div>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={statusLabels[tenant.status]?.variant || 'secondary'}>
+                            {statusLabels[tenant.status]?.label || tenant.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-left">
+                          <span
+                            className={
+                              tenant.current_balance > 0
+                                ? 'text-destructive font-medium'
+                                : tenant.current_balance < 0
+                                ? 'text-green-600 font-medium'
+                                : ''
+                            }
+                          >
+                            {formatCurrency(tenant.current_balance)}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                              <Button variant="ghost" size="icon">
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleEdit(tenant);
+                                }}
+                              >
+                                <Edit className="ml-2 h-4 w-4" />
+                                تعديل
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  navigate(`/tenants/${tenant.id}`);
+                                }}
+                              >
+                                <FileText className="ml-2 h-4 w-4" />
+                                كشف الحساب
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className="text-destructive"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  openDeleteDialog(tenant);
+                                }}
+                              >
+                                <Trash2 className="ml-2 h-4 w-4" />
+                                حذف
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Tenant Dialog */}
+        <TenantDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          tenant={selectedTenant}
+          onSubmit={handleSubmit}
+          isLoading={isAdding || isUpdating}
+        />
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
+              <AlertDialogDescription>
+                هل أنت متأكد من حذف المستأجر "{tenantToDelete?.full_name}"؟
+                <br />
+                سيتم حذف جميع البيانات المرتبطة به.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>إلغاء</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDelete}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                حذف
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
+    </MainLayout>
+  );
+}
