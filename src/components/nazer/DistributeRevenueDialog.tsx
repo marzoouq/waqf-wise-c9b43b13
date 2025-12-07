@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import {
   Dialog,
   DialogContent,
@@ -29,6 +29,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Users, Coins, AlertCircle, CheckCircle2 } from "lucide-react";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import { useFiscalYearsList, FISCAL_YEARS_QUERY_KEY } from "@/hooks/fiscal-years";
 
 interface DistributeRevenueDialogProps {
   open: boolean;
@@ -58,19 +59,9 @@ export function DistributeRevenueDialog({
   const [previewShares, setPreviewShares] = useState<HeirShare[]>([]);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
 
-  // Fetch fiscal years
-  const { data: fiscalYears = [] } = useQuery({
-    queryKey: ["fiscal-years-active"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("fiscal_years")
-        .select("*")
-        .eq("is_active", true)
-        .order("start_date", { ascending: false });
-      if (error) throw error;
-      return data || [];
-    },
-  });
+  // استخدام الـ hook الموحد للسنوات المالية
+  const { fiscalYears } = useFiscalYearsList();
+  const activeFiscalYears = fiscalYears.filter(fy => fy.is_active);
 
   // Fetch beneficiaries for preview
   const { data: beneficiaries = [] } = useQuery({
@@ -227,7 +218,7 @@ export function DistributeRevenueDialog({
                       <SelectValue placeholder="اختر السنة المالية" />
                     </SelectTrigger>
                     <SelectContent>
-                      {fiscalYears.map((fy) => (
+                      {activeFiscalYears.map((fy) => (
                         <SelectItem key={fy.id} value={fy.id}>
                           {fy.name}
                         </SelectItem>

@@ -1,10 +1,11 @@
 /**
  * Hook for checking fiscal year publish status
  * يتحقق من حالة نشر السنة المالية للتحكم في ظهور البيانات للورثة
+ * 
+ * @deprecated استخدم useFiscalYearPublishInfo من @/hooks/fiscal-years بدلاً من هذا
  */
 
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useActiveFiscalYear, useFiscalYearsList } from "@/hooks/fiscal-years";
 
 export interface FiscalYearPublishInfo {
   id: string;
@@ -18,41 +19,11 @@ export interface FiscalYearPublishInfo {
 }
 
 export function useFiscalYearPublishStatus() {
-  // جلب السنة المالية النشطة
-  const {
-    data: activeFiscalYear,
-    isLoading: activeLoading,
-  } = useQuery({
-    queryKey: ["active-fiscal-year-publish-status"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("fiscal_years")
-        .select("id, name, is_active, is_closed, is_published, published_at, start_date, end_date")
-        .eq("is_active", true)
-        .single();
-
-      if (error) return null;
-      return data as FiscalYearPublishInfo;
-    },
-  });
+  const { activeFiscalYear, isLoading: activeLoading } = useActiveFiscalYear();
+  const { fiscalYears, isLoading: listLoading } = useFiscalYearsList();
 
   // جلب جميع السنوات المنشورة
-  const {
-    data: publishedYears = [],
-    isLoading: publishedLoading,
-  } = useQuery({
-    queryKey: ["published-fiscal-years"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("fiscal_years")
-        .select("id, name, is_active, is_closed, is_published, published_at, start_date, end_date")
-        .eq("is_published", true)
-        .order("start_date", { ascending: false });
-
-      if (error) return [];
-      return data as FiscalYearPublishInfo[];
-    },
-  });
+  const publishedYears = fiscalYears.filter(fy => fy.is_published);
 
   // التحقق مما إذا كان يجب إظهار البيانات للورثة
   const isCurrentYearPublished = activeFiscalYear?.is_published || false;
@@ -61,10 +32,10 @@ export function useFiscalYearPublishStatus() {
   const publishedFiscalYearIds = publishedYears.map(fy => fy.id);
 
   return {
-    activeFiscalYear,
-    publishedYears,
+    activeFiscalYear: activeFiscalYear as FiscalYearPublishInfo | null,
+    publishedYears: publishedYears as FiscalYearPublishInfo[],
     isCurrentYearPublished,
     publishedFiscalYearIds,
-    isLoading: activeLoading || publishedLoading,
+    isLoading: activeLoading || listLoading,
   };
 }

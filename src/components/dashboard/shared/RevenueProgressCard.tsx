@@ -1,56 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { TrendingUp, Target, Wallet } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useFiscalYears } from "@/hooks/useFiscalYears";
+import { useRevenueProgress } from "@/hooks/dashboard/useRevenueProgress";
 
 export function RevenueProgressCard() {
-  const { fiscalYears } = useFiscalYears();
-  const activeFiscalYear = fiscalYears.find(fy => fy.is_active);
-
-  const { data, isLoading } = useQuery({
-    queryKey: ["revenue-progress", activeFiscalYear?.id],
-    queryFn: async () => {
-      if (!activeFiscalYear) return null;
-
-      // جلب الإيرادات المحصلة
-      const { data: payments } = await supabase
-        .from("rental_payments")
-        .select("amount_due, tax_amount")
-        .eq("status", "مدفوع")
-        .gte("payment_date", activeFiscalYear.start_date)
-        .lte("payment_date", activeFiscalYear.end_date);
-
-      const totalCollected = payments?.reduce((sum, p) => sum + (p.amount_due || 0), 0) || 0;
-      const totalTax = payments?.reduce((sum, p) => sum + (p.tax_amount || 0), 0) || 0;
-      const netRevenue = totalCollected - totalTax;
-
-      // جلب إجمالي الإيجارات السنوية من العقود النشطة (monthly_rent * 12)
-      const { data: contracts } = await supabase
-        .from("contracts")
-        .select("monthly_rent, payment_frequency")
-        .eq("status", "active");
-
-      // حساب الإيجار السنوي بناءً على الدورية
-      const expectedRevenue = contracts?.reduce((sum, c) => {
-        const monthlyRent = c.monthly_rent || 0;
-        return sum + (monthlyRent * 12);
-      }, 0) || 0;
-
-      const progress = expectedRevenue > 0 ? (totalCollected / expectedRevenue) * 100 : 0;
-
-      return {
-        totalCollected,
-        netRevenue,
-        totalTax,
-        expectedRevenue,
-        progress: Math.min(progress, 100),
-      };
-    },
-    enabled: !!activeFiscalYear,
-  });
+  const { data, isLoading } = useRevenueProgress();
 
   if (isLoading) {
     return (

@@ -85,6 +85,9 @@ export { useFinancialData } from './useFinancialData';
 export { useFinancialAnalytics } from './useFinancialAnalytics';
 export { useFinancialReports } from './useFinancialReports';
 
+// ==================== Fiscal Years (Unified) ====================
+export * from './fiscal-years';
+
 // ==================== Distribution ====================
 export { useDistributions } from './useDistributions';
 export { useDistributionEngine } from './useDistributionEngine';
@@ -134,6 +137,8 @@ export { useCashierStats } from './useCashierStats';
 export { useArchivistDashboard, useArchivistStats, useRecentDocuments } from './useArchivistDashboard';
 export { useKPIs } from './useKPIs';
 export { useAIInsights } from './useAIInsights';
+export { useNazerDashboardRealtime, useNazerDashboardRefresh } from './dashboard/useNazerDashboardRealtime';
+export { useRevenueProgress } from './dashboard/useRevenueProgress';
 
 // ==================== Search ====================
 export { useGlobalSearch } from './useGlobalSearch';
