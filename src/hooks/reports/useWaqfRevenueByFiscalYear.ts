@@ -82,19 +82,32 @@ export function useWaqfRevenueByFiscalYear(waqfUnitId?: string, fiscalYearId?: s
       let annualCollected = 0;
       let totalTax = 0;
 
-      // تصفية حسب waqf_unit_id إذا تم تحديده
-      const filteredPayments = payments?.filter(p => {
-        if (!waqfUnitId) return true;
-        const contract = p.contracts as any;
-        return contract?.properties?.waqf_unit_id === waqfUnitId;
-      }) || [];
+      interface PaymentContract {
+        payment_frequency: string;
+        properties: {
+          waqf_unit_id: string | null;
+        };
+      }
 
-      filteredPayments.forEach((payment: any) => {
-        const contract = payment.contracts as any;
+      interface PaymentData {
+        amount_due: number | null;
+        tax_amount: number | null;
+        status: string;
+        payment_date: string | null;
+        contracts: PaymentContract;
+      }
+
+      // تصفية حسب waqf_unit_id إذا تم تحديده
+      const filteredPayments = (payments || []).filter((p: PaymentData) => {
+        if (!waqfUnitId) return true;
+        return p.contracts?.properties?.waqf_unit_id === waqfUnitId;
+      });
+
+      filteredPayments.forEach((payment: PaymentData) => {
         const amount = payment.amount_due || 0;
         const tax = payment.tax_amount || 0;
         
-        if (contract?.payment_frequency === 'شهري') {
+        if (payment.contracts?.payment_frequency === 'شهري') {
           monthlyCollected += amount;
         } else {
           annualCollected += amount;

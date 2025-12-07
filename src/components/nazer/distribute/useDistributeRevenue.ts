@@ -74,8 +74,9 @@ export function useDistributeRevenue(onClose: () => void) {
 
       setPreviewShares(sharesWithNames);
       setIsPreviewMode(true);
-    } catch (error: any) {
-      toast.error("خطأ في حساب التوزيع: " + error.message);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "خطأ غير معروف";
+      toast.error("خطأ في حساب التوزيع: " + errorMessage);
     }
   };
 
@@ -105,7 +106,7 @@ export function useDistributeRevenue(onClose: () => void) {
       resetForm();
       onClose();
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error("خطأ في التوزيع", { description: error.message });
     },
   });

@@ -16,6 +16,24 @@ export interface PendingRental {
   is_overdue: boolean;
 }
 
+interface RentalPaymentData {
+  id: string;
+  contract_id: string;
+  amount_due: number | null;
+  tax_amount: number | null;
+  net_amount: number | null;
+  due_date: string;
+  status: string;
+  contracts: {
+    contract_number: string;
+    tenant_name: string | null;
+    property_id: string;
+    properties: {
+      name: string;
+    };
+  };
+}
+
 export function usePendingRentals() {
   const { data: pendingRentals = [], isLoading, refetch } = useQuery({
     queryKey: ['pos', 'pending-rentals'],
@@ -43,7 +61,7 @@ export function usePendingRentals() {
 
       if (error) throw error;
 
-      return (data || []).map((item: any) => {
+      return (data || []).map((item: RentalPaymentData) => {
         const today = new Date();
         const dueDate = new Date(item.due_date);
         const daysOverdue = Math.floor((today.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
@@ -56,7 +74,7 @@ export function usePendingRentals() {
           tenant_name: item.contracts?.tenant_name || '',
           amount_due: item.amount_due || 0,
           tax_amount: item.tax_amount || 0,
-          net_amount: item.net_amount || item.amount_due,
+          net_amount: item.net_amount || item.amount_due || 0,
           due_date: item.due_date,
           status: item.status,
           days_overdue: daysOverdue > 0 ? daysOverdue : 0,
