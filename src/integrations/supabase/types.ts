@@ -2516,6 +2516,7 @@ export type Database = {
           start_date: string
           status: string
           tenant_email: string | null
+          tenant_id: string | null
           tenant_id_number: string
           tenant_name: string
           tenant_phone: string
@@ -2541,6 +2542,7 @@ export type Database = {
           start_date: string
           status?: string
           tenant_email?: string | null
+          tenant_id?: string | null
           tenant_id_number: string
           tenant_name: string
           tenant_phone: string
@@ -2566,6 +2568,7 @@ export type Database = {
           start_date?: string
           status?: string
           tenant_email?: string | null
+          tenant_id?: string | null
           tenant_id_number?: string
           tenant_name?: string
           tenant_phone?: string
@@ -2579,6 +2582,13 @@ export type Database = {
             columns: ["property_id"]
             isOneToOne: false
             referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contracts_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
         ]
@@ -5593,10 +5603,13 @@ export type Database = {
           created_at: string
           customer_address: string | null
           customer_city: string | null
+          customer_commercial_register: string | null
           customer_commercial_registration: string | null
           customer_email: string | null
           customer_name: string
+          customer_national_address: string | null
           customer_phone: string | null
+          customer_tax_number: string | null
           customer_vat_number: string | null
           due_date: string | null
           id: string
@@ -5618,6 +5631,7 @@ export type Database = {
           subtotal: number
           tax_amount: number
           tax_rate: number | null
+          tenant_id: string | null
           total_amount: number
           updated_at: string
           vat_number: string | null
@@ -5631,10 +5645,13 @@ export type Database = {
           created_at?: string
           customer_address?: string | null
           customer_city?: string | null
+          customer_commercial_register?: string | null
           customer_commercial_registration?: string | null
           customer_email?: string | null
           customer_name: string
+          customer_national_address?: string | null
           customer_phone?: string | null
+          customer_tax_number?: string | null
           customer_vat_number?: string | null
           due_date?: string | null
           id?: string
@@ -5656,6 +5673,7 @@ export type Database = {
           subtotal?: number
           tax_amount?: number
           tax_rate?: number | null
+          tenant_id?: string | null
           total_amount?: number
           updated_at?: string
           vat_number?: string | null
@@ -5669,10 +5687,13 @@ export type Database = {
           created_at?: string
           customer_address?: string | null
           customer_city?: string | null
+          customer_commercial_register?: string | null
           customer_commercial_registration?: string | null
           customer_email?: string | null
           customer_name?: string
+          customer_national_address?: string | null
           customer_phone?: string | null
+          customer_tax_number?: string | null
           customer_vat_number?: string | null
           due_date?: string | null
           id?: string
@@ -5694,6 +5715,7 @@ export type Database = {
           subtotal?: number
           tax_amount?: number
           tax_rate?: number | null
+          tenant_id?: string | null
           total_amount?: number
           updated_at?: string
           vat_number?: string | null
@@ -5716,6 +5738,13 @@ export type Database = {
             columns: ["rental_payment_id"]
             isOneToOne: false
             referencedRelation: "rental_payments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
         ]
@@ -10394,6 +10423,152 @@ export type Database = {
         }
         Relationships: []
       }
+      tenant_ledger: {
+        Row: {
+          balance: number | null
+          contract_id: string | null
+          created_at: string | null
+          created_by: string | null
+          credit_amount: number | null
+          debit_amount: number | null
+          description: string | null
+          fiscal_year_id: string | null
+          id: string
+          property_id: string | null
+          reference_id: string | null
+          reference_number: string | null
+          reference_type: string | null
+          tenant_id: string
+          transaction_date: string
+          transaction_type: string
+        }
+        Insert: {
+          balance?: number | null
+          contract_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          credit_amount?: number | null
+          debit_amount?: number | null
+          description?: string | null
+          fiscal_year_id?: string | null
+          id?: string
+          property_id?: string | null
+          reference_id?: string | null
+          reference_number?: string | null
+          reference_type?: string | null
+          tenant_id: string
+          transaction_date?: string
+          transaction_type: string
+        }
+        Update: {
+          balance?: number | null
+          contract_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          credit_amount?: number | null
+          debit_amount?: number | null
+          description?: string | null
+          fiscal_year_id?: string | null
+          id?: string
+          property_id?: string | null
+          reference_id?: string | null
+          reference_number?: string | null
+          reference_type?: string | null
+          tenant_id?: string
+          transaction_date?: string
+          transaction_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_ledger_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "contracts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tenant_ledger_fiscal_year_id_fkey"
+            columns: ["fiscal_year_id"]
+            isOneToOne: false
+            referencedRelation: "fiscal_years"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tenant_ledger_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tenant_ledger_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tenants: {
+        Row: {
+          address: string | null
+          city: string | null
+          commercial_register: string | null
+          created_at: string | null
+          email: string | null
+          full_name: string
+          id: string
+          id_number: string
+          id_type: string | null
+          national_address: string | null
+          notes: string | null
+          phone: string | null
+          status: string | null
+          tax_number: string | null
+          tenant_number: string | null
+          tenant_type: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          commercial_register?: string | null
+          created_at?: string | null
+          email?: string | null
+          full_name: string
+          id?: string
+          id_number: string
+          id_type?: string | null
+          national_address?: string | null
+          notes?: string | null
+          phone?: string | null
+          status?: string | null
+          tax_number?: string | null
+          tenant_number?: string | null
+          tenant_type?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          commercial_register?: string | null
+          created_at?: string | null
+          email?: string | null
+          full_name?: string
+          id?: string
+          id_number?: string
+          id_type?: string | null
+          national_address?: string | null
+          notes?: string | null
+          phone?: string | null
+          status?: string | null
+          tax_number?: string | null
+          tenant_number?: string | null
+          tenant_type?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       translations: {
         Row: {
           ar: string
@@ -11664,6 +11839,10 @@ export type Database = {
       calculate_sla_due_date: {
         Args: { p_request_type_id: string }
         Returns: string
+      }
+      calculate_tenant_balance: {
+        Args: { p_tenant_id: string }
+        Returns: number
       }
       check_file_retention_eligibility: {
         Args: { p_file_category: string; p_uploaded_at: string }
