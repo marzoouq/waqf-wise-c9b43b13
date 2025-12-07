@@ -6,3 +6,4 @@ export { QuickPaymentDialog } from './QuickPaymentDialog';
 export { PendingRentalsTable } from './PendingRentalsTable';
 export { TransactionsTable } from './TransactionsTable';
 export { POSStatsCards } from './POSStatsCards';
+export { POSQuickAccessCard } from './POSQuickAccessCard';

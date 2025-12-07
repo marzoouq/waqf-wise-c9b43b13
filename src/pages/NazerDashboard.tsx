@@ -16,6 +16,7 @@ import { PublishFiscalYearDialog } from "@/components/nazer/PublishFiscalYearDia
 import { FiscalYearPublishStatus } from "@/components/nazer/FiscalYearPublishStatus";
 import { CurrentFiscalYearCard, RevenueProgressCard } from "@/components/dashboard/shared";
 import { useNazerDashboardRealtime, useNazerDashboardRefresh } from "@/hooks/dashboard/useNazerDashboardRealtime";
+import { POSQuickAccessCard } from "@/components/pos";
 
 export default function NazerDashboard() {
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
@@ -63,10 +64,11 @@ export default function NazerDashboard() {
           <NazerKPIs />
         </Suspense>
 
-        {/* بطاقات الرصيد البنكي ورقبة الوقف - تحديث مباشر */}
-        <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2">
+        {/* بطاقات الرصيد البنكي ورقبة الوقف ونقطة البيع - تحديث مباشر */}
+        <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-3">
           <BankBalanceCard />
           <WaqfCorpusCard />
+          <POSQuickAccessCard />
         </div>
 
         <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">

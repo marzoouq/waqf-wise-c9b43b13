@@ -24,6 +24,7 @@ import {
   AdvancedSettings,
   LandingPageSettings,
   SupportManagement,
+  PointOfSale,
 } from "./lazyPages";
 
 export const adminRoutes = [
@@ -186,6 +187,15 @@ export const adminRoutes = [
     element={
       <ProtectedRoute requiredRoles={["admin", "nazer"]}>
         <ProjectDocumentation />
+      </ProtectedRoute>
+    } 
+  />,
+  <Route 
+    key="pos"
+    path="/pos" 
+    element={
+      <ProtectedRoute requiredRoles={["nazer", "accountant", "cashier"]}>
+        <PointOfSale />
       </ProtectedRoute>
     } 
   />,

@@ -33,6 +33,7 @@ import {
   TrendingUp,
   Code,
   Calendar,
+  Store,
 } from "lucide-react";
 import {
   Sidebar,
@@ -88,6 +89,7 @@ const menuGroups = [
     icon: Calculator,
     roles: ["admin", "accountant", "nazer", "cashier"],
     subItems: [
+      { icon: Store, label: "نقطة البيع", path: "/pos", roles: ["nazer", "accountant", "cashier"] },
       { icon: Calculator, label: "المحاسبة", path: "/accounting", roles: ["admin", "accountant", "nazer"] },
       { icon: Calendar, label: "السنوات المالية", path: "/fiscal-years", roles: ["admin", "accountant", "nazer"] },
       { icon: TrendingUp, label: "الميزانيات", path: "/budgets", roles: ["admin", "accountant", "nazer"] },

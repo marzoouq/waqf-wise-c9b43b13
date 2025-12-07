@@ -15,6 +15,7 @@ import { AdminSendMessageDialog } from "@/components/messages/AdminSendMessageDi
 import { BankBalanceCard } from "@/components/shared/BankBalanceCard";
 import { WaqfCorpusCard } from "@/components/shared/WaqfCorpusCard";
 import { useQueryClient } from "@tanstack/react-query";
+import { POSQuickAccessCard } from "@/components/pos";
 
 // Lazy load heavy components
 const RecentJournalEntries = lazy(() => import("@/components/dashboard/RecentJournalEntries"));
@@ -83,10 +84,11 @@ export default function CashierDashboard() {
         />
       </UnifiedStatsGrid>
 
-      {/* بطاقات الرصيد البنكي ورقبة الوقف */}
-      <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2 mt-6 mb-4">
+      {/* بطاقات الرصيد البنكي ورقبة الوقف ونقطة البيع */}
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-3 mt-6 mb-4">
         <BankBalanceCard />
         <WaqfCorpusCard />
+        <POSQuickAccessCard />
       </div>
 
         {/* Tabs Section */}
