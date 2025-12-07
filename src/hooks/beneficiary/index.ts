@@ -1,6 +1,7 @@
 /**
  * Beneficiary Hooks - خطافات المستفيدين
  * جميع hooks المستفيدين مُصدَّرة من مكان واحد
+ * @version 2.6.33
  */
 
 // ==================== Core Beneficiary Hooks ====================
@@ -14,15 +15,16 @@ export { useBeneficiaryEmergencyAid } from './useBeneficiaryEmergencyAid';
 export { useBeneficiaryAccountStatementData } from './useBeneficiaryAccountStatementData';
 export { useBeneficiaryPersonalReportsData } from './useBeneficiaryPersonalReportsData';
 
-// ==================== External Re-exports ====================
-export { useBeneficiaries } from '../useBeneficiaries';
-export { useBeneficiaryRequests } from '../useBeneficiaryRequests';
-export { useBeneficiaryAttachments } from '../useBeneficiaryAttachments';
-export { useBeneficiaryActivityLog } from '../useBeneficiaryActivityLog';
-export { useBeneficiaryCategories } from '../useBeneficiaryCategories';
-export { useBeneficiariesFilters } from '../useBeneficiariesFilters';
-export { useEligibilityAssessment } from '../useEligibilityAssessment';
-export { useFamilies } from '../useFamilies';
-export { useFamiliesPage } from '../useFamiliesPage';
-export { useTribes } from '../useTribes';
-export { useMyBeneficiaryRequests } from '../useMyBeneficiaryRequests';
+// ==================== Beneficiaries Management ====================
+export { useBeneficiaries } from './useBeneficiaries';
+export { useBeneficiaryRequests, type BeneficiaryRequestData } from './useBeneficiaryRequests';
+export { useBeneficiaryAttachments, type BeneficiaryAttachment } from './useBeneficiaryAttachments';
+export { useBeneficiaryActivityLog, type BeneficiaryActivity } from './useBeneficiaryActivityLog';
+export { useBeneficiaryCategories } from '@/hooks/useBeneficiaryCategories';
+export { useBeneficiariesFilters } from './useBeneficiariesFilters';
+export { useEligibilityAssessment } from './useEligibilityAssessment';
+export { useFamilies, useFamilyMembers } from './useFamilies';
+export { useFamiliesPage, type FamilyWithHead } from './useFamiliesPage';
+export { useTribes, useAddTribe, useUpdateTribe, useDeleteTribe } from './useTribes';
+export { useMyBeneficiaryRequests, type BeneficiaryRequest, type RequestFormData } from './useMyBeneficiaryRequests';
+export { useWaqfSummary } from './useWaqfSummary';

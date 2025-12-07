@@ -48,12 +48,23 @@ export { useTranslation } from './useTranslation';
 
 // ==================== Auth & Security ====================
 export { useAuth } from './useAuth';
-export { useBiometricAuth } from './useBiometricAuth';
-export { useActiveSessions } from './useActiveSessions';
-export { useLeakedPassword } from './useLeakedPassword';
-export { useIdleTimeout } from './useIdleTimeout';
-export { usePermissions } from './usePermissions';
-export { useUserRole } from './useUserRole';
+export { 
+  useBiometricAuth, 
+  useActiveSessions, 
+  useLeakedPassword, 
+  useIdleTimeout, 
+  usePermissions, 
+  useUserRole,
+  useSessionCleanup,
+  useProfile,
+  cleanupSession,
+  checkPendingCleanup,
+  type AppRole,
+  type Permission,
+  type BiometricCredential,
+  type ActiveSession,
+  type Profile,
+} from './auth';
 
 // ==================== Beneficiary ====================
 export { useBeneficiaries } from './useBeneficiaries';
@@ -197,7 +208,7 @@ export { useUsersManagement, useUsersQuery, useDeleteUser, useUpdateUserRoles, u
 export { useUsersActivityMetrics } from './useUsersActivityMetrics';
 export { useOrganizationSettings } from './useOrganizationSettings';
 export { useVisibilitySettings } from './useVisibilitySettings';
-export { useProfile } from './useProfile';
+// useProfile - exported from ./auth
 export { useAlertCleanup } from './useAlertCleanup';
 export { useSelfHealing } from './useSelfHealing';
 export { useSystemMonitoring } from './useSystemMonitoring';
