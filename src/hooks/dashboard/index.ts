@@ -10,3 +10,7 @@ export { useAccountantKPIs } from '../useAccountantKPIs';
 export { useAdminKPIs } from '../useAdminKPIs';
 export { useCashierStats } from '../useCashierStats';
 export { useArchivistDashboard } from '../useArchivistDashboard';
+
+// الـ Hooks الجديدة الموحدة
+export { useNazerDashboardRealtime, useNazerDashboardRefresh } from './useNazerDashboardRealtime';
+export { useRevenueProgress, type RevenueProgressData } from './useRevenueProgress';

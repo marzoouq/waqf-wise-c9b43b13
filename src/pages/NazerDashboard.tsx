@@ -15,24 +15,23 @@ import { DistributeRevenueDialog } from "@/components/nazer/DistributeRevenueDia
 import { PublishFiscalYearDialog } from "@/components/nazer/PublishFiscalYearDialog";
 import { FiscalYearPublishStatus } from "@/components/nazer/FiscalYearPublishStatus";
 import { CurrentFiscalYearCard, RevenueProgressCard } from "@/components/dashboard/shared";
-import { useQueryClient } from "@tanstack/react-query";
+import { useNazerDashboardRealtime, useNazerDashboardRefresh } from "@/hooks/dashboard/useNazerDashboardRealtime";
 
 export default function NazerDashboard() {
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
   const [distributeDialogOpen, setDistributeDialogOpen] = useState(false);
   const [publishDialogOpen, setPublishDialogOpen] = useState(false);
-  const queryClient = useQueryClient();
-
-  const handleRefresh = () => {
-    queryClient.invalidateQueries();
-  };
+  
+  // تفعيل التحديثات المباشرة الموحدة
+  useNazerDashboardRealtime();
+  const { refreshAll } = useNazerDashboardRefresh();
 
   return (
     <UnifiedDashboardLayout
       role="nazer"
       actions={
         <div className="flex items-center gap-2">
-          <Button onClick={handleRefresh} variant="ghost" size="icon" title="تحديث البيانات">
+          <Button onClick={refreshAll} variant="ghost" size="icon" title="تحديث البيانات">
             <RefreshCw className="h-4 w-4" />
           </Button>
           <Button onClick={() => setDistributeDialogOpen(true)} className="gap-2" variant="default">
