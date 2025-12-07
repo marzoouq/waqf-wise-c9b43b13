@@ -8,7 +8,7 @@ import {
   Wallet,
   PieChart
 } from "lucide-react";
-import { useNazerKPIs } from "@/hooks/useNazerKPIs";
+import { useNazerKPIs } from "@/hooks/dashboard";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";

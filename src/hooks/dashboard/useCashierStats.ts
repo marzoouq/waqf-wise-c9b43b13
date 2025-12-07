@@ -1,3 +1,9 @@
+/**
+ * useCashierStats Hook
+ * Hook لجلب إحصائيات أمين الصندوق
+ * نُقل من src/hooks/useCashierStats.ts
+ */
+
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 

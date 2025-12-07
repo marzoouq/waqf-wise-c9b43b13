@@ -1,6 +1,7 @@
 /**
  * Hook لبيانات لوحة تحكم الأرشيفي
  * Archivist Dashboard Data Hook
+ * نُقل من src/hooks/useArchivistDashboard.ts
  */
 
 import { useQuery } from "@tanstack/react-query";

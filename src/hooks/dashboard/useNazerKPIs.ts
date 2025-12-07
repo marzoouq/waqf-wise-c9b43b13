@@ -1,3 +1,9 @@
+/**
+ * useNazerKPIs Hook
+ * Hook لجلب KPIs الناظر
+ * نُقل من src/hooks/useNazerKPIs.ts
+ */
+
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";

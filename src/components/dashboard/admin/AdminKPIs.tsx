@@ -1,6 +1,6 @@
 import { memo, useMemo } from "react";
 import { Users, UsersRound, Building2, Wallet, AlertCircle, TrendingUp, TrendingDown, Clock } from "lucide-react";
-import { useAdminKPIs } from "@/hooks/useAdminKPIs";
+import { useAdminKPIs } from "@/hooks/admin";
 import { formatCurrency, formatNumber } from "@/lib/utils";
 import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";

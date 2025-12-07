@@ -2,7 +2,7 @@ import { lazy, Suspense, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Wallet, TrendingUp, TrendingDown, DollarSign, Receipt, Clock, CheckCircle, Mail, RefreshCw } from "lucide-react";
-import { useCashierStats } from "@/hooks/useCashierStats";
+import { useCashierStats } from "@/hooks/dashboard";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { Button } from "@/components/ui/button";
 import { AddReceiptDialog } from "@/components/payments/AddReceiptDialog";
@@ -27,7 +27,9 @@ export default function CashierDashboard() {
   const queryClient = useQueryClient();
 
   const handleRefresh = () => {
-    queryClient.invalidateQueries();
+    queryClient.invalidateQueries({ queryKey: ['cashier-stats'] });
+    queryClient.invalidateQueries({ queryKey: ['bank-accounts'] });
+    queryClient.invalidateQueries({ queryKey: ['journal-entries'] });
   };
 
   if (isLoading) {

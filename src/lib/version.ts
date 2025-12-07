@@ -2,11 +2,11 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.6.31
+ * @version 2.6.32
  * @date 2025-12-07
  */
 
-export const APP_VERSION = '2.6.31';
+export const APP_VERSION = '2.6.32';
 export const APP_VERSION_DATE = '2025-12-07';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
@@ -16,11 +16,11 @@ export const VERSION_INFO = {
   name: APP_VERSION_NAME,
   changelog: '/docs/CHANGELOG.md',
   features: [
-    'إعادة هيكلة لوحة المحاسب',
-    'مكون StatusBadge مشترك',
-    'توحيد useAccountantKPIs',
-    'إعادة هيكلة لوحة المستفيد',
-    'تنظيف Hooks المكررة',
+    'نقل Hooks لوحات التحكم للمجلدات الصحيحة',
+    'إصلاح invalidateQueries في CashierDashboard',
+    'توحيد إصدارات التوثيق',
+    'تصدير جميع مكونات التقارير',
+    'حذف مجلد __tests__ الفارغ',
   ],
 } as const;
 

@@ -11,7 +11,7 @@ import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
 import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 import { SectionSkeleton } from "@/components/dashboard";
 import { AdminSendMessageDialog } from "@/components/messages/AdminSendMessageDialog";
-import { useArchivistDashboard } from "@/hooks/useArchivistDashboard";
+import { useArchivistDashboard } from "@/hooks/archive";
 
 export default function ArchivistDashboard() {
   const navigate = useNavigate();
