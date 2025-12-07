@@ -1,17 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useTenantLedger } from '@/hooks/property/useTenantLedger';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import { FileText, CreditCard, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
+import { FileText, CreditCard, ArrowUpCircle, ArrowDownCircle, Receipt } from 'lucide-react';
 
 interface TenantLedgerProps {
   tenantId: string;
@@ -54,15 +46,16 @@ export function TenantLedger({ tenantId, tenantName }: TenantLedgerProps) {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-lg">
+      <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+          <Receipt className="h-4 w-4 sm:h-5 sm:w-5" />
           كشف حساب {tenantName && `- ${tenantName}`}
         </CardTitle>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">الرصيد الحالي:</span>
+          <span className="text-xs sm:text-sm text-muted-foreground">الرصيد:</span>
           <Badge
             variant={balance > 0 ? 'destructive' : balance < 0 ? 'default' : 'secondary'}
-            className="text-base"
+            className="text-sm sm:text-base"
           >
             {formatCurrency(Math.abs(balance))}
             {balance > 0 ? ' مدين' : balance < 0 ? ' دائن' : ''}
@@ -72,51 +65,75 @@ export function TenantLedger({ tenantId, tenantName }: TenantLedgerProps) {
       <CardContent>
         {entries.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
+            <Receipt className="h-12 w-12 mx-auto mb-4 opacity-50" />
             لا توجد حركات في الحساب
           </div>
         ) : (
-          <div className="rounded-md border overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>التاريخ</TableHead>
-                  <TableHead>النوع</TableHead>
-                  <TableHead>المرجع</TableHead>
-                  <TableHead>البيان</TableHead>
-                  <TableHead className="text-left">مدين</TableHead>
-                  <TableHead className="text-left">دائن</TableHead>
-                  <TableHead className="text-left">الرصيد</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {entries.map((entry) => (
-                  <TableRow key={entry.id}>
-                    <TableCell className="whitespace-nowrap">
-                      {formatDate(entry.transaction_date)}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
+          <div className="space-y-3">
+            {entries.map((entry) => (
+              <div
+                key={entry.id}
+                className="border rounded-lg p-3 sm:p-4 hover:bg-muted/50 transition-colors"
+              >
+                {/* Mobile & Desktop View */}
+                <div className="flex flex-col gap-2">
+                  {/* Row 1: Type, Date, Balance */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className={`p-1.5 rounded-full ${
+                        entry.credit_amount > 0 
+                          ? 'bg-green-100 text-green-600 dark:bg-green-900/30' 
+                          : 'bg-red-100 text-red-600 dark:bg-red-900/30'
+                      }`}>
                         {transactionTypeIcons[entry.transaction_type]}
-                        <span>{transactionTypeLabels[entry.transaction_type]}</span>
                       </div>
-                    </TableCell>
-                    <TableCell className="font-mono text-sm">
-                      {entry.reference_number || '-'}
-                    </TableCell>
-                    <TableCell>{entry.description || '-'}</TableCell>
-                    <TableCell className="text-left font-medium text-destructive">
-                      {entry.debit_amount > 0 ? formatCurrency(entry.debit_amount) : '-'}
-                    </TableCell>
-                    <TableCell className="text-left font-medium text-green-600">
-                      {entry.credit_amount > 0 ? formatCurrency(entry.credit_amount) : '-'}
-                    </TableCell>
-                    <TableCell className="text-left font-bold">
-                      {formatCurrency(entry.balance)}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                      <div>
+                        <p className="font-medium text-sm">
+                          {transactionTypeLabels[entry.transaction_type] || entry.transaction_type}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {formatDate(entry.transaction_date)}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-left">
+                      {entry.credit_amount > 0 && (
+                        <p className="font-bold text-green-600 text-sm sm:text-base">
+                          +{formatCurrency(entry.credit_amount)}
+                        </p>
+                      )}
+                      {entry.debit_amount > 0 && (
+                        <p className="font-bold text-destructive text-sm sm:text-base">
+                          -{formatCurrency(entry.debit_amount)}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Row 2: Description */}
+                  {entry.description && (
+                    <p className="text-xs sm:text-sm text-muted-foreground pr-8">
+                      {entry.description}
+                    </p>
+                  )}
+
+                  {/* Row 3: Balance */}
+                  <div className="flex items-center justify-between pt-2 border-t text-xs sm:text-sm">
+                    <span className="text-muted-foreground">الرصيد بعد العملية</span>
+                    <span className={`font-bold ${
+                      entry.balance > 0 
+                        ? 'text-destructive' 
+                        : entry.balance < 0 
+                          ? 'text-green-600' 
+                          : ''
+                    }`}>
+                      {formatCurrency(Math.abs(entry.balance))}
+                      {entry.balance > 0 ? ' مدين' : entry.balance < 0 ? ' دائن' : ''}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </CardContent>
