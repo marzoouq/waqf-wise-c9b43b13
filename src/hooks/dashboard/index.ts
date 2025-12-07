@@ -17,4 +17,5 @@ export { useArchivistDashboard, useArchivistStats, useRecentDocuments } from '..
 // الـ Hooks الموحدة للـ Realtime
 export { useNazerDashboardRealtime, useNazerDashboardRefresh } from './useNazerDashboardRealtime';
 export { useAdminDashboardRealtime, useAdminDashboardRefresh } from './useAdminDashboardRealtime';
+export { useCashierDashboardRealtime, useCashierDashboardRefresh } from './useCashierDashboardRealtime';
 export { useRevenueProgress, type RevenueProgressData } from './useRevenueProgress';

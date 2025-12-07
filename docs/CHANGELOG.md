@@ -24,6 +24,15 @@
   - `CashFlowReport`, `DistributionAnalysisReport`, `DistributionEfficiencyReport`
   - `FundsPerformanceReport`, `LoansAgingReport`, `MaintenanceCostReport`, `PropertiesReports`
 
+#### ✨ الميزات الجديدة (المرحلة 2)
+- **`useCashierDashboardRealtime`:** قناة Realtime موحدة للوحة أمين الصندوق
+- **`useArchivistDashboardRealtime`:** قناة Realtime موحدة للوحة الأرشيفي
+- **مجلد `src/components/dashboard/cashier/`:** مكونات خاصة بلوحة أمين الصندوق
+
+#### 📚 تحديثات التوثيق
+- تحديث `src/hooks/README.md` بالهيكل الجديد (165+ hooks في 20 مجلد)
+- توحيد جميع ملفات التوثيق على الإصدار 2.6.32
+
 #### 🗑️ الملفات المحذوفة
 - `src/hooks/__tests__/` (كان فارغاً بعد إزالة الاختبارات)
 - `src/hooks/useNazerKPIs.ts` → نُقل إلى dashboard/
@@ -31,7 +40,7 @@
 - `src/hooks/useCashierStats.ts` → نُقل إلى dashboard/
 - `src/hooks/useArchivistDashboard.ts` → نُقل إلى archive/
 
-## [2.6.31] - 2025-12-07
+---
 
 ### 🧹 تنظيف وتوحيد الـ Hooks
 
