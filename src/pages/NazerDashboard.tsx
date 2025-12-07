@@ -1,6 +1,7 @@
-import { Mail, Coins, Globe, RefreshCw, Settings } from "lucide-react";
+import { Mail, Coins, Globe, RefreshCw, Settings, Users, FileText, Activity } from "lucide-react";
 import { Suspense, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AdminSendMessageDialog } from "@/components/messages/AdminSendMessageDialog";
 import { ChartSkeleton, SectionSkeleton } from "@/components/dashboard";
 import { UnifiedDashboardLayout } from "@/components/dashboard/UnifiedDashboardLayout";
@@ -15,20 +16,18 @@ import { DistributeRevenueDialog } from "@/components/nazer/DistributeRevenueDia
 import { PublishFiscalYearDialog } from "@/components/nazer/PublishFiscalYearDialog";
 import { FiscalYearPublishStatus } from "@/components/nazer/FiscalYearPublishStatus";
 import { BeneficiaryControlSection } from "@/components/nazer/BeneficiaryControlSection";
+import { NazerBeneficiaryManagement } from "@/components/nazer/NazerBeneficiaryManagement";
+import { NazerReportsSection } from "@/components/nazer/NazerReportsSection";
+import { NazerSystemOverview } from "@/components/nazer/NazerSystemOverview";
 import { CurrentFiscalYearCard, RevenueProgressCard } from "@/components/dashboard/shared";
 import { useNazerDashboardRealtime, useNazerDashboardRefresh } from "@/hooks/dashboard/useNazerDashboardRealtime";
 import { POSQuickAccessCard } from "@/components/pos";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 
 export default function NazerDashboard() {
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
   const [distributeDialogOpen, setDistributeDialogOpen] = useState(false);
   const [publishDialogOpen, setPublishDialogOpen] = useState(false);
-  const [controlSectionOpen, setControlSectionOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("overview");
   
   // تفعيل التحديثات المباشرة الموحدة
   useNazerDashboardRealtime();
@@ -61,57 +60,94 @@ export default function NazerDashboard() {
         {/* حالة نشر السنة المالية */}
         <FiscalYearPublishStatus onPublishClick={() => setPublishDialogOpen(true)} />
 
-        {/* السنة المالية وتقدم الإيرادات */}
-        <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
-          <CurrentFiscalYearCard />
-          <RevenueProgressCard />
-        </div>
+        {/* تبويبات لوحة التحكم الشاملة */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-4 mb-4">
+            <TabsTrigger value="overview" className="gap-2">
+              <Activity className="h-4 w-4" />
+              <span className="hidden sm:inline">نظرة عامة</span>
+            </TabsTrigger>
+            <TabsTrigger value="beneficiaries" className="gap-2">
+              <Users className="h-4 w-4" />
+              <span className="hidden sm:inline">المستفيدون</span>
+            </TabsTrigger>
+            <TabsTrigger value="reports" className="gap-2">
+              <FileText className="h-4 w-4" />
+              <span className="hidden sm:inline">التقارير</span>
+            </TabsTrigger>
+            <TabsTrigger value="settings" className="gap-2">
+              <Settings className="h-4 w-4" />
+              <span className="hidden sm:inline">التحكم</span>
+            </TabsTrigger>
+          </TabsList>
 
-        <Suspense fallback={<SectionSkeleton />}>
-          <NazerKPIs />
-        </Suspense>
+          {/* تبويب نظرة عامة */}
+          <TabsContent value="overview" className="space-y-6">
+            {/* السنة المالية وتقدم الإيرادات */}
+            <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
+              <CurrentFiscalYearCard />
+              <RevenueProgressCard />
+            </div>
 
-        {/* بطاقات الرصيد البنكي ورقبة الوقف ونقطة البيع - تحديث مباشر */}
-        <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-3">
-          <BankBalanceCard />
-          <WaqfCorpusCard />
-          <POSQuickAccessCard />
-        </div>
+            <Suspense fallback={<SectionSkeleton />}>
+              <NazerKPIs />
+            </Suspense>
 
-        <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
-          <Suspense fallback={<ChartSkeleton />}>
-            <PendingApprovalsSection />
-          </Suspense>
-          <Suspense fallback={<ChartSkeleton />}>
-            <SmartAlertsSection />
-          </Suspense>
-        </div>
+            {/* بطاقات الرصيد البنكي ورقبة الوقف ونقطة البيع */}
+            <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-3">
+              <BankBalanceCard />
+              <WaqfCorpusCard />
+              <POSQuickAccessCard />
+            </div>
 
-        <Suspense fallback={<ChartSkeleton />}>
-          <AIInsightsWidget />
-        </Suspense>
+            <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
+              <Suspense fallback={<ChartSkeleton />}>
+                <PendingApprovalsSection />
+              </Suspense>
+              <Suspense fallback={<ChartSkeleton />}>
+                <SmartAlertsSection />
+              </Suspense>
+            </div>
 
-        <Suspense fallback={<ChartSkeleton />}>
-          <QuickActionsGrid />
-        </Suspense>
+            <Suspense fallback={<ChartSkeleton />}>
+              <AIInsightsWidget />
+            </Suspense>
 
-        {/* قسم التحكم بعرض المستفيدين - قابل للطي */}
-        <Collapsible open={controlSectionOpen} onOpenChange={setControlSectionOpen}>
-          <CollapsibleTrigger asChild>
-            <Button variant="outline" className="w-full gap-2 justify-between">
-              <div className="flex items-center gap-2">
-                <Settings className="h-4 w-4" />
-                <span>التحكم بعرض المستفيدين والورثة</span>
-              </div>
-              <span className="text-xs text-muted-foreground">
-                {controlSectionOpen ? "إخفاء" : "عرض"}
-              </span>
-            </Button>
-          </CollapsibleTrigger>
-          <CollapsibleContent className="pt-4">
-            <BeneficiaryControlSection />
-          </CollapsibleContent>
-        </Collapsible>
+            <Suspense fallback={<ChartSkeleton />}>
+              <QuickActionsGrid />
+            </Suspense>
+          </TabsContent>
+
+          {/* تبويب المستفيدين */}
+          <TabsContent value="beneficiaries" className="space-y-6">
+            <Suspense fallback={<SectionSkeleton />}>
+              <NazerSystemOverview />
+            </Suspense>
+
+            <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
+              <Suspense fallback={<ChartSkeleton />}>
+                <NazerBeneficiaryManagement />
+              </Suspense>
+              <Suspense fallback={<ChartSkeleton />}>
+                <PendingApprovalsSection />
+              </Suspense>
+            </div>
+          </TabsContent>
+
+          {/* تبويب التقارير */}
+          <TabsContent value="reports" className="space-y-6">
+            <Suspense fallback={<SectionSkeleton />}>
+              <NazerReportsSection />
+            </Suspense>
+          </TabsContent>
+
+          {/* تبويب التحكم */}
+          <TabsContent value="settings" className="space-y-6">
+            <Suspense fallback={<SectionSkeleton />}>
+              <BeneficiaryControlSection />
+            </Suspense>
+          </TabsContent>
+        </Tabs>
       </div>
 
       <AdminSendMessageDialog
