@@ -1,21 +1,25 @@
 /**
  * Dashboard Hooks - خطافات لوحات التحكم
- * @version 2.6.32
+ * @version 2.6.33
  */
 
-export { useDashboardConfigs } from '../useDashboardConfig';
-export { useDashboardKPIs } from '../useDashboardKPIs';
-export { useKPIs } from '../useKPIs';
-export { useAccountantKPIs } from '../accounting';
+// ==================== Core Dashboard Hooks ====================
+export { useDashboardConfigs, useSaveDashboardConfig, useUpdateDashboardConfig, useDeleteDashboardConfig, type DashboardConfig, type DashboardWidget } from './useDashboardConfig';
+export { useDashboardKPIs, type DashboardKPIs } from './useDashboardKPIs';
+export { useKPIs, type KPI } from './useKPIs';
+export { useUnifiedKPIs, type UnifiedKPIsData } from './useUnifiedKPIs';
 
-// Hooks نُقلت إلى مجلداتها الصحيحة
+// ==================== Role-Specific Dashboard Hooks ====================
 export { useNazerKPIs, type NazerKPIData } from './useNazerKPIs';
-export { useAdminKPIs } from '../admin/useAdminKPIs';
 export { useCashierStats } from './useCashierStats';
-export { useArchivistDashboard, useArchivistStats, useRecentDocuments } from '../archive/useArchivistDashboard';
+export { useRevenueProgress, type RevenueProgressData } from './useRevenueProgress';
 
-// الـ Hooks الموحدة للـ Realtime
+// ==================== Realtime Dashboard Hooks ====================
 export { useNazerDashboardRealtime, useNazerDashboardRefresh } from './useNazerDashboardRealtime';
 export { useAdminDashboardRealtime, useAdminDashboardRefresh } from './useAdminDashboardRealtime';
 export { useCashierDashboardRealtime, useCashierDashboardRefresh } from './useCashierDashboardRealtime';
-export { useRevenueProgress, type RevenueProgressData } from './useRevenueProgress';
+
+// ==================== Re-exports from other folders ====================
+export { useAdminKPIs } from '../admin/useAdminKPIs';
+export { useAccountantKPIs } from '../accounting';
+export { useArchivistDashboard, useArchivistStats, useRecentDocuments } from '../archive/useArchivistDashboard';
