@@ -7,3 +7,4 @@ export { PendingRentalsTable } from './PendingRentalsTable';
 export { TransactionsTable } from './TransactionsTable';
 export { POSStatsCards } from './POSStatsCards';
 export { POSQuickAccessCard } from './POSQuickAccessCard';
+export { POSReceipt } from './POSReceipt';

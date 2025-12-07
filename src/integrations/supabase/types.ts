@@ -11892,6 +11892,45 @@ export type Database = {
         }
       }
       get_family_statistics: { Args: { p_family_id: string }; Returns: Json }
+      get_pos_daily_stats: {
+        Args: { p_date?: string }
+        Returns: {
+          card_amount: number
+          cash_amount: number
+          net_amount: number
+          total_collections: number
+          total_payments: number
+          transactions_count: number
+          transfer_amount: number
+        }[]
+      }
+      get_shift_stats: {
+        Args: { p_shift_id: string }
+        Returns: {
+          card_collections: number
+          cash_collections: number
+          net_amount: number
+          total_collections: number
+          total_payments: number
+          transactions_count: number
+        }[]
+      }
+      get_shifts_report: {
+        Args: { p_end_date: string; p_start_date: string }
+        Returns: {
+          cashier_name: string
+          closed_at: string
+          closing_balance: number
+          opened_at: string
+          opening_balance: number
+          shift_id: string
+          shift_number: string
+          status: string
+          total_collections: number
+          total_payments: number
+          variance: number
+        }[]
+      }
       get_user_permissions: {
         Args: { _user_id: string }
         Returns: {
