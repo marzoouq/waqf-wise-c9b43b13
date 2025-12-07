@@ -1,10 +1,10 @@
 import { FileText, CheckCircle2, FileEdit, XCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAccountingStats } from "@/hooks/useAccountingStats";
+import { useAccountantKPIs } from "@/hooks/accounting";
 
 const AccountingStats = () => {
-  const { data, isLoading } = useAccountingStats();
+  const { data, isLoading } = useAccountantKPIs();
 
   if (isLoading) {
     return (

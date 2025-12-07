@@ -72,7 +72,7 @@ export { useMyBeneficiaryRequests } from './useMyBeneficiaryRequests';
 // ==================== Accounting ====================
 export { useJournalEntries } from './useJournalEntries';
 export { useAccounts } from './useAccounts';
-export { useAccountingStats } from './useAccountingStats';
+// useAccountingStats - تم دمجها في useAccountantKPIs (src/hooks/accounting/)
 export { useAccountingTabs } from './useAccountingTabs';
 export { useAccountingFilters } from './useAccountingFilters';
 export { useBudgets } from './useBudgets';
