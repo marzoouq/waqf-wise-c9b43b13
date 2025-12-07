@@ -8,3 +8,4 @@ export { useDocumentVersions } from '../useDocumentVersions';
 export { useDocumentTags } from '../useDocumentTags';
 export { useFolders } from '../useFolders';
 export { useArchiveStats } from '../useArchiveStats';
+export { useArchivistDashboard, useArchivistStats, useRecentDocuments, type ArchivistStats, type RecentDocument } from './useArchivistDashboard';

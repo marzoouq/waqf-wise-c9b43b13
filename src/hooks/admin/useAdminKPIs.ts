@@ -1,3 +1,9 @@
+/**
+ * useAdminKPIs Hook
+ * جلب KPIs لوحة المشرف من Database Function محسّنة
+ * نُقل من src/hooks/useAdminKPIs.ts
+ */
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";

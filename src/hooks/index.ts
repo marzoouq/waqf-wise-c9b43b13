@@ -25,8 +25,8 @@
  *    - @/hooks/ui - واجهة المستخدم
  * 3. الملفات المباشرة: @/hooks/useAuth
  * 
- * @version 2.6.4
- * @lastUpdate 2025-12-03
+ * @version 2.6.32
+ * @lastUpdate 2025-12-07
  */
 
 // ==================== UI & Utility ====================
@@ -127,14 +127,18 @@ export { useSecurityAlerts } from './useSecurityAlerts';
 // ==================== Dashboard & KPIs ====================
 export { useDashboardKPIs } from './useDashboardKPIs';
 export { useDashboardConfigs } from './useDashboardConfig';
-export { useAdminKPIs } from './useAdminKPIs';
-export { useNazerKPIs } from './useNazerKPIs';
 export { useUnifiedKPIs } from './useUnifiedKPIs';
 export { useAccountantKPIs } from './accounting';
-export { useCashierStats } from './useCashierStats';
-export { useArchivistDashboard, useArchivistStats, useRecentDocuments } from './useArchivistDashboard';
 export { useKPIs } from './useKPIs';
 export { useAIInsights } from './useAIInsights';
+
+// Dashboard KPIs - نُقلت إلى مجلداتها الصحيحة
+export { useNazerKPIs, type NazerKPIData } from './dashboard/useNazerKPIs';
+export { useAdminKPIs } from './admin/useAdminKPIs';
+export { useCashierStats } from './dashboard/useCashierStats';
+export { useArchivistDashboard, useArchivistStats, useRecentDocuments } from './archive/useArchivistDashboard';
+
+// Dashboard Realtime Hooks
 export { useNazerDashboardRealtime, useNazerDashboardRefresh } from './dashboard/useNazerDashboardRealtime';
 export { useAdminDashboardRealtime, useAdminDashboardRefresh } from './dashboard/useAdminDashboardRealtime';
 export { useRevenueProgress } from './dashboard/useRevenueProgress';

@@ -4,3 +4,4 @@
  */
 
 export { useUserStats, type UserStats } from './useUserStats';
+export { useAdminKPIs } from './useAdminKPIs';

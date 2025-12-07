@@ -1,8 +1,35 @@
 # 📝 سجل التغييرات | Changelog
 
-**الإصدار الحالي:** 2.6.31 | **آخر تحديث:** 2025-12-07
+**الإصدار الحالي:** 2.6.32 | **آخر تحديث:** 2025-12-07
 
 ---
+
+## [2.6.32] - 2025-12-07
+
+### 🏗️ إعادة هيكلة Hooks لوحات التحكم
+
+#### 📂 نقل الـ Hooks للمجلدات الصحيحة
+- **`useNazerKPIs`:** نُقل من `src/hooks/` إلى `src/hooks/dashboard/`
+- **`useAdminKPIs`:** نُقل من `src/hooks/` إلى `src/hooks/admin/`
+- **`useCashierStats`:** نُقل من `src/hooks/` إلى `src/hooks/dashboard/`
+- **`useArchivistDashboard`:** نُقل من `src/hooks/` إلى `src/hooks/archive/`
+
+#### 🔧 الإصلاحات
+- **إصلاح `invalidateQueries()`:** في `CashierDashboard.tsx` كان يمسح الكاش بالكامل، الآن يستهدف queries محددة
+- **توحيد إصدارات التوثيق:** جميع الملفات الآن على الإصدار 2.6.32
+
+#### 📊 تصدير جميع مكونات التقارير
+- إضافة 10 مكونات كانت مفقودة في `reports/index.ts`:
+  - `AccountingLinkReport`, `BeneficiaryDistributionReport`, `BeneficiaryReports`
+  - `CashFlowReport`, `DistributionAnalysisReport`, `DistributionEfficiencyReport`
+  - `FundsPerformanceReport`, `LoansAgingReport`, `MaintenanceCostReport`, `PropertiesReports`
+
+#### 🗑️ الملفات المحذوفة
+- `src/hooks/__tests__/` (كان فارغاً بعد إزالة الاختبارات)
+- `src/hooks/useNazerKPIs.ts` → نُقل إلى dashboard/
+- `src/hooks/useAdminKPIs.ts` → نُقل إلى admin/
+- `src/hooks/useCashierStats.ts` → نُقل إلى dashboard/
+- `src/hooks/useArchivistDashboard.ts` → نُقل إلى archive/
 
 ## [2.6.31] - 2025-12-07
 
