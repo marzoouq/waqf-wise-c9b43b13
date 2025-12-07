@@ -6,7 +6,7 @@
  * @date 2025-12-07
  */
 
-export const APP_VERSION = '2.6.35';
+export const APP_VERSION = '2.6.36';
 export const APP_VERSION_DATE = '2025-12-07';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
@@ -16,11 +16,11 @@ export const VERSION_INFO = {
   name: APP_VERSION_NAME,
   changelog: '/docs/CHANGELOG.md',
   features: [
-    'تنظيم 170+ hook في 25 مجلداً فرعياً',
-    'إنشاء ملفات proxy للتوافق مع الإصدارات السابقة',
-    'تحديث ملفات index.ts في جميع المجلدات',
-    'نقل hooks التقارير والدعم الفني',
-    'تحسين هيكل المشروع',
+    'نظام نقطة البيع (POS) المتكامل',
+    'إدارة الورديات والتحصيل والصرف',
+    'تقارير POS اليومية وتحليل طرق الدفع',
+    'ربط POS بلوحات تحكم الناظر والمحاسب والصراف',
+    'دعم Realtime لتحديث البيانات فورياً',
   ],
 } as const;
 
