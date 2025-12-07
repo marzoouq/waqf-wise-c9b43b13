@@ -1,4 +1,4 @@
-import { Mail, Coins, Globe, RefreshCw } from "lucide-react";
+import { Mail, Coins, Globe, RefreshCw, Settings } from "lucide-react";
 import { Suspense, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { AdminSendMessageDialog } from "@/components/messages/AdminSendMessageDialog";
@@ -14,14 +14,21 @@ import { WaqfCorpusCard } from "@/components/shared/WaqfCorpusCard";
 import { DistributeRevenueDialog } from "@/components/nazer/DistributeRevenueDialog";
 import { PublishFiscalYearDialog } from "@/components/nazer/PublishFiscalYearDialog";
 import { FiscalYearPublishStatus } from "@/components/nazer/FiscalYearPublishStatus";
+import { BeneficiaryControlSection } from "@/components/nazer/BeneficiaryControlSection";
 import { CurrentFiscalYearCard, RevenueProgressCard } from "@/components/dashboard/shared";
 import { useNazerDashboardRealtime, useNazerDashboardRefresh } from "@/hooks/dashboard/useNazerDashboardRealtime";
 import { POSQuickAccessCard } from "@/components/pos";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 export default function NazerDashboard() {
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
   const [distributeDialogOpen, setDistributeDialogOpen] = useState(false);
   const [publishDialogOpen, setPublishDialogOpen] = useState(false);
+  const [controlSectionOpen, setControlSectionOpen] = useState(false);
   
   // تفعيل التحديثات المباشرة الموحدة
   useNazerDashboardRealtime();
@@ -87,6 +94,24 @@ export default function NazerDashboard() {
         <Suspense fallback={<ChartSkeleton />}>
           <QuickActionsGrid />
         </Suspense>
+
+        {/* قسم التحكم بعرض المستفيدين - قابل للطي */}
+        <Collapsible open={controlSectionOpen} onOpenChange={setControlSectionOpen}>
+          <CollapsibleTrigger asChild>
+            <Button variant="outline" className="w-full gap-2 justify-between">
+              <div className="flex items-center gap-2">
+                <Settings className="h-4 w-4" />
+                <span>التحكم بعرض المستفيدين والورثة</span>
+              </div>
+              <span className="text-xs text-muted-foreground">
+                {controlSectionOpen ? "إخفاء" : "عرض"}
+              </span>
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="pt-4">
+            <BeneficiaryControlSection />
+          </CollapsibleContent>
+        </Collapsible>
       </div>
 
       <AdminSendMessageDialog
