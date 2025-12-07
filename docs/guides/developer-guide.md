@@ -31,7 +31,7 @@ npm run dev
 src/
 ├── assets/          # الصور والملفات الثابتة
 ├── components/      # المكونات (~350)
-├── hooks/           # Custom Hooks (~152)
+├── hooks/           # Custom Hooks (~165)
 ├── integrations/    # Supabase client
 ├── lib/             # المكتبات المساعدة
 ├── pages/           # الصفحات (~74)
