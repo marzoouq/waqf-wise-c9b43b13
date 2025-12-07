@@ -57,6 +57,17 @@
     --info-foreground: 0 0% 100%;
     --info-light: 210 100% 95%;
 
+    /* ألوان الورثة */
+    --heir-wife: 330 70% 50%;
+    --heir-son: 210 80% 50%;
+    --heir-daughter: 280 60% 55%;
+    
+    /* ألوان الحالة */
+    --status-success: 150 60% 45%;
+    --status-warning: 38 92% 50%;
+    --status-error: 0 72% 51%;
+    --status-info: 210 100% 50%;
+
     /* الحدود والإدخال */
     --border: 150 15% 88%;
     --input: 150 15% 90%;

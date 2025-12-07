@@ -84,6 +84,15 @@ export default {
           foreground: "hsl(var(--info-foreground))",
           light: "hsl(var(--info-light))",
         },
+        // ألوان الورثة
+        "heir-wife": "hsl(var(--heir-wife))",
+        "heir-son": "hsl(var(--heir-son))",
+        "heir-daughter": "hsl(var(--heir-daughter))",
+        // ألوان الحالة
+        "status-success": "hsl(var(--status-success))",
+        "status-warning": "hsl(var(--status-warning))",
+        "status-error": "hsl(var(--status-error))",
+        "status-info": "hsl(var(--status-info))",
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
