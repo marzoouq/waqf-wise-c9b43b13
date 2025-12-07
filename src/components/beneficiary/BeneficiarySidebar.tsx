@@ -1,52 +1,14 @@
 import { useState } from "react";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
-import {
-  TrendingUp,
-  User,
-  FileText,
-  CreditCard,
-  Building2,
-  Users,
-  Landmark,
-  Shield,
-  DollarSign,
-  CreditCard as LoanIcon,
-  Menu,
-  MessageSquare,
-  HelpCircle,
-  BarChart3,
-} from "lucide-react";
-
-interface SidebarItem {
-  id: string;
-  label: string;
-  icon: React.ComponentType<{ className?: string }>;
-  href?: string;
-  tab?: string;
-  visibilityKey?: keyof ReturnType<typeof useVisibilitySettings>['settings'];
-}
-
-const sidebarItems: SidebarItem[] = [
-  { id: "overview", label: "نظرة عامة", icon: TrendingUp, tab: "overview", visibilityKey: "show_overview" },
-  { id: "profile", label: "الملف الشخصي", icon: User, tab: "profile", visibilityKey: "show_profile" },
-  { id: "distributions", label: "التوزيعات", icon: DollarSign, tab: "distributions", visibilityKey: "show_distributions" },
-  { id: "statements", label: "كشف الحساب", icon: CreditCard, tab: "statements", visibilityKey: "show_statements" },
-  { id: "properties", label: "العقارات", icon: Building2, tab: "properties", visibilityKey: "show_properties" },
-  { id: "family", label: "العائلة", icon: Users, tab: "family", visibilityKey: "show_family_tree" },
-  { id: "waqf", label: "الوقف", icon: Landmark, tab: "waqf" },
-  { id: "governance", label: "الحوكمة", icon: Shield, tab: "governance", visibilityKey: "show_governance" },
-  { id: "budgets", label: "الميزانيات", icon: DollarSign, tab: "budgets", visibilityKey: "show_budgets" },
-  { id: "loans", label: "القروض", icon: LoanIcon, tab: "loans", visibilityKey: "show_own_loans" },
-  { id: "messages", label: "الرسائل", icon: MessageSquare, href: "/messages" },
-  { id: "reports", label: "التقارير", icon: BarChart3, href: "/beneficiary/reports", visibilityKey: "show_financial_reports" },
-  { id: "support", label: "الدعم الفني", icon: HelpCircle, href: "/beneficiary-support" },
-];
+import { Menu, User } from "lucide-react";
+import { sidebarItems, type SidebarItem } from "./config/sidebarConfig";
+import { APP_VERSION } from "@/lib/version";
 
 interface BeneficiarySidebarProps {
   activeTab: string;
@@ -61,21 +23,18 @@ interface BeneficiarySidebarProps {
  */
 export function BeneficiarySidebar({ activeTab, onTabChange, beneficiaryName }: BeneficiarySidebarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const location = useLocation();
   const navigate = useNavigate();
   const { settings } = useVisibilitySettings();
 
   const handleItemClick = (tab: string) => {
     onTabChange(tab);
-    setMobileOpen(false); // إغلاق القائمة على الجوال بعد الاختيار
+    setMobileOpen(false);
   };
 
   // تصفية العناصر حسب إعدادات الشفافية
   const visibleItems = sidebarItems.filter((item) => {
-    // العناصر بدون visibilityKey تظهر دائماً
     if (!item.visibilityKey) return true;
-    // التحقق من إعدادات الشفافية
-    return settings?.[item.visibilityKey] === true;
+    return settings?.[item.visibilityKey as keyof typeof settings] === true;
   });
 
   const SidebarContent = () => (
@@ -95,7 +54,6 @@ export function BeneficiarySidebar({ activeTab, onTabChange, beneficiaryName }: 
         </div>
       </div>
 
-
       {/* Navigation Items */}
       <ScrollArea className="flex-1 px-3 py-4">
         <div className="space-y-1">
@@ -103,7 +61,6 @@ export function BeneficiarySidebar({ activeTab, onTabChange, beneficiaryName }: 
             const isActive = activeTab === item.tab;
             const Icon = item.icon;
 
-            // إذا كان العنصر يحتوي على رابط خارجي
             if (item.href) {
               return (
                 <button
@@ -151,7 +108,7 @@ export function BeneficiarySidebar({ activeTab, onTabChange, beneficiaryName }: 
       {/* Footer */}
       <div className="p-4 text-xs text-center text-muted-foreground">
         <p>منصة إدارة الوقف</p>
-        <p className="mt-1">الإصدار 2.0</p>
+        <p className="mt-1">الإصدار {APP_VERSION}</p>
       </div>
     </div>
   );

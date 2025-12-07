@@ -79,6 +79,9 @@ export { ReportsMenu } from './ReportsMenu';
 export { SystemHealthIndicator } from './SystemHealthIndicator';
 export { AccountStatementView } from './AccountStatementView';
 
+// ==================== TabContent Wrapper ====================
+export { TabContentWrapper } from './common/TabContentWrapper';
+
 // NOTE: NotificationsBell is now exported from @/components/layout/NotificationsBell
 // NotificationsCenter was removed as it was unused
 
@@ -86,6 +89,7 @@ export { AccountStatementView } from './AccountStatementView';
 export { PropertiesListView } from './PropertiesListView';
 export { PropertyAccordionView } from './PropertyAccordionView';
 export { PropertyUnitsGrid } from './PropertyUnitsGrid';
+export { PropertyUnitsDisplay } from './properties/PropertyUnitsDisplay';
 
 // ==================== Admin Components (للموظفين) ====================
 // يمكن الاستيراد من: @/components/beneficiary/admin

@@ -73,12 +73,12 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
 
   const getStatusBadge = (isClosed: boolean) => {
     return isClosed ? (
-      <Badge variant="secondary" className="gap-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+      <Badge variant="secondary" className="gap-1 bg-muted text-muted-foreground">
         <Archive className="h-3 w-3" />
         مؤرشف
       </Badge>
     ) : (
-      <Badge variant="default" className="gap-1 bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 border-emerald-300">
+      <Badge variant="default" className="gap-1 bg-success-light text-success border-success/30">
         <CircleDot className="h-3 w-3" />
         حالي
       </Badge>
@@ -109,12 +109,12 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
           </CardHeader>
           <CardContent className="pt-0">
             <div className="grid grid-cols-3 gap-4 text-center">
-              <div className="p-3 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800">
-                <div className="flex items-center justify-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 mb-1">
+              <div className="p-3 rounded-lg bg-success-light border border-success/20">
+                <div className="flex items-center justify-center gap-1 text-xs text-success mb-1">
                   <CircleDot className="h-3 w-3" />
                   السنة الحالية
                 </div>
-                <p className="font-bold text-emerald-700 dark:text-emerald-300">
+                <p className="font-bold text-success">
                   {masked ? (
                     <MaskedValue value={String(currentTotal)} type="amount" masked={true} />
                   ) : (
@@ -122,12 +122,12 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
                   )}
                 </p>
               </div>
-              <div className="p-3 rounded-lg bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700">
-                <div className="flex items-center justify-center gap-1 text-xs text-slate-500 dark:text-slate-400 mb-1">
+              <div className="p-3 rounded-lg bg-muted/50 border border-border">
+                <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground mb-1">
                   <Archive className="h-3 w-3" />
                   السنوات السابقة
                 </div>
-                <p className="font-bold text-slate-600 dark:text-slate-300">
+                <p className="font-bold text-muted-foreground">
                   {masked ? (
                     <MaskedValue value={String(historicalTotal)} type="amount" masked={true} />
                   ) : (
@@ -179,8 +179,8 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
                     key={dist.id} 
                     className={`hover:shadow-md transition-shadow ${
                       isClosed 
-                        ? 'bg-slate-50/50 dark:bg-slate-900/30 border-slate-200 dark:border-slate-700' 
-                        : 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800'
+                        ? 'bg-muted/30 border-border' 
+                        : 'bg-success-light/30 border-success/20'
                     }`}
                   >
                     <CardContent className="p-4 space-y-3">
@@ -211,7 +211,7 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
 
                       <div className="pt-2 border-t">
                         <p className="text-xs text-muted-foreground mb-1">المبلغ المستحق</p>
-                        <p className={`text-lg font-bold ${isClosed ? 'text-slate-600 dark:text-slate-300' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                        <p className={`text-lg font-bold ${isClosed ? 'text-muted-foreground' : 'text-success'}`}>
                           {masked ? (
                             <MaskedValue value={String(dist.share_amount || 0)} type="amount" masked={true} />
                           ) : (
@@ -246,16 +246,16 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
                           key={dist.id}
                           className={
                             isClosed 
-                              ? 'bg-slate-50/50 dark:bg-slate-900/20' 
-                              : 'bg-emerald-50/30 dark:bg-emerald-950/10'
+                              ? 'bg-muted/30' 
+                              : 'bg-success-light/20'
                           }
                         >
                           <TableCell className="font-medium">
                             <div className="flex items-center gap-2">
                               {isClosed ? (
-                                <Archive className="h-4 w-4 text-slate-400" />
+                                <Archive className="h-4 w-4 text-muted-foreground" />
                               ) : (
-                                <CircleDot className="h-4 w-4 text-emerald-500" />
+                                <CircleDot className="h-4 w-4 text-success" />
                               )}
                               {dist.fiscal_years?.name || "—"}
                             </div>
@@ -266,7 +266,7 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
                           <TableCell>
                             <Badge variant="outline">{getHeirTypeLabel(dist.heir_type)}</Badge>
                           </TableCell>
-                          <TableCell className={`font-bold ${isClosed ? 'text-slate-600 dark:text-slate-300' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                          <TableCell className={`font-bold ${isClosed ? 'text-muted-foreground' : 'text-success'}`}>
                             {masked ? (
                               <MaskedValue value={String(dist.share_amount || 0)} type="amount" masked={true} />
                             ) : (
