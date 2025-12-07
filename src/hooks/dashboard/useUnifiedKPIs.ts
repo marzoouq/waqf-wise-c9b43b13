@@ -94,9 +94,10 @@ async function fetchUnifiedKPIs(): Promise<UnifiedKPIsData> {
   const activeProperties = properties.filter(p => p.status === 'نشط' || p.status === 'active').length;
 
   const contracts = contractsResult.data || [];
-  const occupiedProperties = contracts.filter(c => c.status === 'ساري' || c.status === 'active').length;
+  // تصحيح: استخدام 'نشط' بدلاً من 'ساري' للتوافق مع البيانات الحقيقية
+  const occupiedProperties = contracts.filter(c => c.status === 'نشط' || c.status === 'active').length;
   const monthlyReturn = contracts
-    .filter(c => c.status === 'ساري' || c.status === 'active')
+    .filter(c => c.status === 'نشط' || c.status === 'active')
     .reduce((sum, c) => sum + (c.monthly_rent || 0), 0);
 
   const funds = fundsResult.data || [];
@@ -150,7 +151,7 @@ export function useUnifiedKPIs() {
   const queryClient = useQueryClient();
 
   const query = useQuery({
-    queryKey: ['unified-kpis'],
+    queryKey: ['unified-dashboard-kpis'],
     queryFn: fetchUnifiedKPIs,
     ...QUERY_CONFIG.DASHBOARD_KPIS
   });
@@ -161,9 +162,9 @@ export function useUnifiedKPIs() {
     
     const channels = tables.map(table => 
       supabase
-        .channel(`unified-kpis-${table}`)
+        .channel(`unified-dashboard-kpis-${table}`)
         .on('postgres_changes', { event: '*', schema: 'public', table }, () => {
-          queryClient.invalidateQueries({ queryKey: ['unified-kpis'] });
+          queryClient.invalidateQueries({ queryKey: ['unified-dashboard-kpis'] });
         })
         .subscribe()
     );
@@ -174,7 +175,7 @@ export function useUnifiedKPIs() {
   }, [queryClient]);
 
   const refresh = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: ['unified-kpis'] });
+    queryClient.invalidateQueries({ queryKey: ['unified-dashboard-kpis'] });
   }, [queryClient]);
 
   return {

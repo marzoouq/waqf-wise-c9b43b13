@@ -1,49 +1,40 @@
 /**
  * useAdminKPIs Hook
- * جلب KPIs لوحة المشرف من Database Function محسّنة
- * نُقل من src/hooks/useAdminKPIs.ts
+ * يستخدم useUnifiedKPIs كمصدر موحد للبيانات
+ * @deprecated استخدم useUnifiedKPIs مباشرة
  */
 
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { QUERY_CONFIG } from "@/lib/queryOptimization";
+import { useUnifiedKPIs } from "@/hooks/dashboard/useUnifiedKPIs";
 import type { AdminKPI } from "@/types/admin";
-import { parseAdminKPIsResponse } from "@/types/database-responses";
 
 /**
- * useAdminKPIs Hook
- * جلب KPIs لوحة المشرف من Database Function محسّنة
- * ملاحظة: Realtime يتم إدارته من useAdminDashboardRealtime
+ * Hook لجلب KPIs لوحة المشرف
+ * يستخدم المصدر الموحد useUnifiedKPIs لضمان تطابق البيانات بين جميع اللوحات
  */
 export function useAdminKPIs() {
-  const query = useQuery({
-    queryKey: ["admin-kpis"],
-    queryFn: async (): Promise<AdminKPI> => {
-      // استدعاء Database Function المحسّنة (استعلام واحد بدلاً من 8)
-      const { data, error } = await supabase.rpc('get_admin_dashboard_kpis');
-      
-      if (error) throw error;
+  const { data, isLoading, isError, error, refresh } = useUnifiedKPIs();
 
-      // تحليل البيانات بشكل آمن مع type safety
-      const kpisData = parseAdminKPIsResponse(data);
+  // تحويل البيانات الموحدة إلى صيغة AdminKPI
+  const adminData: AdminKPI | undefined = data ? {
+    totalBeneficiaries: data.totalBeneficiaries,
+    activeBeneficiaries: data.activeBeneficiaries,
+    totalFamilies: data.totalFamilies,
+    totalProperties: data.totalProperties,
+    occupiedProperties: data.occupiedProperties,
+    totalFunds: data.totalFunds,
+    activeFunds: data.activeFunds,
+    pendingRequests: data.pendingRequests,
+    overdueRequests: data.overdueRequests,
+    totalRevenue: data.totalRevenue,
+    totalExpenses: data.totalExpenses,
+    netIncome: data.netIncome,
+  } : undefined;
 
-      return {
-        totalBeneficiaries: kpisData.totalBeneficiaries,
-        activeBeneficiaries: kpisData.activeBeneficiaries,
-        totalFamilies: kpisData.totalFamilies,
-        totalProperties: kpisData.totalProperties,
-        occupiedProperties: kpisData.occupiedProperties,
-        totalFunds: kpisData.totalFunds,
-        activeFunds: kpisData.activeFunds,
-        pendingRequests: kpisData.pendingRequests,
-        overdueRequests: kpisData.overdueRequests,
-        totalRevenue: kpisData.totalRevenue,
-        totalExpenses: kpisData.totalExpenses,
-        netIncome: kpisData.netIncome,
-      };
-    },
-    ...QUERY_CONFIG.DASHBOARD_KPIS,
-  });
-
-  return query;
+  return {
+    data: adminData,
+    isLoading,
+    isError,
+    error,
+    refresh
+  };
 }
