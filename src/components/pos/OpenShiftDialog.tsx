@@ -7,29 +7,25 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Wallet } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { Briefcase, Play } from 'lucide-react';
 
 interface OpenShiftDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onConfirm: (data: { openingBalance: number; notes?: string }) => void;
+  onConfirm: (data: { notes?: string }) => void;
   isLoading?: boolean;
 }
 
 export function OpenShiftDialog({ open, onOpenChange, onConfirm, isLoading }: OpenShiftDialogProps) {
-  const [openingBalance, setOpeningBalance] = useState('0');
   const [notes, setNotes] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onConfirm({
-      openingBalance: parseFloat(openingBalance) || 0,
       notes: notes || undefined,
     });
-    setOpeningBalance('0');
     setNotes('');
   };
 
@@ -38,28 +34,24 @@ export function OpenShiftDialog({ open, onOpenChange, onConfirm, isLoading }: Op
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Wallet className="h-5 w-5" />
-            فتح وردية جديدة
+            <Briefcase className="h-5 w-5" />
+            بدء جلسة عمل جديدة
           </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="openingBalance">الرصيد الافتتاحي (ر.س)</Label>
-            <Input
-              id="openingBalance"
-              type="number"
-              min="0"
-              step="0.01"
-              value={openingBalance}
-              onChange={(e) => setOpeningBalance(e.target.value)}
-              placeholder="0.00"
-              className="text-lg font-medium"
-              autoFocus
-            />
-            <p className="text-xs text-muted-foreground">
-              أدخل المبلغ النقدي الموجود في الصندوق عند بداية الوردية
-            </p>
+          <div className="p-4 rounded-lg bg-muted/50 border border-border/50">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-full bg-primary/10">
+                <Play className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="font-medium">مركز التحصيل والصرف</p>
+                <p className="text-sm text-muted-foreground">
+                  سيتم تسجيل جميع عمليات التحصيل والصرف خلال هذه الجلسة
+                </p>
+              </div>
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -78,7 +70,7 @@ export function OpenShiftDialog({ open, onOpenChange, onConfirm, isLoading }: Op
               إلغاء
             </Button>
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? 'جاري الفتح...' : 'فتح الوردية'}
+              {isLoading ? 'جاري البدء...' : 'بدء الجلسة'}
             </Button>
           </DialogFooter>
         </form>
