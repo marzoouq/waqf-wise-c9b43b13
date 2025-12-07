@@ -1,8 +1,8 @@
 # 📁 Hooks Directory / مجلد الـ Hooks
 
-هذا المجلد يحتوي على **152** React Hook منظمة في **18 مجلد فرعي**.
+هذا المجلد يحتوي على **155+** React Hook منظمة في **20 مجلد فرعي**.
 
-## 📂 الهيكل الجديد (v2.6.4)
+## 📂 الهيكل الحالي (v2.6.32)
 
 ```
 src/hooks/
@@ -16,8 +16,8 @@ src/hooks/
 ├── notifications/        # الإشعارات (8 hooks)
 ├── requests/             # الطلبات والموافقات (10 hooks)
 ├── reports/              # التقارير (4 hooks)
-├── archive/              # الأرشيف (6 hooks)
-├── dashboard/            # لوحات التحكم (8 hooks)
+├── archive/              # الأرشيف (8 hooks)
+├── dashboard/            # لوحات التحكم (12 hooks)
 ├── system/               # النظام (8 hooks)
 ├── users/                # المستخدمين (3 hooks)
 ├── messages/             # الرسائل (3 hooks)
@@ -25,8 +25,10 @@ src/hooks/
 ├── ai/                   # الذكاء الاصطناعي (2 hooks)
 ├── governance/           # الحوكمة (5 hooks)
 ├── ui/                   # واجهة المستخدم (25 hooks)
-├── developer/            # أدوات المطورين
-└── __tests__/            # الاختبارات
+├── admin/                # الإدارة (2 hooks)
+├── developer/            # أدوات المطورين (10 hooks)
+├── security/             # الأمان (2 hooks)
+└── transactions/         # المعاملات (2 hooks)
 ```
 
 ## 🔄 طرق الاستيراد
@@ -213,8 +215,8 @@ import { useDocuments, useFolders } from '@/hooks/archive';
 | `useDocumentTags` | تصنيفات المستندات |
 | `useFolders` | المجلدات |
 | `useArchiveStats` | إحصائيات الأرشيف |
-
-### 📊 dashboard/
+| `useArchivistDashboard` | لوحة الأرشيفي |
+| `useArchivistDashboardRealtime` | تحديثات لوحة الأرشيفي الفورية |
 ```typescript
 import { useNazerKPIs, useCashierStats } from '@/hooks/dashboard';
 ```
@@ -342,8 +344,9 @@ import { useIsMobile, useToast } from '@/hooks/ui';
 | notifications | 8 |
 | requests | 10 |
 | reports | 4 |
-| archive | 6 |
-| dashboard | 8 |
+| archive | 8 |
+| dashboard | 12 |
+| admin | 2 |
 | system | 8 |
 | users | 3 |
 | messages | 3 |
@@ -351,9 +354,12 @@ import { useIsMobile, useToast } from '@/hooks/ui';
 | ai | 2 |
 | governance | 5 |
 | ui | 25 |
-| **الإجمالي** | **152** |
+| developer | 10 |
+| security | 2 |
+| transactions | 2 |
+| **الإجمالي** | **165+** |
 
 ---
 
-**آخر تحديث:** 2025-12-03
-**الإصدار:** 2.6.4
+**آخر تحديث:** 2025-12-07
+**الإصدار:** 2.6.32
