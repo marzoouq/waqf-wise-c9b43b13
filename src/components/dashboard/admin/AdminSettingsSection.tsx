@@ -107,7 +107,7 @@ export function AdminSettingsSection() {
       title: "المظهر",
       icon: Palette,
       description: "تخصيص الألوان والثيم",
-      color: "bg-purple-500/10 text-purple-600",
+      color: "bg-accent/10 text-accent",
       action: () => navigate("/settings"),
       settings: [
         { label: "الثيم", value: "حسب النظام" },

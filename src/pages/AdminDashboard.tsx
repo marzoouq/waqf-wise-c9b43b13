@@ -17,15 +17,18 @@ import { ChartSkeleton, SectionSkeleton } from "@/components/dashboard";
 import { BankBalanceCard } from "@/components/shared/BankBalanceCard";
 import { WaqfCorpusCard } from "@/components/shared/WaqfCorpusCard";
 import { CurrentFiscalYearCard, RevenueProgressCard } from "@/components/dashboard/shared";
-import { useQueryClient } from "@tanstack/react-query";
+import { useAdminDashboardRealtime, useAdminDashboardRefresh } from "@/hooks/dashboard/useAdminDashboardRealtime";
 
 export default function AdminDashboard() {
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("system");
-  const queryClient = useQueryClient();
+  
+  // تفعيل التحديثات المباشرة الموحدة
+  useAdminDashboardRealtime();
+  const { refreshAll } = useAdminDashboardRefresh();
 
   const handleRefresh = () => {
-    queryClient.invalidateQueries();
+    refreshAll();
   };
 
   return (

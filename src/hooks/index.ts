@@ -138,7 +138,11 @@ export { useArchivistDashboard, useArchivistStats, useRecentDocuments } from './
 export { useKPIs } from './useKPIs';
 export { useAIInsights } from './useAIInsights';
 export { useNazerDashboardRealtime, useNazerDashboardRefresh } from './dashboard/useNazerDashboardRealtime';
+export { useAdminDashboardRealtime, useAdminDashboardRefresh } from './dashboard/useAdminDashboardRealtime';
 export { useRevenueProgress } from './dashboard/useRevenueProgress';
+
+// ==================== Admin Hooks ====================
+export { useUserStats, type UserStats } from './admin';
 
 // ==================== Search ====================
 export { useGlobalSearch } from './useGlobalSearch';

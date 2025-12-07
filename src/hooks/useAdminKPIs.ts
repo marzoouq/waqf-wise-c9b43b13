@@ -1,13 +1,15 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";
 import type { AdminKPI } from "@/types/admin";
 import { parseAdminKPIsResponse } from "@/types/database-responses";
-import { useEffect } from "react";
 
+/**
+ * useAdminKPIs Hook
+ * جلب KPIs لوحة المشرف من Database Function محسّنة
+ * ملاحظة: Realtime يتم إدارته من useAdminDashboardRealtime
+ */
 export function useAdminKPIs() {
-  const queryClient = useQueryClient();
-
   const query = useQuery({
     queryKey: ["admin-kpis"],
     queryFn: async (): Promise<AdminKPI> => {
@@ -37,31 +39,5 @@ export function useAdminKPIs() {
     ...QUERY_CONFIG.DASHBOARD_KPIS,
   });
 
-  // Real-time subscriptions
-  useEffect(() => {
-    const channel = supabase
-      .channel('admin-kpis-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'beneficiaries' }, () => {
-        queryClient.invalidateQueries({ queryKey: ["admin-kpis"] });
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'properties' }, () => {
-        queryClient.invalidateQueries({ queryKey: ["admin-kpis"] });
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'families' }, () => {
-        queryClient.invalidateQueries({ queryKey: ["admin-kpis"] });
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'beneficiary_requests' }, () => {
-        queryClient.invalidateQueries({ queryKey: ["admin-kpis"] });
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
-
-  return {
-    ...query,
-    refresh: () => queryClient.invalidateQueries({ queryKey: ["admin-kpis"] }),
-  };
+  return query;
 }

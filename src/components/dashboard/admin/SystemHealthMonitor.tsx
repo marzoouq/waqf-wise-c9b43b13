@@ -31,10 +31,10 @@ export function SystemHealthMonitor() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'healthy': return 'text-green-600 bg-green-50';
-      case 'degraded': return 'text-yellow-600 bg-yellow-50';
-      case 'down': return 'text-red-600 bg-red-50';
-      default: return 'text-gray-600 bg-gray-50';
+      case 'healthy': return 'text-status-success bg-status-success/10';
+      case 'degraded': return 'text-status-warning bg-status-warning/10';
+      case 'down': return 'text-status-error bg-status-error/10';
+      default: return 'text-muted-foreground bg-muted';
     }
   };
 
@@ -47,7 +47,9 @@ export function SystemHealthMonitor() {
     }
   };
 
-  const storagePercentage = (health.storage.usedSpace / health.storage.totalSpace) * 100;
+  const storagePercentage = health.storage.totalSpace > 0 
+    ? (health.storage.usedSpace / health.storage.totalSpace) * 100 
+    : 0;
 
   return (
     <Card>
@@ -102,7 +104,7 @@ export function SystemHealthMonitor() {
               </p>
             </div>
           </div>
-          <Badge className="bg-green-50 text-green-600">
+          <Badge className="bg-status-success/10 text-status-success">
             نشط
           </Badge>
         </div>

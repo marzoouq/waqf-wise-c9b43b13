@@ -34,19 +34,19 @@ export function SecurityAlertsSection() {
 
   const getSeverityIcon = (severity: string) => {
     switch (severity) {
-      case 'critical': return <AlertTriangle className="h-4 w-4 text-red-600" />;
-      case 'high': return <AlertCircle className="h-4 w-4 text-orange-600" />;
-      case 'medium': return <AlertCircle className="h-4 w-4 text-yellow-600" />;
-      default: return <Info className="h-4 w-4 text-blue-600" />;
+      case 'critical': return <AlertTriangle className="h-4 w-4 text-status-error" />;
+      case 'high': return <AlertCircle className="h-4 w-4 text-status-warning" />;
+      case 'medium': return <AlertCircle className="h-4 w-4 text-status-warning" />;
+      default: return <Info className="h-4 w-4 text-status-info" />;
     }
   };
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'critical': return 'bg-red-50 text-red-700 border-red-200';
-      case 'high': return 'bg-orange-50 text-orange-700 border-orange-200';
-      case 'medium': return 'bg-yellow-50 text-yellow-700 border-yellow-200';
-      default: return 'bg-blue-50 text-blue-700 border-blue-200';
+      case 'critical': return 'bg-status-error/10 text-status-error border-status-error/20';
+      case 'high': return 'bg-status-warning/10 text-status-warning border-status-warning/20';
+      case 'medium': return 'bg-status-warning/10 text-status-warning border-status-warning/20';
+      default: return 'bg-status-info/10 text-status-info border-status-info/20';
     }
   };
 
@@ -71,9 +71,9 @@ export function SecurityAlertsSection() {
             التنبيهات الأمنية
           </CardTitle>
           <p className="text-sm text-muted-foreground mt-1">
-            {criticalCount > 0 && <span className="text-red-600 font-medium">{criticalCount} حرج</span>}
+            {criticalCount > 0 && <span className="text-status-error font-medium">{criticalCount} حرج</span>}
             {criticalCount > 0 && highCount > 0 && <span className="mx-1">•</span>}
-            {highCount > 0 && <span className="text-orange-600 font-medium">{highCount} عالي</span>}
+            {highCount > 0 && <span className="text-status-warning font-medium">{highCount} عالي</span>}
           </p>
         </div>
         <Button 
