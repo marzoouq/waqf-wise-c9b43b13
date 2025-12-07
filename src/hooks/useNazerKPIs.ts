@@ -2,7 +2,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";
 import { logger } from "@/lib/logger";
-import { useEffect } from "react";
 
 export interface NazerKPIData {
   totalAssets: number;
@@ -15,6 +14,10 @@ export interface NazerKPIData {
   monthlyReturn: number;
 }
 
+/**
+ * Hook لجلب KPIs الناظر
+ * ملاحظة: Realtime يُدار من خلال useNazerDashboardRealtime في NazerDashboard.tsx
+ */
 export function useNazerKPIs() {
   const queryClient = useQueryClient();
 
@@ -90,33 +93,6 @@ export function useNazerKPIs() {
     },
     ...QUERY_CONFIG.DASHBOARD_KPIS,
   });
-
-  // استخدام القناة الموحدة بدلاً من اشتراكات متعددة
-  // ملاحظة: يمكن استخدام useNazerDashboardRealtime بدلاً من هذا
-  useEffect(() => {
-    const channel = supabase
-      .channel('nazer-kpis-unified')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'beneficiaries' }, () => {
-        queryClient.invalidateQueries({ queryKey: ["nazer-kpis"] });
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'properties' }, () => {
-        queryClient.invalidateQueries({ queryKey: ["nazer-kpis"] });
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'contracts' }, () => {
-        queryClient.invalidateQueries({ queryKey: ["nazer-kpis"] });
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'loans' }, () => {
-        queryClient.invalidateQueries({ queryKey: ["nazer-kpis"] });
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'journal_entries' }, () => {
-        queryClient.invalidateQueries({ queryKey: ["nazer-kpis"] });
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
 
   return {
     ...query,

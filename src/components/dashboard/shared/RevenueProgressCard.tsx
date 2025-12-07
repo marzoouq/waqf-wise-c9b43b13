@@ -24,10 +24,10 @@ export function RevenueProgressCard() {
   if (!data) return null;
 
   return (
-    <Card className="border-l-4 border-l-[hsl(var(--chart-2))]">
+    <Card className="border-l-4 border-l-success">
       <CardHeader className="pb-3">
         <CardTitle className="text-sm flex items-center gap-2">
-          <TrendingUp className="h-4 w-4 text-[hsl(var(--chart-2))]" />
+          <TrendingUp className="h-4 w-4 text-success" />
           تقدم الإيرادات للسنة المالية
         </CardTitle>
       </CardHeader>
@@ -35,14 +35,14 @@ export function RevenueProgressCard() {
         <div>
           <div className="flex justify-between text-sm mb-2">
             <span className="text-muted-foreground">نسبة التحصيل</span>
-            <span className="font-bold text-[hsl(var(--chart-2))]">{data.progress.toFixed(1)}%</span>
+            <span className="font-bold text-success">{data.progress.toFixed(1)}%</span>
           </div>
           <Progress value={data.progress} className="h-3" />
         </div>
 
         <div className="grid grid-cols-3 gap-3 pt-2">
-          <div className="text-center p-2 bg-[hsl(var(--chart-2))]/10 rounded-lg">
-            <Wallet className="h-4 w-4 mx-auto mb-1 text-[hsl(var(--chart-2))]" />
+          <div className="text-center p-2 bg-success/10 rounded-lg">
+            <Wallet className="h-4 w-4 mx-auto mb-1 text-success" />
             <span className="text-sm font-bold block">{data.totalCollected.toLocaleString('ar-SA')}</span>
             <span className="text-xs text-muted-foreground">المحصل</span>
           </div>
