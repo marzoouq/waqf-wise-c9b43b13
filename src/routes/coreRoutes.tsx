@@ -11,6 +11,9 @@ import {
   Families,
   FamilyDetails,
   Properties,
+  Tenants,
+  TenantDetails,
+  TenantsAgingReportPage,
   Funds,
   WaqfUnits,
   Archive,
@@ -91,6 +94,33 @@ export const coreRoutes = [
     element={
       <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
         <Properties />
+      </ProtectedRoute>
+    } 
+  />,
+  <Route
+    key="tenants"
+    path="/tenants" 
+    element={
+      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant", "cashier"]}>
+        <Tenants />
+      </ProtectedRoute>
+    } 
+  />,
+  <Route
+    key="tenant-details"
+    path="/tenants/:id" 
+    element={
+      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant", "cashier"]}>
+        <TenantDetails />
+      </ProtectedRoute>
+    } 
+  />,
+  <Route
+    key="tenants-aging"
+    path="/tenants/aging-report" 
+    element={
+      <ProtectedRoute requiredRoles={["admin", "nazer", "accountant"]}>
+        <TenantsAgingReportPage />
       </ProtectedRoute>
     } 
   />,
