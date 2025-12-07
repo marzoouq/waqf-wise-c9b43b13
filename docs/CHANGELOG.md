@@ -1,6 +1,42 @@
 # 📝 سجل التغييرات | Changelog
 
-**الإصدار الحالي:** 2.6.29 | **آخر تحديث:** 2025-12-07
+**الإصدار الحالي:** 2.6.30 | **آخر تحديث:** 2025-12-07
+
+---
+
+## [2.6.30] - 2025-12-07
+
+### 🏗️ إعادة هيكلة لوحة المحاسب (Accountant Dashboard Refactoring)
+
+#### ✨ الميزات الجديدة
+- **مكون `StatusBadge` مشترك:** لتوحيد عرض حالات القيود والموافقات
+- **مكون `PendingApprovalsList`:** استخراج قائمة الموافقات المعلقة
+- **مكون `QuickActionsGrid`:** استخراج الإجراءات السريعة
+
+#### 🔧 التحسينات
+- نقل `useAccountantKPIs` إلى `src/hooks/accounting/`
+- إصلاح `invalidateQueries()` بتحديد مفاتيح محددة
+- إنشاء مجلد `src/components/dashboard/accountant/` مع:
+  - `config/quickActionsConfig.ts`
+  - `PendingApprovalsList.tsx`
+  - `QuickActionsGrid.tsx`
+- إزالة `getStatusBadge` المكررة من المكونات
+
+#### 📁 الملفات الجديدة
+```
+src/components/shared/StatusBadge.tsx
+src/hooks/accounting/useAccountantKPIs.ts
+src/components/dashboard/accountant/
+├── config/
+│   ├── quickActionsConfig.ts
+│   └── index.ts
+├── PendingApprovalsList.tsx
+├── QuickActionsGrid.tsx
+└── index.ts
+```
+
+#### 🗑️ الملفات المحذوفة
+- `src/hooks/useAccountantKPIs.ts` (نُقل إلى accounting/)
 
 ---
 

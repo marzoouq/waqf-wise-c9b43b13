@@ -1,10 +1,10 @@
-import { memo, useCallback } from "react";
+import { memo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/date";
 import { FileText } from "lucide-react";
+import { StatusBadge } from "@/components/shared/StatusBadge";
 
 const RecentJournalEntries = memo(() => {
   const { data: entries, isLoading } = useQuery({
@@ -22,17 +22,6 @@ const RecentJournalEntries = memo(() => {
     },
     staleTime: 2 * 60 * 1000, // 2 minutes cache
   });
-
-  const getStatusBadge = useCallback((status: string) => {
-    type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
-    const variants: Record<string, { label: string; variant: BadgeVariant }> = {
-      draft: { label: "مسودة", variant: "secondary" },
-      posted: { label: "مرحّل", variant: "default" },
-      cancelled: { label: "ملغى", variant: "destructive" },
-    };
-    const config = variants[status] || { label: status, variant: "outline" as BadgeVariant };
-    return <Badge variant={config.variant}>{config.label}</Badge>;
-  }, []);
 
   if (isLoading) {
     return (
@@ -75,7 +64,7 @@ const RecentJournalEntries = memo(() => {
                     <p className="text-xs sm:text-sm font-mono font-medium truncate">
                       {entry.entry_number}
                     </p>
-                    {getStatusBadge(entry.status)}
+                    <StatusBadge status={entry.status} showIcon={false} />
                   </div>
                   <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">
                     {entry.description}
