@@ -1,0 +1,179 @@
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { useJournalEntries } from "@/hooks/accounting/useJournalEntries";
+import { useEffect } from "react";
+import { logger } from "@/lib/logger";
+import { paymentRequiresApproval } from "@/lib/supabase-wrappers";
+import { createMutationErrorHandler } from "@/lib/errors";
+
+export interface Payment {
+  id: string;
+  payment_type: "receipt" | "payment";
+  payment_number: string;
+  payment_date: string;
+  amount: number;
+  payment_method: "cash" | "bank_transfer" | "cheque" | "card";
+  payer_name: string;
+  reference_number?: string;
+  description: string;
+  notes?: string;
+  journal_entry_id?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export function usePayments() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { createAutoEntry } = useJournalEntries();
+
+  // Real-time subscription
+  useEffect(() => {
+    const channel = supabase
+      .channel('payments-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'payments'
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["payments"] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+
+  const { data: payments = [], isLoading } = useQuery({
+    queryKey: ["payments"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("payments")
+        .select("id, payment_type, payment_number, payment_date, amount, payment_method, payer_name, reference_number, description, notes, journal_entry_id, status, created_at, updated_at")
+        .order("payment_date", { ascending: false });
+
+      if (error) throw error;
+      return data as Payment[];
+    },
+    staleTime: 3 * 60 * 1000,
+  });
+
+  const addPayment = useMutation({
+    mutationFn: async (payment: Omit<Payment, "id" | "created_at" | "updated_at">) => {
+      // التحقق من حاجة المدفوعة للموافقة
+      const result = await paymentRequiresApproval(payment.amount);
+      const requiresApproval = result.data || false;
+
+      const paymentStatus = requiresApproval ? 'pending' : 'completed';
+
+      const { data, error } = await supabase
+        .from("payments")
+        .insert([{ ...payment, status: paymentStatus }])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // إذا كانت تحتاج موافقة، إنشاء موافقات (مستويين)
+      if (requiresApproval) {
+        const approvals = [
+          { level: 1, approver_name: 'المشرف المالي' },
+          { level: 2, approver_name: 'المدير' }
+        ];
+
+        await supabase.from('payment_approvals').insert(
+          approvals.map(approval => ({
+            payment_id: data.id,
+            ...approval,
+            status: 'معلق'
+          }))
+        );
+      }
+
+      // القيد المحاسبي سيتم إنشاؤه تلقائياً عبر Trigger
+      // عند إدخال المدفوعة في قاعدة البيانات
+
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["payments"] });
+      queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
+      toast({
+        title: "تمت الإضافة بنجاح",
+        description: "تم إضافة السند وإنشاء القيد المحاسبي",
+      });
+    },
+    onError: createMutationErrorHandler({
+      context: 'add_payment',
+      toastTitle: 'خطأ في الإضافة',
+    }),
+  });
+
+  const updatePayment = useMutation({
+    mutationFn: async ({ id, ...updates }: Partial<Payment> & { id: string }) => {
+      // الحصول على البيانات القديمة
+      const { data: oldPayment } = await supabase
+        .from("payments")
+        .select("journal_entry_id, amount, payment_date")
+        .eq("id", id)
+        .single();
+
+      const { data, error } = await supabase
+        .from("payments")
+        .update(updates)
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // القيد المحاسبي تم إنشاؤه مسبقاً عبر Trigger عند الإدخال
+
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["payments"] });
+      toast({
+        title: "تم التحديث بنجاح",
+        description: "تم تحديث بيانات السند بنجاح",
+      });
+    },
+    onError: createMutationErrorHandler({
+      context: 'update_payment',
+      toastTitle: 'خطأ في التحديث',
+    }),
+  });
+
+  const deletePayment = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("payments").delete().eq("id", id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["payments"] });
+      toast({
+        title: "تم الحذف بنجاح",
+        description: "تم حذف السند بنجاح",
+      });
+    },
+    onError: createMutationErrorHandler({
+      context: 'delete_payment',
+      toastTitle: 'خطأ في الحذف',
+    }),
+  });
+
+  return {
+    payments,
+    isLoading,
+    addPayment: addPayment.mutateAsync,
+    updatePayment: updatePayment.mutateAsync,
+    deletePayment: deletePayment.mutateAsync,
+  };
+}
