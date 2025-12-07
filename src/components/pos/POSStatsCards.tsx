@@ -1,5 +1,5 @@
 import { Card, CardContent } from '@/components/ui/card';
-import { DollarSign, ArrowDownCircle, ArrowUpCircle, Receipt, AlertTriangle } from 'lucide-react';
+import { ArrowDownCircle, ArrowUpCircle, Receipt, AlertTriangle, TrendingUp } from 'lucide-react';
 
 interface POSStatsCardsProps {
   stats: {
@@ -18,6 +18,8 @@ interface POSStatsCardsProps {
 }
 
 export function POSStatsCards({ stats, pendingStats }: POSStatsCardsProps) {
+  const netAmount = stats.totalCollections - stats.totalPayments;
+  
   const cards = [
     {
       title: 'إجمالي التحصيل',
@@ -35,10 +37,10 @@ export function POSStatsCards({ stats, pendingStats }: POSStatsCardsProps) {
     },
     {
       title: 'صافي الحركة',
-      value: stats.totalCollections - stats.totalPayments,
-      icon: DollarSign,
-      color: 'text-primary',
-      bgColor: 'bg-primary/10',
+      value: netAmount,
+      icon: TrendingUp,
+      color: netAmount >= 0 ? 'text-status-success' : 'text-status-error',
+      bgColor: netAmount >= 0 ? 'bg-status-success/10' : 'bg-status-error/10',
     },
     {
       title: 'عدد العمليات',

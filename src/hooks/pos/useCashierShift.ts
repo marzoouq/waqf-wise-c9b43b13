@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/auth/useAuth';
@@ -28,7 +27,7 @@ export function useCashierShift() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  // جلب الوردية الحالية المفتوحة
+  // جلب الجلسة الحالية النشطة
   const { data: currentShift, isLoading: isLoadingShift } = useQuery({
     queryKey: ['pos', 'current-shift'],
     queryFn: async () => {
@@ -45,7 +44,7 @@ export function useCashierShift() {
     },
   });
 
-  // جلب جميع الورديات
+  // جلب جميع الجلسات
   const { data: shifts = [], isLoading: isLoadingShifts } = useQuery({
     queryKey: ['pos', 'shifts'],
     queryFn: async () => {
@@ -60,10 +59,10 @@ export function useCashierShift() {
     },
   });
 
-  // فتح وردية جديدة
+  // بدء جلسة عمل جديدة (مبسط - بدون رصيد افتتاحي)
   const openShiftMutation = useMutation({
-    mutationFn: async ({ openingBalance, notes }: { openingBalance: number; notes?: string }) => {
-      // التحقق من عدم وجود وردية مفتوحة
+    mutationFn: async ({ notes }: { notes?: string }) => {
+      // التحقق من عدم وجود جلسة نشطة
       const { data: existingShift } = await supabase
         .from('cashier_shifts')
         .select('id')
@@ -71,10 +70,10 @@ export function useCashierShift() {
         .maybeSingle();
 
       if (existingShift) {
-        throw new Error('يوجد وردية مفتوحة بالفعل. يجب إغلاقها أولاً.');
+        throw new Error('يوجد جلسة عمل نشطة بالفعل. يجب إنهاؤها أولاً.');
       }
 
-      // توليد رقم الوردية
+      // توليد رقم الجلسة
       const { data: shiftNumber } = await supabase.rpc('generate_shift_number');
 
       // جلب اسم المستخدم
@@ -90,8 +89,8 @@ export function useCashierShift() {
           shift_number: shiftNumber,
           cashier_id: user?.id,
           cashier_name: profile?.full_name || 'غير معروف',
-          opening_balance: openingBalance,
-          expected_balance: openingBalance,
+          opening_balance: 0, // دائماً صفر - لا نحتاج رصيد افتتاحي
+          expected_balance: 0,
           notes,
         })
         .select()
@@ -102,33 +101,28 @@ export function useCashierShift() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pos'] });
-      toast.success('تم فتح الوردية بنجاح');
+      toast.success('تم بدء جلسة العمل بنجاح');
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'حدث خطأ أثناء فتح الوردية');
+      toast.error(error.message || 'حدث خطأ أثناء بدء الجلسة');
     },
   });
 
-  // إغلاق الوردية
+  // إنهاء جلسة العمل (مبسط - بدون رصيد ختامي أو فروقات)
   const closeShiftMutation = useMutation({
-    mutationFn: async ({ shiftId, closingBalance, notes }: { 
+    mutationFn: async ({ shiftId, notes }: { 
       shiftId: string; 
-      closingBalance: number; 
       notes?: string 
     }) => {
-      // حساب الفرق
       const shift = shifts.find(s => s.id === shiftId) || currentShift;
-      if (!shift) throw new Error('الوردية غير موجودة');
-
-      const expectedBalance = shift.opening_balance + shift.total_collections - shift.total_payments;
-      const variance = closingBalance - expectedBalance;
+      if (!shift) throw new Error('الجلسة غير موجودة');
 
       const { data, error } = await supabase
         .from('cashier_shifts')
         .update({
-          closing_balance: closingBalance,
-          expected_balance: expectedBalance,
-          variance,
+          closing_balance: 0, // لا نحتاج رصيد ختامي
+          expected_balance: 0,
+          variance: 0, // لا نحتاج فروقات
           status: 'مغلقة',
           closed_at: new Date().toISOString(),
           closed_by: user?.id,
@@ -143,14 +137,13 @@ export function useCashierShift() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['pos'] });
-      if (Math.abs(data.variance) > 0) {
-        toast.warning(`تم إغلاق الوردية مع فرق ${data.variance.toFixed(2)} ريال`);
-      } else {
-        toast.success('تم إغلاق الوردية بنجاح - الصندوق مطابق');
-      }
+      const netAmount = data.total_collections - data.total_payments;
+      toast.success(
+        `تم إنهاء الجلسة بنجاح - صافي الحركة: ${netAmount.toLocaleString('ar-SA')} ر.س`
+      );
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'حدث خطأ أثناء إغلاق الوردية');
+      toast.error(error.message || 'حدث خطأ أثناء إنهاء الجلسة');
     },
   });
 

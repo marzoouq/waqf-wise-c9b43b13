@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Store, DollarSign, ArrowUpCircle, Receipt } from 'lucide-react';
+import { Briefcase, DollarSign, ArrowUpCircle, Receipt } from 'lucide-react';
 import {
   useCashierShift,
   usePOSTransactions,
@@ -49,12 +49,12 @@ export default function PointOfSale() {
   const { pay, isPaying } = useQuickPayment();
 
   // Handlers
-  const handleOpenShift = (data: { openingBalance: number; notes?: string }) => {
+  const handleOpenShift = (data: { notes?: string }) => {
     openShift(data);
     setShowOpenShift(false);
   };
 
-  const handleCloseShift = (data: { shiftId: string; closingBalance: number; notes?: string }) => {
+  const handleCloseShift = (data: { shiftId: string; notes?: string }) => {
     closeShift(data);
     setShowCloseShift(false);
   };
@@ -106,11 +106,11 @@ export default function PointOfSale() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-lg bg-primary/10">
-            <Store className="h-6 w-6 text-primary" />
+            <Briefcase className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold">نقطة البيع</h1>
-            <p className="text-sm text-muted-foreground">إدارة التحصيل والصرف</p>
+            <h1 className="text-2xl font-bold">مركز التحصيل والصرف</h1>
+            <p className="text-sm text-muted-foreground">إدارة عمليات التحصيل والصرف العقاري</p>
           </div>
         </div>
 
@@ -145,7 +145,7 @@ export default function PointOfSale() {
               </TabsTrigger>
               <TabsTrigger value="transactions" className="gap-2">
                 <Receipt className="h-4 w-4" />
-                عمليات الوردية
+                عمليات الجلسة
               </TabsTrigger>
             </TabsList>
 

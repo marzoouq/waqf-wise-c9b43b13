@@ -13,7 +13,7 @@ export default defineConfig(({ mode }) => {
   logLevel: 'warn',
   
   define: {
-    'import.meta.env.VITE_APP_VERSION': JSON.stringify('2.6.36'),
+    'import.meta.env.VITE_APP_VERSION': JSON.stringify('2.6.37'),
     'import.meta.env.VITE_BUILD_TIME': JSON.stringify(new Date().toISOString()),
     'process.env.NODE_ENV': JSON.stringify('production'),
   },
