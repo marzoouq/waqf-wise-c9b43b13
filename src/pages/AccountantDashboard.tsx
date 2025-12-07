@@ -1,13 +1,10 @@
 import { useState, lazy, Suspense } from "react";
-import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { FileText, DollarSign, AlertCircle, CheckCircle, XCircle, TrendingUp, FileCheck, FileClock, LayoutDashboard, Mail } from "lucide-react";
-import { useAccountantKPIs } from "@/hooks/useAccountantKPIs";
-import { useAccountantDashboardData } from "@/hooks/accounting/useAccountantDashboardData";
+import { FileText, AlertCircle, TrendingUp, FileCheck, FileClock, LayoutDashboard, Mail, RefreshCw } from "lucide-react";
+import { useAccountantKPIs, useAccountantDashboardData } from "@/hooks/accounting";
 import { ApproveJournalDialog } from "@/components/accounting/ApproveJournalDialog";
 import { UnifiedDashboardLayout } from "@/components/dashboard/UnifiedDashboardLayout";
 import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
@@ -18,15 +15,14 @@ import { JournalApproval } from "@/types/approvals";
 import { BankBalanceCard } from "@/components/shared/BankBalanceCard";
 import { WaqfCorpusCard } from "@/components/shared/WaqfCorpusCard";
 import { CurrentFiscalYearCard, RevenueProgressCard } from "@/components/dashboard/shared";
+import { PendingApprovalsList, QuickActionsGrid } from "@/components/dashboard/accountant";
 import { useQueryClient } from "@tanstack/react-query";
-import { RefreshCw } from "lucide-react";
 
 // Lazy load components
 const AccountingStats = lazy(() => import("@/components/dashboard/AccountingStats"));
 const RecentJournalEntries = lazy(() => import("@/components/dashboard/RecentJournalEntries"));
 
 const AccountantDashboard = () => {
-  const navigate = useNavigate();
   const [selectedApproval, setSelectedApproval] = useState<JournalApproval | null>(null);
   const [isApprovalDialogOpen, setIsApprovalDialogOpen] = useState(false);
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
@@ -36,25 +32,14 @@ const AccountantDashboard = () => {
   const { pendingApprovals, isLoading: approvalsLoading } = useAccountantDashboardData();
 
   const handleRefresh = () => {
-    queryClient.invalidateQueries();
+    queryClient.invalidateQueries({ queryKey: ["accountant-kpis"] });
+    queryClient.invalidateQueries({ queryKey: ["pending_approvals"] });
+    queryClient.invalidateQueries({ queryKey: ["recent_journal_entries"] });
   };
 
-  const getStatusBadge = (status: string) => {
-    type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
-    type IconComponent = React.ComponentType<{ className?: string }>;
-    const variants: Record<string, { label: string; variant: BadgeVariant; icon: IconComponent }> = {
-      pending: { label: "قيد المراجعة", variant: "secondary", icon: AlertCircle },
-      approved: { label: "موافق عليه", variant: "default", icon: CheckCircle },
-      rejected: { label: "مرفوض", variant: "destructive", icon: XCircle },
-    };
-    const config = variants[status] || { label: status, variant: "outline" as BadgeVariant, icon: FileText };
-    const Icon = config.icon;
-    return (
-      <Badge variant={config.variant} className="gap-1">
-        <Icon className="h-3 w-3" />
-        {config.label}
-      </Badge>
-    );
+  const handleReviewApproval = (approval: JournalApproval) => {
+    setSelectedApproval(approval);
+    setIsApprovalDialogOpen(true);
   };
 
   return (
@@ -106,19 +91,19 @@ const AccountantDashboard = () => {
             subtitle="قيود جديدة اليوم"
           />
         </UnifiedStatsGrid>
-        )}
+      )}
 
-        {/* السنة المالية وتقدم الإيرادات */}
-        <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2 mt-4">
-          <CurrentFiscalYearCard />
-          <RevenueProgressCard />
-        </div>
+      {/* السنة المالية وتقدم الإيرادات */}
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2 mt-4">
+        <CurrentFiscalYearCard />
+        <RevenueProgressCard />
+      </div>
 
-        {/* بطاقات الرصيد البنكي ورقبة الوقف */}
-        <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2 mt-4">
-          <BankBalanceCard />
-          <WaqfCorpusCard />
-        </div>
+      {/* بطاقات الرصيد البنكي ورقبة الوقف */}
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2 mt-4">
+        <BankBalanceCard />
+        <WaqfCorpusCard />
+      </div>
 
       {/* Tabs for organized view */}
       <Tabs defaultValue="overview" className="space-y-4">
@@ -155,60 +140,26 @@ const AccountantDashboard = () => {
           </Suspense>
         </TabsContent>
 
-          <TabsContent value="approvals" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <AlertCircle className="h-5 w-5 text-warning" />
-                  الموافقات المعلقة
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {approvalsLoading ? (
-                  <SectionSkeleton />
-                ) : pendingApprovals.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <CheckCircle className="h-12 w-12 mx-auto mb-3 text-success" />
-                    <p>لا توجد موافقات معلقة</p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {pendingApprovals.map((approval) => (
-                      <div
-                        key={approval.id}
-                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-                      >
-                        <div className="flex-1 space-y-1">
-                          <div className="flex items-center gap-2">
-                            <FileText className="h-4 w-4 text-muted-foreground" />
-                            <p className="font-medium">
-                              {approval.journal_entry?.entry_number || 'قيد محاسبي'}
-                            </p>
-                            {getStatusBadge(approval.status)}
-                          </div>
-                          <p className="text-sm text-muted-foreground">
-                            {approval.journal_entry?.description || 'لا يوجد وصف'}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            المراجع: {approval.approver_name}
-                          </p>
-                        </div>
-                        <Button
-                          size="sm"
-                          onClick={() => {
-                            setSelectedApproval(approval);
-                            setIsApprovalDialogOpen(true);
-                          }}
-                        >
-                          مراجعة
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
+        <TabsContent value="approvals" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <AlertCircle className="h-5 w-5 text-warning" />
+                الموافقات المعلقة
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {approvalsLoading ? (
+                <SectionSkeleton />
+              ) : (
+                <PendingApprovalsList 
+                  approvals={pendingApprovals} 
+                  onReview={handleReviewApproval} 
+                />
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="entries" className="space-y-4">
           <Card>
@@ -231,40 +182,7 @@ const AccountantDashboard = () => {
               <CardTitle className="text-sm sm:text-base">إجراءات سريعة</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-2 sm:gap-3 grid-cols-2 md:grid-cols-4">
-                <Button 
-                  variant="outline" 
-                  className="w-full text-xs sm:text-sm"
-                  onClick={() => navigate('/accounting')}
-                >
-                  <FileText className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
-                  قيد جديد
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full text-xs sm:text-sm"
-                  onClick={() => navigate('/reports')}
-                >
-                  <FileCheck className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
-                  التقارير
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full text-xs sm:text-sm"
-                  onClick={() => navigate('/approvals')}
-                >
-                  <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
-                  الموافقات
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full text-xs sm:text-sm"
-                  onClick={() => navigate('/accounting')}
-                >
-                  <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
-                  الحسابات
-                </Button>
-              </div>
+              <QuickActionsGrid />
             </CardContent>
           </Card>
         </TabsContent>

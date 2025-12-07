@@ -2,6 +2,11 @@
  * Accounting Hooks - خطافات المحاسبة
  */
 
+// ==================== Dashboard Hooks ====================
+export { useAccountantKPIs, type AccountantKPIs } from './useAccountantKPIs';
+export { useAccountantDashboardData } from './useAccountantDashboardData';
+
+// ==================== Core Hooks ====================
 export { useAccounts } from '../useAccounts';
 export { useJournalEntries } from '../useJournalEntries';
 export { useBudgets } from '../useBudgets';
