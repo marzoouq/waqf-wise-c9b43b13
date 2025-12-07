@@ -29,3 +29,4 @@ export { useTribes, useAddTribe, useUpdateTribe, useDeleteTribe } from './useTri
 export { useMyBeneficiaryRequests, type BeneficiaryRequest, type RequestFormData } from './useMyBeneficiaryRequests';
 export { useWaqfSummary } from './useWaqfSummary';
 export { useEmergencyAid } from './useEmergencyAid';
+export { useBeneficiarySession } from './useBeneficiarySession';

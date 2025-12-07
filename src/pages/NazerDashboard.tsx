@@ -19,6 +19,7 @@ import { BeneficiaryControlSection } from "@/components/nazer/BeneficiaryControl
 import { NazerBeneficiaryManagement } from "@/components/nazer/NazerBeneficiaryManagement";
 import { NazerReportsSection } from "@/components/nazer/NazerReportsSection";
 import { NazerSystemOverview } from "@/components/nazer/NazerSystemOverview";
+import { BeneficiaryActivityMonitor } from "@/components/nazer/BeneficiaryActivityMonitor";
 import { CurrentFiscalYearCard, RevenueProgressCard } from "@/components/dashboard/shared";
 import { useNazerDashboardRealtime, useNazerDashboardRefresh } from "@/hooks/dashboard/useNazerDashboardRealtime";
 import { POSQuickAccessCard } from "@/components/pos";
@@ -129,9 +130,13 @@ export default function NazerDashboard() {
                 <NazerBeneficiaryManagement />
               </Suspense>
               <Suspense fallback={<ChartSkeleton />}>
-                <PendingApprovalsSection />
+                <BeneficiaryActivityMonitor />
               </Suspense>
             </div>
+
+            <Suspense fallback={<ChartSkeleton />}>
+              <PendingApprovalsSection />
+            </Suspense>
           </TabsContent>
 
           {/* تبويب التقارير */}
