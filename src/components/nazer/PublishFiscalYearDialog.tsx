@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Dialog,
   DialogContent,
@@ -33,6 +33,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import { useFiscalYearsList, FISCAL_YEARS_QUERY_KEY } from "@/hooks/fiscal-years";
 
 interface PublishFiscalYearDialogProps {
   open: boolean;
@@ -47,18 +48,8 @@ export function PublishFiscalYearDialog({
   const [selectedFiscalYear, setSelectedFiscalYear] = useState<string>("");
   const [notifyHeirs, setNotifyHeirs] = useState(true);
 
-  // Fetch fiscal years
-  const { data: fiscalYears = [], isLoading } = useQuery({
-    queryKey: ["fiscal-years-for-publish"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("fiscal_years")
-        .select("*")
-        .order("start_date", { ascending: false });
-      if (error) throw error;
-      return data || [];
-    },
-  });
+  // استخدام الـ hook الموحد
+  const { fiscalYears, isLoading } = useFiscalYearsList();
 
   const selectedYear = fiscalYears.find((fy) => fy.id === selectedFiscalYear);
 

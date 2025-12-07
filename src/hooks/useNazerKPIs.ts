@@ -91,10 +91,11 @@ export function useNazerKPIs() {
     ...QUERY_CONFIG.DASHBOARD_KPIS,
   });
 
-  // Real-time subscriptions
+  // استخدام القناة الموحدة بدلاً من اشتراكات متعددة
+  // ملاحظة: يمكن استخدام useNazerDashboardRealtime بدلاً من هذا
   useEffect(() => {
     const channel = supabase
-      .channel('nazer-kpis-changes')
+      .channel('nazer-kpis-unified')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'beneficiaries' }, () => {
         queryClient.invalidateQueries({ queryKey: ["nazer-kpis"] });
       })

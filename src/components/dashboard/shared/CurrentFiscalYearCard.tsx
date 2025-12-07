@@ -1,17 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, CheckCircle, Clock, Globe } from "lucide-react";
-import { useFiscalYears } from "@/hooks/useFiscalYears";
+import { Calendar, Clock, Globe } from "lucide-react";
+import { useFiscalYearsList } from "@/hooks/fiscal-years";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 
 export function CurrentFiscalYearCard() {
-  const { fiscalYears, isLoading } = useFiscalYears();
-  
-  const activeFiscalYear = fiscalYears.find(fy => fy.is_active);
-  const closedYearsCount = fiscalYears.filter(fy => fy.is_closed).length;
-  const publishedYearsCount = fiscalYears.filter(fy => fy.is_published).length;
+  const { activeFiscalYear, closedYearsCount, publishedYearsCount, isLoading } = useFiscalYearsList();
 
   if (isLoading) {
     return (

@@ -1,11 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { supabase } from "@/integrations/supabase/client";
 import { Eye, EyeOff, Calendar, Globe } from "lucide-react";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import { useActiveFiscalYear } from "@/hooks/fiscal-years";
 
 interface FiscalYearPublishStatusProps {
   onPublishClick: () => void;
@@ -14,18 +13,7 @@ interface FiscalYearPublishStatusProps {
 export function FiscalYearPublishStatus({
   onPublishClick,
 }: FiscalYearPublishStatusProps) {
-  const { data: activeFiscalYear } = useQuery({
-    queryKey: ["active-fiscal-year-status"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("fiscal_years")
-        .select("*")
-        .eq("is_active", true)
-        .single();
-      if (error) return null;
-      return data;
-    },
-  });
+  const { activeFiscalYear } = useActiveFiscalYear();
 
   if (!activeFiscalYear) return null;
 
