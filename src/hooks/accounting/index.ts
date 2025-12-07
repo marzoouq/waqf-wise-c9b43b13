@@ -18,5 +18,5 @@ export { useFinancialAnalytics } from '../useFinancialAnalytics';
 export { useFinancialData } from '../useFinancialData';
 export { useFinancialReports } from '../useFinancialReports';
 export { useAccountingFilters } from '../useAccountingFilters';
-export { useAccountingStats } from '../useAccountingStats';
+// useAccountingStats - تم دمجها في useAccountantKPIs
 export { useAccountingTabs } from '../useAccountingTabs';
