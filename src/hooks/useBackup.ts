@@ -97,9 +97,13 @@ export function useBackup() {
           title: "تمت الاستعادة بنجاح",
           description: data.message,
         });
-
-        // إعادة تحميل جميع البيانات
-        queryClient.invalidateQueries();
+        // إعادة تحميل جميع البيانات بعد الاستعادة - هذه حالة استثنائية مقصودة
+        // حيث تم تغيير جميع البيانات في قاعدة البيانات
+        queryClient.invalidateQueries({ queryKey: ["backup-logs"] });
+        // إعادة تحميل الصفحة لضمان تحديث جميع البيانات
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
       }
     },
     onError: (error: Error) => {
