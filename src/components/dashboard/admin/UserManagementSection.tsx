@@ -1,69 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Users, UserCheck, Shield, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-
-interface UserStats {
-  totalUsers: number;
-  activeUsers: number;
-  adminCount: number;
-  recentUsers: Array<{
-    id: string;
-    email: string;
-    created_at: string;
-    last_login_at?: string;
-  }>;
-}
+import { useUserStats } from "@/hooks/admin/useUserStats";
 
 export function UserManagementSection() {
   const navigate = useNavigate();
-
-  const { data: stats, isLoading } = useQuery({
-    queryKey: ["user-stats"],
-    queryFn: async (): Promise<UserStats> => {
-      // جلب المستخدمين من user_roles
-      const { data: usersData, error: usersError } = await supabase
-        .from("user_roles")
-        .select("user_id, role, created_at")
-        .order("created_at", { ascending: false })
-        .limit(100);
-
-      if (usersError) throw usersError;
-
-      // حساب الإحصائيات
-      const uniqueUsers = new Set(usersData?.map(u => u.user_id) || []);
-      const adminUsers = usersData?.filter(u => u.role === 'admin') || [];
-
-      // جلب آخر 5 مستخدمين من profiles بدلاً من auth.admin
-      const { data: profilesData, error: profilesError } = await supabase
-        .from("profiles")
-        .select("id, email, created_at, last_login_at")
-        .order("created_at", { ascending: false })
-        .limit(5);
-
-      if (profilesError) throw profilesError;
-
-      const recentUsers = (profilesData || []).map(user => ({
-        id: user.id,
-        email: user.email || '',
-        created_at: user.created_at,
-        last_login_at: user.last_login_at,
-      }));
-
-      return {
-        totalUsers: uniqueUsers.size,
-        activeUsers: recentUsers.filter(u => u.last_login_at).length,
-        adminCount: new Set(adminUsers.map(u => u.user_id)).size,
-        recentUsers,
-      };
-    },
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    refetchInterval: false,
-  });
+  const { data: stats, isLoading } = useUserStats();
 
   if (isLoading) {
     return (
@@ -110,13 +55,13 @@ export function UserManagementSection() {
             <p className="text-2xl font-bold">{stats.totalUsers}</p>
             <p className="text-xs text-muted-foreground">إجمالي المستخدمين</p>
           </div>
-          <div className="text-center p-3 rounded-lg bg-green-500/10">
-            <UserCheck className="h-5 w-5 mx-auto mb-2 text-green-600" />
+          <div className="text-center p-3 rounded-lg bg-status-success/10">
+            <UserCheck className="h-5 w-5 mx-auto mb-2 text-status-success" />
             <p className="text-2xl font-bold">{stats.activeUsers}</p>
             <p className="text-xs text-muted-foreground">نشط</p>
           </div>
-          <div className="text-center p-3 rounded-lg bg-purple-500/10">
-            <Shield className="h-5 w-5 mx-auto mb-2 text-purple-600" />
+          <div className="text-center p-3 rounded-lg bg-accent/10">
+            <Shield className="h-5 w-5 mx-auto mb-2 text-accent" />
             <p className="text-2xl font-bold">{stats.adminCount}</p>
             <p className="text-xs text-muted-foreground">مشرفين</p>
           </div>

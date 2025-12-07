@@ -36,15 +36,15 @@ export function AuditLogsPreview() {
 
   const getActionColor = (actionType: string) => {
     if (actionType.includes('INSERT') || actionType.includes('CREATE')) {
-      return 'bg-green-50 text-green-700 border-green-200';
+      return 'bg-status-success/10 text-status-success border-status-success/20';
     }
     if (actionType.includes('UPDATE') || actionType.includes('EDIT')) {
-      return 'bg-blue-50 text-blue-700 border-blue-200';
+      return 'bg-status-info/10 text-status-info border-status-info/20';
     }
     if (actionType.includes('DELETE') || actionType.includes('REMOVE')) {
-      return 'bg-red-50 text-red-700 border-red-200';
+      return 'bg-status-error/10 text-status-error border-status-error/20';
     }
-    return 'bg-gray-50 text-gray-700 border-gray-200';
+    return 'bg-muted text-muted-foreground border-border';
   };
 
   return (

@@ -12,6 +12,7 @@ interface UserActivityDataPoint {
 
 /**
  * Hook لجلب إحصائيات نشاط المستخدمين لآخر 7 أيام
+ * محسّن باستخدام Promise.all للاستعلامات المتوازية
  */
 export function useUsersActivityMetrics() {
   return useQuery({
@@ -20,36 +21,42 @@ export function useUsersActivityMetrics() {
       const now = new Date();
       const weekAgo = subDays(now, 7);
       
-      // جلب محاولات تسجيل الدخول
-      const { data: loginAttempts, error: loginError } = await supabase
-        .from("login_attempts_log")
-        .select("created_at, success, user_email")
-        .gte("created_at", weekAgo.toISOString())
-        .order("created_at", { ascending: true });
+      // جلب جميع البيانات بالتوازي باستخدام Promise.all
+      const [loginAttemptsResponse, newProfilesResponse, activitiesResponse] = await Promise.all([
+        // جلب محاولات تسجيل الدخول
+        supabase
+          .from("login_attempts_log")
+          .select("created_at, success, user_email")
+          .gte("created_at", weekAgo.toISOString())
+          .order("created_at", { ascending: true }),
+        
+        // جلب المستخدمين الجدد (من profiles)
+        supabase
+          .from("profiles")
+          .select("created_at")
+          .gte("created_at", weekAgo.toISOString()),
+        
+        // جلب الأنشطة لتحديد المستخدمين النشطين
+        supabase
+          .from("activities")
+          .select("timestamp, user_name")
+          .gte("timestamp", weekAgo.toISOString()),
+      ]);
 
-      if (loginError) {
-        console.error("Error fetching login attempts:", loginError);
+      // التعامل مع الأخطاء
+      if (loginAttemptsResponse.error) {
+        console.error("Error fetching login attempts:", loginAttemptsResponse.error);
+      }
+      if (newProfilesResponse.error) {
+        console.error("Error fetching new profiles:", newProfilesResponse.error);
+      }
+      if (activitiesResponse.error) {
+        console.error("Error fetching activities:", activitiesResponse.error);
       }
 
-      // جلب المستخدمين الجدد (من profiles)
-      const { data: newProfiles, error: profilesError } = await supabase
-        .from("profiles")
-        .select("created_at")
-        .gte("created_at", weekAgo.toISOString());
-
-      if (profilesError) {
-        console.error("Error fetching new profiles:", profilesError);
-      }
-
-      // جلب الأنشطة لتحديد المستخدمين النشطين
-      const { data: activities, error: activitiesError } = await supabase
-        .from("activities")
-        .select("timestamp, user_name")
-        .gte("timestamp", weekAgo.toISOString());
-
-      if (activitiesError) {
-        console.error("Error fetching activities:", activitiesError);
-      }
+      const loginAttempts = loginAttemptsResponse.data || [];
+      const newProfiles = newProfilesResponse.data || [];
+      const activities = activitiesResponse.data || [];
 
       // إنشاء نقاط البيانات لكل يوم
       const days = eachDayOfInterval({ start: weekAgo, end: now });
@@ -59,20 +66,20 @@ export function useUsersActivityMetrics() {
         const dayEnd = endOfDay(day);
         
         // عد عمليات الدخول الناجحة في هذا اليوم
-        const dayLogins = (loginAttempts || []).filter(attempt => {
+        const dayLogins = loginAttempts.filter(attempt => {
           const attemptDate = parseISO(attempt.created_at);
           return attemptDate >= dayStart && attemptDate <= dayEnd && attempt.success;
         }).length;
 
         // عد المستخدمين الجدد في هذا اليوم
-        const dayNewUsers = (newProfiles || []).filter(profile => {
+        const dayNewUsers = newProfiles.filter(profile => {
           const profileDate = parseISO(profile.created_at);
           return profileDate >= dayStart && profileDate <= dayEnd;
         }).length;
 
         // عد المستخدمين النشطين (المستخدمين الفريدين الذين لديهم نشاط)
         const uniqueActiveUsers = new Set(
-          (activities || [])
+          activities
             .filter(activity => {
               const activityDate = parseISO(activity.timestamp);
               return activityDate >= dayStart && activityDate <= dayEnd;
