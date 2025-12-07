@@ -1,6 +1,6 @@
 # 👨‍💻 دليل المطور | Developer Guide
 
-**الإصدار:** 2.6.32 | **آخر تحديث:** 2025-12-07
+**الإصدار:** 2.6.38 | **آخر تحديث:** 2025-12-07
 
 ---
 
@@ -29,15 +29,63 @@ npm run dev
 
 ```
 src/
-├── assets/          # الصور والملفات الثابتة
-├── components/      # المكونات (~350)
-├── hooks/           # Custom Hooks (~165)
-├── integrations/    # Supabase client
-├── lib/             # المكتبات المساعدة
-├── pages/           # الصفحات (~74)
-├── routes/          # التوجيه
-├── services/        # الخدمات
-└── types/           # الأنواع
+├── assets/              # الصور والملفات الثابتة
+├── components/          # المكونات (~360 مكون)
+│   ├── accounting/      # المحاسبة
+│   ├── auth/            # المصادقة
+│   ├── beneficiary/     # المستفيدين
+│   ├── contracts/       # العقود
+│   ├── dashboard/       # لوحات التحكم
+│   │   ├── accountant/  # لوحة المحاسب
+│   │   ├── cashier/     # لوحة أمين الصندوق
+│   │   └── nazer/       # لوحة الناظر
+│   ├── distributions/   # التوزيعات
+│   ├── properties/      # العقارات
+│   ├── reports/         # التقارير
+│   ├── shared/          # مكونات مشتركة
+│   ├── tenants/         # المستأجرين ✨
+│   ├── ui/              # مكونات Shadcn
+│   └── waqf/            # الوقف
+├── hooks/               # Custom Hooks (~170)
+│   ├── accounting/      # محاسبة
+│   ├── admin/           # إدارة
+│   ├── ai/              # الذكاء الاصطناعي
+│   ├── archive/         # الأرشفة
+│   ├── auth/            # مصادقة
+│   ├── beneficiary/     # مستفيدين
+│   ├── dashboard/       # لوحات تحكم
+│   ├── distributions/   # توزيعات
+│   ├── fiscal-years/    # السنوات المالية
+│   ├── governance/      # الحوكمة
+│   ├── messages/        # الرسائل
+│   ├── notifications/   # الإشعارات
+│   ├── payments/        # مدفوعات
+│   ├── performance/     # الأداء
+│   ├── pos/             # نقطة البيع
+│   ├── property/        # عقارات + مستأجرين ✨
+│   ├── reports/         # تقارير
+│   ├── requests/        # الطلبات
+│   ├── security/        # الأمان
+│   ├── settings/        # الإعدادات
+│   ├── support/         # الدعم
+│   ├── system/          # النظام
+│   ├── transactions/    # المعاملات
+│   ├── ui/              # واجهة المستخدم
+│   └── users/           # المستخدمين
+├── integrations/        # التكاملات
+│   └── supabase/        # Supabase client & types
+├── lib/                 # المكتبات المساعدة
+│   ├── excel-helper.ts  # تصدير Excel
+│   ├── fonts/           # الخطوط العربية
+│   └── version.ts       # معلومات الإصدار
+├── pages/               # الصفحات (~76)
+├── routes/              # التوجيه (~71 مسار)
+├── services/            # الخدمات
+│   ├── AuthService.ts
+│   ├── ArchiveService.ts
+│   └── LoansService.ts
+└── types/               # الأنواع
+    └── tenants.ts       # أنواع المستأجرين ✨
 ```
 
 ---
@@ -47,38 +95,53 @@ src/
 ### تسمية الملفات
 | النوع | التسمية | مثال |
 |-------|---------|------|
-| Component | PascalCase.tsx | `BeneficiaryCard.tsx` |
-| Hook | useCamelCase.ts | `useBeneficiaries.ts` |
+| Component | PascalCase.tsx | `TenantDialog.tsx` |
+| Hook | useCamelCase.ts | `useTenantLedger.ts` |
 | Utility | camelCase.ts | `exportHelpers.ts` |
-| Type | PascalCase.ts | `Beneficiary.ts` |
+| Type | camelCase.ts | `tenants.ts` |
+| Service | PascalCase.ts | `AuthService.ts` |
 
 ### هيكل المكون
 ```tsx
 // 1. Imports
 import { useState } from 'react';
-import { useBeneficiaries } from '@/hooks/beneficiary/useBeneficiaries';
+import { useTenants } from '@/hooks/property/useTenants';
+import { Button } from '@/components/ui/button';
 
 // 2. Types
-interface Props {
-  id: string;
+interface TenantCardProps {
+  tenantId: string;
+  onEdit?: (id: string) => void;
 }
 
 // 3. Component
-export const BeneficiaryCard = ({ id }: Props) => {
-  // 4. Hooks
-  const { data, isLoading } = useBeneficiaries();
+export const TenantCard = ({ tenantId, onEdit }: TenantCardProps) => {
+  // 4. Hooks (دائماً في الأعلى)
+  const { tenants, isLoading } = useTenants();
   
   // 5. State
   const [isOpen, setIsOpen] = useState(false);
   
-  // 6. Handlers
-  const handleClick = () => setIsOpen(true);
+  // 6. Derived Data
+  const tenant = tenants.find(t => t.id === tenantId);
   
-  // 7. Render
+  // 7. Handlers
+  const handleEdit = () => onEdit?.(tenantId);
+  
+  // 8. Early Returns
+  if (isLoading) return <Skeleton />;
+  if (!tenant) return null;
+  
+  // 9. Render
   return (
-    <div onClick={handleClick}>
-      {/* JSX */}
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>{tenant.full_name}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Button onClick={handleEdit}>تعديل</Button>
+      </CardContent>
+    </Card>
   );
 };
 ```
@@ -92,52 +155,111 @@ export const BeneficiaryCard = ({ id }: Props) => {
 src/hooks/{category}/use{Name}.ts
 ```
 
-### القالب
+### قالب Hook للقراءة
 ```typescript
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import type { Tenant } from '@/types/tenants';
 
-export const useBeneficiaries = () => {
+export function useTenants() {
   return useQuery({
-    queryKey: ['beneficiaries'],
-    queryFn: async () => {
+    queryKey: ['tenants'],
+    queryFn: async (): Promise<Tenant[]> => {
       const { data, error } = await supabase
-        .from('beneficiaries')
-        .select('*');
+        .from('tenants')
+        .select('*')
+        .order('created_at', { ascending: false });
       
       if (error) throw error;
       return data;
     },
     staleTime: 2 * 60 * 1000, // دقيقتان
   });
-};
+}
+```
+
+### قالب Hook مع Mutations
+```typescript
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import type { Tenant, TenantInsert } from '@/types/tenants';
+
+export function useTenants() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Query
+  const { data: tenants = [], isLoading } = useQuery({
+    queryKey: ['tenants'],
+    queryFn: async (): Promise<Tenant[]> => {
+      const { data, error } = await supabase
+        .from('tenants')
+        .select('*');
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Add Mutation
+  const addTenant = useMutation({
+    mutationFn: async (tenant: TenantInsert) => {
+      const { data, error } = await supabase
+        .from('tenants')
+        .insert(tenant)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tenants'] });
+      toast({ title: 'تمت الإضافة بنجاح' });
+    },
+    onError: (error: Error) => {
+      toast({ title: 'خطأ', description: error.message, variant: 'destructive' });
+    },
+  });
+
+  return {
+    tenants,
+    isLoading,
+    addTenant: addTenant.mutateAsync,
+    isAdding: addTenant.isPending,
+  };
+}
 ```
 
 ---
 
 ## 🎨 نظام التصميم
 
-### استخدام Tailwind Tokens
+### ❌ لا تستخدم ألوان مباشرة
 ```tsx
-// ❌ خطأ - ألوان مباشرة
+// ❌ خطأ
 <div className="bg-blue-500 text-white">
+<div className="bg-green-100 text-green-800">
 
-// ✅ صحيح - tokens من النظام
+// ✅ صحيح - استخدم tokens النظام
 <div className="bg-primary text-primary-foreground">
+<div className="bg-status-success/10 text-status-success">
 ```
 
-### المتغيرات المتاحة
+### المتغيرات المتاحة (index.css)
 ```css
---background
---foreground
---primary
---primary-foreground
---secondary
---muted
---accent
---destructive
---border
---ring
+/* ألوان أساسية */
+--background, --foreground
+--primary, --primary-foreground
+--secondary, --secondary-foreground
+--muted, --muted-foreground
+--accent, --accent-foreground
+--destructive, --destructive-foreground
+
+/* ألوان الحالة */
+--status-success, --status-warning, --status-error, --status-info
+
+/* ألوان الورثة */
+--heir-son, --heir-daughter, --heir-wife
 ```
 
 ---
@@ -160,6 +282,7 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
@@ -170,10 +293,12 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // المنطق هنا
+    const { data } = await req.json();
+    
+    // Logic here...
 
     return new Response(
-      JSON.stringify({ success: true }),
+      JSON.stringify({ success: true, data }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
@@ -191,63 +316,86 @@ serve(async (req) => {
 
 ### 1. الاستعلامات المتوازية
 ```typescript
-// ❌ خطأ - متتابعة
-const beneficiaries = await getBeneficiaries();
+// ❌ خطأ - متتابعة (بطيء)
+const tenants = await getTenants();
 const properties = await getProperties();
+const contracts = await getContracts();
 
-// ✅ صحيح - متوازية
-const [beneficiaries, properties] = await Promise.all([
-  getBeneficiaries(),
-  getProperties()
+// ✅ صحيح - متوازية (سريع)
+const [tenants, properties, contracts] = await Promise.all([
+  getTenants(),
+  getProperties(),
+  getContracts()
 ]);
 ```
 
-### 2. التحميل الكسول
+### 2. Invalidate Queries بشكل محدد
 ```typescript
-// استخدام React.lazy
-const HeavyComponent = React.lazy(() => import('./HeavyComponent'));
+// ❌ خطأ - يمسح كل الكاش
+queryClient.invalidateQueries();
+
+// ✅ صحيح - يستهدف queries محددة
+queryClient.invalidateQueries({ queryKey: ['tenants'] });
+queryClient.invalidateQueries({ queryKey: ['tenant-ledger', tenantId] });
 ```
 
-### 3. React Query Configuration
+### 3. استخدام Realtime موحد
 ```typescript
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 2 * 60 * 1000, // دقيقتان
-      refetchOnWindowFocus: true,
-    },
-  },
-});
+// ❌ خطأ - قنوات متعددة في كل مكون
+useEffect(() => {
+  const channel1 = supabase.channel('tenants')...
+  const channel2 = supabase.channel('contracts')...
+  // ...
+}, []);
+
+// ✅ صحيح - قناة موحدة في hook واحد
+export function useDashboardRealtime() {
+  const queryClient = useQueryClient();
+  
+  useEffect(() => {
+    const channel = supabase
+      .channel('dashboard-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'tenants' }, 
+        () => queryClient.invalidateQueries({ queryKey: ['tenants'] }))
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'contracts' }, 
+        () => queryClient.invalidateQueries({ queryKey: ['contracts'] }))
+      .subscribe();
+      
+    return () => { supabase.removeChannel(channel); };
+  }, [queryClient]);
+}
 ```
 
----
-
-## 🐛 التصحيح
-
-### قراءة السجلات
+### 4. React Hooks Rules
 ```typescript
-// Console logs
-console.log('Debug:', data);
+// ❌ خطأ - شرط قبل hooks
+const MyComponent = ({ userId }) => {
+  if (!userId) return null; // ⚠️ خطأ!
+  
+  const { data } = useQuery(...); // سيفشل
+};
 
-// Supabase logs
-const { data, error } = await supabase.from('table').select();
-if (error) console.error('Supabase error:', error);
+// ✅ صحيح - hooks في الأعلى دائماً
+const MyComponent = ({ userId }) => {
+  const { data, isLoading } = useQuery({
+    queryKey: ['user', userId],
+    queryFn: () => fetchUser(userId),
+    enabled: !!userId, // استخدم enabled بدلاً من الشرط
+  });
+  
+  if (!userId || isLoading) return <Skeleton />;
+};
 ```
-
-### أدوات التطوير
-- React Query DevTools
-- Supabase Dashboard
-- Browser DevTools
 
 ---
 
 ## 📚 المراجع
 
-- [التوثيق الرسمي](./OFFICIAL_DOCUMENTATION.md)
+- [التوثيق الرسمي](../OFFICIAL_DOCUMENTATION.md)
 - [مرجع API](../technical/api-reference.md)
 - [هيكل قاعدة البيانات](../technical/database-schema.md)
 - [سياسات الأمان](../technical/security-policies.md)
 
 ---
 
-**الحالة:** ✅ محدّث | **الإصدار:** 2.6.32
+**الحالة:** ✅ محدّث | **الإصدار:** 2.6.38

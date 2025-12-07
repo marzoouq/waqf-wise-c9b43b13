@@ -1,6 +1,6 @@
 # 📖 مرجع API | API Reference
 
-**الإصدار:** 2.6.27 | **آخر تحديث:** 2025-12-07
+**الإصدار:** 2.6.38 | **آخر تحديث:** 2025-12-07
 
 ---
 
@@ -9,6 +9,7 @@
 1. [Edge Functions](#-edge-functions)
 2. [Custom Hooks](#-custom-hooks)
 3. [Services](#-services)
+4. [Types](#-types)
 
 ---
 
@@ -39,82 +40,101 @@
 
 ### المصادقة (auth/)
 
-| Hook | الوصف |
-|------|-------|
-| `useAuth` | إدارة حالة المصادقة |
-| `useUserRole` | جلب دور المستخدم |
-| `usePermissions` | التحقق من الصلاحيات |
-| `useSessionCleanup` | تنظيف الجلسة |
+| Hook | الوصف | الاستخدام |
+|------|-------|----------|
+| `useAuth` | إدارة حالة المصادقة | `const { user, signIn, signOut } = useAuth()` |
+| `useUserRole` | جلب دور المستخدم | `const { role, isNazer } = useUserRole()` |
+| `usePermissions` | التحقق من الصلاحيات | `const { hasPermission } = usePermissions()` |
+| `useSessionCleanup` | تنظيف الجلسة | يُستخدم في SessionManager |
 
 ### المستفيدين (beneficiary/)
 
-| Hook | الوصف |
-|------|-------|
-| `useBeneficiaries` | جلب قائمة المستفيدين |
-| `useBeneficiary` | جلب مستفيد واحد |
-| `useBeneficiaryStats` | إحصائيات المستفيد |
-| `useBeneficiaryRequests` | طلبات المستفيدين |
-| `useFamilyTree` | شجرة العائلة |
+| Hook | الوصف | الاستخدام |
+|------|-------|----------|
+| `useBeneficiaries` | جلب قائمة المستفيدين | `const { data, isLoading } = useBeneficiaries()` |
+| `useBeneficiary` | جلب مستفيد واحد | `const { beneficiary } = useBeneficiary(id)` |
+| `useBeneficiaryStats` | إحصائيات المستفيد | `const { stats } = useBeneficiaryStats(id)` |
+| `useBeneficiaryRequests` | طلبات المستفيدين | `const { requests } = useBeneficiaryRequests()` |
+| `useFamilyTree` | شجرة العائلة | `const { familyMembers } = useFamilyTree(id)` |
+| `useBeneficiaryId` | جلب ID المستفيد للمستخدم الحالي | `const { beneficiaryId } = useBeneficiaryId()` |
 
 ### المحاسبة (accounting/)
 
-| Hook | الوصف |
-|------|-------|
-| `useAccounts` | شجرة الحسابات |
-| `useJournalEntries` | القيود اليومية |
-| `useTrialBalance` | ميزان المراجعة |
-| `useFiscalYears` | السنوات المالية |
-| `useBudgets` | الميزانيات |
+| Hook | الوصف | الاستخدام |
+|------|-------|----------|
+| `useAccounts` | شجرة الحسابات | `const { accounts } = useAccounts()` |
+| `useJournalEntries` | القيود اليومية | `const { entries, addEntry } = useJournalEntries()` |
+| `useTrialBalance` | ميزان المراجعة | `const { balance } = useTrialBalance()` |
+| `useFiscalYears` | السنوات المالية | `const { fiscalYears } = useFiscalYears()` |
+| `useActiveFiscalYear` | السنة المالية النشطة | `const { activeFiscalYear } = useActiveFiscalYear()` |
+| `useBudgets` | الميزانيات | `const { budgets } = useBudgets()` |
+| `useAccountantKPIs` | مؤشرات المحاسب | `const { kpis } = useAccountantKPIs()` |
 
 ### العقارات (property/)
 
-| Hook | الوصف |
-|------|-------|
-| `useProperties` | قائمة العقارات |
-| `useContracts` | العقود |
-| `useRentalPayments` | مدفوعات الإيجار |
-| `useMaintenanceRequests` | طلبات الصيانة |
+| Hook | الوصف | الاستخدام |
+|------|-------|----------|
+| `useProperties` | قائمة العقارات | `const { properties, addProperty } = useProperties()` |
+| `useContracts` | العقود | `const { contracts, addContract } = useContracts()` |
+| `useRentalPayments` | مدفوعات الإيجار | `const { payments } = useRentalPayments()` |
+| `useMaintenanceRequests` | طلبات الصيانة | `const { requests } = useMaintenanceRequests()` |
+| `usePropertyUnits` | الوحدات العقارية | `const { units } = usePropertyUnits(propertyId)` |
+
+### المستأجرون (property/) ✨ جديد
+
+| Hook | الوصف | الاستخدام |
+|------|-------|----------|
+| `useTenants` | قائمة المستأجرين | `const { tenants, addTenant, updateTenant } = useTenants()` |
+| `useTenant` | مستأجر واحد | `const { tenant } = useTenant(id)` |
+| `useTenantLedger` | سجل حساب المستأجر | `const { entries, balance, addEntry } = useTenantLedger(tenantId)` |
+| `useTenantsAging` | تقرير أعمار الديون | `const { agingData } = useTenantsAging()` |
+| `useRecordInvoiceToLedger` | تسجيل فاتورة في السجل | `recordInvoice({ tenantId, invoiceId, amount })` |
+| `useRecordPaymentToLedger` | تسجيل دفعة في السجل | `recordPayment({ tenantId, paymentId, amount })` |
 
 ### التوزيعات (distributions/)
 
-| Hook | الوصف |
-|------|-------|
-| `useDistributions` | التوزيعات |
-| `useDistributionEngine` | محرك التوزيع |
-| `useHeirDistributions` | توزيعات الورثة |
+| Hook | الوصف | الاستخدام |
+|------|-------|----------|
+| `useDistributions` | التوزيعات | `const { distributions } = useDistributions()` |
+| `useDistributionEngine` | محرك التوزيع | `const { calculate, simulate } = useDistributionEngine()` |
+| `useHeirDistributions` | توزيعات الورثة | `const { heirDistributions } = useHeirDistributions()` |
+| `useDistributeRevenue` | توزيع الإيرادات | `const { distribute } = useDistributeRevenue()` |
 
 ### المدفوعات (payments/)
 
-| Hook | الوصف |
-|------|-------|
-| `usePayments` | المدفوعات |
-| `usePaymentVouchers` | سندات الصرف |
-| `useBankTransfers` | التحويلات البنكية |
+| Hook | الوصف | الاستخدام |
+|------|-------|----------|
+| `usePayments` | المدفوعات | `const { payments } = usePayments()` |
+| `usePaymentVouchers` | سندات الصرف | `const { vouchers } = usePaymentVouchers()` |
+| `useBankTransfers` | التحويلات البنكية | `const { transfers } = useBankTransfers()` |
 
 ### التقارير (reports/)
 
-| Hook | الوصف |
-|------|-------|
-| `useFinancialReports` | التقارير المالية |
-| `useBeneficiaryReports` | تقارير المستفيدين |
-| `usePropertyReports` | تقارير العقارات |
+| Hook | الوصف | الاستخدام |
+|------|-------|----------|
+| `useFinancialReports` | التقارير المالية | `const { reports } = useFinancialReports()` |
+| `useBeneficiaryReports` | تقارير المستفيدين | `const { reports } = useBeneficiaryReports()` |
+| `usePropertyReports` | تقارير العقارات | `const { reports } = usePropertyReports()` |
+| `useUnifiedExport` | تصدير موحد | `const { exportToPDF, exportToExcel } = useUnifiedExport()` |
 
 ### لوحات التحكم (dashboard/)
 
-| Hook | الوصف |
-|------|-------|
-| `useNazerKPIs` | مؤشرات الناظر |
-| `useCashierStats` | إحصائيات أمين الصندوق |
-| `usePendingApprovals` | الموافقات المعلقة |
-| `useSmartAlerts` | التنبيهات الذكية |
-| `useUnifiedKPIs` | المؤشرات الموحدة |
+| Hook | الوصف | الاستخدام |
+|------|-------|----------|
+| `useNazerKPIs` | مؤشرات الناظر | `const { kpis, isLoading } = useNazerKPIs()` |
+| `useCashierStats` | إحصائيات أمين الصندوق | `const { stats } = useCashierStats()` |
+| `usePendingApprovals` | الموافقات المعلقة | `const { approvals } = usePendingApprovals()` |
+| `useSmartAlerts` | التنبيهات الذكية | `const { alerts } = useSmartAlerts()` |
+| `useUnifiedKPIs` | المؤشرات الموحدة | `const { kpis } = useUnifiedKPIs()` |
+| `useNazerDashboardRealtime` | اشتراكات Realtime موحدة | `useNazerDashboardRealtime()` |
+| `useRevenueProgress` | تقدم الإيرادات | `const { progress } = useRevenueProgress()` |
 
 ### الوقف (waqf/)
 
-| Hook | الوصف |
-|------|-------|
-| `useWaqfUnits` | أقلام الوقف |
-| `useWaqfRevenueByFiscalYear` | إيرادات الوقف حسب السنة |
+| Hook | الوصف | الاستخدام |
+|------|-------|----------|
+| `useWaqfUnits` | أقلام الوقف | `const { units } = useWaqfUnits()` |
+| `useWaqfRevenueByFiscalYear` | إيرادات الوقف حسب السنة | `const { revenue } = useWaqfRevenueByFiscalYear(fiscalYearId)` |
 
 ---
 
@@ -129,6 +149,9 @@ await AuthService.signIn(email, password);
 
 // تسجيل الخروج
 await AuthService.signOut();
+
+// جلب الجلسة الحالية
+const session = await AuthService.getSession();
 ```
 
 ### ArchiveService
@@ -136,10 +159,13 @@ await AuthService.signOut();
 import { ArchiveService } from '@/services/ArchiveService';
 
 // رفع مستند
-await ArchiveService.uploadDocument(file, metadata);
+await ArchiveService.uploadDocument(file, { folderId, title });
 
 // جلب المستندات
-await ArchiveService.getDocuments(folderId);
+const documents = await ArchiveService.getDocuments(folderId);
+
+// حذف مستند
+await ArchiveService.deleteDocument(documentId);
 ```
 
 ### LoansService
@@ -150,9 +176,106 @@ import { LoansService } from '@/services/LoansService';
 await LoansService.createLoan(loanData);
 
 // حساب جدول السداد
-LoansService.calculateSchedule(principal, months);
+const schedule = LoansService.calculateSchedule(principal, months, interestRate);
+
+// تسجيل دفعة
+await LoansService.recordPayment(loanId, amount);
 ```
 
 ---
 
-**الحالة:** ✅ موثق | **الإصدار:** 2.6.27
+## 📝 Types
+
+### المستأجرون ✨ جديد
+```typescript
+// src/types/tenants.ts
+
+export interface Tenant {
+  id: string;
+  tenant_number: string;
+  full_name: string;
+  id_type: 'national_id' | 'iqama' | 'passport' | 'commercial_register';
+  id_number: string;
+  tax_number?: string;
+  commercial_register?: string;
+  national_address?: string;
+  phone: string;
+  email?: string;
+  bank_name?: string;
+  iban?: string;
+  notes?: string;
+  status: 'active' | 'inactive';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TenantLedgerEntry {
+  id: string;
+  tenant_id: string;
+  transaction_date: string;
+  transaction_type: 'invoice' | 'payment' | 'adjustment' | 'opening_balance';
+  reference_type?: string;
+  reference_id?: string;
+  reference_number?: string;
+  description?: string;
+  debit_amount: number;
+  credit_amount: number;
+  balance: number;
+  property_id?: string;
+  contract_id?: string;
+  fiscal_year_id?: string;
+  created_at: string;
+}
+
+export interface TenantWithBalance extends Tenant {
+  current_balance: number;
+  total_invoices: number;
+  total_payments: number;
+}
+
+export interface TenantAgingItem {
+  tenant_id: string;
+  tenant_name: string;
+  current: number;    // 0-30 يوم
+  days_30: number;    // 31-60 يوم
+  days_60: number;    // 61-90 يوم
+  days_90: number;    // 91-120 يوم
+  over_90: number;    // أكثر من 120 يوم
+  total: number;
+}
+```
+
+### المستفيدون
+```typescript
+export interface Beneficiary {
+  id: string;
+  beneficiary_number?: string;
+  full_name: string;
+  national_id: string;
+  phone: string;
+  email?: string;
+  category: 'son' | 'daughter' | 'wife';
+  status: 'active' | 'inactive';
+  family_id?: string;
+  account_balance: number;
+  total_received: number;
+}
+```
+
+### العقارات
+```typescript
+export interface Property {
+  id: string;
+  name: string;
+  property_type: string;
+  location?: string;
+  status: string;
+  total_units: number;
+  monthly_rent: number;
+  tax_percentage: number;
+}
+```
+
+---
+
+**الحالة:** ✅ موثق ومحدّث | **الإصدار:** 2.6.38
