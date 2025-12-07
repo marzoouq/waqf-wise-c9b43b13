@@ -2,12 +2,12 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.6.25
- * @date 2025-12-05
+ * @version 2.6.29
+ * @date 2025-12-07
  */
 
-export const APP_VERSION = '2.6.28';
-export const APP_VERSION_DATE = '2025-12-05';
+export const APP_VERSION = '2.6.29';
+export const APP_VERSION_DATE = '2025-12-07';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
 export const VERSION_INFO = {
@@ -16,11 +16,11 @@ export const VERSION_INFO = {
   name: APP_VERSION_NAME,
   changelog: '/docs/CHANGELOG.md',
   features: [
-    'فصل الاهتمامات 100%',
-    'Type Safety 99.5%+',
-    'إزالة 7 تعليقات eslint-disable',
-    '0 صفحات/Hooks/Components تستخدم any',
-    'Best Practices 97%+',
+    'توحيد useActiveFiscalYear Hook',
+    'توحيد Realtime Subscriptions',
+    'نقل منطق الحساب إلى Hooks',
+    'إعادة هيكلة DistributeRevenueDialog',
+    'ألوان CSS Variables دلالية للورثة',
   ],
 } as const;
 
