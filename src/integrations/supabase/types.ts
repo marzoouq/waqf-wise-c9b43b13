@@ -2139,6 +2139,98 @@ export type Database = {
           },
         ]
       }
+      cashier_shifts: {
+        Row: {
+          cashier_id: string
+          cashier_name: string | null
+          closed_at: string | null
+          closed_by: string | null
+          closing_balance: number | null
+          created_at: string
+          expected_balance: number | null
+          id: string
+          notes: string | null
+          opened_at: string
+          opening_balance: number
+          shift_number: string
+          status: string
+          total_collections: number | null
+          total_payments: number | null
+          transactions_count: number | null
+          updated_at: string
+          variance: number | null
+        }
+        Insert: {
+          cashier_id: string
+          cashier_name?: string | null
+          closed_at?: string | null
+          closed_by?: string | null
+          closing_balance?: number | null
+          created_at?: string
+          expected_balance?: number | null
+          id?: string
+          notes?: string | null
+          opened_at?: string
+          opening_balance?: number
+          shift_number: string
+          status?: string
+          total_collections?: number | null
+          total_payments?: number | null
+          transactions_count?: number | null
+          updated_at?: string
+          variance?: number | null
+        }
+        Update: {
+          cashier_id?: string
+          cashier_name?: string | null
+          closed_at?: string | null
+          closed_by?: string | null
+          closing_balance?: number | null
+          created_at?: string
+          expected_balance?: number | null
+          id?: string
+          notes?: string | null
+          opened_at?: string
+          opening_balance?: number
+          shift_number?: string
+          status?: string
+          total_collections?: number | null
+          total_payments?: number | null
+          transactions_count?: number | null
+          updated_at?: string
+          variance?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cashier_shifts_cashier_id_fkey"
+            columns: ["cashier_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cashier_shifts_cashier_id_fkey"
+            columns: ["cashier_id"]
+            isOneToOne: false
+            referencedRelation: "user_profile_with_roles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cashier_shifts_closed_by_fkey"
+            columns: ["closed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cashier_shifts_closed_by_fkey"
+            columns: ["closed_by"]
+            isOneToOne: false
+            referencedRelation: "user_profile_with_roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chatbot_conversations: {
         Row: {
           context: Json | null
@@ -7783,6 +7875,162 @@ export type Database = {
         }
         Relationships: []
       }
+      pos_transactions: {
+        Row: {
+          amount: number
+          beneficiary_id: string | null
+          cashier_id: string
+          contract_id: string | null
+          created_at: string
+          description: string | null
+          expense_category: string | null
+          id: string
+          journal_entry_id: string | null
+          net_amount: number | null
+          payer_name: string | null
+          payment_method: string
+          receipt_printed: boolean | null
+          reference_number: string | null
+          rental_payment_id: string | null
+          shift_id: string
+          tax_amount: number | null
+          transaction_number: string
+          transaction_type: string
+          void_reason: string | null
+          voided: boolean | null
+          voided_at: string | null
+          voided_by: string | null
+        }
+        Insert: {
+          amount: number
+          beneficiary_id?: string | null
+          cashier_id: string
+          contract_id?: string | null
+          created_at?: string
+          description?: string | null
+          expense_category?: string | null
+          id?: string
+          journal_entry_id?: string | null
+          net_amount?: number | null
+          payer_name?: string | null
+          payment_method: string
+          receipt_printed?: boolean | null
+          reference_number?: string | null
+          rental_payment_id?: string | null
+          shift_id: string
+          tax_amount?: number | null
+          transaction_number: string
+          transaction_type: string
+          void_reason?: string | null
+          voided?: boolean | null
+          voided_at?: string | null
+          voided_by?: string | null
+        }
+        Update: {
+          amount?: number
+          beneficiary_id?: string | null
+          cashier_id?: string
+          contract_id?: string | null
+          created_at?: string
+          description?: string | null
+          expense_category?: string | null
+          id?: string
+          journal_entry_id?: string | null
+          net_amount?: number | null
+          payer_name?: string | null
+          payment_method?: string
+          receipt_printed?: boolean | null
+          reference_number?: string | null
+          rental_payment_id?: string | null
+          shift_id?: string
+          tax_amount?: number | null
+          transaction_number?: string
+          transaction_type?: string
+          void_reason?: string | null
+          voided?: boolean | null
+          voided_at?: string | null
+          voided_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pos_transactions_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiaries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_transactions_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_account_statement"
+            referencedColumns: ["beneficiary_id"]
+          },
+          {
+            foreignKeyName: "pos_transactions_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "beneficiary_statistics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_transactions_cashier_id_fkey"
+            columns: ["cashier_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_transactions_cashier_id_fkey"
+            columns: ["cashier_id"]
+            isOneToOne: false
+            referencedRelation: "user_profile_with_roles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_transactions_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "contracts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_transactions_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
+            referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_transactions_rental_payment_id_fkey"
+            columns: ["rental_payment_id"]
+            isOneToOne: false
+            referencedRelation: "rental_payments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_transactions_shift_id_fkey"
+            columns: ["shift_id"]
+            isOneToOne: false
+            referencedRelation: "cashier_shifts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_transactions_voided_by_fkey"
+            columns: ["voided_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_transactions_voided_by_fkey"
+            columns: ["voided_by"]
+            isOneToOne: false
+            referencedRelation: "user_profile_with_roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -11549,6 +11797,8 @@ export type Database = {
         Args: { p_fiscal_year_id: string; p_increase_percentage?: number }
         Returns: number
       }
+      generate_pos_transaction_number: { Args: never; Returns: string }
+      generate_shift_number: { Args: never; Returns: string }
       generate_smart_insights: { Args: never; Returns: undefined }
       generate_transfer_file_number: { Args: never; Returns: string }
       generate_voucher_number: {
