@@ -57,14 +57,12 @@ export { useUserRole } from './useUserRole';
 
 // ==================== Beneficiary ====================
 export { useBeneficiaries } from './useBeneficiaries';
-export { useBeneficiaryProfile } from './useBeneficiaryProfile';
+export { useBeneficiaryProfile, useBeneficiaryLoans, useBeneficiaryEmergencyAid, useBeneficiaryId, useBeneficiaryPortalData } from './beneficiary';
 export { useBeneficiaryRequests } from './useBeneficiaryRequests';
 export { useBeneficiaryAttachments } from './useBeneficiaryAttachments';
 export { useBeneficiaryActivityLog } from './useBeneficiaryActivityLog';
 export { useBeneficiaryCategories } from './useBeneficiaryCategories';
 export { useBeneficiariesFilters } from './useBeneficiariesFilters';
-export { useBeneficiaryEmergencyAid } from './useBeneficiaryEmergencyAid';
-export { useBeneficiaryLoans } from './useBeneficiaryLoans';
 export { useFamilies } from './useFamilies';
 export { useTribes } from './useTribes';
 export { useEligibilityAssessment } from './useEligibilityAssessment';

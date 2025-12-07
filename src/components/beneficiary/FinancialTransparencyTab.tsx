@@ -5,7 +5,7 @@ import { ContractsTable } from "./ContractsTable";
 import { MonthlyRevenueChart } from "./MonthlyRevenueChart";
 import { DistributionPieChart } from "./DistributionPieChart";
 import { EmptyPaymentsState } from "./EmptyPaymentsState";
-import { useBeneficiaryProfile } from "@/hooks/useBeneficiaryProfile";
+import { useBeneficiaryProfile } from "@/hooks/beneficiary";
 import { useAuth } from "@/hooks/useAuth";
 import { useFiscalYearPublishStatus } from "@/hooks/useFiscalYearPublishStatus";
 import { FiscalYearNotPublishedBanner } from "./FiscalYearNotPublishedBanner";

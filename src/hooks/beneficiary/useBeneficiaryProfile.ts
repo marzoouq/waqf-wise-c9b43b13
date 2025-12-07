@@ -1,3 +1,8 @@
+/**
+ * useBeneficiaryProfile Hook
+ * Hook محسّن لجلب بيانات المستفيد باستخدام React Query
+ */
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Beneficiary } from "@/types/beneficiary";
@@ -15,10 +20,6 @@ interface BeneficiaryProfileData {
   payments: Payment[];
 }
 
-/**
- * Hook محسّن لجلب بيانات المستفيد باستخدام React Query
- * يستبدل useBeneficiaryData القديم
- */
 export const useBeneficiaryProfile = (userId?: string) => {
   const { data, isLoading, error } = useQuery({
     queryKey: ["beneficiary-profile", userId],
@@ -27,7 +28,6 @@ export const useBeneficiaryProfile = (userId?: string) => {
         return { beneficiary: null, payments: [] };
       }
 
-      // جلب بيانات المستفيد
       // جلب بيانات المستفيد الكاملة
       const { data: beneficiaryData, error: beneficiaryError } = await supabase
         .from("beneficiaries")

@@ -5,8 +5,7 @@ import { DollarSign, TrendingUp, AlertCircle, CheckCircle, Inbox } from "lucide-
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { MaskedValue } from "@/components/shared/MaskedValue";
 import { format, arLocale as ar } from "@/lib/date";
-import { useBeneficiaryLoans } from "@/hooks/useBeneficiaryLoans";
-import { useBeneficiaryEmergencyAid } from "@/hooks/useBeneficiaryEmergencyAid";
+import { useBeneficiaryLoans, useBeneficiaryEmergencyAid } from "@/hooks/beneficiary";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function LoansOverviewTab() {

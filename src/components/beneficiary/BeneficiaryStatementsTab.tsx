@@ -37,18 +37,6 @@ export function BeneficiaryStatementsTab({ beneficiaryId }: BeneficiaryStatement
 
 
   const handleExport = async () => {
-interface JournalEntryLine {
-  debit_amount?: number;
-  credit_amount?: number;
-  accounts?: { name_ar: string; code: string };
-}
-
-interface JournalEntryWithLines {
-  entry_date: string;
-  description?: string;
-  journal_entry_lines?: JournalEntryLine[];
-}
-
     try {
       const { data: transactions } = await supabase
         .from('journal_entries')
@@ -66,14 +54,14 @@ interface JournalEntryWithLines {
         return;
       }
 
-      // Create CSV content
+      // Create CSV content with proper typing
       const headers = ['التاريخ', 'الوصف', 'المدين', 'الدائن', 'الرصيد'];
-      const rows = (transactions as unknown as JournalEntryWithLines[]).map(entry => {
+      const rows = transactions.map(entry => {
         const lines = entry.journal_entry_lines || [];
-        const debit = lines.reduce((sum, line) => 
+        const debit = lines.reduce((sum: number, line: { debit_amount?: number }) => 
           sum + (line.debit_amount || 0), 0
         );
-        const credit = lines.reduce((sum, line) => 
+        const credit = lines.reduce((sum: number, line: { credit_amount?: number }) => 
           sum + (line.credit_amount || 0), 0
         );
         
