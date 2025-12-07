@@ -4,6 +4,7 @@ import { Contract } from "@/hooks/useContracts";
 export interface ContractFormData {
   contract_number: string;
   property_id: string;
+  tenant_id: string;
   tenant_name: string;
   tenant_phone: string;
   tenant_id_number: string;
@@ -29,6 +30,7 @@ const generateContractNumber = () => {
 const getInitialFormData = (): ContractFormData => ({
   contract_number: generateContractNumber(),
   property_id: "",
+  tenant_id: "",
   tenant_name: "",
   tenant_phone: "",
   tenant_id_number: "",
@@ -97,6 +99,7 @@ export function useContractForm(contract?: Contract | null) {
       setFormData({
         contract_number: contract.contract_number,
         property_id: contract.property_id,
+        tenant_id: (contract as { tenant_id?: string }).tenant_id || "",
         tenant_name: contract.tenant_name,
         tenant_phone: contract.tenant_phone,
         tenant_id_number: contract.tenant_id_number,
