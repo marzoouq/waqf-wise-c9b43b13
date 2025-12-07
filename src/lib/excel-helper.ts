@@ -2,7 +2,7 @@
  * Excel Helper - مساعد Excel باستخدام ExcelJS
  * بديل آمن لـ xlsx (CVE-2024-22363)
  * 
- * @version 2.6.9
+ * @version 2.6.32
  */
 
 import ExcelJS from 'exceljs';
