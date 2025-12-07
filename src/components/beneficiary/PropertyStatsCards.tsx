@@ -9,6 +9,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { formatCurrency } from "@/lib/utils";
 import { useFiscalYearPublishStatus } from "@/hooks/useFiscalYearPublishStatus";
+import { PropertyUnitsDisplay } from "./properties/PropertyUnitsDisplay";
 
 interface RentalPaymentWithContract {
   amount_paid: number | null;
@@ -21,48 +22,34 @@ interface RentalPaymentWithContract {
 export function PropertyStatsCards() {
   const { isCurrentYearPublished, isLoading: publishStatusLoading } = useFiscalYearPublishStatus();
   
-  // جلب بيانات العقارات
-  const { data: properties, isLoading: propertiesLoading } = useQuery({
-    queryKey: ["properties-stats"],
+  // جلب البيانات بشكل متوازي
+  const { data, isLoading: dataLoading } = useQuery({
+    queryKey: ["property-stats-combined"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("properties")
-        .select(`
-          id,
-          name,
-          location,
-          total_units,
-          occupied_units,
-          status
-        `)
-        .order("name");
+      const [propertiesRes, paymentsRes] = await Promise.all([
+        supabase
+          .from("properties")
+          .select(`id, name, location, total_units, occupied_units, status`)
+          .order("name"),
+        supabase
+          .from("rental_payments")
+          .select(`amount_paid, tax_amount, contracts!inner (payment_frequency)`)
+          .eq("status", "مدفوع"),
+      ]);
 
-      if (error) throw error;
-      return data || [];
+      if (propertiesRes.error) throw propertiesRes.error;
+      if (paymentsRes.error) throw paymentsRes.error;
+
+      return {
+        properties: propertiesRes.data || [],
+        payments: (paymentsRes.data || []) as RentalPaymentWithContract[],
+      };
     },
   });
 
-  // جلب المدفوعات الفعلية مع نوع الدفع من العقود
-  const { data: payments, isLoading: paymentsLoading } = useQuery({
-    queryKey: ["rental-payments-collected"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("rental_payments")
-        .select(`
-          amount_paid,
-          tax_amount,
-          contracts!inner (
-            payment_frequency
-          )
-        `)
-        .eq("status", "مدفوع");
-
-      if (error) throw error;
-      return (data || []) as RentalPaymentWithContract[];
-    },
-  });
-
-  const isLoading = propertiesLoading || paymentsLoading || publishStatusLoading;
+  const isLoading = dataLoading || publishStatusLoading;
+  const properties = data?.properties || [];
+  const payments = data?.payments || [];
 
   if (isLoading) {
     return (
@@ -82,24 +69,20 @@ export function PropertyStatsCards() {
   }
 
   // إحصائيات العقارات
-  const totalProperties = properties?.length || 0;
-  const totalUnits = properties?.reduce((sum, p) => sum + (p.total_units || 0), 0) || 0;
-  const occupiedUnits = properties?.reduce((sum, p) => sum + (p.occupied_units || 0), 0) || 0;
+  const totalProperties = properties.length;
+  const totalUnits = properties.reduce((sum, p) => sum + (p.total_units || 0), 0);
+  const occupiedUnits = properties.reduce((sum, p) => sum + (p.occupied_units || 0), 0);
   const occupancyRate = totalUnits > 0 ? (occupiedUnits / totalUnits) * 100 : 0;
 
-  // فصل المدفوعات حسب نوع الدفع (سنوي/شهري)
-  const annualPayments = payments?.filter(p => p.contracts?.payment_frequency === 'سنوي') || [];
-  const monthlyPayments = payments?.filter(p => p.contracts?.payment_frequency === 'شهري') || [];
+  // فصل المدفوعات حسب نوع الدفع
+  const annualPayments = payments.filter(p => p.contracts?.payment_frequency === 'سنوي');
+  const monthlyPayments = payments.filter(p => p.contracts?.payment_frequency === 'شهري');
 
   // حساب الإيجارات المحصلة
   const totalAnnualCollected = annualPayments.reduce((sum, p) => sum + (p.amount_paid || 0), 0);
   const totalMonthlyCollected = monthlyPayments.reduce((sum, p) => sum + (p.amount_paid || 0), 0);
   const totalCollected = totalAnnualCollected + totalMonthlyCollected;
-
-  // الضريبة المستقطعة
-  const totalTax = payments?.reduce((sum, p) => sum + (p.tax_amount || 0), 0) || 0;
-
-  // صافي الإيرادات
+  const totalTax = payments.reduce((sum, p) => sum + (p.tax_amount || 0), 0);
   const netRevenue = totalCollected - totalTax;
 
   return (
@@ -111,34 +94,14 @@ export function PropertyStatsCards() {
           إحصائيات العقارات
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-          <StatsCard
-            title="إجمالي العقارات"
-            value={totalProperties}
-            icon={Building2}
-            colorClass="text-info"
-          />
-          <StatsCard
-            title="إجمالي الوحدات"
-            value={totalUnits}
-            colorClass="text-info"
-            icon={Home}
-          />
-          <StatsCard
-            title="الوحدات المشغولة"
-            value={occupiedUnits}
-            colorClass="text-success"
-            icon={CheckCircle}
-          />
-          <StatsCard
-            title="معدل الإشغال"
-            value={`${occupancyRate.toFixed(1)}%`}
-            icon={TrendingUp}
-            colorClass="text-warning"
-          />
+          <StatsCard title="إجمالي العقارات" value={totalProperties} icon={Building2} colorClass="text-info" />
+          <StatsCard title="إجمالي الوحدات" value={totalUnits} colorClass="text-info" icon={Home} />
+          <StatsCard title="الوحدات المشغولة" value={occupiedUnits} colorClass="text-success" icon={CheckCircle} />
+          <StatsCard title="معدل الإشغال" value={`${occupancyRate.toFixed(1)}%`} icon={TrendingUp} colorClass="text-warning" />
         </div>
       </div>
 
-      {/* الإيرادات المحصلة - مخفية حتى النشر */}
+      {/* الإيرادات المحصلة */}
       {isCurrentYearPublished ? (
         <div>
           <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
@@ -146,46 +109,23 @@ export function PropertyStatsCards() {
             الإيرادات المحصلة
           </h3>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-            <StatsCard
-              title="المبلغ المحصل"
-              value={formatCurrency(totalCollected)}
-              icon={DollarSign}
-              colorClass="text-success"
-            />
-            <StatsCard
-              title="الإيجارات السنوية"
-              value={formatCurrency(totalAnnualCollected)}
-              icon={Receipt}
-              colorClass="text-primary"
-              trend={annualPayments.length > 0 ? `${annualPayments.length} دفعة` : undefined}
-            />
-            <StatsCard
-              title="الإيجارات الشهرية"
-              value={formatCurrency(totalMonthlyCollected)}
-              icon={Receipt}
-              colorClass="text-accent"
-              trend={monthlyPayments.length > 0 ? `${monthlyPayments.length} دفعة` : undefined}
-            />
-            <StatsCard
-              title="صافي الإيرادات"
-              value={formatCurrency(netRevenue)}
-              icon={TrendingUp}
-              colorClass="text-success"
-              trend="بعد الضريبة"
-            />
+            <StatsCard title="المبلغ المحصل" value={formatCurrency(totalCollected)} icon={DollarSign} colorClass="text-success" />
+            <StatsCard title="الإيجارات السنوية" value={formatCurrency(totalAnnualCollected)} icon={Receipt} colorClass="text-primary" trend={annualPayments.length > 0 ? `${annualPayments.length} دفعة` : undefined} />
+            <StatsCard title="الإيجارات الشهرية" value={formatCurrency(totalMonthlyCollected)} icon={Receipt} colorClass="text-accent" trend={monthlyPayments.length > 0 ? `${monthlyPayments.length} دفعة` : undefined} />
+            <StatsCard title="صافي الإيرادات" value={formatCurrency(netRevenue)} icon={TrendingUp} colorClass="text-success" trend="بعد الضريبة" />
           </div>
         </div>
       ) : (
-        <Alert className="border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-800">
-          <EyeOff className="h-4 w-4 text-amber-600" />
-          <AlertTitle className="text-amber-800 dark:text-amber-200">الإيرادات مخفية</AlertTitle>
-          <AlertDescription className="text-amber-700 dark:text-amber-300">
+        <Alert className="border-warning/30 bg-warning-light">
+          <EyeOff className="h-4 w-4 text-warning" />
+          <AlertTitle className="text-warning">الإيرادات مخفية</AlertTitle>
+          <AlertDescription className="text-warning/80">
             بيانات الإيرادات والإيجارات مخفية حتى يتم اعتمادها ونشرها من قبل الناظر
           </AlertDescription>
         </Alert>
       )}
 
-      {/* الاستقطاعات الحكومية - مخفية حتى النشر */}
+      {/* الاستقطاعات الحكومية */}
       {isCurrentYearPublished && (
         <div>
           <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
@@ -193,20 +133,8 @@ export function PropertyStatsCards() {
             الاستقطاعات الحكومية
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-            <StatsCard
-              title="ضريبة القيمة المضافة"
-              value={formatCurrency(totalTax)}
-              icon={Landmark}
-              colorClass="text-destructive"
-              trend="هيئة الزكاة والضريبة والجمارك"
-            />
-            <StatsCard
-              title="الزكاة"
-              value={formatCurrency(0)}
-              icon={Landmark}
-              colorClass="text-muted-foreground"
-              trend="لم يتم احتسابها"
-            />
+            <StatsCard title="ضريبة القيمة المضافة" value={formatCurrency(totalTax)} icon={Landmark} colorClass="text-destructive" trend="هيئة الزكاة والضريبة والجمارك" />
+            <StatsCard title="الزكاة" value={formatCurrency(0)} icon={Landmark} colorClass="text-muted-foreground" trend="لم يتم احتسابها" />
           </div>
         </div>
       )}
@@ -220,7 +148,7 @@ export function PropertyStatsCards() {
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-4">
-          {properties && properties.length > 0 ? (
+          {properties.length > 0 ? (
             <Accordion type="single" collapsible className="space-y-3">
               {properties.map((property) => (
                 <AccordionItem
@@ -264,116 +192,6 @@ export function PropertyStatsCards() {
           )}
         </CardContent>
       </Card>
-    </div>
-  );
-}
-
-// مكون فرعي لعرض وحدات العقار
-function PropertyUnitsDisplay({ propertyId }: { propertyId: string }) {
-  const { data: units, isLoading } = useQuery({
-    queryKey: ["property-units", propertyId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("property_units")
-        .select(`
-          id,
-          unit_number,
-          unit_type,
-          floor_number,
-          area,
-          annual_rent,
-          occupancy_status,
-          current_contract_id
-        `)
-        .eq("property_id", propertyId)
-        .order("unit_number");
-
-      if (error) throw error;
-      return data || [];
-    },
-  });
-
-  const { data: contracts } = useQuery({
-    queryKey: ["property-contracts", propertyId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("contracts")
-        .select("id, tenant_name, monthly_rent")
-        .eq("property_id", propertyId)
-        .eq("status", "نشط");
-
-      if (error) throw error;
-      return data || [];
-    },
-  });
-
-  if (isLoading) {
-    return (
-      <div className="space-y-2">
-        {[...Array(3)].map((_, i) => (
-          <Skeleton key={i} className="h-20" />
-        ))}
-      </div>
-    );
-  }
-
-  if (!units || units.length === 0) {
-    return (
-      <div className="text-center py-6 text-muted-foreground">
-        لا توجد وحدات مسجلة لهذا العقار
-      </div>
-    );
-  }
-
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 mt-2">
-      {units.map((unit) => {
-        const contract = contracts?.find((c) => c.id === unit.current_contract_id);
-        const isOccupied = unit.occupancy_status === "مشغول";
-
-        return (
-          <Card
-            key={unit.id}
-            className={`border-l-4 ${
-              isOccupied ? "border-l-success" : "border-l-border"
-            }`}
-          >
-            <CardContent className="p-2 sm:p-3">
-              <div className="space-y-1.5 sm:space-y-2">
-                <div className="flex items-center justify-between gap-2">
-                  <h5 className="font-semibold text-xs sm:text-sm truncate flex-1 min-w-0">{unit.unit_number}</h5>
-                  <Badge
-                    variant={isOccupied ? "default" : "secondary"}
-                    className="text-[10px] sm:text-xs shrink-0"
-                  >
-                    {unit.occupancy_status}
-                  </Badge>
-                </div>
-                <div className="space-y-0.5 sm:space-y-1 text-[10px] sm:text-xs text-muted-foreground">
-                  <p className="truncate">النوع: {unit.unit_type || "غير محدد"}</p>
-                  {unit.floor_number && <p>الطابق: {unit.floor_number}</p>}
-                  {unit.area && <p>المساحة: {unit.area} م²</p>}
-                  {unit.annual_rent && (
-                    <p className="text-primary font-medium truncate">
-                      {formatCurrency(unit.annual_rent / 12)}/شهر
-                    </p>
-                  )}
-                  {contract && (
-                    <div className="pt-1 border-t mt-1.5 sm:mt-2">
-                      <p className="font-medium text-foreground truncate">
-                        المستأجر: {contract.tenant_name}
-                      </p>
-                     <p className="text-success font-medium truncate">
-                        {formatCurrency(contract.monthly_rent)}/شهر
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        );
-      })}
     </div>
   );
 }

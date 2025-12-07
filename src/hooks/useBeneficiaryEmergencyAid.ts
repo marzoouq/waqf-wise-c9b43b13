@@ -1,36 +1,26 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
+import { useBeneficiaryId } from "@/hooks/beneficiary/useBeneficiaryId";
 import { EmergencyAid } from "@/types/loans";
 
 export function useBeneficiaryEmergencyAid() {
-  const { user } = useAuth();
+  const { beneficiaryId, isLoading: idLoading } = useBeneficiaryId();
 
-  const { data: emergencyAids = [], isLoading } = useQuery({
-    queryKey: ["beneficiary-emergency-aid", user?.id],
+  const { data: emergencyAids = [], isLoading: aidsLoading } = useQuery({
+    queryKey: ["beneficiary-emergency-aid", beneficiaryId],
     queryFn: async () => {
-      if (!user?.id) return [];
+      if (!beneficiaryId) return [];
 
-      // Get beneficiary_id for current user
-      const { data: beneficiary, error: beneficiaryError } = await supabase
-        .from("beneficiaries")
-        .select("id")
-        .eq("user_id", user.id)
-        .single();
-
-      if (beneficiaryError || !beneficiary) return [];
-
-      // Fetch emergency aid for this beneficiary
       const { data, error } = await supabase
         .from("emergency_aid")
         .select("*")
-        .eq("beneficiary_id", beneficiary.id)
+        .eq("beneficiary_id", beneficiaryId)
         .order("requested_date", { ascending: false });
 
       if (error) throw error;
       return data as EmergencyAid[] || [];
     },
-    enabled: !!user?.id,
+    enabled: !!beneficiaryId,
   });
 
   // Calculate total aid amount
@@ -39,7 +29,7 @@ export function useBeneficiaryEmergencyAid() {
   return {
     emergencyAids,
     totalAidAmount,
-    isLoading,
+    isLoading: idLoading || aidsLoading,
     hasEmergencyAid: emergencyAids.length > 0,
   };
 }

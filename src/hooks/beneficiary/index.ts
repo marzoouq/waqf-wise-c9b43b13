@@ -4,6 +4,7 @@
 
 export { useBeneficiaries } from '../useBeneficiaries';
 export { useBeneficiaryPortalData, type BeneficiaryStatistics } from './useBeneficiaryPortalData';
+export { useBeneficiaryId } from './useBeneficiaryId';
 export { useBeneficiaryProfile } from '../useBeneficiaryProfile';
 export { useBeneficiaryLoans } from '../useBeneficiaryLoans';
 export { useBeneficiaryRequests } from '../useBeneficiaryRequests';

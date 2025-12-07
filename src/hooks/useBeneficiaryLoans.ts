@@ -1,29 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
+import { useBeneficiaryId } from "@/hooks/beneficiary/useBeneficiaryId";
 
 export function useBeneficiaryLoans() {
-  const { user } = useAuth();
+  const { beneficiaryId, isLoading: idLoading } = useBeneficiaryId();
 
-  const { data: loans = [], isLoading } = useQuery({
-    queryKey: ["beneficiary-loans", user?.id],
+  const { data: loans = [], isLoading: loansLoading } = useQuery({
+    queryKey: ["beneficiary-loans", beneficiaryId],
     queryFn: async () => {
-      if (!user?.id) return [];
+      if (!beneficiaryId) return [];
 
-      // Get beneficiary_id for current user
-      const { data: beneficiary, error: beneficiaryError } = await supabase
-        .from("beneficiaries")
-        .select("id")
-        .eq("user_id", user.id)
-        .single();
-
-      if (beneficiaryError || !beneficiary) return [];
-
-      // Fetch loans for this beneficiary
       const { data, error } = await supabase
         .from("loans")
         .select("*")
-        .eq("beneficiary_id", beneficiary.id)
+        .eq("beneficiary_id", beneficiaryId)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -37,7 +27,7 @@ export function useBeneficiaryLoans() {
         due_date: loan.end_date,
       }));
     },
-    enabled: !!user?.id,
+    enabled: !!beneficiaryId,
   });
 
   // Calculate statistics
@@ -51,7 +41,7 @@ export function useBeneficiaryLoans() {
   return {
     loans,
     statistics,
-    isLoading,
+    isLoading: idLoading || loansLoading,
     hasLoans: loans.length > 0,
   };
 }

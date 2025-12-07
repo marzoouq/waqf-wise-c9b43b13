@@ -1,53 +1,8 @@
 import { memo, useMemo } from 'react';
-import { Home, User, FileText, Bell, Settings } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
-
-interface NavigationItem {
-  id: string;
-  label: string;
-  icon: React.ComponentType<{ className?: string }>;
-  path: string;
-  matchPaths?: string[];
-  badge?: number;
-}
-
-const beneficiaryNavigationItems: NavigationItem[] = [
-  {
-    id: 'home',
-    label: 'الرئيسية',
-    icon: Home,
-    path: '/beneficiary-dashboard',
-    matchPaths: ['/beneficiary-dashboard'],
-  },
-  {
-    id: 'portal',
-    label: 'بوابتي',
-    icon: User,
-    path: '/beneficiary-dashboard',
-    matchPaths: ['/beneficiary-dashboard', '/beneficiary-portal'],
-  },
-  {
-    id: 'requests',
-    label: 'طلباتي',
-    icon: FileText,
-    path: '/beneficiary/requests',
-    matchPaths: ['/beneficiary/requests'],
-  },
-  {
-    id: 'notifications',
-    label: 'الإشعارات',
-    icon: Bell,
-    path: '/notifications',
-  },
-  {
-    id: 'settings',
-    label: 'الإعدادات',
-    icon: Settings,
-    path: '/beneficiary-settings',
-  },
-];
+import { beneficiaryNavigationItems, type NavigationItem } from '@/components/beneficiary/config/bottomNavConfig';
 
 /**
  * شريط التنقل السفلي للمستفيدين - مخصص للجوال
