@@ -2,11 +2,11 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.6.39
+ * @version 2.6.40
  * @date 2025-12-07
  */
 
-export const APP_VERSION = '2.6.39';
+export const APP_VERSION = '2.6.40';
 export const APP_VERSION_DATE = '2025-12-07';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
@@ -16,11 +16,11 @@ export const VERSION_INFO = {
   name: APP_VERSION_NAME,
   changelog: '/docs/CHANGELOG.md',
   features: [
-    'توحيد مصادر بيانات لوحات التحكم',
-    'مصدر موحد useUnifiedKPIs لجميع اللوحات',
-    'إصلاح حساب العقارات المشغولة في جميع المصادر',
-    'Query Key موحد للتحديثات الفورية',
-    'إصلاح get_admin_dashboard_kpis SQL function',
+    'ربط المستأجرين بالعقود وكشف الحساب',
+    'تسجيل دفعات الإيجار في سجل حساب المستأجرين',
+    'تحسين صفحة تفاصيل المستأجر للجوال',
+    'إضافة مكون عقود المستأجر TenantContracts',
+    'تحسين كشف الحساب TenantLedger للجوال',
   ],
 } as const;
 
