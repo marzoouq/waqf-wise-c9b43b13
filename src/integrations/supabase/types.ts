@@ -2266,20 +2266,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "cashier_shifts_cashier_id_fkey"
-            columns: ["cashier_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "cashier_shifts_cashier_id_fkey"
-            columns: ["cashier_id"]
-            isOneToOne: false
-            referencedRelation: "user_profile_with_roles"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "cashier_shifts_closed_by_fkey"
             columns: ["closed_by"]
             isOneToOne: false
