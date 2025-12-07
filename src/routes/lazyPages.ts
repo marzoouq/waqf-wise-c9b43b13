@@ -111,3 +111,6 @@ export const ProjectDocumentation = lazyWithRetry(() => import("@/pages/ProjectD
 // ==================== الذكاء الاصطناعي ====================
 export const AIInsights = lazyWithRetry(() => import("@/pages/AIInsights"));
 export const Chatbot = lazyWithRetry(() => import("@/pages/Chatbot"));
+
+// ==================== نقطة البيع ====================
+export const PointOfSale = lazyWithRetry(() => import("@/pages/PointOfSale"));

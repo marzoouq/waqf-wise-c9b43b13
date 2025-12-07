@@ -46,7 +46,16 @@ export type Permission =
   | 'view_financial_reports'
   | 'view_approvals_log'
   | 'view_statements'
-  | 'edit_user_email';
+  | 'edit_user_email'
+  // صلاحيات نقطة البيع
+  | 'pos_access'
+  | 'pos_open_shift'
+  | 'pos_close_shift'
+  | 'pos_collect'
+  | 'pos_disburse'
+  | 'pos_print_receipt'
+  | 'pos_view_reports'
+  | 'pos_daily_settlement';
 
 export type RoleName =
   | 'nazer' 
@@ -74,7 +83,16 @@ export const ROLE_PERMISSIONS: Record<RoleName, Permission[]> = {
     'export_data', 
     'manage_properties', 
     'manage_contracts',
-    'edit_user_email'
+    'edit_user_email',
+    // صلاحيات نقطة البيع
+    'pos_access',
+    'pos_open_shift',
+    'pos_close_shift',
+    'pos_collect',
+    'pos_disburse',
+    'pos_print_receipt',
+    'pos_view_reports',
+    'pos_daily_settlement'
   ],
   admin: [
     'view_dashboard', 
@@ -87,7 +105,16 @@ export const ROLE_PERMISSIONS: Record<RoleName, Permission[]> = {
     'export_data', 
     'manage_properties', 
     'manage_contracts',
-    'edit_user_email'
+    'edit_user_email',
+    // صلاحيات نقطة البيع
+    'pos_access',
+    'pos_open_shift',
+    'pos_close_shift',
+    'pos_collect',
+    'pos_disburse',
+    'pos_print_receipt',
+    'pos_view_reports',
+    'pos_daily_settlement'
   ],
   accountant: [
     'view_dashboard', 
@@ -95,13 +122,29 @@ export const ROLE_PERMISSIONS: Record<RoleName, Permission[]> = {
     'view_reports',
     'export_data', 
     'manage_journal_entries', 
-    'view_beneficiaries'
+    'view_beneficiaries',
+    // صلاحيات نقطة البيع
+    'pos_access',
+    'pos_open_shift',
+    'pos_close_shift',
+    'pos_collect',
+    'pos_disburse',
+    'pos_print_receipt',
+    'pos_view_reports',
+    'pos_daily_settlement'
   ],
   cashier: [
     'view_dashboard', 
     'process_payments', 
     'view_beneficiaries',
-    'view_distributions'
+    'view_distributions',
+    // صلاحيات نقطة البيع
+    'pos_access',
+    'pos_open_shift',
+    'pos_close_shift',
+    'pos_collect',
+    'pos_disburse',
+    'pos_print_receipt'
   ],
   archivist: [
     'view_dashboard', 
