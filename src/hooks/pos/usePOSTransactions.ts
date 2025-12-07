@@ -157,11 +157,16 @@ export function usePOSTransactions(shiftId?: string) {
     cardTransactions: transactions.filter(t => t.payment_method === 'شبكة').reduce((sum, t) => sum + t.amount, 0),
   };
 
+  const refetch = () => {
+    queryClient.invalidateQueries({ queryKey: ['pos', 'transactions'] });
+  };
+
   return {
     transactions,
     todayTransactions,
     isLoading,
     stats,
+    refetch,
     createTransaction: createTransactionMutation.mutateAsync,
     voidTransaction: voidTransactionMutation.mutate,
     isCreating: createTransactionMutation.isPending,
