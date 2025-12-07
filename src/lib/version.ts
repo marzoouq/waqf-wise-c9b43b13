@@ -2,11 +2,11 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.6.32
+ * @version 2.6.34
  * @date 2025-12-07
  */
 
-export const APP_VERSION = '2.6.32';
+export const APP_VERSION = '2.6.34';
 export const APP_VERSION_DATE = '2025-12-07';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
@@ -16,11 +16,11 @@ export const VERSION_INFO = {
   name: APP_VERSION_NAME,
   changelog: '/docs/CHANGELOG.md',
   features: [
-    'نقل Hooks لوحات التحكم للمجلدات الصحيحة',
-    'إصلاح invalidateQueries في CashierDashboard',
-    'توحيد إصدارات التوثيق',
-    'تصدير جميع مكونات التقارير',
-    'حذف مجلد __tests__ الفارغ',
+    'تنظيم 170+ hook في 25 مجلداً فرعياً',
+    'إنشاء ملفات proxy للتوافق مع الإصدارات السابقة',
+    'تحديث ملفات index.ts في جميع المجلدات',
+    'نقل hooks التقارير والدعم الفني',
+    'تحسين هيكل المشروع',
   ],
 } as const;
 
