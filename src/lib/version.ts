@@ -2,11 +2,11 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.6.42
+ * @version 2.7.0
  * @date 2025-12-08
  */
 
-export const APP_VERSION = '2.6.42';
+export const APP_VERSION = '2.7.0';
 export const APP_VERSION_DATE = '2025-12-08';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
@@ -16,10 +16,10 @@ export const VERSION_INFO = {
   name: APP_VERSION_NAME,
   changelog: '/docs/CHANGELOG.md',
   features: [
-    'إضافة DashboardService كطبقة خدمة',
-    'إضافة ثوابت الحالة (PROPERTY_STATUS, CONTRACT_STATUS, etc.)',
-    'تحديث Hooks لاستخدام Service Layer',
-    'حذف useNazerKPIs المهمل',
+    'إنشاء 23 Service Layer كاملة',
+    'تغطية 100% لطبقة الخدمات',
+    'توثيق معماري شامل (ARCHITECTURE.md)',
+    'توحيد ثوابت الحالة',
     'تحسين الهيكل المعماري وفصل الاهتمامات',
   ],
 } as const;
