@@ -1,6 +1,6 @@
 /**
  * POS Service - خدمة نقاط البيع
- * @version 2.8.24
+ * @version 2.8.25
  */
 
 import { supabase } from "@/integrations/supabase/client";
@@ -431,5 +431,30 @@ export class POSService {
       referenceNumber: input.referenceNumber,
       cashierId: input.cashierId,
     });
+  }
+
+  /**
+   * تسوية وردية
+   */
+  static async settleShift(shiftId: string): Promise<void> {
+    const { error } = await supabase
+      .from("cashier_shifts")
+      .update({ status: "مغلقة" })
+      .eq("id", shiftId);
+
+    if (error) throw error;
+  }
+
+  /**
+   * جلب تقرير الورديات
+   */
+  static async getShiftsReport(startDate: string, endDate: string): Promise<any[]> {
+    const { data, error } = await supabase.rpc("get_shifts_report", {
+      p_start_date: startDate,
+      p_end_date: endDate,
+    });
+
+    if (error) throw error;
+    return data || [];
   }
 }

@@ -1,56 +1,27 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { SystemService } from "@/services/system.service";
 import { useToast } from "@/hooks/use-toast";
 
 export function useBackup() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // جلب سجلات النسخ الاحتياطي
   const { data: backupLogs, isLoading } = useQuery({
     queryKey: ["backup-logs"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("backup_logs")
-        .select("id, backup_type, status, file_path, file_size, tables_included, started_at, completed_at, error_message, created_at")
-        .order("created_at", { ascending: false })
-        .limit(20);
-
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => SystemService.getBackupLogs(),
   });
 
-  // جلب جداول النسخ الاحتياطي التلقائية
   const { data: backupSchedules } = useQuery({
     queryKey: ["backup-schedules"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("backup_schedules")
-        .select("id, schedule_name, backup_type, frequency, tables_included, retention_days, is_active, include_storage, last_backup_at, next_backup_at, created_at, updated_at")
-        .eq("is_active", true);
-
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => SystemService.getBackupSchedules(),
   });
 
-  // إنشاء نسخة احتياطية
   const createBackup = useMutation({
     mutationFn: async (options?: { tablesIncluded?: string[] }) => {
-      const { data, error } = await supabase.functions.invoke("backup-database", {
-        body: {
-          backupType: "manual",
-          tablesIncluded: options?.tablesIncluded || [],
-        },
-      });
-
-      if (error) throw error;
-      return data;
+      return SystemService.createBackup(options?.tablesIncluded);
     },
     onSuccess: (data) => {
       if (data.success) {
-        // تنزيل الملف
         const blob = new Blob([data.content], { type: "application/json" });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement("a");
@@ -78,18 +49,9 @@ export function useBackup() {
     },
   });
 
-  // استعادة نسخة احتياطية
   const restoreBackup = useMutation({
     mutationFn: async (options: { backupData: Record<string, unknown>; mode?: "replace" | "merge" }) => {
-      const { data, error } = await supabase.functions.invoke("restore-database", {
-        body: {
-          backupData: options.backupData,
-          mode: options.mode || "replace",
-        },
-      });
-
-      if (error) throw error;
-      return data;
+      return SystemService.restoreBackup(options.backupData, options.mode);
     },
     onSuccess: (data) => {
       if (data.success) {
@@ -97,10 +59,7 @@ export function useBackup() {
           title: "تمت الاستعادة بنجاح",
           description: data.message,
         });
-        // إعادة تحميل جميع البيانات بعد الاستعادة - هذه حالة استثنائية مقصودة
-        // حيث تم تغيير جميع البيانات في قاعدة البيانات
         queryClient.invalidateQueries({ queryKey: ["backup-logs"] });
-        // إعادة تحميل الصفحة لضمان تحديث جميع البيانات
         setTimeout(() => {
           window.location.reload();
         }, 1500);

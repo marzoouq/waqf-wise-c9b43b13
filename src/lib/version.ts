@@ -2,11 +2,11 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.8.24
+ * @version 2.8.25
  * @date 2025-12-08
  */
 
-export const APP_VERSION = '2.8.24';
+export const APP_VERSION = '2.8.26';
 export const APP_VERSION_DATE = '2025-12-08';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
@@ -16,10 +16,11 @@ export const VERSION_INFO = {
   name: APP_VERSION_NAME,
   changelog: '/docs/CHANGELOG.md',
   features: [
-    'نقل 80+ hook للخدمات',
-    'توسيع POSService مع جميع عمليات POS',
-    'توسيع MessageService و InvoiceService',
-    'تحويل useCashierShift, usePOSTransactions, useQuickCollection, useQuickPayment',
+    'نقل 85+ hook للخدمات',
+    'إنشاء SystemService للنظام والإعدادات',
+    'توسيع MaintenanceService مع Providers و Schedules',
+    'توسيع POSService مع settleShift و getShiftsReport',
+    'تحويل useBackup, useSystemHealth, useSystemSettings, useSecurityAlerts',
     'صفر أخطاء بناء',
   ],
 } as const;

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { UIService } from "@/services/ui.service";
 import { useToast } from "@/hooks/use-toast";
 import { TOAST_MESSAGES } from "@/lib/constants";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";
@@ -20,31 +20,13 @@ export function useTasks() {
 
   const { data: tasks = [], isLoading } = useQuery({
     queryKey: ["tasks"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("tasks")
-        .select("*")
-        .eq("status", "pending")
-        .order("created_at", { ascending: false })
-        .limit(10);
-
-      if (error) throw error;
-      return data as Task[];
-    },
+    queryFn: () => UIService.getTasks(10),
     ...QUERY_CONFIG.TASKS,
   });
 
   const addTask = useMutation({
-    mutationFn: async (task: Omit<Task, "id" | "created_at" | "updated_at">) => {
-      const { data, error } = await supabase
-        .from("tasks")
-        .insert([task])
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: (task: Omit<Task, "id" | "created_at" | "updated_at">) =>
+      UIService.addTask(task),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
       toast({
@@ -59,17 +41,8 @@ export function useTasks() {
   });
 
   const updateTask = useMutation({
-    mutationFn: async ({ id, ...updates }: Partial<Task> & { id: string }) => {
-      const { data, error } = await supabase
-        .from("tasks")
-        .update(updates)
-        .eq("id", id)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: ({ id, ...updates }: Partial<Task> & { id: string }) =>
+      UIService.updateTask(id, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
       toast({
