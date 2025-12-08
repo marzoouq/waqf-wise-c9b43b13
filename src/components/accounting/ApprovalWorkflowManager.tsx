@@ -1,47 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, XCircle, Clock, User } from "lucide-react";
-import { formatCurrency } from "@/lib/utils";
-
-interface ApprovalStatus {
-  id: string;
-  entity_type: string;
-  entity_id: string;
-  status: string;
-  current_level: number;
-  total_levels: number;
-  started_at: string;
-  completed_at: string | null;
-  approval_steps: Array<{
-    level: number;
-    approver_role: string;
-    approver_name: string | null;
-    action: string | null;
-    actioned_at: string | null;
-    notes: string | null;
-  }>;
-}
+import { useApprovalWorkflow, type ApprovalStatus } from "@/hooks/accounting";
 
 export function ApprovalWorkflowManager() {
-  const { data: pendingApprovals, isLoading } = useQuery({
-    queryKey: ["pending-approvals"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("approval_status")
-        .select(`
-          *,
-          approval_steps (*)
-        `)
-        .eq("status", "pending")
-        .order("started_at", { ascending: false });
-      
-      if (error) throw error;
-      return data as ApprovalStatus[];
-    },
-  });
+  const { pendingApprovals, isLoading } = useApprovalWorkflow();
 
   const getStatusBadge = (status: string) => {
     const variants = {
@@ -82,7 +46,7 @@ export function ApprovalWorkflowManager() {
         </Card>
       ) : (
         <div className="grid gap-4">
-          {pendingApprovals?.map((approval) => (
+          {pendingApprovals?.map((approval: ApprovalStatus) => (
             <Card key={approval.id} className="p-4">
               <div className="space-y-4">
                 <div className="flex items-start justify-between">
@@ -110,7 +74,6 @@ export function ApprovalWorkflowManager() {
                   </div>
                 </div>
 
-                {/* مسار الموافقة */}
                 <div className="border-t pt-4">
                   <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
                     <User className="h-4 w-4" />
