@@ -9,6 +9,8 @@ import type { Database } from "@/integrations/supabase/types";
 type Invoice = Database['public']['Tables']['invoices']['Row'];
 type InvoiceInsert = Database['public']['Tables']['invoices']['Insert'];
 
+type InvoiceLine = Database['public']['Tables']['invoice_lines']['Insert'];
+
 export class InvoiceService {
   static async getAll(filters?: { status?: string }): Promise<Invoice[]> {
     let query = supabase.from('invoices').select('*').order('invoice_date', { ascending: false });
@@ -30,10 +32,87 @@ export class InvoiceService {
     return data;
   }
 
-  static async create(invoice: InvoiceInsert): Promise<Invoice> {
-    const { data, error } = await supabase.from('invoices').insert(invoice).select().single();
+  static async create(invoice: InvoiceInsert, lines?: InvoiceLine[]): Promise<Invoice> {
+    const invoiceToInsert = { ...invoice };
+    if (!invoiceToInsert.invoice_number || invoiceToInsert.invoice_number.trim() === '') {
+      delete invoiceToInsert.invoice_number;
+    }
+    
+    const { data: invoiceRecord, error: invoiceError } = await supabase
+      .from('invoices')
+      .insert([invoiceToInsert])
+      .select()
+      .maybeSingle();
+
+    if (invoiceError) throw invoiceError;
+    if (!invoiceRecord) throw new Error('فشل في إنشاء الفاتورة');
+
+    if (lines && lines.length > 0) {
+      const linesWithInvoiceId = lines.map((line) => ({
+        ...line,
+        invoice_id: invoiceRecord.id,
+      }));
+
+      const { error: linesError } = await supabase
+        .from('invoice_lines')
+        .insert(linesWithInvoiceId);
+
+      if (linesError) throw linesError;
+    }
+
+    return invoiceRecord;
+  }
+
+  static async update(id: string, invoice: Partial<Invoice>, lines?: InvoiceLine[]): Promise<Invoice> {
+    const { data: invoiceData, error: invoiceError } = await supabase
+      .from('invoices')
+      .update(invoice)
+      .eq('id', id)
+      .select()
+      .maybeSingle();
+
+    if (invoiceError) throw invoiceError;
+    if (!invoiceData) throw new Error('فشل في تحديث الفاتورة');
+
+    if (lines && lines.length > 0) {
+      await supabase.from('invoice_lines').delete().eq('invoice_id', id);
+
+      const linesWithInvoiceId = lines.map((line) => ({
+        ...line,
+        invoice_id: id,
+      }));
+
+      const { error: linesError } = await supabase
+        .from('invoice_lines')
+        .insert(linesWithInvoiceId);
+
+      if (linesError) throw linesError;
+    }
+
+    return invoiceData;
+  }
+
+  static async delete(id: string): Promise<void> {
+    const { data: invoice } = await supabase
+      .from('invoices')
+      .select('status, journal_entry_id')
+      .eq('id', id)
+      .maybeSingle();
+    
+    if (!invoice) throw new Error('الفاتورة غير موجودة');
+    
+    if (invoice.status === 'paid') {
+      throw new Error('لا يمكن حذف فاتورة مدفوعة');
+    }
+    
+    await supabase.from('invoice_lines').delete().eq('invoice_id', id);
+    
+    if (invoice.journal_entry_id) {
+      await supabase.from('journal_entries').delete().eq('id', invoice.journal_entry_id);
+    }
+    
+    const { error } = await supabase.from('invoices').delete().eq('id', id);
     if (error) throw error;
-    return data;
   }
 
   static async updateStatus(id: string, status: string): Promise<Invoice> {

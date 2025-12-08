@@ -1,8 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
 import { VoucherService, type VoucherData } from "@/services/voucher.service";
+import { RealtimeService } from "@/services/realtime.service";
 
 export interface PaymentVoucher {
   id: string;
@@ -31,43 +31,20 @@ export function usePaymentVouchers() {
 
   // Real-time subscription
   useEffect(() => {
-    const channel = supabase
-      .channel('payment-vouchers-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'payment_vouchers'
-        },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ["payment_vouchers"] });
-        }
-      )
-      .subscribe();
+    const subscription = RealtimeService.subscribeToTable('payment_vouchers', () => {
+      queryClient.invalidateQueries({ queryKey: ["payment_vouchers"] });
+    });
 
     return () => {
-      supabase.removeChannel(channel);
+      subscription.unsubscribe();
     };
   }, [queryClient]);
 
   const { data: vouchers = [], isLoading } = useQuery({
     queryKey: ["payment_vouchers"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("payment_vouchers")
-        .select(`
-          *,
-          beneficiaries (
-            id,
-            full_name,
-            national_id
-          )
-        `)
-        .order("voucher_date", { ascending: false });
-
-      if (error) throw error;
-      return data as PaymentVoucher[];
+      const result = await VoucherService.getWithFilters();
+      return result;
     },
     staleTime: 3 * 60 * 1000,
   });

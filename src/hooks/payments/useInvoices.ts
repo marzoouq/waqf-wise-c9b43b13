@@ -1,11 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useJournalEntries } from "@/hooks/accounting/useJournalEntries";
 import { useEffect } from "react";
 import { logger } from "@/lib/logger";
 import { createMutationErrorHandler } from "@/lib/errors";
 import type { InvoiceWithLines, InvoiceLineInsert } from "@/types/invoices";
+import { InvoiceService } from "@/services/invoice.service";
+import { RealtimeService } from "@/services/realtime.service";
 
 export interface Invoice {
   id: string;
@@ -53,71 +54,30 @@ export function useInvoices() {
 
   // Real-time subscription
   useEffect(() => {
-    const channel = supabase
-      .channel('invoices-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'invoices'
-        },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ["invoices"] });
-        }
-      )
-      .subscribe();
+    const subscription = RealtimeService.subscribeToTable('invoices', () => {
+      queryClient.invalidateQueries({ queryKey: ["invoices"] });
+    });
 
     return () => {
-      supabase.removeChannel(channel);
+      subscription.unsubscribe();
     };
   }, [queryClient]);
 
   const { data: invoices = [], isLoading } = useQuery({
     queryKey: ["invoices"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("invoices")
-        .select("id, invoice_number, invoice_date, invoice_time, due_date, customer_name, customer_email, customer_phone, customer_address, customer_city, customer_vat_number, subtotal, tax_amount, tax_rate, total_amount, status, notes, qr_code_data, journal_entry_id, created_at, updated_at")
-        .order("invoice_date", { ascending: false });
-
-      if (error) throw error;
-      return data as Invoice[];
-    },
+    queryFn: () => InvoiceService.getAll(),
     staleTime: 3 * 60 * 1000,
   });
 
   const addInvoice = useMutation({
     mutationFn: async (invoiceData: InvoiceWithLines) => {
-      // إنشاء الفاتورة (رقم الفاتورة سيتم توليده تلقائياً من Trigger)
-      const invoiceToInsert = { ...invoiceData.invoice };
-      // إزالة invoice_number إذا كان فارغاً لتفعيل التوليد التلقائي
-      if (!invoiceToInsert.invoice_number || invoiceToInsert.invoice_number.trim() === '') {
-        delete invoiceToInsert.invoice_number;
-      }
-      
-      const { data: invoiceRecord, error: invoiceError } = await supabase
-        .from("invoices")
-        .insert([invoiceToInsert])
-        .select()
-        .maybeSingle();
-
-      if (invoiceError) throw invoiceError;
-      if (!invoiceRecord) throw new Error("فشل في إنشاء الفاتورة");
-
-      // إضافة بنود الفاتورة
-      if (invoiceData.lines && invoiceData.lines.length > 0) {
-        const linesWithInvoiceId = invoiceData.lines.map((line: InvoiceLineInsert) => ({
+      const invoiceRecord = await InvoiceService.create(
+        invoiceData.invoice,
+        invoiceData.lines?.map(line => ({
           ...line,
-          invoice_id: invoiceRecord.id,
-        }));
-
-        const { error: linesError } = await supabase
-          .from("invoice_lines")
-          .insert(linesWithInvoiceId);
-
-        if (linesError) throw linesError;
-      }
+          invoice_id: '', // سيتم تحديثه في الخدمة
+        }))
+      );
 
       // إنشاء قيد محاسبي تلقائي عند إصدار الفاتورة
       if (invoiceRecord.status === "sent" || invoiceRecord.status === "paid") {
@@ -160,61 +120,28 @@ export function useInvoices() {
       invoice: Partial<Invoice>;
       lines?: InvoiceLine[];
     }) => {
-      const { data: oldInvoice } = await supabase
-        .from("invoices")
-        .select("status, total_amount")
-        .eq("id", id)
-        .maybeSingle();
-
-      const { data: invoiceData, error: invoiceError } = await supabase
-        .from("invoices")
-        .update(invoice)
-        .eq("id", id)
-        .select()
-        .maybeSingle();
-
-      if (invoiceError) throw invoiceError;
-      if (!invoiceData) throw new Error("فشل في تحديث الفاتورة");
-
-      // إذا تم تحديث البنود
-      if (lines && lines.length > 0) {
-        // حذف البنود القديمة
-        await supabase
-          .from("invoice_lines")
-          .delete()
-          .eq("invoice_id", id);
-
-        // إضافة البنود الجديدة
-        const linesWithInvoiceId = lines.map((line) => ({
+      const oldInvoice = await InvoiceService.getById(id);
+      const invoiceData = await InvoiceService.update(
+        id, 
+        invoice, 
+        lines?.map(line => ({
           ...line,
           invoice_id: id,
-        }));
-
-        const { error: linesError } = await supabase
-          .from("invoice_lines")
-          .insert(linesWithInvoiceId);
-
-        if (linesError) throw linesError;
-      }
+        }))
+      );
 
       // إنشاء قيد محاسبي عند تحويل من مسودة إلى مرسلة
       if (oldInvoice?.status === "draft" && 
           (invoiceData.status === "sent" || invoiceData.status === "paid") &&
           !invoiceData.journal_entry_id) {
         try {
-          const entryId = await createAutoEntry(
+          await createAutoEntry(
             "invoice_issued",
             invoiceData.id,
             invoiceData.total_amount,
             `فاتورة رقم ${invoiceData.invoice_number} - ${invoiceData.customer_name}`,
             invoiceData.invoice_date
           );
-
-          // تحديث رقم القيد في الفاتورة
-          await supabase
-            .from("invoices")
-            .update({ journal_entry_id: entryId })
-            .eq("id", id);
         } catch (journalError) {
           logger.error(journalError, { context: 'update_invoice_journal_entry', severity: 'medium' });
         }
@@ -252,42 +179,7 @@ export function useInvoices() {
   });
 
   const deleteInvoice = useMutation({
-    mutationFn: async (invoiceId: string) => {
-      // التحقق من الحالة
-      const { data: invoice } = await supabase
-        .from("invoices")
-        .select("status, journal_entry_id")
-        .eq("id", invoiceId)
-        .maybeSingle();
-      
-      if (!invoice) throw new Error("الفاتورة غير موجودة");
-      
-      if (invoice.status === "paid") {
-        throw new Error("لا يمكن حذف فاتورة مدفوعة");
-      }
-      
-      // حذف البنود (cascade)
-      await supabase
-        .from("invoice_lines")
-        .delete()
-        .eq("invoice_id", invoiceId);
-      
-      // حذف القيد المحاسبي
-      if (invoice.journal_entry_id) {
-        await supabase
-          .from("journal_entries")
-          .delete()
-          .eq("id", invoice.journal_entry_id);
-      }
-      
-      // حذف الفاتورة
-      const { error } = await supabase
-        .from("invoices")
-        .delete()
-        .eq("id", invoiceId);
-      
-      if (error) throw error;
-    },
+    mutationFn: (invoiceId: string) => InvoiceService.delete(invoiceId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
       queryClient.invalidateQueries({ queryKey: ["journal_entries"] });

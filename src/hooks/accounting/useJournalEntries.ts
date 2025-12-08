@@ -1,14 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useActivities } from "@/hooks/useActivities";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
 import { logger } from "@/lib/logger";
 import { createAutoJournalEntry as createAutoJournalEntryWrapper } from "@/lib/supabase-wrappers";
-import { createAutoJournalEntry } from "@/lib/supabase-wrappers";
 import { createMutationErrorHandler } from "@/lib/errors";
 import type { JournalEntryInsert, JournalLineInsert } from "@/types/accounting";
+import { AccountingService } from "@/services/accounting.service";
+import { RealtimeService } from "@/services/realtime.service";
 
 export interface JournalEntry {
   id: string;
@@ -44,44 +44,19 @@ export function useJournalEntries() {
 
   // Real-time subscription
   useEffect(() => {
-    const channel = supabase
-      .channel('journal-entries-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'journal_entries'
-        },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
-          queryClient.invalidateQueries({ queryKey: ["accounts"] });
-        }
-      )
-      .subscribe();
+    const subscription = RealtimeService.subscribeToTable('journal_entries', () => {
+      queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
+      queryClient.invalidateQueries({ queryKey: ["accounts"] });
+    });
 
     return () => {
-      supabase.removeChannel(channel);
+      subscription.unsubscribe();
     };
   }, [queryClient]);
 
   const { data: entries = [], isLoading } = useQuery({
     queryKey: ["journal_entries"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("journal_entries")
-        .select(`
-          *,
-          journal_entry_lines (
-            *,
-            accounts (code, name_ar)
-          )
-        `)
-        .order("entry_date", { ascending: false });
-
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => AccountingService.getJournalEntriesWithLines(),
   });
 
   const createEntry = useMutation({
@@ -100,28 +75,7 @@ export function useJournalEntries() {
         throw new Error("القيد غير متوازن: مجموع المدين يجب أن يساوي مجموع الدائن");
       }
 
-      // Create entry
-      const { data: entryData, error: entryError } = await supabase
-        .from("journal_entries")
-        .insert([entry])
-        .select()
-        .single();
-
-      if (entryError) throw entryError;
-
-      // Create lines
-      const linesWithEntryId = lines.map((line) => ({
-        ...line,
-        journal_entry_id: entryData.id,
-      }));
-
-      const { error: linesError } = await supabase
-        .from("journal_entry_lines")
-        .insert(linesWithEntryId);
-
-      if (linesError) throw linesError;
-
-      return entryData;
+      return AccountingService.createJournalEntry(entry, lines);
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
@@ -146,15 +100,7 @@ export function useJournalEntries() {
 
   const postEntry = useMutation({
     mutationFn: async (entryId: string) => {
-      const { data, error } = await supabase
-        .from("journal_entries")
-        .update({ status: "posted", posted_at: new Date().toISOString() })
-        .eq("id", entryId)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
+      return AccountingService.postJournalEntry(entryId, user?.email || 'النظام');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["journal_entries"] });

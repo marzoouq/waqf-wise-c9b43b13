@@ -121,6 +121,99 @@ export class AccountingService {
   }
 
   /**
+   * جلب الحسابات النشطة غير الرئيسية
+   */
+  static async getActiveLeafAccounts() {
+    try {
+      const { data, error } = await supabase
+        .from('accounts')
+        .select('*')
+        .eq('is_active', true)
+        .eq('is_header', false)
+        .order('code');
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching active leaf accounts', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب السنوات المالية النشطة
+   */
+  static async getActiveFiscalYears() {
+    try {
+      const { data, error } = await supabase
+        .from('fiscal_years')
+        .select('*')
+        .eq('is_active', true)
+        .order('start_date', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching active fiscal years', error);
+      throw error;
+    }
+  }
+
+  /**
+   * توليد رقم قيد جديد
+   */
+  static async generateNextEntryNumber(): Promise<string> {
+    try {
+      const year = new Date().getFullYear();
+      const { data: lastEntry } = await supabase
+        .from('journal_entries')
+        .select('entry_number')
+        .like('entry_number', `JV-${year}-%`)
+        .order('entry_number', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      let nextNumber = 1;
+      if (lastEntry && lastEntry.entry_number) {
+        const match = lastEntry.entry_number.match(/JV-\d+-(\d+)/);
+        if (match) {
+          nextNumber = parseInt(match[1]) + 1;
+        }
+      }
+
+      return `JV-${year}-${nextNumber.toString().padStart(3, '0')}`;
+    } catch (error) {
+      productionLogger.error('Error generating entry number', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب القيود مع سطورها
+   */
+  static async getJournalEntriesWithLines() {
+    try {
+      const { data, error } = await supabase
+        .from('journal_entries')
+        .select(`
+          *,
+          journal_entry_lines (
+            *,
+            accounts (code, name_ar)
+          )
+        `)
+        .order('entry_date', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching journal entries with lines', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب القيود المحاسبية
    */
   static async getJournalEntries(filters?: {
     status?: string;
