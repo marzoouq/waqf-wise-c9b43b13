@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { startOfDay, subDays, format, eachHourOfInterval, parseISO } from "date-fns";
 import { ar } from "date-fns/locale";
+import { MonitoringService } from "@/services";
 
 interface PerformanceDataPoint {
   time: string;
@@ -21,17 +21,7 @@ export function useSystemPerformanceMetrics() {
       const now = new Date();
       const yesterday = subDays(now, 1);
       
-      // جلب سجلات النشاط لآخر 24 ساعة
-      const { data: logs, error } = await supabase
-        .from("audit_logs")
-        .select("created_at, action_type")
-        .gte("created_at", yesterday.toISOString())
-        .order("created_at", { ascending: true });
-
-      if (error) {
-        console.error("Error fetching performance metrics:", error);
-        throw error;
-      }
+      const logs = await MonitoringService.getPerformanceMetrics(yesterday);
 
       // إنشاء نقاط زمنية لكل 4 ساعات
       const hours = eachHourOfInterval({ start: yesterday, end: now })
@@ -51,15 +41,15 @@ export function useSystemPerformanceMetrics() {
 
         return {
           time: format(hour, "HH:mm", { locale: ar }),
-          responseTime: 0, // غير متوفر - يتطلب قياس حقيقي
+          responseTime: 0,
           requests,
-          cpu: 0, // غير متوفر - يتطلب قياس حقيقي
+          cpu: 0,
         };
       });
 
       return dataPoints;
     },
-    staleTime: 5 * 60 * 1000, // 5 دقائق
-    refetchInterval: false, // تعطيل التحديث التلقائي لتحسين LCP
+    staleTime: 5 * 60 * 1000,
+    refetchInterval: false,
   });
 }

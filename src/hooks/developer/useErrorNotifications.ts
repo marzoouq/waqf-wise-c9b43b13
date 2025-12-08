@@ -1,29 +1,19 @@
 /**
  * useErrorNotifications Hook - إشعارات الأخطاء
- * يستخدم RealtimeService
+ * يستخدم RealtimeService و MonitoringService
  */
 import { useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { SystemErrorLog } from "@/types/system-error";
-import { AuditService, RealtimeService } from "@/services";
-import { supabase } from "@/integrations/supabase/client";
+import { RealtimeService, MonitoringService } from "@/services";
 
 export function useErrorNotifications(enabled: boolean = true) {
   const shownErrorsRef = useRef<Set<string>>(new Set());
   
   const { data: errors } = useQuery({
     queryKey: ["system-errors"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("system_error_logs")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(20);
-      
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => MonitoringService.getRecentErrors(20),
     refetchInterval: enabled ? 60000 : false,
     staleTime: 30 * 1000,
     refetchOnWindowFocus: false,

@@ -5,9 +5,9 @@
 
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Database } from "@/integrations/supabase/types";
+import { MonitoringService } from "@/services";
+import type { Database } from "@/integrations/supabase/types";
 
 type SystemErrorRow = Database['public']['Tables']['system_error_logs']['Row'];
 
@@ -31,43 +31,18 @@ export function useSystemErrorLogsData() {
     isLoading,
   } = useQuery({
     queryKey: ["system-error-logs"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("system_error_logs")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(100);
-
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => MonitoringService.getErrorLogs(100),
   });
 
   // جلب التنبيهات النشطة
   const { data: activeAlerts } = useQuery({
     queryKey: ["system-alerts"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("system_alerts")
-        .select("*")
-        .eq("status", "active")
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => MonitoringService.getActiveAlerts(),
   });
 
   // حذف جميع الأخطاء المحلولة
   const deleteResolvedMutation = useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase
-        .from("system_error_logs")
-        .delete()
-        .eq("status", "resolved");
-
-      if (error) throw error;
-    },
+    mutationFn: () => MonitoringService.deleteResolvedErrors(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["system-error-logs"] });
       toast({
@@ -86,18 +61,8 @@ export function useSystemErrorLogsData() {
 
   // تحديث حالة الخطأ
   const updateErrorMutation = useMutation({
-    mutationFn: async ({ id, status, notes }: { id: string; status: string; notes?: string }) => {
-      const { error } = await supabase
-        .from("system_error_logs")
-        .update({
-          status,
-          resolved_at: status === "resolved" ? new Date().toISOString() : null,
-          resolution_notes: notes,
-        })
-        .eq("id", id);
-
-      if (error) throw error;
-    },
+    mutationFn: ({ id, status, notes }: { id: string; status: string; notes?: string }) =>
+      MonitoringService.updateError(id, status, notes),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["system-error-logs"] });
       toast({
