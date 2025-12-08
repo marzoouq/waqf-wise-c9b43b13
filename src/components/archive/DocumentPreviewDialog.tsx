@@ -1,10 +1,7 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Download, X, FileText, Image as ImageIcon } from "lucide-react";
-import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import { logger } from "@/lib/logger";
+import { useDocumentPreview } from "@/hooks/archive/useDocumentPreview";
 
 interface DocumentPreviewDialogProps {
   open: boolean;
@@ -23,42 +20,7 @@ export function DocumentPreviewDialog({
   onOpenChange,
   document,
 }: DocumentPreviewDialogProps) {
-  const [loading, setLoading] = useState(false);
-
-  if (!document) return null;
-
-  const handleDownload = async () => {
-    try {
-      setLoading(true);
-      
-      // استخراج اسم الملف من المسار
-      const fileName = document.file_path.split('/').pop() || document.name;
-      
-      // تحميل الملف من Supabase Storage
-      const { data, error } = await supabase.storage
-        .from('beneficiary-documents')
-        .download(fileName);
-
-      if (error) throw error;
-
-      // إنشاء رابط تحميل
-      const url = URL.createObjectURL(data);
-      const a = window.document.createElement('a');
-      a.href = url;
-      a.download = document.name;
-      window.document.body.appendChild(a);
-      a.click();
-      window.document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-
-      toast.success('تم تحميل الملف بنجاح');
-    } catch (error: unknown) {
-      logger.error(error, { context: 'download_document', severity: 'medium' });
-      toast.error('فشل تحميل الملف');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { loading, handleDownload } = useDocumentPreview({ document });
 
   const getPreviewContent = () => {
     const fileType = document.file_type.toLowerCase();

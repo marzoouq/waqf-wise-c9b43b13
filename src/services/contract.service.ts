@@ -69,4 +69,54 @@ export class ContractService {
       totalRent: contracts.filter(c => c.status === CONTRACT_STATUS.ACTIVE).reduce((s, c) => s + (c.monthly_rent || 0), 0),
     };
   }
+
+  static async getActiveWithProperties(): Promise<{
+    id: string;
+    contract_number: string;
+    tenant_name: string;
+    monthly_rent: number;
+    start_date: string;
+    end_date: string;
+    status: string;
+    properties: {
+      name: string;
+      type: string;
+      location: string;
+    } | null;
+  }[]> {
+    const { data, error } = await supabase
+      .from('contracts')
+      .select(`
+        id,
+        contract_number,
+        tenant_name,
+        monthly_rent,
+        start_date,
+        end_date,
+        status,
+        properties (
+          name,
+          type,
+          location
+        )
+      `)
+      .eq('status', 'نشط')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return (data || []) as {
+      id: string;
+      contract_number: string;
+      tenant_name: string;
+      monthly_rent: number;
+      start_date: string;
+      end_date: string;
+      status: string;
+      properties: {
+        name: string;
+        type: string;
+        location: string;
+      } | null;
+    }[];
+  }
 }

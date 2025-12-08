@@ -1,8 +1,6 @@
-import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import {
   FileSearch,
@@ -11,88 +9,21 @@ import {
   Tag,
   Clock,
   Zap,
-  Upload,
   Search,
-  Filter
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { useSmartArchive } from "@/hooks/archive/useSmartArchive";
 
 export function SmartArchiveFeatures() {
   const { toast } = useToast();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [ocrProgress, setOcrProgress] = useState(0);
-
-  const handleOCRScan = async () => {
-    setIsProcessing(true);
-    setOcrProgress(0);
-
-    try {
-      // محاكاة عملية OCR
-      const interval = setInterval(() => {
-        setOcrProgress(prev => {
-          if (prev >= 100) {
-            clearInterval(interval);
-            return 100;
-          }
-          return prev + 10;
-        });
-      }, 300);
-
-      // استدعاء edge function لـ OCR
-      await supabase.functions.invoke('ocr-document', {
-        body: { action: 'scan_all' }
-      });
-
-      toast({
-        title: "اكتمل المسح الضوئي",
-        description: "تم استخراج النص من جميع المستندات",
-      });
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'فشل معالجة المستند';
-      toast({
-        variant: "destructive",
-        title: "حدث خطأ",
-        description: errorMessage,
-      });
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const handleSmartSearch = async () => {
-    if (!searchQuery.trim()) {
-      toast({
-        variant: "destructive",
-        title: "خطأ",
-        description: "يرجى إدخال نص للبحث",
-      });
-      return;
-    }
-
-    try {
-      const { data, error } = await supabase
-        .from("documents")
-        .select("*")
-        .or(`title.ilike.%${searchQuery}%,ocr_text.ilike.%${searchQuery}%`)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-
-      toast({
-        title: "نتائج البحث",
-        description: `تم العثور على ${data.length} مستند`,
-      });
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'فشل البحث الذكي';
-      toast({
-        variant: "destructive",
-        title: "حدث خطأ",
-        description: errorMessage,
-      });
-    }
-  };
+  const {
+    searchQuery,
+    setSearchQuery,
+    isProcessing,
+    ocrProgress,
+    handleOCRScan,
+    handleSmartSearch,
+  } = useSmartArchive();
 
   const features = [
     {

@@ -317,4 +317,27 @@ export class ArchiveService {
       return data;
     }
   }
+
+  /**
+   * تحميل ملف من التخزين
+   */
+  static async downloadFile(bucketName: string, fileName: string): Promise<Blob> {
+    const { data, error } = await supabase.storage
+      .from(bucketName)
+      .download(fileName);
+
+    if (error) throw error;
+    return data;
+  }
+
+  /**
+   * استدعاء دالة OCR
+   */
+  static async invokeOCR(action: string): Promise<void> {
+    const { error } = await supabase.functions.invoke('ocr-document', {
+      body: { action }
+    });
+
+    if (error) throw error;
+  }
 }

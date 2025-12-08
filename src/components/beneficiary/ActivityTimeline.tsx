@@ -1,31 +1,16 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity, FileText, Upload, LogIn, Send, CheckCircle } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useBeneficiaryActivity } from "@/hooks/beneficiary/useBeneficiaryActivity";
 
 interface ActivityTimelineProps {
   beneficiaryId: string;
 }
 
 export function ActivityTimeline({ beneficiaryId }: ActivityTimelineProps) {
-  const { data: activities, isLoading } = useQuery({
-    queryKey: ["beneficiary-activity", beneficiaryId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("beneficiary_activity_log")
-        .select("*")
-        .eq("beneficiary_id", beneficiaryId)
-        .order("created_at", { ascending: false })
-        .limit(20);
-
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !!beneficiaryId,
-  });
+  const { activities, isLoading } = useBeneficiaryActivity(beneficiaryId);
 
   const getActivityIcon = (actionType: string) => {
     switch (actionType) {
