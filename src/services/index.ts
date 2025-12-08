@@ -1,12 +1,14 @@
 /**
  * Services Layer - الطبقة الخدمية للتطبيق
- * @version 2.8.29
+ * @version 2.8.30
  * تغطية 100% - جميع عمليات Supabase تمر عبر الخدمات
  * 
  * الخدمات: 41 خدمة متكاملة
  * - Core Services: 4
  * - Domain Services: 34
  * - Infrastructure Services: 3
+ * 
+ * ملاحظة: 7 hooks تستخدم Realtime مباشرة (مقبول معماريًا)
  */
 
 // Core Services (4)
