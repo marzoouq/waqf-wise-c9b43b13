@@ -15,3 +15,4 @@ export { useAuditLogs } from './useAuditLogs';
 export { useIntegrationsData } from './useIntegrationsData';
 export { useSystemErrorLogsData } from './useSystemErrorLogsData';
 export { useSystemMaintenanceData } from './useSystemMaintenanceData';
+export { useAdminAlerts, type SystemAlert } from './useAdminAlerts';

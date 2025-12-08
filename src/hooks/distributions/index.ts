@@ -11,3 +11,5 @@ export { useDistributionApprovals } from './useDistributionApprovals';
 export { useFunds, type Fund } from './useFunds';
 export { useWaqfUnits, type WaqfUnit } from './useWaqfUnits';
 export { useWaqfBudgets } from './useWaqfBudgets';
+export { useBeneficiarySelector } from './useBeneficiarySelector';
+export { useTransferStatusTracker, type TransferStatus } from './useTransferStatusTracker';
