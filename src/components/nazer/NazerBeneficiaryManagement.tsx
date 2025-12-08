@@ -163,7 +163,8 @@ export function NazerBeneficiaryManagement() {
                       variant="ghost" 
                       size="icon" 
                       className="h-8 w-8"
-                      onClick={() => navigate(`/beneficiaries/${beneficiary.id}/edit`)}
+                      onClick={() => navigate(`/beneficiaries/${beneficiary.id}`)}
+                      title="تعديل المستفيد"
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
