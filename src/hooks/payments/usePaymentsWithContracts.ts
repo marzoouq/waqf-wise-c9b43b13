@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { PaymentService } from "@/services";
 
 export interface PaymentWithContract {
   id: string;
@@ -29,23 +29,14 @@ export function usePaymentsWithContracts(payments: Array<{ id: string }>) {
 
   const { data, isLoading } = useQuery({
     queryKey: ["payments-with-contracts", payments.length],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("payments_with_contract_details")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return data as PaymentWithContract[];
-    },
+    queryFn: () => PaymentService.getPaymentsWithContractDetails(),
     enabled: payments.length > 0,
   });
 
   useEffect(() => {
     if (data) {
-      setPaymentsWithContracts(data);
+      setPaymentsWithContracts(data as PaymentWithContract[]);
     } else if (payments.length > 0) {
-      // Cast through unknown for compatibility with different payment types
       setPaymentsWithContracts(payments as unknown as PaymentWithContract[]);
     }
   }, [data, payments]);

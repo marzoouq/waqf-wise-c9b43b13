@@ -33,7 +33,12 @@ export function useLoans() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as Loan[];
+      
+      // Map beneficiaries to beneficiary for compatibility
+      return (data || []).map(loan => ({
+        ...loan,
+        beneficiary: loan.beneficiaries,
+      })) as Loan[];
     },
   });
 
