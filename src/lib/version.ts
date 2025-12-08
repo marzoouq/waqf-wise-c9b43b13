@@ -2,11 +2,11 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.8.19
+ * @version 2.8.22
  * @date 2025-12-08
  */
 
-export const APP_VERSION = '2.8.21';
+export const APP_VERSION = '2.8.22';
 export const APP_VERSION_DATE = '2025-12-08';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
@@ -16,10 +16,10 @@ export const VERSION_INFO = {
   name: APP_VERSION_NAME,
   changelog: '/docs/CHANGELOG.md',
   features: [
-    'نقل 50+ hook للخدمات',
-    'إضافة دوال جديدة لـ LoansService و MaintenanceService و ReportService',
+    'نقل 60+ hook للخدمات',
+    'إضافة 3 خدمات جديدة: AuditService, POSService, BankReconciliationService',
+    'إصلاح حساب العائد الشهري والسنوي في التقارير',
     'توحيد استخدام RealtimeService عبر جميع الـ hooks',
-    'إزالة الاستدعاءات المباشرة لـ Supabase من 15+ hooks',
     'تحسين بنية الكود: Component → Hook → Service → Supabase',
     'صفر أخطاء بناء',
   ],

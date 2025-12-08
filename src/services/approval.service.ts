@@ -221,4 +221,164 @@ export class ApprovalService {
     if (error) throw error;
     return data || [];
   }
+
+  // ==================== الموافقات المعلقة الموحدة ====================
+  static async getPendingApprovals(): Promise<{
+    id: string;
+    type: 'distribution' | 'request' | 'journal' | 'payment';
+    title: string;
+    amount?: number;
+    date: Date;
+    priority: 'high' | 'medium' | 'low';
+    description: string;
+  }[]> {
+    const allApprovals: any[] = [];
+
+    const [distApprovalsResult, reqApprovalsResult, journalApprovalsResult] = await Promise.all([
+      supabase
+        .from('distribution_approvals')
+        .select(`id, created_at, distributions(month, total_amount, beneficiaries_count)`)
+        .eq('status', 'معلق')
+        .eq('level', 3)
+        .limit(5),
+      supabase
+        .from('request_approvals')
+        .select(`id, created_at, beneficiary_requests(request_number, amount, priority, beneficiaries(full_name))`)
+        .eq('status', 'معلق')
+        .eq('level', 3)
+        .limit(5),
+      supabase
+        .from('approvals')
+        .select(`id, created_at, journal_entries(entry_number, description)`)
+        .eq('status', 'pending')
+        .limit(5)
+    ]);
+
+    if (distApprovalsResult.error) throw distApprovalsResult.error;
+    if (reqApprovalsResult.error) throw reqApprovalsResult.error;
+    if (journalApprovalsResult.error) throw journalApprovalsResult.error;
+
+    if (distApprovalsResult.data) {
+      distApprovalsResult.data.forEach((app: any) => {
+        if (app.distributions) {
+          allApprovals.push({
+            id: app.id,
+            type: 'distribution',
+            title: `توزيع ${app.distributions.month}`,
+            amount: app.distributions.total_amount,
+            date: new Date(app.created_at),
+            priority: 'high',
+            description: `توزيع لـ ${app.distributions.beneficiaries_count} مستفيد`
+          });
+        }
+      });
+    }
+
+    if (reqApprovalsResult.data) {
+      reqApprovalsResult.data.forEach((app: any) => {
+        if (app.beneficiary_requests?.beneficiaries) {
+          allApprovals.push({
+            id: app.id,
+            type: 'request',
+            title: `طلب ${app.beneficiary_requests.request_number || ''}`,
+            amount: app.beneficiary_requests.amount,
+            date: new Date(app.created_at),
+            priority: app.beneficiary_requests.priority === 'عاجلة' ? 'high' : 'medium',
+            description: `من ${app.beneficiary_requests.beneficiaries.full_name}`
+          });
+        }
+      });
+    }
+
+    if (journalApprovalsResult.data) {
+      journalApprovalsResult.data.forEach((app: any) => {
+        if (app.journal_entries) {
+          allApprovals.push({
+            id: app.id,
+            type: 'journal',
+            title: `قيد ${app.journal_entries.entry_number}`,
+            date: new Date(app.created_at),
+            priority: 'medium',
+            description: app.journal_entries.description
+          });
+        }
+      });
+    }
+
+    return allApprovals
+      .sort((a, b) => {
+        const priorityOrder = { high: 3, medium: 2, low: 1 };
+        if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
+          return priorityOrder[b.priority] - priorityOrder[a.priority];
+        }
+        return b.date.getTime() - a.date.getTime();
+      })
+      .slice(0, 6);
+  }
+
+  // ==================== موافقات الطلبات الخاصة ====================
+  static async getRequestApprovalsByRequestId(requestId: string): Promise<any[]> {
+    const { data, error } = await supabase
+      .from("request_approvals")
+      .select("*")
+      .eq("request_id", requestId)
+      .order("level", { ascending: true });
+    
+    if (error) throw error;
+    return data || [];
+  }
+
+  static async upsertRequestApproval(approval: {
+    request_id: string;
+    level: number;
+    status: string;
+    notes?: string;
+    approved_at?: string;
+    approver_id?: string;
+    approver_name: string;
+  }): Promise<any> {
+    // التحقق من وجود موافقة سابقة
+    const { data: existing } = await supabase
+      .from("request_approvals")
+      .select("id")
+      .eq("request_id", approval.request_id)
+      .eq("level", approval.level)
+      .maybeSingle();
+
+    if (existing?.id) {
+      const { data, error } = await supabase
+        .from("request_approvals")
+        .update({
+          status: approval.status,
+          notes: approval.notes,
+          approved_at: approval.approved_at,
+          approver_id: approval.approver_id,
+          approver_name: approval.approver_name,
+        })
+        .eq("id", existing.id)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    }
+
+    const { data, error } = await supabase
+      .from("request_approvals")
+      .insert([approval])
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  }
+
+  static async updateRequestApproval(id: string, updates: Partial<any>): Promise<any> {
+    const { data, error } = await supabase
+      .from("request_approvals")
+      .update(updates)
+      .eq("id", id)
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  }
 }
