@@ -292,4 +292,157 @@ export class RequestService {
     if (error) throw error;
     return data;
   }
+
+  // ==================== المرفقات ====================
+  static async getAttachments(requestId: string) {
+    const { data, error } = await supabase
+      .from("request_attachments")
+      .select("*")
+      .eq("request_id", requestId)
+      .order("uploaded_at", { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  static async uploadAttachment(requestId: string, file: File, description?: string) {
+    const fileExt = file.name.split(".").pop();
+    const fileName = `${requestId}/${Date.now()}.${fileExt}`;
+    
+    const { error: uploadError } = await supabase.storage
+      .from("request-attachments")
+      .upload(fileName, file);
+
+    if (uploadError) throw uploadError;
+
+    const { data: urlData } = supabase.storage
+      .from("request-attachments")
+      .getPublicUrl(fileName);
+
+    const { data, error } = await supabase
+      .from("request_attachments")
+      .insert({
+        request_id: requestId,
+        file_name: file.name,
+        file_path: urlData.publicUrl,
+        file_type: file.type,
+        file_size: file.size,
+        description,
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    // Update attachments_count
+    const { data: currentRequest } = await supabase
+      .from("beneficiary_requests")
+      .select("attachments_count")
+      .eq("id", requestId)
+      .single();
+
+    if (currentRequest) {
+      await supabase
+        .from("beneficiary_requests")
+        .update({ attachments_count: (currentRequest.attachments_count || 0) + 1 })
+        .eq("id", requestId);
+    }
+
+    return data;
+  }
+
+  static async deleteAttachment(attachmentId: string, filePath: string, requestId: string) {
+    const urlParts = filePath.split("/request-attachments/");
+    const storagePath = urlParts[1];
+
+    if (storagePath) {
+      await supabase.storage.from("request-attachments").remove([storagePath]);
+    }
+
+    const { error } = await supabase
+      .from("request_attachments")
+      .delete()
+      .eq("id", attachmentId);
+
+    if (error) throw error;
+
+    const { data: currentRequest } = await supabase
+      .from("beneficiary_requests")
+      .select("attachments_count")
+      .eq("id", requestId)
+      .single();
+
+    if (currentRequest) {
+      await supabase
+        .from("beneficiary_requests")
+        .update({ attachments_count: Math.max((currentRequest.attachments_count || 0) - 1, 0) })
+        .eq("id", requestId);
+    }
+  }
+
+  // ==================== التعليقات ====================
+  static async getComments(requestId: string) {
+    const { data, error } = await supabase
+      .from("request_comments")
+      .select("*")
+      .eq("request_id", requestId)
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    const commentsWithProfiles = await Promise.all(
+      (data || []).map(async (comment) => {
+        if (comment.user_id) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("full_name, email")
+            .eq("user_id", comment.user_id)
+            .single();
+
+          return {
+            ...comment,
+            profiles: profile || { full_name: "مستخدم", email: "" },
+          };
+        }
+        return { ...comment, profiles: { full_name: "مستخدم", email: "" } };
+      })
+    );
+
+    return commentsWithProfiles;
+  }
+
+  static async addComment(requestId: string, comment: string, isInternal = false) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("غير مصرح");
+
+    const { data, error } = await supabase
+      .from("request_comments")
+      .insert([{ request_id: requestId, comment, is_internal: isInternal, user_id: user.id }])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  static async updateComment(id: string, comment: string) {
+    const { data, error } = await supabase
+      .from("request_comments")
+      .update({ comment })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  static async deleteComment(id: string) {
+    const { error } = await supabase
+      .from("request_comments")
+      .delete()
+      .eq("id", id);
+
+    if (error) throw error;
+  }
 }

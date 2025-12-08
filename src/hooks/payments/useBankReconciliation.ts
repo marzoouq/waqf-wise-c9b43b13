@@ -1,18 +1,16 @@
+/**
+ * useBankReconciliation Hook - التسوية البنكية
+ * يستخدم BankReconciliationService
+ */
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { logger } from "@/lib/logger";
-import { Database } from "@/integrations/supabase/types";
+import { BankReconciliationService } from "@/services";
 import { 
   BankStatementInsert, 
-  BankStatementUpdate,
   BankTransactionInsert,
-  BankTransactionUpdate,
   BankTransactionMatch 
 } from "@/types/banking";
 import { getErrorMessage } from "@/types/errors";
-
-type Tables = Database['public']['Tables'];
 
 export interface BankStatement {
   id: string;
@@ -48,169 +46,59 @@ export function useBankReconciliation() {
 
   const { data: statements = [], isLoading } = useQuery({
     queryKey: ["bank_statements"],
-    queryFn: async () => {
-      try {
-        const { data, error } = await supabase
-          .from("bank_statements")
-          .select(`
-            *,
-            bank_accounts!inner (
-              bank_name,
-              account_number,
-              accounts (code, name_ar)
-            )
-          `)
-          .order("statement_date", { ascending: false });
-
-        if (error) throw error;
-        return data as unknown as (Tables['bank_statements']['Row'] & {
-          bank_accounts: {
-            bank_name: string;
-            account_number: string;
-            accounts: { code: string; name_ar: string; } | null;
-          };
-        })[];
-      } catch (error) {
-        logger.error(error, { context: 'fetch_bank_statements', severity: 'low' });
-        return [];
-      }
-    },
+    queryFn: () => BankReconciliationService.getStatements(),
   });
 
   const { data: transactions = [] } = useQuery({
     queryKey: ["bank_transactions"],
-    queryFn: async () => {
-      try {
-        const { data, error } = await supabase
-          .from("bank_transactions")
-          .select("*")
-          .order("transaction_date", { ascending: false });
-
-        if (error) throw error;
-        return data as unknown as Tables['bank_transactions']['Row'][];
-      } catch (error) {
-        logger.error(error, { context: 'fetch_bank_transactions', severity: 'low' });
-        return [];
-      }
-    },
+    queryFn: () => BankReconciliationService.getTransactions(),
   });
 
   const createStatement = useMutation({
-    mutationFn: async (statement: BankStatementInsert) => {
-      const { data, error } = await supabase
-        .from("bank_statements")
-        .insert([statement])
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: (statement: BankStatementInsert) => 
+      BankReconciliationService.createStatement(statement),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bank_statements"] });
-      toast({
-        title: "تم الإنشاء",
-        description: "تم إنشاء كشف الحساب بنجاح",
-      });
+      toast({ title: "تم الإنشاء", description: "تم إنشاء كشف الحساب بنجاح" });
     },
     onError: (error: unknown) => {
-      toast({
-        title: "خطأ",
-        description: getErrorMessage(error),
-        variant: "destructive",
-      });
+      toast({ title: "خطأ", description: getErrorMessage(error), variant: "destructive" });
     },
   });
 
   const addTransaction = useMutation({
-    mutationFn: async (transaction: BankTransactionInsert) => {
-      const { data, error } = await supabase
-        .from("bank_transactions")
-        .insert([transaction])
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: (transaction: BankTransactionInsert) => 
+      BankReconciliationService.addTransaction(transaction),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bank_transactions"] });
-      toast({
-        title: "تم الإضافة",
-        description: "تم إضافة الحركة بنجاح",
-      });
+      toast({ title: "تم الإضافة", description: "تم إضافة الحركة بنجاح" });
     },
     onError: (error: unknown) => {
-      toast({
-        title: "خطأ",
-        description: getErrorMessage(error),
-        variant: "destructive",
-      });
+      toast({ title: "خطأ", description: getErrorMessage(error), variant: "destructive" });
     },
   });
 
   const matchTransaction = useMutation({
-    mutationFn: async ({
-      transaction_id,
-      journal_entry_id,
-    }: BankTransactionMatch) => {
-      const { data, error } = await supabase
-        .from("bank_transactions")
-        .update({
-          is_matched: true,
-          journal_entry_id: journal_entry_id,
-        })
-        .eq("id", transaction_id)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: (match: BankTransactionMatch) => 
+      BankReconciliationService.matchTransaction(match),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bank_transactions"] });
-      toast({
-        title: "تمت المطابقة",
-        description: "تمت مطابقة الحركة بنجاح",
-      });
+      toast({ title: "تمت المطابقة", description: "تمت مطابقة الحركة بنجاح" });
     },
     onError: (error: unknown) => {
-      toast({
-        title: "خطأ",
-        description: getErrorMessage(error),
-        variant: "destructive",
-      });
+      toast({ title: "خطأ", description: getErrorMessage(error), variant: "destructive" });
     },
   });
 
   const reconcileStatement = useMutation({
-    mutationFn: async (statementId: string) => {
-      const { data, error } = await supabase
-        .from("bank_statements")
-        .update({
-          status: 'reconciled',
-          reconciled_at: new Date().toISOString(),
-        })
-        .eq("id", statementId)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: (statementId: string) => 
+      BankReconciliationService.reconcileStatement(statementId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bank_statements"] });
-      toast({
-        title: "تمت التسوية",
-        description: "تمت تسوية كشف الحساب بنجاح",
-      });
+      toast({ title: "تمت التسوية", description: "تمت تسوية كشف الحساب بنجاح" });
     },
     onError: (error: unknown) => {
-      toast({
-        title: "خطأ",
-        description: getErrorMessage(error),
-        variant: "destructive",
-      });
+      toast({ title: "خطأ", description: getErrorMessage(error), variant: "destructive" });
     },
   });
 
