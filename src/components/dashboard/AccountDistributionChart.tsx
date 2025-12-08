@@ -1,16 +1,7 @@
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
-import { useQueryClient } from "@tanstack/react-query";
-
-interface AccountData {
-  name: string;
-  value: number;
-  count: number;
-  [key: string]: string | number;
-}
+import { useAccountDistribution } from "@/hooks/dashboard/useAccountDistribution";
 
 const COLORS = [
   'hsl(var(--chart-1))',
@@ -21,70 +12,9 @@ const COLORS = [
 ];
 
 const AccountDistributionChart = () => {
-  const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<AccountData[]>([]);
-  const queryClient = useQueryClient();
+  const { data, isLoading } = useAccountDistribution();
 
-  useEffect(() => {
-    fetchAccountDistribution();
-    
-    // Real-time subscription
-    const channel = supabase
-      .channel('accounts-realtime')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'accounts'
-      }, () => {
-        fetchAccountDistribution();
-        queryClient.invalidateQueries({ queryKey: ["accounts"] });
-      })
-      .subscribe();
-      
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
-
-  const fetchAccountDistribution = async () => {
-    try {
-      const { data: accounts, error } = await supabase
-        .from("accounts")
-        .select("account_type")
-        .eq("is_active", true);
-
-      if (error) throw error;
-
-      // Count accounts by type
-      const distribution = new Map<string, number>();
-      accounts?.forEach((account) => {
-        const type = account.account_type;
-        distribution.set(type, (distribution.get(type) || 0) + 1);
-      });
-
-      const typeLabels: Record<string, string> = {
-        asset: 'الأصول',
-        liability: 'الخصوم',
-        equity: 'حقوق الملكية',
-        revenue: 'الإيرادات',
-        expense: 'المصروفات',
-      };
-
-      const chartData: AccountData[] = Array.from(distribution.entries()).map(([type, count]) => ({
-        name: typeLabels[type] || type,
-        value: count,
-        count: count,
-      }));
-
-      setData(chartData);
-    } catch (error) {
-      setData([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
+  if (isLoading) {
     return (
       <Card>
         <CardHeader>
@@ -106,7 +36,7 @@ const AccountDistributionChart = () => {
         <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 200 : 300}>
           <PieChart>
             <Pie
-              data={data}
+              data={data as { name: string; value: number; count: number; [key: string]: string | number }[] || []}
               cx="50%"
               cy="50%"
               labelLine={false}
@@ -119,7 +49,7 @@ const AccountDistributionChart = () => {
               fill="#8884d8"
               dataKey="value"
             >
-              {data.map((entry, index) => (
+              {(data || []).map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>

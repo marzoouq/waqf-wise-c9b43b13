@@ -20,6 +20,14 @@ export { useNazerDashboardRealtime, useNazerDashboardRefresh } from './useNazerD
 export { useAdminDashboardRealtime, useAdminDashboardRefresh } from './useAdminDashboardRealtime';
 export { useCashierDashboardRealtime, useCashierDashboardRefresh } from './useCashierDashboardRealtime';
 
+// ==================== Dashboard Data Hooks ====================
+export { useRecentJournalEntries } from './useRecentJournalEntries';
+export { useVouchersStats, type VouchersStats } from './useVouchersStats';
+export { usePropertyRevenueStats, type RentalPaymentWithContract } from './usePropertyRevenueStats';
+export { usePropertiesPerformance } from './usePropertiesPerformance';
+export { useRevenueDistribution } from './useRevenueDistribution';
+export { useAccountDistribution } from './useAccountDistribution';
+
 // ==================== Re-exports from other folders ====================
 export { useAdminKPIs } from '../admin/useAdminKPIs';
 export { useAccountantKPIs } from '../accounting';

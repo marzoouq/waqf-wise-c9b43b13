@@ -448,6 +448,36 @@ export class PropertyService {
   }
 
   /**
+   * جلب المدفوعات مع نوع الدفع من العقود
+   */
+  static async getRentalPaymentsWithFrequency(): Promise<{
+    amount_paid: number | null;
+    tax_amount: number | null;
+    contracts: {
+      payment_frequency: string | null;
+    } | null;
+  }[]> {
+    try {
+      const { data, error } = await supabase
+        .from("rental_payments")
+        .select(`
+          amount_paid,
+          tax_amount,
+          contracts!inner (
+            payment_frequency
+          )
+        `)
+        .eq("status", "مدفوع");
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching rental payments with frequency', error);
+      throw error;
+    }
+  }
+
+  /**
    * جلب إحصائيات العقارات الشاملة (للوحة التحكم)
    */
   static async getPropertiesStats(): Promise<{

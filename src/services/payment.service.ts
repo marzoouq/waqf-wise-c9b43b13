@@ -148,4 +148,35 @@ export class PaymentService {
       pendingApprovals: pending.count || 0,
     };
   }
+
+  /**
+   * جلب إحصائيات سندات الدفع
+   */
+  static async getVouchersStats(): Promise<{
+    total: number;
+    draft: number;
+    paid: number;
+    thisMonth: number;
+    totalAmount: number;
+    paidAmount: number;
+  }> {
+    const { data, error } = await supabase
+      .from('payment_vouchers')
+      .select('amount, status, created_at');
+
+    if (error) throw error;
+
+    const now = new Date();
+    const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const vouchers = data || [];
+
+    return {
+      total: vouchers.length,
+      draft: vouchers.filter(v => v.status === 'draft').length,
+      paid: vouchers.filter(v => v.status === 'paid').length,
+      thisMonth: vouchers.filter(v => new Date(v.created_at) >= thisMonth).length,
+      totalAmount: vouchers.reduce((sum, v) => sum + (v.amount || 0), 0),
+      paidAmount: vouchers.filter(v => v.status === 'paid').reduce((sum, v) => sum + (v.amount || 0), 0),
+    };
+  }
 }

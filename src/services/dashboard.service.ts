@@ -384,5 +384,97 @@ export const DashboardService = {
       default:
         return 0;
     }
+  },
+
+  /**
+   * جلب بيانات أداء العقارات
+   */
+  async getPropertiesPerformance() {
+    const { data: contractsData } = await supabase
+      .from('contracts')
+      .select(`
+        id,
+        properties(name),
+        rental_payments(amount_paid, status)
+      `)
+      .eq('status', 'نشط')
+      .limit(6);
+
+    const propertyStats: { [key: string]: { revenue: number, paid: number, pending: number } } = {};
+
+    if (contractsData) {
+      contractsData.forEach(contract => {
+        const propertyName = contract.properties?.name || 'غير محدد';
+        
+        if (!propertyStats[propertyName]) {
+          propertyStats[propertyName] = { revenue: 0, paid: 0, pending: 0 };
+        }
+
+        if (contract.rental_payments) {
+          contract.rental_payments.forEach((payment: { amount_paid: number; status: string }) => {
+            propertyStats[propertyName].revenue += payment.amount_paid || 0;
+            
+            if (payment.status === 'مدفوع') {
+              propertyStats[propertyName].paid += payment.amount_paid || 0;
+            } else if (payment.status === 'معلق' || payment.status === 'متأخر') {
+              propertyStats[propertyName].pending += payment.amount_paid || 0;
+            }
+          });
+        }
+      });
+    }
+
+    return Object.entries(propertyStats)
+      .map(([name, stats]) => ({
+        name,
+        'الإيرادات الكلية': stats.revenue,
+        'المدفوع': stats.paid,
+        'المعلق': stats.pending
+      }))
+      .slice(0, 6);
+  },
+
+  /**
+   * جلب بيانات توزيع الإيرادات
+   */
+  async getRevenueDistribution() {
+    const { data: revenueData } = await supabase
+      .from('journal_entry_lines')
+      .select(`
+        credit_amount,
+        debit_amount,
+        accounts!inner(name_ar)
+      `)
+      .eq('accounts.account_type', 'revenue')
+      .limit(50);
+
+    const revenueByType: { [key: string]: number } = {};
+
+    if (revenueData) {
+      revenueData.forEach(line => {
+        const accountName = line.accounts?.name_ar || 'غير محدد';
+        const amount = (line.credit_amount || 0) - (line.debit_amount || 0);
+        
+        if (!revenueByType[accountName]) {
+          revenueByType[accountName] = 0;
+        }
+        revenueByType[accountName] += amount;
+      });
+    }
+
+    const chartData = Object.entries(revenueByType)
+      .filter(([_, value]) => value > 0)
+      .map(([name, value]) => ({
+        name,
+        value,
+        percentage: 0
+      }));
+
+    const total = chartData.reduce((sum, item) => sum + item.value, 0);
+    chartData.forEach(item => {
+      item.percentage = total > 0 ? (item.value / total) * 100 : 0;
+    });
+
+    return chartData;
   }
 };
