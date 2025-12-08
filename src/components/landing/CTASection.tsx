@@ -27,31 +27,22 @@ export function CTASection() {
             مستفيديها بشكل أفضل
           </p>
 
-          {/* CTA Buttons */}
+          {/* CTA Button */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 animate-fade-in">
-            <Link to="/signup" className="w-full sm:w-auto">
+            <Link to="/login" className="w-full sm:w-auto">
               <Button
                 size="lg"
                 className="w-full sm:w-auto gap-2 bg-white text-primary hover:bg-white/90 shadow-xl shadow-black/10"
               >
-                سجل الآن مجاناً
-                <ArrowLeft className="w-4 h-4" />
-              </Button>
-            </Link>
-            <Link to="/login" className="w-full sm:w-auto">
-              <Button
-                variant="outline"
-                size="lg"
-                className="w-full sm:w-auto border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/50"
-              >
                 تسجيل الدخول
+                <ArrowLeft className="w-4 h-4" />
               </Button>
             </Link>
           </div>
 
           {/* Trust Text */}
           <p className="text-white/60 text-sm mt-6 sm:mt-8 animate-fade-in">
-            لا يتطلب بطاقة ائتمان • إعداد في دقائق • دعم فني مجاني
+            الحسابات تُنشأ من قبل الناظر أو المشرف • دعم فني مجاني
           </p>
         </div>
       </div>

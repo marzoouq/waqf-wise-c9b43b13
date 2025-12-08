@@ -74,13 +74,8 @@ export function LandingHeader() {
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-3">
             <Link to="/login">
-              <Button variant="ghost" size="sm">
-                تسجيل الدخول
-              </Button>
-            </Link>
-            <Link to="/signup">
               <Button size="sm" className="shadow-lg shadow-primary/25">
-                إنشاء حساب
+                تسجيل الدخول
               </Button>
             </Link>
           </div>
@@ -121,13 +116,8 @@ export function LandingHeader() {
             ))}
             <div className="flex flex-col gap-2 mt-4 px-4">
               <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                <Button variant="outline" className="w-full">
-                  تسجيل الدخول
-                </Button>
-              </Link>
-              <Link to="/signup" onClick={() => setIsMenuOpen(false)}>
                 <Button className="w-full">
-                  إنشاء حساب
+                  تسجيل الدخول
                 </Button>
               </Link>
             </div>

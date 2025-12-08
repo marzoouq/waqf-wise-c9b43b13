@@ -36,12 +36,12 @@ export function HeroSection() {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto">
-            <Link to="/signup" className="w-full sm:w-auto">
+            <Link to="/login" className="w-full sm:w-auto">
               <Button
                 size="lg"
                 className="w-full sm:w-auto gap-2 shadow-lg hover:shadow-xl transition-shadow"
               >
-                ابدأ الآن مجاناً
+                تسجيل الدخول
                 <ArrowLeft className="w-4 h-4" />
               </Button>
             </Link>
