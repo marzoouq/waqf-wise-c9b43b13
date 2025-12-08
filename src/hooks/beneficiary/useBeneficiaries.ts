@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { BeneficiaryService } from "@/services";
 import { handleError, showSuccess } from "@/lib/errors";
-import { executeMutation } from "@/lib/mutationHelpers";
 import { useActivities } from "@/hooks/useActivities";
 import { useAuth } from "@/hooks/useAuth";
 import { Beneficiary } from "@/types/beneficiary";
@@ -16,16 +15,11 @@ export function useBeneficiaries() {
   const { data: beneficiariesData, isLoading } = useQuery({
     queryKey: ["beneficiaries"],
     queryFn: async () => {
-      const { data, error, count } = await supabase
-        .from("beneficiaries")
-        .select("*", { count: "exact" })
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return { beneficiaries: (data || []) as Beneficiary[], totalCount: count || 0 };
+      const result = await BeneficiaryService.getAll();
+      return { beneficiaries: result.data as Beneficiary[], totalCount: result.count };
     },
-    staleTime: 10 * 60 * 1000, // 10 minutes - improved caching
-    gcTime: 20 * 60 * 1000, // 20 minutes - garbage collection
+    staleTime: 10 * 60 * 1000,
+    gcTime: 20 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
 
@@ -34,25 +28,11 @@ export function useBeneficiaries() {
 
   const addBeneficiary = useMutation({
     mutationFn: async (beneficiary: Omit<Beneficiary, "id" | "created_at" | "updated_at">) => {
-      return executeMutation(
-        async () => {
-          const { data, error } = await supabase
-            .from("beneficiaries")
-            .insert([beneficiary])
-            .select()
-            .maybeSingle();
-
-          if (error) throw error;
-          if (!data) throw new Error("فشل في إضافة المستفيد");
-          return data;
-        },
-        'add_beneficiary'
-      );
+      return BeneficiaryService.create(beneficiary as any);
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["beneficiaries"] });
       
-      // إضافة نشاط
       addActivity({
         action: `تم إضافة مستفيد جديد: ${data.full_name}`,
         user_name: user?.email || 'النظام',
@@ -69,26 +49,11 @@ export function useBeneficiaries() {
 
   const updateBeneficiary = useMutation({
     mutationFn: async ({ id, ...updates }: Partial<Beneficiary> & { id: string }) => {
-      return executeMutation(
-        async () => {
-          const { data, error } = await supabase
-            .from("beneficiaries")
-            .update(updates)
-            .eq("id", id)
-            .select()
-            .maybeSingle();
-
-          if (error) throw error;
-          if (!data) throw new Error("فشل في تحديث بيانات المستفيد");
-          return data;
-        },
-        'update_beneficiary'
-      );
+      return BeneficiaryService.update(id, updates as any);
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["beneficiaries"] });
       
-      // إضافة نشاط
       addActivity({
         action: `تم تحديث بيانات المستفيد: ${data.full_name}`,
         user_name: user?.email || 'النظام',
@@ -105,17 +70,7 @@ export function useBeneficiaries() {
 
   const deleteBeneficiary = useMutation({
     mutationFn: async (id: string) => {
-      return executeMutation(
-        async () => {
-          const { error } = await supabase
-            .from("beneficiaries")
-            .delete()
-            .eq("id", id);
-
-          if (error) throw error;
-        },
-        'delete_beneficiary'
-      );
+      return BeneficiaryService.delete(id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["beneficiaries"] });

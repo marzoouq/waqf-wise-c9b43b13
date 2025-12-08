@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { AccountingService } from "@/services";
 import { useToast } from "@/hooks/use-toast";
 import { logger } from "@/lib/logger";
 import { AccountRow, AccountWithBalance } from "@/types/supabase-helpers";
@@ -12,27 +12,12 @@ export function useAccounts() {
 
   const { data: accounts = [], isLoading } = useQuery({
     queryKey: ["accounts"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("accounts")
-        .select("id, code, name_ar, name_en, account_type, account_nature, parent_id, is_header, is_active, current_balance, description, created_at, updated_at")
-        .order("code", { ascending: true });
-
-      if (error) throw error;
-      return data as AccountRow[];
-    },
+    queryFn: () => AccountingService.getAccounts(),
   });
 
   const addAccount = useMutation({
     mutationFn: async (account: AccountInsert) => {
-      const { data, error } = await supabase
-        .from("accounts")
-        .insert([account])
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
+      return AccountingService.createAccount(account);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["accounts"] });
@@ -54,15 +39,7 @@ export function useAccounts() {
 
   const updateAccount = useMutation({
     mutationFn: async ({ id, ...updates }: AccountUpdate & { id: string }) => {
-      const { data, error } = await supabase
-        .from("accounts")
-        .update(updates)
-        .eq("id", id)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
+      return AccountingService.updateAccount(id, updates);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["accounts"] });
@@ -84,41 +61,7 @@ export function useAccounts() {
 
   const deleteAccount = useMutation({
     mutationFn: async (id: string) => {
-      // التحقق من عدم وجود معاملات
-      const { count: transactionsCount } = await supabase
-        .from("journal_entry_lines")
-        .select("*", { count: 'exact', head: true })
-        .eq("account_id", id);
-
-      if (transactionsCount && transactionsCount > 0) {
-        throw new Error("لا يمكن حذف حساب يحتوي على معاملات");
-      }
-
-      // التحقق من عدم كونه حساب رئيسي
-      const { data: account } = await supabase
-        .from("accounts")
-        .select("is_header, code")
-        .eq("id", id)
-        .single();
-
-      if (account?.is_header) {
-        throw new Error("لا يمكن حذف حساب رئيسي");
-      }
-
-      // منع حذف الحسابات النظامية (الأكواد من 1000 إلى 5999)
-      if (account?.code) {
-        const codeNum = parseInt(account.code);
-        if (codeNum >= 1000 && codeNum <= 5999) {
-          throw new Error("لا يمكن حذف الحسابات النظامية");
-        }
-      }
-
-      const { error } = await supabase
-        .from("accounts")
-        .delete()
-        .eq("id", id);
-
-      if (error) throw error;
+      return AccountingService.deleteAccount(id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["accounts"] });
@@ -140,11 +83,8 @@ export function useAccounts() {
 
   const calculateBalance = async (accountId: string): Promise<number> => {
     try {
-      const { data, error } = await supabase
-        .rpc("calculate_account_balance", { account_uuid: accountId });
-
-      if (error) throw error;
-      return (data as number) || 0;
+      const account = await AccountingService.getAccountWithBalance(accountId);
+      return account?.current_balance || 0;
     } catch (error: unknown) {
       logger.error(error, { context: 'calculate_account_balance', severity: 'medium' });
       return 0;
