@@ -2,7 +2,7 @@
 
 هذا المجلد يحتوي على **170+** React Hook منظمة في **25 مجلد فرعي**.
 
-## 📂 الهيكل الحالي (v2.6.35)
+## 📂 الهيكل الحالي (v2.6.42)
 
 ```
 src/hooks/
@@ -217,19 +217,24 @@ import { useDocuments, useFolders } from '@/hooks/archive';
 | `useArchiveStats` | إحصائيات الأرشيف |
 | `useArchivistDashboard` | لوحة الأرشيفي |
 | `useArchivistDashboardRealtime` | تحديثات لوحة الأرشيفي الفورية |
+
+### 📊 dashboard/
 ```typescript
-import { useNazerKPIs, useCashierStats } from '@/hooks/dashboard';
+import { useUnifiedKPIs, useCashierStats } from '@/hooks/dashboard';
 ```
 | Hook | الوظيفة |
 |------|---------|
 | `useDashboardConfigs` | إعدادات اللوحات |
 | `useDashboardKPIs` | مؤشرات الأداء |
 | `useKPIs` | المؤشرات |
-| `useNazerKPIs` | مؤشرات الناظر |
+| `useUnifiedKPIs` | **المصدر الموحد لجميع KPIs** ✅ |
+| `useNazerSystemOverview` | إحصائيات النظام الشاملة 🆕 |
 | `useAccountantKPIs` | مؤشرات المحاسب |
 | `useAdminKPIs` | مؤشرات المدير |
 | `useCashierStats` | إحصائيات أمين الصندوق |
 | `useArchivistDashboard` | لوحة الأرشيفي |
+
+> **ملاحظة:** تم حذف `useNazerKPIs` المهمل - استخدم `useUnifiedKPIs` مباشرة
 
 ### ⚙️ system/
 ```typescript
@@ -361,5 +366,5 @@ import { useIsMobile, useToast } from '@/hooks/ui';
 
 ---
 
-**آخر تحديث:** 2025-12-07
-**الإصدار:** 2.6.41
+**آخر تحديث:** 2025-12-08
+**الإصدار:** 2.6.42

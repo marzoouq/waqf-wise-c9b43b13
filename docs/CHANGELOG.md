@@ -1,39 +1,52 @@
 # 📝 سجل التغييرات | Changelog
 
-**الإصدار الحالي:** 2.6.39 | **آخر تحديث:** 2025-12-07
+**الإصدار الحالي:** 2.6.42 | **آخر تحديث:** 2025-12-08
+
+---
+
+## [2.6.42] - 2025-12-08
+
+### 🏗️ تحسين الهيكل المعماري (Architecture Improvements)
+
+#### ✨ الميزات الجديدة
+- **DashboardService:** طبقة خدمة جديدة للـ Dashboard تفصل منطق الأعمال عن الـ Hooks
+- **ثوابت الحالة الجديدة:** `PROPERTY_STATUS`, `CONTRACT_STATUS`, `LOAN_STATUS`, `REQUEST_STATUS`
+
+#### 🔧 التحسينات
+- **useNazerSystemOverview:** يستخدم الآن `DashboardService.getSystemOverview()` بدلاً من استعلام Supabase المباشر
+- **useUnifiedKPIs:** يستخدم الآن `DashboardService.getUnifiedKPIs()` والثوابت الموحدة
+- **NazerKPIs.tsx:** يستخدم الآن `useUnifiedKPIs` مباشرة بدلاً من `useNazerKPIs`
+
+#### 🗑️ الإزالات
+- **useNazerKPIs:** تم حذف الـ Hook المهمل - استخدم `useUnifiedKPIs` مباشرة
+
+#### 📂 الملفات المُحدّثة
+```
+src/services/dashboard.service.ts   # خدمة جديدة ✨
+src/services/index.ts               # تصدير DashboardService
+src/lib/constants.ts                # ثوابت الحالة الجديدة
+src/hooks/dashboard/useNazerSystemOverview.ts  # استخدام Service
+src/hooks/dashboard/useUnifiedKPIs.ts          # استخدام Service + Constants
+src/hooks/dashboard/index.ts        # إزالة useNazerKPIs
+src/components/dashboard/nazer/NazerKPIs.tsx  # استخدام useUnifiedKPIs
+src/services/README.md              # توثيق محدث
+docs/                               # توثيق موحد
+```
+
+#### 📊 الهيكل المعماري الجديد
+```
+Pages → Components → Hooks → Services → Constants → Supabase
+                              ↓
+                      DashboardService
+                        ├── getSystemOverview()
+                        └── getUnifiedKPIs()
+```
 
 ---
 
 ## [2.6.39] - 2025-12-07
 
 ### 🔄 توحيد مصادر بيانات لوحات التحكم (Unified Dashboard Data Sources)
-
-#### 🐛 الإصلاحات
-- **إصلاح `get_admin_dashboard_kpis` SQL Function:** تصحيح حساب العقارات المشغولة من `status = 'مؤجر'` (غير موجود) إلى `contracts WHERE status IN ('نشط', 'active')`
-- **إصلاح `useUnifiedKPIs.ts`:** تصحيح فلتر العقود من `'ساري'` إلى `'نشط'`
-
-#### 🔧 التحسينات
-- **توحيد مصادر البيانات:** `useNazerKPIs` و `useAdminKPIs` يستخدمان الآن `useUnifiedKPIs` كمصدر موحد
-- **توحيد Query Key:** جميع اللوحات تستخدم `['unified-dashboard-kpis']` للتحديث الفوري
-- **Realtime موحد:** اشتراكات على 9 جداول (beneficiaries, properties, contracts, payments, journal_entries, loans, beneficiary_requests, families, funds)
-
-#### 📂 الملفات المُحدّثة
-```
-src/hooks/dashboard/useUnifiedKPIs.ts  # المصدر الموحد الرئيسي
-src/hooks/dashboard/useNazerKPIs.ts    # يستخدم useUnifiedKPIs
-src/hooks/admin/useAdminKPIs.ts        # يستخدم useUnifiedKPIs
-supabase/migrations/                   # إصلاح get_admin_dashboard_kpis
-```
-
-#### 📊 النتائج
-| المؤشر | قبل | بعد |
-|--------|-----|------|
-| العقارات المشغولة (Admin) | 0 ❌ | صحيح ✅ |
-| العقارات المشغولة (Unified) | 0 ❌ | صحيح ✅ |
-| تناسق البيانات | ❌ متناقضة | ✅ موحدة |
-| التحديث الفوري | ❌ مختلف | ✅ موحد |
-
----
 
 ## [2.6.38] - 2025-12-07
 
@@ -532,4 +545,4 @@ src/components/beneficiary/
 
 ---
 
-**الحالة:** ✅ محدّث | **الإصدار:** 2.6.38
+**الحالة:** ✅ محدّث | **الإصدار:** 2.6.42

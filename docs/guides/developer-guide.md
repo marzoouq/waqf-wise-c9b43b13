@@ -1,6 +1,6 @@
 # 👨‍💻 دليل المطور | Developer Guide
 
-**الإصدار:** 2.6.38 | **آخر تحديث:** 2025-12-07
+**الإصدار:** 2.6.42 | **آخر تحديث:** 2025-12-08
 
 ---
 
@@ -81,11 +81,13 @@ src/
 ├── pages/               # الصفحات (~76)
 ├── routes/              # التوجيه (~71 مسار)
 ├── services/            # الخدمات
-│   ├── AuthService.ts
-│   ├── ArchiveService.ts
-│   └── LoansService.ts
+│   ├── auth.service.ts
+│   ├── archive.service.ts
+│   ├── loans.service.ts
+│   ├── dashboard.service.ts  # 🆕 خدمة لوحة التحكم
+│   └── README.md
 └── types/               # الأنواع
-    └── tenants.ts       # أنواع المستأجرين ✨
+    └── tenants.ts       # أنواع المستأجرين
 ```
 
 ---
@@ -155,7 +157,23 @@ export const TenantCard = ({ tenantId, onEdit }: TenantCardProps) => {
 src/hooks/{category}/use{Name}.ts
 ```
 
-### قالب Hook للقراءة
+### النمط الموصى به: Hook → Service → Supabase
+```typescript
+// ✅ صحيح - Hook يستخدم Service
+import { useQuery } from '@tanstack/react-query';
+import { DashboardService } from '@/services';
+import { QUERY_STALE_TIME } from '@/lib/constants';
+
+export function useNazerSystemOverview() {
+  return useQuery({
+    queryKey: ['nazer-system-overview'],
+    queryFn: () => DashboardService.getSystemOverview(),
+    staleTime: QUERY_STALE_TIME.DASHBOARD,
+  });
+}
+```
+
+### قالب Hook للقراءة (استخدام مباشر - غير موصى)
 ```typescript
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -398,4 +416,4 @@ const MyComponent = ({ userId }) => {
 
 ---
 
-**الحالة:** ✅ محدّث | **الإصدار:** 2.6.38
+**الحالة:** ✅ محدّث | **الإصدار:** 2.6.42
