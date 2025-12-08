@@ -185,4 +185,100 @@ export class NotificationService {
       action_url: '/staff/requests',
     });
   }
+
+  /**
+   * جلب تنبيهات النظام
+   */
+  static async getSystemAlerts(limit: number = 10): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .from('system_alerts')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(limit);
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching system alerts', error);
+      return [];
+    }
+  }
+
+  /**
+   * حل تنبيه
+   */
+  static async resolveAlert(alertId: string): Promise<void> {
+    try {
+      const { data: user } = await supabase.auth.getUser();
+      const { error } = await supabase
+        .from('system_alerts')
+        .update({
+          is_resolved: true,
+          resolved_at: new Date().toISOString(),
+          resolved_by: user?.user?.id,
+        })
+        .eq('id', alertId);
+
+      if (error) throw error;
+    } catch (error) {
+      productionLogger.error('Error resolving alert', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب إشعارات المستخدم
+   */
+  static async getUserNotifications(userId: string, limit: number = 20): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(limit);
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching user notifications', error);
+      return [];
+    }
+  }
+
+  /**
+   * تحديث حالة قراءة الإشعار
+   */
+  static async markAsRead(notificationId: string): Promise<void> {
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .update({ is_read: true })
+        .eq('id', notificationId);
+
+      if (error) throw error;
+    } catch (error) {
+      productionLogger.error('Error marking notification as read', error);
+      throw error;
+    }
+  }
+
+  /**
+   * تحديث جميع إشعارات المستخدم كمقروءة
+   */
+  static async markAllAsRead(userId: string): Promise<void> {
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .update({ is_read: true })
+        .eq('user_id', userId)
+        .eq('is_read', false);
+
+      if (error) throw error;
+    } catch (error) {
+      productionLogger.error('Error marking all notifications as read', error);
+      throw error;
+    }
+  }
 }
