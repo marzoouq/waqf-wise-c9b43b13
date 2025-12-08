@@ -41,16 +41,15 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
   
   const { units, isLoading: unitsLoading } = usePropertyUnits(selectedPropertyId);
 
-  // تحديث العقار المحدد - بدون تعديل monthly_rent لمنع التضارب مع الحسابات التلقائية
+  // تحديث العقار المحدد فوراً عند التغيير
   useEffect(() => {
-    if (formData.property_id && !contract && properties) {
-      const selectedProperty = properties.find(p => p.id === formData.property_id);
-      if (selectedProperty) {
-        setSelectedPropertyId(selectedProperty.id);
+    if (formData.property_id && formData.property_id !== selectedPropertyId) {
+      setSelectedPropertyId(formData.property_id);
+      if (!contract) {
         setSelectedUnits([]);
       }
     }
-  }, [formData.property_id, properties, contract, setSelectedPropertyId, setSelectedUnits]);
+  }, [formData.property_id, selectedPropertyId, contract, setSelectedPropertyId, setSelectedUnits]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -173,7 +172,7 @@ export const ContractDialog = ({ open, onOpenChange, contract }: Props) => {
           </Alert>
         )}
 
-        {!contract && selectedPropertyId && (
+        {!contract && formData.property_id && (
           <ContractUnitsSelector
             units={units}
             selectedUnits={selectedUnits}
