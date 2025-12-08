@@ -1,8 +1,8 @@
 import { useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { logger } from "@/lib/logger";
 import { DisclosurePayload } from "@/types/disclosure";
+import { supabase } from "@/integrations/supabase/client";
 
 export function useDisclosureNotifications() {
   const { toast } = useToast();

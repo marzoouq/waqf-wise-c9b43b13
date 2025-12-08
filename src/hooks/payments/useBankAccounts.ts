@@ -1,8 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { deleteFromTable } from "@/lib/utils/supabaseHelpers";
 import { createMutationErrorHandler } from "@/lib/errors";
+import { PaymentService } from "@/services/payment.service";
 
 export interface BankAccount {
   id: string;
@@ -24,28 +23,12 @@ export function useBankAccounts() {
 
   const { data: bankAccounts = [], isLoading } = useQuery({
     queryKey: ["bank_accounts"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("bank_accounts")
-        .select("id, account_id, bank_name, account_number, iban, swift_code, currency, current_balance, is_active, created_at, updated_at")
-        .order("bank_name", { ascending: true });
-
-      if (error) throw error;
-      return (data || []) as BankAccount[];
-    },
+    queryFn: () => PaymentService.getBankAccounts(),
   });
 
   const addBankAccount = useMutation({
-    mutationFn: async (bankAccount: Omit<BankAccount, "id" | "created_at" | "updated_at">) => {
-      const { data, error } = await supabase
-        .from("bank_accounts")
-        .insert([bankAccount])
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: (bankAccount: Omit<BankAccount, "id" | "created_at" | "updated_at">) =>
+      PaymentService.createBankAccount(bankAccount),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bank_accounts"] });
       toast({
@@ -60,17 +43,8 @@ export function useBankAccounts() {
   });
 
   const updateBankAccount = useMutation({
-    mutationFn: async ({ id, ...updates }: Partial<BankAccount> & { id: string }) => {
-      const { data, error } = await supabase
-        .from("bank_accounts")
-        .update(updates)
-        .eq("id", id)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: ({ id, ...updates }: Partial<BankAccount> & { id: string }) =>
+      PaymentService.updateBankAccount(id, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bank_accounts"] });
       toast({
@@ -85,12 +59,7 @@ export function useBankAccounts() {
   });
 
   const deleteBankAccount = useMutation({
-    mutationFn: async (id: string) => {
-      const result = await deleteFromTable("bank_accounts", id);
-      const error = result.error;
-
-      if (error) throw error;
-    },
+    mutationFn: (id: string) => PaymentService.deleteBankAccount(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bank_accounts"] });
       toast({

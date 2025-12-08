@@ -179,4 +179,58 @@ export class PaymentService {
       paidAmount: vouchers.filter(v => v.status === 'paid').reduce((sum, v) => sum + (v.amount || 0), 0),
     };
   }
+
+  /**
+   * جلب الحسابات البنكية
+   */
+  static async getBankAccounts(): Promise<any[]> {
+    const { data, error } = await supabase
+      .from("bank_accounts")
+      .select("id, account_id, bank_name, account_number, iban, swift_code, currency, current_balance, is_active, created_at, updated_at")
+      .order("bank_name", { ascending: true });
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * إضافة حساب بنكي
+   */
+  static async createBankAccount(bankAccount: any): Promise<any> {
+    const { data, error } = await supabase
+      .from("bank_accounts")
+      .insert([bankAccount])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  /**
+   * تحديث حساب بنكي
+   */
+  static async updateBankAccount(id: string, updates: any): Promise<any> {
+    const { data, error } = await supabase
+      .from("bank_accounts")
+      .update(updates)
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  /**
+   * حذف حساب بنكي
+   */
+  static async deleteBankAccount(id: string): Promise<void> {
+    const { error } = await supabase
+      .from("bank_accounts")
+      .delete()
+      .eq("id", id);
+
+    if (error) throw error;
+  }
 }
