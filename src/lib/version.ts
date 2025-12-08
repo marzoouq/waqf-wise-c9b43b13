@@ -6,7 +6,7 @@
  * @date 2025-12-08
  */
 
-export const APP_VERSION = '2.8.27';
+export const APP_VERSION = '2.8.30';
 export const APP_VERSION_DATE = '2025-12-08';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
@@ -16,12 +16,13 @@ export const VERSION_INFO = {
   name: APP_VERSION_NAME,
   changelog: '/docs/CHANGELOG.md',
   features: [
-    'نقل 85+ hook للخدمات',
-    'إنشاء SystemService للنظام والإعدادات',
-    'توسيع MaintenanceService مع Providers و Schedules',
-    'توسيع POSService مع settleShift و getShiftsReport',
-    'تحويل useBackup, useSystemHealth, useSystemSettings, useSecurityAlerts',
-    'صفر أخطاء بناء',
+    'اكتمال نقل جميع الـ hooks للخدمات',
+    '41 خدمة متكاملة (Core: 4, Domain: 34, Infrastructure: 3)',
+    'Realtime subscriptions مقبولة في 7 hooks',
+    'SecurityService, SettingsService, IntegrationService',
+    'MonitoringService, KnowledgeService, DocumentationService',
+    'NotificationSettingsService للإشعارات',
+    'صفر أخطاء بناء - 100% فصل الاهتمامات',
   ],
 } as const;
 
