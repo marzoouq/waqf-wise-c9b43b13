@@ -1,46 +1,17 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building, DollarSign, TrendingUp, Home, Landmark, Receipt, Wallet } from "lucide-react";
+import { Building, TrendingUp, Home, Landmark, Receipt, Wallet } from "lucide-react";
 import { useProperties } from "@/hooks/useProperties";
 import { usePropertyUnits } from "@/hooks/usePropertyUnits";
-import { useRentalPayments } from "@/hooks/useRentalPayments";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { usePropertyRevenueStats } from "@/hooks/dashboard/usePropertyRevenueStats";
 import { safeFilter, safeLength } from '@/lib/utils/array-safe';
 import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
 import { formatCurrency } from "@/lib/utils";
 
-interface RentalPaymentWithContract {
-  amount_paid: number | null;
-  tax_amount: number | null;
-  contracts: {
-    payment_frequency: string | null;
-  } | null;
-}
-
 export const PropertyStatsCard = () => {
   const { properties } = useProperties();
   const { units: propertyUnits } = usePropertyUnits();
-
-  // جلب المدفوعات الفعلية مع نوع الدفع من العقود
-  const { data: payments } = useQuery({
-    queryKey: ["rental-payments-with-frequency"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("rental_payments")
-        .select(`
-          amount_paid,
-          tax_amount,
-          contracts!inner (
-            payment_frequency
-          )
-        `)
-        .eq("status", "مدفوع");
-
-      if (error) throw error;
-      return (data || []) as RentalPaymentWithContract[];
-    },
-  });
+  const { data: payments } = usePropertyRevenueStats();
 
   // حساب إحصائيات العقارات
   const totalProperties = safeLength(properties);

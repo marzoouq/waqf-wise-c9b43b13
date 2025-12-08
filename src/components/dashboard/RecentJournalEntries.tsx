@@ -1,27 +1,12 @@
 import { memo } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useRecentJournalEntries } from "@/hooks/dashboard/useRecentJournalEntries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDate } from "@/lib/date";
 import { FileText } from "lucide-react";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 
 const RecentJournalEntries = memo(() => {
-  const { data: entries, isLoading } = useQuery({
-    queryKey: ["recent_journal_entries"],
-    queryFn: async () => {
-      // Optimized: Select only needed fields
-      const { data, error } = await supabase
-        .from("journal_entries")
-        .select("id, entry_number, description, status, entry_date")
-        .order("created_at", { ascending: false })
-        .limit(5);
-      
-      if (error) throw error;
-      return data;
-    },
-    staleTime: 2 * 60 * 1000, // 2 minutes cache
-  });
+  const { data: entries, isLoading } = useRecentJournalEntries(5);
 
   if (isLoading) {
     return (

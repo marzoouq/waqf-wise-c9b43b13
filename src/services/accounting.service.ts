@@ -599,6 +599,62 @@ export class AccountingService {
   }
 
   /**
+   * جلب آخر القيود المحاسبية
+   */
+  static async getRecentJournalEntries(limit: number = 5): Promise<JournalEntryRow[]> {
+    try {
+      const { data, error } = await supabase
+        .from("journal_entries")
+        .select("id, entry_number, description, status, entry_date")
+        .order("created_at", { ascending: false })
+        .limit(limit);
+      
+      if (error) throw error;
+      return (data || []) as JournalEntryRow[];
+    } catch (error) {
+      productionLogger.error('Error fetching recent journal entries', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب توزيع الحسابات حسب النوع
+   */
+  static async getAccountDistribution(): Promise<{ name: string; value: number; count: number }[]> {
+    try {
+      const { data: accounts, error } = await supabase
+        .from("accounts")
+        .select("account_type")
+        .eq("is_active", true);
+
+      if (error) throw error;
+
+      const distribution = new Map<string, number>();
+      accounts?.forEach((account) => {
+        const type = account.account_type;
+        distribution.set(type, (distribution.get(type) || 0) + 1);
+      });
+
+      const typeLabels: Record<string, string> = {
+        asset: 'الأصول',
+        liability: 'الخصوم',
+        equity: 'حقوق الملكية',
+        revenue: 'الإيرادات',
+        expense: 'المصروفات',
+      };
+
+      return Array.from(distribution.entries()).map(([type, count]) => ({
+        name: typeLabels[type] || type,
+        value: count,
+        count: count,
+      }));
+    } catch (error) {
+      productionLogger.error('Error fetching account distribution', error);
+      throw error;
+    }
+  }
+
+  /**
    * جلب ميزان المراجعة
    */
   static async getTrialBalance(fiscalYearId?: string): Promise<{

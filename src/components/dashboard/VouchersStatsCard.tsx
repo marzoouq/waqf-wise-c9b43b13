@@ -1,34 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useVouchersStats } from "@/hooks/dashboard/useVouchersStats";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Receipt, TrendingUp, Clock, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { safeFilter, safeReduce, safeLength } from '@/lib/utils/array-safe';
 
 export function VouchersStatsCard() {
-  const { data: stats, isLoading } = useQuery({
-    queryKey: ["vouchers-stats"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('payment_vouchers')
-        .select('amount, status, created_at');
-
-      if (error) throw error;
-
-      const now = new Date();
-      const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-
-      return {
-        total: safeLength(data),
-        draft: safeFilter(data, v => v.status === 'draft').length,
-        paid: safeFilter(data, v => v.status === 'paid').length,
-        thisMonth: safeFilter(data, v => new Date(v.created_at) >= thisMonth).length,
-        totalAmount: safeReduce(data, (sum, v) => sum + v.amount, 0),
-        paidAmount: safeReduce(safeFilter(data, v => v.status === 'paid'), (sum, v) => sum + v.amount, 0),
-      };
-    },
-  });
+  const { data: stats, isLoading } = useVouchersStats();
 
   if (isLoading) {
     return (
