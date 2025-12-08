@@ -255,4 +255,215 @@ export class DistributionService {
       throw error;
     }
   }
+
+  /**
+   * جلب الجدول الزمني للتوزيع
+   */
+  static async getTimeline(distributionId: string): Promise<{
+    events: { date: string; action: string; user?: string; notes?: string }[];
+  }> {
+    try {
+      const distribution = await this.getById(distributionId);
+      if (!distribution) throw new Error('التوزيع غير موجود');
+
+      const events: { date: string; action: string; user?: string; notes?: string }[] = [];
+
+      events.push({
+        date: distribution.created_at,
+        action: 'إنشاء التوزيع',
+      });
+
+      if (distribution.approved_at) {
+        events.push({
+          date: distribution.approved_at,
+          action: 'الموافقة على التوزيع',
+          user: distribution.approved_by || undefined,
+        });
+      }
+
+      if (distribution.status === 'paid') {
+        events.push({
+          date: distribution.updated_at,
+          action: 'تم الصرف',
+        });
+      }
+
+      return { events };
+    } catch (error) {
+      productionLogger.error('Error fetching distribution timeline', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب سندات التوزيع
+   */
+  static async getVouchers(distributionId: string): Promise<Database['public']['Tables']['payment_vouchers']['Row'][]> {
+    try {
+      const { data, error } = await supabase
+        .from('payment_vouchers')
+        .select('*')
+        .eq('distribution_id', distributionId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching distribution vouchers', error);
+      throw error;
+    }
+  }
+
+  /**
+   * إنشاء سند صرف
+   */
+  static async createVoucher(voucher: Database['public']['Tables']['payment_vouchers']['Insert']): Promise<Database['public']['Tables']['payment_vouchers']['Row']> {
+    try {
+      const { data, error } = await supabase
+        .from('payment_vouchers')
+        .insert([voucher])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      productionLogger.error('Error creating voucher', error);
+      throw error;
+    }
+  }
+
+  /**
+   * رفع كشف حساب بنكي للإفصاح
+   */
+  static async uploadBankStatement(disclosureId: string, file: File): Promise<string> {
+    try {
+      const filePath = `disclosures/${disclosureId}/bank_statement_${Date.now()}.pdf`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('disclosure-documents')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from('disclosure-documents')
+        .getPublicUrl(filePath);
+
+      await supabase
+        .from('annual_disclosures')
+        .update({ bank_statement_url: urlData.publicUrl })
+        .eq('id', disclosureId);
+
+      return urlData.publicUrl;
+    } catch (error) {
+      productionLogger.error('Error uploading bank statement', error);
+      throw error;
+    }
+  }
+
+  /**
+   * إنشاء ملف تحويل بنكي
+   */
+  static async generateBankTransfer(distributionId: string): Promise<Database['public']['Tables']['bank_transfer_files']['Row']> {
+    try {
+      const distribution = await this.getById(distributionId);
+      if (!distribution) throw new Error('التوزيع غير موجود');
+
+      const vouchers = await this.getVouchers(distributionId);
+      
+      // إنشاء ملف التحويل
+      const fileNumber = `BTF-${Date.now()}`;
+      const totalAmount = vouchers.reduce((sum, v) => sum + (v.amount || 0), 0);
+
+      const { data, error } = await supabase
+        .from('bank_transfer_files')
+        .insert([{
+          file_number: fileNumber,
+          distribution_id: distributionId,
+          file_format: 'CSV',
+          total_transactions: vouchers.length,
+          total_amount: totalAmount,
+          status: 'pending',
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      productionLogger.error('Error generating bank transfer', error);
+      throw error;
+    }
+  }
+
+  /**
+   * تتبع حالة التحويل
+   */
+  static async trackTransferStatus(transferId: string): Promise<Database['public']['Tables']['bank_transfer_files']['Row']> {
+    try {
+      const { data, error } = await supabase
+        .from('bank_transfer_files')
+        .select('*')
+        .eq('id', transferId)
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      productionLogger.error('Error tracking transfer status', error);
+      throw error;
+    }
+  }
+
+  /**
+   * اختيار المستفيدين للتوزيع
+   */
+  static async selectBeneficiaries(query: {
+    status?: string;
+    category?: string;
+    hasBank?: boolean;
+  }): Promise<{ id: string; full_name: string; iban: string | null }[]> {
+    try {
+      const { data, error } = await supabase
+        .from('beneficiaries')
+        .select('id, full_name, iban')
+        .eq('status', query.status || 'active')
+        .order('full_name');
+
+      if (error) throw error;
+      
+      let filtered = data || [];
+      if (query.category) {
+        filtered = filtered.filter(b => true); // category filter would go here
+      }
+      if (query.hasBank) {
+        filtered = filtered.filter(b => !!b.iban);
+      }
+      
+      return filtered;
+    } catch (error) {
+      productionLogger.error('Error selecting beneficiaries', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب توزيعات السنة المالية
+   */
+  static async getByFiscalYear(fiscalYearId: string): Promise<DistributionRow[]> {
+    try {
+      const { data, error } = await supabase
+        .from('distributions')
+        .select('*')
+        .eq('fiscal_year_id', fiscalYearId)
+        .order('distribution_date', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching fiscal year distributions', error);
+      throw error;
+    }
+  }
 }
