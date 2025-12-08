@@ -4,7 +4,8 @@
  */
 
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { BeneficiaryService } from "@/services";
 
 export interface BeneficiaryStatistics {
   total_received: number;
@@ -14,26 +15,20 @@ export interface BeneficiaryStatistics {
 }
 
 export function useBeneficiaryPortalData() {
+  const { user } = useAuth();
+
   // جلب بيانات المستفيد الحالي
   const {
     data: beneficiary,
     isLoading: beneficiaryLoading,
     error: beneficiaryError,
   } = useQuery({
-    queryKey: ["current-beneficiary"],
+    queryKey: ["current-beneficiary", user?.id],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("غير مصرح");
-
-      const { data, error } = await supabase
-        .from("beneficiaries")
-        .select("*")
-        .eq("user_id", user.id)
-        .single();
-
-      if (error) throw error;
-      return data;
+      if (!user?.id) throw new Error("غير مصرح");
+      return BeneficiaryService.getByUserId(user.id);
     },
+    enabled: !!user?.id,
   });
 
   // جلب الإحصائيات
@@ -44,12 +39,11 @@ export function useBeneficiaryPortalData() {
     queryKey: ["beneficiary-statistics", beneficiary?.id],
     queryFn: async () => {
       if (!beneficiary?.id) return null;
-      
-      const { data, error } = await supabase
-        .rpc('get_beneficiary_statistics', { p_beneficiary_id: beneficiary.id });
-
-      if (error) throw error;
-      return data as unknown as BeneficiaryStatistics | null;
+      const result = await BeneficiaryService.getStatisticsRPC(beneficiary.id);
+      return result as unknown as BeneficiaryStatistics | null;
+    },
+    enabled: !!beneficiary?.id,
+  });
     },
     enabled: !!beneficiary?.id,
   });

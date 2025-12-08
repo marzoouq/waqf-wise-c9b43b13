@@ -5,10 +5,10 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import { BeneficiaryService } from "@/services";
 
 interface HeirDistribution {
   share_amount: number;
@@ -53,15 +53,7 @@ export function useBeneficiaryPersonalReportsData() {
     queryKey: ['my-beneficiary', user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
-      
-      const { data, error } = await supabase
-        .from('beneficiaries')
-        .select('id, full_name, beneficiary_number, status, user_id')
-        .eq('user_id', user.id)
-        .single();
-
-      if (error) throw error;
-      return data as Beneficiary;
+      return BeneficiaryService.getByUserId(user.id) as Promise<Beneficiary | null>;
     },
     enabled: !!user?.id,
   });
@@ -71,17 +63,7 @@ export function useBeneficiaryPersonalReportsData() {
     queryKey: ['beneficiary-yearly-distributions', beneficiary?.id, selectedYear],
     queryFn: async () => {
       if (!beneficiary?.id) return [];
-
-      const { data, error } = await supabase
-        .from('heir_distributions')
-        .select('share_amount, distribution_date, heir_type, notes')
-        .eq('beneficiary_id', beneficiary.id)
-        .gte('distribution_date', `${selectedYear}-01-01`)
-        .lte('distribution_date', `${selectedYear}-12-31`)
-        .order('distribution_date', { ascending: true });
-
-      if (error) throw error;
-      return data as HeirDistribution[];
+      return BeneficiaryService.getYearlyDistributions(beneficiary.id, selectedYear) as Promise<HeirDistribution[]>;
     },
     enabled: !!beneficiary?.id && !!selectedYear,
   });
@@ -91,16 +73,7 @@ export function useBeneficiaryPersonalReportsData() {
     queryKey: ['beneficiary-yearly-requests', beneficiary?.id, selectedYear],
     queryFn: async () => {
       if (!beneficiary?.id) return [];
-
-      const { data, error } = await supabase
-        .from('beneficiary_requests')
-        .select('status, amount, created_at')
-        .eq('beneficiary_id', beneficiary.id)
-        .gte('created_at', `${selectedYear}-01-01`)
-        .lte('created_at', `${selectedYear}-12-31`);
-
-      if (error) throw error;
-      return data as Request[];
+      return BeneficiaryService.getYearlyRequests(beneficiary.id, selectedYear) as Promise<Request[]>;
     },
     enabled: !!beneficiary?.id && !!selectedYear,
   });

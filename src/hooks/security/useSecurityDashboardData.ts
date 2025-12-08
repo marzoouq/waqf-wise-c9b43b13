@@ -4,8 +4,7 @@
  */
 
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { SecurityEvent, LoginAttempt } from "@/types/security";
+import { SecurityService } from "@/services";
 
 export interface SecurityStats {
   total: number;
@@ -20,15 +19,7 @@ export function useSecurityDashboardData() {
     isLoading: eventsLoading,
   } = useQuery({
     queryKey: ["security-events"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("security_events_log")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(50);
-      if (error) throw error;
-      return data as SecurityEvent[];
-    },
+    queryFn: () => SecurityService.getSecurityEvents(50),
   });
 
   const {
@@ -36,15 +27,7 @@ export function useSecurityDashboardData() {
     isLoading: attemptsLoading,
   } = useQuery({
     queryKey: ["login-attempts"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("login_attempts_log")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(20);
-      if (error) throw error;
-      return data as LoginAttempt[];
-    },
+    queryFn: () => SecurityService.getLoginAttempts(20),
   });
 
   const stats: SecurityStats = {
@@ -55,8 +38,8 @@ export function useSecurityDashboardData() {
   };
 
   return {
-    securityEvents,
-    loginAttempts,
+    securityEvents: securityEvents as unknown as import("@/types/security").SecurityEvent[],
+    loginAttempts: loginAttempts as unknown as import("@/types/security").LoginAttempt[],
     stats,
     isLoading: eventsLoading || attemptsLoading,
   };

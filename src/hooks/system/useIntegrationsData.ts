@@ -4,8 +4,7 @@
  */
 
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { BankIntegration, PaymentGateway, GovernmentIntegration } from "@/types/integrations";
+import { IntegrationService } from "@/services";
 
 export function useIntegrationsData() {
   const {
@@ -13,14 +12,7 @@ export function useIntegrationsData() {
     isLoading: bankLoading,
   } = useQuery({
     queryKey: ["bank-integrations"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("bank_integrations")
-        .select("*")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data as BankIntegration[];
-    },
+    queryFn: () => IntegrationService.getBankIntegrations(),
   });
 
   const {
@@ -28,14 +20,7 @@ export function useIntegrationsData() {
     isLoading: gatewaysLoading,
   } = useQuery({
     queryKey: ["payment-gateways"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("payment_gateways")
-        .select("*")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data as PaymentGateway[];
-    },
+    queryFn: () => IntegrationService.getPaymentGateways(),
   });
 
   const {
@@ -43,14 +28,7 @@ export function useIntegrationsData() {
     isLoading: governmentLoading,
   } = useQuery({
     queryKey: ["government-integrations"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("government_integrations")
-        .select("*")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data as GovernmentIntegration[];
-    },
+    queryFn: () => IntegrationService.getGovernmentIntegrations(),
   });
 
   return {

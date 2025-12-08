@@ -5,9 +5,8 @@
 
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { RequestService } from "@/services/request.service";
+import { RequestService, BeneficiaryService } from "@/services";
 
 export interface BeneficiaryRequest {
   id: string;
@@ -43,15 +42,7 @@ export function useMyBeneficiaryRequests(userId?: string) {
     queryKey: ["my-beneficiary", userId],
     queryFn: async () => {
       if (!userId) return null;
-
-      const { data, error } = await supabase
-        .from("beneficiaries")
-        .select("id")
-        .eq("user_id", userId)
-        .single();
-
-      if (error) throw error;
-      return data;
+      return BeneficiaryService.getByUserId(userId);
     },
     enabled: !!userId,
   });
