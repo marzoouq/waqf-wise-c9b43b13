@@ -176,7 +176,7 @@ export const DashboardService = {
       supabase.from('beneficiaries').select('id, status'),
       supabase.from('families').select('id'),
       supabase.from('properties').select('id, status'),
-      supabase.from('contracts').select('id, status, monthly_rent'),
+      supabase.from('contracts').select('id, status, monthly_rent, payment_frequency'),
       supabase.from('funds').select('id, is_active'),
       supabase.from('beneficiary_requests').select('id, status, is_overdue'),
       supabase.from('loans').select('id, status'),
@@ -203,9 +203,24 @@ export const DashboardService = {
     const occupiedProperties = contracts.filter(c => 
       c.status === CONTRACT_STATUS.ACTIVE || c.status === 'active'
     ).length;
+    // حساب العائد الشهري الفعلي - مع مراعاة تكرار الدفع
+    // العقود السنوية: الإيجار ÷ 12، العقود الشهرية: الإيجار كما هو
     const monthlyReturn = contracts
       .filter(c => c.status === CONTRACT_STATUS.ACTIVE || c.status === 'active')
-      .reduce((sum, c) => sum + (c.monthly_rent || 0), 0);
+      .reduce((sum, c) => {
+        const rent = c.monthly_rent || 0;
+        const frequency = c.payment_frequency;
+        // إذا كان الدفع سنوي، نقسم على 12 للحصول على المعدل الشهري
+        if (frequency === 'سنوي' || frequency === 'annual') {
+          return sum + (rent / 12);
+        }
+        // إذا كان الدفع ربع سنوي، نقسم على 3
+        if (frequency === 'ربع سنوي' || frequency === 'quarterly') {
+          return sum + (rent / 3);
+        }
+        // الدفع الشهري كما هو
+        return sum + rent;
+      }, 0);
 
     const funds = fundsResult.data || [];
     const totalFunds = funds.length;
