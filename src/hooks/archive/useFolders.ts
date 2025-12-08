@@ -1,8 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { QUERY_KEYS, TOAST_MESSAGES, QUERY_STALE_TIME } from "@/lib/constants";
 import { createMutationErrorHandler } from "@/lib/errors";
+import { ArchiveService } from "@/services/archive.service";
 
 export interface Folder {
   id: string;
@@ -19,29 +19,13 @@ export function useFolders() {
 
   const { data: folders = [], isLoading } = useQuery({
     queryKey: [QUERY_KEYS.FOLDERS],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("folders")
-        .select("id, name, description, files_count, created_at, updated_at")
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return data as Folder[];
-    },
+    queryFn: () => ArchiveService.getFolders(),
     staleTime: QUERY_STALE_TIME.DEFAULT,
   });
 
   const addFolder = useMutation({
-    mutationFn: async (folder: Omit<Folder, "id" | "created_at" | "updated_at" | "files_count">) => {
-      const { data, error } = await supabase
-        .from("folders")
-        .insert([{ ...folder, files_count: 0 }])
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: (folder: Omit<Folder, "id" | "created_at" | "updated_at" | "files_count">) => 
+      ArchiveService.createFolder({ ...folder, files_count: 0 }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.FOLDERS] });
       toast({
@@ -56,17 +40,8 @@ export function useFolders() {
   });
 
   const updateFolder = useMutation({
-    mutationFn: async ({ id, ...updates }: Partial<Folder> & { id: string }) => {
-      const { data, error } = await supabase
-        .from("folders")
-        .update(updates)
-        .eq("id", id)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: ({ id, ...updates }: Partial<Folder> & { id: string }) => 
+      ArchiveService.updateFolder(id, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.FOLDERS] });
       toast({

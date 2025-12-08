@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { createMutationErrorHandler } from "@/lib/errors";
+import { AccountingService } from "@/services/accounting.service";
 
 export interface Budget {
   id: string;
@@ -32,41 +32,12 @@ export function useBudgets(fiscalYearId?: string) {
     refetch,
   } = useQuery({
     queryKey: ["budgets", fiscalYearId],
-    queryFn: async () => {
-      let query = supabase
-        .from("budgets")
-        .select(`
-          *,
-          accounts:account_id (
-            code,
-            name_ar,
-            account_type
-          )
-        `)
-        .order("period_number", { ascending: true });
-
-      if (fiscalYearId) {
-        query = query.eq("fiscal_year_id", fiscalYearId);
-      }
-
-      const { data, error } = await query;
-
-      if (error) throw error;
-      return (data || []) as Budget[];
-    },
+    queryFn: () => AccountingService.getBudgetsWithAccounts(fiscalYearId),
   });
 
   const addBudget = useMutation({
-    mutationFn: async (budget: Omit<Budget, "id" | "created_at" | "updated_at" | "actual_amount" | "variance_amount" | "accounts">) => {
-      const { data, error } = await supabase
-        .from("budgets")
-        .insert([budget])
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: (budget: Omit<Budget, "id" | "created_at" | "updated_at" | "actual_amount" | "variance_amount" | "accounts">) => 
+      AccountingService.createBudget(budget),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["budgets"] });
       toast({
@@ -81,17 +52,8 @@ export function useBudgets(fiscalYearId?: string) {
   });
 
   const updateBudget = useMutation({
-    mutationFn: async ({ id, ...updates }: Partial<Budget> & { id: string }) => {
-      const { data, error } = await supabase
-        .from("budgets")
-        .update(updates)
-        .eq("id", id)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: ({ id, ...updates }: Partial<Budget> & { id: string }) => 
+      AccountingService.updateBudget(id, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["budgets"] });
       toast({
@@ -106,14 +68,7 @@ export function useBudgets(fiscalYearId?: string) {
   });
 
   const deleteBudget = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from("budgets")
-        .delete()
-        .eq("id", id);
-
-      if (error) throw error;
-    },
+    mutationFn: (id: string) => AccountingService.deleteBudget(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["budgets"] });
       toast({
@@ -128,39 +83,7 @@ export function useBudgets(fiscalYearId?: string) {
   });
 
   const calculateVariances = useMutation({
-    mutationFn: async (fiscalYearId: string) => {
-      // حساب الانحرافات لكل ميزانية
-      const { data: budgetsData, error: budgetsError } = await supabase
-        .from("budgets")
-        .select("id, account_id, fiscal_year_id, period_type, period_number, budgeted_amount, actual_amount, variance_amount")
-        .eq("fiscal_year_id", fiscalYearId);
-
-      if (budgetsError) throw budgetsError;
-
-      for (const budget of budgetsData || []) {
-        // حساب المبلغ الفعلي من القيود المحاسبية
-        const { data: actualData, error: actualError } = await supabase
-          .from("journal_entry_lines")
-          .select("debit_amount, credit_amount")
-          .eq("account_id", budget.account_id);
-
-        if (actualError) throw actualError;
-
-        const actualAmount = actualData?.reduce((sum, line) => 
-          sum + (line.debit_amount - line.credit_amount), 0) || 0;
-
-        const varianceAmount = budget.budgeted_amount - actualAmount;
-
-        // تحديث الميزانية
-        await supabase
-          .from("budgets")
-          .update({
-            actual_amount: actualAmount,
-            variance_amount: varianceAmount,
-          })
-          .eq("id", budget.id);
-      }
-    },
+    mutationFn: (fiscalYearId: string) => AccountingService.calculateBudgetVariances(fiscalYearId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["budgets"] });
       toast({
