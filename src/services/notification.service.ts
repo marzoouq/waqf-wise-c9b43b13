@@ -325,4 +325,40 @@ export class NotificationService {
       return { success: false };
     }
   }
+
+  /**
+   * إرسال إشعارات لرسائل نموذج الاتصال
+   */
+  static async sendContactNotifications(formData: {
+    name: string;
+    email: string;
+    phone: string;
+    subject: string;
+    message: string;
+  }): Promise<void> {
+    try {
+      // جلب المسؤولين
+      const { data: adminUsers } = await supabase
+        .from('user_roles')
+        .select('user_id')
+        .in('role', ['admin', 'nazer']);
+
+      if (adminUsers && adminUsers.length > 0) {
+        const notifications: NotificationData[] = adminUsers.map(admin => ({
+          user_id: admin.user_id,
+          title: `رسالة جديدة: ${formData.subject}`,
+          message: `رسالة من ${formData.name}: ${formData.subject}`,
+          type: 'info' as const,
+          priority: 'medium' as const,
+          reference_type: 'contact_message',
+          action_url: '/admin/messages',
+        }));
+
+        await this.sendBulk(notifications);
+      }
+    } catch (error) {
+      productionLogger.error('Error sending contact notifications', error);
+      throw error;
+    }
+  }
 }

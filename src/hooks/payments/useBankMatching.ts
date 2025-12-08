@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { AccountingService } from '@/services';
 import type { Json } from '@/integrations/supabase/types';
 
 export interface MatchingConditions {
@@ -83,14 +83,8 @@ export function useBankMatching() {
   const { data: rules, isLoading: isLoadingRules } = useQuery({
     queryKey: ['bank_matching_rules'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('bank_matching_rules')
-        .select('id, rule_name, description, conditions, account_mapping, priority, is_active, match_count, last_matched_at, created_at, updated_at')
-        .eq('is_active', true)
-        .order('priority', { ascending: false });
-
-      if (error) throw error;
-      return (data || []).map(item => ({
+      const data = await AccountingService.getBankMatchingRules();
+      return data.map(item => ({
         ...item,
         conditions: parseConditions(item.conditions),
         account_mapping: parseAccountMapping(item.account_mapping),
@@ -104,32 +98,15 @@ export function useBankMatching() {
   const { data: matches, isLoading: isLoadingMatches } = useQuery({
     queryKey: ['bank_reconciliation_matches'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('bank_reconciliation_matches')
-        .select('id, bank_transaction_id, journal_entry_id, match_type, confidence_score, matching_rule_id, matched_at, matched_by, notes')
-        .order('matched_at', { ascending: false });
-
-      if (error) throw error;
+      const data = await AccountingService.getBankReconciliationMatches();
       return data as BankReconciliationMatch[];
     },
   });
 
   const autoMatch = useMutation({
     mutationFn: async ({ statementId }: { statementId: string }) => {
-      const { data: transactions, error: txError } = await supabase
-        .from('bank_transactions')
-        .select('id, statement_id, transaction_date, amount, description, transaction_type, reference_number, is_matched, journal_entry_id, created_at')
-        .eq('statement_id', statementId)
-        .eq('is_matched', false);
-
-      if (txError) throw txError;
-
-      const { data: entries, error: entriesError } = await supabase
-        .from('journal_entries')
-        .select('*, journal_entry_lines(*, accounts(*))')
-        .eq('status', 'posted');
-
-      if (entriesError) throw entriesError;
+      const transactions = await AccountingService.getUnmatchedBankTransactions(statementId);
+      const entries = await AccountingService.getPostedEntriesForMatching();
 
       const suggestions: MatchSuggestion[] = [];
 
@@ -205,17 +182,12 @@ export function useBankMatching() {
       const autoMatches = suggestions.filter(s => s.confidence >= 0.9);
       
       for (const match of autoMatches) {
-        await supabase.from('bank_reconciliation_matches').insert({
+        await AccountingService.createBankMatch({
           bank_transaction_id: match.bankTransactionId,
           journal_entry_id: match.journalEntryId,
           match_type: 'auto',
           confidence_score: match.confidence,
         });
-
-        await supabase
-          .from('bank_transactions')
-          .update({ is_matched: true, journal_entry_id: match.journalEntryId })
-          .eq('id', match.bankTransactionId);
       }
 
       return { suggestions, autoMatched: autoMatches.length };
@@ -240,26 +212,13 @@ export function useBankMatching() {
       journalEntryId: string;
       notes?: string;
     }) => {
-      const { data, error } = await supabase
-        .from('bank_reconciliation_matches')
-        .insert({
-          bank_transaction_id: bankTransactionId,
-          journal_entry_id: journalEntryId,
-          match_type: 'manual',
-          confidence_score: 1.0,
-          notes,
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      await supabase
-        .from('bank_transactions')
-        .update({ is_matched: true, journal_entry_id: journalEntryId })
-        .eq('id', bankTransactionId);
-
-      return data;
+      return await AccountingService.createBankMatch({
+        bank_transaction_id: bankTransactionId,
+        journal_entry_id: journalEntryId,
+        match_type: 'manual',
+        confidence_score: 1.0,
+        notes,
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bank_transactions'] });
@@ -273,25 +232,7 @@ export function useBankMatching() {
 
   const unmatch = useMutation({
     mutationFn: async (matchId: string) => {
-      const { data: match, error: fetchError } = await supabase
-        .from('bank_reconciliation_matches')
-        .select('id, bank_transaction_id, journal_entry_id')
-        .eq('id', matchId)
-        .single();
-
-      if (fetchError) throw fetchError;
-
-      const { error } = await supabase
-        .from('bank_reconciliation_matches')
-        .delete()
-        .eq('id', matchId);
-
-      if (error) throw error;
-
-      await supabase
-        .from('bank_transactions')
-        .update({ is_matched: false, journal_entry_id: null })
-        .eq('id', match.bank_transaction_id);
+      await AccountingService.deleteBankMatch(matchId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bank_transactions'] });
