@@ -64,6 +64,7 @@ export interface Beneficiary {
   phone: string;
   email: string | null;
   category: string;
+  family_id: string | null;
   family_name: string | null;
   relationship: string | null;
   status: string;
@@ -114,6 +115,13 @@ export interface Beneficiary {
   income_sources: Json | null;
   disabilities: Json | null;
   medical_conditions: Json | null;
+  // Additional fields from database
+  account_balance: number | null;
+  last_activity_at: string | null;
+  pending_amount: number | null;
+  pending_requests: number | null;
+  total_payments: number | null;
+  total_received: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -126,8 +134,6 @@ export type BeneficiaryUpdate = Partial<Omit<Beneficiary, "id" | "created_at" | 
 
 // Beneficiary with statistics for dashboard
 export interface BeneficiaryWithStats extends Beneficiary {
-  total_payments?: number;
-  payment_count?: number;
   last_payment_date?: string;
 }
 

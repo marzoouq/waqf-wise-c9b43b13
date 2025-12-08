@@ -44,9 +44,6 @@ export function useBeneficiaryPortalData() {
     },
     enabled: !!beneficiary?.id,
   });
-    },
-    enabled: !!beneficiary?.id,
-  });
 
   const stats: BeneficiaryStatistics = statistics || {
     total_received: 0,
