@@ -1,43 +1,27 @@
+/**
+ * useTenantLedger Hook - يستخدم Service Layer
+ */
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { TenantService } from '@/services';
 import type { TenantLedgerEntry, TenantLedgerInsert, TenantAgingItem } from '@/types/tenants';
 
 export function useTenantLedger(tenantId: string | undefined) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch ledger entries for a tenant
   const { data: entries = [], isLoading } = useQuery({
     queryKey: ['tenant-ledger', tenantId],
     queryFn: async (): Promise<TenantLedgerEntry[]> => {
       if (!tenantId) return [];
-
-      const { data, error } = await supabase
-        .from('tenant_ledger')
-        .select('*')
-        .eq('tenant_id', tenantId)
-        .order('transaction_date', { ascending: false })
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return data as TenantLedgerEntry[];
+      return TenantService.getLedger(tenantId) as Promise<TenantLedgerEntry[]>;
     },
     enabled: !!tenantId,
   });
 
-  // Add ledger entry
   const addEntry = useMutation({
-    mutationFn: async (entry: TenantLedgerInsert) => {
-      const { data, error } = await supabase
-        .from('tenant_ledger')
-        .insert(entry)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: (entry: TenantLedgerInsert) => TenantService.addLedgerEntry(entry),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tenant-ledger', tenantId] });
       queryClient.invalidateQueries({ queryKey: ['tenants'] });
@@ -51,7 +35,6 @@ export function useTenantLedger(tenantId: string | undefined) {
     },
   });
 
-  // Calculate current balance
   const balance = entries.reduce(
     (acc, entry) => acc + (entry.debit_amount || 0) - (entry.credit_amount || 0),
     0
@@ -69,63 +52,7 @@ export function useTenantLedger(tenantId: string | undefined) {
 export function useTenantsAging() {
   return useQuery({
     queryKey: ['tenants-aging'],
-    queryFn: async (): Promise<TenantAgingItem[]> => {
-      const { data: tenants, error: tenantsError } = await supabase
-        .from('tenants')
-        .select('id, full_name')
-        .eq('status', 'active');
-
-      if (tenantsError) throw tenantsError;
-
-      const today = new Date();
-      const agingData: TenantAgingItem[] = [];
-
-      for (const tenant of tenants || []) {
-        const { data: ledger } = await supabase
-          .from('tenant_ledger')
-          .select('*')
-          .eq('tenant_id', tenant.id)
-          .eq('transaction_type', 'invoice');
-
-        let current = 0;
-        let days_30 = 0;
-        let days_60 = 0;
-        let days_90 = 0;
-        let over_90 = 0;
-
-        for (const entry of ledger || []) {
-          const transactionDate = new Date(entry.transaction_date);
-          const daysDiff = Math.floor(
-            (today.getTime() - transactionDate.getTime()) / (1000 * 60 * 60 * 24)
-          );
-          const amount = (entry.debit_amount || 0) - (entry.credit_amount || 0);
-
-          if (amount <= 0) continue;
-
-          if (daysDiff <= 30) current += amount;
-          else if (daysDiff <= 60) days_30 += amount;
-          else if (daysDiff <= 90) days_60 += amount;
-          else if (daysDiff <= 120) days_90 += amount;
-          else over_90 += amount;
-        }
-
-        const total = current + days_30 + days_60 + days_90 + over_90;
-        if (total > 0) {
-          agingData.push({
-            tenant_id: tenant.id,
-            tenant_name: tenant.full_name,
-            current,
-            days_30,
-            days_60,
-            days_90,
-            over_90,
-            total,
-          });
-        }
-      }
-
-      return agingData.sort((a, b) => b.total - a.total);
-    },
+    queryFn: (): Promise<TenantAgingItem[]> => TenantService.getTenantsAging(),
   });
 }
 
@@ -151,7 +78,7 @@ export function useRecordInvoiceToLedger() {
       propertyId?: string;
       contractId?: string;
     }) => {
-      const { error } = await supabase.from('tenant_ledger').insert({
+      return TenantService.addLedgerEntry({
         tenant_id: tenantId,
         transaction_type: 'invoice',
         reference_type: 'invoice',
@@ -163,8 +90,6 @@ export function useRecordInvoiceToLedger() {
         property_id: propertyId,
         contract_id: contractId,
       });
-
-      if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tenant-ledger'] });
@@ -202,7 +127,7 @@ export function useRecordPaymentToLedger() {
       propertyId?: string;
       contractId?: string;
     }) => {
-      const { error } = await supabase.from('tenant_ledger').insert({
+      return TenantService.addLedgerEntry({
         tenant_id: tenantId,
         transaction_type: 'payment',
         reference_type: 'receipt_voucher',
@@ -214,8 +139,6 @@ export function useRecordPaymentToLedger() {
         property_id: propertyId,
         contract_id: contractId,
       });
-
-      if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tenant-ledger'] });

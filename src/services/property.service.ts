@@ -446,4 +446,135 @@ export class PropertyService {
       throw error;
     }
   }
+
+  /**
+   * جلب إحصائيات العقارات الشاملة (للوحة التحكم)
+   */
+  static async getPropertiesStats(): Promise<{
+    totalProperties: number;
+    activeProperties: number;
+    occupiedUnits: number;
+    vacantUnits: number;
+    totalUnits: number;
+    occupancyRate: number;
+    totalCollected: number;
+    annualCollected: number;
+    monthlyCollected: number;
+    totalTax: number;
+    totalNetRevenue: number;
+    fiscalYearName: string;
+    carryForwardWaqfCorpus: number;
+    carryForwardSourceYear: string;
+    maintenanceRequests: number;
+    expiringContracts: number;
+    occupiedProperties: number;
+    vacantProperties: number;
+    totalMonthlyRevenue: number;
+    totalAnnualRevenue: number;
+  }> {
+    try {
+      const [
+        propertiesResult,
+        unitsResult,
+        contractsResult,
+        maintenanceResult,
+        fiscalYearResult,
+      ] = await Promise.all([
+        supabase.from("properties").select("*"),
+        supabase.from("property_units").select("*"),
+        supabase.from("contracts").select("*").eq("status", "نشط"),
+        supabase.from("maintenance_requests").select("*").in("status", ["معلق", "قيد التنفيذ"]),
+        supabase.from("fiscal_years").select("*").eq("is_active", true).single(),
+      ]);
+
+      if (propertiesResult.error) throw propertiesResult.error;
+      if (unitsResult.error) throw unitsResult.error;
+      if (contractsResult.error) throw contractsResult.error;
+      if (maintenanceResult.error) throw maintenanceResult.error;
+
+      const properties = propertiesResult.data;
+      const units = unitsResult.data;
+      const contracts = contractsResult.data;
+      const maintenance = maintenanceResult.data;
+      const fiscalYear = fiscalYearResult.data;
+
+      // جلب المدفوعات الفعلية
+      let paymentsQuery = supabase
+        .from("rental_payments")
+        .select("amount_paid, tax_amount, net_amount")
+        .eq("status", "مدفوع");
+
+      if (fiscalYear) {
+        paymentsQuery = paymentsQuery
+          .gte("payment_date", fiscalYear.start_date)
+          .lte("payment_date", fiscalYear.end_date);
+      }
+
+      const { data: payments, error: paymentsError } = await paymentsQuery;
+      if (paymentsError) throw paymentsError;
+
+      // العقود المنتهية قريباً
+      const thirtyDaysFromNow = new Date();
+      thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+
+      const { data: expiringContracts, error: expiringError } = await supabase
+        .from("contracts")
+        .select("*")
+        .eq("status", "نشط")
+        .lte("end_date", thirtyDaysFromNow.toISOString().split('T')[0]);
+
+      if (expiringError) throw expiringError;
+
+      const totalProperties = properties?.length || 0;
+      const activeProperties = properties?.filter(p => p.status === "مؤجر" || p.status === "active").length || 0;
+      
+      const totalUnits = units?.length || 0;
+      const occupiedUnits = units?.filter(u => u.occupancy_status === 'مشغول').length || 0;
+      const vacantUnits = totalUnits - occupiedUnits;
+      const occupancyRate = totalUnits > 0 ? Math.round((occupiedUnits / totalUnits) * 100) : 0;
+
+      const totalCollected = payments?.reduce((sum, p) => sum + (Number(p.amount_paid) || 0), 0) || 0;
+      const totalTax = payments?.reduce((sum, p) => sum + (Number(p.tax_amount) || 0), 0) || 0;
+      const totalNetRevenue = payments?.reduce((sum, p) => sum + (Number(p.net_amount) || 0), 0) || 0;
+
+      // جلب رقبة الوقف
+      let carryForwardWaqfCorpus = 0;
+      if (fiscalYear) {
+        const { data: waqfReserve } = await supabase
+          .from("waqf_reserves")
+          .select("current_balance")
+          .eq("fiscal_year_id", fiscalYear.id)
+          .eq("reserve_type", "احتياطي")
+          .single();
+
+        carryForwardWaqfCorpus = waqfReserve?.current_balance || 0;
+      }
+
+      return {
+        totalProperties,
+        activeProperties,
+        totalUnits,
+        occupiedUnits,
+        vacantUnits,
+        occupancyRate,
+        totalCollected,
+        annualCollected: totalCollected,
+        monthlyCollected: 0,
+        totalTax,
+        totalNetRevenue,
+        fiscalYearName: fiscalYear?.name || "غير محدد",
+        carryForwardWaqfCorpus,
+        carryForwardSourceYear: "2024-2025",
+        maintenanceRequests: maintenance?.length || 0,
+        expiringContracts: expiringContracts?.length || 0,
+        occupiedProperties: contracts?.length || occupiedUnits,
+        vacantProperties: totalProperties - (contracts?.length || 0),
+        totalMonthlyRevenue: totalCollected,
+        totalAnnualRevenue: totalCollected,
+      };
+    } catch (error) {
+      productionLogger.error('Error fetching properties stats', error);
+      throw error;
+    }
+  }
 }

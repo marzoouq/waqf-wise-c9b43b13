@@ -59,4 +59,101 @@ export class TenantService {
     const tenants = await this.getAll();
     return { total: tenants.length, active: tenants.filter(t => t.status === 'active').length };
   }
+
+  static async delete(id: string): Promise<void> {
+    const { error } = await supabase.from('tenants').delete().eq('id', id);
+    if (error) throw error;
+  }
+
+  static async addLedgerEntry(entry: Database['public']['Tables']['tenant_ledger']['Insert']) {
+    const { data, error } = await supabase.from('tenant_ledger').insert(entry).select().single();
+    if (error) throw error;
+    return data;
+  }
+
+  static async getTenantsWithBalance() {
+    const tenantsData = await this.getAll();
+    
+    const tenantsWithBalance = await Promise.all(
+      tenantsData.map(async (tenant) => {
+        const { data: ledgerData } = await supabase
+          .from('tenant_ledger')
+          .select('debit_amount, credit_amount, transaction_type')
+          .eq('tenant_id', tenant.id);
+
+        const ledger = ledgerData || [];
+        const totalDebit = ledger.reduce((sum, e) => sum + (e.debit_amount || 0), 0);
+        const totalCredit = ledger.reduce((sum, e) => sum + (e.credit_amount || 0), 0);
+        const totalInvoices = ledger.filter(e => e.transaction_type === 'invoice').length;
+        const totalPayments = ledger.filter(e => e.transaction_type === 'payment').length;
+
+        return {
+          ...tenant,
+          current_balance: totalDebit - totalCredit,
+          total_invoices: totalInvoices,
+          total_payments: totalPayments,
+        };
+      })
+    );
+
+    return tenantsWithBalance;
+  }
+
+  static async getTenantsAging() {
+    const today = new Date();
+    const { data: tenants, error: tenantsError } = await supabase
+      .from('tenants')
+      .select('id, full_name')
+      .eq('status', 'active');
+
+    if (tenantsError) throw tenantsError;
+
+    const agingData = [];
+
+    for (const tenant of tenants || []) {
+      const { data: ledger } = await supabase
+        .from('tenant_ledger')
+        .select('*')
+        .eq('tenant_id', tenant.id)
+        .eq('transaction_type', 'invoice');
+
+      let current = 0;
+      let days_30 = 0;
+      let days_60 = 0;
+      let days_90 = 0;
+      let over_90 = 0;
+
+      for (const entry of ledger || []) {
+        const transactionDate = new Date(entry.transaction_date);
+        const daysDiff = Math.floor(
+          (today.getTime() - transactionDate.getTime()) / (1000 * 60 * 60 * 24)
+        );
+        const amount = (entry.debit_amount || 0) - (entry.credit_amount || 0);
+
+        if (amount <= 0) continue;
+
+        if (daysDiff <= 30) current += amount;
+        else if (daysDiff <= 60) days_30 += amount;
+        else if (daysDiff <= 90) days_60 += amount;
+        else if (daysDiff <= 120) days_90 += amount;
+        else over_90 += amount;
+      }
+
+      const total = current + days_30 + days_60 + days_90 + over_90;
+      if (total > 0) {
+        agingData.push({
+          tenant_id: tenant.id,
+          tenant_name: tenant.full_name,
+          current,
+          days_30,
+          days_60,
+          days_90,
+          over_90,
+          total,
+        });
+      }
+    }
+
+    return agingData.sort((a, b) => b.total - a.total);
+  }
 }

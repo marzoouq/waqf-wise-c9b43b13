@@ -776,4 +776,123 @@ export class AccountingService {
       throw error;
     }
   }
+
+  /**
+   * جلب إحصائيات المحاسب (KPIs)
+   */
+  static async getAccountantKPIs(): Promise<{
+    pendingApprovals: number;
+    draftEntries: number;
+    postedEntries: number;
+    cancelledEntries: number;
+    todayEntries: number;
+    monthlyTotal: number;
+    totalEntries: number;
+  }> {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const startOfMonth = new Date();
+      startOfMonth.setDate(1);
+      startOfMonth.setHours(0, 0, 0, 0);
+      const monthStart = startOfMonth.toISOString().split('T')[0];
+
+      const [
+        approvalsRes,
+        draftRes,
+        postedRes,
+        cancelledRes,
+        todayRes,
+        monthlyRes,
+        totalRes
+      ] = await Promise.all([
+        supabase.from('approvals').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+        supabase.from('journal_entries').select('*', { count: 'exact', head: true }).eq('status', 'draft'),
+        supabase.from('journal_entries').select('*', { count: 'exact', head: true }).eq('status', 'posted'),
+        supabase.from('journal_entries').select('*', { count: 'exact', head: true }).eq('status', 'cancelled'),
+        supabase.from('journal_entries').select('*', { count: 'exact', head: true }).eq('entry_date', today),
+        supabase.from('journal_entries').select('*', { count: 'exact', head: true }).gte('entry_date', monthStart),
+        supabase.from('journal_entries').select('*', { count: 'exact', head: true })
+      ]);
+
+      return {
+        pendingApprovals: approvalsRes.count || 0,
+        draftEntries: draftRes.count || 0,
+        postedEntries: postedRes.count || 0,
+        cancelledEntries: cancelledRes.count || 0,
+        todayEntries: todayRes.count || 0,
+        monthlyTotal: monthlyRes.count || 0,
+        totalEntries: totalRes.count || 0,
+      };
+    } catch (error) {
+      productionLogger.error('Error fetching accountant KPIs', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب إحصائيات أمين الصندوق
+   */
+  static async getCashierStats(): Promise<{
+    cashBalance: number;
+    todayReceipts: number;
+    todayPayments: number;
+    pendingTransactions: number;
+  }> {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+
+      const [cashAccountsResult, receiptsResult, paymentsResult, pendingResult] = await Promise.all([
+        supabase.from('bank_accounts').select('current_balance').eq('is_active', true),
+        supabase.from('journal_entries')
+          .select('*, journal_entry_lines(debit_amount, credit_amount)')
+          .eq('entry_date', today)
+          .eq('status', 'posted')
+          .eq('reference_type', 'payment_receipt'),
+        supabase.from('journal_entries')
+          .select('*, journal_entry_lines(debit_amount, credit_amount)')
+          .eq('entry_date', today)
+          .eq('status', 'posted')
+          .eq('reference_type', 'payment_voucher'),
+        supabase.from('journal_entries')
+          .select('*', { count: 'exact', head: true })
+          .eq('status', 'draft')
+      ]);
+
+      if (cashAccountsResult.error) throw cashAccountsResult.error;
+      if (receiptsResult.error) throw receiptsResult.error;
+      if (paymentsResult.error) throw paymentsResult.error;
+      if (pendingResult.error) throw pendingResult.error;
+
+      const cashBalance = cashAccountsResult.data?.reduce(
+        (sum, acc) => sum + Number(acc.current_balance || 0),
+        0
+      ) || 0;
+
+      const todayReceipts = receiptsResult.data?.reduce((sum, entry) => {
+        const debitTotal = (Array.isArray(entry.journal_entry_lines) ? entry.journal_entry_lines : []).reduce(
+          (s: number, line: { debit_amount?: number }) => s + Number(line.debit_amount || 0),
+          0
+        );
+        return sum + debitTotal;
+      }, 0) || 0;
+
+      const todayPayments = paymentsResult.data?.reduce((sum, entry) => {
+        const creditTotal = (Array.isArray(entry.journal_entry_lines) ? entry.journal_entry_lines : []).reduce(
+          (s: number, line: { credit_amount?: number }) => s + Number(line.credit_amount || 0),
+          0
+        );
+        return sum + creditTotal;
+      }, 0) || 0;
+
+      return {
+        cashBalance,
+        todayReceipts,
+        todayPayments,
+        pendingTransactions: pendingResult.count || 0,
+      };
+    } catch (error) {
+      productionLogger.error('Error fetching cashier stats', error);
+      throw error;
+    }
+  }
 }
