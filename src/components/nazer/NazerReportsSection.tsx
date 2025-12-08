@@ -32,11 +32,11 @@ const reportCategories: ReportCategory[] = [
     color: "text-green-600",
     bgColor: "bg-green-100",
     reports: [
-      { label: "ميزان المراجعة", path: "/accounting/trial-balance" },
-      { label: "قائمة الدخل", path: "/accounting/income-statement" },
-      { label: "الميزانية العمومية", path: "/accounting/balance-sheet" },
-      { label: "التدفقات النقدية", path: "/reports/cash-flow" },
-      { label: "دفتر الأستاذ", path: "/accounting/ledger" },
+      { label: "ميزان المراجعة", path: "/accounting?tab=trial-balance" },
+      { label: "قائمة الدخل", path: "/accounting?tab=income-statement" },
+      { label: "الميزانية العمومية", path: "/accounting?tab=balance-sheet" },
+      { label: "التدفقات النقدية", path: "/accounting?tab=cash-flow" },
+      { label: "دفتر الأستاذ", path: "/accounting?tab=ledger" },
     ],
   },
   {
@@ -45,10 +45,10 @@ const reportCategories: ReportCategory[] = [
     color: "text-amber-600",
     bgColor: "bg-amber-100",
     reports: [
-      { label: "أداء العقارات", path: "/reports/properties" },
-      { label: "الإيجارات والتحصيل", path: "/properties/rentals" },
-      { label: "العقود والمستأجرين", path: "/properties/contracts" },
-      { label: "تكاليف الصيانة", path: "/properties/maintenance" },
+      { label: "أداء العقارات", path: "/properties" },
+      { label: "الإيجارات والتحصيل", path: "/invoices" },
+      { label: "العقود والمستأجرين", path: "/tenants" },
+      { label: "تقرير أعمار الديون", path: "/tenants/aging-report" },
     ],
   },
   {
@@ -57,9 +57,9 @@ const reportCategories: ReportCategory[] = [
     color: "text-blue-600",
     bgColor: "bg-blue-100",
     reports: [
-      { label: "إحصائيات المستفيدين", path: "/reports/beneficiaries" },
-      { label: "التوزيعات السنوية", path: "/reports/distributions" },
-      { label: "تقرير الورثة", path: "/reports/heirs" },
+      { label: "إحصائيات المستفيدين", path: "/beneficiaries" },
+      { label: "التوزيعات السنوية", path: "/fiscal-years" },
+      { label: "العائلات والورثة", path: "/families" },
       { label: "تاريخ المدفوعات", path: "/payments" },
     ],
   },
@@ -70,9 +70,9 @@ const reportCategories: ReportCategory[] = [
     bgColor: "bg-red-100",
     reports: [
       { label: "القروض النشطة", path: "/loans", badge: "مهم" },
-      { label: "أعمار الديون", path: "/loans/aging" },
       { label: "الفزعات الطارئة", path: "/emergency-aid" },
-      { label: "جداول السداد", path: "/loans/schedule" },
+      { label: "سندات الصرف", path: "/payment-vouchers" },
+      { label: "الموافقات", path: "/approvals" },
     ],
   },
   {
@@ -81,10 +81,10 @@ const reportCategories: ReportCategory[] = [
     color: "text-purple-600",
     bgColor: "bg-purple-100",
     reports: [
-      { label: "الإفصاح السنوي", path: "/disclosures" },
-      { label: "تقرير الحوكمة", path: "/governance" },
-      { label: "مؤشرات الأداء", path: "/reports/kpi" },
-      { label: "التحليل التفاعلي", path: "/reports/interactive" },
+      { label: "التقارير الشاملة", path: "/reports" },
+      { label: "تقرير الحوكمة", path: "/governance/guide" },
+      { label: "قرارات الحوكمة", path: "/governance/decisions" },
+      { label: "التقارير المخصصة", path: "/reports/custom" },
     ],
   },
 ];
