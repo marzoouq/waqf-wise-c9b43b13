@@ -20,6 +20,19 @@ export class ContractService {
     return data || [];
   }
 
+  static async getAllWithProperties() {
+    const { data, error } = await supabase
+      .from('contracts')
+      .select(`
+        *,
+        properties(name, type, location)
+      `)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  }
+
   static async getById(id: string): Promise<Contract | null> {
     const { data, error } = await supabase.from('contracts').select('*').eq('id', id).single();
     if (error) throw error;
@@ -32,9 +45,40 @@ export class ContractService {
     return data || [];
   }
 
-  static async create(contract: ContractInsert): Promise<Contract> {
-    const { data, error } = await supabase.from('contracts').insert(contract).select().single();
+  static async create(contract: ContractInsert & { unit_ids?: string[] }): Promise<Contract> {
+    const { unit_ids, ...contractData } = contract;
+    
+    const { data, error } = await supabase
+      .from('contracts')
+      .insert([contractData])
+      .select()
+      .single();
+
     if (error) throw error;
+
+    // ربط الوحدات بالعقد
+    if (data && unit_ids && unit_ids.length > 0) {
+      const contractUnits = unit_ids.map(unitId => ({
+        contract_id: data.id,
+        property_unit_id: unitId,
+      }));
+
+      await supabase
+        .from('contract_units')
+        .insert(contractUnits);
+    }
+
+    // إنشاء جدول الدفعات تلقائياً
+    if (data) {
+      await supabase.rpc('create_payment_schedule', {
+        p_contract_id: data.id,
+        p_start_date: data.start_date,
+        p_end_date: data.end_date,
+        p_monthly_rent: data.monthly_rent,
+        p_payment_frequency: data.payment_frequency
+      });
+    }
+
     return data;
   }
 
@@ -42,6 +86,11 @@ export class ContractService {
     const { data, error } = await supabase.from('contracts').update(updates).eq('id', id).select().single();
     if (error) throw error;
     return data;
+  }
+
+  static async delete(id: string): Promise<void> {
+    const { error } = await supabase.from('contracts').delete().eq('id', id);
+    if (error) throw error;
   }
 
   static async terminate(id: string): Promise<Contract> {

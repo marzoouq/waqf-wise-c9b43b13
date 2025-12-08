@@ -1,8 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { logger } from "@/lib/logger";
 import type { Contract, ContractInsert } from "@/types/contracts";
+import { ContractService } from "@/services/contract.service";
 
 export type { Contract, ContractInsert };
 
@@ -11,86 +11,13 @@ export const useContracts = () => {
 
   const { data: contracts = [], isLoading } = useQuery({
     queryKey: ["contracts"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("contracts")
-        .select(`
-          *,
-          properties(name, type, location)
-        `)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return (data || []) as Contract[];
-    },
+    queryFn: () => ContractService.getAllWithProperties(),
     staleTime: 3 * 60 * 1000, // 3 minutes
   });
 
   const addContract = useMutation({
-    mutationFn: async (contract: ContractInsert & { unit_ids?: string[] }) => {
-      const { unit_ids, ...contractData } = contract;
-      
-      const { data, error } = await supabase
-        .from("contracts")
-        .insert([contractData])
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      // ربط الوحدات بالعقد
-      if (data && unit_ids && unit_ids.length > 0) {
-        const contractUnits = unit_ids.map(unitId => ({
-          contract_id: data.id,
-          property_unit_id: unitId,
-        }));
-
-        const { error: unitsError } = await supabase
-          .from("contract_units")
-          .insert(contractUnits);
-
-        if (unitsError) {
-          logger.error(unitsError, { context: 'link_contract_units', severity: 'high' });
-          // لا نوقف العملية، العقد تم إنشاؤه بالفعل
-          toast({
-            title: "تحذير",
-            description: "تم إنشاء العقد لكن فشل في ربط بعض الوحدات",
-            variant: "destructive",
-          });
-        }
-      }
-
-      // إنشاء جدول الدفعات تلقائياً
-      if (data) {
-        const { data: scheduleResult, error: scheduleError } = await supabase
-          .rpc('create_payment_schedule', {
-            p_contract_id: data.id,
-            p_start_date: data.start_date,
-            p_end_date: data.end_date,
-            p_monthly_rent: data.monthly_rent,
-            p_payment_frequency: data.payment_frequency
-          });
-
-        if (scheduleError) {
-          logger.error(scheduleError, { context: 'create_payment_schedule', severity: 'high' });
-          toast({
-            title: "تحذير",
-            description: "تم إنشاء العقد لكن فشل في إنشاء جدول الدفعات",
-            variant: "destructive",
-          });
-        } else if (scheduleResult && typeof scheduleResult === 'object' && 'success' in scheduleResult) {
-          const result = scheduleResult as { success: boolean; payments_created?: number };
-          if (result.success) {
-            toast({
-              title: "تم إضافة العقد بنجاح",
-              description: `تم إنشاء العقد مع ${result.payments_created || 0} دفعة وربط ${unit_ids?.length || 0} وحدة`,
-            });
-          }
-        }
-      }
-
-      return data;
-    },
+    mutationFn: (contract: ContractInsert & { unit_ids?: string[] }) => 
+      ContractService.create(contract),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contracts"] });
       queryClient.invalidateQueries({ queryKey: ["rental_payments"] });
@@ -99,6 +26,10 @@ export const useContracts = () => {
       queryClient.invalidateQueries({ queryKey: ["property-units"] });
       queryClient.invalidateQueries({ queryKey: ["properties"] });
       queryClient.invalidateQueries({ queryKey: ["properties-stats"] });
+      toast({
+        title: "تم إضافة العقد بنجاح",
+        description: "تم إنشاء العقد وجدول الدفعات",
+      });
     },
     onError: (error) => {
       logger.error(error, { context: 'add_contract', severity: 'medium' });
@@ -111,17 +42,8 @@ export const useContracts = () => {
   });
 
   const updateContract = useMutation({
-    mutationFn: async ({ id, ...contract }: Partial<Contract> & { id: string }) => {
-      const { data, error } = await supabase
-        .from("contracts")
-        .update(contract)
-        .eq("id", id)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: ({ id, ...contract }: Partial<Contract> & { id: string }) => 
+      ContractService.update(id, contract),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contracts"] });
       toast({
@@ -140,14 +62,7 @@ export const useContracts = () => {
   });
 
   const deleteContract = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from("contracts")
-        .delete()
-        .eq("id", id);
-
-      if (error) throw error;
-    },
+    mutationFn: (id: string) => ContractService.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contracts"] });
       toast({

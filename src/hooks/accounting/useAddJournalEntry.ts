@@ -3,10 +3,10 @@
  */
 import { useState, useEffect, useCallback } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { format } from "@/lib/date";
 import { UseFormReturn } from "react-hook-form";
+import { AccountingService } from "@/services/accounting.service";
 
 export interface EntryLine {
   account_id: string;
@@ -31,53 +31,19 @@ export function useAddJournalEntry(form: UseFormReturn<JournalEntryFormData>, op
 
   const { data: accounts } = useQuery({
     queryKey: ["accounts"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("accounts")
-        .select("*")
-        .eq("is_active", true)
-        .eq("is_header", false)
-        .order("code");
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => AccountingService.getActiveLeafAccounts(),
   });
 
   const { data: fiscalYears } = useQuery({
     queryKey: ["fiscal_years"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("fiscal_years")
-        .select("*")
-        .eq("is_active", true)
-        .order("start_date", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => AccountingService.getActiveFiscalYears(),
   });
 
   // Auto-generate entry number
   useEffect(() => {
     const generateEntryNumber = async () => {
       if (open && !form.getValues("entry_number")) {
-        const year = new Date().getFullYear();
-        const { data: lastEntry } = await supabase
-          .from("journal_entries")
-          .select("entry_number")
-          .like("entry_number", `JV-${year}-%`)
-          .order("entry_number", { ascending: false })
-          .limit(1)
-          .maybeSingle();
-
-        let nextNumber = 1;
-        if (lastEntry && lastEntry.entry_number) {
-          const match = lastEntry.entry_number.match(/JV-\d+-(\d+)/);
-          if (match) {
-            nextNumber = parseInt(match[1]) + 1;
-          }
-        }
-
-        const entryNumber = `JV-${year}-${nextNumber.toString().padStart(3, '0')}`;
+        const entryNumber = await AccountingService.generateNextEntryNumber();
         form.setValue("entry_number", entryNumber);
       }
     };
@@ -108,36 +74,21 @@ export function useAddJournalEntry(form: UseFormReturn<JournalEntryFormData>, op
         throw new Error("يجب اختيار حساب لكل سطر");
       }
 
-      const { data: entry, error: entryError } = await supabase
-        .from("journal_entries")
-        .insert([
-          {
-            entry_number: data.entry_number,
-            entry_date: format(data.entry_date, 'yyyy-MM-dd'),
-            description: data.description,
-            fiscal_year_id: data.fiscal_year_id,
-            status: "draft",
-          },
-        ])
-        .select()
-        .single();
-
-      if (entryError) throw entryError;
-
-      const entryLines = lines.map((line, index) => ({
-        journal_entry_id: entry.id,
-        account_id: line.account_id,
-        description: line.description,
-        debit_amount: line.debit_amount,
-        credit_amount: line.credit_amount,
-        line_number: index + 1,
-      }));
-
-      const { error: linesError } = await supabase
-        .from("journal_entry_lines")
-        .insert(entryLines);
-
-      if (linesError) throw linesError;
+      await AccountingService.createJournalEntry(
+        {
+          entry_number: data.entry_number,
+          entry_date: format(data.entry_date, 'yyyy-MM-dd'),
+          description: data.description,
+          fiscal_year_id: data.fiscal_year_id,
+          status: "draft",
+        },
+        lines.map((line) => ({
+          account_id: line.account_id,
+          description: line.description,
+          debit_amount: line.debit_amount,
+          credit_amount: line.credit_amount,
+        }))
+      );
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
