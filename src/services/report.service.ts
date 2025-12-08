@@ -669,4 +669,104 @@ export class ReportService {
     if (error) throw error;
     return data || [];
   }
+
+  /**
+   * جلب إيرادات الوقف حسب السنة المالية
+   */
+  static async getWaqfRevenue(
+    fiscalYearId: string,
+    selectedYear: { id: string; name: string; start_date: string; end_date: string; is_active: boolean; is_closed: boolean },
+    waqfUnitId?: string
+  ) {
+    // للسنوات المغلقة
+    if (selectedYear.is_closed) {
+      const { data: closing } = await supabase
+        .from('fiscal_year_closings')
+        .select('*')
+        .eq('fiscal_year_id', fiscalYearId)
+        .maybeSingle();
+
+      if (closing) {
+        return {
+          fiscalYearId,
+          fiscalYearName: selectedYear.name,
+          isClosed: true,
+          isActive: false,
+          monthlyCollected: 0,
+          annualCollected: closing.total_revenues || 0,
+          totalCollected: closing.total_revenues || 0,
+          totalTax: closing.net_vat || 0,
+          netRevenue: closing.net_income || 0,
+          totalExpenses: closing.total_expenses || 0,
+          netIncome: closing.net_income || 0,
+          nazerShare: closing.nazer_share || 0,
+          waqfCorpus: closing.waqf_corpus || 0,
+        };
+      }
+    }
+
+    // للسنة النشطة
+    const { data: payments } = await supabase
+      .from('rental_payments')
+      .select(`
+        amount_due,
+        tax_amount,
+        status,
+        payment_date,
+        contracts!inner(
+          payment_frequency,
+          properties!inner(
+            waqf_unit_id
+          )
+        )
+      `)
+      .eq('status', 'مدفوع')
+      .gte('payment_date', selectedYear.start_date)
+      .lte('payment_date', selectedYear.end_date);
+
+    let monthlyCollected = 0;
+    let annualCollected = 0;
+    let totalTax = 0;
+
+    interface PaymentData {
+      amount_due: number | null;
+      tax_amount: number | null;
+      contracts: {
+        payment_frequency: string;
+        properties: { waqf_unit_id: string | null };
+      };
+    }
+
+    const filteredPayments = (payments || []).filter((p: PaymentData) => {
+      if (!waqfUnitId) return true;
+      return p.contracts?.properties?.waqf_unit_id === waqfUnitId;
+    });
+
+    filteredPayments.forEach((payment: PaymentData) => {
+      const amount = payment.amount_due || 0;
+      const tax = payment.tax_amount || 0;
+      
+      if (payment.contracts?.payment_frequency === 'شهري') {
+        monthlyCollected += amount;
+      } else {
+        annualCollected += amount;
+      }
+      totalTax += tax;
+    });
+
+    const totalCollected = monthlyCollected + annualCollected;
+    const netRevenue = totalCollected - totalTax;
+
+    return {
+      fiscalYearId,
+      fiscalYearName: selectedYear.name,
+      isClosed: false,
+      isActive: selectedYear.is_active,
+      monthlyCollected,
+      annualCollected,
+      totalCollected,
+      totalTax,
+      netRevenue,
+    };
+  }
 }

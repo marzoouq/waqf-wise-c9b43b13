@@ -23,6 +23,28 @@ export interface FinancialSummary {
   netIncome: number;
 }
 
+export interface TrialBalanceAccount {
+  account_id: string;
+  code: string;
+  name: string;
+  debit: number;
+  credit: number;
+  balance: number;
+}
+
+export interface BalanceSheetData {
+  assets: { current: number; fixed: number; total: number };
+  liabilities: { current: number; longTerm: number; total: number };
+  equity: { capital: number; reserves: number; total: number };
+  retainedEarnings: number;
+}
+
+export interface IncomeStatementData {
+  revenue: { property: number; investment: number; other: number; total: number };
+  expenses: { administrative: number; operational: number; beneficiaries: number; total: number };
+  netIncome: number;
+}
+
 export class AccountingService {
   /**
    * جلب جميع الحسابات
@@ -1767,5 +1789,169 @@ export class AccountingService {
       .eq("id", id);
 
     if (error) throw error;
+  }
+
+  /**
+   * جلب ميزان المراجعة للتقارير المالية (نوع مبسط)
+   */
+  static async getTrialBalanceSimple(): Promise<TrialBalanceAccount[]> {
+    const accounts = await this.getActiveLeafAccounts();
+    
+    const trialBalanceData: TrialBalanceAccount[] = await Promise.all(
+      accounts.map(async (acc) => {
+        try {
+          const { data: balance } = await supabase
+            .rpc("calculate_account_balance", { account_uuid: acc.id });
+          
+          const balanceValue = Number(balance || 0);
+          return {
+            account_id: acc.id,
+            code: acc.code,
+            name: acc.name_ar,
+            debit: balanceValue > 0 ? balanceValue : 0,
+            credit: balanceValue < 0 ? -balanceValue : 0,
+            balance: balanceValue,
+          };
+        } catch {
+          return {
+            account_id: acc.id,
+            code: acc.code,
+            name: acc.name_ar,
+            debit: 0,
+            credit: 0,
+            balance: 0,
+          };
+        }
+      })
+    );
+
+    return trialBalanceData.filter(a => a.debit > 0 || a.credit > 0);
+  }
+
+  /**
+   * جلب الميزانية العمومية
+   */
+  static async getBalanceSheet(): Promise<BalanceSheetData> {
+    const accounts = await this.getChartOfAccounts();
+    
+    const balances = new Map<string, number>();
+
+    for (const account of accounts) {
+      try {
+        const { data } = await supabase
+          .rpc("calculate_account_balance", { account_uuid: account.id });
+        balances.set(account.id, (data as number) || 0);
+      } catch {
+        balances.set(account.id, 0);
+      }
+    }
+
+    const result: BalanceSheetData = {
+      assets: { current: 0, fixed: 0, total: 0 },
+      liabilities: { current: 0, longTerm: 0, total: 0 },
+      equity: { capital: 0, reserves: 0, total: 0 },
+      retainedEarnings: 0,
+    };
+
+    let totalRevenue = 0;
+    let totalExpenses = 0;
+
+    accounts.forEach((account) => {
+      const balance = balances.get(account.id) || 0;
+
+      if (account.code.startsWith("1.1")) {
+        result.assets.current += balance;
+      } else if (account.code.startsWith("1.2")) {
+        result.assets.fixed += balance;
+      } else if (account.code.startsWith("2.1")) {
+        result.liabilities.current += balance;
+      } else if (account.code.startsWith("2.2")) {
+        result.liabilities.longTerm += balance;
+      } else if (account.code.startsWith("3")) {
+        if (account.code === "3.1") {
+          result.equity.capital += balance;
+        } else {
+          result.equity.reserves += balance;
+        }
+      } else if (account.code.startsWith("4")) {
+        totalRevenue += Math.abs(balance);
+      } else if (account.code.startsWith("5")) {
+        totalExpenses += balance;
+      }
+    });
+
+    result.retainedEarnings = totalRevenue - totalExpenses;
+    result.assets.total = result.assets.current + result.assets.fixed;
+    result.liabilities.total = result.liabilities.current + result.liabilities.longTerm;
+    result.equity.total = result.equity.capital + result.equity.reserves + result.retainedEarnings;
+
+    return result;
+  }
+
+  /**
+   * جلب قائمة الدخل
+   */
+  static async getIncomeStatement(): Promise<IncomeStatementData> {
+    const { data: accounts, error } = await supabase
+      .from("accounts")
+      .select("id, code")
+      .or("code.like.4%,code.like.5%");
+
+    if (error) throw error;
+
+    const balances = new Map<string, number>();
+
+    for (const account of accounts || []) {
+      try {
+        const { data } = await supabase
+          .rpc("calculate_account_balance", { account_uuid: account.id });
+        balances.set(account.id, (data as number) || 0);
+      } catch {
+        balances.set(account.id, 0);
+      }
+    }
+
+    const result: IncomeStatementData = {
+      revenue: { property: 0, investment: 0, other: 0, total: 0 },
+      expenses: { administrative: 0, operational: 0, beneficiaries: 0, total: 0 },
+      netIncome: 0,
+    };
+
+    (accounts || []).forEach((account) => {
+      const balance = Math.abs(balances.get(account.id) || 0);
+
+      if (account.code.startsWith("4.1")) {
+        result.revenue.property += balance;
+      } else if (account.code.startsWith("4.2")) {
+        result.revenue.investment += balance;
+      } else if (account.code.startsWith("4.3")) {
+        result.revenue.other += balance;
+      } else if (account.code.startsWith("5.1")) {
+        result.expenses.administrative += balance;
+      } else if (account.code.startsWith("5.2")) {
+        result.expenses.operational += balance;
+      } else if (account.code.startsWith("5.3")) {
+        result.expenses.beneficiaries += balance;
+      }
+    });
+
+    result.revenue.total = result.revenue.property + result.revenue.investment + result.revenue.other;
+    result.expenses.total = result.expenses.administrative + result.expenses.operational + result.expenses.beneficiaries;
+    result.netIncome = result.revenue.total - result.expenses.total;
+
+    return result;
+  }
+
+  /**
+   * جلب المعاملات الموحدة
+   */
+  static async getUnifiedTransactions() {
+    const { data, error } = await supabase
+      .from("unified_transactions_view")
+      .select("*")
+      .order("transaction_date", { ascending: false });
+
+    if (error) throw error;
+    return data || [];
   }
 }
