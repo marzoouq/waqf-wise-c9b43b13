@@ -254,7 +254,7 @@ export default function SystemMonitoring() {
               <CardContent>
                 <p className="text-center text-muted-foreground">
                   راجع صفحة{" "}
-                  <Link to="/system-errors" className="text-primary underline hover:text-primary/80 transition-colors">
+                  <Link to="/system-error-logs" className="text-primary underline hover:text-primary/80 transition-colors">
                     سجل الأخطاء
                   </Link>{" "}
                   للتفاصيل الكاملة
