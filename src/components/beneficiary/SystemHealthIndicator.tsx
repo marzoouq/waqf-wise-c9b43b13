@@ -1,14 +1,8 @@
 /**
  * مؤشر صحة النظام - نظام مراقبة منهجي وتقني
  * System Health Indicator - Methodical Technical Monitoring
- * 
- * يقوم بفحص:
- * 1. الاتصال بقاعدة البيانات
- * 2. وقت الاستجابة
- * 3. حالة الشبكة
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
 import { Badge } from '@/components/ui/badge';
 import {
   Tooltip,
@@ -17,176 +11,15 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { AlertTriangle, WifiOff, CheckCircle2, Database, Clock, RefreshCw } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { retryWithBackoff, isRetryableError } from '@/lib/utils/retry';
+import { useSystemHealthIndicator } from '@/hooks/system/useSystemHealthIndicator';
 
-type HealthStatus = 'healthy' | 'degraded' | 'offline' | 'slow';
-
-interface HealthDetails {
-  database: 'ok' | 'error' | 'unknown';
-  responseTime: number;
-  networkOnline: boolean;
-  lastError?: string;
-}
-
-// حدود تقنية واقعية
 const THRESHOLDS = {
-  SLOW_RESPONSE_MS: 3000,      // 3 ثواني = بطيء
-  CRITICAL_RESPONSE_MS: 8000,  // 8 ثواني = مشكلة حقيقية
-  CHECK_INTERVAL_MS: 120000,   // فحص كل دقيقتين
-  INITIAL_DELAY_MS: 10000,     // انتظار 10 ثواني قبل أول فحص
+  SLOW_RESPONSE_MS: 3000,
+  CRITICAL_RESPONSE_MS: 8000,
 };
 
 export function SystemHealthIndicator() {
-  const [status, setStatus] = useState<HealthStatus>('healthy');
-  const [details, setDetails] = useState<HealthDetails>({
-    database: 'unknown',
-    responseTime: 0,
-    networkOnline: true,
-  });
-  const [isChecking, setIsChecking] = useState(false);
-  const mountedRef = useRef(true);
-
-  // فحص صحة النظام بشكل منهجي
-  const checkHealth = useCallback(async () => {
-    if (!mountedRef.current) return;
-    
-    // التحقق من الشبكة أولاً
-    if (!navigator.onLine) {
-      setStatus('offline');
-      setDetails(prev => ({ ...prev, networkOnline: false, database: 'unknown' }));
-      return;
-    }
-
-    setIsChecking(true);
-    const startTime = performance.now();
-
-    try {
-      // استخدام retry mechanism للتعامل مع الأخطاء المؤقتة
-      const { error } = await retryWithBackoff(
-        async () => {
-          const result = await supabase
-            .from('activities')
-            .select('id')
-            .limit(1)
-            .maybeSingle();
-          
-          if (result.error) throw result.error;
-          return result;
-        },
-        {
-          maxRetries: 2,
-          baseDelay: 500,
-          maxDelay: 2000,
-          shouldRetry: isRetryableError
-        }
-      );
-
-      const responseTime = Math.round(performance.now() - startTime);
-
-      if (!mountedRef.current) return;
-
-      if (error) {
-        // خطأ حقيقي من قاعدة البيانات بعد المحاولات
-        setStatus('degraded');
-        setDetails({
-          database: 'error',
-          responseTime,
-          networkOnline: true,
-          lastError: error.message || 'خطأ في الاتصال بقاعدة البيانات',
-        });
-      } else if (responseTime > THRESHOLDS.CRITICAL_RESPONSE_MS) {
-        // استجابة بطيئة جداً - مشكلة حقيقية
-        setStatus('degraded');
-        setDetails({
-          database: 'ok',
-          responseTime,
-          networkOnline: true,
-          lastError: `استجابة بطيئة جداً: ${responseTime}ms`,
-        });
-      } else if (responseTime > THRESHOLDS.SLOW_RESPONSE_MS) {
-        // استجابة بطيئة - تحذير فقط
-        setStatus('slow');
-        setDetails({
-          database: 'ok',
-          responseTime,
-          networkOnline: true,
-        });
-      } else {
-        // كل شيء طبيعي
-        setStatus('healthy');
-        setDetails({
-          database: 'ok',
-          responseTime,
-          networkOnline: true,
-        });
-      }
-    } catch (error) {
-      if (!mountedRef.current) return;
-      
-      const responseTime = Math.round(performance.now() - startTime);
-      
-      // التمييز بين أنواع الأخطاء
-      const errorMessage = error instanceof Error ? error.message : 'خطأ غير معروف';
-      
-      if (errorMessage.includes('fetch') || errorMessage.includes('network')) {
-        // مشكلة شبكة حقيقية
-        setStatus('offline');
-        setDetails({
-          database: 'unknown',
-          responseTime,
-          networkOnline: false,
-          lastError: 'فشل في الاتصال بالخادم',
-        });
-      } else {
-        // مشكلة في قاعدة البيانات
-        setStatus('degraded');
-        setDetails({
-          database: 'error',
-          responseTime,
-          networkOnline: true,
-          lastError: errorMessage,
-        });
-      }
-    } finally {
-      if (mountedRef.current) {
-        setIsChecking(false);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    mountedRef.current = true;
-
-    // فحص بعد فترة انتظار (لإعطاء التطبيق وقت للتحميل)
-    const initialTimeout = setTimeout(checkHealth, THRESHOLDS.INITIAL_DELAY_MS);
-
-    // فحص دوري
-    const interval = setInterval(checkHealth, THRESHOLDS.CHECK_INTERVAL_MS);
-
-    // الاستماع لتغييرات الشبكة
-    const handleOnline = () => {
-      setDetails(prev => ({ ...prev, networkOnline: true }));
-      // فحص فوري عند عودة الشبكة
-      checkHealth();
-    };
-
-    const handleOffline = () => {
-      setStatus('offline');
-      setDetails(prev => ({ ...prev, networkOnline: false }));
-    };
-
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    return () => {
-      mountedRef.current = false;
-      clearTimeout(initialTimeout);
-      clearInterval(interval);
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, [checkHealth]);
+  const { status, details, isChecking } = useSystemHealthIndicator();
 
   const getStatusConfig = () => {
     switch (status) {

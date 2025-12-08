@@ -1,6 +1,4 @@
 import { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import {
   Dialog,
   DialogContent,
@@ -11,7 +9,6 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
@@ -21,9 +18,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/hooks/use-toast';
 import { CheckCircle, AlertCircle, Clock, Shield } from 'lucide-react';
 import { Beneficiary } from '@/types/beneficiary';
+import { useIdentityVerification } from '@/hooks/beneficiary/useIdentityVerification';
 
 interface IdentityVerificationDialogProps {
   open: boolean;
@@ -40,65 +37,25 @@ export function IdentityVerificationDialog({
   onOpenChange,
   beneficiary,
 }: IdentityVerificationDialogProps) {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  
-  const [formData, setFormData] = useState({
-    verification_type: 'identity_card',
-    verification_method: 'manual',
-    verification_status: 'pending',
-    notes: '',
-  });
-
-  const verifyMutation = useMutation({
-    mutationFn: async () => {
-      if (!beneficiary) throw new Error('لا يوجد مستفيد محدد');
-
-      // إنشاء سجل التحقق
-      const { error: verificationError } = await supabase
-        .from('identity_verifications')
-        .insert({
-          beneficiary_id: beneficiary.id,
-          ...formData,
-          verified_by: (await supabase.auth.getUser()).data.user?.id,
-          verified_at: new Date().toISOString(),
-        });
-
-      if (verificationError) throw verificationError;
-
-      // تحديث حالة المستفيد
-      const { error: updateError } = await supabase
-        .from('beneficiaries')
-        .update({
-          verification_status: formData.verification_status,
-          verification_method: formData.verification_method,
-          last_verification_date: new Date().toISOString(),
-          verification_notes: formData.notes,
-        })
-        .eq('id', beneficiary.id);
-
-      if (updateError) throw updateError;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['beneficiaries'] });
-      queryClient.invalidateQueries({ queryKey: ['beneficiary', beneficiary?.id] });
-      toast({
-        title: 'تم التحقق بنجاح',
-        description: 'تم التحقق من هوية المستفيد وتحديث البيانات',
-      });
-      onOpenChange(false);
-    },
-    onError: (error: Error) => {
-      toast({
-        title: 'خطأ في التحقق',
-        description: error.message || 'فشل التحقق من الهوية',
-        variant: 'destructive',
-      });
-    },
-  });
+  const {
+    formData,
+    updateFormData,
+    resetForm,
+    verify,
+    isVerifying,
+  } = useIdentityVerification(beneficiary);
 
   const handleSubmit = () => {
-    verifyMutation.mutate();
+    verify(undefined, {
+      onSuccess: () => {
+        onOpenChange(false);
+      },
+    });
+  };
+
+  const handleClose = () => {
+    resetForm();
+    onOpenChange(false);
   };
 
   const getStatusIcon = (status: string) => {
@@ -115,7 +72,7 @@ export function IdentityVerificationDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -168,7 +125,7 @@ export function IdentityVerificationDialog({
                   <Select
                     value={formData.verification_type}
                     onValueChange={(value) =>
-                      setFormData({ ...formData, verification_type: value })
+                      updateFormData({ verification_type: value })
                     }
                   >
                     <SelectTrigger id="verification_type">
@@ -189,7 +146,7 @@ export function IdentityVerificationDialog({
                   <Select
                     value={formData.verification_method}
                     onValueChange={(value) =>
-                      setFormData({ ...formData, verification_method: value })
+                      updateFormData({ verification_method: value })
                     }
                   >
                     <SelectTrigger id="verification_method">
@@ -211,7 +168,7 @@ export function IdentityVerificationDialog({
                 <Select
                   value={formData.verification_status}
                   onValueChange={(value) =>
-                    setFormData({ ...formData, verification_status: value })
+                    updateFormData({ verification_status: value })
                   }
                 >
                   <SelectTrigger id="verification_status">
@@ -232,7 +189,7 @@ export function IdentityVerificationDialog({
                   id="notes"
                   value={formData.notes}
                   onChange={(e) =>
-                    setFormData({ ...formData, notes: e.target.value })
+                    updateFormData({ notes: e.target.value })
                   }
                   placeholder="أدخل أي ملاحظات حول عملية التحقق..."
                   rows={4}
@@ -243,11 +200,11 @@ export function IdentityVerificationDialog({
         )}
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" onClick={handleClose}>
             إلغاء
           </Button>
-          <Button onClick={handleSubmit} disabled={verifyMutation.isPending}>
-            {verifyMutation.isPending ? 'جاري التحقق...' : 'تأكيد التحقق'}
+          <Button onClick={handleSubmit} disabled={isVerifying}>
+            {isVerifying ? 'جاري التحقق...' : 'تأكيد التحقق'}
           </Button>
         </DialogFooter>
       </DialogContent>
