@@ -5,9 +5,9 @@
 
 import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { BeneficiaryReportData } from "@/types/reports/index";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";
+import { BeneficiaryService, RealtimeService } from "@/services";
 
 export function useBeneficiaryReportsData() {
   const queryClient = useQueryClient();
@@ -21,40 +21,34 @@ export function useBeneficiaryReportsData() {
   } = useQuery({
     queryKey: ["beneficiaries-report"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("beneficiaries")
-        .select("id, full_name, national_id, phone, email, category, status, city, tribe, created_at")
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return data as BeneficiaryReportData[];
+      const result = await BeneficiaryService.getAll();
+      return (result.data || []).map(b => ({
+        id: b.id,
+        full_name: b.full_name,
+        national_id: b.national_id,
+        phone: b.phone,
+        email: b.email,
+        category: b.category,
+        status: b.status,
+        city: b.city,
+        tribe: b.tribe,
+        created_at: b.created_at,
+      })) as BeneficiaryReportData[];
     },
     ...QUERY_CONFIG.REPORTS,
   });
 
-  // تحديث وقت آخر تحديث
   useEffect(() => {
     if (dataUpdatedAt) {
       setLastUpdated(new Date(dataUpdatedAt));
     }
   }, [dataUpdatedAt]);
 
-  // Real-time subscription للتحديث المباشر
   useEffect(() => {
-    const channel = supabase
-      .channel("beneficiaries-report-changes")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "beneficiaries" },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ["beneficiaries-report"] });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    const subscription = RealtimeService.subscribeToTable("beneficiaries", () => {
+      queryClient.invalidateQueries({ queryKey: ["beneficiaries-report"] });
+    });
+    return () => { subscription.unsubscribe(); };
   }, [queryClient]);
 
   const handleRefresh = () => {

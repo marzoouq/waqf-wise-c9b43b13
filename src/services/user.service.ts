@@ -164,4 +164,70 @@ export class UserService {
     if (error) throw error;
     return data?.map(r => r.role) || [];
   }
+
+  /**
+   * جلب المستخدمين مع أدوارهم
+   */
+  static async getUsersWithRoles(): Promise<{
+    id: string;
+    user_id: string;
+    full_name: string;
+    email: string;
+    avatar_url: string | null;
+    roles: string[];
+    roles_array: string[];
+    roles_count: number;
+  }[]> {
+    const { data, error } = await supabase
+      .from("users_profiles_cache")
+      .select("*")
+      .order("user_created_at", { ascending: false });
+
+    if (error) throw error;
+    return (data || []).map((u) => ({
+      id: u.user_id,
+      user_id: u.user_id,
+      full_name: u.full_name || u.email || "",
+      email: u.email || "",
+      avatar_url: null,
+      roles: Array.isArray(u.roles) ? (u.roles as string[]) : [],
+      roles_array: Array.isArray(u.roles) ? (u.roles as string[]) : [],
+      roles_count: Array.isArray(u.roles) ? u.roles.length : 0,
+    }));
+  }
+
+  /**
+   * جلب سجل تغييرات الأدوار
+   */
+  static async getRolesAuditLog() {
+    const { data, error } = await supabase
+      .from("user_roles_audit")
+      .select("*")
+      .order("changed_at", { ascending: false })
+      .limit(50);
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * إضافة دور للمستخدم
+   */
+  static async addRole(userId: string, role: "accountant" | "admin" | "archivist" | "beneficiary" | "cashier" | "nazer" | "user" | "waqf_heir") {
+    const { error } = await supabase
+      .from("user_roles")
+      .insert([{ user_id: userId, role }]);
+    if (error) throw error;
+  }
+
+  /**
+   * حذف دور من المستخدم
+   */
+  static async removeRole(userId: string, role: "accountant" | "admin" | "archivist" | "beneficiary" | "cashier" | "nazer" | "user" | "waqf_heir") {
+    const { error } = await supabase
+      .from("user_roles")
+      .delete()
+      .eq("user_id", userId)
+      .eq("role", role);
+    if (error) throw error;
+  }
 }

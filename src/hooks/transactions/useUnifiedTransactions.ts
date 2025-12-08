@@ -4,7 +4,7 @@
  */
 
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { AccountingService } from "@/services";
 
 export interface UnifiedTransaction {
   source: string;
@@ -39,15 +39,7 @@ export function useUnifiedTransactions() {
     error,
   } = useQuery({
     queryKey: ["unified-transactions"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("unified_transactions_view")
-        .select("*")
-        .order("transaction_date", { ascending: false });
-
-      if (error) throw error;
-      return data as UnifiedTransaction[];
-    },
+    queryFn: () => AccountingService.getUnifiedTransactions(),
   });
 
   const calculateStats = (filteredTransactions: UnifiedTransaction[]): TransactionStats => {
