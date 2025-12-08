@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { WaqfDistributionSettings } from "@/types/distributions";
+import { FundService } from "@/services/fund.service";
 
 export function useDistributionSettings() {
   const { toast } = useToast();
@@ -9,41 +9,12 @@ export function useDistributionSettings() {
 
   const { data: settings, isLoading } = useQuery({
     queryKey: ["distribution-settings"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("waqf_distribution_settings")
-        .select("*")
-        .eq("is_active", true)
-        .single();
-
-      if (error && error.code !== "PGRST116") throw error;
-      return data as WaqfDistributionSettings | null;
-    },
+    queryFn: () => FundService.getDistributionSettings(),
   });
 
   const updateSettings = useMutation({
-    mutationFn: async (updates: Partial<WaqfDistributionSettings> & { calculation_order?: string }) => {
-      if (settings?.id) {
-        const { data, error } = await supabase
-          .from("waqf_distribution_settings")
-          .update(updates)
-          .eq("id", settings.id)
-          .select()
-          .single();
-
-        if (error) throw error;
-        return data;
-      } else {
-        const { data, error } = await supabase
-          .from("waqf_distribution_settings")
-          .insert([updates])
-          .select()
-          .single();
-
-        if (error) throw error;
-        return data;
-      }
-    },
+    mutationFn: (updates: Partial<WaqfDistributionSettings> & { calculation_order?: string }) => 
+      FundService.updateDistributionSettings(settings?.id, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["distribution-settings"] });
       toast({
@@ -51,7 +22,7 @@ export function useDistributionSettings() {
         description: "تم تحديث إعدادات التوزيع",
       });
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast({
         title: "خطأ في التحديث",
         description: error.message,
