@@ -6,96 +6,25 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { 
   Building2, Users, FileText, Wallet, 
-  TrendingUp, AlertTriangle, CheckCircle, Clock,
-  Database, Shield, Activity
+  TrendingUp, AlertTriangle, Clock,
+  Database, Shield, CheckCircle, Activity
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { cn } from "@/lib/utils";
+import { useNazerSystemOverview } from "@/hooks/dashboard/useNazerSystemOverview";
 
 interface SystemStat {
   label: string;
   value: number | string;
   icon: React.ElementType;
   color: string;
-  trend?: "up" | "down" | "stable";
   percentage?: number;
 }
 
 export function NazerSystemOverview() {
-  const { data: stats, isLoading } = useQuery({
-    queryKey: ["nazer-system-overview"],
-    queryFn: async () => {
-      // تنفيذ الاستعلامات بالتوازي
-      const [
-        beneficiariesRes,
-        propertiesRes,
-        contractsRes,
-        loansRes,
-        paymentsRes,
-        requestsRes,
-        documentsRes,
-      ] = await Promise.all([
-        supabase.from("beneficiaries").select("id, status", { count: "exact" }),
-        supabase.from("properties").select("id, status", { count: "exact" }),
-        supabase.from("contracts").select("id, status", { count: "exact" }),
-        supabase.from("loans").select("id, status, loan_amount, paid_amount", { count: "exact" }),
-        supabase.from("rental_payments").select("id, amount_paid, status").eq("status", "مدفوع"),
-        supabase.from("beneficiary_requests").select("id, status", { count: "exact" }),
-        supabase.from("documents").select("id", { count: "exact" }),
-      ]);
-
-      const beneficiaries = beneficiariesRes.data || [];
-      const properties = propertiesRes.data || [];
-      const contracts = contractsRes.data || [];
-      const loans = loansRes.data || [];
-      const payments = paymentsRes.data || [];
-      const requests = requestsRes.data || [];
-
-      const activeBeneficiaries = beneficiaries.filter(b => b.status === "نشط").length;
-      const occupiedProperties = properties.filter(p => p.status === "مؤجر").length;
-      const activeContracts = contracts.filter(c => c.status === "نشط" || c.status === "active").length;
-      const activeLoans = loans.filter(l => l.status === "نشط" || l.status === "active").length;
-      const totalLoansAmount = loans.reduce((sum, l) => sum + ((l.loan_amount || 0) - (l.paid_amount || 0)), 0);
-      const totalPayments = payments.reduce((sum, p) => sum + (p.amount_paid || 0), 0);
-      const pendingRequests = requests.filter(r => r.status === "pending" || r.status === "معلق").length;
-
-      return {
-        beneficiaries: {
-          total: beneficiaries.length,
-          active: activeBeneficiaries,
-          percentage: beneficiaries.length > 0 ? Math.round((activeBeneficiaries / beneficiaries.length) * 100) : 0,
-        },
-        properties: {
-          total: properties.length,
-          occupied: occupiedProperties,
-          percentage: properties.length > 0 ? Math.round((occupiedProperties / properties.length) * 100) : 0,
-        },
-        contracts: {
-          total: contracts.length,
-          active: activeContracts,
-        },
-        loans: {
-          total: loans.length,
-          active: activeLoans,
-          amount: totalLoansAmount,
-        },
-        payments: {
-          total: payments.length,
-          amount: totalPayments,
-        },
-        requests: {
-          total: requests.length,
-          pending: pendingRequests,
-        },
-        documents: documentsRes.count || 0,
-      };
-    },
-    staleTime: 2 * 60 * 1000,
-  });
+  const { data: stats, isLoading } = useNazerSystemOverview();
 
   if (isLoading) {
     return (

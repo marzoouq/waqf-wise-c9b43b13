@@ -1,6 +1,6 @@
 /**
  * Dashboard Hooks - خطافات لوحات التحكم
- * @version 2.6.33
+ * @version 2.6.36
  */
 
 // ==================== Core Dashboard Hooks ====================
@@ -8,6 +8,7 @@ export { useDashboardConfigs, useSaveDashboardConfig, useUpdateDashboardConfig, 
 export { useDashboardKPIs, type DashboardKPIs } from './useDashboardKPIs';
 export { useKPIs, type KPI } from './useKPIs';
 export { useUnifiedKPIs, type UnifiedKPIsData } from './useUnifiedKPIs';
+export { useNazerSystemOverview, type SystemOverviewStats } from './useNazerSystemOverview';
 
 // ==================== Role-Specific Dashboard Hooks ====================
 export { useNazerKPIs, type NazerKPIData } from './useNazerKPIs';
