@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { productionLogger } from "@/lib/logger/production-logger";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";
 import { useEffect } from "react";
+import { DashboardService } from "@/services/dashboard.service";
 
 export interface KPI {
   id: string;
@@ -35,23 +36,13 @@ export function useKPIs(category?: string) {
     queryKey: ["kpis", category],
     ...QUERY_CONFIG.REPORTS,
     queryFn: async () => {
-      let query = supabase
-        .from("kpi_definitions")
-        .select("id, kpi_name, kpi_code, description, calculation_formula, data_source, target_value, unit, chart_type, is_active, category, created_at")
-        .eq("is_active", true);
-
-      if (category) {
-        query = query.eq("category", category);
-      }
-
-      const { data, error } = await query;
-
-      if (error) throw error;
+      // استخدام الخدمة بدلاً من Supabase مباشرة
+      const data = await DashboardService.getKPIDefinitions(category);
 
       // حساب القيم الحالية لكل KPI
       const kpisWithValues = await Promise.all(
-        (data || []).map(async (kpi) => {
-          const currentValue = await calculateKPIValue(kpi.kpi_code);
+        data.map(async (kpi) => {
+          const currentValue = await DashboardService.calculateKPIValue(kpi.kpi_code);
           const previousValue = currentValue * 0.95;
           const changePercentage = previousValue > 0 ? ((currentValue - previousValue) / previousValue) * 100 : 0;
           const trend = determineTrend(currentValue, kpi.target_value);
@@ -116,122 +107,6 @@ export function useKPIs(category?: string) {
     lastUpdated: dataUpdatedAt ? new Date(dataUpdatedAt) : undefined,
     refresh: handleRefresh,
   };
-}
-
-/**
- * حساب قيمة المؤشر الحالية
- */
-async function calculateKPIValue(kpiCode: string): Promise<number> {
-  try {
-    switch (kpiCode) {
-      case "distribution_rate": {
-        const { data } = await supabase.from("distributions").select("total_amount, status");
-        const total = data?.reduce((sum, d) => sum + (d.total_amount || 0), 0) || 0;
-        const completed = data?.filter(d => d.status === "completed" || d.status === "معتمد")
-          .reduce((sum, d) => sum + (d.total_amount || 0), 0) || 0;
-        return total > 0 ? (completed / total) * 100 : 0;
-      }
-
-      case "occupancy_rate":
-        return 85; // placeholder
-
-      case "collection_rate":
-        return 92; // placeholder
-
-      case "approval_time":
-        return 2.5; // placeholder
-
-      case "beneficiary_satisfaction":
-        return 88; // placeholder
-
-      case "pending_requests": {
-        const { count } = await supabase
-          .from("beneficiary_requests")
-          .select("*", { count: "exact", head: true })
-          .eq("status", "pending");
-        return count || 0;
-      }
-
-      case "monthly_revenue": {
-        const startOfMonth = new Date();
-        startOfMonth.setDate(1);
-        startOfMonth.setHours(0, 0, 0, 0);
-        
-        const { data } = await supabase
-          .from("payments")
-          .select("amount")
-          .eq("payment_type", "receipt")
-          .gte("payment_date", startOfMonth.toISOString());
-        return data?.reduce((sum, p) => sum + (p.amount || 0), 0) || 0;
-      }
-
-      case "monthly_expenses": {
-        const startOfMonth = new Date();
-        startOfMonth.setDate(1);
-        startOfMonth.setHours(0, 0, 0, 0);
-        
-        const { data } = await supabase
-          .from("payments")
-          .select("amount")
-          .eq("payment_type", "voucher")
-          .gte("payment_date", startOfMonth.toISOString());
-        return data?.reduce((sum, p) => sum + (p.amount || 0), 0) || 0;
-      }
-
-      case "active_beneficiaries": {
-        const { count } = await supabase
-          .from("beneficiaries")
-          .select("*", { count: "exact", head: true })
-          .eq("status", "active");
-        return count || 0;
-      }
-
-      case "expiring_contracts": {
-        const today = new Date();
-        const thirtyDays = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
-        const { count } = await supabase
-          .from("contracts")
-          .select("*", { count: "exact", head: true })
-          .gte("end_date", today.toISOString())
-          .lte("end_date", thirtyDays.toISOString());
-        return count || 0;
-      }
-
-      case "total_distributions": {
-        const { count } = await supabase
-          .from("distributions")
-          .select("*", { count: "exact", head: true })
-          .eq("status", "معتمد");
-        return count || 0;
-      }
-
-      case "total_beneficiaries": {
-        const { count } = await supabase
-          .from("beneficiaries")
-          .select("*", { count: "exact", head: true })
-          .eq("status", "نشط");
-        return count || 0;
-      }
-
-      case "approval_rate": {
-        const { data: distributions } = await supabase
-          .from("distributions")
-          .select("status")
-          .gte("created_at", new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
-
-        const total = distributions?.length || 0;
-        const approved = distributions?.filter((d) => d.status === "معتمد").length || 0;
-
-        return total > 0 ? Math.round((approved / total) * 100) : 0;
-      }
-
-      default:
-        return 0;
-    }
-  } catch (error) {
-    productionLogger.error(`Error calculating KPI ${kpiCode}:`, error);
-    return 0;
-  }
 }
 
 /**

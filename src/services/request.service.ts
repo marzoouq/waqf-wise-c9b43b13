@@ -22,7 +22,7 @@ export class RequestService {
   static async getRequestTypes() {
     const { data, error } = await supabase
       .from('request_types')
-      .select('id, name_ar, name_en, description, category, sla_hours, is_active, created_at')
+      .select('id, name_ar, name_en, description, sla_hours, is_active, created_at')
       .eq('is_active', true)
       .order('name_ar', { ascending: true });
 

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';
+import { NotificationService } from '@/services/notification.service';
 
 interface PushSubscription {
   endpoint: string;
@@ -79,8 +79,6 @@ export function usePushNotifications() {
     try {
       const registration = await navigator.serviceWorker.ready;
       
-      // For now, subscribe without VAPID key (will work for basic notifications)
-      // In production, you would configure VAPID keys
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
       });
@@ -93,16 +91,15 @@ export function usePushNotifications() {
         },
       };
 
-      // حفظ الاشتراك في قاعدة البيانات
-      const { error } = await supabase.from('push_subscriptions').upsert({
+      // استخدام الخدمة بدلاً من Supabase مباشرة
+      const result = await NotificationService.savePushSubscription({
         user_id: user.id,
         endpoint: subscriptionData.endpoint,
         p256dh: subscriptionData.keys.p256dh,
         auth: subscriptionData.keys.auth,
-        is_active: true,
       });
 
-      if (error) throw error;
+      if (!result.success) throw new Error('Failed to save subscription');
 
       setIsSubscribed(true);
       toast({
@@ -133,13 +130,10 @@ export function usePushNotifications() {
         await subscription.unsubscribe();
       }
 
-      // تعطيل الاشتراك في قاعدة البيانات
-      const { error } = await supabase
-        .from('push_subscriptions')
-        .update({ is_active: false })
-        .eq('user_id', user.id);
+      // استخدام الخدمة بدلاً من Supabase مباشرة
+      const result = await NotificationService.deactivatePushSubscription(user.id);
 
-      if (error) throw error;
+      if (!result.success) throw new Error('Failed to deactivate subscription');
 
       setIsSubscribed(false);
       toast({

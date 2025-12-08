@@ -5,10 +5,10 @@
 
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { AppRole } from "@/hooks/useUserRole";
 import { Permission } from "@/hooks/usePermissions";
+import { AuthService } from "@/services/auth.service";
 
 export interface RolePermissionState {
   permissionId: string;
@@ -25,37 +25,25 @@ export function usePermissionsManagement(initialRole: AppRole = "accountant") {
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [modifications, setModifications] = useState<Map<string, RolePermissionState>>(new Map());
 
-  // جلب جميع الصلاحيات
+  // جلب جميع الصلاحيات باستخدام الخدمة
   const { data: allPermissions = [], isLoading: loadingPermissions } = useQuery({
     queryKey: ["all-permissions"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("permissions")
-        .select("*")
-        .order("category", { ascending: true })
-        .order("name", { ascending: true });
-
-      if (error) throw error;
-      return data as Permission[];
+      const permissions = await AuthService.getAllPermissions();
+      return permissions as Permission[];
     },
   });
 
-  // جلب صلاحيات الدور المحدد
+  // جلب صلاحيات الدور المحدد باستخدام الخدمة
   const { data: rolePermissions = [], isLoading: loadingRolePerms } = useQuery({
     queryKey: ["role-permissions", selectedRole],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("role_permissions")
-        .select("*")
-        .eq("role", selectedRole);
-
-      if (error) throw error;
-      return data;
+      return AuthService.getRolePermissions(selectedRole);
     },
     enabled: !!selectedRole,
   });
 
-  // تحديث صلاحية
+  // تحديث صلاحية باستخدام الخدمة
   const updatePermissionMutation = useMutation({
     mutationFn: async ({
       permissionId,
@@ -64,18 +52,7 @@ export function usePermissionsManagement(initialRole: AppRole = "accountant") {
       permissionId: string;
       granted: boolean;
     }) => {
-      const { error } = await supabase.from("role_permissions").upsert(
-        {
-          role: selectedRole,
-          permission_id: permissionId,
-          granted,
-        },
-        {
-          onConflict: "role,permission_id",
-        }
-      );
-
-      if (error) throw error;
+      await AuthService.updateRolePermission(selectedRole, permissionId, granted);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["role-permissions"] });
