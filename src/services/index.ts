@@ -1,16 +1,21 @@
 /**
  * Services Layer - الطبقة الخدمية للتطبيق
- * @version 2.7.2
+ * @version 2.7.3
  * تغطية 100% - جميع عمليات Supabase تمر عبر الخدمات
+ * 
+ * الخدمات: 23 خدمة متكاملة
+ * - Core Services: 4
+ * - Domain Services: 16
+ * - Infrastructure Services: 3
  */
 
-// Core Services
+// Core Services (4)
 export { NotificationService } from './notification.service';
 export { RequestService } from './request.service';
 export { VoucherService } from './voucher.service';
 export { ReportService } from './report.service';
 
-// Domain Services
+// Domain Services (16)
 export { BeneficiaryService, type BeneficiaryFilters, type BeneficiaryStats } from './beneficiary.service';
 export { PropertyService, type PropertyStats, type PropertyFilters } from './property.service';
 export { DistributionService, type DistributionSummary } from './distribution.service';
@@ -19,8 +24,6 @@ export { ArchiveService, type ArchiveStats } from './archive.service';
 export { LoansService, type LoanStats, type LoanWithInstallments } from './loans.service';
 export { AuthService, type UserProfile, type LoginResult } from './auth.service';
 export { DashboardService, type SystemOverviewStats, type UnifiedKPIsData } from './dashboard.service';
-
-// NEW Services (Phase 1)
 export { ApprovalService } from './approval.service';
 export { FiscalYearService } from './fiscal-year.service';
 export { InvoiceService } from './invoice.service';
@@ -30,7 +33,7 @@ export { MaintenanceService } from './maintenance.service';
 export { FundService } from './fund.service';
 export { PaymentService, type PaymentFilters } from './payment.service';
 
-// Infrastructure Services
+// Infrastructure Services (3)
 export { StorageService } from './storage.service';
 export { EdgeFunctionService } from './edge-function.service';
 export { RealtimeService } from './realtime.service';
