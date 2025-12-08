@@ -2,12 +2,12 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.6.41
- * @date 2025-12-07
+ * @version 2.6.42
+ * @date 2025-12-08
  */
 
-export const APP_VERSION = '2.6.41';
-export const APP_VERSION_DATE = '2025-12-07';
+export const APP_VERSION = '2.6.42';
+export const APP_VERSION_DATE = '2025-12-08';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
 export const VERSION_INFO = {
@@ -16,11 +16,11 @@ export const VERSION_INFO = {
   name: APP_VERSION_NAME,
   changelog: '/docs/CHANGELOG.md',
   features: [
-    'حذف ملفات الاختبار المتبقية (60+ ملف)',
-    'تنظيف src/__tests__/ بالكامل',
-    'تنظيف src/lib/__tests__/ بالكامل',
-    'تحسين حجم المشروع وسرعة البناء',
-    'صفر أخطاء في البناء',
+    'إضافة DashboardService كطبقة خدمة',
+    'إضافة ثوابت الحالة (PROPERTY_STATUS, CONTRACT_STATUS, etc.)',
+    'تحديث Hooks لاستخدام Service Layer',
+    'حذف useNazerKPIs المهمل',
+    'تحسين الهيكل المعماري وفصل الاهتمامات',
   ],
 } as const;
 

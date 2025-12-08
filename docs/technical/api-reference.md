@@ -1,6 +1,6 @@
 # 📖 مرجع API | API Reference
 
-**الإصدار:** 2.6.39 | **آخر تحديث:** 2025-12-07
+**الإصدار:** 2.6.42 | **آخر تحديث:** 2025-12-08
 
 ---
 
@@ -122,7 +122,7 @@
 | Hook | الوصف | الاستخدام |
 |------|-------|----------|
 | `useUnifiedKPIs` | **المصدر الموحد لجميع KPIs** | `const { data, isLoading, refresh } = useUnifiedKPIs()` |
-| `useNazerKPIs` | مؤشرات الناظر (يستخدم useUnifiedKPIs) | `const { data, isLoading } = useNazerKPIs()` |
+| `useNazerSystemOverview` | إحصائيات النظام الشاملة للناظر | `const { data } = useNazerSystemOverview()` |
 | `useAdminKPIs` | مؤشرات المشرف (يستخدم useUnifiedKPIs) | `const { data, isLoading } = useAdminKPIs()` |
 | `useCashierStats` | إحصائيات أمين الصندوق | `const { stats } = useCashierStats()` |
 | `usePendingApprovals` | الموافقات المعلقة | `const { approvals } = usePendingApprovals()` |
@@ -130,7 +130,7 @@
 | `useNazerDashboardRealtime` | اشتراكات Realtime موحدة | `useNazerDashboardRealtime()` |
 | `useRevenueProgress` | تقدم الإيرادات | `const { progress } = useRevenueProgress()` |
 
-> **ملاحظة:** جميع hooks لوحات التحكم تستخدم `useUnifiedKPIs` كمصدر موحد مع Query Key `['unified-dashboard-kpis']` لضمان تناسق البيانات والتحديث الفوري.
+> **ملاحظة:** تم إزالة `useNazerKPIs` المهمل - استخدم `useUnifiedKPIs` مباشرة كمصدر موحد مع Query Key `['unified-dashboard-kpis']` لضمان تناسق البيانات.
 
 ### الوقف (waqf/)
 
@@ -142,6 +142,17 @@
 ---
 
 ## 🔧 Services
+
+### DashboardService 🆕
+```typescript
+import { DashboardService } from '@/services';
+
+// إحصائيات النظام الشاملة
+const systemStats = await DashboardService.getSystemOverview();
+
+// مؤشرات الأداء الموحدة
+const kpis = await DashboardService.getUnifiedKPIs();
+```
 
 ### AuthService
 ```typescript
@@ -281,4 +292,4 @@ export interface Property {
 
 ---
 
-**الحالة:** ✅ موثق ومحدّث | **الإصدار:** 2.6.39
+**الحالة:** ✅ موثق ومحدّث | **الإصدار:** 2.6.42
