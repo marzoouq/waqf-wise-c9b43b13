@@ -4,7 +4,7 @@
  */
 
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { FundService } from "@/services/fund.service";
 
 export interface ApprovedDistribution {
   id: string;
@@ -23,40 +23,13 @@ export interface ApprovedDistribution {
 }
 
 export function useBankTransfersData() {
-  const {
-    data: distributions = [],
-    isLoading,
-    error,
-  } = useQuery({
+  const { data: distributions = [], isLoading, error } = useQuery({
     queryKey: ["approved-distributions"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("distributions")
-        .select(`
-          id,
-          distribution_date,
-          total_amount,
-          status,
-          distribution_details!inner(
-            beneficiary_id,
-            allocated_amount,
-            beneficiaries!inner(
-              full_name,
-              bank_account_number,
-              iban
-            )
-          )
-        `)
-        .eq("status", "معتمد")
-        .order("distribution_date", { ascending: false });
-
-      if (error) throw error;
-      return data as ApprovedDistribution[];
-    },
+    queryFn: () => FundService.getApprovedDistributions(),
   });
 
   return {
-    distributions,
+    distributions: distributions as ApprovedDistribution[],
     isLoading,
     error,
   };

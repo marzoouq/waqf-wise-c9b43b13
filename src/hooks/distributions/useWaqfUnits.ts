@@ -1,11 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useActivities } from "@/hooks/useActivities";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { useEffect } from "react";
 import type { Json } from '@/integrations/supabase/types';
 import { logger } from "@/lib/logger";
+import { FundService } from "@/services/fund.service";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface WaqfUnit {
   id: string;
@@ -31,87 +32,24 @@ export function useWaqfUnits() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  // Real-time subscription
   useEffect(() => {
     const channel = supabase
       .channel('waqf-units-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'waqf_units'
-        },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ['waqf_units'] });
-        }
-      )
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'waqf_units' }, () => {
+        queryClient.invalidateQueries({ queryKey: ['waqf_units'] });
+      })
       .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => { supabase.removeChannel(channel); };
   }, [queryClient]);
 
-  // Fetch waqf units
   const { data: waqfUnits = [], isLoading } = useQuery({
     queryKey: ['waqf_units'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('waqf_units')
-        .select('id, code, name, description, waqf_type, location, acquisition_date, acquisition_value, current_value, annual_return, documents, is_active, notes, created_at, updated_at')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return data as WaqfUnit[];
-    },
+    queryFn: () => FundService.getWaqfUnits(),
   });
 
-  // Get waqf unit by ID with related data
-  const getWaqfUnitWithDetails = async (id: string) => {
-    const { data: unit, error: unitError } = await supabase
-      .from('waqf_units')
-      .select('id, code, name, description, waqf_type, location, acquisition_date, acquisition_value, current_value, annual_return, documents, is_active, notes, created_at, updated_at')
-      .eq('id', id)
-      .single();
-
-    if (unitError) throw unitError;
-
-    // Get related properties
-    const { data: properties, error: propertiesError } = await supabase
-      .from('properties')
-      .select('id, name, type, monthly_revenue, status')
-      .eq('waqf_unit_id', id);
-
-    if (propertiesError) throw propertiesError;
-
-    // Get related funds
-    const { data: funds, error: fundsError } = await supabase
-      .from('funds')
-      .select('id, name, allocated_amount, spent_amount, category')
-      .eq('waqf_unit_id', id);
-
-    if (fundsError) throw fundsError;
-
-    return {
-      ...unit,
-      properties: properties || [],
-      funds: funds || [],
-    };
-  };
-
-  // Add waqf unit mutation
   const addWaqfUnit = useMutation({
-    mutationFn: async (waqfUnit: Omit<WaqfUnit, 'id' | 'code' | 'created_at' | 'updated_at'>) => {
-      const { data, error } = await supabase
-        .from('waqf_units')
-        .insert([{ ...waqfUnit, code: '' }])
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: (waqfUnit: Omit<WaqfUnit, 'id' | 'code' | 'created_at' | 'updated_at'>) => 
+      FundService.createWaqfUnit({ ...waqfUnit, code: '' }),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['waqf_units'] });
       
@@ -136,19 +74,9 @@ export function useWaqfUnits() {
     },
   });
 
-  // Update waqf unit mutation
   const updateWaqfUnit = useMutation({
-    mutationFn: async ({ id, ...updates }: Partial<WaqfUnit> & { id: string }) => {
-      const { data, error } = await supabase
-        .from('waqf_units')
-        .update(updates)
-        .eq('id', id)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: ({ id, ...updates }: Partial<WaqfUnit> & { id: string }) => 
+      FundService.updateWaqfUnit(id, updates),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['waqf_units'] });
       
@@ -159,9 +87,7 @@ export function useWaqfUnits() {
         logger.error(error, { context: 'update_waqf_unit_activity', severity: 'low' });
       });
 
-      toast({
-        title: "تم تحديث القلم بنجاح",
-      });
+      toast({ title: "تم تحديث القلم بنجاح" });
     },
     onError: (error: Error) => {
       toast({
@@ -172,16 +98,8 @@ export function useWaqfUnits() {
     },
   });
 
-  // Delete waqf unit mutation
   const deleteWaqfUnit = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('waqf_units')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-    },
+    mutationFn: (id: string) => FundService.deleteWaqfUnit(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['waqf_units'] });
       
@@ -192,9 +110,7 @@ export function useWaqfUnits() {
         logger.error(error, { context: 'delete_waqf_unit_activity', severity: 'low' });
       });
 
-      toast({
-        title: "تم حذف القلم بنجاح",
-      });
+      toast({ title: "تم حذف القلم بنجاح" });
     },
     onError: (error: Error) => {
       toast({
@@ -211,6 +127,6 @@ export function useWaqfUnits() {
     addWaqfUnit: addWaqfUnit.mutateAsync,
     updateWaqfUnit: updateWaqfUnit.mutateAsync,
     deleteWaqfUnit: deleteWaqfUnit.mutateAsync,
-    getWaqfUnitWithDetails,
+    getWaqfUnitWithDetails: FundService.getWaqfUnitWithDetails,
   };
 }

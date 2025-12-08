@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { FundService } from "@/services/fund.service";
 
 interface BudgetCategory {
   name: string;
@@ -8,48 +8,17 @@ interface BudgetCategory {
   percentage: number;
 }
 
-interface WaqfReserve {
-  id: string;
-  reserve_type: string;
-  amount: number;
-  current_balance: number;
-}
-
 export function useWaqfBudgets(fiscalYearId?: string) {
-  // Fetch budgets from database
   const { data: budgets, isLoading: budgetsLoading } = useQuery({
     queryKey: ["waqf-budgets", fiscalYearId],
-    queryFn: async () => {
-      let query = supabase
-        .from("budgets")
-        .select("*, accounts(name_ar, code)")
-        .order("created_at", { ascending: false });
-
-      if (fiscalYearId) {
-        query = query.eq("fiscal_year_id", fiscalYearId);
-      }
-
-      const { data, error } = await query;
-      if (error) throw error;
-      return data || [];
-    },
+    queryFn: () => FundService.getBudgets(fiscalYearId),
   });
 
-  // Fetch reserves
   const { data: reserves, isLoading: reservesLoading } = useQuery({
     queryKey: ["waqf-reserves"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("waqf_reserves")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return data as WaqfReserve[] || [];
-    },
+    queryFn: () => FundService.getReserves(),
   });
 
-  // Calculate budget categories
   const budgetCategories: BudgetCategory[] = budgets?.map(budget => ({
     name: budget.accounts?.name_ar || "غير محدد",
     budget: budget.budgeted_amount || 0,
@@ -59,7 +28,6 @@ export function useWaqfBudgets(fiscalYearId?: string) {
       : 0,
   })) || [];
 
-  // Calculate annual totals
   const annualBudget = {
     total: budgets?.reduce((sum, b) => sum + (b.budgeted_amount || 0), 0) || 0,
     spent: budgets?.reduce((sum, b) => sum + (b.actual_amount || 0), 0) || 0,
@@ -71,7 +39,6 @@ export function useWaqfBudgets(fiscalYearId?: string) {
     ? Math.round((annualBudget.spent / annualBudget.total) * 100)
     : 0;
 
-  // Calculate reserve totals
   const reserveTotals = {
     total: reserves?.reduce((sum, r) => sum + (r.amount || 0), 0) || 0,
     invested: 0,

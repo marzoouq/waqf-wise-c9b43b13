@@ -1,88 +1,42 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
-import type { InternalMessage, InternalMessageInsert } from "@/types/messages";
+import type { InternalMessageInsert } from "@/types/messages";
 import { createMutationErrorHandler } from "@/lib/errors";
+import { MessageService } from "@/services/message.service";
+import { supabase } from "@/integrations/supabase/client";
 
 export function useInternalMessages() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
-  // Real-time subscription
   useEffect(() => {
     const channel = supabase
       .channel('messages-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'internal_messages'
-        },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ["internal_messages"] });
-        }
-      )
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'internal_messages' }, () => {
+        queryClient.invalidateQueries({ queryKey: ["internal_messages"] });
+      })
       .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => { supabase.removeChannel(channel); };
   }, [queryClient]);
 
-  // جلب الرسائل الواردة
-  const { data: inboxMessages = [], isLoading: isLoadingInbox } = useQuery<any[]>({
+  const { data: inboxMessages = [], isLoading: isLoadingInbox } = useQuery({
     queryKey: ["internal_messages", "inbox", user?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("internal_messages")
-        .select(`
-          *,
-          sender:profiles!internal_messages_sender_id_fkey(full_name, user_id)
-        `)
-        .eq("receiver_id", user?.id)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return data || [];
-    },
+    queryFn: () => MessageService.getInboxMessages(user!.id),
     enabled: !!user?.id,
   });
 
-  // جلب الرسائل المرسلة
-  const { data: sentMessages = [], isLoading: isLoadingSent } = useQuery<any[]>({
+  const { data: sentMessages = [], isLoading: isLoadingSent } = useQuery({
     queryKey: ["internal_messages", "sent", user?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("internal_messages")
-        .select(`
-          *,
-          receiver:profiles!internal_messages_receiver_id_fkey(full_name, user_id)
-        `)
-        .eq("sender_id", user?.id)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return data || [];
-    },
+    queryFn: () => MessageService.getSentMessages(user!.id),
     enabled: !!user?.id,
   });
 
-  // إرسال رسالة
   const sendMessage = useMutation({
-    mutationFn: async (message: InternalMessageInsert) => {
-      const { data, error } = await supabase
-        .from("internal_messages")
-        .insert([message])
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: (message: InternalMessageInsert) => 
+      MessageService.sendMessage(message),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["internal_messages"] });
       toast({
@@ -96,26 +50,14 @@ export function useInternalMessages() {
     }),
   });
 
-  // تعليم رسالة كمقروءة
   const markAsRead = useMutation({
-    mutationFn: async (messageId: string) => {
-      const { data, error } = await supabase
-        .from("internal_messages")
-        .update({ is_read: true, read_at: new Date().toISOString() })
-        .eq("id", messageId)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: (messageId: string) => MessageService.markAsRead(messageId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["internal_messages"] });
     },
   });
 
-  // عدد الرسائل غير المقروءة
-  const unreadCount = inboxMessages.filter(m => !m.is_read).length;
+  const unreadCount = inboxMessages.filter((m: { is_read: boolean }) => !m.is_read).length;
 
   return {
     inboxMessages,
