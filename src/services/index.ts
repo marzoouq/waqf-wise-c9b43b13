@@ -32,6 +32,7 @@ export { TenantService } from './tenant.service';
 export { MaintenanceService } from './maintenance.service';
 export { FundService } from './fund.service';
 export { PaymentService, type PaymentFilters } from './payment.service';
+export { TribeService } from './tribe.service';
 
 // Infrastructure Services (3)
 export { StorageService } from './storage.service';

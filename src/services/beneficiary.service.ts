@@ -741,4 +741,41 @@ export class BeneficiaryService {
       throw error;
     }
   }
+
+  /**
+   * جلب فئات المستفيدين
+   */
+  static async getCategories(): Promise<Database['public']['Tables']['beneficiary_categories']['Row'][]> {
+    try {
+      const { data, error } = await supabase
+        .from('beneficiary_categories')
+        .select('*')
+        .order('sort_order', { ascending: true });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching categories', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب طلبات الفزعات الطارئة للمستفيد
+   */
+  static async getEmergencyAid(beneficiaryId: string): Promise<Database['public']['Tables']['emergency_aid']['Row'][]> {
+    try {
+      const { data, error } = await supabase
+        .from('emergency_aid')
+        .select('*')
+        .eq('beneficiary_id', beneficiaryId)
+        .order('requested_date', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching emergency aid', error);
+      throw error;
+    }
+  }
 }

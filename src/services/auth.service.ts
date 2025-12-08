@@ -269,4 +269,33 @@ export class AuthService {
 
     if (error) throw error;
   }
+
+  /**
+   * جلب ملف الشخصية
+   */
+  static async getProfile(userId: string) {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("id, user_id, full_name, email, phone, position, avatar_url, created_at, updated_at")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (error) throw error;
+    return data;
+  }
+
+  /**
+   * تحديث أو إنشاء ملف الشخصية
+   */
+  static async upsertProfile(userId: string, profileData: Record<string, any>) {
+    const { data, error } = await supabase
+      .from("profiles")
+      .upsert([{ ...profileData, user_id: userId }], { onConflict: "user_id" })
+      .select()
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) throw new Error("فشل في تحديث الملف الشخصي");
+    return data;
+  }
 }

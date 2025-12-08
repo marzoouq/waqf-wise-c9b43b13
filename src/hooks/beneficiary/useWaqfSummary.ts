@@ -4,7 +4,7 @@
  */
 
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { DashboardService } from "@/services/dashboard.service";
 
 export interface WaqfSummaryData {
   propertiesCount: number;
@@ -18,33 +18,7 @@ export interface WaqfSummaryData {
 export function useWaqfSummary(enabled: boolean = true) {
   const { data: summary, isLoading, error, refetch } = useQuery({
     queryKey: ["waqf-summary"],
-    queryFn: async (): Promise<WaqfSummaryData> => {
-      // استخدام function الجديدة للحصول على البيانات العامة دون RLS
-      const { data: publicStats, error: publicError } = await supabase
-        .rpc('get_waqf_public_stats');
-
-      if (publicError) {
-        console.error('Error fetching public stats:', publicError);
-        throw publicError;
-      }
-
-      const stats = publicStats as {
-        beneficiaries_count: number;
-        properties_count: number;
-        total_property_value: number;
-        total_funds: number;
-        total_bank_balance: number;
-      };
-
-      return {
-        propertiesCount: stats.properties_count || 0,
-        totalPropertyValue: stats.total_property_value || 0,
-        totalFunds: stats.total_funds || 0,
-        beneficiariesCount: stats.beneficiaries_count || 0,
-        totalBankBalance: stats.total_bank_balance || 0,
-        totalWaqfValue: (stats.total_property_value || 0) + (stats.total_bank_balance || 0),
-      };
-    },
+    queryFn: () => DashboardService.getWaqfSummary(),
     enabled,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });

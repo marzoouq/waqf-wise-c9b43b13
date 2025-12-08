@@ -1197,4 +1197,158 @@ export class AccountingService {
       throw error;
     }
   }
+
+  /**
+   * جلب البيانات المالية الموحدة
+   */
+  static async getFinancialData(): Promise<FinancialSummary> {
+    try {
+      // جلب السنة المالية النشطة
+      const { data: fiscalYear } = await supabase
+        .from("fiscal_years")
+        .select("id")
+        .eq("is_active", true)
+        .single();
+
+      // جلب القيود اليومية والأرصدة الافتتاحية بالتوازي
+      const [entriesResult, openingBalancesResult] = await Promise.all([
+        supabase
+          .from("journal_entry_lines")
+          .select(`
+            debit_amount,
+            credit_amount,
+            account_id,
+            accounts (
+              account_type,
+              account_nature
+            )
+          `),
+        supabase
+          .from("opening_balances")
+          .select(`
+            opening_balance,
+            accounts (
+              account_type,
+              account_nature
+            )
+          `)
+          .eq("fiscal_year_id", fiscalYear?.id || '')
+      ]);
+
+      if (entriesResult.error) throw entriesResult.error;
+
+      let totalAssets = 0;
+      let totalLiabilities = 0;
+      let totalEquity = 0;
+      let totalRevenue = 0;
+      let totalExpenses = 0;
+
+      // حساب من القيود اليومية
+      entriesResult.data?.forEach((line: any) => {
+        const accountType = line.accounts?.account_type;
+        const accountNature = line.accounts?.account_nature;
+        const debit = Number(line.debit_amount || 0);
+        const credit = Number(line.credit_amount || 0);
+
+        if (accountType === 'asset') {
+          totalAssets += accountNature === 'debit' ? debit - credit : credit - debit;
+        } else if (accountType === 'liability') {
+          totalLiabilities += accountNature === 'credit' ? credit - debit : debit - credit;
+        } else if (accountType === 'equity') {
+          totalEquity += accountNature === 'credit' ? credit - debit : debit - credit;
+        } else if (accountType === 'revenue') {
+          totalRevenue += accountNature === 'credit' ? credit - debit : debit - credit;
+        } else if (accountType === 'expense') {
+          totalExpenses += accountNature === 'debit' ? debit - credit : credit - debit;
+        }
+      });
+
+      // إضافة الأرصدة الافتتاحية
+      openingBalancesResult.data?.forEach((ob: any) => {
+        const accountType = ob.accounts?.account_type;
+        const balance = Number(ob.opening_balance || 0);
+
+        if (accountType === 'asset') totalAssets += balance;
+        else if (accountType === 'liability') totalLiabilities += balance;
+        else if (accountType === 'equity') totalEquity += balance;
+        else if (accountType === 'revenue') totalRevenue += balance;
+        else if (accountType === 'expense') totalExpenses += balance;
+      });
+
+      const netIncome = totalRevenue - totalExpenses;
+
+      return {
+        totalAssets,
+        totalLiabilities,
+        totalEquity: totalEquity + netIncome,
+        totalRevenue,
+        totalExpenses,
+        netIncome,
+      };
+    } catch (error) {
+      productionLogger.error('Error fetching financial data', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب التدفقات النقدية
+   */
+  static async getCashFlows(fiscalYearId?: string) {
+    try {
+      const { data, error } = await supabase
+        .from('cash_flows')
+        .select('*')
+        .order('period_start', { ascending: false })
+        .limit(10);
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching cash flows', error);
+      throw error;
+    }
+  }
+
+  /**
+   * حساب وحفظ التدفقات النقدية
+   */
+  static async calculateCashFlow(params: {
+    fiscalYearId: string;
+    periodStart: string;
+    periodEnd: string;
+  }) {
+    try {
+      // حساب مبسط للتدفقات النقدية
+      const { data: bankAccount } = await supabase
+        .from('accounts')
+        .select('current_balance')
+        .eq('code', '1.1.1')
+        .single();
+
+      const openingCash = bankAccount?.current_balance || 0;
+
+      const { data, error } = await supabase
+        .from("cash_flows")
+        .insert([{
+          fiscal_year_id: params.fiscalYearId,
+          period_start: params.periodStart,
+          period_end: params.periodEnd,
+          operating_activities: 0,
+          investing_activities: 0,
+          financing_activities: 0,
+          net_cash_flow: 0,
+          opening_cash: openingCash,
+          closing_cash: openingCash,
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      productionLogger.error('Error calculating cash flow', error);
+      throw error;
+    }
+  }
 }

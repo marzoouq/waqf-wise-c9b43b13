@@ -1,6 +1,5 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { useQuery } from "@tanstack/react-query";
+import { BeneficiaryService } from "@/services/beneficiary.service";
 
 export interface BeneficiaryCategory {
   id: string;
@@ -15,20 +14,9 @@ export interface BeneficiaryCategory {
 }
 
 export function useBeneficiaryCategories() {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-
   const { data: categories = [], isLoading } = useQuery({
     queryKey: ["beneficiary-categories"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("beneficiary_categories")
-        .select("*")
-        .order("sort_order", { ascending: true });
-
-      if (error) throw error;
-      return data as BeneficiaryCategory[];
-    },
+    queryFn: () => BeneficiaryService.getCategories(),
   });
 
   const activeCategories = categories.filter(c => c.is_active);

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { BeneficiaryService } from "@/services/beneficiary.service";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -31,15 +31,7 @@ export function useBeneficiaryAttachments(beneficiaryId?: string) {
     queryKey: ["beneficiary-attachments", beneficiaryId],
     queryFn: async () => {
       if (!beneficiaryId) return [];
-      
-      const { data, error } = await supabase
-        .from("beneficiary_attachments")
-        .select("*")
-        .eq("beneficiary_id", beneficiaryId)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return data;
+      return await BeneficiaryService.getDocuments(beneficiaryId);
     },
     enabled: !!beneficiaryId,
   });
@@ -56,39 +48,7 @@ export function useBeneficiaryAttachments(beneficiaryId?: string) {
       description?: string;
     }) => {
       if (!beneficiaryId) throw new Error("Beneficiary ID is required");
-
-      // Upload file to Supabase Storage
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${beneficiaryId}/${Date.now()}.${fileExt}`;
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from("beneficiary-documents")
-        .upload(fileName, file);
-
-      if (uploadError) throw uploadError;
-
-      // Get public URL
-      const { data: urlData } = supabase.storage
-        .from("beneficiary-documents")
-        .getPublicUrl(fileName);
-
-      // Save metadata to database
-      const { data, error } = await supabase
-        .from("beneficiary_attachments")
-        .insert({
-          beneficiary_id: beneficiaryId,
-          file_name: file.name,
-          file_path: urlData.publicUrl,
-          file_type: file.type,
-          file_size: file.size,
-          document_type: documentType,
-          description,
-          uploaded_by: user?.id,
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
+      return await BeneficiaryService.uploadDocument(beneficiaryId, file, documentType, description);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["beneficiary-attachments", beneficiaryId] });
@@ -109,24 +69,7 @@ export function useBeneficiaryAttachments(beneficiaryId?: string) {
   // Delete attachment
   const deleteAttachment = useMutation({
     mutationFn: async (attachmentId: string) => {
-      const attachment = attachments.find((a) => a.id === attachmentId);
-      if (!attachment) throw new Error("Attachment not found");
-
-      // Delete from storage
-      const fileName = attachment.file_path.split("/").pop();
-      if (fileName) {
-        await supabase.storage
-          .from("beneficiary-documents")
-          .remove([`${beneficiaryId}/${fileName}`]);
-      }
-
-      // Delete from database
-      const { error } = await supabase
-        .from("beneficiary_attachments")
-        .delete()
-        .eq("id", attachmentId);
-
-      if (error) throw error;
+      return await BeneficiaryService.deleteDocument(attachmentId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["beneficiary-attachments", beneficiaryId] });
