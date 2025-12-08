@@ -1,9 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { QUERY_KEYS, TOAST_MESSAGES, QUERY_STALE_TIME } from "@/lib/constants";
 import { createMutationErrorHandler } from "@/lib/errors";
-import { Database } from "@/integrations/supabase/types";
+import { ArchiveService } from "@/services/archive.service";
 
 export interface Document {
   id: string;
@@ -26,29 +25,13 @@ export function useDocuments() {
 
   const { data: documents = [], isLoading } = useQuery({
     queryKey: [QUERY_KEYS.DOCUMENTS],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("documents")
-        .select("id, name, description, file_type, file_size, file_size_bytes, category, folder_id, uploaded_at, created_at, file_path, storage_path")
-        .order("uploaded_at", { ascending: false });
-
-      if (error) throw error;
-      return data as Document[];
-    },
+    queryFn: () => ArchiveService.getDocuments(),
     staleTime: QUERY_STALE_TIME.DEFAULT,
   });
 
   const addDocument = useMutation({
-    mutationFn: async (document: Omit<Database['public']['Tables']['documents']['Insert'], 'id' | 'created_at'>) => {
-      const { data, error } = await supabase
-        .from("documents")
-        .insert([document])
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: (document: Parameters<typeof ArchiveService.createDocument>[0]) => 
+      ArchiveService.createDocument(document),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.DOCUMENTS] });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.FOLDERS] });
@@ -64,17 +47,8 @@ export function useDocuments() {
   });
 
   const updateDocument = useMutation({
-    mutationFn: async ({ id, ...updates }: Partial<Document> & { id: string }) => {
-      const { data, error } = await supabase
-        .from("documents")
-        .update(updates)
-        .eq("id", id)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: ({ id, ...updates }: Partial<Document> & { id: string }) => 
+      ArchiveService.updateDocument(id, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.DOCUMENTS] });
       toast({
@@ -89,14 +63,7 @@ export function useDocuments() {
   });
 
   const deleteDocument = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from("documents")
-        .delete()
-        .eq("id", id);
-
-      if (error) throw error;
-    },
+    mutationFn: (id: string) => ArchiveService.deleteDocument(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.DOCUMENTS] });
       toast({

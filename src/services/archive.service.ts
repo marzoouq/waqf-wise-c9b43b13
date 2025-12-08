@@ -121,6 +121,21 @@ export class ArchiveService {
   }
 
   /**
+   * تحديث مجلد
+   */
+  static async updateFolder(id: string, updates: Partial<FolderInsert>): Promise<Folder> {
+    const { data, error } = await supabase
+      .from('folders')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  }
+
+  /**
    * البحث في المستندات
    */
   static async searchDocuments(query: string): Promise<Document[]> {

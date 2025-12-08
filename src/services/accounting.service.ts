@@ -542,6 +542,34 @@ export class AccountingService {
   }
 
   /**
+   * جلب الميزانيات مع بيانات الحسابات
+   */
+  static async getBudgetsWithAccounts(fiscalYearId?: string): Promise<(Database['public']['Tables']['budgets']['Row'] & { accounts?: { code: string; name_ar: string; account_type: string } })[]> {
+    try {
+      let query = supabase.from('budgets').select(`
+        *,
+        accounts:account_id (
+          code,
+          name_ar,
+          account_type
+        )
+      `);
+      
+      if (fiscalYearId) {
+        query = query.eq('fiscal_year_id', fiscalYearId);
+      }
+
+      const { data, error } = await query.order('period_number');
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching budgets with accounts', error);
+      throw error;
+    }
+  }
+
+  /**
    * إنشاء ميزانية
    */
   static async createBudget(budget: Database['public']['Tables']['budgets']['Insert']): Promise<Database['public']['Tables']['budgets']['Row']> {
@@ -556,6 +584,82 @@ export class AccountingService {
       return data;
     } catch (error) {
       productionLogger.error('Error creating budget', error);
+      throw error;
+    }
+  }
+
+  /**
+   * تحديث ميزانية
+   */
+  static async updateBudget(id: string, updates: Partial<Database['public']['Tables']['budgets']['Row']>): Promise<Database['public']['Tables']['budgets']['Row']> {
+    try {
+      const { data, error } = await supabase
+        .from('budgets')
+        .update({ ...updates, updated_at: new Date().toISOString() })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      productionLogger.error('Error updating budget', error);
+      throw error;
+    }
+  }
+
+  /**
+   * حذف ميزانية
+   */
+  static async deleteBudget(id: string): Promise<void> {
+    try {
+      const { error } = await supabase
+        .from('budgets')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+    } catch (error) {
+      productionLogger.error('Error deleting budget', error);
+      throw error;
+    }
+  }
+
+  /**
+   * حساب انحرافات الميزانية
+   */
+  static async calculateBudgetVariances(fiscalYearId: string): Promise<void> {
+    try {
+      const { data: budgetsData, error: budgetsError } = await supabase
+        .from('budgets')
+        .select('id, account_id, budgeted_amount')
+        .eq('fiscal_year_id', fiscalYearId);
+
+      if (budgetsError) throw budgetsError;
+
+      for (const budget of budgetsData || []) {
+        const { data: actualData, error: actualError } = await supabase
+          .from('journal_entry_lines')
+          .select('debit_amount, credit_amount')
+          .eq('account_id', budget.account_id);
+
+        if (actualError) throw actualError;
+
+        const actualAmount = actualData?.reduce((sum, line) => 
+          sum + ((line.debit_amount || 0) - (line.credit_amount || 0)), 0) || 0;
+
+        const varianceAmount = budget.budgeted_amount - actualAmount;
+
+        await supabase
+          .from('budgets')
+          .update({
+            actual_amount: actualAmount,
+            variance_amount: varianceAmount,
+          })
+          .eq('id', budget.id);
+      }
+    } catch (error) {
+      productionLogger.error('Error calculating budget variances', error);
       throw error;
     }
   }
