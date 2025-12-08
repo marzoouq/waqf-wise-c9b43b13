@@ -3,7 +3,7 @@ import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { TrendingUp, DollarSign, Users, Clock, Calendar, CheckCircle2 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { DistributionService } from '@/services';
 import { productionLogger } from '@/lib/logger/production-logger';
 import { Distribution, MonthlyDistributionData, PatternDistributionData } from '@/types/distributions';
 
@@ -19,12 +19,7 @@ export function DistributionsDashboard() {
 
   const loadData = async () => {
     try {
-      const { data, error } = await supabase
-        .from('distributions')
-        .select('id, created_at, total_amount, status, month, notes, distribution_type, beneficiaries_count, distribution_date')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
+      const data = await DistributionService.getAll();
       setDistributions(data || []);
     } catch (error) {
       productionLogger.error('Error loading distributions', error);

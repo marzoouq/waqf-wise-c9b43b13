@@ -25,7 +25,24 @@ export interface FinancialSummary {
 
 export class AccountingService {
   /**
-   * جلب جميع القيود المحاسبية
+   * جلب جميع الحسابات
+   */
+  static async getAccounts() {
+    try {
+      const { data, error } = await supabase
+        .from('accounts')
+        .select('*')
+        .order('code', { ascending: true });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching accounts', error);
+      throw error;
+    }
+  }
+
+  /**
    */
   static async getJournalEntries(filters?: {
     status?: string;

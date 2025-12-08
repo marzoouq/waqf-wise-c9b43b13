@@ -10,6 +10,7 @@ import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
 import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
 import { ReportRefreshIndicator } from './ReportRefreshIndicator';
 import { QUERY_CONFIG } from '@/lib/queryOptimization';
+import { BeneficiaryService, PropertyService, AccountingService } from '@/services';
 
 export function InteractiveDashboard() {
   const [timeRange, setTimeRange] = useState('month');
@@ -17,15 +18,12 @@ export function InteractiveDashboard() {
   const queryClient = useQueryClient();
   const [lastUpdated, setLastUpdated] = useState<Date>();
 
-  // إحصائيات المستفيدين
+  // إحصائيات المستفيدين باستخدام Service
   const { data: beneficiariesStats, isLoading: loadingBeneficiaries, dataUpdatedAt } = useQuery({
     queryKey: ['dashboard-beneficiaries', timeRange],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('beneficiaries')
-        .select('category, status, created_at');
-      
-      if (error) throw error;
+      const result = await BeneficiaryService.getAll();
+      const data = result.data || [];
       
       // تجميع البيانات حسب الفئة
       const categoryCount = data.reduce((acc, curr) => {
@@ -93,7 +91,7 @@ export function InteractiveDashboard() {
       if (error) throw error;
 
       // تجميع البيانات حسب الشهر
-      const monthlyData = data.reduce((acc, curr) => {
+      const monthlyData = (data || []).reduce((acc, curr) => {
         const month = new Date(curr.payment_date).toLocaleDateString('ar-SA', { month: 'short' });
         if (!acc[month]) {
           acc[month] = { month, total: 0, count: 0 };
@@ -107,18 +105,14 @@ export function InteractiveDashboard() {
     },
   });
 
-  // إحصائيات العقارات
+  // إحصائيات العقارات باستخدام Service
   const { data: propertiesStats, isLoading: loadingProperties, isRefetching: isRefetchingProperties } = useQuery({
     queryKey: ['dashboard-properties'],
     ...QUERY_CONFIG.REPORTS,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('properties')
-        .select('status, type');
-      
-      if (error) throw error;
+      const data = await PropertyService.getAll();
 
-      const statusCount = data.reduce((acc, curr) => {
+      const statusCount = (data || []).reduce((acc, curr) => {
         acc[curr.status] = (acc[curr.status] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);

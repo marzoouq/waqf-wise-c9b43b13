@@ -1,10 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { BeneficiaryService } from '@/services';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { Users, User, Crown } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ProfileFamilyTreeProps {
   beneficiaryId: string;

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { BeneficiaryService } from '@/services';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -23,16 +23,7 @@ interface ProfileDocumentsGalleryProps {
 export function ProfileDocumentsGallery({ beneficiaryId }: ProfileDocumentsGalleryProps) {
   const { data: documents, isLoading } = useQuery({
     queryKey: ['beneficiary-documents', beneficiaryId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('beneficiary_attachments')
-        .select('id, file_name, file_type, file_size, description, is_verified, created_at')
-        .eq('beneficiary_id', beneficiaryId)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return data || [];
-    },
+    queryFn: () => BeneficiaryService.getDocuments(beneficiaryId),
     staleTime: 60 * 1000,
   });
 

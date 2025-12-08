@@ -221,7 +221,25 @@ export class BeneficiaryService {
   }
 
   /**
-   * جلب أفراد عائلة مستفيد
+   * جلب إحصائيات مستفيد محدد
+   */
+  static async getStatistics(beneficiaryId: string) {
+    try {
+      const { data, error } = await supabase
+        .from('beneficiaries')
+        .select('total_received, pending_amount, total_payments, pending_requests')
+        .eq('id', beneficiaryId)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      productionLogger.error('Error fetching beneficiary statistics', error);
+      throw error;
+    }
+  }
+
+  /**
    */
   static async getFamilyMembers(beneficiaryId: string): Promise<Beneficiary[]> {
     try {

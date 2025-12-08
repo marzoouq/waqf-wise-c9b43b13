@@ -1,9 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { BeneficiaryService } from '@/services';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DollarSign, FileText, Users, TrendingUp, Calendar, CheckCircle } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
-import { Database } from '@/integrations/supabase/types';
 
 interface ProfileStatsProps {
   beneficiaryId: string;
@@ -23,38 +22,15 @@ export function ProfileStats({ beneficiaryId }: ProfileStatsProps) {
   const { data: stats, isLoading } = useQuery<StatsData>({
     queryKey: ['beneficiary-stats', beneficiaryId],
     queryFn: async () => {
-      const { data: payments } = await supabase
-        .from('payments')
-        .select('amount')
-        .eq('beneficiary_id', beneficiaryId);
-
-      const { data: requests } = await supabase
-        .from('beneficiary_requests')
-        .select('status')
-        .eq('beneficiary_id', beneficiaryId);
-
-      const { count: attachmentsCount } = await supabase
-        .from('beneficiary_attachments')
-        .select('*', { count: 'exact', head: true })
-        .eq('beneficiary_id', beneficiaryId);
-
-      const { count: familyCount } = await supabase
-        .from('family_members')
-        .select('*', { count: 'exact', head: true })
-        .eq('beneficiary_id', beneficiaryId);
-
-      const totalPayments = (payments || []).reduce((sum: number, p) => sum + (Number(p.amount) || 0), 0);
-      const approvedCount = (requests || []).filter((r) => r.status === 'معتمد').length;
-      const pendingCount = (requests || []).filter((r) => r.status === 'قيد المراجعة').length;
-
+      const statistics = await BeneficiaryService.getStatistics(beneficiaryId);
       return {
-        totalPayments,
-        paymentsCount: payments?.length || 0,
-        totalRequests: requests?.length || 0,
-        approvedRequests: approvedCount,
-        pendingRequests: pendingCount,
-        attachmentsCount: attachmentsCount || 0,
-        familyMembersCount: familyCount || 0,
+        totalPayments: statistics?.total_received || 0,
+        paymentsCount: statistics?.total_payments || 0,
+        totalRequests: statistics?.pending_requests || 0,
+        approvedRequests: 0,
+        pendingRequests: statistics?.pending_requests || 0,
+        attachmentsCount: 0,
+        familyMembersCount: 0,
       };
     },
   });
