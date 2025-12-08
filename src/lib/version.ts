@@ -2,11 +2,11 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.7.10
+ * @version 2.8.0
  * @date 2025-12-08
  */
 
-export const APP_VERSION = '2.7.10';
+export const APP_VERSION = '2.8.0';
 export const APP_VERSION_DATE = '2025-12-08';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
@@ -16,12 +16,12 @@ export const VERSION_INFO = {
   name: APP_VERSION_NAME,
   changelog: '/docs/CHANGELOG.md',
   features: [
-    '23 Service Layer متكامل',
-    '170+ Hook منظم في 26 مجلد',
-    'توحيد البنية: Hooks تستخدم Services',
+    'نقل 25+ مكون من Supabase مباشر إلى Hooks',
+    '30+ Hook جديد للتقارير والبحث والفواتير',
+    'توحيد البنية: Component → Hook → Supabase',
     'إصلاح تصديرات hooks المفقودة',
     'حذف ملفات proxy مكررة',
-    'إصلاح أخطاء البناء',
+    'صفر أخطاء بناء',
   ],
 } as const;
 
