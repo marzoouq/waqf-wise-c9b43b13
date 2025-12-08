@@ -1,0 +1,259 @@
+/**
+ * Dashboard Service - خدمة لوحة التحكم
+ * 
+ * تحتوي على منطق الأعمال لجلب بيانات الداشبورد
+ * 
+ * @version 2.6.36
+ */
+
+import { supabase } from "@/integrations/supabase/client";
+import { BENEFICIARY_STATUS, PROPERTY_STATUS, CONTRACT_STATUS, LOAN_STATUS, REQUEST_STATUS } from "@/lib/constants";
+
+// ==================== Types ====================
+
+export interface SystemOverviewStats {
+  beneficiaries: {
+    total: number;
+    active: number;
+    percentage: number;
+  };
+  properties: {
+    total: number;
+    occupied: number;
+    percentage: number;
+  };
+  contracts: {
+    total: number;
+    active: number;
+  };
+  loans: {
+    total: number;
+    active: number;
+    amount: number;
+  };
+  payments: {
+    total: number;
+    amount: number;
+  };
+  requests: {
+    total: number;
+    pending: number;
+  };
+  documents: number;
+}
+
+export interface UnifiedKPIsData {
+  // المستفيدون
+  totalBeneficiaries: number;
+  activeBeneficiaries: number;
+  
+  // العائلات
+  totalFamilies: number;
+  
+  // العقارات
+  totalProperties: number;
+  activeProperties: number;
+  occupiedProperties: number;
+  
+  // المالية
+  totalRevenue: number;
+  totalExpenses: number;
+  netIncome: number;
+  availableBudget: number;
+  monthlyReturn: number;
+  totalAssets: number;
+  
+  // الأقلام
+  totalFunds: number;
+  activeFunds: number;
+  
+  // الطلبات
+  pendingRequests: number;
+  overdueRequests: number;
+  
+  // القروض
+  pendingLoans: number;
+  
+  // التحديث
+  lastUpdated: Date;
+}
+
+// ==================== Service ====================
+
+export const DashboardService = {
+  /**
+   * جلب إحصائيات النظام الشاملة للناظر
+   */
+  async getSystemOverview(): Promise<SystemOverviewStats> {
+    const [
+      beneficiariesRes,
+      propertiesRes,
+      contractsRes,
+      loansRes,
+      paymentsRes,
+      requestsRes,
+      documentsRes,
+    ] = await Promise.all([
+      supabase.from("beneficiaries").select("id, status", { count: "exact" }),
+      supabase.from("properties").select("id, status", { count: "exact" }),
+      supabase.from("contracts").select("id, status", { count: "exact" }),
+      supabase.from("loans").select("id, status, loan_amount, paid_amount", { count: "exact" }),
+      supabase.from("rental_payments").select("id, amount_paid, status").eq("status", "مدفوع"),
+      supabase.from("beneficiary_requests").select("id, status", { count: "exact" }),
+      supabase.from("documents").select("id", { count: "exact" }),
+    ]);
+
+    const beneficiaries = beneficiariesRes.data || [];
+    const properties = propertiesRes.data || [];
+    const contracts = contractsRes.data || [];
+    const loans = loansRes.data || [];
+    const payments = paymentsRes.data || [];
+    const requests = requestsRes.data || [];
+
+    const activeBeneficiaries = beneficiaries.filter(b => b.status === BENEFICIARY_STATUS.ACTIVE).length;
+    const occupiedProperties = properties.filter(p => p.status === PROPERTY_STATUS.ACTIVE).length;
+    const activeContracts = contracts.filter(c => 
+      c.status === CONTRACT_STATUS.ACTIVE || c.status === 'active'
+    ).length;
+    const activeLoans = loans.filter(l => 
+      l.status === LOAN_STATUS.ACTIVE || l.status === 'active'
+    ).length;
+    const totalLoansAmount = loans.reduce((sum, l) => sum + ((l.loan_amount || 0) - (l.paid_amount || 0)), 0);
+    const totalPayments = payments.reduce((sum, p) => sum + (p.amount_paid || 0), 0);
+    const pendingRequests = requests.filter(r => 
+      r.status === REQUEST_STATUS.PENDING || r.status === 'pending'
+    ).length;
+
+    return {
+      beneficiaries: {
+        total: beneficiaries.length,
+        active: activeBeneficiaries,
+        percentage: beneficiaries.length > 0 ? Math.round((activeBeneficiaries / beneficiaries.length) * 100) : 0,
+      },
+      properties: {
+        total: properties.length,
+        occupied: occupiedProperties,
+        percentage: properties.length > 0 ? Math.round((occupiedProperties / properties.length) * 100) : 0,
+      },
+      contracts: {
+        total: contracts.length,
+        active: activeContracts,
+      },
+      loans: {
+        total: loans.length,
+        active: activeLoans,
+        amount: totalLoansAmount,
+      },
+      payments: {
+        total: payments.length,
+        amount: totalPayments,
+      },
+      requests: {
+        total: requests.length,
+        pending: pendingRequests,
+      },
+      documents: documentsRes.count || 0,
+    };
+  },
+
+  /**
+   * جلب مؤشرات الأداء الموحدة
+   */
+  async getUnifiedKPIs(): Promise<UnifiedKPIsData> {
+    const now = new Date();
+
+    const [
+      beneficiariesResult,
+      familiesResult,
+      propertiesResult,
+      contractsResult,
+      fundsResult,
+      requestsResult,
+      loansResult,
+      paymentsResult,
+      journalEntriesResult
+    ] = await Promise.all([
+      supabase.from('beneficiaries').select('id, status'),
+      supabase.from('families').select('id'),
+      supabase.from('properties').select('id, status'),
+      supabase.from('contracts').select('id, status, monthly_rent'),
+      supabase.from('funds').select('id, is_active'),
+      supabase.from('beneficiary_requests').select('id, status, is_overdue'),
+      supabase.from('loans').select('id, status'),
+      supabase.from('payments').select('id, amount, payment_type, status'),
+      supabase.from('journal_entry_lines').select('id, debit_amount, credit_amount')
+    ]);
+
+    // حساب المؤشرات باستخدام الثوابت
+    const beneficiaries = beneficiariesResult.data || [];
+    const totalBeneficiaries = beneficiaries.length;
+    const activeBeneficiaries = beneficiaries.filter(b => 
+      b.status === BENEFICIARY_STATUS.ACTIVE || b.status === 'active'
+    ).length;
+
+    const totalFamilies = familiesResult.data?.length || 0;
+
+    const properties = propertiesResult.data || [];
+    const totalProperties = properties.length;
+    const activeProperties = properties.filter(p => 
+      p.status === PROPERTY_STATUS.ACTIVE || p.status === 'active'
+    ).length;
+
+    const contracts = contractsResult.data || [];
+    const occupiedProperties = contracts.filter(c => 
+      c.status === CONTRACT_STATUS.ACTIVE || c.status === 'active'
+    ).length;
+    const monthlyReturn = contracts
+      .filter(c => c.status === CONTRACT_STATUS.ACTIVE || c.status === 'active')
+      .reduce((sum, c) => sum + (c.monthly_rent || 0), 0);
+
+    const funds = fundsResult.data || [];
+    const totalFunds = funds.length;
+    const activeFunds = funds.filter(f => f.is_active).length;
+
+    const requests = requestsResult.data || [];
+    const pendingRequests = requests.filter(r => 
+      r.status === REQUEST_STATUS.PENDING || r.status === 'pending'
+    ).length;
+    const overdueRequests = requests.filter(r => r.is_overdue).length;
+
+    const loans = loansResult.data || [];
+    const pendingLoans = loans.filter(l => 
+      l.status === LOAN_STATUS.ACTIVE || l.status === 'active'
+    ).length;
+
+    const payments = paymentsResult.data || [];
+    const completedPayments = payments.filter(p => p.status === 'مدفوع' || p.status === 'completed');
+    const totalRevenue = completedPayments
+      .filter(p => p.payment_type === 'payment' || p.payment_type === 'إيجار')
+      .reduce((sum, p) => sum + (p.amount || 0), 0);
+
+    const journalLines = journalEntriesResult.data || [];
+    const totalExpenses = journalLines.reduce((sum, line) => sum + (line.credit_amount || 0), 0);
+
+    const netIncome = totalRevenue - totalExpenses;
+    const availableBudget = netIncome > 0 ? netIncome : 0;
+    const totalAssets = totalRevenue;
+
+    return {
+      totalBeneficiaries,
+      activeBeneficiaries,
+      totalFamilies,
+      totalProperties,
+      activeProperties,
+      occupiedProperties,
+      totalRevenue,
+      totalExpenses,
+      netIncome,
+      availableBudget,
+      monthlyReturn,
+      totalAssets,
+      totalFunds,
+      activeFunds,
+      pendingRequests,
+      overdueRequests,
+      pendingLoans,
+      lastUpdated: now
+    };
+  }
+};

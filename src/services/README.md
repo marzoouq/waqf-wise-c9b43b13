@@ -15,12 +15,22 @@ src/services/
 ├── report.service.ts           # خدمة التقارير
 ├── request.service.ts          # خدمة الطلبات
 ├── voucher.service.ts          # خدمة السندات
-├── auth.service.ts             # خدمة المصادقة 🆕
-├── archive.service.ts          # خدمة الأرشيف 🆕
-└── loans.service.ts            # خدمة القروض 🆕
+├── auth.service.ts             # خدمة المصادقة
+├── archive.service.ts          # خدمة الأرشيف
+├── loans.service.ts            # خدمة القروض
+└── dashboard.service.ts        # خدمة لوحة التحكم 🆕
 ```
 
 ## 📋 الخدمات المتوفرة
+
+### 📊 DashboardService 🆕
+```typescript
+import { DashboardService } from '@/services';
+
+// الوظائف
+DashboardService.getSystemOverview()          // إحصائيات النظام الشاملة
+DashboardService.getUnifiedKPIs()             // مؤشرات الأداء الموحدة
+```
 
 ### 👥 BeneficiaryService
 ```typescript
@@ -176,15 +186,16 @@ LoansService.getStats()                       // إحصائيات القروض
 
 ## 🔄 أمثلة الاستخدام
 
-### في Hook
+### في Hook (النمط الموصى به)
 ```typescript
-import { BeneficiaryService } from '@/services';
+import { DashboardService } from '@/services';
 import { useQuery } from '@tanstack/react-query';
 
-export function useBeneficiaryStats() {
+export function useNazerSystemOverview() {
   return useQuery({
-    queryKey: ['beneficiary-stats'],
-    queryFn: () => BeneficiaryService.getStats(),
+    queryKey: ['nazer-system-overview'],
+    queryFn: () => DashboardService.getSystemOverview(),
+    staleTime: 2 * 60 * 1000,
   });
 }
 ```
@@ -202,7 +213,41 @@ const handleSendNotification = async () => {
 };
 ```
 
+## 🏗️ الهيكل المعماري
+
+```
+┌─────────────────────────────────────────┐
+│           Pages (الصفحات)               │
+└─────────────┬───────────────────────────┘
+              ▼
+┌─────────────────────────────────────────┐
+│        Components (المكونات)            │
+└─────────────┬───────────────────────────┘
+              ▼
+┌─────────────────────────────────────────┐
+│         Hooks (الخطافات)                │
+│   useNazerSystemOverview                │
+│   useUnifiedKPIs                        │
+└─────────────┬───────────────────────────┘
+              ▼
+┌─────────────────────────────────────────┐
+│       Services (الخدمات) ◄──────────────│
+│   DashboardService.getSystemOverview()  │
+│   DashboardService.getUnifiedKPIs()     │
+└─────────────┬───────────────────────────┘
+              ▼
+┌─────────────────────────────────────────┐
+│      Constants (الثوابت)                │
+│   PROPERTY_STATUS, CONTRACT_STATUS      │
+│   BENEFICIARY_STATUS, LOAN_STATUS       │
+└─────────────┬───────────────────────────┘
+              ▼
+┌─────────────────────────────────────────┐
+│         Supabase (قاعدة البيانات)       │
+└─────────────────────────────────────────┘
+```
+
 ---
 
-**آخر تحديث:** 2025-12-03
-**الإصدار:** 2.6.4
+**آخر تحديث:** 2025-12-08
+**الإصدار:** 2.6.36

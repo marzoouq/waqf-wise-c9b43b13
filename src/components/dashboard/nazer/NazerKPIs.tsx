@@ -1,3 +1,9 @@
+/**
+ * NazerKPIs Component
+ * يستخدم useUnifiedKPIs مباشرة كمصدر موحد للبيانات
+ * 
+ * @version 2.6.36
+ */
 import { 
   Building2, 
   Users, 
@@ -8,7 +14,7 @@ import {
   Wallet,
   PieChart
 } from "lucide-react";
-import { useNazerKPIs } from "@/hooks/dashboard";
+import { useUnifiedKPIs } from "@/hooks/dashboard";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
@@ -16,7 +22,7 @@ import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 import { UnifiedSectionHeader } from "@/components/unified/UnifiedSectionHeader";
 
 export default function NazerKPIs() {
-  const { data, isLoading, isError, error } = useNazerKPIs();
+  const { data, isLoading, isError, error } = useUnifiedKPIs();
 
   if (isError) {
     return (
