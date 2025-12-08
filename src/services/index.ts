@@ -1,11 +1,11 @@
 /**
  * Services Layer - الطبقة الخدمية للتطبيق
- * @version 2.7.3
+ * @version 2.8.8
  * تغطية 100% - جميع عمليات Supabase تمر عبر الخدمات
  * 
- * الخدمات: 23 خدمة متكاملة
+ * الخدمات: 25 خدمة متكاملة
  * - Core Services: 4
- * - Domain Services: 16
+ * - Domain Services: 18
  * - Infrastructure Services: 3
  */
 
@@ -15,7 +15,7 @@ export { RequestService } from './request.service';
 export { VoucherService } from './voucher.service';
 export { ReportService } from './report.service';
 
-// Domain Services (16)
+// Domain Services (18)
 export { BeneficiaryService, type BeneficiaryFilters, type BeneficiaryStats } from './beneficiary.service';
 export { PropertyService, type PropertyStats, type PropertyFilters } from './property.service';
 export { DistributionService, type DistributionSummary } from './distribution.service';
@@ -33,6 +33,8 @@ export { MaintenanceService } from './maintenance.service';
 export { FundService } from './fund.service';
 export { PaymentService, type PaymentFilters } from './payment.service';
 export { TribeService } from './tribe.service';
+export { UserService, type UserStats } from './user.service';
+export { ChatbotService, type ChatMessage, type QuickReply } from './chatbot.service';
 
 // Infrastructure Services (3)
 export { StorageService } from './storage.service';

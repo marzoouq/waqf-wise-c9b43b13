@@ -1351,4 +1351,298 @@ export class AccountingService {
       throw error;
     }
   }
+
+  // ==================== دوال إضافية للموافقات والقيود ====================
+
+  /**
+   * جلب الموافقات المعلقة للمحاسب
+   */
+  static async getPendingApprovals() {
+    const { data, error } = await supabase
+      .from("approvals")
+      .select(`
+        *,
+        journal_entry:journal_entries(*)
+      `)
+      .eq("status", "pending")
+      .order("created_at", { ascending: false })
+      .limit(10);
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * جلب حالة الموافقات للـ Workflow
+   */
+  static async getApprovalWorkflowStatus() {
+    const { data, error } = await supabase
+      .from("approval_status")
+      .select(`
+        *,
+        approval_steps (*)
+      `)
+      .eq("status", "pending")
+      .order("started_at", { ascending: false });
+    
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * الموافقة على قيد
+   */
+  static async approveJournalApproval(approvalId: string, notes?: string) {
+    const { error: approvalError } = await supabase
+      .from('approvals')
+      .update({
+        status: 'approved',
+        approved_at: new Date().toISOString(),
+        notes: notes || null,
+      })
+      .eq('id', approvalId);
+
+    if (approvalError) throw approvalError;
+  }
+
+  /**
+   * رفض قيد
+   */
+  static async rejectJournalApproval(approvalId: string, notes: string) {
+    const { error } = await supabase
+      .from('approvals')
+      .update({
+        status: 'rejected',
+        approved_at: new Date().toISOString(),
+        notes: notes,
+      })
+      .eq('id', approvalId);
+
+    if (error) throw error;
+  }
+
+  /**
+   * تحديث حالة القيد
+   */
+  static async updateJournalEntryStatus(entryId: string, status: 'draft' | 'posted' | 'cancelled') {
+    const { error } = await supabase
+      .from('journal_entries')
+      .update({
+        status,
+        posted_at: status === 'posted' ? new Date().toISOString() : undefined,
+      })
+      .eq('id', entryId);
+
+    if (error) throw error;
+  }
+
+  /**
+   * جلب الميزانيات حسب نوع الفترة
+   */
+  static async getBudgetsByPeriod(periodType: string) {
+    const { data, error } = await supabase
+      .from("budgets")
+      .select(`
+        *,
+        accounts (
+          code,
+          name_ar
+        )
+      `)
+      .eq("period_type", periodType)
+      .order("accounts(code)", { ascending: true });
+    
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * جلب سطور القيد مع الحساب
+   */
+  static async getJournalEntryLinesWithAccount(entryId: string) {
+    const { data, error } = await supabase
+      .from("journal_entry_lines")
+      .select(`
+        *,
+        account:accounts(code, name_ar)
+      `)
+      .eq("journal_entry_id", entryId)
+      .order("line_number");
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * ترحيل القيد
+   */
+  static async postJournalEntryById(entryId: string) {
+    const { error } = await supabase
+      .from("journal_entries")
+      .update({ status: "posted", posted_at: new Date().toISOString() })
+      .eq("id", entryId);
+
+    if (error) throw error;
+  }
+
+  /**
+   * جلب إقفالات السنوات المالية
+   */
+  static async getFiscalYearClosings() {
+    const { data, error } = await supabase
+      .from("fiscal_year_closings")
+      .select(`
+        *,
+        fiscal_years (
+          id,
+          name,
+          start_date,
+          end_date,
+          is_active,
+          is_closed
+        )
+      `)
+      .order("closing_date", { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * جلب إقفال سنة مالية محددة
+   */
+  static async getClosingByFiscalYear(fiscalYearId: string) {
+    const { data, error } = await supabase
+      .from("fiscal_year_closings")
+      .select("*")
+      .eq("fiscal_year_id", fiscalYearId)
+      .single();
+
+    if (error && error.code !== 'PGRST116') throw error;
+    return data;
+  }
+
+  /**
+   * إنشاء إقفال سنة مالية
+   */
+  static async createFiscalYearClosing(closing: any) {
+    const { data, error } = await supabase
+      .from("fiscal_year_closings")
+      .insert(closing)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  /**
+   * تحديث إقفال سنة مالية
+   */
+  static async updateFiscalYearClosing(id: string, updates: any) {
+    const { data, error } = await supabase
+      .from("fiscal_year_closings")
+      .update(updates)
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  /**
+   * حساب ملخص السنة المالية
+   */
+  static async calculateFiscalYearSummary(fiscalYearId: string) {
+    const { data, error } = await supabase
+      .rpc("calculate_fiscal_year_summary", {
+        p_fiscal_year_id: fiscalYearId,
+      });
+
+    if (error) throw error;
+    return data;
+  }
+
+  /**
+   * جلب دفتر الأستاذ للـ Hook
+   */
+  static async getGeneralLedgerForHook(params: {
+    accountId: string;
+    dateFrom?: string;
+    dateTo?: string;
+  }) {
+    if (!params.accountId) return null;
+
+    let query = supabase
+      .from("journal_entry_lines")
+      .select(`
+        *,
+        journal_entry:journal_entries!inner(
+          entry_number,
+          entry_date,
+          description,
+          status
+        )
+      `)
+      .eq("account_id", params.accountId)
+      .eq("journal_entry.status", "posted")
+      .order("journal_entry(entry_date)", { ascending: true });
+
+    if (params.dateFrom) {
+      query = query.gte("journal_entry.entry_date", params.dateFrom);
+    }
+    if (params.dateTo) {
+      query = query.lte("journal_entry.entry_date", params.dateTo);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * جلب الحسابات للدفتر
+   */
+  static async getAccountsForLedger() {
+    const { data, error } = await supabase
+      .from("accounts")
+      .select("id, code, name_ar")
+      .eq("is_active", true)
+      .eq("is_header", false)
+      .order("code");
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * جلب الفواتير
+   */
+  static async getInvoices(statusFilter?: string) {
+    let query = supabase
+      .from("invoices")
+      .select("*")
+      .order("invoice_date", { ascending: false });
+
+    if (statusFilter && statusFilter !== "all") {
+      query = query.eq("status", statusFilter);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * تحديث حالة الفاتورة
+   */
+  static async updateInvoiceStatus(id: string, status: string) {
+    const { error } = await supabase
+      .from("invoices")
+      .update({ status })
+      .eq("id", id);
+
+    if (error) throw error;
+  }
 }

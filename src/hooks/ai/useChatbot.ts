@@ -1,26 +1,11 @@
 import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { ChatbotService, ChatMessage, QuickReply } from "@/services/chatbot.service";
+import { UserService } from "@/services/user.service";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
-export interface ChatMessage {
-  id: string;
-  message: string;
-  message_type: 'user' | 'bot';
-  created_at: string;
-  quick_reply_id?: string;
-}
-
-export interface QuickReply {
-  id: string;
-  text: string;
-  icon: string;
-  prompt: string;
-  category: string;
-  order_index: number;
-  created_at: string;
-  is_active: boolean;
-}
+export type { ChatMessage, QuickReply } from "@/services/chatbot.service";
 
 export interface QuickAction {
   label: string;
@@ -32,31 +17,18 @@ export interface QuickAction {
 export function useChatbot() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [isTyping, setIsTyping] = useState(false);
   const [quickActions, setQuickActions] = useState<QuickAction[]>([]);
 
-  // جلب معرف المستخدم الحالي
-  const { data: session } = useQuery({
-    queryKey: ["session"],
-    queryFn: async () => {
-      const { data } = await supabase.auth.getSession();
-      return data.session;
-    },
-  });
-
-  const userId = session?.user?.id;
+  const userId = user?.id;
 
   // جلب أدوار المستخدم
   const { data: userRoles = [] } = useQuery({
     queryKey: ["user_roles_chatbot", userId],
     queryFn: async () => {
       if (!userId) return [];
-      const { data, error } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", userId);
-      if (error) throw error;
-      return data?.map(r => r.role) || [];
+      return await UserService.getUserRoles(userId);
     },
     enabled: !!userId,
   });
@@ -76,16 +48,7 @@ export function useChatbot() {
     queryKey: ["chatbot_conversations", userId],
     queryFn: async () => {
       if (!userId) return [];
-      
-      const { data, error } = await supabase
-        .from("chatbot_conversations")
-        .select("id, message, message_type, created_at, quick_reply_id")
-        .eq("user_id", userId)
-        .order("created_at", { ascending: true })
-        .limit(100);
-
-      if (error) throw error;
-      return data as ChatMessage[];
+      return await ChatbotService.getConversations(userId) as ChatMessage[];
     },
     enabled: !!userId,
   });
@@ -93,27 +56,16 @@ export function useChatbot() {
   // جلب الردود السريعة
   const { data: allQuickReplies = [] } = useQuery({
     queryKey: ["chatbot_quick_replies"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("chatbot_quick_replies")
-        .select("id, text, icon, prompt, category, order_index, created_at, is_active")
-        .eq("is_active", true)
-        .order("order_index");
-
-      if (error) throw error;
-      return data as QuickReply[];
-    },
+    queryFn: () => ChatbotService.getQuickReplies() as Promise<QuickReply[]>,
   });
 
   // فلترة الردود السريعة حسب دور المستخدم
   const quickReplies = useMemo(() => {
     if (isStaff) {
-      // الموظفون يرون الفئات: financial, properties, requests, distributions, help
       return allQuickReplies.filter(r => 
         ['financial', 'properties', 'requests', 'distributions', 'help'].includes(r.category)
       );
     } else if (isBeneficiary) {
-      // المستفيدون يرون الفئات: beneficiary, general
       return allQuickReplies.filter(r => 
         ['beneficiary', 'general'].includes(r.category)
       );
@@ -136,16 +88,7 @@ export function useChatbot() {
 
       setIsTyping(true);
       
-      const { data, error } = await supabase.functions.invoke('chatbot', {
-        body: { 
-          message, 
-          userId,
-          quickReplyId 
-        }
-      });
-
-      if (error) throw error;
-      if (!data.success) throw new Error(data.error || 'فشل في الحصول على الرد');
+      const data = await ChatbotService.sendMessage(userId, message, quickReplyId);
       
       // تحديث الإجراءات السريعة
       if (data.quickActions && data.quickActions.length > 0) {
@@ -173,13 +116,7 @@ export function useChatbot() {
   const clearConversations = useMutation({
     mutationFn: async () => {
       if (!userId) return;
-      
-      const { error } = await supabase
-        .from("chatbot_conversations")
-        .delete()
-        .eq("user_id", userId);
-
-      if (error) throw error;
+      await ChatbotService.clearConversations(userId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["chatbot_conversations"] });

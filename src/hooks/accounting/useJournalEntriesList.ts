@@ -4,7 +4,7 @@
  */
 
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { AccountingService } from "@/services/accounting.service";
 
 export type JournalEntry = {
   id: string;
@@ -20,11 +20,7 @@ export function useJournalEntriesList() {
   const { data: entries, isLoading, error, refetch } = useQuery({
     queryKey: ["journal_entries"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("journal_entries")
-        .select("*")
-        .order("entry_date", { ascending: false });
-      if (error) throw error;
+      const data = await AccountingService.getJournalEntries();
       return data as JournalEntry[];
     },
   });

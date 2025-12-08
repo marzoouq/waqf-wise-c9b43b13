@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { UserService } from "@/services/user.service";
+import { AuthService } from "@/services/auth.service";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -28,15 +29,7 @@ export function useActiveSessions() {
     queryKey: ["active-sessions", user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
-
-      const { data, error } = await supabase
-        .from("user_sessions")
-        .select("id, user_id, session_token, ip_address, user_agent, device_info, is_active, last_activity_at, created_at")
-        .eq("user_id", user.id)
-        .eq("is_active", true)
-        .order("last_activity_at", { ascending: false });
-
-      if (error) throw error;
+      const data = await UserService.getActiveSessions(user.id);
       return data as ActiveSession[];
     },
     enabled: !!user?.id,
@@ -46,13 +39,7 @@ export function useActiveSessions() {
   const endSession = useMutation({
     mutationFn: async (sessionId: string) => {
       if (!user?.id) throw new Error("User not authenticated");
-      
-      const { error } = await supabase.rpc("end_user_session", {
-        p_session_id: sessionId,
-        p_user_id: user.id,
-      });
-
-      if (error) throw error;
+      await UserService.endSession(sessionId, user.id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["active-sessions"] });
@@ -74,21 +61,11 @@ export function useActiveSessions() {
     mutationFn: async () => {
       if (!user?.id) throw new Error("User not authenticated");
 
-      // Get current session token from storage
-      const { data: { session } } = await supabase.auth.getSession();
-      const currentSessionToken = session?.access_token;
+      // Get current session token from auth
+      const session = await AuthService.getSession();
+      const currentSessionToken = session?.access_token || "";
 
-      // End all sessions except current
-      const { error } = await supabase
-        .from("user_sessions")
-        .update({ 
-          is_active: false,
-          ended_at: new Date().toISOString()
-        })
-        .eq("user_id", user.id)
-        .neq("session_token", currentSessionToken || "");
-
-      if (error) throw error;
+      await UserService.endAllOtherSessions(user.id, currentSessionToken);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["active-sessions"] });

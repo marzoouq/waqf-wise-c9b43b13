@@ -4,7 +4,7 @@
  */
 
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { AccountingService } from "@/services/accounting.service";
 
 export interface BudgetData {
   id: string;
@@ -24,19 +24,7 @@ export function useBudgetManagement(periodType: string) {
   const { data: budgets, isLoading, error, refetch } = useQuery({
     queryKey: ["budgets", periodType],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("budgets")
-        .select(`
-          *,
-          accounts (
-            code,
-            name_ar
-          )
-        `)
-        .eq("period_type", periodType)
-        .order("accounts(code)", { ascending: true });
-      
-      if (error) throw error;
+      const data = await AccountingService.getBudgetsByPeriod(periodType);
       return data as BudgetData[];
     },
   });

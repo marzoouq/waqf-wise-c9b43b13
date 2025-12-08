@@ -4,7 +4,7 @@
  */
 
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { FiscalYearService } from "@/services/fiscal-year.service";
 import { useCashFlows } from "./useCashFlows";
 import { toast } from "sonner";
 import { productionLogger } from "@/lib/logger/production-logger";
@@ -16,11 +16,7 @@ export function useCashFlowCalculation() {
   const handleCalculate = async () => {
     setIsCalculating(true);
     try {
-      const { data: fiscalYear } = await supabase
-        .from("fiscal_years")
-        .select("*")
-        .eq("is_active", true)
-        .single();
+      const fiscalYear = await FiscalYearService.getActive();
 
       if (!fiscalYear) {
         toast.error("لا توجد سنة مالية نشطة");

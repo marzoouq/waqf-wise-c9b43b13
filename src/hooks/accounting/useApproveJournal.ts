@@ -3,7 +3,7 @@
  */
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { AccountingService } from "@/services/accounting.service";
 import { useToast } from "@/hooks/use-toast";
 import { JournalApproval } from "@/types/approvals";
 
@@ -16,27 +16,8 @@ export function useApproveJournal(onSuccess?: () => void) {
     try {
       setIsSubmitting(true);
 
-      const { error } = await supabase
-        .from('approvals')
-        .update({
-          status: 'approved',
-          approved_at: new Date().toISOString(),
-          notes: notes || null,
-        })
-        .eq('id', approval.id);
-
-      if (error) throw error;
-
-      // Update journal entry status to posted
-      const { error: jeError } = await supabase
-        .from('journal_entries')
-        .update({
-          status: 'posted',
-          posted_at: new Date().toISOString(),
-        })
-        .eq('id', approval.journal_entry_id);
-
-      if (jeError) throw jeError;
+      await AccountingService.approveJournalApproval(approval.id, notes);
+      await AccountingService.updateJournalEntryStatus(approval.journal_entry_id, 'posted');
 
       toast({
         title: "تمت الموافقة",
@@ -75,26 +56,8 @@ export function useApproveJournal(onSuccess?: () => void) {
     try {
       setIsSubmitting(true);
 
-      const { error } = await supabase
-        .from('approvals')
-        .update({
-          status: 'rejected',
-          approved_at: new Date().toISOString(),
-          notes: notes,
-        })
-        .eq('id', approval.id);
-
-      if (error) throw error;
-
-      // Update journal entry status to cancelled
-      const { error: jeError } = await supabase
-        .from('journal_entries')
-        .update({
-          status: 'cancelled',
-        })
-        .eq('id', approval.journal_entry_id);
-
-      if (jeError) throw jeError;
+      await AccountingService.rejectJournalApproval(approval.id, notes);
+      await AccountingService.updateJournalEntryStatus(approval.journal_entry_id, 'cancelled');
 
       toast({
         title: "تم الرفض",
