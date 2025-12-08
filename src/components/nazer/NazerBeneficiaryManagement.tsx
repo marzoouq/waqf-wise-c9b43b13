@@ -176,7 +176,7 @@ export function NazerBeneficiaryManagement() {
 
         {/* زر إضافة مستفيد */}
         <Button 
-          onClick={() => navigate("/beneficiaries/new")} 
+          onClick={() => navigate("/beneficiaries")} 
           className="w-full gap-2"
           variant="outline"
         >

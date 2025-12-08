@@ -75,7 +75,7 @@ export default function BeneficiaryPortal() {
             <AlertCircle className="h-12 w-12 mx-auto mb-4 text-destructive" />
             <h3 className="text-lg font-semibold mb-2">خطأ في الوصول</h3>
             <p className="text-muted-foreground mb-4">لم يتم العثور على بيانات المستفيد</p>
-            <Button onClick={() => navigate("/auth")}>العودة لتسجيل الدخول</Button>
+            <Button onClick={() => navigate("/login")}>العودة لتسجيل الدخول</Button>
           </CardContent>
         </Card>
       </div>

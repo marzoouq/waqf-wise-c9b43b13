@@ -55,7 +55,7 @@ export function BeneficiarySettingsDropdown({
         title: "تم تسجيل الخروج",
         description: "نراك قريباً",
       });
-      navigate("/auth");
+      navigate("/login");
     } catch (error) {
       toast({
         title: "خطأ",
