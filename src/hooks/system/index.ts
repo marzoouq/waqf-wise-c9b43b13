@@ -3,6 +3,9 @@
  */
 
 export { useSystemHealth } from './useSystemHealth';
+export { useSystemHealthIndicator, type HealthIndicatorStatus, type HealthIndicatorDetails } from './useSystemHealthIndicator';
+export { useAdminAlerts, type SystemAlert } from './useAdminAlerts';
+export { logErrorToSupport } from './useGlobalErrorLogging';
 export { useSystemMonitoring } from './useSystemMonitoring';
 export { useSystemSettings } from './useSystemSettings';
 export { useSystemPerformanceMetrics } from './useSystemPerformanceMetrics';
@@ -15,4 +18,3 @@ export { useAuditLogs } from './useAuditLogs';
 export { useIntegrationsData } from './useIntegrationsData';
 export { useSystemErrorLogsData } from './useSystemErrorLogsData';
 export { useSystemMaintenanceData } from './useSystemMaintenanceData';
-export { useAdminAlerts, type SystemAlert } from './useAdminAlerts';

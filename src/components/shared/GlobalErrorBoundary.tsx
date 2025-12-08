@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertTriangle, RefreshCcw, Home, Trash2 } from 'lucide-react';
 import { logger } from '@/lib/logger';
-import { supabase } from '@/integrations/supabase/client';
+import { logErrorToSupport } from '@/hooks/system/useGlobalErrorLogging';
 import { clearAllCaches } from '@/lib/clearCache';
 
 interface Props {
@@ -53,35 +53,8 @@ export class GlobalErrorBoundary extends Component<Props, State> {
     }));
 
     // إرسال إشعار للدعم الفني تلقائياً
-    await this.notifySupportTeam(error, errorInfo);
+    await logErrorToSupport(error, errorInfo, this.state.errorCount + 1);
   }
-
-  notifySupportTeam = async (error: Error, errorInfo: ErrorInfo) => {
-    try {
-      // استخدام نظام تسجيل الأخطاء الجديد
-      await supabase.functions.invoke('log-error', {
-        body: {
-          error_type: 'react_component_error',
-          error_message: error.message,
-          error_stack: error.stack,
-          severity: 'critical',
-          url: window.location.href,
-          user_agent: navigator.userAgent,
-          additional_data: {
-            component_stack: errorInfo.componentStack,
-            error_count: this.state.errorCount + 1,
-          },
-        },
-      });
-      
-      logger.info('✅ Error logged to support team successfully');
-    } catch (notifyError) {
-      logger.error(notifyError, { 
-        context: 'notify_support_team_failed', 
-        severity: 'low'
-      });
-    }
-  };
 
   handleReset = () => {
     this.setState({
@@ -95,18 +68,12 @@ export class GlobalErrorBoundary extends Component<Props, State> {
     this.setState({ isClearing: true });
     
     try {
-      // مسح الـ cache بشكل شامل
       await clearAllCaches();
-      
-      // مسح التخزين المحلي للإصدار لإجبار إعادة التحقق
       localStorage.removeItem('waqf_app_version');
       sessionStorage.clear();
-      
-      // إعادة تحميل الصفحة
       window.location.reload();
     } catch (error) {
       console.error('Error clearing cache:', error);
-      // إعادة التحميل على أي حال
       window.location.reload();
     }
   };
@@ -171,7 +138,6 @@ export class GlobalErrorBoundary extends Component<Props, State> {
 
               {/* أزرار الإجراءات */}
               <div className="flex flex-col gap-3">
-                {/* زر مسح الذاكرة المؤقتة - دائماً متاح */}
                 <Button 
                   onClick={this.handleHardRefresh} 
                   className="w-full gap-2 bg-primary hover:bg-primary/90"

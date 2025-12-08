@@ -13,3 +13,4 @@ export { useActiveSessions, type ActiveSession } from './useActiveSessions';
 export { useIdleTimeout } from './useIdleTimeout';
 export { useSessionCleanup, cleanupSession, checkPendingCleanup } from './useSessionCleanup';
 export { useProfile, type Profile } from './useProfile';
+export { useResetPassword } from './useResetPassword';

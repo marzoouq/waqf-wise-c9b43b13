@@ -24,3 +24,4 @@ export { useCashierDashboardRealtime, useCashierDashboardRefresh } from './useCa
 export { useAdminKPIs } from '../admin/useAdminKPIs';
 export { useAccountantKPIs } from '../accounting';
 export { useArchivistDashboard, useArchivistStats, useRecentDocuments } from '../archive/useArchivistDashboard';
+export { useInteractiveDashboard } from './useInteractiveDashboard';

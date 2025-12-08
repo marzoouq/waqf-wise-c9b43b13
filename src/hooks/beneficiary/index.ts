@@ -30,5 +30,5 @@ export { useMyBeneficiaryRequests, type BeneficiaryRequest, type RequestFormData
 export { useWaqfSummary } from './useWaqfSummary';
 export { useEmergencyAid } from './useEmergencyAid';
 export { useBeneficiarySession } from './useBeneficiarySession';
-export { useBeneficiaryFamilyTree } from './useBeneficiaryFamilyTree';
+export { useIdentityVerification } from './useIdentityVerification';
 export { useBeneficiaryTimeline, type TimelineEvent } from './useBeneficiaryTimeline';
