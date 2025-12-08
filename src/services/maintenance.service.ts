@@ -1,6 +1,6 @@
 /**
  * Maintenance Service - خدمة الصيانة
- * @version 2.7.0
+ * @version 2.8.25
  */
 
 import { supabase } from "@/integrations/supabase/client";
@@ -10,6 +10,18 @@ type MaintenanceRequest = Database['public']['Tables']['maintenance_requests']['
 type MaintenanceRequestInsert = Database['public']['Tables']['maintenance_requests']['Insert'];
 type MaintenanceProvider = Database['public']['Tables']['maintenance_providers']['Row'];
 type MaintenanceProviderInsert = Database['public']['Tables']['maintenance_providers']['Insert'];
+type MaintenanceSchedule = Database['public']['Tables']['maintenance_schedules']['Row'];
+type MaintenanceScheduleInsert = Database['public']['Tables']['maintenance_schedules']['Insert'];
+
+export interface ProviderRating {
+  provider_id: string;
+  maintenance_request_id?: string;
+  rating: number;
+  quality_score?: number;
+  timeliness_score?: number;
+  cost_score?: number;
+  comments?: string;
+}
 
 export class MaintenanceService {
   static async getRequests(filters?: { status?: string; propertyId?: string }): Promise<MaintenanceRequest[]> {
@@ -119,6 +131,115 @@ export class MaintenanceService {
   static async deleteRequest(id: string) {
     const { error } = await supabase
       .from('maintenance_requests')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+  }
+
+  /**
+   * تحديث مقدم خدمة
+   */
+  static async updateProvider(id: string, updates: Partial<MaintenanceProvider>): Promise<MaintenanceProvider> {
+    const { data, error } = await supabase
+      .from('maintenance_providers')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  /**
+   * حذف مقدم خدمة
+   */
+  static async deleteProvider(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('maintenance_providers')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+  }
+
+  /**
+   * تقييم مقدم خدمة
+   */
+  static async rateProvider(rating: ProviderRating): Promise<any> {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    const { data, error } = await supabase
+      .from("provider_ratings")
+      .insert([{ ...rating, rated_by: user?.id }])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  /**
+   * جلب جداول الصيانة
+   */
+  static async getSchedules(): Promise<MaintenanceSchedule[]> {
+    const { data, error } = await supabase
+      .from('maintenance_schedules')
+      .select(`
+        *,
+        properties:property_id (
+          id,
+          name,
+          location
+        ),
+        property_units:property_unit_id (
+          id,
+          unit_number,
+          unit_name
+        )
+      `)
+      .order('next_maintenance_date', { ascending: true });
+
+    if (error) throw error;
+    return data as MaintenanceSchedule[];
+  }
+
+  /**
+   * إضافة جدول صيانة
+   */
+  static async addSchedule(schedule: MaintenanceScheduleInsert): Promise<MaintenanceSchedule> {
+    const { data, error } = await supabase
+      .from('maintenance_schedules')
+      .insert(schedule)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  /**
+   * تحديث جدول صيانة
+   */
+  static async updateSchedule(id: string, updates: Partial<MaintenanceSchedule>): Promise<MaintenanceSchedule> {
+    const { data, error } = await supabase
+      .from('maintenance_schedules')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  /**
+   * حذف جدول صيانة
+   */
+  static async deleteSchedule(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('maintenance_schedules')
       .delete()
       .eq('id', id);
 

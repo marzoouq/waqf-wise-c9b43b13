@@ -1,18 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { SystemService, type SystemSetting } from "@/services/system.service";
 import { useToast } from "@/hooks/use-toast";
 import { createMutationErrorHandler } from "@/lib/errors";
 
-export interface SystemSetting {
-  id: string;
-  setting_key: string;
-  setting_value: string;
-  setting_type?: string;
-  category?: string;
-  description?: string;
-  created_at: string;
-  updated_at: string;
-}
+export type { SystemSetting };
 
 export function useSystemSettings() {
   const { toast } = useToast();
@@ -20,26 +11,12 @@ export function useSystemSettings() {
 
   const { data: settings = [], isLoading } = useQuery({
     queryKey: ["system_settings"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("system_settings")
-        .select("*")
-        .order("setting_key");
-
-      if (error) throw error;
-      return (data || []) as unknown as SystemSetting[];
-    },
+    queryFn: () => SystemService.getSettings(),
   });
 
   const updateSetting = useMutation({
-    mutationFn: async ({ key, value }: { key: string; value: string }) => {
-      const { error } = await supabase
-        .from("system_settings")
-        .update({ setting_value: value, updated_at: new Date().toISOString() })
-        .eq("setting_key", key);
-
-      if (error) throw error;
-    },
+    mutationFn: ({ key, value }: { key: string; value: string }) =>
+      SystemService.updateSetting(key, value),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["system_settings"] });
       toast({

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { MaintenanceService, type ProviderRating } from "@/services/maintenance.service";
 import { toast } from "sonner";
 
 export interface MaintenanceProvider {
@@ -26,29 +26,12 @@ export function useMaintenanceProviders() {
 
   const { data: providers = [], isLoading } = useQuery({
     queryKey: ["maintenance-providers"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("maintenance_providers")
-        .select("id, provider_name, contact_person, phone, email, address, specialization, rating, total_jobs, active_jobs, average_cost, average_response_time, is_active, notes, created_at, updated_at")
-        .eq("is_active", true)
-        .order("rating", { ascending: false });
-      
-      if (error) throw error;
-      return data as MaintenanceProvider[];
-    }
+    queryFn: () => MaintenanceService.getProviders(true),
   });
 
   const addProvider = useMutation({
-    mutationFn: async (provider: Omit<MaintenanceProvider, 'id' | 'created_at' | 'updated_at'>) => {
-      const { data, error } = await supabase
-        .from("maintenance_providers")
-        .insert([provider])
-        .select()
-        .single();
-      
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: (provider: Omit<MaintenanceProvider, 'id' | 'created_at' | 'updated_at'>) =>
+      MaintenanceService.addProvider(provider as any),
     onSuccess: () => {
       toast.success("تمت إضافة مقدم الخدمة بنجاح");
       queryClient.invalidateQueries({ queryKey: ["maintenance-providers"] });
@@ -59,17 +42,8 @@ export function useMaintenanceProviders() {
   });
 
   const updateProvider = useMutation({
-    mutationFn: async ({ id, ...updates }: Partial<MaintenanceProvider> & { id: string }) => {
-      const { data, error } = await supabase
-        .from("maintenance_providers")
-        .update(updates)
-        .eq("id", id)
-        .select()
-        .single();
-      
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: ({ id, ...updates }: Partial<MaintenanceProvider> & { id: string }) =>
+      MaintenanceService.updateProvider(id, updates as any),
     onSuccess: () => {
       toast.success("تم تحديث مقدم الخدمة بنجاح");
       queryClient.invalidateQueries({ queryKey: ["maintenance-providers"] });
@@ -80,14 +54,7 @@ export function useMaintenanceProviders() {
   });
 
   const deleteProvider = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from("maintenance_providers")
-        .delete()
-        .eq("id", id);
-      
-      if (error) throw error;
-    },
+    mutationFn: (id: string) => MaintenanceService.deleteProvider(id),
     onSuccess: () => {
       toast.success("تم حذف مقدم الخدمة بنجاح");
       queryClient.invalidateQueries({ queryKey: ["maintenance-providers"] });
@@ -98,26 +65,7 @@ export function useMaintenanceProviders() {
   });
 
   const rateProvider = useMutation({
-    mutationFn: async (rating: {
-      provider_id: string;
-      maintenance_request_id?: string;
-      rating: number;
-      quality_score?: number;
-      timeliness_score?: number;
-      cost_score?: number;
-      comments?: string;
-    }) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      const { data, error } = await supabase
-        .from("provider_ratings")
-        .insert([{ ...rating, rated_by: user?.id }])
-        .select()
-        .single();
-      
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: (rating: ProviderRating) => MaintenanceService.rateProvider(rating),
     onSuccess: () => {
       toast.success("تم إضافة التقييم بنجاح");
       queryClient.invalidateQueries({ queryKey: ["maintenance-providers"] });

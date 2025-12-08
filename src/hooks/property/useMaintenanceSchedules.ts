@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { MaintenanceService } from "@/services/maintenance.service";
 import { useToast } from "@/hooks/use-toast";
 import { productionLogger } from "@/lib/logger/production-logger";
 import { Database } from "@/integrations/supabase/types";
@@ -13,40 +13,11 @@ export const useMaintenanceSchedules = () => {
 
   const { data: schedules = [], isLoading } = useQuery({
     queryKey: ['maintenance-schedules'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('maintenance_schedules')
-        .select(`
-          *,
-          properties:property_id (
-            id,
-            name,
-            location
-          ),
-          property_units:property_unit_id (
-            id,
-            unit_number,
-            unit_name
-          )
-        `)
-        .order('next_maintenance_date', { ascending: true });
-
-      if (error) throw error;
-      return data as MaintenanceSchedule[];
-    },
+    queryFn: () => MaintenanceService.getSchedules(),
   });
 
   const addSchedule = useMutation({
-    mutationFn: async (schedule: MaintenanceScheduleInsert) => {
-      const { data, error } = await supabase
-        .from('maintenance_schedules')
-        .insert(schedule)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: (schedule: MaintenanceScheduleInsert) => MaintenanceService.addSchedule(schedule),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['maintenance-schedules'] });
       toast({
@@ -65,17 +36,8 @@ export const useMaintenanceSchedules = () => {
   });
 
   const updateSchedule = useMutation({
-    mutationFn: async ({ id, ...updates }: Partial<MaintenanceSchedule> & { id: string }) => {
-      const { data, error } = await supabase
-        .from('maintenance_schedules')
-        .update(updates)
-        .eq('id', id)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: ({ id, ...updates }: Partial<MaintenanceSchedule> & { id: string }) =>
+      MaintenanceService.updateSchedule(id, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['maintenance-schedules'] });
       toast({
@@ -93,14 +55,7 @@ export const useMaintenanceSchedules = () => {
   });
 
   const deleteSchedule = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('maintenance_schedules')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-    },
+    mutationFn: (id: string) => MaintenanceService.deleteSchedule(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['maintenance-schedules'] });
       toast({
