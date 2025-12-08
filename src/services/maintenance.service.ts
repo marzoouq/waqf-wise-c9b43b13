@@ -63,4 +63,65 @@ export class MaintenanceService {
       totalCost: requests.reduce((s, r) => s + (r.actual_cost || 0), 0),
     };
   }
+
+  /**
+   * جلب طلبات الصيانة مع بيانات العقار
+   */
+  static async getRequestsWithProperties() {
+    const { data, error } = await supabase
+      .from('maintenance_requests')
+      .select(`
+        *,
+        properties(name, location)
+      `)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * إنشاء طلب صيانة مع رقم تلقائي
+   */
+  static async createRequestWithNumber(request: Omit<MaintenanceRequestInsert, 'request_number'>) {
+    const requestNumber = `MR-${Date.now().toString().slice(-8)}`;
+    const { data, error } = await supabase
+      .from('maintenance_requests')
+      .insert([{ ...request, request_number: requestNumber }])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  /**
+   * تحديث طلب صيانة مع بيانات العقار
+   */
+  static async updateRequestWithProperties(id: string, updates: Partial<MaintenanceRequest>) {
+    const { data, error } = await supabase
+      .from('maintenance_requests')
+      .update(updates)
+      .eq('id', id)
+      .select(`
+        *,
+        properties(name, location)
+      `)
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  /**
+   * حذف طلب صيانة
+   */
+  static async deleteRequest(id: string) {
+    const { error } = await supabase
+      .from('maintenance_requests')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+  }
 }

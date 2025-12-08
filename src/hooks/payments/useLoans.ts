@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { LoansService } from "@/services";
 import type { Database } from "@/integrations/supabase/types";
 
 export type Loan = Database['public']['Tables']['loans']['Row'] & {
@@ -20,39 +20,12 @@ export function useLoans() {
 
   const { data: loans = [], isLoading } = useQuery({
     queryKey: ["loans"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("loans")
-        .select(`
-          *,
-          beneficiaries (
-            full_name,
-            national_id
-          )
-        `)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      
-      // Map beneficiaries to beneficiary for compatibility
-      return (data || []).map(loan => ({
-        ...loan,
-        beneficiary: loan.beneficiaries,
-      })) as Loan[];
-    },
+    queryFn: () => LoansService.getAllWithBeneficiary(),
   });
 
   const addLoan = useMutation({
-    mutationFn: async (loan: Database['public']['Tables']['loans']['Insert']) => {
-      const { data, error } = await supabase
-        .from("loans")
-        .insert([loan])
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: (loan: Database['public']['Tables']['loans']['Insert']) => 
+      LoansService.create(loan),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["loans"] });
       toast({
@@ -70,17 +43,8 @@ export function useLoans() {
   });
 
   const updateLoan = useMutation({
-    mutationFn: async ({ id, ...updates }: Partial<Loan> & { id: string }) => {
-      const { data, error } = await supabase
-        .from("loans")
-        .update(updates)
-        .eq("id", id)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: ({ id, ...updates }: Partial<Loan> & { id: string }) => 
+      LoansService.update(id, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["loans"] });
       toast({
@@ -98,7 +62,7 @@ export function useLoans() {
   });
 
   return {
-    loans,
+    loans: loans as Loan[],
     isLoading,
     addLoan: addLoan.mutate,
     updateLoan: updateLoan.mutate,

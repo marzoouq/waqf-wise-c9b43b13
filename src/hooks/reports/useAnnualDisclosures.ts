@@ -1,12 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { logger } from "@/lib/logger";
 import { getErrorMessage } from "@/types/errors";
 import type { Database } from "@/integrations/supabase/types";
+import { ReportService } from "@/services";
 
 type DbAnnualDisclosure = Database['public']['Tables']['annual_disclosures']['Row'];
-type DbAnnualDisclosureInsert = Database['public']['Tables']['annual_disclosures']['Insert'];
 
 export type AnnualDisclosure = DbAnnualDisclosure;
 
@@ -28,42 +27,17 @@ export function useAnnualDisclosures() {
 
   const { data: disclosures = [], isLoading } = useQuery({
     queryKey: ["annual-disclosures"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("annual_disclosures")
-        .select("id, year, waqf_name, fiscal_year_id, disclosure_date, opening_balance, closing_balance, total_revenues, total_expenses, administrative_expenses, maintenance_expenses, development_expenses, other_expenses, net_income, nazer_percentage, nazer_share, charity_percentage, charity_share, corpus_percentage, corpus_share, sons_count, daughters_count, wives_count, total_beneficiaries, status, published_at, published_by, bank_statement_url, beneficiaries_details, expenses_breakdown, created_at, updated_at")
-        .order("year", { ascending: false });
-
-      if (error) throw error;
-      return (data || []) as AnnualDisclosure[];
-    },
+    queryFn: () => ReportService.getAnnualDisclosures(),
   });
 
   const { data: currentYearDisclosure, isLoading: loadingCurrent } = useQuery({
     queryKey: ["annual-disclosure-current"],
-    queryFn: async () => {
-      const currentYear = new Date().getFullYear();
-      const { data, error } = await supabase
-        .from("annual_disclosures")
-        .select("id, year, waqf_name, fiscal_year_id, disclosure_date, opening_balance, closing_balance, total_revenues, total_expenses, administrative_expenses, maintenance_expenses, development_expenses, other_expenses, net_income, nazer_percentage, nazer_share, charity_percentage, charity_share, corpus_percentage, corpus_share, sons_count, daughters_count, wives_count, total_beneficiaries, status, published_at, published_by, bank_statement_url, beneficiaries_details, expenses_breakdown, created_at, updated_at")
-        .eq("year", currentYear)
-        .maybeSingle();
-
-      if (error) throw error;
-      return (data || null) as AnnualDisclosure | null;
-    },
+    queryFn: () => ReportService.getCurrentYearDisclosure(),
   });
 
   const generateDisclosure = useMutation({
-    mutationFn: async ({ year, waqfName }: { year: number; waqfName: string }) => {
-      const { data, error } = await supabase.rpc("generate_annual_disclosure", {
-        p_year: year,
-        p_waqf_name: waqfName,
-      });
-
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: ({ year, waqfName }: { year: number; waqfName: string }) =>
+      ReportService.generateAnnualDisclosure(year, waqfName),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["annual-disclosures"] });
       queryClient.invalidateQueries({ queryKey: ["annual-disclosure-current"] });
@@ -83,33 +57,7 @@ export function useAnnualDisclosures() {
   });
 
   const publishDisclosure = useMutation({
-    mutationFn: async (disclosureId: string) => {
-      const { data: userData } = await supabase.auth.getUser();
-      
-      const { data, error } = await supabase
-        .from("annual_disclosures")
-        .update({
-          status: "published",
-          published_at: new Date().toISOString(),
-          published_by: userData.user?.id,
-        })
-        .eq("id", disclosureId)
-        .select()
-        .single();
-
-      if (error) throw error;
-      
-      // إرسال إشعارات للمستفيدين
-      try {
-        await supabase.functions.invoke('notify-disclosure-published', {
-          body: { disclosure_id: disclosureId }
-        });
-      } catch (err) {
-        logger.error(err, { context: 'notify_disclosure_published' });
-      }
-      
-      return data;
-    },
+    mutationFn: (disclosureId: string) => ReportService.publishDisclosure(disclosureId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["annual-disclosures"] });
       toast({
@@ -128,8 +76,8 @@ export function useAnnualDisclosures() {
   });
 
   return {
-    disclosures,
-    currentYearDisclosure,
+    disclosures: disclosures as AnnualDisclosure[],
+    currentYearDisclosure: currentYearDisclosure as AnnualDisclosure | null,
     isLoading: isLoading || loadingCurrent,
     generateDisclosure: generateDisclosure.mutateAsync,
     publishDisclosure: publishDisclosure.mutateAsync,
@@ -139,23 +87,12 @@ export function useAnnualDisclosures() {
 export function useDisclosureBeneficiaries(disclosureId?: string) {
   const { data: beneficiaries = [], isLoading } = useQuery({
     queryKey: ["disclosure-beneficiaries", disclosureId],
-    queryFn: async () => {
-      if (!disclosureId) return [];
-
-      const { data, error } = await supabase
-        .from("disclosure_beneficiaries")
-        .select("id, disclosure_id, beneficiary_id, beneficiary_name, beneficiary_type, relationship, allocated_amount, payments_count, created_at")
-        .eq("disclosure_id", disclosureId)
-        .order("allocated_amount", { ascending: false });
-
-      if (error) throw error;
-      return data as DisclosureBeneficiary[];
-    },
+    queryFn: () => disclosureId ? ReportService.getDisclosureBeneficiaries(disclosureId) : [],
     enabled: !!disclosureId,
   });
 
   return {
-    beneficiaries,
+    beneficiaries: beneficiaries as DisclosureBeneficiary[],
     isLoading,
   };
 }

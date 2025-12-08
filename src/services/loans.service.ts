@@ -267,4 +267,78 @@ export class LoansService {
     if (error) throw error;
     return data;
   }
+
+  /**
+   * جلب جميع القروض مع بيانات المستفيد
+   */
+  static async getAllWithBeneficiary() {
+    const { data, error } = await supabase
+      .from('loans')
+      .select(`
+        *,
+        beneficiaries (
+          full_name,
+          national_id
+        )
+      `)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    
+    return (data || []).map(loan => ({
+      ...loan,
+      beneficiary: loan.beneficiaries,
+    }));
+  }
+
+  /**
+   * جلب دفعات القروض
+   */
+  static async getLoanPayments(loanId?: string) {
+    let query = supabase
+      .from('loan_payments')
+      .select('id, loan_id, installment_id, payment_number, payment_amount, payment_date, payment_method, journal_entry_id, notes, created_at')
+      .order('created_at', { ascending: false });
+
+    if (loanId) {
+      query = query.eq('loan_id', loanId);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * إضافة دفعة قرض
+   */
+  static async addLoanPayment(payment: {
+    loan_id: string;
+    installment_id?: string;
+    payment_amount: number;
+    payment_date: string;
+    payment_method: string;
+    notes?: string;
+  }) {
+    const { data, error } = await supabase
+      .from('loan_payments')
+      .insert([payment])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  /**
+   * تحديث دفعة قرض بـ journal_entry_id
+   */
+  static async updateLoanPaymentJournalEntry(paymentId: string, journalEntryId: string) {
+    const { error } = await supabase
+      .from('loan_payments')
+      .update({ journal_entry_id: journalEntryId })
+      .eq('id', paymentId);
+
+    if (error) throw error;
+  }
 }

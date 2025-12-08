@@ -3,8 +3,7 @@ import { useToast } from "@/hooks/use-toast";
 import { QUERY_KEYS, TOAST_MESSAGES, QUERY_STALE_TIME } from "@/lib/constants";
 import { useEffect } from "react";
 import { createMutationErrorHandler } from "@/lib/errors";
-import { FundService } from "@/services/fund.service";
-import { supabase } from "@/integrations/supabase/client";
+import { FundService, RealtimeService } from "@/services";
 
 export interface Fund {
   id: string;
@@ -25,13 +24,12 @@ export function useFunds() {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    const channel = supabase
-      .channel('funds-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'funds' }, () => {
-        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.FUNDS] });
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    const subscription = RealtimeService.subscribeToTable('funds', () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.FUNDS] });
+    });
+    return () => { 
+      subscription.unsubscribe(); 
+    };
   }, [queryClient]);
 
   const { data: funds = [], isLoading } = useQuery({

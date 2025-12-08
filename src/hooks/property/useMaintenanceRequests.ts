@@ -1,12 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { createMutationErrorHandler } from "@/lib/errors";
-import type { MaintenanceRequestInsert, MaintenanceRequestUpdate } from "@/types/maintenance";
+import type { MaintenanceRequestInsert } from "@/types/maintenance";
 import { useJournalEntries } from "@/hooks/accounting/useJournalEntries";
 import { useTasks } from "@/hooks/useTasks";
 import { useEffect } from "react";
 import { logger } from "@/lib/logger";
+import { MaintenanceService, RealtimeService } from "@/services";
 
 export interface MaintenanceRequest {
   id: string;
@@ -43,55 +43,24 @@ export const useMaintenanceRequests = () => {
 
   // Real-time subscription
   useEffect(() => {
-    const channel = supabase
-      .channel('maintenance-requests-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'maintenance_requests'
-        },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ["maintenance_requests"] });
-        }
-      )
-      .subscribe();
+    const subscription = RealtimeService.subscribeToTable('maintenance_requests', () => {
+      queryClient.invalidateQueries({ queryKey: ["maintenance_requests"] });
+    });
 
     return () => {
-      supabase.removeChannel(channel);
+      subscription.unsubscribe();
     };
   }, [queryClient]);
 
   const { data: requests = [], isLoading } = useQuery({
     queryKey: ["maintenance_requests"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("maintenance_requests")
-        .select(`
-          *,
-          properties(name, location)
-        `)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return (data || []) as MaintenanceRequest[];
-    },
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    queryFn: () => MaintenanceService.getRequestsWithProperties(),
+    staleTime: 2 * 60 * 1000,
   });
 
   const addRequest = useMutation({
-    mutationFn: async (request: Omit<MaintenanceRequestInsert, 'request_number'>) => {
-      const requestNumber = `MR-${Date.now().toString().slice(-8)}`;
-      const { data, error } = await supabase
-        .from("maintenance_requests")
-        .insert([{ ...request, request_number: requestNumber }])
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: (request: Omit<MaintenanceRequestInsert, 'request_number'>) =>
+      MaintenanceService.createRequestWithNumber(request),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["maintenance_requests"] });
       
@@ -117,23 +86,10 @@ export const useMaintenanceRequests = () => {
   const updateRequest = useMutation({
     mutationFn: async ({ id, ...request }: Partial<MaintenanceRequest> & { id: string }) => {
       // جلب البيانات القديمة
-      const { data: oldData } = await supabase
-        .from("maintenance_requests")
-        .select("actual_cost, status, completed_date")
-        .eq("id", id)
-        .single();
+      const oldRequests = await MaintenanceService.getRequests();
+      const oldData = oldRequests.find(r => r.id === id);
 
-      const { data, error } = await supabase
-        .from("maintenance_requests")
-        .update(request)
-        .eq("id", id)
-        .select(`
-          *,
-          properties(name, location)
-        `)
-        .single();
-
-      if (error) throw error;
+      const data = await MaintenanceService.updateRequestWithProperties(id, request);
 
       // إنشاء قيد محاسبي عند تسجيل التكلفة الفعلية والإكتمال
       const hasNewCost = data && data.actual_cost && (!oldData || oldData.actual_cost !== data.actual_cost);
@@ -149,9 +105,9 @@ export const useMaintenanceRequests = () => {
             `مصروف صيانة - ${data.request_number} - ${data.title}`,
             completedDate
           );
-          } catch (journalError) {
-            logger.error(journalError, { context: 'maintenance_journal_entry', severity: 'medium' });
-          }
+        } catch (journalError) {
+          logger.error(journalError, { context: 'maintenance_journal_entry', severity: 'medium' });
+        }
       }
 
       return data;
@@ -175,14 +131,7 @@ export const useMaintenanceRequests = () => {
   });
 
   const deleteRequest = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from("maintenance_requests")
-        .delete()
-        .eq("id", id);
-
-      if (error) throw error;
-    },
+    mutationFn: (id: string) => MaintenanceService.deleteRequest(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["maintenance_requests"] });
       toast({
@@ -201,7 +150,7 @@ export const useMaintenanceRequests = () => {
   });
 
   return {
-    requests,
+    requests: requests as MaintenanceRequest[],
     isLoading,
     addRequest,
     updateRequest,
