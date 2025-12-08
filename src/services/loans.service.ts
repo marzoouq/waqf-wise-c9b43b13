@@ -123,6 +123,42 @@ export class LoansService {
   }
 
   /**
+   * جلب أقساط قرض معين
+   */
+  static async getInstallments(loanId?: string): Promise<LoanInstallment[]> {
+    let query = supabase
+      .from('loan_installments')
+      .select('id, loan_id, installment_number, due_date, principal_amount, interest_amount, total_amount, paid_amount, remaining_amount, status, paid_at, created_at')
+      .order('installment_number', { ascending: true });
+
+    if (loanId) {
+      query = query.eq('loan_id', loanId);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return data as LoanInstallment[];
+  }
+
+  /**
+   * تحديث قسط
+   */
+  static async updateInstallment(
+    id: string,
+    updates: { paid_amount: number; remaining_amount: number; status: string; paid_at?: string | null }
+  ): Promise<LoanInstallment> {
+    const { data, error } = await supabase
+      .from('loan_installments')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  }
+
+  /**
    * تسجيل سداد قسط
    */
   static async payInstallment(

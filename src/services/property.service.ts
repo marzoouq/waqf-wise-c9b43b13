@@ -234,14 +234,18 @@ export class PropertyService {
   /**
    * جلب وحدات العقار
    */
-  static async getUnits(propertyId: string): Promise<Database['public']['Tables']['property_units']['Row'][]> {
+  static async getUnits(propertyId?: string): Promise<Database['public']['Tables']['property_units']['Row'][]> {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('property_units')
         .select('*')
-        .eq('property_id', propertyId)
         .order('unit_number');
+      
+      if (propertyId) {
+        query = query.eq('property_id', propertyId);
+      }
 
+      const { data, error } = await query;
       if (error) throw error;
       return data || [];
     } catch (error) {
@@ -251,28 +255,37 @@ export class PropertyService {
   }
 
   /**
+   * جلب جميع الوحدات
+   */
+  static async getAllUnits(): Promise<Database['public']['Tables']['property_units']['Row'][]> {
+    return this.getUnits();
+  }
+
+  /**
    * إنشاء وحدة جديدة
    */
-  static async createUnit(propertyId: string, unit: Omit<Database['public']['Tables']['property_units']['Insert'], 'id' | 'property_id'>): Promise<Database['public']['Tables']['property_units']['Row']> {
+  static async createUnit(unit: Database['public']['Tables']['property_units']['Insert']): Promise<Database['public']['Tables']['property_units']['Row']> {
     try {
       const { data, error } = await supabase
         .from('property_units')
-        .insert([{ ...unit, property_id: propertyId }])
+        .insert([unit])
         .select()
         .single();
 
       if (error) throw error;
 
       // تحديث عدد الوحدات في العقار
-      const { data: units } = await supabase
-        .from('property_units')
-        .select('id')
-        .eq('property_id', propertyId);
+      if (unit.property_id) {
+        const { data: units } = await supabase
+          .from('property_units')
+          .select('id')
+          .eq('property_id', unit.property_id);
 
-      await supabase
-        .from('properties')
-        .update({ units: units?.length || 0 })
-        .eq('id', propertyId);
+        await supabase
+          .from('properties')
+          .update({ units: units?.length || 0 })
+          .eq('id', unit.property_id);
+      }
 
       return data;
     } catch (error) {

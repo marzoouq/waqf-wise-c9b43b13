@@ -1,9 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { PropertyService } from "@/services/property.service";
 import type { Database } from "@/integrations/supabase/types";
 
-type DbPropertyUnit = Database['public']['Tables']['property_units']['Row'];
 type DbPropertyUnitInsert = Database['public']['Tables']['property_units']['Insert'];
 type DbPropertyUnitUpdate = Database['public']['Tables']['property_units']['Update'];
 
@@ -13,33 +12,11 @@ export function usePropertyUnits(propertyId?: string) {
 
   const { data: units = [], isLoading } = useQuery({
     queryKey: ["property-units", propertyId],
-    queryFn: async () => {
-      let query = supabase
-        .from("property_units")
-        .select("*")
-        .order("unit_number");
-      
-      if (propertyId) {
-        query = query.eq("property_id", propertyId);
-      }
-      
-      const { data, error } = await query;
-      if (error) throw error;
-      return data || [];
-    },
+    queryFn: () => PropertyService.getUnits(propertyId),
   });
 
   const addUnit = useMutation({
-    mutationFn: async (unit: DbPropertyUnitInsert) => {
-      const { data, error } = await supabase
-        .from("property_units")
-        .insert([unit])
-        .select()
-        .single();
-      
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: (unit: DbPropertyUnitInsert) => PropertyService.createUnit(unit),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["property-units"] });
       queryClient.invalidateQueries({ queryKey: ["properties"] });
@@ -51,17 +28,8 @@ export function usePropertyUnits(propertyId?: string) {
   });
 
   const updateUnit = useMutation({
-    mutationFn: async ({ id, ...updates }: DbPropertyUnitUpdate & { id: string }) => {
-      const { data, error } = await supabase
-        .from("property_units")
-        .update(updates)
-        .eq("id", id)
-        .select()
-        .single();
-      
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: ({ id, ...updates }: DbPropertyUnitUpdate & { id: string }) => 
+      PropertyService.updateUnit(id, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["property-units"] });
       queryClient.invalidateQueries({ queryKey: ["properties"] });
@@ -73,14 +41,7 @@ export function usePropertyUnits(propertyId?: string) {
   });
 
   const deleteUnit = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from("property_units")
-        .delete()
-        .eq("id", id);
-      
-      if (error) throw error;
-    },
+    mutationFn: (id: string) => PropertyService.deleteUnit(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["property-units"] });
       queryClient.invalidateQueries({ queryKey: ["properties"] });

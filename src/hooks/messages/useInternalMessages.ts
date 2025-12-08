@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import type { InternalMessageInsert } from "@/types/messages";
 import { createMutationErrorHandler } from "@/lib/errors";
 import { MessageService } from "@/services/message.service";
-import { supabase } from "@/integrations/supabase/client";
+import { RealtimeService } from "@/services/realtime.service";
 
 export function useInternalMessages() {
   const { toast } = useToast();
@@ -13,13 +13,11 @@ export function useInternalMessages() {
   const { user } = useAuth();
 
   useEffect(() => {
-    const channel = supabase
-      .channel('messages-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'internal_messages' }, () => {
-        queryClient.invalidateQueries({ queryKey: ["internal_messages"] });
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    const subscription = RealtimeService.subscribeToTable(
+      'internal_messages',
+      () => queryClient.invalidateQueries({ queryKey: ["internal_messages"] })
+    );
+    return () => { subscription.unsubscribe(); };
   }, [queryClient]);
 
   const { data: inboxMessages = [], isLoading: isLoadingInbox } = useQuery({

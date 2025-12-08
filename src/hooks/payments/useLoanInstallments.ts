@@ -1,8 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";
+import { LoansService } from "@/services/loans.service";
+import { RealtimeService } from "@/services/realtime.service";
 
 export interface LoanInstallment {
   id: string;
@@ -25,44 +26,20 @@ export function useLoanInstallments(loanId?: string) {
 
   // Real-time subscription
   useEffect(() => {
-    const channel = supabase
-      .channel('installments-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'loan_installments'
-        },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ['loan_installments'] });
-        }
-      )
-      .subscribe();
+    const subscription = RealtimeService.subscribeToTable(
+      'loan_installments',
+      () => queryClient.invalidateQueries({ queryKey: ['loan_installments'] })
+    );
 
     return () => {
-      supabase.removeChannel(channel);
+      subscription.unsubscribe();
     };
   }, [queryClient]);
 
   // Fetch installments
   const { data: installments = [], isLoading } = useQuery({
     queryKey: ['loan_installments', loanId],
-    queryFn: async () => {
-      let query = supabase
-        .from('loan_installments')
-        .select('id, loan_id, installment_number, due_date, principal_amount, interest_amount, total_amount, paid_amount, remaining_amount, status, paid_at, created_at')
-        .order('installment_number', { ascending: true });
-
-      if (loanId) {
-        query = query.eq('loan_id', loanId);
-      }
-
-      const { data, error } = await query;
-
-      if (error) throw error;
-      return data as LoanInstallment[];
-    },
+    queryFn: () => LoansService.getInstallments(loanId),
     enabled: !!loanId,
     ...QUERY_CONFIG.LOANS,
   });
@@ -85,20 +62,12 @@ export function useLoanInstallments(loanId?: string) {
       const newRemainingAmount = installment.total_amount - newPaidAmount;
       const newStatus = newRemainingAmount <= 0 ? 'paid' : newPaidAmount > 0 ? 'partial' : status;
 
-      const { data, error } = await supabase
-        .from('loan_installments')
-        .update({
-          paid_amount: newPaidAmount,
-          remaining_amount: newRemainingAmount,
-          status: newStatus,
-          paid_at: newStatus === 'paid' ? new Date().toISOString() : null
-        })
-        .eq('id', id)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
+      return LoansService.updateInstallment(id, {
+        paid_amount: newPaidAmount,
+        remaining_amount: newRemainingAmount,
+        status: newStatus,
+        paid_at: newStatus === 'paid' ? new Date().toISOString() : null
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['loan_installments'] });
@@ -118,7 +87,7 @@ export function useLoanInstallments(loanId?: string) {
   });
 
   return {
-    installments,
+    installments: installments as LoanInstallment[],
     isLoading,
     updateInstallment: updateInstallment.mutateAsync,
   };

@@ -1,8 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { NotificationService, RealtimeService } from "@/services";
+import { NotificationService, RealtimeService, AuthService } from "@/services";
 import { useEffect } from "react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 
 export interface Notification {
   id: string;
@@ -31,7 +30,7 @@ export const useNotifications = () => {
   const { data: notifications = [], isLoading } = useQuery({
     queryKey: ["notifications"],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await AuthService.getCurrentUser();
       if (!user) return [];
       return NotificationService.getUserNotifications(user.id);
     },
@@ -50,7 +49,7 @@ export const useNotifications = () => {
   // Mark all as read
   const markAllAsReadMutation = useMutation({
     mutationFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await AuthService.getCurrentUser();
       if (!user) throw new Error("User not authenticated");
       return NotificationService.markAllAsRead(user.id);
     },
@@ -60,99 +59,44 @@ export const useNotifications = () => {
     },
   });
 
-  // Real-time subscription
+  // Real-time subscription for notifications
   useEffect(() => {
-    const channel = supabase
-      .channel("notifications-changes")
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "notifications",
-        },
-        (payload) => {
+    const subscription = RealtimeService.subscribeToTable(
+      "notifications",
+      (payload) => {
+        if (payload.eventType === 'INSERT') {
           const newNotification = payload.new as Notification;
-          
-          // Show toast notification
           toast.info(newNotification.title, {
             description: newNotification.message,
             duration: 5000,
           });
-
-          // Invalidate query to refetch
-          queryClient.invalidateQueries({ queryKey: ["notifications"] });
         }
-      )
-      .on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: "notifications",
-        },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ["notifications"] });
-        }
-      )
-      .subscribe();
+        queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      }
+    );
 
     return () => {
-      supabase.removeChannel(channel);
+      subscription.unsubscribe();
     };
   }, [queryClient]);
 
   // Subscribe to changes in related tables
   useEffect(() => {
-    const approvalsChannel = supabase
-      .channel("approvals-changes")
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "approvals",
-        },
-        () => {
+    const subscription = RealtimeService.subscribeToChanges(
+      ["approvals", "payments", "journal_entries"],
+      (payload) => {
+        if (payload.table === 'approvals') {
           queryClient.invalidateQueries({ queryKey: ["approvals"] });
-        }
-      )
-      .subscribe();
-
-    const paymentsChannel = supabase
-      .channel("payments-changes")
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "payments",
-        },
-        () => {
+        } else if (payload.table === 'payments') {
           queryClient.invalidateQueries({ queryKey: ["payments"] });
-        }
-      )
-      .subscribe();
-
-    const journalChannel = supabase
-      .channel("journal-changes")
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "journal_entries",
-        },
-        () => {
+        } else if (payload.table === 'journal_entries') {
           queryClient.invalidateQueries({ queryKey: ["journal-entries"] });
         }
-      )
-      .subscribe();
+      }
+    );
 
     return () => {
-      supabase.removeChannel(approvalsChannel);
-      supabase.removeChannel(paymentsChannel);
-      supabase.removeChannel(journalChannel);
+      subscription.unsubscribe();
     };
   }, [queryClient]);
 
