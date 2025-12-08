@@ -297,4 +297,466 @@ export class AccountingService {
       throw error;
     }
   }
+
+  /**
+   * إنشاء حساب جديد
+   */
+  static async createAccount(account: {
+    code: string;
+    name_ar: string;
+    name_en?: string;
+    account_type: 'asset' | 'liability' | 'equity' | 'revenue' | 'expense';
+    account_nature: 'debit' | 'credit';
+    parent_id?: string;
+    is_header?: boolean;
+    description?: string;
+  }): Promise<AccountRow> {
+    try {
+      const { data, error } = await supabase
+        .from('accounts')
+        .insert([account])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      productionLogger.error('Error creating account', error);
+      throw error;
+    }
+  }
+
+  /**
+   * تحديث حساب
+   */
+  static async updateAccount(id: string, updates: Partial<AccountRow>): Promise<AccountRow> {
+    try {
+      const { data, error } = await supabase
+        .from('accounts')
+        .update({ ...updates, updated_at: new Date().toISOString() })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      productionLogger.error('Error updating account', error);
+      throw error;
+    }
+  }
+
+  /**
+   * حذف حساب
+   */
+  static async deleteAccount(id: string): Promise<void> {
+    try {
+      const { error } = await supabase
+        .from('accounts')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+    } catch (error) {
+      productionLogger.error('Error deleting account', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب حساب مع رصيده
+   */
+  static async getAccountWithBalance(id: string): Promise<AccountRow & { balance: number }> {
+    try {
+      const account = await this.getAccountById(id);
+      if (!account) throw new Error('الحساب غير موجود');
+
+      return { ...account, balance: account.current_balance || 0 };
+    } catch (error) {
+      productionLogger.error('Error fetching account with balance', error);
+      throw error;
+    }
+  }
+
+  /**
+   * الموافقة على قيد محاسبي
+   */
+  static async approveJournalEntry(id: string, action: 'approve' | 'reject', notes?: string): Promise<JournalEntryRow> {
+    try {
+      const status = action === 'approve' ? 'posted' : 'cancelled';
+      const { data, error } = await supabase
+        .from('journal_entries')
+        .update({
+          status,
+          posted_at: action === 'approve' ? new Date().toISOString() : undefined,
+          notes: notes || undefined,
+        })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      if (action === 'approve') {
+        await this.updateAccountBalances(id);
+      }
+
+      return data;
+    } catch (error) {
+      productionLogger.error('Error approving journal entry', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب قوالب القيود التلقائية
+   */
+  static async getAutoJournalTemplates(): Promise<Database['public']['Tables']['auto_journal_templates']['Row'][]> {
+    try {
+      const { data, error } = await supabase
+        .from('auto_journal_templates')
+        .select('*')
+        .eq('is_active', true)
+        .order('priority');
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching auto journal templates', error);
+      throw error;
+    }
+  }
+
+  /**
+   * إنشاء قيد تلقائي
+   */
+  static async createAutoJournalEntry(params: {
+    trigger: string;
+    referenceId: string;
+    referenceType: string;
+    amount: number;
+    description: string;
+  }): Promise<JournalEntryRow | null> {
+    try {
+      const { data: templates } = await supabase
+        .from('auto_journal_templates')
+        .select('*')
+        .eq('trigger_event', params.trigger)
+        .eq('is_active', true)
+        .order('priority')
+        .limit(1);
+
+      if (!templates || templates.length === 0) return null;
+
+      const template = templates[0];
+      const debitAccounts = template.debit_accounts as { account_id: string; percentage: number }[];
+      const creditAccounts = template.credit_accounts as { account_id: string; percentage: number }[];
+
+      const lines = [
+        ...debitAccounts.map(acc => ({
+          account_id: acc.account_id,
+          debit_amount: (params.amount * acc.percentage) / 100,
+          credit_amount: 0,
+        })),
+        ...creditAccounts.map(acc => ({
+          account_id: acc.account_id,
+          debit_amount: 0,
+          credit_amount: (params.amount * acc.percentage) / 100,
+        })),
+      ];
+
+      const { data: activeFY } = await supabase
+        .from('fiscal_years')
+        .select('id')
+        .eq('is_active', true)
+        .limit(1)
+        .single();
+
+      const entry = await this.createJournalEntry(
+        {
+          description: params.description,
+          entry_date: new Date().toISOString().split('T')[0],
+          entry_number: `AUTO-${Date.now()}`,
+          status: 'draft',
+          reference_type: params.referenceType,
+          reference_id: params.referenceId,
+          fiscal_year_id: activeFY?.id || '',
+        },
+        lines
+      );
+
+      // تسجيل في سجل القيود التلقائية
+      await supabase.from('auto_journal_log').insert([{
+        template_id: template.id,
+        trigger_event: params.trigger,
+        reference_id: params.referenceId,
+        reference_type: params.referenceType,
+        amount: params.amount,
+        journal_entry_id: entry.id,
+        success: true,
+      }]);
+
+      return entry;
+    } catch (error) {
+      productionLogger.error('Error creating auto journal entry', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب الميزانيات
+   */
+  static async getBudgets(fiscalYearId?: string): Promise<Database['public']['Tables']['budgets']['Row'][]> {
+    try {
+      let query = supabase.from('budgets').select('*');
+      
+      if (fiscalYearId) {
+        query = query.eq('fiscal_year_id', fiscalYearId);
+      }
+
+      const { data, error } = await query.order('period_number');
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching budgets', error);
+      throw error;
+    }
+  }
+
+  /**
+   * إنشاء ميزانية
+   */
+  static async createBudget(budget: Database['public']['Tables']['budgets']['Insert']): Promise<Database['public']['Tables']['budgets']['Row']> {
+    try {
+      const { data, error } = await supabase
+        .from('budgets')
+        .insert([budget])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      productionLogger.error('Error creating budget', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب سير عمل الموافقات
+   */
+  static async getApprovalWorkflows(): Promise<Database['public']['Tables']['approval_workflows']['Row'][]> {
+    try {
+      const { data, error } = await supabase
+        .from('approval_workflows')
+        .select('*')
+        .eq('is_active', true)
+        .order('workflow_name');
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching approval workflows', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب بيانات التدفق النقدي
+   */
+  static async getCashFlowData(fiscalYearId: string): Promise<Database['public']['Tables']['cash_flows']['Row'][]> {
+    try {
+      const { data, error } = await supabase
+        .from('cash_flows')
+        .select('*')
+        .eq('fiscal_year_id', fiscalYearId)
+        .order('period_start');
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching cash flow data', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب ميزان المراجعة
+   */
+  static async getTrialBalance(fiscalYearId?: string): Promise<{
+    accounts: (AccountRow & { debit_total: number; credit_total: number })[];
+    totals: { debit: number; credit: number };
+  }> {
+    try {
+      const { data: accounts, error: accountsError } = await supabase
+        .from('accounts')
+        .select('*')
+        .eq('is_active', true)
+        .eq('is_header', false)
+        .order('code');
+
+      if (accountsError) throw accountsError;
+
+      // جلب مجموع القيود لكل حساب
+      let entriesQuery = supabase
+        .from('journal_entry_lines')
+        .select('account_id, debit_amount, credit_amount, journal_entries!inner(status, fiscal_year_id)');
+
+      if (fiscalYearId) {
+        entriesQuery = entriesQuery.eq('journal_entries.fiscal_year_id', fiscalYearId);
+      }
+      
+      entriesQuery = entriesQuery.eq('journal_entries.status', 'posted');
+
+      const { data: lines, error: linesError } = await entriesQuery;
+
+      if (linesError) throw linesError;
+
+      // حساب المجاميع لكل حساب
+      const accountTotals: Record<string, { debit: number; credit: number }> = {};
+      (lines || []).forEach(line => {
+        if (!accountTotals[line.account_id]) {
+          accountTotals[line.account_id] = { debit: 0, credit: 0 };
+        }
+        accountTotals[line.account_id].debit += line.debit_amount || 0;
+        accountTotals[line.account_id].credit += line.credit_amount || 0;
+      });
+
+      const result = (accounts || []).map(account => ({
+        ...account,
+        debit_total: accountTotals[account.id]?.debit || 0,
+        credit_total: accountTotals[account.id]?.credit || 0,
+      }));
+
+      const totals = result.reduce(
+        (acc, account) => ({
+          debit: acc.debit + account.debit_total,
+          credit: acc.credit + account.credit_total,
+        }),
+        { debit: 0, credit: 0 }
+      );
+
+      return { accounts: result, totals };
+    } catch (error) {
+      productionLogger.error('Error fetching trial balance', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب دفتر الأستاذ العام
+   */
+  static async getGeneralLedger(accountId: string, dateRange?: { from: string; to: string }): Promise<{
+    account: AccountRow;
+    entries: (JournalEntryLineRow & { journal_entry: JournalEntryRow })[];
+    openingBalance: number;
+    closingBalance: number;
+  }> {
+    try {
+      const account = await this.getAccountById(accountId);
+      if (!account) throw new Error('الحساب غير موجود');
+
+      let query = supabase
+        .from('journal_entry_lines')
+        .select('*, journal_entries!inner(*)')
+        .eq('account_id', accountId)
+        .eq('journal_entries.status', 'posted');
+
+      if (dateRange?.from) {
+        query = query.gte('journal_entries.entry_date', dateRange.from);
+      }
+      if (dateRange?.to) {
+        query = query.lte('journal_entries.entry_date', dateRange.to);
+      }
+
+      const { data, error } = await query.order('journal_entries(entry_date)', { ascending: true });
+
+      if (error) throw error;
+
+      const entries = (data || []).map(line => ({
+        ...line,
+        journal_entry: line.journal_entries as unknown as JournalEntryRow,
+      }));
+
+      // حساب الرصيد الافتتاحي والختامي
+      let balance = account.current_balance || 0;
+      const openingBalance = balance;
+
+      entries.forEach(entry => {
+        if (account.account_nature === 'debit') {
+          balance += (entry.debit_amount || 0) - (entry.credit_amount || 0);
+        } else {
+          balance += (entry.credit_amount || 0) - (entry.debit_amount || 0);
+        }
+      });
+
+      return {
+        account,
+        entries,
+        openingBalance,
+        closingBalance: balance,
+      };
+    } catch (error) {
+      productionLogger.error('Error fetching general ledger', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب سطور القيد
+   */
+  static async getJournalEntryLines(journalEntryId: string): Promise<JournalEntryLineRow[]> {
+    try {
+      const { data, error } = await supabase
+        .from('journal_entry_lines')
+        .select('*')
+        .eq('journal_entry_id', journalEntryId)
+        .order('line_number');
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching journal entry lines', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب الحسابات البنكية
+   */
+  static async getBankAccounts(): Promise<Database['public']['Tables']['bank_accounts']['Row'][]> {
+    try {
+      const { data, error } = await supabase
+        .from('bank_accounts')
+        .select('*')
+        .eq('is_active', true)
+        .order('bank_name');
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching bank accounts', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب كشف حساب بنكي
+   */
+  static async getBankStatement(bankAccountId: string): Promise<Database['public']['Tables']['bank_statements']['Row'][]> {
+    try {
+      const { data, error } = await supabase
+        .from('bank_statements')
+        .select('*')
+        .eq('bank_account_id', bankAccountId)
+        .order('statement_date', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching bank statement', error);
+      throw error;
+    }
+  }
 }

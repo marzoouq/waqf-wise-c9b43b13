@@ -230,4 +230,220 @@ export class PropertyService {
       return total + (monthlyRevenue * occupancyRate);
     }, 0);
   }
+
+  /**
+   * جلب وحدات العقار
+   */
+  static async getUnits(propertyId: string): Promise<Database['public']['Tables']['property_units']['Row'][]> {
+    try {
+      const { data, error } = await supabase
+        .from('property_units')
+        .select('*')
+        .eq('property_id', propertyId)
+        .order('unit_number');
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching property units', error);
+      throw error;
+    }
+  }
+
+  /**
+   * إنشاء وحدة جديدة
+   */
+  static async createUnit(propertyId: string, unit: Omit<Database['public']['Tables']['property_units']['Insert'], 'id' | 'property_id'>): Promise<Database['public']['Tables']['property_units']['Row']> {
+    try {
+      const { data, error } = await supabase
+        .from('property_units')
+        .insert([{ ...unit, property_id: propertyId }])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // تحديث عدد الوحدات في العقار
+      const { data: units } = await supabase
+        .from('property_units')
+        .select('id')
+        .eq('property_id', propertyId);
+
+      await supabase
+        .from('properties')
+        .update({ units: units?.length || 0 })
+        .eq('id', propertyId);
+
+      return data;
+    } catch (error) {
+      productionLogger.error('Error creating property unit', error);
+      throw error;
+    }
+  }
+
+  /**
+   * تحديث وحدة
+   */
+  static async updateUnit(unitId: string, updates: Partial<Database['public']['Tables']['property_units']['Update']>): Promise<Database['public']['Tables']['property_units']['Row']> {
+    try {
+      const { data, error } = await supabase
+        .from('property_units')
+        .update({ ...updates, updated_at: new Date().toISOString() })
+        .eq('id', unitId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      productionLogger.error('Error updating property unit', error);
+      throw error;
+    }
+  }
+
+  /**
+   * حذف وحدة
+   */
+  static async deleteUnit(unitId: string): Promise<void> {
+    try {
+      const { data: unit } = await supabase
+        .from('property_units')
+        .select('property_id')
+        .eq('id', unitId)
+        .single();
+
+      const { error } = await supabase
+        .from('property_units')
+        .delete()
+        .eq('id', unitId);
+
+      if (error) throw error;
+
+      // تحديث عدد الوحدات في العقار
+      if (unit?.property_id) {
+        const { data: units } = await supabase
+          .from('property_units')
+          .select('id')
+          .eq('property_id', unit.property_id);
+
+        await supabase
+          .from('properties')
+          .update({ units: units?.length || 0 })
+          .eq('id', unit.property_id);
+      }
+    } catch (error) {
+      productionLogger.error('Error deleting property unit', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب مزودي الصيانة
+   */
+  static async getMaintenanceProviders(): Promise<Database['public']['Tables']['maintenance_providers']['Row'][]> {
+    try {
+      const { data, error } = await supabase
+        .from('maintenance_providers')
+        .select('*')
+        .eq('is_active', true)
+        .order('provider_name');
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching maintenance providers', error);
+      throw error;
+    }
+  }
+
+  /**
+   * إضافة مزود صيانة
+   */
+  static async addMaintenanceProvider(provider: Omit<Database['public']['Tables']['maintenance_providers']['Insert'], 'id'>): Promise<Database['public']['Tables']['maintenance_providers']['Row']> {
+    try {
+      const { data, error } = await supabase
+        .from('maintenance_providers')
+        .insert([provider])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      productionLogger.error('Error adding maintenance provider', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب تنبيهات العقار
+   */
+  static async getAlerts(_propertyId?: string): Promise<{ id: string; property_id: string; alert_type: string; message: string; is_resolved: boolean; created_at: string }[]> {
+    // Return empty array - no property_alerts table exists
+    return [];
+  }
+
+  /**
+   * حل تنبيه
+   */
+  static async resolveAlert(_alertId: string): Promise<void> {
+    // No-op - no property_alerts table exists
+  }
+
+  /**
+   * جلب مدفوعات العقد
+   */
+  static async getPayments(contractId: string): Promise<Database['public']['Tables']['rental_payments']['Row'][]> {
+    try {
+      const { data, error } = await supabase
+        .from('rental_payments')
+        .select('*')
+        .eq('contract_id', contractId)
+        .order('payment_date', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching contract payments', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب العقود للعقار
+   */
+  static async getContracts(propertyId: string): Promise<Database['public']['Tables']['contracts']['Row'][]> {
+    try {
+      const { data, error } = await supabase
+        .from('contracts')
+        .select('*')
+        .eq('property_id', propertyId)
+        .order('start_date', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching property contracts', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب طلبات الصيانة للعقار
+   */
+  static async getMaintenanceRequests(propertyId: string): Promise<Database['public']['Tables']['maintenance_requests']['Row'][]> {
+    try {
+      const { data, error } = await supabase
+        .from('maintenance_requests')
+        .select('*')
+        .eq('property_id', propertyId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching maintenance requests', error);
+      throw error;
+    }
+  }
 }
