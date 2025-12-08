@@ -1,5 +1,3 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,11 +5,10 @@ import { CheckCircle, XCircle, Clock } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
 import { useState } from "react";
 import { RequestWithBeneficiary, StatusConfigMap } from "@/types/approvals";
-import { RequestService } from "@/services";
-import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { useRequestApprovals } from "@/hooks/approvals";
 
 export function RequestApprovalsTab() {
   const [selectedRequest, setSelectedRequest] = useState<RequestWithBeneficiary | null>(null);
@@ -19,70 +16,8 @@ export function RequestApprovalsTab() {
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [notes, setNotes] = useState("");
   const [rejectionReason, setRejectionReason] = useState("");
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
 
-  const { data: requests, isLoading } = useQuery<RequestWithBeneficiary[]>({
-    queryKey: ["requests_with_approvals"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("beneficiary_requests")
-        .select(`
-          *,
-          beneficiaries(full_name, national_id),
-          request_types(name_ar, name)
-        `)
-        .in("status", ["قيد المراجعة", "معلق"])
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return data as unknown as RequestWithBeneficiary[];
-    },
-  });
-
-  const approveMutation = useMutation({
-    mutationFn: async () => {
-      if (!selectedRequest) return;
-      return RequestService.approve(
-        selectedRequest.id,
-        'current-user-id', // يجب استبداله بالـ auth.uid() الفعلي
-        'الموظف',
-        notes
-      );
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["requests_with_approvals"] });
-      toast({
-        title: "تمت الموافقة",
-        description: "تمت الموافقة على الطلب بنجاح",
-      });
-      setApproveDialogOpen(false);
-      setSelectedRequest(null);
-      setNotes("");
-    },
-  });
-
-  const rejectMutation = useMutation({
-    mutationFn: async () => {
-      if (!selectedRequest) return;
-      return RequestService.reject(
-        selectedRequest.id,
-        'current-user-id',
-        'الموظف',
-        rejectionReason
-      );
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["requests_with_approvals"] });
-      toast({
-        title: "تم الرفض",
-        description: "تم رفض الطلب",
-      });
-      setRejectDialogOpen(false);
-      setSelectedRequest(null);
-      setRejectionReason("");
-    },
-  });
+  const { data: requests, isLoading, approveMutation, rejectMutation } = useRequestApprovals();
 
   const getStatusBadge = (status: string) => {
     const config: StatusConfigMap = {
@@ -98,12 +33,6 @@ export function RequestApprovalsTab() {
         {c.label}
       </Badge>
     );
-  };
-
-  const getApprovalProgress = (approvals: { status: string }[] | undefined) => {
-    const total = 3;
-    const approved = approvals?.filter((a) => a.status === "موافق").length || 0;
-    return `${approved}/${total}`;
   };
 
   if (isLoading) {
@@ -140,31 +69,31 @@ export function RequestApprovalsTab() {
                   {format(new Date(request.submitted_at), "dd MMM yyyy", { locale: ar })}
                 </p>
               </div>
-            <div className="flex gap-2">
-              <Button
-                size="sm"
-                onClick={() => {
-                  setSelectedRequest(request);
-                  setApproveDialogOpen(true);
-                }}
-                disabled={request.status !== 'قيد المراجعة'}
-              >
-                <CheckCircle className="h-4 w-4 ml-1" />
-                موافقة
-              </Button>
-              <Button
-                size="sm"
-                variant="destructive"
-                onClick={() => {
-                  setSelectedRequest(request);
-                  setRejectDialogOpen(true);
-                }}
-                disabled={request.status !== 'قيد المراجعة'}
-              >
-                <XCircle className="h-4 w-4 ml-1" />
-                رفض
-              </Button>
-            </div>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    setSelectedRequest(request);
+                    setApproveDialogOpen(true);
+                  }}
+                  disabled={request.status !== 'قيد المراجعة'}
+                >
+                  <CheckCircle className="h-4 w-4 ml-1" />
+                  موافقة
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => {
+                    setSelectedRequest(request);
+                    setRejectDialogOpen(true);
+                  }}
+                  disabled={request.status !== 'قيد المراجعة'}
+                >
+                  <XCircle className="h-4 w-4 ml-1" />
+                  رفض
+                </Button>
+              </div>
             </div>
             <div className="mt-4">
               <p className="text-sm text-muted-foreground mb-1">الوصف:</p>
@@ -183,7 +112,6 @@ export function RequestApprovalsTab() {
         </Card>
       )}
 
-      {/* Approve Dialog */}
       <Dialog open={approveDialogOpen} onOpenChange={setApproveDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -208,14 +136,26 @@ export function RequestApprovalsTab() {
             <Button variant="outline" onClick={() => setApproveDialogOpen(false)}>
               إلغاء
             </Button>
-            <Button onClick={() => approveMutation.mutate()} disabled={approveMutation.isPending}>
+            <Button 
+              onClick={() => {
+                if (selectedRequest) {
+                  approveMutation.mutate({ requestId: selectedRequest.id, notes }, {
+                    onSuccess: () => {
+                      setApproveDialogOpen(false);
+                      setSelectedRequest(null);
+                      setNotes("");
+                    }
+                  });
+                }
+              }} 
+              disabled={approveMutation.isPending}
+            >
               {approveMutation.isPending ? "جاري المعالجة..." : "تأكيد الموافقة"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Reject Dialog */}
       <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -243,7 +183,17 @@ export function RequestApprovalsTab() {
             </Button>
             <Button
               variant="destructive"
-              onClick={() => rejectMutation.mutate()}
+              onClick={() => {
+                if (selectedRequest) {
+                  rejectMutation.mutate({ requestId: selectedRequest.id, reason: rejectionReason }, {
+                    onSuccess: () => {
+                      setRejectDialogOpen(false);
+                      setSelectedRequest(null);
+                      setRejectionReason("");
+                    }
+                  });
+                }
+              }}
               disabled={!rejectionReason || rejectMutation.isPending}
             >
               {rejectMutation.isPending ? "جاري المعالجة..." : "تأكيد الرفض"}
