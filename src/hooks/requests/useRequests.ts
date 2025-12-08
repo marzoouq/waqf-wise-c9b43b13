@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { RequestService, RealtimeService } from '@/services';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useTasks } from '@/hooks/useTasks';
@@ -14,20 +15,11 @@ import { createMutationErrorHandler } from '@/lib/errors';
 export const useRequestTypes = () => {
   const { data: requestTypes = [], isLoading } = useQuery({
     queryKey: ['request-types'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('request_types')
-        .select('id, name_ar, name_en, description, category, sla_hours, is_active, created_at')
-        .eq('is_active', true)
-        .order('name_ar', { ascending: true });
-
-      if (error) throw error;
-      return data as unknown as RequestType[];
-    },
+    queryFn: () => RequestService.getRequestTypes(),
   });
 
   return {
-    requestTypes,
+    requestTypes: requestTypes as unknown as RequestType[],
     isLoading,
   };
 };
@@ -41,65 +33,26 @@ export const useRequests = (beneficiaryId?: string) => {
   const queryClient = useQueryClient();
   const { addTask } = useTasks();
 
-  // Fetch requests
+  // Fetch requests using RequestService
   const { data: requests = [], isLoading } = useQuery({
     queryKey: beneficiaryId ? ['requests', 'beneficiary', beneficiaryId] : ['requests'],
-    queryFn: async () => {
-      let query = supabase
-        .from('beneficiary_requests')
-        .select(`
-          *,
-          request_type:request_types(name_ar, description),
-          beneficiary:beneficiaries(full_name)
-        `)
-        .order('submitted_at', { ascending: false });
-
-      if (beneficiaryId) {
-        query = query.eq('beneficiary_id', beneficiaryId);
-      }
-
-      const { data, error } = await query;
-
-      if (error) throw error;
-      return data || [];
-    },
+    queryFn: () => RequestService.getAll(beneficiaryId),
   });
 
-  // Real-time subscription
+  // Real-time subscription using RealtimeService
   useEffect(() => {
-    const channel = supabase
-      .channel('requests-changes')
-      .on('postgres_changes', 
-        { event: '*', schema: 'public', table: 'beneficiary_requests' }, 
-        () => {
-          queryClient.invalidateQueries({ queryKey: ['requests'] });
-        }
-      )
-      .subscribe();
+    const { unsubscribe } = RealtimeService.subscribeToTable('beneficiary_requests', () => {
+      queryClient.invalidateQueries({ queryKey: ['requests'] });
+    });
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => unsubscribe();
   }, [queryClient]);
 
   // Get single request
   const getRequest = (requestId: string) => {
     return useQuery({
       queryKey: ['request', requestId],
-      queryFn: async () => {
-        const { data, error } = await supabase
-          .from('beneficiary_requests')
-          .select(`
-            *,
-            request_type:request_types(name_ar, description),
-            beneficiary:beneficiaries(full_name)
-          `)
-          .eq('id', requestId)
-          .maybeSingle();
-
-        if (error) throw error;
-        return data || null;
-      },
+      queryFn: () => RequestService.getById(requestId),
       enabled: !!requestId,
     });
   };
@@ -107,17 +60,22 @@ export const useRequests = (beneficiaryId?: string) => {
   // Create request
   const createRequest = useMutation({
     mutationFn: async (newRequest: Omit<BeneficiaryRequest, 'id' | 'request_number' | 'created_at' | 'updated_at' | 'submitted_at' | 'sla_due_at' | 'is_overdue'>) => {
-      const { data, error } = await supabase
-        .from('beneficiary_requests')
-        .insert({
-          ...newRequest,
-          submitted_at: new Date().toISOString(),
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data as unknown as BeneficiaryRequest;
+      const result = await RequestService.create({
+        beneficiary_id: newRequest.beneficiary_id,
+        request_type_id: newRequest.request_type_id || '',
+        description: newRequest.description,
+        amount: newRequest.amount,
+        priority: newRequest.priority as any,
+      });
+      
+      if (!result.success) throw new Error(result.message);
+      
+      // Fetch the created request to return
+      if (result.id) {
+        const created = await RequestService.getById(result.id);
+        return created as BeneficiaryRequest;
+      }
+      throw new Error('Failed to get created request');
     },
     onSuccess: (data: BeneficiaryRequest) => {
       queryClient.invalidateQueries({ queryKey: ['requests'] });
@@ -144,15 +102,7 @@ export const useRequests = (beneficiaryId?: string) => {
   // Update request
   const updateRequest = useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<BeneficiaryRequest> }) => {
-      const { data, error } = await supabase
-        .from('beneficiary_requests')
-        .update(updates)
-        .eq('id', id)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
+      return RequestService.update(id, updates as any);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['requests'] });
@@ -167,12 +117,7 @@ export const useRequests = (beneficiaryId?: string) => {
   // Delete request
   const deleteRequest = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('beneficiary_requests')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
+      return RequestService.delete(id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['requests'] });
@@ -197,26 +142,7 @@ export const useRequests = (beneficiaryId?: string) => {
       decision_notes?: string;
       rejection_reason?: string;
     }) => {
-      const updates: Record<string, string | undefined> = {
-        status,
-        decision_notes,
-        rejection_reason,
-        reviewed_at: new Date().toISOString(),
-      };
-
-      if (status === 'موافق') {
-        updates.approved_at = new Date().toISOString();
-      }
-
-      const { data, error } = await supabase
-        .from('beneficiary_requests')
-        .update(updates)
-        .eq('id', id)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
+      return RequestService.review(id, status, decision_notes, rejection_reason);
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['requests'] });
@@ -234,39 +160,13 @@ export const useRequests = (beneficiaryId?: string) => {
     },
   });
 
-  // Delete request mutation
-  const deleteRequestMutation = useMutation({
-    mutationFn: async (requestId: string) => {
-      const { error } = await supabase
-        .from("beneficiary_requests")
-        .delete()
-        .eq("id", requestId);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["requests"] });
-      toast({
-        title: "تم الحذف",
-        description: "تم حذف الطلب بنجاح",
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "خطأ",
-        description: "فشل حذف الطلب",
-        variant: "destructive",
-      });
-    },
-  });
-
   return {
     requests,
     isLoading,
     getRequest,
     createRequest,
     updateRequest,
-    deleteRequest: deleteRequestMutation,
+    deleteRequest,
     reviewRequest,
   };
 };

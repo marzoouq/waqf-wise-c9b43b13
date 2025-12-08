@@ -1,7 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { NotificationService, RealtimeService } from "@/services";
 import { useEffect } from "react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface Notification {
   id: string;
@@ -15,7 +16,6 @@ export interface Notification {
   created_at: string;
   read_at: string | null;
   action_url: string | null;
-  // الأعمدة الجديدة من المرحلة 4
   channel?: string;
   sent_at?: string | null;
   delivery_status?: string;
@@ -27,37 +27,21 @@ export interface Notification {
 export const useNotifications = () => {
   const queryClient = useQueryClient();
 
-  // Fetch notifications
+  // Fetch notifications - get user inside query
   const { data: notifications = [], isLoading } = useQuery({
     queryKey: ["notifications"],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("User not authenticated");
-
-      const { data, error } = await supabase
-        .from("notifications")
-        .select("id, user_id, title, message, type, reference_id, reference_type, is_read, created_at, read_at, action_url")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(50);
-
-      if (error) throw error;
-      return data as Notification[];
+      if (!user) return [];
+      return NotificationService.getUserNotifications(user.id);
     },
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: 2 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
 
   // Mark notification as read
   const markAsReadMutation = useMutation({
-    mutationFn: async (notificationId: string) => {
-      const { error } = await supabase
-        .from("notifications")
-        .update({ is_read: true, read_at: new Date().toISOString() })
-        .eq("id", notificationId);
-
-      if (error) throw error;
-    },
+    mutationFn: (notificationId: string) => NotificationService.markAsRead(notificationId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
     },
@@ -68,14 +52,7 @@ export const useNotifications = () => {
     mutationFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
-
-      const { error } = await supabase
-        .from("notifications")
-        .update({ is_read: true, read_at: new Date().toISOString() })
-        .eq("user_id", user.id)
-        .eq("is_read", false);
-
-      if (error) throw error;
+      return NotificationService.markAllAsRead(user.id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });

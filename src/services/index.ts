@@ -1,6 +1,6 @@
 /**
  * Services Layer - الطبقة الخدمية للتطبيق
- * @version 2.7.1
+ * @version 2.7.2
  * تغطية 100% - جميع عمليات Supabase تمر عبر الخدمات
  */
 
@@ -28,6 +28,7 @@ export { ContractService } from './contract.service';
 export { TenantService } from './tenant.service';
 export { MaintenanceService } from './maintenance.service';
 export { FundService } from './fund.service';
+export { PaymentService, type PaymentFilters } from './payment.service';
 
 // Infrastructure Services
 export { StorageService } from './storage.service';

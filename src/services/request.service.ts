@@ -17,19 +17,68 @@ export interface RequestData {
 
 export class RequestService {
   /**
+   * جلب أنواع الطلبات
+   */
+  static async getRequestTypes() {
+    const { data, error } = await supabase
+      .from('request_types')
+      .select('id, name_ar, name_en, description, category, sla_hours, is_active, created_at')
+      .eq('is_active', true)
+      .order('name_ar', { ascending: true });
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * جلب جميع الطلبات
+   */
+  static async getAll(beneficiaryId?: string) {
+    let query = supabase
+      .from('beneficiary_requests')
+      .select(`
+        *,
+        request_type:request_types(name_ar, description),
+        beneficiary:beneficiaries(full_name)
+      `)
+      .order('submitted_at', { ascending: false });
+
+    if (beneficiaryId) {
+      query = query.eq('beneficiary_id', beneficiaryId);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * جلب طلب بالمعرف
+   */
+  static async getById(requestId: string) {
+    const { data, error } = await supabase
+      .from('beneficiary_requests')
+      .select(`
+        *,
+        request_type:request_types(name_ar, description),
+        beneficiary:beneficiaries(full_name)
+      `)
+      .eq('id', requestId)
+      .maybeSingle();
+
+    if (error) throw error;
+    return data;
+  }
+
+  /**
    * إنشاء طلب جديد
    */
   static async create(data: RequestData): Promise<{ success: boolean; id?: string; message: string }> {
     try {
-      // 1. Validation
       if (!data.beneficiary_id || !data.request_type_id || !data.description) {
-        return {
-          success: false,
-          message: 'البيانات المطلوبة ناقصة',
-        };
+        return { success: false, message: 'البيانات المطلوبة ناقصة' };
       }
 
-      // 2. إنشاء الطلب
       const { data: request, error } = await supabase
         .from('beneficiary_requests')
         .insert({
@@ -46,25 +95,71 @@ export class RequestService {
 
       if (error) throw error;
 
-      // 3. تسجيل النشاط
       productionLogger.info(`تم إنشاء طلب جديد ${request.request_number}`);
 
-      // 4. الإشعارات تتم تلقائياً عبر trigger
-
-      return {
-        success: true,
-        id: request.id,
-        message: 'تم تقديم الطلب بنجاح',
-      };
+      return { success: true, id: request.id, message: 'تم تقديم الطلب بنجاح' };
     } catch (error) {
-      productionLogger.error('Error in RequestService.create', error, {
-        context: 'request_service',
-      });
-      return {
-        success: false,
-        message: 'فشل في إنشاء الطلب',
-      };
+      productionLogger.error('Error in RequestService.create', error, { context: 'request_service' });
+      return { success: false, message: 'فشل في إنشاء الطلب' };
     }
+  }
+
+  /**
+   * تحديث طلب
+   */
+  static async update(id: string, updates: Partial<RequestData>) {
+    const { data, error } = await supabase
+      .from('beneficiary_requests')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  /**
+   * حذف طلب
+   */
+  static async delete(id: string) {
+    const { error } = await supabase
+      .from('beneficiary_requests')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+  }
+
+  /**
+   * مراجعة طلب (موافقة/رفض)
+   */
+  static async review(
+    id: string,
+    status: 'موافق' | 'مرفوض',
+    decision_notes?: string,
+    rejection_reason?: string
+  ) {
+    const updates: Record<string, string | undefined> = {
+      status,
+      decision_notes,
+      rejection_reason,
+      reviewed_at: new Date().toISOString(),
+    };
+
+    if (status === 'موافق') {
+      updates.approved_at = new Date().toISOString();
+    }
+
+    const { data, error } = await supabase
+      .from('beneficiary_requests')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
   }
 
   /**
