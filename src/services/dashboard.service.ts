@@ -521,5 +521,56 @@ export const DashboardService = {
       totalBankBalance: stats.total_bank_balance || 0,
       totalWaqfValue: (stats.total_property_value || 0) + (stats.total_bank_balance || 0),
     };
+  },
+
+  /**
+   * جلب تقدم الإيرادات للسنة المالية
+   */
+  async getRevenueProgress(fiscalYear: { id: string; start_date: string; end_date: string }): Promise<{
+    totalCollected: number;
+    netRevenue: number;
+    totalTax: number;
+    expectedRevenue: number;
+    progress: number;
+  }> {
+    const [paymentsResult, contractsResult] = await Promise.all([
+      supabase
+        .from("rental_payments")
+        .select("amount_due, tax_amount")
+        .eq("status", "مدفوع")
+        .gte("payment_date", fiscalYear.start_date)
+        .lte("payment_date", fiscalYear.end_date),
+      supabase
+        .from("contracts")
+        .select("monthly_rent, payment_frequency")
+        .eq("status", "active"),
+    ]);
+
+    const payments = paymentsResult.data || [];
+    const contracts = contractsResult.data || [];
+
+    const totalCollected = payments.reduce((sum, p) => sum + (p.amount_due || 0), 0);
+    const totalTax = payments.reduce((sum, p) => sum + (p.tax_amount || 0), 0);
+    const netRevenue = totalCollected - totalTax;
+
+    // حساب العائد الشهري الصحيح بناءً على تكرار الدفع
+    const expectedRevenue = contracts.reduce((sum, c) => {
+      const rent = c.monthly_rent || 0;
+      const frequency = c.payment_frequency || 'شهري';
+      
+      if (frequency === 'سنوي' || frequency === 'annual') {
+        return sum + rent; // الإيجار السنوي كما هو
+      } else if (frequency === 'ربع سنوي' || frequency === 'quarterly') {
+        return sum + (rent * 4); // الإيجار ربع السنوي × 4
+      } else {
+        return sum + (rent * 12); // الإيجار الشهري × 12
+      }
+    }, 0);
+
+    const progress = expectedRevenue > 0 
+      ? Math.min((totalCollected / expectedRevenue) * 100, 100) 
+      : 0;
+
+    return { totalCollected, netRevenue, totalTax, expectedRevenue, progress };
   }
 };

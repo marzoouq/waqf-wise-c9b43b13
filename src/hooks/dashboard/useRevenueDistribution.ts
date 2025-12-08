@@ -1,11 +1,11 @@
 /**
  * useRevenueDistribution Hook
  * Hook لجلب بيانات توزيع الإيرادات
+ * يستخدم DashboardService + RealtimeService
  */
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { DashboardService } from "@/services/dashboard.service";
-import { supabase } from "@/integrations/supabase/client";
+import { DashboardService, RealtimeService } from "@/services";
 import type { RevenueDistribution } from "@/types/dashboard";
 
 export function useRevenueDistribution() {
@@ -18,16 +18,12 @@ export function useRevenueDistribution() {
   });
 
   useEffect(() => {
-    const channel = supabase
-      .channel('revenue-distribution')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'journal_entry_lines' }, () => {
-        queryClient.invalidateQueries({ queryKey: ["revenue-distribution"] });
-      })
-      .subscribe();
+    const subscription = RealtimeService.subscribeToTable(
+      'journal_entry_lines',
+      () => { queryClient.invalidateQueries({ queryKey: ["revenue-distribution"] }); }
+    );
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => { subscription.unsubscribe(); };
   }, [queryClient]);
 
   return query;

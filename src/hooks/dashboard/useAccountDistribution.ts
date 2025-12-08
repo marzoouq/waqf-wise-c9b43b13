@@ -1,11 +1,11 @@
 /**
  * useAccountDistribution Hook
  * Hook لجلب بيانات توزيع الحسابات
+ * يستخدم AccountingService + RealtimeService
  */
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { AccountingService } from "@/services/accounting.service";
-import { supabase } from "@/integrations/supabase/client";
+import { AccountingService, RealtimeService } from "@/services";
 
 interface AccountDistribution {
   name: string;
@@ -23,16 +23,12 @@ export function useAccountDistribution() {
   });
 
   useEffect(() => {
-    const channel = supabase
-      .channel('accounts-realtime')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'accounts' }, () => {
-        queryClient.invalidateQueries({ queryKey: ["account-distribution"] });
-      })
-      .subscribe();
+    const subscription = RealtimeService.subscribeToTable(
+      'accounts',
+      () => { queryClient.invalidateQueries({ queryKey: ["account-distribution"] }); }
+    );
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => { subscription.unsubscribe(); };
   }, [queryClient]);
 
   return query;
