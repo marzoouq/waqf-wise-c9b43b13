@@ -30,7 +30,7 @@ export { useApprovalWorkflow, type ApprovalStatus, type ApprovalStep } from './u
 export { useApproveJournal } from './useApproveJournal';
 
 // ==================== Component Hooks (New) ====================
-export { useBudgetManagement, type BudgetData } from './useBudgetManagement';
+export { useBudgetManagement, type BudgetData as BudgetManagementData } from './useBudgetManagement';
 export { useCashFlowCalculation } from './useCashFlowCalculation';
 export { useGeneralLedger } from './useGeneralLedger';
 export { useInvoiceManagement, type Invoice } from './useInvoiceManagement';
