@@ -1,13 +1,10 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, Clock, AlertCircle } from "lucide-react";
+import { CheckCircle, XCircle, AlertCircle } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { format, arLocale as ar } from "@/lib/date";
 import {
@@ -18,116 +15,60 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-
-interface EmergencyRequest {
-  id: string;
-  request_number: string;
-  amount_requested: number;
-  reason: string;
-  urgency_level: string;
-  status: string;
-  sla_due_at: string;
-  created_at: string;
-  beneficiary_id: string;
-  beneficiaries?: {
-    full_name: string;
-    national_id: string;
-  };
-}
+import { useEmergencyAidApprovals, type EmergencyRequest } from "@/hooks/approvals/useEmergencyAidApprovals";
 
 export function EmergencyAidApprovalsTab() {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
+  const { 
+    requests, 
+    isLoading, 
+    approveRequest, 
+    rejectRequest, 
+    isApproving, 
+    isRejecting 
+  } = useEmergencyAidApprovals();
+  
   const [selectedRequest, setSelectedRequest] = useState<EmergencyRequest | null>(null);
   const [approvalNotes, setApprovalNotes] = useState("");
   const [rejectionReason, setRejectionReason] = useState("");
   const [approvedAmount, setApprovedAmount] = useState(0);
+  const [dialogMode, setDialogMode] = useState<"approve" | "reject" | null>(null);
 
-  // جلب الطلبات المعلقة
-  const { data: requests = [], isLoading } = useQuery({
-    queryKey: ["emergency-approvals"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("emergency_aid_requests")
-        .select(`
-          *,
-          beneficiaries!inner(
-            full_name,
-            national_id
-          )
-        `)
-        .eq("status", "معلق")
-        .order("sla_due_at", { ascending: true });
+  const handleApprove = async () => {
+    if (!selectedRequest) return;
+    await approveRequest({ 
+      id: selectedRequest.id, 
+      amount: approvedAmount,
+      notes: approvalNotes 
+    });
+    closeDialog();
+  };
 
-      if (error) throw error;
-      return data as EmergencyRequest[];
-    },
-  });
+  const handleReject = async () => {
+    if (!selectedRequest) return;
+    await rejectRequest({ 
+      id: selectedRequest.id, 
+      reason: rejectionReason 
+    });
+    closeDialog();
+  };
 
-  // موافقة على الطلب
-  const approveMutation = useMutation({
-    mutationFn: async ({ id, amount }: { id: string; amount: number }) => {
-      const { error } = await supabase
-        .from("emergency_aid_requests")
-        .update({
-          status: "معتمد",
-          amount_approved: amount,
-          approved_at: new Date().toISOString(),
-          notes: approvalNotes,
-        })
-        .eq("id", id);
+  const closeDialog = () => {
+    setSelectedRequest(null);
+    setDialogMode(null);
+    setApprovalNotes("");
+    setRejectionReason("");
+  };
 
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast({
-        title: "✅ تمت الموافقة",
-        description: "تم الموافقة على الطلب بنجاح",
-      });
-      queryClient.invalidateQueries({ queryKey: ["emergency-approvals"] });
-      setSelectedRequest(null);
-      setApprovalNotes("");
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "❌ خطأ",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
+  const openApproveDialog = (request: EmergencyRequest) => {
+    setSelectedRequest(request);
+    setApprovedAmount(request.amount_requested);
+    setDialogMode("approve");
+  };
 
-  // رفض الطلب
-  const rejectMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from("emergency_aid_requests")
-        .update({
-          status: "مرفوض",
-          rejected_at: new Date().toISOString(),
-          rejection_reason: rejectionReason,
-        })
-        .eq("id", id);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast({
-        title: "✅ تم الرفض",
-        description: "تم رفض الطلب",
-      });
-      queryClient.invalidateQueries({ queryKey: ["emergency-approvals"] });
-      setSelectedRequest(null);
-      setRejectionReason("");
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "❌ خطأ",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
+  const openRejectDialog = (request: EmergencyRequest) => {
+    setSelectedRequest(request);
+    setDialogMode("reject");
+  };
 
   const getUrgencyBadge = (level: string) => {
     const config: Record<string, { variant: "default" | "secondary" | "destructive" }> = {
@@ -213,10 +154,7 @@ export function EmergencyAidApprovalsTab() {
                           <Button
                             size="sm"
                             variant="default"
-                            onClick={() => {
-                              setSelectedRequest(request);
-                              setApprovedAmount(request.amount_requested);
-                            }}
+                            onClick={() => openApproveDialog(request)}
                           >
                             <CheckCircle className="h-3 w-3 ml-1" />
                             موافقة
@@ -224,10 +162,7 @@ export function EmergencyAidApprovalsTab() {
                           <Button
                             size="sm"
                             variant="destructive"
-                            onClick={() => {
-                              setSelectedRequest(request);
-                              setRejectionReason("");
-                            }}
+                            onClick={() => openRejectDialog(request)}
                           >
                             <XCircle className="h-3 w-3 ml-1" />
                             رفض
@@ -245,8 +180,8 @@ export function EmergencyAidApprovalsTab() {
 
       {/* مربع الموافقة */}
       <Dialog
-        open={!!selectedRequest && !rejectionReason}
-        onOpenChange={(open) => !open && setSelectedRequest(null)}
+        open={dialogMode === "approve"}
+        onOpenChange={(open) => !open && closeDialog()}
       >
         <DialogContent>
           <DialogHeader>
@@ -280,17 +215,11 @@ export function EmergencyAidApprovalsTab() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setSelectedRequest(null)}>
+            <Button variant="outline" onClick={closeDialog}>
               إلغاء
             </Button>
-            <Button
-              onClick={() =>
-                selectedRequest &&
-                approveMutation.mutate({ id: selectedRequest.id, amount: approvedAmount })
-              }
-              disabled={approveMutation.isPending}
-            >
-              تأكيد الموافقة
+            <Button onClick={handleApprove} disabled={isApproving}>
+              {isApproving ? "جاري المعالجة..." : "تأكيد الموافقة"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -298,13 +227,8 @@ export function EmergencyAidApprovalsTab() {
 
       {/* مربع الرفض */}
       <Dialog
-        open={!!selectedRequest && !!rejectionReason}
-        onOpenChange={(open) => {
-          if (!open) {
-            setSelectedRequest(null);
-            setRejectionReason("");
-          }
-        }}
+        open={dialogMode === "reject"}
+        onOpenChange={(open) => !open && closeDialog()}
       >
         <DialogContent>
           <DialogHeader>
@@ -326,21 +250,15 @@ export function EmergencyAidApprovalsTab() {
             </div>
           </div>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setSelectedRequest(null);
-                setRejectionReason("");
-              }}
-            >
+            <Button variant="outline" onClick={closeDialog}>
               إلغاء
             </Button>
             <Button
               variant="destructive"
-              onClick={() => selectedRequest && rejectMutation.mutate(selectedRequest.id)}
-              disabled={!rejectionReason || rejectMutation.isPending}
+              onClick={handleReject}
+              disabled={!rejectionReason || isRejecting}
             >
-              تأكيد الرفض
+              {isRejecting ? "جاري المعالجة..." : "تأكيد الرفض"}
             </Button>
           </DialogFooter>
         </DialogContent>
