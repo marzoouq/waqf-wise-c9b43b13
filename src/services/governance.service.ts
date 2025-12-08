@@ -8,17 +8,18 @@ import type { Database } from '@/integrations/supabase/types';
 
 type GovernanceDecisionRow = Database['public']['Tables']['governance_decisions']['Row'];
 type GovernanceDecisionInsert = Database['public']['Tables']['governance_decisions']['Insert'];
+type GovernanceVoteRow = Database['public']['Tables']['governance_votes']['Row'];
 
 export class GovernanceService {
   /**
-   * جلب جميع القرارات
+   * جلب جميع قرارات الحوكمة
    */
   static async getDecisions(): Promise<GovernanceDecisionRow[]> {
     try {
       const { data, error } = await supabase
         .from('governance_decisions')
         .select('*')
-        .order('decision_date', { ascending: false });
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
       return data || [];
@@ -29,7 +30,7 @@ export class GovernanceService {
   }
 
   /**
-   * جلب قرار واحد
+   * جلب قرار بالمعرف
    */
   static async getDecisionById(id: string): Promise<GovernanceDecisionRow | null> {
     try {
@@ -37,7 +38,7 @@ export class GovernanceService {
         .from('governance_decisions')
         .select('*')
         .eq('id', id)
-        .maybeSingle();
+        .single();
 
       if (error) throw error;
       return data;
@@ -69,7 +70,7 @@ export class GovernanceService {
   /**
    * تحديث قرار
    */
-  static async updateDecision(id: string, updates: Partial<GovernanceDecisionInsert>): Promise<GovernanceDecisionRow> {
+  static async updateDecision(id: string, updates: Partial<GovernanceDecisionRow>): Promise<GovernanceDecisionRow> {
     try {
       const { data, error } = await supabase
         .from('governance_decisions')
@@ -82,6 +83,23 @@ export class GovernanceService {
       return data;
     } catch (error) {
       productionLogger.error('Error updating governance decision', error);
+      throw error;
+    }
+  }
+
+  /**
+   * حذف قرار
+   */
+  static async deleteDecision(id: string): Promise<void> {
+    try {
+      const { error } = await supabase
+        .from('governance_decisions')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+    } catch (error) {
+      productionLogger.error('Error deleting governance decision', error);
       throw error;
     }
   }
@@ -102,6 +120,72 @@ export class GovernanceService {
       if (error) throw error;
     } catch (error) {
       productionLogger.error('Error closing voting', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب الأصوات لقرار
+   */
+  static async getVotes(decisionId: string): Promise<GovernanceVoteRow[]> {
+    try {
+      const { data, error } = await supabase
+        .from('governance_votes')
+        .select('*')
+        .eq('decision_id', decisionId)
+        .order('voted_at', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching votes', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب صوت المستخدم
+   */
+  static async getUserVote(decisionId: string, userId: string): Promise<GovernanceVoteRow | null> {
+    try {
+      const { data, error } = await supabase
+        .from('governance_votes')
+        .select('*')
+        .eq('decision_id', decisionId)
+        .eq('voter_id', userId)
+        .single();
+
+      if (error && error.code !== 'PGRST116') throw error;
+      return data;
+    } catch (error) {
+      productionLogger.error('Error fetching user vote', error);
+      throw error;
+    }
+  }
+
+  /**
+   * تسجيل صوت
+   */
+  static async castVote(vote: {
+    decision_id: string;
+    voter_id: string;
+    voter_name: string;
+    voter_type: string;
+    beneficiary_id?: string;
+    vote: string;
+    vote_reason?: string;
+  }): Promise<GovernanceVoteRow> {
+    try {
+      const { data, error } = await supabase
+        .from('governance_votes')
+        .insert([vote])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      productionLogger.error('Error casting vote', error);
       throw error;
     }
   }
@@ -160,36 +244,6 @@ export class GovernanceService {
         mask_exact_amounts: false,
         mask_tenant_info: true,
         mask_national_ids: true,
-        show_bank_balances: true,
-        show_bank_transactions: true,
-        show_bank_statements: true,
-        show_invoices: true,
-        show_contracts_details: true,
-        show_maintenance_costs: true,
-        show_property_revenues: true,
-        show_expenses_breakdown: true,
-        show_governance_meetings: true,
-        show_nazer_decisions: true,
-        show_policy_changes: true,
-        show_strategic_plans: true,
-        show_audit_reports: true,
-        show_compliance_reports: true,
-        show_own_loans: true,
-        show_other_loans: false,
-        mask_loan_amounts: false,
-        show_emergency_aid: true,
-        show_emergency_statistics: true,
-        show_annual_budget: true,
-        show_budget_execution: true,
-        show_reserve_funds: true,
-        show_investment_plans: true,
-        show_journal_entries: false,
-        show_trial_balance: false,
-        show_ledger_details: false,
-        show_internal_messages: true,
-        show_support_tickets: true,
-        allow_export_pdf: true,
-        allow_print: true,
       };
 
       const { data, error } = await supabase
@@ -234,9 +288,11 @@ export class GovernanceService {
       const { data, error } = await supabase
         .from('organization_settings')
         .select('*')
+        .order('created_at', { ascending: false })
+        .limit(1)
         .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') throw error;
+      if (error) throw error;
       return data;
     } catch (error) {
       productionLogger.error('Error fetching organization settings', error);

@@ -1,6 +1,6 @@
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { productionLogger } from "@/lib/logger/production-logger";
+import { supabase } from "@/integrations/supabase/client";
 
 interface SendNotificationParams {
   userId: string;
@@ -32,9 +32,6 @@ export function useNotificationSystem() {
     }
   };
 
-  /**
-   * إرسال إشعار بإصدار فاتورة جديدة
-   */
   const notifyInvoiceIssued = async (
     userId: string,
     invoiceNumber: string,
@@ -51,9 +48,6 @@ export function useNotificationSystem() {
     });
   };
 
-  /**
-   * إرسال تذكير باستحقاق دفعة
-   */
   const notifyPaymentDue = async (
     userId: string,
     description: string,
@@ -71,9 +65,6 @@ export function useNotificationSystem() {
     });
   };
 
-  /**
-   * إرسال إشعار بالموافقة على طلب
-   */
   const notifyRequestApproved = async (
     userId: string,
     requestType: string,
@@ -90,9 +81,6 @@ export function useNotificationSystem() {
     });
   };
 
-  /**
-   * إرسال إشعار برفض طلب
-   */
   const notifyRequestRejected = async (
     userId: string,
     requestType: string,
@@ -110,9 +98,6 @@ export function useNotificationSystem() {
     });
   };
 
-  /**
-   * إرسال إشعار بتوزيع جديد
-   */
   const notifyDistributionCreated = async (
     userId: string,
     amount: number,

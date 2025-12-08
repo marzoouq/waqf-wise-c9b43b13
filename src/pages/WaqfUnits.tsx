@@ -381,7 +381,7 @@ export default function WaqfUnits() {
                         variant="ghost"
                         size="sm"
                         onClick={() => {
-                          setSelectedDetailsUnit(unit);
+                          setSelectedDetailsUnit(unit as WaqfUnit);
                           setDetailsDialogOpen(true);
                         }}
                         className="text-xs sm:text-sm gap-1"
@@ -393,7 +393,7 @@ export default function WaqfUnits() {
                         variant="outline"
                         size="sm"
                         onClick={() => {
-                          setSelectedUnit(unit);
+                          setSelectedUnit(unit as WaqfUnit);
                           setIsDialogOpen(true);
                         }}
                         className="text-xs sm:text-sm"

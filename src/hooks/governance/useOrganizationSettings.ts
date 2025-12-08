@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { GovernanceService } from "@/services/governance.service";
 
 export interface OrganizationSettings {
   id: string;
@@ -16,21 +16,16 @@ export interface OrganizationSettings {
   phone: string | null;
   email: string | null;
   logo_url: string | null;
-  
-  // جديد: نوع إدارة الوقف
-  governance_type?: 'nazer_only' | 'nazer_with_board';
+  governance_type?: string;
   nazer_name?: string | null;
   nazer_title?: string | null;
   nazer_appointment_date?: string | null;
   nazer_contact_phone?: string | null;
   nazer_contact_email?: string | null;
-  
-  // جديد: معلومات الوقف
   waqf_type?: string | null;
   waqf_establishment_date?: string | null;
   waqf_registration_number?: string | null;
   waqf_deed_url?: string | null;
-  
   created_at: string;
   updated_at: string;
 }
@@ -39,48 +34,14 @@ export const useOrganizationSettings = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // جلب الإعدادات
   const { data: settings, isLoading } = useQuery({
     queryKey: ["organization-settings"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("organization_settings")
-        .select("id, organization_name_ar, organization_name_en, vat_registration_number, commercial_registration_number, address_ar, address_en, city, postal_code, country, phone, email, logo_url, governance_type, nazer_name, nazer_title, nazer_appointment_date, nazer_contact_phone, nazer_contact_email, waqf_type, waqf_establishment_date, waqf_registration_number, waqf_deed_url, created_at, updated_at")
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      if (error) throw error;
-      return data as OrganizationSettings | null;
-    },
+    queryFn: () => GovernanceService.getOrganizationSettings(),
   });
 
-  // إضافة أو تحديث الإعدادات
   const saveMutation = useMutation({
-    mutationFn: async (values: Omit<OrganizationSettings, "id" | "created_at" | "updated_at">) => {
-      if (settings?.id) {
-        // تحديث
-        const { data, error } = await supabase
-          .from("organization_settings")
-          .update({ ...values, updated_at: new Date().toISOString() })
-          .eq("id", settings.id)
-          .select()
-          .maybeSingle();
-
-        if (error) throw error;
-        return data;
-      } else {
-        // إضافة جديد
-        const { data, error } = await supabase
-          .from("organization_settings")
-          .insert(values)
-          .select()
-          .maybeSingle();
-
-        if (error) throw error;
-        return data;
-      }
-    },
+    mutationFn: (values: Omit<OrganizationSettings, "id" | "created_at" | "updated_at">) =>
+      GovernanceService.updateOrganizationSettings(settings?.id, values),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["organization-settings"] });
       toast({

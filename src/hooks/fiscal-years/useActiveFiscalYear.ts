@@ -5,9 +5,10 @@
  */
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useEffect } from "react";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";
+import { FiscalYearService } from "@/services/fiscal-year.service";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface ActiveFiscalYear {
   id: string;
@@ -23,10 +24,7 @@ export interface ActiveFiscalYear {
   updated_at: string;
 }
 
-// مفتاح الاستعلام الموحد للسنة المالية النشطة
 export const ACTIVE_FISCAL_YEAR_QUERY_KEY = ["fiscal-year", "active"] as const;
-
-// مفتاح الاستعلام لجميع السنوات المالية
 export const FISCAL_YEARS_QUERY_KEY = ["fiscal-years", "all"] as const;
 
 /**
@@ -37,23 +35,10 @@ export function useActiveFiscalYear() {
 
   const query = useQuery({
     queryKey: ACTIVE_FISCAL_YEAR_QUERY_KEY,
-    queryFn: async (): Promise<ActiveFiscalYear | null> => {
-      const { data, error } = await supabase
-        .from("fiscal_years")
-        .select("*")
-        .eq("is_active", true)
-        .single();
-
-      if (error && error.code !== "PGRST116") {
-        throw error;
-      }
-      
-      return data as ActiveFiscalYear | null;
-    },
+    queryFn: () => FiscalYearService.getActive(),
     ...QUERY_CONFIG.DASHBOARD_KPIS,
   });
 
-  // الاشتراك في التحديثات المباشرة
   useEffect(() => {
     const channel = supabase
       .channel("active-fiscal-year-changes")
@@ -77,7 +62,7 @@ export function useActiveFiscalYear() {
   }, [queryClient]);
 
   return {
-    activeFiscalYear: query.data,
+    activeFiscalYear: query.data as ActiveFiscalYear | null,
     isLoading: query.isLoading,
     isError: query.isError,
     error: query.error,
@@ -94,19 +79,10 @@ export function useFiscalYearsList() {
 
   const query = useQuery({
     queryKey: FISCAL_YEARS_QUERY_KEY,
-    queryFn: async (): Promise<ActiveFiscalYear[]> => {
-      const { data, error } = await supabase
-        .from("fiscal_years")
-        .select("*")
-        .order("start_date", { ascending: false });
-
-      if (error) throw error;
-      return (data || []) as ActiveFiscalYear[];
-    },
+    queryFn: () => FiscalYearService.getAll(),
     ...QUERY_CONFIG.DASHBOARD_KPIS,
   });
 
-  // حساب الإحصائيات
   const closedYearsCount = query.data?.filter(fy => fy.is_closed).length || 0;
   const publishedYearsCount = query.data?.filter(fy => fy.is_published).length || 0;
   const activeFiscalYear = query.data?.find(fy => fy.is_active) || null;

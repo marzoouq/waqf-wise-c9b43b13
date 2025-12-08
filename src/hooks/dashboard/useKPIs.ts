@@ -1,9 +1,8 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { productionLogger } from "@/lib/logger/production-logger";
-import { QUERY_CONFIG } from "@/lib/queryOptimization";
 import { useEffect } from "react";
+import { QUERY_CONFIG } from "@/lib/queryOptimization";
 import { DashboardService } from "@/services/dashboard.service";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface KPI {
   id: string;
@@ -36,10 +35,8 @@ export function useKPIs(category?: string) {
     queryKey: ["kpis", category],
     ...QUERY_CONFIG.REPORTS,
     queryFn: async () => {
-      // استخدام الخدمة بدلاً من Supabase مباشرة
       const data = await DashboardService.getKPIDefinitions(category);
 
-      // حساب القيم الحالية لكل KPI
       const kpisWithValues = await Promise.all(
         data.map(async (kpi) => {
           const currentValue = await DashboardService.calculateKPIValue(kpi.kpi_code);
@@ -73,7 +70,6 @@ export function useKPIs(category?: string) {
     },
   });
 
-  // Real-time subscription for KPIs data sources
   useEffect(() => {
     const channel = supabase
       .channel('kpis-data-changes')
@@ -109,9 +105,6 @@ export function useKPIs(category?: string) {
   };
 }
 
-/**
- * تحديد الاتجاه
- */
 function determineTrend(
   currentValue?: number,
   targetValue?: number | null
@@ -125,9 +118,6 @@ function determineTrend(
   return "stable";
 }
 
-/**
- * تحديد الحالة
- */
 function determineStatus(
   currentValue: number,
   targetValue?: number | null,

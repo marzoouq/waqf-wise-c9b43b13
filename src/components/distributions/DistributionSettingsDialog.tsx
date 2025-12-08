@@ -32,8 +32,10 @@ export function DistributionSettingsDialog() {
   const handleSubmit = async () => {
     await updateSettings({
       ...formData,
+      distribution_frequency: formData.distribution_frequency as 'شهري' | 'ربع_سنوي' | 'نصف_سنوي' | 'سنوي',
+      distribution_rule: formData.distribution_rule as 'شرعي' | 'متساوي' | 'مخصص',
       calculation_order: 'تسلسلي',
-      is_active: true as true,
+      is_active: true,
     });
     setOpen(false);
   };
