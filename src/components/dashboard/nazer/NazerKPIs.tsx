@@ -119,7 +119,16 @@ export default function NazerKPIs() {
         : '—',
       icon: PieChart,
       variant: "default" as const,
-      subtitle: data.monthlyReturn === 0 ? "غير متاح" : undefined
+      subtitle: data.monthlyReturn === 0 ? "غير متاح" : "من العقود النشطة"
+    },
+    {
+      title: "العائد السنوي المتوقع",
+      value: (typeof data.monthlyReturn === 'number' && data.monthlyReturn > 0)
+        ? (data.monthlyReturn * 12).toLocaleString('ar-SA')
+        : '—',
+      icon: TrendingUp,
+      variant: "success" as const,
+      subtitle: data.monthlyReturn === 0 ? "غير متاح" : "تقدير سنوي"
     }
   ];
 

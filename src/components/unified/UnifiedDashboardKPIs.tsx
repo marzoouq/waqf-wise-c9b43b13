@@ -170,7 +170,15 @@ export const UnifiedDashboardKPIs = memo(function UnifiedDashboardKPIs({
         value: kpis.monthlyReturn > 0 ? formatCurrency(kpis.monthlyReturn) : '—',
         icon: PieChart,
         variant: "default" as const,
-        subtitle: kpis.monthlyReturn === 0 ? "غير متاح" : undefined,
+        subtitle: kpis.monthlyReturn === 0 ? "غير متاح" : "من العقود النشطة",
+        show: variant === 'nazer'
+      },
+      {
+        title: "العائد السنوي المتوقع",
+        value: kpis.monthlyReturn > 0 ? formatCurrency(kpis.monthlyReturn * 12) : '—',
+        icon: TrendingUp,
+        variant: "success" as const,
+        subtitle: kpis.monthlyReturn === 0 ? "غير متاح" : "تقدير سنوي",
         show: variant === 'nazer'
       },
       {

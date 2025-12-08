@@ -8,6 +8,7 @@ interface PropertyData {
   units?: number;
   occupied?: number;
   monthly_revenue?: number;
+  revenue_type?: string; // 'شهري' | 'سنوي' | 'ربع سنوي'
 }
 
 interface PropertyAnalyticsCardProps {
@@ -21,7 +22,20 @@ export function PropertyAnalyticsCard({ property, onAnalyzeClick }: PropertyAnal
     ? Math.round((property.occupied / property.units) * 100) 
     : 0;
   
-  const monthlyRevenue = property.monthly_revenue || 0;
+  // حساب العائد الشهري والسنوي بناءً على نوع الإيراد
+  const rawRevenue = property.monthly_revenue || 0;
+  const revenueType = property.revenue_type || 'شهري';
+  
+  // تحويل للمعدل الشهري الصحيح
+  let monthlyRevenue: number;
+  if (revenueType === 'سنوي' || revenueType === 'annual') {
+    monthlyRevenue = rawRevenue / 12;
+  } else if (revenueType === 'ربع سنوي' || revenueType === 'quarterly') {
+    monthlyRevenue = rawRevenue / 3;
+  } else {
+    monthlyRevenue = rawRevenue;
+  }
+  
   const annualRevenue = monthlyRevenue * 12;
   
   // تقييم الأداء
