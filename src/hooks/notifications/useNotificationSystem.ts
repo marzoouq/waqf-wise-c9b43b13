@@ -1,6 +1,10 @@
+/**
+ * useNotificationSystem Hook - نظام الإشعارات
+ * يستخدم EdgeFunctionService
+ */
 import { toast } from "sonner";
 import { productionLogger } from "@/lib/logger/production-logger";
-import { supabase } from "@/integrations/supabase/client";
+import { EdgeFunctionService } from "@/services";
 
 interface SendNotificationParams {
   userId: string;
@@ -12,18 +16,10 @@ interface SendNotificationParams {
   priority?: 'low' | 'medium' | 'high';
 }
 
-/**
- * Hook لإرسال إشعارات للمستخدمين
- */
 export function useNotificationSystem() {
   const sendNotification = async (params: SendNotificationParams) => {
     try {
-      const { data, error } = await supabase.functions.invoke('send-notification', {
-        body: params
-      });
-
-      if (error) throw error;
-
+      const data = await EdgeFunctionService.invoke('send-notification', params);
       return { success: true, data };
     } catch (error) {
       productionLogger.error('Failed to send notification:', error);
@@ -32,11 +28,7 @@ export function useNotificationSystem() {
     }
   };
 
-  const notifyInvoiceIssued = async (
-    userId: string,
-    invoiceNumber: string,
-    amount: number
-  ) => {
+  const notifyInvoiceIssued = async (userId: string, invoiceNumber: string, amount: number) => {
     return sendNotification({
       userId,
       title: 'فاتورة جديدة',
@@ -48,12 +40,7 @@ export function useNotificationSystem() {
     });
   };
 
-  const notifyPaymentDue = async (
-    userId: string,
-    description: string,
-    amount: number,
-    dueDate: string
-  ) => {
+  const notifyPaymentDue = async (userId: string, description: string, amount: number, dueDate: string) => {
     return sendNotification({
       userId,
       title: 'تذكير: دفعة مستحقة',
@@ -65,11 +52,7 @@ export function useNotificationSystem() {
     });
   };
 
-  const notifyRequestApproved = async (
-    userId: string,
-    requestType: string,
-    requestNumber: string
-  ) => {
+  const notifyRequestApproved = async (userId: string, requestType: string, requestNumber: string) => {
     return sendNotification({
       userId,
       title: 'تمت الموافقة',
@@ -81,12 +64,7 @@ export function useNotificationSystem() {
     });
   };
 
-  const notifyRequestRejected = async (
-    userId: string,
-    requestType: string,
-    requestNumber: string,
-    reason?: string
-  ) => {
+  const notifyRequestRejected = async (userId: string, requestType: string, requestNumber: string, reason?: string) => {
     return sendNotification({
       userId,
       title: 'تم رفض الطلب',
@@ -98,11 +76,7 @@ export function useNotificationSystem() {
     });
   };
 
-  const notifyDistributionCreated = async (
-    userId: string,
-    amount: number,
-    distributionDate: string
-  ) => {
+  const notifyDistributionCreated = async (userId: string, amount: number, distributionDate: string) => {
     return sendNotification({
       userId,
       title: 'توزيع جديد',

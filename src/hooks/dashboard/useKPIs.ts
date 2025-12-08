@@ -1,8 +1,12 @@
+/**
+ * useKPIs Hook
+ * Hook لجلب مؤشرات الأداء الرئيسية
+ * يستخدم DashboardService + RealtimeService
+ */
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";
-import { DashboardService } from "@/services/dashboard.service";
-import { supabase } from "@/integrations/supabase/client";
+import { DashboardService, RealtimeService } from "@/services";
 
 export interface KPI {
   id: string;
@@ -71,25 +75,12 @@ export function useKPIs(category?: string) {
   });
 
   useEffect(() => {
-    const channel = supabase
-      .channel('kpis-data-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'distributions' }, () => {
-        queryClient.invalidateQueries({ queryKey: ["kpis"] });
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'beneficiaries' }, () => {
-        queryClient.invalidateQueries({ queryKey: ["kpis"] });
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'payments' }, () => {
-        queryClient.invalidateQueries({ queryKey: ["kpis"] });
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'contracts' }, () => {
-        queryClient.invalidateQueries({ queryKey: ["kpis"] });
-      })
-      .subscribe();
+    const subscription = RealtimeService.subscribeToChanges(
+      ['distributions', 'beneficiaries', 'payments', 'contracts'],
+      () => { queryClient.invalidateQueries({ queryKey: ["kpis"] }); }
+    );
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => { subscription.unsubscribe(); };
   }, [queryClient, category]);
 
   const handleRefresh = () => {
@@ -105,14 +96,9 @@ export function useKPIs(category?: string) {
   };
 }
 
-function determineTrend(
-  currentValue?: number,
-  targetValue?: number | null
-): "up" | "down" | "stable" {
+function determineTrend(currentValue?: number, targetValue?: number | null): "up" | "down" | "stable" {
   if (!currentValue || !targetValue) return "stable";
-
   const percentage = (currentValue / targetValue) * 100;
-
   if (percentage > 100) return "up";
   if (percentage < 80) return "down";
   return "stable";
@@ -125,15 +111,8 @@ function determineStatus(
   dangerThreshold?: number | null
 ): "success" | "warning" | "danger" | "neutral" {
   if (targetValue === null || targetValue === undefined) return "neutral";
-  
-  if (dangerThreshold !== null && dangerThreshold !== undefined && currentValue <= dangerThreshold) {
-    return "danger";
-  }
-  if (warningThreshold !== null && warningThreshold !== undefined && currentValue <= warningThreshold) {
-    return "warning";
-  }
-  if (currentValue >= targetValue) {
-    return "success";
-  }
+  if (dangerThreshold !== null && dangerThreshold !== undefined && currentValue <= dangerThreshold) return "danger";
+  if (warningThreshold !== null && warningThreshold !== undefined && currentValue <= warningThreshold) return "warning";
+  if (currentValue >= targetValue) return "success";
   return "neutral";
 }

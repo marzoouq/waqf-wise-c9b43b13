@@ -1,9 +1,12 @@
+/**
+ * useDistributionApprovals Hook - موافقات التوزيعات
+ * يستخدم FundService + RealtimeService
+ */
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
 import { createMutationErrorHandler } from "@/lib/errors";
-import { FundService } from "@/services/fund.service";
-import { supabase } from "@/integrations/supabase/client";
+import { FundService, RealtimeService } from "@/services";
 
 export interface DistributionApproval {
   id: string;
@@ -23,14 +26,14 @@ export function useDistributionApprovals(distributionId?: string) {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    const channel = supabase
-      .channel('distribution-approvals-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'distribution_approvals' }, () => {
+    const subscription = RealtimeService.subscribeToTable(
+      'distribution_approvals',
+      () => {
         queryClient.invalidateQueries({ queryKey: ["distribution_approvals"] });
         queryClient.invalidateQueries({ queryKey: ["distributions"] });
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
+      }
+    );
+    return () => { subscription.unsubscribe(); };
   }, [queryClient]);
 
   const { data: approvals = [], isLoading } = useQuery({
@@ -45,15 +48,9 @@ export function useDistributionApprovals(distributionId?: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["distribution_approvals"] });
       queryClient.invalidateQueries({ queryKey: ["distributions"] });
-      toast({
-        title: "تمت الموافقة بنجاح",
-        description: "تم تسجيل الموافقة على التوزيع",
-      });
+      toast({ title: "تمت الموافقة بنجاح", description: "تم تسجيل الموافقة على التوزيع" });
     },
-    onError: createMutationErrorHandler({
-      context: 'approve_distribution',
-      toastTitle: 'خطأ في الموافقة',
-    }),
+    onError: createMutationErrorHandler({ context: 'approve_distribution', toastTitle: 'خطأ في الموافقة' }),
   });
 
   const updateApproval = useMutation({
@@ -62,29 +59,14 @@ export function useDistributionApprovals(distributionId?: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["distribution_approvals"] });
       queryClient.invalidateQueries({ queryKey: ["distributions"] });
-      toast({
-        title: "تم التحديث بنجاح",
-        description: "تم تحديث حالة الموافقة",
-      });
+      toast({ title: "تم التحديث بنجاح", description: "تم تحديث حالة الموافقة" });
     },
-    onError: createMutationErrorHandler({
-      context: 'update_distribution_approval',
-      toastTitle: 'خطأ في التحديث',
-    }),
+    onError: createMutationErrorHandler({ context: 'update_distribution_approval', toastTitle: 'خطأ في التحديث' }),
   });
 
-  const checkAllApproved = () => {
-    return approvals.length === 3 && approvals.every(a => a.status === "موافق");
-  };
-
-  const hasRejection = () => {
-    return approvals.some(a => a.status === "مرفوض");
-  };
-
-  const getCurrentLevel = () => {
-    const approvedCount = approvals.filter(a => a.status === "موافق").length;
-    return approvedCount + 1;
-  };
+  const checkAllApproved = () => approvals.length === 3 && approvals.every(a => a.status === "موافق");
+  const hasRejection = () => approvals.some(a => a.status === "مرفوض");
+  const getCurrentLevel = () => approvals.filter(a => a.status === "موافق").length + 1;
 
   return {
     approvals,

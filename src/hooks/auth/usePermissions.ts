@@ -1,8 +1,11 @@
+/**
+ * usePermissions Hook - صلاحيات المستخدم
+ * يستخدم UserService + RealtimeService
+ */
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
-import { UserService } from "@/services/user.service";
-import { supabase } from "@/integrations/supabase/client";
+import { UserService, RealtimeService } from "@/services";
 
 export interface Permission {
   id: string;
@@ -29,7 +32,6 @@ export function usePermissions() {
       if (Array.isArray(result)) return [];
       
       const { rolePermissions, userPermissions } = result;
-
       const permissionsMap = new Map<string, Permission>();
 
       (rolePermissions as RolePermissionResult[] | null)?.forEach((rp) => {
@@ -41,13 +43,12 @@ export function usePermissions() {
       userPermissions?.forEach((up: any) => {
         if (up.permission_key) {
           if (up.granted) {
-            const perm: Permission = {
+            permissionsMap.set(up.permission_key, {
               id: up.permission_key,
               name: up.permission_key,
               category: 'user_specific',
               description: null,
-            };
-            permissionsMap.set(up.permission_key, perm);
+            });
           } else {
             permissionsMap.delete(up.permission_key);
           }
@@ -64,13 +65,12 @@ export function usePermissions() {
   useEffect(() => {
     if (!user?.id) return;
 
-    const channel = supabase
-      .channel('permissions-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'user_permissions', filter: `user_id=eq.${user.id}` }, () => refetch())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'role_permissions' }, () => refetch())
-      .subscribe();
+    const subscription = RealtimeService.subscribeToChanges(
+      ['user_permissions', 'role_permissions'],
+      () => refetch()
+    );
 
-    return () => { supabase.removeChannel(channel); };
+    return () => { subscription.unsubscribe(); };
   }, [user?.id, refetch]);
 
   const permissionNames = permissions.map(p => p.name);

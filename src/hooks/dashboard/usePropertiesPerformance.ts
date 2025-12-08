@@ -1,11 +1,11 @@
 /**
  * usePropertiesPerformance Hook
  * Hook لجلب بيانات أداء العقارات
+ * يستخدم DashboardService + RealtimeService
  */
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { DashboardService } from "@/services/dashboard.service";
-import { supabase } from "@/integrations/supabase/client";
+import { DashboardService, RealtimeService } from "@/services";
 import type { PropertyPerformance } from "@/types/dashboard";
 
 export function usePropertiesPerformance() {
@@ -18,19 +18,12 @@ export function usePropertiesPerformance() {
   });
 
   useEffect(() => {
-    const channel = supabase
-      .channel('properties-performance')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'rental_payments' }, () => {
-        queryClient.invalidateQueries({ queryKey: ["properties-performance"] });
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'contracts' }, () => {
-        queryClient.invalidateQueries({ queryKey: ["properties-performance"] });
-      })
-      .subscribe();
+    const subscription = RealtimeService.subscribeToChanges(
+      ['rental_payments', 'contracts'],
+      () => { queryClient.invalidateQueries({ queryKey: ["properties-performance"] }); }
+    );
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => { subscription.unsubscribe(); };
   }, [queryClient]);
 
   return query;

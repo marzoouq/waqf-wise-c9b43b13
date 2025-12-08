@@ -1,3 +1,7 @@
+/**
+ * useWaqfUnits Hook - أقلام الوقف
+ * يستخدم FundService + RealtimeService
+ */
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { useActivities } from "@/hooks/useActivities";
@@ -5,8 +9,7 @@ import { useAuth } from "@/hooks/auth/useAuth";
 import { useEffect } from "react";
 import type { Json } from '@/integrations/supabase/types';
 import { logger } from "@/lib/logger";
-import { FundService } from "@/services/fund.service";
-import { supabase } from "@/integrations/supabase/client";
+import { FundService, RealtimeService } from "@/services";
 
 export interface WaqfUnit {
   id: string;
@@ -33,13 +36,11 @@ export function useWaqfUnits() {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    const channel = supabase
-      .channel('waqf-units-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'waqf_units' }, () => {
-        queryClient.invalidateQueries({ queryKey: ['waqf_units'] });
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    const subscription = RealtimeService.subscribeToTable(
+      'waqf_units',
+      () => { queryClient.invalidateQueries({ queryKey: ['waqf_units'] }); }
+    );
+    return () => { subscription.unsubscribe(); };
   }, [queryClient]);
 
   const { data: waqfUnits = [], isLoading } = useQuery({
@@ -52,25 +53,14 @@ export function useWaqfUnits() {
       FundService.createWaqfUnit({ ...waqfUnit, code: '' }),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['waqf_units'] });
-      
       addActivity({
         action: `تم إضافة قلم وقف جديد: ${data.name} (${data.code})`,
         user_name: user?.user_metadata?.full_name || 'مستخدم',
-      }).catch((error) => {
-        logger.error(error, { context: 'add_waqf_unit_activity', severity: 'low' });
-      });
-
-      toast({
-        title: "تم إضافة القلم بنجاح",
-        description: `كود القلم: ${data.code}`,
-      });
+      }).catch((error) => logger.error(error, { context: 'add_waqf_unit_activity', severity: 'low' }));
+      toast({ title: "تم إضافة القلم بنجاح", description: `كود القلم: ${data.code}` });
     },
     onError: (error: Error) => {
-      toast({
-        variant: "destructive",
-        title: "خطأ في إضافة القلم",
-        description: error.message,
-      });
+      toast({ variant: "destructive", title: "خطأ في إضافة القلم", description: error.message });
     },
   });
 
@@ -79,22 +69,14 @@ export function useWaqfUnits() {
       FundService.updateWaqfUnit(id, updates),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['waqf_units'] });
-      
       addActivity({
         action: `تم تحديث قلم الوقف: ${data.name} (${data.code})`,
         user_name: user?.user_metadata?.full_name || 'مستخدم',
-      }).catch((error) => {
-        logger.error(error, { context: 'update_waqf_unit_activity', severity: 'low' });
-      });
-
+      }).catch((error) => logger.error(error, { context: 'update_waqf_unit_activity', severity: 'low' }));
       toast({ title: "تم تحديث القلم بنجاح" });
     },
     onError: (error: Error) => {
-      toast({
-        variant: "destructive",
-        title: "خطأ في تحديث القلم",
-        description: error.message,
-      });
+      toast({ variant: "destructive", title: "خطأ في تحديث القلم", description: error.message });
     },
   });
 
@@ -102,22 +84,14 @@ export function useWaqfUnits() {
     mutationFn: (id: string) => FundService.deleteWaqfUnit(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['waqf_units'] });
-      
       addActivity({
         action: 'تم حذف قلم وقف',
         user_name: user?.user_metadata?.full_name || 'مستخدم',
-      }).catch((error) => {
-        logger.error(error, { context: 'delete_waqf_unit_activity', severity: 'low' });
-      });
-
+      }).catch((error) => logger.error(error, { context: 'delete_waqf_unit_activity', severity: 'low' }));
       toast({ title: "تم حذف القلم بنجاح" });
     },
     onError: (error: Error) => {
-      toast({
-        variant: "destructive",
-        title: "خطأ في حذف القلم",
-        description: error.message,
-      });
+      toast({ variant: "destructive", title: "خطأ في حذف القلم", description: error.message });
     },
   });
 

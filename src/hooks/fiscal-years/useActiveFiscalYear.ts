@@ -1,14 +1,13 @@
 /**
  * useActiveFiscalYear Hook
  * موحد لجلب السنة المالية النشطة
- * يستخدم في جميع المكونات بدلاً من تكرار الاستعلام
+ * يستخدم FiscalYearService + RealtimeService
  */
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";
-import { FiscalYearService } from "@/services/fiscal-year.service";
-import { supabase } from "@/integrations/supabase/client";
+import { FiscalYearService, RealtimeService } from "@/services";
 
 export interface ActiveFiscalYear {
   id: string;
@@ -40,25 +39,15 @@ export function useActiveFiscalYear() {
   });
 
   useEffect(() => {
-    const channel = supabase
-      .channel("active-fiscal-year-changes")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "fiscal_years",
-        },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ACTIVE_FISCAL_YEAR_QUERY_KEY });
-          queryClient.invalidateQueries({ queryKey: FISCAL_YEARS_QUERY_KEY });
-        }
-      )
-      .subscribe();
+    const subscription = RealtimeService.subscribeToTable(
+      'fiscal_years',
+      () => {
+        queryClient.invalidateQueries({ queryKey: ACTIVE_FISCAL_YEAR_QUERY_KEY });
+        queryClient.invalidateQueries({ queryKey: FISCAL_YEARS_QUERY_KEY });
+      }
+    );
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => { subscription.unsubscribe(); };
   }, [queryClient]);
 
   return {
