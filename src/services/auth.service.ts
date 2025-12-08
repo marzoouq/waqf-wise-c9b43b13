@@ -7,7 +7,8 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 
-type UserRole = Database['public']['Tables']['user_roles']['Row'];
+type UserRoleRow = Database['public']['Tables']['user_roles']['Row'];
+type AppRole = Database['public']['Enums']['app_role'];
 
 export interface UserProfile {
   id: string;
@@ -145,5 +146,127 @@ export class AuthService {
       return { success: false, error: error.message };
     }
     return { success: true };
+  }
+
+  // ==================== إدارة المستخدمين ====================
+
+  /**
+   * جلب قائمة المستخدمين مع أدوارهم
+   */
+  static async getUsers() {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    const usersWithRoles = await Promise.all(
+      (data || []).map(async (profile) => {
+        const { data: rolesData } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", profile.user_id);
+
+        return {
+          ...profile,
+          user_roles: rolesData || [],
+        };
+      })
+    );
+
+    return usersWithRoles;
+  }
+
+  /**
+   * حذف مستخدم
+   */
+  static async deleteUser(userId: string): Promise<void> {
+    await supabase.from("user_roles").delete().eq("user_id", userId);
+    const { error } = await supabase
+      .from("profiles")
+      .delete()
+      .eq("user_id", userId);
+
+    if (error) throw error;
+  }
+
+  /**
+   * تحديث أدوار المستخدم
+   */
+  static async updateUserRoles(userId: string, roles: AppRole[]): Promise<void> {
+    await supabase.from("user_roles").delete().eq("user_id", userId);
+
+    if (roles.length > 0) {
+      const rolesToInsert = roles.map(role => ({ 
+        user_id: userId, 
+        role
+      }));
+
+      const { error } = await supabase
+        .from("user_roles")
+        .insert(rolesToInsert);
+
+      if (error) throw error;
+    }
+  }
+
+  /**
+   * تحديث حالة المستخدم
+   */
+  static async updateUserStatus(userId: string, isActive: boolean): Promise<void> {
+    const { error } = await supabase
+      .from("profiles")
+      .update({ is_active: isActive })
+      .eq("user_id", userId);
+
+    if (error) throw error;
+  }
+
+  // ==================== إدارة الصلاحيات ====================
+
+  /**
+   * جلب جميع الصلاحيات
+   */
+  static async getAllPermissions() {
+    const { data, error } = await supabase
+      .from("permissions")
+      .select("*")
+      .order("category", { ascending: true })
+      .order("name", { ascending: true });
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * جلب صلاحيات دور معين
+   */
+  static async getRolePermissions(role: AppRole) {
+    const { data, error } = await supabase
+      .from("role_permissions")
+      .select("*")
+      .eq("role", role);
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * تحديث صلاحية لدور
+   */
+  static async updateRolePermission(role: AppRole, permissionId: string, granted: boolean): Promise<void> {
+    const { error } = await supabase.from("role_permissions").upsert(
+      {
+        role,
+        permission_id: permissionId,
+        granted,
+      },
+      {
+        onConflict: "role,permission_id",
+      }
+    );
+
+    if (error) throw error;
   }
 }

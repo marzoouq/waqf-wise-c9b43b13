@@ -4,9 +4,9 @@
  */
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { AppRole } from "@/hooks/auth/useUserRole";
+import { AuthService } from "@/services/auth.service";
 
 export interface UserProfile {
   id: string;
@@ -28,29 +28,8 @@ export function useUsersQuery() {
   return useQuery({
     queryKey: ["users"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-
-      // Fetch roles for each user
-      const usersWithRoles = await Promise.all(
-        (data || []).map(async (profile) => {
-          const { data: rolesData } = await supabase
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", profile.user_id);
-
-          return {
-            ...profile,
-            user_roles: rolesData || [],
-          };
-        })
-      );
-
-      return usersWithRoles as UserProfile[];
+      const users = await AuthService.getUsers();
+      return users as UserProfile[];
     },
   });
 }
@@ -64,16 +43,7 @@ export function useDeleteUser() {
 
   return useMutation({
     mutationFn: async (userId: string) => {
-      // حذف أدوار المستخدم أولاً
-      await supabase.from("user_roles").delete().eq("user_id", userId);
-      
-      // حذف الملف الشخصي
-      const { error } = await supabase
-        .from("profiles")
-        .delete()
-        .eq("user_id", userId);
-
-      if (error) throw error;
+      await AuthService.deleteUser(userId);
     },
     onSuccess: () => {
       toast({
@@ -102,22 +72,7 @@ export function useUpdateUserRoles() {
 
   return useMutation({
     mutationFn: async ({ userId, roles }: { userId: string; roles: AppRole[] }) => {
-      // حذف الأدوار الحالية
-      await supabase.from("user_roles").delete().eq("user_id", userId);
-
-      // إضافة الأدوار الجديدة
-      if (roles.length > 0) {
-        const rolesToInsert = roles.map(role => ({ 
-          user_id: userId, 
-          role: role
-        }));
-
-        const { error } = await supabase
-          .from("user_roles")
-          .insert(rolesToInsert);
-
-        if (error) throw error;
-      }
+      await AuthService.updateUserRoles(userId, roles);
     },
     onSuccess: () => {
       toast({
@@ -146,12 +101,7 @@ export function useUpdateUserStatus() {
 
   return useMutation({
     mutationFn: async ({ userId, isActive }: { userId: string; isActive: boolean }) => {
-      const { error } = await supabase
-        .from("profiles")
-        .update({ is_active: isActive })
-        .eq("user_id", userId);
-
-      if (error) throw error;
+      await AuthService.updateUserStatus(userId, isActive);
     },
     onSuccess: () => {
       toast({
@@ -179,6 +129,8 @@ export function useResetUserPassword() {
 
   return useMutation({
     mutationFn: async ({ userId, password }: { userId: string; password: string }) => {
+      // هذه العملية تتطلب Edge Function
+      const { supabase } = await import('@/integrations/supabase/client');
       const { data, error } = await supabase.functions.invoke('reset-user-password', {
         body: { user_id: userId, new_password: password }
       });

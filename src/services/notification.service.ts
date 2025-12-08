@@ -281,4 +281,48 @@ export class NotificationService {
       throw error;
     }
   }
+
+  /**
+   * حفظ اشتراك الإشعارات الفورية
+   */
+  static async savePushSubscription(data: {
+    user_id: string;
+    endpoint: string;
+    p256dh: string;
+    auth: string;
+  }): Promise<{ success: boolean }> {
+    try {
+      const { error } = await supabase.from('push_subscriptions').upsert({
+        user_id: data.user_id,
+        endpoint: data.endpoint,
+        p256dh: data.p256dh,
+        auth: data.auth,
+        is_active: true,
+      });
+
+      if (error) throw error;
+      return { success: true };
+    } catch (error) {
+      productionLogger.error('Error saving push subscription', error);
+      return { success: false };
+    }
+  }
+
+  /**
+   * إلغاء اشتراك الإشعارات الفورية
+   */
+  static async deactivatePushSubscription(userId: string): Promise<{ success: boolean }> {
+    try {
+      const { error } = await supabase
+        .from('push_subscriptions')
+        .update({ is_active: false })
+        .eq('user_id', userId);
+
+      if (error) throw error;
+      return { success: true };
+    } catch (error) {
+      productionLogger.error('Error deactivating push subscription', error);
+      return { success: false };
+    }
+  }
 }

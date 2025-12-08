@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { RequestService } from "@/services/request.service";
 
 export interface BeneficiaryRequest {
   id: string;
@@ -55,49 +56,34 @@ export function useMyBeneficiaryRequests(userId?: string) {
     enabled: !!userId,
   });
 
-  // جلب الطلبات
+  // جلب الطلبات باستخدام الخدمة
   const { data: requests = [], isLoading } = useQuery({
     queryKey: ["beneficiary-requests", beneficiary?.id],
     queryFn: async () => {
       if (!beneficiary?.id) return [];
-
-      const { data, error } = await supabase
-        .from("beneficiary_requests")
-        .select(
-          "id, request_number, request_type_id, description, amount, status, created_at, reviewed_at, decision_notes"
-        )
-        .eq("beneficiary_id", beneficiary.id)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return data as BeneficiaryRequest[];
+      return RequestService.getAll(beneficiary.id);
     },
     enabled: !!beneficiary?.id,
   });
 
-  // إنشاء طلب جديد
+  // إنشاء طلب جديد باستخدام الخدمة
   const createRequest = useMutation({
     mutationFn: async (requestData: RequestFormData) => {
       if (!beneficiary?.id) throw new Error("لم يتم العثور على حساب المستفيد");
 
       // الحصول على نوع طلب افتراضي
-      const { data: requestType } = await supabase
-        .from("request_types")
-        .select("id")
-        .limit(1)
-        .single();
+      const requestTypes = await RequestService.getRequestTypes();
+      const defaultType = requestTypes[0];
 
-      const { error } = await supabase.from("beneficiary_requests").insert([
-        {
-          beneficiary_id: beneficiary.id,
-          request_type_id: requestType?.id || null,
-          description: requestData.description,
-          amount: requestData.amount ? parseFloat(requestData.amount) : null,
-          status: "pending",
-        },
-      ]);
+      const result = await RequestService.create({
+        beneficiary_id: beneficiary.id,
+        request_type_id: defaultType?.id || "",
+        description: requestData.description,
+        amount: requestData.amount ? parseFloat(requestData.amount) : undefined,
+      });
 
-      if (error) throw error;
+      if (!result.success) throw new Error(result.message);
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["beneficiary-requests"] });
@@ -113,9 +99,9 @@ export function useMyBeneficiaryRequests(userId?: string) {
   // حساب الإحصائيات
   const stats = {
     total: requests.length,
-    pending: requests.filter((r) => r.status === "pending").length,
-    approved: requests.filter((r) => r.status === "approved").length,
-    rejected: requests.filter((r) => r.status === "rejected").length,
+    pending: requests.filter((r: BeneficiaryRequest) => r.status === "pending" || r.status === "قيد المراجعة").length,
+    approved: requests.filter((r: BeneficiaryRequest) => r.status === "approved" || r.status === "موافق عليه").length,
+    rejected: requests.filter((r: BeneficiaryRequest) => r.status === "rejected" || r.status === "مرفوض").length,
   };
 
   // دوال مساعدة
