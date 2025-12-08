@@ -1,5 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -10,21 +8,10 @@ import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { MaskedValue } from "@/components/shared/MaskedValue";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { WaqfDistributionsSummaryCard } from "./cards/WaqfDistributionsSummaryCard";
+import { useBeneficiaryDistributions } from "@/hooks/beneficiary/useBeneficiaryDistributions";
 
 interface BeneficiaryDistributionsTabProps {
   beneficiaryId: string;
-}
-
-interface HeirDistribution {
-  id: string;
-  share_amount: number;
-  heir_type: string;
-  distribution_date: string;
-  fiscal_year_id: string;
-  fiscal_years: {
-    name: string;
-    is_closed: boolean;
-  } | null;
 }
 
 export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistributionsTabProps) {
@@ -32,29 +19,15 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
   const isMobile = useIsMobile();
   const masked = settings?.mask_exact_amounts || false;
   
-  const { data: distributions = [], isLoading } = useQuery({
-    queryKey: ["beneficiary-heir-distributions", beneficiaryId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("heir_distributions")
-        .select(`
-          id,
-          share_amount,
-          heir_type,
-          distribution_date,
-          fiscal_year_id,
-          fiscal_years (
-            name,
-            is_closed
-          )
-        `)
-        .eq("beneficiary_id", beneficiaryId)
-        .order("distribution_date", { ascending: false });
-
-      if (error) throw error;
-      return (data || []) as HeirDistribution[];
-    },
-  });
+  const {
+    distributions,
+    currentDistributions,
+    historicalDistributions,
+    currentTotal,
+    historicalTotal,
+    totalDistributed,
+    isLoading,
+  } = useBeneficiaryDistributions(beneficiaryId);
 
   const getHeirTypeLabel = (type: string) => {
     const labels: Record<string, string> = {
@@ -84,14 +57,6 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
       </Badge>
     );
   };
-
-  // فصل التوزيعات الحالية عن التاريخية
-  const currentDistributions = distributions.filter(d => !d.fiscal_years?.is_closed);
-  const historicalDistributions = distributions.filter(d => d.fiscal_years?.is_closed);
-  
-  const currentTotal = currentDistributions.reduce((sum, d) => sum + (d.share_amount || 0), 0);
-  const historicalTotal = historicalDistributions.reduce((sum, d) => sum + (d.share_amount || 0), 0);
-  const totalDistributed = currentTotal + historicalTotal;
 
   return (
     <div className="space-y-6">

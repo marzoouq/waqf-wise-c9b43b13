@@ -1,6 +1,6 @@
 /**
  * Archive Hooks - خطافات الأرشيف
- * @version 2.6.33
+ * @version 2.8.5
  */
 
 export { useDocuments, type Document } from './useDocuments';
@@ -11,3 +11,5 @@ export { useFolders, type Folder } from './useFolders';
 export { useArchiveStats } from './useArchiveStats';
 export { useArchivistDashboard, useArchivistStats, useRecentDocuments, type ArchivistStats, type RecentDocument } from './useArchivistDashboard';
 export { useArchivistDashboardRealtime, useArchivistDashboardRefresh } from './useArchivistDashboardRealtime';
+export { useDocumentPreview } from './useDocumentPreview';
+export { useSmartArchive } from './useSmartArchive';

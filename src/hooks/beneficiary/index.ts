@@ -1,7 +1,7 @@
 /**
  * Beneficiary Hooks - خطافات المستفيدين
  * جميع hooks المستفيدين مُصدَّرة من مكان واحد
- * @version 2.6.33
+ * @version 2.8.5
  */
 
 // ==================== Core Beneficiary Hooks ====================
@@ -14,12 +14,15 @@ export { useBeneficiaryEmergencyAid } from './useBeneficiaryEmergencyAid';
 // ==================== Data Hooks ====================
 export { useBeneficiaryAccountStatementData } from './useBeneficiaryAccountStatementData';
 export { useBeneficiaryPersonalReportsData } from './useBeneficiaryPersonalReportsData';
+export { useBeneficiaryActivity } from './useBeneficiaryActivity';
+export { useBeneficiaryDistributions } from './useBeneficiaryDistributions';
+export { useBeneficiaryProperties } from './useBeneficiaryProperties';
 
 // ==================== Beneficiaries Management ====================
 export { useBeneficiaries } from './useBeneficiaries';
 export { useBeneficiaryRequests, type BeneficiaryRequestData } from './useBeneficiaryRequests';
 export { useBeneficiaryAttachments, type BeneficiaryAttachment } from './useBeneficiaryAttachments';
-export { useBeneficiaryActivityLog, type BeneficiaryActivity } from './useBeneficiaryActivityLog';
+export { useBeneficiaryActivityLog, type BeneficiaryActivity as BeneficiaryActivityLogType } from './useBeneficiaryActivityLog';
 export { useBeneficiaryCategories } from './useBeneficiaryCategories';
 export { useBeneficiariesFilters } from './useBeneficiariesFilters';
 export { useEligibilityAssessment } from './useEligibilityAssessment';

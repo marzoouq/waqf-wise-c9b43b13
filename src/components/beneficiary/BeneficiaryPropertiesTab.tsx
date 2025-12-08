@@ -1,5 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -13,75 +11,17 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { MobilePropertyCard } from "./cards/MobilePropertyCard";
 import { MobileContractCard } from "./cards/MobileContractCard";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-
-// نوع العقد مع بيانات العقار
-interface ContractWithProperty {
-  id: string;
-  contract_number: string;
-  tenant_name: string;
-  monthly_rent: number;
-  start_date: string;
-  end_date: string;
-  status: string;
-  properties?: {
-    name: string;
-    type: string;
-    location: string;
-  } | null;
-}
+import { useBeneficiaryProperties } from "@/hooks/beneficiary/useBeneficiaryProperties";
 
 export function BeneficiaryPropertiesTab() {
   const { settings } = useVisibilitySettings();
   const { isCurrentYearPublished, isLoading: publishStatusLoading } = useFiscalYearPublishStatus();
   const isMobile = useIsMobile();
   
-  // جلب العقارات (العقارات تظهر دائماً)
-  const { data: properties = [], isLoading: propertiesLoading } = useQuery({
-    queryKey: ["properties-for-beneficiary"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("properties")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  // جلب العقود النشطة - تظهر فقط عند نشر السنة المالية
-  const { data: contracts = [], isLoading: contractsLoading } = useQuery({
-    queryKey: ["contracts-for-beneficiary", isCurrentYearPublished],
-    queryFn: async () => {
-      // إذا لم تكن السنة منشورة، لا نعرض العقود
-      if (!isCurrentYearPublished) {
-        return [] as ContractWithProperty[];
-      }
-
-      const { data, error } = await supabase
-        .from("contracts")
-        .select(`
-          id,
-          contract_number,
-          tenant_name,
-          monthly_rent,
-          start_date,
-          end_date,
-          status,
-          properties (
-            name,
-            type,
-            location
-          )
-        `)
-        .eq("status", "نشط")
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return (data || []) as ContractWithProperty[];
-    },
-    enabled: !publishStatusLoading,
-  });
+  const { properties, contracts, isLoading } = useBeneficiaryProperties(
+    isCurrentYearPublished,
+    publishStatusLoading
+  );
 
   const getPropertyTypeBadge = (type: string) => {
     const config: Record<string, { variant: "default" | "secondary" | "outline" }> = {
@@ -102,8 +42,6 @@ export function BeneficiaryPropertiesTab() {
 
     return <Badge variant={config[status]?.variant || "secondary"}>{status}</Badge>;
   };
-
-  const isLoading = propertiesLoading || contractsLoading;
 
   return (
     <div className="space-y-6">
