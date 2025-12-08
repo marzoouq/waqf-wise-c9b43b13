@@ -4,7 +4,7 @@
  */
 
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { VoucherService } from "@/services";
 
 export interface PaymentVoucherWithDetails {
   id: string;
@@ -42,28 +42,7 @@ export function usePaymentVouchersData(searchTerm: string, selectedStatus: strin
     refetch,
   } = useQuery({
     queryKey: ["payment-vouchers", searchTerm, selectedStatus],
-    queryFn: async () => {
-      let query = supabase
-        .from('payment_vouchers')
-        .select(`
-          *,
-          beneficiaries (full_name, national_id),
-          distributions (total_amount, distribution_date)
-        `)
-        .order('created_at', { ascending: false });
-
-      if (searchTerm) {
-        query = query.or(`voucher_number.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
-      }
-
-      if (selectedStatus !== "all") {
-        query = query.eq('status', selectedStatus);
-      }
-
-      const { data, error } = await query;
-      if (error) throw error;
-      return data as PaymentVoucherWithDetails[];
-    },
+    queryFn: () => VoucherService.getWithFilters(searchTerm, selectedStatus),
   });
 
   const stats: VoucherStats = {

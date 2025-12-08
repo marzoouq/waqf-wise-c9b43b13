@@ -2,7 +2,7 @@
  * useBeneficiaryId Hook - جلب beneficiary_id للمستخدم الحالي
  */
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { BeneficiaryService } from "@/services";
 import { useAuth } from "@/contexts/AuthContext";
 
 export function useBeneficiaryId() {
@@ -12,9 +12,7 @@ export function useBeneficiaryId() {
     queryKey: ["beneficiary-id", user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
-      const { data, error } = await supabase.from("beneficiaries").select("id").eq("user_id", user.id).single();
-      if (error) throw error;
-      return data?.id || null;
+      return BeneficiaryService.getBeneficiaryIdByUserId(user.id);
     },
     enabled: !!user?.id,
     staleTime: 10 * 60 * 1000,

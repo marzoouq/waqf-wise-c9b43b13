@@ -498,6 +498,176 @@ export class BeneficiaryService {
   }
 
   /**
+   * جلب مستفيد بـ user_id
+   */
+  static async getByUserId(userId: string): Promise<Beneficiary | null> {
+    try {
+      const { data, error } = await supabase
+        .from('beneficiaries')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data as Beneficiary | null;
+    } catch (error) {
+      productionLogger.error('Error fetching beneficiary by user ID', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب ID المستفيد بـ user_id
+   */
+  static async getBeneficiaryIdByUserId(userId: string): Promise<string | null> {
+    try {
+      const { data, error } = await supabase
+        .from('beneficiaries')
+        .select('id')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data?.id || null;
+    } catch (error) {
+      productionLogger.error('Error fetching beneficiary ID', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب بيانات المستفيد للكشف
+   */
+  static async getAccountStatementData(userId: string) {
+    try {
+      const { data, error } = await supabase
+        .from('beneficiaries')
+        .select('id, full_name, beneficiary_number, account_balance, total_received')
+        .eq('user_id', userId)
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      productionLogger.error('Error fetching account statement data', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب مدفوعات المستفيد
+   */
+  static async getBeneficiaryPayments(beneficiaryId: string, filters?: {
+    dateFrom?: string;
+    dateTo?: string;
+    paymentMethod?: string;
+  }) {
+    try {
+      let query = supabase
+        .from('payments')
+        .select('id, amount, payment_date, description, payment_method')
+        .eq('beneficiary_id', beneficiaryId)
+        .order('payment_date', { ascending: false });
+
+      if (filters?.dateFrom) query = query.gte('payment_date', filters.dateFrom);
+      if (filters?.dateTo) query = query.lte('payment_date', filters.dateTo);
+      if (filters?.paymentMethod && filters.paymentMethod !== 'all') {
+        query = query.eq('payment_method', filters.paymentMethod);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching beneficiary payments', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب ملف المستفيد الكامل
+   */
+  static async getProfile(userId: string) {
+    try {
+      const { data: beneficiary, error: beneficiaryError } = await supabase
+        .from('beneficiaries')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
+
+      if (beneficiaryError) throw beneficiaryError;
+      if (!beneficiary) throw new Error('لم يتم العثور على حساب مستفيد');
+
+      const { data: payments, error: paymentsError } = await supabase
+        .from('payments')
+        .select('id, payment_number, payment_date, amount, description')
+        .eq('beneficiary_id', beneficiary.id)
+        .order('payment_date', { ascending: false })
+        .limit(50);
+
+      if (paymentsError) throw paymentsError;
+
+      return { beneficiary, payments: payments || [] };
+    } catch (error) {
+      productionLogger.error('Error fetching beneficiary profile', error);
+      throw error;
+    }
+  }
+
+  /**
+   * تحديث جلسة المستفيد
+   */
+  static async updateSession(sessionId: string | null, beneficiaryId: string, userId: string | undefined, page: string) {
+    try {
+      if (sessionId) {
+        await supabase
+          .from('beneficiary_sessions')
+          .update({
+            current_page: page,
+            last_activity: new Date().toISOString(),
+            is_online: true,
+          })
+          .eq('id', sessionId);
+        return sessionId;
+      } else {
+        const { data, error } = await supabase
+          .from('beneficiary_sessions')
+          .insert({
+            beneficiary_id: beneficiaryId,
+            user_id: userId,
+            current_page: page,
+            is_online: true,
+          })
+          .select('id')
+          .single();
+
+        if (error) throw error;
+        return data?.id || null;
+      }
+    } catch (error) {
+      productionLogger.error('Error updating beneficiary session', error);
+      return null;
+    }
+  }
+
+  /**
+   * إنهاء جلسة المستفيد
+   */
+  static async endSession(sessionId: string) {
+    try {
+      await supabase
+        .from('beneficiary_sessions')
+        .update({
+          is_online: false,
+          last_activity: new Date().toISOString(),
+        })
+        .eq('id', sessionId);
+    } catch (error) {
+      productionLogger.error('Error ending beneficiary session', error);
+    }
+  }
+
+  /**
    * جلب طلبات المستفيد
    */
   static async getRequests(beneficiaryId: string): Promise<Database['public']['Tables']['beneficiary_requests']['Row'][]> {

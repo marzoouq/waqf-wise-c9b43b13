@@ -4,7 +4,7 @@
  */
 import { useEffect, useRef, useCallback } from "react";
 import { useLocation } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { BeneficiaryService } from "@/services";
 import { useAuth } from "@/hooks/useAuth";
 
 interface UseBeneficiarySessionOptions {
@@ -28,32 +28,14 @@ export function useBeneficiarySession({ beneficiaryId, enabled = true }: UseBene
     lastUpdateRef.current = now;
 
     try {
-      if (sessionIdRef.current) {
-        // تحديث الجلسة الحالية
-        await supabase
-          .from("beneficiary_sessions")
-          .update({
-            current_page: page,
-            last_activity: new Date().toISOString(),
-            is_online: true,
-          })
-          .eq("id", sessionIdRef.current);
-      } else {
-        // إنشاء جلسة جديدة
-        const { data, error } = await supabase
-          .from("beneficiary_sessions")
-          .insert({
-            beneficiary_id: beneficiaryId,
-            user_id: user?.id,
-            current_page: page,
-            is_online: true,
-          })
-          .select("id")
-          .single();
-
-        if (!error && data) {
-          sessionIdRef.current = data.id;
-        }
+      const newSessionId = await BeneficiaryService.updateSession(
+        sessionIdRef.current,
+        beneficiaryId,
+        user?.id,
+        page
+      );
+      if (newSessionId) {
+        sessionIdRef.current = newSessionId;
       }
     } catch (error) {
       console.error("Error updating beneficiary session:", error);
@@ -65,13 +47,7 @@ export function useBeneficiarySession({ beneficiaryId, enabled = true }: UseBene
     if (!sessionIdRef.current) return;
 
     try {
-      await supabase
-        .from("beneficiary_sessions")
-        .update({
-          is_online: false,
-          last_activity: new Date().toISOString(),
-        })
-        .eq("id", sessionIdRef.current);
+      await BeneficiaryService.endSession(sessionIdRef.current);
     } catch (error) {
       console.error("Error ending beneficiary session:", error);
     }

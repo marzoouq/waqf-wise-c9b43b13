@@ -364,4 +364,30 @@ export class VoucherService {
       beneficiaryCount: lines.length,
     };
   }
+
+  /**
+   * جلب السندات مع الفلترة
+   */
+  static async getWithFilters(searchTerm?: string, status?: string): Promise<any[]> {
+    let query = supabase
+      .from('payment_vouchers')
+      .select(`
+        *,
+        beneficiaries (full_name, national_id),
+        distributions (total_amount, distribution_date)
+      `)
+      .order('created_at', { ascending: false });
+
+    if (searchTerm) {
+      query = query.or(`voucher_number.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
+    }
+
+    if (status && status !== "all") {
+      query = query.eq('status', status);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return data || [];
+  }
 }

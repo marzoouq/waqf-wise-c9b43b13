@@ -233,4 +233,17 @@ export class PaymentService {
 
     if (error) throw error;
   }
+
+  /**
+   * جلب السندات مع تفاصيل العقود
+   */
+  static async getPaymentsWithContractDetails(): Promise<any[]> {
+    const { data, error } = await supabase
+      .from("payments_with_contract_details")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  }
 }
