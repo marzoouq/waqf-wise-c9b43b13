@@ -445,4 +445,40 @@ export class RequestService {
 
     if (error) throw error;
   }
+
+  /**
+   * جلب جميع الطلبات مع بيانات المستفيد (للموظفين)
+   */
+  static async getAllWithBeneficiary() {
+    const { data, error } = await supabase
+      .from('beneficiary_requests')
+      .select(`
+        *,
+        beneficiary:beneficiaries(
+          full_name,
+          national_id,
+          phone
+        )
+      `)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * تحديث حالة الطلب
+   */
+  static async updateRequestStatus(requestId: string, status: string, notes: string) {
+    const { error } = await supabase
+      .from('beneficiary_requests')
+      .update({
+        status,
+        decision_notes: notes,
+        reviewed_at: new Date().toISOString(),
+      })
+      .eq('id', requestId);
+
+    if (error) throw error;
+  }
 }

@@ -5,17 +5,8 @@
 
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-
-export interface LandingSetting {
-  id: string;
-  setting_key: string;
-  setting_value: string;
-  setting_type: string;
-  description: string;
-  is_active: boolean;
-}
+import { SettingsService } from "@/services";
 
 export function useLandingPageSettings() {
   const queryClient = useQueryClient();
@@ -27,25 +18,12 @@ export function useLandingPageSettings() {
     error,
   } = useQuery({
     queryKey: ['landing-page-settings'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('landing_page_settings')
-        .select('*')
-        .order('setting_key');
-
-      if (error) throw error;
-      return data as LandingSetting[];
-    }
+    queryFn: () => SettingsService.getLandingSettings(),
   });
 
   const updateMutation = useMutation({
     mutationFn: async ({ key, value }: { key: string; value: string }) => {
-      const { error } = await supabase
-        .from('landing_page_settings')
-        .update({ setting_value: value })
-        .eq('setting_key', key);
-
-      if (error) throw error;
+      return SettingsService.updateSetting(key, value);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['landing-page-settings'] });
@@ -77,7 +55,7 @@ export function useLandingPageSettings() {
     try {
       return JSON.parse(setting.setting_value as string);
     } catch {
-      return setting.setting_value as string;
+      return String(setting.setting_value);
     }
   };
 

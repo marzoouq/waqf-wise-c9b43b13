@@ -948,4 +948,61 @@ export class BeneficiaryService {
       throw error;
     }
   }
+
+  /**
+   * جلب إحصائيات المستفيد عبر RPC
+   */
+  static async getStatisticsRPC(beneficiaryId: string) {
+    try {
+      const { data, error } = await supabase
+        .rpc('get_beneficiary_statistics', { p_beneficiary_id: beneficiaryId });
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      productionLogger.error('Error fetching beneficiary statistics via RPC', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب التوزيعات السنوية للمستفيد
+   */
+  static async getYearlyDistributions(beneficiaryId: string, year: string) {
+    try {
+      const { data, error } = await supabase
+        .from('heir_distributions')
+        .select('share_amount, distribution_date, heir_type, notes')
+        .eq('beneficiary_id', beneficiaryId)
+        .gte('distribution_date', `${year}-01-01`)
+        .lte('distribution_date', `${year}-12-31`)
+        .order('distribution_date', { ascending: true });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching yearly distributions', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب طلبات المستفيد السنوية
+   */
+  static async getYearlyRequests(beneficiaryId: string, year: string) {
+    try {
+      const { data, error } = await supabase
+        .from('beneficiary_requests')
+        .select('status, amount, created_at')
+        .eq('beneficiary_id', beneficiaryId)
+        .gte('created_at', `${year}-01-01`)
+        .lte('created_at', `${year}-12-31`);
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching yearly requests', error);
+      throw error;
+    }
+  }
 }

@@ -4,8 +4,8 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { RequestService } from "@/services";
 
 export interface RequestWithBeneficiary {
   id: string;
@@ -39,36 +39,12 @@ export function useStaffRequestsData() {
     error,
   } = useQuery({
     queryKey: ['all-beneficiary-requests'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('beneficiary_requests')
-        .select(`
-          *,
-          beneficiary:beneficiaries(
-            full_name,
-            national_id,
-            phone
-          )
-        `)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return data as RequestWithBeneficiary[];
-    },
+    queryFn: () => RequestService.getAllWithBeneficiary() as Promise<RequestWithBeneficiary[]>,
   });
 
   const updateRequestStatus = useMutation({
     mutationFn: async ({ requestId, status, notes }: { requestId: string; status: string; notes: string }) => {
-      const { error } = await supabase
-        .from('beneficiary_requests')
-        .update({
-          status,
-          decision_notes: notes,
-          reviewed_at: new Date().toISOString(),
-        })
-        .eq('id', requestId);
-
-      if (error) throw error;
+      return RequestService.updateRequestStatus(requestId, status, notes);
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['all-beneficiary-requests'] });
