@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { toast } from 'sonner';
+import { POSService } from '@/services/pos.service';
 
 export interface PaymentInput {
   shiftId: string;
@@ -29,32 +29,11 @@ export function useQuickPayment() {
 
   const payMutation = useMutation({
     mutationFn: async (input: PaymentInput) => {
-      // 1. توليد رقم العملية
-      const { data: transactionNumber } = await supabase.rpc('generate_pos_transaction_number');
-
-      // 2. إنشاء عملية الصرف
-      const { data: transaction, error } = await supabase
-        .from('pos_transactions')
-        .insert({
-          transaction_number: transactionNumber,
-          shift_id: input.shiftId,
-          transaction_type: 'صرف',
-          amount: input.amount,
-          payment_method: input.paymentMethod,
-          expense_category: input.expenseCategory,
-          payer_name: input.payeeName,
-          beneficiary_id: input.beneficiaryId,
-          description: input.description,
-          reference_number: input.referenceNumber,
-          cashier_id: user?.id,
-          net_amount: input.amount,
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      return transaction;
+      if (!user?.id) throw new Error('المستخدم غير مسجل');
+      return POSService.quickPayment({
+        ...input,
+        cashierId: user.id,
+      });
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['pos'] });

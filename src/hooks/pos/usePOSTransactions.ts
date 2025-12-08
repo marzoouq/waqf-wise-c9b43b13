@@ -1,30 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { toast } from 'sonner';
+import { POSService, POSTransaction } from '@/services/pos.service';
 
-export interface POSTransaction {
-  id: string;
-  transaction_number: string;
-  shift_id: string;
-  transaction_type: 'تحصيل' | 'صرف' | 'تعديل';
-  rental_payment_id: string | null;
-  contract_id: string | null;
-  beneficiary_id: string | null;
-  amount: number;
-  tax_amount: number;
-  net_amount: number | null;
-  payment_method: 'نقدي' | 'شبكة' | 'تحويل' | 'شيك';
-  reference_number: string | null;
-  payer_name: string | null;
-  expense_category: string | null;
-  description: string | null;
-  cashier_id: string;
-  journal_entry_id: string | null;
-  receipt_printed: boolean;
-  voided: boolean;
-  created_at: string;
-}
+export type { POSTransaction };
 
 export interface CreateTransactionInput {
   shiftId: string;
@@ -47,70 +26,24 @@ export function usePOSTransactions(shiftId?: string) {
   // جلب عمليات وردية معينة
   const { data: transactions = [], isLoading } = useQuery({
     queryKey: ['pos', 'transactions', shiftId],
-    queryFn: async () => {
-      if (!shiftId) return [];
-      
-      const { data, error } = await supabase
-        .from('pos_transactions')
-        .select('*')
-        .eq('shift_id', shiftId)
-        .eq('voided', false)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return data as POSTransaction[];
-    },
+    queryFn: () => POSService.getTransactions(shiftId!),
     enabled: !!shiftId,
   });
 
   // جلب عمليات اليوم
   const { data: todayTransactions = [] } = useQuery({
     queryKey: ['pos', 'transactions', 'today'],
-    queryFn: async () => {
-      const today = new Date().toISOString().split('T')[0];
-      
-      const { data, error } = await supabase
-        .from('pos_transactions')
-        .select('*')
-        .gte('created_at', `${today}T00:00:00`)
-        .lte('created_at', `${today}T23:59:59`)
-        .eq('voided', false)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return data as POSTransaction[];
-    },
+    queryFn: () => POSService.getTodayTransactions(),
   });
 
   // إنشاء عملية جديدة
   const createTransactionMutation = useMutation({
     mutationFn: async (input: CreateTransactionInput) => {
-      // توليد رقم العملية
-      const { data: transactionNumber } = await supabase.rpc('generate_pos_transaction_number');
-
-      const { data, error } = await supabase
-        .from('pos_transactions')
-        .insert({
-          transaction_number: transactionNumber,
-          shift_id: input.shiftId,
-          transaction_type: input.transactionType,
-          amount: input.amount,
-          payment_method: input.paymentMethod,
-          rental_payment_id: input.rentalPaymentId,
-          contract_id: input.contractId,
-          beneficiary_id: input.beneficiaryId,
-          payer_name: input.payerName,
-          expense_category: input.expenseCategory,
-          description: input.description,
-          reference_number: input.referenceNumber,
-          cashier_id: user?.id,
-          net_amount: input.amount,
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
+      if (!user?.id) throw new Error('المستخدم غير مسجل');
+      return POSService.createTransaction({
+        ...input,
+        cashierId: user.id,
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pos'] });
@@ -124,20 +57,8 @@ export function usePOSTransactions(shiftId?: string) {
   // إلغاء عملية
   const voidTransactionMutation = useMutation({
     mutationFn: async ({ transactionId, reason }: { transactionId: string; reason: string }) => {
-      const { data, error } = await supabase
-        .from('pos_transactions')
-        .update({
-          voided: true,
-          voided_at: new Date().toISOString(),
-          voided_by: user?.id,
-          void_reason: reason,
-        })
-        .eq('id', transactionId)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
+      if (!user?.id) throw new Error('المستخدم غير مسجل');
+      return POSService.voidTransaction(transactionId, user.id, reason);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pos'] });

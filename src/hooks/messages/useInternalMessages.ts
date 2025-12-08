@@ -49,7 +49,7 @@ export function useInternalMessages() {
   });
 
   const markAsRead = useMutation({
-    mutationFn: (messageId: string) => MessageService.markAsRead(messageId),
+    mutationFn: (messageId: string) => MessageService.markAsRead(messageId, user!.id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["internal_messages"] });
     },

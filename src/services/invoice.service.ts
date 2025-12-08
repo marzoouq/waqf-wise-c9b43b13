@@ -1,6 +1,6 @@
 /**
  * Invoice Service - خدمة الفواتير
- * @version 2.7.0
+ * @version 2.8.24
  */
 
 import { supabase } from "@/integrations/supabase/client";
@@ -8,8 +8,19 @@ import type { Database } from "@/integrations/supabase/types";
 
 type Invoice = Database['public']['Tables']['invoices']['Row'];
 type InvoiceInsert = Database['public']['Tables']['invoices']['Insert'];
-
 type InvoiceLine = Database['public']['Tables']['invoice_lines']['Insert'];
+
+export interface InvoiceSummary {
+  id: string;
+  invoice_number: string;
+  invoice_date: string;
+  customer_name: string;
+  total_amount: number;
+  status: string;
+  zatca_status: string | null;
+  is_zatca_compliant: boolean;
+  created_at: string;
+}
 
 export class InvoiceService {
   static async getAll(filters?: { status?: string }): Promise<Invoice[]> {
@@ -18,6 +29,19 @@ export class InvoiceService {
     const { data, error } = await query;
     if (error) throw error;
     return data || [];
+  }
+
+  /**
+   * جلب ملخص الفواتير للعرض
+   */
+  static async getInvoiceSummaries(): Promise<InvoiceSummary[]> {
+    const { data, error } = await supabase
+      .from('invoices')
+      .select('id, invoice_number, invoice_date, customer_name, total_amount, status, zatca_status, is_zatca_compliant, created_at')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data as InvoiceSummary[];
   }
 
   static async getById(id: string): Promise<Invoice | null> {

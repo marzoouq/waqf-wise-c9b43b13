@@ -4,32 +4,14 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { InvoiceService, InvoiceSummary } from '@/services/invoice.service';
 
-export interface Invoice {
-  id: string;
-  invoice_number: string;
-  invoice_date: string;
-  customer_name: string;
-  total_amount: number;
-  status: string;
-  zatca_status: string | null;
-  is_zatca_compliant: boolean;
-  created_at: string;
-}
+export type { InvoiceSummary as Invoice };
 
 export function useInvoices() {
   const { data: invoices, isLoading, error, refetch } = useQuery({
     queryKey: ['invoices'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('invoices')
-        .select('id, invoice_number, invoice_date, customer_name, total_amount, status, zatca_status, is_zatca_compliant, created_at')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return data as Invoice[];
-    },
+    queryFn: () => InvoiceService.getInvoiceSummaries(),
   });
 
   // الإحصائيات
