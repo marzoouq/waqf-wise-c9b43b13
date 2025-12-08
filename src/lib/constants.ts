@@ -26,6 +26,34 @@ export const BENEFICIARY_STATUS = {
   SUSPENDED: "معلق",
 } as const;
 
+export const PROPERTY_STATUS = {
+  ACTIVE: "نشط",
+  INACTIVE: "غير نشط",
+  VACANT: "شاغر",
+  RENTED: "مؤجر",
+} as const;
+
+export const CONTRACT_STATUS = {
+  ACTIVE: "نشط",
+  DRAFT: "مسودة",
+  PENDING: "معلق",
+  EXPIRED: "منتهي",
+  CANCELLED: "ملغي",
+} as const;
+
+export const LOAN_STATUS = {
+  ACTIVE: "نشط",
+  PAID: "مسدد",
+  DEFAULTED: "متعثر",
+} as const;
+
+export const REQUEST_STATUS = {
+  PENDING: "معلق",
+  APPROVED: "موافق عليه",
+  REJECTED: "مرفوض",
+  IN_PROGRESS: "قيد المعالجة",
+} as const;
+
 export const PAYMENT_STATUS = {
   PENDING: "معلق",
   COMPLETED: "مكتمل",

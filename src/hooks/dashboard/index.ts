@@ -11,7 +11,7 @@ export { useUnifiedKPIs, type UnifiedKPIsData } from './useUnifiedKPIs';
 export { useNazerSystemOverview, type SystemOverviewStats } from './useNazerSystemOverview';
 
 // ==================== Role-Specific Dashboard Hooks ====================
-export { useNazerKPIs, type NazerKPIData } from './useNazerKPIs';
+// Note: useNazerKPIs removed - use useUnifiedKPIs directly
 export { useCashierStats } from './useCashierStats';
 export { useRevenueProgress, type RevenueProgressData } from './useRevenueProgress';
 
