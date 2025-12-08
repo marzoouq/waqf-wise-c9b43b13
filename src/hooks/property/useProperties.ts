@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { PropertyService, RealtimeService } from "@/services";
 import { useToast } from "@/hooks/use-toast";
 import { useActivities } from "@/hooks/useActivities";
 import { useAuth } from "@/hooks/useAuth";
@@ -20,9 +20,10 @@ export interface Property {
   tax_percentage?: number;
   shop_count?: number;
   apartment_count?: number;
-  revenue_type?: 'شهري' | 'سنوي';
+  revenue_type?: string;
   created_at: string;
   updated_at: string;
+  [key: string]: any; // Allow additional properties
 }
 
 export function useProperties() {
@@ -33,52 +34,27 @@ export function useProperties() {
 
   const { data: properties = [], isLoading } = useQuery({
     queryKey: ["properties"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("properties")
-        .select("id, name, type, location, units, occupied, monthly_revenue, status, description, tax_percentage, shop_count, apartment_count, revenue_type, created_at, updated_at")
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return data as Property[];
-    },
-    staleTime: 10 * 60 * 1000, // 10 minutes
+    queryFn: () => PropertyService.getAll(),
+    staleTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
 
   // Real-time subscription
   useEffect(() => {
-    const channel = supabase
-      .channel('properties-changes')
-      .on('postgres_changes', 
-        { event: '*', schema: 'public', table: 'properties' }, 
-        () => {
-          queryClient.invalidateQueries({ queryKey: ['properties'] });
-        }
-      )
-      .subscribe();
+    const { unsubscribe } = RealtimeService.subscribeToTable('properties', () => {
+      queryClient.invalidateQueries({ queryKey: ['properties'] });
+    });
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => unsubscribe();
   }, [queryClient]);
 
   const addProperty = useMutation({
     mutationFn: async (property: Omit<Property, "id" | "created_at" | "updated_at">) => {
-      const { data, error } = await supabase
-        .from("properties")
-        .insert([property])
-        .select()
-        .maybeSingle();
-
-      if (error) throw error;
-      if (!data) throw new Error("فشل في إضافة العقار");
-      return data;
+      return PropertyService.create(property);
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["properties"] });
       
-      // إضافة نشاط
       addActivity({
         action: `تم إضافة عقار جديد: ${data.name}`,
         user_name: user?.email || 'النظام',
@@ -99,16 +75,7 @@ export function useProperties() {
 
   const updateProperty = useMutation({
     mutationFn: async ({ id, ...updates }: Partial<Property> & { id: string }) => {
-      const { data, error } = await supabase
-        .from("properties")
-        .update(updates)
-        .eq("id", id)
-        .select()
-        .maybeSingle();
-
-      if (error) throw error;
-      if (!data) throw new Error("فشل في تحديث العقار");
-      return data;
+      return PropertyService.update(id, updates);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["properties"] });
@@ -125,12 +92,7 @@ export function useProperties() {
 
   const deleteProperty = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from("properties")
-        .delete()
-        .eq("id", id);
-
-      if (error) throw error;
+      return PropertyService.delete(id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["properties"] });
