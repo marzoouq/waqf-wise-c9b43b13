@@ -1,5 +1,3 @@
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Download, AlertTriangle } from 'lucide-react';
@@ -9,109 +7,11 @@ import { Badge } from '@/components/ui/badge';
 import { exportToExcel, exportToPDF } from '@/lib/exportHelpers';
 import { useToast } from '@/hooks/use-toast';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-
-interface LoanAgingData {
-  loan_id: string;
-  loan_number: string;
-  beneficiary_name: string;
-  principal_amount: number;
-  total_paid: number;
-  remaining_balance: number;
-  days_overdue: number;
-  aging_category: string;
-}
+import { useLoansAgingReport } from '@/hooks/reports/useLoansAgingReport';
 
 export function LoansAgingReport() {
   const { toast } = useToast();
-
-  // بيانات أعمار الديون
-  const { data: agingData, isLoading } = useQuery<LoanAgingData[]>({
-    queryKey: ['loans-aging'],
-    queryFn: async () => {
-      const { data: loans, error } = await supabase
-        .from('loans')
-        .select(`
-          id,
-          loan_number,
-          loan_amount,
-          start_date,
-          status,
-          beneficiaries!inner(full_name)
-        `)
-        .in('status', ['active', 'defaulted']);
-      
-      if (error) throw error;
-
-      // حساب أيام التأخير
-      const agingData = await Promise.all(
-        loans.map(async (loan) => {
-          // جلب الأقساط المتأخرة والمدفوعات
-          const [overdueResult, paymentsResult] = await Promise.all([
-            supabase
-              .from('loan_installments')
-              .select('due_date')
-              .eq('loan_id', loan.id)
-              .eq('status', 'overdue')
-              .order('due_date', { ascending: true })
-              .limit(1),
-            supabase
-              .from('loan_installments')
-              .select('principal_amount, paid_amount')
-              .eq('loan_id', loan.id)
-          ]);
-
-          const oldestOverdue = overdueResult.data?.[0];
-          const daysOverdue = oldestOverdue 
-            ? Math.floor((new Date().getTime() - new Date(oldestOverdue.due_date).getTime()) / (1000 * 60 * 60 * 24))
-            : 0;
-
-          // حساب المبالغ
-          const installments = paymentsResult.data || [];
-          const totalPaid = installments.reduce((sum, inst) => sum + Number(inst.paid_amount || 0), 0);
-          const remainingBalance = Number(loan.loan_amount) - totalPaid;
-
-          // تصنيف العمر
-          let agingCategory = 'حديث (0-30 يوم)';
-          if (daysOverdue > 90) agingCategory = 'خطير (90+ يوم)';
-          else if (daysOverdue > 60) agingCategory = 'متأخر جداً (60-90 يوم)';
-          else if (daysOverdue > 30) agingCategory = 'متأخر (30-60 يوم)';
-
-          return {
-            loan_id: loan.id,
-            loan_number: loan.loan_number,
-            beneficiary_name: loan.beneficiaries?.full_name || 'غير محدد',
-            principal_amount: Number(loan.loan_amount),
-            total_paid: totalPaid,
-            remaining_balance: remainingBalance,
-            days_overdue: daysOverdue,
-            aging_category: agingCategory
-          };
-        })
-      );
-
-      return agingData.sort((a, b) => b.days_overdue - a.days_overdue);
-    },
-  });
-
-  // تجميع البيانات حسب الفئة
-  const { data: agingByCategory } = useQuery({
-    queryKey: ['loans-aging-categories', agingData],
-    queryFn: async () => {
-      if (!agingData) return [];
-
-      const categories = agingData.reduce((acc, loan) => {
-        if (!acc[loan.aging_category]) {
-          acc[loan.aging_category] = { category: loan.aging_category, count: 0, amount: 0 };
-        }
-        acc[loan.aging_category].count += 1;
-        acc[loan.aging_category].amount += loan.remaining_balance;
-        return acc;
-      }, {} as Record<string, { category: string; count: number; amount: number }>);
-
-      return Object.values(categories);
-    },
-    enabled: !!agingData,
-  });
+  const { agingData, agingByCategory, isLoading } = useLoansAgingReport();
 
   const handleExportPDF = () => {
     if (!agingData) return;

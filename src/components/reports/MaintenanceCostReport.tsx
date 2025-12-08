@@ -1,5 +1,3 @@
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Download, Wrench } from 'lucide-react';
@@ -9,102 +7,13 @@ import { Badge } from '@/components/ui/badge';
 import { exportToExcel, exportToPDF } from '@/lib/exportHelpers';
 import { useToast } from '@/hooks/use-toast';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { useMaintenanceCostReport } from '@/hooks/reports/useMaintenanceCostReport';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
-interface MaintenanceCostData {
-  property_id: string;
-  property_name: string;
-  total_cost: number;
-  completed_count: number;
-  pending_count: number;
-  avg_cost: number;
-}
-
 export function MaintenanceCostReport() {
   const { toast } = useToast();
-
-  // تحليل تكاليف الصيانة
-  const { data: maintenanceData, isLoading } = useQuery<MaintenanceCostData[]>({
-    queryKey: ['maintenance-cost-analysis'],
-    queryFn: async () => {
-      const { data: requests, error } = await supabase
-        .from('maintenance_requests')
-        .select(`
-          id,
-          estimated_cost,
-          actual_cost,
-          status,
-          properties!inner(id, name)
-        `);
-      
-      if (error) throw error;
-
-      // تجميع البيانات حسب العقار
-      const propertyData = requests.reduce((acc, req) => {
-        const propertyId = req.properties.id;
-        const propertyName = req.properties.name;
-        
-        if (!acc[propertyId]) {
-          acc[propertyId] = {
-            property_id: propertyId,
-            property_name: propertyName,
-            total_cost: 0,
-            completed_count: 0,
-            pending_count: 0,
-            avg_cost: 0
-          };
-        }
-
-        const cost = Number(req.actual_cost || req.estimated_cost || 0);
-        acc[propertyId].total_cost += cost;
-        if (req.status === 'مكتمل') {
-          acc[propertyId].completed_count += 1;
-        } else if (req.status === 'معلق') {
-          acc[propertyId].pending_count += 1;
-        }
-
-        return acc;
-      }, {} as Record<string, MaintenanceCostData>);
-
-      // حساب المتوسط
-      const result = Object.values(propertyData).map(item => ({
-        ...item,
-        avg_cost: item.completed_count > 0 ? item.total_cost / item.completed_count : 0
-      }));
-
-      return result.sort((a, b) => b.total_cost - a.total_cost);
-    },
-  });
-
-  // تحليل حسب نوع الصيانة
-  const { data: typeAnalysis } = useQuery({
-    queryKey: ['maintenance-type-analysis'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('maintenance_requests')
-        .select('category, estimated_cost, actual_cost, status');
-      
-      if (error) throw error;
-
-      const typeData = data.reduce((acc, req) => {
-        const category = req.category || 'غير محدد';
-        if (!acc[category]) {
-          acc[category] = { type: category, totalCost: 0, count: 0 };
-        }
-        const cost = Number(req.actual_cost || req.estimated_cost || 0);
-        acc[category].totalCost += cost;
-        acc[category].count += 1;
-        return acc;
-      }, {} as Record<string, { type: string; totalCost: number; count: number }>);
-
-      return Object.values(typeData).map((item) => ({
-        name: item.type,
-        value: item.totalCost,
-        count: item.count
-      }));
-    },
-  });
+  const { maintenanceData, typeAnalysis, totals, isLoading } = useMaintenanceCostReport();
 
   const handleExportPDF = () => {
     if (!maintenanceData) return;
@@ -149,10 +58,6 @@ export function MaintenanceCostReport() {
     return <LoadingState message="جاري تحليل تكاليف الصيانة..." />;
   }
 
-  const totalCost = maintenanceData?.reduce((sum, m) => sum + m.total_cost, 0) || 0;
-  const totalCompleted = maintenanceData?.reduce((sum, m) => sum + m.completed_count, 0) || 0;
-  const totalPending = maintenanceData?.reduce((sum, m) => sum + m.pending_count, 0) || 0;
-
   return (
     <div className="space-y-6">
       {/* إحصائيات إجمالية */}
@@ -162,7 +67,7 @@ export function MaintenanceCostReport() {
             <CardTitle className="text-sm font-medium">التكلفة الإجمالية</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalCost.toLocaleString('ar-SA')} ريال</div>
+            <div className="text-2xl font-bold">{totals.totalCost.toLocaleString('ar-SA')} ريال</div>
           </CardContent>
         </Card>
 
@@ -171,7 +76,7 @@ export function MaintenanceCostReport() {
             <CardTitle className="text-sm font-medium">العمليات المكتملة</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-success">{totalCompleted}</div>
+            <div className="text-2xl font-bold text-success">{totals.totalCompleted}</div>
           </CardContent>
         </Card>
 
@@ -180,7 +85,7 @@ export function MaintenanceCostReport() {
             <CardTitle className="text-sm font-medium">العمليات المعلقة</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-warning">{totalPending}</div>
+            <div className="text-2xl font-bold text-warning">{totals.totalPending}</div>
           </CardContent>
         </Card>
       </div>
@@ -215,7 +120,7 @@ export function MaintenanceCostReport() {
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
-                  data={typeAnalysis}
+                  data={typeAnalysis as unknown as { name: string; value: number }[]}
                   dataKey="value"
                   nameKey="name"
                   cx="50%"
@@ -242,6 +147,16 @@ export function MaintenanceCostReport() {
             <Wrench className="h-5 w-5" />
             تفاصيل تكاليف الصيانة حسب العقار
           </CardTitle>
+          <div className="flex gap-2">
+            <Button onClick={handleExportPDF} variant="outline" size="sm">
+              <Download className="h-4 w-4 ml-2" />
+              PDF
+            </Button>
+            <Button onClick={handleExportExcel} variant="outline" size="sm">
+              <Download className="h-4 w-4 ml-2" />
+              Excel
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="rounded-lg border overflow-x-auto">
