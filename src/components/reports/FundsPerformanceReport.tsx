@@ -1,5 +1,3 @@
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Download, PieChart as PieChartIcon } from 'lucide-react';
@@ -9,72 +7,13 @@ import { Progress } from '@/components/ui/progress';
 import { exportToExcel, exportToPDF } from '@/lib/exportHelpers';
 import { useToast } from '@/hooks/use-toast';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { useFundsPerformanceReport } from '@/hooks/reports/useFundsPerformanceReport';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
-interface FundPerformance {
-  fund_id: string;
-  fund_name: string;
-  category: string;
-  allocated_amount: number;
-  spent_amount: number;
-  beneficiaries_count: number;
-  utilization_rate: number;
-  avg_per_beneficiary: number;
-}
-
 export function FundsPerformanceReport() {
   const { toast } = useToast();
-
-  // تحليل أداء المصارف
-  const { data: fundPerformance, isLoading } = useQuery<FundPerformance[]>({
-    queryKey: ['funds-performance'],
-    queryFn: async () => {
-      const { data: funds, error } = await supabase
-        .from('funds')
-        .select('id, name, category, allocated_amount, spent_amount, beneficiaries_count')
-        .eq('is_active', true);
-      
-      if (error) throw error;
-
-      const performance = funds.map(fund => ({
-        fund_id: fund.id,
-        fund_name: fund.name,
-        category: fund.category,
-        allocated_amount: Number(fund.allocated_amount),
-        spent_amount: Number(fund.spent_amount),
-        beneficiaries_count: fund.beneficiaries_count,
-        utilization_rate: Number(fund.allocated_amount) > 0 
-          ? (Number(fund.spent_amount) / Number(fund.allocated_amount)) * 100 
-          : 0,
-        avg_per_beneficiary: fund.beneficiaries_count > 0 
-          ? Number(fund.spent_amount) / fund.beneficiaries_count 
-          : 0
-      }));
-
-      return performance.sort((a, b) => b.spent_amount - a.spent_amount);
-    },
-  });
-
-  // توزيع المصارف حسب الفئة
-  const { data: categoryDistribution } = useQuery({
-    queryKey: ['funds-category-distribution', fundPerformance],
-    queryFn: async () => {
-      if (!fundPerformance) return [];
-
-      const categories = fundPerformance.reduce((acc, fund) => {
-        if (!acc[fund.category]) {
-          acc[fund.category] = { name: fund.category, value: 0, count: 0 };
-        }
-        acc[fund.category].value += fund.spent_amount;
-        acc[fund.category].count += 1;
-        return acc;
-      }, {} as Record<string, { name: string; value: number; count: number }>);
-
-      return Object.values(categories);
-    },
-    enabled: !!fundPerformance,
-  });
+  const { fundPerformance, categoryDistribution, totals, isLoading } = useFundsPerformanceReport();
 
   const handleExportPDF = () => {
     if (!fundPerformance) return;
@@ -123,10 +62,6 @@ export function FundsPerformanceReport() {
     return <LoadingState message="جاري تحليل أداء المصارف..." />;
   }
 
-  const totalAllocated = fundPerformance?.reduce((sum, f) => sum + f.allocated_amount, 0) || 0;
-  const totalSpent = fundPerformance?.reduce((sum, f) => sum + f.spent_amount, 0) || 0;
-  const overallUtilization = totalAllocated > 0 ? (totalSpent / totalAllocated) * 100 : 0;
-
   return (
     <div className="space-y-6">
       {/* ملخص الأداء */}
@@ -136,7 +71,7 @@ export function FundsPerformanceReport() {
             <CardTitle className="text-sm font-medium">إجمالي المخصصات</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalAllocated.toLocaleString('ar-SA')} ريال</div>
+            <div className="text-2xl font-bold">{totals.totalAllocated.toLocaleString('ar-SA')} ريال</div>
           </CardContent>
         </Card>
 
@@ -145,7 +80,7 @@ export function FundsPerformanceReport() {
             <CardTitle className="text-sm font-medium">إجمالي المنفق</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-success">{totalSpent.toLocaleString('ar-SA')} ريال</div>
+            <div className="text-2xl font-bold text-success">{totals.totalSpent.toLocaleString('ar-SA')} ريال</div>
           </CardContent>
         </Card>
 
@@ -155,7 +90,7 @@ export function FundsPerformanceReport() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-info">
-              {(totalAllocated - totalSpent).toLocaleString('ar-SA')} ريال
+              {(totals.totalAllocated - totals.totalSpent).toLocaleString('ar-SA')} ريال
             </div>
           </CardContent>
         </Card>
@@ -165,8 +100,8 @@ export function FundsPerformanceReport() {
             <CardTitle className="text-sm font-medium">نسبة الاستخدام</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{overallUtilization.toFixed(1)}%</div>
-            <Progress value={overallUtilization} className="mt-2" />
+            <div className="text-2xl font-bold">{totals.overallUtilization.toFixed(1)}%</div>
+            <Progress value={totals.overallUtilization} className="mt-2" />
           </CardContent>
         </Card>
       </div>
@@ -202,7 +137,7 @@ export function FundsPerformanceReport() {
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
-                  data={categoryDistribution}
+                  data={categoryDistribution as unknown as { name: string; value: number }[]}
                   dataKey="value"
                   nameKey="name"
                   cx="50%"

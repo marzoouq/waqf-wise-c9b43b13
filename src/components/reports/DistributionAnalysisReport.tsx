@@ -1,5 +1,3 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Download, TrendingUp } from 'lucide-react';
@@ -8,100 +6,19 @@ import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, L
 import { exportToExcel, exportToPDF } from '@/lib/exportHelpers';
 import { useToast } from '@/hooks/use-toast';
 import { ReportRefreshIndicator } from './ReportRefreshIndicator';
-import { QUERY_CONFIG } from '@/lib/queryOptimization';
-import { useState, useEffect } from 'react';
+import { useDistributionAnalysisReport } from '@/hooks/reports/useDistributionAnalysisReport';
 
 export function DistributionAnalysisReport() {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [lastUpdated, setLastUpdated] = useState<Date>();
-
-  // تحليل التوزيعات
-  const { data: distributionTrends, isLoading, isRefetching, dataUpdatedAt } = useQuery({
-    queryKey: ['distribution-analysis'],
-    ...QUERY_CONFIG.REPORTS,
-    queryFn: async () => {
-      const { data: distributions, error } = await supabase
-        .from('distributions')
-        .select('id, distribution_date, total_amount, beneficiaries_count, status')
-        .order('distribution_date', { ascending: true });
-      
-      if (error) throw error;
-
-      // تجميع البيانات حسب الشهر
-      const monthlyData = distributions.reduce((acc, dist) => {
-        const month = new Date(dist.distribution_date).toLocaleDateString('ar-SA', { month: 'short', year: 'numeric' });
-        if (!acc[month]) {
-          acc[month] = { 
-            month, 
-            totalAmount: 0, 
-            beneficiariesCount: 0,
-            distributionsCount: 0,
-            avgPerBeneficiary: 0
-          };
-        }
-        acc[month].totalAmount += Number(dist.total_amount);
-        acc[month].beneficiariesCount += dist.beneficiaries_count;
-        acc[month].distributionsCount += 1;
-        return acc;
-      }, {} as Record<string, { month: string; totalAmount: number; beneficiariesCount: number; distributionsCount: number; avgPerBeneficiary: number }>);
-
-      // حساب المتوسط لكل مستفيد
-      const result = Object.values(monthlyData).map((item) => ({
-        ...item,
-        avgPerBeneficiary: item.totalAmount / item.beneficiariesCount
-      }));
-
-      return result;
-    },
-  });
-
-  // تحديث وقت آخر تحديث
-  useEffect(() => {
-    if (dataUpdatedAt) {
-      setLastUpdated(new Date(dataUpdatedAt));
-    }
-  }, [dataUpdatedAt]);
-
-  // Real-time subscription
-  useEffect(() => {
-    const channel = supabase
-      .channel('distribution-report-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'distributions' }, () => {
-        queryClient.invalidateQueries({ queryKey: ['distribution-analysis'] });
-        queryClient.invalidateQueries({ queryKey: ['distribution-status-stats'] });
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
-
-  const handleRefresh = () => {
-    queryClient.invalidateQueries({ queryKey: ['distribution-analysis'] });
-    queryClient.invalidateQueries({ queryKey: ['distribution-status-stats'] });
-  };
-
-  // إحصائيات التوزيعات حسب الحالة
-  const { data: statusStats } = useQuery({
-    queryKey: ['distribution-status-stats'],
-    ...QUERY_CONFIG.REPORTS,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('distributions')
-        .select('status');
-      
-      if (error) throw error;
-
-      const statusCount = data.reduce((acc, curr) => {
-        acc[curr.status] = (acc[curr.status] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
-
-      return Object.entries(statusCount).map(([name, value]) => ({ name, value }));
-    },
-  });
+  const { 
+    distributionTrends, 
+    statusStats, 
+    totals, 
+    isLoading, 
+    isRefetching, 
+    lastUpdated, 
+    handleRefresh 
+  } = useDistributionAnalysisReport();
 
   const handleExportPDF = () => {
     if (!distributionTrends) return;
@@ -155,7 +72,7 @@ export function DistributionAnalysisReport() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {distributionTrends?.reduce((sum, d) => sum + d.totalAmount, 0).toLocaleString('ar-SA')} ريال
+              {totals.totalAmount.toLocaleString('ar-SA')} ريال
             </div>
           </CardContent>
         </Card>
@@ -166,7 +83,7 @@ export function DistributionAnalysisReport() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {distributionTrends?.reduce((sum, d) => sum + d.beneficiariesCount, 0).toLocaleString('ar-SA')}
+              {totals.totalBeneficiaries.toLocaleString('ar-SA')}
             </div>
           </CardContent>
         </Card>
@@ -177,7 +94,7 @@ export function DistributionAnalysisReport() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {distributionTrends?.length || 0}
+              {totals.totalMonths}
             </div>
           </CardContent>
         </Card>
@@ -188,9 +105,7 @@ export function DistributionAnalysisReport() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {distributionTrends && distributionTrends.length > 0
-                ? (distributionTrends.reduce((sum, d) => sum + d.totalAmount, 0) / distributionTrends.length).toLocaleString('ar-SA')
-                : '0'} ريال
+              {totals.monthlyAverage.toLocaleString('ar-SA')} ريال
             </div>
           </CardContent>
         </Card>

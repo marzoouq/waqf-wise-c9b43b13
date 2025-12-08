@@ -1,27 +1,12 @@
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { Building, Calendar, FileText, CreditCard } from 'lucide-react';
+import { useTenantContracts } from '@/hooks/tenants/useTenantContracts';
 
 interface TenantContractsProps {
   tenantId: string;
-}
-
-interface Contract {
-  id: string;
-  contract_number: string;
-  property_id: string;
-  start_date: string;
-  end_date: string;
-  monthly_rent: number;
-  status: string;
-  payment_frequency: string;
-  properties: {
-    name: string;
-  };
 }
 
 const statusLabels: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
@@ -33,30 +18,7 @@ const statusLabels: Record<string, { label: string; variant: 'default' | 'second
 };
 
 export function TenantContracts({ tenantId }: TenantContractsProps) {
-  const { data: contracts = [], isLoading } = useQuery({
-    queryKey: ['tenant-contracts', tenantId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('contracts')
-        .select(`
-          id,
-          contract_number,
-          property_id,
-          start_date,
-          end_date,
-          monthly_rent,
-          status,
-          payment_frequency,
-          properties!inner (name)
-        `)
-        .eq('tenant_id', tenantId)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return data as unknown as Contract[];
-    },
-    enabled: !!tenantId,
-  });
+  const { contracts, isLoading } = useTenantContracts(tenantId);
 
   if (isLoading) {
     return (

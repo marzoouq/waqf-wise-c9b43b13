@@ -1,106 +1,12 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Clock, AlertTriangle } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
-
-interface BeneficiaryAgingData {
-  id: string;
-  full_name: string;
-  account_balance: number | null;
-  total_received: number | null;
-}
-
-interface AgingRecord {
-  id: string;
-  beneficiary_name: string;
-  amount_due: number;
-  days_overdue: number;
-  ageCategory: string;
-}
-
-interface AgingSummary {
-  current: number;
-  '1-30': number;
-  '30-60': number;
-  '60-90': number;
-  '90+': number;
-  total: number;
-}
+import { useAgingReport } from '@/hooks/reports/useAgingReport';
 
 export function AgingReport() {
-  const { data: agingData, isLoading } = useQuery({
-    queryKey: ['aging_report'],
-    queryFn: async () => {
-      // جلب البيانات المالية للمستفيدين
-      const { data: beneficiaries, error } = await supabase
-        .from('beneficiaries')
-        .select('id, full_name, account_balance, total_received')
-        .gt('account_balance', 0)
-        .order('account_balance', { ascending: false });
-
-      if (error) throw error;
-
-      const today = new Date();
-      const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
-      const twoMonthsAgo = new Date(today.getTime() - 60 * 24 * 60 * 60 * 1000);
-      const threeMonthsAgo = new Date(today.getTime() - 90 * 24 * 60 * 60 * 1000);
-      
-interface AgingItem {
-  id: string;
-  beneficiary_name: string;
-  amount_due: number;
-  due_date: string;
-  daysPastDue: number;
-  ageCategory: string;
-}
-
-      return ((beneficiaries || []) as BeneficiaryAgingData[]).map((ben): AgingItem => {
-        // محاكاة بيانات العمر بناءً على الرصيد
-        const balance = ben.account_balance || 0;
-        let ageCategory = 'current';
-        let daysPastDue = 0;
-
-        // تصنيف تقريبي بناءً على الرصيد
-        if (balance > 50000) {
-          ageCategory = '90+';
-          daysPastDue = 120;
-        } else if (balance > 30000) {
-          ageCategory = '60-90';
-          daysPastDue = 75;
-        } else if (balance > 15000) {
-          ageCategory = '30-60';
-          daysPastDue = 45;
-        } else if (balance > 5000) {
-          ageCategory = '1-30';
-          daysPastDue = 15;
-        }
-
-        return {
-          id: ben.id,
-          beneficiary_name: ben.full_name,
-          amount_due: balance,
-          due_date: new Date().toISOString(),
-          daysPastDue,
-          ageCategory,
-        };
-      });
-    },
-  });
-
-  const summary = agingData?.reduce<AgingSummary>(
-    (acc, loan) => {
-      const category = loan.ageCategory as keyof AgingSummary;
-      if (category !== 'total') {
-        acc[category] = (acc[category] || 0) + loan.amount_due;
-      }
-      acc.total += loan.amount_due;
-      return acc;
-    },
-    { current: 0, '1-30': 0, '30-60': 0, '60-90': 0, '90+': 0, total: 0 }
-  );
+  const { agingData, summary, isLoading } = useAgingReport();
 
   const getAgeCategoryBadge = (category: string, days: number) => {
     if (category === 'current') {

@@ -1,90 +1,28 @@
-import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { FileText, Printer, FileDown, Calendar } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
+import { useDetailedGeneralLedger } from '@/hooks/reports/useDetailedGeneralLedger';
 
 export function DetailedGeneralLedger() {
-  const [selectedAccount, setSelectedAccount] = useState<string>('');
-  const [startDate, setStartDate] = useState<string>('');
-  const [endDate, setEndDate] = useState<string>('');
-
-  const { data: accounts } = useQuery({
-    queryKey: ['accounts_list'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('accounts')
-        .select('id, code, name_ar')
-        .eq('is_active', true)
-        .order('code');
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const { data: ledgerEntries, isLoading } = useQuery({
-    queryKey: ['general_ledger', selectedAccount, startDate, endDate],
-    queryFn: async () => {
-      if (!selectedAccount) return [];
-
-      let query = supabase
-        .from('journal_entry_lines')
-        .select(`
-          *,
-          journal_entries!inner(
-            entry_number,
-            entry_date,
-            description,
-            status
-          )
-        `)
-        .eq('account_id', selectedAccount)
-        .eq('journal_entries.status', 'posted')
-        .order('journal_entries(entry_date)', { ascending: true });
-
-      if (startDate) {
-        query = query.gte('journal_entries.entry_date', startDate);
-      }
-      if (endDate) {
-        query = query.lte('journal_entries.entry_date', endDate);
-      }
-
-      const { data, error } = await query;
-      if (error) throw error;
-
-      // حساب الرصيد الجاري
-      let runningBalance = 0;
-      interface LedgerEntry {
-        id: string;
-        debit_amount: number;
-        credit_amount: number;
-        description?: string;
-        journal_entries: {
-          entry_number: string;
-          entry_date: string;
-          description: string;
-          status: string;
-        };
-      }
-      return (data || []).map((entry: LedgerEntry) => {
-        runningBalance += entry.debit_amount - entry.credit_amount;
-        return {
-          ...entry,
-          running_balance: runningBalance,
-        };
-      });
-    },
-    enabled: !!selectedAccount,
-  });
-
-  const totalDebit = ledgerEntries?.reduce((sum, entry) => sum + entry.debit_amount, 0) || 0;
-  const totalCredit = ledgerEntries?.reduce((sum, entry) => sum + entry.credit_amount, 0) || 0;
+  const {
+    accounts,
+    ledgerEntries,
+    selectedAccount,
+    setSelectedAccount,
+    startDate,
+    setStartDate,
+    endDate,
+    setEndDate,
+    totalDebit,
+    totalCredit,
+    finalBalance,
+    isLoading,
+  } = useDetailedGeneralLedger();
 
   return (
     <Card>
@@ -213,7 +151,7 @@ export function DetailedGeneralLedger() {
                           {formatCurrency(totalCredit)}
                         </TableCell>
                         <TableCell className="text-right">
-                          {formatCurrency(ledgerEntries[ledgerEntries.length - 1]?.running_balance || 0)}
+                          {formatCurrency(finalBalance)}
                         </TableCell>
                       </TableRow>
                     )}

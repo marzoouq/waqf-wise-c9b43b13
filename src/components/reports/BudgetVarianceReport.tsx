@@ -1,52 +1,22 @@
-import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { TrendingUp, TrendingDown, AlertTriangle } from 'lucide-react';
+import { TrendingUp, AlertTriangle } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { useBudgetVarianceReport } from '@/hooks/reports/useBudgetVarianceReport';
 
 export function BudgetVarianceReport() {
-  const [selectedFiscalYear, setSelectedFiscalYear] = useState<string>('');
-
-  const { data: fiscalYears } = useQuery({
-    queryKey: ['fiscal_years'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('fiscal_years')
-        .select('id, name, start_date, end_date')
-        .order('start_date', { ascending: false });
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const { data: budgets, isLoading } = useQuery({
-    queryKey: ['budgets_variance', selectedFiscalYear],
-    queryFn: async () => {
-      if (!selectedFiscalYear) return [];
-
-      const { data, error } = await supabase
-        .from('budgets')
-        .select('*, accounts(code, name_ar)')
-        .eq('fiscal_year_id', selectedFiscalYear)
-        .order('variance_amount', { ascending: true });
-
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!selectedFiscalYear,
-  });
-
-  const getVarianceStatus = (variance: number, budgeted: number) => {
-    const percentage = (variance / budgeted) * 100;
-    if (Math.abs(percentage) <= 5) return 'good';
-    if (Math.abs(percentage) <= 15) return 'warning';
-    return 'critical';
-  };
+  const { 
+    fiscalYears, 
+    budgets, 
+    summary, 
+    selectedFiscalYear, 
+    setSelectedFiscalYear, 
+    getVarianceStatus,
+    isLoading 
+  } = useBudgetVarianceReport();
 
   const getVarianceBadge = (variance: number) => {
     if (variance > 0) {
@@ -56,15 +26,6 @@ export function BudgetVarianceReport() {
     }
     return <Badge variant="secondary">متطابق</Badge>;
   };
-
-  const summary = budgets?.reduce(
-    (acc, budget) => ({
-      totalBudgeted: acc.totalBudgeted + budget.budgeted_amount,
-      totalActual: acc.totalActual + (budget.actual_amount || 0),
-      totalVariance: acc.totalVariance + (budget.variance_amount || 0),
-    }),
-    { totalBudgeted: 0, totalActual: 0, totalVariance: 0 }
-  );
 
   return (
     <div className="space-y-4">
