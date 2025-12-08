@@ -1,6 +1,6 @@
 /**
  * Accounting Hooks - خطافات المحاسبة
- * @version 2.6.33
+ * @version 2.8.0
  */
 
 // ==================== Dashboard Hooks ====================
@@ -22,3 +22,9 @@ export { useAccountingFilters } from './useAccountingFilters';
 export { useAccountingTabs } from './useAccountingTabs';
 export { useFinancialReportsData } from './useFinancialReportsData';
 export { useJournalEntryForm, type JournalLine } from './useJournalEntryForm';
+
+// ==================== Dialog Hooks ====================
+export { useAddAccount } from './useAddAccount';
+export { useAddJournalEntry, type EntryLine } from './useAddJournalEntry';
+export { useApprovalWorkflow, type ApprovalStatus, type ApprovalStep } from './useApprovalWorkflow';
+export { useApproveJournal } from './useApproveJournal';

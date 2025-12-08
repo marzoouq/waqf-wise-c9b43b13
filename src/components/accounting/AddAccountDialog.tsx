@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 import { z } from "zod";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
+import { useAddAccount } from "@/hooks/accounting";
 import {
   Form,
   FormControl,
@@ -25,7 +23,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-
 import { AccountRow } from "@/types/supabase-helpers";
 
 const accountSchema = z.object({
@@ -59,8 +56,10 @@ interface AddAccountDialogProps {
 }
 
 const AddAccountDialog = ({ open, onOpenChange, account, accounts }: AddAccountDialogProps) => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const queryClient = useQueryClient();
+  const { isSubmitting, mutate } = useAddAccount(() => {
+    onOpenChange(false);
+    form.reset();
+  });
 
   const form = useForm<FormData>({
     resolver: zodResolver(accountSchema),
@@ -95,68 +94,21 @@ const AddAccountDialog = ({ open, onOpenChange, account, accounts }: AddAccountD
     }
   }, [account, form, open]);
 
-  const mutation = useMutation({
-    mutationFn: async (data: FormData) => {
-      setIsSubmitting(true);
-      
-      // التحقق من عدم تكرار رمز الحساب
-      if (!account || (account && account.code !== data.code)) {
-        const { data: existingAccount } = await supabase
-          .from("accounts")
-          .select("id")
-          .eq("code", data.code)
-          .maybeSingle();
-
-        if (existingAccount) {
-          throw new Error("رمز الحساب موجود مسبقاً. يرجى اختيار رمز آخر.");
-        }
-      }
-
-      const accountData = {
+  const onSubmit = (data: FormData) => {
+    mutate({ 
+      data: {
         code: data.code,
         name_ar: data.name_ar,
-        name_en: data.name_en || null,
-        parent_id: data.parent_id || null,
+        name_en: data.name_en,
+        parent_id: data.parent_id,
         account_type: data.account_type,
         account_nature: data.account_nature,
-        description: data.description || null,
         is_active: data.is_active,
         is_header: data.is_header,
-      };
-
-      let result;
-      if (account) {
-        result = await supabase
-          .from("accounts")
-          .update(accountData)
-          .eq("id", account.id)
-          .select()
-          .single();
-      } else {
-        result = await supabase
-          .from("accounts")
-          .insert([accountData])
-          .select()
-          .single();
-      }
-
-      return result;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["accounts"] });
-      toast.success(account ? "تم تحديث الحساب بنجاح" : "تم إضافة الحساب بنجاح");
-      onOpenChange(false);
-      form.reset();
-      setIsSubmitting(false);
-    },
-    onError: (error: Error) => {
-      toast.error(error.message || "حدث خطأ أثناء حفظ الحساب");
-      setIsSubmitting(false);
-    },
-  });
-
-  const onSubmit = (data: FormData) => {
-    mutation.mutate(data);
+        description: data.description,
+      }, 
+      existingAccount: account 
+    });
   };
 
   return (
@@ -166,189 +118,189 @@ const AddAccountDialog = ({ open, onOpenChange, account, accounts }: AddAccountD
       title={account ? "تعديل حساب" : "إضافة حساب جديد"}
       size="lg"
     >
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="code"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>رمز الحساب <span className="text-destructive">*</span></FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="مثال: 1010" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="name_ar"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>الاسم العربي <span className="text-destructive">*</span></FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="اسم الحساب" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="name_en"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>الاسم الإنجليزي (اختياري)</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Account Name" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="parent_id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>الحساب الأب</FormLabel>
-                    <Select 
-                      onValueChange={(value) => field.onChange(value === "none" ? undefined : value)} 
-                      value={field.value || "none"}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="لا يوجد (حساب رئيسي)" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="none">لا يوجد (حساب رئيسي)</SelectItem>
-                        {accounts
-                          ?.filter(
-                            (acc) => acc.is_header && (!account || acc.id !== account.id)
-                          )
-                          .map((acc) => (
-                            <SelectItem key={acc.id} value={acc.id}>
-                              {acc.code} - {acc.name_ar}
-                            </SelectItem>
-                          ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="account_type"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>نوع الحساب <span className="text-destructive">*</span></FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="asset">أصول</SelectItem>
-                        <SelectItem value="liability">خصوم</SelectItem>
-                        <SelectItem value="equity">حقوق ملكية</SelectItem>
-                        <SelectItem value="revenue">إيرادات</SelectItem>
-                        <SelectItem value="expense">مصروفات</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="account_nature"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>طبيعة الحساب <span className="text-destructive">*</span></FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="debit">مدين</SelectItem>
-                        <SelectItem value="credit">دائن</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FormField
               control={form.control}
-              name="description"
+              name="code"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>الوصف (اختياري)</FormLabel>
+                  <FormLabel>رمز الحساب <span className="text-destructive">*</span></FormLabel>
                   <FormControl>
-                    <Textarea {...field} rows={3} />
+                    <Input {...field} placeholder="مثال: 1010" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="name_ar"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>الاسم العربي <span className="text-destructive">*</span></FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="اسم الحساب" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
-            <div className="flex flex-col sm:flex-row gap-4">
-              <FormField
-                control={form.control}
-                name="is_active"
-                render={({ field }) => (
-                  <FormItem className="flex items-center space-x-2 space-x-reverse">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="name_en"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>الاسم الإنجليزي (اختياري)</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Account Name" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="parent_id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>الحساب الأب</FormLabel>
+                  <Select 
+                    onValueChange={(value) => field.onChange(value === "none" ? undefined : value)} 
+                    value={field.value || "none"}
+                  >
                     <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
+                      <SelectTrigger>
+                        <SelectValue placeholder="لا يوجد (حساب رئيسي)" />
+                      </SelectTrigger>
                     </FormControl>
-                    <FormLabel className="!mt-0">حساب نشط</FormLabel>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="is_header"
-                render={({ field }) => (
-                  <FormItem className="flex items-center space-x-2 space-x-reverse">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                    <FormLabel className="!mt-0">حساب رئيسي (يحتوي على حسابات فرعية)</FormLabel>
-                  </FormItem>
-                )}
-              />
-            </div>
+                    <SelectContent>
+                      <SelectItem value="none">لا يوجد (حساب رئيسي)</SelectItem>
+                      {accounts
+                        ?.filter(
+                          (acc) => acc.is_header && (!account || acc.id !== account.id)
+                        )
+                        .map((acc) => (
+                          <SelectItem key={acc.id} value={acc.id}>
+                            {acc.code} - {acc.name_ar}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
-            <div className="flex justify-end gap-2 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-              >
-                إلغاء
-              </Button>
-              <Button type="submit" disabled={isSubmitting}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="account_type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>نوع الحساب <span className="text-destructive">*</span></FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="asset">أصول</SelectItem>
+                      <SelectItem value="liability">خصوم</SelectItem>
+                      <SelectItem value="equity">حقوق ملكية</SelectItem>
+                      <SelectItem value="revenue">إيرادات</SelectItem>
+                      <SelectItem value="expense">مصروفات</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="account_nature"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>طبيعة الحساب <span className="text-destructive">*</span></FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="debit">مدين</SelectItem>
+                      <SelectItem value="credit">دائن</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>الوصف (اختياري)</FormLabel>
+                <FormControl>
+                  <Textarea {...field} rows={3} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="flex flex-col sm:flex-row gap-4">
+            <FormField
+              control={form.control}
+              name="is_active"
+              render={({ field }) => (
+                <FormItem className="flex items-center space-x-2 space-x-reverse">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <FormLabel className="!mt-0">حساب نشط</FormLabel>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="is_header"
+              render={({ field }) => (
+                <FormItem className="flex items-center space-x-2 space-x-reverse">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <FormLabel className="!mt-0">حساب رئيسي (يحتوي على حسابات فرعية)</FormLabel>
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="flex justify-end gap-2 pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
+              إلغاء
+            </Button>
+            <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? "جاري الحفظ..." : account ? "حفظ التعديلات" : "إضافة"}
             </Button>
           </div>

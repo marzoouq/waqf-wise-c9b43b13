@@ -3,11 +3,9 @@ import { ResponsiveDialog, DialogFooter } from "@/components/shared/ResponsiveDi
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { useQueryClient } from "@tanstack/react-query";
 import { CheckCircle, XCircle } from "lucide-react";
 import { JournalApproval } from "@/types/approvals";
+import { useApproveJournal } from "@/hooks/accounting";
 
 interface ApproveJournalDialogProps {
   open: boolean;
@@ -16,120 +14,12 @@ interface ApproveJournalDialogProps {
 }
 
 export function ApproveJournalDialog({ open, onOpenChange, approval }: ApproveJournalDialogProps) {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
   const [notes, setNotes] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleApprove = async () => {
-    try {
-      setIsSubmitting(true);
-
-      const { error } = await supabase
-        .from('approvals')
-        .update({
-          status: 'approved',
-          approved_at: new Date().toISOString(),
-          notes: notes || null,
-        })
-        .eq('id', approval.id);
-
-      if (error) throw error;
-
-      // تحديث حالة القيد إلى posted
-      const { error: jeError } = await supabase
-        .from('journal_entries')
-        .update({
-          status: 'posted',
-          posted_at: new Date().toISOString(),
-        })
-        .eq('id', approval.journal_entry_id);
-
-      if (jeError) throw jeError;
-
-      toast({
-        title: "تمت الموافقة",
-        description: "تم الموافقة على القيد بنجاح وترحيله",
-      });
-
-      queryClient.invalidateQueries({ queryKey: ['pending_approvals'] });
-      queryClient.invalidateQueries({ queryKey: ['recent_journal_entries'] });
-      queryClient.invalidateQueries({ queryKey: ['journal_entries'] });
-      queryClient.invalidateQueries({ queryKey: ['accountant-kpis'] });
-      queryClient.invalidateQueries({ queryKey: ['accounting-stats'] });
-      
-      onOpenChange(false);
-      setNotes("");
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "حدث خطأ أثناء الموافقة";
-      toast({
-        title: "خطأ",
-        description: errorMessage,
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleReject = async () => {
-    if (!notes.trim()) {
-      toast({
-        title: "خطأ",
-        description: "يجب إدخال سبب الرفض",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      setIsSubmitting(true);
-
-      const { error } = await supabase
-        .from('approvals')
-        .update({
-          status: 'rejected',
-          approved_at: new Date().toISOString(),
-          notes: notes,
-        })
-        .eq('id', approval.id);
-
-      if (error) throw error;
-
-      // تحديث حالة القيد إلى cancelled
-      const { error: jeError } = await supabase
-        .from('journal_entries')
-        .update({
-          status: 'cancelled',
-        })
-        .eq('id', approval.journal_entry_id);
-
-      if (jeError) throw jeError;
-
-      toast({
-        title: "تم الرفض",
-        description: "تم رفض القيد بنجاح",
-      });
-
-      queryClient.invalidateQueries({ queryKey: ['pending_approvals'] });
-      queryClient.invalidateQueries({ queryKey: ['recent_journal_entries'] });
-      queryClient.invalidateQueries({ queryKey: ['journal_entries'] });
-      queryClient.invalidateQueries({ queryKey: ['accountant-kpis'] });
-      queryClient.invalidateQueries({ queryKey: ['accounting-stats'] });
-      
-      onOpenChange(false);
-      setNotes("");
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "حدث خطأ أثناء الرفض";
-      toast({
-        title: "خطأ",
-        description: errorMessage,
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  
+  const { isSubmitting, handleApprove, handleReject } = useApproveJournal(() => {
+    onOpenChange(false);
+    setNotes("");
+  });
 
   if (!approval) return null;
 
@@ -178,14 +68,14 @@ export function ApproveJournalDialog({ open, onOpenChange, approval }: ApproveJo
           </Button>
           <Button
             variant="destructive"
-            onClick={handleReject}
+            onClick={() => handleReject(approval, notes)}
             disabled={isSubmitting}
           >
             <XCircle className="h-4 w-4 mr-2" />
             رفض
           </Button>
           <Button
-            onClick={handleApprove}
+            onClick={() => handleApprove(approval, notes)}
             disabled={isSubmitting}
           >
             <CheckCircle className="h-4 w-4 mr-2" />

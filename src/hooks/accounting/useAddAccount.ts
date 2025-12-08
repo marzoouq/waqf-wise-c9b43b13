@@ -1,0 +1,91 @@
+/**
+ * Hook for adding/editing accounts
+ */
+import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { AccountRow } from "@/types/supabase-helpers";
+
+interface AddAccountFormData {
+  code: string;
+  name_ar: string;
+  name_en?: string;
+  parent_id?: string;
+  account_type: 'asset' | 'liability' | 'equity' | 'revenue' | 'expense';
+  account_nature: 'debit' | 'credit';
+  is_active: boolean;
+  is_header: boolean;
+  description?: string;
+}
+
+export function useAddAccount(onSuccess?: () => void) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: async ({ data, existingAccount }: { data: AddAccountFormData; existingAccount?: AccountRow | null }) => {
+      setIsSubmitting(true);
+      
+      // Check for duplicate code
+      if (!existingAccount || (existingAccount && existingAccount.code !== data.code)) {
+        const { data: existingAccountCheck } = await supabase
+          .from("accounts")
+          .select("id")
+          .eq("code", data.code)
+          .maybeSingle();
+
+        if (existingAccountCheck) {
+          throw new Error("رمز الحساب موجود مسبقاً. يرجى اختيار رمز آخر.");
+        }
+      }
+
+      const accountData = {
+        code: data.code,
+        name_ar: data.name_ar,
+        name_en: data.name_en || null,
+        parent_id: data.parent_id || null,
+        account_type: data.account_type,
+        account_nature: data.account_nature,
+        description: data.description || null,
+        is_active: data.is_active,
+        is_header: data.is_header,
+      };
+
+      let result;
+      if (existingAccount) {
+        result = await supabase
+          .from("accounts")
+          .update(accountData)
+          .eq("id", existingAccount.id)
+          .select()
+          .single();
+      } else {
+        result = await supabase
+          .from("accounts")
+          .insert([accountData])
+          .select()
+          .single();
+      }
+
+      if (result.error) throw result.error;
+      return result.data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      toast.success(variables.existingAccount ? "تم تحديث الحساب بنجاح" : "تم إضافة الحساب بنجاح");
+      setIsSubmitting(false);
+      onSuccess?.();
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "حدث خطأ أثناء حفظ الحساب");
+      setIsSubmitting(false);
+    },
+  });
+
+  return {
+    isSubmitting,
+    mutate: mutation.mutate,
+    isLoading: mutation.isPending,
+  };
+}
