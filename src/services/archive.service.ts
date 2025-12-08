@@ -17,6 +17,7 @@ export interface ArchiveStats {
   totalFolders: number;
   totalSize: string;
   recentUploads: number;
+  thisMonthAdditions: number;
 }
 
 export class ArchiveService {
@@ -84,7 +85,10 @@ export class ArchiveService {
   /**
    * حذف مستند
    */
-  static async deleteDocument(id: string): Promise<void> {
+  static async deleteDocument(id: string, storagePath?: string | null): Promise<void> {
+    if (storagePath) {
+      await supabase.storage.from('archive-documents').remove([storagePath]);
+    }
     const { error } = await supabase
       .from('documents')
       .delete()
@@ -154,7 +158,7 @@ export class ArchiveService {
    */
   static async getStats(): Promise<ArchiveStats> {
     const [documentsRes, foldersRes] = await Promise.all([
-      supabase.from('documents').select('id, file_size, created_at'),
+      supabase.from('documents').select('id, file_size, file_size_bytes, created_at'),
       supabase.from('folders').select('id'),
     ]);
 
@@ -168,12 +172,74 @@ export class ArchiveService {
       new Date(d.created_at) > weekAgo
     ).length;
 
+    // Count this month additions
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+    startOfMonth.setHours(0, 0, 0, 0);
+    const thisMonthAdditions = documents.filter(d => 
+      new Date(d.created_at) >= startOfMonth
+    ).length;
+
+    // Calculate total size
+    const totalBytes = documents.reduce((s, d) => s + (d.file_size_bytes || 0), 0);
+    const formatBytes = (b: number) => b === 0 ? "0 B" : `${(b / Math.pow(1024, Math.floor(Math.log(b) / Math.log(1024)))).toFixed(1)} ${["B","KB","MB","GB"][Math.floor(Math.log(b) / Math.log(1024))]}`;
+
     return {
       totalDocuments: documents.length,
       totalFolders: folders.length,
-      totalSize: '0 MB',
+      totalSize: formatBytes(totalBytes),
       recentUploads,
+      thisMonthAdditions,
     };
+  }
+
+  /**
+   * رفع مستند جديد
+   */
+  static async uploadDocument(
+    file: File,
+    name: string,
+    category: string,
+    description?: string,
+    folder_id?: string
+  ): Promise<Document> {
+    const fileExt = file.name.split('.').pop()?.toLowerCase() || 'pdf';
+    const storagePath = `${category}/${Date.now()}_${name.replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, '_')}.${fileExt}`;
+
+    const { error: uploadError } = await supabase.storage.from('archive-documents').upload(storagePath, file);
+    if (uploadError) throw new Error(`فشل في رفع الملف: ${uploadError.message}`);
+
+    const { data: urlData } = supabase.storage.from('archive-documents').getPublicUrl(storagePath);
+    const formatSize = (b: number) => b < 1024 ? `${b} B` : b < 1048576 ? `${(b/1024).toFixed(1)} KB` : `${(b/1048576).toFixed(1)} MB`;
+
+    const { data, error } = await supabase.from('documents').insert({
+      name, 
+      category, 
+      description, 
+      file_type: fileExt.toUpperCase(), 
+      file_size: formatSize(file.size),
+      file_size_bytes: file.size, 
+      folder_id, 
+      storage_path: storagePath, 
+      file_path: urlData.publicUrl,
+    }).select().single();
+
+    if (error) { 
+      await supabase.storage.from('archive-documents').remove([storagePath]); 
+      throw error; 
+    }
+    return data;
+  }
+
+  /**
+   * حذف مستند مع الملف
+   */
+  static async deleteDocumentWithFile(id: string, storagePath?: string | null): Promise<void> {
+    if (storagePath) {
+      await supabase.storage.from('archive-documents').remove([storagePath]);
+    }
+    const { error } = await supabase.from('documents').delete().eq('id', id);
+    if (error) throw error;
   }
 
   /**

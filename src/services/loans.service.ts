@@ -175,4 +175,60 @@ export class LoansService {
       overdueInstallments,
     };
   }
+
+  /**
+   * جلب الفزعات الطارئة
+   */
+  static async getEmergencyAids() {
+    const { data, error } = await supabase
+      .from('emergency_aid')
+      .select(`*, beneficiaries (full_name, national_id, phone)`)
+      .order('requested_date', { ascending: false });
+    
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * إنشاء فزعة طارئة
+   */
+  static async createEmergencyAid(aid: {
+    beneficiary_id: string;
+    amount: number;
+    reason: string;
+    urgency_level?: 'low' | 'medium' | 'high' | 'critical';
+    aid_type?: string;
+    notes?: string;
+  }) {
+    const { data, error } = await supabase
+      .from('emergency_aid')
+      .insert([aid])
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  }
+
+  /**
+   * تحديث فزعة طارئة
+   */
+  static async updateEmergencyAid(id: string, updates: {
+    status?: string;
+    notes?: string;
+    approved_by?: string;
+    approved_date?: string;
+    disbursed_by?: string;
+    disbursed_date?: string;
+  }) {
+    const { data, error } = await supabase
+      .from('emergency_aid')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  }
 }

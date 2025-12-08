@@ -166,19 +166,36 @@ export class GovernanceService {
   /**
    * تسجيل صوت
    */
-  static async castVote(vote: {
-    decision_id: string;
-    voter_id: string;
-    voter_name: string;
-    voter_type: string;
-    beneficiary_id?: string;
-    vote: string;
-    vote_reason?: string;
-  }): Promise<GovernanceVoteRow> {
+  static async castVote(decisionId: string, voteValue: string, reason?: string): Promise<GovernanceVoteRow> {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('غير مصرح');
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('full_name')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      const { data: beneficiary } = await supabase
+        .from('beneficiaries')
+        .select('id, full_name, category')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      const voterType = beneficiary ? 'beneficiary' : 'board_member';
+
       const { data, error } = await supabase
         .from('governance_votes')
-        .insert([vote])
+        .insert([{
+          decision_id: decisionId,
+          voter_id: user.id,
+          voter_name: profile?.full_name || 'مستخدم',
+          voter_type: voterType,
+          beneficiary_id: beneficiary?.id,
+          vote: voteValue,
+          vote_reason: reason,
+        }])
         .select()
         .single();
 

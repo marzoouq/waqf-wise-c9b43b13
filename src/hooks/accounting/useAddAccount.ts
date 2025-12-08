@@ -3,7 +3,7 @@
  */
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { AccountingService } from "@/services";
 import { toast } from "sonner";
 import { AccountRow } from "@/types/supabase-helpers";
 
@@ -29,12 +29,7 @@ export function useAddAccount(onSuccess?: () => void) {
       
       // Check for duplicate code
       if (!existingAccount || (existingAccount && existingAccount.code !== data.code)) {
-        const { data: existingAccountCheck } = await supabase
-          .from("accounts")
-          .select("id")
-          .eq("code", data.code)
-          .maybeSingle();
-
+        const existingAccountCheck = await AccountingService.getAccountByCode(data.code);
         if (existingAccountCheck) {
           throw new Error("رمز الحساب موجود مسبقاً. يرجى اختيار رمز آخر.");
         }
@@ -52,24 +47,11 @@ export function useAddAccount(onSuccess?: () => void) {
         is_header: data.is_header,
       };
 
-      let result;
       if (existingAccount) {
-        result = await supabase
-          .from("accounts")
-          .update(accountData)
-          .eq("id", existingAccount.id)
-          .select()
-          .single();
+        return AccountingService.updateAccount(existingAccount.id, accountData);
       } else {
-        result = await supabase
-          .from("accounts")
-          .insert([accountData])
-          .select()
-          .single();
+        return AccountingService.createAccount(accountData);
       }
-
-      if (result.error) throw result.error;
-      return result.data;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["accounts"] });
