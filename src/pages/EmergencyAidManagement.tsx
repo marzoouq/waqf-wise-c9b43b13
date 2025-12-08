@@ -137,7 +137,7 @@ export default function EmergencyAidManagement() {
         <CardContent>
           <UnifiedDataTable
             columns={columns}
-            data={emergencyAids}
+            data={emergencyAids as EmergencyAid[]}
             loading={isLoading}
             emptyMessage="لا توجد طلبات فزعات"
             showMobileScrollHint={true}

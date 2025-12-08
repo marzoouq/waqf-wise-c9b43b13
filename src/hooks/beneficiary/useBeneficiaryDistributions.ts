@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { DistributionService } from "@/services";
 
 interface HeirDistribution {
   id: string;
@@ -17,23 +17,7 @@ export function useBeneficiaryDistributions(beneficiaryId: string) {
   const { data: distributions = [], isLoading } = useQuery({
     queryKey: ["beneficiary-heir-distributions", beneficiaryId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("heir_distributions")
-        .select(`
-          id,
-          share_amount,
-          heir_type,
-          distribution_date,
-          fiscal_year_id,
-          fiscal_years (
-            name,
-            is_closed
-          )
-        `)
-        .eq("beneficiary_id", beneficiaryId)
-        .order("distribution_date", { ascending: false });
-
-      if (error) throw error;
+      const data = await DistributionService.getHeirDistributions(beneficiaryId);
       return (data || []) as HeirDistribution[];
     },
     enabled: !!beneficiaryId,

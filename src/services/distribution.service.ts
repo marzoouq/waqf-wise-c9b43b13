@@ -50,6 +50,35 @@ export class DistributionService {
   }
 
   /**
+   * جلب توزيعات الوريث
+   */
+  static async getHeirDistributions(beneficiaryId: string) {
+    try {
+      const { data, error } = await supabase
+        .from('heir_distributions')
+        .select(`
+          id,
+          share_amount,
+          heir_type,
+          distribution_date,
+          fiscal_year_id,
+          fiscal_years (
+            name,
+            is_closed
+          )
+        `)
+        .eq('beneficiary_id', beneficiaryId)
+        .order('distribution_date', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching heir distributions', error);
+      throw error;
+    }
+  }
+
+  /**
    * جلب توزيع واحد
    */
   static async getById(id: string): Promise<DistributionRow | null> {

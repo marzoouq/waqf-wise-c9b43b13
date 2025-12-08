@@ -43,6 +43,84 @@ export class AccountingService {
   }
 
   /**
+   * جلب حساب بالرمز
+   */
+  static async getAccountByCode(code: string) {
+    try {
+      const { data, error } = await supabase
+        .from('accounts')
+        .select('id')
+        .eq('code', code)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      productionLogger.error('Error fetching account by code', error);
+      throw error;
+    }
+  }
+
+  /**
+   * إنشاء حساب جديد
+   */
+  static async createAccount(account: {
+    code: string;
+    name_ar: string;
+    name_en?: string | null;
+    parent_id?: string | null;
+    account_type: 'asset' | 'liability' | 'equity' | 'revenue' | 'expense';
+    account_nature: 'debit' | 'credit';
+    description?: string | null;
+    is_active?: boolean;
+    is_header?: boolean;
+  }) {
+    try {
+      const { data, error } = await supabase
+        .from('accounts')
+        .insert([{ ...account, is_active: account.is_active ?? true }])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      productionLogger.error('Error creating account', error);
+      throw error;
+    }
+  }
+
+  /**
+   * تحديث حساب
+   */
+  static async updateAccount(id: string, updates: {
+    code?: string;
+    name_ar?: string;
+    name_en?: string | null;
+    parent_id?: string | null;
+    account_type?: 'asset' | 'liability' | 'equity' | 'revenue' | 'expense';
+    account_nature?: 'debit' | 'credit';
+    description?: string | null;
+    is_active?: boolean;
+    is_header?: boolean;
+  }) {
+    try {
+      const { data, error } = await supabase
+        .from('accounts')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      productionLogger.error('Error updating account', error);
+      throw error;
+    }
+  }
+
+  /**
    */
   static async getJournalEntries(filters?: {
     status?: string;
@@ -311,54 +389,6 @@ export class AccountingService {
       }
     } catch (error) {
       productionLogger.error('Error updating account balances', error);
-      throw error;
-    }
-  }
-
-  /**
-   * إنشاء حساب جديد
-   */
-  static async createAccount(account: {
-    code: string;
-    name_ar: string;
-    name_en?: string;
-    account_type: 'asset' | 'liability' | 'equity' | 'revenue' | 'expense';
-    account_nature: 'debit' | 'credit';
-    parent_id?: string;
-    is_header?: boolean;
-    description?: string;
-  }): Promise<AccountRow> {
-    try {
-      const { data, error } = await supabase
-        .from('accounts')
-        .insert([account])
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    } catch (error) {
-      productionLogger.error('Error creating account', error);
-      throw error;
-    }
-  }
-
-  /**
-   * تحديث حساب
-   */
-  static async updateAccount(id: string, updates: Partial<AccountRow>): Promise<AccountRow> {
-    try {
-      const { data, error } = await supabase
-        .from('accounts')
-        .update({ ...updates, updated_at: new Date().toISOString() })
-        .eq('id', id)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    } catch (error) {
-      productionLogger.error('Error updating account', error);
       throw error;
     }
   }
