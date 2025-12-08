@@ -1,6 +1,10 @@
+/**
+ * useDocumentTags Hook - يستخدم Service Layer
+ */
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { ArchiveService } from '@/services';
 
 export interface DocumentTag {
   id: string;
@@ -15,18 +19,7 @@ export interface DocumentTag {
 export function useDocumentTags(documentId?: string) {
   return useQuery({
     queryKey: ['document-tags', documentId],
-    queryFn: async () => {
-      let query = supabase.from('document_tags').select('id, document_id, tag_name, tag_type, confidence_score, created_at, created_by');
-      
-      if (documentId) {
-        query = query.eq('document_id', documentId);
-      }
-      
-      const { data, error } = await query.order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      return data as DocumentTag[];
-    },
+    queryFn: () => ArchiveService.getDocumentTags(documentId),
     enabled: !!documentId,
   });
 }
@@ -35,21 +28,8 @@ export function useAddDocumentTag() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (tag: Omit<DocumentTag, 'id' | 'created_at' | 'created_by'>) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      const { data, error } = await supabase
-        .from('document_tags')
-        .insert({
-          ...tag,
-          created_by: user?.id,
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: (tag: Omit<DocumentTag, 'id' | 'created_at' | 'created_by'>) => 
+      ArchiveService.addDocumentTag(tag),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['document-tags', variables.document_id] });
       queryClient.invalidateQueries({ queryKey: ['document-tags'] });
@@ -65,14 +45,7 @@ export function useDeleteDocumentTag() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (tagId: string) => {
-      const { error } = await supabase
-        .from('document_tags')
-        .delete()
-        .eq('id', tagId);
-
-      if (error) throw error;
-    },
+    mutationFn: (tagId: string) => ArchiveService.deleteDocumentTag(tagId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['document-tags'] });
       toast.success('تم حذف الوسم بنجاح');
@@ -85,38 +58,7 @@ export function useDeleteDocumentTag() {
 
 export function useSmartSearch() {
   return useMutation({
-    mutationFn: async ({ query, searchType }: { query: string; searchType: 'text' | 'tags' | 'ocr' }) => {
-      if (searchType === 'ocr') {
-        // البحث في محتوى OCR
-        const { data, error } = await supabase
-          .from('document_ocr_content')
-          .select('*, documents(*)')
-          .textSearch('extracted_text', query, {
-            type: 'websearch',
-            config: 'arabic'
-          });
-
-        if (error) throw error;
-        return data;
-      } else if (searchType === 'tags') {
-        // البحث في الوسوم
-        const { data, error } = await supabase
-          .from('document_tags')
-          .select('*, documents(*)')
-          .ilike('tag_name', `%${query}%`);
-
-        if (error) throw error;
-        return data;
-      } else {
-        // البحث النصي العادي
-        const { data, error } = await supabase
-          .from('documents')
-          .select('id, name, description, file_type, file_path, file_size, folder_id, created_at, updated_at')
-          .or(`name.ilike.%${query}%,description.ilike.%${query}%`);
-
-        if (error) throw error;
-        return data;
-      }
-    },
+    mutationFn: ({ query, searchType }: { query: string; searchType: 'text' | 'tags' | 'ocr' }) =>
+      ArchiveService.smartSearch(query, searchType),
   });
 }
