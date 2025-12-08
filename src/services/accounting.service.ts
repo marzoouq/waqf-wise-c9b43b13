@@ -895,4 +895,146 @@ export class AccountingService {
       throw error;
     }
   }
+
+  // =============== Bank Matching Operations ===============
+
+  /**
+   * جلب قواعد المطابقة البنكية
+   */
+  static async getBankMatchingRules() {
+    try {
+      const { data, error } = await supabase
+        .from('bank_matching_rules')
+        .select('id, rule_name, description, conditions, account_mapping, priority, is_active, match_count, last_matched_at, created_at, updated_at')
+        .eq('is_active', true)
+        .order('priority', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching bank matching rules', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب سجلات المطابقة
+   */
+  static async getBankReconciliationMatches() {
+    try {
+      const { data, error } = await supabase
+        .from('bank_reconciliation_matches')
+        .select('id, bank_transaction_id, journal_entry_id, match_type, confidence_score, matching_rule_id, matched_at, matched_by, notes')
+        .order('matched_at', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching bank reconciliation matches', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب العمليات البنكية غير المطابقة
+   */
+  static async getUnmatchedBankTransactions(statementId: string) {
+    try {
+      const { data, error } = await supabase
+        .from('bank_transactions')
+        .select('id, statement_id, transaction_date, amount, description, transaction_type, reference_number, is_matched, journal_entry_id, created_at')
+        .eq('statement_id', statementId)
+        .eq('is_matched', false);
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching unmatched bank transactions', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب القيود المرحلة للمطابقة
+   */
+  static async getPostedEntriesForMatching() {
+    try {
+      const { data, error } = await supabase
+        .from('journal_entries')
+        .select('*, journal_entry_lines(*, accounts(*))')
+        .eq('status', 'posted');
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching posted entries for matching', error);
+      throw error;
+    }
+  }
+
+  /**
+   * إنشاء سجل مطابقة بنكية
+   */
+  static async createBankMatch(match: {
+    bank_transaction_id: string;
+    journal_entry_id: string;
+    match_type: 'auto' | 'manual' | 'suggested';
+    confidence_score: number;
+    notes?: string;
+  }) {
+    try {
+      const { data, error } = await supabase
+        .from('bank_reconciliation_matches')
+        .insert(match)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // تحديث حالة العملية البنكية
+      await supabase
+        .from('bank_transactions')
+        .update({ is_matched: true, journal_entry_id: match.journal_entry_id })
+        .eq('id', match.bank_transaction_id);
+
+      return data;
+    } catch (error) {
+      productionLogger.error('Error creating bank match', error);
+      throw error;
+    }
+  }
+
+  /**
+   * إلغاء مطابقة بنكية
+   */
+  static async deleteBankMatch(matchId: string) {
+    try {
+      // جلب بيانات المطابقة أولاً
+      const { data: match, error: fetchError } = await supabase
+        .from('bank_reconciliation_matches')
+        .select('id, bank_transaction_id, journal_entry_id')
+        .eq('id', matchId)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      // حذف المطابقة
+      const { error } = await supabase
+        .from('bank_reconciliation_matches')
+        .delete()
+        .eq('id', matchId);
+
+      if (error) throw error;
+
+      // إعادة حالة العملية البنكية
+      await supabase
+        .from('bank_transactions')
+        .update({ is_matched: false, journal_entry_id: null })
+        .eq('id', match.bank_transaction_id);
+
+    } catch (error) {
+      productionLogger.error('Error deleting bank match', error);
+      throw error;
+    }
+  }
 }
