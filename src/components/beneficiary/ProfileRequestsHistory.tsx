@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { BeneficiaryService } from '@/services';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -7,32 +7,15 @@ import { LoadingState } from '@/components/shared/LoadingState';
 import { FileText, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
-import { Database } from '@/integrations/supabase/types';
-
-type BeneficiaryRequest = Database['public']['Tables']['beneficiary_requests']['Row'] & {
-  request_types?: { name_ar: string; description: string | null } | null;
-};
 
 interface ProfileRequestsHistoryProps {
   beneficiaryId: string;
 }
 
 export function ProfileRequestsHistory({ beneficiaryId }: ProfileRequestsHistoryProps) {
-  const { data: requests, isLoading } = useQuery<BeneficiaryRequest[]>({
+  const { data: requests, isLoading } = useQuery({
     queryKey: ['beneficiary-requests', beneficiaryId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('beneficiary_requests')
-        .select(`
-          *,
-          request_types(name_ar, description)
-        `)
-        .eq('beneficiary_id', beneficiaryId)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return (data || []) as BeneficiaryRequest[];
-    },
+    queryFn: () => BeneficiaryService.getRequests(beneficiaryId),
     staleTime: 60 * 1000,
   });
 
@@ -140,7 +123,7 @@ export function ProfileRequestsHistory({ beneficiaryId }: ProfileRequestsHistory
                       <div className="flex items-center gap-2 mb-2">
                         <FileText className="h-4 w-4 text-muted-foreground" />
                         <h4 className="font-semibold text-foreground">
-                          {request.request_types?.name_ar || 'طلب'}
+                          {(request as any).request_types?.name_ar || 'طلب'}
                         </h4>
                       </div>
                       <p className="text-sm text-muted-foreground mb-2">

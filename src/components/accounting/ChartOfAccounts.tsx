@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { AccountingService } from '@/services';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -33,29 +33,15 @@ export function ChartOfAccounts() {
 
   const queryClient = useQueryClient();
 
-  // جلب جميع الحسابات
+  // جلب جميع الحسابات باستخدام Service
   const { data: accounts = [], isLoading } = useQuery({
     queryKey: ['accounts'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('accounts')
-        .select('id, code, name_ar, name_en, account_type, account_nature, parent_id, is_header, current_balance, is_active')
-        .order('code', { ascending: true });
-
-      if (error) throw error;
-      return data as Account[];
-    },
+    queryFn: () => AccountingService.getAccounts(),
   });
 
-  // إضافة حساب جديد
+  // إضافة حساب جديد باستخدام Service
   const addAccount = useMutation({
-    mutationFn: async (accountData: typeof formData) => {
-      const { error } = await supabase
-        .from('accounts')
-        .insert([accountData]);
-
-      if (error) throw error;
-    },
+    mutationFn: (accountData: typeof formData) => AccountingService.createAccount(accountData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       toast.success('تم إضافة الحساب بنجاح');

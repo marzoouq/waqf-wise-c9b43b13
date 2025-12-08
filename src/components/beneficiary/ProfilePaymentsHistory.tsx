@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { BeneficiaryService } from '@/services';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { LoadingState } from '@/components/shared/LoadingState';
@@ -14,16 +14,7 @@ interface ProfilePaymentsHistoryProps {
 export function ProfilePaymentsHistory({ beneficiaryId }: ProfilePaymentsHistoryProps) {
   const { data: payments, isLoading } = useQuery({
     queryKey: ['beneficiary-payments', beneficiaryId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('payments')
-        .select('id, amount, description, payment_date, payment_method, beneficiary_id')
-        .eq('beneficiary_id', beneficiaryId)
-        .order('payment_date', { ascending: false });
-
-      if (error) throw error;
-      return data || [];
-    },
+    queryFn: () => BeneficiaryService.getPaymentsHistory(beneficiaryId),
     staleTime: 60 * 1000,
   });
 
