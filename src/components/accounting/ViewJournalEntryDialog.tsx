@@ -1,10 +1,7 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { ResponsiveDialog, DialogFooter } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Printer, CheckCircle, UserCheck } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import ApprovalDialog from "./ApprovalDialog";
 import {
@@ -17,7 +14,8 @@ import {
   TableFooter,
 } from "@/components/ui/table";
 import { format, arLocale as ar } from "@/lib/date";
-import { BadgeVariant, JournalEntryWithLines } from "@/types";
+import { BadgeVariant } from "@/types";
+import { useViewJournalEntry } from "@/hooks/accounting/useViewJournalEntry";
 
 type JournalEntry = {
   id: string;
@@ -35,54 +33,15 @@ type Props = {
 };
 
 const ViewJournalEntryDialog = ({ open, onOpenChange, entry }: Props) => {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
   const [isApprovalDialogOpen, setIsApprovalDialogOpen] = useState(false);
-
-  const { data: lines } = useQuery({
-    queryKey: ["journal_entry_lines", entry.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("journal_entry_lines")
-        .select(`
-          *,
-          account:accounts(code, name_ar)
-        `)
-        .eq("journal_entry_id", entry.id)
-        .order("line_number");
-      if (error) throw error;
-      return data;
-    },
-    enabled: open,
-  });
-
-  const postEntryMutation = useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase
-        .from("journal_entries")
-        .update({ status: "posted", posted_at: new Date().toISOString() })
-        .eq("id", entry.id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
-      toast({
-        title: "تم الترحيل بنجاح",
-        description: "تم ترحيل القيد المحاسبي بنجاح",
-      });
-      onOpenChange(false);
-    },
-    onError: () => {
-      toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء ترحيل القيد",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const totalDebit = lines?.reduce((sum, line) => sum + Number(line.debit_amount), 0) || 0;
-  const totalCredit = lines?.reduce((sum, line) => sum + Number(line.credit_amount), 0) || 0;
+  
+  const {
+    lines,
+    totalDebit,
+    totalCredit,
+    postEntry,
+    isPosting,
+  } = useViewJournalEntry(entry.id, open);
 
   const handlePrint = () => {
     window.print();
@@ -90,7 +49,8 @@ const ViewJournalEntryDialog = ({ open, onOpenChange, entry }: Props) => {
 
   const handlePost = () => {
     if (entry.status === "draft") {
-      postEntryMutation.mutate();
+      postEntry();
+      onOpenChange(false);
     }
   };
 
@@ -196,7 +156,7 @@ const ViewJournalEntryDialog = ({ open, onOpenChange, entry }: Props) => {
             </Button>
           )}
           {entry.status === "draft" && (
-            <Button onClick={handlePost} disabled={postEntryMutation.isPending}>
+            <Button onClick={handlePost} disabled={isPosting}>
               <CheckCircle className="h-4 w-4 ml-2" />
               ترحيل القيد
             </Button>

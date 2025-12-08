@@ -1,10 +1,7 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Plus, FileText, Send, CheckCircle, ScanLine } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
 import { formatCurrency } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -15,59 +12,17 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { BatchInvoiceOCR } from "@/components/invoices/BatchInvoiceOCR";
-
-interface Invoice {
-  id: string;
-  invoice_number: string;
-  invoice_date: string;
-  due_date: string | null;
-  customer_name: string;
-  subtotal: number;
-  tax_amount: number;
-  total_amount: number;
-  status: string;
-}
+import { useInvoiceManagement } from "@/hooks/accounting/useInvoiceManagement";
+import { useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
 
 export function InvoiceManagement() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const [showOCRDialog, setShowOCRDialog] = useState(false);
-
-  const { data: invoices, isLoading } = useQuery({
-    queryKey: ["invoices", selectedStatus],
-    queryFn: async () => {
-      let query = supabase
-        .from("invoices")
-        .select("*")
-        .order("invoice_date", { ascending: false });
-
-      if (selectedStatus !== "all") {
-        query = query.eq("status", selectedStatus);
-      }
-
-      const { data, error } = await query;
-      if (error) throw error;
-      return data as Invoice[];
-    },
-  });
-
-  const updateStatusMutation = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      const { error } = await supabase
-        .from("invoices")
-        .update({ status })
-        .eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["invoices"] });
-      toast({
-        title: "تم التحديث",
-        description: "تم تحديث حالة الفاتورة بنجاح",
-      });
-    },
-  });
+  
+  const { invoices, isLoading, updateStatus } = useInvoiceManagement(selectedStatus);
 
   const getStatusBadge = (status: string) => {
     const variants = {
@@ -168,10 +123,7 @@ export function InvoiceManagement() {
                 {invoice.status === "draft" && (
                   <Button
                     size="sm"
-                    onClick={() => updateStatusMutation.mutate({
-                      id: invoice.id,
-                      status: "sent"
-                    })}
+                    onClick={() => updateStatus(invoice.id, "sent")}
                   >
                     <Send className="ml-2 h-4 w-4" />
                     إرسال
@@ -181,10 +133,7 @@ export function InvoiceManagement() {
                   <Button
                     size="sm"
                     className="bg-success hover:bg-success/90"
-                    onClick={() => updateStatusMutation.mutate({
-                      id: invoice.id,
-                      status: "paid"
-                    })}
+                    onClick={() => updateStatus(invoice.id, "paid")}
                   >
                     <CheckCircle className="ml-2 h-4 w-4" />
                     تأكيد الدفع
@@ -196,7 +145,6 @@ export function InvoiceManagement() {
         ))}
       </div>
 
-      {/* OCR Dialog */}
       <Dialog open={showOCRDialog} onOpenChange={setShowOCRDialog}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>

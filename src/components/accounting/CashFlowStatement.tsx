@@ -2,61 +2,23 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Printer, FileDown, TrendingUp, TrendingDown, Activity } from "lucide-react";
-import { useCashFlows } from "@/hooks/useCashFlows";
+import { useCashFlowCalculation } from "@/hooks/accounting/useCashFlowCalculation";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyAccountingState } from "./EmptyAccountingState";
 import { format, arLocale as ar } from "@/lib/date";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 import { formatCurrency, formatNumber } from "@/lib/utils";
-import { productionLogger } from "@/lib/logger/production-logger";
 
 export function CashFlowStatement() {
-  const { cashFlows, isLoading, calculateCashFlow } = useCashFlows();
+  const { cashFlows, isLoading, isCalculating, latestFlow, handleCalculate } = useCashFlowCalculation();
   const [selectedPeriod, setSelectedPeriod] = useState<string | null>(null);
-  const [isCalculating, setIsCalculating] = useState(false);
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل قائمة التدفقات النقدية..." />;
   }
 
-  const latestFlow = cashFlows[0];
-
-  // Using formatCurrency and formatNumber from @/lib/utils
-
   const handlePrint = () => {
     window.print();
-  };
-
-  const handleCalculate = async () => {
-    setIsCalculating(true);
-    try {
-      // الحصول على السنة المالية النشطة
-      const { data: fiscalYear } = await supabase
-        .from("fiscal_years")
-        .select("*")
-        .eq("is_active", true)
-        .single();
-
-      if (!fiscalYear) {
-        toast.error("لا توجد سنة مالية نشطة");
-        return;
-      }
-
-      await calculateCashFlow({
-        fiscalYearId: fiscalYear.id,
-        periodStart: fiscalYear.start_date,
-        periodEnd: fiscalYear.end_date,
-      });
-    } catch (error) {
-      productionLogger.error("Error calculating cash flow", error, {
-        context: 'CashFlowStatement',
-        severity: 'medium',
-      });
-      toast.error("حدث خطأ أثناء حساب التدفقات النقدية");
-    } finally {
-      setIsCalculating(false);
-    }
   };
 
   const handleExport = async () => {
@@ -69,14 +31,10 @@ export function CashFlowStatement() {
       const { default: jsPDF } = await import('jspdf');
       const doc = new jsPDF();
       
-      // إعداد الخط - استخدام خط يدعم العربية
       doc.setFont("helvetica");
       doc.setFontSize(18);
-      
-      // العنوان الرئيسي
       doc.text("قائمة التدفقات النقدية", 105, 20, { align: "center" });
       
-      // الفترة الزمنية
       doc.setFontSize(10);
       const periodText = `من ${format(new Date(latestFlow.period_start), "dd/MM/yyyy")} إلى ${format(new Date(latestFlow.period_end), "dd/MM/yyyy")}`;
       doc.text(periodText, 105, 30, { align: "center" });
@@ -84,7 +42,6 @@ export function CashFlowStatement() {
       doc.setFontSize(12);
       let yPos = 50;
       
-      // الأنشطة التشغيلية
       doc.setFillColor(240, 240, 240);
       doc.rect(15, yPos - 5, 180, 10, "F");
       doc.text("Operating Activities", 20, yPos);
@@ -95,7 +52,6 @@ export function CashFlowStatement() {
       doc.text(`${formatNumber(latestFlow.operating_activities)} SAR`, 150, yPos);
       yPos += 20;
       
-      // الأنشطة الاستثمارية
       doc.setFontSize(12);
       doc.setFillColor(240, 240, 240);
       doc.rect(15, yPos - 5, 180, 10, "F");
@@ -107,7 +63,6 @@ export function CashFlowStatement() {
       doc.text(`${formatNumber(latestFlow.investing_activities)} SAR`, 150, yPos);
       yPos += 20;
       
-      // الأنشطة التمويلية
       doc.setFontSize(12);
       doc.setFillColor(240, 240, 240);
       doc.rect(15, yPos - 5, 180, 10, "F");
@@ -119,12 +74,10 @@ export function CashFlowStatement() {
       doc.text(`${formatNumber(latestFlow.financing_activities)} SAR`, 150, yPos);
       yPos += 25;
       
-      // خط فاصل
       doc.setLineWidth(0.5);
       doc.line(15, yPos, 195, yPos);
       yPos += 10;
       
-      // صافي التدفق النقدي
       doc.setFontSize(14);
       doc.setFont("helvetica", "bold");
       doc.text("Net Cash Flow:", 20, yPos);
@@ -137,7 +90,6 @@ export function CashFlowStatement() {
       doc.setTextColor(0, 0, 0);
       yPos += 15;
       
-      // النقد في بداية ونهاية الفترة
       doc.setFont("helvetica", "normal");
       doc.setFontSize(10);
       doc.text("Opening Cash:", 20, yPos);
@@ -148,12 +100,10 @@ export function CashFlowStatement() {
       doc.text(`${formatNumber(latestFlow.closing_cash)} SAR`, 150, yPos);
       yPos += 15;
       
-      // تاريخ التصدير
       doc.setFontSize(8);
       doc.setTextColor(128, 128, 128);
       doc.text(`Export Date: ${format(new Date(), "dd/MM/yyyy HH:mm")}`, 105, 280, { align: "center" });
       
-      // حفظ الملف
       const filename = `cash-flow-statement-${format(new Date(), "yyyyMMdd-HHmmss")}.pdf`;
       doc.save(filename);
       
@@ -202,7 +152,6 @@ export function CashFlowStatement() {
       </CardHeader>
       <CardContent className="p-3 sm:p-4 md:p-6">
         <div className="space-y-4 sm:space-y-6">
-          {/* التدفقات النقدية من الأنشطة التشغيلية */}
           <div className="border rounded-lg p-4 bg-card">
             <div className="flex items-center gap-2 mb-4">
               <Activity className="h-5 w-5 text-primary" />
@@ -227,7 +176,6 @@ export function CashFlowStatement() {
             </div>
           </div>
 
-          {/* التدفقات النقدية من الأنشطة الاستثمارية */}
           <div className="border rounded-lg p-4 bg-card">
             <div className="flex items-center gap-2 mb-4">
               <Activity className="h-5 w-5 text-info" />
@@ -252,7 +200,6 @@ export function CashFlowStatement() {
             </div>
           </div>
 
-          {/* التدفقات النقدية من الأنشطة التمويلية */}
           <div className="border rounded-lg p-4 bg-card">
             <div className="flex items-center gap-2 mb-4">
               <Activity className="h-5 w-5 text-primary" />
@@ -277,7 +224,6 @@ export function CashFlowStatement() {
             </div>
           </div>
 
-          {/* الملخص النهائي */}
           <div className="border-t-2 pt-6 mt-6">
             <div className="space-y-4">
               <div className="flex justify-between items-center py-2">
