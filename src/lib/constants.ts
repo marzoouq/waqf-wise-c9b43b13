@@ -200,3 +200,62 @@ export const COMPANY_INFO = {
   COPYRIGHT_AR: "© 2025 منصة الوقف - جميع الحقوق محفوظة",
   COPYRIGHT_EN: "© 2025 Waqf Platform - All Rights Reserved",
 } as const;
+
+// Distribution Settings
+export const DISTRIBUTION_CONFIG = {
+  NAZER_SHARE_PERCENTAGE: 10,
+  WAQIF_SHARE_PERCENTAGE: 5,
+  HEIR_MALE_RATIO: 2,
+  HEIR_FEMALE_RATIO: 1,
+  WIVES_SHARE_RATIO: 0.125, // 1/8
+} as const;
+
+// Maintenance Status
+export const MAINTENANCE_STATUS = {
+  PENDING: "معلق",
+  IN_PROGRESS: "قيد التنفيذ",
+  COMPLETED: "مكتمل",
+  CANCELLED: "ملغي",
+} as const;
+
+// Unit Status
+export const UNIT_STATUS = {
+  AVAILABLE: "متاح",
+  OCCUPIED: "مشغول",
+  MAINTENANCE: "صيانة",
+  UNAVAILABLE: "غير متاح",
+} as const;
+
+// Alert Severity
+export const ALERT_SEVERITY = {
+  CRITICAL: "critical",
+  HIGH: "high",
+  MEDIUM: "medium",
+  LOW: "low",
+} as const;
+
+// Approval Status
+export const APPROVAL_STATUS = {
+  PENDING: "pending",
+  APPROVED: "approved",
+  REJECTED: "rejected",
+} as const;
+
+// Fiscal Year Status
+export const FISCAL_YEAR_STATUS = {
+  ACTIVE: "نشط",
+  CLOSED: "مغلق",
+  PENDING_CLOSURE: "قيد الإغلاق",
+} as const;
+
+// API Rate Limits
+export const API_RATE_LIMITS = {
+  MAX_REQUESTS_PER_MINUTE: 60,
+  BATCH_SIZE: 100,
+} as const;
+
+// File Upload Limits
+export const FILE_LIMITS = {
+  MAX_SIZE_MB: 10,
+  ALLOWED_TYPES: ["pdf", "png", "jpg", "jpeg", "doc", "docx", "xls", "xlsx"],
+} as const;

@@ -1,5 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { NotificationService } from "@/services";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,21 +12,13 @@ import type { SystemAlert, SeverityConfig } from "@/types/alerts";
 
 export function AlertsPanel() {
   const [aiDialogOpen, setAiDialogOpen] = useState(false);
+  const queryClient = useQueryClient();
   
   const { data: alerts = [], isLoading } = useQuery({
     queryKey: ["system-alerts"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("system_alerts")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(10);
-      
-      if (error) throw error;
-      return (data || []) as SystemAlert[];
-    },
+    queryFn: () => NotificationService.getSystemAlerts(),
     staleTime: 60 * 1000,
-    refetchInterval: false, // تعطيل التحديث التلقائي لتحسين LCP
+    refetchInterval: false,
   });
 
   const getSeverityConfig = (severity: string): SeverityConfig => {
@@ -40,18 +32,11 @@ export function AlertsPanel() {
   };
 
   const handleResolve = async (alertId: string) => {
-    const { error } = await supabase
-      .from("system_alerts")
-      .update({ 
-        is_resolved: true, 
-        resolved_at: new Date().toISOString(),
-        resolved_by: (await supabase.auth.getUser()).data.user?.id 
-      })
-      .eq("id", alertId);
-
-    if (!error) {
-      // Invalidate queries
-      const queryClient = await import("@tanstack/react-query").then(m => m.useQueryClient);
+    try {
+      await NotificationService.resolveAlert(alertId);
+      queryClient.invalidateQueries({ queryKey: ["system-alerts"] });
+    } catch (error) {
+      console.error('Error resolving alert:', error);
     }
   };
 

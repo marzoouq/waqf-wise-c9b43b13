@@ -33,8 +33,11 @@ export class MaintenanceService {
     return data;
   }
 
-  static async getProviders(): Promise<MaintenanceProvider[]> {
-    const { data, error } = await supabase.from('maintenance_providers').select('*').order('name');
+  static async getProviders(activeOnly: boolean = true): Promise<MaintenanceProvider[]> {
+    let query = supabase.from('maintenance_providers').select('*');
+    if (activeOnly) query = query.eq('is_active', true);
+    query = query.order('rating', { ascending: false });
+    const { data, error } = await query;
     if (error) throw error;
     return data || [];
   }

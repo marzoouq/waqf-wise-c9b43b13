@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { supabase } from "@/integrations/supabase/client";
+import { MaintenanceService } from "@/services";
 import { Plus, Star, Phone, Mail, MapPin } from "lucide-react";
 import { toast } from "sonner";
 
@@ -31,26 +31,13 @@ export function MaintenanceProvidersDialog({ open, onOpenChange }: MaintenancePr
 
   const { data: providers = [], isLoading } = useQuery({
     queryKey: ["maintenance-providers"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("maintenance_providers")
-        .select("*")
-        .eq("is_active", true)
-        .order("rating", { ascending: false });
-      
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => MaintenanceService.getProviders(true),
     enabled: open
   });
 
   const addProvider = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const { error } = await supabase
-        .from("maintenance_providers")
-        .insert([data]);
-      
-      if (error) throw error;
+      await MaintenanceService.addProvider(data as any);
     },
     onSuccess: () => {
       toast.success("تمت إضافة مقدم الخدمة بنجاح");
