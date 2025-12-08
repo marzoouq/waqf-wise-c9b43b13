@@ -1,79 +1,20 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Bell, CheckCircle, AlertTriangle, XCircle, Clock } from 'lucide-react';
-import { toast } from 'sonner';
 import { formatRelative } from "@/lib/date";
-
-interface SystemAlert {
-  id: string;
-  alert_type: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  title: string;
-  description: string;
-  status: string;
-  created_at: string;
-  acknowledged_at: string | null;
-  resolved_at: string | null;
-}
+import { useAdminAlerts } from '@/hooks/system/useAdminAlerts';
 
 export function AdminAlertsPanel() {
-  const queryClient = useQueryClient();
-
-  const { data: alerts = [], isLoading, refetch } = useQuery({
-    queryKey: ['admin-alerts'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('system_alerts')
-        .select('id, alert_type, severity, title, description, status, created_at, acknowledged_at, resolved_at')
-        .in('status', ['active', 'acknowledged'])
-        .order('created_at', { ascending: false })
-        .limit(20);
-
-      if (error) throw error;
-      return data as SystemAlert[];
-    },
-    staleTime: 60 * 1000,
-    refetchInterval: false, // تعطيل التحديث التلقائي لتحسين LCP
-  });
-
-  const acknowledgeMutation = useMutation({
-    mutationFn: async (alertId: string) => {
-      const { error } = await supabase
-        .from('system_alerts')
-        .update({
-          status: 'acknowledged',
-          acknowledged_at: new Date().toISOString(),
-        })
-        .eq('id', alertId);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-alerts'] });
-      toast.success('تم الاعتراف بالتنبيه');
-    },
-  });
-
-  const resolveMutation = useMutation({
-    mutationFn: async (alertId: string) => {
-      const { error } = await supabase
-        .from('system_alerts')
-        .update({
-          status: 'resolved',
-          resolved_at: new Date().toISOString(),
-        })
-        .eq('id', alertId);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-alerts'] });
-      toast.success('تم حل التنبيه');
-    },
-  });
+  const { 
+    alerts, 
+    activeAlerts, 
+    isLoading, 
+    acknowledge, 
+    resolve, 
+    isAcknowledging, 
+    isResolving 
+  } = useAdminAlerts();
 
   const getSeverityIcon = (severity: string) => {
     switch (severity) {
@@ -126,9 +67,6 @@ export function AdminAlertsPanel() {
     );
   }
 
-  const activeAlerts = alerts.filter((a) => a.status === 'active');
-  const acknowledgedAlerts = alerts.filter((a) => a.status === 'acknowledged');
-
   return (
     <Card>
       <CardHeader>
@@ -179,15 +117,15 @@ export function AdminAlertsPanel() {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => acknowledgeMutation.mutate(alert.id)}
-                      disabled={acknowledgeMutation.isPending}
+                      onClick={() => acknowledge(alert.id)}
+                      disabled={isAcknowledging}
                     >
                       اعتراف
                     </Button>
                     <Button
                       size="sm"
-                      onClick={() => resolveMutation.mutate(alert.id)}
-                      disabled={resolveMutation.isPending}
+                      onClick={() => resolve(alert.id)}
+                      disabled={isResolving}
                     >
                       حل
                     </Button>
@@ -196,8 +134,8 @@ export function AdminAlertsPanel() {
                 {alert.status === 'acknowledged' && (
                   <Button
                     size="sm"
-                    onClick={() => resolveMutation.mutate(alert.id)}
-                    disabled={resolveMutation.isPending}
+                    onClick={() => resolve(alert.id)}
+                    disabled={isResolving}
                   >
                     حل
                   </Button>

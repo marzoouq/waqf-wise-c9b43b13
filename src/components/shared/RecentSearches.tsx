@@ -1,11 +1,10 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { Clock, X, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Database } from '@/integrations/supabase/types';
+import { useRecentSearches } from '@/hooks/search/useRecentSearches';
 
 type Json = Database['public']['Tables']['search_history']['Row']['filters'];
 
@@ -15,58 +14,13 @@ interface RecentSearchesProps {
 }
 
 export function RecentSearches({ searchType, onSelectSearch }: RecentSearchesProps) {
-  const queryClient = useQueryClient();
-
-  const { data: recentSearches = [] } = useQuery({
-    queryKey: ['recent-searches', searchType],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return [];
-
-      const { data, error } = await supabase
-        .from('search_history')
-        .select('id, search_query, filters, results_count, created_at')
-        .eq('user_id', user.id)
-        .eq('search_type', searchType)
-        .order('created_at', { ascending: false })
-        .limit(10);
-
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const deleteSearch = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('search_history')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['recent-searches', searchType] });
-    },
-  });
-
-  const clearAllSearches = useMutation({
-    mutationFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { error } = await supabase
-        .from('search_history')
-        .delete()
-        .eq('user_id', user.id)
-        .eq('search_type', searchType);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['recent-searches', searchType] });
-    },
-  });
+  const { 
+    recentSearches, 
+    deleteSearch, 
+    clearAllSearches, 
+    isDeleting, 
+    isClearing 
+  } = useRecentSearches(searchType);
 
   if (recentSearches.length === 0) {
     return null;
@@ -82,7 +36,8 @@ export function RecentSearches({ searchType, onSelectSearch }: RecentSearchesPro
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => clearAllSearches.mutate()}
+          onClick={() => clearAllSearches()}
+          disabled={isClearing}
           className="h-8 text-xs"
         >
           مسح الكل
@@ -122,7 +77,8 @@ export function RecentSearches({ searchType, onSelectSearch }: RecentSearchesPro
                   variant="ghost"
                   size="sm"
                   className="opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0"
-                  onClick={() => deleteSearch.mutate(search.id)}
+                  onClick={() => deleteSearch(search.id)}
+                  disabled={isDeleting}
                 >
                   <X className="h-3 w-3" />
                 </Button>

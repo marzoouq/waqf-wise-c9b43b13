@@ -1,13 +1,11 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { FileText, Download, TrendingUp, TrendingDown } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { Badge } from '@/components/ui/badge';
-import type { TrialBalanceItem, AccountWithBalance } from '@/types/accounting';
+import { useFinancialReportsData } from '@/hooks/accounting/useFinancialReportsData';
 
 /**
  * مكون التقارير المالية
@@ -15,45 +13,16 @@ import type { TrialBalanceItem, AccountWithBalance } from '@/types/accounting';
  */
 export function FinancialReports() {
   const [selectedReport, setSelectedReport] = useState('trial-balance');
+  const { 
+    trialBalance, 
+    accounts, 
+    totalRevenue, 
+    totalExpense, 
+    netIncome, 
+    isLoading 
+  } = useFinancialReportsData();
 
-  // ميزان المراجعة
-  const { data: trialBalance = [], isLoading: loadingTrial } = useQuery({
-    queryKey: ['trial-balance'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('trial_balance')
-        .select('code, name_ar, total_debit, total_credit, balance');
-      if (error) throw error;
-      return (data || []) as TrialBalanceItem[];
-    },
-  });
-
-  // قائمة الدخل - حساب يدوي
-  const { data: accounts = [], isLoading: loadingIncome } = useQuery({
-    queryKey: ['accounts-with-balances'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('accounts')
-        .select('id, code, name_ar, account_type, account_nature, current_balance')
-        .in('account_type', ['revenue', 'expense'])
-        .eq('is_active', true);
-      
-      if (error) throw error;
-      return (data || []) as AccountWithBalance[];
-    },
-  });
-
-  const totalRevenue = accounts
-    .filter(acc => acc.account_type === 'revenue')
-    .reduce((sum, acc) => sum + (acc.current_balance || 0), 0);
-
-  const totalExpense = accounts
-    .filter(acc => acc.account_type === 'expense')
-    .reduce((sum, acc) => sum + (acc.current_balance || 0), 0);
-
-  const netIncome = totalRevenue - totalExpense;
-
-  if (loadingTrial || loadingIncome) {
+  if (isLoading) {
     return <LoadingState />;
   }
 

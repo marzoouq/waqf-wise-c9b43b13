@@ -1,11 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
 import { Search, Users } from 'lucide-react';
-import { productionLogger } from '@/lib/logger/production-logger';
-import { BeneficiarySelectorItem } from '@/types/beneficiary';
+import { useBeneficiarySelector } from '@/hooks/distributions/useBeneficiarySelector';
 
 interface BeneficiarySelectorProps {
   selected: string[];
@@ -13,35 +11,10 @@ interface BeneficiarySelectorProps {
 }
 
 export function BeneficiarySelector({ selected, onChange }: BeneficiarySelectorProps) {
-  const [beneficiaries, setBeneficiaries] = useState<BeneficiarySelectorItem[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(true);
+  const { beneficiaries, loading, filterBeneficiaries } = useBeneficiarySelector();
 
-  useEffect(() => {
-    loadBeneficiaries();
-  }, []);
-
-  const loadBeneficiaries = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('beneficiaries')
-        .select('id, full_name, national_id, category')
-        .eq('status', 'active')
-        .order('full_name');
-
-      if (error) throw error;
-      setBeneficiaries(data || []);
-    } catch (error) {
-      productionLogger.error('Error loading beneficiaries', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const filteredBeneficiaries = beneficiaries.filter(b =>
-    b.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    b.national_id.includes(searchTerm)
-  );
+  const filteredBeneficiaries = filterBeneficiaries(searchTerm);
 
   const handleToggle = (id: string) => {
     if (selected.includes(id)) {

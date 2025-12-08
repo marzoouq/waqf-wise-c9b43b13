@@ -1,64 +1,16 @@
-import { useQuery } from '@tanstack/react-query';
-import { BeneficiaryService } from '@/services';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { Users, User, Crown } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { useBeneficiaryFamilyTree } from '@/hooks/beneficiary/useBeneficiaryFamilyTree';
 
 interface ProfileFamilyTreeProps {
   beneficiaryId: string;
 }
 
 export function ProfileFamilyTree({ beneficiaryId }: ProfileFamilyTreeProps) {
-  const { data: familyData, isLoading } = useQuery({
-    queryKey: ['beneficiary-family', beneficiaryId],
-    queryFn: async () => {
-      // جلب بيانات المستفيد الحالي
-      const { data: beneficiary, error: benError } = await supabase
-        .from('beneficiaries')
-        .select('id, full_name, family_name, category, relationship, is_head_of_family, gender, date_of_birth, status, number_of_sons, number_of_daughters, number_of_wives, family_size')
-        .eq('id', beneficiaryId)
-        .single();
-
-      if (benError) throw benError;
-
-      // جلب أفراد العائلة
-      let familyMembers = [];
-      
-      if (beneficiary.family_name) {
-        const { data: members, error: membersError } = await supabase
-          .from('beneficiaries')
-          .select('id, full_name, family_name, category, relationship, is_head_of_family, gender, date_of_birth, status')
-          .eq('family_name', beneficiary.family_name)
-          .neq('id', beneficiaryId)
-          .order('is_head_of_family', { ascending: false });
-
-        if (!membersError && members) {
-          familyMembers = members;
-        }
-      }
-
-      // جلب الأبناء المباشرين
-      const { data: children, error: childrenError } = await supabase
-        .from('beneficiaries')
-        .select('id, full_name, family_name, category, relationship, is_head_of_family, gender, date_of_birth, status')
-        .eq('parent_beneficiary_id', beneficiaryId);
-
-      if (!childrenError && children) {
-        familyMembers = [...familyMembers, ...children];
-      }
-
-      return {
-        beneficiary,
-        familyMembers: familyMembers.filter((m, index, self) => 
-          index === self.findIndex(t => t.id === m.id)
-        )
-      };
-    },
-    staleTime: 60 * 1000,
-  });
+  const { data: familyData, isLoading } = useBeneficiaryFamilyTree(beneficiaryId);
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل شجرة العائلة..." />;

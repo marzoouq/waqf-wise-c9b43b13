@@ -1,108 +1,60 @@
-import { useState, useEffect } from 'react';
-import { productionLogger } from '@/lib/logger/production-logger';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { CheckCircle2, Clock, AlertCircle, RefreshCw, Download } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-
-interface TransferStatus {
-  id: string;
-  beneficiary_name: string;
-  iban: string;
-  amount: number;
-  status: string;
-  reference_number?: string | null;
-  error_message?: string | null;
-  processed_at?: string | null;
-}
+import { useTransferStatusTracker, type TransferStatus } from '@/hooks/distributions/useTransferStatusTracker';
 
 interface TransferStatusTrackerProps {
   transferFileId: string;
 }
 
+const statusConfig: Record<string, {
+  icon: React.ComponentType<{ className?: string }>;
+  color: string;
+  bgColor: string;
+  label: string;
+  variant: 'default' | 'secondary' | 'outline' | 'destructive';
+}> = {
+  completed: {
+    icon: CheckCircle2,
+    color: 'text-green-500',
+    bgColor: 'bg-green-500/10',
+    label: 'مكتمل',
+    variant: 'default',
+  },
+  processing: {
+    icon: Clock,
+    color: 'text-blue-500',
+    bgColor: 'bg-blue-500/10',
+    label: 'جاري المعالجة',
+    variant: 'secondary',
+  },
+  pending: {
+    icon: Clock,
+    color: 'text-gray-500',
+    bgColor: 'bg-gray-500/10',
+    label: 'معلق',
+    variant: 'outline',
+  },
+  failed: {
+    icon: AlertCircle,
+    color: 'text-red-500',
+    bgColor: 'bg-red-500/10',
+    label: 'فشل',
+    variant: 'destructive',
+  },
+};
+
 export function TransferStatusTracker({ transferFileId }: TransferStatusTrackerProps) {
-  const [transfers, setTransfers] = useState<TransferStatus[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [autoRefresh, setAutoRefresh] = useState(true);
-
-  useEffect(() => {
-    loadTransfers();
-    
-    if (autoRefresh) {
-      const interval = setInterval(loadTransfers, 10000); // كل 10 ثواني
-      return () => clearInterval(interval);
-    }
-  }, [transferFileId, autoRefresh]);
-
-  const loadTransfers = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('bank_transfer_details')
-        .select('id, beneficiary_name, iban, amount, status, reference_number, error_message, processed_at')
-        .eq('transfer_file_id', transferFileId)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setTransfers(data || []);
-    } catch (error) {
-      productionLogger.error('Error loading transfers:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const stats = {
-    total: transfers.length,
-    completed: transfers.filter(t => t.status === 'completed').length,
-    processing: transfers.filter(t => t.status === 'processing').length,
-    failed: transfers.filter(t => t.status === 'failed').length,
-    pending: transfers.filter(t => t.status === 'pending').length,
-    totalAmount: transfers.reduce((sum, t) => sum + t.amount, 0),
-    completedAmount: transfers
-      .filter(t => t.status === 'completed')
-      .reduce((sum, t) => sum + t.amount, 0),
-  };
-
-  const progress = stats.total > 0 ? (stats.completed / stats.total) * 100 : 0;
-
-  const statusConfig: Record<string, {
-    icon: React.ComponentType<{ className?: string }>;
-    color: string;
-    bgColor: string;
-    label: string;
-    variant: 'default' | 'secondary' | 'outline' | 'destructive';
-  }> = {
-    completed: {
-      icon: CheckCircle2,
-      color: 'text-green-500',
-      bgColor: 'bg-green-500/10',
-      label: 'مكتمل',
-      variant: 'default',
-    },
-    processing: {
-      icon: Clock,
-      color: 'text-blue-500',
-      bgColor: 'bg-blue-500/10',
-      label: 'جاري المعالجة',
-      variant: 'secondary',
-    },
-    pending: {
-      icon: Clock,
-      color: 'text-gray-500',
-      bgColor: 'bg-gray-500/10',
-      label: 'معلق',
-      variant: 'outline',
-    },
-    failed: {
-      icon: AlertCircle,
-      color: 'text-red-500',
-      bgColor: 'bg-red-500/10',
-      label: 'فشل',
-      variant: 'destructive',
-    },
-  };
+  const { 
+    transfers, 
+    loading, 
+    autoRefresh, 
+    setAutoRefresh, 
+    stats, 
+    progress 
+  } = useTransferStatusTracker(transferFileId);
 
   const exportReport = () => {
     const csv = [
@@ -111,7 +63,7 @@ export function TransferStatusTracker({ transferFileId }: TransferStatusTrackerP
         t.beneficiary_name,
         t.iban,
         t.amount,
-        statusConfig[t.status].label,
+        statusConfig[t.status]?.label || t.status,
         t.reference_number || '-',
         t.processed_at || '-',
         t.error_message || '-',

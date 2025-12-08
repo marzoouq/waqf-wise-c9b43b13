@@ -1,26 +1,13 @@
-import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Eye, Send, FileText } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatCurrency } from '@/lib/utils';
+import { useInvoices } from '@/hooks/invoices/useInvoices';
 
 export function InvoiceManager() {
-  const { data: invoices, isLoading } = useQuery({
-    queryKey: ['invoices'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('invoices')
-        .select('id, invoice_number, invoice_date, customer_name, total_amount, status, zatca_status, is_zatca_compliant, created_at')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return data;
-    },
-  });
+  const { invoices, isLoading, stats } = useInvoices();
 
   const getStatusBadge = (status: string) => {
     type BadgeVariant = 'default' | 'secondary' | 'destructive' | 'outline';
@@ -138,14 +125,14 @@ export function InvoiceManager() {
           <Card>
             <CardContent className="pt-4">
               <div className="text-sm text-muted-foreground">إجمالي الفواتير</div>
-              <div className="text-2xl font-bold">{invoices?.length || 0}</div>
+              <div className="text-2xl font-bold">{stats.total}</div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="pt-4">
               <div className="text-sm text-muted-foreground">متوافق مع ZATCA</div>
               <div className="text-2xl font-bold text-green-600">
-                {invoices?.filter(i => i.is_zatca_compliant).length || 0}
+                {stats.zatcaCompliant}
               </div>
             </CardContent>
           </Card>
@@ -153,7 +140,7 @@ export function InvoiceManager() {
             <CardContent className="pt-4">
               <div className="text-sm text-muted-foreground">مقبول</div>
               <div className="text-2xl font-bold text-blue-600">
-                {invoices?.filter(i => i.zatca_status === 'accepted').length || 0}
+                {stats.accepted}
               </div>
             </CardContent>
           </Card>
@@ -161,7 +148,7 @@ export function InvoiceManager() {
             <CardContent className="pt-4">
               <div className="text-sm text-muted-foreground">معلق</div>
               <div className="text-2xl font-bold text-yellow-600">
-                {invoices?.filter(i => i.zatca_status === 'pending' || !i.zatca_status).length || 0}
+                {stats.pending}
               </div>
             </CardContent>
           </Card>

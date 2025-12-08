@@ -20,3 +20,5 @@ export { useFinancialData } from './useFinancialData';
 export { useFinancialReports } from './useFinancialReports';
 export { useAccountingFilters } from './useAccountingFilters';
 export { useAccountingTabs } from './useAccountingTabs';
+export { useFinancialReportsData } from './useFinancialReportsData';
+export { useJournalEntryForm, type JournalLine } from './useJournalEntryForm';
