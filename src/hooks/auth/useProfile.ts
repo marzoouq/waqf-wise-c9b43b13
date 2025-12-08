@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { AuthService } from "@/services/auth.service";
 import { useToast } from "@/hooks/use-toast";
-import { TOAST_MESSAGES, QUERY_STALE_TIME } from "@/lib/constants";
+import { TOAST_MESSAGES } from "@/lib/constants";
 import { useAuth } from "@/contexts/AuthContext";
 import { createMutationErrorHandler } from "@/lib/errors";
 
@@ -24,19 +24,7 @@ export function useProfile() {
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ["profile", user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("id, user_id, full_name, email, phone, position, avatar_url, created_at, updated_at")
-        .eq("user_id", user.id)
-        .maybeSingle();
-
-      if (error) throw error;
-      
-      return data as Profile | null;
-    },
+    queryFn: () => AuthService.getProfile(user?.id || ''),
     enabled: !!user?.id,
     staleTime: 10 * 60 * 1000, // 10 minutes
     refetchOnWindowFocus: false,
@@ -45,16 +33,7 @@ export function useProfile() {
   const upsertProfile = useMutation({
     mutationFn: async (profileData: Partial<Profile>) => {
       if (!user?.id) throw new Error("User not authenticated");
-
-      const { data, error } = await supabase
-        .from("profiles")
-        .upsert([{ ...profileData, user_id: user.id }], { onConflict: "user_id" })
-        .select()
-        .maybeSingle();
-
-      if (error) throw error;
-      if (!data) throw new Error("فشل في تحديث الملف الشخصي");
-      return data;
+      return AuthService.upsertProfile(user.id, profileData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["profile"] });

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { TribeService } from "@/services/tribe.service";
 import { toast } from "sonner";
 import type { Tribe, TribeInsert, TribeUpdate } from "@/types/tribes";
 import { logger } from "@/lib/logger";
@@ -7,15 +7,7 @@ import { logger } from "@/lib/logger";
 export const useTribes = () => {
   return useQuery<Tribe[]>({
     queryKey: ["tribes"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("tribes")
-        .select("*")
-        .order("name");
-
-      if (error) throw error;
-      return data as Tribe[];
-    },
+    queryFn: () => TribeService.getAll(),
   });
 };
 
@@ -23,16 +15,7 @@ export const useAddTribe = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (tribe: TribeInsert) => {
-      const { data, error } = await supabase
-        .from("tribes")
-        .insert([tribe])
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: (tribe: TribeInsert) => TribeService.create(tribe),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tribes"] });
       toast.success("تم إضافة القبيلة بنجاح");
@@ -48,17 +31,8 @@ export const useUpdateTribe = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, ...updates }: TribeUpdate & { id: string }) => {
-      const { data, error } = await supabase
-        .from("tribes")
-        .update(updates)
-        .eq("id", id)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: ({ id, ...updates }: TribeUpdate & { id: string }) => 
+      TribeService.update(id, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tribes"] });
       toast.success("تم تحديث القبيلة بنجاح");
@@ -74,14 +48,7 @@ export const useDeleteTribe = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from("tribes")
-        .delete()
-        .eq("id", id);
-
-      if (error) throw error;
-    },
+    mutationFn: (id: string) => TribeService.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tribes"] });
       toast.success("تم حذف القبيلة بنجاح");

@@ -4,7 +4,7 @@
  */
 
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { BeneficiaryService } from "@/services/beneficiary.service";
 import { useBeneficiaryId } from "./useBeneficiaryId";
 import { EmergencyAid } from "@/types/loans";
 
@@ -15,15 +15,7 @@ export function useBeneficiaryEmergencyAid() {
     queryKey: ["beneficiary-emergency-aid", beneficiaryId],
     queryFn: async () => {
       if (!beneficiaryId) return [];
-
-      const { data, error } = await supabase
-        .from("emergency_aid")
-        .select("*")
-        .eq("beneficiary_id", beneficiaryId)
-        .order("requested_date", { ascending: false });
-
-      if (error) throw error;
-      return data as EmergencyAid[] || [];
+      return await BeneficiaryService.getEmergencyAid(beneficiaryId) as EmergencyAid[];
     },
     enabled: !!beneficiaryId,
   });

@@ -17,108 +17,38 @@ export function useDocumentUpload() {
 
   const uploadDocument = useMutation({
     mutationFn: async ({ file, name, category, description, folder_id }: UploadDocumentParams) => {
-      // Generate unique file path
       const fileExt = file.name.split('.').pop()?.toLowerCase() || 'pdf';
-      const timestamp = Date.now();
-      const sanitizedName = name.replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, '_');
-      const storagePath = `${category}/${timestamp}_${sanitizedName}.${fileExt}`;
+      const storagePath = `${category}/${Date.now()}_${name.replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, '_')}.${fileExt}`;
 
-      // Upload file to Storage
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('archive-documents')
-        .upload(storagePath, file, {
-          cacheControl: '3600',
-          upsert: false,
-        });
+      const { error: uploadError } = await supabase.storage.from('archive-documents').upload(storagePath, file);
+      if (uploadError) throw new Error(`فشل في رفع الملف: ${uploadError.message}`);
 
-      if (uploadError) {
-        console.error('Upload error:', uploadError);
-        throw new Error(`فشل في رفع الملف: ${uploadError.message}`);
-      }
+      const { data: urlData } = supabase.storage.from('archive-documents').getPublicUrl(storagePath);
+      const formatSize = (b: number) => b < 1024 ? `${b} B` : b < 1048576 ? `${(b/1024).toFixed(1)} KB` : `${(b/1048576).toFixed(1)} MB`;
 
-      // Get public URL
-      const { data: urlData } = supabase.storage
-        .from('archive-documents')
-        .getPublicUrl(storagePath);
+      const { data, error } = await supabase.from('documents').insert({
+        name, category, description, file_type: fileExt.toUpperCase(), file_size: formatSize(file.size),
+        file_size_bytes: file.size, folder_id, storage_path: storagePath, file_path: urlData.publicUrl,
+      }).select().single();
 
-      // Format file size
-      const formatFileSize = (bytes: number): string => {
-        if (bytes < 1024) return `${bytes} B`;
-        if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-        return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-      };
-
-      // Insert document record
-      const { data: docData, error: docError } = await supabase
-        .from('documents')
-        .insert({
-          name,
-          category,
-          description: description || null,
-          file_type: fileExt.toUpperCase(),
-          file_size: formatFileSize(file.size),
-          file_size_bytes: file.size,
-          folder_id: folder_id || null,
-          storage_path: storagePath,
-          file_path: urlData.publicUrl,
-        })
-        .select()
-        .single();
-
-      if (docError) {
-        // Clean up uploaded file if document insert fails
-        await supabase.storage.from('archive-documents').remove([storagePath]);
-        throw new Error(`فشل في حفظ بيانات المستند: ${docError.message}`);
-      }
-
-      return docData;
+      if (error) { await supabase.storage.from('archive-documents').remove([storagePath]); throw error; }
+      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.DOCUMENTS] });
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.FOLDERS] });
-      toast({
-        title: "تم الرفع بنجاح",
-        description: "تم رفع المستند وحفظه في الأرشيف",
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "خطأ في الرفع",
-        description: error.message,
-        variant: "destructive",
-      });
+      toast({ title: "تم الرفع بنجاح" });
     },
   });
 
   const deleteDocumentWithFile = useMutation({
     mutationFn: async ({ id, storagePath }: { id: string; storagePath?: string | null }) => {
-      // Delete file from storage if path exists
-      if (storagePath) {
-        await supabase.storage.from('archive-documents').remove([storagePath]);
-      }
-
-      // Delete document record
-      const { error } = await supabase
-        .from('documents')
-        .delete()
-        .eq('id', id);
-
+      if (storagePath) await supabase.storage.from('archive-documents').remove([storagePath]);
+      const { error } = await supabase.from('documents').delete().eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.DOCUMENTS] });
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.FOLDERS] });
-      toast({
-        title: "تم الحذف",
-        description: "تم حذف المستند من الأرشيف",
-      });
-    },
-    onError: () => {
-      toast({
-        title: "خطأ في الحذف",
-        description: "حدث خطأ أثناء حذف المستند",
-        variant: "destructive",
-      });
+      toast({ title: "تم الحذف" });
     },
   });
 

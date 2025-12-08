@@ -12,63 +12,31 @@ interface ArchiveStats {
 export function useArchiveStats() {
   const { data: stats, isLoading } = useQuery({
     queryKey: [QUERY_KEYS.DOCUMENTS, "stats"],
-    queryFn: async () => {
-      // Fetch total documents count
-      const { count: documentsCount } = await supabase
-        .from("documents")
-        .select("*", { count: "exact", head: true });
+    queryFn: async (): Promise<ArchiveStats> => {
+      const [docsRes, foldersRes, docsDataRes] = await Promise.all([
+        supabase.from("documents").select("*", { count: "exact", head: true }),
+        supabase.from("folders").select("*", { count: "exact", head: true }),
+        supabase.from("documents").select("file_size_bytes, created_at"),
+      ]);
 
-      // Fetch total folders count
-      const { count: foldersCount } = await supabase
-        .from("folders")
-        .select("*", { count: "exact", head: true });
+      const totalBytes = docsDataRes.data?.reduce((s, d) => s + (d.file_size_bytes || 0), 0) || 0;
+      const formatBytes = (b: number) => b === 0 ? "0 B" : `${(b / Math.pow(1024, Math.floor(Math.log(b) / Math.log(1024)))).toFixed(1)} ${["B","KB","MB","GB"][Math.floor(Math.log(b) / Math.log(1024))]}`;
 
-      // Fetch documents for size calculation and this month count
-      const { data: documents } = await supabase
-        .from("documents")
-        .select("file_size_bytes, created_at");
+      const startOfMonth = new Date(); startOfMonth.setDate(1); startOfMonth.setHours(0,0,0,0);
+      const thisMonthDocs = docsDataRes.data?.filter(d => new Date(d.created_at) >= startOfMonth).length || 0;
 
-      // Calculate total size from file_size_bytes
-      const totalBytes = documents?.reduce((sum: number, doc: { file_size_bytes?: number }) =>
-        sum + (doc.file_size_bytes || 0), 0) || 0;
-
-      // Convert bytes to human-readable format
-      const formatBytes = (bytes: number): string => {
-        if (bytes === 0) return "0 B";
-        const k = 1024;
-        const sizes = ["B", "KB", "MB", "GB"];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return `${Math.round((bytes / Math.pow(k, i)) * 10) / 10} ${sizes[i]}`;
-      };
-
-      // Calculate this month additions
-      const startOfMonth = new Date();
-      startOfMonth.setDate(1);
-      startOfMonth.setHours(0, 0, 0, 0);
-
-      const thisMonthDocs = documents?.filter(
-        (doc) => new Date(doc.created_at) >= startOfMonth
-      ).length || 0;
-
-      const stats: ArchiveStats = {
-        totalDocuments: documentsCount || 0,
-        totalFolders: foldersCount || 0,
+      return {
+        totalDocuments: docsRes.count || 0,
+        totalFolders: foldersRes.count || 0,
         totalSize: formatBytes(totalBytes),
         thisMonthAdditions: thisMonthDocs,
       };
-
-      return stats;
     },
     staleTime: QUERY_STALE_TIME.DEFAULT,
   });
 
   return {
-    stats: stats || {
-      totalDocuments: 0,
-      totalFolders: 0,
-      totalSize: "0 B",
-      thisMonthAdditions: 0,
-    },
+    stats: stats || { totalDocuments: 0, totalFolders: 0, totalSize: "0 B", thisMonthAdditions: 0 },
     isLoading,
   };
 }
