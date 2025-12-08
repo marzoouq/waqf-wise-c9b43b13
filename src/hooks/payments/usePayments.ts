@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { PaymentService, RealtimeService } from "@/services";
 import { useToast } from "@/hooks/use-toast";
 import { useJournalEntries } from "@/hooks/accounting/useJournalEntries";
 import { useEffect } from "react";
@@ -28,39 +28,18 @@ export function usePayments() {
   const queryClient = useQueryClient();
   const { createAutoEntry } = useJournalEntries();
 
-  // Real-time subscription
+  // Real-time subscription using RealtimeService
   useEffect(() => {
-    const channel = supabase
-      .channel('payments-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'payments'
-        },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ["payments"] });
-        }
-      )
-      .subscribe();
+    const { unsubscribe } = RealtimeService.subscribeToTable('payments', () => {
+      queryClient.invalidateQueries({ queryKey: ["payments"] });
+    });
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => unsubscribe();
   }, [queryClient]);
 
   const { data: payments = [], isLoading } = useQuery({
     queryKey: ["payments"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("payments")
-        .select("id, payment_type, payment_number, payment_date, amount, payment_method, payer_name, reference_number, description, notes, journal_entry_id, status, created_at, updated_at")
-        .order("payment_date", { ascending: false });
-
-      if (error) throw error;
-      return data as Payment[];
-    },
+    queryFn: () => PaymentService.getAll(),
     staleTime: 3 * 60 * 1000,
   });
 
@@ -71,33 +50,16 @@ export function usePayments() {
       const requiresApproval = result.data || false;
 
       const paymentStatus = requiresApproval ? 'pending' : 'completed';
+      
+      const data = await PaymentService.create({ 
+        ...payment, 
+        status: paymentStatus 
+      } as any);
 
-      const { data, error } = await supabase
-        .from("payments")
-        .insert([{ ...payment, status: paymentStatus }])
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      // إذا كانت تحتاج موافقة، إنشاء موافقات (مستويين)
+      // إذا كانت تحتاج موافقة، إنشاء موافقات
       if (requiresApproval) {
-        const approvals = [
-          { level: 1, approver_name: 'المشرف المالي' },
-          { level: 2, approver_name: 'المدير' }
-        ];
-
-        await supabase.from('payment_approvals').insert(
-          approvals.map(approval => ({
-            payment_id: data.id,
-            ...approval,
-            status: 'معلق'
-          }))
-        );
+        await PaymentService.createApprovals(data.id);
       }
-
-      // القيد المحاسبي سيتم إنشاؤه تلقائياً عبر Trigger
-      // عند إدخال المدفوعة في قاعدة البيانات
 
       return data;
     },
@@ -117,25 +79,7 @@ export function usePayments() {
 
   const updatePayment = useMutation({
     mutationFn: async ({ id, ...updates }: Partial<Payment> & { id: string }) => {
-      // الحصول على البيانات القديمة
-      const { data: oldPayment } = await supabase
-        .from("payments")
-        .select("journal_entry_id, amount, payment_date")
-        .eq("id", id)
-        .single();
-
-      const { data, error } = await supabase
-        .from("payments")
-        .update(updates)
-        .eq("id", id)
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      // القيد المحاسبي تم إنشاؤه مسبقاً عبر Trigger عند الإدخال
-
-      return data;
+      return PaymentService.update(id, updates as any);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["payments"] });
@@ -152,9 +96,7 @@ export function usePayments() {
 
   const deletePayment = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("payments").delete().eq("id", id);
-
-      if (error) throw error;
+      return PaymentService.delete(id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["payments"] });
