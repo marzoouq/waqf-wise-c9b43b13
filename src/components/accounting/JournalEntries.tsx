@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Plus, Eye, FileText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -15,33 +13,14 @@ import { AccountingFilters } from "./AccountingFilters";
 import { EmptyAccountingState } from "./EmptyAccountingState";
 import { AccountingErrorState } from "./AccountingErrorState";
 import { UnifiedDataTable, type Column } from "@/components/unified/UnifiedDataTable";
-
-type JournalEntry = {
-  id: string;
-  entry_number: string;
-  entry_date: string;
-  description: string;
-  status: string;
-  posted_at: string | null;
-  created_at: string;
-};
+import { useJournalEntriesList, type JournalEntry } from "@/hooks/accounting/useJournalEntriesList";
 
 const JournalEntries = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
 
-  const { data: allEntries, isLoading, error, refetch } = useQuery({
-    queryKey: ["journal_entries"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("journal_entries")
-        .select("*")
-        .order("entry_date", { ascending: false });
-      if (error) throw error;
-      return data as JournalEntry[];
-    },
-  });
+  const { entries: allEntries, isLoading, error, refetch } = useJournalEntriesList();
 
   const { filteredData: entries, filters } = useAccountingFilters({
     data: allEntries || [],
@@ -141,7 +120,6 @@ const JournalEntries = () => {
         </div>
       </div>
 
-      {/* Filters */}
       <Card>
         <CardContent className="pt-6">
           <AccountingFilters

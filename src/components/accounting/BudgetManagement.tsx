@@ -1,53 +1,14 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Plus, TrendingUp, TrendingDown } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
-
-interface BudgetData {
-  id: string;
-  account_id: string;
-  fiscal_year_id: string;
-  period_type: string;
-  budgeted_amount: number;
-  actual_amount: number;
-  variance_amount: number;
-  accounts: {
-    code: string;
-    name_ar: string;
-  };
-}
+import { useBudgetManagement } from "@/hooks/accounting/useBudgetManagement";
 
 export function BudgetManagement() {
   const [selectedPeriod, setSelectedPeriod] = useState("annual");
-
-  const { data: budgets, isLoading } = useQuery({
-    queryKey: ["budgets", selectedPeriod],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("budgets")
-        .select(`
-          *,
-          accounts (
-            code,
-            name_ar
-          )
-        `)
-        .eq("period_type", selectedPeriod)
-        .order("accounts(code)", { ascending: true });
-      
-      if (error) throw error;
-      return data as BudgetData[];
-    },
-  });
-
-  const calculatePercentage = (actual: number, budgeted: number) => {
-    if (budgeted === 0) return 0;
-    return Math.round((actual / budgeted) * 100);
-  };
+  const { budgets, isLoading, calculatePercentage } = useBudgetManagement(selectedPeriod);
 
   if (isLoading) {
     return <div className="text-center p-8">جاري التحميل...</div>;
