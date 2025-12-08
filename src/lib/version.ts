@@ -2,11 +2,11 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.8.23
+ * @version 2.8.24
  * @date 2025-12-08
  */
 
-export const APP_VERSION = '2.8.23';
+export const APP_VERSION = '2.8.24';
 export const APP_VERSION_DATE = '2025-12-08';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
@@ -16,10 +16,10 @@ export const VERSION_INFO = {
   name: APP_VERSION_NAME,
   changelog: '/docs/CHANGELOG.md',
   features: [
-    'نقل 70+ hook للخدمات',
-    'توحيد استخدام RealtimeService في جميع hooks',
-    'إضافة getRevenueProgress للـ DashboardService',
-    'تحسين useKPIs, useNotificationSystem, useErrorNotifications',
+    'نقل 80+ hook للخدمات',
+    'توسيع POSService مع جميع عمليات POS',
+    'توسيع MessageService و InvoiceService',
+    'تحويل useCashierShift, usePOSTransactions, useQuickCollection, useQuickPayment',
     'صفر أخطاء بناء',
   ],
 } as const;

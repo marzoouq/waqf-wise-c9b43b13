@@ -1,5 +1,6 @@
 /**
  * Message Service - خدمة الرسائل الداخلية
+ * @version 2.8.24
  */
 
 import { supabase } from '@/integrations/supabase/client';
@@ -8,6 +9,20 @@ import type { Database } from '@/integrations/supabase/types';
 
 type InternalMessageRow = Database['public']['Tables']['internal_messages']['Row'];
 type InternalMessageInsert = Database['public']['Tables']['internal_messages']['Insert'];
+
+export interface MessageWithUsers {
+  id: string;
+  sender_id: string;
+  receiver_id: string;
+  subject: string;
+  body: string;
+  is_read: boolean;
+  read_at: string | null;
+  priority?: string;
+  created_at: string;
+  sender_name?: string;
+  receiver_name?: string;
+}
 
 export class MessageService {
   /**
@@ -55,6 +70,25 @@ export class MessageService {
   }
 
   /**
+   * جلب جميع رسائل المستخدم (واردة ومرسلة)
+   */
+  static async getAllMessages(userId: string): Promise<MessageWithUsers[]> {
+    try {
+      const { data, error } = await supabase
+        .from('messages_with_users')
+        .select('id, sender_id, receiver_id, subject, body, is_read, read_at, priority, created_at, sender_name, receiver_name')
+        .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data as MessageWithUsers[];
+    } catch (error) {
+      productionLogger.error('Error fetching all messages', error);
+      throw error;
+    }
+  }
+
+  /**
    * إرسال رسالة
    */
   static async sendMessage(message: InternalMessageInsert): Promise<InternalMessageRow> {
@@ -76,17 +110,15 @@ export class MessageService {
   /**
    * تعليم رسالة كمقروءة
    */
-  static async markAsRead(messageId: string): Promise<InternalMessageRow> {
+  static async markAsRead(messageId: string, userId: string): Promise<void> {
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('internal_messages')
         .update({ is_read: true, read_at: new Date().toISOString() })
         .eq('id', messageId)
-        .select()
-        .single();
+        .eq('receiver_id', userId);
 
       if (error) throw error;
-      return data;
     } catch (error) {
       productionLogger.error('Error marking message as read', error);
       throw error;
