@@ -4,6 +4,32 @@
 
 ---
 
+## [2.6.42] - 2025-12-08
+
+### 🏗️ تحسين الهيكل المعماري
+
+#### ✨ الميزات الجديدة
+- **DashboardService:** طبقة خدمة جديدة للـ Dashboard
+- **ثوابت الحالة:** `PROPERTY_STATUS`, `CONTRACT_STATUS`, `LOAN_STATUS`, `REQUEST_STATUS`
+
+#### 🔧 التحسينات
+- **useNazerSystemOverview:** يستخدم `DashboardService.getSystemOverview()`
+- **useUnifiedKPIs:** يستخدم `DashboardService.getUnifiedKPIs()` + الثوابت
+- **NazerKPIs.tsx:** يستخدم `useUnifiedKPIs` مباشرة
+
+#### 🗑️ الإزالات
+- **useNazerKPIs:** تم حذف الـ Hook المهمل
+
+#### 📂 الملفات المُحدّثة
+```
+src/services/dashboard.service.ts   # خدمة جديدة
+src/lib/constants.ts                # ثوابت جديدة
+src/hooks/dashboard/                # تحديثات
+docs/                               # توثيق موحد
+```
+
+---
+
 ## [2.6.41] - 2025-12-07
 
 ### 🧹 تنظيف ملفات الاختبار
