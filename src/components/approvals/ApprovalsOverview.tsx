@@ -1,41 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Clock, CheckCircle, XCircle, FileText } from "lucide-react";
+import { useApprovalsOverview } from "@/hooks/approvals";
 
 export function ApprovalsOverview() {
-  const { data: stats } = useQuery({
-    queryKey: ["approvals_overview"],
-    queryFn: async () => {
-      // موافقات القيود المحاسبية
-      const { data: journalApprovals } = await supabase
-        .from("approvals")
-        .select("status");
-
-      // موافقات التوزيعات
-      const { data: distributionApprovals } = await supabase
-        .from("distribution_approvals")
-        .select("status");
-
-      // موافقات الطلبات
-      const { data: requestApprovals } = await supabase
-        .from("request_approvals")
-        .select("status");
-
-      const allApprovals = [
-        ...(journalApprovals || []),
-        ...(distributionApprovals || []),
-        ...(requestApprovals || []),
-      ];
-
-      return {
-        total: allApprovals.length,
-        pending: allApprovals.filter((a) => a.status === "pending" || a.status === "معلق").length,
-        approved: allApprovals.filter((a) => a.status === "approved" || a.status === "موافق").length,
-        rejected: allApprovals.filter((a) => a.status === "rejected" || a.status === "مرفوض").length,
-      };
-    },
-  });
+  const { data: stats } = useApprovalsOverview();
 
   const statCards = [
     {

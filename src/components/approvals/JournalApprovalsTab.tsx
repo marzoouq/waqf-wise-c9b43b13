@@ -1,5 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,34 +5,15 @@ import { CheckCircle, XCircle, Clock, Eye } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
 import { useState } from "react";
 import ViewJournalEntryDialog from "@/components/accounting/ViewJournalEntryDialog";
-import { JournalApproval, StatusConfigMap, BadgeVariant, JournalEntryWithLines } from "@/types";
+import { JournalApproval, BadgeVariant, JournalEntryWithLines } from "@/types";
 import { LucideIcon } from "lucide-react";
+import { useJournalApprovals } from "@/hooks/approvals";
 
 export function JournalApprovalsTab() {
   const [selectedEntry, setSelectedEntry] = useState<JournalEntryWithLines | null>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
 
-  const { data: approvals, isLoading } = useQuery<JournalApproval[]>({
-    queryKey: ["journal_approvals"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("approvals")
-        .select(`
-          *,
-          journal_entry:journal_entries(
-            id,
-            entry_number,
-            entry_date,
-            description,
-            status
-          )
-        `)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return data as unknown as JournalApproval[];
-    },
-  });
+  const { data: approvals, isLoading } = useJournalApprovals();
 
   const getStatusBadge = (status: string) => {
     const config: Record<string, { label: string; variant: BadgeVariant; icon: LucideIcon }> = {

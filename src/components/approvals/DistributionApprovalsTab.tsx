@@ -1,5 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,31 +5,16 @@ import { CheckCircle, XCircle, Clock, Eye, Lock } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
 import { useState } from "react";
 import { ApprovalFlowDialog } from "@/components/funds/ApprovalFlowDialog";
-import { DistributionForApproval, calculateProgress, StatusConfigMap } from "@/types/approvals";
+import { DistributionForApproval, StatusConfigMap } from "@/types/approvals";
 import { useApprovalPermissions } from "@/hooks/useApprovalPermissions";
-import { useToast } from "@/hooks/use-toast";
+import { useDistributionApprovals } from "@/hooks/approvals";
 
 export function DistributionApprovalsTab() {
   const [selectedDistribution, setSelectedDistribution] = useState<DistributionForApproval | null>(null);
   const [isFlowDialogOpen, setIsFlowDialogOpen] = useState(false);
   const { canApproveLevel, userRole } = useApprovalPermissions();
-  const { toast } = useToast();
 
-  const { data: distributions, isLoading } = useQuery<DistributionForApproval[]>({
-    queryKey: ["distributions_with_approvals"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("distributions")
-        .select(`
-          *,
-          distribution_approvals(*)
-        `)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return data as unknown as DistributionForApproval[];
-    },
-  });
+  const { data: distributions, isLoading } = useDistributionApprovals();
 
   const getStatusBadge = (status: string) => {
     const config: StatusConfigMap = {

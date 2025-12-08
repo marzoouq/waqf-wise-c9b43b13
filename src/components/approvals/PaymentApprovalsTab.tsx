@@ -1,5 +1,3 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,97 +5,19 @@ import { CheckCircle, XCircle, Clock, Receipt, CreditCard } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
 import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
-import { useApprovalHistory } from "@/hooks/useApprovalHistory";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { PaymentForApproval, PaymentApprovalRow, calculateProgress, getNextPendingApproval, StatusConfigMap, BadgeVariant } from "@/types";
+import { PaymentForApproval, PaymentApprovalRow, BadgeVariant } from "@/types";
+import { usePaymentApprovals } from "@/hooks/approvals";
 
 export function PaymentApprovalsTab() {
-  const { toast } = useToast();
-  const { user } = useAuth();
-  const queryClient = useQueryClient();
-  const { addToHistory } = useApprovalHistory();
   const [selectedPayment, setSelectedPayment] = useState<PaymentForApproval | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [approvalNotes, setApprovalNotes] = useState("");
   const [approvalAction, setApprovalAction] = useState<"approve" | "reject">("approve");
 
-  const { data: payments, isLoading} = useQuery<PaymentForApproval[]>({
-    queryKey: ["payments_with_approvals"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("payments")
-        .select(`
-          *,
-          beneficiaries(full_name, national_id),
-          payment_approvals(*)
-        `)
-        .eq("status", "pending")
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      
-      return (data || []) as unknown as PaymentForApproval[];
-    },
-  });
-
-  const approveMutation = useMutation({
-    mutationFn: async ({ paymentId, approvalId, action, notes }: {
-      paymentId: string;
-      approvalId: string;
-      action: "approve" | "reject";
-      notes: string;
-    }) => {
-      const status = action === "approve" ? "موافق" : "مرفوض";
-      
-      const { error } = await supabase
-        .from("payment_approvals")
-        .update({
-          status,
-          notes,
-          approved_at: new Date().toISOString(),
-          approver_id: user?.id
-        })
-        .eq("id", approvalId);
-
-      if (error) throw error;
-
-      // سجل في تاريخ الموافقات
-      await addToHistory.mutateAsync({
-        approval_type: "payment",
-        approval_id: approvalId,
-        reference_id: paymentId,
-        action: action === "approve" ? "approved" : "rejected",
-        performed_by: user?.id || "",
-        performed_by_name: user?.user_metadata?.full_name || "مستخدم",
-        notes
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["payments_with_approvals"] });
-      queryClient.invalidateQueries({ queryKey: ["payments"] });
-      
-      toast({
-        title: "تمت العملية بنجاح",
-        description: approvalAction === "approve" ? "تمت الموافقة على المدفوعة" : "تم رفض المدفوعة"
-      });
-      
-      setIsDialogOpen(false);
-      setSelectedPayment(null);
-      setApprovalNotes("");
-    },
-    onError: (error) => {
-      const errorMessage = error instanceof Error ? error.message : "حدث خطأ في العملية";
-      toast({
-        title: "خطأ في العملية",
-        description: errorMessage,
-        variant: "destructive"
-      });
-    }
-  });
+  const { data: payments, isLoading, approveMutation } = usePaymentApprovals();
 
   const handleApprovalClick = (payment: PaymentForApproval, action: "approve" | "reject") => {
     setSelectedPayment(payment);
@@ -112,19 +32,19 @@ export function PaymentApprovalsTab() {
       (a) => a.status === "معلق"
     );
 
-    if (!pendingApproval) {
-      toast({
-        title: "لا توجد موافقة معلقة",
-        variant: "destructive"
-      });
-      return;
-    }
+    if (!pendingApproval) return;
 
     approveMutation.mutate({
       paymentId: selectedPayment.id,
       approvalId: pendingApproval.id,
       action: approvalAction,
       notes: approvalNotes
+    }, {
+      onSuccess: () => {
+        setIsDialogOpen(false);
+        setSelectedPayment(null);
+        setApprovalNotes("");
+      }
     });
   };
 
@@ -226,7 +146,6 @@ export function PaymentApprovalsTab() {
                   <p className="text-sm">{payment.description}</p>
                 </div>
 
-                {/* عرض الموافقات */}
                 {payment.payment_approvals && payment.payment_approvals.length > 0 && (
                   <div className="mt-4 pt-4 border-t">
                     <p className="text-sm font-semibold mb-2">مستويات الموافقة:</p>
@@ -249,7 +168,6 @@ export function PaymentApprovalsTab() {
                   </div>
                 )}
 
-                {/* أزرار الموافقة */}
                 {canApprove && (
                   <div className="mt-4 flex gap-2">
                     <Button
@@ -287,7 +205,6 @@ export function PaymentApprovalsTab() {
         )}
       </div>
 
-      {/* Dialog للموافقة/الرفض */}
       <ResponsiveDialog 
         open={isDialogOpen} 
         onOpenChange={setIsDialogOpen}
@@ -297,55 +214,55 @@ export function PaymentApprovalsTab() {
           : "هل أنت متأكد من رفض هذه المدفوعة؟"}
       >
         {selectedPayment && (
-            <div className="space-y-4">
-              <div className="bg-muted p-3 rounded-md">
-                <p className="text-sm">
-                  <strong>رقم السند:</strong> {selectedPayment.payment_number}
-                </p>
-                <p className="text-sm">
-                  <strong>النوع:</strong> {selectedPayment.payment_type === "receipt" ? "قبض" : "صرف"}
-                </p>
-                <p className="text-sm">
-                  <strong>المبلغ:</strong>{" "}
-                  {selectedPayment.amount?.toLocaleString("ar-SA")} ريال
-                </p>
-                <p className="text-sm">
-                  <strong>المستفيد:</strong> {selectedPayment.beneficiaries?.full_name || 'غير محدد'}
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="notes">ملاحظات (اختياري)</Label>
-                <Textarea
-                  id="notes"
-                  value={approvalNotes}
-                  onChange={(e) => setApprovalNotes(e.target.value)}
-                  placeholder="أضف ملاحظاتك هنا..."
-                  rows={3}
-                />
-              </div>
+          <div className="space-y-4">
+            <div className="bg-muted p-3 rounded-md">
+              <p className="text-sm">
+                <strong>رقم السند:</strong> {selectedPayment.payment_number}
+              </p>
+              <p className="text-sm">
+                <strong>النوع:</strong> {selectedPayment.payment_type === "receipt" ? "قبض" : "صرف"}
+              </p>
+              <p className="text-sm">
+                <strong>المبلغ:</strong>{" "}
+                {selectedPayment.amount?.toLocaleString("ar-SA")} ريال
+              </p>
+              <p className="text-sm">
+                <strong>المستفيد:</strong> {selectedPayment.beneficiaries?.full_name || 'غير محدد'}
+              </p>
             </div>
-          )}
 
-          <div className="flex justify-end gap-2 pt-4">
-            <Button
-              variant="outline"
-              onClick={() => {
-                setIsDialogOpen(false);
-                setSelectedPayment(null);
-                setApprovalNotes("");
-              }}
-            >
-              إلغاء
-            </Button>
-            <Button
-              variant={approvalAction === "approve" ? "default" : "destructive"}
-              onClick={handleConfirmApproval}
-              disabled={approveMutation.isPending}
-            >
-              {approveMutation.isPending ? "جاري المعالجة..." : "تأكيد"}
-            </Button>
+            <div className="space-y-2">
+              <Label htmlFor="notes">ملاحظات (اختياري)</Label>
+              <Textarea
+                id="notes"
+                value={approvalNotes}
+                onChange={(e) => setApprovalNotes(e.target.value)}
+                placeholder="أضف ملاحظاتك هنا..."
+                rows={3}
+              />
+            </div>
           </div>
+        )}
+
+        <div className="flex justify-end gap-2 pt-4">
+          <Button
+            variant="outline"
+            onClick={() => {
+              setIsDialogOpen(false);
+              setSelectedPayment(null);
+              setApprovalNotes("");
+            }}
+          >
+            إلغاء
+          </Button>
+          <Button
+            variant={approvalAction === "approve" ? "default" : "destructive"}
+            onClick={handleConfirmApproval}
+            disabled={approveMutation.isPending}
+          >
+            {approveMutation.isPending ? "جاري المعالجة..." : "تأكيد"}
+          </Button>
+        </div>
       </ResponsiveDialog>
     </>
   );
