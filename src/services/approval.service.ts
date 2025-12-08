@@ -381,4 +381,18 @@ export class ApprovalService {
     if (error) throw error;
     return data;
   }
+
+  /**
+   * جلب دور المستخدم للموافقات
+   */
+  static async getUserRole(userId: string): Promise<string | null> {
+    const { data, error } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .single();
+
+    if (error) throw error;
+    return data?.role || null;
+  }
 }

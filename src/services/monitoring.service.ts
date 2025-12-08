@@ -1,6 +1,6 @@
 /**
  * Monitoring Service - خدمة المراقبة
- * @version 2.8.28
+ * @version 2.8.29
  */
 
 import { supabase } from "@/integrations/supabase/client";
@@ -17,6 +17,30 @@ export interface SystemStats {
   totalHealthChecks: number;
   successfulFixes: number;
   totalFixAttempts: number;
+}
+
+export interface SmartAlert {
+  id: string;
+  type: 'contract_expiring' | 'rent_overdue' | 'loan_due' | 'request_overdue';
+  title: string;
+  description: string;
+  severity: 'high' | 'medium' | 'low';
+  date: Date;
+  actionUrl: string;
+}
+
+export interface PerformanceMetric {
+  id: string;
+  metric_name: string;
+  value: number;
+  recorded_at: string;
+}
+
+export interface SlowQueryLog {
+  id: string;
+  query_text: string;
+  execution_time_ms: number;
+  created_at: string;
 }
 
 export class MonitoringService {
@@ -180,5 +204,153 @@ export class MonitoringService {
       newProfiles: newProfilesResponse.data || [],
       activities: activitiesResponse.data || [],
     };
+  }
+
+  /**
+   * جلب مقاييس الأداء
+   */
+  static async getPerformanceMetricsData(): Promise<{ metrics: PerformanceMetric[]; slowQueries: SlowQueryLog[] }> {
+    const [metricsResult, queriesResult] = await Promise.all([
+      supabase
+        .from("performance_metrics")
+        .select("*")
+        .order("recorded_at", { ascending: false })
+        .limit(100),
+      supabase
+        .from("slow_query_log")
+        .select("*")
+        .order("execution_time_ms", { ascending: false })
+        .limit(20),
+    ]);
+
+    if (metricsResult.error) throw metricsResult.error;
+
+    return {
+      metrics: (metricsResult.data || []) as PerformanceMetric[],
+      slowQueries: (queriesResult.data || []) as SlowQueryLog[],
+    };
+  }
+
+  /**
+   * جلب التنبيهات الذكية
+   */
+  static async getSmartAlerts(): Promise<SmartAlert[]> {
+    const today = new Date();
+    const [
+      expiringContractsResult,
+      overduePaymentsResult,
+      dueLoansResult,
+      overdueRequestsResult
+    ] = await Promise.all([
+      supabase
+        .from('contracts')
+        .select('id, contract_number, tenant_name, end_date, properties(name)')
+        .eq('status', 'نشط')
+        .gte('end_date', today.toISOString().split('T')[0])
+        .lte('end_date', new Date(today.getTime() + 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
+        .limit(5),
+      supabase
+        .from('rental_payments')
+        .select(`id, payment_number, amount_due, due_date, contracts(tenant_name, properties(name))`)
+        .eq('status', 'متأخر')
+        .limit(5),
+      supabase
+        .from('loan_installments')
+        .select(`id, installment_number, principal_amount, total_amount, due_date, status, loans(loan_number, beneficiaries(full_name))`)
+        .in('status', ['overdue', 'pending', 'معلق'])
+        .lte('due_date', new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
+        .limit(5),
+      supabase
+        .from('beneficiary_requests')
+        .select(`id, request_number, sla_due_at, beneficiaries(full_name)`)
+        .eq('is_overdue', true)
+        .eq('status', 'قيد المراجعة')
+        .limit(5)
+    ]);
+
+    if (expiringContractsResult.error) throw expiringContractsResult.error;
+
+    const allAlerts: SmartAlert[] = [];
+
+    // عقود قرب الانتهاء
+    if (expiringContractsResult.data) {
+      expiringContractsResult.data.forEach(contract => {
+        const daysRemaining = Math.floor((new Date(contract.end_date).getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+        allAlerts.push({
+          id: contract.id,
+          type: 'contract_expiring',
+          title: `عقد ${contract.contract_number} قارب الانتهاء`,
+          description: `عقد ${contract.tenant_name} - ${(contract.properties as any)?.name} ينتهي خلال ${daysRemaining} يوم`,
+          severity: daysRemaining <= 30 ? 'high' : 'medium',
+          date: new Date(contract.end_date),
+          actionUrl: '/properties?tab=contracts'
+        });
+      });
+    }
+
+    // إيجارات متأخرة
+    if (overduePaymentsResult.data) {
+      overduePaymentsResult.data.forEach(payment => {
+        const daysOverdue = Math.floor((today.getTime() - new Date(payment.due_date).getTime()) / (1000 * 60 * 60 * 24));
+        allAlerts.push({
+          id: payment.id,
+          type: 'rent_overdue',
+          title: `دفعة إيجار متأخرة - ${payment.payment_number}`,
+          description: `${(payment.contracts as any)?.tenant_name} - متأخر ${daysOverdue} يوم`,
+          severity: daysOverdue > 30 ? 'high' : 'medium',
+          date: new Date(payment.due_date),
+          actionUrl: '/properties?tab=payments'
+        });
+      });
+    }
+
+    // قروض مستحقة
+    if (dueLoansResult.data) {
+      dueLoansResult.data.forEach(installment => {
+        const daysUntilDue = Math.floor((new Date(installment.due_date).getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+        const isOverdue = installment.status === 'overdue' || daysUntilDue < 0;
+        allAlerts.push({
+          id: installment.id,
+          type: 'loan_due',
+          title: isOverdue ? `قسط قرض متأخر` : `قسط قرض مستحق قريبًا`,
+          description: `قرض ${(installment.loans as any)?.loan_number}`,
+          severity: isOverdue || daysUntilDue <= 7 ? 'high' : 'medium',
+          date: new Date(installment.due_date),
+          actionUrl: '/loans'
+        });
+      });
+    }
+
+    // طلبات متأخرة
+    if (overdueRequestsResult.data) {
+      overdueRequestsResult.data.forEach(request => {
+        allAlerts.push({
+          id: request.id,
+          type: 'request_overdue',
+          title: `طلب متأخر - ${request.request_number}`,
+          description: `طلب ${(request.beneficiaries as any)?.full_name} تجاوز الوقت المحدد`,
+          severity: 'high',
+          date: new Date(request.sla_due_at || Date.now()),
+          actionUrl: '/requests'
+        });
+      });
+    }
+
+    return allAlerts.sort((a, b) => {
+      const severityOrder = { high: 3, medium: 2, low: 1 };
+      if (severityOrder[a.severity] !== severityOrder[b.severity]) {
+        return severityOrder[b.severity] - severityOrder[a.severity];
+      }
+      return a.date.getTime() - b.date.getTime();
+    }).slice(0, 6);
+  }
+
+  /**
+   * استدعاء دالة backfill للمستندات
+   */
+  static async backfillDocuments() {
+    const { data, error } = await supabase.functions.invoke('backfill-rental-documents');
+    if (error) throw error;
+    return data;
   }
 }

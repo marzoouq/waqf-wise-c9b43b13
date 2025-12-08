@@ -4,9 +4,9 @@
  */
 
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { productionLogger } from "@/lib/logger/production-logger";
+import { MonitoringService } from "@/services";
 
 export interface BackfillResult {
   success: boolean;
@@ -33,12 +33,7 @@ export function useSystemMaintenanceData() {
         description: "يتم الآن معالجة الدفعات المدفوعة وإنشاء المستندات المفقودة",
       });
 
-      const { data, error } = await supabase.functions.invoke('backfill-rental-documents');
-
-      if (error) {
-        throw error;
-      }
-
+      const data = await MonitoringService.backfillDocuments();
       setResult(data);
 
       if (data.success) {
