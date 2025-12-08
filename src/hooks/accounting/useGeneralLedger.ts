@@ -4,7 +4,7 @@
  */
 
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { AccountingService } from "@/services/accounting.service";
 import { AccountRow, GeneralLedgerEntry } from "@/types/supabase-helpers";
 
 interface UseGeneralLedgerParams {
@@ -16,16 +16,7 @@ interface UseGeneralLedgerParams {
 export function useGeneralLedger({ accountId, dateFrom, dateTo }: UseGeneralLedgerParams) {
   const { data: accounts, error: accountsError, refetch: refetchAccounts } = useQuery({
     queryKey: ["accounts_for_ledger"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("accounts")
-        .select("id, code, name_ar")
-        .eq("is_active", true)
-        .eq("is_header", false)
-        .order("code");
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => AccountingService.getAccountsForLedger(),
   });
 
   const { data: ledgerData, isLoading, error, refetch } = useQuery({
@@ -33,34 +24,17 @@ export function useGeneralLedger({ accountId, dateFrom, dateTo }: UseGeneralLedg
     queryFn: async () => {
       if (!accountId) return null;
 
-      let query = supabase
-        .from("journal_entry_lines")
-        .select(`
-          *,
-          journal_entry:journal_entries!inner(
-            entry_number,
-            entry_date,
-            description,
-            status
-          )
-        `)
-        .eq("account_id", accountId)
-        .eq("journal_entry.status", "posted")
-        .order("journal_entry(entry_date)", { ascending: true });
+      const data = await AccountingService.getGeneralLedgerForHook({
+        accountId,
+        dateFrom,
+        dateTo,
+      });
 
-      if (dateFrom) {
-        query = query.gte("journal_entry.entry_date", dateFrom);
-      }
-      if (dateTo) {
-        query = query.lte("journal_entry.entry_date", dateTo);
-      }
-
-      const { data, error } = await query;
-      if (error) throw error;
+      if (!data) return null;
 
       let balance = 0;
       
-      const processedData: GeneralLedgerEntry[] = data.map((line, index: number) => {
+      const processedData: GeneralLedgerEntry[] = data.map((line: any, index: number) => {
         const debit = Number(line.debit_amount);
         const credit = Number(line.credit_amount);
         balance += debit - credit;

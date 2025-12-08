@@ -3,13 +3,9 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { AccountingService } from "@/services/accounting.service";
 import { toast } from "sonner";
 import type { FiscalYearClosing, FiscalYearSummary } from "@/types/fiscal-year-closing";
-import { Database } from "@/integrations/supabase/types";
-
-type FiscalYearClosingInsert = Database['public']['Tables']['fiscal_year_closings']['Insert'];
-type FiscalYearClosingUpdate = Database['public']['Tables']['fiscal_year_closings']['Update'];
 
 export function useFiscalYearClosings() {
   const queryClient = useQueryClient();
@@ -18,60 +14,27 @@ export function useFiscalYearClosings() {
   const { data: closings, isLoading } = useQuery({
     queryKey: ["fiscal-year-closings"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("fiscal_year_closings")
-        .select(`
-          *,
-          fiscal_years (
-            id,
-            name,
-            start_date,
-            end_date,
-            is_active,
-            is_closed
-          )
-        `)
-        .order("closing_date", { ascending: false });
-
-      if (error) throw error;
+      const data = await AccountingService.getFiscalYearClosings();
       return (data || []) as unknown as FiscalYearClosing[];
     },
   });
 
   // استرجاع عملية إقفال محددة
   const getClosingByFiscalYear = async (fiscalYearId: string) => {
-    const { data, error } = await supabase
-      .from("fiscal_year_closings")
-      .select("*")
-      .eq("fiscal_year_id", fiscalYearId)
-      .single();
-
-      if (error && error.code !== 'PGRST116') throw error;
-      return data as unknown as FiscalYearClosing | null;
+    const data = await AccountingService.getClosingByFiscalYear(fiscalYearId);
+    return data as unknown as FiscalYearClosing | null;
   };
 
   // حساب ملخص السنة المالية
   const calculateSummary = async (fiscalYearId: string): Promise<FiscalYearSummary> => {
-    const { data, error } = await supabase
-      .rpc("calculate_fiscal_year_summary", {
-        p_fiscal_year_id: fiscalYearId,
-      });
-
-      if (error) throw error;
-      return data as unknown as FiscalYearSummary;
+    const data = await AccountingService.calculateFiscalYearSummary(fiscalYearId);
+    return data as unknown as FiscalYearSummary;
   };
 
   // إنشاء عملية إقفال جديدة
   const createClosing = useMutation({
-    mutationFn: async (closing: FiscalYearClosingInsert) => {
-      const { data, error } = await supabase
-        .from("fiscal_year_closings")
-        .insert(closing)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
+    mutationFn: async (closing: any) => {
+      return await AccountingService.createFiscalYearClosing(closing);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["fiscal-year-closings"] });
@@ -85,16 +48,8 @@ export function useFiscalYearClosings() {
 
   // تحديث عملية إقفال
   const updateClosing = useMutation({
-    mutationFn: async ({ id, updates }: { id: string; updates: FiscalYearClosingUpdate }) => {
-      const { data, error } = await supabase
-        .from("fiscal_year_closings")
-        .update(updates)
-        .eq("id", id)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
+    mutationFn: async ({ id, updates }: { id: string; updates: any }) => {
+      return await AccountingService.updateFiscalYearClosing(id, updates);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["fiscal-year-closings"] });

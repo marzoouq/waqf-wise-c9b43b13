@@ -2,7 +2,7 @@
  * Hook for approval workflow management
  */
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { AccountingService } from "@/services/accounting.service";
 
 export interface ApprovalStep {
   level: number;
@@ -29,16 +29,7 @@ export function useApprovalWorkflow() {
   const { data: pendingApprovals, isLoading } = useQuery({
     queryKey: ["pending-approvals"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("approval_status")
-        .select(`
-          *,
-          approval_steps (*)
-        `)
-        .eq("status", "pending")
-        .order("started_at", { ascending: false });
-      
-      if (error) throw error;
+      const data = await AccountingService.getApprovalWorkflowStatus();
       return data as ApprovalStatus[];
     },
   });

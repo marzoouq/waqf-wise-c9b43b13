@@ -4,7 +4,7 @@
  */
 
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { AccountingService } from "@/services/accounting.service";
 import { JournalApproval } from "@/types/approvals";
 
 export function useAccountantDashboardData() {
@@ -15,17 +15,7 @@ export function useAccountantDashboardData() {
   } = useQuery({
     queryKey: ["pending_approvals"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("approvals")
-        .select(`
-          *,
-          journal_entry:journal_entries(*)
-        `)
-        .eq("status", "pending")
-        .order("created_at", { ascending: false })
-        .limit(10);
-
-      if (error) throw error;
+      const data = await AccountingService.getPendingApprovals();
       return data as JournalApproval[];
     },
   });

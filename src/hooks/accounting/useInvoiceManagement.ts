@@ -4,7 +4,7 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { AccountingService } from "@/services/accounting.service";
 import { useToast } from "@/hooks/use-toast";
 
 export interface Invoice {
@@ -26,28 +26,14 @@ export function useInvoiceManagement(statusFilter: string) {
   const { data: invoices, isLoading, error, refetch } = useQuery({
     queryKey: ["invoices", statusFilter],
     queryFn: async () => {
-      let query = supabase
-        .from("invoices")
-        .select("*")
-        .order("invoice_date", { ascending: false });
-
-      if (statusFilter !== "all") {
-        query = query.eq("status", statusFilter);
-      }
-
-      const { data, error } = await query;
-      if (error) throw error;
+      const data = await AccountingService.getInvoices(statusFilter);
       return data as Invoice[];
     },
   });
 
   const updateStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      const { error } = await supabase
-        .from("invoices")
-        .update({ status })
-        .eq("id", id);
-      if (error) throw error;
+      await AccountingService.updateInvoiceStatus(id, status);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["invoices"] });

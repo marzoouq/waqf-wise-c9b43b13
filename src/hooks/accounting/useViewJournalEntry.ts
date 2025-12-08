@@ -4,7 +4,7 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { AccountingService } from "@/services/accounting.service";
 import { useToast } from "@/hooks/use-toast";
 
 interface JournalEntryLine {
@@ -25,15 +25,7 @@ export function useViewJournalEntry(entryId: string, enabled: boolean) {
   const { data: lines } = useQuery({
     queryKey: ["journal_entry_lines", entryId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("journal_entry_lines")
-        .select(`
-          *,
-          account:accounts(code, name_ar)
-        `)
-        .eq("journal_entry_id", entryId)
-        .order("line_number");
-      if (error) throw error;
+      const data = await AccountingService.getJournalEntryLinesWithAccount(entryId);
       return data as JournalEntryLine[];
     },
     enabled,
@@ -41,11 +33,7 @@ export function useViewJournalEntry(entryId: string, enabled: boolean) {
 
   const postEntryMutation = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase
-        .from("journal_entries")
-        .update({ status: "posted", posted_at: new Date().toISOString() })
-        .eq("id", entryId);
-      if (error) throw error;
+      await AccountingService.postJournalEntryById(entryId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
