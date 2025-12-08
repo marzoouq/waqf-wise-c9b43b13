@@ -2,11 +2,11 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.7.4
+ * @version 2.7.10
  * @date 2025-12-08
  */
 
-export const APP_VERSION = '2.7.9';
+export const APP_VERSION = '2.7.10';
 export const APP_VERSION_DATE = '2025-12-08';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
@@ -18,10 +18,10 @@ export const VERSION_INFO = {
   features: [
     '23 Service Layer متكامل',
     '170+ Hook منظم في 26 مجلد',
-    'توحيد البنية: Hooks تستخدم Services (37→14 استعلام مباشر)',
-    'ثوابت موحدة (15+ مجموعة)',
-    'خدمات بنية تحتية (Storage, EdgeFunction, Realtime)',
-    'توثيق معماري شامل',
+    'توحيد البنية: Hooks تستخدم Services',
+    'إصلاح تصديرات hooks المفقودة',
+    'حذف ملفات proxy مكررة',
+    'إصلاح أخطاء البناء',
   ],
 } as const;
 

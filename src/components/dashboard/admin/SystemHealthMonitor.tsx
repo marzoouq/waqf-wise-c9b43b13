@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useSystemHealth } from "@/hooks/useSystemHealth";
+import { useSystemHealth } from "@/hooks/system";
 import { Database, HardDrive, Clock, Activity } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
