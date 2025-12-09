@@ -11,12 +11,17 @@ import { EnhancedEmptyState } from "@/components/shared";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { Database } from "@/integrations/supabase/types";
 import type { GovernanceDecision } from "@/types/governance";
+import { useAuth } from "@/hooks/useAuth";
 
 type GovernanceDecisionRow = Database['public']['Tables']['governance_decisions']['Row'];
 
 export default function GovernanceDecisions() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const { decisions, isLoading, error } = useGovernanceDecisions();
+  const { roles } = useAuth();
+
+  // فقط admin و nazer يمكنهم إنشاء قرارات
+  const canCreateDecision = roles.includes('admin') || roles.includes('nazer');
 
   const typedDecisions = decisions as GovernanceDecisionRow[];
   
@@ -36,10 +41,12 @@ export default function GovernanceDecisions() {
       <MobileOptimizedHeader
         title="القرارات والتصويت"
         actions={
-          <Button onClick={() => setDialogOpen(true)} size="sm">
-            <Plus className="h-4 w-4 ml-2" />
-            قرار جديد
-          </Button>
+          canCreateDecision ? (
+            <Button onClick={() => setDialogOpen(true)} size="sm">
+              <Plus className="h-4 w-4 ml-2" />
+              قرار جديد
+            </Button>
+          ) : undefined
         }
       />
 
@@ -60,11 +67,11 @@ export default function GovernanceDecisions() {
           <EnhancedEmptyState 
             icon={Vote}
             title="لا توجد قرارات"
-            description="ابدأ بإنشاء قرار جديد وحدد من له حق التصويت"
-            action={{
+            description={canCreateDecision ? "ابدأ بإنشاء قرار جديد وحدد من له حق التصويت" : "لا توجد قرارات حالياً"}
+            action={canCreateDecision ? {
               label: "إنشاء قرار جديد",
               onClick: () => setDialogOpen(true)
-            }}
+            } : undefined}
           />
         ) : (
           <Tabs defaultValue="active" className="w-full">
@@ -101,7 +108,9 @@ export default function GovernanceDecisions() {
         )}
       </div>
 
-      <CreateDecisionDialog open={dialogOpen} onOpenChange={setDialogOpen} />
+      {canCreateDecision && (
+        <CreateDecisionDialog open={dialogOpen} onOpenChange={setDialogOpen} />
+      )}
     </MobileOptimizedLayout>
     </PageErrorBoundary>
   );
