@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { PropertyService } from "@/services";
 import { ContractService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 interface ContractWithProperty {
   id: string;
@@ -19,12 +20,12 @@ interface ContractWithProperty {
 
 export function useBeneficiaryProperties(isCurrentYearPublished: boolean, publishStatusLoading: boolean) {
   const { data: properties = [], isLoading: propertiesLoading } = useQuery({
-    queryKey: ["properties-for-beneficiary"],
+    queryKey: QUERY_KEYS.PROPERTIES_FOR_BENEFICIARY,
     queryFn: () => PropertyService.getAll(),
   });
 
   const { data: contracts = [], isLoading: contractsLoading } = useQuery({
-    queryKey: ["contracts-for-beneficiary", isCurrentYearPublished],
+    queryKey: QUERY_KEYS.CONTRACTS_FOR_BENEFICIARY(isCurrentYearPublished),
     queryFn: async (): Promise<ContractWithProperty[]> => {
       if (!isCurrentYearPublished) {
         return [];

@@ -239,6 +239,39 @@ export const QUERY_KEYS = {
   // Beneficiary Timeline
   BENEFICIARY_TIMELINE: (beneficiaryId: string) => ['beneficiary-timeline', beneficiaryId] as const,
   BENEFICIARY_FAMILY: (beneficiaryId: string) => ['beneficiary-family', beneficiaryId] as const,
+  
+  // Beneficiary Portal & Profile
+  CURRENT_BENEFICIARY: (userId?: string) => ['current-beneficiary', userId] as const,
+  BENEFICIARY_STATISTICS: (beneficiaryId?: string) => ['beneficiary-statistics', beneficiaryId] as const,
+  BENEFICIARY_PROFILE: (userId?: string) => ['beneficiary-profile', userId] as const,
+  BENEFICIARY_DOCUMENTS: (beneficiaryId?: string) => ['beneficiary-documents', beneficiaryId] as const,
+  BENEFICIARY_PROFILE_PAYMENTS: (beneficiaryId?: string) => ['beneficiary-payments', beneficiaryId] as const,
+  BENEFICIARY_PROFILE_REQUESTS: (beneficiaryId?: string) => ['beneficiary-requests', beneficiaryId] as const,
+  FAMILY_TREE: (beneficiaryId: string) => ['family-tree', beneficiaryId] as const,
+  REQUEST_DETAILS: (requestId: string) => ['request-details', requestId] as const,
+  REQUEST_MESSAGES: (requestId: string) => ['request-messages', requestId] as const,
+  BENEFICIARY_INTEGRATION_STATS: (beneficiaryId: string) => ['beneficiary-integration-stats', beneficiaryId] as const,
+  HEIR_DISTRIBUTIONS_SUMMARY: (beneficiaryId: string) => ['heir-distributions-summary', beneficiaryId] as const,
+  
+  // Beneficiary Properties
+  PROPERTIES_FOR_BENEFICIARY: ['properties-for-beneficiary'] as const,
+  CONTRACTS_FOR_BENEFICIARY: (isPublished: boolean) => ['contracts-for-beneficiary', isPublished] as const,
+  
+  // Beneficiary Tabs Data
+  APPROVALS_LOG_BENEFICIARY: ['approvals-log-beneficiary'] as const,
+  BANK_ACCOUNTS_BENEFICIARY: ['bank-accounts-beneficiary'] as const,
+  ANNUAL_DISCLOSURES_BENEFICIARY: ['annual-disclosures-beneficiary'] as const,
+  DISTRIBUTION_PIE_CHART: ['distribution-pie-chart'] as const,
+  YEARLY_COMPARISON: (beneficiaryId: string) => ['yearly-comparison', beneficiaryId] as const,
+  MONTHLY_REVENUE_CHART: ['monthly-revenue-chart'] as const,
+  PROPERTY_STATS_COMBINED: ['property-stats-combined'] as const,
+  
+  // Yearly Distributions & Requests
+  BENEFICIARY_YEARLY_DISTRIBUTIONS: (beneficiaryId?: string, year?: number) => ['beneficiary-yearly-distributions', beneficiaryId, year] as const,
+  BENEFICIARY_YEARLY_REQUESTS: (beneficiaryId?: string, year?: number) => ['beneficiary-yearly-requests', beneficiaryId, year] as const,
+  
+  // Waqf Summary
+  WAQF_SUMMARY: ['waqf-summary'] as const,
 } as const;
 
 // Query Config with default settings

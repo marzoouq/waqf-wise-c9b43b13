@@ -17,7 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 // Hook for approvals log tab
 export function useApprovalsLog(enabled: boolean = true) {
   return useQuery({
-    queryKey: ["approvals-log-beneficiary"],
+    queryKey: QUERY_KEYS.APPROVALS_LOG_BENEFICIARY,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("approval_history")
@@ -35,7 +35,7 @@ export function useApprovalsLog(enabled: boolean = true) {
 // Hook for bank accounts (waqf accounts visible to beneficiaries)
 export function useBeneficiaryBankAccounts(enabled: boolean = true) {
   return useQuery({
-    queryKey: ["bank-accounts-beneficiary"],
+    queryKey: QUERY_KEYS.BANK_ACCOUNTS_BENEFICIARY,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("bank_accounts")
@@ -54,7 +54,7 @@ export function useBeneficiaryDocuments(beneficiaryId: string) {
   const queryClient = useQueryClient();
   
   const query = useQuery({
-    queryKey: ["beneficiary-documents", beneficiaryId],
+    queryKey: QUERY_KEYS.BENEFICIARY_DOCUMENTS(beneficiaryId),
     queryFn: () => BeneficiaryService.getDocuments(beneficiaryId),
     enabled: !!beneficiaryId,
   });
@@ -62,7 +62,7 @@ export function useBeneficiaryDocuments(beneficiaryId: string) {
   const deleteMutation = useMutation({
     mutationFn: (documentId: string) => BeneficiaryService.deleteDocument(documentId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["beneficiary-documents"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARY_DOCUMENTS() });
       toast.success("تم حذف المستند بنجاح");
     },
     onError: () => {
@@ -91,7 +91,7 @@ export function useBeneficiaryDocuments(beneficiaryId: string) {
 // Hook for beneficiary statements (payments)
 export function useBeneficiaryStatements(beneficiaryId: string) {
   return useQuery({
-    queryKey: ["beneficiary-payments", beneficiaryId],
+    queryKey: QUERY_KEYS.BENEFICIARY_PROFILE_PAYMENTS(beneficiaryId),
     queryFn: async () => {
       const { data, error } = await supabase
         .from("payments")
@@ -109,7 +109,7 @@ export function useBeneficiaryStatements(beneficiaryId: string) {
 // Hook for annual disclosures
 export function useDisclosures(enabled: boolean = true) {
   return useQuery({
-    queryKey: ["annual-disclosures-beneficiary"],
+    queryKey: QUERY_KEYS.ANNUAL_DISCLOSURES_BENEFICIARY,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("annual_disclosures")
@@ -127,7 +127,7 @@ export function useDisclosures(enabled: boolean = true) {
 // Hook for distribution pie chart data
 export function useDistributionChartData() {
   return useQuery({
-    queryKey: ["distribution-pie-chart"],
+    queryKey: QUERY_KEYS.DISTRIBUTION_PIE_CHART,
     queryFn: async () => {
       const { data: latestDistribution, error: distError } = await supabase
         .from("distributions")
@@ -174,9 +174,9 @@ export function useDistributionChartData() {
 }
 
 // Hook for beneficiary requests
-export function useBeneficiaryRequests(beneficiaryId: string) {
+export function useBeneficiaryRequestsTab(beneficiaryId: string) {
   return useQuery({
-    queryKey: ["beneficiary-requests", beneficiaryId],
+    queryKey: QUERY_KEYS.BENEFICIARY_PROFILE_REQUESTS(beneficiaryId),
     queryFn: async () => {
       const { data, error } = await supabase
         .from("beneficiary_requests")
@@ -200,7 +200,7 @@ export function useBeneficiaryRequests(beneficiaryId: string) {
 // Hook for yearly comparison chart
 export function useYearlyComparison(beneficiaryId: string) {
   return useQuery({
-    queryKey: ["yearly-comparison", beneficiaryId],
+    queryKey: QUERY_KEYS.YEARLY_COMPARISON(beneficiaryId),
     queryFn: async () => {
       const currentYear = new Date().getFullYear();
       const years = [currentYear - 1, currentYear];
@@ -237,7 +237,7 @@ export function useYearlyComparison(beneficiaryId: string) {
 // Hook for monthly revenue chart
 export function useMonthlyRevenue() {
   return useQuery({
-    queryKey: ["monthly-revenue-chart"],
+    queryKey: QUERY_KEYS.MONTHLY_REVENUE_CHART,
     queryFn: async () => {
       const { data: payments, error } = await supabase
         .from("rental_payments")
@@ -283,7 +283,7 @@ interface RentalPaymentWithContract {
 
 export function usePropertyStats() {
   return useQuery({
-    queryKey: ["property-stats-combined"],
+    queryKey: QUERY_KEYS.PROPERTY_STATS_COMBINED,
     queryFn: async () => {
       const [propertiesRes, paymentsRes] = await Promise.all([
         supabase

@@ -6,11 +6,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { BeneficiaryService, RequestService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 // ==================== Family Tree Hook ====================
 export function useFamilyTree(beneficiaryId: string, enabled: boolean = true) {
   return useQuery({
-    queryKey: ["family-tree", beneficiaryId],
+    queryKey: QUERY_KEYS.FAMILY_TREE(beneficiaryId),
     queryFn: async () => {
       const result = await BeneficiaryService.getFamilyTree(beneficiaryId);
       return result.familyMembers || [];
@@ -39,7 +40,7 @@ interface RequestWithDetails {
 
 export function useRequestDetails(requestId: string, isOpen: boolean) {
   const requestQuery = useQuery<RequestWithDetails>({
-    queryKey: ["request-details", requestId],
+    queryKey: QUERY_KEYS.REQUEST_DETAILS(requestId),
     queryFn: async () => {
       const data = await RequestService.getById(requestId);
       if (!data) throw new Error("Request not found");
@@ -49,7 +50,7 @@ export function useRequestDetails(requestId: string, isOpen: boolean) {
   });
 
   const messagesQuery = useQuery({
-    queryKey: ["request-messages", requestId],
+    queryKey: QUERY_KEYS.REQUEST_MESSAGES(requestId),
     queryFn: async () => {
       const { data, error } = await supabase
         .from("internal_messages")
@@ -73,7 +74,7 @@ export function useRequestDetails(requestId: string, isOpen: boolean) {
 // ==================== Beneficiary Integration Stats Hook ====================
 export function useBeneficiaryIntegrationStats(beneficiaryId: string) {
   return useQuery({
-    queryKey: ["beneficiary-integration-stats", beneficiaryId],
+    queryKey: QUERY_KEYS.BENEFICIARY_INTEGRATION_STATS(beneficiaryId),
     queryFn: () => BeneficiaryService.getIntegrationStats(beneficiaryId),
     staleTime: 30 * 1000,
   });
@@ -97,7 +98,7 @@ interface HeirDistribution {
 
 export function useWaqfDistributionsSummary(beneficiaryId: string) {
   return useQuery({
-    queryKey: ["heir-distributions-summary", beneficiaryId],
+    queryKey: QUERY_KEYS.HEIR_DISTRIBUTIONS_SUMMARY(beneficiaryId),
     queryFn: async () => {
       const data = await BeneficiaryService.getWaqfDistributionsSummary(beneficiaryId);
       return data as HeirDistribution[];
