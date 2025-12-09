@@ -2,58 +2,23 @@
  * عرض نشاط المستفيدين المباشر للناظر
  * يظهر من متصل حالياً والقسم الذي يتصفحه
  */
-import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { 
-  Users, Clock, MapPin, Monitor, Wifi, WifiOff,
+  useBeneficiaryActivitySessions, 
+  getPageName,
+  type BeneficiarySession 
+} from "@/hooks/nazer/useBeneficiaryActivitySessions";
+import { 
+  Users, Clock, MapPin, Wifi, WifiOff,
   Eye, Calendar, Activity
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ar } from "date-fns/locale";
 import { cn } from "@/lib/utils";
-
-interface BeneficiarySession {
-  id: string;
-  beneficiary_id: string;
-  current_page: string | null;
-  current_section: string | null;
-  last_activity: string;
-  is_online: boolean;
-  session_start: string;
-  beneficiary?: {
-    full_name: string;
-    phone: string;
-    category: string;
-  };
-}
-
-// ترجمة أسماء الصفحات
-const PAGE_NAMES: Record<string, string> = {
-  "/beneficiary-portal": "الصفحة الرئيسية",
-  "/beneficiary-portal/profile": "الملف الشخصي",
-  "/beneficiary-portal/distributions": "التوزيعات",
-  "/beneficiary-portal/statements": "كشف الحساب",
-  "/beneficiary-portal/properties": "العقارات",
-  "/beneficiary-portal/family": "العائلة",
-  "/beneficiary-portal/waqf": "الوقف",
-  "/beneficiary-portal/governance": "الحوكمة",
-  "/beneficiary-portal/budgets": "الميزانيات",
-  "/beneficiary-portal/requests": "الطلبات",
-  "/beneficiary-portal/documents": "المستندات",
-  "/beneficiary-portal/loans": "القروض",
-  "/beneficiary-dashboard": "لوحة التحكم",
-};
-
-function getPageName(path: string | null): string {
-  if (!path) return "غير محدد";
-  return PAGE_NAMES[path] || path.split("/").pop() || "غير محدد";
-}
 
 function getTimeAgo(date: string): string {
   try {
@@ -64,76 +29,12 @@ function getTimeAgo(date: string): string {
 }
 
 export function BeneficiaryActivityMonitor() {
-  const [realtimeSessions, setRealtimeSessions] = useState<BeneficiarySession[]>([]);
-
-  const { data: sessions = [], isLoading, refetch } = useQuery({
-    queryKey: ["beneficiary-sessions-live"],
-    queryFn: async () => {
-      // جلب الجلسات مع بيانات المستفيدين
-      const { data, error } = await supabase
-        .from("beneficiary_sessions")
-        .select(`
-          id,
-          beneficiary_id,
-          current_page,
-          current_section,
-          last_activity,
-          is_online,
-          session_start,
-          beneficiaries:beneficiary_id (
-            full_name,
-            phone,
-            category
-          )
-        `)
-        .order("last_activity", { ascending: false })
-        .limit(20);
-
-      if (error) throw error;
-      
-      return (data || []).map(session => ({
-        ...session,
-        beneficiary: session.beneficiaries as BeneficiarySession['beneficiary']
-      }));
-    },
-    staleTime: 30 * 1000, // 30 ثانية
-    refetchInterval: 60 * 1000, // تحديث كل دقيقة
-  });
-
-  // الاشتراك في التحديثات المباشرة
-  useEffect(() => {
-    const channel = supabase
-      .channel("beneficiary-sessions-realtime")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "beneficiary_sessions",
-        },
-        () => {
-          refetch();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [refetch]);
-
-  // تحديد المتصلين حالياً (نشاط خلال آخر 5 دقائق)
-  const onlineSessions = sessions.filter(s => {
-    const lastActivity = new Date(s.last_activity);
-    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-    return lastActivity > fiveMinutesAgo && s.is_online;
-  });
-
-  const offlineSessions = sessions.filter(s => {
-    const lastActivity = new Date(s.last_activity);
-    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-    return lastActivity <= fiveMinutesAgo || !s.is_online;
-  });
+  const { 
+    sessions, 
+    onlineSessions, 
+    offlineSessions, 
+    isLoading 
+  } = useBeneficiaryActivitySessions();
 
   if (isLoading) {
     return (

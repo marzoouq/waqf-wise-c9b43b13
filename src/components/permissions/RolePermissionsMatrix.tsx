@@ -1,11 +1,7 @@
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { useToast } from "@/hooks/use-toast";
 import { Save, RotateCcw, CheckCircle } from "lucide-react";
 import {
   Table,
@@ -17,112 +13,25 @@ import {
 } from "@/components/ui/table";
 import { Permission } from "@/hooks/usePermissions";
 import { AppRole } from "@/hooks/useUserRole";
+import { useRolePermissionsData } from "@/hooks/permissions/useRolePermissionsData";
 
 interface RolePermissionsMatrixProps {
   role: AppRole;
   permissions: Permission[];
 }
 
-interface RolePermissionState {
-  permissionId: string;
-  granted: boolean;
-  modified: boolean;
-}
-
 export function RolePermissionsMatrix({ role, permissions }: RolePermissionsMatrixProps) {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [modifications, setModifications] = useState<Map<string, RolePermissionState>>(new Map());
-
-  // Fetch role permissions
-  const { data: rolePermissions = [], isLoading } = useQuery({
-    queryKey: ["role-permissions", role],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("role_permissions")
-        .select("*")
-        .eq("role", role);
-      
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!role,
-  });
-
-  // Update role permission mutation
-  const updatePermissionMutation = useMutation({
-    mutationFn: async ({ permissionId, granted }: { permissionId: string; granted: boolean }) => {
-      const { error } = await supabase
-        .from("role_permissions")
-        .upsert({
-          role: role,
-          permission_id: permissionId,
-          granted
-        }, {
-          onConflict: 'role,permission_id'
-        });
-      
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["role-permissions"] });
-      queryClient.invalidateQueries({ queryKey: ["user-permissions"] });
-      toast({
-        title: "تم الحفظ",
-        description: "تم تحديث الصلاحيات بنجاح",
-      });
-      setModifications(new Map());
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "خطأ",
-        description: error.message || "فشل تحديث الصلاحيات",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Save all modifications
-  const saveAllModifications = async () => {
-    const updates: Array<{ permissionId: string; granted: boolean }> = [];
-    modifications.forEach((state, permissionId) => {
-      if (state.modified) {
-        updates.push({ permissionId, granted: state.granted });
-      }
-    });
-
-    for (const update of updates) {
-      await updatePermissionMutation.mutateAsync(update);
-    }
-  };
-
-  const isPermissionGranted = (permissionId: string): boolean => {
-    const modification = modifications.get(permissionId);
-    if (modification !== undefined) {
-      return modification.granted;
-    }
-    
-    return rolePermissions.some(rp => rp.permission_id === permissionId && rp.granted);
-  };
-
-  const togglePermission = (permissionId: string, currentValue: boolean) => {
-    const newValue = !currentValue;
-    setModifications(prev => {
-      const newMap = new Map(prev);
-      newMap.set(permissionId, {
-        permissionId,
-        granted: newValue,
-        modified: true
-      });
-      return newMap;
-    });
-  };
-
-  const resetModifications = () => {
-    setModifications(new Map());
-  };
-
-  const hasModifications = modifications.size > 0;
+  const {
+    rolePermissions,
+    isLoading,
+    modifications,
+    hasModifications,
+    updatePermissionMutation,
+    saveAllModifications,
+    isPermissionGranted,
+    togglePermission,
+    resetModifications,
+  } = useRolePermissionsData(role);
 
   // Group permissions by category
   const groupedPermissions = permissions.reduce((acc, perm) => {
@@ -132,6 +41,7 @@ export function RolePermissionsMatrix({ role, permissions }: RolePermissionsMatr
     acc[perm.category].push(perm);
     return acc;
   }, {} as Record<string, Permission[]>);
+
 
   if (isLoading) {
     return (
