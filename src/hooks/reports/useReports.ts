@@ -1,13 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { ReportService, type ReportTemplate } from "@/services/report.service";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export function useReports(reportType?: string) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const { data: templates = [], isLoading } = useQuery({
-    queryKey: ["report_templates", reportType],
+    queryKey: QUERY_KEYS.REPORT_TEMPLATES(reportType),
     queryFn: async () => {
       const result = await ReportService.getTemplates(reportType);
       return result.templates;
@@ -20,7 +21,7 @@ export function useReports(reportType?: string) {
       return result.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["report_templates"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REPORT_TEMPLATES() });
       toast({
         title: "تم إنشاء القالب بنجاح",
         description: "يمكنك الآن استخدام هذا القالب لتوليد التقارير",
@@ -60,7 +61,7 @@ export function useReports(reportType?: string) {
       await ReportService.deleteTemplate(templateId);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["report_templates"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REPORT_TEMPLATES() });
       toast({
         title: "تم حذف القالب بنجاح",
       });

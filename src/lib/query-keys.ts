@@ -50,13 +50,27 @@ export const QUERY_KEYS = {
   // Accounting
   ACCOUNTS: ['accounts'] as const,
   ACCOUNT: (id: string) => ['account', id] as const,
+  ACCOUNTS_FOR_LEDGER: ['accounts_for_ledger'] as const,
+  ACCOUNTS_WITH_BALANCES: ['accounts-with-balances'] as const,
   JOURNAL_ENTRIES: ['journal_entries'] as const,
   JOURNAL_ENTRY: (id: string) => ['journal_entry', id] as const,
+  JOURNAL_ENTRY_LINES: (entryId: string) => ['journal_entry_lines', entryId] as const,
+  JOURNAL_ENTRY_ACCOUNTS: ['journal-entry-accounts'] as const,
   TRIAL_BALANCE: ['trial-balance'] as const,
+  TRIAL_BALANCE_BY_YEAR: (fiscalYearId?: string) => ['trial_balance', fiscalYearId] as const,
   BALANCE_SHEET: ['balance-sheet'] as const,
+  BALANCE_SHEET_BY_YEAR: (fiscalYearId?: string) => ['balance_sheet', fiscalYearId] as const,
   INCOME_STATEMENT: ['income-statement'] as const,
+  INCOME_STATEMENT_BY_YEAR: (fiscalYearId?: string) => ['income_statement', fiscalYearId] as const,
   CASH_FLOW: ['cash-flow'] as const,
+  CASH_FLOWS: (fiscalYearId?: string) => ['cash_flows', fiscalYearId] as const,
   BUDGETS: ['budgets'] as const,
+  BUDGETS_BY_YEAR: (fiscalYearId?: string) => ['budgets', fiscalYearId] as const,
+  BUDGETS_BY_PERIOD: (periodType?: string) => ['budgets', periodType] as const,
+  GENERAL_LEDGER: (accountId?: string, dateFrom?: string, dateTo?: string) => ['general_ledger', accountId, dateFrom, dateTo] as const,
+  FINANCIAL_DATA: ['financial-data'] as const,
+  PENDING_APPROVALS: ['pending_approvals'] as const,
+  PENDING_APPROVALS_ALT: ['pending-approvals'] as const,
 
   // Loans
   LOANS: ['loans'] as const,
@@ -71,8 +85,11 @@ export const QUERY_KEYS = {
   HEIR_DISTRIBUTIONS: ['heir-distributions'] as const,
 
   // Fiscal Years
-  FISCAL_YEARS: ['fiscal-years'] as const,
+  FISCAL_YEARS: ['fiscal_years'] as const,
+  FISCAL_YEARS_ALT: ['fiscal-years'] as const,
   FISCAL_YEAR_ACTIVE: ['fiscal-year', 'active'] as const,
+  ACTIVE_FISCAL_YEAR: ['active-fiscal-year'] as const,
+  ACTIVE_FISCAL_YEARS: ['active-fiscal-years'] as const,
   FISCAL_YEAR: (id: string) => ['fiscal-year', id] as const,
   FISCAL_YEAR_CLOSINGS: ['fiscal-year-closings'] as const,
 
@@ -123,6 +140,7 @@ export const QUERY_KEYS = {
   // Reports
   REPORTS: ['reports'] as const,
   REPORT: (id: string) => ['report', id] as const,
+  REPORT_TEMPLATES: (reportType?: string) => ['report_templates', reportType] as const,
   ANNUAL_DISCLOSURES: ['annual-disclosures'] as const,
 
   // Dashboard KPIs

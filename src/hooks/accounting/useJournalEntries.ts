@@ -10,6 +10,7 @@ import type { JournalEntryInsert, JournalLineInsert } from "@/types/accounting";
 import { AccountingService } from "@/services/accounting.service";
 import { RealtimeService } from "@/services/realtime.service";
 import { invalidateAccountingQueries } from "@/lib/query-invalidation";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface JournalEntry {
   id: string;
@@ -55,7 +56,7 @@ export function useJournalEntries() {
   }, [queryClient]);
 
   const { data: entries = [], isLoading } = useQuery({
-    queryKey: ["journal_entries"],
+    queryKey: QUERY_KEYS.JOURNAL_ENTRIES,
     queryFn: () => AccountingService.getJournalEntriesWithLines(),
   });
 
@@ -78,7 +79,7 @@ export function useJournalEntries() {
       return AccountingService.createJournalEntry(entry, lines);
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.JOURNAL_ENTRIES });
       
       // إضافة نشاط
       addActivity({
@@ -133,7 +134,7 @@ export function useJournalEntries() {
 
       if (result.error) throw result.error;
       
-      queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.JOURNAL_ENTRIES });
       return result.data?.id;
     } catch (error) {
       logger.error(error, { context: 'create_auto_entry', severity: 'high' });

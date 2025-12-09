@@ -6,13 +6,14 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AccountingService } from "@/services/accounting.service";
 import { toast } from "sonner";
 import type { FiscalYearClosing, FiscalYearSummary } from "@/types/fiscal-year-closing";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export function useFiscalYearClosings() {
   const queryClient = useQueryClient();
 
   // استرجاع جميع عمليات الإقفال
   const { data: closings, isLoading } = useQuery({
-    queryKey: ["fiscal-year-closings"],
+    queryKey: QUERY_KEYS.FISCAL_YEAR_CLOSINGS,
     queryFn: async () => {
       const data = await AccountingService.getFiscalYearClosings();
       return (data || []) as unknown as FiscalYearClosing[];
@@ -37,8 +38,8 @@ export function useFiscalYearClosings() {
       return await AccountingService.createFiscalYearClosing(closing);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["fiscal-year-closings"] });
-      queryClient.invalidateQueries({ queryKey: ["fiscal_years"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FISCAL_YEAR_CLOSINGS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FISCAL_YEARS });
       toast.success("تم إنشاء عملية الإقفال بنجاح");
     },
     onError: (error: Error) => {
@@ -52,7 +53,7 @@ export function useFiscalYearClosings() {
       return await AccountingService.updateFiscalYearClosing(id, updates);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["fiscal-year-closings"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FISCAL_YEAR_CLOSINGS });
       toast.success("تم تحديث عملية الإقفال بنجاح");
     },
     onError: (error: Error) => {

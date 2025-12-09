@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { FiscalYearService } from "@/services/fiscal-year.service";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface FiscalYear {
   id: string;
@@ -17,7 +18,7 @@ export interface FiscalYear {
 
 export function useFiscalYears() {
   const { data: fiscalYears = [], isLoading } = useQuery({
-    queryKey: ["fiscal_years"],
+    queryKey: QUERY_KEYS.FISCAL_YEARS,
     queryFn: () => FiscalYearService.getAll(),
   });
 

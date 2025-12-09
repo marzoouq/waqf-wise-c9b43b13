@@ -6,6 +6,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AccountingService } from "@/services/accounting.service";
 import { useToast } from "@/hooks/use-toast";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface Invoice {
   id: string;
@@ -24,7 +25,7 @@ export function useInvoiceManagement(statusFilter: string) {
   const queryClient = useQueryClient();
 
   const { data: invoices, isLoading, error, refetch } = useQuery({
-    queryKey: ["invoices", statusFilter],
+    queryKey: [...QUERY_KEYS.INVOICES, statusFilter],
     queryFn: async () => {
       const data = await AccountingService.getInvoices(statusFilter);
       return data as Invoice[];
@@ -36,7 +37,7 @@ export function useInvoiceManagement(statusFilter: string) {
       await AccountingService.updateInvoiceStatus(id, status);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["invoices"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INVOICES });
       toast({
         title: "تم التحديث",
         description: "تم تحديث حالة الفاتورة بنجاح",
