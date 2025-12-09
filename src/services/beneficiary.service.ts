@@ -1083,4 +1083,142 @@ export class BeneficiaryService {
       throw error;
     }
   }
+
+  /**
+   * استيراد مستفيدين من ملف
+   */
+  static async importBeneficiaries(beneficiaries: Array<{
+    full_name: string;
+    national_id: string;
+    phone: string;
+    gender: string;
+    relationship: string;
+    category: string;
+    nationality: string;
+  }>): Promise<void> {
+    const records = beneficiaries.map(b => ({
+      ...b,
+      status: 'نشط',
+    }));
+
+    const { error } = await supabase
+      .from('beneficiaries')
+      .insert(records);
+
+    if (error) throw error;
+  }
+
+  /**
+   * رفع مرفقات المستفيد
+   */
+  static async uploadAttachment(
+    beneficiaryId: string,
+    file: File
+  ): Promise<{ filePath: string }> {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${beneficiaryId}/${Date.now()}.${fileExt}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('beneficiary-attachments')
+      .upload(fileName, file);
+
+    if (uploadError) throw uploadError;
+
+    const { error: dbError } = await supabase
+      .from('beneficiary_attachments')
+      .insert({
+        beneficiary_id: beneficiaryId,
+        file_name: file.name,
+        file_path: fileName,
+        file_type: file.type.split('/')[0] || 'document',
+        file_size: file.size,
+        mime_type: file.type,
+      });
+
+    if (dbError) throw dbError;
+
+    return { filePath: fileName };
+  }
+
+  /**
+   * حذف مرفق المستفيد
+   */
+  static async deleteAttachment(attachmentId: string, filePath: string): Promise<void> {
+    const { error: storageError } = await supabase.storage
+      .from('beneficiary-attachments')
+      .remove([filePath]);
+
+    if (storageError) throw storageError;
+
+    const { error: dbError } = await supabase
+      .from('beneficiary_attachments')
+      .delete()
+      .eq('id', attachmentId);
+
+    if (dbError) throw dbError;
+  }
+
+  /**
+   * إنشاء حساب مصادقة للمستفيد
+   */
+  static async createAuthAccount(
+    beneficiary: { id: string; full_name: string; email: string },
+    password: string
+  ): Promise<{ userId: string }> {
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email: beneficiary.email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/`,
+        data: { full_name: beneficiary.full_name }
+      }
+    });
+
+    if (authError) throw authError;
+    if (!authData.user) throw new Error('فشل إنشاء الحساب');
+
+    const { error: updateError } = await supabase
+      .from('beneficiaries')
+      .update({
+        user_id: authData.user.id,
+        can_login: true,
+        login_enabled_at: new Date().toISOString()
+      })
+      .eq('id', beneficiary.id);
+
+    if (updateError) throw updateError;
+
+    return { userId: authData.user.id };
+  }
+
+  /**
+   * تفعيل/تعطيل حساب المستفيد
+   */
+  static async toggleLogin(beneficiaryId: string, enabled: boolean): Promise<void> {
+    const { error } = await supabase
+      .from('beneficiaries')
+      .update({
+        can_login: enabled,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', beneficiaryId);
+
+    if (error) throw error;
+  }
+
+  /**
+   * تقييم أهلية المستفيد باستخدام RPC
+   */
+  static async assessEligibilityRPC(beneficiaryId: string): Promise<{
+    score: number;
+    status: string;
+    max_score: number;
+  }> {
+    const { data, error } = await supabase.rpc('auto_assess_eligibility', {
+      p_beneficiary_id: beneficiaryId,
+    });
+
+    if (error) throw error;
+    return data as { score: number; status: string; max_score: number };
+  }
 }

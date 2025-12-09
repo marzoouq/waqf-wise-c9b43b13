@@ -210,4 +210,19 @@ export class InvoiceService {
     if (error) throw error;
     return data || [];
   }
+
+  /**
+   * جلب حسابات الإيرادات
+   */
+  static async getRevenueAccounts() {
+    const { data, error } = await supabase
+      .from("accounts")
+      .select("id, code, name_ar")
+      .eq("account_type", "revenue")
+      .eq("is_active", true)
+      .eq("is_header", false)
+      .order("code");
+    if (error) throw error;
+    return data || [];
+  }
 }

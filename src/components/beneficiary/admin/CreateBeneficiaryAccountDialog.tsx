@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { BeneficiaryService } from "@/services/beneficiary.service";
 import { UserPlus, Copy, Eye, EyeOff } from "lucide-react";
 import { Beneficiary } from "@/types/beneficiary";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -74,45 +74,22 @@ export function CreateBeneficiaryAccountDialog({
         return;
       }
 
-      // Create auth account
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      await BeneficiaryService.createAuthAccount(
+        { id: beneficiary.id, full_name: beneficiary.full_name, email: beneficiary.email },
+        data.password
+      );
+
+      setCreatedAccount({
         email: beneficiary.email,
         password: data.password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/`,
-          data: {
-            full_name: beneficiary.full_name,
-          }
-        }
       });
 
-      if (authError) throw authError;
+      toast({
+        title: "تم إنشاء الحساب بنجاح",
+        description: "يمكن للمستفيد الآن تسجيل الدخول",
+      });
 
-      if (authData.user) {
-        // Update beneficiary with user_id
-        const { error: updateError } = await supabase
-          .from("beneficiaries")
-          .update({ 
-            user_id: authData.user.id,
-            can_login: true,
-            login_enabled_at: new Date().toISOString()
-          })
-          .eq("id", beneficiary.id);
-
-        if (updateError) throw updateError;
-
-        setCreatedAccount({
-          email: beneficiary.email,
-          password: data.password,
-        });
-
-        toast({
-          title: "تم إنشاء الحساب بنجاح",
-          description: "يمكن للمستفيد الآن تسجيل الدخول",
-        });
-
-        onSuccess?.();
-      }
+      onSuccess?.();
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "حدث خطأ أثناء إنشاء الحساب";
       toast({

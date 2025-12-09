@@ -3,7 +3,7 @@ import { ResponsiveDialog, DialogFooter } from "@/components/shared/ResponsiveDi
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { supabase } from "@/integrations/supabase/client";
+import { BeneficiaryService } from "@/services/beneficiary.service";
 import { useToast } from "@/hooks/use-toast";
 import { Key, Mail, User, Info, RefreshCw } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -55,15 +55,7 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
   const handleEnableExisting = async () => {
     setLoading(true);
     try {
-      const { error } = await supabase
-        .from("beneficiaries")
-        .update({ 
-          can_login: true,
-          updated_at: new Date().toISOString()
-        })
-        .eq("id", beneficiary.id);
-
-      if (error) throw error;
+      await BeneficiaryService.toggleLogin(beneficiary.id, true);
 
       toast({
         title: "تم التفعيل بنجاح",
@@ -131,94 +123,13 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
         return;
       }
 
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          data: {
-            full_name: beneficiary.full_name,
-            beneficiary_id: beneficiary.id,
-          },
-          emailRedirectTo: `${window.location.origin}/beneficiary-dashboard`,
-        },
-      });
+      await BeneficiaryService.createAuthAccount(
+        { id: beneficiary.id, full_name: beneficiary.full_name, email: formData.email },
+        formData.password
+      );
 
-      if (authError) {
-        let errorMessage = "حدث خطأ أثناء إنشاء الحساب";
-        let errorTitle = "خطأ في الإنشاء";
-        
-        // معالجة الأخطاء الشائعة برسائل واضحة
-        if (authError.message.includes("already registered") || authError.message.includes("User already registered")) {
-          errorTitle = "البريد الإلكتروني مستخدم";
-          errorMessage = "هذا البريد الإلكتروني مسجل بالفعل. حاول استخدام بريد آخر.";
-        } else if (authError.message.includes("Invalid email")) {
-          errorTitle = "بريد إلكتروني غير صالح";
-          errorMessage = "يرجى التأكد من صحة البريد الإلكتروني المدخل.";
-        } else if (authError.message.includes("Password")) {
-          errorTitle = "خطأ في كلمة المرور";
-          errorMessage = "كلمة المرور يجب أن تكون على الأقل 6 أحرف وتحتوي على أحرف وأرقام.";
-        } else if (authError.message.includes("Database")) {
-          errorTitle = "خطأ في قاعدة البيانات";
-          errorMessage = "حدث خطأ أثناء حفظ البيانات. يرجى المحاولة مرة أخرى.";
-        } else {
-          // رسالة عامة مع تفاصيل الخطأ
-          errorMessage = `${errorMessage}: ${authError.message}`;
-        }
-        
-        logger.error(authError, { 
-          context: 'auth_signup_failed', 
-          severity: 'high'
-        });
-        
-        toast({
-          title: errorTitle,
-          description: errorMessage,
-          variant: "destructive",
-        });
-        
-        setLoading(false);
-        return;
-      }
-
-      const { error: updateError } = await supabase
-        .from("beneficiaries")
-        .update({
-          username: formData.username,
-          email: formData.email,
-          can_login: true,
-          login_enabled_at: new Date().toISOString(),
-          user_id: authData.user?.id,
-        })
-        .eq("id", beneficiary.id);
-
-      if (updateError) {
-        logger.error(updateError, { 
-          context: 'beneficiary_update_failed', 
-          severity: 'critical'
-        });
-        
-        toast({
-          title: "خطأ في حفظ البيانات",
-          description: "تم إنشاء حساب المصادقة لكن فشل ربطه بالمستفيد. يرجى التواصل مع الدعم الفني.",
-          variant: "destructive",
-        });
-        
-        setLoading(false);
-        return;
-      }
-
-      if (authData.user) {
-        try {
-          await supabase.rpc('create_user_profile_and_role', {
-            p_user_id: authData.user.id,
-            p_full_name: beneficiary.full_name,
-            p_email: formData.email,
-            p_role: 'beneficiary'
-          });
-        } catch (roleError) {
-          logger.error(roleError, { context: 'create_beneficiary_profile', severity: 'low' });
-        }
-      }
+      // Update username
+      await BeneficiaryService.update(beneficiary.id, { username: formData.username });
 
       toast({
         title: "تم التفعيل بنجاح",
@@ -240,20 +151,10 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
     }
   };
 
-  // تم نقل وظيفة إعادة تعيين كلمة المرور إلى ResetPasswordDialog
-
   const handleDisable = async () => {
     setLoading(true);
     try {
-      const { error } = await supabase
-        .from("beneficiaries")
-        .update({ 
-          can_login: false,
-          updated_at: new Date().toISOString()
-        })
-        .eq("id", beneficiary.id);
-
-      if (error) throw error;
+      await BeneficiaryService.toggleLogin(beneficiary.id, false);
 
       toast({
         title: "تم التعطيل",

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { BeneficiaryService } from '@/services/beneficiary.service';
 import {
   Dialog,
   DialogContent,
@@ -46,13 +46,7 @@ export function EligibilityAssessmentDialog({
   const assessMutation = useMutation({
     mutationFn: async () => {
       if (!beneficiary) throw new Error('لا يوجد مستفيد محدد');
-
-      const { data, error } = await supabase.rpc('auto_assess_eligibility', {
-        p_beneficiary_id: beneficiary.id,
-      });
-
-      if (error) throw error;
-      return data as unknown as AssessmentResult;
+      return await BeneficiaryService.assessEligibilityRPC(beneficiary.id);
     },
     onSuccess: (data) => {
       setAssessment(data);
