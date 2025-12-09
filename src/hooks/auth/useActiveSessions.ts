@@ -3,6 +3,7 @@ import { UserService } from "@/services/user.service";
 import { AuthService } from "@/services/auth.service";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface ActiveSession {
   id: string;
@@ -26,14 +27,14 @@ export function useActiveSessions() {
   const { user } = useAuth();
 
   const { data: sessions = [], isLoading } = useQuery({
-    queryKey: ["active-sessions", user?.id],
+    queryKey: QUERY_KEYS.ACTIVE_SESSIONS(user?.id),
     queryFn: async () => {
       if (!user?.id) return [];
       const data = await UserService.getActiveSessions(user.id);
       return data as ActiveSession[];
     },
     enabled: !!user?.id,
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: 30 * 1000,
   });
 
   const endSession = useMutation({
@@ -42,7 +43,7 @@ export function useActiveSessions() {
       await UserService.endSession(sessionId, user.id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["active-sessions"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ACTIVE_SESSIONS() });
       toast({
         title: "تم إنهاء الجلسة",
         description: "تم إنهاء الجلسة بنجاح",
@@ -60,15 +61,12 @@ export function useActiveSessions() {
   const endAllOtherSessions = useMutation({
     mutationFn: async () => {
       if (!user?.id) throw new Error("User not authenticated");
-
-      // Get current session token from auth
       const session = await AuthService.getSession();
       const currentSessionToken = session?.access_token || "";
-
       await UserService.endAllOtherSessions(user.id, currentSessionToken);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["active-sessions"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ACTIVE_SESSIONS() });
       toast({
         title: "تم إنهاء الجلسات",
         description: "تم إنهاء جميع الجلسات الأخرى بنجاح",

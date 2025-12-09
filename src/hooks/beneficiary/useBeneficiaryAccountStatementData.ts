@@ -3,6 +3,7 @@
  */
 import { useQuery } from "@tanstack/react-query";
 import { BeneficiaryService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface BeneficiaryInfo {
   id: string;
@@ -28,7 +29,7 @@ export interface PaymentFilters {
 
 export function useBeneficiaryAccountStatementData(userId: string | undefined, filters: PaymentFilters) {
   const { data: beneficiary, isLoading: beneficiaryLoading } = useQuery({
-    queryKey: ["my-beneficiary", userId],
+    queryKey: QUERY_KEYS.MY_BENEFICIARY(userId),
     queryFn: async () => {
       if (!userId) return null;
       return BeneficiaryService.getAccountStatementData(userId);
@@ -37,7 +38,7 @@ export function useBeneficiaryAccountStatementData(userId: string | undefined, f
   });
 
   const { data: payments = [], isLoading: paymentsLoading } = useQuery({
-    queryKey: ["beneficiary-payments", beneficiary?.id, filters.dateFrom, filters.dateTo, filters.paymentMethod],
+    queryKey: QUERY_KEYS.BENEFICIARY_PAYMENTS(beneficiary?.id || '', filters.dateFrom, filters.dateTo, filters.paymentMethod),
     queryFn: async () => {
       if (!beneficiary?.id) return [];
       return BeneficiaryService.getBeneficiaryPayments(beneficiary.id, {

@@ -5,6 +5,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { ArchiveService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface ArchivistStats {
   totalFolders: number;
@@ -29,7 +30,7 @@ export interface RecentDocument {
  */
 export function useArchivistStats() {
   return useQuery<ArchivistStats>({
-    queryKey: ["archivist-stats"],
+    queryKey: QUERY_KEYS.ARCHIVIST_STATS,
     queryFn: () => ArchiveService.getArchivistStats(),
     staleTime: 60 * 1000,
     refetchInterval: false,
@@ -42,7 +43,7 @@ export function useArchivistStats() {
  */
 export function useRecentDocuments(category: string, searchTerm: string) {
   return useQuery<RecentDocument[]>({
-    queryKey: ["recent-documents", category, searchTerm],
+    queryKey: QUERY_KEYS.RECENT_DOCUMENTS(category, searchTerm),
     queryFn: () => ArchiveService.getRecentDocuments(category, searchTerm),
     staleTime: 60 * 1000,
     refetchInterval: false,

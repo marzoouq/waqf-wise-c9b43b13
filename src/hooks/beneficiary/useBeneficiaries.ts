@@ -5,15 +5,15 @@ import { useActivities } from "@/hooks/useActivities";
 import { useAuth } from "@/hooks/useAuth";
 import { Beneficiary } from "@/types/beneficiary";
 import { logger } from "@/lib/logger";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export function useBeneficiaries() {
   const queryClient = useQueryClient();
   const { addActivity } = useActivities();
   const { user } = useAuth();
 
-  // Paginated query with count - Optimized for list view
   const { data: beneficiariesData, isLoading } = useQuery({
-    queryKey: ["beneficiaries"],
+    queryKey: QUERY_KEYS.BENEFICIARIES,
     queryFn: async () => {
       const result = await BeneficiaryService.getAll();
       return { beneficiaries: result.data as Beneficiary[], totalCount: result.count };
@@ -31,15 +31,13 @@ export function useBeneficiaries() {
       return BeneficiaryService.create(beneficiary as any);
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["beneficiaries"] });
-      
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARIES });
       addActivity({
         action: `تم إضافة مستفيد جديد: ${data.full_name}`,
         user_name: user?.email || 'النظام',
       }).catch((error) => {
         logger.error(error, { context: 'add_beneficiary_activity', severity: 'low' });
       });
-      
       showSuccess("تمت الإضافة بنجاح", "تم إضافة المستفيد الجديد بنجاح");
     },
     onError: (error: unknown) => {
@@ -52,15 +50,13 @@ export function useBeneficiaries() {
       return BeneficiaryService.update(id, updates as any);
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["beneficiaries"] });
-      
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARIES });
       addActivity({
         action: `تم تحديث بيانات المستفيد: ${data.full_name}`,
         user_name: user?.email || 'النظام',
       }).catch((error) => {
         logger.error(error, { context: 'update_beneficiary_activity', severity: 'low' });
       });
-      
       showSuccess("تم التحديث بنجاح", "تم تحديث بيانات المستفيد بنجاح");
     },
     onError: (error: unknown) => {
@@ -73,7 +69,7 @@ export function useBeneficiaries() {
       return BeneficiaryService.delete(id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["beneficiaries"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARIES });
       showSuccess("تم الحذف بنجاح", "تم حذف المستفيد بنجاح");
     },
     onError: (error: unknown) => {

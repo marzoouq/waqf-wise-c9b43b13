@@ -18,6 +18,8 @@ export const QUERY_KEYS = {
   BENEFICIARY_ATTACHMENTS: (id: string) => ['beneficiary-attachments', id] as const,
   BENEFICIARY_ACTIVITY: ['beneficiary-activity'] as const,
   BENEFICIARY_SESSIONS: ['beneficiary-sessions'] as const,
+  MY_BENEFICIARY: (userId?: string) => userId ? ['my-beneficiary', userId] as const : ['my-beneficiary'] as const,
+  BENEFICIARY_PAYMENTS: (beneficiaryId: string, ...filters: string[]) => ['beneficiary-payments', beneficiaryId, ...filters] as const,
 
   // Properties
   PROPERTIES: ['properties'] as const,
@@ -119,6 +121,9 @@ export const QUERY_KEYS = {
   DOCUMENTS: ['documents'] as const,
   DOCUMENT: (id: string) => ['document', id] as const,
   ARCHIVE_STATS: ['archive-stats'] as const,
+  ARCHIVIST_STATS: ['archivist-stats'] as const,
+  RECENT_DOCUMENTS: (category: string, searchTerm: string) => ['recent-documents', category, searchTerm] as const,
+  FOLDERS: ['folders'] as const,
 
   // Users & Auth
   USERS: ['users'] as const,
@@ -126,6 +131,9 @@ export const QUERY_KEYS = {
   USER_ROLES: ['user-roles'] as const,
   USER_STATS: ['user-stats'] as const,
   PROFILES: ['profiles'] as const,
+  PROFILE: (userId?: string) => userId ? ['profile', userId] : ['profile'] as const,
+  ACTIVE_SESSIONS: (userId?: string) => userId ? ['active-sessions', userId] : ['active-sessions'] as const,
+  USER_PERMISSIONS: (userId?: string) => userId ? ['user-permissions', userId] : ['user-permissions'] as const,
 
   // Notifications
   NOTIFICATIONS: ['notifications'] as const,
@@ -175,6 +183,8 @@ export const QUERY_KEYS = {
   DISTRIBUTIONS_WITH_APPROVALS: ['distributions_with_approvals'] as const,
   JOURNAL_APPROVALS: ['journal_approvals'] as const,
   LOANS_WITH_APPROVALS: ['loans_with_approvals'] as const,
+  PAYMENTS_WITH_APPROVALS: ['payments_with_approvals'] as const,
+  REQUESTS_WITH_APPROVALS: ['requests_with_approvals'] as const,
 
   // Chatbot
   USER_ROLES_CHATBOT: (userId?: string) => ['user_roles_chatbot', userId] as const,

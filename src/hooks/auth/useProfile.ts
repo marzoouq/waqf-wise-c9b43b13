@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { TOAST_MESSAGES } from "@/lib/constants";
 import { useAuth } from "@/contexts/AuthContext";
 import { createMutationErrorHandler } from "@/lib/errors";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface Profile {
   id: string;
@@ -23,10 +24,10 @@ export function useProfile() {
   const { user } = useAuth();
 
   const { data: profile, isLoading } = useQuery({
-    queryKey: ["profile", user?.id],
+    queryKey: QUERY_KEYS.PROFILE(user?.id),
     queryFn: () => AuthService.getProfile(user?.id || ''),
     enabled: !!user?.id,
-    staleTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
 
@@ -36,7 +37,7 @@ export function useProfile() {
       return AuthService.upsertProfile(user.id, profileData);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROFILE() });
       toast({
         title: TOAST_MESSAGES.SUCCESS.UPDATE,
         description: "تم تحديث الملف الشخصي بنجاح",
