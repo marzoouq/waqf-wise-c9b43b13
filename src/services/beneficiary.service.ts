@@ -1,5 +1,6 @@
 /**
  * Beneficiary Service - خدمة إدارة المستفيدين
+ * @version 2.8.52
  * 
  * تحتوي على منطق الأعمال المتعلق بالمستفيدين
  */
@@ -26,6 +27,29 @@ export interface BeneficiaryStats {
   pending: number;
   totalPaid: number;
   totalPending: number;
+}
+
+// ==================== Beneficiary Tabs Data Methods ====================
+export interface ApprovalLogItem {
+  id: string;
+  approval_type: string;
+  approval_id: string;
+  reference_id: string;
+  action: string;
+  performed_by: string | null;
+  performed_by_name: string | null;
+  notes: string | null;
+  created_at: string;
+}
+
+export interface BeneficiaryBankAccount {
+  id: string;
+  bank_name: string;
+  account_number: string;
+  iban: string | null;
+  is_active: boolean;
+  current_balance: number;
+  currency: string;
 }
 
 export class BeneficiaryService {
@@ -1220,5 +1244,228 @@ export class BeneficiaryService {
 
     if (error) throw error;
     return data as { score: number; status: string; max_score: number };
+  }
+
+  // ==================== Beneficiary Tabs Data Methods ====================
+
+  /**
+   * جلب سجل الموافقات
+   */
+  static async getApprovalsLog(limit: number = 50): Promise<ApprovalLogItem[]> {
+    const { data, error } = await supabase
+      .from("approval_history")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(limit);
+
+    if (error) throw error;
+    return (data || []) as ApprovalLogItem[];
+  }
+
+  /**
+   * جلب الحسابات البنكية للوقف
+   */
+  static async getWaqfBankAccounts(): Promise<BeneficiaryBankAccount[]> {
+    const { data, error } = await supabase
+      .from("bank_accounts")
+      .select("*")
+      .eq("is_active", true);
+
+    if (error) throw error;
+    return (data || []) as BeneficiaryBankAccount[];
+  }
+
+  /**
+   * جلب كشوفات المستفيد (المدفوعات) - بيانات بسيطة للتبويبات
+   */
+  static async getStatementsSimple(beneficiaryId: string) {
+    const { data, error } = await supabase
+      .from("payments")
+      .select("*")
+      .eq("beneficiary_id", beneficiaryId)
+      .order("payment_date", { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * جلب الإفصاحات السنوية
+   */
+  static async getAnnualDisclosures(limit: number = 10) {
+    const { data, error } = await supabase
+      .from("annual_disclosures")
+      .select("*")
+      .order("year", { ascending: false })
+      .limit(limit);
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * جلب بيانات مخطط التوزيع
+   */
+  static async getDistributionChartData() {
+    const { data: latestDistribution, error: distError } = await supabase
+      .from("distributions")
+      .select("id, total_amount")
+      .eq("status", "معتمد")
+      .order("distribution_date", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (distError || !latestDistribution) {
+      return [];
+    }
+
+    const { data: details, error: detailsError } = await supabase
+      .from("distribution_details")
+      .select("allocated_amount, beneficiary_type")
+      .eq("distribution_id", latestDistribution.id);
+
+    if (detailsError || !details?.length) {
+      return [];
+    }
+
+    const typeData: { [key: string]: number } = {};
+    
+    details.forEach((detail) => {
+      const type = detail.beneficiary_type || 'أخرى';
+      if (!typeData[type]) {
+        typeData[type] = 0;
+      }
+      typeData[type] += Number(detail.allocated_amount || 0);
+    });
+
+    const total = Object.values(typeData).reduce((sum, val) => sum + val, 0);
+
+    if (total === 0) return [];
+
+    return Object.entries(typeData).map(([name, value]) => ({
+      name,
+      value: Math.round(value),
+      percentage: Math.round((value / total) * 100),
+    }));
+  }
+
+  /**
+   * جلب طلبات المستفيد
+   */
+  static async getRequestsWithTypes(beneficiaryId: string) {
+    const { data, error } = await supabase
+      .from("beneficiary_requests")
+      .select(`
+        *,
+        request_types (
+          name_ar,
+          requires_amount
+        )
+      `)
+      .eq("beneficiary_id", beneficiaryId)
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * جلب مقارنة سنوية للمستفيد
+   */
+  static async getYearlyComparison(beneficiaryId: string) {
+    const currentYear = new Date().getFullYear();
+    const years = [currentYear - 1, currentYear];
+
+    const results = await Promise.all(
+      years.map(async (year) => {
+        const { data, error } = await supabase
+          .from("payments")
+          .select("amount")
+          .eq("beneficiary_id", beneficiaryId)
+          .gte("payment_date", `${year}-01-01`)
+          .lte("payment_date", `${year}-12-31`);
+
+        if (error) throw error;
+
+        const total = data?.reduce((sum, p) => sum + (p.amount || 0), 0) || 0;
+        const count = data?.length || 0;
+
+        return {
+          year: year.toString(),
+          total,
+          count,
+          average: count > 0 ? total / count : 0,
+        };
+      })
+    );
+
+    return results;
+  }
+
+  /**
+   * جلب إيرادات الإيجار الشهرية
+   */
+  static async getMonthlyRevenue() {
+    const { data: payments, error } = await supabase
+      .from("rental_payments")
+      .select("payment_date, amount_due")
+      .eq("status", "مدفوع")
+      .order("payment_date", { ascending: false })
+      .limit(200);
+
+    if (error) throw error;
+    if (!payments?.length) return [];
+
+    const monthlyData: { [key: string]: number } = {};
+    
+    payments.forEach((payment) => {
+      const date = new Date(payment.payment_date);
+      const monthKey = date.toLocaleDateString('ar-SA', { year: 'numeric', month: 'short' });
+      
+      if (!monthlyData[monthKey]) {
+        monthlyData[monthKey] = 0;
+      }
+      monthlyData[monthKey] += Number(payment.amount_due);
+    });
+
+    const chartData = Object.entries(monthlyData)
+      .map(([month, revenue]) => ({
+        month,
+        revenue: Math.round(revenue),
+      }));
+    
+    return chartData.length > 0 ? [...chartData].reverse().slice(-12) : [];
+  }
+
+  /**
+   * جلب إحصائيات العقارات
+   */
+  static async getPropertyStats() {
+    interface RentalPaymentWithContract {
+      amount_paid: number | null;
+      tax_amount: number | null;
+      contracts: {
+        payment_frequency: string | null;
+      } | null;
+    }
+
+    const [propertiesRes, paymentsRes] = await Promise.all([
+      supabase
+        .from("properties")
+        .select(`id, name, location, total_units, occupied_units, status`)
+        .order("name"),
+      supabase
+        .from("rental_payments")
+        .select(`amount_paid, tax_amount, contracts!inner (payment_frequency)`)
+        .eq("status", "مدفوع"),
+    ]);
+
+    if (propertiesRes.error) throw propertiesRes.error;
+    if (paymentsRes.error) throw paymentsRes.error;
+
+    return {
+      properties: propertiesRes.data || [],
+      payments: (paymentsRes.data || []) as RentalPaymentWithContract[],
+    };
   }
 }

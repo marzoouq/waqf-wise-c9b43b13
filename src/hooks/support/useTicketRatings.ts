@@ -1,20 +1,17 @@
+/**
+ * Ticket Ratings Hooks
+ * @version 2.8.52
+ */
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { SupportService } from '@/services/support.service';
 import { toast } from 'sonner';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export function useTicketRating(ticketId: string) {
   return useQuery({
-    queryKey: ['ticket-rating', ticketId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('support_ticket_ratings')
-        .select('id, ticket_id, rating, feedback, response_speed_rating, solution_quality_rating, staff_friendliness_rating, rated_by, created_at')
-        .eq('ticket_id', ticketId)
-        .maybeSingle();
-
-      if (error) throw error;
-      return data;
-    },
+    queryKey: QUERY_KEYS.TICKET_RATING(ticketId),
+    queryFn: () => SupportService.getTicketRating(ticketId),
     enabled: !!ticketId,
   });
 }
@@ -38,30 +35,19 @@ export function useAddTicketRating() {
       solutionQualityRating?: number;
       staffFriendlinessRating?: number;
     }) => {
-      const { data: { user } } = await supabase.auth.getUser();
-
-      const { data, error } = await supabase
-        .from('support_ticket_ratings')
-        .insert({
-          ticket_id: ticketId,
-          rating,
-          feedback,
-          response_speed_rating: responseSpeedRating,
-          solution_quality_rating: solutionQualityRating,
-          staff_friendliness_rating: staffFriendlinessRating,
-          rated_by: user?.id,
-        })
-        .select()
-        .maybeSingle();
-
-      if (error) throw error;
-      if (!data) throw new Error('فشل إضافة التقييم');
-      return data;
+      return SupportService.addTicketRating({
+        ticketId,
+        rating,
+        feedback,
+        responseSpeedRating,
+        solutionQualityRating,
+        staffFriendlinessRating,
+      });
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['ticket-rating', variables.ticketId] });
-      queryClient.invalidateQueries({ queryKey: ['support-tickets'] });
-      queryClient.invalidateQueries({ queryKey: ['support-stats'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TICKET_RATING(variables.ticketId) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.SUPPORT_TICKETS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.SUPPORT_STATS });
       toast.success('تم إضافة التقييم بنجاح');
     },
     onError: (error: Error) => {

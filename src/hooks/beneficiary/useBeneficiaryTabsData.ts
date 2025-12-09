@@ -1,33 +1,20 @@
 /**
  * Beneficiary Tabs Data Hooks
- * Provides data fetching for beneficiary portal tabs
+ * @version 2.8.52
+ * Provides data fetching for beneficiary portal tabs using services
  */
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { BeneficiaryService } from "@/services/beneficiary.service";
-import { ApprovalService } from "@/services/approval.service";
-import { AccountingService } from "@/services/accounting.service";
-import { DistributionService } from "@/services/distribution.service";
-import { PropertyService } from "@/services/property.service";
-import { RentalPaymentService } from "@/services/rental-payment.service";
+import { StorageService } from "@/services/storage.service";
 import { QUERY_KEYS } from "@/lib/query-keys";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 
 // Hook for approvals log tab
 export function useApprovalsLog(enabled: boolean = true) {
   return useQuery({
     queryKey: QUERY_KEYS.APPROVALS_LOG_BENEFICIARY,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("approval_history")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(50);
-
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => BeneficiaryService.getApprovalsLog(50),
     enabled,
   });
 }
@@ -36,15 +23,7 @@ export function useApprovalsLog(enabled: boolean = true) {
 export function useBeneficiaryBankAccounts(enabled: boolean = true) {
   return useQuery({
     queryKey: QUERY_KEYS.BANK_ACCOUNTS_BENEFICIARY,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("bank_accounts")
-        .select("*")
-        .eq("is_active", true);
-
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => BeneficiaryService.getWaqfBankAccounts(),
     enabled,
   });
 }
@@ -71,12 +50,9 @@ export function useBeneficiaryDocuments(beneficiaryId: string) {
   });
 
   const viewDocument = async (filePath: string) => {
-    const { data } = await supabase.storage
-      .from("beneficiary-documents")
-      .createSignedUrl(filePath, 3600);
-
-    if (data?.signedUrl) {
-      window.open(data.signedUrl, "_blank");
+    const signedUrl = await StorageService.getSignedUrl('beneficiary-documents', filePath, 3600);
+    if (signedUrl) {
+      window.open(signedUrl, "_blank");
     }
   };
 
@@ -92,16 +68,7 @@ export function useBeneficiaryDocuments(beneficiaryId: string) {
 export function useBeneficiaryStatements(beneficiaryId: string) {
   return useQuery({
     queryKey: QUERY_KEYS.BENEFICIARY_PROFILE_PAYMENTS(beneficiaryId),
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("payments")
-        .select("*")
-        .eq("beneficiary_id", beneficiaryId)
-        .order("payment_date", { ascending: false });
-
-      if (error) throw error;
-      return data || [];
-    },
+    queryFn: () => BeneficiaryService.getStatementsSimple(beneficiaryId),
     enabled: !!beneficiaryId,
   });
 }
@@ -110,16 +77,7 @@ export function useBeneficiaryStatements(beneficiaryId: string) {
 export function useDisclosures(enabled: boolean = true) {
   return useQuery({
     queryKey: QUERY_KEYS.ANNUAL_DISCLOSURES_BENEFICIARY,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("annual_disclosures")
-        .select("*")
-        .order("year", { ascending: false })
-        .limit(10);
-
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => BeneficiaryService.getAnnualDisclosures(10),
     enabled,
   });
 }
@@ -128,48 +86,7 @@ export function useDisclosures(enabled: boolean = true) {
 export function useDistributionChartData() {
   return useQuery({
     queryKey: QUERY_KEYS.DISTRIBUTION_PIE_CHART,
-    queryFn: async () => {
-      const { data: latestDistribution, error: distError } = await supabase
-        .from("distributions")
-        .select("id, total_amount")
-        .eq("status", "معتمد")
-        .order("distribution_date", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      if (distError || !latestDistribution) {
-        return [];
-      }
-
-      const { data: details, error: detailsError } = await supabase
-        .from("distribution_details")
-        .select("allocated_amount, beneficiary_type")
-        .eq("distribution_id", latestDistribution.id);
-
-      if (detailsError || !details?.length) {
-        return [];
-      }
-
-      const typeData: { [key: string]: number } = {};
-      
-      details.forEach((detail) => {
-        const type = detail.beneficiary_type || 'أخرى';
-        if (!typeData[type]) {
-          typeData[type] = 0;
-        }
-        typeData[type] += Number(detail.allocated_amount || 0);
-      });
-
-      const total = Object.values(typeData).reduce((sum, val) => sum + val, 0);
-
-      if (total === 0) return [];
-
-      return Object.entries(typeData).map(([name, value]) => ({
-        name,
-        value: Math.round(value),
-        percentage: Math.round((value / total) * 100),
-      }));
-    },
+    queryFn: () => BeneficiaryService.getDistributionChartData(),
   });
 }
 
@@ -177,22 +94,7 @@ export function useDistributionChartData() {
 export function useBeneficiaryRequestsTab(beneficiaryId: string) {
   return useQuery({
     queryKey: QUERY_KEYS.BENEFICIARY_PROFILE_REQUESTS(beneficiaryId),
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("beneficiary_requests")
-        .select(`
-          *,
-          request_types (
-            name_ar,
-            requires_amount
-          )
-        `)
-        .eq("beneficiary_id", beneficiaryId)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return data || [];
-    },
+    queryFn: () => BeneficiaryService.getRequestsWithTypes(beneficiaryId),
     enabled: !!beneficiaryId,
   });
 }
@@ -201,35 +103,7 @@ export function useBeneficiaryRequestsTab(beneficiaryId: string) {
 export function useYearlyComparison(beneficiaryId: string) {
   return useQuery({
     queryKey: QUERY_KEYS.YEARLY_COMPARISON(beneficiaryId),
-    queryFn: async () => {
-      const currentYear = new Date().getFullYear();
-      const years = [currentYear - 1, currentYear];
-
-      const results = await Promise.all(
-        years.map(async (year) => {
-          const { data, error } = await supabase
-            .from("payments")
-            .select("amount")
-            .eq("beneficiary_id", beneficiaryId)
-            .gte("payment_date", `${year}-01-01`)
-            .lte("payment_date", `${year}-12-31`);
-
-          if (error) throw error;
-
-          const total = data?.reduce((sum, p) => sum + (p.amount || 0), 0) || 0;
-          const count = data?.length || 0;
-
-          return {
-            year: year.toString(),
-            total,
-            count,
-            average: count > 0 ? total / count : 0,
-          };
-        })
-      );
-
-      return results;
-    },
+    queryFn: () => BeneficiaryService.getYearlyComparison(beneficiaryId),
     enabled: !!beneficiaryId,
   });
 }
@@ -238,71 +112,14 @@ export function useYearlyComparison(beneficiaryId: string) {
 export function useMonthlyRevenue() {
   return useQuery({
     queryKey: QUERY_KEYS.MONTHLY_REVENUE_CHART,
-    queryFn: async () => {
-      const { data: payments, error } = await supabase
-        .from("rental_payments")
-        .select("payment_date, amount_due")
-        .eq("status", "مدفوع")
-        .order("payment_date", { ascending: false })
-        .limit(200);
-
-      if (error) throw error;
-      if (!payments?.length) return [];
-
-      const monthlyData: { [key: string]: number } = {};
-      
-      payments.forEach((payment) => {
-        const date = new Date(payment.payment_date);
-        const monthKey = date.toLocaleDateString('ar-SA', { year: 'numeric', month: 'short' });
-        
-        if (!monthlyData[monthKey]) {
-          monthlyData[monthKey] = 0;
-        }
-        monthlyData[monthKey] += Number(payment.amount_due);
-      });
-
-      const chartData = Object.entries(monthlyData)
-        .map(([month, revenue]) => ({
-          month,
-          revenue: Math.round(revenue),
-        }));
-      
-      return chartData.length > 0 ? [...chartData].reverse().slice(-12) : [];
-    },
+    queryFn: () => BeneficiaryService.getMonthlyRevenue(),
   });
 }
 
 // Hook for property stats
-interface RentalPaymentWithContract {
-  amount_paid: number | null;
-  tax_amount: number | null;
-  contracts: {
-    payment_frequency: string | null;
-  } | null;
-}
-
 export function usePropertyStats() {
   return useQuery({
     queryKey: QUERY_KEYS.PROPERTY_STATS_COMBINED,
-    queryFn: async () => {
-      const [propertiesRes, paymentsRes] = await Promise.all([
-        supabase
-          .from("properties")
-          .select(`id, name, location, total_units, occupied_units, status`)
-          .order("name"),
-        supabase
-          .from("rental_payments")
-          .select(`amount_paid, tax_amount, contracts!inner (payment_frequency)`)
-          .eq("status", "مدفوع"),
-      ]);
-
-      if (propertiesRes.error) throw propertiesRes.error;
-      if (paymentsRes.error) throw paymentsRes.error;
-
-      return {
-        properties: propertiesRes.data || [],
-        payments: (paymentsRes.data || []) as RentalPaymentWithContract[],
-      };
-    },
+    queryFn: () => BeneficiaryService.getPropertyStats(),
   });
 }
