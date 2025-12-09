@@ -25,7 +25,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Eye, Calculator, Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { EdgeFunctionService } from "@/services";
 import { productionLogger } from "@/lib/logger/production-logger";
 
 interface SimulationResult {
@@ -135,21 +135,15 @@ export function DistributionDialog({
         month: values.month,
       });
 
-      const { data, error } = await supabase.functions.invoke('simulate-distribution', {
-        body: {
-          total_amount: values.totalAmount,
-          nazer_percentage: 0.05,
-          reserve_percentage: 0.10,
-          waqf_corpus_percentage: 0.05,
-          maintenance_percentage: 0.03,
-          development_percentage: 0.02,
-        },
+      const result = await EdgeFunctionService.invokeSimulateDistribution({
+        totalAmount: values.totalAmount,
       });
 
-      if (error) {
-        throw error;
+      if (!result.success) {
+        throw new Error(result.error || 'فشلت عملية المحاكاة');
       }
 
+      const data = result.data;
       if (!data || !data.success) {
         throw new Error(data?.error || 'فشلت عملية المحاكاة');
       }

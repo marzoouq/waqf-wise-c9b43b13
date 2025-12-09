@@ -22,7 +22,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { useTheme } from "next-themes";
-import { supabase } from "@/integrations/supabase/client";
+import { AuthService } from "@/services";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { EditEmailDialog } from "./EditEmailDialog";
@@ -50,7 +50,7 @@ export function BeneficiarySettingsDropdown({
 
   const handleLogout = async () => {
     try {
-      await supabase.auth.signOut();
+      await AuthService.logout();
       toast({
         title: "تم تسجيل الخروج",
         description: "نراك قريباً",

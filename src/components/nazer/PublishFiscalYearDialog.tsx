@@ -21,7 +21,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { EdgeFunctionService } from "@/services";
 import {
   Loader2,
   Globe,
@@ -56,15 +56,13 @@ export function PublishFiscalYearDialog({
   // Publish mutation
   const publishMutation = useMutation({
     mutationFn: async () => {
-      const response = await supabase.functions.invoke("publish-fiscal-year", {
-        body: {
-          fiscalYearId: selectedFiscalYear,
-          notifyHeirs,
-        },
+      const result = await EdgeFunctionService.invokePublishFiscalYear({
+        fiscalYearId: selectedFiscalYear,
+        notifyHeirs,
       });
 
-      if (response.error) throw new Error(response.error.message);
-      return response.data;
+      if (!result.success) throw new Error(result.error);
+      return result.data;
     },
     onSuccess: (data) => {
       toast.success("تم نشر السنة المالية بنجاح", {

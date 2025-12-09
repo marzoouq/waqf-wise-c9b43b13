@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { StorageService, DistributionService } from "@/services";
 import { logger } from "@/lib/logger";
 
 interface BankStatementUploadProps {
@@ -52,28 +52,15 @@ export function BankStatementUpload({ disclosureId, onUploadComplete }: BankStat
       const fileName = `${disclosureId}_${Date.now()}.${fileExt}`;
       const filePath = `bank-statements/${fileName}`;
 
-      // رفع الملف إلى Supabase Storage
-      const { error: uploadError } = await supabase.storage
-        .from('documents')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false,
-        });
+      // رفع الملف إلى Storage
+      const uploadResult = await StorageService.uploadFile('documents', filePath, file);
 
-      if (uploadError) throw uploadError;
-
-      // الحصول على الرابط العام
-      const { data: { publicUrl } } = supabase.storage
-        .from('documents')
-        .getPublicUrl(filePath);
+      if (!uploadResult.success) {
+        throw new Error(uploadResult.error || 'فشل الرفع');
+      }
 
       // تحديث الإفصاح بالرابط
-      const { error: updateError } = await supabase
-        .from('annual_disclosures')
-        .update({ bank_statement_url: publicUrl })
-        .eq('id', disclosureId);
-
-      if (updateError) throw updateError;
+      await DistributionService.uploadBankStatement(disclosureId, file);
 
       setUploadStatus("success");
       toast({
@@ -81,7 +68,7 @@ export function BankStatementUpload({ disclosureId, onUploadComplete }: BankStat
         description: "تم رفع كشف الحساب البنكي بنجاح",
       });
 
-      onUploadComplete?.(publicUrl);
+      onUploadComplete?.(uploadResult.url || '');
     } catch (error: unknown) {
       logger.error(error, { 
         context: 'upload_bank_statement', 

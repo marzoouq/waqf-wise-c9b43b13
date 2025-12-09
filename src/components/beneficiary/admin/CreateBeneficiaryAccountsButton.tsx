@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { UserPlus, Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { BeneficiaryService, EdgeFunctionService } from "@/services";
 import { useToast } from "@/hooks/use-toast";
 import { logger } from "@/lib/logger";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -57,19 +57,21 @@ export function CreateBeneficiaryAccountsButton() {
   const fetchEligibleBeneficiaries = async () => {
     setLoadingBeneficiaries(true);
     try {
-      const { data, error } = await supabase
-        .from('beneficiaries')
-        .select('id, full_name, national_id, user_id')
-        .eq('can_login', true)
-        .order('full_name');
-
-      if (error) throw error;
-
-      setEligibleBeneficiaries(data || []);
-      // تحديد الكل افتراضياً
-      setSelectedIds(new Set(data?.map(b => b.id) || []));
+      const { data } = await BeneficiaryService.getAll({ status: 'all' });
+      const eligible = data.filter(b => b.can_login);
       
-      if (data && data.length > 0) {
+      const mappedData = eligible.map(b => ({
+        id: b.id,
+        full_name: b.full_name,
+        national_id: b.national_id,
+        user_id: b.user_id || null,
+      }));
+
+      setEligibleBeneficiaries(mappedData);
+      // تحديد الكل افتراضياً
+      setSelectedIds(new Set(mappedData.map(b => b.id)));
+      
+      if (mappedData.length > 0) {
         setShowSelectionDialog(true);
       } else {
         toast({
@@ -119,12 +121,13 @@ export function CreateBeneficiaryAccountsButton() {
 
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('create-beneficiary-accounts', {
-        body: { beneficiary_ids: Array.from(selectedIds) }
+      const result = await EdgeFunctionService.invokeCreateBeneficiaryAccounts({
+        beneficiary_ids: Array.from(selectedIds)
       });
 
-      if (error) throw error;
+      if (!result.success) throw new Error(result.error);
 
+      const data = result.data!;
       setResults({
         total: data.total,
         created: data.created,

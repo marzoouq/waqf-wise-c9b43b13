@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { DistributionService } from "@/services";
 import { Receipt, Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -52,33 +52,22 @@ export function PaymentVoucherDialog({
     setIsLoading(true);
 
     try {
-      // توليد رقم السند التلقائي
-      const { data: voucherNumber, error: voucherError } = await supabase
-        .rpc('generate_voucher_number', { voucher_type: formData.voucherType });
-
-      if (voucherError) throw voucherError;
-
-      // إنشاء السند
-      const { error: insertError } = await supabase
-        .from('payment_vouchers')
-        .insert({
-          voucher_number: voucherNumber,
-          voucher_type: formData.voucherType,
-          distribution_id: distributionId || null,
-          beneficiary_id: beneficiaryId || null,
-          amount: parseFloat(formData.amount),
-          description: formData.description,
-          payment_method: formData.paymentMethod,
-          reference_number: formData.referenceNumber || null,
-          notes: formData.notes || null,
-          status: 'draft',
-        });
-
-      if (insertError) throw insertError;
+      await DistributionService.createVoucher({
+        voucher_number: `V-${Date.now()}`,
+        voucher_type: formData.voucherType,
+        distribution_id: distributionId || null,
+        beneficiary_id: beneficiaryId || null,
+        amount: parseFloat(formData.amount),
+        description: formData.description,
+        payment_method: formData.paymentMethod,
+        reference_number: formData.referenceNumber || null,
+        notes: formData.notes || null,
+        status: 'draft',
+      });
 
       toast({
         title: "تم بنجاح",
-        description: `تم إنشاء السند رقم ${voucherNumber}`,
+        description: "تم إنشاء السند بنجاح",
       });
 
       onOpenChange(false);
