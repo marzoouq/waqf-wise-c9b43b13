@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { APP_VERSION } from "@/lib/version";
 import { useNavigate } from "react-router-dom";
 import { User, Bell, Shield, Database, Palette, Globe, Settings as SettingsIcon, Building2, Calendar, Eye, BookOpen, Fingerprint } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -232,7 +233,7 @@ const Settings = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">الإصدار</p>
-                <p className="font-medium text-primary">v{import.meta.env.VITE_APP_VERSION || '2.1.0'}</p>
+                <p className="font-medium text-primary">v{APP_VERSION}</p>
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">آخر تحديث</p>
