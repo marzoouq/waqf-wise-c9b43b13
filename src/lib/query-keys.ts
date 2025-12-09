@@ -299,6 +299,22 @@ export const QUERY_KEYS = {
   
   // Support Stats
   SUPPORT_STATS: ['support-stats'] as const,
+  
+  // Recent Searches
+  RECENT_SEARCHES: (searchType: string) => ['recent-searches', searchType] as const,
+  
+  // Loans Aging Report
+  LOANS_AGING: ['loans-aging'] as const,
+  LOANS_AGING_CATEGORIES: (data: unknown) => ['loans-aging-categories', data] as const,
+  
+  // Budget Variance
+  BUDGETS_VARIANCE: (fiscalYearId: string) => ['budgets_variance', fiscalYearId] as const,
+  
+  // AI Insights
+  SMART_ALERTS: ['smart-alerts'] as const,
+  
+  // Ticket Comments
+  TICKET_COMMENTS: (ticketId: string) => ['ticket-comments', ticketId] as const,
 } as const;
 
 // Query Config with default settings

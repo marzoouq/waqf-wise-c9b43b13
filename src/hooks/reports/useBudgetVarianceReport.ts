@@ -4,7 +4,9 @@
  */
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { AccountingService } from '@/services/accounting.service';
+import { FiscalYearService } from '@/services/fiscal-year.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface BudgetData {
   id: string;
@@ -29,35 +31,19 @@ export function useBudgetVarianceReport() {
   const [selectedFiscalYear, setSelectedFiscalYear] = useState<string>('');
 
   const { data: fiscalYears, isLoading: loadingFiscalYears } = useQuery({
-    queryKey: ['fiscal_years'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('fiscal_years')
-        .select('id, name, start_date, end_date')
-        .order('start_date', { ascending: false });
-      if (error) throw error;
-      return data;
-    },
+    queryKey: QUERY_KEYS.FISCAL_YEARS,
+    queryFn: () => FiscalYearService.getAll(),
   });
 
   const { data: budgets, isLoading: loadingBudgets, error } = useQuery({
-    queryKey: ['budgets_variance', selectedFiscalYear],
-    queryFn: async () => {
-      if (!selectedFiscalYear) return [];
-
-      const { data, error } = await supabase
-        .from('budgets')
-        .select('*, accounts(code, name_ar)')
-        .eq('fiscal_year_id', selectedFiscalYear)
-        .order('variance_amount', { ascending: true });
-
-      if (error) throw error;
-      return data as BudgetData[];
-    },
+    queryKey: QUERY_KEYS.BUDGETS_VARIANCE(selectedFiscalYear),
+    queryFn: () => AccountingService.getBudgetsByFiscalYear(selectedFiscalYear),
     enabled: !!selectedFiscalYear,
   });
 
-  const summary: BudgetSummary | null = budgets?.reduce(
+  const typedBudgets = (budgets || []) as BudgetData[];
+
+  const summary: BudgetSummary | null = typedBudgets.reduce(
     (acc, budget) => ({
       totalBudgeted: acc.totalBudgeted + budget.budgeted_amount,
       totalActual: acc.totalActual + (budget.actual_amount || 0),
@@ -75,7 +61,7 @@ export function useBudgetVarianceReport() {
 
   return {
     fiscalYears,
-    budgets,
+    budgets: typedBudgets,
     summary,
     selectedFiscalYear,
     setSelectedFiscalYear,

@@ -223,4 +223,17 @@ export class SupportService {
     return data;
   }
 
+  /**
+   * جلب تعليقات التذكرة
+   */
+  static async getTicketComments(ticketId: string) {
+    const { data, error } = await supabase
+      .from('support_ticket_comments')
+      .select(`*, user:user_id(id, email)`)
+      .eq('ticket_id', ticketId)
+      .order('created_at', { ascending: true });
+
+    if (error) throw error;
+    return data || [];
+  }
 }

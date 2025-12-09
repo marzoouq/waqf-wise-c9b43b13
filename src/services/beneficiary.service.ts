@@ -1468,4 +1468,30 @@ export class BeneficiaryService {
       payments: (paymentsRes.data || []) as RentalPaymentWithContract[],
     };
   }
+
+  /**
+   * جلب تقييمات الأهلية
+   */
+  static async getEligibilityAssessments(beneficiaryId: string) {
+    const { data, error } = await supabase
+      .from('eligibility_assessments')
+      .select('id, beneficiary_id, assessment_date, total_score, eligibility_status, criteria_scores, recommendations, assessed_by, created_at')
+      .eq('beneficiary_id', beneficiaryId)
+      .order('assessment_date', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * تشغيل تقييم أهلية
+   */
+  static async runEligibilityAssessment(beneficiaryId: string) {
+    const { data, error } = await supabase.rpc('auto_assess_eligibility', {
+      p_beneficiary_id: beneficiaryId,
+    });
+
+    if (error) throw error;
+    return data;
+  }
 }

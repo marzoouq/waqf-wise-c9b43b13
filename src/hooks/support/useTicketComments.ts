@@ -1,8 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { SupportService } from '@/services/support.service';
 import { toast } from 'sonner';
 import { useEffect } from 'react';
 import type { TicketComment } from '@/types/support';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 /**
  * Hook لإدارة تعليقات تذاكر الدعم
@@ -12,20 +14,8 @@ export function useTicketComments(ticketId: string) {
 
   // جلب التعليقات
   const { data: comments, isLoading } = useQuery({
-    queryKey: ['ticket-comments', ticketId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('support_ticket_comments')
-        .select(`
-          *,
-          user:user_id(id, email)
-        `)
-        .eq('ticket_id', ticketId)
-        .order('created_at', { ascending: true });
-
-      if (error) throw error;
-      return data as TicketComment[];
-    },
+    queryKey: QUERY_KEYS.TICKET_COMMENTS(ticketId),
+    queryFn: () => SupportService.getTicketComments(ticketId),
     enabled: !!ticketId,
   });
 

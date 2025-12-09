@@ -420,4 +420,47 @@ export class LoansService {
     if (error) throw error;
     return data;
   }
+
+  /**
+   * تقرير أعمار القروض
+   */
+  static async getAgingReport() {
+    const { data: loans, error } = await supabase
+      .from('loans')
+      .select(`
+        id,
+        loan_number,
+        loan_amount,
+        start_date,
+        status,
+        beneficiaries!inner(full_name)
+      `)
+      .in('status', ['active', 'defaulted']);
+    
+    if (error) throw error;
+
+    return (loans || []).map((loan) => {
+      const totalPaid = 0;
+      const remainingBalance = Number(loan.loan_amount) - totalPaid;
+      const daysOverdue = 0;
+      
+      let agingCategory = 'حديث (0-30 يوم)';
+      if (daysOverdue > 90) agingCategory = 'خطير (90+ يوم)';
+      else if (daysOverdue > 60) agingCategory = 'متأخر جداً (60-90 يوم)';
+      else if (daysOverdue > 30) agingCategory = 'متأخر (30-60 يوم)';
+
+      const beneficiaryData = loan.beneficiaries as unknown as { full_name: string };
+
+      return {
+        loan_id: loan.id,
+        loan_number: loan.loan_number,
+        beneficiary_name: beneficiaryData?.full_name || 'غير محدد',
+        principal_amount: Number(loan.loan_amount),
+        total_paid: totalPaid,
+        remaining_balance: remainingBalance,
+        days_overdue: daysOverdue,
+        aging_category: agingCategory,
+      };
+    }).sort((a, b) => b.days_overdue - a.days_overdue);
+  }
 }
