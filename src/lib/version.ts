@@ -2,11 +2,11 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.8.57
+ * @version 2.8.58
  * @date 2025-12-09
  */
 
-export const APP_VERSION = '2.8.57';
+export const APP_VERSION = '2.8.58';
 export const APP_VERSION_DATE = '2025-12-09';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
@@ -20,7 +20,7 @@ export const VERSION_INFO = {
     '170+ hooks منظمة في 25 مجلد',
     'QUERY_KEYS موحد لـ React Query',
     'Realtime موحد للوحات التحكم',
-    '36 hook تستخدم Supabase (11 Realtime مقبول)',
+    '0 hook تستدعي Supabase مباشرة (Realtime مقبول عبر RealtimeService)',
   ],
 } as const;
 
