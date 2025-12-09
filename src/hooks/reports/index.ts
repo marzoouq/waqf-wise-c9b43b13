@@ -20,3 +20,4 @@ export { useBudgetVarianceReport, type BudgetData, type BudgetSummary } from './
 export { useDetailedGeneralLedger, type LedgerEntry } from './useDetailedGeneralLedger';
 export { useCashFlowReport, type CashFlowData, type CashFlowStats } from './useCashFlowReport';
 export { usePropertiesReport, type PropertyWithContracts } from './usePropertiesReport';
+export { useAccountingLinkReport, type OperationRecord } from './useAccountingLinkReport';

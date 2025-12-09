@@ -1,5 +1,4 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Printer, Download, Loader2, Mail } from "lucide-react";
@@ -11,6 +10,8 @@ import { useState } from "react";
 import { logger } from "@/lib/logger";
 import { InvoiceStatusActions } from "./InvoiceStatusActions";
 import { format } from "@/lib/date";
+import { useInvoiceDetails } from "@/hooks/invoices/useInvoiceDetails";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ViewInvoiceDialogProps {
   invoiceId: string | null;
@@ -23,35 +24,7 @@ export const ViewInvoiceDialog = ({ invoiceId, open, onOpenChange }: ViewInvoice
   const [isExporting, setIsExporting] = useState(false);
   const queryClient = useQueryClient();
   
-  const { data: invoice, isLoading: invoiceLoading } = useQuery({
-    queryKey: ["invoice", invoiceId || undefined],
-    queryFn: async () => {
-      if (!invoiceId) return null;
-      const { data, error } = await supabase
-        .from("invoices")
-        .select("*")
-        .eq("id", invoiceId)
-        .maybeSingle();
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!invoiceId,
-  });
-
-  const { data: invoiceLines, isLoading: linesLoading } = useQuery({
-    queryKey: ["invoice-lines", invoiceId || undefined],
-    queryFn: async () => {
-      if (!invoiceId) return [];
-      const { data, error } = await supabase
-        .from("invoice_lines")
-        .select("*")
-        .eq("invoice_id", invoiceId)
-        .order("line_number");
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!invoiceId,
-  });
+  const { invoice, invoiceLines, invoiceLoading, linesLoading } = useInvoiceDetails(invoiceId);
 
   const handlePrint = () => {
     // الحصول على محتوى الفاتورة
@@ -69,7 +42,7 @@ export const ViewInvoiceDialog = ({ invoiceId, open, onOpenChange }: ViewInvoice
     if (invoice && invoiceLines) {
       setIsExporting(true);
       try {
-        await generateInvoicePDF(invoice, invoiceLines, orgSettings);
+        await generateInvoicePDF(invoice, invoiceLines as any, orgSettings);
         toast.success("تم تصدير الفاتورة بنجاح");
       } catch (error) {
         logger.error(error, { context: 'generate_invoice_pdf', severity: 'medium' });
@@ -147,7 +120,7 @@ export const ViewInvoiceDialog = ({ invoiceId, open, onOpenChange }: ViewInvoice
           )}
         </div>
         <div id="invoice-content">
-          <EnhancedInvoiceView invoice={invoice} lines={invoiceLines || []} orgSettings={orgSettings} />
+          <EnhancedInvoiceView invoice={invoice} lines={invoiceLines as any || []} orgSettings={orgSettings} />
         </div>
         <div className="border-t pt-4 mt-4 print:hidden">
           <InvoiceStatusActions 
