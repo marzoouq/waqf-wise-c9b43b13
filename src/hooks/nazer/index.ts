@@ -1,6 +1,6 @@
 /**
  * Nazer Hooks
- * @version 2.8.37
+ * @version 2.8.38
  */
 
 export { 
@@ -8,3 +8,8 @@ export {
   getPageName,
   type BeneficiarySession 
 } from './useBeneficiaryActivitySessions';
+
+export { 
+  useDistributeRevenue,
+  type HeirShare 
+} from './useDistributeRevenue';
