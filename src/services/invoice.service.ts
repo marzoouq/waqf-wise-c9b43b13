@@ -160,4 +160,28 @@ export class InvoiceService {
       totalAmount: invoices.reduce((s, i) => s + (i.total_amount || 0), 0),
     };
   }
+
+  /**
+   * جلب رقم الفاتورة التالي
+   */
+  static async getNextInvoiceNumber(): Promise<string> {
+    const { data, error } = await supabase
+      .from("invoices")
+      .select("invoice_number")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    
+    if (error) throw error;
+    
+    const year = new Date().getFullYear();
+    if (!data) {
+      return `INV-${year}-001`;
+    }
+    
+    const parts = data.invoice_number?.split("-") || [];
+    const lastNumber = parseInt(parts[2] || "0");
+    const newNumber = (lastNumber + 1).toString().padStart(3, "0");
+    return `INV-${year}-${newNumber}`;
+  }
 }

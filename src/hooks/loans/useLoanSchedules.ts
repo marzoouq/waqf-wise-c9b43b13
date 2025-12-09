@@ -1,24 +1,17 @@
 /**
  * Loan Schedules Hook
- * @version 2.8.37
+ * @version 2.8.43
  */
 
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { LoansService } from "@/services";
 import { LoanSchedule } from "@/types/loans";
 
 export function useLoanSchedules(loanId: string) {
   return useQuery({
     queryKey: ["loan-schedules", loanId],
     queryFn: async (): Promise<LoanSchedule[]> => {
-      const { data, error } = await supabase
-        .from("loan_schedules")
-        .select("*")
-        .eq("loan_id", loanId)
-        .order("installment_number");
-
-      if (error) throw error;
-      return data as LoanSchedule[];
+      return LoansService.getLoanSchedules(loanId) as Promise<LoanSchedule[]>;
     },
     enabled: !!loanId,
   });

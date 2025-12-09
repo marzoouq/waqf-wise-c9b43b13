@@ -1,10 +1,10 @@
 /**
  * User Permissions Override Hook
- * @version 2.8.40
+ * @version 2.8.43
  */
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { SecurityService } from "@/services";
 
 export interface UserPermissionOverride {
   id: string;
@@ -19,31 +19,13 @@ export function useUserPermissionsOverride(userId: string) {
 
   const overridesQuery = useQuery({
     queryKey: ["user-permissions-overrides", userId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("user_permissions")
-        .select("*")
-        .eq("user_id", userId);
-      
-      if (error) throw error;
-      return data as UserPermissionOverride[];
-    },
+    queryFn: () => SecurityService.getUserPermissionOverrides(userId),
     enabled: !!userId,
   });
 
   const addOverrideMutation = useMutation({
-    mutationFn: async ({ permissionKey, granted }: { permissionKey: string; granted: boolean }) => {
-      const { error } = await supabase
-        .from("user_permissions")
-        .upsert({
-          user_id: userId,
-          permission_key: permissionKey,
-          granted,
-          granted_at: new Date().toISOString()
-        });
-      
-      if (error) throw error;
-    },
+    mutationFn: ({ permissionKey, granted }: { permissionKey: string; granted: boolean }) => 
+      SecurityService.upsertUserPermissionOverride(userId, permissionKey, granted),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user-permissions-overrides"] });
       queryClient.invalidateQueries({ queryKey: ["user-permissions"] });
@@ -51,15 +33,8 @@ export function useUserPermissionsOverride(userId: string) {
   });
 
   const removeOverrideMutation = useMutation({
-    mutationFn: async (permissionKey: string) => {
-      const { error } = await supabase
-        .from("user_permissions")
-        .delete()
-        .eq("user_id", userId)
-        .eq("permission_key", permissionKey);
-      
-      if (error) throw error;
-    },
+    mutationFn: (permissionKey: string) => 
+      SecurityService.removeUserPermissionOverride(userId, permissionKey),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user-permissions-overrides"] });
       queryClient.invalidateQueries({ queryKey: ["user-permissions"] });
@@ -67,7 +42,7 @@ export function useUserPermissionsOverride(userId: string) {
   });
 
   return {
-    userOverrides: overridesQuery.data || [],
+    userOverrides: (overridesQuery.data || []) as UserPermissionOverride[],
     isLoading: overridesQuery.isLoading,
     addOverride: addOverrideMutation.mutateAsync,
     removeOverride: removeOverrideMutation.mutateAsync,

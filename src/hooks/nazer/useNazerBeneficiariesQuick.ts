@@ -1,10 +1,10 @@
 /**
  * Nazer Beneficiaries Quick List Hook
- * @version 2.8.39
+ * @version 2.8.43
  */
 
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { BeneficiaryService } from "@/services";
 
 export interface NazerBeneficiary {
   id: string;
@@ -22,14 +22,7 @@ export function useNazerBeneficiariesQuick() {
   return useQuery({
     queryKey: ["nazer-beneficiaries-quick"],
     queryFn: async (): Promise<NazerBeneficiary[]> => {
-      const { data, error } = await supabase
-        .from("beneficiaries")
-        .select("id, full_name, phone, email, status, category, total_received, account_balance, national_id")
-        .order("created_at", { ascending: false })
-        .limit(20);
-
-      if (error) throw error;
-      return (data || []) as NazerBeneficiary[];
+      return BeneficiaryService.getQuickList(20) as Promise<NazerBeneficiary[]>;
     },
     staleTime: 2 * 60 * 1000,
   });

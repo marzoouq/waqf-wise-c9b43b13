@@ -341,4 +341,18 @@ export class LoansService {
 
     if (error) throw error;
   }
+
+  /**
+   * جلب جدول أقساط القرض
+   */
+  static async getLoanSchedules(loanId: string) {
+    const { data, error } = await supabase
+      .from('loan_schedules')
+      .select('*')
+      .eq('loan_id', loanId)
+      .order('installment_number');
+
+    if (error) throw error;
+    return data || [];
+  }
 }

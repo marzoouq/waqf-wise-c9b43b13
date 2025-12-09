@@ -241,4 +241,30 @@ export class FiscalYearService {
       publishedAt: fiscalYear?.published_at || undefined,
     };
   }
+
+  /**
+   * جلب السنوات المالية النشطة
+   */
+  static async getActiveFiscalYears() {
+    const { data, error } = await supabase
+      .from("fiscal_years")
+      .select("*")
+      .eq("is_active", true)
+      .order("start_date", { ascending: false });
+    
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * جلب معاينة إغلاق السنة المالية
+   */
+  static async getClosingPreview(fiscalYearId: string) {
+    const { data, error } = await supabase.functions.invoke("auto-close-fiscal-year", {
+      body: { fiscal_year_id: fiscalYearId, preview_only: true }
+    });
+    
+    if (error) throw error;
+    return data;
+  }
 }
