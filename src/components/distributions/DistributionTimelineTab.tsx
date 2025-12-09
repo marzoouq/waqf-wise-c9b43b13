@@ -1,49 +1,15 @@
 import { UnifiedTimeline, TimelineEvent } from "@/components/unified/UnifiedTimeline";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Distribution } from "@/hooks/useDistributions";
 import { CheckCircle, XCircle, Clock, FileText } from "lucide-react";
 import { useMemo } from "react";
+import { useDistributionTimeline } from "@/hooks/distributions/useDistributionTabsData";
 
 interface DistributionTimelineTabProps {
   distribution: Distribution | null;
 }
 
 export function DistributionTimelineTab({ distribution }: DistributionTimelineTabProps) {
-  const { data: approvals } = useQuery({
-    queryKey: ['distribution-approvals', distribution?.id],
-    queryFn: async () => {
-      if (!distribution?.id) return [];
-      
-      const { data, error } = await supabase
-        .from('distribution_approvals')
-        .select('id, distribution_id, level, status, approver_name, notes, approved_at, created_at')
-        .eq('distribution_id', distribution.id)
-        .order('level', { ascending: true });
-      
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !!distribution?.id,
-  });
-
-  const { data: history } = useQuery({
-    queryKey: ['approval-history', distribution?.id],
-    queryFn: async () => {
-      if (!distribution?.id) return [];
-      
-      const { data, error } = await supabase
-        .from('approval_history')
-        .select('id, action, notes, performed_by_name, created_at')
-        .eq('reference_id', distribution.id)
-        .eq('approval_type', 'distribution')
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !!distribution?.id,
-  });
+  const { approvals, history } = useDistributionTimeline(distribution?.id);
 
   const events: TimelineEvent[] = useMemo(() => {
     if (!distribution) return [];

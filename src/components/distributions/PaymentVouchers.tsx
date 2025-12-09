@@ -1,34 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { FileText, Printer, Download } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import { usePaymentVouchersList } from "@/hooks/distributions/useDistributionTabsData";
 
 export function PaymentVouchers() {
-  const { data: vouchers, isLoading } = useQuery({
-    queryKey: ["payment-vouchers"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("payment_vouchers")
-        .select(`
-          *,
-          beneficiaries (
-            full_name,
-            national_id
-          ),
-          distributions (
-            distribution_name: month
-          )
-        `)
-        .order("created_at", { ascending: false })
-        .limit(50);
-      
-      if (error) throw error;
-      return data;
-    },
-  });
+  const { data: vouchers, isLoading } = usePaymentVouchersList();
 
   const getStatusBadge = (status: string) => {
     const variants = {

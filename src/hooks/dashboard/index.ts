@@ -33,3 +33,6 @@ export { useAdminKPIs } from '../admin/useAdminKPIs';
 export { useAccountantKPIs } from '../accounting';
 export { useArchivistDashboard, useArchivistStats, useRecentDocuments } from '../archive/useArchivistDashboard';
 export { useInteractiveDashboard } from './useInteractiveDashboard';
+
+// ==================== Dashboard Charts Hooks ====================
+export { useBudgetComparison, useRevenueExpenseChart } from './useDashboardCharts';

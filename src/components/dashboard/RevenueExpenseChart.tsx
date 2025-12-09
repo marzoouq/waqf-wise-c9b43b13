@@ -1,8 +1,5 @@
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { JournalEntryLineRow, AccountRow } from "@/types/supabase-helpers";
 import {
   AreaChart,
   Area,
@@ -13,86 +10,12 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
-
-interface JournalLineWithRelations extends JournalEntryLineRow {
-  journal_entries: {
-    entry_date: string;
-  };
-  accounts: AccountRow;
-}
-
-interface MonthlyData {
-  month: string;
-  revenue: number;
-  expense: number;
-}
+import { useRevenueExpenseChart } from "@/hooks/dashboard/useDashboardCharts";
 
 const RevenueExpenseChart = () => {
-  const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<MonthlyData[]>([]);
+  const { data, isLoading } = useRevenueExpenseChart();
 
-  useEffect(() => {
-    fetchMonthlyData();
-  }, []);
-
-  const fetchMonthlyData = async () => {
-    try {
-      const { data: entries, error } = await supabase
-        .from("journal_entry_lines")
-        .select(`
-          debit_amount,
-          credit_amount,
-          journal_entries!inner (
-            entry_date
-          ),
-          accounts!inner (
-            account_type,
-            account_nature
-          )
-        `)
-        .order('journal_entries(entry_date)', { ascending: true });
-
-      if (error) throw error;
-
-      // Group by month
-      const monthlyMap = new Map<string, { revenue: number; expense: number }>();
-
-      (entries as JournalLineWithRelations[] | null)?.forEach((line) => {
-        const date = new Date(line.journal_entries.entry_date);
-        const monthKey = date.toLocaleDateString('ar-SA', { year: 'numeric', month: 'short' });
-        
-        if (!monthlyMap.has(monthKey)) {
-          monthlyMap.set(monthKey, { revenue: 0, expense: 0 });
-        }
-
-        const monthData = monthlyMap.get(monthKey)!;
-        const accountType = line.accounts.account_type;
-        const accountNature = line.accounts.account_nature;
-        const debit = Number(line.debit_amount || 0);
-        const credit = Number(line.credit_amount || 0);
-
-        if (accountType === 'revenue') {
-          monthData.revenue += accountNature === 'credit' ? credit - debit : debit - credit;
-        } else if (accountType === 'expense') {
-          monthData.expense += accountNature === 'debit' ? debit - credit : credit - debit;
-        }
-      });
-
-      const chartData: MonthlyData[] = Array.from(monthlyMap.entries()).map(([month, values]) => ({
-        month,
-        revenue: values.revenue,
-        expense: values.expense,
-      }));
-
-      setData(chartData);
-    } catch (error) {
-      setData([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
+  if (isLoading) {
     return (
       <Card className="col-span-full">
         <CardHeader>
@@ -112,7 +35,7 @@ const RevenueExpenseChart = () => {
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 200 : 300}>
-          <AreaChart data={data}>
+          <AreaChart data={data || []}>
             <defs>
               <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="hsl(var(--success))" stopOpacity={0.3} />
