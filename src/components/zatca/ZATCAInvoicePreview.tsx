@@ -22,8 +22,7 @@ interface ZATCAInvoicePreviewProps {
 }
 
 export function ZATCAInvoicePreview({ invoice }: ZATCAInvoicePreviewProps) {
-  const { isSubmitting, status, submitToZATCA } = useZATCASubmit();
-  const zatcaStatus = status;
+  const { isSubmitting, zatcaStatus, submitToZATCA } = useZATCASubmit();
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('ar-SA', {

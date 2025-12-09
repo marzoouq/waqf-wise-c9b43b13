@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,11 +10,8 @@ import { Send, Mail, MailOpen, Inbox, SendIcon, Reply } from "lucide-react";
 import { useInternalMessages } from "@/hooks/useInternalMessages";
 import { useAuth } from "@/hooks/useAuth";
 import { format, arLocale as ar } from "@/lib/date";
-import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { productionLogger } from "@/lib/logger/production-logger";
+import { useRecipients } from "@/hooks/messages/useRecipients";
 
 interface InternalMessagesDialogProps {
   open: boolean;
@@ -26,7 +23,6 @@ export function InternalMessagesDialog({
   onOpenChange,
 }: InternalMessagesDialogProps) {
   const { user } = useAuth();
-  const { toast } = useToast();
   const { inboxMessages, sentMessages, sendMessage, markAsRead, unreadCount } = useInternalMessages();
   const [activeTab, setActiveTab] = useState("inbox");
   const [replyToMessage, setReplyToMessage] = useState<typeof inboxMessages[0] | null>(null);
@@ -35,114 +31,9 @@ export function InternalMessagesDialog({
     subject: "",
     body: "",
   });
-  const [recipients, setRecipients] = useState<Array<{ id: string; name: string; role: string; roleKey: string }>>([]);
-  const [loadingRecipients, setLoadingRecipients] = useState(false);
-
-  // جلب قائمة المستخدمين المتاحين للمراسلة
-  useEffect(() => {
-    const fetchRecipients = async () => {
-      setLoadingRecipients(true);
-      try {
-        // جلب دور المستخدم الحالي
-        const { data: currentUserRole, error: currentRoleError } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', user?.id)
-          .maybeSingle();
-
-        if (currentRoleError) throw currentRoleError;
-
-        // تحديد الأدوار المتاحة للمراسلة بناءً على دور المستخدم
-        let allowedRoles: ('accountant' | 'admin' | 'archivist' | 'beneficiary' | 'waqf_heir' | 'cashier' | 'nazer' | 'user')[];
-        
-        if (currentUserRole?.role === 'beneficiary' || currentUserRole?.role === 'waqf_heir') {
-          // المستفيد أو وارث الوقف يمكنه مراسلة الناظر والمشرف فقط
-          allowedRoles = ['admin', 'nazer'];
-        } else {
-          // الإداريون يمكنهم مراسلة الجميع
-          allowedRoles = ['admin', 'nazer', 'accountant', 'cashier', 'beneficiary', 'waqf_heir', 'archivist'];
-        }
-        
-        const { data: userRoles, error: rolesError } = await supabase
-          .from('user_roles')
-          .select('user_id, role')
-          .in('role', allowedRoles)
-          .neq('user_id', user?.id); // استبعاد المستخدم الحالي
-
-        if (rolesError) throw rolesError;
-        
-
-        if (userRoles && userRoles.length > 0) {
-          const userIds = userRoles.map(ur => ur.user_id);
-          
-          // جلب بيانات المستخدمين
-          const { data: profiles, error: profilesError } = await supabase
-            .from('profiles')
-            .select('user_id, full_name')
-            .in('user_id', userIds);
-
-          if (profilesError) throw profilesError;
-
-          // دمج البيانات وترجمة الأدوار
-          const roleTranslations: Record<string, string> = {
-            'admin': 'مشرف',
-            'nazer': 'ناظر',
-            'accountant': 'محاسب',
-            'cashier': 'صراف',
-            'beneficiary': 'مستفيد',
-            'archivist': 'أرشيفي'
-          };
-
-          // ترتيب الأدوار حسب الأهمية
-          const roleOrder: Record<string, number> = {
-            'nazer': 1,
-            'admin': 2,
-            'accountant': 3,
-            'cashier': 4,
-            'archivist': 5,
-            'beneficiary': 6
-          };
-
-          const recipientsList = profiles?.map(profile => {
-            const userRole = userRoles.find(ur => ur.user_id === profile.user_id);
-            const roleName = userRole?.role || 'user';
-            return {
-              id: profile.user_id,
-              name: profile.full_name || 'مستخدم',
-              role: roleTranslations[roleName] || roleName,
-              roleKey: roleName
-            };
-          })
-          .sort((a, b) => {
-            // ترتيب حسب الدور أولاً، ثم الاسم
-            const roleCompare = (roleOrder[a.roleKey] || 999) - (roleOrder[b.roleKey] || 999);
-            if (roleCompare !== 0) return roleCompare;
-            return a.name.localeCompare(b.name, 'ar');
-          }) || [];
-
-          setRecipients(recipientsList);
-        } else {
-          setRecipients([]);
-        }
-      } catch (error) {
-        productionLogger.error('Error fetching recipients', error, {
-          context: 'InternalMessagesDialog',
-          severity: 'medium',
-        });
-        toast({
-          title: "خطأ في تحميل المستلمين",
-          description: "حدث خطأ أثناء تحميل قائمة المستلمين",
-          variant: "destructive"
-        });
-      } finally {
-        setLoadingRecipients(false);
-      }
-    };
-
-    if (open && user?.id) {
-      fetchRecipients();
-    }
-  }, [open, user?.id]); // إزالة toast من dependencies
+  
+  // استخدام hook مخصص لجلب المستلمين
+  const { recipients, loadingRecipients } = useRecipients(user?.id, open);
 
   const handleReplyToMessage = (message: typeof inboxMessages[0]) => {
     setReplyToMessage(message);

@@ -13,12 +13,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
-import { Shield, Lock, Key, Monitor } from "lucide-react";
+import { Lock, Key, Monitor } from "lucide-react";
 import { TwoFactorDialog } from "./TwoFactorDialog";
 import { ActiveSessionsDialog } from "./ActiveSessionsDialog";
+import { useChangePassword } from "@/hooks/auth/useChangePassword";
 
 interface SecuritySettingsDialogProps {
   open: boolean;
@@ -40,10 +39,11 @@ export function SecuritySettingsDialog({
   open,
   onOpenChange,
 }: SecuritySettingsDialogProps) {
-  const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
   const [twoFactorDialogOpen, setTwoFactorDialogOpen] = useState(false);
   const [activeSessionsDialogOpen, setActiveSessionsDialogOpen] = useState(false);
+  
+  // استخدام hook مخصص لتغيير كلمة المرور
+  const { changePassword, isLoading } = useChangePassword();
 
   const form = useForm<PasswordFormValues>({
     resolver: zodResolver(passwordSchema),
@@ -55,45 +55,10 @@ export function SecuritySettingsDialog({
   });
 
   const onSubmit = async (values: PasswordFormValues) => {
-    try {
-      setIsLoading(true);
-      
-      // Step 1: Verify current password by attempting sign in
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user?.email) throw new Error('User not found');
-      
-      const { error: verifyError } = await supabase.auth.signInWithPassword({
-        email: user.email,
-        password: values.currentPassword,
-      });
-      
-      if (verifyError) {
-        throw new Error('كلمة المرور الحالية غير صحيحة');
-      }
-      
-      // Step 2: Update to new password
-      const { error } = await supabase.auth.updateUser({
-        password: values.newPassword,
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "تم تحديث كلمة المرور",
-        description: "تم تغيير كلمة المرور بنجاح",
-      });
-
+    const success = await changePassword(values.currentPassword, values.newPassword);
+    if (success) {
       form.reset();
       onOpenChange(false);
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'حدث خطأ أثناء تحديث كلمة المرور';
-      toast({
-        title: "خطأ",
-        description: errorMessage,
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
     }
   };
 
