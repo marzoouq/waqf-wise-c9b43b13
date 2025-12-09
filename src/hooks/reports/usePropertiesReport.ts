@@ -1,17 +1,15 @@
 /**
  * Properties Report Hook
- * @version 2.8.40
+ * @version 2.8.44
  */
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";
-import { PropertyRow, ContractRow } from "@/types/supabase-helpers";
+import { ReportsService, type PropertyWithContracts } from "@/services/reports.service";
 
-export interface PropertyWithContracts extends PropertyRow {
-  contracts?: ContractRow[];
-}
+export type { PropertyWithContracts };
 
 export function usePropertiesReport() {
   const queryClient = useQueryClient();
@@ -19,24 +17,7 @@ export function usePropertiesReport() {
 
   const query = useQuery<PropertyWithContracts[]>({
     queryKey: ["properties-report"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("properties")
-        .select(`
-          *,
-          contracts (
-            id,
-            contract_number,
-            tenant_name,
-            monthly_rent,
-            status
-          )
-        `)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return data as PropertyWithContracts[];
-    },
+    queryFn: () => ReportsService.getPropertiesReport(),
     ...QUERY_CONFIG.REPORTS,
   });
 

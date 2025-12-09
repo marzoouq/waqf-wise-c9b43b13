@@ -1,10 +1,10 @@
 /**
  * Invoice Details Hook
- * @version 2.8.40
+ * @version 2.8.44
  */
 
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { InvoiceService } from "@/services";
 
 export interface InvoiceLine {
   id: string;
@@ -24,13 +24,7 @@ export function useInvoiceDetails(invoiceId: string | null) {
     queryKey: ["invoice", invoiceId || undefined],
     queryFn: async () => {
       if (!invoiceId) return null;
-      const { data, error } = await supabase
-        .from("invoices")
-        .select("*")
-        .eq("id", invoiceId)
-        .maybeSingle();
-      if (error) throw error;
-      return data;
+      return InvoiceService.getInvoiceDetails(invoiceId);
     },
     enabled: !!invoiceId,
   });
@@ -39,13 +33,7 @@ export function useInvoiceDetails(invoiceId: string | null) {
     queryKey: ["invoice-lines", invoiceId || undefined],
     queryFn: async () => {
       if (!invoiceId) return [];
-      const { data, error } = await supabase
-        .from("invoice_lines")
-        .select("*")
-        .eq("invoice_id", invoiceId)
-        .order("line_number");
-      if (error) throw error;
-      return data as InvoiceLine[];
+      return InvoiceService.getInvoiceLines(invoiceId) as Promise<InvoiceLine[]>;
     },
     enabled: !!invoiceId,
   });

@@ -1,21 +1,22 @@
 /**
  * Services Layer - الطبقة الخدمية للتطبيق
- * @version 2.8.30
+ * @version 2.8.44
  * تغطية 100% - جميع عمليات Supabase تمر عبر الخدمات
  * 
- * الخدمات: 42 خدمة متكاملة
- * - Core Services: 4
+ * الخدمات: 43 خدمة متكاملة
+ * - Core Services: 5
  * - Domain Services: 35
  * - Infrastructure Services: 3
  * 
  * ملاحظة: 7 hooks تستخدم Realtime مباشرة (مقبول معماريًا)
  */
 
-// Core Services (4)
+// Core Services (5)
 export { NotificationService } from './notification.service';
 export { RequestService } from './request.service';
 export { VoucherService } from './voucher.service';
 export { ReportService } from './report.service';
+export { ReportsService, type CashFlowData, type PropertyWithContracts, type OperationRecord } from './reports.service';
 
 // Domain Services (35)
 export { BeneficiaryService, type BeneficiaryFilters, type BeneficiaryStats } from './beneficiary.service';
