@@ -4,11 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { BeneficiaryService } from "@/services";
 import { useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 const emailSchema = z.object({
   email: z.string().email("البريد الإلكتروني غير صحيح"),
@@ -43,19 +44,15 @@ export function EditEmailDialog({
   const onSubmit = async (values: EmailFormValues) => {
     setIsLoading(true);
     try {
-      const { error } = await supabase
-        .from("beneficiaries")
-        .update({ email: values.email })
-        .eq("id", beneficiaryId);
-
-      if (error) throw error;
+      await BeneficiaryService.update(beneficiaryId, { email: values.email });
 
       toast({
         title: "تم بنجاح",
         description: "تم تحديث البريد الإلكتروني بنجاح",
       });
 
-      queryClient.invalidateQueries({ queryKey: ["beneficiary-profile"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARY_STATS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARY(beneficiaryId) });
       onOpenChange(false);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "فشل تحديث البريد الإلكتروني";
