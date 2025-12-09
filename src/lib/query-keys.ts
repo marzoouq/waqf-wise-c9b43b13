@@ -272,6 +272,7 @@ export const QUERY_KEYS = {
   
   // Waqf Summary
   WAQF_SUMMARY: ['waqf-summary'] as const,
+  WAQF_UNITS: ['waqf-units'] as const,
   
   // Cashier Stats
   CASHIER_STATS: ['cashier-stats'] as const,

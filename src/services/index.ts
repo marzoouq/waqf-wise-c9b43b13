@@ -17,8 +17,10 @@ export { RequestService } from './request.service';
 export { VoucherService } from './voucher.service';
 export { ReportService, type CashFlowData, type PropertyWithContracts, type OperationRecord } from './report.service';
 
-// Domain Services (35)
+// Domain Services (37)
 export { BeneficiaryService, type BeneficiaryFilters, type BeneficiaryStats } from './beneficiary.service';
+export { WaqfService, type WaqfProperty, type UnlinkedProperty } from './waqf.service';
+export { DocumentService, type InvoiceData, type InvoiceLine, type ReceiptData, type OrganizationSettings } from './document.service';
 export { PropertyService, type PropertyStats, type PropertyFilters } from './property.service';
 export { DistributionService, type DistributionSummary } from './distribution.service';
 export { AccountingService, type FinancialSummary } from './accounting.service';
