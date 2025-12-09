@@ -12,29 +12,11 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { supabase } from "@/integrations/supabase/client";
 import { format } from "@/lib/date";
 import type { WaqfUnit } from "@/hooks/useWaqfUnits";
 import { useWaqfRevenueByFiscalYear } from "@/hooks/useWaqfRevenueByFiscalYear";
+import { useWaqfUnitProperties } from "@/hooks/waqf/useWaqfProperties";
 import { LinkPropertyDialog } from "./LinkPropertyDialog";
-
-interface ContractInfo {
-  monthly_rent: number;
-  payment_frequency: string;
-  status: string;
-}
-
-interface Property {
-  id: string;
-  name: string;
-  type: string;
-  location: string;
-  units: number;
-  occupied: number;
-  monthly_revenue: number;
-  status: string;
-  contracts?: ContractInfo[];
-}
 
 interface WaqfUnitDetailsDialogProps {
   open: boolean;
@@ -51,10 +33,11 @@ export function WaqfUnitDetailsDialog({
   selectedFiscalYearId,
   onRefresh,
 }: WaqfUnitDetailsDialogProps) {
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [linkDialogOpen, setLinkDialogOpen] = useState(false);
   const [currentFiscalYearId, setCurrentFiscalYearId] = useState<string | undefined>(selectedFiscalYearId);
+
+  // جلب عقارات قلم الوقف
+  const { data: properties = [], isLoading, refetch: refetchProperties } = useWaqfUnitProperties(waqfUnit?.id);
 
   // جلب بيانات الإيرادات حسب السنة المالية
   const { revenueData, fiscalYears, activeFiscalYear } = useWaqfRevenueByFiscalYear(
@@ -69,39 +52,8 @@ export function WaqfUnitDetailsDialog({
     }
   }, [open, selectedFiscalYearId, activeFiscalYear?.id]);
 
-  useEffect(() => {
-    if (open && waqfUnit) {
-      fetchProperties();
-    }
-  }, [open, waqfUnit?.id]);
-
-  const fetchProperties = async () => {
-    if (!waqfUnit) return;
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from("properties")
-        .select(`
-          id, name, type, location, units, occupied, monthly_revenue, status,
-          contracts!contracts_property_id_fkey(
-            monthly_rent, 
-            payment_frequency, 
-            status
-          )
-        `)
-        .eq("waqf_unit_id", waqfUnit.id);
-
-      if (error) throw error;
-      setProperties(data || []);
-    } catch (error) {
-      console.error("Error fetching properties:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handlePropertyLinked = () => {
-    fetchProperties();
+    refetchProperties();
     onRefresh?.();
   };
 
@@ -109,8 +61,8 @@ export function WaqfUnitDetailsDialog({
 
   // حساب الإيرادات من العقود النشطة
   const calculateRevenues = () => {
-    let monthlyFromContracts = 0; // إيرادات من عقود شهرية
-    let annualFromContracts = 0; // إيرادات من عقود سنوية
+    let monthlyFromContracts = 0;
+    let annualFromContracts = 0;
 
     properties.forEach((property) => {
       const activeContracts = property.contracts?.filter(c => c.status === 'نشط') || [];
@@ -123,7 +75,6 @@ export function WaqfUnitDetailsDialog({
       });
     });
 
-    // إجمالي الإيرادات السنوية = (الشهري × 12) + السنوي
     const totalYearlyIncome = (monthlyFromContracts * 12) + annualFromContracts;
 
     return {
@@ -270,7 +221,6 @@ export function WaqfUnitDetailsDialog({
               {/* Revenue Cards - Based on Fiscal Year */}
               {revenueData ? (
                 revenueData.isClosed ? (
-                  // بطاقات السنة المالية المغلقة
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <Card className="p-4 border-green-200 bg-green-50/50 dark:border-green-800 dark:bg-green-950/20">
                       <div className="flex items-center gap-2 text-green-600 dark:text-green-400 mb-2">
@@ -314,7 +264,6 @@ export function WaqfUnitDetailsDialog({
                     </Card>
                   </div>
                 ) : (
-                  // بطاقات السنة المالية النشطة
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <Card className="p-4 border-blue-200 bg-blue-50/50 dark:border-blue-800 dark:bg-blue-950/20">
                       <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 mb-2">
@@ -324,9 +273,7 @@ export function WaqfUnitDetailsDialog({
                       <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">
                         {revenueData.monthlyCollected.toLocaleString("ar-SA")} ريال
                       </p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        من عقود شهرية
-                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">من عقود شهرية</p>
                     </Card>
 
                     <Card className="p-4 border-green-200 bg-green-50/50 dark:border-green-800 dark:bg-green-950/20">
@@ -337,9 +284,7 @@ export function WaqfUnitDetailsDialog({
                       <p className="text-2xl font-bold text-green-700 dark:text-green-300">
                         {revenueData.annualCollected.toLocaleString("ar-SA")} ريال
                       </p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        من عقود سنوية
-                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">من عقود سنوية</p>
                     </Card>
 
                     <Card className="p-4 border-amber-200 bg-amber-50/50 dark:border-amber-800 dark:bg-amber-950/20">
@@ -360,14 +305,11 @@ export function WaqfUnitDetailsDialog({
                       <p className="text-2xl font-bold text-primary">
                         {revenueData.netRevenue.toLocaleString("ar-SA")} ريال
                       </p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        بعد خصم الضريبة
-                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">بعد خصم الضريبة</p>
                     </Card>
                   </div>
                 )
               ) : (
-                // حالة عدم وجود بيانات
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <Card className="p-4 border-blue-200 bg-blue-50/50 dark:border-blue-800 dark:bg-blue-950/20">
                     <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 mb-2">
@@ -377,9 +319,7 @@ export function WaqfUnitDetailsDialog({
                     <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">
                       {revenues.monthlyRevenue.toLocaleString("ar-SA")} ريال
                     </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      من العقود الشهرية النشطة
-                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">من العقود الشهرية النشطة</p>
                   </Card>
 
                   <Card className="p-4 border-green-200 bg-green-50/50 dark:border-green-800 dark:bg-green-950/20">
@@ -390,22 +330,18 @@ export function WaqfUnitDetailsDialog({
                     <p className="text-2xl font-bold text-green-700 dark:text-green-300">
                       {revenues.annualRevenue.toLocaleString("ar-SA")} ريال
                     </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      من العقود السنوية النشطة
-                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">من العقود السنوية النشطة</p>
                   </Card>
 
                   <Card className="p-4 border-primary/30 bg-primary/5">
                     <div className="flex items-center gap-2 text-primary mb-2">
                       <Calculator className="h-5 w-5" />
-                      <span className="font-semibold">إجمالي الإيرادات السنوية</span>
+                      <span className="font-semibold">إجمالي الدخل السنوي</span>
                     </div>
                     <p className="text-2xl font-bold text-primary">
                       {revenues.totalYearlyIncome.toLocaleString("ar-SA")} ريال
                     </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      (الشهري × 12) + السنوي
-                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">(الشهري × 12) + السنوي</p>
                   </Card>
                 </div>
               )}
@@ -413,8 +349,9 @@ export function WaqfUnitDetailsDialog({
 
             <TabsContent value="properties" className="space-y-4 mt-4">
               <div className="flex justify-between items-center">
-                <h4 className="font-semibold">العقارات المرتبطة بقلم الوقف</h4>
+                <h4 className="font-semibold">العقارات المرتبطة</h4>
                 <Button
+                  variant="outline"
                   size="sm"
                   onClick={() => setLinkDialogOpen(true)}
                   className="gap-2"
@@ -429,19 +366,19 @@ export function WaqfUnitDetailsDialog({
                   جاري التحميل...
                 </div>
               ) : properties.length === 0 ? (
-                <Card className="p-8 text-center">
-                  <Home className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <h4 className="font-semibold mb-2">لا توجد عقارات مرتبطة</h4>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    لم يتم ربط أي عقارات بقلم الوقف هذا بعد
-                  </p>
-                  <Button onClick={() => setLinkDialogOpen(true)} className="gap-2">
-                    <Link2 className="h-4 w-4" />
-                    ربط عقار
+                <div className="text-center py-8 border rounded-lg bg-muted/50">
+                  <Home className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+                  <p className="text-muted-foreground">لا توجد عقارات مرتبطة</p>
+                  <Button
+                    variant="link"
+                    onClick={() => setLinkDialogOpen(true)}
+                    className="mt-2"
+                  >
+                    ربط عقار جديد
                   </Button>
-                </Card>
+                </div>
               ) : (
-                <Card>
+                <div className="border rounded-lg overflow-hidden">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -449,52 +386,36 @@ export function WaqfUnitDetailsDialog({
                         <TableHead className="text-right">النوع</TableHead>
                         <TableHead className="text-right">الموقع</TableHead>
                         <TableHead className="text-right">الوحدات</TableHead>
-                        <TableHead className="text-right">نوع الدفع</TableHead>
-                        <TableHead className="text-right">قيمة الإيجار</TableHead>
                         <TableHead className="text-right">الحالة</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {properties.map((property) => {
-                        const activeContract = property.contracts?.find(c => c.status === 'نشط');
-                        const paymentType = activeContract?.payment_frequency || '-';
-                        const rentAmount = activeContract?.monthly_rent || 0;
-                        
-                        return (
-                          <TableRow key={property.id}>
-                            <TableCell className="font-medium">{property.name}</TableCell>
-                            <TableCell>{property.type}</TableCell>
-                            <TableCell>{property.location}</TableCell>
-                            <TableCell>
-                              {property.occupied}/{property.units}
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant={paymentType === 'شهري' ? 'default' : paymentType === 'سنوي' ? 'secondary' : 'outline'}>
-                                {paymentType}
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="text-primary font-semibold">
-                              {rentAmount.toLocaleString("ar-SA")} ريال
-                            </TableCell>
-                            <TableCell>
-                              <Badge
-                                variant={
-                                  property.status === "مؤجر"
-                                    ? "default"
-                                    : property.status === "شاغر"
-                                    ? "secondary"
-                                    : "outline"
-                                }
-                              >
-                                {property.status}
-                              </Badge>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
+                      {properties.map((property) => (
+                        <TableRow key={property.id}>
+                          <TableCell className="font-medium">
+                            {property.name}
+                          </TableCell>
+                          <TableCell>{property.type}</TableCell>
+                          <TableCell>{property.location}</TableCell>
+                          <TableCell>
+                            {property.occupied}/{property.units}
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={
+                                property.status === "نشط"
+                                  ? "default"
+                                  : "secondary"
+                              }
+                            >
+                              {property.status}
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      ))}
                     </TableBody>
                   </Table>
-                </Card>
+                </div>
               )}
             </TabsContent>
           </Tabs>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link2, Building2 } from "lucide-react";
 import {
   Dialog,
@@ -16,16 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-
-interface Property {
-  id: string;
-  name: string;
-  location: string;
-  type: string;
-  waqf_unit_id: string | null;
-}
+import { useUnlinkedProperties, useLinkProperty } from "@/hooks/waqf/useWaqfProperties";
 
 interface LinkPropertyDialogProps {
   open: boolean;
@@ -40,60 +31,24 @@ export function LinkPropertyDialog({
   waqfUnitId,
   onSuccess,
 }: LinkPropertyDialogProps) {
-  const [properties, setProperties] = useState<Property[]>([]);
   const [selectedPropertyId, setSelectedPropertyId] = useState<string>("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-
-  useEffect(() => {
-    if (open) {
-      fetchUnlinkedProperties();
-    }
-  }, [open]);
-
-  const fetchUnlinkedProperties = async () => {
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from("properties")
-        .select("id, name, location, type, waqf_unit_id")
-        .is("waqf_unit_id", null);
-
-      if (error) throw error;
-      setProperties(data || []);
-    } catch (error) {
-      console.error("Error fetching properties:", error);
-      toast.error("فشل في جلب العقارات");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  
+  const { data: properties = [], isLoading } = useUnlinkedProperties();
+  const linkProperty = useLinkProperty();
 
   const handleSubmit = async () => {
-    if (!selectedPropertyId) {
-      toast.error("الرجاء اختيار عقار");
-      return;
-    }
+    if (!selectedPropertyId) return;
 
-    setIsSaving(true);
-    try {
-      const { error } = await supabase
-        .from("properties")
-        .update({ waqf_unit_id: waqfUnitId })
-        .eq("id", selectedPropertyId);
-
-      if (error) throw error;
-
-      toast.success("تم ربط العقار بنجاح");
-      onOpenChange(false);
-      setSelectedPropertyId("");
-      onSuccess?.();
-    } catch (error) {
-      console.error("Error linking property:", error);
-      toast.error("فشل في ربط العقار");
-    } finally {
-      setIsSaving(false);
-    }
+    linkProperty.mutate(
+      { propertyId: selectedPropertyId, waqfUnitId },
+      {
+        onSuccess: () => {
+          onOpenChange(false);
+          setSelectedPropertyId("");
+          onSuccess?.();
+        },
+      }
+    );
   };
 
   return (
@@ -151,10 +106,10 @@ export function LinkPropertyDialog({
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={!selectedPropertyId || isSaving}
+            disabled={!selectedPropertyId || linkProperty.isPending}
             className="gap-2"
           >
-            {isSaving ? "جاري الحفظ..." : "ربط العقار"}
+            {linkProperty.isPending ? "جاري الحفظ..." : "ربط العقار"}
           </Button>
         </DialogFooter>
       </DialogContent>
