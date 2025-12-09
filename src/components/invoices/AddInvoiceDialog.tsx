@@ -2,8 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useCreateInvoice } from "@/hooks/invoices/useCreateInvoice";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -14,9 +13,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { toast } from "sonner";
 import { Plus, Trash2, Loader2, AlertCircle, FileImage } from "lucide-react";
 import { format } from "@/lib/date";
-import { generateZATCAQRData, formatZATCACurrency, validateVATNumber } from "@/lib/zatca";
+import { validateVATNumber, formatZATCACurrency } from "@/lib/zatca";
 import { useOrganizationSettings } from "@/hooks/useOrganizationSettings";
-import { validateZATCAInvoice, formatValidationErrors } from "@/lib/validateZATCAInvoice";
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { commonValidation } from "@/lib/validationSchemas";
@@ -72,7 +70,6 @@ export const AddInvoiceDialog = ({ open, onOpenChange, isEdit = false, invoiceTo
   });
   const [showOCRDialog, setShowOCRDialog] = useState(false);
   const [ocrImageUrl, setOcrImageUrl] = useState<string | null>(null);
-  const queryClient = useQueryClient();
   const { settings: orgSettings } = useOrganizationSettings();
 
   const form = useForm<InvoiceFormData>({
@@ -138,115 +135,12 @@ export const AddInvoiceDialog = ({ open, onOpenChange, isEdit = false, invoiceTo
   const taxAmount = lines.reduce((sum, line) => sum + line.tax_amount, 0);
   const totalAmount = subtotal + taxAmount;
 
-  const createInvoiceMutation = useMutation({
-    mutationFn: async (data: InvoiceFormData) => {
-      if (lines.length === 0) {
-        throw new Error("يجب إضافة بند واحد على الأقل");
-      }
-
-      // التحقق من صحة البيانات
-      const validationResult = validateZATCAInvoice({
-        invoice_number: nextInvoiceNumber!,
-        invoice_date: data.invoice_date,
-        seller_vat_number: orgSettings?.vat_registration_number || "",
-        customer_name: data.customer_name,
-        lines: lines.map(line => ({
-          description: line.description,
-          quantity: line.quantity,
-          unit_price: line.unit_price,
-          tax_rate: line.tax_rate,
-        })),
-        subtotal,
-        tax_amount: taxAmount,
-        total_amount: totalAmount,
-      });
-
-      if (!validationResult.isValid) {
-        throw new Error(formatValidationErrors(validationResult));
-      }
-
-      // توليد QR Code
-      let qrCodeData = null;
-      if (orgSettings) {
-        const invoiceDate = new Date(data.invoice_date);
-        if (data.invoice_time) {
-          const [hours, minutes] = data.invoice_time.split(':');
-          invoiceDate.setHours(parseInt(hours), parseInt(minutes));
-        }
-        
-        qrCodeData = generateZATCAQRData({
-          sellerName: orgSettings.organization_name_ar,
-          sellerVatNumber: orgSettings.vat_registration_number,
-          invoiceDate: invoiceDate.toISOString(),
-          invoiceTotal: formatZATCACurrency(totalAmount),
-          vatTotal: formatZATCACurrency(taxAmount),
-        });
-      }
-
-      const { data: invoice, error: invoiceError } = await supabase
-        .from("invoices")
-        .insert({
-          invoice_number: nextInvoiceNumber!,
-          invoice_date: data.invoice_date,
-          invoice_time: data.invoice_time || format(new Date(), "HH:mm"),
-          due_date: data.due_date || null,
-          customer_name: data.customer_name,
-          customer_email: data.customer_email || null,
-          customer_phone: data.customer_phone || null,
-          customer_address: data.customer_address || null,
-          customer_city: data.customer_city || null,
-          customer_vat_number: data.customer_vat_number || null,
-          customer_commercial_registration: data.customer_commercial_registration || null,
-          subtotal,
-          tax_amount: taxAmount,
-          tax_rate: 15,
-          total_amount: totalAmount,
-          notes: data.notes || null,
-          qr_code_data: qrCodeData,
-          status: "draft",
-          source_image_url: ocrImageUrl,
-          ocr_extracted: !!ocrImageUrl,
-          ocr_confidence_score: ocrImageUrl ? 85 : null,
-          ocr_processed_at: ocrImageUrl ? new Date().toISOString() : null,
-        })
-        .select()
-        .maybeSingle();
-      
-      if (!invoice) throw new Error("Failed to create invoice");
-
-      const invoiceLines = lines.map((line, index) => ({
-        invoice_id: invoice.id,
-        line_number: index + 1,
-        account_id: line.account_id,
-        description: line.description,
-        quantity: line.quantity,
-        unit_price: line.unit_price,
-        subtotal: line.subtotal,
-        tax_rate: line.tax_rate,
-        tax_amount: line.tax_amount,
-        line_total: line.line_total,
-      }));
-
-      const { error: linesError } = await supabase
-        .from("invoice_lines")
-        .insert(invoiceLines);
-
-      if (linesError) throw linesError;
-
-      return invoice;
-    },
-    onSuccess: () => {
-      toast.success("تم إنشاء الفاتورة بنجاح");
-      queryClient.invalidateQueries({ queryKey: ["invoices"] });
-      queryClient.invalidateQueries({ queryKey: ["next-invoice-number"] });
-      form.reset();
-      setLines([]);
-      setOcrImageUrl(null);
-      onOpenChange(false);
-    },
-    onError: (error: Error) => {
-      toast.error(`خطأ في إنشاء الفاتورة: ${error.message}`);
-    },
+  // استخدام الـ hook بدلاً من useMutation مباشرة
+  const { createInvoice, isCreating } = useCreateInvoice(() => {
+    form.reset();
+    setLines([]);
+    setOcrImageUrl(null);
+    onOpenChange(false);
   });
 
   const onSubmit = (data: InvoiceFormData) => {
@@ -262,7 +156,33 @@ export const AddInvoiceDialog = ({ open, onOpenChange, isEdit = false, invoiceTo
       return;
     }
 
-    createInvoiceMutation.mutate(data);
+    if (!nextInvoiceNumber) {
+      toast.error("فشل في تحديد رقم الفاتورة");
+      return;
+    }
+
+    createInvoice({
+      formData: {
+        invoice_date: data.invoice_date,
+        invoice_time: data.invoice_time,
+        due_date: data.due_date,
+        customer_name: data.customer_name,
+        customer_email: data.customer_email,
+        customer_phone: data.customer_phone,
+        customer_address: data.customer_address,
+        customer_city: data.customer_city,
+        customer_vat_number: data.customer_vat_number,
+        customer_commercial_registration: data.customer_commercial_registration,
+        notes: data.notes,
+      },
+      lines,
+      nextInvoiceNumber,
+      orgSettings: orgSettings ? {
+        organization_name_ar: orgSettings.organization_name_ar || '',
+        vat_registration_number: orgSettings.vat_registration_number || '',
+      } : null,
+      ocrImageUrl,
+    });
   };
 
   const handleOCRDataExtracted = (data: ExtractedInvoiceData, imageUrl: string) => {
@@ -617,9 +537,9 @@ export const AddInvoiceDialog = ({ open, onOpenChange, isEdit = false, invoiceTo
             </Button>
             <Button 
               type="submit" 
-              disabled={createInvoiceMutation.isPending || lines.length === 0}
+              disabled={isCreating || lines.length === 0}
             >
-              {createInvoiceMutation.isPending && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+              {isCreating && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
               إنشاء الفاتورة
             </Button>
           </div>
