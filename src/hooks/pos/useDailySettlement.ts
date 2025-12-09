@@ -40,9 +40,9 @@ export const useDailySettlement = (startDate: Date, endDate: Date) => {
     },
   });
 
-  const totalCollections = shiftsReport?.reduce((sum: number, s: any) => sum + (s.total_collections || 0), 0) || 0;
-  const totalPayments = shiftsReport?.reduce((sum: number, s: any) => sum + (s.total_payments || 0), 0) || 0;
-  const totalVariance = shiftsReport?.reduce((sum: number, s: any) => sum + (s.variance || 0), 0) || 0;
+  const totalCollections = shiftsReport?.reduce((sum: number, s: ShiftReport) => sum + (s.total_collections || 0), 0) || 0;
+  const totalPayments = shiftsReport?.reduce((sum: number, s: ShiftReport) => sum + (s.total_payments || 0), 0) || 0;
+  const totalVariance = shiftsReport?.reduce((sum: number, s: ShiftReport) => sum + (s.variance || 0), 0) || 0;
 
   return {
     shiftsReport: shiftsReport || [],

@@ -63,14 +63,7 @@ export const useNotifications = () => {
   useEffect(() => {
     const subscription = RealtimeService.subscribeToTable(
       "notifications",
-      (payload) => {
-        if (payload.eventType === 'INSERT') {
-          const newNotification = payload.new as Notification;
-          toast.info(newNotification.title, {
-            description: newNotification.message,
-            duration: 5000,
-          });
-        }
+      () => {
         queryClient.invalidateQueries({ queryKey: ["notifications"] });
       }
     );

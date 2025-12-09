@@ -258,8 +258,38 @@ export class ApprovalService {
     if (reqApprovalsResult.error) throw reqApprovalsResult.error;
     if (journalApprovalsResult.error) throw journalApprovalsResult.error;
 
+    interface DistApproval {
+      id: string;
+      created_at: string;
+      distributions?: {
+        month?: string;
+        total_amount?: number;
+        beneficiaries_count?: number;
+      };
+    }
+
+    interface ReqApproval {
+      id: string;
+      created_at: string;
+      beneficiary_requests?: {
+        request_number?: string;
+        amount?: number;
+        priority?: string;
+        beneficiaries?: { full_name?: string };
+      };
+    }
+
+    interface JournalApprovalItem {
+      id: string;
+      created_at: string;
+      journal_entries?: {
+        entry_number?: string;
+        description?: string;
+      };
+    }
+
     if (distApprovalsResult.data) {
-      distApprovalsResult.data.forEach((app: any) => {
+      (distApprovalsResult.data as DistApproval[]).forEach((app) => {
         if (app.distributions) {
           allApprovals.push({
             id: app.id,
@@ -275,7 +305,7 @@ export class ApprovalService {
     }
 
     if (reqApprovalsResult.data) {
-      reqApprovalsResult.data.forEach((app: any) => {
+      (reqApprovalsResult.data as ReqApproval[]).forEach((app) => {
         if (app.beneficiary_requests?.beneficiaries) {
           allApprovals.push({
             id: app.id,
@@ -291,7 +321,7 @@ export class ApprovalService {
     }
 
     if (journalApprovalsResult.data) {
-      journalApprovalsResult.data.forEach((app: any) => {
+      (journalApprovalsResult.data as JournalApprovalItem[]).forEach((app) => {
         if (app.journal_entries) {
           allApprovals.push({
             id: app.id,

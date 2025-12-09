@@ -196,7 +196,7 @@ export class PaymentService {
   /**
    * إضافة حساب بنكي
    */
-  static async createBankAccount(bankAccount: any): Promise<any> {
+  static async createBankAccount(bankAccount: Database['public']['Tables']['bank_accounts']['Insert']) {
     const { data, error } = await supabase
       .from("bank_accounts")
       .insert([bankAccount])
@@ -210,7 +210,7 @@ export class PaymentService {
   /**
    * تحديث حساب بنكي
    */
-  static async updateBankAccount(id: string, updates: any): Promise<any> {
+  static async updateBankAccount(id: string, updates: Database['public']['Tables']['bank_accounts']['Update']) {
     const { data, error } = await supabase
       .from("bank_accounts")
       .update(updates)
