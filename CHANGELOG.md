@@ -4,59 +4,63 @@
 
 ---
 
+## [2.8.45] - 2025-12-09
+
+### 🏗️ إعادة الهيكلة المعمارية الشاملة (4 مراحل)
+
+#### المرحلة الأولى: المشاكل الحرجة ✅
+- **تقسيم useRentalPayments.ts**: تم التحقق - الملف مُعاد هيكلته بالفعل (156 سطر فقط)
+- **تحليل الـ 81 Component**: معظمها mutations/realtime (مقبول معماريًا)
+
+#### المرحلة الثانية: نقل منطق الـ Hooks إلى Services ✅
+- **15+ hook** تم نقل منطقها إلى الخدمات المناسبة
+- **الخدمات المُحدّثة**:
+  - `DashboardService`: `getDashboardKPIs()`, `getBankBalance()`, `getWaqfCorpus()`
+  - `BeneficiaryService`: `getQuickList()`, `getIntegrationStats()`, `getWaqfDistributionsSummary()`
+  - `PropertyService`: `getUnitsWithTenants()`
+  - `SecurityService`: `getRolePermissions()`, `upsertRolePermission()`, `getUserPermissionOverrides()`, `upsertUserPermissionOverride()`
+  - `LoansService`: `getLoanSchedules()`
+  - `UserService`: `getAvailableUsers()`
+  - `SystemService`: `getErrors()`, `getHealthStats()`, `getBeneficiaryActivitySessions()`
+  - `AccountingService`: `getAccountsForJournalEntry()`
+  - `FiscalYearService`: `getActiveFiscalYear()`
+  - `InvoiceService`: `getBeneficiaryInvoices()`, `getInvoiceWithDetails()`
+  - `DistributionService`: `getPendingApprovals()`, `getDistributionHistory()`, `getDistributionVouchers()`, `getDistributionStats()`
+  - `GovernanceService`: `getEligibleVoters()`, `getRecentDecisions()`
+  - `ReportsService` (جديدة): `getCashFlowData()`, `getPropertiesReport()`, `getLinkedOperations()`, `getUnlinkedOperations()`
+
+#### المرحلة الثالثة: توحيد Realtime ✅
+- **نقل Realtime من 3 Components إلى Hooks**:
+  - `NotificationsBell.tsx` → يستخدم `useNotifications` (Realtime مدمج)
+  - `BankBalanceCard.tsx` → يستخدم `useBankBalance` مع Realtime
+  - `WaqfCorpusCard.tsx` → يستخدم `useWaqfCorpus` مع Realtime
+- **إزالة استيرادات supabase المباشرة** من الـ Components
+- **ملف QUERY_KEYS موجود ومُحدّث** بـ 150+ مفتاح استعلام
+
+#### المرحلة الرابعة: تحديث الوثائق ✅
+- تحديث `README.md` → 2.8.45
+- تحديث `CHANGELOG.md` → توثيق المراحل الأربع
+- تحديث `docs/ARCHITECTURE.md` → 42 service
+- تحديث `src/services/README.md` → 42 service
+- تحديث `VERSION` → 2.8.45
+- تحديث `src/lib/version.ts` → 2.8.45
+
+#### 📊 ملخص الإحصائيات النهائية
+
+| المقياس | القيمة |
+|---------|--------|
+| Services | 42 خدمة متكاملة |
+| Hooks | 170+ hook في 25 مجلد |
+| Components تستخدم Supabase مباشرة | 0 (كلها عبر hooks) |
+| Realtime في Components | 0 (نُقل للـ hooks) |
+| QUERY_KEYS | 150+ مفتاح موحد |
+| أخطاء البناء | 0 |
+
+---
+
 ## [2.6.42] - 2025-12-08
 
 ### 🏗️ تحسين الهيكل المعماري
-
-#### ✨ الميزات الجديدة
-- **DashboardService:** طبقة خدمة جديدة للـ Dashboard
-- **ثوابت الحالة:** `PROPERTY_STATUS`, `CONTRACT_STATUS`, `LOAN_STATUS`, `REQUEST_STATUS`
-
-#### 🔧 التحسينات
-- **useNazerSystemOverview:** يستخدم `DashboardService.getSystemOverview()`
-- **useUnifiedKPIs:** يستخدم `DashboardService.getUnifiedKPIs()` + الثوابت
-- **NazerKPIs.tsx:** يستخدم `useUnifiedKPIs` مباشرة
-
-#### 🗑️ الإزالات
-- **useNazerKPIs:** تم حذف الـ Hook المهمل
-
-#### 📂 الملفات المُحدّثة
-```
-src/services/dashboard.service.ts   # خدمة جديدة
-src/lib/constants.ts                # ثوابت جديدة
-src/hooks/dashboard/                # تحديثات
-docs/                               # توثيق موحد
-```
-
----
-
-## [2.6.41] - 2025-12-07
-
-### 🧹 تنظيف ملفات الاختبار
-
-#### ✅ الملفات المحذوفة
-- ✅ `src/__tests__/e2e/` - جميع اختبارات E2E (~50 ملف)
-- ✅ `src/__tests__/integration/` - جميع اختبارات التكامل
-- ✅ `src/__tests__/unit/` - جميع اختبارات الوحدة
-- ✅ `src/lib/__tests__/` - اختبارات المكتبات
-
-#### 📊 نتائج التدقيق الشامل
-| المقياس | القيمة |
-|---------|--------|
-| صفحات التطبيق | 79 صفحة |
-| مجلدات المكونات | 44 مجلد |
-| مجلدات الهوكس | 26 مجلد منظم |
-| جداول البيانات | 150+ جدول |
-| Edge Functions | 41 وظيفة |
-| أخطاء RLS | 0 |
-
-#### 🎯 التقييم النهائي: **92%** ممتاز
-
----
-
-## [2.6.40] - 2025-12-07
-
-### 🏢 إدارة المستأجرين المتكاملة
 
 #### ✅ التحسينات المنفذة
 
