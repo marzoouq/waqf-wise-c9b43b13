@@ -7,7 +7,7 @@ import { Shield, Key, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
 import { AuthService } from "@/services/auth.service";
 import { useProfile } from "@/hooks/useProfile";
-import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { useTwoFactorAuth } from "@/hooks/settings/useTwoFactorAuth";
 import { logger } from "@/lib/logger";
 
 interface TwoFactorDialogProps {
@@ -17,25 +17,13 @@ interface TwoFactorDialogProps {
 
 export const TwoFactorDialog = ({ open, onOpenChange }: TwoFactorDialogProps) => {
   const { profile } = useProfile();
-  const queryClient = useQueryClient();
+  const { twoFactorEnabled, invalidate2FAStatus } = useTwoFactorAuth(profile?.user_id);
   const [step, setStep] = useState<"enable" | "verify">("enable");
   const [code, setCode] = useState("");
   const [secret, setSecret] = useState("");
   const [backupCodes, setBackupCodes] = useState<string[]>([]);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  
-  // Query two_factor_secrets table to check if 2FA is enabled
-  const { data: twoFactorData } = useQuery({
-    queryKey: ["two-factor-status", profile?.user_id],
-    queryFn: async () => {
-      if (!profile?.user_id) return null;
-      return AuthService.get2FAStatus(profile.user_id);
-    },
-    enabled: !!profile?.user_id,
-  });
-
-  const twoFactorEnabled = twoFactorData?.enabled || false;
 
   const generateSecret = () => {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
@@ -84,8 +72,7 @@ export const TwoFactorDialog = ({ open, onOpenChange }: TwoFactorDialogProps) =>
     try {
       await AuthService.enable2FA(profile?.user_id || "", secret, backupCodes);
 
-      await queryClient.invalidateQueries({ queryKey: ["profile"] });
-      await queryClient.invalidateQueries({ queryKey: ["two-factor-status"] });
+      await invalidate2FAStatus();
       toast.success("تم تفعيل المصادقة الثنائية بنجاح");
       onOpenChange(false);
       setStep("enable");
@@ -103,8 +90,7 @@ export const TwoFactorDialog = ({ open, onOpenChange }: TwoFactorDialogProps) =>
     try {
       await AuthService.disable2FA(profile?.user_id || "");
 
-      await queryClient.invalidateQueries({ queryKey: ["profile"] });
-      await queryClient.invalidateQueries({ queryKey: ["two-factor-status"] });
+      await invalidate2FAStatus();
       toast.success("تم إلغاء تفعيل المصادقة الثنائية");
       onOpenChange(false);
     } catch (error) {

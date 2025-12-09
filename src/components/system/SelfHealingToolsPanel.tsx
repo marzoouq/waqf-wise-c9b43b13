@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -19,7 +18,7 @@ import {
 import { useSelfHealing } from "@/hooks/useSelfHealing";
 import { useToast } from "@/hooks/use-toast";
 import { selfHealing } from "@/lib/selfHealing";
-import { supabase } from "@/integrations/supabase/client";
+import { useSelfHealingStats } from "@/hooks/system/useSelfHealingStats";
 
 export function SelfHealingToolsPanel() {
   const { toast } = useToast();
@@ -27,47 +26,7 @@ export function SelfHealingToolsPanel() {
   const [isHealthMonitorRunning, setIsHealthMonitorRunning] = useState(true);
 
   // 📊 إحصائيات ديناميكية حقيقية من قاعدة البيانات
-  const { data: stats, isLoading: statsLoading, refetch: refetchStats } = useQuery({
-    queryKey: ['self-healing-stats'],
-    queryFn: async () => {
-      // إجمالي الأخطاء
-      const { count: totalErrors } = await supabase
-        .from('system_error_logs')
-        .select('*', { count: 'exact', head: true });
-      
-      // الأخطاء المحلولة
-      const { count: resolvedErrors } = await supabase
-        .from('system_error_logs')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'resolved');
-      
-      // التنبيهات النشطة
-      const { count: activeAlerts } = await supabase
-        .from('system_alerts')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'active');
-      
-      // معدل النجاح
-      const retrySuccessRate = totalErrors > 0 
-        ? Math.round((resolvedErrors / totalErrors) * 100) 
-        : 100;
-      
-      // صحة النظام (عكسي للتنبيهات النشطة)
-      const systemHealth = activeAlerts < 100 ? 99 : 
-                          activeAlerts < 500 ? 95 : 
-                          activeAlerts < 1000 ? 85 : 70;
-      
-      return {
-        retrySuccessRate,
-        systemHealth,
-        totalErrors,
-        resolvedErrors,
-        activeAlerts,
-      };
-    },
-    staleTime: 60 * 1000,
-    refetchInterval: false, // تعطيل التحديث التلقائي لتحسين LCP
-  });
+  const { stats, isLoading: statsLoading, refetch: refetchStats } = useSelfHealingStats();
 
   // حالة الأدوات
   const toolsStatus = {

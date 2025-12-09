@@ -1,6 +1,6 @@
 /**
  * Nazer Hooks
- * @version 2.8.38
+ * @version 2.8.39
  */
 
 export { 
@@ -13,3 +13,5 @@ export {
   useDistributeRevenue,
   type HeirShare 
 } from './useDistributeRevenue';
+
+export { usePublishFiscalYear } from './usePublishFiscalYear';
