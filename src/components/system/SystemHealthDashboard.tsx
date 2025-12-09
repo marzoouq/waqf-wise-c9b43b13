@@ -20,6 +20,7 @@ import {
 import { errorTracker } from "@/lib/errors/tracker";
 import { toast } from "sonner";
 import { useSystemHealthLive } from "@/hooks/system/useSystemHealthLive";
+import { supabase } from "@/integrations/supabase/client";
 
 export function SystemHealthDashboard() {
   const { data: liveStats, isLoading, refetch } = useSystemHealthLive();
@@ -103,9 +104,7 @@ export function SystemHealthDashboard() {
     );
   }
 
-  const healthScore = liveStats 
-    ? Math.round((liveStats.errorResolutionRate + liveStats.fixSuccessRate) / 2)
-    : 0;
+  const healthScore = liveStats?.healthScore || 0;
 
   const getHealthColor = (score: number) => {
     if (score >= 90) return "text-success";
