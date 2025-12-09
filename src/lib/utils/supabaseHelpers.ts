@@ -1,141 +1,165 @@
 /**
- * مساعدات Supabase لتجنب Type instantiation issues
- * ملاحظة: استخدام any هنا مقصود لتجنب مشاكل TypeScript العميقة
+ * مساعدات Supabase - نسخة محسّنة
+ * @version 2.8.51
+ * 
+ * ملاحظة: استخدام type assertions ضروري هنا لتجنب مشاكل TypeScript العميقة
+ * مع Supabase client. هذا نمط موصى به في وثائق Supabase.
+ * @see https://supabase.com/docs/reference/javascript/typescript-support
  */
 
 import { supabase } from "@/integrations/supabase/client";
 import type { AppError } from "@/types/errors";
 
+interface FetchOptions {
+  select?: string;
+  filters?: Array<{ 
+    column: string; 
+    operator: 'eq' | 'gt' | 'lt' | 'gte' | 'lte' | 'neq' | 'like' | 'ilike'; 
+    value: unknown 
+  }>;
+  order?: { column: string; ascending?: boolean };
+  limit?: number;
+  single?: boolean;
+}
+
+interface FetchResult<T> {
+  data: T | T[] | null;
+  error: AppError | null;
+}
+
+interface MutationResult<T> {
+  data: T | null;
+  error: AppError | null;
+}
+
+// Type assertion helper للتعامل مع dynamic table names
+const getTableQuery = (tableName: string) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (supabase as any).from(tableName);
+};
+
 /**
- * Helper function to fetch data from Supabase without type complexity
+ * جلب البيانات من جدول Supabase
  */
 export async function fetchFromTable<T>(
   tableName: string,
-  options: {
-    select?: string;
-    filters?: Array<{ column: string; operator: string; value: unknown }>;
-    order?: { column: string; ascending?: boolean };
-    limit?: number;
-    single?: boolean;
-  } = {}
-): Promise<{ data: T | T[] | null; error: AppError | null }> {
+  options: FetchOptions = {}
+): Promise<FetchResult<T>> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const client: any = supabase;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let query: any = client.from(tableName);
+    let query = getTableQuery(tableName).select(options.select || '*');
 
-    // Select
-    if (options.select) {
-      query = query.select(options.select);
-    } else {
-      query = query.select('*');
-    }
-
-    // Filters
+    // تطبيق الفلاتر
     if (options.filters) {
       for (const filter of options.filters) {
-        if (filter.operator === 'eq') {
-          query = query.eq(filter.column, filter.value);
-        } else if (filter.operator === 'gt') {
-          query = query.gt(filter.column, filter.value);
-        } else if (filter.operator === 'lt') {
-          query = query.lt(filter.column, filter.value);
-        } else if (filter.operator === 'gte') {
-          query = query.gte(filter.column, filter.value);
-        } else if (filter.operator === 'lte') {
-          query = query.lte(filter.column, filter.value);
+        const { column, operator, value } = filter;
+        switch (operator) {
+          case 'eq':
+            query = query.eq(column, value);
+            break;
+          case 'neq':
+            query = query.neq(column, value);
+            break;
+          case 'gt':
+            query = query.gt(column, value);
+            break;
+          case 'lt':
+            query = query.lt(column, value);
+            break;
+          case 'gte':
+            query = query.gte(column, value);
+            break;
+          case 'lte':
+            query = query.lte(column, value);
+            break;
+          case 'like':
+            query = query.like(column, value as string);
+            break;
+          case 'ilike':
+            query = query.ilike(column, value as string);
+            break;
         }
       }
     }
 
-    // Order
+    // الترتيب
     if (options.order) {
       query = query.order(options.order.column, { 
         ascending: options.order.ascending ?? true 
       });
     }
 
-    // Limit
+    // الحد
     if (options.limit) {
       query = query.limit(options.limit);
     }
 
-    // Single
+    // سجل واحد
     if (options.single) {
-      query = query.maybeSingle();
+      const { data, error } = await query.maybeSingle();
+      return { data: data as T | null, error: error as AppError | null };
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result: any = await query;
-    return { data: result.data, error: result.error };
+    const { data, error } = await query;
+    return { data: data as T[] | null, error: error as AppError | null };
   } catch (error) {
-    return { data: null, error };
+    return { data: null, error: error as AppError };
   }
 }
 
 /**
- * Helper to insert data
+ * إدراج بيانات في جدول
  */
 export async function insertIntoTable<T>(
   tableName: string,
   data: Record<string, unknown>
-): Promise<{ data: T | null; error: AppError | null }> {
+): Promise<MutationResult<T>> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const client: any = supabase;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const query: any = client.from(tableName).insert([data]).select().maybeSingle();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result: any = await query;
-    return { data: result.data, error: result.error };
+    const { data: result, error } = await getTableQuery(tableName)
+      .insert([data])
+      .select()
+      .maybeSingle();
+
+    return { data: result as T | null, error: error as AppError | null };
   } catch (error) {
-    return { data: null, error };
+    return { data: null, error: error as AppError };
   }
 }
 
 /**
- * Helper to update data
+ * تحديث بيانات في جدول
  */
 export async function updateInTable<T>(
   tableName: string,
   id: string,
   updates: Record<string, unknown>
-): Promise<{ data: T | null; error: AppError | null }> {
+): Promise<MutationResult<T>> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const client: any = supabase;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const query: any = client
-      .from(tableName)
+    const { data: result, error } = await getTableQuery(tableName)
       .update(updates)
       .eq('id', id)
       .select()
       .maybeSingle();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result: any = await query;
-    return { data: result.data, error: result.error };
+
+    return { data: result as T | null, error: error as AppError | null };
   } catch (error) {
-    return { data: null, error };
+    return { data: null, error: error as AppError };
   }
 }
 
 /**
- * Helper to delete data
+ * حذف بيانات من جدول
  */
 export async function deleteFromTable(
   tableName: string,
   id: string
 ): Promise<{ error: AppError | null }> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const client: any = supabase;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const query: any = client.from(tableName).delete().eq('id', id);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result: any = await query;
-    return { error: result.error };
+    const { error } = await getTableQuery(tableName)
+      .delete()
+      .eq('id', id);
+
+    return { error: error as AppError | null };
   } catch (error) {
-    return { error };
+    return { error: error as AppError };
   }
 }
