@@ -1388,8 +1388,24 @@ export class AccountingService {
       let totalRevenue = 0;
       let totalExpenses = 0;
 
+      interface EntryLine {
+        debit_amount?: number | null;
+        credit_amount?: number | null;
+        accounts?: {
+          account_type?: string;
+          account_nature?: string;
+        };
+      }
+
+      interface OpeningBalance {
+        opening_balance?: number | null;
+        accounts?: {
+          account_type?: string;
+        };
+      }
+
       // حساب من القيود اليومية
-      entriesResult.data?.forEach((line: any) => {
+      (entriesResult.data as EntryLine[] | null)?.forEach((line) => {
         const accountType = line.accounts?.account_type;
         const accountNature = line.accounts?.account_nature;
         const debit = Number(line.debit_amount || 0);
@@ -1409,7 +1425,7 @@ export class AccountingService {
       });
 
       // إضافة الأرصدة الافتتاحية
-      openingBalancesResult.data?.forEach((ob: any) => {
+      (openingBalancesResult.data as OpeningBalance[] | null)?.forEach((ob) => {
         const accountType = ob.accounts?.account_type;
         const balance = Number(ob.opening_balance || 0);
 
@@ -1670,7 +1686,7 @@ export class AccountingService {
   /**
    * إنشاء إقفال سنة مالية
    */
-  static async createFiscalYearClosing(closing: any) {
+  static async createFiscalYearClosing(closing: Database['public']['Tables']['fiscal_year_closings']['Insert']) {
     const { data, error } = await supabase
       .from("fiscal_year_closings")
       .insert(closing)
@@ -1684,7 +1700,7 @@ export class AccountingService {
   /**
    * تحديث إقفال سنة مالية
    */
-  static async updateFiscalYearClosing(id: string, updates: any) {
+  static async updateFiscalYearClosing(id: string, updates: Database['public']['Tables']['fiscal_year_closings']['Update']) {
     const { data, error } = await supabase
       .from("fiscal_year_closings")
       .update(updates)

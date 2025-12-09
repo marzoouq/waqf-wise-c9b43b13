@@ -45,7 +45,7 @@ export function useRequestAttachments(requestId?: string) {
 
   const deleteAttachment = useMutation({
     mutationFn: async (attachmentId: string) => {
-      const attachment = attachments.find((a: any) => a.id === attachmentId);
+      const attachment = attachments.find((a) => a.id === attachmentId);
       if (!attachment) throw new Error("Attachment not found");
       return RequestService.deleteAttachment(attachmentId, attachment.file_path, requestId!);
     },

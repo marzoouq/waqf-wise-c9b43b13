@@ -84,15 +84,15 @@ export function useRequestApprovals(requestId?: string) {
   });
 
   const checkAllApproved = () => {
-    return approvals.length === 3 && approvals.every((a: any) => a.status === "موافق");
+    return approvals.length === 3 && approvals.every((a) => a.status === "موافق");
   };
 
   const hasRejection = () => {
-    return approvals.some((a: any) => a.status === "مرفوض");
+    return approvals.some((a) => a.status === "مرفوض");
   };
 
   const getCurrentLevel = () => {
-    const approvedCount = approvals.filter((a: any) => a.status === "موافق").length;
+    const approvedCount = approvals.filter((a) => a.status === "موافق").length;
     return approvedCount + 1;
   };
 

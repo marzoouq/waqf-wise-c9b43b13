@@ -4,26 +4,28 @@
  */
 
 import { supabase } from "@/integrations/supabase/client";
-import type { RealtimeChannel } from "@supabase/supabase-js";
+import type { RealtimeChannel, RealtimePostgresChangesPayload } from "@supabase/supabase-js";
+
+type RealtimeCallback = (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => void;
 
 export class RealtimeService {
   private static channels: Map<string, RealtimeChannel> = new Map();
 
-  static subscribeToTable(table: string, callback: (payload: any) => void) {
+  static subscribeToTable(table: string, callback: RealtimeCallback) {
     const channelName = `${table}-${Date.now()}`;
     const channel = supabase
       .channel(channelName)
-      .on('postgres_changes' as any, { event: '*', schema: 'public', table }, callback)
+      .on('postgres_changes', { event: '*', schema: 'public', table }, callback)
       .subscribe();
     this.channels.set(channelName, channel);
     return { channel, unsubscribe: () => this.unsubscribe(channelName) };
   }
 
-  static subscribeToChanges(tables: string[], callback: (payload: any) => void) {
+  static subscribeToChanges(tables: string[], callback: RealtimeCallback) {
     const channelName = `multi-${Date.now()}`;
     let channel = supabase.channel(channelName);
     tables.forEach(table => {
-      channel = channel.on('postgres_changes' as any, { event: '*', schema: 'public', table }, callback);
+      channel = channel.on('postgres_changes', { event: '*', schema: 'public', table }, callback);
     });
     channel.subscribe();
     this.channels.set(channelName, channel);

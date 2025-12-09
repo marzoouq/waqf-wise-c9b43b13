@@ -34,7 +34,7 @@ export function useFiscalYearClosings() {
 
   // إنشاء عملية إقفال جديدة
   const createClosing = useMutation({
-    mutationFn: async (closing: any) => {
+    mutationFn: async (closing: Parameters<typeof AccountingService.createFiscalYearClosing>[0]) => {
       return await AccountingService.createFiscalYearClosing(closing);
     },
     onSuccess: () => {
@@ -49,7 +49,7 @@ export function useFiscalYearClosings() {
 
   // تحديث عملية إقفال
   const updateClosing = useMutation({
-    mutationFn: async ({ id, updates }: { id: string; updates: any }) => {
+    mutationFn: async ({ id, updates }: { id: string; updates: Parameters<typeof AccountingService.updateFiscalYearClosing>[1] }) => {
       return await AccountingService.updateFiscalYearClosing(id, updates);
     },
     onSuccess: () => {

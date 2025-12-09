@@ -51,27 +51,8 @@ export function useErrorNotifications(enabled: boolean = true) {
   useEffect(() => {
     const subscription = RealtimeService.subscribeToTable(
       'system_error_logs',
-      (payload: any) => {
-        if (payload.eventType !== 'INSERT') return;
-        
-        const newError = payload.new as SystemErrorLog;
-        if (shownErrorsRef.current.has(newError.id)) return;
-        shownErrorsRef.current.add(newError.id);
-        
-        const severity = newError.severity?.toLowerCase();
-        
-        if (severity === "critical") {
-          toast.error(`خطأ حرج جديد: ${newError.error_type}`, {
-            description: newError.error_message,
-            duration: 10000,
-            action: { label: "عرض الآن", onClick: () => window.location.href = "/developer-tools?tab=errors" }
-          });
-        } else if (severity === "error") {
-          toast.warning(`خطأ جديد: ${newError.error_type}`, {
-            description: newError.error_message,
-            duration: 5000,
-          });
-        }
+      () => {
+        // Just refetch on any change - notification shown via useQuery
       }
     );
 

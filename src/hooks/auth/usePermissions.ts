@@ -41,7 +41,11 @@ export function usePermissions() {
         }
       });
 
-      userPermissions?.forEach((up: any) => {
+      interface UserPermission {
+        permission_key?: string;
+        granted?: boolean;
+      }
+      (userPermissions as UserPermission[] | null)?.forEach((up) => {
         if (up.permission_key) {
           if (up.granted) {
             permissionsMap.set(up.permission_key, {

@@ -339,7 +339,22 @@ export class POSService {
 
     if (error) throw error;
 
-    return (data || []).map((item: any) => {
+    interface RentalPaymentItem {
+      id: string;
+      contract_id: string;
+      amount_due: number | null;
+      tax_amount: number | null;
+      net_amount: number | null;
+      due_date: string;
+      status: string;
+      contracts?: {
+        contract_number?: string;
+        tenant_name?: string;
+        properties?: { name?: string };
+      };
+    }
+
+    return ((data || []) as RentalPaymentItem[]).map((item) => {
       const today = new Date();
       const dueDate = new Date(item.due_date);
       const daysOverdue = Math.floor((today.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
