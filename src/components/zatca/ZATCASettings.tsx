@@ -4,70 +4,20 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Settings, Shield, Key, CheckCircle } from "lucide-react";
-import { useState } from "react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { useZATCASettings } from "@/hooks/zatca/useZATCASettings";
 
 export function ZATCASettings() {
-  const [settings, setSettings] = useState({
-    enabled: false,
-    organizationId: "",
-    vatNumber: "",
-    apiKey: "",
-    testMode: true,
-  });
-
-  const [isSaving, setIsSaving] = useState(false);
-
-  const handleSave = async () => {
-    setIsSaving(true);
-    try {
-      // ✅ حفظ إعدادات ZATCA في قاعدة البيانات
-      const settingsToSave = [
-        { key: 'zatca_enabled', value: settings.enabled ? 'true' : 'false' },
-        { key: 'zatca_organization_id', value: settings.organizationId },
-        { key: 'zatca_vat_number', value: settings.vatNumber },
-        { key: 'zatca_api_key', value: settings.apiKey },
-        { key: 'zatca_test_mode', value: settings.testMode ? 'true' : 'false' },
-      ];
-
-      for (const { key, value } of settingsToSave) {
-        const { error } = await supabase
-          .from('system_settings')
-          .upsert({
-            setting_key: key,
-            setting_value: value,
-            setting_type: 'text',
-            category: 'zatca',
-            updated_at: new Date().toISOString(),
-          }, {
-            onConflict: 'setting_key'
-          });
-
-        if (error) throw error;
-      }
-      
-      toast.success("تم حفظ الإعدادات", {
-        description: "تم حفظ إعدادات هيئة الزكاة والضريبة بنجاح",
-      });
-    } catch (error) {
-      toast.error("خطأ في الحفظ", {
-        description: "تعذر حفظ الإعدادات. الرجاء المحاولة مرة أخرى.",
-      });
-    } finally {
-      setIsSaving(false);
-    }
-  };
+  const { settings, updateSettings, saveSettings, testConnection, isSaving } = useZATCASettings();
 
   const handleTestConnection = async () => {
     toast.info("جاري الاختبار...", {
       description: "يتم التحقق من الاتصال بخدمة الهيئة",
     });
 
-    // محاكاة اختبار الاتصال
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    if (settings.apiKey && settings.organizationId) {
+    const success = await testConnection();
+    
+    if (success) {
       toast.success("نجح الاتصال", {
         description: "تم التحقق من الاتصال بنجاح",
         icon: <CheckCircle className="h-5 w-5 text-success" />,
@@ -108,7 +58,7 @@ export function ZATCASettings() {
             <Switch
               checked={settings.enabled}
               onCheckedChange={(checked) =>
-                setSettings({ ...settings, enabled: checked })
+                updateSettings({ enabled: checked })
               }
             />
           </div>
@@ -122,7 +72,7 @@ export function ZATCASettings() {
                 placeholder="أدخل رقم المنشأة"
                 value={settings.organizationId}
                 onChange={(e) =>
-                  setSettings({ ...settings, organizationId: e.target.value })
+                  updateSettings({ organizationId: e.target.value })
                 }
               />
               <p className="text-xs text-muted-foreground">
@@ -137,7 +87,7 @@ export function ZATCASettings() {
                 placeholder="أدخل الرقم الضريبي"
                 value={settings.vatNumber}
                 onChange={(e) =>
-                  setSettings({ ...settings, vatNumber: e.target.value })
+                  updateSettings({ vatNumber: e.target.value })
                 }
               />
               <p className="text-xs text-muted-foreground">
@@ -156,7 +106,7 @@ export function ZATCASettings() {
                 placeholder="أدخل مفتاح API"
                 value={settings.apiKey}
                 onChange={(e) =>
-                  setSettings({ ...settings, apiKey: e.target.value })
+                  updateSettings({ apiKey: e.target.value })
                 }
               />
               <p className="text-xs text-muted-foreground">
@@ -174,7 +124,7 @@ export function ZATCASettings() {
               <Switch
                 checked={settings.testMode}
                 onCheckedChange={(checked) =>
-                  setSettings({ ...settings, testMode: checked })
+                  updateSettings({ testMode: checked })
                 }
               />
             </div>
@@ -182,7 +132,7 @@ export function ZATCASettings() {
 
           {/* Actions */}
           <div className="flex gap-2 pt-4">
-            <Button onClick={handleSave} disabled={isSaving} className="flex-1">
+            <Button onClick={saveSettings} disabled={isSaving} className="flex-1">
               {isSaving ? "جاري الحفظ..." : "حفظ الإعدادات"}
             </Button>
             <Button
