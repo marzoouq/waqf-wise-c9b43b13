@@ -62,14 +62,9 @@ export default defineConfig(({ mode }) => {
               return 'react-core';
             }
             
-            // ✅ next-themes و sonner يعتمدان على React - يذهبان مع react-core
-            if (id.includes('next-themes') || id.includes('sonner')) {
+            // ✅ next-themes و sonner و Radix UI يعتمدان على React - يذهبان مع react-core
+            if (id.includes('next-themes') || id.includes('sonner') || id.includes('@radix-ui')) {
               return 'react-core';
-            }
-            
-            // ✅ Radix UI يعتمد على React
-            if (id.includes('@radix-ui')) {
-              return 'radix-ui';
             }
             
             // React Router - chunk منفصل
