@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/hooks/useAuth";
 import { useMessages, type Message } from "@/hooks/useMessages";
+import { useAvailableUsers } from "@/hooks/messages/useAvailableUsers";
 import { format, arLocale as ar } from "@/lib/date";
 import {
   Mail,
@@ -43,72 +42,7 @@ export function MessageCenter() {
   const [isComposing, setIsComposing] = useState(false);
   const [receiverId, setReceiverId] = useState<string>("");
   
-  // Fetch available users for messaging
-  const { data: availableUsers = [] } = useQuery({
-    queryKey: ["available-users"],
-    queryFn: async () => {
-      // جلب جميع المستخدمين بجميع أدوارهم
-      const { data, error } = await supabase
-        .from("user_roles")
-        .select("user_id, role")
-        .limit(200);
-        
-      if (error) throw error;
-      
-      if (!data || data.length === 0) return [];
-      
-      // جلب أسماء المستفيدين
-      const userIds = [...new Set(data.map(u => u.user_id))];
-      const { data: beneficiaries } = await supabase
-        .from("beneficiaries")
-        .select("user_id, full_name, beneficiary_number")
-        .in("user_id", userIds);
-        
-      // تجميع المستخدمين حسب user_id وأدوارهم
-      const userMap = new Map<string, { id: string; name: string; roles: string[] }>();
-      
-      data.forEach(u => {
-        const beneficiary = beneficiaries?.find(b => b.user_id === u.user_id);
-        const existingUser = userMap.get(u.user_id);
-        
-        if (existingUser) {
-          existingUser.roles.push(u.role);
-        } else {
-          userMap.set(u.user_id, {
-            id: u.user_id,
-            name: beneficiary?.full_name || 
-                  (u.role === 'nazer' ? 'الناظر' : 
-                   u.role === 'admin' ? 'المشرف' :
-                   u.role === 'accountant' ? 'المحاسب' :
-                   u.role === 'cashier' ? 'أمين الصندوق' :
-                   u.role === 'archivist' ? 'الأرشيفي' :
-                   beneficiary?.beneficiary_number || 'مستخدم'),
-            roles: [u.role]
-          });
-        }
-      });
-      
-      return Array.from(userMap.values())
-        .map(u => ({
-          ...u,
-          displayName: `${u.name} (${u.roles.join(', ')})`,
-          role: u.roles[0] // للعرض فقط
-        }))
-        .sort((a, b) => {
-          // ترتيب حسب الأدوار: nazer, admin, ثم المستفيدين
-          const roleOrder: Record<string, number> = {
-            nazer: 1,
-            admin: 2,
-            accountant: 3,
-            cashier: 4,
-            archivist: 5,
-            beneficiary: 6,
-            user: 7
-          };
-          return (roleOrder[a.role] || 999) - (roleOrder[b.role] || 999);
-        });
-    },
-  });
+  const { data: availableUsers = [] } = useAvailableUsers();
 
   const handleSelectMessage = (message: Message) => {
     setSelectedMessage(message);

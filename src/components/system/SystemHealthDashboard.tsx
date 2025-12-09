@@ -3,9 +3,7 @@
  * 🔧 جزء من Phase 1: معالجة التنبيهات الحرجة
  */
 
-import { useQuery } from "@tanstack/react-query";
 import { productionLogger } from "@/lib/logger/production-logger";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -21,61 +19,10 @@ import {
 } from "lucide-react";
 import { errorTracker } from "@/lib/errors/tracker";
 import { toast } from "sonner";
+import { useSystemHealthLive } from "@/hooks/system/useSystemHealthLive";
 
 export function SystemHealthDashboard() {
-  // جلب إحصائيات حية من قاعدة البيانات
-  const { data: liveStats, isLoading, refetch } = useQuery({
-    queryKey: ["system-health-live"],
-    queryFn: async () => {
-      const now = new Date();
-      const last24h = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
-      const last7d = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
-
-      const [errorsResult, alertsResult] = await Promise.all([
-        supabase
-          .from("system_error_logs")
-          .select("id, severity, status, created_at", { count: "exact" })
-          .gte("created_at", last7d),
-        supabase
-          .from("system_alerts")
-          .select("id, severity, status, created_at", { count: "exact" })
-          .gte("created_at", last7d),
-      ]);
-
-      const errors = errorsResult.data || [];
-      const alerts = alertsResult.data || [];
-
-      const resolvedCount = errors.filter(e => e.status === "resolved" || e.status === "auto_resolved").length;
-
-      return {
-        // الأخطاء
-        totalErrors: errorsResult.count || 0,
-        newErrors: errors.filter(e => e.status === "new").length,
-        criticalErrors: errors.filter(e => e.severity === "critical" && e.status === "new").length,
-        highErrors: errors.filter(e => e.severity === "high" && e.status === "new").length,
-        resolvedErrors: resolvedCount,
-        
-        // التنبيهات
-        totalAlerts: alertsResult.count || 0,
-        activeAlerts: alerts.filter(a => a.status === "active").length,
-        criticalAlerts: alerts.filter(a => a.severity === "critical" && a.status === "active").length,
-        highAlerts: alerts.filter(a => a.severity === "high" && a.status === "active").length,
-        
-        // الإصلاح التلقائي (محسوب من الأخطاء المحلولة)
-        totalFixes: resolvedCount,
-        successfulFixes: resolvedCount,
-        failedFixes: 0,
-        
-        // معدلات النجاح
-        errorResolutionRate: errors.length > 0 
-          ? Math.round((resolvedCount / errors.length) * 100)
-          : 100,
-        fixSuccessRate: 100,
-      };
-    },
-    staleTime: 60 * 1000, // البيانات صالحة لمدة دقيقة
-    refetchInterval: false, // تعطيل التحديث التلقائي لتحسين الأداء
-  });
+  const { data: liveStats, isLoading, refetch } = useSystemHealthLive();
 
   // جلب إحصائيات Deduplication من Error Tracker
   const dedupStats = errorTracker.getDeduplicationStats();

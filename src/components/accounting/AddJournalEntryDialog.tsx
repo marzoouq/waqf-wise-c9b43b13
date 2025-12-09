@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import {
@@ -35,6 +35,7 @@ import { arLocale } from "@/lib/date";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Plus, Trash2 } from "lucide-react";
+import { useJournalEntryAccounts, useActiveFiscalYears } from "@/hooks/accounting/useJournalEntryFormData";
 
 const formSchema = z.object({
   entry_number: z.string().min(1, { message: "رقم القيد مطلوب" }),
@@ -76,32 +77,8 @@ const AddJournalEntryDialog = ({ open, onOpenChange }: Props) => {
     },
   });
 
-  const { data: accounts } = useQuery({
-    queryKey: ["accounts"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("accounts")
-        .select("*")
-        .eq("is_active", true)
-        .eq("is_header", false)
-        .order("code");
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const { data: fiscalYears } = useQuery({
-    queryKey: ["fiscal_years"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("fiscal_years")
-        .select("*")
-        .eq("is_active", true)
-        .order("start_date", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
-  });
+  const { data: accounts } = useJournalEntryAccounts();
+  const { data: fiscalYears } = useActiveFiscalYears();
 
   // توليد رقم القيد تلقائياً
   useEffect(() => {

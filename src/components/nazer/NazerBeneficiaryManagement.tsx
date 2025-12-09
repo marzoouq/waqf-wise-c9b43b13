@@ -11,8 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useNazerBeneficiariesQuick } from "@/hooks/nazer/useNazerBeneficiariesQuick";
 import { 
   Users, Search, Eye, Edit, UserPlus, 
   ChevronLeft, Phone, Mail, Wallet,
@@ -24,20 +23,7 @@ export function NazerBeneficiaryManagement() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { data: beneficiaries = [], isLoading } = useQuery({
-    queryKey: ["nazer-beneficiaries-quick"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("beneficiaries")
-        .select("id, full_name, phone, email, status, category, total_received, account_balance, national_id")
-        .order("created_at", { ascending: false })
-        .limit(20);
-
-      if (error) throw error;
-      return data || [];
-    },
-    staleTime: 2 * 60 * 1000,
-  });
+  const { data: beneficiaries = [], isLoading } = useNazerBeneficiariesQuick();
 
   const filteredBeneficiaries = beneficiaries.filter(b => 
     b.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||

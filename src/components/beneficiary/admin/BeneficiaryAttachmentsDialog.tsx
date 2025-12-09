@@ -4,10 +4,11 @@ import { UnifiedFileUpload, UploadedFile } from "@/components/unified/UnifiedFil
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { Beneficiary } from "@/types/beneficiary";
 import { Loader2 } from "lucide-react";
 import { productionLogger } from "@/lib/logger/production-logger";
+import { useBeneficiaryAttachments } from "@/hooks/beneficiary/useBeneficiaryAttachments";
 
 interface BeneficiaryAttachmentsDialogProps {
   open: boolean;
@@ -25,22 +26,7 @@ export function BeneficiaryAttachmentsDialog({
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [isUploading, setIsUploading] = useState(false);
 
-  const { data: existingAttachments, isLoading } = useQuery({
-    queryKey: ['beneficiary-attachments', beneficiary?.id],
-    queryFn: async () => {
-      if (!beneficiary?.id) return [];
-      
-      const { data, error } = await supabase
-        .from('beneficiary_attachments')
-        .select('id, file_name, file_path, file_type, file_size, mime_type, created_at')
-        .eq('beneficiary_id', beneficiary.id)
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !!beneficiary?.id && open,
-  });
+  const { attachments: existingAttachments, isLoading } = useBeneficiaryAttachments(beneficiary?.id);
 
   const handleUpload = async (files: File[]) => {
     if (!beneficiary?.id) return;

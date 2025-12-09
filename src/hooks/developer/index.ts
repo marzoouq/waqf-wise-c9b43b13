@@ -12,3 +12,4 @@ export { useCodeHealthAnalyzer, registerIssue, getAllCodeIssues, clearAllCodeIss
 export { useRealTimeMonitor, getAllEvents } from './useRealTimeMonitor';
 export { useComponentProfiler, useProfiledComponent, startComponentRender, registerComponentMount, registerComponentUnmount, getAllComponentProfiles, resetComponentProfiles } from './useComponentProfiler';
 export { useAdvancedPerformanceAnalyzer } from './useAdvancedPerformanceAnalyzer';
+export { useSystemErrors, useDeleteResolvedErrors, useUpdateErrorStatus, useDeleteAllErrors } from './useSystemErrors';

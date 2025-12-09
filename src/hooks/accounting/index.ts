@@ -36,3 +36,4 @@ export { useGeneralLedger } from './useGeneralLedger';
 export { useInvoiceManagement, type Invoice } from './useInvoiceManagement';
 export { useJournalEntriesList, type JournalEntry } from './useJournalEntriesList';
 export { useViewJournalEntry } from './useViewJournalEntry';
+export { useJournalEntryAccounts, useActiveFiscalYears } from './useJournalEntryFormData';
