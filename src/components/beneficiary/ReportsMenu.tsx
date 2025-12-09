@@ -13,10 +13,10 @@ import {
   Info,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { useBeneficiaryProfile } from "@/hooks/beneficiary";
 import { useAuth } from "@/hooks/useAuth";
 import { Contract } from "@/hooks/useContracts";
+import { useAnnualDisclosureExport } from "@/hooks/reports/useAnnualDisclosureExport";
 
 interface ReportsMenuProps {
   type?: "beneficiary" | "waqf";
@@ -26,6 +26,7 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
   const { toast } = useToast();
   const { user } = useAuth();
   const { beneficiary, payments } = useBeneficiaryProfile(user?.id);
+  const { fetchLatestDisclosure, fetchPropertiesWithContracts } = useAnnualDisclosureExport();
 
   const exportPaymentsPDF = async () => {
     try {
@@ -112,12 +113,7 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
   const exportAnnualDisclosure = async () => {
     try {
       // جلب آخر إفصاح سنوي
-      const { data: disclosure, error } = await supabase
-        .from("annual_disclosures")
-        .select("*")
-        .order("year", { ascending: false })
-        .limit(1)
-        .maybeSingle();
+      const disclosure = await fetchLatestDisclosure();
       
       if (!disclosure) {
         toast({
@@ -127,8 +123,6 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
         });
         return;
       }
-
-      if (error) throw error;
 
       const [jsPDFModule, autoTableModule] = await Promise.all([
         import('jspdf'),
@@ -177,13 +171,7 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
 
   const exportPropertiesExcel = async () => {
     try {
-      const { data: properties } = await supabase
-        .from("properties")
-        .select(`
-          *,
-          contracts:contracts(*)
-        `)
-        .order("name");
+      const properties = await fetchPropertiesWithContracts();
 
       if (!properties || properties.length === 0) {
         toast({
@@ -475,13 +463,7 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
 
   const exportPropertiesReportPDF = async () => {
     try {
-      const { data: properties } = await supabase
-        .from("properties")
-        .select(`
-          *,
-          contracts:contracts(*)
-        `)
-        .order("name");
+      const properties = await fetchPropertiesWithContracts();
 
       if (!properties || properties.length === 0) {
         toast({
