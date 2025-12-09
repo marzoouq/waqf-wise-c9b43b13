@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { AccountingService } from '@/services';
+import { useAccounts } from '@/hooks/accounting/useAccounts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,27 +30,8 @@ export function ChartOfAccounts() {
     description: '',
   });
 
-  const queryClient = useQueryClient();
-
-  // جلب جميع الحسابات باستخدام Service
-  const { data: accounts = [], isLoading } = useQuery({
-    queryKey: ['accounts'],
-    queryFn: () => AccountingService.getAccounts(),
-  });
-
-  // إضافة حساب جديد باستخدام Service
-  const addAccount = useMutation({
-    mutationFn: (accountData: typeof formData) => AccountingService.createAccount(accountData),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['accounts'] });
-      toast.success('تم إضافة الحساب بنجاح');
-      setIsDialogOpen(false);
-      resetForm();
-    },
-    onError: (error: Error) => {
-      toast.error(error.message || 'فشل إضافة الحساب');
-    },
-  });
+  // استخدام hook موحد بدلاً من useQuery/useMutation مباشرة
+  const { accounts, isLoading, addAccount } = useAccounts();
 
   const resetForm = () => {
     setFormData({
@@ -64,6 +44,17 @@ export function ChartOfAccounts() {
       is_header: false,
       description: '',
     });
+  };
+
+  const handleAddAccount = async () => {
+    try {
+      await addAccount(formData);
+      toast.success('تم إضافة الحساب بنجاح');
+      setIsDialogOpen(false);
+      resetForm();
+    } catch (error) {
+      toast.error((error as Error).message || 'فشل إضافة الحساب');
+    }
   };
 
   const toggleExpand = (accountId: string) => {
@@ -288,11 +279,11 @@ export function ChartOfAccounts() {
               </div>
 
               <Button
-                onClick={() => addAccount.mutate(formData)}
-                disabled={addAccount.isPending || !formData.code || !formData.name_ar}
+                onClick={handleAddAccount}
+                disabled={!formData.code || !formData.name_ar}
                 className="w-full"
               >
-                {addAccount.isPending ? 'جاري الإضافة...' : 'إضافة الحساب'}
+                إضافة الحساب
               </Button>
             </div>
           </DialogContent>

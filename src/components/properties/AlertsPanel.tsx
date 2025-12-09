@@ -1,25 +1,19 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { NotificationService } from "@/services";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { AlertCircle, Clock, CheckCircle2, XCircle, Brain } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
-import { useState } from "react";
 import { AIAssistantDialog } from "./AIAssistantDialog";
+import { useSystemAlerts } from "@/hooks/property/useSystemAlerts";
 import type { SystemAlert, SeverityConfig } from "@/types/alerts";
 
 export function AlertsPanel() {
   const [aiDialogOpen, setAiDialogOpen] = useState(false);
-  const queryClient = useQueryClient();
   
-  const { data: alerts = [], isLoading } = useQuery({
-    queryKey: ["system-alerts"],
-    queryFn: () => NotificationService.getSystemAlerts(),
-    staleTime: 60 * 1000,
-    refetchInterval: false,
-  });
+  // استخدام hook موحد بدلاً من useQuery مباشرة
+  const { alerts, criticalAlerts, isLoading, resolveAlert } = useSystemAlerts();
 
   const getSeverityConfig = (severity: string): SeverityConfig => {
     const configs: Record<string, SeverityConfig> = {
@@ -33,14 +27,11 @@ export function AlertsPanel() {
 
   const handleResolve = async (alertId: string) => {
     try {
-      await NotificationService.resolveAlert(alertId);
-      queryClient.invalidateQueries({ queryKey: ["system-alerts"] });
+      await resolveAlert(alertId);
     } catch (error) {
       console.error('Error resolving alert:', error);
     }
   };
-
-  const criticalAlerts = alerts.filter(a => a.severity === 'critical' || a.severity === 'high');
 
   return (
     <>

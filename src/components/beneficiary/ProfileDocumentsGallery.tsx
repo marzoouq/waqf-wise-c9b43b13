@@ -1,5 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
-import { BeneficiaryService } from '@/services';
+import { useBeneficiaryProfileDocuments } from '@/hooks/beneficiary/useBeneficiaryProfileDocuments';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -21,11 +20,7 @@ interface ProfileDocumentsGalleryProps {
 }
 
 export function ProfileDocumentsGallery({ beneficiaryId }: ProfileDocumentsGalleryProps) {
-  const { data: documents, isLoading } = useQuery({
-    queryKey: ['beneficiary-documents', beneficiaryId],
-    queryFn: () => BeneficiaryService.getDocuments(beneficiaryId),
-    staleTime: 60 * 1000,
-  });
+  const { data: documents, isLoading } = useBeneficiaryProfileDocuments(beneficiaryId);
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل المستندات..." />;

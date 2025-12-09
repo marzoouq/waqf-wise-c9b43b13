@@ -1,5 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
-import { BeneficiaryService } from '@/services';
+import { useBeneficiaryProfileRequests } from '@/hooks/beneficiary/useBeneficiaryProfileRequests';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,11 +12,7 @@ interface ProfileRequestsHistoryProps {
 }
 
 export function ProfileRequestsHistory({ beneficiaryId }: ProfileRequestsHistoryProps) {
-  const { data: requests, isLoading } = useQuery({
-    queryKey: ['beneficiary-requests', beneficiaryId],
-    queryFn: () => BeneficiaryService.getRequests(beneficiaryId),
-    staleTime: 60 * 1000,
-  });
+  const { data: requests, isLoading } = useBeneficiaryProfileRequests(beneficiaryId);
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل الطلبات..." />;
