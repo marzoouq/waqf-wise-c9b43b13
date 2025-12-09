@@ -148,7 +148,7 @@ export const coreRoutes = [
     key="archive"
     path="/archive" 
     element={
-      <ProtectedRoute requiredRoles={["admin", "nazer", "archivist"]}>
+      <ProtectedRoute requiredRoles={["admin", "nazer", "archivist", "waqf_heir"]}>
         <Archive />
       </ProtectedRoute>
     } 
