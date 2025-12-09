@@ -1,10 +1,24 @@
 /**
  * Rental Payment Service - خدمة دفعات الإيجار
- * @version 2.8.30
+ * @version 2.8.51
  */
 
 import { supabase } from "@/integrations/supabase/client";
 import type { RentalPaymentInsert, RentalPaymentUpdate } from "@/types/payments";
+import type { Database } from "@/integrations/supabase/types";
+
+// Types from database
+type InvoiceRow = Database['public']['Tables']['invoices']['Row'];
+type InvoiceLineRow = Database['public']['Tables']['invoice_lines']['Row'];
+type PaymentRow = Database['public']['Tables']['payments']['Row'];
+type OrganizationSettingsRow = Database['public']['Tables']['organization_settings']['Row'];
+
+export type InvoiceWithLines = InvoiceRow & {
+  invoice_lines: InvoiceLineRow[];
+};
+
+export type PaymentRecord = PaymentRow;
+export type OrganizationSettingsRecord = OrganizationSettingsRow;
 
 export interface RentalPayment {
   id: string;
@@ -196,7 +210,7 @@ export class RentalPaymentService {
   /**
    * جلب بيانات الفاتورة مع البنود
    */
-  static async getInvoiceWithLines(invoiceId: string): Promise<any> {
+  static async getInvoiceWithLines(invoiceId: string): Promise<InvoiceWithLines | null> {
     const { data, error } = await supabase
       .from('invoices')
       .select('*, invoice_lines(*)')
@@ -204,13 +218,13 @@ export class RentalPaymentService {
       .single();
 
     if (error) throw error;
-    return data;
+    return data as InvoiceWithLines | null;
   }
 
   /**
    * جلب بيانات سند القبض
    */
-  static async getReceipt(receiptId: string): Promise<any> {
+  static async getReceipt(receiptId: string): Promise<PaymentRecord | null> {
     const { data, error } = await supabase
       .from('payments')
       .select('*')
@@ -218,13 +232,13 @@ export class RentalPaymentService {
       .single();
 
     if (error) throw error;
-    return data;
+    return data as PaymentRecord | null;
   }
 
   /**
    * جلب إعدادات المنظمة
    */
-  static async getOrganizationSettings(): Promise<any> {
+  static async getOrganizationSettings(): Promise<OrganizationSettingsRecord | null> {
     const { data, error } = await supabase
       .from('organization_settings')
       .select('*')

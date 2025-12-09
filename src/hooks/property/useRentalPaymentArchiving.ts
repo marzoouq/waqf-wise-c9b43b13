@@ -1,14 +1,18 @@
 /**
  * Rental Payment Archiving Hook - أرشفة مستندات دفعات الإيجار
- * @version 2.8.30
+ * @version 2.8.51
  */
 
 import { logger } from "@/lib/logger";
 import { generateInvoicePDF } from "@/lib/generateInvoicePDF";
 import { generateReceiptPDF } from "@/lib/generateReceiptPDF";
 import { archiveDocument } from "@/lib/archiveDocument";
-import { RentalPaymentService, type RentalPayment } from "@/services/rental-payment.service";
-import type { OrganizationSettings } from "@/hooks/useOrganizationSettings";
+import { 
+  RentalPaymentService, 
+  type InvoiceWithLines, 
+  type PaymentRecord, 
+  type OrganizationSettingsRecord 
+} from "@/services/rental-payment.service";
 
 interface ArchiveParams {
   invoiceId: string;
@@ -58,8 +62,8 @@ export const useRentalPaymentArchiving = () => {
  * أرشفة فاتورة PDF
  */
 async function archiveInvoicePDF(
-  invoiceData: any, 
-  orgSettings: OrganizationSettings | null,
+  invoiceData: InvoiceWithLines, 
+  orgSettings: OrganizationSettingsRecord,
   tenantName?: string
 ): Promise<void> {
   const jsPDF = (await import('jspdf')).default;
@@ -82,8 +86,8 @@ async function archiveInvoicePDF(
  * أرشفة سند قبض PDF
  */
 async function archiveReceiptPDF(
-  receiptData: any,
-  orgSettings: OrganizationSettings | null,
+  receiptData: PaymentRecord,
+  orgSettings: OrganizationSettingsRecord,
   tenantName?: string
 ): Promise<void> {
   const jsPDF = (await import('jspdf')).default;
@@ -94,10 +98,10 @@ async function archiveReceiptPDF(
 
   await archiveDocument({
     fileBlob: receiptBlob,
-    fileName: `Receipt-${receiptData.payment_number}.pdf`,
+    fileName: `Receipt-${receiptData.payment_number || receiptData.id}.pdf`,
     fileType: 'receipt',
     referenceId: receiptData.id,
     referenceType: 'payment',
-    description: `سند قبض ${receiptData.payment_number} - ${tenantName || 'غير محدد'}`
+    description: `سند قبض ${receiptData.payment_number || receiptData.id} - ${tenantName || 'غير محدد'}`
   });
 }
