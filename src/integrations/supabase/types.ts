@@ -2944,6 +2944,56 @@ export type Database = {
           },
         ]
       }
+      disclosure_documents: {
+        Row: {
+          created_at: string
+          description: string | null
+          disclosure_id: string
+          document_name: string
+          document_type: string
+          file_path: string
+          file_size: number | null
+          fiscal_year: number
+          id: string
+          updated_at: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          disclosure_id: string
+          document_name: string
+          document_type: string
+          file_path: string
+          file_size?: number | null
+          fiscal_year: number
+          id?: string
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          disclosure_id?: string
+          document_name?: string
+          document_type?: string
+          file_path?: string
+          file_size?: number | null
+          fiscal_year?: number
+          id?: string
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "disclosure_documents_disclosure_id_fkey"
+            columns: ["disclosure_id"]
+            isOneToOne: false
+            referencedRelation: "annual_disclosures"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       distribution_approvals: {
         Row: {
           approval_level: number | null
