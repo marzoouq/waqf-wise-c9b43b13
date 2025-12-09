@@ -117,7 +117,16 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
         .select("*")
         .order("year", { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
+      
+      if (!disclosure) {
+        toast({
+          title: "لا توجد بيانات",
+          description: "لم يتم العثور على إفصاحات سنوية",
+          variant: "destructive",
+        });
+        return;
+      }
 
       if (error) throw error;
 

@@ -35,7 +35,7 @@ export function BankBalanceCard({ className, compact = false }: BankBalanceCardP
         .select("id, name_ar, code, current_balance")
         .eq("code", "1.1.1") // حساب النقدية والبنوك
         .eq("is_active", true)
-        .single();
+        .maybeSingle();
 
       if (error && error.code !== "PGRST116") throw error;
       return data;

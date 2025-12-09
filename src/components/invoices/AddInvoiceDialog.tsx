@@ -243,9 +243,9 @@ export const AddInvoiceDialog = ({ open, onOpenChange, isEdit = false, invoiceTo
           ocr_processed_at: ocrImageUrl ? new Date().toISOString() : null,
         })
         .select()
-        .single();
-
-      if (invoiceError) throw invoiceError;
+        .maybeSingle();
+      
+      if (!invoice) throw new Error("Failed to create invoice");
 
       const invoiceLines = lines.map((line, index) => ({
         invoice_id: invoice.id,

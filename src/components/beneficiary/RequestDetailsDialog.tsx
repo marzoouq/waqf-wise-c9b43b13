@@ -61,7 +61,9 @@ export function RequestDetailsDialog({
         `
         )
         .eq("id", requestId)
-        .single();
+        .maybeSingle();
+      
+      if (!data) throw new Error("Request not found");
 
       if (error) throw error;
       return data as RequestWithDetails;

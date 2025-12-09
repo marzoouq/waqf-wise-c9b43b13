@@ -47,7 +47,7 @@ export function BeneficiaryIntegrationPanel({ beneficiaryId }: BeneficiaryIntegr
         .from("beneficiaries")
         .select("family_name, is_head_of_family")
         .eq("id", beneficiaryId)
-        .single();
+        .maybeSingle();
 
       return {
         paymentsCount: paymentsCount || 0,

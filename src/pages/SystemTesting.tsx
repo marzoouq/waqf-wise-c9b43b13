@@ -231,9 +231,9 @@ export default function SystemTesting() {
         status: 'new',
       })
       .select()
-      .single();
+      .maybeSingle();
 
-    if (errorLogError) throw errorLogError;
+    if (!errorLog) throw new Error("Failed to create error log");
 
     // تحديث حالة الخطأ إلى محلول (محاكاة الإصلاح التلقائي)
     const { error: updateError } = await supabase

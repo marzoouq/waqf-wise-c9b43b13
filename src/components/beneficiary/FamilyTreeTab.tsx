@@ -23,7 +23,7 @@ export function FamilyTreeTab({ beneficiaryId }: FamilyTreeTabProps) {
         .from("beneficiaries")
         .select("*")
         .eq("id", beneficiaryId)
-        .single();
+        .maybeSingle();
 
       if (!currentBeneficiary) return [];
 

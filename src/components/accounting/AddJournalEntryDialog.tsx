@@ -167,9 +167,9 @@ const AddJournalEntryDialog = ({ open, onOpenChange }: Props) => {
           },
         ])
         .select()
-        .single();
+        .maybeSingle();
 
-      if (entryError) throw entryError;
+      if (!entry) throw new Error("فشل إنشاء القيد");
 
       const entryLines = lines.map((line, index) => ({
         journal_entry_id: entry.id,
