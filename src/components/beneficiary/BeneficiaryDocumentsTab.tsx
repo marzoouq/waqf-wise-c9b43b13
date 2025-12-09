@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useToast } from "@/hooks/use-toast";
 import { Upload, FileText, Trash2, Eye } from "lucide-react";
 import { DocumentUploadDialog } from "./DocumentUploadDialog";
+import { useBeneficiaryDocuments } from "@/hooks/beneficiary/useBeneficiaryTabsData";
 import { format, arLocale as ar } from "@/lib/date";
 
 interface BeneficiaryDocumentsTabProps {
@@ -14,58 +13,16 @@ interface BeneficiaryDocumentsTabProps {
 }
 
 export function BeneficiaryDocumentsTab({ beneficiaryId }: BeneficiaryDocumentsTabProps) {
-  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isUploadOpen, setIsUploadOpen] = useState(false);
-
-  const { data: documents = [], isLoading } = useQuery({
-    queryKey: ["beneficiary-documents", beneficiaryId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("beneficiary_attachments")
-        .select("*")
-        .eq("beneficiary_id", beneficiaryId)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: async (documentId: string) => {
-      const { error } = await supabase
-        .from("beneficiary_attachments")
-        .delete()
-        .eq("id", documentId);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["beneficiary-documents"] });
-      toast({
-        title: "تم الحذف",
-        description: "تم حذف المستند بنجاح",
-      });
-    },
-    onError: () => {
-      toast({
-        title: "خطأ",
-        description: "فشل حذف المستند",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const handleView = async (filePath: string) => {
-    const { data } = await supabase.storage
-      .from("beneficiary-documents")
-      .createSignedUrl(filePath, 3600);
-
-    if (data?.signedUrl) {
-      window.open(data.signedUrl, "_blank");
-    }
-  };
+  
+  const { 
+    data: documents = [], 
+    isLoading, 
+    deleteDocument, 
+    isDeleting, 
+    viewDocument 
+  } = useBeneficiaryDocuments(beneficiaryId);
 
   return (
     <div className="space-y-6">
@@ -122,15 +79,15 @@ export function BeneficiaryDocumentsTab({ beneficiaryId }: BeneficiaryDocumentsT
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleView(doc.file_path)}
+                            onClick={() => viewDocument(doc.file_path)}
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => deleteMutation.mutate(doc.id)}
-                            disabled={deleteMutation.isPending}
+                            onClick={() => deleteDocument(doc.id)}
+                            disabled={isDeleting}
                           >
                             <Trash2 className="h-4 w-4 text-destructive" />
                           </Button>

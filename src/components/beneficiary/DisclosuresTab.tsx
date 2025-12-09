@@ -1,29 +1,14 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FileText, Download, Eye, Users, TrendingUp, TrendingDown } from "lucide-react";
+import { Download, Users, TrendingUp, TrendingDown } from "lucide-react";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
+import { useDisclosures } from "@/hooks/beneficiary/useBeneficiaryTabsData";
 import { MaskedValue } from "@/components/shared/MaskedValue";
 
 export function DisclosuresTab() {
   const { settings } = useVisibilitySettings();
-
-  const { data: disclosures, isLoading } = useQuery({
-    queryKey: ["annual-disclosures-beneficiary"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("annual_disclosures")
-        .select("*")
-        .order("year", { ascending: false })
-        .limit(10);
-
-      if (error) throw error;
-      return data;
-    },
-    enabled: settings?.show_disclosures || false,
-  });
+  const { data: disclosures, isLoading } = useDisclosures(settings?.show_disclosures || false);
 
   if (!settings?.show_disclosures) {
     return (
@@ -61,7 +46,6 @@ export function DisclosuresTab() {
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* الملخص المالي */}
             <div className="grid gap-4 md:grid-cols-3">
               <div className="p-4 bg-success/10 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
@@ -106,7 +90,6 @@ export function DisclosuresTab() {
               </div>
             </div>
 
-            {/* المستفيدون */}
             {settings?.show_total_beneficiaries_count && (
               <div className="grid gap-4 md:grid-cols-4 p-4 bg-muted/50 rounded-lg">
                 <div>
@@ -128,7 +111,6 @@ export function DisclosuresTab() {
               </div>
             )}
 
-            {/* التوزيعات */}
             {settings?.show_expenses_breakdown && (
               <div className="space-y-2">
                 <h4 className="font-medium">توزيع الاستقطاعات</h4>

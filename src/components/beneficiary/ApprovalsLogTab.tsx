@@ -1,28 +1,13 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, XCircle, Clock } from "lucide-react";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
+import { useApprovalsLog } from "@/hooks/beneficiary/useBeneficiaryTabsData";
 import { format, arLocale as ar } from "@/lib/date";
 
 export function ApprovalsLogTab() {
   const { settings } = useVisibilitySettings();
-
-  const { data: approvals, isLoading } = useQuery({
-    queryKey: ["approvals-log-beneficiary"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("approval_history")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(50);
-
-      if (error) throw error;
-      return data;
-    },
-    enabled: settings?.show_approvals_log || false,
-  });
+  const { data: approvals, isLoading } = useApprovalsLog(settings?.show_approvals_log || false);
 
   if (!settings?.show_approvals_log) {
     return (

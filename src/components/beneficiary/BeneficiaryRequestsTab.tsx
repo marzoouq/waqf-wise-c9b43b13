@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +8,7 @@ import { RequestSubmissionDialog } from "./RequestSubmissionDialog";
 import { RequestDetailsDialog } from "./RequestDetailsDialog";
 import { RequestAttachmentsUploader } from "./RequestAttachmentsUploader";
 import { SLAIndicator } from "./SLAIndicator";
+import { useBeneficiaryRequests } from "@/hooks/beneficiary/useBeneficiaryTabsData";
 import { format, arLocale as ar } from "@/lib/date";
 
 interface BeneficiaryRequestsTabProps {
@@ -27,25 +26,7 @@ export function BeneficiaryRequestsTab({ beneficiaryId }: BeneficiaryRequestsTab
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
 
-  const { data: requests = [], isLoading } = useQuery({
-    queryKey: ["beneficiary-requests", beneficiaryId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("beneficiary_requests")
-        .select(`
-          *,
-          request_types (
-            name_ar,
-            requires_amount
-          )
-        `)
-        .eq("beneficiary_id", beneficiaryId)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return data;
-    },
-  });
+  const { data: requests = [], isLoading } = useBeneficiaryRequests(beneficiaryId);
 
   const getStatusBadge = (status: string) => {
     const config: Record<string, { icon: LucideIcon; variant: BadgeVariant }> = {

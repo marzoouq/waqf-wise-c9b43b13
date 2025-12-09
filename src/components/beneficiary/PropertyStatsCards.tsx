@@ -1,5 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { StatsCard } from "./StatsCard";
 import { Building2, Home, TrendingUp, DollarSign, Package, MapPin, CheckCircle, Landmark, Receipt, Wallet, EyeOff } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,43 +7,12 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { formatCurrency } from "@/lib/utils";
 import { useFiscalYearPublishStatus } from "@/hooks/useFiscalYearPublishStatus";
+import { usePropertyStats } from "@/hooks/beneficiary/useBeneficiaryTabsData";
 import { PropertyUnitsDisplay } from "./properties/PropertyUnitsDisplay";
-
-interface RentalPaymentWithContract {
-  amount_paid: number | null;
-  tax_amount: number | null;
-  contracts: {
-    payment_frequency: string | null;
-  } | null;
-}
 
 export function PropertyStatsCards() {
   const { isCurrentYearPublished, isLoading: publishStatusLoading } = useFiscalYearPublishStatus();
-  
-  // جلب البيانات بشكل متوازي
-  const { data, isLoading: dataLoading } = useQuery({
-    queryKey: ["property-stats-combined"],
-    queryFn: async () => {
-      const [propertiesRes, paymentsRes] = await Promise.all([
-        supabase
-          .from("properties")
-          .select(`id, name, location, total_units, occupied_units, status`)
-          .order("name"),
-        supabase
-          .from("rental_payments")
-          .select(`amount_paid, tax_amount, contracts!inner (payment_frequency)`)
-          .eq("status", "مدفوع"),
-      ]);
-
-      if (propertiesRes.error) throw propertiesRes.error;
-      if (paymentsRes.error) throw paymentsRes.error;
-
-      return {
-        properties: propertiesRes.data || [],
-        payments: (paymentsRes.data || []) as RentalPaymentWithContract[],
-      };
-    },
-  });
+  const { data, isLoading: dataLoading } = usePropertyStats();
 
   const isLoading = dataLoading || publishStatusLoading;
   const properties = data?.properties || [];
@@ -68,17 +35,14 @@ export function PropertyStatsCards() {
     );
   }
 
-  // إحصائيات العقارات
   const totalProperties = properties.length;
   const totalUnits = properties.reduce((sum, p) => sum + (p.total_units || 0), 0);
   const occupiedUnits = properties.reduce((sum, p) => sum + (p.occupied_units || 0), 0);
   const occupancyRate = totalUnits > 0 ? (occupiedUnits / totalUnits) * 100 : 0;
 
-  // فصل المدفوعات حسب نوع الدفع
   const annualPayments = payments.filter(p => p.contracts?.payment_frequency === 'سنوي');
   const monthlyPayments = payments.filter(p => p.contracts?.payment_frequency === 'شهري');
 
-  // حساب الإيجارات المحصلة
   const totalAnnualCollected = annualPayments.reduce((sum, p) => sum + (p.amount_paid || 0), 0);
   const totalMonthlyCollected = monthlyPayments.reduce((sum, p) => sum + (p.amount_paid || 0), 0);
   const totalCollected = totalAnnualCollected + totalMonthlyCollected;
@@ -87,7 +51,6 @@ export function PropertyStatsCards() {
 
   return (
     <div className="space-y-6">
-      {/* إحصائيات العقارات */}
       <div>
         <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
           <Building2 className="h-4 w-4" />
@@ -101,7 +64,6 @@ export function PropertyStatsCards() {
         </div>
       </div>
 
-      {/* الإيرادات المحصلة */}
       {isCurrentYearPublished ? (
         <div>
           <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
@@ -125,7 +87,6 @@ export function PropertyStatsCards() {
         </Alert>
       )}
 
-      {/* الاستقطاعات الحكومية */}
       {isCurrentYearPublished && (
         <div>
           <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
@@ -139,7 +100,6 @@ export function PropertyStatsCards() {
         </div>
       )}
 
-      {/* نظرة سريعة على العقارات */}
       <Card className="border-primary/20">
         <CardHeader className="bg-gradient-to-br from-primary/5 to-background pb-3">
           <CardTitle className="flex items-center gap-2 text-lg">

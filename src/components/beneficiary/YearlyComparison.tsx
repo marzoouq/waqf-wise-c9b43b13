@@ -1,48 +1,15 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { TrendingUp } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useYearlyComparison } from "@/hooks/beneficiary/useBeneficiaryTabsData";
 
 interface YearlyComparisonProps {
   beneficiaryId: string;
 }
 
 export function YearlyComparison({ beneficiaryId }: YearlyComparisonProps) {
-  const { data: yearlyData, isLoading } = useQuery({
-    queryKey: ["yearly-comparison", beneficiaryId],
-    queryFn: async () => {
-      const currentYear = new Date().getFullYear();
-      const years = [currentYear - 1, currentYear];
-
-      const results = await Promise.all(
-        years.map(async (year) => {
-          const { data, error } = await supabase
-            .from("payments")
-            .select("amount")
-            .eq("beneficiary_id", beneficiaryId)
-            .gte("payment_date", `${year}-01-01`)
-            .lte("payment_date", `${year}-12-31`);
-
-          if (error) throw error;
-
-          const total = data?.reduce((sum, p) => sum + (p.amount || 0), 0) || 0;
-          const count = data?.length || 0;
-
-          return {
-            year: year.toString(),
-            total,
-            count,
-            average: count > 0 ? total / count : 0,
-          };
-        })
-      );
-
-      return results;
-    },
-    enabled: !!beneficiaryId,
-  });
+  const { data: yearlyData, isLoading } = useYearlyComparison(beneficiaryId);
 
   if (isLoading) {
     return (
