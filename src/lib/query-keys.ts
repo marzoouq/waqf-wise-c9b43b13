@@ -7,6 +7,15 @@
  */
 
 export const QUERY_KEYS = {
+  // Users & Roles
+  USER_ROLES: (userId: string) => ['user-roles', userId] as const,
+  USERS: ['users'] as const,
+  CUSTOM_REPORTS: ['custom-reports'] as const,
+  APPROVAL_WORKFLOWS: ['approval-workflows'] as const,
+  APPROVAL_STATUSES: ['approval-statuses'] as const,
+  BENEFICIARY_SELECTOR: ['beneficiary-selector'] as const,
+  TRANSFER_STATUS: (fileId: string) => ['transfer-status', fileId] as const,
+
   // Beneficiaries
   BENEFICIARIES: ['beneficiaries'] as const,
   BENEFICIARY: (id: string) => ['beneficiary', id] as const,

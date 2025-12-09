@@ -425,4 +425,182 @@ export class ApprovalService {
     if (error) throw error;
     return data?.role || null;
   }
+
+  // ==================== مسارات الموافقات المتقدمة ====================
+  static async getAllWorkflows() {
+    const { data, error } = await supabase
+      .from('approval_workflows')
+      .select('id, workflow_name, entity_type, approval_levels, conditions, is_active, created_at, created_by, updated_at')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  static async getAllStatuses() {
+    const { data, error } = await supabase
+      .from('approval_status')
+      .select('*, approval_steps(*)')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  static async createWorkflow(workflow: {
+    workflow_name: string;
+    entity_type: string;
+    approval_levels: any[];
+    conditions?: any;
+    is_active: boolean;
+  }) {
+    const { data, error } = await supabase
+      .from('approval_workflows')
+      .insert({
+        workflow_name: workflow.workflow_name,
+        entity_type: workflow.entity_type,
+        approval_levels: workflow.approval_levels as any,
+        conditions: workflow.conditions as any,
+        is_active: workflow.is_active,
+      })
+      .select()
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) throw new Error('فشل إنشاء المسار');
+    return data;
+  }
+
+  static async initiateApprovalStatus(params: {
+    workflowId: string;
+    entityType: string;
+    entityId: string;
+    totalLevels: number;
+    approvalLevels: { level: number; role: string }[];
+  }) {
+    const { data: statusData, error: statusError } = await supabase
+      .from('approval_status')
+      .insert({
+        workflow_id: params.workflowId,
+        entity_type: params.entityType,
+        entity_id: params.entityId,
+        current_level: 1,
+        total_levels: params.totalLevels,
+        status: 'pending',
+      })
+      .select()
+      .maybeSingle();
+
+    if (statusError) throw statusError;
+    if (!statusData) throw new Error('فشل إنشاء حالة الموافقة');
+
+    const steps = params.approvalLevels.map(level => ({
+      approval_status_id: statusData.id,
+      level: level.level,
+      approver_role: level.role,
+      action: 'pending',
+    }));
+
+    const { error: stepsError } = await supabase
+      .from('approval_steps')
+      .insert(steps);
+
+    if (stepsError) throw stepsError;
+
+    return statusData;
+  }
+
+  static async processApprovalStep(params: {
+    stepId: string;
+    action: 'approved' | 'rejected';
+    notes?: string;
+    approverName: string;
+  }) {
+    const { data: step, error: stepError } = await supabase
+      .from('approval_steps')
+      .update({
+        action: params.action,
+        notes: params.notes,
+        approver_name: params.approverName,
+        actioned_at: new Date().toISOString(),
+      })
+      .eq('id', params.stepId)
+      .select()
+      .maybeSingle();
+
+    if (stepError) throw stepError;
+    if (!step) throw new Error('الخطوة غير موجودة');
+
+    const { data: status, error: statusFetchError } = await supabase
+      .from('approval_status')
+      .select('*, approval_steps(*)')
+      .eq('id', step.approval_status_id)
+      .maybeSingle();
+
+    if (statusFetchError) throw statusFetchError;
+    if (!status) throw new Error('الحالة غير موجودة');
+
+    if (params.action === 'rejected') {
+      await supabase
+        .from('approval_status')
+        .update({
+          status: 'rejected',
+          completed_at: new Date().toISOString(),
+        })
+        .eq('id', status.id);
+    } else {
+      const steps = status.approval_steps as any[];
+      const allApproved = steps
+        .filter((s) => s.level <= (step.level ?? 0))
+        .every((s) => s.action === 'approved');
+
+      const isLastLevel = (step.level ?? 0) === status.total_levels;
+
+      if (allApproved && isLastLevel) {
+        await supabase
+          .from('approval_status')
+          .update({
+            status: 'approved',
+            completed_at: new Date().toISOString(),
+          })
+          .eq('id', status.id);
+      } else {
+        await supabase
+          .from('approval_status')
+          .update({
+            current_level: (step.level ?? 0) + 1,
+          })
+          .eq('id', status.id);
+      }
+    }
+
+    return step;
+  }
+
+  // ==================== موافقات القيود البسيطة ====================
+  static async getSimpleApprovals() {
+    const { data, error } = await supabase
+      .from('approvals')
+      .select('id, journal_entry_id, approver_name, status, notes, approved_at, created_at, updated_at')
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    return data || [];
+  }
+
+  static async addSimpleApproval(approvalData: {
+    journal_entry_id: string;
+    approver_name: string;
+    status: 'approved' | 'rejected';
+    notes?: string;
+  }) {
+    const { error } = await supabase
+      .from('approvals')
+      .insert({
+        ...approvalData,
+        approved_at: new Date().toISOString(),
+      });
+    
+    if (error) throw error;
+  }
 }

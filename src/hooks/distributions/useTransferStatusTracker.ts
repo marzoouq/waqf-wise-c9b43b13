@@ -1,11 +1,12 @@
 /**
  * Hook لتتبع حالة التحويلات
- * Transfer Status Tracker Hook
+ * @version 2.8.55
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { productionLogger } from '@/lib/logger/production-logger';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface TransferStatus {
   id: string;
@@ -19,35 +20,22 @@ export interface TransferStatus {
 }
 
 export function useTransferStatusTracker(transferFileId: string) {
-  const [transfers, setTransfers] = useState<TransferStatus[]>([]);
-  const [loading, setLoading] = useState(true);
   const [autoRefresh, setAutoRefresh] = useState(true);
 
-  useEffect(() => {
-    loadTransfers();
-    
-    if (autoRefresh) {
-      const interval = setInterval(loadTransfers, 10000); // كل 10 ثواني
-      return () => clearInterval(interval);
-    }
-  }, [transferFileId, autoRefresh]);
-
-  const loadTransfers = async () => {
-    try {
+  const { data: transfers = [], isLoading: loading, refetch } = useQuery({
+    queryKey: QUERY_KEYS.TRANSFER_STATUS(transferFileId),
+    queryFn: async () => {
       const { data, error } = await supabase
         .from('bank_transfer_details')
         .select('id, beneficiary_name, iban, amount, status, reference_number, error_message, processed_at')
         .eq('transfer_file_id', transferFileId)
         .order('created_at', { ascending: false });
-
       if (error) throw error;
-      setTransfers(data || []);
-    } catch (error) {
-      productionLogger.error('Error loading transfers:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+      return data || [];
+    },
+    enabled: !!transferFileId,
+    refetchInterval: autoRefresh ? 10000 : false,
+  });
 
   const stats = {
     total: transfers.length,
@@ -56,20 +44,10 @@ export function useTransferStatusTracker(transferFileId: string) {
     failed: transfers.filter(t => t.status === 'failed').length,
     pending: transfers.filter(t => t.status === 'pending').length,
     totalAmount: transfers.reduce((sum, t) => sum + t.amount, 0),
-    completedAmount: transfers
-      .filter(t => t.status === 'completed')
-      .reduce((sum, t) => sum + t.amount, 0),
+    completedAmount: transfers.filter(t => t.status === 'completed').reduce((sum, t) => sum + t.amount, 0),
   };
 
   const progress = stats.total > 0 ? (stats.completed / stats.total) * 100 : 0;
 
-  return {
-    transfers,
-    loading,
-    autoRefresh,
-    setAutoRefresh,
-    stats,
-    progress,
-    refetch: loadTransfers,
-  };
+  return { transfers, loading, autoRefresh, setAutoRefresh, stats, progress, refetch };
 }

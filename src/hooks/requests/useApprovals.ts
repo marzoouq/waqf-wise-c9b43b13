@@ -1,6 +1,12 @@
+/**
+ * Hook للموافقات البسيطة
+ * @version 2.8.55
+ */
+
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { ApprovalService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface ApprovalData {
   journal_entry_id: string;
@@ -15,33 +21,16 @@ export function useApprovals() {
 
   // جلب الموافقات
   const { data: approvals, isLoading } = useQuery({
-    queryKey: ['approvals'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('approvals')
-        .select('id, journal_entry_id, approver_name, status, notes, approved_at, created_at, updated_at')
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      return data;
-    },
+    queryKey: QUERY_KEYS.APPROVALS,
+    queryFn: () => ApprovalService.getSimpleApprovals(),
   });
 
   // إضافة موافقة
   const addApproval = useMutation({
-    mutationFn: async (approvalData: ApprovalData) => {
-      const { error } = await supabase
-        .from('approvals')
-        .insert({
-          ...approvalData,
-          approved_at: new Date().toISOString(),
-        });
-      
-      if (error) throw error;
-    },
+    mutationFn: (approvalData: ApprovalData) => ApprovalService.addSimpleApproval(approvalData),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['approvals'] });
-      queryClient.invalidateQueries({ queryKey: ['journal_entries'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.APPROVALS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.JOURNAL_ENTRIES });
       
       toast({
         title: variables.status === 'approved' ? 'تمت الموافقة' : 'تم الرفض',

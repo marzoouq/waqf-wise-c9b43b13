@@ -1,6 +1,12 @@
+/**
+ * Hook لمسارات الموافقات المتقدمة
+ * @version 2.8.55
+ */
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { ApprovalService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
 import type { Json } from '@/integrations/supabase/types';
 
 export interface ApprovalLevel {
@@ -49,20 +55,6 @@ export interface ApprovalStep {
   actioned_at?: string;
 }
 
-interface ApprovalStatusWithSteps {
-  id: string;
-  workflow_id: string | null;
-  entity_type: string;
-  entity_id: string;
-  current_level: number | null;
-  total_levels: number;
-  status: string | null;
-  started_at: string | null;
-  completed_at: string | null;
-  created_at: string | null;
-  approval_steps: ApprovalStep[];
-}
-
 function parseApprovalLevels(data: Json): ApprovalLevel[] {
   if (!data || !Array.isArray(data)) return [];
   return data as unknown as ApprovalLevel[];
@@ -77,57 +69,34 @@ export function useApprovalWorkflows() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const { data: workflows, isLoading: isLoadingWorkflows } = useQuery({
-    queryKey: ['approval_workflows'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('approval_workflows')
-        .select('id, workflow_name, entity_type, approval_levels, conditions, is_active, created_at, created_by, updated_at')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return (data || []).map(item => ({
-        ...item,
-        approval_levels: parseApprovalLevels(item.approval_levels),
-        conditions: parseConditions(item.conditions),
-        is_active: item.is_active ?? false,
-      })) as ApprovalWorkflow[];
-    },
+  const { data: workflowsRaw, isLoading: isLoadingWorkflows } = useQuery({
+    queryKey: QUERY_KEYS.APPROVAL_WORKFLOWS,
+    queryFn: () => ApprovalService.getAllWorkflows(),
   });
 
-  const { data: statuses, isLoading: isLoadingStatuses } = useQuery({
-    queryKey: ['approval_status'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('approval_status')
-        .select('*, approval_steps(*)')
-        .order('created_at', { ascending: false });
+  const workflows = (workflowsRaw || []).map(item => ({
+    ...item,
+    approval_levels: parseApprovalLevels(item.approval_levels),
+    conditions: parseConditions(item.conditions),
+    is_active: item.is_active ?? false,
+  })) as ApprovalWorkflow[];
 
-      if (error) throw error;
-      return data as ApprovalStatusWithSteps[];
-    },
+  const { data: statuses, isLoading: isLoadingStatuses } = useQuery({
+    queryKey: QUERY_KEYS.APPROVAL_STATUSES,
+    queryFn: () => ApprovalService.getAllStatuses(),
   });
 
   const createWorkflow = useMutation({
-    mutationFn: async (workflow: Omit<ApprovalWorkflow, 'id' | 'created_at'>) => {
-      const { data, error } = await supabase
-        .from('approval_workflows')
-        .insert({
-          workflow_name: workflow.workflow_name,
-          entity_type: workflow.entity_type,
-          approval_levels: workflow.approval_levels as unknown as Json,
-          conditions: workflow.conditions as unknown as Json,
-          is_active: workflow.is_active,
-        })
-        .select()
-        .maybeSingle();
-
-      if (error) throw error;
-      if (!data) throw new Error('فشل إنشاء المسار');
-      return data;
-    },
+    mutationFn: (workflow: Omit<ApprovalWorkflow, 'id' | 'created_at'>) =>
+      ApprovalService.createWorkflow({
+        workflow_name: workflow.workflow_name,
+        entity_type: workflow.entity_type,
+        approval_levels: workflow.approval_levels,
+        conditions: workflow.conditions,
+        is_active: workflow.is_active,
+      }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['approval_workflows'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.APPROVAL_WORKFLOWS });
       toast({
         title: 'تم الحفظ',
         description: 'تم إنشاء مسار الموافقات بنجاح',
@@ -145,51 +114,26 @@ export function useApprovalWorkflows() {
       entityId: string;
       workflowId?: string;
     }) => {
-      let workflow = workflows?.find(w => w.id === workflowId);
+      let workflow = workflows.find(w => w.id === workflowId);
       
       if (!workflow) {
-        workflow = workflows?.find(
-          w => w.entity_type === entityType && w.is_active
-        );
+        workflow = workflows.find(w => w.entity_type === entityType && w.is_active);
       }
 
       if (!workflow) {
         throw new Error('لم يتم العثور على مسار موافقات مناسب');
       }
 
-      const { data: statusData, error: statusError } = await supabase
-        .from('approval_status')
-        .insert({
-          workflow_id: workflow.id,
-          entity_type: entityType,
-          entity_id: entityId,
-          current_level: 1,
-          total_levels: workflow.approval_levels.length,
-          status: 'pending',
-        })
-        .select()
-        .maybeSingle();
-
-      if (statusError) throw statusError;
-      if (!statusData) throw new Error('فشل إنشاء حالة الموافقة');
-
-      const steps = workflow.approval_levels.map(level => ({
-        approval_status_id: statusData.id,
-        level: level.level,
-        approver_role: level.role,
-        action: 'pending',
-      }));
-
-      const { error: stepsError } = await supabase
-        .from('approval_steps')
-        .insert(steps);
-
-      if (stepsError) throw stepsError;
-
-      return statusData;
+      return ApprovalService.initiateApprovalStatus({
+        workflowId: workflow.id,
+        entityType,
+        entityId,
+        totalLevels: workflow.approval_levels.length,
+        approvalLevels: workflow.approval_levels.map(l => ({ level: l.level, role: l.role })),
+      });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['approval_status'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.APPROVAL_STATUSES });
       toast({
         title: 'تم الإرسال',
         description: 'تم إرسال الطلب للموافقة',
@@ -198,7 +142,7 @@ export function useApprovalWorkflows() {
   });
 
   const processApproval = useMutation({
-    mutationFn: async ({
+    mutationFn: ({
       stepId,
       action,
       notes,
@@ -208,70 +152,9 @@ export function useApprovalWorkflows() {
       action: 'approved' | 'rejected';
       notes?: string;
       approverName: string;
-    }) => {
-      const { data: step, error: stepError } = await supabase
-        .from('approval_steps')
-        .update({
-          action,
-          notes,
-          approver_name: approverName,
-          actioned_at: new Date().toISOString(),
-        })
-        .eq('id', stepId)
-        .select()
-        .maybeSingle();
-
-      if (stepError) throw stepError;
-      if (!step) throw new Error('الخطوة غير موجودة');
-
-      const { data: status, error: statusFetchError } = await supabase
-        .from('approval_status')
-        .select('*, approval_steps(*)')
-        .eq('id', step.approval_status_id)
-        .maybeSingle();
-
-      if (statusFetchError) throw statusFetchError;
-      if (!status) throw new Error('الحالة غير موجودة');
-
-      if (action === 'rejected') {
-        await supabase
-          .from('approval_status')
-          .update({
-            status: 'rejected',
-            completed_at: new Date().toISOString(),
-          })
-          .eq('id', status.id);
-      } else {
-        const steps = status.approval_steps as ApprovalStep[];
-        const allApproved = steps
-          .filter((s) => s.level <= (step.level ?? 0))
-          .every((s) => s.action === 'approved');
-
-        const isLastLevel = (step.level ?? 0) === status.total_levels;
-
-        if (allApproved && isLastLevel) {
-          await supabase
-            .from('approval_status')
-            .update({
-              status: 'approved',
-              completed_at: new Date().toISOString(),
-            })
-            .eq('id', status.id);
-        } else {
-          await supabase
-            .from('approval_status')
-            .update({
-              current_level: (step.level ?? 0) + 1,
-            })
-            .eq('id', status.id);
-        }
-      }
-
-      return step;
-    },
+    }) => ApprovalService.processApprovalStep({ stepId, action, notes, approverName }),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['approval_status'] });
-      queryClient.invalidateQueries({ queryKey: ['approval_steps'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.APPROVAL_STATUSES });
       toast({
         title: variables.action === 'approved' ? 'تمت الموافقة' : 'تم الرفض',
         description: variables.action === 'approved' 
@@ -282,7 +165,7 @@ export function useApprovalWorkflows() {
   });
 
   return {
-    workflows: workflows || [],
+    workflows,
     statuses: statuses || [],
     isLoading: isLoadingWorkflows || isLoadingStatuses,
     createWorkflow: createWorkflow.mutateAsync,

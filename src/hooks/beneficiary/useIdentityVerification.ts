@@ -1,6 +1,6 @@
 /**
  * Hook للتحقق من الهوية
- * Identity Verification Hook
+ * @version 2.8.55
  */
 
 import { useState } from 'react';
@@ -32,64 +32,32 @@ export function useIdentityVerification(beneficiary: Beneficiary | null) {
     mutationFn: async () => {
       if (!beneficiary) throw new Error('لا يوجد مستفيد محدد');
 
-      const { error: verificationError } = await supabase
-        .from('identity_verifications')
-        .insert({
-          beneficiary_id: beneficiary.id,
-          ...formData,
-          verified_by: (await supabase.auth.getUser()).data.user?.id,
-          verified_at: new Date().toISOString(),
-        });
+      await supabase.from('identity_verifications').insert({
+        beneficiary_id: beneficiary.id,
+        ...formData,
+        verified_by: (await supabase.auth.getUser()).data.user?.id,
+        verified_at: new Date().toISOString(),
+      });
 
-      if (verificationError) throw verificationError;
-
-      const { error: updateError } = await supabase
-        .from('beneficiaries')
-        .update({
-          verification_status: formData.verification_status,
-          verification_method: formData.verification_method,
-          last_verification_date: new Date().toISOString(),
-          verification_notes: formData.notes,
-        })
-        .eq('id', beneficiary.id);
-
-      if (updateError) throw updateError;
+      await supabase.from('beneficiaries').update({
+        verification_status: formData.verification_status,
+        verification_method: formData.verification_method,
+        last_verification_date: new Date().toISOString(),
+        verification_notes: formData.notes,
+      }).eq('id', beneficiary.id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARIES });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARY(beneficiary?.id || '') });
-      toast({
-        title: 'تم التحقق بنجاح',
-        description: 'تم التحقق من هوية المستفيد وتحديث البيانات',
-      });
+      toast({ title: 'تم التحقق بنجاح', description: 'تم التحقق من هوية المستفيد وتحديث البيانات' });
     },
     onError: (error: Error) => {
-      toast({
-        title: 'خطأ في التحقق',
-        description: error.message || 'فشل التحقق من الهوية',
-        variant: 'destructive',
-      });
+      toast({ title: 'خطأ في التحقق', description: error.message || 'فشل التحقق من الهوية', variant: 'destructive' });
     },
   });
 
-  const updateFormData = (updates: Partial<VerificationFormData>) => {
-    setFormData(prev => ({ ...prev, ...updates }));
-  };
+  const updateFormData = (updates: Partial<VerificationFormData>) => setFormData(prev => ({ ...prev, ...updates }));
+  const resetForm = () => setFormData({ verification_type: 'identity_card', verification_method: 'manual', verification_status: 'pending', notes: '' });
 
-  const resetForm = () => {
-    setFormData({
-      verification_type: 'identity_card',
-      verification_method: 'manual',
-      verification_status: 'pending',
-      notes: '',
-    });
-  };
-
-  return {
-    formData,
-    updateFormData,
-    resetForm,
-    verify: verifyMutation.mutate,
-    isVerifying: verifyMutation.isPending,
-  };
+  return { formData, updateFormData, resetForm, verify: verifyMutation.mutate, isVerifying: verifyMutation.isPending };
 }
