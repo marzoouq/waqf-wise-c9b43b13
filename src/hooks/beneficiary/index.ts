@@ -36,3 +36,17 @@ export { useBeneficiarySession } from './useBeneficiarySession';
 export { useIdentityVerification } from './useIdentityVerification';
 export { useBeneficiaryTimeline, type TimelineEvent } from './useBeneficiaryTimeline';
 export { useBeneficiaryFamilyTree } from './useBeneficiaryFamilyTree';
+
+// ==================== Tabs Data Hooks ====================
+export {
+  useApprovalsLog,
+  useBeneficiaryBankAccounts,
+  useBeneficiaryDocuments,
+  useBeneficiaryStatements,
+  useDisclosures,
+  useDistributionChartData,
+  useBeneficiaryRequests as useBeneficiaryRequestsTab,
+  useYearlyComparison,
+  useMonthlyRevenue,
+  usePropertyStats
+} from './useBeneficiaryTabsData';
