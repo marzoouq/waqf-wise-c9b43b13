@@ -177,4 +177,50 @@ export class SupportService {
     return data;
   }
 
+  /**
+   * جلب تقييم تذكرة
+   */
+  static async getTicketRating(ticketId: string) {
+    const { data, error } = await supabase
+      .from('support_ticket_ratings')
+      .select('id, ticket_id, rating, feedback, response_speed_rating, solution_quality_rating, staff_friendliness_rating, rated_by, created_at')
+      .eq('ticket_id', ticketId)
+      .maybeSingle();
+
+    if (error) throw error;
+    return data;
+  }
+
+  /**
+   * إضافة تقييم تذكرة
+   */
+  static async addTicketRating(params: {
+    ticketId: string;
+    rating: number;
+    feedback?: string;
+    responseSpeedRating?: number;
+    solutionQualityRating?: number;
+    staffFriendlinessRating?: number;
+  }) {
+    const { data: { user } } = await supabase.auth.getUser();
+
+    const { data, error } = await supabase
+      .from('support_ticket_ratings')
+      .insert({
+        ticket_id: params.ticketId,
+        rating: params.rating,
+        feedback: params.feedback,
+        response_speed_rating: params.responseSpeedRating,
+        solution_quality_rating: params.solutionQualityRating,
+        staff_friendliness_rating: params.staffFriendlinessRating,
+        rated_by: user?.id,
+      })
+      .select()
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) throw new Error('فشل إضافة التقييم');
+    return data;
+  }
+
 }

@@ -1,10 +1,11 @@
 /**
  * Hook لإدارة موافقات القروض
- * Loan Approvals Hook
+ * @version 2.8.52
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { LoansService } from '@/services/loans.service';
+import { AccountingService } from '@/services/accounting.service';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useApprovalHistory } from '@/hooks/useApprovalHistory';
@@ -22,17 +23,7 @@ export function useLoanApprovals() {
   const { data: loans, isLoading, error } = useQuery<LoanForApproval[]>({
     queryKey: QUERY_KEYS.LOANS_WITH_APPROVALS,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('loans')
-        .select(`
-          *,
-          beneficiaries(full_name, national_id),
-          loan_approvals(*)
-        `)
-        .in('status', ['pending', 'active'])
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
+      const data = await LoansService.getLoansWithApprovals();
       return data as unknown as LoanForApproval[];
     },
   });
@@ -52,17 +43,12 @@ export function useLoanApprovals() {
     }) => {
       const status = action === 'approve' ? 'موافق' : 'مرفوض';
       
-      const { error } = await supabase
-        .from('loan_approvals')
-        .update({
-          status,
-          notes,
-          approved_at: new Date().toISOString(),
-          approver_id: user?.id
-        })
-        .eq('id', approvalId);
-
-      if (error) throw error;
+      await LoansService.updateLoanApproval(approvalId, {
+        status,
+        notes,
+        approved_at: new Date().toISOString(),
+        approver_id: user?.id
+      });
 
       // سجل في تاريخ الموافقات
       await addToHistory.mutateAsync({
@@ -77,26 +63,17 @@ export function useLoanApprovals() {
 
       // إذا تمت الموافقة النهائية، إنشاء القيد المحاسبي
       if (action === 'approve') {
-        const { data: loan } = await supabase
-          .from('loans')
-          .select('loan_number, loan_amount, beneficiaries(full_name)')
-          .eq('id', loanId)
-          .maybeSingle();
-
-        const { data: allApprovals } = await supabase
-          .from('loan_approvals')
-          .select('status')
-          .eq('loan_id', loanId);
-
+        const loan = await LoansService.getLoanForJournalEntry(loanId);
+        const allApprovals = await LoansService.getLoanApprovalsByLoanId(loanId);
         const allApproved = allApprovals?.every((a) => a.status === 'موافق');
 
         if (allApproved && loan) {
-          await supabase.rpc('create_auto_journal_entry', {
-            p_trigger_event: 'loan_approved',
-            p_reference_id: loanId,
-            p_amount: loan.loan_amount,
-            p_description: `صرف قرض ${loan.loan_number} - ${(loan.beneficiaries as { full_name: string }).full_name}`,
-            p_transaction_date: new Date().toISOString().split('T')[0]
+          await AccountingService.createAutoJournalEntry({
+            trigger: 'loan_approved',
+            referenceId: loanId,
+            referenceType: 'loan',
+            amount: loan.loan_amount,
+            description: `صرف قرض ${loan.loan_number} - ${(loan.beneficiaries as { full_name: string }).full_name}`,
           });
         }
       }
@@ -104,7 +81,6 @@ export function useLoanApprovals() {
       return { action };
     },
     onSuccess: (data) => {
-      // ✅ استدعاء واحد بدلاً من 3
       invalidateAccountingQueries(queryClient);
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.LOANS_WITH_APPROVALS });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.LOANS });

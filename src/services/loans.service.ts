@@ -355,4 +355,69 @@ export class LoansService {
     if (error) throw error;
     return data || [];
   }
+
+  /**
+   * جلب القروض مع الموافقات للإدارة
+   */
+  static async getLoansWithApprovals() {
+    const { data, error } = await supabase
+      .from('loans')
+      .select(`
+        *,
+        beneficiaries(full_name, national_id),
+        loan_approvals(*)
+      `)
+      .in('status', ['pending', 'active'])
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * تحديث موافقة قرض
+   */
+  static async updateLoanApproval(
+    approvalId: string, 
+    updates: { 
+      status: string; 
+      notes: string; 
+      approved_at: string; 
+      approver_id?: string 
+    }
+  ) {
+    const { error } = await supabase
+      .from('loan_approvals')
+      .update(updates)
+      .eq('id', approvalId);
+
+    if (error) throw error;
+  }
+
+  /**
+   * جلب موافقات قرض معين
+   */
+  static async getLoanApprovalsByLoanId(loanId: string) {
+    const { data, error } = await supabase
+      .from('loan_approvals')
+      .select('status')
+      .eq('loan_id', loanId);
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * جلب بيانات قرض للقيد المحاسبي
+   */
+  static async getLoanForJournalEntry(loanId: string) {
+    const { data, error } = await supabase
+      .from('loans')
+      .select('loan_number, loan_amount, beneficiaries(full_name)')
+      .eq('id', loanId)
+      .maybeSingle();
+
+    if (error) throw error;
+    return data;
+  }
 }

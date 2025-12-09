@@ -296,6 +296,9 @@ export const QUERY_KEYS = {
   // Ticket Ratings
   TICKET_RATING: (ticketId: string) => ['ticket-rating', ticketId] as const,
   TICKET_RATINGS: ['ticket-ratings'] as const,
+  
+  // Support Stats
+  SUPPORT_STATS: ['support-stats'] as const,
 } as const;
 
 // Query Config with default settings
