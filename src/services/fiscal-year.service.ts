@@ -35,7 +35,7 @@ export class FiscalYearService {
     const { data, error } = await supabase
       .from('fiscal_years')
       .select('*')
-      .order('year_number', { ascending: false });
+      .order('start_date', { ascending: false });
 
     if (error) throw error;
     return data || [];

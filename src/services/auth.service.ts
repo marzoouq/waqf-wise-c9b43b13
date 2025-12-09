@@ -75,8 +75,8 @@ export class AuthService {
       supabase
         .from('profiles')
         .select('id, email, full_name, avatar_url, created_at')
-        .eq('id', userId)
-        .single(),
+        .eq('user_id', userId)
+        .maybeSingle(),
       supabase
         .from('user_roles')
         .select('role')
