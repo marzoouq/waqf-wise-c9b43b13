@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,25 +9,11 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Building2, RefreshCw, Wifi, ChevronLeft, CheckCircle2, Clock, TrendingUp } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { productionLogger } from "@/lib/logger/production-logger";
+import { useWaqfCorpus, type FiscalYearCorpus } from "@/hooks/dashboard/useFinancialCards";
 
 interface WaqfCorpusCardProps {
   className?: string;
   compact?: boolean;
-}
-
-interface FiscalYearCorpus {
-  id: string;
-  fiscal_year_id: string;
-  waqf_corpus: number;
-  opening_balance: number;
-  closing_balance: number;
-  created_at: string;
-  fiscal_years: {
-    name: string;
-    start_date: string;
-    end_date: string;
-    is_closed: boolean;
-  };
 }
 
 export function WaqfCorpusCard({ className, compact = false }: WaqfCorpusCardProps) {
@@ -37,34 +23,7 @@ export function WaqfCorpusCard({ className, compact = false }: WaqfCorpusCardPro
   const [dialogOpen, setDialogOpen] = useState(false);
 
   // جلب بيانات رقبة الوقف من جميع السنوات المالية المقفلة
-  const { data: corpusData = [], isLoading } = useQuery({
-    queryKey: ["waqf-corpus-realtime"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("fiscal_year_closings")
-        .select(`
-          id,
-          fiscal_year_id,
-          waqf_corpus,
-          opening_balance,
-          closing_balance,
-          created_at,
-          fiscal_years!inner (
-            name,
-            start_date,
-            end_date,
-            is_closed
-          )
-        `)
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        productionLogger.error("Error fetching waqf corpus", { error });
-        throw error;
-      }
-      return (data || []) as FiscalYearCorpus[];
-    },
-  });
+  const { data: corpusData = [], isLoading } = useWaqfCorpus();
 
   // الاشتراك في التحديثات المباشرة
   useEffect(() => {

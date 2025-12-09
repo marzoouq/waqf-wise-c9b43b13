@@ -12,8 +12,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useGovernanceDecisions } from "@/hooks/useGovernanceDecisions";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useRecentGovernanceDecisions } from "@/hooks/governance/useGovernanceData";
 import { Database } from '@/integrations/supabase/types';
 
 type GovernanceDecision = Database['public']['Tables']['governance_decisions']['Row'];
@@ -32,18 +31,7 @@ export function GovernanceSection() {
   ).length;
 
   // جلب آخر القرارات النشطة
-  const { data: recentDecisions = [] } = useQuery({
-    queryKey: ["recent-governance-decisions"],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("governance_decisions")
-        .select("*")
-        .eq("decision_status", "قيد التصويت")
-        .order("created_at", { ascending: false })
-        .limit(3);
-      return data || [];
-    },
-  });
+  const { data: recentDecisions = [] } = useRecentGovernanceDecisions();
 
   const stats = [
     { 

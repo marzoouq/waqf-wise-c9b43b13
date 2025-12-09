@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useWaqfDistributionsSummary } from "@/hooks/beneficiary/useBeneficiaryProfileData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
@@ -31,33 +30,7 @@ interface HeirDistribution {
 export function WaqfDistributionsSummaryCard({ beneficiaryId }: WaqfDistributionsSummaryCardProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const { data: distributions = [], isLoading } = useQuery({
-    queryKey: ["heir-distributions-summary", beneficiaryId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("heir_distributions")
-        .select(`
-          id,
-          share_amount,
-          heir_type,
-          distribution_date,
-          fiscal_year_id,
-          fiscal_years (
-            name,
-            start_date,
-            end_date,
-            is_closed,
-            is_active
-          )
-        `)
-        .eq("beneficiary_id", beneficiaryId)
-        .order("distribution_date", { ascending: false });
-
-      if (error) throw error;
-      return (data || []) as HeirDistribution[];
-    },
-    enabled: !!beneficiaryId,
-  });
+  const { data: distributions = [], isLoading } = useWaqfDistributionsSummary(beneficiaryId);
 
   // فصل التوزيعات الحالية عن التاريخية
   const currentYearDistributions = distributions.filter(d => !d.fiscal_years?.is_closed);

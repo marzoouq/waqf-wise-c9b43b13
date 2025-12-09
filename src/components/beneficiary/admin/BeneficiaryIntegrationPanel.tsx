@@ -1,10 +1,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { FileText, DollarSign, FileArchive, Home, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useBeneficiaryIntegrationStats } from "@/hooks/beneficiary/useBeneficiaryProfileData";
 
 interface BeneficiaryIntegrationPanelProps {
   beneficiaryId: string;
@@ -13,53 +11,7 @@ interface BeneficiaryIntegrationPanelProps {
 export function BeneficiaryIntegrationPanel({ beneficiaryId }: BeneficiaryIntegrationPanelProps) {
   const navigate = useNavigate();
 
-  // Get beneficiary statistics
-  const { data: stats } = useQuery({
-    queryKey: ["beneficiary-integration-stats", beneficiaryId],
-    queryFn: async () => {
-      // Get payments count
-      const { count: paymentsCount } = await supabase
-        .from("payments")
-        .select("*", { count: "exact", head: true })
-        .eq("beneficiary_id", beneficiaryId);
-
-      // Get documents count
-      const { count: documentsCount } = await supabase
-        .from("beneficiary_attachments")
-        .select("*", { count: "exact", head: true })
-        .eq("beneficiary_id", beneficiaryId);
-
-      // Get requests count
-      const { count: requestsCount } = await supabase
-        .from("beneficiary_requests")
-        .select("*", { count: "exact", head: true })
-        .eq("beneficiary_id", beneficiaryId);
-
-      // Get active requests count
-      const { count: activeRequestsCount } = await supabase
-        .from("beneficiary_requests")
-        .select("*", { count: "exact", head: true })
-        .eq("beneficiary_id", beneficiaryId)
-        .in("status", ["معلق", "قيد المعالجة", "قيد المراجعة"]);
-
-      // Get family info
-      const { data: beneficiary } = await supabase
-        .from("beneficiaries")
-        .select("family_name, is_head_of_family")
-        .eq("id", beneficiaryId)
-        .maybeSingle();
-
-      return {
-        paymentsCount: paymentsCount || 0,
-        documentsCount: documentsCount || 0,
-        requestsCount: requestsCount || 0,
-        activeRequestsCount: activeRequestsCount || 0,
-        familyName: beneficiary?.family_name || null,
-        isHeadOfFamily: beneficiary?.is_head_of_family || false,
-      };
-    },
-    staleTime: 30 * 1000,
-  });
+  const { data: stats } = useBeneficiaryIntegrationStats(beneficiaryId);
 
   const integrations = [
     {

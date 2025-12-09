@@ -2,8 +2,7 @@
  * PropertyUnitsDisplay - مكون عرض وحدات العقار
  */
 
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { usePropertyUnits } from "@/hooks/property/usePropertyUnitsData";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -14,42 +13,7 @@ interface PropertyUnitsDisplayProps {
 }
 
 export function PropertyUnitsDisplay({ propertyId }: PropertyUnitsDisplayProps) {
-  const { data: units, isLoading } = useQuery({
-    queryKey: ["property-units", propertyId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("property_units")
-        .select(`
-          id,
-          unit_number,
-          unit_type,
-          floor_number,
-          area,
-          annual_rent,
-          occupancy_status,
-          current_contract_id
-        `)
-        .eq("property_id", propertyId)
-        .order("unit_number");
-
-      if (error) throw error;
-      return data || [];
-    },
-  });
-
-  const { data: contracts } = useQuery({
-    queryKey: ["property-contracts", propertyId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("contracts")
-        .select("id, tenant_name, monthly_rent")
-        .eq("property_id", propertyId)
-        .eq("status", "نشط");
-
-      if (error) throw error;
-      return data || [];
-    },
-  });
+  const { units, contracts, isLoading } = usePropertyUnits(propertyId);
 
   if (isLoading) {
     return (

@@ -17,3 +17,6 @@ export { useMaintenanceSchedules } from './useMaintenanceSchedules';
 // Tenants
 export { useTenants, useTenant } from './useTenants';
 export { useTenantLedger, useTenantsAging, useRecordInvoiceToLedger, useRecordPaymentToLedger } from './useTenantLedger';
+
+// Property Units Display Hook
+export { usePropertyUnits as usePropertyUnitsDisplay } from './usePropertyUnitsData';
