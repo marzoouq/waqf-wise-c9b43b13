@@ -1,16 +1,15 @@
 /**
  * Hook لإدارة أدوار مستخدم محدد
  * User Roles Manager Hook
+ * @version 2.8.55
  */
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { type RoleName } from '@/types/auth';
-import { Database } from '@/integrations/supabase/types';
-
-type DbAppRole = Database['public']['Enums']['app_role'];
+import { UserService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export function useUserRolesManager(userId: string) {
   const [selectedRole, setSelectedRole] = useState<RoleName>('nazer');
@@ -19,29 +18,17 @@ export function useUserRolesManager(userId: string) {
 
   // جلب أدوار المستخدم الحالية
   const { data: userRoles = [], isLoading } = useQuery({
-    queryKey: ['user-roles-manager', userId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId);
-
-      if (error) throw error;
-      return data.map(r => r.role as RoleName);
-    },
+    queryKey: QUERY_KEYS.USER_ROLES(userId),
+    queryFn: () => UserService.getUserRolesForManager(userId),
+    enabled: !!userId,
   });
 
   // إضافة دور جديد
   const addRoleMutation = useMutation({
-    mutationFn: async (role: RoleName) => {
-      const { error } = await supabase
-        .from('user_roles')
-        .insert({ user_id: userId, role: role as DbAppRole });
-
-      if (error) throw error;
-    },
+    mutationFn: (role: RoleName) => UserService.addUserRole(userId, role),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user-roles-manager', userId] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USER_ROLES(userId) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USERS });
       toast({
         title: 'تم إضافة الدور',
         description: 'تم إضافة الدور بنجاح',
@@ -58,17 +45,10 @@ export function useUserRolesManager(userId: string) {
 
   // حذف دور
   const deleteRoleMutation = useMutation({
-    mutationFn: async (role: RoleName) => {
-      const { error } = await supabase
-        .from('user_roles')
-        .delete()
-        .eq('user_id', userId)
-        .eq('role', role as DbAppRole);
-
-      if (error) throw error;
-    },
+    mutationFn: (role: RoleName) => UserService.deleteUserRole(userId, role),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user-roles-manager', userId] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USER_ROLES(userId) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USERS });
       toast({
         title: 'تم حذف الدور',
         description: 'تم حذف الدور بنجاح',
@@ -96,7 +76,7 @@ export function useUserRolesManager(userId: string) {
   };
 
   return {
-    userRoles,
+    userRoles: userRoles as RoleName[],
     isLoading,
     selectedRole,
     setSelectedRole,

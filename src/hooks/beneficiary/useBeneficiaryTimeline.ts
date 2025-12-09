@@ -1,16 +1,11 @@
 /**
  * Hook لجلب بيانات الخط الزمني للمستفيد
- * Beneficiary Timeline Hook
+ * @version 2.8.55
  */
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Database } from '@/integrations/supabase/types';
 import { QUERY_KEYS } from '@/lib/query-keys';
-
-type BeneficiaryRequest = Database['public']['Tables']['beneficiary_requests']['Row'] & {
-  request_types?: { name_ar: string } | null;
-};
 
 export interface TimelineEvent {
   id: string;
@@ -25,76 +20,25 @@ export interface TimelineEvent {
 export function useBeneficiaryTimeline(beneficiaryId: string) {
   return useQuery({
     queryKey: QUERY_KEYS.BENEFICIARY_TIMELINE(beneficiaryId),
-    queryFn: async () => {
+    queryFn: async (): Promise<TimelineEvent[]> => {
       const timelineEvents: TimelineEvent[] = [];
 
-      // جلب المدفوعات
-      const { data: payments } = await supabase
-        .from('payments')
-        .select('id, amount, description, payment_date')
-        .eq('beneficiary_id', beneficiaryId)
-        .order('payment_date', { ascending: false })
-        .limit(10);
+      const [paymentsRes, requestsRes, activitiesRes] = await Promise.all([
+        supabase.from('payments').select('id, amount, description, payment_date')
+          .eq('beneficiary_id', beneficiaryId).order('payment_date', { ascending: false }).limit(10),
+        supabase.from('beneficiary_requests').select('*, request_types(name_ar)')
+          .eq('beneficiary_id', beneficiaryId).order('created_at', { ascending: false }).limit(10),
+        supabase.from('beneficiary_activity_log').select('id, action_type, action_description, created_at')
+          .eq('beneficiary_id', beneficiaryId).order('created_at', { ascending: false }).limit(10),
+      ]);
 
-      if (payments) {
-        payments.forEach(payment => {
-          timelineEvents.push({
-            id: payment.id,
-            type: 'payment',
-            title: 'دفعة مالية',
-            description: payment.description || 'دفعة من الوقف',
-            date: payment.payment_date,
-            amount: payment.amount
-          });
-        });
-      }
+      paymentsRes.data?.forEach(p => timelineEvents.push({ id: p.id, type: 'payment', title: 'دفعة مالية', description: p.description || 'دفعة من الوقف', date: p.payment_date, amount: p.amount }));
+      requestsRes.data?.forEach((r: any) => timelineEvents.push({ id: r.id, type: 'request', title: r.request_types?.name_ar || 'طلب جديد', description: r.description, date: r.created_at || '', status: r.status || undefined }));
+      activitiesRes.data?.forEach(a => timelineEvents.push({ id: a.id, type: a.action_type === 'update' ? 'update' : 'status_change', title: a.action_description, description: a.action_description, date: a.created_at || '' }));
 
-      // جلب الطلبات
-      const { data: requests } = await supabase
-        .from('beneficiary_requests')
-        .select('*, request_types(name_ar)')
-        .eq('beneficiary_id', beneficiaryId)
-        .order('created_at', { ascending: false })
-        .limit(10);
-
-      if (requests) {
-        (requests as BeneficiaryRequest[]).forEach((request) => {
-          timelineEvents.push({
-            id: request.id,
-            type: 'request',
-            title: request.request_types?.name_ar || 'طلب جديد',
-            description: request.description,
-            date: request.created_at || '',
-            status: request.status || undefined
-          });
-        });
-      }
-
-      // جلب سجل النشاط
-      const { data: activities } = await supabase
-        .from('beneficiary_activity_log')
-        .select('id, action_type, action_description, created_at')
-        .eq('beneficiary_id', beneficiaryId)
-        .order('created_at', { ascending: false })
-        .limit(10);
-
-      if (activities) {
-        activities.forEach(activity => {
-          timelineEvents.push({
-            id: activity.id,
-            type: activity.action_type === 'update' ? 'update' : 'status_change',
-            title: activity.action_description,
-            description: activity.action_description,
-            date: activity.created_at || ''
-          });
-        });
-      }
-
-      // ترتيب الأحداث حسب التاريخ
-      return timelineEvents.sort((a, b) => 
-        new Date(b.date).getTime() - new Date(a.date).getTime()
-      );
+      return timelineEvents.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     },
     staleTime: 60 * 1000,
+    enabled: !!beneficiaryId,
   });
 }

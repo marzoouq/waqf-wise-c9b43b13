@@ -286,4 +286,41 @@ export class UserService {
         return (roleOrder[a.role] || 999) - (roleOrder[b.role] || 999);
       });
   }
+
+  /**
+   * جلب أدوار مستخدم محدد للإدارة
+   */
+  static async getUserRolesForManager(userId: string): Promise<string[]> {
+    const { data, error } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', userId);
+
+    if (error) throw error;
+    return data.map(r => r.role);
+  }
+
+  /**
+   * إضافة دور لمستخدم محدد
+   */
+  static async addUserRole(userId: string, role: string): Promise<void> {
+    const { error } = await supabase
+      .from('user_roles')
+      .insert({ user_id: userId, role: role as any });
+
+    if (error) throw error;
+  }
+
+  /**
+   * حذف دور من مستخدم محدد
+   */
+  static async deleteUserRole(userId: string, role: string): Promise<void> {
+    const { error } = await supabase
+      .from('user_roles')
+      .delete()
+      .eq('user_id', userId)
+      .eq('role', role as any);
+
+    if (error) throw error;
+  }
 }
