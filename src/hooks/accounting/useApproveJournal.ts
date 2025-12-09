@@ -6,6 +6,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { AccountingService } from "@/services/accounting.service";
 import { useToast } from "@/hooks/use-toast";
 import { JournalApproval } from "@/types/approvals";
+import { invalidateAccountingQueries } from "@/lib/query-invalidation";
 
 export function useApproveJournal(onSuccess?: () => void) {
   const { toast } = useToast();
@@ -24,11 +25,8 @@ export function useApproveJournal(onSuccess?: () => void) {
         description: "تم الموافقة على القيد بنجاح وترحيله",
       });
 
-      queryClient.invalidateQueries({ queryKey: ['pending_approvals'] });
-      queryClient.invalidateQueries({ queryKey: ['recent_journal_entries'] });
-      queryClient.invalidateQueries({ queryKey: ['journal_entries'] });
-      queryClient.invalidateQueries({ queryKey: ['accountant-kpis'] });
-      queryClient.invalidateQueries({ queryKey: ['accounting-stats'] });
+      // ✅ استدعاء واحد بدلاً من 5
+      invalidateAccountingQueries(queryClient);
       
       onSuccess?.();
     } catch (error) {
@@ -64,11 +62,8 @@ export function useApproveJournal(onSuccess?: () => void) {
         description: "تم رفض القيد بنجاح",
       });
 
-      queryClient.invalidateQueries({ queryKey: ['pending_approvals'] });
-      queryClient.invalidateQueries({ queryKey: ['recent_journal_entries'] });
-      queryClient.invalidateQueries({ queryKey: ['journal_entries'] });
-      queryClient.invalidateQueries({ queryKey: ['accountant-kpis'] });
-      queryClient.invalidateQueries({ queryKey: ['accounting-stats'] });
+      // ✅ استدعاء واحد بدلاً من 5
+      invalidateAccountingQueries(queryClient);
       
       onSuccess?.();
     } catch (error) {

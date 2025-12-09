@@ -9,6 +9,7 @@ import { createMutationErrorHandler } from "@/lib/errors";
 import type { JournalEntryInsert, JournalLineInsert } from "@/types/accounting";
 import { AccountingService } from "@/services/accounting.service";
 import { RealtimeService } from "@/services/realtime.service";
+import { invalidateAccountingQueries } from "@/lib/query-invalidation";
 
 export interface JournalEntry {
   id: string;
@@ -45,8 +46,7 @@ export function useJournalEntries() {
   // Real-time subscription
   useEffect(() => {
     const subscription = RealtimeService.subscribeToTable('journal_entries', () => {
-      queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
-      queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      invalidateAccountingQueries(queryClient);
     });
 
     return () => {
@@ -103,8 +103,7 @@ export function useJournalEntries() {
       return AccountingService.postJournalEntry(entryId, user?.email || 'النظام');
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
-      queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      invalidateAccountingQueries(queryClient);
       toast({
         title: "تم الترحيل",
         description: "تم ترحيل القيد بنجاح",
