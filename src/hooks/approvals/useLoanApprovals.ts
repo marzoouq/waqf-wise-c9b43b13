@@ -10,6 +10,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useApprovalHistory } from '@/hooks/useApprovalHistory';
 import { invalidateAccountingQueries } from '@/lib/query-invalidation';
 import type { LoanForApproval } from '@/types';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export function useLoanApprovals() {
   const { toast } = useToast();
@@ -19,7 +20,7 @@ export function useLoanApprovals() {
 
   // جلب القروض مع الموافقات
   const { data: loans, isLoading, error } = useQuery<LoanForApproval[]>({
-    queryKey: ['loans_with_approvals'],
+    queryKey: QUERY_KEYS.LOANS_WITH_APPROVALS,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('loans')
@@ -105,8 +106,8 @@ export function useLoanApprovals() {
     onSuccess: (data) => {
       // ✅ استدعاء واحد بدلاً من 3
       invalidateAccountingQueries(queryClient);
-      queryClient.invalidateQueries({ queryKey: ['loans_with_approvals'] });
-      queryClient.invalidateQueries({ queryKey: ['loans'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.LOANS_WITH_APPROVALS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.LOANS });
       
       toast({
         title: 'تمت العملية بنجاح',

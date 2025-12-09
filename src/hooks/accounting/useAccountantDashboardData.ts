@@ -6,6 +6,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { AccountingService } from "@/services/accounting.service";
 import { JournalApproval } from "@/types/approvals";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export function useAccountantDashboardData() {
   const {
@@ -13,7 +14,7 @@ export function useAccountantDashboardData() {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["pending_approvals"],
+    queryKey: QUERY_KEYS.PENDING_APPROVALS,
     queryFn: async () => {
       const data = await AccountingService.getPendingApprovals();
       return data as JournalApproval[];

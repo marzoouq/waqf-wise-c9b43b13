@@ -8,6 +8,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Account } from '@/types/accounting';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface JournalLine {
   account_id: string;
@@ -28,7 +29,7 @@ export function useJournalEntryForm() {
 
   // جلب الحسابات
   const { data: accounts = [] } = useQuery({
-    queryKey: ['accounts'],
+    queryKey: QUERY_KEYS.ACCOUNTS,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('accounts')
@@ -44,7 +45,7 @@ export function useJournalEntryForm() {
 
   // جلب السنة المالية النشطة
   const { data: activeFiscalYear } = useQuery({
-    queryKey: ['active-fiscal-year'],
+    queryKey: QUERY_KEYS.ACTIVE_FISCAL_YEAR,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('fiscal_years')
@@ -141,7 +142,7 @@ export function useJournalEntryForm() {
       return entry;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['journal-entries'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.JOURNAL_ENTRIES });
       toast.success('تم حفظ القيد بنجاح');
       resetForm();
     },

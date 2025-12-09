@@ -26,7 +26,7 @@ export function useChatbot() {
 
   // جلب أدوار المستخدم
   const { data: userRoles = [] } = useQuery({
-    queryKey: ["user_roles_chatbot", userId],
+    queryKey: QUERY_KEYS.USER_ROLES_CHATBOT(userId),
     queryFn: async () => {
       if (!userId) return [];
       return await UserService.getUserRoles(userId);
@@ -46,7 +46,7 @@ export function useChatbot() {
 
   // جلب سجل المحادثات
   const { data: conversations = [], isLoading } = useQuery({
-    queryKey: ["chatbot_conversations", userId],
+    queryKey: QUERY_KEYS.CHATBOT_CONVERSATIONS(userId),
     queryFn: async () => {
       if (!userId) return [];
       return await ChatbotService.getConversations(userId) as ChatMessage[];
@@ -56,7 +56,7 @@ export function useChatbot() {
 
   // جلب الردود السريعة
   const { data: allQuickReplies = [] } = useQuery({
-    queryKey: ["chatbot_quick_replies"],
+    queryKey: QUERY_KEYS.CHATBOT_QUICK_REPLIES,
     queryFn: () => ChatbotService.getQuickReplies() as Promise<QuickReply[]>,
   });
 
@@ -100,7 +100,7 @@ export function useChatbot() {
     },
     onSuccess: () => {
       setIsTyping(false);
-      queryClient.invalidateQueries({ queryKey: ["chatbot_conversations"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CHATBOT_CONVERSATIONS(userId) });
     },
     onError: (error: unknown) => {
       setIsTyping(false);
@@ -120,7 +120,7 @@ export function useChatbot() {
       await ChatbotService.clearConversations(userId);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["chatbot_conversations"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CHATBOT_CONVERSATIONS(userId) });
       toast({
         title: "تم المسح",
         description: "تم مسح سجل المحادثات بنجاح",

@@ -5,6 +5,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { AccountingService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface AccountantKPIs {
   pendingApprovals: number;
@@ -18,7 +19,7 @@ export interface AccountantKPIs {
 
 export function useAccountantKPIs() {
   return useQuery({
-    queryKey: ["accountant-kpis"],
+    queryKey: QUERY_KEYS.ACCOUNTANT_KPIS,
     queryFn: (): Promise<AccountantKPIs> => AccountingService.getAccountantKPIs(),
     staleTime: 2 * 60 * 1000,
     gcTime: 10 * 60 * 1000,

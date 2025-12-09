@@ -172,6 +172,14 @@ export const QUERY_KEYS = {
   APPROVALS: ['approvals'] as const,
   APPROVAL_WORKFLOWS: ['approval-workflows'] as const,
   APPROVAL_HISTORY: ['approval-history'] as const,
+  DISTRIBUTIONS_WITH_APPROVALS: ['distributions_with_approvals'] as const,
+  JOURNAL_APPROVALS: ['journal_approvals'] as const,
+  LOANS_WITH_APPROVALS: ['loans_with_approvals'] as const,
+
+  // Chatbot
+  USER_ROLES_CHATBOT: (userId?: string) => ['user_roles_chatbot', userId] as const,
+  CHATBOT_CONVERSATIONS: (userId?: string) => ['chatbot_conversations', userId] as const,
+  CHATBOT_QUICK_REPLIES: ['chatbot_quick_replies'] as const,
 
   // Messages
   MESSAGES: ['messages'] as const,

@@ -6,6 +6,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AccountingService } from "@/services";
 import { toast } from "sonner";
 import { AccountRow } from "@/types/supabase-helpers";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 interface AddAccountFormData {
   code: string;
@@ -54,7 +55,7 @@ export function useAddAccount(onSuccess?: () => void) {
       }
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ACCOUNTS });
       toast.success(variables.existingAccount ? "تم تحديث الحساب بنجاح" : "تم إضافة الحساب بنجاح");
       setIsSubmitting(false);
       onSuccess?.();
