@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { createMutationErrorHandler } from "@/lib/errors";
 import { AccountingService } from "@/services/accounting.service";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface Budget {
   id: string;
@@ -31,7 +32,7 @@ export function useBudgets(fiscalYearId?: string) {
     error,
     refetch,
   } = useQuery({
-    queryKey: ["budgets", fiscalYearId],
+    queryKey: QUERY_KEYS.BUDGETS_BY_YEAR(fiscalYearId),
     queryFn: () => AccountingService.getBudgetsWithAccounts(fiscalYearId),
   });
 
@@ -39,7 +40,7 @@ export function useBudgets(fiscalYearId?: string) {
     mutationFn: (budget: Omit<Budget, "id" | "created_at" | "updated_at" | "actual_amount" | "variance_amount" | "accounts">) => 
       AccountingService.createBudget(budget),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["budgets"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BUDGETS });
       toast({
         title: "تمت الإضافة بنجاح",
         description: "تم إضافة الميزانية بنجاح",
@@ -55,7 +56,7 @@ export function useBudgets(fiscalYearId?: string) {
     mutationFn: ({ id, ...updates }: Partial<Budget> & { id: string }) => 
       AccountingService.updateBudget(id, updates),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["budgets"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BUDGETS });
       toast({
         title: "تم التحديث بنجاح",
         description: "تم تحديث الميزانية بنجاح",
@@ -70,7 +71,7 @@ export function useBudgets(fiscalYearId?: string) {
   const deleteBudget = useMutation({
     mutationFn: (id: string) => AccountingService.deleteBudget(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["budgets"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BUDGETS });
       toast({
         title: "تم الحذف بنجاح",
         description: "تم حذف الميزانية بنجاح",
@@ -85,7 +86,7 @@ export function useBudgets(fiscalYearId?: string) {
   const calculateVariances = useMutation({
     mutationFn: (fiscalYearId: string) => AccountingService.calculateBudgetVariances(fiscalYearId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["budgets"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BUDGETS });
       toast({
         title: "تم الحساب بنجاح",
         description: "تم حساب الانحرافات بنجاح",

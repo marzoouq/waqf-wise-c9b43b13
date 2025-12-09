@@ -4,6 +4,7 @@ import { ChatbotService, ChatMessage, QuickReply } from "@/services/chatbot.serv
 import { UserService } from "@/services/user.service";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export type { ChatMessage, QuickReply } from "@/services/chatbot.service";
 

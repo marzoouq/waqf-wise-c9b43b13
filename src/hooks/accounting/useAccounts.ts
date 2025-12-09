@@ -5,13 +5,14 @@ import { logger } from "@/lib/logger";
 import { AccountRow, AccountWithBalance } from "@/types/supabase-helpers";
 import { AccountInsert, AccountUpdate } from "@/types/accounting";
 import { getErrorMessage } from "@/types/errors";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export function useAccounts() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const { data: accounts = [], isLoading } = useQuery({
-    queryKey: ["accounts"],
+    queryKey: QUERY_KEYS.ACCOUNTS,
     queryFn: () => AccountingService.getAccounts(),
   });
 
@@ -20,7 +21,7 @@ export function useAccounts() {
       return AccountingService.createAccount(account);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ACCOUNTS });
       toast({
         title: "تمت الإضافة بنجاح",
         description: "تم إضافة الحساب بنجاح",
@@ -42,7 +43,7 @@ export function useAccounts() {
       return AccountingService.updateAccount(id, updates);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ACCOUNTS });
       toast({
         title: "تم التحديث",
         description: "تم تحديث الحساب بنجاح",
@@ -64,7 +65,7 @@ export function useAccounts() {
       return AccountingService.deleteAccount(id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ACCOUNTS });
       toast({
         title: "تم الحذف",
         description: "تم حذف الحساب بنجاح",

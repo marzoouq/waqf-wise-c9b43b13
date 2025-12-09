@@ -6,6 +6,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { AccountingService } from "@/services/accounting.service";
 import { AccountRow, GeneralLedgerEntry } from "@/types/supabase-helpers";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 interface UseGeneralLedgerParams {
   accountId: string;
@@ -15,12 +16,12 @@ interface UseGeneralLedgerParams {
 
 export function useGeneralLedger({ accountId, dateFrom, dateTo }: UseGeneralLedgerParams) {
   const { data: accounts, error: accountsError, refetch: refetchAccounts } = useQuery({
-    queryKey: ["accounts_for_ledger"],
+    queryKey: QUERY_KEYS.ACCOUNTS_FOR_LEDGER,
     queryFn: () => AccountingService.getAccountsForLedger(),
   });
 
   const { data: ledgerData, isLoading, error, refetch } = useQuery({
-    queryKey: ["general_ledger", accountId || undefined, dateFrom || undefined, dateTo || undefined],
+    queryKey: QUERY_KEYS.GENERAL_LEDGER(accountId || undefined, dateFrom || undefined, dateTo || undefined),
     queryFn: async () => {
       if (!accountId) return null;
 

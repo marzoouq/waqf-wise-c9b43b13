@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AccountingService } from "@/services/accounting.service";
 import { useToast } from "@/hooks/use-toast";
 import { createMutationErrorHandler } from "@/lib/errors";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface CashFlow {
   id: string;
@@ -23,7 +24,7 @@ export function useCashFlows(fiscalYearId?: string) {
   const queryClient = useQueryClient();
 
   const { data: cashFlows = [], isLoading } = useQuery({
-    queryKey: ["cash_flows", fiscalYearId],
+    queryKey: QUERY_KEYS.CASH_FLOWS(fiscalYearId),
     queryFn: () => AccountingService.getCashFlows(fiscalYearId),
   });
 
@@ -31,7 +32,7 @@ export function useCashFlows(fiscalYearId?: string) {
     mutationFn: (params: { fiscalYearId: string; periodStart: string; periodEnd: string }) =>
       AccountingService.calculateCashFlow(params),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cash_flows"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CASH_FLOWS() });
       toast({
         title: "تم الحساب بنجاح",
         description: "تم حساب قائمة التدفقات النقدية",
