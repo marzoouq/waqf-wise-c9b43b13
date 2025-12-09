@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';
 import type { Json } from '@/integrations/supabase/types';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 interface AIInsight {
   id: string;
@@ -19,7 +20,7 @@ export function useAIInsights() {
   const queryClient = useQueryClient();
 
   const { data: insights, isLoading } = useQuery({
-    queryKey: ['ai-insights'],
+    queryKey: QUERY_KEYS.AI_INSIGHTS,
     queryFn: async (): Promise<AIInsight[]> => {
       const { data, error } = await supabase
         .from('smart_alerts')
@@ -42,7 +43,7 @@ export function useAIInsights() {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['ai-insights'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AI_INSIGHTS });
       toast({
         title: 'تم التوليد',
         description: 'تم توليد الرؤى الذكية بنجاح',
@@ -68,7 +69,7 @@ export function useAIInsights() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['ai-insights'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AI_INSIGHTS });
     },
   });
 

@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { safeFilter, safeReduce } from '@/lib/utils/array-safe';
 import type { Json } from '@/integrations/supabase/types';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface KPIMetadata {
   current_assets?: number;
@@ -58,7 +59,7 @@ export function useFinancialAnalytics(fiscalYearId?: string) {
   const { toast } = useToast();
 
   const { data: kpis, isLoading: isLoadingKPIs } = useQuery({
-    queryKey: ['financial_kpis', fiscalYearId],
+    queryKey: QUERY_KEYS.FINANCIAL_KPIS(fiscalYearId),
     queryFn: async () => {
       let query = supabase
         .from('financial_kpis')
@@ -77,7 +78,7 @@ export function useFinancialAnalytics(fiscalYearId?: string) {
   });
 
   const { data: forecasts, isLoading: isLoadingForecasts } = useQuery({
-    queryKey: ['financial_forecasts'],
+    queryKey: QUERY_KEYS.FINANCIAL_FORECASTS,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('financial_forecasts')

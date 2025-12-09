@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { handleError, showSuccess } from '@/lib/errors';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 interface CriteriaScores {
   income?: number;
@@ -30,7 +31,7 @@ export function useEligibilityAssessment(beneficiaryId: string) {
 
   // جلب تقييمات المستفيد
   const { data: assessments = [], isLoading } = useQuery({
-    queryKey: ['eligibility-assessments', beneficiaryId],
+    queryKey: QUERY_KEYS.ELIGIBILITY_ASSESSMENTS(beneficiaryId),
     queryFn: async () => {
       const { data, error } = await supabase
         .from('eligibility_assessments')
@@ -55,8 +56,8 @@ export function useEligibilityAssessment(beneficiaryId: string) {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['eligibility-assessments', beneficiaryId] });
-      queryClient.invalidateQueries({ queryKey: ['beneficiaries'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ELIGIBILITY_ASSESSMENTS(beneficiaryId) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARIES });
       showSuccess('تم التقييم', 'تم تقييم الأهلية بنجاح');
     },
     onError: (error: unknown) => {

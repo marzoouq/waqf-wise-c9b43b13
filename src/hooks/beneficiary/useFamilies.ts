@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import type { Family, FamilyMember } from '@/types';
 import { updateInTable, deleteFromTable } from '@/lib/utils/supabaseHelpers';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 // ===========================
 // Families Hook
@@ -15,7 +16,7 @@ export const useFamilies = () => {
 
   // Fetch all families
   const { data: families = [], isLoading, error, refetch } = useQuery({
-    queryKey: ['families'],
+    queryKey: QUERY_KEYS.FAMILIES,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('families')
@@ -41,7 +42,7 @@ export const useFamilies = () => {
       .on('postgres_changes', 
         { event: '*', schema: 'public', table: 'families' }, 
         () => {
-          queryClient.invalidateQueries({ queryKey: ['families'] });
+          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FAMILIES });
         }
       )
       .subscribe();
@@ -65,7 +66,7 @@ export const useFamilies = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['families'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FAMILIES });
       toast({
         title: 'تم بنجاح',
         description: 'تم إضافة العائلة بنجاح',
@@ -91,7 +92,7 @@ export const useFamilies = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['families'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FAMILIES });
       toast({
         title: 'تم بنجاح',
         description: 'تم تحديث العائلة بنجاح',
@@ -115,7 +116,7 @@ export const useFamilies = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['families'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FAMILIES });
       toast({
         title: 'تم بنجاح',
         description: 'تم حذف العائلة بنجاح',
@@ -151,7 +152,7 @@ export const useFamilyMembers = (familyId?: string) => {
 
   // Fetch family members
   const { data: members = [], isLoading } = useQuery({
-    queryKey: ['family-members', familyId],
+    queryKey: QUERY_KEYS.FAMILY_MEMBERS(familyId),
     queryFn: async () => {
       if (!familyId) return [];
 
@@ -191,8 +192,8 @@ export const useFamilyMembers = (familyId?: string) => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['family-members'] });
-      queryClient.invalidateQueries({ queryKey: ['families'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FAMILY_MEMBERS(undefined) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FAMILIES });
       toast({
         title: 'تم بنجاح',
         description: 'تم إضافة فرد للعائلة بنجاح',
@@ -222,7 +223,7 @@ export const useFamilyMembers = (familyId?: string) => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['family-members'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FAMILY_MEMBERS(undefined) });
       toast({
         title: 'تم بنجاح',
         description: 'تم تحديث بيانات الفرد بنجاح',
@@ -248,8 +249,8 @@ export const useFamilyMembers = (familyId?: string) => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['family-members'] });
-      queryClient.invalidateQueries({ queryKey: ['families'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FAMILY_MEMBERS(undefined) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FAMILIES });
       toast({
         title: 'تم بنجاح',
         description: 'تم إزالة الفرد من العائلة بنجاح',
