@@ -2,11 +2,11 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.8.31
+ * @version 2.8.45
  * @date 2025-12-09
  */
 
-export const APP_VERSION = '2.8.44';
+export const APP_VERSION = '2.8.45';
 export const APP_VERSION_DATE = '2025-12-09';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
@@ -16,10 +16,9 @@ export const VERSION_INFO = {
   name: APP_VERSION_NAME,
   changelog: '/docs/CHANGELOG.md',
   features: [
-    'نقل منطق 15+ hook إلى Services',
-    'إضافة دوال للـ LoansService, UserService, SystemService',
-    'إضافة دوال للـ AccountingService, FiscalYearService, InvoiceService',
-    'إضافة دوال للـ SecurityService, BeneficiaryService, PropertyService',
+    'المرحلة 3: نقل Realtime من 3 components إلى hooks',
+    'توحيد QUERY_KEYS موجود ومحدث',
+    'إزالة استيرادات supabase مباشرة من Components',
     '42 خدمة متكاملة',
     'صفر أخطاء بناء - معمارية نظيفة',
   ],

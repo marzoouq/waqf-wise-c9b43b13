@@ -1,6 +1,4 @@
-import { useState, useEffect } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -8,7 +6,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Building2, RefreshCw, Wifi, ChevronLeft, CheckCircle2, Clock, TrendingUp } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { productionLogger } from "@/lib/logger/production-logger";
 import { useWaqfCorpus, type FiscalYearCorpus } from "@/hooks/dashboard/useFinancialCards";
 
 interface WaqfCorpusCardProps {
@@ -17,41 +14,10 @@ interface WaqfCorpusCardProps {
 }
 
 export function WaqfCorpusCard({ className, compact = false }: WaqfCorpusCardProps) {
-  const queryClient = useQueryClient();
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const [isLive, setIsLive] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  // جلب بيانات رقبة الوقف من جميع السنوات المالية المقفلة
-  const { data: corpusData = [], isLoading } = useWaqfCorpus();
-
-  // الاشتراك في التحديثات المباشرة
-  useEffect(() => {
-    const channel = supabase
-      .channel("waqf-corpus-changes")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "fiscal_year_closings",
-        },
-        (payload) => {
-          productionLogger.info("Waqf corpus updated", { payload });
-          setLastUpdated(new Date());
-          setIsLive(true);
-          queryClient.invalidateQueries({ queryKey: ["waqf-corpus-realtime"] });
-          
-          // إخفاء مؤشر التحديث بعد 3 ثواني
-          setTimeout(() => setIsLive(false), 3000);
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
+  // جلب بيانات رقبة الوقف مع Realtime من hook
+  const { data: corpusData = [], isLoading, lastUpdated, isLive } = useWaqfCorpus();
 
   // حساب إجمالي رقبة الوقف المرحلة
   const totalCorpus = corpusData.reduce((sum, item) => sum + (item.waqf_corpus || 0), 0);
