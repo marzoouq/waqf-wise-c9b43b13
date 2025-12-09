@@ -5,7 +5,7 @@
 
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { FiscalYearService } from "@/services/fiscal-year.service";
 import {
   Dialog,
   DialogContent,
@@ -64,61 +64,38 @@ export function AddFiscalYearDialog({ open, onOpenChange }: AddFiscalYearDialogP
 
   const createFiscalYearMutation = useMutation({
     mutationFn: async (data: FiscalYearFormData) => {
-      // 1. إنشاء السنة المالية
-      const { data: fiscalYear, error: yearError } = await supabase
-        .from("fiscal_years")
-        .insert({
+      if (data.is_historical) {
+        // إنشاء سنة تاريخية مع بيانات الإقفال
+        return FiscalYearService.createWithClosing(
+          {
+            name: data.name,
+            start_date: data.start_date,
+            end_date: data.end_date,
+            is_active: false,
+            is_closed: true,
+            is_published: true,
+          },
+          {
+            closing_date: data.end_date,
+            total_revenues: data.total_revenues,
+            total_expenses: data.total_expenses,
+            nazer_share: data.nazer_share,
+            waqif_share: data.waqif_share,
+            beneficiary_distributions: data.beneficiary_distributions,
+            waqf_corpus: data.waqf_corpus,
+            notes: data.notes,
+          }
+        );
+      } else {
+        // إنشاء سنة مالية عادية
+        return FiscalYearService.create({
           name: data.name,
           start_date: data.start_date,
           end_date: data.end_date,
-          is_active: false, // السنة التاريخية ليست نشطة
-          is_closed: data.is_historical, // إذا كانت تاريخية تكون مغلقة
-          is_published: data.is_historical, // السنوات التاريخية تُنشر مباشرة
-        })
-        .select()
-        .maybeSingle();
-      
-      if (!fiscalYear) throw new Error("Failed to create fiscal year");
-
-      if (yearError) throw yearError;
-
-      // 2. إذا كانت سنة تاريخية، إنشاء سجل الإقفال
-      if (data.is_historical && fiscalYear) {
-        const { error: closingError } = await supabase
-          .from("fiscal_year_closings")
-          .insert({
-            fiscal_year_id: fiscalYear.id,
-            closing_date: data.end_date,
-            closing_type: "manual",
-            total_revenues: data.total_revenues,
-            rental_revenues: data.total_revenues, // نفترض كلها إيجارات
-            other_revenues: 0,
-            total_expenses: data.total_expenses,
-            administrative_expenses: 0,
-            maintenance_expenses: 0,
-            development_expenses: 0,
-            other_expenses: data.total_expenses,
-            nazer_percentage: 10,
-            nazer_share: data.nazer_share,
-            waqif_percentage: 5,
-            waqif_share: data.waqif_share,
-            total_beneficiary_distributions: data.beneficiary_distributions,
-            heirs_count: 14, // عدد الورثة الثابت
-            total_vat_collected: 0,
-            total_vat_paid: 0,
-            net_vat: 0,
-            zakat_amount: 0,
-            net_income: netIncome,
-            waqf_corpus: data.waqf_corpus,
-            opening_balance: 0,
-            closing_balance: data.waqf_corpus,
-            notes: data.notes || "سنة تاريخية مؤرشفة",
-          });
-
-        if (closingError) throw closingError;
+          is_active: false,
+          is_closed: false,
+        });
       }
-
-      return fiscalYear;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["fiscal_years"] });

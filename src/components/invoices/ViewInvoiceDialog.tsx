@@ -11,7 +11,7 @@ import { logger } from "@/lib/logger";
 import { InvoiceStatusActions } from "./InvoiceStatusActions";
 import { format } from "@/lib/date";
 import { useInvoiceDetails } from "@/hooks/invoices/useInvoiceDetails";
-import { supabase } from "@/integrations/supabase/client";
+import { EdgeFunctionService } from "@/services/edge-function.service";
 
 interface ViewInvoiceDialogProps {
   invoiceId: string | null;
@@ -60,17 +60,15 @@ export const ViewInvoiceDialog = ({ invoiceId, open, onOpenChange }: ViewInvoice
     }
 
     try {
-      const { error } = await supabase.functions.invoke("send-invoice-email", {
-        body: {
-          invoiceId: invoice.id,
-          customerEmail: invoice.customer_email,
-          customerName: invoice.customer_name,
-          invoiceNumber: invoice.invoice_number,
-          totalAmount: invoice.total_amount
-        }
+      const result = await EdgeFunctionService.invoke("send-invoice-email", {
+        invoiceId: invoice.id,
+        customerEmail: invoice.customer_email,
+        customerName: invoice.customer_name,
+        invoiceNumber: invoice.invoice_number,
+        totalAmount: invoice.total_amount
       });
 
-      if (error) throw error;
+      if (!result.success) throw new Error(result.error);
       toast.success("تم إرسال الفاتورة بنجاح");
     } catch (error) {
       logger.error(error, { context: 'send_invoice_email', severity: 'medium' });

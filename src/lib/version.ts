@@ -2,11 +2,11 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.8.46
+ * @version 2.8.47
  * @date 2025-12-09
  */
 
-export const APP_VERSION = '2.8.46';
+export const APP_VERSION = '2.8.47';
 export const APP_VERSION_DATE = '2025-12-09';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
@@ -20,7 +20,7 @@ export const VERSION_INFO = {
     '170+ hooks منظمة في 25 مجلد',
     'QUERY_KEYS موحد لـ React Query',
     'Realtime موحد للوحات التحكم',
-    '41 component تحتاج تحويل (قيد العمل)',
+    '33 component تحتاج تحويل (تم تحويل 12)',
   ],
 } as const;
 
@@ -40,9 +40,9 @@ export const ARCHITECTURE_STATUS = {
     description: 'جميع الـ hooks منظمة في مجلدات وظيفية',
   },
   components: {
-    totalWithDirectSupabase: 38,
+    totalWithDirectSupabase: 33,
     status: 'in_progress',
-    description: '38 مكون لا يزال يستخدم Supabase مباشرة (تم إصلاح 4)',
+    description: '33 مكون لا يزال يستخدم Supabase مباشرة (تم إصلاح 12)',
   },
   queryKeys: {
     status: 'complete',

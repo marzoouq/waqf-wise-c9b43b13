@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { EdgeFunctionService } from "@/services/edge-function.service";
 import { Mail, Loader2 } from "lucide-react";
 
 interface EditUserEmailDialogProps {
@@ -55,17 +55,17 @@ export function EditUserEmailDialog({
 
     try {
       // استدعاء Edge Function لتحديث البريد
-      const { data, error } = await supabase.functions.invoke("update-user-email", {
-        body: {
-          userId: user.user_id,
-          newEmail: newEmail.trim().toLowerCase(),
-        },
+      const result = await EdgeFunctionService.invoke("update-user-email", {
+        userId: user.user_id,
+        newEmail: newEmail.trim().toLowerCase(),
       });
 
-      if (error) throw error;
+      if (!result.success) {
+        throw new Error(result.error || "فشل في تحديث البريد");
+      }
 
-      if (data?.error) {
-        throw new Error(data.error);
+      if (result.data?.error) {
+        throw new Error(result.data.error);
       }
 
       toast({

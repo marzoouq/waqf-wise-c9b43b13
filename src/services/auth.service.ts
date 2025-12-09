@@ -298,4 +298,88 @@ export class AuthService {
     if (!data) throw new Error("فشل في تحديث الملف الشخصي");
     return data;
   }
+
+  // ==================== المصادقة الثنائية ====================
+
+  /**
+   * جلب حالة المصادقة الثنائية
+   */
+  static async get2FAStatus(userId: string) {
+    const { data, error } = await supabase
+      .from("two_factor_secrets")
+      .select("enabled, secret, backup_codes")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (error) throw error;
+    return data;
+  }
+
+  /**
+   * تفعيل المصادقة الثنائية
+   */
+  static async enable2FA(userId: string, secret: string, backupCodes: string[]): Promise<void> {
+    const { error } = await supabase
+      .from("two_factor_secrets")
+      .upsert({
+        user_id: userId,
+        secret: secret,
+        backup_codes: backupCodes,
+        enabled: true,
+      });
+
+    if (error) throw error;
+  }
+
+  /**
+   * إلغاء المصادقة الثنائية
+   */
+  static async disable2FA(userId: string): Promise<void> {
+    const { error } = await supabase
+      .from("two_factor_secrets")
+      .update({ enabled: false })
+      .eq("user_id", userId);
+
+    if (error) throw error;
+  }
+
+  // ==================== إعدادات الإشعارات ====================
+
+  /**
+   * جلب إعدادات الإشعارات
+   */
+  static async getNotificationSettings(userId: string) {
+    const { data, error } = await supabase
+      .from("notification_settings")
+      .select("*")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (error) throw error;
+    return data;
+  }
+
+  /**
+   * تحديث إعدادات الإشعارات
+   */
+  static async updateNotificationSettings(userId: string, settings: Record<string, boolean>): Promise<void> {
+    const { data: existing } = await supabase
+      .from("notification_settings")
+      .select("id")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (existing) {
+      const { error } = await supabase
+        .from("notification_settings")
+        .update(settings)
+        .eq("user_id", userId);
+      if (error) throw error;
+    } else {
+      const { error } = await supabase
+        .from("notification_settings")
+        .insert({ user_id: userId, ...settings });
+      if (error) throw error;
+    }
+  }
 }

@@ -4,7 +4,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { BeneficiaryService } from "@/services/beneficiary.service";
 import { Bell, Mail, MessageSquare, Smartphone } from "lucide-react";
 
 interface NotificationPreferencesProps {
@@ -27,14 +27,9 @@ export function NotificationPreferences({
   const handleSave = async () => {
     setSaving(true);
     try {
-      const { error } = await supabase
-        .from("beneficiaries")
-        .update({
-          notification_preferences: preferences,
-        })
-        .eq("id", beneficiaryId);
-
-      if (error) throw error;
+      await BeneficiaryService.update(beneficiaryId, {
+        notification_preferences: preferences as any,
+      });
 
       toast({
         title: "تم الحفظ",
