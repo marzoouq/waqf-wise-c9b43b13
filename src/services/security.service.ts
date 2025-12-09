@@ -124,4 +124,25 @@ export class SecurityService {
     
     if (error) throw error;
   }
+
+  /**
+   * حفظ نتيجة فحص كلمة المرور المسربة
+   */
+  static async saveLeakedPasswordCheck(userId: string, passwordHash: string, isLeaked: boolean) {
+    const { error } = await supabase.from('leaked_password_checks' as any).insert({
+      user_id: userId,
+      password_hash: passwordHash,
+      is_leaked: isLeaked,
+    });
+    if (error) throw error;
+  }
+
+  /**
+   * الحصول على المستخدم الحالي
+   */
+  static async getCurrentUser() {
+    const { data, error } = await supabase.auth.getUser();
+    if (error) throw error;
+    return data.user;
+  }
 }

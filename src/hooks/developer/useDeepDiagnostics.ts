@@ -3,7 +3,7 @@
  * فحص شامل لجميع أجزاء التطبيق - 25 جانب
  */
 import { useState, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { DiagnosticsService } from '@/services/diagnostics.service';
 import { productionLogger } from '@/lib/logger/production-logger';
 import { getRenderReport } from './useRenderTracker';
 import { getAllPerformanceIssues } from './usePerformanceGuard';
@@ -45,7 +45,7 @@ export function useDeepDiagnostics() {
       setProgress(8);
       results.push(await checkDatabaseLatency());
       setProgress(12);
-      results.push(await checkActiveConnections());
+      results.push(checkActiveConnections());
       setProgress(16);
       results.push(await checkSlowQueries());
 
@@ -135,27 +135,25 @@ export function useDeepDiagnostics() {
 // ==================== فحوصات قاعدة البيانات ====================
 
 async function checkDatabaseConnection(): Promise<DiagnosticResult> {
-  const start = Date.now();
   try {
-    const { error } = await supabase.from('activities').select('id').limit(1);
-    const responseTime = Date.now() - start;
+    const result = await DiagnosticsService.checkConnection();
 
-    if (error) {
+    if (!result.success) {
       return {
         category: 'قاعدة البيانات',
         name: 'الاتصال',
         status: 'fail',
-        message: `فشل الاتصال: ${error.message}`,
-        details: { error },
+        message: `فشل الاتصال: ${result.error?.message}`,
+        details: { error: result.error },
       };
     }
 
     return {
       category: 'قاعدة البيانات',
       name: 'الاتصال',
-      status: responseTime > 2000 ? 'warning' : 'pass',
-      message: responseTime > 2000 ? `بطيء: ${responseTime}ms` : `سريع: ${responseTime}ms`,
-      details: { responseTime },
+      status: result.responseTime > 2000 ? 'warning' : 'pass',
+      message: result.responseTime > 2000 ? `بطيء: ${result.responseTime}ms` : `سريع: ${result.responseTime}ms`,
+      details: { responseTime: result.responseTime },
     };
   } catch (error) {
     return {
@@ -169,34 +167,25 @@ async function checkDatabaseConnection(): Promise<DiagnosticResult> {
 }
 
 async function checkDatabaseLatency(): Promise<DiagnosticResult> {
-  const times: number[] = [];
+  const result = await DiagnosticsService.measureLatency(3);
   
-  for (let i = 0; i < 3; i++) {
-    const start = Date.now();
-    await supabase.from('activities').select('id').limit(1);
-    times.push(Date.now() - start);
-  }
-  
-  const avgLatency = times.reduce((a, b) => a + b, 0) / times.length;
-  const maxLatency = Math.max(...times);
-  
-  if (avgLatency > 1500 || maxLatency > 3000) {
+  if (result.avgLatency > 1500 || result.maxLatency > 3000) {
     return {
       category: 'قاعدة البيانات',
       name: 'زمن الاستجابة',
       status: 'fail',
-      message: `متوسط بطيء: ${avgLatency.toFixed(0)}ms`,
-      details: { avgLatency, maxLatency, times },
+      message: `متوسط بطيء: ${result.avgLatency.toFixed(0)}ms`,
+      details: result,
     };
   }
   
-  if (avgLatency > 800) {
+  if (result.avgLatency > 800) {
     return {
       category: 'قاعدة البيانات',
       name: 'زمن الاستجابة',
       status: 'warning',
-      message: `متوسط مرتفع: ${avgLatency.toFixed(0)}ms`,
-      details: { avgLatency, maxLatency },
+      message: `متوسط مرتفع: ${result.avgLatency.toFixed(0)}ms`,
+      details: result,
     };
   }
   
@@ -204,15 +193,14 @@ async function checkDatabaseLatency(): Promise<DiagnosticResult> {
     category: 'قاعدة البيانات',
     name: 'زمن الاستجابة',
     status: 'pass',
-    message: `متوسط جيد: ${avgLatency.toFixed(0)}ms`,
-    details: { avgLatency, maxLatency },
+    message: `متوسط جيد: ${result.avgLatency.toFixed(0)}ms`,
+    details: result,
   };
 }
 
-async function checkActiveConnections(): Promise<DiagnosticResult> {
+function checkActiveConnections(): DiagnosticResult {
   try {
-    const channels = supabase.getChannels();
-    const activeChannels = channels.length;
+    const activeChannels = DiagnosticsService.getActiveChannels();
     
     if (activeChannels > 10) {
       return {
@@ -243,16 +231,8 @@ async function checkActiveConnections(): Promise<DiagnosticResult> {
 
 async function checkSlowQueries(): Promise<DiagnosticResult> {
   try {
-    const { data, error } = await supabase
-      .from('system_health_checks')
-      .select('id, check_type, response_time_ms')
-      .gt('response_time_ms', 2000)
-      .order('created_at', { ascending: false })
-      .limit(10);
-    
-    if (error) throw error;
-    
-    const slowCount = data?.length || 0;
+    const data = await DiagnosticsService.getSlowQueries(2000, 10);
+    const slowCount = data.length;
     
     if (slowCount > 5) {
       return {
@@ -510,136 +490,148 @@ function checkDOMSize(): DiagnosticResult {
   };
 }
 
-function getMaxDOMDepth(element: Element, depth = 0): number {
-  if (!element.children.length) return depth;
-  let maxChildDepth = depth;
-  for (let i = 0; i < Math.min(element.children.length, 100); i++) {
-    maxChildDepth = Math.max(maxChildDepth, getMaxDOMDepth(element.children[i], depth + 1));
-  }
-  return maxChildDepth;
-}
-
 function checkReactQueryCache(): DiagnosticResult {
   try {
-    const cacheSize = sessionStorage.length + localStorage.length;
+    const queryClient = (window as Window & { __REACT_QUERY_DEVTOOLS_GLOBAL_STORE__?: { queryClient?: { getQueryCache: () => { getAll: () => unknown[] } } } }).__REACT_QUERY_DEVTOOLS_GLOBAL_STORE__?.queryClient;
     
-    if (cacheSize > 100) {
+    if (!queryClient) {
       return {
         category: 'React',
-        name: 'Cache',
+        name: 'React Query Cache',
+        status: 'pass',
+        message: 'لا يمكن قياس الحجم',
+      };
+    }
+    
+    const cachedQueries = queryClient.getQueryCache().getAll().length;
+    
+    if (cachedQueries > 100) {
+      return {
+        category: 'React',
+        name: 'React Query Cache',
         status: 'warning',
-        message: `${cacheSize} عناصر مخزنة`,
-        details: { cacheSize },
+        message: `${cachedQueries} استعلام في الذاكرة`,
+        details: { cachedQueries },
       };
     }
     
     return {
       category: 'React',
-      name: 'Cache',
+      name: 'React Query Cache',
       status: 'pass',
-      message: `${cacheSize} عناصر`,
-      details: { cacheSize },
+      message: `${cachedQueries} استعلام`,
+      details: { cachedQueries },
     };
   } catch {
     return {
       category: 'React',
-      name: 'Cache',
-      status: 'warning',
-      message: 'تعذر التحقق',
+      name: 'React Query Cache',
+      status: 'pass',
+      message: 'لا يمكن التحقق',
     };
   }
 }
 
 function checkStateSize(): DiagnosticResult {
-  const reactRoots = document.querySelectorAll('[data-reactroot]');
-  const reactContainers = document.querySelectorAll('#root, #app, [id^="__next"]');
-  const totalRoots = reactRoots.length + reactContainers.length;
-  
-  if (totalRoots > 3) {
+  try {
+    const localStorageSize = JSON.stringify(localStorage).length;
+    const sessionStorageSize = JSON.stringify(sessionStorage).length;
+    const totalKB = (localStorageSize + sessionStorageSize) / 1024;
+    
+    if (totalKB > 5000) {
+      return {
+        category: 'React',
+        name: 'حجم الحالة',
+        status: 'fail',
+        message: `كبير جداً: ${totalKB.toFixed(0)}KB`,
+        details: { totalKB },
+      };
+    }
+    
+    if (totalKB > 2000) {
+      return {
+        category: 'React',
+        name: 'حجم الحالة',
+        status: 'warning',
+        message: `مرتفع: ${totalKB.toFixed(0)}KB`,
+        details: { totalKB },
+      };
+    }
+    
     return {
       category: 'React',
-      name: 'الجذور',
-      status: 'warning',
-      message: `${totalRoots} جذور React`,
-      details: { totalRoots },
+      name: 'حجم الحالة',
+      status: 'pass',
+      message: `${totalKB.toFixed(0)}KB`,
+      details: { totalKB },
+    };
+  } catch {
+    return {
+      category: 'React',
+      name: 'حجم الحالة',
+      status: 'pass',
+      message: 'لا يمكن التحقق',
     };
   }
-  
-  return {
-    category: 'React',
-    name: 'الجذور',
-    status: 'pass',
-    message: `${totalRoots} جذر`,
-    details: { totalRoots },
-  };
 }
 
-// ==================== فحوصات الشبكة والاتصال ====================
+// ==================== فحوصات الشبكة ====================
 
 async function checkNetworkHealth(): Promise<DiagnosticResult> {
-  if (!navigator.onLine) {
-    return {
-      category: 'الشبكة',
-      name: 'الاتصال',
-      status: 'fail',
-      message: 'لا يوجد اتصال بالإنترنت',
-    };
-  }
-
+  const start = Date.now();
   try {
-    const start = Date.now();
-    await fetch('/favicon.ico', { cache: 'no-store' });
+    const response = await fetch('/favicon.ico', { cache: 'no-cache' });
     const latency = Date.now() - start;
-
+    
+    if (!response.ok) {
+      return {
+        category: 'الشبكة',
+        name: 'الصحة',
+        status: 'warning',
+        message: `استجابة ${response.status}`,
+      };
+    }
+    
     if (latency > 1000) {
       return {
         category: 'الشبكة',
-        name: 'الاتصال',
+        name: 'الصحة',
         status: 'warning',
-        message: `زمن استجابة مرتفع: ${latency}ms`,
+        message: `بطيء: ${latency}ms`,
         details: { latency },
       };
     }
-
+    
     return {
       category: 'الشبكة',
-      name: 'الاتصال',
+      name: 'الصحة',
       status: 'pass',
-      message: `جيد: ${latency}ms`,
+      message: `${latency}ms`,
       details: { latency },
     };
   } catch {
     return {
       category: 'الشبكة',
-      name: 'الاتصال',
-      status: 'warning',
-      message: 'تعذر القياس',
+      name: 'الصحة',
+      status: 'fail',
+      message: 'فشل الاتصال',
     };
   }
 }
 
 function checkNetworkRequests(): DiagnosticResult {
-  const resources = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
-  const failedRequests = resources.filter(r => r.responseStatus && r.responseStatus >= 400);
-  const slowRequests = resources.filter(r => r.duration > 3000);
+  const entries = performance.getEntriesByType('resource');
+  const recentRequests = entries.filter(e => 
+    e.startTime > performance.now() - 60000
+  );
   
-  if (failedRequests.length > 5) {
-    return {
-      category: 'الشبكة',
-      name: 'الطلبات',
-      status: 'fail',
-      message: `${failedRequests.length} طلبات فاشلة`,
-      details: { failedCount: failedRequests.length, slowCount: slowRequests.length },
-    };
-  }
-  
-  if (slowRequests.length > 10) {
+  if (recentRequests.length > 200) {
     return {
       category: 'الشبكة',
       name: 'الطلبات',
       status: 'warning',
-      message: `${slowRequests.length} طلبات بطيئة`,
-      details: { slowCount: slowRequests.length },
+      message: `${recentRequests.length} طلب في الدقيقة الأخيرة`,
+      details: { count: recentRequests.length },
     };
   }
   
@@ -647,59 +639,34 @@ function checkNetworkRequests(): DiagnosticResult {
     category: 'الشبكة',
     name: 'الطلبات',
     status: 'pass',
-    message: `${resources.length} طلب إجمالي`,
-    details: { total: resources.length },
+    message: `${recentRequests.length} طلب`,
+    details: { count: recentRequests.length },
   };
 }
 
 async function checkAPIHealth(): Promise<DiagnosticResult> {
   try {
-    const start = Date.now();
-    const { error } = await supabase.auth.getSession();
-    const responseTime = Date.now() - start;
-    
-    if (error) {
-      return {
-        category: 'الشبكة',
-        name: 'API',
-        status: 'warning',
-        message: `خطأ: ${error.message}`,
-      };
-    }
-    
-    if (responseTime > 2000) {
-      return {
-        category: 'الشبكة',
-        name: 'API',
-        status: 'warning',
-        message: `بطيء: ${responseTime}ms`,
-        details: { responseTime },
-      };
-    }
+    const result = await DiagnosticsService.checkConnection();
     
     return {
       category: 'الشبكة',
       name: 'API',
-      status: 'pass',
-      message: `سريع: ${responseTime}ms`,
-      details: { responseTime },
+      status: result.success ? 'pass' : 'fail',
+      message: result.success ? `${result.responseTime}ms` : 'فشل',
+      details: { responseTime: result.responseTime },
     };
   } catch {
     return {
       category: 'الشبكة',
       name: 'API',
       status: 'fail',
-      message: 'تعذر الاتصال بالـ API',
+      message: 'فشل الاتصال',
     };
   }
 }
 
 function checkConnectionType(): DiagnosticResult {
-  const connection = (navigator as Navigator & { connection?: {
-    effectiveType: string;
-    downlink: number;
-    rtt: number;
-  }}).connection;
+  const connection = (navigator as Navigator & { connection?: { effectiveType: string; downlink: number } }).connection;
   
   if (!connection) {
     return {
@@ -710,25 +677,25 @@ function checkConnectionType(): DiagnosticResult {
     };
   }
   
-  const { effectiveType, downlink, rtt } = connection;
+  const type = connection.effectiveType;
   
-  if (effectiveType === '2g' || effectiveType === 'slow-2g') {
+  if (type === 'slow-2g' || type === '2g') {
     return {
       category: 'الشبكة',
       name: 'نوع الاتصال',
       status: 'fail',
-      message: `اتصال بطيء: ${effectiveType}`,
-      details: { effectiveType, downlink, rtt },
+      message: `بطيء: ${type}`,
+      details: { type, downlink: connection.downlink },
     };
   }
   
-  if (effectiveType === '3g') {
+  if (type === '3g') {
     return {
       category: 'الشبكة',
       name: 'نوع الاتصال',
       status: 'warning',
-      message: `اتصال متوسط: ${effectiveType}`,
-      details: { effectiveType, downlink, rtt },
+      message: `متوسط: ${type}`,
+      details: { type, downlink: connection.downlink },
     };
   }
   
@@ -736,8 +703,8 @@ function checkConnectionType(): DiagnosticResult {
     category: 'الشبكة',
     name: 'نوع الاتصال',
     status: 'pass',
-    message: `${effectiveType} (${downlink}Mbps)`,
-    details: { effectiveType, downlink, rtt },
+    message: type,
+    details: { type, downlink: connection.downlink },
   };
 }
 
@@ -745,87 +712,54 @@ function checkConnectionType(): DiagnosticResult {
 
 function checkLocalStorage(): DiagnosticResult {
   try {
-    const keys = Object.keys(localStorage);
-    let totalSize = 0;
-
-    keys.forEach(key => {
-      totalSize += (localStorage.getItem(key)?.length || 0) * 2;
-    });
-
-    const sizeMB = totalSize / (1024 * 1024);
-    const maxSize = 5;
-
-    if (sizeMB > maxSize * 0.9) {
-      return {
-        category: 'التخزين',
-        name: 'LocalStorage',
-        status: 'fail',
-        message: `ممتلئ تقريباً: ${sizeMB.toFixed(2)}MB`,
-        details: { sizeMB, keys: keys.length },
-      };
-    }
-
-    if (sizeMB > maxSize * 0.7) {
+    const size = JSON.stringify(localStorage).length / 1024;
+    const quota = 5 * 1024; // 5MB typical
+    const usagePercent = (size / quota) * 100;
+    
+    if (usagePercent > 80) {
       return {
         category: 'التخزين',
         name: 'LocalStorage',
         status: 'warning',
-        message: `استخدام مرتفع: ${sizeMB.toFixed(2)}MB`,
-        details: { sizeMB, keys: keys.length },
+        message: `${size.toFixed(0)}KB (${usagePercent.toFixed(0)}%)`,
+        details: { sizeKB: size, usagePercent },
       };
     }
-
+    
     return {
       category: 'التخزين',
       name: 'LocalStorage',
       status: 'pass',
-      message: `${keys.length} عناصر (${sizeMB.toFixed(2)}MB)`,
-      details: { sizeMB, keys: keys.length },
+      message: `${size.toFixed(0)}KB`,
+      details: { sizeKB: size },
     };
   } catch {
     return {
       category: 'التخزين',
       name: 'LocalStorage',
       status: 'fail',
-      message: 'تعذر الوصول',
+      message: 'غير متاح',
     };
   }
 }
 
 function checkSessionStorage(): DiagnosticResult {
   try {
-    const keys = Object.keys(sessionStorage);
-    let totalSize = 0;
-
-    keys.forEach(key => {
-      totalSize += (sessionStorage.getItem(key)?.length || 0) * 2;
-    });
-
-    const sizeKB = totalSize / 1024;
-
-    if (sizeKB > 4000) {
-      return {
-        category: 'التخزين',
-        name: 'SessionStorage',
-        status: 'warning',
-        message: `كبير: ${sizeKB.toFixed(0)}KB`,
-        details: { sizeKB, keys: keys.length },
-      };
-    }
-
+    const size = JSON.stringify(sessionStorage).length / 1024;
+    
     return {
       category: 'التخزين',
       name: 'SessionStorage',
       status: 'pass',
-      message: `${keys.length} عناصر (${sizeKB.toFixed(0)}KB)`,
-      details: { sizeKB, keys: keys.length },
+      message: `${size.toFixed(0)}KB`,
+      details: { sizeKB: size },
     };
   } catch {
     return {
       category: 'التخزين',
       name: 'SessionStorage',
-      status: 'warning',
-      message: 'تعذر الوصول',
+      status: 'fail',
+      message: 'غير متاح',
     };
   }
 }
@@ -848,239 +782,161 @@ function checkIndexedDB(): DiagnosticResult {
   };
 }
 
-// ==================== فحوصات الأمان والمصادقة ====================
+// ==================== فحوصات الأمان ====================
 
 async function checkAuthSession(): Promise<DiagnosticResult> {
   try {
-    const { data, error } = await supabase.auth.getSession();
-    
-    if (error) {
-      return {
-        category: 'الأمان',
-        name: 'الجلسة',
-        status: 'warning',
-        message: `خطأ: ${error.message}`,
-      };
-    }
-    
-    if (!data.session) {
-      return {
-        category: 'الأمان',
-        name: 'الجلسة',
-        status: 'pass',
-        message: 'لا توجد جلسة نشطة',
-      };
-    }
-    
-    const expiresAt = data.session.expires_at ? data.session.expires_at * 1000 : 0;
-    const timeLeft = expiresAt - Date.now();
-    const minutesLeft = Math.floor(timeLeft / 60000);
-    
-    if (minutesLeft < 5) {
-      return {
-        category: 'الأمان',
-        name: 'الجلسة',
-        status: 'warning',
-        message: `تنتهي قريباً: ${minutesLeft} دقيقة`,
-        details: { minutesLeft },
-      };
-    }
+    const result = await DiagnosticsService.checkAuthSession();
     
     return {
       category: 'الأمان',
       name: 'الجلسة',
-      status: 'pass',
-      message: `نشطة (${minutesLeft} دقيقة متبقية)`,
-      details: { minutesLeft },
+      status: result.hasSession ? 'pass' : 'warning',
+      message: result.hasSession ? 'نشطة' : 'غير مسجل',
     };
   } catch {
     return {
       category: 'الأمان',
       name: 'الجلسة',
-      status: 'warning',
-      message: 'تعذر التحقق',
+      status: 'fail',
+      message: 'خطأ في التحقق',
     };
   }
 }
 
 function checkSecurityHeaders(): DiagnosticResult {
-  const isHTTPS = window.location.protocol === 'https:';
-  const isLocalhost = window.location.hostname === 'localhost';
-  
-  if (!isHTTPS && !isLocalhost) {
-    return {
-      category: 'الأمان',
-      name: 'HTTPS',
-      status: 'fail',
-      message: 'الاتصال غير آمن',
-    };
-  }
-  
+  // لا يمكن التحقق من headers من الـ client-side
   return {
     category: 'الأمان',
-    name: 'HTTPS',
+    name: 'Headers',
     status: 'pass',
-    message: isHTTPS ? 'اتصال آمن' : 'بيئة تطوير',
+    message: 'لا يمكن التحقق من الـ client',
   };
 }
 
 async function checkErrorLogs(): Promise<DiagnosticResult> {
   try {
-    const { data, error } = await supabase
-      .from('system_error_logs')
-      .select('id, severity')
-      .eq('status', 'pending')
-      .order('created_at', { ascending: false })
-      .limit(50);
-
-    if (error) throw error;
-
-    const criticalCount = data?.filter(e => e.severity === 'critical').length || 0;
-    const totalCount = data?.length || 0;
-
+    const logs = await DiagnosticsService.getRecentErrorLogs(20);
+    const criticalCount = logs.length;
+    
+    if (criticalCount > 10) {
+      return {
+        category: 'الأمان',
+        name: 'سجلات الأخطاء',
+        status: 'fail',
+        message: `${criticalCount} أخطاء حرجة`,
+        details: { criticalCount },
+      };
+    }
+    
     if (criticalCount > 0) {
       return {
         category: 'الأمان',
-        name: 'الأخطاء',
-        status: 'fail',
-        message: `${criticalCount} أخطاء حرجة`,
-        details: { criticalCount, totalCount },
-      };
-    }
-
-    if (totalCount > 10) {
-      return {
-        category: 'الأمان',
-        name: 'الأخطاء',
+        name: 'سجلات الأخطاء',
         status: 'warning',
-        message: `${totalCount} أخطاء نشطة`,
-        details: { totalCount },
+        message: `${criticalCount} أخطاء`,
+        details: { criticalCount },
       };
     }
-
+    
     return {
       category: 'الأمان',
-      name: 'الأخطاء',
+      name: 'سجلات الأخطاء',
       status: 'pass',
-      message: totalCount > 0 ? `${totalCount} أخطاء طفيفة` : 'لا توجد أخطاء',
+      message: 'لا توجد أخطاء حرجة',
     };
   } catch {
     return {
       category: 'الأمان',
-      name: 'الأخطاء',
+      name: 'سجلات الأخطاء',
       status: 'pass',
-      message: 'لا توجد سجلات',
+      message: 'لا يمكن التحقق',
     };
   }
 }
 
-// ==================== فحوصات البيئة والموارد ====================
+// ==================== فحوصات البيئة ====================
 
 async function checkServiceWorker(): Promise<DiagnosticResult> {
   if (!('serviceWorker' in navigator)) {
     return {
       category: 'البيئة',
       name: 'Service Worker',
-      status: 'pass',
+      status: 'warning',
       message: 'غير مدعوم',
     };
   }
-
+  
   try {
-    const registrations = await navigator.serviceWorker.getRegistrations();
+    const registration = await navigator.serviceWorker.getRegistration();
     
     return {
       category: 'البيئة',
       name: 'Service Worker',
-      status: 'pass',
-      message: registrations.length > 0 ? `${registrations.length} مسجل` : 'لا يوجد',
-      details: { count: registrations.length },
+      status: registration ? 'pass' : 'warning',
+      message: registration ? 'مسجل' : 'غير مسجل',
     };
   } catch {
     return {
       category: 'البيئة',
       name: 'Service Worker',
       status: 'warning',
-      message: 'تعذر التحقق',
+      message: 'خطأ في التحقق',
     };
   }
 }
 
 function checkBundleSize(): DiagnosticResult {
-  const resources = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
-  const jsResources = resources.filter(r => r.name.includes('.js'));
-  const cssResources = resources.filter(r => r.name.includes('.css'));
+  const scripts = document.querySelectorAll('script[src]');
+  const totalScripts = scripts.length;
   
-  const jsSize = jsResources.reduce((sum, r) => sum + (r.transferSize || 0), 0);
-  const cssSize = cssResources.reduce((sum, r) => sum + (r.transferSize || 0), 0);
-  const totalSize = jsSize + cssSize;
-  const sizeMB = totalSize / (1024 * 1024);
-
-  if (sizeMB > 5) {
+  if (totalScripts > 20) {
     return {
       category: 'البيئة',
-      name: 'حجم Bundle',
-      status: 'fail',
-      message: `كبير جداً: ${sizeMB.toFixed(2)}MB`,
-      details: { sizeMB, jsCount: jsResources.length, cssCount: cssResources.length },
-    };
-  }
-
-  if (sizeMB > 2) {
-    return {
-      category: 'البيئة',
-      name: 'حجم Bundle',
+      name: 'حجم الحزمة',
       status: 'warning',
-      message: `مرتفع: ${sizeMB.toFixed(2)}MB`,
-      details: { sizeMB },
+      message: `${totalScripts} ملف JS`,
+      details: { totalScripts },
     };
   }
-
+  
   return {
     category: 'البيئة',
-    name: 'حجم Bundle',
+    name: 'حجم الحزمة',
     status: 'pass',
-    message: `${sizeMB.toFixed(2)}MB (${jsResources.length} JS, ${cssResources.length} CSS)`,
-    details: { sizeMB },
+    message: `${totalScripts} ملف JS`,
+    details: { totalScripts },
   };
 }
 
 function checkConsoleErrors(): DiagnosticResult {
-  // فحص أخطاء الـ Console المخزنة
-  const consoleErrors = (window as Window & { __consoleErrors?: string[] }).__consoleErrors || [];
-  
-  if (consoleErrors.length > 10) {
-    return {
-      category: 'البيئة',
-      name: 'Console',
-      status: 'fail',
-      message: `${consoleErrors.length} أخطاء`,
-      details: { count: consoleErrors.length },
-    };
-  }
-  
-  if (consoleErrors.length > 0) {
-    return {
-      category: 'البيئة',
-      name: 'Console',
-      status: 'warning',
-      message: `${consoleErrors.length} أخطاء`,
-      details: { count: consoleErrors.length },
-    };
-  }
-  
+  // لا يمكن قراءة console errors برمجياً
   return {
     category: 'البيئة',
-    name: 'Console',
+    name: 'Console Errors',
     status: 'pass',
-    message: 'لا توجد أخطاء',
+    message: 'راجع console المتصفح',
   };
 }
 
-// ==================== حساب النتيجة ====================
+// ==================== دوال مساعدة ====================
+
+function getMaxDOMDepth(element: Element, depth = 0): number {
+  if (!element.children.length) return depth;
+  
+  let maxChildDepth = depth;
+  for (const child of element.children) {
+    const childDepth = getMaxDOMDepth(child, depth + 1);
+    if (childDepth > maxChildDepth) {
+      maxChildDepth = childDepth;
+    }
+  }
+  
+  return maxChildDepth;
+}
 
 function calculateDiagnosticScore(results: DiagnosticResult[]): number {
-  const weights = { pass: 100, warning: 50, fail: 0 };
+  const weights = { pass: 1, warning: 0.5, fail: 0 };
   const total = results.reduce((sum, r) => sum + weights[r.status], 0);
-  return Math.round(total / results.length);
+  return Math.round((total / results.length) * 100);
 }

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { SecurityService } from '@/services/security.service';
 import { logger } from '@/lib/logger';
 
 /**
@@ -22,8 +22,6 @@ export function useLeakedPassword() {
 
   /**
    * التحقق من كلمة المرور باستخدام k-Anonymity
-   * @param password كلمة المرور للتحقق منها
-   * @returns true إذا كانت مسربة
    */
   const checkPassword = async (password: string): Promise<boolean> => {
     if (!password || password.length < 6) {
@@ -32,12 +30,10 @@ export function useLeakedPassword() {
 
     setIsChecking(true);
     try {
-      // Hash كلمة المرور باستخدام SHA-1
       const sha1Hash = await sha1(password);
       const prefix = sha1Hash.substring(0, 5);
       const suffix = sha1Hash.substring(5);
 
-      // استخدام Have I Been Pwned API (k-Anonymity model)
       const response = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`);
       
       if (!response.ok) {
@@ -48,20 +44,19 @@ export function useLeakedPassword() {
       const data = await response.text();
       const hashes = data.split('\n');
       
-      // البحث عن الـ suffix في القائمة
       const isLeaked = hashes.some(line => {
         const [hashSuffix] = line.split(':');
         return hashSuffix === suffix;
       });
 
-      // حفظ النتيجة في قاعدة البيانات
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        await supabase.from('leaked_password_checks').insert({
-          user_id: user.id,
-          password_hash: sha1Hash,
-          is_leaked: isLeaked,
-        });
+      // حفظ النتيجة عبر SecurityService
+      try {
+        const user = await SecurityService.getCurrentUser();
+        if (user) {
+          await SecurityService.saveLeakedPasswordCheck(user.id, sha1Hash, isLeaked);
+        }
+      } catch {
+        // تجاهل أخطاء الحفظ
       }
 
       return isLeaked;
