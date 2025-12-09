@@ -63,7 +63,7 @@ export function FiscalYearTestPanel() {
         .from("fiscal_years")
         .select("id")
         .limit(1)
-        .single();
+        .maybeSingle();
 
       if (fiscalYears) {
         const { data, error } = await supabase.rpc("calculate_fiscal_year_summary", {
@@ -99,7 +99,7 @@ export function FiscalYearTestPanel() {
         .select("id")
         .eq("is_closed", false)
         .limit(1)
-        .single();
+        .maybeSingle();
 
       if (fiscalYears) {
         const { data, error } = await supabase.functions.invoke("auto-close-fiscal-year", {
@@ -137,7 +137,9 @@ export function FiscalYearTestPanel() {
         .from("accounts")
         .select("id, code, name_ar")
         .eq("code", "5.4.5")
-        .single();
+        .maybeSingle();
+      
+      if (!data) throw new Error("حساب الزكاة غير موجود");
 
       if (error) throw error;
 
@@ -181,7 +183,7 @@ export function FiscalYearTestPanel() {
         .select("id")
         .eq("is_closed", true)
         .limit(1)
-        .single();
+        .maybeSingle();
 
       if (closedYear) {
         testResults.push({

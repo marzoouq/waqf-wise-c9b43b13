@@ -76,7 +76,9 @@ export function AddFiscalYearDialog({ open, onOpenChange }: AddFiscalYearDialogP
           is_published: data.is_historical, // السنوات التاريخية تُنشر مباشرة
         })
         .select()
-        .single();
+        .maybeSingle();
+      
+      if (!fiscalYear) throw new Error("Failed to create fiscal year");
 
       if (yearError) throw yearError;
 

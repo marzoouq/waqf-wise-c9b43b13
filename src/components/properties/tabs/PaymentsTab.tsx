@@ -57,7 +57,7 @@ export const PaymentsTab = ({ onEdit }: Props) => {
         .from('invoices')
         .select('*, invoice_lines(*)')
         .eq('id', payment.invoice_id)
-        .single();
+        .maybeSingle();
 
       if (invoiceError || !invoiceData) {
         toast({
@@ -73,7 +73,7 @@ export const PaymentsTab = ({ onEdit }: Props) => {
         .from('documents')
         .select('id, name, file_path')
         .eq('name', `Invoice-${invoiceData.invoice_number}.pdf`)
-        .single();
+        .maybeSingle();
 
       if (documentData) {
         // فتح PDF من Storage
@@ -87,7 +87,7 @@ export const PaymentsTab = ({ onEdit }: Props) => {
         const { data: orgSettings } = await supabase
           .from('organization_settings')
           .select('id, organization_name_ar, organization_name_en, address_ar, phone, email, logo_url, vat_registration_number, commercial_registration_number')
-          .single();
+          .maybeSingle();
 
         if (orgSettings) {
           await generateInvoicePDF(invoiceData, invoiceData.invoice_lines || [], orgSettings as OrganizationSettings | null);
@@ -123,7 +123,7 @@ export const PaymentsTab = ({ onEdit }: Props) => {
         .from('payments')
         .select('id, payment_number, payment_date, amount, description, payment_method, beneficiary_id, reference_number, payer_name')
         .eq('id', payment.receipt_id)
-        .single();
+        .maybeSingle();
 
       if (receiptError || !receiptData) {
         toast({
@@ -139,7 +139,7 @@ export const PaymentsTab = ({ onEdit }: Props) => {
         .from('documents')
         .select('id, name, file_path')
         .eq('name', `Receipt-${receiptData.payment_number}.pdf`)
-        .single();
+        .maybeSingle();
 
       if (documentData) {
         // فتح PDF من Storage
@@ -153,7 +153,7 @@ export const PaymentsTab = ({ onEdit }: Props) => {
         const { data: orgSettings } = await supabase
           .from('organization_settings')
           .select('id, organization_name_ar, organization_name_en, address_ar, phone, email, logo_url, vat_registration_number, commercial_registration_number')
-          .single();
+          .maybeSingle();
 
         if (orgSettings) {
           await generateReceiptPDF(receiptData, orgSettings as OrganizationSettings | null);

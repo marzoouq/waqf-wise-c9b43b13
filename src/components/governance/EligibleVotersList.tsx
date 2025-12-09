@@ -99,7 +99,7 @@ export function EligibleVotersList({ decision }: EligibleVotersListProps) {
             .select("user_id")
             .eq("role", "nazer")
             .limit(1)
-            .single();
+            .maybeSingle();
           if (nazerUser) {
             eligibleVoters = [{
               id: nazerUser.user_id,

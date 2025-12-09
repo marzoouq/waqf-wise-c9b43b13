@@ -85,7 +85,7 @@ export function MultiChannelNotifications() {
           .from('notification_settings')
           .select('id')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
 
         const updateData = {
           [`enable_${channelId === 'in_app' ? 'in_app' : channelId}`]: !channel.enabled,
