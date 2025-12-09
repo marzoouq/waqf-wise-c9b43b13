@@ -1,6 +1,39 @@
 # 📝 سجل التغييرات | Changelog
 
-**الإصدار الحالي:** 2.8.50 | **آخر تحديث:** 2025-12-09
+**الإصدار الحالي:** 2.8.51 | **آخر تحديث:** 2025-12-09
+
+---
+
+## [2.8.51] - 2025-12-09
+
+### 🧹 تنظيف الكود وإصلاح الأنواع
+
+#### ✅ ما تم إصلاحه
+- **إزالة 110 استخدام لـ `any` type** من 12 ملف خدمة و hook
+- **تنظيف 45 تنبيه قديم** من النظام
+- **إصلاح الأنواع في الخدمات:**
+  - `ApprovalService` - أنواع محددة للموافقات
+  - `PaymentService` - أنواع Database للحسابات البنكية
+  - `AccountingService` - واجهات محلية لسطور القيود
+  - `POSService` - واجهة RentalPaymentItem
+  - `RealtimeService` - RealtimePostgresChangesPayload
+
+#### ✅ Hooks تم تحسينها
+- `usePermissions` - واجهة UserPermission
+- `useRequestApprovals` - إزالة any من فحص الحالة
+- `useRequestAttachments` - إزالة any من find
+- `useFiscalYearClosings` - Parameters type
+- `useDailySettlement` - ShiftReport type
+- `useNotifications` - تبسيط callbacks
+- `useErrorNotifications` - تبسيط callbacks
+
+#### 📊 إحصائيات الجودة
+| المقياس | قبل | بعد |
+|---------|-----|-----|
+| `any` types | 110 | ~5 (مقبولة) |
+| System Alerts | 45 | 0 |
+| System Errors | undefined | 0 |
+| Build Errors | 0 | 0 |
 
 ---
 
