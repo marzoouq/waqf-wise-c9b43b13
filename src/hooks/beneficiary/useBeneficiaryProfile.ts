@@ -6,6 +6,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { BeneficiaryService } from "@/services";
 import { Beneficiary } from "@/types/beneficiary";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 interface Payment {
   id: string;
@@ -22,7 +23,7 @@ interface BeneficiaryProfileData {
 
 export const useBeneficiaryProfile = (userId?: string) => {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["beneficiary-profile", userId],
+    queryKey: QUERY_KEYS.BENEFICIARY_PROFILE(userId),
     queryFn: async (): Promise<BeneficiaryProfileData> => {
       if (!userId) {
         return { beneficiary: null, payments: [] };

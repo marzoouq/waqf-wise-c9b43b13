@@ -8,7 +8,7 @@ import { RequestSubmissionDialog } from "./RequestSubmissionDialog";
 import { RequestDetailsDialog } from "./RequestDetailsDialog";
 import { RequestAttachmentsUploader } from "./RequestAttachmentsUploader";
 import { SLAIndicator } from "./SLAIndicator";
-import { useBeneficiaryRequests } from "@/hooks/beneficiary/useBeneficiaryTabsData";
+import { useBeneficiaryRequestsTab } from "@/hooks/beneficiary/useBeneficiaryTabsData";
 import { format, arLocale as ar } from "@/lib/date";
 
 interface BeneficiaryRequestsTabProps {
@@ -26,7 +26,7 @@ export function BeneficiaryRequestsTab({ beneficiaryId }: BeneficiaryRequestsTab
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
 
-  const { data: requests = [], isLoading } = useBeneficiaryRequests(beneficiaryId);
+  const { data: requests = [], isLoading } = useBeneficiaryRequestsTab(beneficiaryId);
 
   const getStatusBadge = (status: string) => {
     const config: Record<string, { icon: LucideIcon; variant: BadgeVariant }> = {

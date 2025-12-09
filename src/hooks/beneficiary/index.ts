@@ -45,7 +45,7 @@ export {
   useBeneficiaryStatements,
   useDisclosures,
   useDistributionChartData,
-  useBeneficiaryRequests as useBeneficiaryRequestsTab,
+  useBeneficiaryRequestsTab,
   useYearlyComparison,
   useMonthlyRevenue,
   usePropertyStats

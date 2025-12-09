@@ -6,6 +6,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { BeneficiaryService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface BeneficiaryStatistics {
   total_received: number;
@@ -23,7 +24,7 @@ export function useBeneficiaryPortalData() {
     isLoading: beneficiaryLoading,
     error: beneficiaryError,
   } = useQuery({
-    queryKey: ["current-beneficiary", user?.id],
+    queryKey: QUERY_KEYS.CURRENT_BENEFICIARY(user?.id),
     queryFn: async () => {
       if (!user?.id) throw new Error("غير مصرح");
       return BeneficiaryService.getByUserId(user.id);
@@ -36,7 +37,7 @@ export function useBeneficiaryPortalData() {
     data: statistics,
     isLoading: statisticsLoading,
   } = useQuery({
-    queryKey: ["beneficiary-statistics", beneficiary?.id],
+    queryKey: QUERY_KEYS.BENEFICIARY_STATISTICS(beneficiary?.id),
     queryFn: async () => {
       if (!beneficiary?.id) return null;
       const result = await BeneficiaryService.getStatisticsRPC(beneficiary.id);
