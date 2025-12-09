@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { BeneficiaryService } from "@/services/beneficiary.service";
 import { Phone } from "lucide-react";
 
 const phoneSchema = z.object({
@@ -38,12 +38,7 @@ export function EditPhoneDialog({ open, onOpenChange, beneficiaryId, currentPhon
   const onSubmit = async (data: PhoneFormValues) => {
     setIsLoading(true);
     try {
-      const { error } = await supabase
-        .from("beneficiaries")
-        .update({ phone: data.phone })
-        .eq("id", beneficiaryId);
-
-      if (error) throw error;
+      await BeneficiaryService.update(beneficiaryId, { phone: data.phone });
 
       toast({
         title: "تم تحديث رقم الجوال",

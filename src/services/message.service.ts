@@ -108,6 +108,22 @@ export class MessageService {
   }
 
   /**
+   * إرسال رسائل متعددة
+   */
+  static async sendBulkMessages(messages: InternalMessageInsert[]): Promise<void> {
+    try {
+      const { error } = await supabase
+        .from('internal_messages')
+        .insert(messages);
+
+      if (error) throw error;
+    } catch (error) {
+      productionLogger.error('Error sending bulk messages', error);
+      throw error;
+    }
+  }
+
+  /**
    * تعليم رسالة كمقروءة
    */
   static async markAsRead(messageId: string, userId: string): Promise<void> {

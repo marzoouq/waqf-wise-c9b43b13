@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Bell, Mail, MessageSquare, Smartphone, CheckCircle2, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { AuthService } from "@/services/auth.service";
 
 interface NotificationChannel {
   id: string;
@@ -79,36 +79,13 @@ export function MultiChannelNotifications() {
 
     // حفظ الإعدادات
     try {
+      const { supabase } = await import("@/integrations/supabase/client");
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        const { data: existing } = await supabase
-          .from('notification_settings')
-          .select('id')
-          .eq('user_id', user.id)
-          .maybeSingle();
-
-        const updateData = {
-          [`enable_${channelId === 'in_app' ? 'in_app' : channelId}`]: !channel.enabled,
-        };
-
-        let error;
-        if (existing) {
-          const result = await supabase
-            .from('notification_settings')
-            .update(updateData)
-            .eq('user_id', user.id);
-          error = result.error;
-        } else {
-          const result = await supabase
-            .from('notification_settings')
-            .insert({
-              user_id: user.id,
-              ...updateData
-            });
-          error = result.error;
-        }
-
-        if (error) throw error;
+        const settingKey = `enable_${channelId === 'in_app' ? 'in_app' : channelId}`;
+        await AuthService.updateNotificationSettings(user.id, {
+          [settingKey]: !channel.enabled,
+        });
 
         toast({
           title: "تم الحفظ",

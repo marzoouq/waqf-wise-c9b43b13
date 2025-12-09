@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Send, Mail, Users } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useBeneficiaries } from "@/hooks/useBeneficiaries";
-import { supabase } from "@/integrations/supabase/client";
+import { MessageService } from "@/services/message.service";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
@@ -98,11 +98,7 @@ export function AdminSendMessageDialog({
         body: message.body,
       }));
 
-      const { error } = await supabase
-        .from("internal_messages")
-        .insert(messages);
-
-      if (error) throw error;
+      await MessageService.sendBulkMessages(messages);
 
       const skippedCount = recipientBeneficiaries.length - recipientsWithAccounts.length;
       

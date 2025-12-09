@@ -77,10 +77,74 @@ export class FiscalYearService {
       .from('fiscal_years')
       .insert(fiscalYear)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
+    if (!data) throw new Error('فشل إنشاء السنة المالية');
     return data;
+  }
+
+  /**
+   * إنشاء سنة مالية مع بيانات الإقفال (للسنوات التاريخية)
+   */
+  static async createWithClosing(
+    fiscalYear: FiscalYearInsert,
+    closingData: {
+      closing_date: string;
+      total_revenues: number;
+      total_expenses: number;
+      nazer_share: number;
+      waqif_share: number;
+      beneficiary_distributions: number;
+      waqf_corpus: number;
+      notes?: string;
+    }
+  ): Promise<FiscalYear> {
+    // 1. إنشاء السنة المالية
+    const { data: fy, error: fyError } = await supabase
+      .from('fiscal_years')
+      .insert(fiscalYear)
+      .select()
+      .maybeSingle();
+
+    if (fyError) throw fyError;
+    if (!fy) throw new Error('فشل إنشاء السنة المالية');
+
+    // 2. إنشاء سجل الإقفال
+    const { error: closingError } = await supabase
+      .from('fiscal_year_closings')
+      .insert({
+        fiscal_year_id: fy.id,
+        closing_date: closingData.closing_date,
+        closing_type: 'manual',
+        total_revenues: closingData.total_revenues,
+        rental_revenues: closingData.total_revenues,
+        other_revenues: 0,
+        total_expenses: closingData.total_expenses,
+        administrative_expenses: 0,
+        maintenance_expenses: 0,
+        development_expenses: 0,
+        other_expenses: closingData.total_expenses,
+        nazer_percentage: 10,
+        nazer_share: closingData.nazer_share,
+        waqif_percentage: 5,
+        waqif_share: closingData.waqif_share,
+        total_beneficiary_distributions: closingData.beneficiary_distributions,
+        heirs_count: 14,
+        total_vat_collected: 0,
+        total_vat_paid: 0,
+        net_vat: 0,
+        zakat_amount: 0,
+        net_income: closingData.total_revenues - closingData.total_expenses,
+        waqf_corpus: closingData.waqf_corpus,
+        opening_balance: 0,
+        closing_balance: closingData.waqf_corpus,
+        notes: closingData.notes || 'سنة تاريخية مؤرشفة',
+      });
+
+    if (closingError) throw closingError;
+
+    return fy;
   }
 
   /**

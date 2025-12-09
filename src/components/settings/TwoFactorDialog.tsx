@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Shield, Key, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { AuthService } from "@/services/auth.service";
 import { useProfile } from "@/hooks/useProfile";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { logger } from "@/lib/logger";
@@ -30,12 +30,7 @@ export const TwoFactorDialog = ({ open, onOpenChange }: TwoFactorDialogProps) =>
     queryKey: ["two-factor-status", profile?.user_id],
     queryFn: async () => {
       if (!profile?.user_id) return null;
-      const { data } = await supabase
-        .from("two_factor_secrets")
-        .select("enabled, secret, backup_codes")
-        .eq("user_id", profile.user_id)
-        .maybeSingle();
-      return data;
+      return AuthService.get2FAStatus(profile.user_id);
     },
     enabled: !!profile?.user_id,
   });
@@ -87,17 +82,7 @@ export const TwoFactorDialog = ({ open, onOpenChange }: TwoFactorDialogProps) =>
 
     setIsLoading(true);
     try {
-      // Insert or update in two_factor_secrets table
-      const { error } = await supabase
-        .from("two_factor_secrets")
-        .upsert({
-          user_id: profile?.user_id,
-          secret: secret,
-          backup_codes: backupCodes,
-          enabled: true,
-        });
-
-      if (error) throw error;
+      await AuthService.enable2FA(profile?.user_id || "", secret, backupCodes);
 
       await queryClient.invalidateQueries({ queryKey: ["profile"] });
       await queryClient.invalidateQueries({ queryKey: ["two-factor-status"] });
@@ -116,15 +101,7 @@ export const TwoFactorDialog = ({ open, onOpenChange }: TwoFactorDialogProps) =>
   const handleDisable2FA = async () => {
     setIsLoading(true);
     try {
-      // Update two_factor_secrets table
-      const { error } = await supabase
-        .from("two_factor_secrets")
-        .update({
-          enabled: false,
-        })
-        .eq("user_id", profile?.user_id);
-
-      if (error) throw error;
+      await AuthService.disable2FA(profile?.user_id || "");
 
       await queryClient.invalidateQueries({ queryKey: ["profile"] });
       await queryClient.invalidateQueries({ queryKey: ["two-factor-status"] });
