@@ -1,22 +1,22 @@
 /**
  * Accounting Link Report Hook
- * @version 2.8.44
+ * @version 2.8.45
  */
 
 import { useQuery } from "@tanstack/react-query";
-import { ReportsService, type OperationRecord } from "@/services/reports.service";
+import { ReportService, type OperationRecord } from "@/services/report.service";
 
 export type { OperationRecord };
 
 export function useAccountingLinkReport() {
   const linkedQuery = useQuery<OperationRecord[]>({
     queryKey: ["accounting-link", "linked"],
-    queryFn: () => ReportsService.getLinkedOperations(),
+    queryFn: () => ReportService.getLinkedOperations(),
   });
 
   const unlinkedQuery = useQuery<OperationRecord[]>({
     queryKey: ["accounting-link", "unlinked"],
-    queryFn: () => ReportsService.getUnlinkedOperations(),
+    queryFn: () => ReportService.getUnlinkedOperations(),
   });
 
   return {

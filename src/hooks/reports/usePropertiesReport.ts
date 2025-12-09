@@ -1,13 +1,13 @@
 /**
  * Properties Report Hook
- * @version 2.8.44
+ * @version 2.8.45
  */
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";
-import { ReportsService, type PropertyWithContracts } from "@/services/reports.service";
+import { ReportService, type PropertyWithContracts } from "@/services/report.service";
 
 export type { PropertyWithContracts };
 
@@ -17,7 +17,7 @@ export function usePropertiesReport() {
 
   const query = useQuery<PropertyWithContracts[]>({
     queryKey: ["properties-report"],
-    queryFn: () => ReportsService.getPropertiesReport(),
+    queryFn: () => ReportService.getPropertiesReport(),
     ...QUERY_CONFIG.REPORTS,
   });
 

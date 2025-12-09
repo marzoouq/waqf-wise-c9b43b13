@@ -10,14 +10,12 @@ import { productionLogger } from '@/lib/logger/production-logger';
 import { NotificationService } from './notification.service';
 import type { Database } from '@/integrations/supabase/types';
 
-// تعريفات بسيطة لتجنب أخطاء TypeScript المعقدة
-/* eslint-disable @typescript-eslint/no-explicit-any */
-type DistributionRow = any;
-type DistributionInsert = any;
+// استخدام Types من Supabase مباشرة
+type DistributionRow = Database['public']['Tables']['distributions']['Row'];
+type DistributionInsert = Database['public']['Tables']['distributions']['Insert'];
 type PaymentVoucherRow = Database['public']['Tables']['payment_vouchers']['Row'];
 type PaymentVoucherInsert = Database['public']['Tables']['payment_vouchers']['Insert'];
 type BankTransferFileRow = Database['public']['Tables']['bank_transfer_files']['Row'];
-/* eslint-enable @typescript-eslint/no-explicit-any */
 
 export interface DistributionApproval {
   id: string;

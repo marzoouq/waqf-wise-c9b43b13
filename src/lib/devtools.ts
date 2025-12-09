@@ -4,6 +4,8 @@
  * متاح في بيئة التطوير فقط
  */
 
+import { logger } from '@/lib/logger';
+
 export const DEVTOOLS_CONFIG = {
   // تفعيل الأدوات في بيئة التطوير
   enabled: import.meta.env.DEV,
@@ -19,50 +21,23 @@ export const DEVTOOLS_CONFIG = {
 if (import.meta.env.DEV) {
   // دالة لفتح/إغلاق DevTools
   (window as Window & { toggleQueryDevtools?: () => void }).toggleQueryDevtools = () => {
-    console.log('💡 React Query DevTools مفعّل');
-    console.log('📊 يمكنك مراقبة:');
-    console.log('  • جميع الـ Queries (استعلامات البيانات)');
-    console.log('  • جميع الـ Mutations (عمليات التعديل)');
-    console.log('  • الـ Cache (ذاكرة التخزين المؤقت)');
-    console.log('  • حالة التحميل والأخطاء');
-    console.log('  • تفاصيل الشبكة والأداء');
-    console.log('🔍 استخدم الأيقونة أسفل يسار الشاشة');
+    logger.info('React Query DevTools مفعّل');
   };
   
   // دالة لعرض معلومات QueryClient
   (window as Window & { getQueryClientInfo?: () => void }).getQueryClientInfo = () => {
-    console.log('📊 معلومات QueryClient:');
-    console.log('  • staleTime: 5 دقائق');
-    console.log('  • gcTime: 10 دقائق');
-    console.log('  • retry: 3 محاولات');
-    console.log('  • refetchOnWindowFocus: معطّل');
-    console.log('  • refetchOnReconnect: مفعّل');
+    logger.debug('معلومات QueryClient', {
+      staleTime: '5 دقائق',
+      gcTime: '10 دقائق',
+      retry: 3,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: true,
+    });
   };
   
   // دالة لعرض جميع الـ queries النشطة
   (window as Window & { showActiveQueries?: () => void }).showActiveQueries = () => {
-    console.log('🔄 للاطلاع على الـ queries النشطة، افتح React Query DevTools');
+    logger.info('للاطلاع على الـ queries النشطة، افتح React Query DevTools');
   };
-  
-  // رسالة الترحيب
-  console.log('');
-  console.log('╔══════════════════════════════════════════════╗');
-  console.log('║  🛠️  TanStack React Query DevTools v5       ║');
-  console.log('╚══════════════════════════════════════════════╝');
-  console.log('');
-  console.log('✅ أدوات المطور مفعّلة على كامل التطبيق');
-  console.log('');
-  console.log('📌 الأوامر المتاحة:');
-  console.log('  • toggleQueryDevtools() - معلومات الأدوات');
-  console.log('  • getQueryClientInfo() - إعدادات QueryClient');
-  console.log('  • showActiveQueries() - الاستعلامات النشطة');
-  console.log('');
-  console.log('🎯 الأدوات تراقب:');
-  console.log('  ✓ جميع الصفحات والمسارات');
-  console.log('  ✓ كافة الـ Hooks والمكونات');
-  console.log('  ✓ جميع الطلبات والاستجابات');
-  console.log('  ✓ حالة الـ Cache والتحديثات');
-  console.log('  ✓ الأخطاء والتحذيرات');
-  console.log('');
 }
 
