@@ -1,8 +1,5 @@
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useQueryClient } from "@tanstack/react-query";
 import {
   BarChart,
   Bar,
@@ -13,75 +10,12 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import type { BudgetComparison } from "@/types/dashboard";
+import { useBudgetComparison } from "@/hooks/dashboard/useDashboardCharts";
 
 const BudgetComparisonChart = () => {
-  const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<BudgetComparison[]>([]);
-  const queryClient = useQueryClient();
+  const { data, isLoading } = useBudgetComparison();
 
-  useEffect(() => {
-    fetchBudgetComparison();
-    
-    // Real-time subscription
-    const channel = supabase
-      .channel('budgets-realtime')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'budgets'
-      }, () => {
-        fetchBudgetComparison();
-        queryClient.invalidateQueries({ queryKey: ["budgets"] });
-      })
-      .subscribe();
-      
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
-
-  const fetchBudgetComparison = async () => {
-    try {
-      const { data: budgets, error } = await supabase
-        .from("budgets")
-        .select(`
-          budgeted_amount,
-          actual_amount,
-          variance_amount,
-          accounts!inner (
-            name_ar
-          )
-        `)
-        .limit(10);
-
-      if (error) throw error;
-
-      interface BudgetData {
-        accounts: {
-          name_ar: string;
-        };
-        budgeted_amount: number;
-        actual_amount: number;
-        variance_amount: number;
-      }
-
-      const chartData: BudgetComparison[] = budgets?.map((budget: BudgetData) => ({
-        account: budget.accounts.name_ar.substring(0, 15) + '...',
-        budgeted: Number(budget.budgeted_amount || 0),
-        actual: Number(budget.actual_amount || 0),
-        variance: Number(budget.variance_amount || 0),
-      })) || [];
-
-      setData(chartData);
-    } catch (error) {
-      setData([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
+  if (isLoading) {
     return (
       <Card>
         <CardHeader>
@@ -94,7 +28,7 @@ const BudgetComparisonChart = () => {
     );
   }
 
-  if (data.length === 0) {
+  if (!data || data.length === 0) {
     return (
       <Card className="shadow-soft">
         <CardHeader>

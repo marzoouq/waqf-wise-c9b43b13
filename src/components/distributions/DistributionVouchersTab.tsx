@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +9,8 @@ import { BankTransferGenerator } from "./BankTransferGenerator";
 import { Receipt, Eye, Plus, FileText, CheckCircle, XCircle, Clock, AlertCircle, LucideIcon } from "lucide-react";
 import { formatRelative } from "@/lib/date";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useDistributionVouchers, VoucherRecord } from "@/hooks/distributions/useDistributionTabsData";
+import { useDialogState } from "@/hooks/ui/useDialogState";
 
 interface DistributionVouchersTabProps {
   distributionId: string;
@@ -18,67 +18,11 @@ interface DistributionVouchersTabProps {
 
 type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
 
-interface VoucherRecord {
-  id: string;
-  voucher_number: string;
-  voucher_type?: string;
-  beneficiary_id?: string;
-  amount: number;
-  status: string;
-  created_at: string;
-  description?: string;
-  payment_method?: string;
-  bank_name?: string;
-  account_number?: string;
-  bank_iban?: string;
-  reference_number?: string;
-  notes?: string;
-  approved_by?: string;
-  approved_at?: string;
-  paid_by?: string;
-  paid_at?: string;
-  beneficiaries?: { full_name: string; national_id?: string };
-}
-
 export function DistributionVouchersTab({ distributionId }: DistributionVouchersTabProps) {
-  const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [selectedVoucher, setSelectedVoucher] = useState<VoucherRecord | null>(null);
-  const [showDetailsDialog, setShowDetailsDialog] = useState(false);
+  const createDialog = useDialogState();
+  const detailsDialog = useDialogState<VoucherRecord>();
 
-  const { data: vouchers, isLoading, refetch } = useQuery({
-    queryKey: ["distribution-vouchers", distributionId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('payment_vouchers_with_details')
-        .select('id, voucher_number, voucher_type, beneficiary_id, amount, status, created_at, description, payment_method, bank_account_id, reference_number, notes, approved_by, approved_at, paid_by, paid_at')
-        .eq('distribution_id', distributionId)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const { data: stats } = useQuery({
-    queryKey: ["distribution-vouchers-stats", distributionId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('payment_vouchers')
-        .select('amount, status')
-        .eq('distribution_id', distributionId);
-
-      if (error) throw error;
-
-      return {
-        total: data.length,
-        draft: data.filter(v => v.status === 'draft').length,
-        approved: data.filter(v => v.status === 'approved').length,
-        paid: data.filter(v => v.status === 'paid').length,
-        totalAmount: data.reduce((sum, v) => sum + v.amount, 0),
-        paidAmount: data.filter(v => v.status === 'paid').reduce((sum, v) => sum + v.amount, 0),
-      };
-    },
-  });
+  const { vouchers, stats, isLoading, refetch } = useDistributionVouchers(distributionId);
 
   const getStatusBadge = (status: string) => {
     const configs: Record<string, { label: string; variant: BadgeVariant; icon: LucideIcon; className?: string }> = {
@@ -98,11 +42,6 @@ export function DistributionVouchersTab({ distributionId }: DistributionVouchers
         {config.label}
       </Badge>
     );
-  };
-
-  const handleViewDetails = (voucher: VoucherRecord) => {
-    setSelectedVoucher(voucher);
-    setShowDetailsDialog(true);
   };
 
   return (
@@ -153,7 +92,7 @@ export function DistributionVouchersTab({ distributionId }: DistributionVouchers
               <Receipt className="h-5 w-5" />
               سندات الصرف
             </CardTitle>
-            <Button onClick={() => setShowCreateDialog(true)} size="sm">
+            <Button onClick={() => createDialog.open()} size="sm">
               <Plus className="ml-2 h-4 w-4" />
               إنشاء سند
             </Button>
@@ -196,7 +135,7 @@ export function DistributionVouchersTab({ distributionId }: DistributionVouchers
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleViewDetails(voucher)}
+                          onClick={() => detailsDialog.open(voucher)}
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
@@ -219,16 +158,16 @@ export function DistributionVouchersTab({ distributionId }: DistributionVouchers
 
       {/* Dialogs */}
       <PaymentVoucherDialog
-        open={showCreateDialog}
-        onOpenChange={setShowCreateDialog}
+        open={createDialog.isOpen}
+        onOpenChange={(open) => !open && createDialog.close()}
         distributionId={distributionId}
         onSuccess={refetch}
       />
 
       <VoucherDetailsDialog
-        open={showDetailsDialog}
-        onOpenChange={setShowDetailsDialog}
-        voucher={selectedVoucher}
+        open={detailsDialog.isOpen}
+        onOpenChange={(open) => !open && detailsDialog.close()}
+        voucher={detailsDialog.data || null}
       />
     </div>
   );

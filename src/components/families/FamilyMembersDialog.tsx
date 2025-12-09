@@ -1,5 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -7,6 +5,7 @@ import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Users } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
+import { useFamilyMembersDialog } from "@/hooks/distributions/useDistributionTabsData";
 
 interface FamilyMembersDialogProps {
   open: boolean;
@@ -27,21 +26,7 @@ interface FamilyMember {
 }
 
 export function FamilyMembersDialog({ open, onOpenChange, familyId, familyName }: FamilyMembersDialogProps) {
-  const { data: members = [], isLoading } = useQuery({
-    queryKey: ["family-members", familyId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("beneficiaries")
-        .select("id, full_name, national_id, relationship, gender, date_of_birth, status, is_head_of_family")
-        .eq("family_name", familyName)
-        .order("is_head_of_family", { ascending: false })
-        .order("full_name");
-
-      if (error) throw error;
-      return data as FamilyMember[];
-    },
-    enabled: open,
-  });
+  const { data: members = [], isLoading } = useFamilyMembersDialog(familyName, open);
 
   const getRelationshipBadge = (relationship: string) => {
     const variants: Record<string, "default" | "secondary" | "outline"> = {
@@ -62,7 +47,7 @@ export function FamilyMembersDialog({ open, onOpenChange, familyId, familyName }
 
         {isLoading ? (
           <LoadingState />
-        ) : members.length === 0 ? (
+        ) : (members as FamilyMember[]).length === 0 ? (
           <EmptyState
             icon={Users}
             title="لا يوجد أفراد"
@@ -71,7 +56,7 @@ export function FamilyMembersDialog({ open, onOpenChange, familyId, familyName }
         ) : (
           <div className="space-y-4">
             <div className="text-sm text-muted-foreground">
-              إجمالي الأفراد: <span className="font-bold">{members.length}</span>
+              إجمالي الأفراد: <span className="font-bold">{(members as FamilyMember[]).length}</span>
             </div>
 
             <div className="rounded-md border">
@@ -87,7 +72,7 @@ export function FamilyMembersDialog({ open, onOpenChange, familyId, familyName }
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {members.map((member) => (
+                  {(members as FamilyMember[]).map((member) => (
                     <TableRow key={member.id}>
                       <TableCell className="font-medium">
                         {member.full_name}
