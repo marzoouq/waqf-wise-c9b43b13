@@ -19,7 +19,7 @@ import {
 import { useDisclosureBeneficiaries } from "@/hooks/useAnnualDisclosures";
 import { AnnualDisclosure } from "@/hooks/useAnnualDisclosures";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
-import { DisclosureDocumentsSection } from "@/components/reports/DisclosureDocumentsSection";
+import { SmartDisclosureDocuments } from "@/components/reports/SmartDisclosureDocuments";
 
 interface ViewDisclosureDialogProps {
   open: boolean;
@@ -409,8 +409,8 @@ export const ViewDisclosureDialog = ({
           </Card>
         )}
 
-        {/* المستندات الداعمة للإفصاح */}
-        <DisclosureDocumentsSection disclosureId={disclosure.id} />
+        {/* المستندات الداعمة للإفصاح - العرض الذكي */}
+        <SmartDisclosureDocuments disclosureId={disclosure.id} />
       </div>
     </ResponsiveDialog>
   );
