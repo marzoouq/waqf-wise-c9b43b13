@@ -170,6 +170,33 @@ export const QUERY_KEYS = {
   // Knowledge Base
   KNOWLEDGE_ARTICLES: ['knowledge-articles'] as const,
   PROJECT_PHASES: ['project-phases'] as const,
+
+  // Auto Journal
+  AUTO_JOURNAL_TEMPLATES: ['auto_journal_templates'] as const,
+  AUTO_JOURNAL_LOG: ['auto-journal-log'] as const,
+
+  // AI & Analytics
+  AI_INSIGHTS: ['ai-insights'] as const,
+  FINANCIAL_KPIS: (fiscalYearId?: string) => ['financial_kpis', fiscalYearId] as const,
+  FINANCIAL_FORECASTS: ['financial_forecasts'] as const,
+
+  // Eligibility
+  ELIGIBILITY_ASSESSMENTS: (beneficiaryId: string) => ['eligibility-assessments', beneficiaryId] as const,
+
+  // Family Members
+  FAMILY_MEMBERS: (familyId?: string) => ['family-members', familyId] as const,
+
+  // Emergency Aid
+  EMERGENCY_AID: ['emergency-aid'] as const,
+  EMERGENCY_APPROVALS: ['emergency-approvals'] as const,
+
+  // Document Tags & Versions
+  DOCUMENT_TAGS: (documentId?: string) => ['document-tags', documentId] as const,
+  DOCUMENT_VERSIONS: (documentId: string) => ['document-versions', documentId] as const,
+
+  // Beneficiary Timeline
+  BENEFICIARY_TIMELINE: (beneficiaryId: string) => ['beneficiary-timeline', beneficiaryId] as const,
+  BENEFICIARY_FAMILY: (beneficiaryId: string) => ['beneficiary-family', beneficiaryId] as const,
 } as const;
 
 // Query Config with default settings

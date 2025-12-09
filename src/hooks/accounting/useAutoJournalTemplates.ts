@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import type { Json } from '@/integrations/supabase/types';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface AccountMapping {
   account_code: string;
@@ -41,7 +42,7 @@ export function useAutoJournalTemplates() {
   const { toast } = useToast();
 
   const { data: templates, isLoading } = useQuery({
-    queryKey: ['auto_journal_templates'],
+    queryKey: QUERY_KEYS.AUTO_JOURNAL_TEMPLATES,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('auto_journal_templates')
@@ -80,7 +81,7 @@ export function useAutoJournalTemplates() {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['auto_journal_templates'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTO_JOURNAL_TEMPLATES });
       toast({
         title: 'تم الحفظ',
         description: 'تم إنشاء قالب القيد التلقائي بنجاح',
@@ -117,7 +118,7 @@ export function useAutoJournalTemplates() {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['auto_journal_templates'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTO_JOURNAL_TEMPLATES });
       toast({
         title: 'تم التحديث',
         description: 'تم تحديث قالب القيد التلقائي بنجاح',
@@ -142,7 +143,7 @@ export function useAutoJournalTemplates() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['auto_journal_templates'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTO_JOURNAL_TEMPLATES });
       toast({
         title: 'تم الحذف',
         description: 'تم حذف قالب القيد التلقائي بنجاح',
@@ -167,7 +168,7 @@ export function useAutoJournalTemplates() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['auto_journal_templates'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTO_JOURNAL_TEMPLATES });
     },
   });
 
