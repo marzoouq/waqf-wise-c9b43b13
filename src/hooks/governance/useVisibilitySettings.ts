@@ -61,6 +61,13 @@ export interface VisibilitySettings {
   show_support_tickets: boolean;
   allow_export_pdf: boolean;
   allow_print: boolean;
+  // إعدادات الأرشيف التفصيلية
+  show_archive_contracts: boolean;
+  show_archive_legal_docs: boolean;
+  show_archive_financial_reports: boolean;
+  show_archive_meeting_minutes: boolean;
+  allow_download_documents: boolean;
+  allow_preview_documents: boolean;
 }
 
 export function useVisibilitySettings(targetRole?: 'beneficiary' | 'waqf_heir') {
