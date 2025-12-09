@@ -245,4 +245,79 @@ export class MaintenanceService {
 
     if (error) throw error;
   }
+
+  /**
+   * جلب تقرير تكاليف الصيانة حسب العقار
+   */
+  static async getCostAnalysis() {
+    const { data, error } = await supabase
+      .from('maintenance_requests')
+      .select(`
+        id,
+        estimated_cost,
+        actual_cost,
+        status,
+        properties!inner(id, name)
+      `);
+    
+    if (error) throw error;
+
+    const propertyData: Record<string, { property_id: string; property_name: string; total_cost: number; completed_count: number; pending_count: number; avg_cost: number }> = {};
+    
+    (data || []).forEach((req) => {
+      const property = req.properties as unknown as { id: string; name: string };
+      const propertyId = property.id;
+      const propertyName = property.name;
+      
+      if (!propertyData[propertyId]) {
+        propertyData[propertyId] = {
+          property_id: propertyId,
+          property_name: propertyName,
+          total_cost: 0,
+          completed_count: 0,
+          pending_count: 0,
+          avg_cost: 0
+        };
+      }
+
+      const cost = Number(req.actual_cost || req.estimated_cost || 0);
+      propertyData[propertyId].total_cost += cost;
+      if (req.status === 'مكتمل') {
+        propertyData[propertyId].completed_count += 1;
+      } else if (req.status === 'معلق') {
+        propertyData[propertyId].pending_count += 1;
+      }
+    });
+
+    return Object.values(propertyData)
+      .map(item => ({
+        ...item,
+        avg_cost: item.completed_count > 0 ? item.total_cost / item.completed_count : 0
+      }))
+      .sort((a, b) => b.total_cost - a.total_cost);
+  }
+
+  /**
+   * جلب تحليل تكاليف الصيانة حسب النوع
+   */
+  static async getTypeAnalysis() {
+    const { data, error } = await supabase
+      .from('maintenance_requests')
+      .select('category, estimated_cost, actual_cost, status');
+    
+    if (error) throw error;
+
+    const typeData = (data || []).reduce((acc, req) => {
+      const category = req.category || 'غير محدد';
+      if (!acc[category]) {
+        acc[category] = { name: category, value: 0, count: 0 };
+      }
+      const cost = Number(req.actual_cost || req.estimated_cost || 0);
+      acc[category].value += cost;
+      acc[category].count += 1;
+      return acc;
+    }, {} as Record<string, { name: string; value: number; count: number }>);
+
+    return Object.values(typeData);
+  }
 }

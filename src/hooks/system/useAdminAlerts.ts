@@ -1,10 +1,12 @@
 /**
  * Hook لإدارة تنبيهات النظام
  * Admin Alerts Hook
+ * @version 2.8.54
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { SystemService } from '@/services/system.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 import { toast } from 'sonner';
 
 export interface SystemAlert {
@@ -23,64 +25,34 @@ export function useAdminAlerts() {
   const queryClient = useQueryClient();
 
   const { data: alerts = [], isLoading, refetch } = useQuery({
-    queryKey: ['admin-alerts'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('system_alerts')
-        .select('id, alert_type, severity, title, description, status, created_at, acknowledged_at, resolved_at')
-        .in('status', ['active', 'acknowledged'])
-        .order('created_at', { ascending: false })
-        .limit(20);
-
-      if (error) throw error;
-      return data as SystemAlert[];
-    },
+    queryKey: QUERY_KEYS.ADMIN_ALERTS,
+    queryFn: () => SystemService.getAdminAlerts(),
     staleTime: 60 * 1000,
     refetchInterval: false,
   });
 
   const acknowledgeMutation = useMutation({
-    mutationFn: async (alertId: string) => {
-      const { error } = await supabase
-        .from('system_alerts')
-        .update({
-          status: 'acknowledged',
-          acknowledged_at: new Date().toISOString(),
-        })
-        .eq('id', alertId);
-
-      if (error) throw error;
-    },
+    mutationFn: (alertId: string) => SystemService.acknowledgeAlert(alertId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-alerts'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_ALERTS });
       toast.success('تم الاعتراف بالتنبيه');
     },
   });
 
   const resolveMutation = useMutation({
-    mutationFn: async (alertId: string) => {
-      const { error } = await supabase
-        .from('system_alerts')
-        .update({
-          status: 'resolved',
-          resolved_at: new Date().toISOString(),
-        })
-        .eq('id', alertId);
-
-      if (error) throw error;
-    },
+    mutationFn: (alertId: string) => SystemService.resolveAlert(alertId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-alerts'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_ALERTS });
       toast.success('تم حل التنبيه');
     },
   });
 
   // تجميع التنبيهات
-  const activeAlerts = alerts.filter((a) => a.status === 'active');
-  const acknowledgedAlerts = alerts.filter((a) => a.status === 'acknowledged');
+  const activeAlerts = alerts.filter((a: SystemAlert) => a.status === 'active');
+  const acknowledgedAlerts = alerts.filter((a: SystemAlert) => a.status === 'acknowledged');
 
   return {
-    alerts,
+    alerts: alerts as SystemAlert[],
     activeAlerts,
     acknowledgedAlerts,
     isLoading,

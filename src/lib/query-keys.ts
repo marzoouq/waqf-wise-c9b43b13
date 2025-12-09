@@ -1,6 +1,6 @@
 /**
  * Unified Query Keys - مفاتيح الاستعلامات الموحدة
- * @version 2.8.30
+ * @version 2.8.54
  * 
  * هذا الملف يوفر مفاتيح موحدة لجميع استعلامات React Query
  * لضمان الاتساق وتسهيل إدارة الكاش
@@ -315,6 +315,22 @@ export const QUERY_KEYS = {
   
   // Ticket Comments
   TICKET_COMMENTS: (ticketId: string) => ['ticket-comments', ticketId] as const,
+  
+  // Admin Alerts
+  ADMIN_ALERTS: ['admin-alerts'] as const,
+  
+  // Dashboard Config
+  DASHBOARD_CONFIGS: ['dashboard-configs'] as const,
+  
+  // Knowledge Base
+  KB_ARTICLES: ['kb-articles'] as const,
+  KB_ARTICLES_FEATURED: ['kb-articles', 'featured'] as const,
+  KB_FAQS: ['kb-faqs'] as const,
+  KB_ARTICLE: (id: string) => ['kb-article', id] as const,
+  
+  // Maintenance Cost
+  MAINTENANCE_COST_ANALYSIS: ['maintenance-cost-analysis'] as const,
+  MAINTENANCE_TYPE_ANALYSIS: ['maintenance-type-analysis'] as const,
 } as const;
 
 // Query Config with default settings
