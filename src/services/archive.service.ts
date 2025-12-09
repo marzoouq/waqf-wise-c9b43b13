@@ -421,4 +421,94 @@ export class ArchiveService {
 
     if (error) throw error;
   }
+
+  /**
+   * جلب إصدارات المستند
+   */
+  static async getDocumentVersions(documentId: string) {
+    if (!documentId) return [];
+    
+    const { data, error } = await supabase
+      .from('document_versions')
+      .select('id, document_id, version_number, file_path, file_size, change_description, created_by, created_at, is_current, metadata')
+      .eq('document_id', documentId)
+      .order('version_number', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * إنشاء إصدار جديد
+   */
+  static async createDocumentVersion(data: {
+    documentId: string;
+    filePath: string;
+    fileSize?: number;
+    changeDescription?: string;
+  }) {
+    // إلغاء الإصدار الحالي
+    await supabase
+      .from('document_versions')
+      .update({ is_current: false })
+      .eq('document_id', data.documentId)
+      .eq('is_current', true);
+
+    // حساب رقم الإصدار الجديد
+    const { data: maxVersion } = await supabase
+      .from('document_versions')
+      .select('version_number')
+      .eq('document_id', data.documentId)
+      .order('version_number', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const newVersionNumber = (maxVersion?.version_number || 0) + 1;
+
+    // إنشاء الإصدار الجديد
+    const { data: result, error } = await supabase
+      .from('document_versions')
+      .insert({
+        document_id: data.documentId,
+        version_number: newVersionNumber,
+        file_path: data.filePath,
+        file_size: data.fileSize,
+        change_description: data.changeDescription || `الإصدار ${newVersionNumber}`,
+        is_current: true,
+      })
+      .select()
+      .maybeSingle();
+
+    if (error) throw error;
+    return result;
+  }
+
+  /**
+   * استعادة إصدار سابق
+   */
+  static async restoreDocumentVersion(versionId: string) {
+    // جلب الإصدار المطلوب
+    const { data: version, error: versionError } = await supabase
+      .from('document_versions')
+      .select('id, document_id, version_number, file_path')
+      .eq('id', versionId)
+      .maybeSingle();
+
+    if (versionError || !version) throw new Error('الإصدار غير موجود');
+
+    // تعيين هذا الإصدار كالإصدار الحالي
+    await supabase
+      .from('document_versions')
+      .update({ is_current: false })
+      .eq('document_id', version.document_id);
+
+    const { error: updateError } = await supabase
+      .from('document_versions')
+      .update({ is_current: true })
+      .eq('id', versionId);
+
+    if (updateError) throw updateError;
+
+    return version;
+  }
 }

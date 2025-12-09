@@ -236,4 +236,95 @@ export class SupportService {
     if (error) throw error;
     return data || [];
   }
+
+  /**
+   * جلب إحصائيات الدعم الفني
+   */
+  static async getOverviewStats() {
+    // عدد التذاكر حسب الحالة
+    const { data: allTickets } = await supabase
+      .from('support_tickets')
+      .select('status, category, priority');
+
+    const ticketsByStatus = allTickets?.reduce((acc: Record<string, number>, ticket) => {
+      acc[ticket.status] = (acc[ticket.status] || 0) + 1;
+      return acc;
+    }, {}) || {};
+
+    const ticketsByCategory = allTickets?.reduce((acc: Record<string, number>, ticket) => {
+      acc[ticket.category] = (acc[ticket.category] || 0) + 1;
+      return acc;
+    }, {}) || {};
+
+    const ticketsByPriority = allTickets?.reduce((acc: Record<string, number>, ticket) => {
+      acc[ticket.priority] = (acc[ticket.priority] || 0) + 1;
+      return acc;
+    }, {}) || {};
+
+    // معدل الرضا
+    const { data: ratings } = await supabase
+      .from('support_ticket_ratings')
+      .select('rating');
+
+    const avgSatisfaction = ratings && ratings.length > 0
+      ? ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length
+      : 0;
+
+    return {
+      ticketsByStatus,
+      ticketsByCategory,
+      ticketsByPriority,
+      avgSatisfaction,
+      totalRatings: ratings?.length || 0,
+    };
+  }
+
+  /**
+   * جلب التذاكر المتأخرة
+   */
+  static async getOverdueTickets() {
+    const { data, error } = await supabase
+      .from('support_tickets')
+      .select('id, ticket_number, subject, status, priority, category, is_overdue, sla_due_at, created_at')
+      .eq('is_overdue', true)
+      .order('sla_due_at', { ascending: true });
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * جلب التذاكر الحديثة
+   */
+  static async getRecentTickets(limit: number = 10) {
+    const { data, error } = await supabase
+      .from('support_tickets')
+      .select(`
+        *,
+        user:user_id(email),
+        beneficiary:beneficiary_id(full_name)
+      `)
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * جلب الإحصائيات التاريخية
+   */
+  static async getHistoricalStats(days: number = 30) {
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+
+    const { data, error } = await supabase
+      .from('support_statistics')
+      .select('id, date, total_tickets, new_tickets, resolved_tickets, closed_tickets, reopened_tickets, avg_first_response_minutes, avg_resolution_minutes, sla_compliance_rate, avg_rating, total_ratings, active_agents, total_responses, created_at')
+      .gte('date', startDate.toISOString().split('T')[0])
+      .order('date', { ascending: true });
+
+    if (error) throw error;
+    return data || [];
+  }
 }
