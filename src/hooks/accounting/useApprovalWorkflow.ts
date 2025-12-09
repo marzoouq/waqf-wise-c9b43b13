@@ -3,6 +3,7 @@
  */
 import { useQuery } from "@tanstack/react-query";
 import { AccountingService } from "@/services/accounting.service";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface ApprovalStep {
   level: number;
@@ -27,7 +28,7 @@ export interface ApprovalStatus {
 
 export function useApprovalWorkflow() {
   const { data: pendingApprovals, isLoading } = useQuery({
-    queryKey: ["pending-approvals"],
+    queryKey: QUERY_KEYS.PENDING_APPROVALS_ALT,
     queryFn: async () => {
       const data = await AccountingService.getApprovalWorkflowStatus();
       return data as ApprovalStatus[];

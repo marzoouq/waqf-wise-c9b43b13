@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { AccountingService } from "@/services/accounting.service";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface FinancialData {
   totalAssets: number;
@@ -13,7 +14,7 @@ export interface FinancialData {
 
 export function useFinancialData() {
   return useQuery({
-    queryKey: ["financial-data"],
+    queryKey: QUERY_KEYS.FINANCIAL_DATA,
     queryFn: () => AccountingService.getFinancialData(),
     ...QUERY_CONFIG.CHARTS,
   });

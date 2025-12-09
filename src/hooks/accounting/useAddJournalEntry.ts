@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { format } from "@/lib/date";
 import { UseFormReturn } from "react-hook-form";
 import { AccountingService } from "@/services/accounting.service";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface EntryLine {
   account_id: string;
@@ -30,12 +31,12 @@ export function useAddJournalEntry(form: UseFormReturn<JournalEntryFormData>, op
   ]);
 
   const { data: accounts } = useQuery({
-    queryKey: ["accounts"],
+    queryKey: QUERY_KEYS.ACCOUNTS,
     queryFn: () => AccountingService.getActiveLeafAccounts(),
   });
 
   const { data: fiscalYears } = useQuery({
-    queryKey: ["fiscal_years"],
+    queryKey: QUERY_KEYS.FISCAL_YEARS,
     queryFn: () => AccountingService.getActiveFiscalYears(),
   });
 
@@ -91,7 +92,7 @@ export function useAddJournalEntry(form: UseFormReturn<JournalEntryFormData>, op
       );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.JOURNAL_ENTRIES });
       toast.success("تم إضافة القيد بنجاح");
       form.reset();
       setLines([

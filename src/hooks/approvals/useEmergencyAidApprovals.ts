@@ -7,6 +7,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { invalidateLoanQueries } from '@/lib/query-invalidation';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface EmergencyRequest {
   id: string;
@@ -30,7 +31,7 @@ export function useEmergencyAidApprovals() {
 
   // جلب الطلبات المعلقة
   const { data: requests = [], isLoading, error } = useQuery({
-    queryKey: ['emergency-approvals'],
+    queryKey: QUERY_KEYS.EMERGENCY_APPROVALS,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('emergency_aid_requests')
