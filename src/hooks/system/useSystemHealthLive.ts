@@ -14,9 +14,14 @@ export interface SystemHealthStats {
   resolvedErrors: number;
   totalAlerts: number;
   activeAlerts: number;
+  criticalAlerts: number;
+  highAlerts: number;
   resolvedAlerts: number;
   resolutionRate: number;
   healthScore: number;
+  fixSuccessRate: number;
+  successfulFixes: number;
+  failedFixes: number;
 }
 
 export function useSystemHealthLive() {
@@ -51,6 +56,14 @@ export function useSystemHealthLive() {
       const criticalErrors = errors.filter(e => e.severity === "critical" && e.status === "new").length;
       const highErrors = errors.filter(e => e.severity === "high" && e.status === "new").length;
       const activeAlerts = alerts.filter(a => a.status === "active").length;
+      const criticalAlerts = alerts.filter(a => a.severity === "critical" && a.status === "active").length;
+      const highAlerts = alerts.filter(a => a.severity === "high" && a.status === "active").length;
+      
+      // Calculate fix success rate based on resolved errors
+      const totalResolvable = errors.filter(e => e.status !== "new").length;
+      const successfulFixes = resolvedCount;
+      const failedFixes = Math.max(0, totalResolvable - resolvedCount);
+      const fixSuccessRate = totalResolvable > 0 ? Math.round((successfulFixes / totalResolvable) * 100) : 100;
       
       const healthScore = Math.max(0, 100 - (criticalErrors * 20) - (highErrors * 10) - (activeAlerts * 5));
 
@@ -62,9 +75,14 @@ export function useSystemHealthLive() {
         resolvedErrors: resolvedCount,
         totalAlerts: alertsResult.count || 0,
         activeAlerts,
+        criticalAlerts,
+        highAlerts,
         resolvedAlerts,
         resolutionRate,
         healthScore,
+        fixSuccessRate,
+        successfulFixes,
+        failedFixes,
       };
     },
   });
