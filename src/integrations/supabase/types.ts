@@ -2946,41 +2946,53 @@ export type Database = {
       }
       disclosure_documents: {
         Row: {
+          content_summary: string | null
           created_at: string
           description: string | null
           disclosure_id: string
           document_name: string
           document_type: string
+          extracted_content: Json | null
           file_path: string
           file_size: number | null
           fiscal_year: number
           id: string
+          items_count: number | null
+          total_amount: number | null
           updated_at: string
           uploaded_by: string | null
         }
         Insert: {
+          content_summary?: string | null
           created_at?: string
           description?: string | null
           disclosure_id: string
           document_name: string
           document_type: string
+          extracted_content?: Json | null
           file_path: string
           file_size?: number | null
           fiscal_year: number
           id?: string
+          items_count?: number | null
+          total_amount?: number | null
           updated_at?: string
           uploaded_by?: string | null
         }
         Update: {
+          content_summary?: string | null
           created_at?: string
           description?: string | null
           disclosure_id?: string
           document_name?: string
           document_type?: string
+          extracted_content?: Json | null
           file_path?: string
           file_size?: number | null
           fiscal_year?: number
           id?: string
+          items_count?: number | null
+          total_amount?: number | null
           updated_at?: string
           uploaded_by?: string | null
         }
