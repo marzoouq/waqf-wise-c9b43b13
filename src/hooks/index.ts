@@ -102,3 +102,14 @@ export * from './transactions';
 
 // ==================== Developer ====================
 export * from './developer';
+
+// ==================== Loans ====================
+export * from './loans';
+
+// ==================== Nazer ====================
+export * from './nazer';
+
+// ==================== Permissions ====================
+export * from './permissions';
+
+// Note: approvals exports omitted to avoid conflicts with distributions/requests

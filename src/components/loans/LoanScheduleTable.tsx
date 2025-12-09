@@ -1,29 +1,15 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { UnifiedDataTable, type Column } from "@/components/unified/UnifiedDataTable";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/date";
 import { LoanSchedule } from "@/types/loans";
+import { useLoanSchedules } from "@/hooks/loans/useLoanSchedules";
 
 interface LoanScheduleTableProps {
   loanId: string;
 }
 
 export function LoanScheduleTable({ loanId }: LoanScheduleTableProps) {
-  const { data: schedules = [], isLoading } = useQuery({
-    queryKey: ["loan-schedules", loanId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("loan_schedules")
-        .select("*")
-        .eq("loan_id", loanId)
-        .order("installment_number");
-
-      if (error) throw error;
-      return data as LoanSchedule[];
-    },
-    enabled: !!loanId,
-  });
+  const { data: schedules = [], isLoading } = useLoanSchedules(loanId);
 
   const columns: Column<LoanSchedule>[] = [
     {

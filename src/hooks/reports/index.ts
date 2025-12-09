@@ -18,3 +18,4 @@ export { useMaintenanceCostReport, type MaintenanceCostData, type MaintenanceTyp
 export { useDistributionAnalysisReport, type DistributionTrendData, type StatusStatData } from './useDistributionAnalysisReport';
 export { useBudgetVarianceReport, type BudgetData, type BudgetSummary } from './useBudgetVarianceReport';
 export { useDetailedGeneralLedger, type LedgerEntry } from './useDetailedGeneralLedger';
+export { useCashFlowReport, type CashFlowData, type CashFlowStats } from './useCashFlowReport';

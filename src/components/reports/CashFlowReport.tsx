@@ -1,109 +1,19 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { TrendingUp, TrendingDown, DollarSign } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { ReportRefreshIndicator } from "./ReportRefreshIndicator";
-import { QUERY_CONFIG } from "@/lib/queryOptimization";
-import { useState, useEffect } from "react";
-
-interface CashFlowData {
-  month: string;
-  income: number;
-  expense: number;
-  net: number;
-}
+import { useCashFlowReport } from "@/hooks/reports/useCashFlowReport";
 
 export function CashFlowReport() {
-  const queryClient = useQueryClient();
-  const [lastUpdated, setLastUpdated] = useState<Date>();
-
-  const { data: cashFlowData = [], isLoading, isRefetching, dataUpdatedAt } = useQuery({
-    queryKey: ["cash-flow-report"],
-    ...QUERY_CONFIG.REPORTS,
-    queryFn: async () => {
-      // جلب البيانات من unified_transactions_view
-      const { data, error } = await supabase
-        .from("unified_transactions_view")
-        .select("transaction_date, amount, transaction_type")
-        .gte("transaction_date", new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString());
-
-      if (error) throw error;
-
-      // تجميع البيانات حسب الشهر
-      const monthlyData: Record<string, { income: number; expense: number }> = {};
-
-      data.forEach((transaction) => {
-        const month = new Date(transaction.transaction_date).toLocaleDateString("ar-SA", {
-          year: "numeric",
-          month: "short",
-        });
-
-        if (!monthlyData[month]) {
-          monthlyData[month] = { income: 0, expense: 0 };
-        }
-
-        if (transaction.transaction_type === "قبض") {
-          monthlyData[month].income += transaction.amount;
-        } else {
-          monthlyData[month].expense += transaction.amount;
-        }
-      });
-
-      // تحويل إلى مصفوفة
-      const chartData: CashFlowData[] = Object.entries(monthlyData).map(([month, data]) => ({
-        month,
-        income: data.income,
-        expense: data.expense,
-        net: data.income - data.expense,
-      }));
-
-      return chartData.sort((a, b) => {
-        const dateA = new Date(a.month);
-        const dateB = new Date(b.month);
-        return dateA.getTime() - dateB.getTime();
-      });
-    },
-  });
-
-  // تحديث وقت آخر تحديث
-  useEffect(() => {
-    if (dataUpdatedAt) {
-      setLastUpdated(new Date(dataUpdatedAt));
-    }
-  }, [dataUpdatedAt]);
-
-  // Real-time subscription
-  useEffect(() => {
-    const channel = supabase
-      .channel('cash-flow-report-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'payments' }, () => {
-        queryClient.invalidateQueries({ queryKey: ["cash-flow-report"] });
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'journal_entries' }, () => {
-        queryClient.invalidateQueries({ queryKey: ["cash-flow-report"] });
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
-
-  const handleRefresh = () => {
-    queryClient.invalidateQueries({ queryKey: ["cash-flow-report"] });
-  };
-
-  // حساب الإحصائيات
-  const stats = {
-    totalIncome: cashFlowData.reduce((sum, d) => sum + d.income, 0),
-    totalExpense: cashFlowData.reduce((sum, d) => sum + d.expense, 0),
-    netCashFlow: cashFlowData.reduce((sum, d) => sum + d.net, 0),
-    avgMonthlyIncome: cashFlowData.length > 0 
-      ? cashFlowData.reduce((sum, d) => sum + d.income, 0) / cashFlowData.length 
-      : 0,
-  };
+  const { 
+    data: cashFlowData = [], 
+    isLoading, 
+    isRefetching, 
+    stats, 
+    lastUpdated, 
+    handleRefresh 
+  } = useCashFlowReport();
 
   if (isLoading) {
     return <LoadingState />;
