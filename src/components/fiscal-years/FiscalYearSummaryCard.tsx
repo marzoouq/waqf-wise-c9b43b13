@@ -3,12 +3,11 @@
  * Fiscal Year Summary Card
  */
 
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TrendingUp, TrendingDown, Users, DollarSign, Receipt, Coins } from "lucide-react";
-import type { FiscalYearClosing, FiscalYearSummary } from "@/types/fiscal-year-closing";
+import type { FiscalYearClosing } from "@/types/fiscal-year-closing";
+import { useFiscalYearSummary } from "@/hooks/fiscal-years/useFiscalYearData";
 
 interface FiscalYearSummaryCardProps {
   fiscalYearId: string;
@@ -17,17 +16,7 @@ interface FiscalYearSummaryCardProps {
 
 export function FiscalYearSummaryCard({ fiscalYearId, closing }: FiscalYearSummaryCardProps) {
   // حساب الملخص إذا لم يكن هناك إقفال
-  const { data: summary, isLoading } = useQuery({
-    queryKey: ["fiscal-year-summary", fiscalYearId],
-    queryFn: async () => {
-      const { data, error } = await supabase.rpc("calculate_fiscal_year_summary", {
-        p_fiscal_year_id: fiscalYearId,
-      });
-      if (error) throw error;
-      return data as unknown as FiscalYearSummary;
-    },
-    enabled: !closing, // فقط إذا لم يكن هناك إقفال
-  });
+  const { data: summary, isLoading } = useFiscalYearSummary(fiscalYearId, !!closing);
 
   if (isLoading) {
     return (

@@ -2,11 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, CheckCircle, XCircle, RefreshCw, Trash2, Filter } from "lucide-react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { format, arLocale as ar } from "@/lib/date";
 import { useState } from "react";
-import { toast } from "sonner";
 import {
   Select,
   SelectContent,
@@ -14,73 +11,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { 
+  useSystemErrors, 
+  useDeleteResolvedErrors, 
+  useUpdateErrorStatus, 
+  useDeleteAllErrors 
+} from "@/hooks/developer/useSystemErrors";
 
 export function ErrorsPanel() {
-  const queryClient = useQueryClient();
   const [severityFilter, setSeverityFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
-  const { data: errors, refetch } = useQuery({
-    queryKey: ["system-errors", severityFilter, statusFilter],
-    queryFn: async () => {
-      let query = supabase
-        .from("system_error_logs")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(50);
-      
-      if (severityFilter !== "all") {
-        query = query.eq("severity", severityFilter);
-      }
-      
-      if (statusFilter !== "all") {
-        query = query.eq("status", statusFilter);
-      }
-      
-      const { data, error } = await query;
-      
-      if (error) throw error;
-      return data;
-    }
-  });
-
-  // حذف الأخطاء المحلولة
-  const deleteResolvedErrors = useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase
-        .from("system_error_logs")
-        .delete()
-        .eq("status", "resolved");
-      
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("تم حذف الأخطاء المحلولة");
-      queryClient.invalidateQueries({ queryKey: ["system-errors"] });
-    },
-    onError: () => {
-      toast.error("فشل حذف الأخطاء");
-    }
-  });
-
-  // تحديث حالة خطأ
-  const updateErrorStatus = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      const { error } = await supabase
-        .from("system_error_logs")
-        .update({ status })
-        .eq("id", id);
-      
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("تم تحديث الحالة");
-      queryClient.invalidateQueries({ queryKey: ["system-errors"] });
-    },
-    onError: () => {
-      toast.error("فشل تحديث الحالة");
-    }
-  });
+  const { data: errors, refetch } = useSystemErrors(severityFilter, statusFilter);
+  const deleteResolvedErrors = useDeleteResolvedErrors();
+  const updateErrorStatus = useUpdateErrorStatus();
+  const deleteAllErrors = useDeleteAllErrors();
 
   const getSeverityBadge = (severity: string) => {
     switch (severity?.toLowerCase()) {
@@ -184,21 +129,12 @@ export function ErrorsPanel() {
             <Button
               variant="destructive"
               size="sm"
-              onClick={async () => {
+              onClick={() => {
                 if (confirm("هل أنت متأكد من حذف جميع الأخطاء؟")) {
-                  const { error } = await supabase
-                    .from("system_error_logs")
-                    .delete()
-                    .neq("id", "00000000-0000-0000-0000-000000000000");
-                  
-                  if (!error) {
-                    toast.success("تم حذف جميع الأخطاء");
-                    queryClient.invalidateQueries({ queryKey: ["system-errors"] });
-                  } else {
-                    toast.error("فشل حذف الأخطاء");
-                  }
+                  deleteAllErrors.mutate();
                 }
               }}
+              disabled={deleteAllErrors.isPending}
             >
               <Trash2 className="w-4 h-4 ml-2" />
               حذف الكل

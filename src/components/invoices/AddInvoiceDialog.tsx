@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -22,6 +22,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { commonValidation } from "@/lib/validationSchemas";
 import { InvoiceOCRUpload } from "./InvoiceOCRUpload";
 import { ExtractedInvoiceData } from "@/hooks/useInvoiceOCR";
+import { useRevenueAccounts, useNextInvoiceNumber } from "@/hooks/invoices/useInvoiceFormData";
 
 const invoiceSchema = z.object({
   invoice_date: commonValidation.dateString("تاريخ الفاتورة غير صحيح"),
@@ -90,42 +91,8 @@ export const AddInvoiceDialog = ({ open, onOpenChange, isEdit = false, invoiceTo
     },
   });
 
-  const { data: accounts } = useQuery({
-    queryKey: ["revenue-accounts"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("accounts")
-        .select("*")
-        .eq("account_type", "revenue")
-        .eq("is_active", true)
-        .eq("is_header", false)
-        .order("code");
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const { data: nextInvoiceNumber } = useQuery({
-    queryKey: ["next-invoice-number"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("invoices")
-        .select("invoice_number")
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      
-      if (error) throw error;
-      
-      if (!data) {
-        return `INV-${format(new Date(), "yyyy")}-001`;
-      }
-      
-      const lastNumber = parseInt(data.invoice_number.split("-")[2]);
-      const newNumber = (lastNumber + 1).toString().padStart(3, "0");
-      return `INV-${format(new Date(), "yyyy")}-${newNumber}`;
-    },
-  });
+  const { data: accounts } = useRevenueAccounts();
+  const { data: nextInvoiceNumber } = useNextInvoiceNumber();
 
   const addLine = () => {
     if (!newLine.account_id || !newLine.description || !newLine.quantity || !newLine.unit_price) {

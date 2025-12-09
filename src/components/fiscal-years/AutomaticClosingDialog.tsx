@@ -4,7 +4,6 @@
  */
 
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import {
   Dialog,
   DialogContent,
@@ -18,9 +17,9 @@ import { Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { FiscalYear } from "@/hooks/useFiscalYears";
-import type { ClosingPreview } from "@/types/fiscal-year-closing";
 import { FiscalYearClosingStats } from "./FiscalYearClosingStats";
 import { formatCurrency } from "@/lib/utils";
+import { useClosingPreview } from "@/hooks/fiscal-years/useFiscalYearData";
 
 interface AutomaticClosingDialogProps {
   open: boolean;
@@ -36,18 +35,7 @@ export function AutomaticClosingDialog({
   const [confirming, setConfirming] = useState(false);
 
   // الحصول على معاينة الإقفال التلقائي
-  const { data: preview, isLoading } = useQuery({
-    queryKey: ["closing-preview", fiscalYear.id],
-    queryFn: async () => {
-      const { data, error } = await supabase.functions.invoke("auto-close-fiscal-year", {
-        body: { fiscal_year_id: fiscalYear.id, preview_only: true }
-      });
-      
-      if (error) throw error;
-      return data as ClosingPreview;
-    },
-    enabled: open,
-  });
+  const { data: preview, isLoading } = useClosingPreview(fiscalYear.id, open);
 
   const handleConfirm = async () => {
     setConfirming(true);
