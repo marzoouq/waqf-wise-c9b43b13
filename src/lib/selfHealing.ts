@@ -412,9 +412,9 @@ export class HealthMonitor {
           metadata: { checks, failedChecks },
         })
         .select()
-        .single();
+        .maybeSingle();
 
-      if (error) {
+      if (error || !alert) {
         productionLogger.error('Failed to create health alert:', error);
         return;
       }

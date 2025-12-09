@@ -56,9 +56,10 @@ export function useCreateScheduledReport() {
           next_run_at: nextRun,
         })
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('فشل جدولة التقرير');
       return data;
     },
     onSuccess: () => {
@@ -81,9 +82,10 @@ export function useUpdateScheduledReport() {
         .update(report)
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('الجدولة غير موجودة');
       return data;
     },
     onSuccess: () => {

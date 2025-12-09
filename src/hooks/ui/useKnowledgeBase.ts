@@ -80,7 +80,7 @@ export function useKnowledgeBase() {
         .from(table)
         .select('views_count')
         .eq('id', id)
-        .single();
+        .maybeSingle();
 
       const { error } = await supabase
         .from(table)
@@ -107,7 +107,7 @@ export function useKnowledgeBase() {
         .from('kb_articles')
         .select(column)
         .eq('id', id)
-        .single();
+        .maybeSingle();
 
       const { error } = await supabase
         .from('kb_articles')
@@ -147,9 +147,10 @@ export function useArticle(id: string) {
         .from('kb_articles')
         .select('id, title, content, summary, slug, category, tags, status, is_featured, sort_order, views_count, helpful_count, not_helpful_count, author_id, created_at, updated_at, published_at, metadata')
         .eq('id', id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('المقالة غير موجودة');
 
       // زيادة عدد المشاهدات
       await supabase

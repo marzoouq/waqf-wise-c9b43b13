@@ -46,16 +46,17 @@ export function useSavedFilters(filterType: string) {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
 
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('saved_filters')
         .insert({
           user_id: user.id,
           ...filterData,
         })
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('فشل حفظ الفلتر');
       toast.success('تم الحفظ', { description: 'تم حفظ الفلتر بنجاح' });
     },
     onSuccess: () => {

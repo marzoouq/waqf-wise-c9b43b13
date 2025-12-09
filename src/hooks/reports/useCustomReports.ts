@@ -132,9 +132,10 @@ export function useCustomReports() {
           created_by: user?.id,
         })
         .select()
-        .single();
+        .maybeSingle();
       
       if (error) throw error;
+      if (!data) throw new Error('فشل إنشاء القالب');
       return data;
     },
     onSuccess: () => {
@@ -161,9 +162,10 @@ export function useCustomReports() {
         .update(updates)
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
       
       if (error) throw error;
+      if (!data) throw new Error('القالب غير موجود');
       return data;
     },
     onSuccess: () => {

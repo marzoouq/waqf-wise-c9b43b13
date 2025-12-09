@@ -52,9 +52,10 @@ export function useAddTicketRating() {
           rated_by: user?.id,
         })
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('فشل إضافة التقييم');
       return data;
     },
     onSuccess: (_, variables) => {
