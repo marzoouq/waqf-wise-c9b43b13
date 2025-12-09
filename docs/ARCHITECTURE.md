@@ -35,7 +35,9 @@ src/
 │   ├── accounting.service.ts
 │   ├── beneficiary.service.ts
 │   ├── distribution.service.ts
-│   └── ...              # 23 service
+│   ├── dashboard.service.ts
+│   ├── reports.service.ts
+│   └── ...              # 42 service
 │
 ├── types/               # TypeScript Types
 ├── lib/                 # Utilities & Helpers
@@ -79,31 +81,50 @@ import { BeneficiaryService } from '@/services';
 const beneficiaries = await BeneficiaryService.getAll();
 ```
 
-**Services المتوفرة (23 service):**
+**Services المتوفرة (42 service):**
 
 | Service | الوظيفة |
 |---------|---------|
 | AccountingService | المحاسبة والقيود |
 | ApprovalService | الموافقات |
 | ArchiveService | الأرشفة |
+| AuditService | سجل العمليات |
 | AuthService | المصادقة والمستخدمين |
+| BankReconciliationService | التسوية البنكية |
 | BeneficiaryService | المستفيدين |
+| ChatbotService | الدردشة الآلية |
 | ContractService | العقود |
-| DashboardService | لوحات التحكم |
+| DashboardService | لوحات التحكم و KPIs |
 | DistributionService | التوزيعات |
+| DocumentationService | التوثيق |
 | EdgeFunctionService | Edge Functions |
 | FiscalYearService | السنوات المالية |
 | FundService | الصناديق |
+| GovernanceService | الحوكمة |
+| IntegrationService | التكاملات |
 | InvoiceService | الفواتير |
-| LoansService | القروض |
+| KnowledgeService | قاعدة المعرفة |
+| LoansService | القروض والأقساط |
 | MaintenanceService | الصيانة |
+| MessageService | الرسائل الداخلية |
+| MonitoringService | المراقبة |
 | NotificationService | الإشعارات |
-| PropertyService | العقارات |
+| NotificationSettingsService | إعدادات الإشعارات |
+| PaymentService | المدفوعات |
+| POSService | نقاط البيع |
+| PropertyService | العقارات والوحدات |
 | RealtimeService | Realtime subscriptions |
-| ReportService | التقارير |
+| ReportsService | التقارير المتقدمة |
+| ReportService | إنشاء التقارير |
 | RequestService | الطلبات |
+| SecurityService | الأمان والصلاحيات |
+| SettingsService | الإعدادات |
 | StorageService | التخزين |
+| SystemService | النظام والمراقبة |
 | TenantService | المستأجرين |
+| TribeService | القبائل |
+| UIService | واجهة المستخدم |
+| UserService | المستخدمين |
 | VoucherService | السندات |
 
 ### 4. طبقة البيانات (Data Layer)
@@ -248,5 +269,5 @@ const QUERY_CONFIG = {
 
 ---
 
-**الإصدار**: 2.7.0  
-**آخر تحديث**: 2025-12-08
+**الإصدار**: 2.8.45  
+**آخر تحديث**: 2025-12-09
