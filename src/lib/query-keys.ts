@@ -280,6 +280,9 @@ export const QUERY_KEYS = {
   // Dashboard Charts
   BUDGET_COMPARISON_CHART: ['budget-comparison-chart'] as const,
   REVENUE_EXPENSE_CHART: ['revenue-expense-chart'] as const,
+  
+  // Search History
+  SEARCH_HISTORY: (searchType?: string) => ['search-history', searchType] as const,
 } as const;
 
 // Query Config with default settings

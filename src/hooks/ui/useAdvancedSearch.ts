@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { SearchService } from '@/services/search.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 interface SearchFilters {
   [key: string]: string | number | boolean | null | undefined | { gte: string; lte: string } | string[];
@@ -25,18 +26,8 @@ export function useAdvancedSearch(searchType: string) {
 
   // جلب سجل البحث
   const { data: history = [] } = useQuery({
-    queryKey: ['search-history', searchType],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('search_history')
-        .select('id, search_query, search_type, filters, results_count, created_at')
-        .eq('search_type', searchType)
-        .order('created_at', { ascending: false })
-        .limit(10);
-      
-      if (error) throw error;
-      return data as SearchHistoryItem[];
-    },
+    queryKey: QUERY_KEYS.SEARCH_HISTORY(searchType),
+    queryFn: () => SearchService.getSearchHistory(searchType),
   });
 
   // حفظ عملية بحث
@@ -46,22 +37,10 @@ export function useAdvancedSearch(searchType: string) {
       filters: SearchFilters; 
       resultsCount: number;
     }) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      const { error } = await supabase
-        .from('search_history')
-        .insert({
-          user_id: user?.id,
-          search_query: query,
-          search_type: searchType,
-          filters,
-          results_count: resultsCount,
-        });
-      
-      if (error) throw error;
+      await SearchService.saveSearchHistory(searchType, query, filters, resultsCount);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['search-history', searchType] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.SEARCH_HISTORY(searchType) });
     },
   });
 
@@ -75,42 +54,16 @@ export function useAdvancedSearch(searchType: string) {
   ): Promise<unknown[]> => {
     const searchFilters = customFilters || filters;
     
-    // بناء الاستعلام - استخدام any لتجنب مشاكل TypeScript مع الأسماء الديناميكية
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let dbQuery: any = supabase.from(tableName as any).select(columns);
-
-    // تطبيق البحث النصي
-    if (query) {
-      const searchColumns = ['full_name', 'national_id', 'phone', 'email', 'notes'];
-      const orConditions = searchColumns.map(col => `${col}.ilike.%${query}%`).join(',');
-      dbQuery = dbQuery.or(orConditions);
-    }
-
-    // تطبيق الفلاتر
-    Object.entries(searchFilters).forEach(([key, value]) => {
-      if (value !== null && value !== undefined && value !== '') {
-        if (Array.isArray(value)) {
-          dbQuery = dbQuery.in(key, value);
-        } else if (typeof value === 'object' && value && 'gte' in value && 'lte' in value) {
-          dbQuery = dbQuery.gte(key, value.gte as string).lte(key, value.lte as string);
-        } else {
-          dbQuery = dbQuery.eq(key, value as string);
-        }
-      }
-    });
-
-    const { data, error } = await dbQuery;
-
-    if (error) throw error;
+    const data = await SearchService.advancedSearch(tableName, columns, query, searchFilters);
 
     // حفظ في السجل
     await saveSearch.mutateAsync({
       query,
       filters: searchFilters,
-      resultsCount: data?.length || 0,
+      resultsCount: data.length,
     });
 
-    return data || [];
+    return data;
   };
 
   /**

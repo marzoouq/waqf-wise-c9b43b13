@@ -59,3 +59,5 @@ export { DocumentationService, type ProjectPhase as DocProjectPhase, type Change
 export { StorageService } from './storage.service';
 export { EdgeFunctionService } from './edge-function.service';
 export { RealtimeService } from './realtime.service';
+export { DiagnosticsService } from './diagnostics.service';
+export { SearchService } from './search.service';
