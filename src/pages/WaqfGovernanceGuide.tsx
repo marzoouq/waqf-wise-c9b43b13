@@ -1,6 +1,6 @@
 /**
  * صفحة الدليل الإرشادي والحوكمة
- * اللائحة التنفيذية لوقف مرزوق على الثبيتي
+ * اللائحة التنفيذية لوقف مرزوق علي الثبيتي
  */
 
 import { useState } from "react";
@@ -39,7 +39,7 @@ const WaqfGovernanceGuide = () => {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <MobileOptimizedHeader
           title="الدليل الإرشادي والحوكمة"
-          description="اللائحة التنفيذية لوقف مرزوق على الثبيتي"
+          description="اللائحة التنفيذية لوقف مرزوق علي الثبيتي"
           icon={
             <div className="p-3 rounded-xl bg-gradient-to-br from-red-600 to-red-700 shadow-xl shadow-red-500/40 ring-2 ring-red-500/20">
               <ScrollText className="h-7 w-7 text-white" />
@@ -73,7 +73,7 @@ const WaqfGovernanceGuide = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="space-y-1">
               <p className="text-xs text-muted-foreground">اسم الوقف</p>
-              <p className="font-semibold text-foreground">وقف مرزوق على الثبيتي</p>
+              <p className="font-semibold text-foreground">وقف مرزوق علي الثبيتي</p>
             </div>
             <div className="space-y-1 flex items-center gap-2">
               <Calendar className="h-4 w-4 text-muted-foreground" />

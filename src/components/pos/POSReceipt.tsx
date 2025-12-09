@@ -27,7 +27,7 @@ export const POSReceipt = forwardRef<HTMLDivElement, POSReceiptProps>(
       >
         {/* Header */}
         <div className="text-center mb-4">
-          <h2 className="text-lg font-bold">وقف مرزوق الثبيتي</h2>
+          <h2 className="text-lg font-bold">وقف مرزوق علي الثبيتي</h2>
           <p className="text-muted-foreground text-xs">إيصال {transaction.transaction_type}</p>
         </div>
 
