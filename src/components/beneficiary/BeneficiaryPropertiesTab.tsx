@@ -64,8 +64,17 @@ export function BeneficiaryPropertiesTab() {
             <Home className="h-4 w-4 text-success" />
           </CardHeader>
           <CardContent>
-            <div className="text-xl sm:text-2xl font-bold">{contracts.length}</div>
-            <p className="text-xs text-muted-foreground mt-1">عقود نشطة</p>
+            {isCurrentYearPublished ? (
+              <>
+                <div className="text-xl sm:text-2xl font-bold">{contracts.length}</div>
+                <p className="text-xs text-muted-foreground mt-1">عقود نشطة</p>
+              </>
+            ) : (
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <EyeOff className="h-4 w-4" />
+                <span className="text-sm">ستظهر عند النشر</span>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -75,7 +84,12 @@ export function BeneficiaryPropertiesTab() {
             <Calendar className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            {settings?.show_property_revenues ? (
+            {!isCurrentYearPublished ? (
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <EyeOff className="h-4 w-4" />
+                <span className="text-sm">ستظهر عند النشر</span>
+              </div>
+            ) : settings?.show_property_revenues ? (
               <>
                 <div className="text-xl sm:text-2xl font-bold">
                   <MaskedValue
