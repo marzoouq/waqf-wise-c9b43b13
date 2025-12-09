@@ -3,9 +3,9 @@
  * @version 2.8.30
  * تغطية 100% - جميع عمليات Supabase تمر عبر الخدمات
  * 
- * الخدمات: 41 خدمة متكاملة
+ * الخدمات: 42 خدمة متكاملة
  * - Core Services: 4
- * - Domain Services: 34
+ * - Domain Services: 35
  * - Infrastructure Services: 3
  * 
  * ملاحظة: 7 hooks تستخدم Realtime مباشرة (مقبول معماريًا)
@@ -17,7 +17,7 @@ export { RequestService } from './request.service';
 export { VoucherService } from './voucher.service';
 export { ReportService } from './report.service';
 
-// Domain Services (34)
+// Domain Services (35)
 export { BeneficiaryService, type BeneficiaryFilters, type BeneficiaryStats } from './beneficiary.service';
 export { PropertyService, type PropertyStats, type PropertyFilters } from './property.service';
 export { DistributionService, type DistributionSummary } from './distribution.service';
@@ -34,6 +34,7 @@ export { TenantService } from './tenant.service';
 export { MaintenanceService, type ProviderRating } from './maintenance.service';
 export { FundService } from './fund.service';
 export { PaymentService, type PaymentFilters } from './payment.service';
+export { RentalPaymentService, type RentalPayment, type RentalPaymentFilters } from './rental-payment.service';
 export { TribeService } from './tribe.service';
 export { UserService, type UserStats } from './user.service';
 export { ChatbotService, type ChatMessage, type QuickReply } from './chatbot.service';
