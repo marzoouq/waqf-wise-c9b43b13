@@ -130,8 +130,8 @@ const menuGroups = [
     icon: Archive,
     roles: ["admin", "accountant", "nazer", "archivist", "beneficiary", "waqf_heir"],
     subItems: [
-      { icon: Archive, label: "الأرشيف", path: "/archive", roles: ["admin", "archivist", "nazer"] },
-      { icon: Vote, label: "الحوكمة والقرارات", path: "/governance/decisions", roles: ["admin", "nazer"] },
+      { icon: Archive, label: "الأرشيف", path: "/archive", roles: ["admin", "archivist", "nazer", "waqf_heir"] },
+      { icon: Vote, label: "الحوكمة والقرارات", path: "/governance/decisions", roles: ["admin", "nazer", "waqf_heir"] },
       { icon: ScrollText, label: "الدليل الإرشادي", path: "/governance/guide", roles: ["all"] },
     ]
   },
