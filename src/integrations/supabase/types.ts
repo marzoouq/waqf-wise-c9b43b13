@@ -1894,7 +1894,9 @@ export type Database = {
       }
       beneficiary_visibility_settings: {
         Row: {
+          allow_download_documents: boolean | null
           allow_export_pdf: boolean | null
+          allow_preview_documents: boolean | null
           allow_print: boolean | null
           created_at: string | null
           id: string
@@ -1907,6 +1909,10 @@ export type Database = {
           notes: string | null
           show_annual_budget: boolean | null
           show_approvals_log: boolean | null
+          show_archive_contracts: boolean | null
+          show_archive_financial_reports: boolean | null
+          show_archive_legal_docs: boolean | null
+          show_archive_meeting_minutes: boolean | null
           show_audit_reports: boolean | null
           show_bank_accounts: boolean | null
           show_bank_balances: boolean | null
@@ -1958,7 +1964,9 @@ export type Database = {
           updated_by: string | null
         }
         Insert: {
+          allow_download_documents?: boolean | null
           allow_export_pdf?: boolean | null
+          allow_preview_documents?: boolean | null
           allow_print?: boolean | null
           created_at?: string | null
           id?: string
@@ -1971,6 +1979,10 @@ export type Database = {
           notes?: string | null
           show_annual_budget?: boolean | null
           show_approvals_log?: boolean | null
+          show_archive_contracts?: boolean | null
+          show_archive_financial_reports?: boolean | null
+          show_archive_legal_docs?: boolean | null
+          show_archive_meeting_minutes?: boolean | null
           show_audit_reports?: boolean | null
           show_bank_accounts?: boolean | null
           show_bank_balances?: boolean | null
@@ -2022,7 +2034,9 @@ export type Database = {
           updated_by?: string | null
         }
         Update: {
+          allow_download_documents?: boolean | null
           allow_export_pdf?: boolean | null
+          allow_preview_documents?: boolean | null
           allow_print?: boolean | null
           created_at?: string | null
           id?: string
@@ -2035,6 +2049,10 @@ export type Database = {
           notes?: string | null
           show_annual_budget?: boolean | null
           show_approvals_log?: boolean | null
+          show_archive_contracts?: boolean | null
+          show_archive_financial_reports?: boolean | null
+          show_archive_legal_docs?: boolean | null
+          show_archive_meeting_minutes?: boolean | null
           show_audit_reports?: boolean | null
           show_bank_accounts?: boolean | null
           show_bank_balances?: boolean | null
@@ -12050,7 +12068,9 @@ export type Database = {
       get_beneficiary_visibility_settings: {
         Args: never
         Returns: {
+          allow_download_documents: boolean | null
           allow_export_pdf: boolean | null
+          allow_preview_documents: boolean | null
           allow_print: boolean | null
           created_at: string | null
           id: string
@@ -12063,6 +12083,10 @@ export type Database = {
           notes: string | null
           show_annual_budget: boolean | null
           show_approvals_log: boolean | null
+          show_archive_contracts: boolean | null
+          show_archive_financial_reports: boolean | null
+          show_archive_legal_docs: boolean | null
+          show_archive_meeting_minutes: boolean | null
           show_audit_reports: boolean | null
           show_bank_accounts: boolean | null
           show_bank_balances: boolean | null

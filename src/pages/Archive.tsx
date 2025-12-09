@@ -5,7 +5,7 @@
 import { useState, useMemo } from "react";
 import { Database } from "@/integrations/supabase/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FolderOpen, FileText, Search, Upload } from "lucide-react";
+import { FolderOpen, FileText, Search, Upload, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { LoadingState } from "@/components/shared/LoadingState";
@@ -15,6 +15,8 @@ import { useFolders } from "@/hooks/useFolders";
 import { useArchiveStats } from "@/hooks/useArchiveStats";
 import { useDocumentUpload } from "@/hooks/useDocumentUpload";
 import { useAuth } from "@/hooks/useAuth";
+import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   ArchiveStatsCards,
   ArchiveFoldersTab,
@@ -25,11 +27,31 @@ import {
 
 type Document = Database['public']['Tables']['documents']['Row'];
 
+// ربط أسماء المجلدات بإعدادات الشفافية
+const FOLDER_VISIBILITY_MAP: Record<string, string> = {
+  'العقود': 'show_archive_contracts',
+  'المستندات القانونية': 'show_archive_legal_docs',
+  'التقارير المالية': 'show_archive_financial_reports',
+  'محاضر الاجتماعات': 'show_archive_meeting_minutes',
+};
+
 const Archive = () => {
   const { roles } = useAuth();
+  const { settings } = useVisibilitySettings();
+  
+  // تحديد إذا كان المستخدم وريث أو مستفيد (يحتاج تطبيق إعدادات الشفافية)
+  const isHeirOrBeneficiary = roles.includes('waqf_heir') || roles.includes('beneficiary');
+  const isStaff = roles.includes('admin') || roles.includes('nazer') || roles.includes('archivist') || roles.includes('accountant');
   
   // فقط admin و nazer و archivist يمكنهم إنشاء/رفع/حذف
   const canManageArchive = roles.includes('admin') || roles.includes('nazer') || roles.includes('archivist');
+  
+  // التحقق من إمكانية رؤية الأرشيف بالكامل
+  const canViewArchive = isStaff || (settings?.show_documents !== false);
+  
+  // صلاحيات التحميل والمعاينة
+  const canDownload = isStaff || (settings?.allow_download_documents !== false);
+  const canPreview = isStaff || (settings?.allow_preview_documents !== false);
 
   // Dialog States
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
@@ -45,15 +67,36 @@ const Archive = () => {
 
   // Data Hooks
   const { documents, isLoading: documentsLoading } = useDocuments();
-  const { folders, isLoading: foldersLoading, addFolder } = useFolders();
+  const { folders: allFolders, isLoading: foldersLoading, addFolder } = useFolders();
   const { stats, isLoading: statsLoading } = useArchiveStats();
   const { deleteDocumentWithFile } = useDocumentUpload();
 
   const isLoading = documentsLoading || foldersLoading || statsLoading;
 
+  // فلترة المجلدات حسب إعدادات الشفافية للورثة والمستفيدين
+  const folders = useMemo(() => {
+    if (!allFolders) return [];
+    if (isStaff) return allFolders; // الموظفين يرون كل المجلدات
+    
+    return allFolders.filter(folder => {
+      const settingKey = FOLDER_VISIBILITY_MAP[folder.name];
+      if (!settingKey) return true; // مجلدات غير معرّفة تظهر افتراضياً
+      return settings?.[settingKey as keyof typeof settings] !== false;
+    });
+  }, [allFolders, settings, isStaff]);
+
   // Filtered Documents
   const filteredDocuments = useMemo(() => {
     let filtered = documents;
+    
+    // فلترة المستندات حسب المجلدات المسموح بها
+    if (isHeirOrBeneficiary && !isStaff) {
+      const allowedFolderIds = folders.map(f => f.id);
+      filtered = filtered.filter(doc => 
+        !doc.folder_id || allowedFolderIds.includes(doc.folder_id)
+      );
+    }
+    
     if (selectedFolderId) {
       filtered = filtered.filter(doc => doc.folder_id === selectedFolderId);
     }
@@ -67,7 +110,7 @@ const Archive = () => {
       );
     }
     return filtered;
-  }, [documents, searchQuery, selectedFolderId]);
+  }, [documents, searchQuery, selectedFolderId, folders, isHeirOrBeneficiary, isStaff]);
 
   const selectedFolder = folders?.find(f => f.id === selectedFolderId);
 
@@ -78,6 +121,7 @@ const Archive = () => {
   };
 
   const handlePreviewDocument = (doc: Document) => {
+    if (!canPreview) return;
     setSelectedDocument({ ...doc, file_path: doc.file_path || `/documents/${doc.id}` });
     setPreviewDialogOpen(true);
   };
@@ -100,11 +144,33 @@ const Archive = () => {
   };
 
   const handleDownloadDocument = (doc: Document) => {
+    if (!canDownload) return;
     if (doc.file_path) window.open(doc.file_path, '_blank');
   };
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل الأرشيف..." />;
+  }
+
+  // إذا كان المستفيد/الوريث ممنوع من رؤية الأرشيف
+  if (!canViewArchive) {
+    return (
+      <PageErrorBoundary pageName="الأرشيف">
+        <MobileOptimizedLayout>
+          <MobileOptimizedHeader
+            title="الأرشيف الإلكتروني"
+            description="إدارة وأرشفة المستندات والملفات"
+            icon={<FolderOpen className="h-8 w-8 text-primary" />}
+          />
+          <Alert className="mt-6">
+            <Lock className="h-4 w-4" />
+            <AlertDescription>
+              الأرشيف غير متاح حالياً. تواصل مع الناظر لمزيد من المعلومات.
+            </AlertDescription>
+          </Alert>
+        </MobileOptimizedLayout>
+      </PageErrorBoundary>
+    );
   }
 
   return (
@@ -154,8 +220,8 @@ const Archive = () => {
                 onSelectFolder={setSelectedFolderId}
                 onCreateFolder={canManageArchive ? () => setFolderDialogOpen(true) : undefined}
                 onUploadDocument={canManageArchive ? () => setUploadDialogOpen(true) : undefined}
-                onPreviewDocument={handlePreviewDocument}
-                onDownloadDocument={handleDownloadDocument}
+                onPreviewDocument={canPreview ? handlePreviewDocument : undefined}
+                onDownloadDocument={canDownload ? handleDownloadDocument : undefined}
                 onDeleteDocument={canManageArchive ? handleDeleteClick : undefined}
               />
             </TabsContent>
@@ -169,7 +235,7 @@ const Archive = () => {
                 onSearchChange={setSearchQuery}
                 onUploadDocument={canManageArchive ? () => setUploadDialogOpen(true) : undefined}
                 onCreateFolder={canManageArchive ? () => setFolderDialogOpen(true) : undefined}
-                onPreviewDocument={handlePreviewDocument}
+                onPreviewDocument={canPreview ? handlePreviewDocument : undefined}
                 onDeleteDocument={canManageArchive ? handleDeleteClick : undefined}
               />
             </TabsContent>
@@ -197,7 +263,7 @@ const Archive = () => {
           )}
           
           {/* Dialog للمعاينة فقط للمستخدمين بدون صلاحية الإدارة */}
-          {!canManageArchive && previewDialogOpen && selectedDocument && (
+          {!canManageArchive && canPreview && previewDialogOpen && selectedDocument && (
             <ArchiveDialogs
               uploadDialogOpen={false}
               setUploadDialogOpen={() => {}}

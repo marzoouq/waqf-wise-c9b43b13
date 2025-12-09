@@ -14,7 +14,7 @@ import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings"
 import { 
   Eye, EyeOff, Users, FileText, Wallet, Building2, 
   Shield, Settings, Save, Loader2, 
-  DollarSign, FileBarChart, MessageSquare, Scale
+  DollarSign, FileBarChart, MessageSquare, Scale, FolderArchive
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -154,6 +154,19 @@ const settingCategories: SettingCategory[] = [
     settings: [
       { key: "allow_export_pdf", label: "السماح بتصدير PDF" },
       { key: "allow_print", label: "السماح بالطباعة" },
+    ],
+  },
+  {
+    title: "الأرشيف والمستندات",
+    icon: FolderArchive,
+    color: "text-teal-600",
+    settings: [
+      { key: "show_archive_contracts", label: "مجلد العقود" },
+      { key: "show_archive_legal_docs", label: "مجلد الوثائق القانونية" },
+      { key: "show_archive_financial_reports", label: "مجلد التقارير المالية" },
+      { key: "show_archive_meeting_minutes", label: "مجلد محاضر الاجتماعات" },
+      { key: "allow_download_documents", label: "السماح بتحميل المستندات" },
+      { key: "allow_preview_documents", label: "السماح بمعاينة المستندات" },
     ],
   },
 ];
