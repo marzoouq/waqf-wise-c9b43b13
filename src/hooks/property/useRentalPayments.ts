@@ -18,6 +18,7 @@ import { logger } from "@/lib/logger";
 import { RentalPaymentService, type RentalPayment } from "@/services/rental-payment.service";
 import { useRentalPaymentArchiving } from "./useRentalPaymentArchiving";
 import { filterRelevantPayments } from "@/lib/rental-payment-filters";
+import { QUERY_KEYS, QUERY_CONFIG } from "@/lib/query-keys";
 import type { RentalPaymentInsert } from "@/types/payments";
 
 // Re-export RentalPayment type for backward compatibility
@@ -26,12 +27,11 @@ export type { RentalPayment } from "@/services/rental-payment.service";
 // Re-export filter function for backward compatibility
 export { filterRelevantPayments } from "@/lib/rental-payment-filters";
 
-const QUERY_KEY = ["rental_payments"];
 const RELATED_QUERY_KEYS = [
-  "rental_payments",
-  "rental-payments-collected",
-  "rental-payments-with-frequency",
-  "journal_entries"
+  QUERY_KEYS.RENTAL_PAYMENTS,
+  QUERY_KEYS.RENTAL_PAYMENTS_COLLECTED,
+  QUERY_KEYS.RENTAL_PAYMENTS_WITH_FREQUENCY,
+  QUERY_KEYS.JOURNAL_ENTRIES
 ];
 
 export const useRentalPayments = (
@@ -50,7 +50,7 @@ export const useRentalPayments = (
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'rental_payments' },
-        () => queryClient.invalidateQueries({ queryKey: QUERY_KEY })
+        () => queryClient.invalidateQueries({ queryKey: QUERY_KEYS.RENTAL_PAYMENTS })
       )
       .subscribe();
 
@@ -61,9 +61,9 @@ export const useRentalPayments = (
 
   // Fetch payments using service
   const { data: allPayments = [], isLoading } = useQuery({
-    queryKey: [...QUERY_KEY, contractId],
+    queryKey: contractId ? QUERY_KEYS.RENTAL_PAYMENTS_BY_CONTRACT(contractId) : QUERY_KEYS.RENTAL_PAYMENTS,
     queryFn: () => RentalPaymentService.getAll({ contractId }),
-    staleTime: 2 * 60 * 1000,
+    staleTime: QUERY_CONFIG.DEFAULT.staleTime,
   });
 
   // Apply filtering logic

@@ -1,5 +1,6 @@
 /**
  * UI Hooks - خطافات واجهة المستخدم
+ * @version 2.8.30
  */
 
 export { useIsMobile } from './use-mobile';
@@ -23,6 +24,7 @@ export { useDebouncedCallback } from './useDebouncedCallback';
 export { useContactForm, type ContactFormData } from './useContactForm';
 export { useTasks, type Task } from './useTasks';
 export { useActivities, type Activity } from './useActivities';
+export { useDialogState, useMultiDialogState, useConfirmDialog } from './useDialogState';
 export { 
   useUnifiedExport, 
   formatBeneficiariesForExport,

@@ -2,12 +2,12 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.8.25
- * @date 2025-12-08
+ * @version 2.8.31
+ * @date 2025-12-09
  */
 
-export const APP_VERSION = '2.8.30';
-export const APP_VERSION_DATE = '2025-12-08';
+export const APP_VERSION = '2.8.31';
+export const APP_VERSION_DATE = '2025-12-09';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
 export const VERSION_INFO = {
@@ -16,13 +16,13 @@ export const VERSION_INFO = {
   name: APP_VERSION_NAME,
   changelog: '/docs/CHANGELOG.md',
   features: [
-    'اكتمال نقل جميع الـ hooks للخدمات',
-    '41 خدمة متكاملة (Core: 4, Domain: 34, Infrastructure: 3)',
-    'Realtime subscriptions مقبولة في 7 hooks',
-    'SecurityService, SettingsService, IntegrationService',
-    'MonitoringService, KnowledgeService, DocumentationService',
-    'NotificationSettingsService للإشعارات',
-    'صفر أخطاء بناء - 100% فصل الاهتمامات',
+    'تقسيم useRentalPayments من 518 سطر إلى 4 ملفات',
+    'إنشاء RentalPaymentService للعمليات',
+    'إنشاء useRentalPaymentArchiving للأرشفة',
+    'إنشاء QUERY_KEYS موحد (180+ مفتاح)',
+    'إنشاء useDialogState للمحاورات',
+    '42 خدمة متكاملة',
+    'صفر أخطاء بناء - معمارية نظيفة',
   ],
 } as const;
 
