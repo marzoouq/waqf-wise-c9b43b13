@@ -620,4 +620,35 @@ export class PropertyService {
       throw error;
     }
   }
+
+  /**
+   * جلب بيانات وحدات وعقود العقار
+   */
+  static async getPropertyUnitsAndContracts(propertyId: string) {
+    try {
+      const [unitsResult, contractsResult] = await Promise.all([
+        supabase
+          .from("property_units")
+          .select("id, unit_number, unit_type, floor_number, area, annual_rent, occupancy_status, current_contract_id")
+          .eq("property_id", propertyId)
+          .order("unit_number"),
+        supabase
+          .from("contracts")
+          .select("id, tenant_name, monthly_rent")
+          .eq("property_id", propertyId)
+          .eq("status", "نشط")
+      ]);
+
+      if (unitsResult.error) throw unitsResult.error;
+      if (contractsResult.error) throw contractsResult.error;
+
+      return {
+        units: unitsResult.data || [],
+        contracts: contractsResult.data || []
+      };
+    } catch (error) {
+      productionLogger.error('Error fetching property units and contracts', error);
+      throw error;
+    }
+  }
 }

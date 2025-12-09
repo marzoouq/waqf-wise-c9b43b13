@@ -1064,4 +1064,23 @@ export class BeneficiaryService {
       throw error;
     }
   }
+
+  /**
+   * جلب قائمة مختصرة للمستفيدين (للناظر)
+   */
+  static async getQuickList(limit: number = 20) {
+    try {
+      const { data, error } = await supabase
+        .from("beneficiaries")
+        .select("id, full_name, phone, email, status, category, total_received, account_balance, national_id")
+        .order("created_at", { ascending: false })
+        .limit(limit);
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching quick beneficiaries list', error);
+      throw error;
+    }
+  }
 }

@@ -6,7 +6,7 @@
  * @date 2025-12-09
  */
 
-export const APP_VERSION = '2.8.42';
+export const APP_VERSION = '2.8.43';
 export const APP_VERSION_DATE = '2025-12-09';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
@@ -16,11 +16,10 @@ export const VERSION_INFO = {
   name: APP_VERSION_NAME,
   changelog: '/docs/CHANGELOG.md',
   features: [
-    'تقسيم useRentalPayments من 518 سطر إلى 4 ملفات',
-    'إنشاء RentalPaymentService للعمليات',
-    'إنشاء useRentalPaymentArchiving للأرشفة',
-    'إنشاء QUERY_KEYS موحد (180+ مفتاح)',
-    'إنشاء useDialogState للمحاورات',
+    'نقل منطق 15+ hook إلى Services',
+    'إضافة دوال للـ LoansService, UserService, SystemService',
+    'إضافة دوال للـ AccountingService, FiscalYearService, InvoiceService',
+    'إضافة دوال للـ SecurityService, BeneficiaryService, PropertyService',
     '42 خدمة متكاملة',
     'صفر أخطاء بناء - معمارية نظيفة',
   ],

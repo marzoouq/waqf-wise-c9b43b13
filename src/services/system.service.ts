@@ -243,4 +243,63 @@ export class SystemService {
     if (error) throw error;
     return data;
   }
+
+  /**
+   * جلب أخطاء النظام
+   */
+  static async getSystemErrors(severityFilter: string, statusFilter: string) {
+    let query = supabase
+      .from("system_error_logs")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(50);
+    
+    if (severityFilter !== "all") {
+      query = query.eq("severity", severityFilter);
+    }
+    
+    if (statusFilter !== "all") {
+      query = query.eq("status", statusFilter);
+    }
+    
+    const { data, error } = await query;
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * حذف الأخطاء المحلولة
+   */
+  static async deleteResolvedErrors() {
+    const { error } = await supabase
+      .from("system_error_logs")
+      .delete()
+      .eq("status", "resolved");
+    
+    if (error) throw error;
+  }
+
+  /**
+   * تحديث حالة الخطأ
+   */
+  static async updateErrorStatus(id: string, status: string) {
+    const { error } = await supabase
+      .from("system_error_logs")
+      .update({ status })
+      .eq("id", id);
+    
+    if (error) throw error;
+  }
+
+  /**
+   * حذف جميع الأخطاء
+   */
+  static async deleteAllErrors() {
+    const { error } = await supabase
+      .from("system_error_logs")
+      .delete()
+      .neq("id", "00000000-0000-0000-0000-000000000000");
+    
+    if (error) throw error;
+  }
 }

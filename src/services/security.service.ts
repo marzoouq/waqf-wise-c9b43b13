@@ -82,4 +82,46 @@ export class SecurityService {
     
     if (error) throw error;
   }
+
+  /**
+   * جلب تجاوزات صلاحيات المستخدم
+   */
+  static async getUserPermissionOverrides(userId: string) {
+    const { data, error } = await supabase
+      .from("user_permissions")
+      .select("*")
+      .eq("user_id", userId);
+    
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * إضافة أو تحديث تجاوز صلاحية للمستخدم
+   */
+  static async upsertUserPermissionOverride(userId: string, permissionKey: string, granted: boolean): Promise<void> {
+    const { error } = await supabase
+      .from("user_permissions")
+      .upsert({
+        user_id: userId,
+        permission_key: permissionKey,
+        granted,
+        granted_at: new Date().toISOString()
+      });
+    
+    if (error) throw error;
+  }
+
+  /**
+   * حذف تجاوز صلاحية من المستخدم
+   */
+  static async removeUserPermissionOverride(userId: string, permissionKey: string): Promise<void> {
+    const { error } = await supabase
+      .from("user_permissions")
+      .delete()
+      .eq("user_id", userId)
+      .eq("permission_key", permissionKey);
+    
+    if (error) throw error;
+  }
 }
