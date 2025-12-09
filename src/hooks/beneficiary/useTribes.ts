@@ -3,10 +3,11 @@ import { TribeService } from "@/services/tribe.service";
 import { toast } from "sonner";
 import type { Tribe, TribeInsert, TribeUpdate } from "@/types/tribes";
 import { logger } from "@/lib/logger";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export const useTribes = () => {
   return useQuery<Tribe[]>({
-    queryKey: ["tribes"],
+    queryKey: QUERY_KEYS.TRIBES,
     queryFn: () => TribeService.getAll(),
   });
 };
@@ -17,7 +18,7 @@ export const useAddTribe = () => {
   return useMutation({
     mutationFn: (tribe: TribeInsert) => TribeService.create(tribe),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tribes"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TRIBES });
       toast.success("تم إضافة القبيلة بنجاح");
     },
     onError: (error: unknown) => {
@@ -34,7 +35,7 @@ export const useUpdateTribe = () => {
     mutationFn: ({ id, ...updates }: TribeUpdate & { id: string }) => 
       TribeService.update(id, updates),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tribes"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TRIBES });
       toast.success("تم تحديث القبيلة بنجاح");
     },
     onError: (error: unknown) => {
@@ -50,7 +51,7 @@ export const useDeleteTribe = () => {
   return useMutation({
     mutationFn: (id: string) => TribeService.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tribes"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TRIBES });
       toast.success("تم حذف القبيلة بنجاح");
     },
     onError: (error: unknown) => {

@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { BeneficiaryService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 interface HeirDistribution {
   share_amount: number;
@@ -50,7 +51,7 @@ export function useBeneficiaryPersonalReportsData() {
 
   // جلب بيانات المستفيد
   const { data: beneficiary } = useQuery({
-    queryKey: ['my-beneficiary', user?.id],
+    queryKey: QUERY_KEYS.MY_BENEFICIARY(user?.id),
     queryFn: async () => {
       if (!user?.id) return null;
       return BeneficiaryService.getByUserId(user.id) as Promise<Beneficiary | null>;
@@ -60,7 +61,7 @@ export function useBeneficiaryPersonalReportsData() {
 
   // جلب التوزيعات من heir_distributions للسنة المحددة
   const { data: distributions = [], isLoading: isLoadingDistributions } = useQuery({
-    queryKey: ['beneficiary-yearly-distributions', beneficiary?.id, selectedYear],
+    queryKey: QUERY_KEYS.BENEFICIARY_YEARLY_DISTRIBUTIONS(beneficiary?.id, parseInt(selectedYear)),
     queryFn: async () => {
       if (!beneficiary?.id) return [];
       return BeneficiaryService.getYearlyDistributions(beneficiary.id, selectedYear) as Promise<HeirDistribution[]>;
@@ -70,7 +71,7 @@ export function useBeneficiaryPersonalReportsData() {
 
   // جلب الطلبات
   const { data: requests = [] } = useQuery({
-    queryKey: ['beneficiary-yearly-requests', beneficiary?.id, selectedYear],
+    queryKey: QUERY_KEYS.BENEFICIARY_YEARLY_REQUESTS(beneficiary?.id, parseInt(selectedYear)),
     queryFn: async () => {
       if (!beneficiary?.id) return [];
       return BeneficiaryService.getYearlyRequests(beneficiary.id, selectedYear) as Promise<Request[]>;

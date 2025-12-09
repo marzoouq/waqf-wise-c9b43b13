@@ -5,6 +5,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { ArchiveService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface DocumentTag {
   id: string;
@@ -18,7 +19,7 @@ export interface DocumentTag {
 
 export function useDocumentTags(documentId?: string) {
   return useQuery({
-    queryKey: ['document-tags', documentId],
+    queryKey: QUERY_KEYS.DOCUMENT_TAGS(documentId),
     queryFn: () => ArchiveService.getDocumentTags(documentId),
     enabled: !!documentId,
   });
@@ -31,8 +32,8 @@ export function useAddDocumentTag() {
     mutationFn: (tag: Omit<DocumentTag, 'id' | 'created_at' | 'created_by'>) => 
       ArchiveService.addDocumentTag(tag),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['document-tags', variables.document_id] });
-      queryClient.invalidateQueries({ queryKey: ['document-tags'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DOCUMENT_TAGS(variables.document_id) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DOCUMENT_TAGS() });
       toast.success('تم إضافة الوسم بنجاح');
     },
     onError: (error: Error) => {
@@ -47,7 +48,7 @@ export function useDeleteDocumentTag() {
   return useMutation({
     mutationFn: (tagId: string) => ArchiveService.deleteDocumentTag(tagId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['document-tags'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DOCUMENT_TAGS() });
       toast.success('تم حذف الوسم بنجاح');
     },
     onError: (error: Error) => {

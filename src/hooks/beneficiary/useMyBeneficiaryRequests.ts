@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { RequestService, BeneficiaryService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface BeneficiaryRequest {
   id: string;
@@ -39,7 +40,7 @@ export function useMyBeneficiaryRequests(userId?: string) {
 
   // جلب معرف المستفيد من user_id
   const { data: beneficiary } = useQuery({
-    queryKey: ["my-beneficiary", userId],
+    queryKey: QUERY_KEYS.MY_BENEFICIARY(userId),
     queryFn: async () => {
       if (!userId) return null;
       return BeneficiaryService.getByUserId(userId);
@@ -49,7 +50,7 @@ export function useMyBeneficiaryRequests(userId?: string) {
 
   // جلب الطلبات باستخدام الخدمة
   const { data: requests = [], isLoading } = useQuery({
-    queryKey: ["beneficiary-requests", beneficiary?.id],
+    queryKey: QUERY_KEYS.BENEFICIARY_REQUESTS(beneficiary?.id || ''),
     queryFn: async () => {
       if (!beneficiary?.id) return [];
       return RequestService.getAll(beneficiary.id);
@@ -77,7 +78,7 @@ export function useMyBeneficiaryRequests(userId?: string) {
       return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["beneficiary-requests"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARY_REQUESTS(beneficiary?.id || '') });
       toast.success("تم تقديم الطلب بنجاح");
       setIsDialogOpen(false);
       setFormData(initialFormData);

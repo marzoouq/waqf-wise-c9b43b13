@@ -6,6 +6,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { AccountingService, RealtimeService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 interface AccountDistribution {
   name: string;
@@ -17,7 +18,7 @@ export function useAccountDistribution() {
   const queryClient = useQueryClient();
 
   const query = useQuery<AccountDistribution[]>({
-    queryKey: ["account-distribution"],
+    queryKey: QUERY_KEYS.ACCOUNTS,
     queryFn: () => AccountingService.getAccountDistribution(),
     staleTime: 2 * 60 * 1000,
   });
@@ -25,7 +26,7 @@ export function useAccountDistribution() {
   useEffect(() => {
     const subscription = RealtimeService.subscribeToTable(
       'accounts',
-      () => { queryClient.invalidateQueries({ queryKey: ["account-distribution"] }); }
+      () => { queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ACCOUNTS }); }
     );
 
     return () => { subscription.unsubscribe(); };
