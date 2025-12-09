@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { productionLogger } from "@/lib/logger/production-logger";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MobileStatementCard } from "./cards/MobileStatementCard";
-import { supabase } from "@/integrations/supabase/client";
+import { useBeneficiaryExport } from "@/hooks/beneficiary/useBeneficiaryExport";
 
 interface BeneficiaryStatementsTabProps {
   beneficiaryId: string;
@@ -21,19 +21,11 @@ export function BeneficiaryStatementsTab({ beneficiaryId }: BeneficiaryStatement
   const { settings } = useVisibilitySettings();
   const isMobile = useIsMobile();
   const { data: payments = [], isLoading } = useBeneficiaryStatements(beneficiaryId);
+  const { exportJournalEntries } = useBeneficiaryExport();
 
   const handleExport = async () => {
     try {
-      const { data: transactions } = await supabase
-        .from('journal_entries')
-        .select(`
-          *,
-          journal_entry_lines(
-            *,
-            accounts(name_ar, code)
-          )
-        `)
-        .order('entry_date', { ascending: false });
+      const transactions = await exportJournalEntries();
 
       if (!transactions || transactions.length === 0) {
         toast.warning('لا توجد معاملات لتصديرها');

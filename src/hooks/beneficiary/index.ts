@@ -59,3 +59,7 @@ export {
   useWaqfDistributionsSummary
 } from './useBeneficiaryProfileData';
 export type { RequestWithDetails, HeirDistribution } from './useBeneficiaryProfileData';
+
+// ==================== Export & Disclosure Hooks ====================
+export { useBeneficiaryExport, type JournalExportEntry } from './useBeneficiaryExport';
+export { useDisclosureBeneficiaries, type DisclosureBeneficiary } from './useDisclosureBeneficiaries';

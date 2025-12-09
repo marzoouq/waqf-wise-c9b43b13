@@ -19,3 +19,4 @@ export { useDistributionAnalysisReport, type DistributionTrendData, type StatusS
 export { useBudgetVarianceReport, type BudgetData, type BudgetSummary } from './useBudgetVarianceReport';
 export { useDetailedGeneralLedger, type LedgerEntry } from './useDetailedGeneralLedger';
 export { useCashFlowReport, type CashFlowData, type CashFlowStats } from './useCashFlowReport';
+export { usePropertiesReport, type PropertyWithContracts } from './usePropertiesReport';
