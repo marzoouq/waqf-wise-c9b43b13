@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useApprovalHistory } from '@/hooks/useApprovalHistory';
+import { invalidateAccountingQueries } from '@/lib/query-invalidation';
 import type { LoanForApproval } from '@/types';
 
 export function useLoanApprovals() {
@@ -102,9 +103,10 @@ export function useLoanApprovals() {
       return { action };
     },
     onSuccess: (data) => {
+      // ✅ استدعاء واحد بدلاً من 3
+      invalidateAccountingQueries(queryClient);
       queryClient.invalidateQueries({ queryKey: ['loans_with_approvals'] });
       queryClient.invalidateQueries({ queryKey: ['loans'] });
-      queryClient.invalidateQueries({ queryKey: ['journal_entries'] });
       
       toast({
         title: 'تمت العملية بنجاح',
