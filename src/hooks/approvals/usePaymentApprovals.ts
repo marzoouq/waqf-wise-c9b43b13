@@ -8,6 +8,7 @@ import { PaymentForApproval } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useApprovalHistory } from "@/hooks/useApprovalHistory";
+import { invalidateQueryGroups } from "@/lib/query-invalidation";
 
 export function usePaymentApprovals() {
   const { toast } = useToast();
@@ -45,8 +46,8 @@ export function usePaymentApprovals() {
       });
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["payments_with_approvals"] });
-      queryClient.invalidateQueries({ queryKey: ["payments"] });
+      // ✅ استدعاء واحد بدلاً من 2
+      invalidateQueryGroups(queryClient, ['payments', 'approvals']);
       
       toast({
         title: "تمت العملية بنجاح",

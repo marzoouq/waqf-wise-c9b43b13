@@ -6,6 +6,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { invalidateLoanQueries } from '@/lib/query-invalidation';
 
 export interface EmergencyRequest {
   id: string;
@@ -76,7 +77,7 @@ export function useEmergencyAidApprovals() {
         title: '✅ تمت الموافقة',
         description: 'تم الموافقة على الطلب بنجاح',
       });
-      queryClient.invalidateQueries({ queryKey: ['emergency-approvals'] });
+      invalidateLoanQueries(queryClient);
     },
     onError: (error: Error) => {
       toast({
@@ -112,7 +113,7 @@ export function useEmergencyAidApprovals() {
         title: '✅ تم الرفض',
         description: 'تم رفض الطلب',
       });
-      queryClient.invalidateQueries({ queryKey: ['emergency-approvals'] });
+      invalidateLoanQueries(queryClient);
     },
     onError: (error: Error) => {
       toast({

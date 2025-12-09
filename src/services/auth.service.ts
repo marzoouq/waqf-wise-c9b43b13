@@ -44,6 +44,27 @@ export class AuthService {
   }
 
   /**
+   * تسجيل الدخول باستخدام Google OAuth
+   */
+  static async loginWithGoogle(): Promise<{ success: boolean; error?: string }> {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/redirect`,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+      },
+    });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+    return { success: true };
+  }
+
+  /**
    * تسجيل الخروج
    */
   static async logout(): Promise<void> {

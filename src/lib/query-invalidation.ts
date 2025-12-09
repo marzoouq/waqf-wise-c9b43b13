@@ -90,3 +90,50 @@ export function invalidateDistributionQueries(queryClient: QueryClient) {
     }
   });
 }
+
+/**
+ * إبطال استعلامات القروض
+ */
+export function invalidateLoanQueries(queryClient: QueryClient) {
+  queryClient.invalidateQueries({
+    predicate: (query) => {
+      const key = query.queryKey[0];
+      if (typeof key !== 'string') return false;
+      return key.includes('loan') || 
+             key.includes('emergency') ||
+             key.includes('approval') ||
+             key.includes('beneficiar');
+    }
+  });
+}
+
+/**
+ * إبطال استعلامات الإعدادات
+ */
+export function invalidateSettingsQueries(queryClient: QueryClient) {
+  queryClient.invalidateQueries({
+    predicate: (query) => {
+      const key = query.queryKey[0];
+      if (typeof key !== 'string') return false;
+      return key.includes('setting') || 
+             key.includes('config') ||
+             key.includes('template');
+    }
+  });
+}
+
+/**
+ * إبطال استعلامات المستخدمين
+ */
+export function invalidateUserQueries(queryClient: QueryClient) {
+  queryClient.invalidateQueries({
+    predicate: (query) => {
+      const key = query.queryKey[0];
+      if (typeof key !== 'string') return false;
+      return key.includes('user') || 
+             key.includes('profile') ||
+             key.includes('role') ||
+             key.includes('permission');
+    }
+  });
+}

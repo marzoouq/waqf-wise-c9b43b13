@@ -13,6 +13,7 @@ interface AuthContextType {
   roles: string[];
   rolesLoading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
   signUp: (email: string, password: string, fullName: string) => Promise<void>;
   signOut: () => Promise<void>;
   hasPermission: (permission: string) => Promise<boolean>;
@@ -302,6 +303,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         data: {
           full_name: fullName,
         },
+        emailRedirectTo: `${window.location.origin}/redirect`,
+      },
+    });
+
+    if (error) throw error;
+  };
+
+  // ✅ تسجيل الدخول باستخدام Google OAuth
+  const signInWithGoogle = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/redirect`,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
       },
     });
 
@@ -411,6 +429,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     roles,
     rolesLoading,
     signIn,
+    signInWithGoogle,
     signUp,
     signOut,
     hasPermission,
