@@ -3,6 +3,7 @@ import { toast } from "@/hooks/use-toast";
 import { logger } from "@/lib/logger";
 import type { Contract, ContractInsert } from "@/types/contracts";
 import { ContractService } from "@/services/contract.service";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export type { Contract, ContractInsert };
 
@@ -10,22 +11,22 @@ export const useContracts = () => {
   const queryClient = useQueryClient();
 
   const { data: contracts = [], isLoading } = useQuery({
-    queryKey: ["contracts"],
+    queryKey: QUERY_KEYS.CONTRACTS,
     queryFn: () => ContractService.getAllWithProperties(),
-    staleTime: 3 * 60 * 1000, // 3 minutes
+    staleTime: 3 * 60 * 1000,
   });
 
   const addContract = useMutation({
     mutationFn: (contract: ContractInsert & { unit_ids?: string[] }) => 
       ContractService.create(contract),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["contracts"] });
-      queryClient.invalidateQueries({ queryKey: ["rental_payments"] });
-      queryClient.invalidateQueries({ queryKey: ["rental-payments-collected"] });
-      queryClient.invalidateQueries({ queryKey: ["rental-payments-with-frequency"] });
-      queryClient.invalidateQueries({ queryKey: ["property-units"] });
-      queryClient.invalidateQueries({ queryKey: ["properties"] });
-      queryClient.invalidateQueries({ queryKey: ["properties-stats"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CONTRACTS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.RENTAL_PAYMENTS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.RENTAL_PAYMENTS_COLLECTED });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.RENTAL_PAYMENTS_WITH_FREQUENCY });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTY_UNITS('') });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTIES });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTY_STATS });
       toast({
         title: "تم إضافة العقد بنجاح",
         description: "تم إنشاء العقد وجدول الدفعات",
@@ -45,7 +46,7 @@ export const useContracts = () => {
     mutationFn: ({ id, ...contract }: Partial<Contract> & { id: string }) => 
       ContractService.update(id, contract),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["contracts"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CONTRACTS });
       toast({
         title: "تم تحديث العقد",
         description: "تم تحديث العقد بنجاح",
@@ -64,7 +65,7 @@ export const useContracts = () => {
   const deleteContract = useMutation({
     mutationFn: (id: string) => ContractService.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["contracts"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CONTRACTS });
       toast({
         title: "تم حذف العقد",
         description: "تم حذف العقد بنجاح",

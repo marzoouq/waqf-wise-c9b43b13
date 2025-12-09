@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface BeneficiaryRequestData {
   request_type_id: string;
@@ -27,7 +28,7 @@ export function useBeneficiaryRequests(beneficiaryId: string) {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['requests'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REQUESTS });
       toast({
         title: 'تم الإرسال',
         description: 'تم تقديم الطلب بنجاح، سيتم مراجعته قريباً',

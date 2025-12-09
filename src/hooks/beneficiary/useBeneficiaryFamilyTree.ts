@@ -5,6 +5,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 interface FamilyMember {
   id: string;
@@ -27,7 +28,7 @@ interface Beneficiary extends FamilyMember {
 
 export function useBeneficiaryFamilyTree(beneficiaryId: string) {
   return useQuery({
-    queryKey: ['beneficiary-family', beneficiaryId],
+    queryKey: QUERY_KEYS.BENEFICIARY_FAMILY(beneficiaryId),
     queryFn: async () => {
       // جلب بيانات المستفيد الحالي
       const { data: beneficiary, error: benError } = await supabase

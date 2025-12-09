@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { DistributionService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 interface HeirDistribution {
   id: string;
@@ -15,7 +16,7 @@ interface HeirDistribution {
 
 export function useBeneficiaryDistributions(beneficiaryId: string) {
   const { data: distributions = [], isLoading } = useQuery({
-    queryKey: ["beneficiary-heir-distributions", beneficiaryId],
+    queryKey: QUERY_KEYS.BENEFICIARY_HEIR_DISTRIBUTIONS(beneficiaryId),
     queryFn: async () => {
       const data = await DistributionService.getHeirDistributions(beneficiaryId);
       return (data || []) as HeirDistribution[];

@@ -7,12 +7,13 @@ import { useQuery } from "@tanstack/react-query";
 import { BeneficiaryService } from "@/services/beneficiary.service";
 import { useBeneficiaryId } from "./useBeneficiaryId";
 import { EmergencyAid } from "@/types/loans";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export function useBeneficiaryEmergencyAid() {
   const { beneficiaryId, isLoading: idLoading } = useBeneficiaryId();
 
   const { data: emergencyAids = [], isLoading: aidsLoading } = useQuery({
-    queryKey: ["beneficiary-emergency-aid", beneficiaryId],
+    queryKey: QUERY_KEYS.BENEFICIARY_EMERGENCY_AID(beneficiaryId),
     queryFn: async () => {
       if (!beneficiaryId) return [];
       return await BeneficiaryService.getEmergencyAid(beneficiaryId) as EmergencyAid[];

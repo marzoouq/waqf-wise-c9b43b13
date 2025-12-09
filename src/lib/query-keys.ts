@@ -20,6 +20,12 @@ export const QUERY_KEYS = {
   BENEFICIARY_SESSIONS: ['beneficiary-sessions'] as const,
   MY_BENEFICIARY: (userId?: string) => userId ? ['my-beneficiary', userId] as const : ['my-beneficiary'] as const,
   BENEFICIARY_PAYMENTS: (beneficiaryId: string, ...filters: string[]) => ['beneficiary-payments', beneficiaryId, ...filters] as const,
+  BENEFICIARY_ACTIVITY_LOG: (beneficiaryId?: string) => ['beneficiary-activity-log', beneficiaryId] as const,
+  BENEFICIARY_CATEGORIES: ['beneficiary-categories'] as const,
+  BENEFICIARY_HEIR_DISTRIBUTIONS: (beneficiaryId: string) => ['beneficiary-heir-distributions', beneficiaryId] as const,
+  BENEFICIARY_EMERGENCY_AID: (beneficiaryId?: string) => ['beneficiary-emergency-aid', beneficiaryId] as const,
+  BENEFICIARY_ID: (userId?: string) => ['beneficiary-id', userId] as const,
+  BENEFICIARY_LOANS: (beneficiaryId?: string) => ['beneficiary-loans', beneficiaryId] as const,
 
   // Properties
   PROPERTIES: ['properties'] as const,

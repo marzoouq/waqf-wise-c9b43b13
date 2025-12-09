@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { BeneficiaryService } from "@/services/beneficiary.service";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface BeneficiaryCategory {
   id: string;
@@ -15,7 +16,7 @@ export interface BeneficiaryCategory {
 
 export function useBeneficiaryCategories() {
   const { data: categories = [], isLoading } = useQuery({
-    queryKey: ["beneficiary-categories"],
+    queryKey: QUERY_KEYS.BENEFICIARY_CATEGORIES,
     queryFn: () => BeneficiaryService.getCategories(),
   });
 
