@@ -6,20 +6,21 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { TenantService } from '@/services';
 import type { Tenant, TenantInsert, TenantWithBalance } from '@/types/tenants';
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export function useTenants() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const { data: tenants = [], isLoading } = useQuery({
-    queryKey: ['tenants'],
+    queryKey: QUERY_KEYS.TENANTS,
     queryFn: (): Promise<TenantWithBalance[]> => TenantService.getTenantsWithBalance(),
   });
 
   const addTenant = useMutation({
     mutationFn: (tenant: TenantInsert) => TenantService.create(tenant),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tenants'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TENANTS });
       toast({ title: 'تم إضافة المستأجر بنجاح' });
     },
     onError: (error: Error) => {
@@ -35,7 +36,7 @@ export function useTenants() {
     mutationFn: ({ id, ...data }: Partial<Tenant> & { id: string }) => 
       TenantService.update(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tenants'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TENANTS });
       toast({ title: 'تم تحديث المستأجر بنجاح' });
     },
     onError: (error: Error) => {
@@ -50,7 +51,7 @@ export function useTenants() {
   const deleteTenant = useMutation({
     mutationFn: (id: string) => TenantService.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tenants'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TENANTS });
       toast({ title: 'تم حذف المستأجر بنجاح' });
     },
     onError: (error: Error) => {
@@ -76,7 +77,7 @@ export function useTenants() {
 
 export function useTenant(tenantId: string | undefined) {
   return useQuery({
-    queryKey: ['tenant', tenantId],
+    queryKey: QUERY_KEYS.TENANT(tenantId || ''),
     queryFn: () => tenantId ? TenantService.getById(tenantId) : null,
     enabled: !!tenantId,
   });

@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { BeneficiaryService } from "@/services/beneficiary.service";
 import { productionLogger } from "@/lib/logger/production-logger";
 import type { Json } from "@/integrations/supabase/types";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface BeneficiaryActivity {
   id: string;
@@ -19,7 +20,7 @@ export interface BeneficiaryActivity {
 
 export function useBeneficiaryActivityLog(beneficiaryId?: string) {
   const { data: activities = [], isLoading, error } = useQuery({
-    queryKey: ["beneficiary-activity-log", beneficiaryId],
+    queryKey: QUERY_KEYS.BENEFICIARY_ACTIVITY_LOG(beneficiaryId),
     queryFn: async () => {
       if (!beneficiaryId) return [];
       return await BeneficiaryService.getActivity(beneficiaryId) as BeneficiaryActivity[];

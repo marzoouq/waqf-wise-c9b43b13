@@ -6,6 +6,7 @@ import { useActivities } from "@/hooks/useActivities";
 import { useAuth } from "@/hooks/useAuth";
 import { logger } from "@/lib/logger";
 import { createMutationErrorHandler } from "@/lib/errors";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface Property {
   id: string;
@@ -23,7 +24,7 @@ export interface Property {
   revenue_type?: string;
   created_at: string;
   updated_at: string;
-  [key: string]: any; // Allow additional properties
+  [key: string]: any;
 }
 
 export function useProperties() {
@@ -33,16 +34,15 @@ export function useProperties() {
   const { user } = useAuth();
 
   const { data: properties = [], isLoading } = useQuery({
-    queryKey: ["properties"],
+    queryKey: QUERY_KEYS.PROPERTIES,
     queryFn: () => PropertyService.getAll(),
     staleTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
 
-  // Real-time subscription
   useEffect(() => {
     const { unsubscribe } = RealtimeService.subscribeToTable('properties', () => {
-      queryClient.invalidateQueries({ queryKey: ['properties'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTIES });
     });
 
     return () => unsubscribe();
@@ -53,7 +53,7 @@ export function useProperties() {
       return PropertyService.create(property);
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["properties"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTIES });
       
       addActivity({
         action: `تم إضافة عقار جديد: ${data.name}`,
@@ -78,7 +78,7 @@ export function useProperties() {
       return PropertyService.update(id, updates);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["properties"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTIES });
       toast({
         title: "تم التحديث بنجاح",
         description: "تم تحديث بيانات العقار بنجاح",
@@ -95,7 +95,7 @@ export function useProperties() {
       return PropertyService.delete(id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["properties"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTIES });
       toast({
         title: "تم الحذف بنجاح",
         description: "تم حذف العقار بنجاح",

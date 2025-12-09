@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { BeneficiaryService } from "@/services/beneficiary.service";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface BeneficiaryAttachment {
   id: string;
@@ -26,9 +27,8 @@ export function useBeneficiaryAttachments(beneficiaryId?: string) {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
-  // Fetch attachments
   const { data: attachments = [], isLoading } = useQuery({
-    queryKey: ["beneficiary-attachments", beneficiaryId],
+    queryKey: QUERY_KEYS.BENEFICIARY_ATTACHMENTS(beneficiaryId || ''),
     queryFn: async () => {
       if (!beneficiaryId) return [];
       return await BeneficiaryService.getDocuments(beneficiaryId);
@@ -51,7 +51,7 @@ export function useBeneficiaryAttachments(beneficiaryId?: string) {
       return await BeneficiaryService.uploadDocument(beneficiaryId, file, documentType, description);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["beneficiary-attachments", beneficiaryId] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARY_ATTACHMENTS(beneficiaryId || '') });
       toast({
         title: "تم رفع المستند",
         description: "تم رفع المستند بنجاح",
@@ -72,7 +72,7 @@ export function useBeneficiaryAttachments(beneficiaryId?: string) {
       return await BeneficiaryService.deleteDocument(attachmentId);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["beneficiary-attachments", beneficiaryId] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARY_ATTACHMENTS(beneficiaryId || '') });
       toast({
         title: "تم الحذف",
         description: "تم حذف المستند بنجاح",
