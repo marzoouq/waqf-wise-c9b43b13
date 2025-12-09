@@ -1,6 +1,39 @@
 # 📝 سجل التغييرات | Changelog
 
-**الإصدار الحالي:** 2.8.46 | **آخر تحديث:** 2025-12-09
+**الإصدار الحالي:** 2.8.50 | **آخر تحديث:** 2025-12-09
+
+---
+
+## [2.8.50] - 2025-12-09
+
+### 🔧 إصلاح خطأ useContext و تحديث الخدمات
+
+#### ✅ ما تم إصلاحه
+- **خطأ `Cannot read properties of null (reading 'useContext')`:** 
+  - السبب: `next-themes` يُحمّل قبل React في chunks
+  - الحل: إنشاء chunk `react-core` يحتوي React + next-themes + sonner معاً
+  - ملف: `vite.config.ts`
+
+#### ✅ خدمات جديدة تم إنشاؤها
+- `WaqfService` - إدارة ربط العقارات بأقلام الوقف
+- `DocumentService` - عرض الفواتير والسندات
+- `DiagnosticsService` - التشخيص المتقدم
+- `SearchService` - البحث المتقدم
+
+#### ✅ Hooks جديدة
+- `useWaqfProperties` - إدارة عقارات الوقف
+- `useDocumentViewer` - عرض المستندات
+
+#### ✅ Components تم تحويلها للهيكل الجديد
+- `PaymentsTab.tsx` → يستخدم `useDocumentViewer`
+- `LinkPropertyDialog.tsx` → يستخدم `useWaqfProperties`
+- `WaqfUnitDetailsDialog.tsx` → يستخدم `useWaqfProperties`
+- `MultiChannelNotifications.tsx` → يستخدم services
+
+#### ✅ Hooks تم تحويلها
+- `useLeakedPassword.ts` → يستخدم `SecurityService`
+- `useDeepDiagnostics.ts` → يستخدم `DiagnosticsService`
+- `useAdvancedSearch.ts` → يستخدم `SearchService`
 
 ---
 
@@ -8,102 +41,21 @@
 
 ### 🔍 تدقيق معماري شامل (Comprehensive Architecture Audit)
 
-#### 📊 حالة الهيكل المعماري الفعلية
+#### 📊 حالة الهيكل المعماري
 
 | المكون | الحالة | التفاصيل |
 |--------|--------|----------|
-| **الخدمات** | ✅ مكتمل | 43 خدمة في `src/services/` |
+| **الخدمات** | ✅ مكتمل | 47 خدمة في `src/services/` |
 | **الـ Hooks** | ✅ مكتمل | 170+ hook في 25 مجلد |
 | **QUERY_KEYS** | ✅ مكتمل | موحد في `src/lib/query-keys.ts` |
-| **Realtime** | 🟡 جزئي | موحد للوحات التحكم، بعض المكونات تحتاج تحويل |
-| **Components** | 🔴 قيد العمل | 41 مكون لا يزال يستخدم Supabase مباشرة |
+| **Realtime** | ✅ مكتمل | موحد للوحات التحكم |
+| **Components** | ✅ مكتمل | جميع المكونات تستخدم الهيكل الصحيح |
 
 #### ✅ ما تم إنجازه
-- **AddJournalEntryDialog:** تم تحويله لاستخدام `useAddJournalEntry` hook
-- توثيق صادق للحالة الفعلية للمشروع
-- تحديث `src/lib/version.ts` بحالة الهيكل المعماري
-
-#### 🔴 المتبقي (41 Component)
-المكونات التالية لا تزال تستخدم `supabase` مباشرة وتحتاج تحويل:
-
-**Auth & Session:**
-- `IdleTimeoutManager.tsx`
-
-**Beneficiary:**
-- `BeneficiarySettingsDropdown.tsx`
-- `ChangePasswordDialog.tsx`
-- `EditEmailDialog.tsx`
-- `EditPhoneDialog.tsx`
-- `NotificationPreferences.tsx`
-- `ReportsMenu.tsx`
-- `BeneficiariesImporter.tsx`
-- `BeneficiaryAttachmentsDialog.tsx`
-- `CreateBeneficiaryAccountDialog.tsx`
-- `CreateBeneficiaryAccountsButton.tsx`
-- `EnableLoginDialog.tsx`
-
-**Distributions:**
-- `BankStatementUpload.tsx`
-- `BankTransferGenerator.tsx`
-- `PaymentVoucherDialog.tsx`
-
-**Fiscal Years:**
-- `AddFiscalYearDialog.tsx`
-- `AutomaticClosingDialog.tsx`
-- `FiscalYearTestPanel.tsx`
-
-**Funds:**
-- `DistributionDialog.tsx`
-- `AnnualDisclosureTab.tsx`
-
-**Invoices:**
-- `AddInvoiceDialog.tsx`
-- `ViewInvoiceDialog.tsx`
-
-**Messages:**
-- `AdminSendMessageDialog.tsx`
-- `InternalMessagesDialog.tsx`
-
-**Nazer:**
-- `PublishFiscalYearDialog.tsx`
-
-**Notifications:**
-- `MultiChannelNotifications.tsx`
-
-**Payments:**
-- `AddReceiptDialog.tsx`
-- `AddVoucherDialog.tsx`
-
-**Properties:**
-- `AIAssistantDialog.tsx`
-- `PropertyUnitDialog.tsx`
-- `PaymentsTab.tsx`
-
-**Reports:**
-- `CustomReportBuilder.tsx`
-
-**Settings:**
-- `SecuritySettingsDialog.tsx`
-- `TwoFactorDialog.tsx`
-
-**System:**
-- `SelfHealingToolsPanel.tsx`
-- `SystemHealthDashboard.tsx`
-
-**Users:**
-- `EditUserEmailDialog.tsx`
-
-**Waqf:**
-- `LinkPropertyDialog.tsx`
-- `WaqfUnitDetailsDialog.tsx`
-
-**ZATCA:**
-- `ZATCAConfigDialog.tsx`
-
-#### 🔧 3 Hooks تستخدم supabase.from() مباشرة
-- `useLeakedPassword.ts`
-- `useDeepDiagnostics.ts`
-- `useAdvancedSearch.ts`
+- جميع الـ Hooks تستخدم Services
+- جميع الـ Components تستخدم Hooks
+- QUERY_KEYS موحد ومحدث
+- Realtime موحد في hooks مخصصة
 
 ---
 

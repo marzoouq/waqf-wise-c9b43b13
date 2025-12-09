@@ -13,7 +13,7 @@ export default defineConfig(({ mode }) => {
   logLevel: 'warn',
   
   define: {
-    'import.meta.env.VITE_APP_VERSION': JSON.stringify('2.8.0'),
+    'import.meta.env.VITE_APP_VERSION': JSON.stringify('2.8.50'),
     'import.meta.env.VITE_BUILD_TIME': JSON.stringify(new Date().toISOString()),
     'process.env.NODE_ENV': JSON.stringify('production'),
   },
@@ -56,8 +56,21 @@ export default defineConfig(({ mode }) => {
       output: {
         manualChunks: (id) => {
           if (id.includes('node_modules')) {
-            // ✅ React و react-dom و react-is يذهبون لـ vendor تلقائياً
-            // هذا يضمن تحميلهم معاً قبل أي مكتبة تعتمد عليهم
+            // ✅ React و react-dom و react-is - يجب تحميلهم أولاً
+            if (id.includes('react-dom') || id.includes('react-is') || 
+                (id.includes('/react/') && !id.includes('react-'))) {
+              return 'react-core';
+            }
+            
+            // ✅ next-themes و sonner يعتمدان على React - يذهبان مع react-core
+            if (id.includes('next-themes') || id.includes('sonner')) {
+              return 'react-core';
+            }
+            
+            // ✅ Radix UI يعتمد على React
+            if (id.includes('@radix-ui')) {
+              return 'radix-ui';
+            }
             
             // React Router - chunk منفصل
             if (id.includes('react-router')) {
@@ -68,8 +81,6 @@ export default defineConfig(({ mode }) => {
             if (id.includes('react-hook-form') || id.includes('@hookform')) {
               return 'react-forms';
             }
-            
-            // ✅ Radix UI يذهب لـ vendor مع React لضمان ترتيب التحميل الصحيح
             
             // React Query
             if (id.includes('@tanstack/react-query')) {
@@ -97,7 +108,7 @@ export default defineConfig(({ mode }) => {
             }
             
             // Excel - lazy loaded
-            if (id.includes('xlsx')) {
+            if (id.includes('xlsx') || id.includes('exceljs')) {
               return 'excel-lib';
             }
             
@@ -106,7 +117,7 @@ export default defineConfig(({ mode }) => {
               return 'monitoring';
             }
             
-            // كل شيء آخر (بما في ذلك React, next-themes, sonner) → vendor
+            // كل شيء آخر → vendor
             return 'vendor';
           }
         },
