@@ -1,13 +1,13 @@
 /**
  * Role Permissions Data Hook
- * @version 2.8.37
+ * @version 2.8.42
  */
 
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { AppRole } from "@/hooks/useUserRole";
+import { SecurityService } from "@/services";
 
 interface RolePermissionState {
   permissionId: string;
@@ -22,31 +22,13 @@ export function useRolePermissionsData(role: AppRole) {
 
   const query = useQuery({
     queryKey: ["role-permissions", role],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("role_permissions")
-        .select("*")
-        .eq("role", role);
-      
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => SecurityService.getRolePermissions(role),
     enabled: !!role,
   });
 
   const updatePermissionMutation = useMutation({
     mutationFn: async ({ permissionId, granted }: { permissionId: string; granted: boolean }) => {
-      const { error } = await supabase
-        .from("role_permissions")
-        .upsert({
-          role: role,
-          permission_id: permissionId,
-          granted
-        }, {
-          onConflict: 'role,permission_id'
-        });
-      
-      if (error) throw error;
+      await SecurityService.upsertRolePermission(role, permissionId, granted);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["role-permissions"] });

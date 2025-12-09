@@ -1,6 +1,6 @@
 /**
  * Security Service - خدمة الأمان
- * @version 2.8.28
+ * @version 2.8.42
  */
 
 import { supabase } from "@/integrations/supabase/client";
@@ -8,6 +8,7 @@ import type { Database } from "@/integrations/supabase/types";
 
 type SecurityEventRow = Database['public']['Tables']['security_events_log']['Row'];
 type LoginAttemptRow = Database['public']['Tables']['login_attempts_log']['Row'];
+type RolePermissionRow = Database['public']['Tables']['role_permissions']['Row'];
 
 export class SecurityService {
   /**
@@ -50,5 +51,35 @@ export class SecurityService {
 
     if (error) return null;
     return data?.role || null;
+  }
+
+  /**
+   * جلب صلاحيات دور معين
+   */
+  static async getRolePermissions(role: string): Promise<RolePermissionRow[]> {
+    const { data, error } = await supabase
+      .from("role_permissions")
+      .select("*")
+      .eq("role", role as RolePermissionRow['role']);
+    
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * تحديث أو إضافة صلاحية لدور
+   */
+  static async upsertRolePermission(role: string, permissionId: string, granted: boolean): Promise<void> {
+    const { error } = await supabase
+      .from("role_permissions")
+      .upsert({
+        role: role as RolePermissionRow['role'],
+        permission_id: permissionId,
+        granted
+      }, {
+        onConflict: 'role,permission_id'
+      });
+    
+    if (error) throw error;
   }
 }
