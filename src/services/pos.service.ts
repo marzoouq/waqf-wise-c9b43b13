@@ -173,8 +173,8 @@ export class POSService {
     const { data: profile } = await supabase
       .from('profiles')
       .select('full_name')
-      .eq('id', userId)
-      .single();
+      .eq('user_id', userId)
+      .maybeSingle();
 
     const { data, error } = await supabase
       .from('cashier_shifts')
