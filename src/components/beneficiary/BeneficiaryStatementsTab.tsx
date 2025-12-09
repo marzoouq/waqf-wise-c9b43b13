@@ -1,17 +1,17 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { Download, TrendingUp, TrendingDown } from "lucide-react";
+import { Download } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
+import { useBeneficiaryStatements } from "@/hooks/beneficiary/useBeneficiaryTabsData";
 import { MaskedValue } from "@/components/shared/MaskedValue";
 import { toast } from "sonner";
 import { productionLogger } from "@/lib/logger/production-logger";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MobileStatementCard } from "./cards/MobileStatementCard";
+import { supabase } from "@/integrations/supabase/client";
 
 interface BeneficiaryStatementsTabProps {
   beneficiaryId: string;
@@ -20,21 +20,7 @@ interface BeneficiaryStatementsTabProps {
 export function BeneficiaryStatementsTab({ beneficiaryId }: BeneficiaryStatementsTabProps) {
   const { settings } = useVisibilitySettings();
   const isMobile = useIsMobile();
-  
-  const { data: payments = [], isLoading } = useQuery({
-    queryKey: ["beneficiary-payments", beneficiaryId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("payments")
-        .select("*")
-        .eq("beneficiary_id", beneficiaryId)
-        .order("payment_date", { ascending: false });
-
-      if (error) throw error;
-      return data;
-    },
-  });
-
+  const { data: payments = [], isLoading } = useBeneficiaryStatements(beneficiaryId);
 
   const handleExport = async () => {
     try {
@@ -54,7 +40,6 @@ export function BeneficiaryStatementsTab({ beneficiaryId }: BeneficiaryStatement
         return;
       }
 
-      // Create CSV content with proper typing
       const headers = ['التاريخ', 'الوصف', 'المدين', 'الدائن', 'الرصيد'];
       const rows = transactions.map(entry => {
         const lines = entry.journal_entry_lines || [];
@@ -90,7 +75,6 @@ export function BeneficiaryStatementsTab({ beneficiaryId }: BeneficiaryStatement
 
   return (
     <div className="space-y-6">
-      {/* Summary Card */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
@@ -111,7 +95,6 @@ export function BeneficiaryStatementsTab({ beneficiaryId }: BeneficiaryStatement
         </CardContent>
       </Card>
 
-      {/* Payments Table/Cards */}
       <Card>
         <CardHeader>
           <CardTitle>سجل المدفوعات</CardTitle>
@@ -124,7 +107,6 @@ export function BeneficiaryStatementsTab({ beneficiaryId }: BeneficiaryStatement
               لا توجد مدفوعات بعد
             </div>
           ) : isMobile ? (
-            // عرض البطاقات على الجوال
             <div className="grid gap-4">
               {payments.map((payment) => (
                 <MobileStatementCard
@@ -135,7 +117,6 @@ export function BeneficiaryStatementsTab({ beneficiaryId }: BeneficiaryStatement
               ))}
             </div>
           ) : (
-            // عرض الجدول على الديسكتوب
             <ScrollArea className="w-full">
               <div className="rounded-md border">
                 <Table className="min-w-max">

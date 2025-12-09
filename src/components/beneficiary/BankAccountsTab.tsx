@@ -1,27 +1,13 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Landmark, TrendingUp } from "lucide-react";
+import { Landmark } from "lucide-react";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
+import { useBeneficiaryBankAccounts } from "@/hooks/beneficiary/useBeneficiaryTabsData";
 import { MaskedValue } from "@/components/shared/MaskedValue";
 
 export function BankAccountsTab() {
   const { settings } = useVisibilitySettings();
-
-  const { data: bankAccounts, isLoading } = useQuery({
-    queryKey: ["bank-accounts-beneficiary"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("bank_accounts")
-        .select("*")
-        .eq("is_active", true);
-
-      if (error) throw error;
-      return data;
-    },
-    enabled: settings?.show_bank_accounts || false,
-  });
+  const { data: bankAccounts, isLoading } = useBeneficiaryBankAccounts(settings?.show_bank_accounts || false);
 
   if (!settings?.show_bank_accounts) {
     return (

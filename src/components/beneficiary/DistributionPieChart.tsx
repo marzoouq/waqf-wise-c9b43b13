@@ -1,14 +1,7 @@
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { LoadingState } from "@/components/shared/LoadingState";
-
-interface ChartDataItem {
-  name: string;
-  value: number;
-  [key: string]: string | number;
-}
+import { useDistributionChartData } from "@/hooks/beneficiary/useBeneficiaryTabsData";
 
 const COLORS = [
   'hsl(var(--primary))',
@@ -19,63 +12,9 @@ const COLORS = [
 ];
 
 export function DistributionPieChart() {
-  const [data, setData] = useState<ChartDataItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data = [], isLoading } = useDistributionChartData();
 
-  useEffect(() => {
-    const fetchDistributions = async () => {
-      const { data: latestDistribution, error: distError } = await supabase
-        .from("distributions")
-        .select("id, total_amount")
-        .eq("status", "معتمد")
-        .order("distribution_date", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      if (distError || !latestDistribution) {
-        setLoading(false);
-        return;
-      }
-
-      const { data: details, error: detailsError } = await supabase
-        .from("distribution_details")
-        .select("allocated_amount, beneficiary_type")
-        .eq("distribution_id", latestDistribution.id);
-
-      if (!detailsError && details && details.length > 0) {
-        const typeData: { [key: string]: number } = {};
-        
-        details.forEach((detail) => {
-          const type = detail.beneficiary_type || 'أخرى';
-          if (!typeData[type]) {
-            typeData[type] = 0;
-          }
-          typeData[type] += Number(detail.allocated_amount || 0);
-        });
-
-        const total = Object.values(typeData).reduce((sum, val) => sum + val, 0);
-
-        if (total > 0) {
-          const chartData: ChartDataItem[] = Object.entries(typeData).map(([name, value]) => ({
-            name,
-            value: Math.round(value),
-            percentage: Math.round((value / total) * 100),
-          }));
-
-          setData(chartData);
-        } else {
-          setData([]);
-        }
-      } else {
-        setData([]);
-      }
-      setLoading(false);
-    };
-
-    fetchDistributions();
-  }, []);
-
-  if (loading) return <LoadingState message="جاري تحميل البيانات..." />;
+  if (isLoading) return <LoadingState message="جاري تحميل البيانات..." />;
 
   if (data.length === 0) {
     return (
