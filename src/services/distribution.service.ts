@@ -530,14 +530,15 @@ export class DistributionService {
   /**
    * جلب توزيعات السنة المالية
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   static async getByFiscalYear(fiscalYearId: string): Promise<DistributionRow[]> {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (supabase
+      const client = supabase as any;
+      const { data, error } = await client
         .from('distributions')
         .select('*')
         .eq('fiscal_year_id', fiscalYearId)
-        .order('distribution_date', { ascending: false }) as any);
+        .order('distribution_date', { ascending: false });
 
       if (error) throw error;
       return (data || []) as DistributionRow[];
