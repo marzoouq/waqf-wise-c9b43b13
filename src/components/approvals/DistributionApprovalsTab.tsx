@@ -3,15 +3,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, XCircle, Clock, Eye, Lock } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
-import { useState } from "react";
 import { ApprovalFlowDialog } from "@/components/funds/ApprovalFlowDialog";
 import { DistributionForApproval, StatusConfigMap } from "@/types/approvals";
 import { useApprovalPermissions } from "@/hooks/useApprovalPermissions";
 import { useDistributionApprovals } from "@/hooks/approvals";
+import { useDialogState } from "@/hooks/ui/useDialogState";
 
 export function DistributionApprovalsTab() {
-  const [selectedDistribution, setSelectedDistribution] = useState<DistributionForApproval | null>(null);
-  const [isFlowDialogOpen, setIsFlowDialogOpen] = useState(false);
+  const flowDialog = useDialogState<DistributionForApproval>();
   const { canApproveLevel, userRole } = useApprovalPermissions();
 
   const { data: distributions, isLoading } = useDistributionApprovals();
@@ -85,10 +84,7 @@ export function DistributionApprovalsTab() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => {
-                          setSelectedDistribution(dist);
-                          setIsFlowDialogOpen(true);
-                        }}
+                        onClick={() => flowDialog.open(dist)}
                       >
                         <Eye className="h-4 w-4 ml-1" />
                         عرض التفاصيل
@@ -117,13 +113,13 @@ export function DistributionApprovalsTab() {
         )}
       </div>
 
-      {selectedDistribution && (
+      {flowDialog.data && (
         <ApprovalFlowDialog
-          open={isFlowDialogOpen}
-          onOpenChange={setIsFlowDialogOpen}
-          distributionId={selectedDistribution.id}
-          distributionMonth={selectedDistribution.month}
-          distributionAmount={selectedDistribution.total_amount}
+          open={flowDialog.isOpen}
+          onOpenChange={(open) => !open && flowDialog.close()}
+          distributionId={flowDialog.data.id}
+          distributionMonth={flowDialog.data.month}
+          distributionAmount={flowDialog.data.total_amount}
         />
       )}
     </>

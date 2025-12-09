@@ -3,15 +3,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, XCircle, Clock, Eye } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
-import { useState } from "react";
 import ViewJournalEntryDialog from "@/components/accounting/ViewJournalEntryDialog";
-import { JournalApproval, BadgeVariant, JournalEntryWithLines } from "@/types";
+import { BadgeVariant, JournalEntryWithLines } from "@/types";
 import { LucideIcon } from "lucide-react";
 import { useJournalApprovals } from "@/hooks/approvals";
+import { useDialogState } from "@/hooks/ui/useDialogState";
 
 export function JournalApprovalsTab() {
-  const [selectedEntry, setSelectedEntry] = useState<JournalEntryWithLines | null>(null);
-  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  const viewDialog = useDialogState<JournalEntryWithLines>();
 
   const { data: approvals, isLoading } = useJournalApprovals();
 
@@ -83,8 +82,7 @@ export function JournalApprovalsTab() {
                   size="sm"
                   onClick={() => {
                     if (approval.journal_entry) {
-                      setSelectedEntry(approval.journal_entry as JournalEntryWithLines);
-                      setIsViewDialogOpen(true);
+                      viewDialog.open(approval.journal_entry as JournalEntryWithLines);
                     }
                   }}
                 >
@@ -106,11 +104,11 @@ export function JournalApprovalsTab() {
         )}
       </div>
 
-      {selectedEntry && (
+      {viewDialog.data && (
         <ViewJournalEntryDialog
-          open={isViewDialogOpen}
-          onOpenChange={setIsViewDialogOpen}
-          entry={selectedEntry}
+          open={viewDialog.isOpen}
+          onOpenChange={(open) => !open && viewDialog.close()}
+          entry={viewDialog.data}
         />
       )}
     </>

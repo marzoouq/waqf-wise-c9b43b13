@@ -9,11 +9,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useRequestApprovals } from "@/hooks/approvals";
+import { useDialogState } from "@/hooks/ui/useDialogState";
 
 export function RequestApprovalsTab() {
-  const [selectedRequest, setSelectedRequest] = useState<RequestWithBeneficiary | null>(null);
-  const [approveDialogOpen, setApproveDialogOpen] = useState(false);
-  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const approveDialog = useDialogState<RequestWithBeneficiary>();
+  const rejectDialog = useDialogState<RequestWithBeneficiary>();
   const [notes, setNotes] = useState("");
   const [rejectionReason, setRejectionReason] = useState("");
 
@@ -72,10 +72,7 @@ export function RequestApprovalsTab() {
               <div className="flex gap-2">
                 <Button
                   size="sm"
-                  onClick={() => {
-                    setSelectedRequest(request);
-                    setApproveDialogOpen(true);
-                  }}
+                  onClick={() => approveDialog.open(request)}
                   disabled={request.status !== 'قيد المراجعة'}
                 >
                   <CheckCircle className="h-4 w-4 ml-1" />
@@ -84,10 +81,7 @@ export function RequestApprovalsTab() {
                 <Button
                   size="sm"
                   variant="destructive"
-                  onClick={() => {
-                    setSelectedRequest(request);
-                    setRejectDialogOpen(true);
-                  }}
+                  onClick={() => rejectDialog.open(request)}
                   disabled={request.status !== 'قيد المراجعة'}
                 >
                   <XCircle className="h-4 w-4 ml-1" />
@@ -112,12 +106,12 @@ export function RequestApprovalsTab() {
         </Card>
       )}
 
-      <Dialog open={approveDialogOpen} onOpenChange={setApproveDialogOpen}>
+      <Dialog open={approveDialog.isOpen} onOpenChange={(open) => !open && approveDialog.close()}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>الموافقة على الطلب</DialogTitle>
             <DialogDescription>
-              أنت على وشك الموافقة على الطلب {selectedRequest?.request_number}
+              أنت على وشك الموافقة على الطلب {approveDialog.data?.request_number}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
@@ -133,16 +127,15 @@ export function RequestApprovalsTab() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setApproveDialogOpen(false)}>
+            <Button variant="outline" onClick={() => approveDialog.close()}>
               إلغاء
             </Button>
             <Button 
               onClick={() => {
-                if (selectedRequest) {
-                  approveMutation.mutate({ requestId: selectedRequest.id, notes }, {
+                if (approveDialog.data) {
+                  approveMutation.mutate({ requestId: approveDialog.data.id, notes }, {
                     onSuccess: () => {
-                      setApproveDialogOpen(false);
-                      setSelectedRequest(null);
+                      approveDialog.close();
                       setNotes("");
                     }
                   });
@@ -156,12 +149,12 @@ export function RequestApprovalsTab() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
+      <Dialog open={rejectDialog.isOpen} onOpenChange={(open) => !open && rejectDialog.close()}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>رفض الطلب</DialogTitle>
             <DialogDescription>
-              أنت على وشك رفض الطلب {selectedRequest?.request_number}
+              أنت على وشك رفض الطلب {rejectDialog.data?.request_number}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
@@ -178,17 +171,16 @@ export function RequestApprovalsTab() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setRejectDialogOpen(false)}>
+            <Button variant="outline" onClick={() => rejectDialog.close()}>
               إلغاء
             </Button>
             <Button
               variant="destructive"
               onClick={() => {
-                if (selectedRequest) {
-                  rejectMutation.mutate({ requestId: selectedRequest.id, reason: rejectionReason }, {
+                if (rejectDialog.data) {
+                  rejectMutation.mutate({ requestId: rejectDialog.data.id, reason: rejectionReason }, {
                     onSuccess: () => {
-                      setRejectDialogOpen(false);
-                      setSelectedRequest(null);
+                      rejectDialog.close();
                       setRejectionReason("");
                     }
                   });
