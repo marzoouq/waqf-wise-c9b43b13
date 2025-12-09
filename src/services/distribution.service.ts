@@ -532,15 +532,15 @@ export class DistributionService {
    */
   static async getByFiscalYear(fiscalYearId: string): Promise<DistributionRow[]> {
     try {
-      // @ts-expect-error - تجاوز خطأ TypeScript المعقد
-      const result = await supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase
         .from('distributions')
         .select('*')
         .eq('fiscal_year_id', fiscalYearId)
-        .order('distribution_date', { ascending: false });
+        .order('distribution_date', { ascending: false }) as any);
 
-      if (result.error) throw result.error;
-      return result.data || [];
+      if (error) throw error;
+      return (data || []) as DistributionRow[];
     } catch (error) {
       productionLogger.error('Error fetching fiscal year distributions', error);
       throw error;

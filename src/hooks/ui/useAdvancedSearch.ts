@@ -73,14 +73,14 @@ export function useAdvancedSearch(searchType: string) {
     columns: string = '*',
     customFilters?: SearchFilters
   ): Promise<unknown[]> => {
-    // @ts-expect-error - Dynamic table name
-    let dbQuery = supabase.from(tableName).select(columns);
-
     const searchFilters = customFilters || filters;
+    
+    // بناء الاستعلام - استخدام any لتجنب مشاكل TypeScript مع الأسماء الديناميكية
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let dbQuery: any = supabase.from(tableName as any).select(columns);
 
     // تطبيق البحث النصي
     if (query) {
-      // البحث في عدة أعمدة
       const searchColumns = ['full_name', 'national_id', 'phone', 'email', 'notes'];
       const orConditions = searchColumns.map(col => `${col}.ilike.%${query}%`).join(',');
       dbQuery = dbQuery.or(orConditions);
@@ -90,7 +90,6 @@ export function useAdvancedSearch(searchType: string) {
     Object.entries(searchFilters).forEach(([key, value]) => {
       if (value !== null && value !== undefined && value !== '') {
         if (Array.isArray(value)) {
-          // @ts-expect-error - Dynamic column filtering
           dbQuery = dbQuery.in(key, value);
         } else if (typeof value === 'object' && value && 'gte' in value && 'lte' in value) {
           dbQuery = dbQuery.gte(key, value.gte as string).lte(key, value.lte as string);

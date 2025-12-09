@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Dialog,
   DialogContent,
@@ -20,20 +19,17 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
-import { EdgeFunctionService } from "@/services";
 import {
   Loader2,
   Globe,
   AlertCircle,
-  Calendar,
-  Users,
   Eye,
   EyeOff,
 } from "lucide-react";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
-import { useFiscalYearsList, FISCAL_YEARS_QUERY_KEY } from "@/hooks/fiscal-years";
+import { useFiscalYearsList } from "@/hooks/fiscal-years";
+import { usePublishFiscalYear } from "@/hooks/nazer/usePublishFiscalYear";
 
 interface PublishFiscalYearDialogProps {
   open: boolean;
@@ -44,38 +40,17 @@ export function PublishFiscalYearDialog({
   open,
   onOpenChange,
 }: PublishFiscalYearDialogProps) {
-  const queryClient = useQueryClient();
   const [selectedFiscalYear, setSelectedFiscalYear] = useState<string>("");
   const [notifyHeirs, setNotifyHeirs] = useState(true);
 
-  // استخدام الـ hook الموحد
+  // استخدام الـ hooks الموحدة
   const { fiscalYears, isLoading } = useFiscalYearsList();
+  const { publish, isPublishing } = usePublishFiscalYear(() => {
+    onOpenChange(false);
+    setSelectedFiscalYear("");
+  });
 
   const selectedYear = fiscalYears.find((fy) => fy.id === selectedFiscalYear);
-
-  // Publish mutation
-  const publishMutation = useMutation({
-    mutationFn: async () => {
-      const result = await EdgeFunctionService.invokePublishFiscalYear({
-        fiscalYearId: selectedFiscalYear,
-        notifyHeirs,
-      });
-
-      if (!result.success) throw new Error(result.error);
-      return result.data;
-    },
-    onSuccess: (data) => {
-      toast.success("تم نشر السنة المالية بنجاح", {
-        description: `أصبحت بيانات ${selectedYear?.name} متاحة للورثة`,
-      });
-      queryClient.invalidateQueries({ queryKey: ["fiscal-years"] });
-      onOpenChange(false);
-      setSelectedFiscalYear("");
-    },
-    onError: (error: any) => {
-      toast.error("خطأ في النشر", { description: error.message });
-    },
-  });
 
   const unpublishedYears = fiscalYears.filter((fy) => !fy.is_published);
   const publishedYears = fiscalYears.filter((fy) => fy.is_published);
@@ -228,11 +203,15 @@ export function PublishFiscalYearDialog({
             إلغاء
           </Button>
           <Button
-            onClick={() => publishMutation.mutate()}
-            disabled={!selectedFiscalYear || publishMutation.isPending}
+            onClick={() => publish({ 
+              fiscalYearId: selectedFiscalYear, 
+              notifyHeirs,
+              fiscalYearName: selectedYear?.name 
+            })}
+            disabled={!selectedFiscalYear || isPublishing}
             className="gap-2"
           >
-            {publishMutation.isPending ? (
+            {isPublishing ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
               <Globe className="h-4 w-4" />
