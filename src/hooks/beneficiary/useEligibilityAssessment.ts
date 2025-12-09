@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { BeneficiaryService } from '@/services/beneficiary.service';
 import { handleError, showSuccess } from '@/lib/errors';
 import { QUERY_KEYS } from '@/lib/query-keys';
 
@@ -33,13 +33,7 @@ export function useEligibilityAssessment(beneficiaryId: string) {
   const { data: assessments = [], isLoading } = useQuery({
     queryKey: QUERY_KEYS.ELIGIBILITY_ASSESSMENTS(beneficiaryId),
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('eligibility_assessments')
-        .select('id, beneficiary_id, assessment_date, total_score, eligibility_status, criteria_scores, recommendations, assessed_by, created_at')
-        .eq('beneficiary_id', beneficiaryId)
-        .order('assessment_date', { ascending: false });
-
-      if (error) throw error;
+      const data = await BeneficiaryService.getEligibilityAssessments(beneficiaryId);
       return data as EligibilityAssessment[];
     },
     enabled: !!beneficiaryId,
@@ -47,14 +41,7 @@ export function useEligibilityAssessment(beneficiaryId: string) {
 
   // تشغيل تقييم جديد
   const runAssessment = useMutation({
-    mutationFn: async () => {
-      const { data, error } = await supabase.rpc('auto_assess_eligibility', {
-        p_beneficiary_id: beneficiaryId,
-      });
-
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: () => BeneficiaryService.runEligibilityAssessment(beneficiaryId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ELIGIBILITY_ASSESSMENTS(beneficiaryId) });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARIES });

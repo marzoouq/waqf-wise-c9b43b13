@@ -18,6 +18,14 @@ interface SearchHistoryItem {
   created_at: string;
 }
 
+export interface RecentSearch {
+  id: string;
+  search_query: string;
+  filters: SearchFilters | null;
+  results_count: number;
+  created_at: string;
+}
+
 export const SearchService = {
   /**
    * جلب سجل البحث
@@ -157,5 +165,52 @@ export const SearchService = {
     const { data, error } = await dbQuery;
     if (error) throw error;
     return data || [];
+  },
+
+  /**
+   * جلب عمليات البحث الأخيرة
+   */
+  async getRecentSearches(searchType: string): Promise<RecentSearch[]> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return [];
+
+    const { data, error } = await supabase
+      .from('search_history')
+      .select('id, search_query, filters, results_count, created_at')
+      .eq('user_id', user.id)
+      .eq('search_type', searchType)
+      .order('created_at', { ascending: false })
+      .limit(10);
+
+    if (error) throw error;
+    return (data || []) as RecentSearch[];
+  },
+
+  /**
+   * حذف عملية بحث
+   */
+  async deleteSearch(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('search_history')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+  },
+
+  /**
+   * مسح جميع عمليات البحث
+   */
+  async clearAllSearches(searchType: string): Promise<void> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { error } = await supabase
+      .from('search_history')
+      .delete()
+      .eq('user_id', user.id)
+      .eq('search_type', searchType);
+
+    if (error) throw error;
   },
 };

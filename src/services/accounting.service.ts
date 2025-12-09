@@ -2001,4 +2001,20 @@ export class AccountingService {
     if (error) throw error;
     return data || [];
   }
+
+  /**
+   * جلب الميزانيات حسب السنة المالية
+   */
+  static async getBudgetsByFiscalYear(fiscalYearId: string) {
+    if (!fiscalYearId) return [];
+    
+    const { data, error } = await supabase
+      .from('budgets')
+      .select('*, accounts(code, name_ar)')
+      .eq('fiscal_year_id', fiscalYearId)
+      .order('variance_amount', { ascending: true });
+
+    if (error) throw error;
+    return data || [];
+  }
 }
