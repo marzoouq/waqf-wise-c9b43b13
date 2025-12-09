@@ -16,9 +16,11 @@ export function useUserRolesManager(userId: string) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  const userRolesKey = QUERY_KEYS.USER_ROLES(userId);
+  
   // جلب أدوار المستخدم الحالية
   const { data: userRoles = [], isLoading } = useQuery({
-    queryKey: QUERY_KEYS.USER_ROLES(userId),
+    queryKey: userRolesKey,
     queryFn: () => UserService.getUserRolesForManager(userId),
     enabled: !!userId,
   });
@@ -27,7 +29,7 @@ export function useUserRolesManager(userId: string) {
   const addRoleMutation = useMutation({
     mutationFn: (role: RoleName) => UserService.addUserRole(userId, role),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USER_ROLES(userId) });
+      queryClient.invalidateQueries({ queryKey: userRolesKey });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USERS });
       toast({
         title: 'تم إضافة الدور',
@@ -47,7 +49,7 @@ export function useUserRolesManager(userId: string) {
   const deleteRoleMutation = useMutation({
     mutationFn: (role: RoleName) => UserService.deleteUserRole(userId, role),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USER_ROLES(userId) });
+      queryClient.invalidateQueries({ queryKey: userRolesKey });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USERS });
       toast({
         title: 'تم حذف الدور',
