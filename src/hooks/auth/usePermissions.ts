@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
 import { UserService, RealtimeService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface Permission {
   id: string;
@@ -24,7 +25,7 @@ export function usePermissions() {
   const { user } = useAuth();
 
   const { data: permissions = [], isLoading, isFetching, refetch } = useQuery({
-    queryKey: ["user-permissions", user?.id],
+    queryKey: QUERY_KEYS.USER_PERMISSIONS(user?.id),
     queryFn: async () => {
       if (!user) return [];
 

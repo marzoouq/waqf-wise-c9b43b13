@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useApprovalHistory } from "@/hooks/useApprovalHistory";
 import { invalidateQueryGroups } from "@/lib/query-invalidation";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export function usePaymentApprovals() {
   const { toast } = useToast();
@@ -17,7 +18,7 @@ export function usePaymentApprovals() {
   const { addToHistory } = useApprovalHistory();
 
   const query = useQuery<PaymentForApproval[]>({
-    queryKey: ["payments_with_approvals"],
+    queryKey: QUERY_KEYS.PAYMENTS_WITH_APPROVALS,
     queryFn: () => ApprovalService.getPaymentApprovalsWithDetails(),
   });
 
