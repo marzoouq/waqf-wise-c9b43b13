@@ -14,12 +14,13 @@ import {
 import { useAnnualDisclosures, AnnualDisclosure } from "@/hooks/useAnnualDisclosures";
 import { ViewDisclosureDialog } from "@/components/distributions/ViewDisclosureDialog";
 import { generateDisclosurePDF } from "@/lib/generateDisclosurePDF";
-import { supabase } from "@/integrations/supabase/client";
+import { useDisclosureBeneficiaries } from "@/hooks/beneficiary/useDisclosureBeneficiaries";
 
 export const AnnualDisclosureCard = () => {
   const { disclosures, isLoading } = useAnnualDisclosures();
   const [selectedDisclosure, setSelectedDisclosure] = useState<AnnualDisclosure | null>(null);
   const [viewOpen, setViewOpen] = useState(false);
+  const { fetchDisclosureBeneficiaries } = useDisclosureBeneficiaries();
 
   // عرض الإفصاحات المنشورة فقط
   const publishedDisclosures = disclosures.filter(d => d.status === 'published');
@@ -27,11 +28,7 @@ export const AnnualDisclosureCard = () => {
 
   const handleExportPDF = async (disclosure: AnnualDisclosure) => {
     try {
-      const { data: beneficiaries } = await supabase
-        .from("disclosure_beneficiaries")
-        .select("*")
-        .eq("disclosure_id", disclosure.id);
-      
+      const beneficiaries = await fetchDisclosureBeneficiaries(disclosure.id);
       await generateDisclosurePDF(disclosure, beneficiaries || []);
     } catch (error) {
       // Error already handled in generateDisclosurePDF

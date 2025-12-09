@@ -1,5 +1,3 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, Building2 } from "lucide-react";
@@ -7,7 +5,6 @@ import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { exportToExcel, exportToPDF } from "@/lib/exportHelpers";
 import { useToast } from "@/hooks/use-toast";
-import { PropertyRow, ContractRow } from "@/types/supabase-helpers";
 import {
   Table,
   TableBody,
@@ -18,76 +15,11 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { ReportRefreshIndicator } from "./ReportRefreshIndicator";
-import { QUERY_CONFIG } from "@/lib/queryOptimization";
-import { useState, useEffect } from "react";
-
-interface PropertyWithContracts extends PropertyRow {
-  contracts?: ContractRow[];
-}
+import { usePropertiesReport } from "@/hooks/reports/usePropertiesReport";
 
 export function PropertiesReports() {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [lastUpdated, setLastUpdated] = useState<Date>();
-
-  const { data: properties = [], isLoading, isRefetching, dataUpdatedAt } = useQuery<PropertyWithContracts[]>({
-    queryKey: ["properties-report"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("properties")
-        .select(`
-          *,
-          contracts (
-            id,
-            contract_number,
-            tenant_name,
-            monthly_rent,
-            status
-          )
-        `)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return data as PropertyWithContracts[];
-    },
-    ...QUERY_CONFIG.REPORTS,
-  });
-
-  // تحديث وقت آخر تحديث
-  useEffect(() => {
-    if (dataUpdatedAt) {
-      setLastUpdated(new Date(dataUpdatedAt));
-    }
-  }, [dataUpdatedAt]);
-
-  // Real-time subscription
-  useEffect(() => {
-    const channel = supabase
-      .channel('properties-report-changes')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'properties' },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ["properties-report"] });
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'contracts' },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ["properties-report"] });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
-
-  const handleRefresh = () => {
-    queryClient.invalidateQueries({ queryKey: ["properties-report"] });
-  };
+  const { properties, isLoading, isRefetching, lastUpdated, handleRefresh } = usePropertiesReport();
 
   const handleExportPDF = () => {
     const headers = ["اسم العقار", "الموقع", "نوع العقار", "الحالة", "الإيجار الشهري"];
