@@ -2,6 +2,7 @@
  * Distribution Service - خدمة إدارة التوزيعات
  * 
  * تحتوي على منطق الأعمال المتعلق بتوزيعات الوقف
+ * @version 2.8.44
  */
 
 import { supabase } from '@/integrations/supabase/client';
@@ -17,6 +18,53 @@ type PaymentVoucherRow = Database['public']['Tables']['payment_vouchers']['Row']
 type PaymentVoucherInsert = Database['public']['Tables']['payment_vouchers']['Insert'];
 type BankTransferFileRow = Database['public']['Tables']['bank_transfer_files']['Row'];
 /* eslint-enable @typescript-eslint/no-explicit-any */
+
+export interface DistributionApproval {
+  id: string;
+  distribution_id: string;
+  level: number;
+  status: string;
+  approver_name: string;
+  notes: string | null;
+  approved_at: string | null;
+  created_at: string;
+}
+
+export interface ApprovalHistoryItem {
+  id: string;
+  action: string;
+  notes: string | null;
+  performed_by_name: string | null;
+  created_at: string;
+}
+
+export interface VoucherRecord {
+  id: string;
+  voucher_number: string;
+  voucher_type?: string;
+  beneficiary_id?: string;
+  amount: number;
+  status: string;
+  created_at: string;
+  description?: string;
+  payment_method?: string;
+  bank_account_id?: string;
+  reference_number?: string;
+  notes?: string;
+  approved_by?: string;
+  approved_at?: string;
+  paid_by?: string;
+  paid_at?: string;
+}
+
+export interface VoucherStats {
+  total: number;
+  draft: number;
+  approved: number;
+  paid: number;
+  totalAmount: number;
+  paidAmount: number;
+}
 
 export interface DistributionSummary {
   totalDistributions: number;
@@ -497,6 +545,156 @@ export class DistributionService {
       return result.data || [];
     } catch (error) {
       productionLogger.error('Error fetching fiscal year distributions', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب موافقات التوزيع
+   */
+  static async getDistributionApprovals(distributionId: string): Promise<DistributionApproval[]> {
+    try {
+      const { data, error } = await supabase
+        .from('distribution_approvals')
+        .select('id, distribution_id, level, status, approver_name, notes, approved_at, created_at')
+        .eq('distribution_id', distributionId)
+        .order('level', { ascending: true });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching distribution approvals', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب سجل موافقات التوزيع
+   */
+  static async getDistributionHistory(distributionId: string): Promise<ApprovalHistoryItem[]> {
+    try {
+      const { data, error } = await supabase
+        .from('approval_history')
+        .select('id, action, notes, performed_by_name, created_at')
+        .eq('reference_id', distributionId)
+        .eq('approval_type', 'distribution')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching distribution history', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب سندات التوزيع مع التفاصيل
+   */
+  static async getDistributionVouchersWithDetails(distributionId: string): Promise<VoucherRecord[]> {
+    try {
+      const { data, error } = await supabase
+        .from('payment_vouchers_with_details')
+        .select('id, voucher_number, voucher_type, beneficiary_id, amount, status, created_at, description, payment_method, bank_account_id, reference_number, notes, approved_by, approved_at, paid_by, paid_at')
+        .eq('distribution_id', distributionId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching distribution vouchers with details', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب إحصائيات سندات التوزيع
+   */
+  static async getDistributionVoucherStats(distributionId: string): Promise<VoucherStats> {
+    try {
+      const { data, error } = await supabase
+        .from('payment_vouchers')
+        .select('amount, status')
+        .eq('distribution_id', distributionId);
+
+      if (error) throw error;
+
+      return {
+        total: data.length,
+        draft: data.filter(v => v.status === 'draft').length,
+        approved: data.filter(v => v.status === 'approved').length,
+        paid: data.filter(v => v.status === 'paid').length,
+        totalAmount: data.reduce((sum, v) => sum + v.amount, 0),
+        paidAmount: data.filter(v => v.status === 'paid').reduce((sum, v) => sum + v.amount, 0),
+      };
+    } catch (error) {
+      productionLogger.error('Error fetching distribution voucher stats', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب قائمة سندات الصرف
+   */
+  static async getPaymentVouchersList() {
+    try {
+      const { data, error } = await supabase
+        .from("payment_vouchers")
+        .select(`
+          *,
+          beneficiaries (
+            full_name,
+            national_id
+          ),
+          distributions (
+            distribution_name: month
+          )
+        `)
+        .order("created_at", { ascending: false })
+        .limit(50);
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      productionLogger.error('Error fetching payment vouchers list', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب أفراد العائلة
+   */
+  static async getFamilyMembers(familyName: string) {
+    try {
+      const { data, error } = await supabase
+        .from("beneficiaries")
+        .select("id, full_name, national_id, relationship, gender, date_of_birth, status, is_head_of_family")
+        .eq("family_name", familyName)
+        .order("is_head_of_family", { ascending: false })
+        .order("full_name");
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      productionLogger.error('Error fetching family members', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب مستفيدي الإفصاح
+   */
+  static async getDisclosureBeneficiaries(disclosureId: string) {
+    try {
+      const { data, error } = await supabase
+        .from("disclosure_beneficiaries")
+        .select("*")
+        .eq("disclosure_id", disclosureId);
+      
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      productionLogger.error('Error fetching disclosure beneficiaries', error);
       throw error;
     }
   }

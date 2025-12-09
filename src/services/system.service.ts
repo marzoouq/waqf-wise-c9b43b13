@@ -302,4 +302,96 @@ export class SystemService {
     
     if (error) throw error;
   }
+
+  /**
+   * جلب إحصائيات صحة النظام
+   */
+  static async getHealthStats() {
+    const now = new Date();
+    const last7d = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+
+    const [errorsResult, alertsResult] = await Promise.all([
+      supabase
+        .from("system_error_logs")
+        .select("id, severity, status, created_at", { count: "exact" })
+        .gte("created_at", last7d),
+      supabase
+        .from("system_alerts")
+        .select("id, severity, status, created_at", { count: "exact" })
+        .gte("created_at", last7d),
+    ]);
+
+    const errors = errorsResult.data || [];
+    const alerts = alertsResult.data || [];
+
+    const resolvedCount = errors.filter(e => e.status === "resolved" || e.status === "auto_resolved").length;
+    const resolvedAlerts = alerts.filter(a => a.status === "resolved").length;
+    const totalErrors = errorsResult.count || 0;
+    
+    const resolutionRate = totalErrors > 0 
+      ? Math.round((resolvedCount / totalErrors) * 100) 
+      : 100;
+    
+    const criticalErrors = errors.filter(e => e.severity === "critical" && e.status === "new").length;
+    const highErrors = errors.filter(e => e.severity === "high" && e.status === "new").length;
+    const activeAlerts = alerts.filter(a => a.status === "active").length;
+    const criticalAlerts = alerts.filter(a => a.severity === "critical" && a.status === "active").length;
+    const highAlerts = alerts.filter(a => a.severity === "high" && a.status === "active").length;
+    
+    const totalResolvable = errors.filter(e => e.status !== "new").length;
+    const successfulFixes = resolvedCount;
+    const failedFixes = Math.max(0, totalResolvable - resolvedCount);
+    const fixSuccessRate = totalResolvable > 0 ? Math.round((successfulFixes / totalResolvable) * 100) : 100;
+    
+    const healthScore = Math.max(0, 100 - (criticalErrors * 20) - (highErrors * 10) - (activeAlerts * 5));
+
+    return {
+      totalErrors,
+      newErrors: errors.filter(e => e.status === "new").length,
+      criticalErrors,
+      highErrors,
+      resolvedErrors: resolvedCount,
+      totalAlerts: alertsResult.count || 0,
+      activeAlerts,
+      criticalAlerts,
+      highAlerts,
+      resolvedAlerts,
+      resolutionRate,
+      healthScore,
+      fixSuccessRate,
+      successfulFixes,
+      failedFixes,
+    };
+  }
+
+  /**
+   * جلب جلسات نشاط المستفيدين
+   */
+  static async getBeneficiaryActivitySessions() {
+    const { data, error } = await supabase
+      .from("beneficiary_sessions")
+      .select(`
+        id,
+        beneficiary_id,
+        current_page,
+        current_section,
+        last_activity,
+        is_online,
+        session_start,
+        beneficiaries:beneficiary_id (
+          full_name,
+          phone,
+          category
+        )
+      `)
+      .order("last_activity", { ascending: false })
+      .limit(20);
+
+    if (error) throw error;
+    
+    return (data || []).map(session => ({
+      ...session,
+      beneficiary: session.beneficiaries as { full_name: string; phone: string; category: string } | undefined
+    }));
+  }
 }

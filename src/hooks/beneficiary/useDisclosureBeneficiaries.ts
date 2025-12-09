@@ -1,9 +1,9 @@
 /**
  * Disclosure Beneficiaries Hook
- * @version 2.8.40
+ * @version 2.8.44
  */
 
-import { supabase } from "@/integrations/supabase/client";
+import { DistributionService } from "@/services";
 
 export interface DisclosureBeneficiary {
   id: string;
@@ -19,13 +19,7 @@ export interface DisclosureBeneficiary {
 
 export function useDisclosureBeneficiaries() {
   const fetchDisclosureBeneficiaries = async (disclosureId: string) => {
-    const { data, error } = await supabase
-      .from("disclosure_beneficiaries")
-      .select("*")
-      .eq("disclosure_id", disclosureId);
-    
-    if (error) throw error;
-    return data as DisclosureBeneficiary[];
+    return DistributionService.getDisclosureBeneficiaries(disclosureId) as Promise<DisclosureBeneficiary[]>;
   };
 
   return { fetchDisclosureBeneficiaries };

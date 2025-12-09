@@ -184,4 +184,30 @@ export class InvoiceService {
     const newNumber = (lastNumber + 1).toString().padStart(3, "0");
     return `INV-${year}-${newNumber}`;
   }
+
+  /**
+   * جلب تفاصيل الفاتورة
+   */
+  static async getInvoiceDetails(invoiceId: string) {
+    const { data, error } = await supabase
+      .from("invoices")
+      .select("*")
+      .eq("id", invoiceId)
+      .maybeSingle();
+    if (error) throw error;
+    return data;
+  }
+
+  /**
+   * جلب أسطر الفاتورة
+   */
+  static async getInvoiceLines(invoiceId: string) {
+    const { data, error } = await supabase
+      .from("invoice_lines")
+      .select("*")
+      .eq("invoice_id", invoiceId)
+      .order("line_number");
+    if (error) throw error;
+    return data || [];
+  }
 }

@@ -1,11 +1,12 @@
 /**
  * Beneficiary Activity Sessions Hook
- * @version 2.8.37
+ * @version 2.8.44
  */
 
 import { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { SystemService } from "@/services";
 
 export interface BeneficiarySession {
   id: string;
@@ -50,31 +51,8 @@ export function useBeneficiaryActivitySessions() {
   const query = useQuery({
     queryKey: ["beneficiary-sessions-live"],
     queryFn: async (): Promise<BeneficiarySession[]> => {
-      const { data, error } = await supabase
-        .from("beneficiary_sessions")
-        .select(`
-          id,
-          beneficiary_id,
-          current_page,
-          current_section,
-          last_activity,
-          is_online,
-          session_start,
-          beneficiaries:beneficiary_id (
-            full_name,
-            phone,
-            category
-          )
-        `)
-        .order("last_activity", { ascending: false })
-        .limit(20);
-
-      if (error) throw error;
-      
-      return (data || []).map(session => ({
-        ...session,
-        beneficiary: session.beneficiaries as BeneficiarySession['beneficiary']
-      }));
+      const data = await SystemService.getBeneficiaryActivitySessions();
+      return data as BeneficiarySession[];
     },
     staleTime: 30 * 1000,
     refetchInterval: 60 * 1000,
