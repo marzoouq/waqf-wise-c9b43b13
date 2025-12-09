@@ -8,6 +8,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Beneficiary } from '@/types/beneficiary';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 interface VerificationFormData {
   verification_type: string;
@@ -55,8 +56,8 @@ export function useIdentityVerification(beneficiary: Beneficiary | null) {
       if (updateError) throw updateError;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['beneficiaries'] });
-      queryClient.invalidateQueries({ queryKey: ['beneficiary', beneficiary?.id] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARIES });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARY(beneficiary?.id || '') });
       toast({
         title: 'تم التحقق بنجاح',
         description: 'تم التحقق من هوية المستفيد وتحديث البيانات',

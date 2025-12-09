@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface DocumentVersion {
   id: string;
@@ -20,7 +21,7 @@ export function useDocumentVersions(documentId: string | undefined) {
   const queryClient = useQueryClient();
 
   const { data: versions, isLoading } = useQuery({
-    queryKey: ['document-versions', documentId],
+    queryKey: QUERY_KEYS.DOCUMENT_VERSIONS(documentId || ''),
     queryFn: async (): Promise<DocumentVersion[]> => {
       if (!documentId) return [];
       
@@ -84,7 +85,7 @@ export function useDocumentVersions(documentId: string | undefined) {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['document-versions', documentId] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DOCUMENT_VERSIONS(documentId || '') });
       toast({
         title: 'تم إنشاء الإصدار',
         description: 'تم حفظ إصدار جديد من المستند',
@@ -127,8 +128,8 @@ export function useDocumentVersions(documentId: string | undefined) {
       return version;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['document-versions', documentId] });
-      queryClient.invalidateQueries({ queryKey: ['documents'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DOCUMENT_VERSIONS(documentId || '') });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DOCUMENTS });
       toast({
         title: 'تم الاستعادة',
         description: 'تم استعادة الإصدار السابق بنجاح',

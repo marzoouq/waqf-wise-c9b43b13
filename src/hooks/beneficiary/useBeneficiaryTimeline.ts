@@ -6,6 +6,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 type BeneficiaryRequest = Database['public']['Tables']['beneficiary_requests']['Row'] & {
   request_types?: { name_ar: string } | null;
@@ -23,7 +24,7 @@ export interface TimelineEvent {
 
 export function useBeneficiaryTimeline(beneficiaryId: string) {
   return useQuery({
-    queryKey: ['beneficiary-timeline', beneficiaryId],
+    queryKey: QUERY_KEYS.BENEFICIARY_TIMELINE(beneficiaryId),
     queryFn: async () => {
       const timelineEvents: TimelineEvent[] = [];
 

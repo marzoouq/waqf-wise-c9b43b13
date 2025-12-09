@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { BudgetComparison } from "@/types/dashboard";
 import { JournalEntryLineRow, AccountRow } from "@/types/supabase-helpers";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 // ==================== Types ====================
 interface BudgetData {
@@ -37,7 +38,7 @@ export function useBudgetComparison() {
   const queryClient = useQueryClient();
 
   const query = useQuery({
-    queryKey: ["budget-comparison-chart"],
+    queryKey: QUERY_KEYS.BUDGET_COMPARISON_CHART,
     queryFn: async (): Promise<BudgetComparison[]> => {
       const { data: budgets, error } = await supabase
         .from("budgets")
@@ -71,8 +72,8 @@ export function useBudgetComparison() {
         schema: 'public',
         table: 'budgets'
       }, () => {
-        queryClient.invalidateQueries({ queryKey: ["budget-comparison-chart"] });
-        queryClient.invalidateQueries({ queryKey: ["budgets"] });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BUDGET_COMPARISON_CHART });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BUDGETS });
       })
       .subscribe();
 
@@ -87,7 +88,7 @@ export function useBudgetComparison() {
 // ==================== Revenue Expense Chart Hook ====================
 export function useRevenueExpenseChart() {
   return useQuery({
-    queryKey: ["revenue-expense-chart"],
+    queryKey: QUERY_KEYS.REVENUE_EXPENSE_CHART,
     queryFn: async (): Promise<MonthlyData[]> => {
       const { data: entries, error } = await supabase
         .from("journal_entry_lines")

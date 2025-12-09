@@ -5,6 +5,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { DashboardService } from "@/services/dashboard.service";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface WaqfSummaryData {
   propertiesCount: number;
@@ -17,7 +18,7 @@ export interface WaqfSummaryData {
 
 export function useWaqfSummary(enabled: boolean = true) {
   const { data: summary, isLoading, error, refetch } = useQuery({
-    queryKey: ["waqf-summary"],
+    queryKey: QUERY_KEYS.WAQF_SUMMARY,
     queryFn: () => DashboardService.getWaqfSummary(),
     enabled,
     staleTime: 5 * 60 * 1000, // 5 minutes

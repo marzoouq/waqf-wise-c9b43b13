@@ -272,6 +272,13 @@ export const QUERY_KEYS = {
   
   // Waqf Summary
   WAQF_SUMMARY: ['waqf-summary'] as const,
+  
+  // Cashier Stats
+  CASHIER_STATS: ['cashier-stats'] as const,
+  
+  // Dashboard Charts
+  BUDGET_COMPARISON_CHART: ['budget-comparison-chart'] as const,
+  REVENUE_EXPENSE_CHART: ['revenue-expense-chart'] as const,
 } as const;
 
 // Query Config with default settings
