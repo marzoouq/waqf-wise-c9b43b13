@@ -25,7 +25,7 @@ export { AccountingService, type FinancialSummary } from './accounting.service';
 export { ArchiveService, type ArchiveStats } from './archive.service';
 export { LoansService, type LoanStats, type LoanWithInstallments } from './loans.service';
 export { AuthService, type UserProfile, type LoginResult } from './auth.service';
-export { DashboardService, type SystemOverviewStats, type UnifiedKPIsData } from './dashboard.service';
+export { DashboardService, type SystemOverviewStats, type UnifiedKPIsData, type DashboardKPIs, type BankBalanceData, type FiscalYearCorpus } from './dashboard.service';
 export { ApprovalService } from './approval.service';
 export { FiscalYearService } from './fiscal-year.service';
 export { InvoiceService } from './invoice.service';

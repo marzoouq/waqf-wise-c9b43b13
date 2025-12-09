@@ -3,11 +3,42 @@
  * 
  * تحتوي على منطق الأعمال لجلب بيانات الداشبورد
  * 
- * @version 2.6.36
+ * @version 2.8.42
  */
 
 import { supabase } from "@/integrations/supabase/client";
 import { BENEFICIARY_STATUS, PROPERTY_STATUS, CONTRACT_STATUS, LOAN_STATUS, REQUEST_STATUS } from "@/lib/constants";
+
+// ==================== Dashboard KPIs Types ====================
+export interface DashboardKPIs {
+  beneficiaries: number;
+  properties: number;
+  totalPayments: number;
+  activeContracts: number;
+}
+
+// ==================== Financial Cards Types ====================
+export interface BankBalanceData {
+  id: string;
+  name_ar: string;
+  code: string;
+  current_balance: number;
+}
+
+export interface FiscalYearCorpus {
+  id: string;
+  fiscal_year_id: string;
+  waqf_corpus: number;
+  opening_balance: number;
+  closing_balance: number;
+  created_at: string;
+  fiscal_years: {
+    name: string;
+    start_date: string;
+    end_date: string;
+    is_closed: boolean;
+  };
+}
 
 // ==================== Types ====================
 
@@ -572,5 +603,91 @@ export const DashboardService = {
       : 0;
 
     return { totalCollected, netRevenue, totalTax, expectedRevenue, progress };
+  },
+
+  // ==================== Dashboard KPIs ====================
+  
+  /**
+   * جلب مؤشرات الأداء الأساسية للداشبورد
+   */
+  async getDashboardKPIs(): Promise<DashboardKPIs> {
+    const [
+      beneficiariesCount,
+      propertiesCount,
+      totalPayments,
+      activeContracts
+    ] = await Promise.all([
+      supabase
+        .from('beneficiaries')
+        .select('id', { count: 'exact', head: true }),
+      
+      supabase
+        .from('properties')
+        .select('id', { count: 'exact', head: true }),
+      
+      supabase
+        .from('payments')
+        .select('amount')
+        .limit(1000)
+        .then(res => {
+          if (res.error) throw res.error;
+          return res.data.reduce((sum, p) => sum + Number(p.amount), 0);
+        }),
+      
+      supabase
+        .from('contracts')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'نشط'),
+    ]);
+
+    return {
+      beneficiaries: beneficiariesCount.count || 0,
+      properties: propertiesCount.count || 0,
+      totalPayments,
+      activeContracts: activeContracts.count || 0,
+    };
+  },
+
+  // ==================== Financial Cards ====================
+  
+  /**
+   * جلب رصيد البنك
+   */
+  async getBankBalance(): Promise<BankBalanceData | null> {
+    const { data, error } = await supabase
+      .from("accounts")
+      .select("id, name_ar, code, current_balance")
+      .eq("code", "1.1.1")
+      .eq("is_active", true)
+      .maybeSingle();
+
+    if (error && error.code !== "PGRST116") throw error;
+    return data;
+  },
+
+  /**
+   * جلب رقبة الوقف
+   */
+  async getWaqfCorpus(): Promise<FiscalYearCorpus[]> {
+    const { data, error } = await supabase
+      .from("fiscal_year_closings")
+      .select(`
+        id,
+        fiscal_year_id,
+        waqf_corpus,
+        opening_balance,
+        closing_balance,
+        created_at,
+        fiscal_years!inner (
+          name,
+          start_date,
+          end_date,
+          is_closed
+        )
+      `)
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+    return (data || []) as FiscalYearCorpus[];
   }
 };

@@ -1005,4 +1005,63 @@ export class BeneficiaryService {
       throw error;
     }
   }
+
+  /**
+   * جلب إحصائيات تكامل المستفيد
+   */
+  static async getIntegrationStats(beneficiaryId: string) {
+    try {
+      const [paymentsRes, documentsRes, requestsRes, activeRequestsRes, beneficiaryRes] = await Promise.all([
+        supabase.from("payments").select("*", { count: "exact", head: true }).eq("beneficiary_id", beneficiaryId),
+        supabase.from("beneficiary_attachments").select("*", { count: "exact", head: true }).eq("beneficiary_id", beneficiaryId),
+        supabase.from("beneficiary_requests").select("*", { count: "exact", head: true }).eq("beneficiary_id", beneficiaryId),
+        supabase.from("beneficiary_requests").select("*", { count: "exact", head: true }).eq("beneficiary_id", beneficiaryId).in("status", ["معلق", "قيد المعالجة", "قيد المراجعة"]),
+        supabase.from("beneficiaries").select("family_name, is_head_of_family").eq("id", beneficiaryId).maybeSingle()
+      ]);
+
+      return {
+        paymentsCount: paymentsRes.count || 0,
+        documentsCount: documentsRes.count || 0,
+        requestsCount: requestsRes.count || 0,
+        activeRequestsCount: activeRequestsRes.count || 0,
+        familyName: beneficiaryRes.data?.family_name || null,
+        isHeadOfFamily: beneficiaryRes.data?.is_head_of_family || false,
+      };
+    } catch (error) {
+      productionLogger.error('Error fetching integration stats', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب ملخص توزيعات الوقف للمستفيد
+   */
+  static async getWaqfDistributionsSummary(beneficiaryId: string) {
+    try {
+      const { data, error } = await supabase
+        .from("heir_distributions")
+        .select(`
+          id,
+          share_amount,
+          heir_type,
+          distribution_date,
+          fiscal_year_id,
+          fiscal_years (
+            name,
+            start_date,
+            end_date,
+            is_closed,
+            is_active
+          )
+        `)
+        .eq("beneficiary_id", beneficiaryId)
+        .order("distribution_date", { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching waqf distributions summary', error);
+      throw error;
+    }
+  }
 }
