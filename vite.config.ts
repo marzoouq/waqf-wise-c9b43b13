@@ -54,74 +54,15 @@ export default defineConfig(({ mode }) => {
     
     rollupOptions: {
       output: {
-        manualChunks: (id) => {
-          if (id.includes('node_modules')) {
-            // ✅ React و react-dom و react-is - يجب تحميلهم أولاً
-            if (id.includes('react-dom') || id.includes('react-is') || 
-                (id.includes('/react/') && !id.includes('react-'))) {
-              return 'react-core';
-            }
-            
-            // ✅ next-themes و sonner و Radix UI يعتمدان على React - يذهبان مع react-core
-            if (id.includes('next-themes') || id.includes('sonner') || id.includes('@radix-ui')) {
-              return 'react-core';
-            }
-            
-            // React Router - chunk منفصل
-            if (id.includes('react-router')) {
-              return 'react-router';
-            }
-            
-            // React Forms
-            if (id.includes('react-hook-form') || id.includes('@hookform')) {
-              return 'react-forms';
-            }
-            
-            // React Query
-            if (id.includes('@tanstack/react-query')) {
-              return 'react-query';
-            }
-            
-            // Supabase
-            if (id.includes('@supabase/supabase-js')) {
-              return 'supabase';
-            }
-            
-            // Charts - lazy loaded
-            if (id.includes('recharts')) {
-              return 'charts';
-            }
-            
-            // Animations - lazy loaded
-            if (id.includes('framer-motion')) {
-              return 'animations';
-            }
-            
-            // PDF - lazy loaded
-            if (id.includes('jspdf')) {
-              return 'pdf-lib';
-            }
-            
-            // Excel - lazy loaded
-            if (id.includes('xlsx') || id.includes('exceljs')) {
-              return 'excel-lib';
-            }
-            
-            // Monitoring (Sentry)
-            if (id.includes('@sentry')) {
-              return 'monitoring';
-            }
-            
-            // كل شيء آخر → vendor
-            return 'vendor';
-          }
+        // ✅ تبسيط جذري - فقط فصل المكتبات الكبيرة التي تُحمّل كسولاً
+        manualChunks: {
+          // PDF و Excel فقط - لأنها تُحمّل عند الحاجة
+          'pdf-lib': ['jspdf', 'jspdf-autotable'],
+          'excel-lib': ['exceljs', 'xlsx'],
         },
-        // Optimize chunk sizes
-        chunkFileNames: (chunkInfo) => {
-          const name = chunkInfo.name;
-          // Add hash for cache busting
-          return `assets/${name}-[hash].js`;
-        }
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]'
       }
     }
   }
