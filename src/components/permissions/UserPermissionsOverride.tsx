@@ -1,12 +1,9 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Search, Save, X, UserPlus, AlertCircle } from "lucide-react";
 import {
@@ -27,6 +24,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useUserPermissionsOverride } from "@/hooks/permissions/useUserPermissionsOverride";
 
 interface UserPermissionsOverrideProps {
   userId: string;
@@ -56,45 +54,29 @@ const AVAILABLE_PERMISSIONS = [
 
 export function UserPermissionsOverride({ userId, userName }: UserPermissionsOverrideProps) {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPermission, setSelectedPermission] = useState<typeof AVAILABLE_PERMISSIONS[0] | null>(null);
   const [overrideNotes, setOverrideNotes] = useState("");
   const [grantPermission, setGrantPermission] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  // Fetch user's permission overrides
-  const { data: userOverrides = [], isLoading } = useQuery({
-    queryKey: ["user-permissions-overrides", userId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("user_permissions")
-        .select("*")
-        .eq("user_id", userId);
-      
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!userId,
-  });
+  const { 
+    userOverrides, 
+    isLoading, 
+    addOverride, 
+    removeOverride, 
+    isAdding, 
+    isRemoving 
+  } = useUserPermissionsOverride(userId);
 
-  // Add permission override mutation
-  const addOverrideMutation = useMutation({
-    mutationFn: async ({ permissionKey, granted }: { permissionKey: string; granted: boolean }) => {
-      const { error } = await supabase
-        .from("user_permissions")
-        .upsert({
-          user_id: userId,
-          permission_key: permissionKey,
-          granted,
-          granted_at: new Date().toISOString()
-        });
-      
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user-permissions-overrides"] });
-      queryClient.invalidateQueries({ queryKey: ["user-permissions"] });
+  const handleAddOverride = async () => {
+    if (!selectedPermission) return;
+    
+    try {
+      await addOverride({
+        permissionKey: selectedPermission.key,
+        granted: grantPermission,
+      });
       toast({
         title: "تم الحفظ",
         description: "تم إضافة استثناء الصلاحية بنجاح",
@@ -102,55 +84,29 @@ export function UserPermissionsOverride({ userId, userName }: UserPermissionsOve
       setIsDialogOpen(false);
       setSelectedPermission(null);
       setOverrideNotes("");
-    },
-    onError: (error: Error) => {
+    } catch (error: any) {
       toast({
         title: "خطأ",
         description: error.message || "فشل إضافة استثناء الصلاحية",
         variant: "destructive",
       });
-    },
-  });
+    }
+  };
 
-  // Remove permission override mutation
-  const removeOverrideMutation = useMutation({
-    mutationFn: async (permissionKey: string) => {
-      const { error } = await supabase
-        .from("user_permissions")
-        .delete()
-        .eq("user_id", userId)
-        .eq("permission_key", permissionKey);
-      
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user-permissions-overrides"] });
-      queryClient.invalidateQueries({ queryKey: ["user-permissions"] });
+  const handleRemoveOverride = async (permissionKey: string) => {
+    try {
+      await removeOverride(permissionKey);
       toast({
         title: "تم الحذف",
         description: "تم إزالة استثناء الصلاحية بنجاح",
       });
-    },
-    onError: (error: Error) => {
+    } catch (error: any) {
       toast({
         title: "خطأ",
         description: error.message || "فشل إزالة استثناء الصلاحية",
         variant: "destructive",
       });
-    },
-  });
-
-  const handleAddOverride = async () => {
-    if (!selectedPermission) return;
-    
-    await addOverrideMutation.mutateAsync({
-      permissionKey: selectedPermission.key,
-      granted: grantPermission,
-    });
-  };
-
-  const handleRemoveOverride = async (permissionKey: string) => {
-    await removeOverrideMutation.mutateAsync(permissionKey);
+    }
   };
 
   const filteredPermissions = AVAILABLE_PERMISSIONS.filter(perm =>
@@ -258,7 +214,7 @@ export function UserPermissionsOverride({ userId, userName }: UserPermissionsOve
                 <DialogFooter>
                   <Button
                     onClick={handleAddOverride}
-                    disabled={!selectedPermission || addOverrideMutation.isPending}
+                    disabled={!selectedPermission || isAdding}
                     className="gap-2"
                   >
                     <Save className="h-4 w-4" />
@@ -308,7 +264,7 @@ export function UserPermissionsOverride({ userId, userName }: UserPermissionsOve
                       size="sm"
                       variant="ghost"
                       onClick={() => handleRemoveOverride(override.permission_key)}
-                      disabled={removeOverrideMutation.isPending}
+                      disabled={isRemoving}
                     >
                       <X className="h-4 w-4" />
                     </Button>
