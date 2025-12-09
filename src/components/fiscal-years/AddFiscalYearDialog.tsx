@@ -4,8 +4,7 @@
  */
 
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { FiscalYearService } from "@/services/fiscal-year.service";
+import { useCreateFiscalYear } from "@/hooks/fiscal-years/useCreateFiscalYear";
 import {
   Dialog,
   DialogContent,
@@ -44,8 +43,6 @@ interface FiscalYearFormData {
 }
 
 export function AddFiscalYearDialog({ open, onOpenChange }: AddFiscalYearDialogProps) {
-  const queryClient = useQueryClient();
-  
   const [formData, setFormData] = useState<FiscalYearFormData>({
     name: "",
     start_date: "",
@@ -62,52 +59,10 @@ export function AddFiscalYearDialog({ open, onOpenChange }: AddFiscalYearDialogP
 
   const netIncome = formData.total_revenues - formData.total_expenses;
 
-  const createFiscalYearMutation = useMutation({
-    mutationFn: async (data: FiscalYearFormData) => {
-      if (data.is_historical) {
-        // إنشاء سنة تاريخية مع بيانات الإقفال
-        return FiscalYearService.createWithClosing(
-          {
-            name: data.name,
-            start_date: data.start_date,
-            end_date: data.end_date,
-            is_active: false,
-            is_closed: true,
-            is_published: true,
-          },
-          {
-            closing_date: data.end_date,
-            total_revenues: data.total_revenues,
-            total_expenses: data.total_expenses,
-            nazer_share: data.nazer_share,
-            waqif_share: data.waqif_share,
-            beneficiary_distributions: data.beneficiary_distributions,
-            waqf_corpus: data.waqf_corpus,
-            notes: data.notes,
-          }
-        );
-      } else {
-        // إنشاء سنة مالية عادية
-        return FiscalYearService.create({
-          name: data.name,
-          start_date: data.start_date,
-          end_date: data.end_date,
-          is_active: false,
-          is_closed: false,
-        });
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["fiscal_years"] });
-      queryClient.invalidateQueries({ queryKey: ["fiscal_year_closings"] });
-      toast.success("تم إضافة السنة المالية بنجاح");
-      onOpenChange(false);
-      resetForm();
-    },
-    onError: (error) => {
-      console.error("Error creating fiscal year:", error);
-      toast.error("فشل في إضافة السنة المالية");
-    },
+  // استخدام الـ hook بدلاً من useMutation مباشرة
+  const { createFiscalYear, isCreating } = useCreateFiscalYear(() => {
+    onOpenChange(false);
+    resetForm();
   });
 
   const resetForm = () => {
@@ -134,12 +89,13 @@ export function AddFiscalYearDialog({ open, onOpenChange }: AddFiscalYearDialogP
       return;
     }
 
-    createFiscalYearMutation.mutate(formData);
+    createFiscalYear(formData);
   };
 
   const updateField = (field: keyof FiscalYearFormData, value: string | number | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
+
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -340,9 +296,9 @@ export function AddFiscalYearDialog({ open, onOpenChange }: AddFiscalYearDialogP
             </Button>
             <Button
               type="submit"
-              disabled={createFiscalYearMutation.isPending}
+              disabled={isCreating}
             >
-              {createFiscalYearMutation.isPending ? (
+              {isCreating ? (
                 <>
                   <Loader2 className="h-4 w-4 ml-2 animate-spin" />
                   جاري الحفظ...

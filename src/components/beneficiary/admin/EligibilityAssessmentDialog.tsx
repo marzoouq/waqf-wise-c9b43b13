@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { BeneficiaryService } from '@/services/beneficiary.service';
+import { useEligibilityAssessment } from '@/hooks/beneficiary/useEligibilityAssessment';
 import {
   Dialog,
   DialogContent,
@@ -10,11 +9,9 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useToast } from '@/hooks/use-toast';
 import { Target, TrendingUp, Users, Home, Briefcase, Heart, Loader2 } from 'lucide-react';
 import { Beneficiary } from '@/types/beneficiary';
 
@@ -39,36 +36,37 @@ export function EligibilityAssessmentDialog({
   onOpenChange,
   beneficiary,
 }: EligibilityAssessmentDialogProps) {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
   const [assessment, setAssessment] = useState<AssessmentResult | null>(null);
+  
+  // استخدام الـ hook بدلاً من useMutation مباشرة
+  const { runAssessment, isAssessing, latestAssessment } = useEligibilityAssessment(beneficiary?.id || '');
 
-  const assessMutation = useMutation({
-    mutationFn: async () => {
-      if (!beneficiary) throw new Error('لا يوجد مستفيد محدد');
-      return await BeneficiaryService.assessEligibilityRPC(beneficiary.id);
-    },
-    onSuccess: (data) => {
-      setAssessment(data);
-      queryClient.invalidateQueries({ queryKey: ['beneficiaries'] });
-      queryClient.invalidateQueries({ queryKey: ['beneficiary', beneficiary?.id] });
-      toast({
-        title: 'تم التقييم بنجاح',
-        description: `تم تقييم أهلية المستفيد: ${data.status}`,
+  // تحديث البيانات عند فتح المحاور
+  useEffect(() => {
+    if (open && beneficiary && latestAssessment) {
+      setAssessment({
+        score: latestAssessment.total_score,
+        status: latestAssessment.eligibility_status,
+        max_score: 100,
       });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: 'خطأ في التقييم',
-        description: error.message || 'فشل تقييم الأهلية',
-        variant: 'destructive',
-      });
-    },
-  });
+    }
+  }, [open, beneficiary?.id, latestAssessment]);
 
+  // تشغيل التقييم عند الفتح
   useEffect(() => {
     if (open && beneficiary) {
-      assessMutation.mutate();
+      runAssessment().then((result) => {
+        if (result && typeof result === 'object') {
+          const resultData = result as Record<string, unknown>;
+          setAssessment({
+            score: (resultData.total_score as number) || 0,
+            status: (resultData.eligibility_status as string) || 'غير محدد',
+            max_score: 100,
+          });
+        }
+      }).catch(() => {
+        // معالجة الخطأ تتم في الـ hook
+      });
     }
   }, [open, beneficiary?.id]);
 
@@ -158,7 +156,7 @@ export function EligibilityAssessmentDialog({
           </DialogDescription>
         </DialogHeader>
 
-        {assessMutation.isPending ? (
+        {isAssessing ? (
           <div className="flex flex-col items-center justify-center py-12">
             <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
             <p className="text-muted-foreground">جاري تقييم الأهلية...</p>
@@ -274,7 +272,7 @@ export function EligibilityAssessmentDialog({
             إغلاق
           </Button>
           {assessment && (
-            <Button onClick={() => assessMutation.mutate()}>
+            <Button onClick={() => runAssessment()}>
               إعادة التقييم
             </Button>
           )}
