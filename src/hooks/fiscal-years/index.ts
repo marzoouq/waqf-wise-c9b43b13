@@ -12,3 +12,4 @@ export {
   type ActiveFiscalYear,
 } from "./useActiveFiscalYear";
 export { useClosingPreview, useFiscalYearSummary } from "./useFiscalYearData";
+export { useCreateFiscalYear } from "./useCreateFiscalYear";
