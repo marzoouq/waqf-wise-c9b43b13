@@ -1,13 +1,14 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, TrendingUp, Users, Landmark, DollarSign } from "lucide-react";
+import { Building2, TrendingUp, Users, Landmark, DollarSign, EyeOff } from "lucide-react";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { MaskedValue } from "@/components/shared/MaskedValue";
 import { useWaqfSummary } from "@/hooks/useWaqfSummary";
+import { useFiscalYearPublishStatus } from "@/hooks/useFiscalYearPublishStatus";
 
 export function WaqfSummaryTab() {
   const { settings } = useVisibilitySettings();
   const { summary } = useWaqfSummary(settings?.show_overview || false);
-
+  const { isCurrentYearPublished } = useFiscalYearPublishStatus();
   if (!settings?.show_overview) {
     return (
       <Card>
@@ -28,14 +29,23 @@ export function WaqfSummaryTab() {
             <Landmark className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-xl sm:text-2xl font-bold">
-              <MaskedValue
-                value={summary?.totalPropertyValue.toLocaleString("ar-SA")}
-                type="amount"
-                masked={settings?.mask_exact_amounts || false}
-              />
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">من العقود النشطة</p>
+            {isCurrentYearPublished ? (
+              <>
+                <div className="text-xl sm:text-2xl font-bold">
+                  <MaskedValue
+                    value={summary?.totalPropertyValue.toLocaleString("ar-SA")}
+                    type="amount"
+                    masked={settings?.mask_exact_amounts || false}
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">من العقود النشطة</p>
+              </>
+            ) : (
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <EyeOff className="h-4 w-4" />
+                <span className="text-sm">ستظهر عند نشر السنة المالية</span>
+              </div>
+            )}
           </CardContent>
         </Card>
 
