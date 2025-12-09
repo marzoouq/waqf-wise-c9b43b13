@@ -3,9 +3,8 @@ import { productionLogger } from "@/lib/logger/production-logger";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { supabase } from "@/integrations/supabase/client";
+import { usePropertyAI } from "@/hooks/ai/usePropertyAI";
 import { Brain, Loader2, Sparkles } from "lucide-react";
-import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 import type { SystemAlert } from "@/types/alerts";
 
@@ -43,8 +42,7 @@ interface AIAssistantDialogProps {
 }
 
 export function AIAssistantDialog({ open, onOpenChange, propertyData, actionType }: AIAssistantDialogProps) {
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analysis, setAnalysis] = useState<string>("");
+  const { isAnalyzing, analysis, analyze, reset } = usePropertyAI();
 
   const actionTitles = {
     analyze_property: "تحليل العقار بالذكاء الاصطناعي",
@@ -55,32 +53,7 @@ export function AIAssistantDialog({ open, onOpenChange, propertyData, actionType
   };
 
   const handleAnalyze = async () => {
-    setIsAnalyzing(true);
-    setAnalysis("");
-
-    try {
-      const { data, error } = await supabase.functions.invoke('property-ai-assistant', {
-        body: {
-          action: actionType,
-          data: propertyData
-        }
-      });
-
-      if (error) throw error;
-
-      if (data?.error) {
-        toast.error(data.error);
-        return;
-      }
-
-      setAnalysis(data.analysis);
-      toast.success("تم التحليل بنجاح!");
-    } catch (error) {
-      productionLogger.error("AI Analysis Error:", error);
-      toast.error("حدث خطأ أثناء التحليل");
-    } finally {
-      setIsAnalyzing(false);
-    }
+    await analyze(actionType, propertyData);
   };
 
   return (

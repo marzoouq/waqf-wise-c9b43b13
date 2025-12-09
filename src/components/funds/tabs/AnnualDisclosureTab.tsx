@@ -23,11 +23,12 @@ import { useAnnualDisclosures, AnnualDisclosure } from "@/hooks/useAnnualDisclos
 import { GenerateDisclosureDialog } from "@/components/distributions/GenerateDisclosureDialog";
 import { ViewDisclosureDialog } from "@/components/distributions/ViewDisclosureDialog";
 import { generateDisclosurePDF } from "@/lib/generateDisclosurePDF";
-import { supabase } from "@/integrations/supabase/client";
+import { useDisclosureBeneficiaries } from "@/hooks/reports/useDisclosureBeneficiaries";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from "recharts";
 
 export function AnnualDisclosureTab() {
   const { disclosures, currentYearDisclosure, isLoading, publishDisclosure } = useAnnualDisclosures();
+  const { fetchDisclosureBeneficiaries } = useDisclosureBeneficiaries();
   const [selectedDisclosure, setSelectedDisclosure] = useState<AnnualDisclosure | null>(null);
   const [viewOpen, setViewOpen] = useState(false);
   const [generateOpen, setGenerateOpen] = useState(false);
@@ -67,12 +68,8 @@ export function AnnualDisclosureTab() {
 
   const handleExportPDF = async (disclosure: AnnualDisclosure) => {
     try {
-      const { data: beneficiaries } = await supabase
-        .from("disclosure_beneficiaries")
-        .select("*")
-        .eq("disclosure_id", disclosure.id);
-      
-      await generateDisclosurePDF(disclosure, beneficiaries || []);
+      const beneficiaries = await fetchDisclosureBeneficiaries(disclosure.id);
+      await generateDisclosurePDF(disclosure, beneficiaries);
     } catch (error) {
       // Error already handled in generateDisclosurePDF
     }
