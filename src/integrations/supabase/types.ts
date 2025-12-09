@@ -11938,15 +11938,15 @@ export type Database = {
           }
       calculate_monthly_payment:
         | {
-            Args: { annual_rate: number; months: number; principal: number }
-            Returns: number
-          }
-        | {
             Args: {
               p_interest_rate?: number
               p_principal: number
               p_term_months: number
             }
+            Returns: number
+          }
+        | {
+            Args: { annual_rate: number; months: number; principal: number }
             Returns: number
           }
       calculate_occupied_units: {
