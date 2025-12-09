@@ -55,9 +55,11 @@ export { KnowledgeService, type KnowledgeArticle, type ProjectPhase } from './kn
 export { NotificationSettingsService } from './notification-settings.service';
 export { DocumentationService, type ProjectPhase as DocProjectPhase, type ChangelogEntry, type AddPhaseInput } from './documentation.service';
 
-// Infrastructure Services (3)
+// Infrastructure Services (5)
 export { StorageService } from './storage.service';
 export { EdgeFunctionService } from './edge-function.service';
 export { RealtimeService } from './realtime.service';
 export { DiagnosticsService } from './diagnostics.service';
 export { SearchService } from './search.service';
+export { SupportService, type SupportFilters } from './support.service';
+export { ScheduledReportService, type ScheduledReport } from './scheduled-report.service';

@@ -35,6 +35,70 @@ export const SearchService = {
   },
 
   /**
+   * البحث في المستفيدين
+   */
+  async searchBeneficiaries(query: string) {
+    if (!query || query.length < 2) return [];
+    
+    const { data, error } = await supabase
+      .from('beneficiaries')
+      .select('id, full_name, national_id, phone, category')
+      .or(`full_name.ilike.%${query}%,national_id.ilike.%${query}%,phone.ilike.%${query}%`)
+      .limit(5);
+    
+    if (error) throw error;
+    return data || [];
+  },
+
+  /**
+   * البحث في العقارات
+   */
+  async searchProperties(query: string) {
+    if (!query || query.length < 2) return [];
+    
+    const { data, error } = await supabase
+      .from('properties')
+      .select('id, name, location, status')
+      .or(`name.ilike.%${query}%,location.ilike.%${query}%`)
+      .limit(5);
+    
+    if (error) throw error;
+    return data || [];
+  },
+
+  /**
+   * البحث في القروض
+   */
+  async searchLoans(query: string) {
+    if (!query || query.length < 2) return [];
+    
+    const { data, error } = await supabase
+      .from('loans')
+      .select('id, loan_number, loan_amount, beneficiaries(full_name)')
+      .or(`loan_number.ilike.%${query}%`)
+      .limit(5);
+    
+    if (error) throw error;
+    return data || [];
+  },
+
+  /**
+   * البحث في المستندات
+   */
+  async searchDocuments(query: string) {
+    if (!query || query.length < 2) return [];
+    
+    const { data, error } = await supabase
+      .from('documents')
+      .select('id, name, category, file_type')
+      .ilike('name', `%${query}%`)
+      .limit(5);
+    
+    if (error) throw error;
+    return data || [];
+  },
+
+  /**
    * حفظ عملية بحث
    */
   async saveSearchHistory(

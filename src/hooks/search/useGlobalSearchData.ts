@@ -5,7 +5,8 @@
 
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { SearchService } from '@/services/search.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 import { Users, Building2, DollarSign, FileText, type LucideIcon } from 'lucide-react';
 
 export interface SearchResult {
@@ -20,73 +21,29 @@ export interface SearchResult {
 export function useGlobalSearchData(searchQuery: string) {
   // البحث في المستفيدين
   const { data: beneficiaries = [] } = useQuery({
-    queryKey: ['global-search-beneficiaries', searchQuery],
-    queryFn: async () => {
-      if (!searchQuery || searchQuery.length < 2) return [];
-      
-      const { data, error } = await supabase
-        .from('beneficiaries')
-        .select('id, full_name, national_id, phone, category')
-        .or(`full_name.ilike.%${searchQuery}%,national_id.ilike.%${searchQuery}%,phone.ilike.%${searchQuery}%`)
-        .limit(5);
-      
-      if (error) throw error;
-      return data || [];
-    },
+    queryKey: QUERY_KEYS.GLOBAL_SEARCH_BENEFICIARIES(searchQuery),
+    queryFn: () => SearchService.searchBeneficiaries(searchQuery),
     enabled: searchQuery.length >= 2,
   });
 
   // البحث في العقارات
   const { data: properties = [] } = useQuery({
-    queryKey: ['global-search-properties', searchQuery],
-    queryFn: async () => {
-      if (!searchQuery || searchQuery.length < 2) return [];
-      
-      const { data, error } = await supabase
-        .from('properties')
-        .select('id, name, location, status')
-        .or(`name.ilike.%${searchQuery}%,location.ilike.%${searchQuery}%`)
-        .limit(5);
-      
-      if (error) throw error;
-      return data || [];
-    },
+    queryKey: QUERY_KEYS.GLOBAL_SEARCH_PROPERTIES(searchQuery),
+    queryFn: () => SearchService.searchProperties(searchQuery),
     enabled: searchQuery.length >= 2,
   });
 
   // البحث في القروض
   const { data: loans = [] } = useQuery({
-    queryKey: ['global-search-loans', searchQuery],
-    queryFn: async () => {
-      if (!searchQuery || searchQuery.length < 2) return [];
-      
-      const { data, error } = await supabase
-        .from('loans')
-        .select('id, loan_number, loan_amount, beneficiaries(full_name)')
-        .or(`loan_number.ilike.%${searchQuery}%`)
-        .limit(5);
-      
-      if (error) throw error;
-      return data || [];
-    },
+    queryKey: QUERY_KEYS.GLOBAL_SEARCH_LOANS(searchQuery),
+    queryFn: () => SearchService.searchLoans(searchQuery),
     enabled: searchQuery.length >= 2,
   });
 
   // البحث في المستندات
   const { data: documents = [] } = useQuery({
-    queryKey: ['global-search-documents', searchQuery],
-    queryFn: async () => {
-      if (!searchQuery || searchQuery.length < 2) return [];
-      
-      const { data, error } = await supabase
-        .from('documents')
-        .select('id, name, category, file_type')
-        .ilike('name', `%${searchQuery}%`)
-        .limit(5);
-      
-      if (error) throw error;
-      return data || [];
-    },
+    queryKey: QUERY_KEYS.GLOBAL_SEARCH_DOCUMENTS(searchQuery),
+    queryFn: () => SearchService.searchDocuments(searchQuery),
     enabled: searchQuery.length >= 2,
   });
 
@@ -112,7 +69,7 @@ export function useGlobalSearchData(searchQuery: string) {
         id: p.id,
         type: 'property',
         title: p.name,
-        subtitle: p.location,
+        subtitle: p.location || '',
         url: `/properties`,
         icon: Building2,
       });

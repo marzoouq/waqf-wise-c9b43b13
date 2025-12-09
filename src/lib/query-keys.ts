@@ -283,6 +283,19 @@ export const QUERY_KEYS = {
   
   // Search History
   SEARCH_HISTORY: (searchType?: string) => ['search-history', searchType] as const,
+  
+  // Global Search
+  GLOBAL_SEARCH_BENEFICIARIES: (query: string) => ['global-search-beneficiaries', query] as const,
+  GLOBAL_SEARCH_PROPERTIES: (query: string) => ['global-search-properties', query] as const,
+  GLOBAL_SEARCH_LOANS: (query: string) => ['global-search-loans', query] as const,
+  GLOBAL_SEARCH_DOCUMENTS: (query: string) => ['global-search-documents', query] as const,
+  
+  // Scheduled Reports
+  SCHEDULED_REPORTS: ['scheduled-reports'] as const,
+  
+  // Ticket Ratings
+  TICKET_RATING: (ticketId: string) => ['ticket-rating', ticketId] as const,
+  TICKET_RATINGS: ['ticket-ratings'] as const,
 } as const;
 
 // Query Config with default settings

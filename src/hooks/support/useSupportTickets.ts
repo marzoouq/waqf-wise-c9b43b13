@@ -1,12 +1,17 @@
+/**
+ * Support Tickets Hooks
+ * يستخدم SupportService
+ */
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { SupportService, type SupportFilters } from '@/services/support.service';
 import { supabase } from '@/integrations/supabase/client';
+import { QUERY_KEYS } from '@/lib/query-keys';
 import { toast } from 'sonner';
-import type { Database } from '@/integrations/supabase/types';
 import type { 
   SupportTicket, 
   CreateTicketInput, 
-  UpdateTicketInput,
-  SupportFilters 
+  UpdateTicketInput 
 } from '@/types/support';
 
 /**
@@ -17,49 +22,8 @@ export function useSupportTickets(filters?: SupportFilters) {
 
   // جلب التذاكر
   const { data: tickets, isLoading, error } = useQuery({
-    queryKey: ['support-tickets', filters],
-    queryFn: async () => {
-      let query = supabase
-        .from('support_tickets')
-        .select(`
-          *,
-          user:user_id(id, email),
-          beneficiary:beneficiary_id(id, full_name, national_id),
-          assigned_user:assigned_to(id, email)
-        `)
-        .order('created_at', { ascending: false });
-
-      // تطبيق الفلاتر
-      if (filters?.status && filters.status.length > 0) {
-        query = query.in('status', filters.status);
-      }
-      if (filters?.category && filters.category.length > 0) {
-        query = query.in('category', filters.category);
-      }
-      if (filters?.priority && filters.priority.length > 0) {
-        query = query.in('priority', filters.priority);
-      }
-      if (filters?.assigned_to) {
-        query = query.eq('assigned_to', filters.assigned_to);
-      }
-      if (filters?.is_overdue) {
-        query = query.eq('is_overdue', true);
-      }
-      if (filters?.search) {
-        query = query.or(`subject.ilike.%${filters.search}%,description.ilike.%${filters.search}%,ticket_number.ilike.%${filters.search}%`);
-      }
-      if (filters?.date_from) {
-        query = query.gte('created_at', filters.date_from);
-      }
-      if (filters?.date_to) {
-        query = query.lte('created_at', filters.date_to);
-      }
-
-      const { data, error } = await query;
-      
-      if (error) throw error;
-      return data as SupportTicket[];
-    },
+    queryKey: [QUERY_KEYS.SUPPORT_TICKETS, filters],
+    queryFn: () => SupportService.getTickets(filters),
   });
 
   // إنشاء تذكرة جديدة
@@ -68,28 +32,29 @@ export function useSupportTickets(filters?: SupportFilters) {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('يجب تسجيل الدخول');
 
-      const insertData = {
-        subject: input.subject,
-        description: input.description,
-        category: input.category,
-        priority: input.priority,
-        source: 'portal' as const,
-        ...(input.beneficiary_id && { beneficiary_id: input.beneficiary_id }),
-        ...(input.tags && { tags: input.tags }),
-      };
-
+      const ticketNumber = `TKT-${Date.now()}`;
+      
       const { data, error } = await supabase
         .from('support_tickets')
-        .insert([insertData] as Database['public']['Tables']['support_tickets']['Insert'][])
+        .insert([{
+          ticket_number: ticketNumber,
+          subject: input.subject,
+          description: input.description,
+          category: input.category,
+          priority: input.priority,
+          source: 'portal',
+          user_id: user.id,
+          beneficiary_id: input.beneficiary_id || null,
+          tags: input.tags || null,
+        }])
         .select()
-        .maybeSingle();
-
+        .single();
+      
       if (error) throw error;
-      if (!data) throw new Error('فشل إنشاء التذكرة');
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['support-tickets'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.SUPPORT_TICKETS });
       toast.success('تم إنشاء التذكرة بنجاح');
     },
     onError: (error: Error) => {
@@ -99,20 +64,10 @@ export function useSupportTickets(filters?: SupportFilters) {
 
   // تحديث تذكرة
   const updateTicket = useMutation({
-    mutationFn: async ({ id, updates }: { id: string; updates: UpdateTicketInput }) => {
-      const { data, error } = await supabase
-        .from('support_tickets')
-        .update(updates)
-        .eq('id', id)
-        .select()
-        .maybeSingle();
-
-      if (error) throw error;
-      if (!data) throw new Error('التذكرة غير موجودة');
-      return data;
-    },
+    mutationFn: ({ id, updates }: { id: string; updates: UpdateTicketInput }) =>
+      SupportService.update(id, updates),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['support-tickets'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.SUPPORT_TICKETS });
       toast.success('تم تحديث التذكرة بنجاح');
     },
     onError: (error: Error) => {
@@ -122,23 +77,9 @@ export function useSupportTickets(filters?: SupportFilters) {
 
   // إغلاق تذكرة
   const closeTicket = useMutation({
-    mutationFn: async (id: string) => {
-      const { data, error } = await supabase
-        .from('support_tickets')
-        .update({
-          status: 'closed',
-          closed_at: new Date().toISOString(),
-        })
-        .eq('id', id)
-        .select()
-        .maybeSingle();
-
-      if (error) throw error;
-      if (!data) throw new Error('التذكرة غير موجودة');
-      return data;
-    },
+    mutationFn: (id: string) => SupportService.close(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['support-tickets'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.SUPPORT_TICKETS });
       toast.success('تم إغلاق التذكرة بنجاح');
     },
     onError: (error: Error) => {
@@ -148,30 +89,9 @@ export function useSupportTickets(filters?: SupportFilters) {
 
   // إعادة فتح تذكرة
   const reopenTicket = useMutation({
-    mutationFn: async (id: string) => {
-      const { data, error } = await supabase
-        .from('support_tickets')
-        .update({
-          status: 'open',
-          closed_at: null,
-        })
-        .eq('id', id)
-        .select()
-        .maybeSingle();
-
-      if (error) throw error;
-      if (!data) throw new Error('التذكرة غير موجودة');
-
-      // تحديث عداد إعادة الفتح
-      await supabase
-        .from('support_tickets')
-        .update({ reopened_count: (data.reopened_count || 0) + 1 })
-        .eq('id', id);
-
-      return data;
-    },
+    mutationFn: (id: string) => SupportService.reopen(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['support-tickets'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.SUPPORT_TICKETS });
       toast.success('تم إعادة فتح التذكرة بنجاح');
     },
     onError: (error: Error) => {
@@ -184,25 +104,10 @@ export function useSupportTickets(filters?: SupportFilters) {
     mutationFn: async ({ ticketId, userId }: { ticketId: string; userId: string }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('يجب تسجيل الدخول');
-
-      const { data, error } = await supabase
-        .from('support_tickets')
-        .update({
-          assigned_to: userId,
-          assigned_at: new Date().toISOString(),
-          assigned_by: user.id,
-          status: 'in_progress',
-        })
-        .eq('id', ticketId)
-        .select()
-        .maybeSingle();
-
-      if (error) throw error;
-      if (!data) throw new Error('التذكرة غير موجودة');
-      return data;
+      return SupportService.assign(ticketId, userId, user.id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['support-tickets'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.SUPPORT_TICKETS });
       toast.success('تم تعيين التذكرة بنجاح');
     },
     onError: (error: Error) => {
@@ -211,7 +116,7 @@ export function useSupportTickets(filters?: SupportFilters) {
   });
 
   return {
-    tickets,
+    tickets: tickets as SupportTicket[] | undefined,
     isLoading,
     error,
     createTicket,
@@ -227,23 +132,11 @@ export function useSupportTickets(filters?: SupportFilters) {
  */
 export function useSupportTicket(ticketId: string) {
   return useQuery({
-    queryKey: ['support-ticket', ticketId],
+    queryKey: QUERY_KEYS.SUPPORT_TICKET(ticketId),
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('support_tickets')
-        .select(`
-          *,
-          user:user_id(id, email),
-          beneficiary:beneficiary_id(id, full_name, national_id),
-          assigned_user:assigned_to(id, email),
-          assigned_by_user:assigned_by(id, email)
-        `)
-        .eq('id', ticketId)
-        .maybeSingle();
-
-      if (error) throw error;
-      if (!data) throw new Error('التذكرة غير موجودة');
-      return data as SupportTicket;
+      const ticket = await SupportService.getById(ticketId);
+      if (!ticket) throw new Error('التذكرة غير موجودة');
+      return ticket as SupportTicket;
     },
     enabled: !!ticketId,
   });
