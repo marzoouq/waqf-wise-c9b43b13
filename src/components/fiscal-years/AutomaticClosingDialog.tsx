@@ -14,7 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { EdgeFunctionService } from "@/services";
 import { toast } from "sonner";
 import type { FiscalYear } from "@/hooks/useFiscalYears";
 import { FiscalYearClosingStats } from "./FiscalYearClosingStats";
@@ -40,17 +40,18 @@ export function AutomaticClosingDialog({
   const handleConfirm = async () => {
     setConfirming(true);
     try {
-      const { data, error } = await supabase.functions.invoke("auto-close-fiscal-year", {
-        body: { fiscal_year_id: fiscalYear.id, preview_only: false }
+      const result = await EdgeFunctionService.invokeAutoCloseFiscalYear({
+        fiscalYearId: fiscalYear.id,
+        preview: false
       });
       
-      if (error) throw error;
+      if (!result.success) throw new Error(result.error);
       
-      if (data?.success) {
+      if (result.data?.success) {
         toast.success("تم إقفال السنة المالية بنجاح");
         onOpenChange(false);
       } else {
-        throw new Error(data?.error || "فشل الإقفال");
+        throw new Error(result.data?.error || "فشل الإقفال");
       }
     } catch (error) {
       console.error("Error confirming closing:", error);

@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { supabase } from "@/integrations/supabase/client";
+import { PropertyService } from "@/services";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import type { Database } from "@/integrations/supabase/types";
@@ -125,22 +125,13 @@ export function PropertyUnitDialog({
       };
 
       if (unit) {
-        const { error } = await supabase
-          .from("property_units")
-          .update(data)
-          .eq("id", unit.id);
-
-        if (error) throw error;
+        await PropertyService.updateUnit(unit.id, data);
         toast({
           title: "تم التحديث بنجاح",
           description: "تم تحديث بيانات الوحدة",
         });
       } else {
-        const { error } = await supabase
-          .from("property_units")
-          .insert([data]);
-
-        if (error) throw error;
+        await PropertyService.createUnit(data);
         toast({
           title: "تمت الإضافة بنجاح",
           description: "تم إضافة الوحدة الجديدة",

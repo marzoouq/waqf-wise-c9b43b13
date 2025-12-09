@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { DistributionService } from "@/services";
 import { Download, FileText, Loader2, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import type { BankFileFormat, DistributionDetail, GeneratedTransferFile } from "@/types/bank-transfer";
@@ -23,93 +23,18 @@ export function BankTransferGenerator({ distributionId, onSuccess }: BankTransfe
   const handleGenerate = async () => {
     setIsLoading(true);
     try {
-      // جلب تفاصيل التوزيع
-      const { data: details, error: detailsError } = await supabase
-        .from('distribution_details')
-        .select(`
-          *,
-          beneficiaries (
-            full_name,
-            iban,
-            bank_name
-          )
-        `)
-        .eq('distribution_id', distributionId)
-        .eq('payment_status', 'approved');
-
-      if (detailsError) throw detailsError;
-
-      const typedDetails = details as unknown as DistributionDetail[];
-
-      if (!typedDetails || typedDetails.length === 0) {
-        toast({
-          title: "تنبيه",
-          description: "لا توجد دفعات معتمدة للتصدير",
-          variant: "destructive",
-        });
-        setIsLoading(false);
-        return;
-      }
-
-      // توليد رقم الملف
-      const { data: fileNumber, error: fileNumberError } = await supabase
-        .rpc('generate_transfer_file_number');
-
-      if (fileNumberError) throw fileNumberError;
-
-      // حساب الإجماليات
-      const totalAmount = typedDetails.reduce((sum, detail) => sum + detail.allocated_amount, 0);
-      const totalTransactions = typedDetails.length;
-
-      // توليد محتوى الملف حسب الصيغة
-      let fileContent = "";
-      
-      if (fileFormat === "CSV") {
-        fileContent = generateCSV(typedDetails);
-      } else if (fileFormat === "EXCEL") {
-        fileContent = generateExcelData(typedDetails);
-      } else if (fileFormat === "ISO20022") {
-        fileContent = generateISO20022(typedDetails);
-      } else if (fileFormat === "SWIFT_MT940") {
-        fileContent = generateSWIFT(typedDetails);
-      } else if (fileFormat === "SEPA") {
-        fileContent = generateSEPA(typedDetails);
-      } else if (fileFormat === "ACH") {
-        fileContent = generateACH(typedDetails);
-      } else if (fileFormat === "BACS") {
-        fileContent = generateBACS(typedDetails);
-      } else if (fileFormat === "NCB") {
-        fileContent = generateNCB(typedDetails);
-      } else if (fileFormat === "ALRAJHI") {
-        fileContent = generateAlRajhi(typedDetails);
-      }
-
-      // حفظ الملف في قاعدة البيانات
-      const { error: insertError } = await supabase
-        .from('bank_transfer_files')
-        .insert({
-          file_number: fileNumber,
-          distribution_id: distributionId,
-          file_format: fileFormat,
-          total_amount: totalAmount,
-          total_transactions: totalTransactions,
-          file_content: fileContent,
-          status: 'generated',
-          generated_at: new Date().toISOString(),
-        });
-
-      if (insertError) throw insertError;
+      const transferFile = await DistributionService.generateBankTransfer(distributionId);
 
       setGeneratedFile({
-        fileNumber,
-        totalAmount,
-        totalTransactions,
-        fileContent,
+        fileNumber: transferFile.file_number,
+        totalAmount: transferFile.total_amount,
+        totalTransactions: transferFile.total_transactions,
+        fileContent: transferFile.file_content || '',
       });
 
       toast({
         title: "تم بنجاح",
-        description: `تم توليد ملف التحويل ${fileNumber}`,
+        description: `تم توليد ملف التحويل ${transferFile.file_number}`,
       });
 
       onSuccess?.();

@@ -25,12 +25,11 @@ import {
   Loader2
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { useCustomReports, type ReportResult } from "@/hooks/useCustomReports";
 import { ReportResultsPreview } from "./ReportResultsPreview";
 import { exportToPDF, exportToExcel, exportToCSV } from "@/lib/exportHelpers";
 import type { CustomReportFilter } from "@/types/reports/index";
-import type { Json } from "@/integrations/supabase/types";
+import { ReportService } from "@/services";
 
 export function CustomReportBuilder() {
   const { toast } = useToast();
@@ -94,25 +93,19 @@ export function CustomReportBuilder() {
     }
 
     try {
-      const configuration = {
-        type: reportType,
-        fields: selectedFields,
-        filters,
-        groupBy,
-        sortBy,
-      };
-
-      const { error } = await supabase
-        .from("custom_report_templates")
-        .insert([{
-          name: reportName,
-          description: reportDescription,
-          report_type: reportType,
-          configuration: configuration as unknown as Json,
-          is_public: false,
-        }]);
-
-      if (error) throw error;
+      await ReportService.createTemplate({
+        template_name: reportName,
+        description: reportDescription,
+        report_type: reportType,
+        template_config: JSON.parse(JSON.stringify({
+          type: reportType,
+          fields: selectedFields,
+          filters,
+          groupBy,
+          sortBy,
+        })),
+        is_public: false,
+      });
 
       toast({
         title: "تم الحفظ بنجاح",

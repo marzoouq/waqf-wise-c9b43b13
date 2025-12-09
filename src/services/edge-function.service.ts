@@ -222,4 +222,27 @@ export class EdgeFunctionService {
 
     return { success: true, data };
   }
+
+  /**
+   * إنشاء حسابات المستفيدين
+   */
+  static async invokeCreateBeneficiaryAccounts(params: {
+    beneficiary_ids: string[];
+  }): Promise<EdgeFunctionResult<{
+    total: number;
+    created: number;
+    failed: number;
+    results: any[];
+    errors: any[];
+  }>> {
+    const { data, error } = await supabase.functions.invoke('create-beneficiary-accounts', {
+      body: params,
+    });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, data };
+  }
 }
