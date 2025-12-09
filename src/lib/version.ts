@@ -2,11 +2,11 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.8.45
+ * @version 2.8.46
  * @date 2025-12-09
  */
 
-export const APP_VERSION = '2.8.45';
+export const APP_VERSION = '2.8.46';
 export const APP_VERSION_DATE = '2025-12-09';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
@@ -16,12 +16,42 @@ export const VERSION_INFO = {
   name: APP_VERSION_NAME,
   changelog: '/docs/CHANGELOG.md',
   features: [
-    'المرحلة 3: نقل Realtime من 3 components إلى hooks',
-    'توحيد QUERY_KEYS موجود ومحدث',
-    'إزالة استيرادات supabase مباشرة من Components',
-    '42 خدمة متكاملة',
-    'صفر أخطاء بناء - معمارية نظيفة',
+    '43 خدمة متكاملة في طبقة الخدمات',
+    '170+ hooks منظمة في 25 مجلد',
+    'QUERY_KEYS موحد لـ React Query',
+    'Realtime موحد للوحات التحكم',
+    '41 component تحتاج تحويل (قيد العمل)',
   ],
+} as const;
+
+/**
+ * Architecture Status - حالة الهيكل المعماري
+ */
+export const ARCHITECTURE_STATUS = {
+  services: {
+    total: 43,
+    status: 'complete',
+    description: 'جميع الخدمات مكتملة ومنظمة',
+  },
+  hooks: {
+    total: 170,
+    folders: 25,
+    status: 'complete',
+    description: 'جميع الـ hooks منظمة في مجلدات وظيفية',
+  },
+  components: {
+    totalWithDirectSupabase: 38,
+    status: 'in_progress',
+    description: '38 مكون لا يزال يستخدم Supabase مباشرة (تم إصلاح 4)',
+  },
+  queryKeys: {
+    status: 'complete',
+    description: 'QUERY_KEYS موحد في src/lib/query-keys.ts',
+  },
+  realtime: {
+    status: 'mostly_complete',
+    description: 'Realtime موحد للوحات التحكم، بعض المكونات تحتاج تحويل',
+  },
 } as const;
 
 /**

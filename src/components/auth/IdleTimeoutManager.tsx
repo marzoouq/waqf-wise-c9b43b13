@@ -4,7 +4,7 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { useIdleTimeout } from "@/hooks/useIdleTimeout";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { AuthService } from "@/services";
 import { productionLogger } from "@/lib/logger/production-logger";
 
 /**
@@ -45,7 +45,7 @@ export function IdleTimeoutManager() {
       navigate('/login', { replace: true });
     } catch (error) {
       productionLogger.warn('تحذير أثناء الخروج التلقائي - تم التجاوز', { error });
-      await supabase.auth.signOut();
+      await AuthService.logout();
       navigate('/login', { replace: true });
     }
   }, [signOut, navigate]);

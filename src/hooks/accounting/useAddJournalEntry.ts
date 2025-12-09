@@ -16,10 +16,10 @@ export interface EntryLine {
 }
 
 interface JournalEntryFormData {
-  entry_number: string;
-  entry_date: Date;
-  description: string;
-  fiscal_year_id: string;
+  entry_number?: string;
+  entry_date?: Date;
+  description?: string;
+  fiscal_year_id?: string;
 }
 
 export function useAddJournalEntry(form: UseFormReturn<JournalEntryFormData>, open: boolean, onSuccess?: () => void) {

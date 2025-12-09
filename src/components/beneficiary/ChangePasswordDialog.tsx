@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { supabase } from "@/integrations/supabase/client";
+import { AuthService } from "@/services";
 import { toast } from "sonner";
 import { Eye, EyeOff, Lock } from "lucide-react";
 import { getErrorMessage } from "@/types/errors";
@@ -47,12 +47,11 @@ export function ChangePasswordDialog({ open, onOpenChange }: ChangePasswordDialo
   const onSubmit = async (data: PasswordFormData) => {
     setIsLoading(true);
     try {
-      // تحديث كلمة المرور في Supabase
-      const { error } = await supabase.auth.updateUser({
-        password: data.newPassword,
-      });
+      const result = await AuthService.updatePassword(data.newPassword);
 
-      if (error) throw error;
+      if (!result.success) {
+        throw new Error(result.error);
+      }
 
       toast.success("تم تغيير كلمة المرور بنجاح", {
         description: "يمكنك الآن استخدام كلمة المرور الجديدة في المرة القادمة",
