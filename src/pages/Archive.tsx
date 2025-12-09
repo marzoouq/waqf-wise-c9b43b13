@@ -14,6 +14,7 @@ import { useDocuments } from "@/hooks/useDocuments";
 import { useFolders } from "@/hooks/useFolders";
 import { useArchiveStats } from "@/hooks/useArchiveStats";
 import { useDocumentUpload } from "@/hooks/useDocumentUpload";
+import { useAuth } from "@/hooks/useAuth";
 import {
   ArchiveStatsCards,
   ArchiveFoldersTab,
@@ -25,6 +26,11 @@ import {
 type Document = Database['public']['Tables']['documents']['Row'];
 
 const Archive = () => {
+  const { roles } = useAuth();
+  
+  // فقط admin و nazer و archivist يمكنهم إنشاء/رفع/حذف
+  const canManageArchive = roles.includes('admin') || roles.includes('nazer') || roles.includes('archivist');
+
   // Dialog States
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [folderDialogOpen, setFolderDialogOpen] = useState(false);
@@ -77,12 +83,13 @@ const Archive = () => {
   };
 
   const handleDeleteClick = (doc: Document) => {
+    if (!canManageArchive) return;
     setDocumentToDelete(doc);
     setDeleteDialogOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
-    if (documentToDelete) {
+    if (documentToDelete && canManageArchive) {
       await deleteDocumentWithFile({
         id: documentToDelete.id,
         storagePath: documentToDelete.file_path,
@@ -108,10 +115,12 @@ const Archive = () => {
           description="إدارة وأرشفة المستندات والملفات"
           icon={<FolderOpen className="h-8 w-8 text-primary" />}
           actions={
-            <Button onClick={() => setUploadDialogOpen(true)}>
-              <Upload className="h-4 w-4 ml-2" />
-              رفع مستند
-            </Button>
+            canManageArchive ? (
+              <Button onClick={() => setUploadDialogOpen(true)}>
+                <Upload className="h-4 w-4 ml-2" />
+                رفع مستند
+              </Button>
+            ) : undefined
           }
         />
 
@@ -143,11 +152,11 @@ const Archive = () => {
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
                 onSelectFolder={setSelectedFolderId}
-                onCreateFolder={() => setFolderDialogOpen(true)}
-                onUploadDocument={() => setUploadDialogOpen(true)}
+                onCreateFolder={canManageArchive ? () => setFolderDialogOpen(true) : undefined}
+                onUploadDocument={canManageArchive ? () => setUploadDialogOpen(true) : undefined}
                 onPreviewDocument={handlePreviewDocument}
                 onDownloadDocument={handleDownloadDocument}
-                onDeleteDocument={handleDeleteClick}
+                onDeleteDocument={canManageArchive ? handleDeleteClick : undefined}
               />
             </TabsContent>
 
@@ -158,10 +167,10 @@ const Archive = () => {
                 isLoading={isLoading}
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
-                onUploadDocument={() => setUploadDialogOpen(true)}
-                onCreateFolder={() => setFolderDialogOpen(true)}
+                onUploadDocument={canManageArchive ? () => setUploadDialogOpen(true) : undefined}
+                onCreateFolder={canManageArchive ? () => setFolderDialogOpen(true) : undefined}
                 onPreviewDocument={handlePreviewDocument}
-                onDeleteDocument={handleDeleteClick}
+                onDeleteDocument={canManageArchive ? handleDeleteClick : undefined}
               />
             </TabsContent>
 
@@ -170,20 +179,40 @@ const Archive = () => {
             </TabsContent>
           </Tabs>
 
-          <ArchiveDialogs
-            uploadDialogOpen={uploadDialogOpen}
-            setUploadDialogOpen={setUploadDialogOpen}
-            folderDialogOpen={folderDialogOpen}
-            setFolderDialogOpen={setFolderDialogOpen}
-            previewDialogOpen={previewDialogOpen}
-            setPreviewDialogOpen={setPreviewDialogOpen}
-            deleteDialogOpen={deleteDialogOpen}
-            setDeleteDialogOpen={setDeleteDialogOpen}
-            selectedDocument={selectedDocument}
-            documentToDelete={documentToDelete}
-            onCreateFolder={handleCreateFolder}
-            onDeleteConfirm={handleDeleteConfirm}
-          />
+          {canManageArchive && (
+            <ArchiveDialogs
+              uploadDialogOpen={uploadDialogOpen}
+              setUploadDialogOpen={setUploadDialogOpen}
+              folderDialogOpen={folderDialogOpen}
+              setFolderDialogOpen={setFolderDialogOpen}
+              previewDialogOpen={previewDialogOpen}
+              setPreviewDialogOpen={setPreviewDialogOpen}
+              deleteDialogOpen={deleteDialogOpen}
+              setDeleteDialogOpen={setDeleteDialogOpen}
+              selectedDocument={selectedDocument}
+              documentToDelete={documentToDelete}
+              onCreateFolder={handleCreateFolder}
+              onDeleteConfirm={handleDeleteConfirm}
+            />
+          )}
+          
+          {/* Dialog للمعاينة فقط للمستخدمين بدون صلاحية الإدارة */}
+          {!canManageArchive && previewDialogOpen && selectedDocument && (
+            <ArchiveDialogs
+              uploadDialogOpen={false}
+              setUploadDialogOpen={() => {}}
+              folderDialogOpen={false}
+              setFolderDialogOpen={() => {}}
+              previewDialogOpen={previewDialogOpen}
+              setPreviewDialogOpen={setPreviewDialogOpen}
+              deleteDialogOpen={false}
+              setDeleteDialogOpen={() => {}}
+              selectedDocument={selectedDocument}
+              documentToDelete={null}
+              onCreateFolder={async () => {}}
+              onDeleteConfirm={async () => {}}
+            />
+          )}
         </div>
       </MobileOptimizedLayout>
     </PageErrorBoundary>
