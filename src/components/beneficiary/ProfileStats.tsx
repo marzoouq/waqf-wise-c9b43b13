@@ -1,5 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
-import { BeneficiaryService } from '@/services';
+import { useBeneficiaryProfileStats } from '@/hooks/beneficiary/useBeneficiaryProfileStats';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DollarSign, FileText, Users, TrendingUp, Calendar, CheckCircle } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
@@ -8,32 +7,8 @@ interface ProfileStatsProps {
   beneficiaryId: string;
 }
 
-interface StatsData {
-  totalPayments: number;
-  paymentsCount: number;
-  totalRequests: number;
-  approvedRequests: number;
-  pendingRequests: number;
-  attachmentsCount: number;
-  familyMembersCount: number;
-}
-
 export function ProfileStats({ beneficiaryId }: ProfileStatsProps) {
-  const { data: stats, isLoading } = useQuery<StatsData>({
-    queryKey: ['beneficiary-stats', beneficiaryId],
-    queryFn: async () => {
-      const statistics = await BeneficiaryService.getStatistics(beneficiaryId);
-      return {
-        totalPayments: statistics?.total_received || 0,
-        paymentsCount: statistics?.total_payments || 0,
-        totalRequests: statistics?.pending_requests || 0,
-        approvedRequests: 0,
-        pendingRequests: statistics?.pending_requests || 0,
-        attachmentsCount: 0,
-        familyMembersCount: 0,
-      };
-    },
-  });
+  const { data: stats, isLoading } = useBeneficiaryProfileStats(beneficiaryId);
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل الإحصائيات..." />;

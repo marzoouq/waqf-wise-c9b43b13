@@ -9,10 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { format } from "@/lib/date";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { commonValidation } from "@/lib/validationSchemas";
+import { useAutoJournalEntry } from "@/hooks/payments/useAutoJournalEntry";
 
 const voucherSchema = z.object({
   payment_number: z.string().min(1, { message: "رقم السند مطلوب" }),
@@ -38,6 +38,9 @@ export function AddVoucherDialog({ open, onOpenChange }: AddVoucherDialogProps) 
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // استخدام hook بدلاً من supabase.rpc مباشرة
+  const { createAutoJournalEntry } = useAutoJournalEntry();
 
   const form = useForm<VoucherFormValues>({
     resolver: zodResolver(voucherSchema),
@@ -57,16 +60,14 @@ export function AddVoucherDialog({ open, onOpenChange }: AddVoucherDialogProps) 
     try {
       setIsSubmitting(true);
 
-      // إنشاء قيد محاسبي تلقائي
-      const { error: jeError } = await supabase.rpc('create_auto_journal_entry', {
-        p_trigger_event: 'payment_voucher',
-        p_reference_id: crypto.randomUUID(),
-        p_amount: data.amount,
-        p_description: `سند صرف: ${data.description} - ${data.payee_name}`,
-        p_transaction_date: data.payment_date
+      // إنشاء قيد محاسبي تلقائي عبر الـ hook
+      await createAutoJournalEntry.mutateAsync({
+        triggerEvent: 'payment_voucher',
+        referenceId: crypto.randomUUID(),
+        amount: data.amount,
+        description: `سند صرف: ${data.description} - ${data.payee_name}`,
+        transactionDate: data.payment_date,
       });
-
-      if (jeError) throw jeError;
 
       toast({
         title: "تم الحفظ بنجاح",
@@ -74,7 +75,6 @@ export function AddVoucherDialog({ open, onOpenChange }: AddVoucherDialogProps) 
       });
 
       queryClient.invalidateQueries({ queryKey: ['cashier-stats'] });
-      queryClient.invalidateQueries({ queryKey: ['journal_entries'] });
       
       form.reset();
       onOpenChange(false);

@@ -1,5 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
-import { BeneficiaryService } from '@/services';
+import { useBeneficiaryProfilePayments } from '@/hooks/beneficiary/useBeneficiaryProfilePayments';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { LoadingState } from '@/components/shared/LoadingState';
@@ -12,11 +11,7 @@ interface ProfilePaymentsHistoryProps {
 }
 
 export function ProfilePaymentsHistory({ beneficiaryId }: ProfilePaymentsHistoryProps) {
-  const { data: payments, isLoading } = useQuery({
-    queryKey: ['beneficiary-payments', beneficiaryId],
-    queryFn: () => BeneficiaryService.getPaymentsHistory(beneficiaryId),
-    staleTime: 60 * 1000,
-  });
+  const { data: payments, isLoading } = useBeneficiaryProfilePayments(beneficiaryId);
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل سجل المدفوعات..." />;

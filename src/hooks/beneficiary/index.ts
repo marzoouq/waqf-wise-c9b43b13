@@ -60,6 +60,12 @@ export {
 } from './useBeneficiaryProfileData';
 export type { RequestWithDetails, HeirDistribution } from './useBeneficiaryProfileData';
 
+// ==================== Profile Components Hooks ====================
+export { useBeneficiaryProfileStats, type BeneficiaryProfileStats } from './useBeneficiaryProfileStats';
+export { useBeneficiaryProfileDocuments } from './useBeneficiaryProfileDocuments';
+export { useBeneficiaryProfilePayments } from './useBeneficiaryProfilePayments';
+export { useBeneficiaryProfileRequests } from './useBeneficiaryProfileRequests';
+
 // ==================== Export & Disclosure Hooks ====================
 export { useBeneficiaryExport, type JournalExportEntry } from './useBeneficiaryExport';
 export { useDisclosureBeneficiaries, type DisclosureBeneficiary } from './useDisclosureBeneficiaries';

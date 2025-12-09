@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { MaintenanceService } from "@/services";
+import { useMaintenanceProviders } from "@/hooks/property/useMaintenanceProviders";
 import { Plus, Star, Phone, Mail, MapPin } from "lucide-react";
 import { toast } from "sonner";
 
@@ -17,7 +16,6 @@ interface MaintenanceProvidersDialogProps {
 }
 
 export function MaintenanceProvidersDialog({ open, onOpenChange }: MaintenanceProvidersDialogProps) {
-  const queryClient = useQueryClient();
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [formData, setFormData] = useState({
     provider_name: "",
@@ -29,41 +27,37 @@ export function MaintenanceProvidersDialog({ open, onOpenChange }: MaintenancePr
     notes: ""
   });
 
-  const { data: providers = [], isLoading } = useQuery({
-    queryKey: ["maintenance-providers"],
-    queryFn: () => MaintenanceService.getProviders(true),
-    enabled: open
-  });
-
-  const addProvider = useMutation({
-    mutationFn: async (data: typeof formData) => {
-      await MaintenanceService.addProvider(data as any);
-    },
-    onSuccess: () => {
-      toast.success("تمت إضافة مقدم الخدمة بنجاح");
-      queryClient.invalidateQueries({ queryKey: ["maintenance-providers"] });
-      setIsAddingNew(false);
-      setFormData({
-        provider_name: "",
-        contact_person: "",
-        phone: "",
-        email: "",
-        address: "",
-        specialization: [],
-        notes: ""
-      });
-    },
-    onError: () => {
-      toast.error("حدث خطأ أثناء إضافة مقدم الخدمة");
-    }
-  });
+  // استخدام hook موحد بدلاً من useQuery/useMutation مباشرة
+  const { providers, isLoading, addProvider } = useMaintenanceProviders();
 
   const handleSubmit = () => {
     if (!formData.provider_name || !formData.phone) {
       toast.error("يرجى إدخال الاسم ورقم الهاتف");
       return;
     }
-    addProvider.mutate(formData);
+    addProvider({
+      provider_name: formData.provider_name,
+      contact_person: formData.contact_person || undefined,
+      phone: formData.phone,
+      email: formData.email || undefined,
+      address: formData.address || undefined,
+      specialization: formData.specialization,
+      notes: formData.notes || undefined,
+      rating: 0,
+      total_jobs: 0,
+      active_jobs: 0,
+      is_active: true,
+    });
+    setIsAddingNew(false);
+    setFormData({
+      provider_name: "",
+      contact_person: "",
+      phone: "",
+      email: "",
+      address: "",
+      specialization: [],
+      notes: ""
+    });
   };
 
   const specializations = ["سباكة", "كهرباء", "تكييف", "نجارة", "دهان", "تنظيف", "أخرى"];
