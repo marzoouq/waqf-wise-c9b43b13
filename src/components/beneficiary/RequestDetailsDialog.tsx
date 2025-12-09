@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useRequestDetails } from "@/hooks/beneficiary/useBeneficiaryProfileData";
 import {
   Dialog,
   DialogContent,
@@ -26,13 +25,6 @@ import {
   CheckCircle,
   XCircle,
 } from "lucide-react";
-import { Database } from "@/integrations/supabase/types";
-
-// نوع الطلب مع البيانات المرتبطة
-type RequestWithDetails = Database['public']['Tables']['beneficiary_requests']['Row'] & {
-  request_types?: { name_ar: string; description: string | null } | null;
-  beneficiaries?: { full_name: string; national_id: string } | null;
-};
 
 interface RequestDetailsDialogProps {
   requestId: string;
@@ -47,45 +39,7 @@ export function RequestDetailsDialog({
 }: RequestDetailsDialogProps) {
   const [activeTab, setActiveTab] = useState("details");
 
-  // Fetch request details
-  const { data: request, isLoading } = useQuery<RequestWithDetails>({
-    queryKey: ["request-details", requestId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("beneficiary_requests")
-        .select(
-          `
-          *,
-          request_types (name_ar, description),
-          beneficiaries (full_name, national_id)
-        `
-        )
-        .eq("id", requestId)
-        .maybeSingle();
-      
-      if (!data) throw new Error("Request not found");
-
-      if (error) throw error;
-      return data as RequestWithDetails;
-    },
-    enabled: isOpen && !!requestId,
-  });
-
-  // Fetch related messages
-  const { data: messages = [] } = useQuery({
-    queryKey: ["request-messages", requestId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("internal_messages")
-        .select("*")
-        .eq("request_id", requestId)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return data;
-    },
-    enabled: isOpen && !!requestId,
-  });
+  const { request, messages, isLoading } = useRequestDetails(requestId, isOpen);
 
   const getStatusIcon = (status: string) => {
     switch (status) {

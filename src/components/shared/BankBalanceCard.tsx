@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { productionLogger } from "@/lib/logger/production-logger";
 import { useFiscalYearPublishStatus } from "@/hooks/useFiscalYearPublishStatus";
 import { useAuth } from "@/hooks/useAuth";
+import { useBankBalance } from "@/hooks/dashboard/useFinancialCards";
 
 interface BankBalanceCardProps {
   className?: string;
@@ -27,20 +28,7 @@ export function BankBalanceCard({ className, compact = false }: BankBalanceCardP
                               !roles.some(r => ['admin', 'nazer', 'accountant', 'cashier'].includes(r));
 
   // جلب رصيد البنك من حساب النقدية والبنوك
-  const { data: bankBalance, isLoading } = useQuery({
-    queryKey: ["bank-balance-realtime"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("accounts")
-        .select("id, name_ar, code, current_balance")
-        .eq("code", "1.1.1") // حساب النقدية والبنوك
-        .eq("is_active", true)
-        .maybeSingle();
-
-      if (error && error.code !== "PGRST116") throw error;
-      return data;
-    },
-  });
+  const { data: bankBalance, isLoading } = useBankBalance();
 
   // الاشتراك في التحديثات المباشرة
   useEffect(() => {

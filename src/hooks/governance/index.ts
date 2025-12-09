@@ -1,8 +1,10 @@
 /**
  * Governance Hooks - خطافات الحوكمة
+ * @version 2.8.35
  */
 
-export { useGovernanceData } from './useGovernanceData';
+export { useGovernanceData, useEligibleVoters, useRecentGovernanceDecisions } from './useGovernanceData';
+export type { EligibleVoter, GovernanceDecisionInput } from './useGovernanceData';
 export { useGovernanceDecisions } from './useGovernanceDecisions';
 export { useGovernanceVoting } from './useGovernanceVoting';
 export { useVisibilitySettings } from './useVisibilitySettings';

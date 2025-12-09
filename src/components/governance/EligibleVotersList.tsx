@@ -1,20 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useEligibleVoters } from "@/hooks/governance/useGovernanceData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { CheckCircle2, XCircle, Clock, Users } from "lucide-react";
-import type { GovernanceDecision } from "@/types/governance";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { Json } from "@/integrations/supabase/types";
-
-interface EligibleVoter {
-  id: string;
-  name: string;
-  type: 'board_member' | 'beneficiary' | 'nazer';
-  hasVoted?: boolean;
-  vote?: 'approve' | 'reject' | 'abstain';
-}
 
 interface EligibleVotersListProps {
   decision: { 
@@ -26,108 +16,7 @@ interface EligibleVotersListProps {
 }
 
 export function EligibleVotersList({ decision }: EligibleVotersListProps) {
-  const { data: voters = [], isLoading } = useQuery({
-    queryKey: ["eligible-voters", decision.id],
-    queryFn: async () => {
-      let eligibleVoters: EligibleVoter[] = [];
-
-      // حسب نوع المصوتين
-      switch (decision.voting_participants_type) {
-        case 'board_only':
-          // جلب المسؤولين والنظار فقط (بدون joins معقدة)
-          const { data: boardUsers } = await supabase
-            .from("user_roles")
-            .select("user_id")
-            .in("role", ["admin", "nazer"]);
-          
-          if (boardUsers) {
-          eligibleVoters = boardUsers.map(u => ({
-            id: u.user_id,
-            name: 'عضو مجلس',
-            type: 'board_member' as const
-          }));
-          }
-          break;
-
-        case 'first_class_beneficiaries':
-          const { data: beneficiaries } = await supabase
-            .from("beneficiaries")
-            .select("id, full_name, user_id")
-            .eq("category", "الفئة الأولى")
-            .eq("can_login", true);
-          eligibleVoters = beneficiaries?.map(b => ({
-            id: b.user_id,
-            name: b.full_name,
-            type: 'beneficiary' as const
-          })) || [];
-          break;
-
-        case 'board_and_beneficiaries':
-          const { data: boardUsers2 } = await supabase
-            .from("user_roles")
-            .select("user_id")
-            .in("role", ["admin", "nazer"]);
-          const { data: beneficiaries2 } = await supabase
-            .from("beneficiaries")
-            .select("id, full_name, user_id")
-            .eq("category", "الفئة الأولى")
-            .eq("can_login", true);
-          
-          eligibleVoters = [
-            ...(boardUsers2?.map(u => ({
-              id: u.user_id,
-              name: 'عضو مجلس',
-              type: 'board_member' as const
-            })) || []),
-            ...(beneficiaries2?.map(b => ({
-              id: b.user_id,
-              name: b.full_name,
-              type: 'beneficiary' as const
-            })) || [])
-          ];
-          break;
-
-        case 'custom':
-          // Type assertion for custom_voters from Json to EligibleVoter[]
-          eligibleVoters = (decision.custom_voters as unknown as EligibleVoter[] | null) || [];
-          break;
-
-        case 'nazer_only':
-          // الناظر فقط
-          const { data: nazerUser } = await supabase
-            .from("user_roles")
-            .select("user_id")
-            .eq("role", "nazer")
-            .limit(1)
-            .maybeSingle();
-          if (nazerUser) {
-            eligibleVoters = [{
-              id: nazerUser.user_id,
-              name: 'الناظر',
-              type: 'nazer' as const
-            }];
-          }
-          break;
-      }
-
-      // جلب من صوّت
-      const { data: votes } = await supabase
-        .from("governance_votes")
-        .select("voter_id, vote")
-        .eq("decision_id", decision.id);
-
-      // دمج البيانات
-      return eligibleVoters.map(voter => {
-        const vote = votes?.find(v => v.voter_id === voter.id);
-        return {
-          ...voter,
-          hasVoted: !!vote,
-          vote: vote?.vote
-        };
-      });
-    },
-    enabled: !!decision.id,
-  });
+  const { data: voters = [], isLoading } = useEligibleVoters(decision);
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل المصوتين..." />;

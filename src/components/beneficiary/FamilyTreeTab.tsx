@@ -1,5 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useFamilyTree } from "@/hooks/beneficiary/useBeneficiaryProfileData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Users, User } from "lucide-react";
@@ -15,31 +14,10 @@ export function FamilyTreeTab({ beneficiaryId }: FamilyTreeTabProps) {
   const { settings } = useVisibilitySettings();
   const isMobile = useIsMobile();
 
-  const { data: familyMembers, isLoading } = useQuery({
-    queryKey: ["family-tree", beneficiaryId],
-    queryFn: async () => {
-      // جلب المستفيد الحالي
-      const { data: currentBeneficiary } = await supabase
-        .from("beneficiaries")
-        .select("*")
-        .eq("id", beneficiaryId)
-        .maybeSingle();
-
-      if (!currentBeneficiary) return [];
-
-      // جلب جميع أفراد العائلة
-      const { data: family } = await supabase
-        .from("beneficiaries")
-        .select("*")
-        .or(`family_name.eq.${currentBeneficiary.family_name},parent_beneficiary_id.eq.${beneficiaryId},id.eq.${currentBeneficiary.parent_beneficiary_id}`)
-        .eq("status", "نشط")
-        .order("is_head_of_family", { ascending: false })
-        .order("date_of_birth", { ascending: true });
-
-      return family || [];
-    },
-    enabled: settings?.show_family_tree || false,
-  });
+  const { data: familyMembers, isLoading } = useFamilyTree(
+    beneficiaryId,
+    settings?.show_family_tree || false
+  );
 
   if (!settings?.show_family_tree) {
     return (

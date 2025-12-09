@@ -36,3 +36,6 @@ export { useInteractiveDashboard } from './useInteractiveDashboard';
 
 // ==================== Dashboard Charts Hooks ====================
 export { useBudgetComparison, useRevenueExpenseChart } from './useDashboardCharts';
+
+// ==================== Financial Cards Hooks ====================
+export { useBankBalance, useWaqfCorpus, type FiscalYearCorpus } from './useFinancialCards';

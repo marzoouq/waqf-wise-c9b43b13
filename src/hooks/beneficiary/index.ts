@@ -50,3 +50,12 @@ export {
   useMonthlyRevenue,
   usePropertyStats
 } from './useBeneficiaryTabsData';
+
+// ==================== Profile Data Hooks ====================
+export {
+  useFamilyTree,
+  useRequestDetails,
+  useBeneficiaryIntegrationStats,
+  useWaqfDistributionsSummary
+} from './useBeneficiaryProfileData';
+export type { RequestWithDetails, HeirDistribution } from './useBeneficiaryProfileData';
