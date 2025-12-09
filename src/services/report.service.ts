@@ -506,27 +506,56 @@ export class ReportService {
 
       const totalCost = (data || []).reduce((sum, r) => sum + (r.actual_cost || 0), 0);
 
-      // تجميع حسب العقار
-      const byPropertyMap: Record<string, number> = {};
-      (data || []).forEach(r => {
-        const name = (r.properties as { name: string })?.name || 'غير محدد';
-        byPropertyMap[name] = (byPropertyMap[name] || 0) + (r.actual_cost || 0);
-      });
-
-      const byProperty = Object.entries(byPropertyMap).map(([propertyName, amount]) => ({
-        propertyName,
-        amount,
-      }));
-
       return {
         totalCost,
         byCategory: [],
-        byProperty,
+        byProperty: [],
       };
     } catch (error) {
       logger.error(error, { context: 'get_maintenance_cost_report', severity: 'medium' });
       throw error;
     }
+  }
+
+  /**
+   * جلب آخر إفصاح سنوي
+   */
+  static async getLatestAnnualDisclosure() {
+    const { data, error } = await supabase
+      .from('annual_disclosures')
+      .select('*')
+      .order('year', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error) throw error;
+    return data;
+  }
+
+  /**
+   * جلب العقارات مع العقود
+   */
+  static async getPropertiesWithContracts() {
+    const { data, error } = await supabase
+      .from('properties')
+      .select(`*, contracts:contracts(*)`)
+      .order('name');
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * جلب المستفيدين المرتبطين بالإفصاح
+   */
+  static async getDisclosureBeneficiariesForPDF(disclosureId: string) {
+    const { data, error } = await supabase
+      .from('disclosure_beneficiaries')
+      .select('*')
+      .eq('disclosure_id', disclosureId);
+
+    if (error) throw error;
+    return data || [];
   }
 
   /**

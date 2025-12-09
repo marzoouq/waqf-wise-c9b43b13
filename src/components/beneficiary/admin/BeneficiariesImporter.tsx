@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Upload, FileSpreadsheet, AlertCircle, CheckCircle2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
-import { supabase } from "@/integrations/supabase/client";
+import { BeneficiaryService } from "@/services/beneficiary.service";
 
 const importSchema = z.object({
   full_name: z.string().min(3, "الاسم قصير جداً"),
@@ -97,22 +97,16 @@ export function BeneficiariesImporter({ onSuccess }: BeneficiariesImporterProps)
 
     setImporting(true);
     try {
-      const { error } = await supabase
-        .from("beneficiaries")
-        .insert(
-          previewData.map(row => ({
-            full_name: row.full_name,
-            national_id: row.national_id,
-            phone: row.phone,
-            gender: row.gender,
-            relationship: row.relationship,
-            category: row.category,
-            nationality: row.nationality,
-            status: "نشط",
-          }))
-        );
-
-      if (error) throw error;
+      const records = previewData.map(row => ({
+        full_name: row.full_name!,
+        national_id: row.national_id!,
+        phone: row.phone!,
+        gender: row.gender!,
+        relationship: row.relationship!,
+        category: row.category || 'الدرجة الأولى',
+        nationality: row.nationality || 'سعودي',
+      }));
+      await BeneficiaryService.importBeneficiaries(records);
 
       toast({
         title: "تم الاستيراد بنجاح",

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { UnifiedFileUpload, UploadedFile } from "@/components/unified/UnifiedFileUpload";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
+import { BeneficiaryService } from "@/services/beneficiary.service";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { Beneficiary } from "@/types/beneficiary";
@@ -35,29 +35,7 @@ export function BeneficiaryAttachmentsDialog({
 
     try {
       for (const file of files) {
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${beneficiary.id}/${Date.now()}.${fileExt}`;
-
-        // رفع الملف إلى Supabase Storage
-        const { error: uploadError } = await supabase.storage
-          .from('beneficiary-attachments')
-          .upload(fileName, file);
-
-        if (uploadError) throw uploadError;
-
-        // حفظ البيانات في قاعدة البيانات
-        const { error: dbError } = await supabase
-          .from('beneficiary_attachments')
-          .insert({
-            beneficiary_id: beneficiary.id,
-            file_name: file.name,
-            file_path: fileName,
-            file_type: file.type.split('/')[0] || 'document',
-            file_size: file.size,
-            mime_type: file.type,
-          });
-
-        if (dbError) throw dbError;
+        await BeneficiaryService.uploadAttachment(beneficiary.id, file);
       }
 
       toast({
@@ -81,20 +59,7 @@ export function BeneficiaryAttachmentsDialog({
 
   const handleDeleteAttachment = async (attachmentId: string, filePath: string) => {
     try {
-      // حذف الملف من Storage
-      const { error: storageError } = await supabase.storage
-        .from('beneficiary-attachments')
-        .remove([filePath]);
-
-      if (storageError) throw storageError;
-
-      // حذف السجل من قاعدة البيانات
-      const { error: dbError } = await supabase
-        .from('beneficiary_attachments')
-        .delete()
-        .eq('id', attachmentId);
-
-      if (dbError) throw dbError;
+      await BeneficiaryService.deleteAttachment(attachmentId, filePath);
 
       toast({
         title: "تم الحذف",
