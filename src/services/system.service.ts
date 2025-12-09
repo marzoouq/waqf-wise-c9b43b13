@@ -394,4 +394,49 @@ export class SystemService {
       beneficiary: session.beneficiaries as { full_name: string; phone: string; category: string } | undefined
     }));
   }
+
+  /**
+   * جلب تنبيهات النظام
+   */
+  static async getAdminAlerts() {
+    const { data, error } = await supabase
+      .from('system_alerts')
+      .select('id, alert_type, severity, title, description, status, created_at, acknowledged_at, resolved_at')
+      .in('status', ['active', 'acknowledged'])
+      .order('created_at', { ascending: false })
+      .limit(20);
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * الاعتراف بتنبيه
+   */
+  static async acknowledgeAlert(alertId: string) {
+    const { error } = await supabase
+      .from('system_alerts')
+      .update({
+        status: 'acknowledged',
+        acknowledged_at: new Date().toISOString(),
+      })
+      .eq('id', alertId);
+
+    if (error) throw error;
+  }
+
+  /**
+   * حل تنبيه
+   */
+  static async resolveAlert(alertId: string) {
+    const { error } = await supabase
+      .from('system_alerts')
+      .update({
+        status: 'resolved',
+        resolved_at: new Date().toISOString(),
+      })
+      .eq('id', alertId);
+
+    if (error) throw error;
+  }
 }

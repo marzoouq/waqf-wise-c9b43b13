@@ -1,5 +1,10 @@
+/**
+ * Dashboard Config Hook
+ * @version 2.8.54
+ */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { DashboardService } from '@/services/dashboard.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 import { toast } from 'sonner';
 import type { Json } from '@/integrations/supabase/types';
 
@@ -27,17 +32,9 @@ export interface DashboardConfig {
 
 export function useDashboardConfigs() {
   return useQuery({
-    queryKey: ['dashboard-configs'],
+    queryKey: QUERY_KEYS.DASHBOARD_CONFIGS,
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      const { data, error } = await supabase
-        .from('dashboard_configurations')
-        .select('id, user_id, dashboard_name, layout_config, is_default, is_shared, created_at, updated_at')
-        .or(`user_id.eq.${user?.id},is_shared.eq.true`)
-        .order('is_default', { ascending: false });
-
-      if (error) throw error;
+      const data = await DashboardService.getDashboardConfigs();
       return (data || []).map(item => ({
         ...item,
         layout_config: item.layout_config as unknown as { widgets: DashboardWidget[] }
@@ -50,27 +47,13 @@ export function useSaveDashboardConfig() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (config: Omit<DashboardConfig, 'id' | 'created_at' | 'updated_at' | 'user_id'>) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      const { data, error } = await supabase
-        .from('dashboard_configurations')
-        .insert({
-          dashboard_name: config.dashboard_name,
-          layout_config: config.layout_config as unknown as Json,
-          is_default: config.is_default,
-          is_shared: config.is_shared,
-          user_id: user?.id,
-        })
-        .select()
-        .maybeSingle();
-
-      if (error) throw error;
-      if (!data) throw new Error('فشل إنشاء لوحة التحكم');
-      return data;
-    },
+    mutationFn: (config: Omit<DashboardConfig, 'id' | 'created_at' | 'updated_at' | 'user_id'>) => 
+      DashboardService.saveDashboardConfig({
+        ...config,
+        layout_config: config.layout_config as unknown as Json
+      }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['dashboard-configs'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DASHBOARD_CONFIGS });
       toast.success('تم حفظ لوحة التحكم بنجاح');
     },
     onError: (error: Error) => {
@@ -83,26 +66,10 @@ export function useUpdateDashboardConfig() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, config }: { id: string; config: Partial<DashboardConfig> }) => {
-      const updateData: Record<string, unknown> = {};
-      if (config.dashboard_name) updateData.dashboard_name = config.dashboard_name;
-      if (config.layout_config) updateData.layout_config = config.layout_config;
-      if (config.is_default !== undefined) updateData.is_default = config.is_default;
-      if (config.is_shared !== undefined) updateData.is_shared = config.is_shared;
-      
-      const { data, error } = await supabase
-        .from('dashboard_configurations')
-        .update(updateData)
-        .eq('id', id)
-        .select()
-        .maybeSingle();
-
-      if (error) throw error;
-      if (!data) throw new Error('لوحة التحكم غير موجودة');
-      return data;
-    },
+    mutationFn: ({ id, config }: { id: string; config: Partial<DashboardConfig> }) => 
+      DashboardService.updateDashboardConfig(id, config),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['dashboard-configs'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DASHBOARD_CONFIGS });
       toast.success('تم تحديث لوحة التحكم بنجاح');
     },
     onError: (error: Error) => {
@@ -115,16 +82,9 @@ export function useDeleteDashboardConfig() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('dashboard_configurations')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-    },
+    mutationFn: (id: string) => DashboardService.deleteDashboardConfig(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['dashboard-configs'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DASHBOARD_CONFIGS });
       toast.success('تم حذف لوحة التحكم بنجاح');
     },
     onError: (error: Error) => {
