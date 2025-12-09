@@ -58,9 +58,10 @@ export const useFamilies = () => {
         .from('families')
         .insert(newFamily)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('فشل إنشاء العائلة');
       return data;
     },
     onSuccess: () => {
@@ -183,9 +184,10 @@ export const useFamilyMembers = (familyId?: string) => {
         .from('family_members')
         .insert([newMember])
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('فشل إضافة الفرد');
       return data;
     },
     onSuccess: () => {
@@ -213,9 +215,10 @@ export const useFamilyMembers = (familyId?: string) => {
         .update(updates)
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('الفرد غير موجود');
       return data;
     },
     onSuccess: () => {

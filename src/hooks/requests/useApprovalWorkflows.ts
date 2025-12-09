@@ -120,9 +120,10 @@ export function useApprovalWorkflows() {
           is_active: workflow.is_active,
         })
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('فشل إنشاء المسار');
       return data;
     },
     onSuccess: () => {
@@ -167,9 +168,10 @@ export function useApprovalWorkflows() {
           status: 'pending',
         })
         .select()
-        .single();
+        .maybeSingle();
 
       if (statusError) throw statusError;
+      if (!statusData) throw new Error('فشل إنشاء حالة الموافقة');
 
       const steps = workflow.approval_levels.map(level => ({
         approval_status_id: statusData.id,
@@ -217,17 +219,19 @@ export function useApprovalWorkflows() {
         })
         .eq('id', stepId)
         .select()
-        .single();
+        .maybeSingle();
 
       if (stepError) throw stepError;
+      if (!step) throw new Error('الخطوة غير موجودة');
 
       const { data: status, error: statusFetchError } = await supabase
         .from('approval_status')
         .select('*, approval_steps(*)')
         .eq('id', step.approval_status_id)
-        .single();
+        .maybeSingle();
 
       if (statusFetchError) throw statusFetchError;
+      if (!status) throw new Error('الحالة غير موجودة');
 
       if (action === 'rejected') {
         await supabase

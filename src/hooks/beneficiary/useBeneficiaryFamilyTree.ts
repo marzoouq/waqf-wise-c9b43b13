@@ -34,9 +34,10 @@ export function useBeneficiaryFamilyTree(beneficiaryId: string) {
         .from('beneficiaries')
         .select('id, full_name, family_name, category, relationship, is_head_of_family, gender, date_of_birth, status, number_of_sons, number_of_daughters, number_of_wives, family_size')
         .eq('id', beneficiaryId)
-        .single();
+        .maybeSingle();
 
       if (benError) throw benError;
+      if (!beneficiary) throw new Error('المستفيد غير موجود');
 
       // جلب أفراد العائلة
       let familyMembers: FamilyMember[] = [];

@@ -79,7 +79,7 @@ export function useLoanApprovals() {
           .from('loans')
           .select('loan_number, loan_amount, beneficiaries(full_name)')
           .eq('id', loanId)
-          .single();
+          .maybeSingle();
 
         const { data: allApprovals } = await supabase
           .from('loan_approvals')

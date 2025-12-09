@@ -49,9 +49,10 @@ export function useBatchPayments(distributionId?: string) {
         .from('payment_schedules')
         .insert([schedule])
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('فشل إنشاء الجدول');
       return data;
     },
     onSuccess: () => {
@@ -78,9 +79,10 @@ export function useBatchPayments(distributionId?: string) {
         .update(updates)
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('الجدول غير موجود');
       return data;
     },
     onSuccess: () => {

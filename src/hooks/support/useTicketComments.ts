@@ -78,9 +78,10 @@ export function useTicketComments(ticketId: string) {
           is_solution: isSolution,
         })
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('فشل إضافة التعليق');
 
       // إذا كان حل، تحديث حالة التذكرة
       if (isSolution) {
@@ -116,9 +117,10 @@ export function useTicketComments(ticketId: string) {
         })
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('التعليق غير موجود');
       return data;
     },
     onSuccess: () => {

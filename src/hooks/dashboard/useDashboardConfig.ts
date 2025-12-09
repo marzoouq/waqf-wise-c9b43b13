@@ -63,9 +63,10 @@ export function useSaveDashboardConfig() {
           user_id: user?.id,
         })
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('فشل إنشاء لوحة التحكم');
       return data;
     },
     onSuccess: () => {
@@ -94,9 +95,10 @@ export function useUpdateDashboardConfig() {
         .update(updateData)
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('لوحة التحكم غير موجودة');
       return data;
     },
     onSuccess: () => {

@@ -85,7 +85,7 @@ export async function insertIntoTable<T>(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const client: any = supabase;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const query: any = client.from(tableName).insert([data]).select().single();
+    const query: any = client.from(tableName).insert([data]).select().maybeSingle();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const result: any = await query;
     return { data: result.data, error: result.error };
@@ -111,7 +111,7 @@ export async function updateInTable<T>(
       .update(updates)
       .eq('id', id)
       .select()
-      .single();
+      .maybeSingle();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const result: any = await query;
     return { data: result.data, error: result.error };

@@ -50,7 +50,7 @@ export function useJournalEntryForm() {
         .from('fiscal_years')
         .select('id, name, start_date, end_date, is_active')
         .eq('is_active', true)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
@@ -117,9 +117,10 @@ export function useJournalEntryForm() {
           },
         ])
         .select()
-        .single();
+        .maybeSingle();
 
       if (entryError) throw entryError;
+      if (!entry) throw new Error('فشل إنشاء القيد');
 
       // إضافة الأسطر
       const linesData = lines.map((line, index) => ({

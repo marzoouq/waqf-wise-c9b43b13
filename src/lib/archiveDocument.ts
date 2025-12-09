@@ -54,7 +54,7 @@ export async function archiveDocument(params: {
         description: description || `${fileType === 'invoice' ? 'فاتورة' : 'سند قبض'} تلقائي - مرجع: ${referenceId}`,
       })
       .select('id')
-      .single();
+      .maybeSingle();
 
     if (documentError) {
       logger.error(documentError, { 
@@ -63,6 +63,10 @@ export async function archiveDocument(params: {
         metadata: { fileName, fileType }
       });
       return { success: false, error: 'فشل حفظ بيانات المستند' };
+    }
+    
+    if (!documentData) {
+      return { success: false, error: 'فشل إنشاء سجل المستند' };
     }
 
     logger.info('تم أرشفة المستند بنجاح', {

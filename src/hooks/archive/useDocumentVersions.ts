@@ -62,7 +62,7 @@ export function useDocumentVersions(documentId: string | undefined) {
         .eq('document_id', documentId)
         .order('version_number', { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
       const newVersionNumber = (maxVersion?.version_number || 0) + 1;
 
@@ -78,7 +78,7 @@ export function useDocumentVersions(documentId: string | undefined) {
           is_current: true,
         })
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
@@ -107,7 +107,7 @@ export function useDocumentVersions(documentId: string | undefined) {
         .from('document_versions')
         .select('id, document_id, version_number, file_path')
         .eq('id', versionId)
-        .single();
+        .maybeSingle();
 
       if (versionError || !version) throw new Error('الإصدار غير موجود');
 

@@ -72,9 +72,10 @@ export function useUpdateAvailability() {
           onConflict: 'user_id',
         })
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('فشل تحديث التوافر');
       return data;
     },
     onSuccess: () => {
@@ -144,7 +145,7 @@ export function useAssignmentSettings() {
       const { data, error } = await supabase
         .from('support_assignment_settings')
         .select('id, assignment_type, auto_assign, max_tickets_per_agent, created_at, updated_at')
-        .single();
+        .maybeSingle();
 
       if (error && error.code !== 'PGRST116') throw error;
       return data;
@@ -164,9 +165,10 @@ export function useAssignmentSettings() {
           updated_at: new Date().toISOString(),
         })
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('فشل تحديث الإعدادات');
       return data;
     },
     onSuccess: () => {
