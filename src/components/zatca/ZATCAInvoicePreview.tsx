@@ -3,9 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Send, Download, QrCode, CheckCircle, AlertCircle } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
-import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { useZATCASubmit } from "@/hooks/zatca/useZATCASubmit";
 
 interface ZATCAInvoicePreviewProps {
   invoice: {
@@ -24,8 +22,8 @@ interface ZATCAInvoicePreviewProps {
 }
 
 export function ZATCAInvoicePreview({ invoice }: ZATCAInvoicePreviewProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [zatcaStatus, setZatcaStatus] = useState<'pending' | 'success' | 'error'>('pending');
+  const { isSubmitting, status, submitToZATCA } = useZATCASubmit();
+  const zatcaStatus = status;
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('ar-SA', {
@@ -35,33 +33,7 @@ export function ZATCAInvoicePreview({ invoice }: ZATCAInvoicePreviewProps) {
   };
 
   const handleSubmitToZATCA = async () => {
-    setIsSubmitting(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('zatca-submit', {
-        body: { invoiceId: invoice.id },
-      });
-
-      if (error) throw error;
-
-      if (data.success) {
-        setZatcaStatus('success');
-        toast.success("تم إرسال الفاتورة إلى هيئة الزكاة والضريبة", {
-          description: `رقم الإرسال: ${data.submissionId}`,
-        });
-      } else {
-        setZatcaStatus('error');
-        toast.error("فشل إرسال الفاتورة", {
-          description: data.error || "حدث خطأ غير متوقع",
-        });
-      }
-    } catch (error) {
-      setZatcaStatus('error');
-      toast.error("خطأ في الاتصال", {
-        description: "تعذر الاتصال بخدمة هيئة الزكاة والضريبة",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    await submitToZATCA(invoice.id);
   };
 
   return (
