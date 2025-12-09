@@ -10,11 +10,11 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { createMutationErrorHandler } from "@/lib/errors";
 import { useEffect, useMemo } from "react";
 import { logger } from "@/lib/logger";
+import { RealtimeService } from "@/services/realtime.service";
 import { RentalPaymentService, type RentalPayment } from "@/services/rental-payment.service";
 import { useRentalPaymentArchiving } from "./useRentalPaymentArchiving";
 import { filterRelevantPayments } from "@/lib/rental-payment-filters";
@@ -43,19 +43,14 @@ export const useRentalPayments = (
   const queryClient = useQueryClient();
   const { archiveInvoiceAndReceipt } = useRentalPaymentArchiving();
 
-  // Real-time subscription
+  // Real-time subscription using RealtimeService
   useEffect(() => {
-    const channel = supabase
-      .channel('rental-payments-changes')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'rental_payments' },
-        () => queryClient.invalidateQueries({ queryKey: QUERY_KEYS.RENTAL_PAYMENTS })
-      )
-      .subscribe();
+    const subscription = RealtimeService.subscribeToTable('rental_payments', () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.RENTAL_PAYMENTS });
+    });
 
     return () => {
-      supabase.removeChannel(channel);
+      subscription.unsubscribe();
     };
   }, [queryClient]);
 
