@@ -22,9 +22,14 @@ export function DocumentPreviewDialog({
 }: DocumentPreviewDialogProps) {
   const { loading, handleDownload } = useDocumentPreview({ document });
 
+  // لا تعرض شيئاً إذا لم يكن هناك مستند
+  if (!document) {
+    return null;
+  }
+
   const getPreviewContent = () => {
-    const fileType = document.file_type.toLowerCase();
-    const fileName = document.file_path.split('/').pop() || '';
+    const fileType = document.file_type?.toLowerCase() || '';
+    const fileName = document.file_path?.split('/').pop() || '';
 
     // معاينة PDF
     if (fileType === 'pdf' || fileName.endsWith('.pdf')) {
