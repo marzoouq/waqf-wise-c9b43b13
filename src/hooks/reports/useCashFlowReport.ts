@@ -1,13 +1,13 @@
 /**
  * Cash Flow Report Hook
- * @version 2.8.44
+ * @version 2.8.45
  */
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";
-import { ReportsService, type CashFlowData } from "@/services/reports.service";
+import { ReportService, type CashFlowData } from "@/services/report.service";
 
 export type { CashFlowData };
 
@@ -25,7 +25,7 @@ export function useCashFlowReport() {
   const query = useQuery({
     queryKey: ["cash-flow-report"],
     ...QUERY_CONFIG.REPORTS,
-    queryFn: () => ReportsService.getCashFlowData(),
+    queryFn: () => ReportService.getCashFlowData(),
   });
 
   // تحديث وقت آخر تحديث
