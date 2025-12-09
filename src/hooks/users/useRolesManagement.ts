@@ -8,6 +8,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { AppRole } from "@/hooks/useUserRole";
 import { UserService } from "@/services";
+import { invalidateUserQueries } from "@/lib/query-invalidation";
 
 export interface UserWithRoles {
   id: string;
@@ -56,8 +57,7 @@ export function useRolesManagement() {
     mutationFn: ({ userId, role }: { userId: string; role: string }) =>
       UserService.addRole(userId, role as "accountant" | "admin" | "archivist" | "beneficiary" | "cashier" | "nazer" | "user" | "waqf_heir"),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["users-profiles-cache"] });
-      queryClient.invalidateQueries({ queryKey: ["user-roles-audit"] });
+      invalidateUserQueries(queryClient);
       toast({ title: "تمت الإضافة", description: "تم إضافة الدور بنجاح" });
       setAddRoleDialogOpen(false);
       setSelectedUser(null);
@@ -71,8 +71,7 @@ export function useRolesManagement() {
     mutationFn: ({ userId, role }: { userId: string; role: string }) =>
       UserService.removeRole(userId, role as "accountant" | "admin" | "archivist" | "beneficiary" | "cashier" | "nazer" | "user" | "waqf_heir"),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["users-profiles-cache"] });
-      queryClient.invalidateQueries({ queryKey: ["user-roles-audit"] });
+      invalidateUserQueries(queryClient);
       toast({ title: "تم الحذف", description: "تم حذف الدور بنجاح" });
     },
     onError: (error: Error) => {

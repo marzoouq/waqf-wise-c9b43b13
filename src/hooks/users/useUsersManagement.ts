@@ -7,6 +7,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { AppRole } from "@/hooks/auth/useUserRole";
 import { AuthService } from "@/services/auth.service";
+import { invalidateUserQueries } from "@/lib/query-invalidation";
 
 export interface UserProfile {
   id: string;
@@ -50,7 +51,7 @@ export function useDeleteUser() {
         title: "تم الحذف",
         description: "تم حذف المستخدم بنجاح",
       });
-      queryClient.invalidateQueries({ queryKey: ["users"] });
+      invalidateUserQueries(queryClient);
     },
     onError: (error) => {
       console.error("Error deleting user:", error);
@@ -79,7 +80,7 @@ export function useUpdateUserRoles() {
         title: "تم التحديث",
         description: "تم تحديث أدوار المستخدم بنجاح",
       });
-      queryClient.invalidateQueries({ queryKey: ["users"] });
+      invalidateUserQueries(queryClient);
     },
     onError: (error) => {
       console.error("Error updating roles:", error);
@@ -108,7 +109,7 @@ export function useUpdateUserStatus() {
         title: "تم التحديث",
         description: "تم تحديث حالة المستخدم بنجاح",
       });
-      queryClient.invalidateQueries({ queryKey: ["users"] });
+      invalidateUserQueries(queryClient);
     },
     onError: (error) => {
       console.error("Error updating status:", error);
