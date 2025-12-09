@@ -12,19 +12,14 @@ import { useNotifications } from "@/hooks/useNotifications";
 import { NotificationItem } from "@/components/notifications/NotificationItem";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
-import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, memo, useCallback, useState } from "react";
-import { toast } from "sonner";
-import { RealtimeNotification, NotificationPayload } from "@/types/notifications";
+import { memo, useCallback, useState } from "react";
+import { RealtimeNotification } from "@/types/notifications";
 
 export const NotificationsBell = memo(function NotificationsBell() {
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
   
+  // useNotifications already handles Realtime subscriptions internally
   const { 
     notifications, 
     isLoading, 
@@ -33,41 +28,6 @@ export const NotificationsBell = memo(function NotificationsBell() {
     markAllAsRead,
     isMarkingAllAsRead 
   } = useNotifications();
-  
-  // Real-time subscription for new notifications
-  useEffect(() => {
-    if (!user?.id) return;
-    
-    const channel = supabase
-      .channel('new-notifications')
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'notifications',
-        filter: `user_id=eq.${user.id}`
-      }, (payload: unknown) => {
-        const typedPayload = payload as NotificationPayload;
-        const newNotification = typedPayload.new;
-        toast.info(newNotification.title, {
-          description: newNotification.message,
-        });
-        
-        queryClient.invalidateQueries({ queryKey: ["notifications"] });
-      })
-      .on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'notifications',
-        filter: `user_id=eq.${user.id}`
-      }, () => {
-        queryClient.invalidateQueries({ queryKey: ["notifications"] });
-      })
-      .subscribe();
-      
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [user?.id, queryClient]);
 
   const handleNotificationClick = useCallback((notification: RealtimeNotification) => {
     if (notification.action_url) {

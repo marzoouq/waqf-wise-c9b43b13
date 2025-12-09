@@ -1,12 +1,8 @@
-import { useState, useEffect } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Landmark, RefreshCw, Wifi, EyeOff } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { productionLogger } from "@/lib/logger/production-logger";
 import { useFiscalYearPublishStatus } from "@/hooks/useFiscalYearPublishStatus";
 import { useAuth } from "@/hooks/useAuth";
 import { useBankBalance } from "@/hooks/dashboard/useFinancialCards";
@@ -17,9 +13,6 @@ interface BankBalanceCardProps {
 }
 
 export function BankBalanceCard({ className, compact = false }: BankBalanceCardProps) {
-  const queryClient = useQueryClient();
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const [isLive, setIsLive] = useState(false);
   const { roles } = useAuth();
   const { isCurrentYearPublished, isLoading: publishStatusLoading } = useFiscalYearPublishStatus();
   
@@ -27,37 +20,8 @@ export function BankBalanceCard({ className, compact = false }: BankBalanceCardP
   const isBeneficiaryOrHeir = roles.some(r => ['beneficiary', 'waqf_heir'].includes(r)) && 
                               !roles.some(r => ['admin', 'nazer', 'accountant', 'cashier'].includes(r));
 
-  // جلب رصيد البنك من حساب النقدية والبنوك
-  const { data: bankBalance, isLoading } = useBankBalance();
-
-  // الاشتراك في التحديثات المباشرة
-  useEffect(() => {
-    const channel = supabase
-      .channel("bank-balance-changes")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "accounts",
-          filter: "code=eq.1.1.1",
-        },
-        (payload) => {
-          productionLogger.info("Bank balance updated", { payload });
-          setLastUpdated(new Date());
-          setIsLive(true);
-          queryClient.invalidateQueries({ queryKey: ["bank-balance-realtime"] });
-          
-          // إخفاء مؤشر التحديث بعد 3 ثواني
-          setTimeout(() => setIsLive(false), 3000);
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
+  // جلب رصيد البنك مع Realtime من hook
+  const { data: bankBalance, isLoading, lastUpdated, isLive } = useBankBalance();
 
   const balance = bankBalance?.current_balance || 0;
 
