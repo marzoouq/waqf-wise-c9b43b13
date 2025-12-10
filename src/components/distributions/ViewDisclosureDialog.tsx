@@ -329,6 +329,48 @@ export const ViewDisclosureDialog = ({
           </Card>
         )}
 
+        {/* جدول المستأجرين والعقود */}
+        {disclosure.beneficiaries_details && (disclosure.beneficiaries_details as { contracts?: Array<{ tenant: string; property: string; annual_rent: number; monthly_rent: number; status: string }> })?.contracts && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Building className="h-5 w-5" />
+                المستأجرين والعقود
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-[250px]">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>المستأجر</TableHead>
+                      <TableHead>العقار</TableHead>
+                      <TableHead>الإيجار الشهري</TableHead>
+                      <TableHead>الإيجار السنوي</TableHead>
+                      <TableHead>الحالة</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {((disclosure.beneficiaries_details as { contracts: Array<{ tenant: string; property: string; annual_rent: number; monthly_rent: number; status: string }> }).contracts).map((contract, index) => (
+                      <TableRow key={index}>
+                        <TableCell className="font-medium">{contract.tenant}</TableCell>
+                        <TableCell>{contract.property}</TableCell>
+                        <TableCell>{contract.monthly_rent.toLocaleString()} ر.س</TableCell>
+                        <TableCell className="text-success font-bold">{contract.annual_rent.toLocaleString()} ر.س</TableCell>
+                        <TableCell>
+                          <Badge variant={contract.status === 'نشط' ? 'default' : 'secondary'}>
+                            {contract.status}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        )}
+
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
