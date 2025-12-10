@@ -247,7 +247,88 @@ export const ViewDisclosureDialog = ({
           </CardContent>
         </Card>
 
-        {/* نسب التوزيع */}
+        {/* توزيعات المستفيدين */}
+        {disclosure.beneficiaries_details && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                توزيعات المستفيدين
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="p-4 bg-primary/10 rounded-lg border border-primary/30 col-span-2 md:col-span-4">
+                  <p className="text-sm text-primary mb-1">إجمالي التوزيعات للمستفيدين</p>
+                  <p className="text-2xl font-bold text-primary">
+                    {((disclosure.beneficiaries_details as { distributions?: { total?: number } })?.distributions?.total || 0).toLocaleString()} ر.س
+                  </p>
+                </div>
+                <div className="p-3 bg-heir-son/10 rounded-lg border border-heir-son/30">
+                  <p className="text-xs text-heir-son mb-1">حصة الأبناء</p>
+                  <p className="text-lg font-bold text-heir-son">
+                    {((disclosure.beneficiaries_details as { distributions?: { sons_share?: number } })?.distributions?.sons_share || 0).toLocaleString()} ر.س
+                  </p>
+                </div>
+                <div className="p-3 bg-heir-daughter/10 rounded-lg border border-heir-daughter/30">
+                  <p className="text-xs text-heir-daughter mb-1">حصة البنات</p>
+                  <p className="text-lg font-bold text-heir-daughter">
+                    {((disclosure.beneficiaries_details as { distributions?: { daughters_share?: number } })?.distributions?.daughters_share || 0).toLocaleString()} ر.س
+                  </p>
+                </div>
+                <div className="p-3 bg-heir-wife/10 rounded-lg border border-heir-wife/30">
+                  <p className="text-xs text-heir-wife mb-1">حصة الزوجات</p>
+                  <p className="text-lg font-bold text-heir-wife">
+                    {((disclosure.beneficiaries_details as { distributions?: { wives_share?: number } })?.distributions?.wives_share || 0).toLocaleString()} ر.س
+                  </p>
+                </div>
+                <div className="p-3 bg-muted rounded-lg border">
+                  <p className="text-xs text-muted-foreground mb-1">عدد الورثة</p>
+                  <p className="text-lg font-bold">
+                    {(disclosure.beneficiaries_details as { distributions?: { heirs_count?: number } })?.distributions?.heirs_count || 0} وريث
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* البيانات الشهرية */}
+        {disclosure.monthly_data && Array.isArray(disclosure.monthly_data) && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                البيانات الشهرية
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-[300px]">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>الشهر</TableHead>
+                      <TableHead>الإيرادات</TableHead>
+                      <TableHead>المصروفات</TableHead>
+                      <TableHead>الصافي</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {(disclosure.monthly_data as Array<{ month: number; revenues: number; expenses: number }>).map((item) => (
+                      <TableRow key={item.month}>
+                        <TableCell>شهر {item.month}</TableCell>
+                        <TableCell className="text-success">{item.revenues.toLocaleString()} ر.س</TableCell>
+                        <TableCell className="text-destructive">{item.expenses.toLocaleString()} ر.س</TableCell>
+                        <TableCell className="font-bold">{(item.revenues - item.expenses).toLocaleString()} ر.س</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        )}
+
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
