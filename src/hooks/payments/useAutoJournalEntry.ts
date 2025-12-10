@@ -1,6 +1,7 @@
 /**
  * Hook for creating automatic journal entries
- * نقل استدعاءات supabase.rpc من AddReceiptDialog و AddVoucherDialog
+ * يستخدم AccountingService لإنشاء القيود التلقائية
+ * @version 2.8.69
  */
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AccountingService } from "@/services/accounting.service";

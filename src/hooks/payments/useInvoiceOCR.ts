@@ -1,6 +1,10 @@
+/**
+ * Invoice OCR Hook
+ * @version 2.8.68
+ */
 import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { StorageService, EdgeFunctionService } from '@/services';
 
 export interface ExtractedInvoiceData {
   invoice_number?: string;
@@ -45,22 +49,8 @@ export const useInvoiceOCR = () => {
     const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
     const filePath = `invoice-images/${fileName}`;
 
-    const { error: uploadError } = await supabase.storage
-      .from('documents')
-      .upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: false,
-      });
-
-    if (uploadError) {
-      throw new Error(`فشل رفع الصورة: ${uploadError.message}`);
-    }
-
-    const { data: { publicUrl } } = supabase.storage
-      .from('documents')
-      .getPublicUrl(filePath);
-
-    return publicUrl;
+    await StorageService.uploadFile('documents', filePath, file);
+    return StorageService.getPublicUrl('documents', filePath);
   };
 
   const extractInvoiceData = async (file: File): Promise<OCRResult> => {
@@ -89,29 +79,22 @@ export const useInvoiceOCR = () => {
       // 3. استدعاء Edge Function للاستخراج
       toast.info('جاري تحليل الفاتورة بالذكاء الاصطناعي...');
       
-      const { data, error: functionError } = await supabase.functions.invoke(
+      const result = await EdgeFunctionService.invoke<{ success: boolean; data: ExtractedInvoiceData; error?: string }>(
         'extract-invoice-data',
-        {
-          body: {
-            image_base64: base64Data,
-          },
-        }
+        { image_base64: base64Data }
       );
 
-      if (functionError) {
-        throw new Error(functionError.message);
+      if (!result.success || !result.data) {
+        throw new Error(result.error || 'فشل استخراج البيانات');
       }
 
-      if (!data.success) {
-        throw new Error(data.error || 'فشل استخراج البيانات');
-      }
-
-      setExtractedData(data.data);
-      toast.success(`تم استخراج البيانات بنجاح! (نسبة الثقة: ${data.data.overall_confidence}%)`);
+      const extractedDataFromAPI = result.data.data;
+      setExtractedData(extractedDataFromAPI);
+      toast.success(`تم استخراج البيانات بنجاح! (نسبة الثقة: ${extractedDataFromAPI.overall_confidence}%)`);
 
       return {
         success: true,
-        data: data.data,
+        data: extractedDataFromAPI,
         imageUrl: uploadedImageUrl,
       };
     } catch (err: unknown) {
