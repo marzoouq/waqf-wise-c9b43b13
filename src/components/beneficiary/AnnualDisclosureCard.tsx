@@ -84,9 +84,45 @@ export const AnnualDisclosureCard = () => {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-center text-muted-foreground py-4">
-            لا توجد معلومات مالية متاحة في الإفصاح السنوي
-          </p>
+          {/* الملخص المالي */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="p-3 bg-success/10 rounded-lg border border-success/30">
+              <div className="flex items-center gap-1 mb-1">
+                <TrendingUp className="h-3 w-3 text-success" />
+                <p className="text-xs text-success">الإيرادات</p>
+              </div>
+              <p className="text-lg font-bold text-success">
+                {latestDisclosure.total_revenues.toLocaleString()} ر.س
+              </p>
+            </div>
+            <div className="p-3 bg-destructive/10 rounded-lg border border-destructive/30">
+              <div className="flex items-center gap-1 mb-1">
+                <DollarSign className="h-3 w-3 text-destructive" />
+                <p className="text-xs text-destructive">المصروفات</p>
+              </div>
+              <p className="text-lg font-bold text-destructive">
+                {latestDisclosure.total_expenses.toLocaleString()} ر.س
+              </p>
+            </div>
+            <div className="p-3 bg-info/10 rounded-lg border border-info/30">
+              <div className="flex items-center gap-1 mb-1">
+                <Users className="h-3 w-3 text-info" />
+                <p className="text-xs text-info">صافي الدخل</p>
+              </div>
+              <p className="text-lg font-bold text-info">
+                {latestDisclosure.net_income.toLocaleString()} ر.س
+              </p>
+            </div>
+            <div className="p-3 bg-warning/10 rounded-lg border border-warning/30">
+              <div className="flex items-center gap-1 mb-1">
+                <Users className="h-3 w-3 text-warning" />
+                <p className="text-xs text-warning">المستفيدون</p>
+              </div>
+              <p className="text-lg font-bold text-warning">
+                {latestDisclosure.total_beneficiaries} مستفيد
+              </p>
+            </div>
+          </div>
 
           {/* تاريخ الإفصاح */}
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
