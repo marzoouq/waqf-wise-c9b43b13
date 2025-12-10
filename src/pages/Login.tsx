@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, LogIn, Smartphone, Fingerprint, Chrome } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { supabase } from '@/integrations/supabase/client';
+import { AuthService } from '@/services/auth.service';
 import { useBiometricAuth } from '@/hooks/useBiometricAuth';
 
 export default function Login() {
@@ -65,25 +65,15 @@ export default function Login() {
 
     try {
       if (loginType === 'beneficiary') {
-        // تسجيل دخول المستفيد برقم الهوية
-        const { data, error: rpcError } = await supabase
-          .rpc('get_beneficiary_email_by_national_id', { 
-            p_national_id: identifier 
-          });
+        // تسجيل دخول المستفيد برقم الهوية عبر AuthService
+        const beneficiaryData = await AuthService.getBeneficiaryEmailByNationalId(identifier);
 
-        if (rpcError) {
-          productionLogger.error('RPC Error:', rpcError);
-          throw new Error('حدث خطأ في البحث عن رقم الهوية');
-        }
-
-        if (!data || data.length === 0) {
+        if (!beneficiaryData) {
           throw new Error('رقم الهوية غير مسجل في النظام أو ليس لديه حساب دخول. يرجى التواصل مع الإدارة');
         }
-
-        const beneficiary = data[0];
         
         // تسجيل الدخول بالبريد الإلكتروني المرتبط
-        await signIn(beneficiary.email, password);
+        await signIn(beneficiaryData.email, password);
       } else {
         // تسجيل دخول الموظفين بالبريد الإلكتروني
         await signIn(identifier, password);
