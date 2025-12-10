@@ -203,4 +203,96 @@ export class FamilyService {
       throw error;
     }
   }
+
+  /**
+   * جلب بيانات شجرة عائلة المستفيد
+   */
+  static async getBeneficiaryFamilyTree(beneficiaryId: string): Promise<{
+    beneficiary: {
+      id: string;
+      full_name: string;
+      family_name: string | null;
+      category: string;
+      relationship: string | null;
+      is_head_of_family: boolean | null;
+      gender: string | null;
+      date_of_birth: string | null;
+      status: string;
+      number_of_sons: number | null;
+      number_of_daughters: number | null;
+      number_of_wives: number | null;
+      family_size: number | null;
+    };
+    familyMembers: Array<{
+      id: string;
+      full_name: string;
+      family_name: string | null;
+      category: string;
+      relationship: string | null;
+      is_head_of_family: boolean | null;
+      gender: string | null;
+      date_of_birth: string | null;
+      status: string;
+    }>;
+  }> {
+    try {
+      // جلب بيانات المستفيد الحالي
+      const { data: beneficiary, error: benError } = await supabase
+        .from('beneficiaries')
+        .select('id, full_name, family_name, category, relationship, is_head_of_family, gender, date_of_birth, status, number_of_sons, number_of_daughters, number_of_wives, family_size')
+        .eq('id', beneficiaryId)
+        .maybeSingle();
+
+      if (benError) throw benError;
+      if (!beneficiary) throw new Error('المستفيد غير موجود');
+
+      // جلب أفراد العائلة
+      type FamilyMemberData = {
+        id: string;
+        full_name: string;
+        family_name: string | null;
+        category: string;
+        relationship: string | null;
+        is_head_of_family: boolean | null;
+        gender: string | null;
+        date_of_birth: string | null;
+        status: string;
+      };
+      
+      let familyMembers: FamilyMemberData[] = [];
+      
+      if (beneficiary.family_name) {
+        const { data: members, error: membersError } = await supabase
+          .from('beneficiaries')
+          .select('id, full_name, family_name, category, relationship, is_head_of_family, gender, date_of_birth, status')
+          .eq('family_name', beneficiary.family_name)
+          .neq('id', beneficiaryId)
+          .order('is_head_of_family', { ascending: false });
+
+        if (!membersError && members) {
+          familyMembers = members as FamilyMemberData[];
+        }
+      }
+
+      // جلب الأبناء المباشرين
+      const { data: children, error: childrenError } = await supabase
+        .from('beneficiaries')
+        .select('id, full_name, family_name, category, relationship, is_head_of_family, gender, date_of_birth, status')
+        .eq('parent_beneficiary_id', beneficiaryId);
+
+      if (!childrenError && children) {
+        familyMembers = [...familyMembers, ...(children as FamilyMemberData[])];
+      }
+
+      return {
+        beneficiary,
+        familyMembers: familyMembers.filter((m, index, self) => 
+          index === self.findIndex(t => t.id === m.id)
+        )
+      };
+    } catch (error) {
+      productionLogger.error('Error fetching beneficiary family tree', error);
+      throw error;
+    }
+  }
 }

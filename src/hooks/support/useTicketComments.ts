@@ -3,11 +3,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { SupportService } from '@/services/support.service';
 import { toast } from 'sonner';
 import { useEffect } from 'react';
-import type { TicketComment } from '@/types/support';
 import { QUERY_KEYS } from '@/lib/query-keys';
 
 /**
  * Hook لإدارة تعليقات تذاكر الدعم
+ * @version 2.8.73 - Refactored to use SupportService
  */
 export function useTicketComments(ticketId: string) {
   const queryClient = useQueryClient();
@@ -19,7 +19,7 @@ export function useTicketComments(ticketId: string) {
     enabled: !!ticketId,
   });
 
-  // الاشتراك في التحديثات الفورية
+  // الاشتراك في التحديثات الفورية (Realtime acceptable in hooks)
   useEffect(() => {
     if (!ticketId) return;
 
@@ -34,7 +34,7 @@ export function useTicketComments(ticketId: string) {
           filter: `ticket_id=eq.${ticketId}`,
         },
         () => {
-          queryClient.invalidateQueries({ queryKey: ['ticket-comments', ticketId] });
+          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TICKET_COMMENTS(ticketId) });
         }
       )
       .subscribe();
@@ -55,40 +55,16 @@ export function useTicketComments(ticketId: string) {
       isInternal?: boolean;
       isSolution?: boolean;
     }) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('يجب تسجيل الدخول');
-
-      const { data, error } = await supabase
-        .from('support_ticket_comments')
-        .insert({
-          ticket_id: ticketId,
-          user_id: user.id,
-          comment,
-          is_internal: isInternal,
-          is_solution: isSolution,
-        })
-        .select()
-        .maybeSingle();
-
-      if (error) throw error;
-      if (!data) throw new Error('فشل إضافة التعليق');
-
-      // إذا كان حل، تحديث حالة التذكرة
-      if (isSolution) {
-        await supabase
-          .from('support_tickets')
-          .update({
-            status: 'resolved',
-            resolved_at: new Date().toISOString(),
-          })
-          .eq('id', ticketId);
-      }
-
-      return data;
+      return SupportService.addTicketComment({
+        ticketId,
+        comment,
+        isInternal,
+        isSolution,
+      });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['ticket-comments', ticketId] });
-      queryClient.invalidateQueries({ queryKey: ['support-tickets'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TICKET_COMMENTS(ticketId) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.SUPPORT_TICKETS });
       toast.success('تم إضافة التعليق بنجاح');
     },
     onError: (error: Error) => {
@@ -99,22 +75,10 @@ export function useTicketComments(ticketId: string) {
   // تحديث تعليق
   const updateComment = useMutation({
     mutationFn: async ({ id, comment }: { id: string; comment: string }) => {
-      const { data, error } = await supabase
-        .from('support_ticket_comments')
-        .update({
-          comment,
-          edited_at: new Date().toISOString(),
-        })
-        .eq('id', id)
-        .select()
-        .maybeSingle();
-
-      if (error) throw error;
-      if (!data) throw new Error('التعليق غير موجود');
-      return data;
+      return SupportService.updateTicketComment(id, comment);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['ticket-comments', ticketId] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TICKET_COMMENTS(ticketId) });
       toast.success('تم تحديث التعليق بنجاح');
     },
     onError: (error: Error) => {

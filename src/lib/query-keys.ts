@@ -212,6 +212,13 @@ export const QUERY_KEYS = {
   // Support
   SUPPORT_TICKETS: ['support-tickets'] as const,
   SUPPORT_TICKET: (id: string) => ['support-ticket', id] as const,
+  TICKET_COMMENTS: (ticketId: string) => ['ticket-comments', ticketId] as const,
+  AGENT_AVAILABILITY: (userId: string) => ['agent-availability', userId] as const,
+  AGENT_STATS: (userId: string, dateRange?: { from: string; to: string }) => ['agent-stats', userId, dateRange] as const,
+  SUPPORT_ESCALATIONS: ['support-escalations'] as const,
+  ASSIGNMENT_SETTINGS: ['assignment-settings'] as const,
+  KB_ARTICLES: ['kb-articles'] as const,
+  KB_FAQS: ['kb-faqs'] as const,
 
   // Governance
   GOVERNANCE: ['governance'] as const,
@@ -321,19 +328,14 @@ export const QUERY_KEYS = {
   // AI Insights
   SMART_ALERTS: ['smart-alerts'] as const,
   
-  // Ticket Comments
-  TICKET_COMMENTS: (ticketId: string) => ['ticket-comments', ticketId] as const,
-  
   // Admin Alerts
   ADMIN_ALERTS: ['admin-alerts'] as const,
   
   // Dashboard Config
   DASHBOARD_CONFIGS: ['dashboard-configs'] as const,
   
-  // Knowledge Base
-  KB_ARTICLES: ['kb-articles'] as const,
+  // KB Articles Extended
   KB_ARTICLES_FEATURED: ['kb-articles', 'featured'] as const,
-  KB_FAQS: ['kb-faqs'] as const,
   KB_ARTICLE: (id: string) => ['kb-article', id] as const,
   
   // Maintenance Cost

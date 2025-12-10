@@ -1,11 +1,11 @@
 /**
  * Hook لإدارة نموذج القيد اليومي
- * Journal Entry Form Hook
+ * @version 2.8.73 - Refactored to use JournalEntryFormService
  */
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { JournalEntryFormService } from '@/services/accounting.service';
 import { toast } from 'sonner';
 import { Account } from '@/types/accounting';
 import { QUERY_KEYS } from '@/lib/query-keys';
@@ -30,32 +30,13 @@ export function useJournalEntryForm() {
   // جلب الحسابات
   const { data: accounts = [] } = useQuery({
     queryKey: QUERY_KEYS.ACCOUNTS,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('accounts')
-        .select('id, code, name_ar, account_type, account_nature')
-        .eq('is_header', false)
-        .eq('is_active', true)
-        .order('code');
-
-      if (error) throw error;
-      return data as Account[];
-    },
+    queryFn: () => JournalEntryFormService.getAccountsForEntry() as Promise<Account[]>,
   });
 
   // جلب السنة المالية النشطة
   const { data: activeFiscalYear } = useQuery({
     queryKey: QUERY_KEYS.ACTIVE_FISCAL_YEAR,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('fiscal_years')
-        .select('id, name, start_date, end_date, is_active')
-        .eq('is_active', true)
-        .maybeSingle();
-
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => JournalEntryFormService.getActiveFiscalYear(),
   });
 
   // حساب المجاميع
@@ -63,26 +44,22 @@ export function useJournalEntryForm() {
   const totalCredit = lines.reduce((sum, line) => sum + (line.credit_amount || 0), 0);
   const isBalanced = totalDebit === totalCredit && totalDebit > 0;
 
-  // إضافة سطر جديد
   const addLine = () => {
     setLines([...lines, { account_id: '', description: '', debit_amount: 0, credit_amount: 0 }]);
   };
 
-  // حذف سطر
   const removeLine = (index: number) => {
     if (lines.length > 2) {
       setLines(lines.filter((_, i) => i !== index));
     }
   };
 
-  // تحديث سطر
   const updateLine = (index: number, field: keyof JournalLine, value: string | number) => {
     const newLines = [...lines];
     newLines[index] = { ...newLines[index], [field]: value };
     setLines(newLines);
   };
 
-  // إعادة تعيين النموذج
   const resetForm = () => {
     setDescription('');
     setLines([
@@ -91,55 +68,17 @@ export function useJournalEntryForm() {
     ]);
   };
 
-  // حفظ القيد
   const saveEntry = useMutation({
     mutationFn: async () => {
-      if (!activeFiscalYear) {
-        throw new Error('لا توجد سنة مالية نشطة');
-      }
+      if (!activeFiscalYear) throw new Error('لا توجد سنة مالية نشطة');
+      if (!isBalanced) throw new Error('القيد غير متوازن');
 
-      if (!isBalanced) {
-        throw new Error('القيد غير متوازن');
-      }
-
-      // إنشاء رقم القيد
-      const entryNumber = `JE-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`;
-
-      // إنشاء القيد
-      const { data: entry, error: entryError } = await supabase
-        .from('journal_entries')
-        .insert([
-          {
-            entry_number: entryNumber,
-            entry_date: entryDate,
-            description,
-            fiscal_year_id: activeFiscalYear.id,
-            status: 'draft',
-          },
-        ])
-        .select()
-        .maybeSingle();
-
-      if (entryError) throw entryError;
-      if (!entry) throw new Error('فشل إنشاء القيد');
-
-      // إضافة الأسطر
-      const linesData = lines.map((line, index) => ({
-        journal_entry_id: entry.id,
-        account_id: line.account_id,
-        line_number: index + 1,
-        description: line.description,
-        debit_amount: line.debit_amount || 0,
-        credit_amount: line.credit_amount || 0,
-      }));
-
-      const { error: linesError } = await supabase
-        .from('journal_entry_lines')
-        .insert(linesData);
-
-      if (linesError) throw linesError;
-
-      return entry;
+      return JournalEntryFormService.createJournalEntry({
+        entryDate,
+        description,
+        fiscalYearId: activeFiscalYear.id,
+        lines,
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.JOURNAL_ENTRIES });
@@ -152,30 +91,10 @@ export function useJournalEntryForm() {
   });
 
   return {
-    // Form State
-    entryDate,
-    setEntryDate,
-    description,
-    setDescription,
-    lines,
-    
-    // Data
-    accounts,
-    activeFiscalYear,
-    
-    // Computed
-    totalDebit,
-    totalCredit,
-    isBalanced,
-    
-    // Actions
-    addLine,
-    removeLine,
-    updateLine,
-    saveEntry,
-    resetForm,
-    
-    // Status
+    entryDate, setEntryDate, description, setDescription, lines,
+    accounts, activeFiscalYear,
+    totalDebit, totalCredit, isBalanced,
+    addLine, removeLine, updateLine, saveEntry, resetForm,
     isSaving: saveEntry.isPending,
   };
 }

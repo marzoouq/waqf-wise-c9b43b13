@@ -1,99 +1,53 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { KnowledgeService } from '@/services/knowledge.service';
 import { toast } from 'sonner';
 import type { KBArticle, KBFAQ } from '@/types/support';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 /**
  * Hook لإدارة قاعدة المعرفة
+ * @version 2.8.73 - Refactored to use KnowledgeService
  */
 export function useKnowledgeBase() {
   const queryClient = useQueryClient();
 
   // جلب المقالات المنشورة
   const { data: articles, isLoading: articlesLoading } = useQuery({
-    queryKey: ['kb-articles'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('kb_articles')
-        .select('id, title, content, summary, slug, category, tags, status, is_featured, sort_order, views_count, helpful_count, not_helpful_count, author_id, created_at, updated_at, published_at, metadata')
-        .eq('status', 'published')
-        .order('sort_order', { ascending: true })
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return data as KBArticle[];
-    },
+    queryKey: QUERY_KEYS.KB_ARTICLES,
+    queryFn: () => KnowledgeService.getKBArticles(),
   });
 
   // جلب المقالات المميزة
   const { data: featuredArticles } = useQuery({
-    queryKey: ['kb-articles', 'featured'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('kb_articles')
-        .select('id, title, content, summary, slug, category, tags, status, is_featured, sort_order, views_count, helpful_count, not_helpful_count, author_id, created_at, updated_at, published_at, metadata')
-        .eq('status', 'published')
-        .eq('is_featured', true)
-        .order('sort_order', { ascending: true })
-        .limit(5);
-
-      if (error) throw error;
-      return data as KBArticle[];
-    },
+    queryKey: [...QUERY_KEYS.KB_ARTICLES, 'featured'],
+    queryFn: () => KnowledgeService.getFeaturedKBArticles(),
   });
 
   // جلب الأسئلة الشائعة
   const { data: faqs, isLoading: faqsLoading } = useQuery({
-    queryKey: ['kb-faqs'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('kb_faqs')
-        .select('id, question, answer, category, sort_order, is_active, views_count, helpful_count, created_at, updated_at')
-        .eq('is_active', true)
-        .order('sort_order', { ascending: true });
-
-      if (error) throw error;
-      return data as KBFAQ[];
-    },
+    queryKey: QUERY_KEYS.KB_FAQS,
+    queryFn: () => KnowledgeService.getKBFAQs(),
   });
 
   // البحث في المقالات
   const searchArticles = async (searchTerm: string) => {
-    const { data, error } = await supabase
-      .from('kb_articles')
-      .select('id, title, content, summary, slug, category, tags, views_count, created_at, updated_at')
-      .eq('status', 'published')
-      .or(`title.ilike.%${searchTerm}%,content.ilike.%${searchTerm}%,summary.ilike.%${searchTerm}%`)
-      .order('views_count', { ascending: false })
-      .limit(10);
-
-    if (error) throw error;
-    return data as KBArticle[];
+    return KnowledgeService.searchKBArticles(searchTerm);
   };
 
   // زيادة عدد المشاهدات
   const incrementViews = useMutation({
     mutationFn: async ({ id, type }: { id: string; type: 'article' | 'faq' }) => {
-      const table = type === 'article' ? 'kb_articles' : 'kb_faqs';
-      
-      const { data: current } = await supabase
-        .from(table)
-        .select('views_count')
-        .eq('id', id)
-        .maybeSingle();
-
-      const { error } = await supabase
-        .from(table)
-        .update({ views_count: (current?.views_count || 0) + 1 })
-        .eq('id', id);
-
-      if (error) throw error;
+      if (type === 'article') {
+        await KnowledgeService.incrementKBArticleViews(id);
+      } else {
+        await KnowledgeService.incrementFAQViews(id);
+      }
     },
     onSuccess: (_, variables) => {
       if (variables.type === 'article') {
-        queryClient.invalidateQueries({ queryKey: ['kb-articles'] });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.KB_ARTICLES });
       } else {
-        queryClient.invalidateQueries({ queryKey: ['kb-faqs'] });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.KB_FAQS });
       }
     },
   });
@@ -101,31 +55,18 @@ export function useKnowledgeBase() {
   // تقييم مقالة (مفيدة / غير مفيدة)
   const rateArticle = useMutation({
     mutationFn: async ({ id, helpful }: { id: string; helpful: boolean }) => {
-      const column = helpful ? 'helpful_count' : 'not_helpful_count';
-      
-      const { data: current } = await supabase
-        .from('kb_articles')
-        .select(column)
-        .eq('id', id)
-        .maybeSingle();
-
-      const { error } = await supabase
-        .from('kb_articles')
-        .update({ [column]: ((current?.[column] as number) || 0) + 1 })
-        .eq('id', id);
-
-      if (error) throw error;
+      await KnowledgeService.rateKBArticle(id, helpful);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['kb-articles'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.KB_ARTICLES });
       toast.success('شكراً لتقييمك');
     },
   });
 
   return {
-    articles,
-    featuredArticles,
-    faqs,
+    articles: articles as KBArticle[] | undefined,
+    featuredArticles: featuredArticles as KBArticle[] | undefined,
+    faqs: faqs as KBFAQ[] | undefined,
     articlesLoading,
     faqsLoading,
     searchArticles,
@@ -138,30 +79,19 @@ export function useKnowledgeBase() {
  * Hook لجلب مقالة واحدة
  */
 export function useArticle(id: string) {
-  const queryClient = useQueryClient();
-
   const { data: article, isLoading } = useQuery({
-    queryKey: ['kb-article', id],
+    queryKey: [...QUERY_KEYS.KB_ARTICLES, id],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('kb_articles')
-        .select('id, title, content, summary, slug, category, tags, status, is_featured, sort_order, views_count, helpful_count, not_helpful_count, author_id, created_at, updated_at, published_at, metadata')
-        .eq('id', id)
-        .maybeSingle();
-
-      if (error) throw error;
+      const data = await KnowledgeService.getKBArticleById(id);
       if (!data) throw new Error('المقالة غير موجودة');
-
+      
       // زيادة عدد المشاهدات
-      await supabase
-        .from('kb_articles')
-        .update({ views_count: (data.views_count || 0) + 1 })
-        .eq('id', id);
-
-      return data as KBArticle;
+      await KnowledgeService.incrementKBArticleViews(id);
+      
+      return data;
     },
     enabled: !!id,
   });
 
-  return { article, isLoading };
+  return { article: article as KBArticle | undefined, isLoading };
 }

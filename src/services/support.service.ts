@@ -327,4 +327,209 @@ export class SupportService {
     if (error) throw error;
     return data || [];
   }
+
+  // ============ Agent Availability ============
+
+  /**
+   * جلب توافر وكيل الدعم
+   */
+  static async getAgentAvailability(userId: string) {
+    const { data, error } = await supabase
+      .from('support_agent_availability')
+      .select('id, user_id, is_available, current_load, max_capacity, skills, priority_level')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (error) throw error;
+    return data;
+  }
+
+  /**
+   * تحديث توافر وكيل الدعم
+   */
+  static async updateAgentAvailability(params: {
+    userId: string;
+    isAvailable?: boolean;
+    maxCapacity?: number;
+    skills?: string[];
+  }) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('غير مصرح');
+
+    interface AvailabilityUpdate {
+      is_available?: boolean;
+      max_capacity?: number;
+      skills?: string[];
+      updated_at: string;
+    }
+
+    const updates: AvailabilityUpdate = {
+      updated_at: new Date().toISOString()
+    };
+    if (params.isAvailable !== undefined) updates.is_available = params.isAvailable;
+    if (params.maxCapacity !== undefined) updates.max_capacity = params.maxCapacity;
+    if (params.skills !== undefined) updates.skills = params.skills;
+
+    const { data, error } = await supabase
+      .from('support_agent_availability')
+      .upsert({
+        user_id: params.userId,
+        ...updates,
+      }, {
+        onConflict: 'user_id',
+      })
+      .select()
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) throw new Error('فشل تحديث التوافر');
+    return data;
+  }
+
+  // ============ Agent Stats ============
+
+  /**
+   * جلب إحصائيات وكيل الدعم
+   */
+  static async getAgentStats(userId?: string, dateRange?: { from: string; to: string }) {
+    let query = supabase
+      .from('support_agent_stats')
+      .select('id, user_id, date, total_assigned, total_resolved, total_closed, avg_response_minutes, avg_resolution_minutes, customer_satisfaction_avg, created_at');
+
+    if (userId) {
+      query = query.eq('user_id', userId);
+    }
+
+    if (dateRange) {
+      query = query
+        .gte('date', dateRange.from)
+        .lte('date', dateRange.to);
+    }
+
+    query = query.order('date', { ascending: false });
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+    return data;
+  }
+
+  // ============ Escalations ============
+
+  /**
+   * جلب التصعيدات
+   */
+  static async getEscalations() {
+    const { data, error } = await supabase
+      .from('support_escalations')
+      .select(`
+        *,
+        ticket:support_tickets(ticket_number, subject, status),
+        escalated_from_user:escalated_from(id),
+        escalated_to_user:escalated_to(id)
+      `)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data;
+  }
+
+  // ============ Assignment Settings ============
+
+  /**
+   * جلب إعدادات التعيين
+   */
+  static async getAssignmentSettings() {
+    const { data, error } = await supabase
+      .from('support_assignment_settings')
+      .select('id, assignment_type, auto_assign, max_tickets_per_agent, created_at, updated_at')
+      .maybeSingle();
+
+    if (error && error.code !== 'PGRST116') throw error;
+    return data;
+  }
+
+  /**
+   * تحديث إعدادات التعيين
+   */
+  static async updateAssignmentSettings(newSettings: {
+    assignment_type?: string;
+    auto_assign?: boolean;
+    max_tickets_per_agent?: number;
+  }) {
+    const { data, error } = await supabase
+      .from('support_assignment_settings')
+      .upsert({
+        ...newSettings,
+        updated_at: new Date().toISOString(),
+      })
+      .select()
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) throw new Error('فشل تحديث الإعدادات');
+    return data;
+  }
+
+  // ============ Ticket Comments ============
+
+  /**
+   * إضافة تعليق على تذكرة
+   */
+  static async addTicketComment(params: {
+    ticketId: string;
+    comment: string;
+    isInternal?: boolean;
+    isSolution?: boolean;
+  }) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('يجب تسجيل الدخول');
+
+    const { data, error } = await supabase
+      .from('support_ticket_comments')
+      .insert({
+        ticket_id: params.ticketId,
+        user_id: user.id,
+        comment: params.comment,
+        is_internal: params.isInternal || false,
+        is_solution: params.isSolution || false,
+      })
+      .select()
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) throw new Error('فشل إضافة التعليق');
+
+    // إذا كان حل، تحديث حالة التذكرة
+    if (params.isSolution) {
+      await supabase
+        .from('support_tickets')
+        .update({
+          status: 'resolved',
+          resolved_at: new Date().toISOString(),
+        })
+        .eq('id', params.ticketId);
+    }
+
+    return data;
+  }
+
+  /**
+   * تحديث تعليق
+   */
+  static async updateTicketComment(id: string, comment: string) {
+    const { data, error } = await supabase
+      .from('support_ticket_comments')
+      .update({
+        comment,
+        edited_at: new Date().toISOString(),
+      })
+      .eq('id', id)
+      .select()
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) throw new Error('التعليق غير موجود');
+    return data;
+  }
 }
