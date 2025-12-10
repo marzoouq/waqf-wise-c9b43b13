@@ -24,8 +24,8 @@
  *    - @/hooks/governance - الحوكمة
  *    - @/hooks/ui - واجهة المستخدم
  * 
- * @version 2.6.33
- * @lastUpdate 2025-12-07
+ * @version 2.8.60
+ * @lastUpdate 2025-12-10
  */
 
 // ==================== UI & Utility ====================

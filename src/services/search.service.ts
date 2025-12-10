@@ -140,7 +140,7 @@ export const SearchService = {
     filters: SearchFilters
   ): Promise<unknown[]> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let dbQuery: any = supabase.from(tableName as any).select(columns);
+    let dbQuery: any = supabase.from(tableName as 'beneficiaries').select(columns);
 
     // تطبيق البحث النصي
     if (query) {

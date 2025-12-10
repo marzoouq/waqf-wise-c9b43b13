@@ -1,14 +1,14 @@
 /**
  * Hook للتحقق من الهوية
- * @version 2.8.55
+ * @version 2.8.60
  */
 
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Beneficiary } from '@/types/beneficiary';
 import { QUERY_KEYS } from '@/lib/query-keys';
+import { BeneficiaryService } from '@/services';
 
 interface VerificationFormData {
   verification_type: string;
@@ -31,20 +31,7 @@ export function useIdentityVerification(beneficiary: Beneficiary | null) {
   const verifyMutation = useMutation({
     mutationFn: async () => {
       if (!beneficiary) throw new Error('لا يوجد مستفيد محدد');
-
-      await supabase.from('identity_verifications').insert({
-        beneficiary_id: beneficiary.id,
-        ...formData,
-        verified_by: (await supabase.auth.getUser()).data.user?.id,
-        verified_at: new Date().toISOString(),
-      });
-
-      await supabase.from('beneficiaries').update({
-        verification_status: formData.verification_status,
-        verification_method: formData.verification_method,
-        last_verification_date: new Date().toISOString(),
-        verification_notes: formData.notes,
-      }).eq('id', beneficiary.id);
+      await BeneficiaryService.verifyIdentity(beneficiary.id, formData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARIES });

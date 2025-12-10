@@ -164,13 +164,13 @@ export class ApprovalService {
 
   // ==================== عمليات الموافقة/الرفض ====================
   static async approveItem(type: string, id: string, approverName: string, notes?: string): Promise<void> {
-    const tables: Record<string, string> = {
+    const tableMap: Record<string, 'approvals' | 'distribution_approvals' | 'loan_approvals' | 'payment_approvals'> = {
       journal: 'approvals',
       distribution: 'distribution_approvals',
       loan: 'loan_approvals',
       payment: 'payment_approvals',
     };
-    const table = tables[type] as any;
+    const table = tableMap[type];
     if (!table) throw new Error('Invalid type');
     
     const { error } = await supabase.from(table).update({
@@ -183,13 +183,13 @@ export class ApprovalService {
   }
 
   static async rejectItem(type: string, id: string, approverName: string, notes?: string): Promise<void> {
-    const tables: Record<string, string> = {
+    const tableMap: Record<string, 'approvals' | 'distribution_approvals' | 'loan_approvals' | 'payment_approvals'> = {
       journal: 'approvals',
       distribution: 'distribution_approvals',
       loan: 'loan_approvals',
       payment: 'payment_approvals',
     };
-    const table = tables[type] as any;
+    const table = tableMap[type];
     if (!table) throw new Error('Invalid type');
     
     const { error } = await supabase.from(table).update({
@@ -232,7 +232,15 @@ export class ApprovalService {
     priority: 'high' | 'medium' | 'low';
     description: string;
   }[]> {
-    const allApprovals: any[] = [];
+    const allApprovals: {
+      id: string;
+      type: 'distribution' | 'request' | 'journal' | 'payment';
+      title: string;
+      amount?: number;
+      date: Date;
+      priority: 'high' | 'medium' | 'low';
+      description: string;
+    }[] = [];
 
     const [distApprovalsResult, reqApprovalsResult, journalApprovalsResult] = await Promise.all([
       supabase

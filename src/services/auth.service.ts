@@ -156,6 +156,39 @@ export class AuthService {
   }
 
   /**
+   * تغيير كلمة المرور (مع التحقق من كلمة المرور الحالية)
+   */
+  static async changePassword(
+    currentPassword: string,
+    newPassword: string
+  ): Promise<{ success: boolean; error?: string }> {
+    // التحقق من كلمة المرور الحالية
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user?.email) {
+      return { success: false, error: 'المستخدم غير موجود' };
+    }
+    
+    const { error: verifyError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: currentPassword,
+    });
+    
+    if (verifyError) {
+      return { success: false, error: 'كلمة المرور الحالية غير صحيحة' };
+    }
+    
+    // تحديث كلمة المرور
+    const { error } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+    return { success: true };
+  }
+
+  /**
    * طلب إعادة تعيين كلمة المرور
    */
   static async requestPasswordReset(email: string): Promise<{ success: boolean; error?: string }> {

@@ -325,4 +325,37 @@ export class EdgeFunctionService {
 
     return { success: true, data };
   }
+
+  /**
+   * توزيع الغلة على الورثة
+   */
+  static async distributeRevenue(params: {
+    totalAmount: number;
+    fiscalYearId: string;
+    distributionDate: string;
+    notes: string;
+    notifyHeirs: boolean;
+  }): Promise<EdgeFunctionResult<{
+    success: boolean;
+    summary: {
+      totalAmount: number;
+      heirsCount: number;
+      distributionDate: string;
+    };
+    distributions: Array<{
+      beneficiary_id: string;
+      amount: number;
+      heir_type: string;
+    }>;
+  }>> {
+    const { data, error } = await supabase.functions.invoke('distribute-revenue', {
+      body: params,
+    });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, data };
+  }
 }

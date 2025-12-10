@@ -1,8 +1,10 @@
 /**
  * Hook لتغيير كلمة المرور
+ * @version 2.8.60
  */
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { AuthService } from "@/services";
 
 interface ChangePasswordResult {
   success: boolean;
@@ -10,6 +12,7 @@ interface ChangePasswordResult {
 }
 
 export function useChangePassword() {
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
   const changePassword = async (
@@ -18,36 +21,31 @@ export function useChangePassword() {
   ): Promise<ChangePasswordResult> => {
     setIsLoading(true);
     try {
-      // Step 1: Verify current password by attempting sign in
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user?.email) {
-        return { success: false, error: 'User not found' };
+      const result = await AuthService.changePassword(currentPassword, newPassword);
+      
+      if (!result.success) {
+        toast({
+          title: "خطأ",
+          description: result.error || 'حدث خطأ أثناء تحديث كلمة المرور',
+          variant: "destructive",
+        });
+        return result;
       }
-      
-      const { error: verifyError } = await supabase.auth.signInWithPassword({
-        email: user.email,
-        password: currentPassword,
-      });
-      
-      if (verifyError) {
-        return { success: false, error: 'كلمة المرور الحالية غير صحيحة' };
-      }
-      
-      // Step 2: Update to new password
-      const { error } = await supabase.auth.updateUser({
-        password: newPassword,
-      });
 
-      if (error) {
-        return { success: false, error: error.message };
-      }
+      toast({
+        title: "تم تحديث كلمة المرور",
+        description: "تم تغيير كلمة المرور بنجاح",
+      });
 
       return { success: true };
     } catch (error) {
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : 'حدث خطأ أثناء تحديث كلمة المرور' 
-      };
+      const errorMessage = error instanceof Error ? error.message : 'حدث خطأ أثناء تحديث كلمة المرور';
+      toast({
+        title: "خطأ",
+        description: errorMessage,
+        variant: "destructive",
+      });
+      return { success: false, error: errorMessage };
     } finally {
       setIsLoading(false);
     }
