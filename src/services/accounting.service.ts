@@ -6,7 +6,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { productionLogger } from '@/lib/logger/production-logger';
-import type { Database } from '@/integrations/supabase/types';
+import type { Database, Json } from '@/integrations/supabase/types';
 
 // استخدام الأنواع من قاعدة البيانات
 type JournalEntryRow = Database['public']['Tables']['journal_entries']['Row'];
@@ -2063,7 +2063,7 @@ export class AccountingService {
   /**
    * حفظ مؤشرات الأداء
    */
-  static async saveFinancialKPIs(kpis: any[]): Promise<void> {
+  static async saveFinancialKPIs(kpis: FinancialKPIInsert[]): Promise<void> {
     const { error } = await supabase
       .from('financial_kpis')
       .insert(kpis);
@@ -2074,7 +2074,7 @@ export class AccountingService {
   /**
    * حفظ التنبؤات المالية
    */
-  static async saveFinancialForecasts(forecasts: any[]): Promise<void> {
+  static async saveFinancialForecasts(forecasts: FinancialForecastInsert[]): Promise<void> {
     const { error } = await supabase
       .from('financial_forecasts')
       .insert(forecasts);
@@ -2124,6 +2124,36 @@ export class AccountingService {
 
     const { data, error } = await query;
     if (error) throw error;
-    return data as any[];
+    return data || [];
   }
+}
+
+/**
+ * واجهة إدخال مؤشرات الأداء المالية
+ */
+export interface FinancialKPIInsert {
+  kpi_name: string;
+  kpi_category: string;
+  kpi_value: number;
+  kpi_target?: number | null;
+  period_start: string;
+  period_end: string;
+  fiscal_year_id?: string | null;
+  metadata?: Json | null;
+}
+
+/**
+ * واجهة إدخال التنبؤات المالية
+ */
+export interface FinancialForecastInsert {
+  forecast_type: string;
+  account_id?: string | null;
+  period_start: string;
+  period_end: string;
+  forecasted_amount: number;
+  actual_amount?: number | null;
+  variance?: number | null;
+  confidence_level?: number | null;
+  model_used?: string | null;
+  metadata?: Json | null;
 }
