@@ -112,6 +112,7 @@ export type Database = {
           fiscal_year_id: string | null
           id: string
           maintenance_expenses: number | null
+          monthly_data: Json | null
           nazer_percentage: number
           nazer_share: number
           net_income: number
@@ -119,12 +120,14 @@ export type Database = {
           other_expenses: number | null
           published_at: string | null
           published_by: string | null
+          revenue_breakdown: Json | null
           sons_count: number
           status: string | null
           total_beneficiaries: number
           total_expenses: number
           total_revenues: number
           updated_at: string | null
+          vat_amount: number | null
           waqf_name: string
           wives_count: number
           year: number
@@ -146,6 +149,7 @@ export type Database = {
           fiscal_year_id?: string | null
           id?: string
           maintenance_expenses?: number | null
+          monthly_data?: Json | null
           nazer_percentage?: number
           nazer_share?: number
           net_income?: number
@@ -153,12 +157,14 @@ export type Database = {
           other_expenses?: number | null
           published_at?: string | null
           published_by?: string | null
+          revenue_breakdown?: Json | null
           sons_count?: number
           status?: string | null
           total_beneficiaries?: number
           total_expenses?: number
           total_revenues?: number
           updated_at?: string | null
+          vat_amount?: number | null
           waqf_name: string
           wives_count?: number
           year: number
@@ -180,6 +186,7 @@ export type Database = {
           fiscal_year_id?: string | null
           id?: string
           maintenance_expenses?: number | null
+          monthly_data?: Json | null
           nazer_percentage?: number
           nazer_share?: number
           net_income?: number
@@ -187,12 +194,14 @@ export type Database = {
           other_expenses?: number | null
           published_at?: string | null
           published_by?: string | null
+          revenue_breakdown?: Json | null
           sons_count?: number
           status?: string | null
           total_beneficiaries?: number
           total_expenses?: number
           total_revenues?: number
           updated_at?: string | null
+          vat_amount?: number | null
           waqf_name?: string
           wives_count?: number
           year?: number

@@ -108,6 +108,78 @@ export const ViewDisclosureDialog = ({
           </CardContent>
         </Card>
 
+        {/* تفاصيل الإيرادات */}
+        {disclosure.revenue_breakdown && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5" />
+                تفاصيل الإيرادات
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {(disclosure.revenue_breakdown as { residential_monthly?: number; remaining_2024?: number; jeddah_properties?: number; nahdi_rental?: number })?.residential_monthly && (
+                  <div className="p-3 bg-success/10 rounded-lg border border-success/30">
+                    <p className="text-xs text-success mb-1">إيراد سكني شهري</p>
+                    <p className="text-lg font-bold text-success">
+                      {((disclosure.revenue_breakdown as { residential_monthly: number }).residential_monthly).toLocaleString()} ر.س
+                    </p>
+                  </div>
+                )}
+                {(disclosure.revenue_breakdown as { remaining_2024?: number })?.remaining_2024 && (
+                  <div className="p-3 bg-success/10 rounded-lg border border-success/30">
+                    <p className="text-xs text-success mb-1">متبقي 2024</p>
+                    <p className="text-lg font-bold text-success">
+                      {((disclosure.revenue_breakdown as { remaining_2024: number }).remaining_2024).toLocaleString()} ر.س
+                    </p>
+                  </div>
+                )}
+                {(disclosure.revenue_breakdown as { jeddah_properties?: number })?.jeddah_properties && (
+                  <div className="p-3 bg-success/10 rounded-lg border border-success/30">
+                    <p className="text-xs text-success mb-1">عقار 2 و 3 جدة</p>
+                    <p className="text-lg font-bold text-success">
+                      {((disclosure.revenue_breakdown as { jeddah_properties: number }).jeddah_properties).toLocaleString()} ر.س
+                    </p>
+                  </div>
+                )}
+                {(disclosure.revenue_breakdown as { nahdi_rental?: number })?.nahdi_rental && (
+                  <div className="p-3 bg-success/10 rounded-lg border border-success/30">
+                    <p className="text-xs text-success mb-1">إيجار النهدي</p>
+                    <p className="text-lg font-bold text-success">
+                      {((disclosure.revenue_breakdown as { nahdi_rental: number }).nahdi_rental).toLocaleString()} ر.س
+                    </p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* ضريبة VAT */}
+        {disclosure.vat_amount && disclosure.vat_amount > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                الخصومات الضريبية
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="p-4 bg-destructive/10 rounded-lg border border-destructive/30">
+                <div className="flex items-center gap-2 mb-2">
+                  <TrendingDown className="h-4 w-4 text-destructive" />
+                  <p className="text-sm font-medium text-destructive">ضريبة القيمة المضافة (VAT)</p>
+                </div>
+                <p className="text-2xl font-bold text-destructive">
+                  {disclosure.vat_amount.toLocaleString()} ر.س
+                </p>
+                <Badge variant="outline" className="mt-2">15%</Badge>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* رسوم بيانية تفاعلية */}
         <Card>
           <CardHeader>
