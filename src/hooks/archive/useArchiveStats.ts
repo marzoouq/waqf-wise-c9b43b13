@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { ArchiveService } from "@/services";
-import { QUERY_KEYS, QUERY_STALE_TIME } from "@/lib/constants";
+import { QUERY_STALE_TIME } from "@/lib/constants";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 interface ArchiveStats {
   totalDocuments: number;
@@ -11,7 +12,7 @@ interface ArchiveStats {
 
 export function useArchiveStats() {
   const { data: stats, isLoading } = useQuery({
-    queryKey: [QUERY_KEYS.DOCUMENTS, "stats"],
+    queryKey: [...QUERY_KEYS.DOCUMENTS, "stats"],
     queryFn: () => ArchiveService.getStats(),
     staleTime: QUERY_STALE_TIME.DEFAULT,
   });

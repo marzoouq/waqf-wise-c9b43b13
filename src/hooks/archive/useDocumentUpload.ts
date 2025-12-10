@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ArchiveService } from "@/services";
 import { useToast } from "@/hooks/use-toast";
-import { QUERY_KEYS } from "@/lib/constants";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 interface UploadDocumentParams {
   file: File;
@@ -20,7 +20,7 @@ export function useDocumentUpload() {
       return ArchiveService.uploadDocument(file, name, category, description, folder_id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.DOCUMENTS] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DOCUMENTS });
       toast({ title: "تم الرفع بنجاح" });
     },
   });
@@ -30,7 +30,7 @@ export function useDocumentUpload() {
       return ArchiveService.deleteDocument(id, storagePath);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.DOCUMENTS] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DOCUMENTS });
       toast({ title: "تم الحذف" });
     },
   });
