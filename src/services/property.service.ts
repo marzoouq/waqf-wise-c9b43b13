@@ -527,7 +527,7 @@ export class PropertyService {
         supabase.from("property_units").select("*"),
         supabase.from("contracts").select("*").eq("status", "نشط"),
         supabase.from("maintenance_requests").select("*").in("status", ["معلق", "قيد التنفيذ"]),
-        supabase.from("fiscal_years").select("*").eq("is_active", true).single(),
+        supabase.from("fiscal_years").select("*").eq("is_active", true).maybeSingle(),
       ]);
 
       if (propertiesResult.error) throw propertiesResult.error;

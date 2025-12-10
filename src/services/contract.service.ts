@@ -34,7 +34,7 @@ export class ContractService {
   }
 
   static async getById(id: string): Promise<Contract | null> {
-    const { data, error } = await supabase.from('contracts').select('*').eq('id', id).single();
+    const { data, error } = await supabase.from('contracts').select('*').eq('id', id).maybeSingle();
     if (error) throw error;
     return data;
   }

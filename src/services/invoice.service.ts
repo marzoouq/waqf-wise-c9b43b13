@@ -45,13 +45,13 @@ export class InvoiceService {
   }
 
   static async getById(id: string): Promise<Invoice | null> {
-    const { data, error } = await supabase.from('invoices').select('*').eq('id', id).single();
+    const { data, error } = await supabase.from('invoices').select('*').eq('id', id).maybeSingle();
     if (error) throw error;
     return data;
   }
 
   static async getWithLines(id: string) {
-    const { data, error } = await supabase.from('invoices').select('*, invoice_lines(*)').eq('id', id).single();
+    const { data, error } = await supabase.from('invoices').select('*, invoice_lines(*)').eq('id', id).maybeSingle();
     if (error) throw error;
     return data;
   }
