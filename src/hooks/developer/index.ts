@@ -13,3 +13,7 @@ export { useRealTimeMonitor, getAllEvents } from './useRealTimeMonitor';
 export { useComponentProfiler, useProfiledComponent, startComponentRender, registerComponentMount, registerComponentUnmount, getAllComponentProfiles, resetComponentProfiles } from './useComponentProfiler';
 export { useAdvancedPerformanceAnalyzer } from './useAdvancedPerformanceAnalyzer';
 export { useSystemErrors, useDeleteResolvedErrors, useUpdateErrorStatus, useDeleteAllErrors } from './useSystemErrors';
+
+// أداة الفحص العميق
+export { useDeepCodeAudit } from './useDeepCodeAudit';
+export type { AuditIssue, AuditReport, AuditProgress } from './useDeepCodeAudit';
