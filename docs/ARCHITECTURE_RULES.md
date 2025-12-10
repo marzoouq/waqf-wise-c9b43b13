@@ -1,7 +1,7 @@
 # قواعد الهيكل المعماري الصارمة
 # Strict Architecture Rules
 
-> **الإصدار**: 2.8.73  
+> **الإصدار**: 2.8.74  
 > **آخر تحديث**: 2025-12-10
 
 ---
@@ -42,7 +42,23 @@ Component (UI) → Hook (State) → Service (Data) → Supabase
 
 ---
 
-### 3. التسميات والأنواع - Naming & Types
+### 3. استخدام `.maybeSingle()` بدلاً من `.single()` - Use maybeSingle
+
+```typescript
+// ❌ خطر - DANGEROUS (قد يفشل إذا لم يوجد السجل)
+const { data } = await supabase.from('users').select('*').eq('id', id).single();
+
+// ✅ آمن - SAFE (يُرجع null إذا لم يوجد)
+const { data } = await supabase.from('users').select('*').eq('id', id).maybeSingle();
+```
+
+**متى يُسمح بـ `.single()`**:
+- مع `insert().select().single()` - آمن (الـ insert يُرجع دائماً صف)
+- مع `update().eq().select().single()` - آمن نسبياً
+
+---
+
+### 4. التسميات والأنواع - Naming & Types
 
 ```typescript
 // ✅ كل دالة يجب أن تحدد نوع الإرجاع
@@ -71,7 +87,7 @@ src/
 │   ├── beneficiary/
 │   ├── accounting/
 │   └── ...
-├── services/            # 51 خدمة لاستعلامات البيانات
+├── services/            # 54 خدمة لاستعلامات البيانات
 ├── types/               # أنواع TypeScript
 └── lib/                 # أدوات مساعدة
 ```
@@ -84,6 +100,7 @@ src/
 - [ ] جميع الدوال لها أنواع إرجاع محددة
 - [ ] Components لا تستدعي Supabase مباشرة
 - [ ] Hooks تستخدم Services للبيانات
+- [ ] استخدام `.maybeSingle()` بدلاً من `.single()` للاستعلامات
 - [ ] لا يوجد `console.log` (فقط `console.warn`, `console.error`, `console.info`)
 
 ---
@@ -100,6 +117,9 @@ npx eslint src/ --ext .ts,.tsx
 # البحث عن any متبقية
 grep -r ": any" src/services/ --include="*.ts"
 grep -r "Promise<any>" src/ --include="*.ts"
+
+# البحث عن .single() خطرة
+grep -r "\.select.*\.eq.*\.single()" src/services/ --include="*.ts"
 ```
 
 ---
@@ -112,7 +132,8 @@ grep -r "Promise<any>" src/ --include="*.ts"
 | Components تستدعي Supabase | 0 | ✅ |
 | Pages تستدعي Supabase | 0 | ✅ |
 | Hooks تستخدم Services | 170+ | ✅ |
-| الخدمات الإجمالية | 51 | ✅ |
+| الخدمات الإجمالية | 54 | ✅ |
+| استخدام `.maybeSingle()` | 474+ | ✅ |
 
 ---
 
