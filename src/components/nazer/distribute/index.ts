@@ -5,4 +5,4 @@
 
 export { DistributeInputSection } from "./DistributeInputSection";
 export { DistributePreviewSection } from "./DistributePreviewSection";
-export { useDistributeRevenue, type HeirShare } from "./useDistributeRevenue";
+export { useDistributeRevenue, type HeirShare } from "@/hooks/nazer/useDistributeRevenue";
