@@ -51,11 +51,29 @@ interface Account {
   current_balance: number | null;
 }
 
+interface JournalEntryLineAccount {
+  code: string;
+  name_ar: string;
+  account_type?: string;
+}
+
 interface JournalEntryLine {
   debit_amount: number;
   credit_amount: number;
-  accounts: { account_type: string } | null;
+  accounts: JournalEntryLineAccount | null;
   journal_entries: { entry_date: string };
+}
+
+interface JournalEntryLineRaw {
+  account_id: string;
+  debit_amount: number;
+  credit_amount: number;
+  description: string;
+  id: string;
+  journal_entry_id: string;
+  line_number: number;
+  created_at: string;
+  accounts: JournalEntryLineAccount | null;
 }
 
 export function useFinancialAnalytics(fiscalYearId?: string) {
@@ -118,12 +136,12 @@ export function useFinancialAnalytics(fiscalYearId?: string) {
       // جلب سطور القيود للفترة المحددة
       const journalLines = await AccountingService.getJournalEntriesWithLines();
       const filteredLines = (journalLines || []).flatMap(entry => 
-        (entry.journal_entry_lines || []).filter((line: any) => {
+        (entry.journal_entry_lines || []).filter((line: JournalEntryLineRaw) => {
           const entryDate = entry.entry_date;
           return entry.status === 'posted' && 
                  entryDate >= periodStart && 
                  entryDate <= periodEnd;
-        }).map((line: any) => ({
+        }).map((line: JournalEntryLineRaw) => ({
           ...line,
           accounts: line.accounts,
           journal_entries: { entry_date: entry.entry_date }
@@ -273,7 +291,7 @@ export function useFinancialAnalytics(fiscalYearId?: string) {
       const monthlyTotals = new Map<string, number>();
       
       filteredEntries.forEach(entry => {
-        (entry.journal_entry_lines || []).forEach((line: any) => {
+        (entry.journal_entry_lines || []).forEach((line: JournalEntryLineRaw) => {
           const matchesAccount = !accountId || line.account_id === accountId;
           const matchesType = !forecastType || 
             (forecastType === 'revenue' && line.accounts?.account_type === 'revenue') ||
