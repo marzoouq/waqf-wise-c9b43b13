@@ -24,7 +24,9 @@ export interface Property {
   revenue_type?: string;
   created_at: string;
   updated_at: string;
-  [key: string]: any;
+  waqf_unit_id?: string;
+  monthly_rent?: number;
+  floors_count?: number;
 }
 
 export function useProperties() {

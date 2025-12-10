@@ -32,8 +32,16 @@ export function useBeneficiaryTimeline(beneficiaryId: string) {
           .eq('beneficiary_id', beneficiaryId).order('created_at', { ascending: false }).limit(10),
       ]);
 
+      interface RequestWithType {
+        id: string;
+        description: string;
+        created_at: string | null;
+        status: string | null;
+        request_types: { name_ar: string } | null;
+      }
+      
       paymentsRes.data?.forEach(p => timelineEvents.push({ id: p.id, type: 'payment', title: 'دفعة مالية', description: p.description || 'دفعة من الوقف', date: p.payment_date, amount: p.amount }));
-      requestsRes.data?.forEach((r: any) => timelineEvents.push({ id: r.id, type: 'request', title: r.request_types?.name_ar || 'طلب جديد', description: r.description, date: r.created_at || '', status: r.status || undefined }));
+      requestsRes.data?.forEach((r: RequestWithType) => timelineEvents.push({ id: r.id, type: 'request', title: r.request_types?.name_ar || 'طلب جديد', description: r.description, date: r.created_at || '', status: r.status || undefined }));
       activitiesRes.data?.forEach(a => timelineEvents.push({ id: a.id, type: a.action_type === 'update' ? 'update' : 'status_change', title: a.action_description, description: a.action_description, date: a.created_at || '' }));
 
       return timelineEvents.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
