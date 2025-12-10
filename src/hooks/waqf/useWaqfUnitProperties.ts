@@ -1,9 +1,11 @@
 /**
  * Hook لجلب عقارات قلم الوقف
+ * @version 2.8.65
  */
 
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { PropertyService } from "@/services";
+import { productionLogger } from "@/lib/logger/production-logger";
 
 interface ContractInfo {
   monthly_rent: number;
@@ -37,22 +39,11 @@ export function useWaqfUnitProperties(waqfUnitId: string | undefined, isOpen: bo
     if (!waqfUnitId) return;
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
-        .from("properties")
-        .select(`
-          id, name, type, location, units, occupied, monthly_revenue, status,
-          contracts!contracts_property_id_fkey(
-            monthly_rent, 
-            payment_frequency, 
-            status
-          )
-        `)
-        .eq("waqf_unit_id", waqfUnitId);
-
-      if (error) throw error;
-      setProperties(data || []);
+      const allProperties = await PropertyService.getAll();
+      const filteredProperties = allProperties.filter(p => p.waqf_unit_id === waqfUnitId);
+      setProperties(filteredProperties as unknown as Property[]);
     } catch (error) {
-      console.error("Error fetching properties:", error);
+      productionLogger.error("Error fetching properties:", error);
     } finally {
       setIsLoading(false);
     }

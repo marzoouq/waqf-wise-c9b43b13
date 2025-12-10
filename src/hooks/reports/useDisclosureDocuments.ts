@@ -1,8 +1,9 @@
 /**
  * Hook لإدارة مستندات الإفصاح السنوي
+ * @version 2.8.65
  */
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { DisclosureService } from "@/services/disclosure.service";
 
 export interface DisclosureDocument {
   id: string;
@@ -30,18 +31,7 @@ const DOCUMENT_TYPE_LABELS: Record<string, string> = {
 export function useDisclosureDocuments(disclosureId?: string) {
   const { data: documents = [], isLoading } = useQuery({
     queryKey: ["disclosure-documents", disclosureId],
-    queryFn: async () => {
-      if (!disclosureId) return [];
-      
-      const { data, error } = await supabase
-        .from("disclosure_documents")
-        .select("*")
-        .eq("disclosure_id", disclosureId)
-        .order("document_type", { ascending: true });
-      
-      if (error) throw error;
-      return data as DisclosureDocument[];
-    },
+    queryFn: () => DisclosureService.getDocuments(disclosureId!),
     enabled: !!disclosureId,
   });
 
@@ -51,12 +41,12 @@ export function useDisclosureDocuments(disclosureId?: string) {
     if (!acc[type]) {
       acc[type] = [];
     }
-    acc[type].push(doc);
+    acc[type].push(doc as unknown as DisclosureDocument);
     return acc;
   }, {} as Record<string, DisclosureDocument[]>);
 
   return {
-    documents,
+    documents: documents as unknown as DisclosureDocument[],
     groupedDocuments,
     isLoading,
     getTypeLabel: (type: string) => DOCUMENT_TYPE_LABELS[type] || type,

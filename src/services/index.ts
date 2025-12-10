@@ -65,3 +65,4 @@ export { SearchService, type RecentSearch } from './search.service';
 export { SupportService, type SupportFilters } from './support.service';
 export { ScheduledReportService, type ScheduledReport } from './scheduled-report.service';
 export { AIService, type AIInsight } from './ai.service';
+export { DisclosureService, type SmartDisclosureDocument } from './disclosure.service';

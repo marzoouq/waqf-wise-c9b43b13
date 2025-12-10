@@ -1,9 +1,10 @@
 /**
  * Hook لإعدادات هيئة الزكاة والضريبة
+ * @version 2.8.65
  */
 
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { SettingsService } from "@/services/settings.service";
 import { toast } from "sonner";
 import { CheckCircle } from "lucide-react";
 import React from "react";
@@ -33,29 +34,13 @@ export function useZATCASettings() {
   const saveSettings = async () => {
     setIsSaving(true);
     try {
-      const settingsToSave = [
+      await SettingsService.saveZATCASettings([
         { key: 'zatca_enabled', value: settings.enabled ? 'true' : 'false' },
         { key: 'zatca_organization_id', value: settings.organizationId },
         { key: 'zatca_vat_number', value: settings.vatNumber },
         { key: 'zatca_api_key', value: settings.apiKey },
         { key: 'zatca_test_mode', value: settings.testMode ? 'true' : 'false' },
-      ];
-
-      for (const { key, value } of settingsToSave) {
-        const { error } = await supabase
-          .from('system_settings')
-          .upsert({
-            setting_key: key,
-            setting_value: value,
-            setting_type: 'text',
-            category: 'zatca',
-            updated_at: new Date().toISOString(),
-          }, {
-            onConflict: 'setting_key'
-          });
-
-        if (error) throw error;
-      }
+      ]);
       
       toast.success("تم حفظ الإعدادات", {
         description: "تم حفظ إعدادات هيئة الزكاة والضريبة بنجاح",

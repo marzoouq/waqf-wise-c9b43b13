@@ -1,14 +1,16 @@
 /**
  * useCreateInvoice Hook
  * إنشاء فاتورة جديدة
+ * @version 2.8.65
  */
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { format } from "@/lib/date";
 import { generateZATCAQRData, formatZATCACurrency } from "@/lib/zatca";
 import { validateZATCAInvoice, formatValidationErrors } from "@/lib/validateZATCAInvoice";
+import { InvoiceService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 interface InvoiceLine {
   id: string;
@@ -99,9 +101,8 @@ export function useCreateInvoice(onSuccess?: () => void) {
         });
       }
 
-      const { data: invoice, error: invoiceError } = await supabase
-        .from("invoices")
-        .insert({
+      const invoice = await InvoiceService.create(
+        {
           invoice_number: nextInvoiceNumber,
           invoice_date: formData.invoice_date,
           invoice_time: formData.invoice_time || format(new Date(), "HH:mm"),
@@ -124,12 +125,10 @@ export function useCreateInvoice(onSuccess?: () => void) {
           ocr_extracted: !!ocrImageUrl,
           ocr_confidence_score: ocrImageUrl ? 85 : null,
           ocr_processed_at: ocrImageUrl ? new Date().toISOString() : null,
-        })
-        .select()
-        .maybeSingle();
-      
-      if (!invoice) throw new Error("Failed to create invoice");
+        }
+      );
 
+      // إضافة أسطر الفاتورة بعد إنشائها
       const invoiceLines = lines.map((line, index) => ({
         invoice_id: invoice.id,
         line_number: index + 1,
@@ -143,17 +142,15 @@ export function useCreateInvoice(onSuccess?: () => void) {
         line_total: line.line_total,
       }));
 
-      const { error: linesError } = await supabase
-        .from("invoice_lines")
-        .insert(invoiceLines);
-
-      if (linesError) throw linesError;
+      if (invoiceLines.length > 0) {
+        await InvoiceService.update(invoice.id, {}, invoiceLines);
+      }
 
       return invoice;
     },
     onSuccess: () => {
       toast.success("تم إنشاء الفاتورة بنجاح");
-      queryClient.invalidateQueries({ queryKey: ["invoices"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INVOICES });
       queryClient.invalidateQueries({ queryKey: ["next-invoice-number"] });
       onSuccess?.();
     },

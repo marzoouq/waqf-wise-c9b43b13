@@ -1,39 +1,20 @@
 /**
  * Hook لتصدير الإفصاح السنوي
+ * @version 2.8.65
  */
-import { supabase } from "@/integrations/supabase/client";
+import { DisclosureService } from "@/services/disclosure.service";
 
 export function useAnnualDisclosureExport() {
   const fetchLatestDisclosure = async () => {
-    const { data, error } = await supabase
-      .from("annual_disclosures")
-      .select("*")
-      .order("year", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    
-    if (error) throw error;
-    return data;
+    return DisclosureService.getLatest();
   };
 
   const fetchPropertiesWithContracts = async () => {
-    const { data, error } = await supabase
-      .from("properties")
-      .select(`*, contracts:contracts(*)`)
-      .order("name");
-    
-    if (error) throw error;
-    return data;
+    return DisclosureService.getPropertiesWithContracts();
   };
 
   const fetchDisclosureBeneficiaries = async (disclosureId: string) => {
-    const { data, error } = await supabase
-      .from("disclosure_beneficiaries")
-      .select("*")
-      .eq("disclosure_id", disclosureId);
-    
-    if (error) throw error;
-    return data || [];
+    return DisclosureService.getBeneficiaries(disclosureId);
   };
 
   return {
