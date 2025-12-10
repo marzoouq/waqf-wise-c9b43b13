@@ -24,6 +24,18 @@ export interface ApprovalsStats {
   rejected: number;
 }
 
+export interface RequestApproval {
+  id: string;
+  request_id: string;
+  level: number;
+  status: string;
+  notes?: string;
+  approved_at?: string;
+  approver_id?: string;
+  approver_name: string;
+  created_at?: string;
+}
+
 export class ApprovalService {
   // ==================== إحصائيات عامة ====================
   static async getOverviewStats(): Promise<ApprovalsStats> {
@@ -375,7 +387,7 @@ export class ApprovalService {
     approved_at?: string;
     approver_id?: string;
     approver_name: string;
-  }): Promise<any> {
+  }): Promise<RequestApproval> {
     // التحقق من وجود موافقة سابقة
     const { data: existing } = await supabase
       .from("request_approvals")
@@ -398,7 +410,7 @@ export class ApprovalService {
         .select()
         .single();
       if (error) throw error;
-      return data;
+      return data as RequestApproval;
     }
 
     const { data, error } = await supabase
@@ -407,10 +419,10 @@ export class ApprovalService {
       .select()
       .single();
     if (error) throw error;
-    return data;
+    return data as RequestApproval;
   }
 
-  static async updateRequestApproval(id: string, updates: Partial<any>): Promise<any> {
+  static async updateRequestApproval(id: string, updates: Partial<RequestApproval>): Promise<RequestApproval> {
     const { data, error } = await supabase
       .from("request_approvals")
       .update(updates)
@@ -418,7 +430,7 @@ export class ApprovalService {
       .select()
       .single();
     if (error) throw error;
-    return data;
+    return data as RequestApproval;
   }
 
   /**

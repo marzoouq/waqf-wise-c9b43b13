@@ -217,7 +217,15 @@ export class SystemService {
   /**
    * إنشاء نسخة احتياطية
    */
-  static async createBackup(tablesIncluded?: string[]): Promise<any> {
+  static async createBackup(tablesIncluded?: string[]): Promise<{ 
+    success: boolean; 
+    message?: string; 
+    filePath?: string; 
+    content?: string; 
+    fileName?: string; 
+    totalRecords?: number; 
+    totalTables?: number; 
+  }> {
     const { data, error } = await supabase.functions.invoke("backup-database", {
       body: {
         backupType: "manual",
@@ -232,7 +240,11 @@ export class SystemService {
   /**
    * استعادة نسخة احتياطية
    */
-  static async restoreBackup(backupData: Record<string, unknown>, mode: "replace" | "merge" = "replace"): Promise<any> {
+  static async restoreBackup(backupData: Record<string, unknown>, mode: "replace" | "merge" = "replace"): Promise<{ 
+    success: boolean; 
+    message?: string; 
+    restoredTables?: string[]; 
+  }> {
     const { data, error } = await supabase.functions.invoke("restore-database", {
       body: {
         backupData,
@@ -438,5 +450,61 @@ export class SystemService {
       .eq('id', alertId);
 
     if (error) throw error;
+  }
+
+  // =====================
+  // دوال اختبار النظام
+  // =====================
+
+  /**
+   * اختبار نظام الإشعارات
+   */
+  static async testNotificationSystem(): Promise<void> {
+    const { data: user } = await supabase.auth.getUser();
+    
+    if (!user.user) {
+      throw new Error('User not authenticated');
+    }
+
+    const { error } = await supabase.from('notifications').insert({
+      user_id: user.user.id,
+      title: 'إشعار اختبار',
+      message: 'هذا إشعار اختبار من نظام الفحص الشامل',
+      type: 'system_test',
+      priority: 'low',
+      is_read: false,
+    });
+
+    if (error) throw error;
+  }
+
+  /**
+   * اختبار تسجيل الإصلاح التلقائي
+   */
+  static async testAutoFixLogging(): Promise<void> {
+    const { data: errorLog, error: errorLogError } = await supabase
+      .from('system_error_logs')
+      .insert({
+        error_type: 'test_error',
+        error_message: 'Test error for auto-fix',
+        severity: 'low',
+        url: typeof window !== 'undefined' ? window.location.href : '',
+        user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
+        status: 'new',
+      })
+      .select()
+      .maybeSingle();
+
+    if (!errorLog) throw new Error("Failed to create error log");
+
+    const { error: updateError } = await supabase
+      .from('system_error_logs')
+      .update({
+        status: 'auto_resolved',
+        resolved_at: new Date().toISOString(),
+      })
+      .eq('id', errorLog.id);
+
+    if (updateError) throw updateError;
   }
 }
