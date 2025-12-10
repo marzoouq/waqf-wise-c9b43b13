@@ -81,7 +81,7 @@ import { BeneficiaryService } from '@/services';
 const beneficiaries = await BeneficiaryService.getAll();
 ```
 
-**Services المتوفرة (42 service):**
+**Services المتوفرة (51 service):**
 
 | Service | الوظيفة |
 |---------|---------|
@@ -130,8 +130,8 @@ const beneficiaries = await BeneficiaryService.getAll();
 ### 4. طبقة البيانات (Data Layer)
 **المسؤولية**: Supabase + PostgreSQL
 
-- **150+ جدول** في قاعدة البيانات
-- **RLS Policies** لحماية البيانات
+- **170+ جدول** في قاعدة البيانات
+- **650 سياسة RLS** لحماية البيانات (موحدة)
 - **Edge Functions** للعمليات المعقدة
 
 ---
@@ -269,5 +269,5 @@ const QUERY_CONFIG = {
 
 ---
 
-**الإصدار**: 2.8.45  
-**آخر تحديث**: 2025-12-09
+**الإصدار**: 2.8.73  
+**آخر تحديث**: 2025-12-10
