@@ -1,15 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { TranslationService, type Translation } from '@/services/translation.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export type Language = 'ar' | 'en' | 'fr';
-
-interface Translation {
-  key: string;
-  ar: string;
-  en: string | null;
-  fr: string | null;
-}
 
 /**
  * Hook لإدارة الترجمات المتعددة اللغات
@@ -21,15 +15,8 @@ export function useTranslation() {
 
   // جلب جميع الترجمات
   const { data: translations = [] } = useQuery({
-    queryKey: ['translations'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('translations')
-        .select('key, ar, en, fr');
-      
-      if (error) throw error;
-      return data as Translation[];
-    },
+    queryKey: QUERY_KEYS.TRANSLATIONS,
+    queryFn: () => TranslationService.fetchAll(),
   });
 
   // حفظ اللغة عند التغيير
