@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { QUERY_KEYS, TOAST_MESSAGES, QUERY_STALE_TIME } from "@/lib/constants";
+import { TOAST_MESSAGES, QUERY_STALE_TIME } from "@/lib/constants";
+import { QUERY_KEYS } from "@/lib/query-keys";
 import { useEffect } from "react";
 import { createMutationErrorHandler } from "@/lib/errors";
 import { FundService, RealtimeService } from "@/services";
@@ -25,7 +26,7 @@ export function useFunds() {
 
   useEffect(() => {
     const subscription = RealtimeService.subscribeToTable('funds', () => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.FUNDS] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FUNDS });
     });
     return () => { 
       subscription.unsubscribe(); 
@@ -33,7 +34,7 @@ export function useFunds() {
   }, [queryClient]);
 
   const { data: funds = [], isLoading } = useQuery({
-    queryKey: [QUERY_KEYS.FUNDS],
+    queryKey: QUERY_KEYS.FUNDS,
     queryFn: () => FundService.getAll(true),
     staleTime: QUERY_STALE_TIME.DEFAULT,
   });
@@ -41,7 +42,7 @@ export function useFunds() {
   const addFund = useMutation({
     mutationFn: (fund: Omit<Fund, "id" | "created_at" | "updated_at">) => FundService.create(fund),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.FUNDS] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FUNDS });
       toast({ title: TOAST_MESSAGES.SUCCESS.ADD, description: "تم إضافة الصندوق بنجاح" });
     },
     onError: createMutationErrorHandler({ context: 'add_fund', toastTitle: TOAST_MESSAGES.ERROR.ADD }),
@@ -50,7 +51,7 @@ export function useFunds() {
   const updateFund = useMutation({
     mutationFn: ({ id, ...updates }: Partial<Fund> & { id: string }) => FundService.update(id, updates),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.FUNDS] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FUNDS });
       toast({ title: TOAST_MESSAGES.SUCCESS.UPDATE, description: "تم تحديث الصندوق بنجاح" });
     },
     onError: createMutationErrorHandler({ context: 'update_fund', toastTitle: TOAST_MESSAGES.ERROR.UPDATE }),

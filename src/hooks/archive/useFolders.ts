@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { QUERY_KEYS, TOAST_MESSAGES, QUERY_STALE_TIME } from "@/lib/constants";
+import { TOAST_MESSAGES, QUERY_STALE_TIME } from "@/lib/constants";
+import { QUERY_KEYS } from "@/lib/query-keys";
 import { createMutationErrorHandler } from "@/lib/errors";
 import { ArchiveService } from "@/services/archive.service";
 
@@ -18,7 +19,7 @@ export function useFolders() {
   const queryClient = useQueryClient();
 
   const { data: folders = [], isLoading } = useQuery({
-    queryKey: [QUERY_KEYS.FOLDERS],
+    queryKey: QUERY_KEYS.FOLDERS,
     queryFn: () => ArchiveService.getFolders(),
     staleTime: QUERY_STALE_TIME.DEFAULT,
   });
@@ -27,7 +28,7 @@ export function useFolders() {
     mutationFn: (folder: Omit<Folder, "id" | "created_at" | "updated_at" | "files_count">) => 
       ArchiveService.createFolder({ ...folder, files_count: 0 }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.FOLDERS] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FOLDERS });
       toast({
         title: TOAST_MESSAGES.SUCCESS.ADD,
         description: "تم إنشاء المجلد بنجاح",
@@ -43,7 +44,7 @@ export function useFolders() {
     mutationFn: ({ id, ...updates }: Partial<Folder> & { id: string }) => 
       ArchiveService.updateFolder(id, updates),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.FOLDERS] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FOLDERS });
       toast({
         title: TOAST_MESSAGES.SUCCESS.UPDATE,
         description: "تم تحديث المجلد بنجاح",

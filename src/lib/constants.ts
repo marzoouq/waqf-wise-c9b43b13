@@ -133,23 +133,6 @@ export const EXPORT_FORMATS = {
   CSV: "csv",
 } as const;
 
-// Query Keys
-export const QUERY_KEYS = {
-  BENEFICIARIES: "beneficiaries",
-  PROPERTIES: "properties",
-  PAYMENTS: "payments",
-  DISTRIBUTIONS: "distributions",
-  INVOICES: "invoices",
-  JOURNAL_ENTRIES: "journal_entries",
-  ACCOUNTS: "accounts",
-  APPROVALS: "approvals",
-  DASHBOARD_STATS: "dashboard_stats",
-  ACCOUNTING_STATS: "accounting_stats",
-  FUNDS: "funds",
-  FOLDERS: "folders",
-  DOCUMENTS: "documents",
-} as const;
-
 // Local Storage Keys
 export const STORAGE_KEYS = {
   THEME: "theme",
