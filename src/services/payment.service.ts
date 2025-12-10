@@ -268,14 +268,7 @@ export class PaymentService {
   /**
    * إنشاء جدول مدفوعات
    */
-  static async createPaymentSchedule(schedule: {
-    distribution_id: string;
-    scheduled_date: string;
-    scheduled_amount: number;
-    status?: string;
-    batch_number?: string;
-    notes?: string;
-  }): Promise<any> {
+  static async createPaymentSchedule(schedule: PaymentScheduleInsert): Promise<PaymentScheduleRow> {
     const { data, error } = await supabase
       .from('payment_schedules')
       .insert([schedule])
@@ -290,7 +283,7 @@ export class PaymentService {
   /**
    * تحديث جدول مدفوعات
    */
-  static async updatePaymentSchedule(id: string, updates: Record<string, unknown>): Promise<any> {
+  static async updatePaymentSchedule(id: string, updates: Partial<PaymentScheduleInsert>): Promise<PaymentScheduleRow> {
     const { data, error } = await supabase
       .from('payment_schedules')
       .update(updates)
@@ -318,14 +311,7 @@ export class PaymentService {
   /**
    * إنشاء جداول مدفوعات متعددة
    */
-  static async createBatchSchedules(schedules: {
-    distribution_id: string;
-    scheduled_date: string;
-    scheduled_amount: number;
-    status: string;
-    batch_number: string;
-    notes?: string;
-  }[]): Promise<any[]> {
+  static async createBatchSchedules(schedules: PaymentScheduleInsert[]): Promise<PaymentScheduleRow[]> {
     const { data, error } = await supabase
       .from('payment_schedules')
       .insert(schedules)
@@ -334,4 +320,33 @@ export class PaymentService {
     if (error) throw error;
     return data || [];
   }
+}
+
+/**
+ * واجهة إدخال جدول المدفوعات
+ */
+export interface PaymentScheduleInsert {
+  distribution_id: string;
+  scheduled_date: string;
+  scheduled_amount: number;
+  status?: string;
+  batch_number?: string;
+  notes?: string;
+}
+
+/**
+ * واجهة صف جدول المدفوعات
+ */
+export interface PaymentScheduleRow {
+  id: string;
+  distribution_id: string | null;
+  scheduled_date: string;
+  scheduled_amount: number;
+  status: string;
+  batch_number: string | null;
+  processed_at: string | null;
+  error_message: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
 }
