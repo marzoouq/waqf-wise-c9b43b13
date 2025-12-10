@@ -1,7 +1,14 @@
+/**
+ * useBeneficiaryRequests Hook - تقديم طلبات المستفيدين
+ * @version 2.8.65
+ * 
+ * يستخدم RequestService للوصول لقاعدة البيانات
+ */
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { QUERY_KEYS } from "@/lib/query-keys";
+import { RequestService } from '@/services';
 
 export interface BeneficiaryRequestData {
   request_type_id: string;
@@ -16,16 +23,23 @@ export function useBeneficiaryRequests(beneficiaryId: string) {
 
   const submitRequest = useMutation({
     mutationFn: async (formData: BeneficiaryRequestData) => {
-      const { error } = await supabase
-        .from('beneficiary_requests')
-        .insert({
-          beneficiary_id: beneficiaryId,
-          ...formData,
-          submitted_at: new Date().toISOString(),
-          status: 'قيد المراجعة',
-        });
+      const priorityMap: Record<string, 'عاجلة' | 'عالية' | 'متوسطة' | 'منخفضة'> = {
+        'عاجلة': 'عاجلة',
+        'عالية': 'عالية',
+        'متوسطة': 'متوسطة',
+        'منخفضة': 'منخفضة',
+      };
+      
+      const result = await RequestService.create({
+        beneficiary_id: beneficiaryId,
+        request_type_id: formData.request_type_id,
+        description: formData.description,
+        amount: formData.amount,
+        priority: priorityMap[formData.priority] || 'متوسطة',
+      });
 
-      if (error) throw error;
+      if (!result.success) throw new Error(result.message);
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REQUESTS });

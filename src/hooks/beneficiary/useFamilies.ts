@@ -1,10 +1,16 @@
+/**
+ * useFamilies Hook - إدارة العائلات
+ * @version 2.8.65
+ * 
+ * يستخدم FamilyService للوصول لقاعدة البيانات
+ */
+
 import { useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import type { Family, FamilyMember } from '@/types';
-import { updateInTable, deleteFromTable } from '@/lib/utils/supabaseHelpers';
 import { QUERY_KEYS } from '@/lib/query-keys';
+import { FamilyService, RealtimeService } from '@/services';
 
 // ===========================
 // Families Hook
@@ -17,54 +23,27 @@ export const useFamilies = () => {
   // Fetch all families
   const { data: families = [], isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.FAMILIES,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('families')
-        .select(`
-          *,
-          head_of_family:beneficiaries!families_head_of_family_id_fkey(
-            id,
-            full_name,
-            national_id
-          )
-        `)
-        .order('family_name', { ascending: true });
-
-      if (error) throw error;
-      return data as unknown as Family[];
-    },
+    queryFn: () => FamilyService.getAll(),
   });
 
   // Real-time subscription
   useEffect(() => {
-    const channel = supabase
-      .channel('families-changes')
-      .on('postgres_changes', 
-        { event: '*', schema: 'public', table: 'families' }, 
-        () => {
-          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FAMILIES });
-        }
-      )
-      .subscribe();
+    const subscription = RealtimeService.subscribeToTable(
+      'families',
+      () => {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FAMILIES });
+      }
+    );
 
     return () => {
-      supabase.removeChannel(channel);
+      subscription.unsubscribe();
     };
   }, [queryClient]);
 
   // Add new family
   const addFamily = useMutation({
-    mutationFn: async (newFamily: Omit<Family, 'id' | 'created_at' | 'updated_at' | 'total_members'>) => {
-      const { data, error } = await supabase
-        .from('families')
-        .insert(newFamily)
-        .select()
-        .maybeSingle();
-
-      if (error) throw error;
-      if (!data) throw new Error('فشل إنشاء العائلة');
-      return data;
-    },
+    mutationFn: (newFamily: Omit<Family, 'id' | 'created_at' | 'updated_at' | 'total_members'>) => 
+      FamilyService.create(newFamily),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FAMILIES });
       toast({
@@ -83,14 +62,8 @@ export const useFamilies = () => {
 
   // Update family
   const updateFamily = useMutation({
-    mutationFn: async ({ id, updates }: { id: string; updates: Partial<Family> }) => {
-      const result = await updateInTable<Family>('families', id, updates);
-      const error = result.error;
-      const data = result.data;
-
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: ({ id, updates }: { id: string; updates: Partial<Family> }) => 
+      FamilyService.update(id, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FAMILIES });
       toast({
@@ -109,12 +82,7 @@ export const useFamilies = () => {
 
   // Delete family
   const deleteFamily = useMutation({
-    mutationFn: async (id: string) => {
-      const result = await deleteFromTable('families', id);
-      const error = result.error;
-
-      if (error) throw error;
-    },
+    mutationFn: (id: string) => FamilyService.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FAMILIES });
       toast({
@@ -153,44 +121,14 @@ export const useFamilyMembers = (familyId?: string) => {
   // Fetch family members
   const { data: members = [], isLoading } = useQuery({
     queryKey: QUERY_KEYS.FAMILY_MEMBERS(familyId),
-    queryFn: async () => {
-      if (!familyId) return [];
-
-      const { data, error } = await supabase
-        .from('family_members')
-        .select(`
-          *,
-          beneficiary:beneficiaries(
-            id,
-            full_name,
-            national_id,
-            phone,
-            email,
-            status
-          )
-        `)
-        .eq('family_id', familyId)
-        .order('priority_level', { ascending: true });
-
-      if (error) throw error;
-      return data as unknown as FamilyMember[];
-    },
+    queryFn: () => familyId ? FamilyService.getMembers(familyId) : Promise.resolve([]),
     enabled: !!familyId,
   });
 
   // Add family member
   const addMember = useMutation({
-    mutationFn: async (newMember: Omit<FamilyMember, 'id' | 'created_at' | 'updated_at'> & { relationship_to_head: string }) => {
-      const { data, error } = await supabase
-        .from('family_members')
-        .insert([newMember])
-        .select()
-        .maybeSingle();
-
-      if (error) throw error;
-      if (!data) throw new Error('فشل إضافة الفرد');
-      return data;
-    },
+    mutationFn: (newMember: Omit<FamilyMember, 'id' | 'created_at' | 'updated_at'> & { relationship_to_head: string }) => 
+      FamilyService.addMember(newMember),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FAMILY_MEMBERS(undefined) });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FAMILIES });
@@ -210,18 +148,8 @@ export const useFamilyMembers = (familyId?: string) => {
 
   // Update family member
   const updateMember = useMutation({
-    mutationFn: async ({ id, updates }: { id: string; updates: Partial<FamilyMember> }) => {
-      const { data, error } = await supabase
-        .from('family_members')
-        .update(updates)
-        .eq('id', id)
-        .select()
-        .maybeSingle();
-
-      if (error) throw error;
-      if (!data) throw new Error('الفرد غير موجود');
-      return data;
-    },
+    mutationFn: ({ id, updates }: { id: string; updates: Partial<FamilyMember> }) => 
+      FamilyService.updateMember(id, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FAMILY_MEMBERS(undefined) });
       toast({
@@ -240,14 +168,7 @@ export const useFamilyMembers = (familyId?: string) => {
 
   // Remove family member
   const removeMember = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('family_members')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-    },
+    mutationFn: (id: string) => FamilyService.removeMember(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FAMILY_MEMBERS(undefined) });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FAMILIES });

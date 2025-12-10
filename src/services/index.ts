@@ -38,6 +38,7 @@ export { FundService } from './fund.service';
 export { PaymentService, type PaymentFilters } from './payment.service';
 export { RentalPaymentService, type RentalPayment, type RentalPaymentFilters } from './rental-payment.service';
 export { TribeService } from './tribe.service';
+export { FamilyService } from './family.service';
 export { UserService, type UserStats } from './user.service';
 export { ChatbotService, type ChatMessage, type QuickReply } from './chatbot.service';
 export { GovernanceService } from './governance.service';
