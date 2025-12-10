@@ -7,6 +7,11 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 
+export interface BeneficiaryEmailResult {
+  email: string;
+  user_id: string;
+}
+
 type UserRoleRow = Database['public']['Tables']['user_roles']['Row'];
 type AppRole = Database['public']['Enums']['app_role'];
 
@@ -139,6 +144,30 @@ export class AuthService {
   static async hasAnyRole(userId: string, roles: string[]): Promise<boolean> {
     const userRoles = await this.getUserRoles(userId);
     return roles.some(role => userRoles.includes(role));
+  }
+
+  /**
+   * جلب بريد المستفيد برقم الهوية الوطنية
+   * للاستخدام في تسجيل دخول المستفيدين
+   */
+  static async getBeneficiaryEmailByNationalId(nationalId: string): Promise<BeneficiaryEmailResult | null> {
+    const { data, error } = await supabase
+      .rpc('get_beneficiary_email_by_national_id', { 
+        p_national_id: nationalId 
+      });
+
+    if (error) {
+      throw new Error('حدث خطأ في البحث عن رقم الهوية');
+    }
+
+    if (!data || data.length === 0) {
+      return null;
+    }
+
+    return {
+      email: data[0].email,
+      user_id: data[0].user_id,
+    };
   }
 
   /**

@@ -1,11 +1,12 @@
 /**
  * Approval Service - خدمة الموافقات
- * @version 2.8.3
+ * @version 2.8.61
  */
 
 import { supabase } from "@/integrations/supabase/client";
 import { JournalApproval, PaymentForApproval } from "@/types";
 import { DistributionForApproval, RequestWithBeneficiary } from "@/types/approvals";
+import type { Json } from "@/integrations/supabase/types";
 
 export interface ApprovalItem {
   id: string;
@@ -458,8 +459,8 @@ export class ApprovalService {
   static async createWorkflow(workflow: {
     workflow_name: string;
     entity_type: string;
-    approval_levels: any[];
-    conditions?: any;
+    approval_levels: { level: number; role: string; required?: boolean }[];
+    conditions?: { min_amount?: number; max_amount?: number; entity_subtype?: string };
     is_active: boolean;
   }) {
     const { data, error } = await supabase
@@ -467,8 +468,8 @@ export class ApprovalService {
       .insert({
         workflow_name: workflow.workflow_name,
         entity_type: workflow.entity_type,
-        approval_levels: workflow.approval_levels as any,
-        conditions: workflow.conditions as any,
+        approval_levels: workflow.approval_levels as Json,
+        conditions: workflow.conditions as Json,
         is_active: workflow.is_active,
       })
       .select()

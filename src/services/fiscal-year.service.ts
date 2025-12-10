@@ -24,7 +24,7 @@ export interface FiscalYearSummary {
 export interface FiscalYearClosureResult {
   success: boolean;
   message?: string;
-  data?: any;
+  data?: FiscalYear;
 }
 
 export class FiscalYearService {
