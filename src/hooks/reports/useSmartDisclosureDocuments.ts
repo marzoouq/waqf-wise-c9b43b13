@@ -1,26 +1,11 @@
 /**
  * Hook لإدارة مستندات الإفصاح السنوي مع المحتوى المستخرج
+ * @version 2.8.65
  */
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { Json } from "@/integrations/supabase/types";
+import { DisclosureService, SmartDisclosureDocument } from "@/services/disclosure.service";
 
-export interface SmartDisclosureDocument {
-  id: string;
-  disclosure_id: string;
-  document_name: string;
-  document_type: string;
-  file_path: string;
-  file_size: number | null;
-  description: string | null;
-  fiscal_year: number;
-  uploaded_by: string | null;
-  created_at: string;
-  extracted_content: Json | null;
-  content_summary: string | null;
-  total_amount: number | null;
-  items_count: number | null;
-}
+export type { SmartDisclosureDocument };
 
 export interface CategorySummary {
   type: string;
@@ -42,18 +27,7 @@ const DOCUMENT_TYPE_LABELS: Record<string, string> = {
 export function useSmartDisclosureDocuments(disclosureId?: string) {
   const { data: documents = [], isLoading } = useQuery({
     queryKey: ["smart-disclosure-documents", disclosureId],
-    queryFn: async () => {
-      if (!disclosureId) return [];
-      
-      const { data, error } = await supabase
-        .from("disclosure_documents")
-        .select("*")
-        .eq("disclosure_id", disclosureId)
-        .order("document_type", { ascending: true });
-      
-      if (error) throw error;
-      return data as SmartDisclosureDocument[];
-    },
+    queryFn: () => DisclosureService.getSmartDocuments(disclosureId!),
     enabled: !!disclosureId,
   });
 

@@ -1,9 +1,9 @@
 /**
  * Beneficiary Export Hook
- * @version 2.8.40
+ * @version 2.8.65
  */
 
-import { supabase } from "@/integrations/supabase/client";
+import { AccountingService } from "@/services";
 
 export interface JournalExportEntry {
   entry_date: string;
@@ -17,18 +17,7 @@ export interface JournalExportEntry {
 
 export function useBeneficiaryExport() {
   const exportJournalEntries = async () => {
-    const { data: transactions, error } = await supabase
-      .from('journal_entries')
-      .select(`
-        *,
-        journal_entry_lines(
-          *,
-          accounts(name_ar, code)
-        )
-      `)
-      .order('entry_date', { ascending: false });
-
-    if (error) throw error;
+    const transactions = await AccountingService.getJournalEntriesWithLines();
     return transactions as JournalExportEntry[];
   };
 

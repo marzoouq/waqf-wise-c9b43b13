@@ -1,12 +1,17 @@
 /**
  * Settings Service - خدمة الإعدادات
- * @version 2.8.28
+ * @version 2.8.65
  */
 
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 
 type LandingSettingRow = Database['public']['Tables']['landing_page_settings']['Row'];
+
+export interface ZATCASetting {
+  key: string;
+  value: string;
+}
 
 export class SettingsService {
   /**
@@ -32,5 +37,44 @@ export class SettingsService {
       .eq('setting_key', key);
 
     if (error) throw error;
+  }
+
+  /**
+   * حفظ إعدادات ZATCA
+   */
+  static async saveZATCASettings(settings: ZATCASetting[]): Promise<void> {
+    for (const { key, value } of settings) {
+      const { error } = await supabase
+        .from('system_settings')
+        .upsert({
+          setting_key: key,
+          setting_value: value,
+          setting_type: 'text',
+          category: 'zatca',
+          updated_at: new Date().toISOString(),
+        }, {
+          onConflict: 'setting_key'
+        });
+
+      if (error) throw error;
+    }
+  }
+
+  /**
+   * جلب إعدادات ZATCA
+   */
+  static async getZATCASettings(): Promise<Record<string, string>> {
+    const { data, error } = await supabase
+      .from('system_settings')
+      .select('setting_key, setting_value')
+      .eq('category', 'zatca');
+
+    if (error) throw error;
+
+    const settings: Record<string, string> = {};
+    (data || []).forEach(item => {
+      settings[item.setting_key] = item.setting_value;
+    });
+    return settings;
   }
 }
