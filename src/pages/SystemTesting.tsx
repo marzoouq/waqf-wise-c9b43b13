@@ -23,9 +23,9 @@ import {
 } from 'lucide-react';
 import { selfHealing, retryOperation, fetchWithFallback } from '@/lib/selfHealing';
 import { errorTracker } from '@/lib/errors';
-import { supabase } from '@/integrations/supabase/client';
 import { SelfHealingComponent } from '@/components/shared/SelfHealingComponent';
 import { useToast } from '@/hooks/use-toast';
+import { SystemService } from '@/services/system.service';
 
 interface TestResult {
   name: string;
@@ -194,58 +194,13 @@ export default function SystemTesting() {
 
   const testNotificationSystem = async () => {
     console.log('🧪 Testing Notification System...');
-    
-    const { data: user } = await supabase.auth.getUser();
-    
-    if (!user.user) {
-      throw new Error('User not authenticated');
-    }
-
-    // إنشاء إشعار اختباري
-    const { error } = await supabase.from('notifications').insert({
-      user_id: user.user.id,
-      title: 'إشعار اختبار',
-      message: 'هذا إشعار اختبار من نظام الفحص الشامل',
-      type: 'system_test',
-      priority: 'low',
-      is_read: false,
-    });
-
-    if (error) throw error;
-
+    await SystemService.testNotificationSystem();
     console.log('✅ Notification created successfully!');
   };
 
   const testAutoFixLogging = async () => {
     console.log('🧪 Testing Auto-Fix Logging...');
-    
-    // إنشاء سجل خطأ واختبار تحديث حالته للمحلول
-    const { data: errorLog, error: errorLogError } = await supabase
-      .from('system_error_logs')
-      .insert({
-        error_type: 'test_error',
-        error_message: 'Test error for auto-fix',
-        severity: 'low',
-        url: window.location.href,
-        user_agent: navigator.userAgent,
-        status: 'new',
-      })
-      .select()
-      .maybeSingle();
-
-    if (!errorLog) throw new Error("Failed to create error log");
-
-    // تحديث حالة الخطأ إلى محلول (محاكاة الإصلاح التلقائي)
-    const { error: updateError } = await supabase
-      .from('system_error_logs')
-      .update({
-        status: 'auto_resolved',
-        resolved_at: new Date().toISOString(),
-      })
-      .eq('id', errorLog.id);
-
-    if (updateError) throw updateError;
-
+    await SystemService.testAutoFixLogging();
     console.log('✅ Auto-fix logging working!');
   };
 

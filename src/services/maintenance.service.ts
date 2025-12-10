@@ -167,7 +167,7 @@ export class MaintenanceService {
   /**
    * تقييم مقدم خدمة
    */
-  static async rateProvider(rating: ProviderRating): Promise<any> {
+  static async rateProvider(rating: ProviderRating): Promise<{ id: string; rating: number; provider_id: string; rated_by?: string }> {
     const { data: { user } } = await supabase.auth.getUser();
     
     const { data, error } = await supabase
@@ -177,7 +177,7 @@ export class MaintenanceService {
       .single();
 
     if (error) throw error;
-    return data;
+    return data as { id: string; rating: number; provider_id: string; rated_by?: string };
   }
 
   /**

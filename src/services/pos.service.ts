@@ -99,7 +99,7 @@ export class POSService {
   /**
    * جلب إحصائيات الوردية
    */
-  static async getShiftStats(shiftId: string): Promise<any> {
+  static async getShiftStats(shiftId: string): Promise<Record<string, number> | null> {
     const { data, error } = await supabase.rpc("get_shift_stats", {
       p_shift_id: shiftId,
     });
@@ -111,7 +111,7 @@ export class POSService {
   /**
    * جلب التسوية اليومية
    */
-  static async getDailySettlement(date: Date = new Date()): Promise<any> {
+  static async getDailySettlement(date: Date = new Date()): Promise<Record<string, number> | null> {
     const formattedDate = format(date, "yyyy-MM-dd");
     const { data, error } = await supabase.rpc("get_pos_daily_stats", {
       p_date: formattedDate,
