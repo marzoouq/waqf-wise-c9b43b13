@@ -1,20 +1,26 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Building2, FileText, TrendingUp, PieChart, EyeOff } from "lucide-react";
+import { Building2, FileText, TrendingUp, PieChart } from "lucide-react";
 import { PropertyAccordionView } from "./PropertyAccordionView";
 import { ContractsTable } from "./ContractsTable";
 import { MonthlyRevenueChart } from "./MonthlyRevenueChart";
 import { DistributionPieChart } from "./DistributionPieChart";
 import { EmptyPaymentsState } from "./EmptyPaymentsState";
+import { HistoricalRentalDetailsCard } from "@/components/fiscal-year";
 import { useBeneficiaryProfile } from "@/hooks/beneficiary";
 import { useAuth } from "@/hooks/useAuth";
 import { useFiscalYearPublishStatus } from "@/hooks/useFiscalYearPublishStatus";
 import { FiscalYearNotPublishedBanner } from "./FiscalYearNotPublishedBanner";
+import { useFiscalYearsList } from "@/hooks/fiscal-years";
 
 export function FinancialTransparencyTab() {
   const { user } = useAuth();
   const { payments } = useBeneficiaryProfile(user?.id);
   const { isCurrentYearPublished } = useFiscalYearPublishStatus();
+  const { fiscalYears } = useFiscalYearsList();
   const hasPayments = payments && payments.length > 0;
+  
+  // البحث عن السنوات المغلقة للعرض التاريخي
+  const closedFiscalYears = fiscalYears.filter(fy => fy.is_closed);
 
   return (
     <div className="space-y-6">
@@ -65,6 +71,15 @@ export function FinancialTransparencyTab() {
       ) : (
         <EmptyPaymentsState />
       )}
+
+      {/* تفاصيل الإيرادات السكنية التاريخية */}
+      {closedFiscalYears.map((fy) => (
+        <HistoricalRentalDetailsCard
+          key={fy.id}
+          fiscalYearId={fy.id}
+          fiscalYearName={fy.name}
+        />
+      ))}
 
       {/* عقارات الوقف ووحداتها */}
       <Card>

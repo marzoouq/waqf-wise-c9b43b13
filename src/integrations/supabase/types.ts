@@ -5503,6 +5503,71 @@ export type Database = {
           },
         ]
       }
+      historical_rental_details: {
+        Row: {
+          annual_contract_value: number | null
+          contract_end_date: string | null
+          contract_number: string | null
+          contract_start_date: string | null
+          created_at: string | null
+          fiscal_year_closing_id: string
+          floor_number: number | null
+          id: string
+          month_date: string
+          monthly_payment: number | null
+          notes: string | null
+          payment_status: string | null
+          property_name: string | null
+          tenant_name: string
+          unit_number: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          annual_contract_value?: number | null
+          contract_end_date?: string | null
+          contract_number?: string | null
+          contract_start_date?: string | null
+          created_at?: string | null
+          fiscal_year_closing_id: string
+          floor_number?: number | null
+          id?: string
+          month_date: string
+          monthly_payment?: number | null
+          notes?: string | null
+          payment_status?: string | null
+          property_name?: string | null
+          tenant_name: string
+          unit_number?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          annual_contract_value?: number | null
+          contract_end_date?: string | null
+          contract_number?: string | null
+          contract_start_date?: string | null
+          created_at?: string | null
+          fiscal_year_closing_id?: string
+          floor_number?: number | null
+          id?: string
+          month_date?: string
+          monthly_payment?: number | null
+          notes?: string | null
+          payment_status?: string | null
+          property_name?: string | null
+          tenant_name?: string
+          unit_number?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "historical_rental_details_fiscal_year_closing_id_fkey"
+            columns: ["fiscal_year_closing_id"]
+            isOneToOne: false
+            referencedRelation: "fiscal_year_closings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       identity_verifications: {
         Row: {
           beneficiary_id: string
@@ -11478,6 +11543,29 @@ export type Database = {
           status: Database["public"]["Enums"]["entry_status"] | null
         }
         Relationships: []
+      }
+      historical_rental_monthly_summary: {
+        Row: {
+          fiscal_year_closing_id: string | null
+          month_date: string | null
+          month_label: string | null
+          month_year: string | null
+          paid_amount: number | null
+          paid_count: number | null
+          total_collected: number | null
+          total_units: number | null
+          unpaid_count: number | null
+          vacant_count: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "historical_rental_details_fiscal_year_closing_id_fkey"
+            columns: ["fiscal_year_closing_id"]
+            isOneToOne: false
+            referencedRelation: "fiscal_year_closings"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       messages_with_users: {
         Row: {

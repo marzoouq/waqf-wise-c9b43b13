@@ -76,3 +76,9 @@ export { SupportService, type SupportFilters } from './support.service';
 export { ScheduledReportService, type ScheduledReport } from './scheduled-report.service';
 export { AIService, type AIInsight } from './ai.service';
 export { DisclosureService, type SmartDisclosureDocument } from './disclosure.service';
+export { 
+  HistoricalRentalService, 
+  type HistoricalRentalDetail, 
+  type HistoricalRentalMonthlySummary,
+  type CreateHistoricalRentalInput 
+} from './historical-rental.service';
