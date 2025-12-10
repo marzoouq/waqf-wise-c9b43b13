@@ -77,4 +77,17 @@ export class SettingsService {
     });
     return settings;
   }
+
+  /**
+   * جلب إعدادات المنظمة
+   */
+  static async getOrganizationSettings() {
+    const { data, error } = await supabase
+      .from('organization_settings')
+      .select('id, organization_name_ar, organization_name_en, address_ar, phone, email, logo_url, vat_registration_number, commercial_registration_number')
+      .maybeSingle();
+
+    if (error) throw error;
+    return data;
+  }
 }

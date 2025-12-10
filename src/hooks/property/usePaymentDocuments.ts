@@ -1,8 +1,9 @@
 /**
  * Hook لعرض مستندات الدفع (الفواتير وسندات القبض)
+ * @version 2.8.67
  */
 
-import { supabase } from "@/integrations/supabase/client";
+import { InvoiceService, PaymentService, SettingsService, StorageService } from "@/services";
 import { generateInvoicePDF } from "@/lib/generateInvoicePDF";
 import { generateReceiptPDF } from "@/lib/generateReceiptPDF";
 import { useToast } from "@/hooks/use-toast";
@@ -23,13 +24,9 @@ export function usePaymentDocuments() {
     }
 
     try {
-      const { data: invoiceData, error: invoiceError } = await supabase
-        .from('invoices')
-        .select('*, invoice_lines(*)')
-        .eq('id', payment.invoice_id)
-        .maybeSingle();
+      const invoiceData = await InvoiceService.getWithLines(payment.invoice_id);
 
-      if (invoiceError || !invoiceData) {
+      if (!invoiceData) {
         toast({
           title: "خطأ",
           description: "فشل تحميل بيانات الفاتورة",
@@ -39,24 +36,20 @@ export function usePaymentDocuments() {
       }
 
       // البحث عن المستند المؤرشف
-      const { data: documentData } = await supabase
-        .from('documents')
-        .select('id, name, file_path')
-        .eq('name', `Invoice-${invoiceData.invoice_number}.pdf`)
-        .maybeSingle();
+      const documentExists = await StorageService.documentExists(
+        `Invoice-${invoiceData.invoice_number}.pdf`
+      );
 
-      if (documentData) {
-        const { data: { publicUrl } } = supabase.storage
-          .from('documents')
-          .getPublicUrl(`invoices/${new Date(invoiceData.invoice_date).getFullYear()}/${new Date(invoiceData.invoice_date).getMonth() + 1}/Invoice-${invoiceData.invoice_number}.pdf`);
+      if (documentExists) {
+        const publicUrl = StorageService.getPublicUrl(
+          'documents',
+          `invoices/${new Date(invoiceData.invoice_date).getFullYear()}/${new Date(invoiceData.invoice_date).getMonth() + 1}/Invoice-${invoiceData.invoice_number}.pdf`
+        );
         
         window.open(publicUrl, '_blank');
       } else {
         // fallback: توليد PDF فوري
-        const { data: orgSettings } = await supabase
-          .from('organization_settings')
-          .select('id, organization_name_ar, organization_name_en, address_ar, phone, email, logo_url, vat_registration_number, commercial_registration_number')
-          .maybeSingle();
+        const orgSettings = await SettingsService.getOrganizationSettings();
 
         if (orgSettings) {
           await generateInvoicePDF(invoiceData, invoiceData.invoice_lines || [], orgSettings as OrganizationSettings | null);
@@ -87,13 +80,9 @@ export function usePaymentDocuments() {
     }
 
     try {
-      const { data: receiptData, error: receiptError } = await supabase
-        .from('payments')
-        .select('id, payment_number, payment_date, amount, description, payment_method, beneficiary_id, reference_number, payer_name')
-        .eq('id', payment.receipt_id)
-        .maybeSingle();
+      const receiptData = await PaymentService.getById(payment.receipt_id);
 
-      if (receiptError || !receiptData) {
+      if (!receiptData) {
         toast({
           title: "خطأ",
           description: "فشل تحميل بيانات سند القبض",
@@ -103,24 +92,20 @@ export function usePaymentDocuments() {
       }
 
       // البحث عن المستند المؤرشف
-      const { data: documentData } = await supabase
-        .from('documents')
-        .select('id, name, file_path')
-        .eq('name', `Receipt-${receiptData.payment_number}.pdf`)
-        .maybeSingle();
+      const documentExists = await StorageService.documentExists(
+        `Receipt-${receiptData.payment_number}.pdf`
+      );
 
-      if (documentData) {
-        const { data: { publicUrl } } = supabase.storage
-          .from('documents')
-          .getPublicUrl(`receipts/${new Date(receiptData.payment_date).getFullYear()}/${new Date(receiptData.payment_date).getMonth() + 1}/Receipt-${receiptData.payment_number}.pdf`);
+      if (documentExists) {
+        const publicUrl = StorageService.getPublicUrl(
+          'documents',
+          `receipts/${new Date(receiptData.payment_date).getFullYear()}/${new Date(receiptData.payment_date).getMonth() + 1}/Receipt-${receiptData.payment_number}.pdf`
+        );
         
         window.open(publicUrl, '_blank');
       } else {
         // fallback: توليد PDF فوري
-        const { data: orgSettings } = await supabase
-          .from('organization_settings')
-          .select('id, organization_name_ar, organization_name_en, address_ar, phone, email, logo_url, vat_registration_number, commercial_registration_number')
-          .maybeSingle();
+        const orgSettings = await SettingsService.getOrganizationSettings();
 
         if (orgSettings) {
           await generateReceiptPDF(receiptData, orgSettings as OrganizationSettings | null);

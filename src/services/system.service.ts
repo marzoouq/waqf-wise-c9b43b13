@@ -507,4 +507,37 @@ export class SystemService {
 
     if (updateError) throw updateError;
   }
+
+  /**
+   * حل جميع التنبيهات القديمة (أكثر من 24 ساعة)
+   */
+  static async bulkResolveOldAlerts(): Promise<void> {
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    
+    const { error } = await supabase
+      .from('system_alerts')
+      .update({ 
+        status: 'resolved', 
+        resolved_at: new Date().toISOString() 
+      })
+      .eq('status', 'active')
+      .lt('created_at', oneDayAgo);
+
+    if (error) throw error;
+  }
+
+  /**
+   * مسح الأخطاء المحلولة القديمة (أكثر من أسبوع)
+   */
+  static async cleanupResolvedErrors(): Promise<void> {
+    const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    
+    const { error } = await supabase
+      .from('system_error_logs')
+      .delete()
+      .in('status', ['resolved', 'auto_resolved'])
+      .lt('resolved_at', oneWeekAgo);
+
+    if (error) throw error;
+  }
 }

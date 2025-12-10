@@ -1,11 +1,10 @@
 /**
  * Beneficiary Profile Data Hooks - خطافات بيانات ملف المستفيد
- * @version 2.8.42
+ * @version 2.8.67
  */
 
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { BeneficiaryService, RequestService } from "@/services";
+import { BeneficiaryService, RequestService, MessageService } from "@/services";
 import { QUERY_KEYS } from "@/lib/query-keys";
 
 // ==================== Family Tree Hook ====================
@@ -52,14 +51,7 @@ export function useRequestDetails(requestId: string, isOpen: boolean) {
   const messagesQuery = useQuery({
     queryKey: QUERY_KEYS.REQUEST_MESSAGES(requestId),
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("internal_messages")
-        .select("*")
-        .eq("request_id", requestId)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return data || [];
+      return MessageService.getByRequestId(requestId);
     },
     enabled: isOpen && !!requestId,
   });

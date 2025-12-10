@@ -1,17 +1,12 @@
 /**
  * Hook لجلب المستفيدين من الإفصاح
+ * @version 2.8.67
  */
-import { supabase } from "@/integrations/supabase/client";
+import { DisclosureService } from "@/services/disclosure.service";
 
 export function useDisclosureBeneficiaries() {
   const fetchDisclosureBeneficiaries = async (disclosureId: string) => {
-    const { data, error } = await supabase
-      .from("disclosure_beneficiaries")
-      .select("*")
-      .eq("disclosure_id", disclosureId);
-    
-    if (error) throw error;
-    return data || [];
+    return DisclosureService.getBeneficiaries(disclosureId);
   };
 
   return {

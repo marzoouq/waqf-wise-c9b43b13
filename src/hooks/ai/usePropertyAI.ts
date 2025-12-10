@@ -1,8 +1,9 @@
 /**
  * Hook للتحليل بالذكاء الاصطناعي للعقارات
+ * @version 2.8.67
  */
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { EdgeFunctionService } from "@/services";
 import { productionLogger } from "@/lib/logger/production-logger";
 import { toast } from "sonner";
 
@@ -41,23 +42,19 @@ export function usePropertyAI() {
     setAnalysis("");
 
     try {
-      const { data, error } = await supabase.functions.invoke('property-ai-assistant', {
-        body: {
-          action: actionType,
-          data: propertyData
-        }
+      const result = await EdgeFunctionService.invoke<{ analysis?: string; error?: string }>('property-ai-assistant', {
+        action: actionType,
+        data: propertyData
       });
 
-      if (error) throw error;
-
-      if (data?.error) {
-        toast.error(data.error);
+      if (!result.success || result.data?.error) {
+        toast.error(result.data?.error || result.error);
         return null;
       }
 
-      setAnalysis(data.analysis);
+      setAnalysis(result.data?.analysis || "");
       toast.success("تم التحليل بنجاح!");
-      return data.analysis;
+      return result.data?.analysis;
     } catch (error) {
       productionLogger.error("AI Analysis Error:", error);
       toast.error("حدث خطأ أثناء التحليل");
