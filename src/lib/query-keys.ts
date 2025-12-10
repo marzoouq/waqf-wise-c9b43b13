@@ -219,6 +219,8 @@ export const QUERY_KEYS = {
   ASSIGNMENT_SETTINGS: ['assignment-settings'] as const,
   KB_ARTICLES: ['kb-articles'] as const,
   KB_FAQS: ['kb-faqs'] as const,
+  TRANSLATIONS: ['translations'] as const,
+  BIOMETRIC_CREDENTIALS: ['biometric-credentials'] as const,
 
   // Governance
   GOVERNANCE: ['governance'] as const,

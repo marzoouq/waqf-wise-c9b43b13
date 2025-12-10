@@ -4,8 +4,10 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { BiometricService, type BiometricCredential } from '@/services/biometric.service';
+
+export type { BiometricCredential };
 
 // تحويل ArrayBuffer إلى Base64
 const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
@@ -33,13 +35,22 @@ const stringToArrayBuffer = (str: string): ArrayBuffer => {
   return encoder.encode(str).buffer;
 };
 
-export interface BiometricCredential {
-  id: string;
-  credential_id: string;
-  device_name: string | null;
-  device_type: string | null;
-  created_at: string;
-  last_used_at: string | null;
+// مساعدات للحصول على معلومات الجهاز
+function getDeviceName(): string {
+  const ua = navigator.userAgent;
+  if (/iPhone/i.test(ua)) return 'iPhone';
+  if (/iPad/i.test(ua)) return 'iPad';
+  if (/Android/i.test(ua)) return 'Android';
+  if (/Mac/i.test(ua)) return 'Mac';
+  if (/Windows/i.test(ua)) return 'Windows';
+  return 'جهاز غير معروف';
+}
+
+function getDeviceType(): string {
+  const ua = navigator.userAgent;
+  if (/Mobile|Android|iPhone/i.test(ua)) return 'mobile';
+  if (/iPad|Tablet/i.test(ua)) return 'tablet';
+  return 'desktop';
 }
 
 export function useBiometricAuth() {
@@ -68,17 +79,14 @@ export function useBiometricAuth() {
 
   // جلب بيانات الاعتماد المسجلة
   const fetchCredentials = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await BiometricService.getCurrentUser();
     if (!user) return;
 
-    const { data, error } = await supabase
-      .from('webauthn_credentials')
-      .select('id, credential_id, device_name, device_type, created_at, last_used_at')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false });
-
-    if (!error && data) {
+    try {
+      const data = await BiometricService.fetchUserCredentials(user.id);
       setCredentials(data);
+    } catch {
+      // Silent fail for credentials fetch
     }
   }, []);
 
@@ -93,7 +101,7 @@ export function useBiometricAuth() {
       return false;
     }
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await BiometricService.getCurrentUser();
     if (!user) {
       toast({
         title: 'خطأ',
@@ -146,17 +154,13 @@ export function useBiometricAuth() {
       const response = credential.response as AuthenticatorAttestationResponse;
 
       // تخزين credential في قاعدة البيانات
-      const { error } = await supabase
-        .from('webauthn_credentials')
-        .insert({
-          user_id: user.id,
-          credential_id: arrayBufferToBase64(credential.rawId),
-          public_key: arrayBufferToBase64(response.getPublicKey() || new ArrayBuffer(0)),
-          device_name: deviceName || getDeviceName(),
-          device_type: getDeviceType(),
-        });
-
-      if (error) throw error;
+      await BiometricService.registerCredential({
+        userId: user.id,
+        credentialId: arrayBufferToBase64(credential.rawId),
+        publicKey: arrayBufferToBase64(response.getPublicKey() || new ArrayBuffer(0)),
+        deviceName: deviceName || getDeviceName(),
+        deviceType: getDeviceType(),
+      });
 
       toast({
         title: 'تم التسجيل بنجاح',
@@ -193,12 +197,9 @@ export function useBiometricAuth() {
 
     try {
       // جلب credentials المسجلة للمستخدم
-      const { data: userCredentials, error: fetchError } = await supabase
-        .from('webauthn_credentials')
-        .select('credential_id, user_id')
-        .limit(50);
+      const userCredentials = await BiometricService.fetchAllCredentialsForAuth();
 
-      if (fetchError || !userCredentials?.length) {
+      if (!userCredentials?.length) {
         throw new Error('لا توجد بصمة مسجلة. يرجى تسجيل البصمة أولاً من الإعدادات');
       }
 
@@ -267,18 +268,11 @@ export function useBiometricAuth() {
       }
 
       // استدعاء Edge Function لإنشاء جلسة
-      const { data: authData, error: authError } = await supabase.functions.invoke('biometric-auth', {
-        body: {
-          credentialId: usedCredentialId,
-          userId: matchedCredential.user_id,
-          challenge: arrayBufferToBase64(challenge.buffer),
-        },
+      const authData = await BiometricService.authenticateViaEdgeFunction({
+        credentialId: usedCredentialId,
+        userId: matchedCredential.user_id,
+        challenge: arrayBufferToBase64(challenge.buffer),
       });
-
-      if (authError) {
-        console.error('Edge function error:', authError);
-        throw new Error('فشل في الاتصال بالخادم. يرجى المحاولة مرة أخرى');
-      }
 
       if (!authData?.success) {
         throw new Error(authData?.error || 'فشل في إنشاء الجلسة');
@@ -286,16 +280,7 @@ export function useBiometricAuth() {
 
       // تسجيل الدخول باستخدام OTP token
       if (authData.token_hash && authData.email) {
-        const { error: verifyError } = await supabase.auth.verifyOtp({
-          email: authData.email,
-          token_hash: authData.token_hash,
-          type: 'magiclink',
-        });
-
-        if (verifyError) {
-          console.error('Verify OTP error:', verifyError);
-          throw new Error('فشل في تأكيد الجلسة. يرجى المحاولة مرة أخرى');
-        }
+        await BiometricService.verifyOtp(authData.email, authData.token_hash);
       } else {
         throw new Error('بيانات المصادقة غير مكتملة');
       }
@@ -339,12 +324,7 @@ export function useBiometricAuth() {
   // حذف بصمة
   const removeCredential = useCallback(async (credentialId: string): Promise<boolean> => {
     try {
-      const { error } = await supabase
-        .from('webauthn_credentials')
-        .delete()
-        .eq('id', credentialId);
-
-      if (error) throw error;
+      await BiometricService.deleteCredential(credentialId);
 
       toast({
         title: 'تم الحذف',
@@ -377,22 +357,4 @@ export function useBiometricAuth() {
     removeCredential,
     fetchCredentials,
   };
-}
-
-// مساعدات للحصول على معلومات الجهاز
-function getDeviceName(): string {
-  const ua = navigator.userAgent;
-  if (/iPhone/i.test(ua)) return 'iPhone';
-  if (/iPad/i.test(ua)) return 'iPad';
-  if (/Android/i.test(ua)) return 'Android';
-  if (/Mac/i.test(ua)) return 'Mac';
-  if (/Windows/i.test(ua)) return 'Windows';
-  return 'جهاز غير معروف';
-}
-
-function getDeviceType(): string {
-  const ua = navigator.userAgent;
-  if (/Mobile|Android|iPhone/i.test(ua)) return 'mobile';
-  if (/iPad|Tablet/i.test(ua)) return 'tablet';
-  return 'desktop';
 }
