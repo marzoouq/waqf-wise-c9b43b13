@@ -1,9 +1,10 @@
 /**
  * Hook لربط العقارات بأقلام الوقف
+ * @version 2.8.67
  */
 
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { PropertyService } from "@/services";
 import { toast } from "sonner";
 
 interface Property {
@@ -29,13 +30,8 @@ export function useLinkProperty(isOpen: boolean) {
   const fetchUnlinkedProperties = async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
-        .from("properties")
-        .select("id, name, location, type, waqf_unit_id")
-        .is("waqf_unit_id", null);
-
-      if (error) throw error;
-      setProperties(data || []);
+      const data = await PropertyService.getUnlinkedToWaqf();
+      setProperties(data as Property[]);
     } catch (error) {
       console.error("Error fetching properties:", error);
       toast.error("فشل في جلب العقارات");
@@ -52,13 +48,7 @@ export function useLinkProperty(isOpen: boolean) {
 
     setIsSaving(true);
     try {
-      const { error } = await supabase
-        .from("properties")
-        .update({ waqf_unit_id: waqfUnitId })
-        .eq("id", selectedPropertyId);
-
-      if (error) throw error;
-
+      await PropertyService.linkToWaqfUnit(selectedPropertyId, waqfUnitId);
       toast.success("تم ربط العقار بنجاح");
       setSelectedPropertyId("");
       onSuccess?.();

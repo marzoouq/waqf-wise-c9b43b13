@@ -211,4 +211,17 @@ export class StorageService {
       return false;
     }
   }
+
+  /**
+   * التحقق من وجود مستند بالاسم في جدول documents
+   */
+  static async documentExists(documentName: string): Promise<boolean> {
+    const { data } = await supabase
+      .from('documents')
+      .select('id')
+      .eq('name', documentName)
+      .maybeSingle();
+    
+    return !!data;
+  }
 }

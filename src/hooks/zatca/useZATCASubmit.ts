@@ -1,9 +1,10 @@
 /**
  * Hook لإرسال الفواتير لهيئة الزكاة والضريبة
+ * @version 2.8.67
  */
 
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { EdgeFunctionService } from "@/services";
 import { toast } from "sonner";
 
 type ZATCAStatus = 'pending' | 'success' | 'error';
@@ -15,22 +16,22 @@ export function useZATCASubmit() {
   const submitToZATCA = async (invoiceId: string) => {
     setIsSubmitting(true);
     try {
-      const { data, error } = await supabase.functions.invoke('zatca-submit', {
-        body: { invoiceId },
+      const result = await EdgeFunctionService.invoke<{ success: boolean; submissionId?: string; error?: string }>('zatca-submit', {
+        invoiceId,
       });
 
-      if (error) throw error;
+      if (!result.success) throw new Error(result.error);
 
-      if (data.success) {
+      if (result.data?.success) {
         setZatcaStatus('success');
         toast.success("تم إرسال الفاتورة إلى هيئة الزكاة والضريبة", {
-          description: `رقم الإرسال: ${data.submissionId}`,
+          description: `رقم الإرسال: ${result.data.submissionId}`,
         });
         return true;
       } else {
         setZatcaStatus('error');
         toast.error("فشل إرسال الفاتورة", {
-          description: data.error || "حدث خطأ غير متوقع",
+          description: result.data?.error || "حدث خطأ غير متوقع",
         });
         return false;
       }

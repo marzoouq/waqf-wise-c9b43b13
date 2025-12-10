@@ -267,4 +267,23 @@ export class MessageService {
 
     return recipientsList;
   }
+
+  /**
+   * جلب رسائل الطلب
+   */
+  static async getByRequestId(requestId: string): Promise<InternalMessageRow[]> {
+    try {
+      const { data, error } = await supabase
+        .from('internal_messages')
+        .select('*')
+        .eq('request_id', requestId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching request messages', error);
+      throw error;
+    }
+  }
 }

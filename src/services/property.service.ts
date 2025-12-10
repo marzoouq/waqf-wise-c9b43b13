@@ -651,4 +651,39 @@ export class PropertyService {
       throw error;
     }
   }
+
+  /**
+   * جلب العقارات غير المربوطة بأقلام الوقف
+   */
+  static async getUnlinkedToWaqf(): Promise<{ id: string; name: string; location: string; type: string; waqf_unit_id: string | null }[]> {
+    try {
+      const { data, error } = await supabase
+        .from('properties')
+        .select('id, name, location, type, waqf_unit_id')
+        .is('waqf_unit_id', null);
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      productionLogger.error('Error fetching unlinked properties', error);
+      throw error;
+    }
+  }
+
+  /**
+   * ربط عقار بقلم وقف
+   */
+  static async linkToWaqfUnit(propertyId: string, waqfUnitId: string): Promise<void> {
+    try {
+      const { error } = await supabase
+        .from('properties')
+        .update({ waqf_unit_id: waqfUnitId })
+        .eq('id', propertyId);
+
+      if (error) throw error;
+    } catch (error) {
+      productionLogger.error('Error linking property to waqf unit', error);
+      throw error;
+    }
+  }
 }
