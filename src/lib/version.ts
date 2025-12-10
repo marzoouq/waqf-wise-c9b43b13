@@ -2,12 +2,12 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.8.59
- * @date 2025-12-09
+ * @version 2.8.60
+ * @date 2025-12-10
  */
 
-export const APP_VERSION = '2.8.59';
-export const APP_VERSION_DATE = '2025-12-09';
+export const APP_VERSION = '2.8.60';
+export const APP_VERSION_DATE = '2025-12-10';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
 export const VERSION_INFO = {
@@ -16,11 +16,11 @@ export const VERSION_INFO = {
   name: APP_VERSION_NAME,
   changelog: '/docs/CHANGELOG.md',
   features: [
-    '47 خدمة متكاملة في طبقة الخدمات',
-    '170+ hooks منظمة في 25 مجلد',
+    '51 خدمة متكاملة في طبقة الخدمات',
+    '170+ hooks منظمة في 36 مجلد',
     'QUERY_KEYS موحد لـ React Query',
     'Realtime موحد للوحات التحكم',
-    '0 hook تستدعي Supabase مباشرة (Realtime مقبول عبر RealtimeService)',
+    '0 hook تستدعي Supabase مباشرة (Component → Hook → Service)',
   ],
 } as const;
 
@@ -29,13 +29,13 @@ export const VERSION_INFO = {
  */
 export const ARCHITECTURE_STATUS = {
   services: {
-    total: 47,
+    total: 51,
     status: 'complete',
     description: 'جميع الخدمات مكتملة ومنظمة',
   },
   hooks: {
     total: 170,
-    folders: 25,
+    folders: 36,
     status: 'complete',
     description: 'جميع الـ hooks منظمة في مجلدات وظيفية',
   },

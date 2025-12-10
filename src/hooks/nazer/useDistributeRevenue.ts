@@ -1,14 +1,16 @@
 /**
  * useDistributeRevenue Hook
  * إدارة حالة ومنطق توزيع الغلة
+ * @version 2.8.60
  */
 
 import { useState } from "react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { useFiscalYearsList } from "@/hooks/fiscal-years";
+import { DistributionService, BeneficiaryService } from "@/services";
+import { EdgeFunctionService } from "@/services/edge-function.service";
 
 export interface HeirShare {
   beneficiary_id: string;
@@ -40,13 +42,8 @@ export function useDistributeRevenue(onClose: () => void) {
   const { data: beneficiaries = [] } = useQuery({
     queryKey: ["beneficiaries-active"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("beneficiaries")
-        .select("id, full_name, relationship")
-        .eq("status", "نشط")
-        .in("relationship", ["زوجة", "ابن", "بنت"]);
-      if (error) throw error;
-      return data || [];
+      const { data } = await BeneficiaryService.getAll({ status: "نشط" });
+      return data.filter(b => ["زوجة", "ابن", "بنت"].includes(b.relationship || ""));
     },
   });
 
@@ -59,13 +56,9 @@ export function useDistributeRevenue(onClose: () => void) {
     }
 
     try {
-      const { data, error } = await supabase.rpc("calculate_shariah_distribution", {
-        p_total_amount: amount,
-      });
+      const result = await DistributionService.calculateShariahDistribution(amount);
 
-      if (error) throw error;
-
-      const sharesWithNames = data.map((share: HeirShare) => ({
+      const sharesWithNames = result.map((share: HeirShare) => ({
         ...share,
         beneficiary_name:
           beneficiaries.find((b) => b.id === share.beneficiary_id)?.full_name ||
@@ -83,22 +76,20 @@ export function useDistributeRevenue(onClose: () => void) {
   // تنفيذ التوزيع
   const distributeMutation = useMutation({
     mutationFn: async () => {
-      const response = await supabase.functions.invoke("distribute-revenue", {
-        body: {
-          totalAmount: parseFloat(totalAmount),
-          fiscalYearId: selectedFiscalYear,
-          distributionDate,
-          notes,
-          notifyHeirs,
-        },
+      const response = await EdgeFunctionService.distributeRevenue({
+        totalAmount: parseFloat(totalAmount),
+        fiscalYearId: selectedFiscalYear,
+        distributionDate,
+        notes,
+        notifyHeirs,
       });
 
-      if (response.error) throw new Error(response.error.message);
+      if (!response.success) throw new Error(response.error || 'فشل التوزيع');
       return response.data;
     },
     onSuccess: (data) => {
       toast.success("تم توزيع الغلة بنجاح", {
-        description: `تم توزيع ${parseFloat(totalAmount).toLocaleString("ar-SA")} ر.س على ${data.summary.heirsCount} وريث`,
+        description: `تم توزيع ${parseFloat(totalAmount).toLocaleString("ar-SA")} ر.س على ${data?.summary?.heirsCount || 0} وريث`,
       });
       queryClient.invalidateQueries({ queryKey: ["heir-distributions"] });
       queryClient.invalidateQueries({ queryKey: ["beneficiaries"] });

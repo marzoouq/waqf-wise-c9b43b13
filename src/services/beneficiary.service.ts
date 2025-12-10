@@ -1494,4 +1494,101 @@ export class BeneficiaryService {
     if (error) throw error;
     return data;
   }
+
+  /**
+   * التحقق من هوية المستفيد
+   */
+  static async verifyIdentity(
+    beneficiaryId: string,
+    formData: {
+      verification_type: string;
+      verification_method: string;
+      verification_status: string;
+      notes: string;
+    }
+  ): Promise<void> {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    await supabase.from('identity_verifications').insert({
+      beneficiary_id: beneficiaryId,
+      ...formData,
+      verified_by: user?.id,
+      verified_at: new Date().toISOString(),
+    });
+
+    await supabase.from('beneficiaries').update({
+      verification_status: formData.verification_status,
+      verification_method: formData.verification_method,
+      last_verification_date: new Date().toISOString(),
+      verification_notes: formData.notes,
+    }).eq('id', beneficiaryId);
+  }
+
+  /**
+   * جلب الخط الزمني للمستفيد
+   */
+  static async getTimeline(beneficiaryId: string): Promise<{
+    id: string;
+    type: 'payment' | 'request' | 'update' | 'status_change';
+    title: string;
+    description: string;
+    date: string;
+    status?: string;
+    amount?: number;
+  }[]> {
+    const timelineEvents: {
+      id: string;
+      type: 'payment' | 'request' | 'update' | 'status_change';
+      title: string;
+      description: string;
+      date: string;
+      status?: string;
+      amount?: number;
+    }[] = [];
+
+    const [paymentsRes, requestsRes, activitiesRes] = await Promise.all([
+      supabase.from('payments').select('id, amount, description, payment_date')
+        .eq('beneficiary_id', beneficiaryId).order('payment_date', { ascending: false }).limit(10),
+      supabase.from('beneficiary_requests').select('*, request_types(name_ar)')
+        .eq('beneficiary_id', beneficiaryId).order('created_at', { ascending: false }).limit(10),
+      supabase.from('beneficiary_activity_log').select('id, action_type, action_description, created_at')
+        .eq('beneficiary_id', beneficiaryId).order('created_at', { ascending: false }).limit(10),
+    ]);
+
+    interface RequestWithType {
+      id: string;
+      description: string;
+      created_at: string | null;
+      status: string | null;
+      request_types: { name_ar: string } | null;
+    }
+    
+    paymentsRes.data?.forEach(p => timelineEvents.push({ 
+      id: p.id, 
+      type: 'payment', 
+      title: 'دفعة مالية', 
+      description: p.description || 'دفعة من الوقف', 
+      date: p.payment_date, 
+      amount: p.amount 
+    }));
+    
+    requestsRes.data?.forEach((r: RequestWithType) => timelineEvents.push({ 
+      id: r.id, 
+      type: 'request', 
+      title: r.request_types?.name_ar || 'طلب جديد', 
+      description: r.description, 
+      date: r.created_at || '', 
+      status: r.status || undefined 
+    }));
+    
+    activitiesRes.data?.forEach(a => timelineEvents.push({ 
+      id: a.id, 
+      type: a.action_type === 'update' ? 'update' : 'status_change', 
+      title: a.action_description, 
+      description: a.action_description, 
+      date: a.created_at || '' 
+    }));
+
+    return timelineEvents.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  }
 }

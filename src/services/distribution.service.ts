@@ -697,4 +697,21 @@ export class DistributionService {
       throw error;
     }
   }
+
+  /**
+   * حساب التوزيع الشرعي
+   */
+  static async calculateShariahDistribution(totalAmount: number): Promise<{
+    beneficiary_id: string;
+    heir_type: string;
+    share_amount: number;
+    share_percentage: number;
+  }[]> {
+    const { data, error } = await supabase.rpc("calculate_shariah_distribution", {
+      p_total_amount: totalAmount,
+    });
+
+    if (error) throw error;
+    return data || [];
+  }
 }

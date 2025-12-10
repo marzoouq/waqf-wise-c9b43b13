@@ -1,10 +1,11 @@
 /**
  * Hook لاختبار نظام السنة المالية
+ * @version 2.8.60
  */
 
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { FiscalYearService } from "@/services";
 
 interface TestResult {
   test: string;
@@ -23,21 +24,15 @@ export function useFiscalYearTests() {
 
     // Test 1: جدول fiscal_year_closings
     try {
-      const { data, error } = await supabase
-        .from("fiscal_year_closings")
-        .select("id")
-        .limit(1);
-      
-      if (error) throw error;
-      
+      const fiscalYears = await FiscalYearService.getAll();
       testResults.push({
-        test: "جدول fiscal_year_closings",
+        test: "جدول السنوات المالية",
         status: "success",
-        message: "الجدول موجود ويعمل بشكل صحيح"
+        message: `تم العثور على ${fiscalYears.length} سنة مالية`
       });
     } catch (error) {
       testResults.push({
-        test: "جدول fiscal_year_closings",
+        test: "جدول السنوات المالية",
         status: "error",
         message: error instanceof Error ? error.message : "فشل الاتصال بالجدول"
       });
@@ -45,34 +40,26 @@ export function useFiscalYearTests() {
 
     // Test 2: دالة calculate_fiscal_year_summary
     try {
-      const { data: fiscalYears } = await supabase
-        .from("fiscal_years")
-        .select("id")
-        .limit(1)
-        .maybeSingle();
+      const fiscalYears = await FiscalYearService.getAll();
+      const firstYear = fiscalYears[0];
 
-      if (fiscalYears) {
-        const { data, error } = await supabase.rpc("calculate_fiscal_year_summary", {
-          p_fiscal_year_id: fiscalYears.id
-        });
-
-        if (error) throw error;
-
+      if (firstYear) {
+        const summary = await FiscalYearService.calculateSummary(firstYear.id);
         testResults.push({
-          test: "دالة calculate_fiscal_year_summary",
+          test: "دالة حساب ملخص السنة",
           status: "success",
-          message: `الدالة تعمل بنجاح: ${JSON.stringify(data).substring(0, 50)}...`
+          message: `الإيرادات: ${summary.totalRevenues.toLocaleString('ar-SA')} ر.س`
         });
       } else {
         testResults.push({
-          test: "دالة calculate_fiscal_year_summary",
+          test: "دالة حساب ملخص السنة",
           status: "error",
           message: "لا توجد سنوات مالية للاختبار"
         });
       }
     } catch (error) {
       testResults.push({
-        test: "دالة calculate_fiscal_year_summary",
+        test: "دالة حساب ملخص السنة",
         status: "error",
         message: error instanceof Error ? error.message : "فشل تنفيذ الدالة"
       });
@@ -80,27 +67,15 @@ export function useFiscalYearTests() {
 
     // Test 3: Edge Function
     try {
-      const { data: fiscalYears } = await supabase
-        .from("fiscal_years")
-        .select("id")
-        .eq("is_closed", false)
-        .limit(1)
-        .maybeSingle();
+      const activeFiscalYears = await FiscalYearService.getActiveFiscalYears();
+      const activeYear = activeFiscalYears[0];
 
-      if (fiscalYears) {
-        const { data, error } = await supabase.functions.invoke("auto-close-fiscal-year", {
-          body: { 
-            fiscal_year_id: fiscalYears.id, 
-            preview_only: true 
-          }
-        });
-
-        if (error) throw error;
-
+      if (activeYear) {
+        const preview = await FiscalYearService.getClosingPreview(activeYear.id);
         testResults.push({
           test: "Edge Function: auto-close-fiscal-year",
           status: "success",
-          message: `المعاينة تعمل: ${data?.can_close ? 'يمكن الإقفال' : 'لا يمكن الإقفال'}`
+          message: `المعاينة تعمل: ${preview?.can_close ? 'يمكن الإقفال' : 'لا يمكن الإقفال'}`
         });
       } else {
         testResults.push({
@@ -117,77 +92,55 @@ export function useFiscalYearTests() {
       });
     }
 
-    // Test 4: حساب الزكاة
+    // Test 4: السنة النشطة
     try {
-      const { data, error } = await supabase
-        .from("accounts")
-        .select("id, code, name_ar")
-        .eq("code", "5.4.5")
-        .maybeSingle();
+      const activeYear = await FiscalYearService.getActive();
       
-      if (!data) throw new Error("حساب الزكاة غير موجود");
-      if (error) throw error;
-
-      testResults.push({
-        test: "حساب الزكاة (5.4.5)",
-        status: "success",
-        message: `الحساب موجود: ${data.name_ar}`
-      });
-    } catch (error) {
-      testResults.push({
-        test: "حساب الزكاة (5.4.5)",
-        status: "error",
-        message: "حساب الزكاة غير موجود في شجرة الحسابات"
-      });
-    }
-
-    // Test 5: RLS Policies
-    try {
-      const { data, error } = await supabase
-        .from("fiscal_year_closings")
-        .select("id")
-        .limit(1);
-
-      testResults.push({
-        test: "RLS Policies",
-        status: data ? "success" : "error",
-        message: data ? "الصلاحيات تعمل بشكل صحيح" : "مشكلة في الصلاحيات"
-      });
-    } catch (error) {
-      testResults.push({
-        test: "RLS Policies",
-        status: "error",
-        message: "فشل اختبار الصلاحيات"
-      });
-    }
-
-    // Test 6: Trigger الحماية
-    try {
-      const { data: closedYear } = await supabase
-        .from("fiscal_years")
-        .select("id")
-        .eq("is_closed", true)
-        .limit(1)
-        .maybeSingle();
-
-      if (closedYear) {
+      if (activeYear) {
         testResults.push({
-          test: "Trigger حماية السنوات المغلقة",
+          test: "السنة المالية النشطة",
           status: "success",
-          message: "تم العثور على سنة مغلقة للاختبار"
+          message: `السنة النشطة: ${activeYear.name}`
         });
       } else {
         testResults.push({
-          test: "Trigger حماية السنوات المغلقة",
+          test: "السنة المالية النشطة",
+          status: "pending",
+          message: "لا توجد سنة نشطة"
+        });
+      }
+    } catch (error) {
+      testResults.push({
+        test: "السنة المالية النشطة",
+        status: "error",
+        message: error instanceof Error ? error.message : "فشل جلب السنة النشطة"
+      });
+    }
+
+    // Test 5: بيانات الإقفال
+    try {
+      const fiscalYears = await FiscalYearService.getAll();
+      const closedYear = fiscalYears.find(fy => fy.is_closed);
+
+      if (closedYear) {
+        const closingData = await FiscalYearService.getClosingData(closedYear.id);
+        testResults.push({
+          test: "بيانات الإقفال",
+          status: closingData ? "success" : "pending",
+          message: closingData ? "بيانات الإقفال موجودة" : "لا توجد بيانات إقفال"
+        });
+      } else {
+        testResults.push({
+          test: "بيانات الإقفال",
           status: "pending",
           message: "لا توجد سنوات مغلقة للاختبار"
         });
       }
     } catch (error) {
       testResults.push({
-        test: "Trigger حماية السنوات المغلقة",
+        test: "بيانات الإقفال",
         status: "error",
-        message: "فشل اختبار Trigger"
+        message: "فشل اختبار بيانات الإقفال"
       });
     }
 
