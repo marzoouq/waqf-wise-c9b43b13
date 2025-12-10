@@ -1,41 +1,15 @@
+/**
+ * Hook لإدارة قوالب القيود التلقائية
+ * @version 2.8.73 - Refactored to use AutoJournalService
+ */
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { AutoJournalService, type AutoJournalTemplate, type AutoJournalTemplateInsert } from '@/services/accounting.service';
 import { useToast } from '@/hooks/use-toast';
-import type { Json } from '@/integrations/supabase/types';
 import { QUERY_KEYS } from '@/lib/query-keys';
 
-export interface AccountMapping {
-  account_code: string;
-  percentage?: number;
-  fixed_amount?: number;
-}
-
-export interface AutoJournalTemplate {
-  id: string;
-  trigger_event: string;
-  template_name: string;
-  description?: string;
-  debit_accounts: AccountMapping[];
-  credit_accounts: AccountMapping[];
-  is_active: boolean;
-  priority: number;
-  created_at: string;
-}
-
-export interface AutoJournalTemplateInsert {
-  trigger_event: string;
-  template_name: string;
-  description?: string;
-  debit_accounts: AccountMapping[];
-  credit_accounts: AccountMapping[];
-  is_active?: boolean;
-  priority?: number;
-}
-
-function parseAccountMappings(data: Json): AccountMapping[] {
-  if (!data || !Array.isArray(data)) return [];
-  return data as unknown as AccountMapping[];
-}
+export type { AutoJournalTemplate, AutoJournalTemplateInsert };
+export type { AccountMapping } from '@/services/accounting.service';
 
 export function useAutoJournalTemplates() {
   const queryClient = useQueryClient();
@@ -43,130 +17,46 @@ export function useAutoJournalTemplates() {
 
   const { data: templates, isLoading } = useQuery({
     queryKey: QUERY_KEYS.AUTO_JOURNAL_TEMPLATES,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('auto_journal_templates')
-        .select('id, trigger_event, template_name, description, debit_accounts, credit_accounts, is_active, priority, created_at, created_by, updated_at')
-        .order('priority', { ascending: false });
-
-      if (error) throw error;
-      return (data || []).map(item => ({
-        ...item,
-        debit_accounts: parseAccountMappings(item.debit_accounts),
-        credit_accounts: parseAccountMappings(item.credit_accounts),
-        is_active: item.is_active ?? false,
-        priority: item.priority ?? 0,
-      })) as AutoJournalTemplate[];
-    },
+    queryFn: () => AutoJournalService.getTemplates(),
   });
 
   const createTemplate = useMutation({
-    mutationFn: async (template: AutoJournalTemplateInsert) => {
-      const { data, error } = await supabase
-        .from('auto_journal_templates')
-        .insert({
-          trigger_event: template.trigger_event,
-          template_name: template.template_name,
-          description: template.description,
-          debit_accounts: template.debit_accounts as unknown as Json,
-          credit_accounts: template.credit_accounts as unknown as Json,
-          is_active: template.is_active,
-          priority: template.priority,
-        })
-        .select()
-        .maybeSingle();
-
-      if (error) throw error;
-      if (!data) throw new Error('فشل إنشاء القالب');
-      return data;
-    },
+    mutationFn: (template: AutoJournalTemplateInsert) => AutoJournalService.createTemplate(template),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTO_JOURNAL_TEMPLATES });
-      toast({
-        title: 'تم الحفظ',
-        description: 'تم إنشاء قالب القيد التلقائي بنجاح',
-      });
+      toast({ title: 'تم الحفظ', description: 'تم إنشاء قالب القيد التلقائي بنجاح' });
     },
     onError: (error: Error) => {
-      toast({
-        title: 'خطأ',
-        description: error.message,
-        variant: 'destructive',
-      });
+      toast({ title: 'خطأ', description: error.message, variant: 'destructive' });
     },
   });
 
   const updateTemplate = useMutation({
-    mutationFn: async ({ id, ...template }: Partial<AutoJournalTemplate> & { id: string }) => {
-      const updateData: Record<string, unknown> = { ...template };
-      if (template.debit_accounts) {
-        updateData.debit_accounts = template.debit_accounts as unknown as Json;
-      }
-      if (template.credit_accounts) {
-        updateData.credit_accounts = template.credit_accounts as unknown as Json;
-      }
-      
-      const { data, error } = await supabase
-        .from('auto_journal_templates')
-        .update(updateData)
-        .eq('id', id)
-        .select()
-        .maybeSingle();
-
-      if (error) throw error;
-      if (!data) throw new Error('القالب غير موجود');
-      return data;
-    },
+    mutationFn: ({ id, ...template }: Partial<AutoJournalTemplate> & { id: string }) => 
+      AutoJournalService.updateTemplate(id, template),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTO_JOURNAL_TEMPLATES });
-      toast({
-        title: 'تم التحديث',
-        description: 'تم تحديث قالب القيد التلقائي بنجاح',
-      });
+      toast({ title: 'تم التحديث', description: 'تم تحديث قالب القيد التلقائي بنجاح' });
     },
     onError: (error: Error) => {
-      toast({
-        title: 'خطأ',
-        description: error.message,
-        variant: 'destructive',
-      });
+      toast({ title: 'خطأ', description: error.message, variant: 'destructive' });
     },
   });
 
   const deleteTemplate = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('auto_journal_templates')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-    },
+    mutationFn: (id: string) => AutoJournalService.deleteTemplate(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTO_JOURNAL_TEMPLATES });
-      toast({
-        title: 'تم الحذف',
-        description: 'تم حذف قالب القيد التلقائي بنجاح',
-      });
+      toast({ title: 'تم الحذف', description: 'تم حذف قالب القيد التلقائي بنجاح' });
     },
     onError: (error: Error) => {
-      toast({
-        title: 'خطأ',
-        description: error.message,
-        variant: 'destructive',
-      });
+      toast({ title: 'خطأ', description: error.message, variant: 'destructive' });
     },
   });
 
   const toggleActive = useMutation({
-    mutationFn: async ({ id, is_active }: { id: string; is_active: boolean }) => {
-      const { error } = await supabase
-        .from('auto_journal_templates')
-        .update({ is_active })
-        .eq('id', id);
-
-      if (error) throw error;
-    },
+    mutationFn: ({ id, is_active }: { id: string; is_active: boolean }) => 
+      AutoJournalService.toggleActive(id, is_active),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTO_JOURNAL_TEMPLATES });
     },

@@ -2128,6 +2128,220 @@ export class AccountingService {
   }
 }
 
+// ============ Auto Journal Templates ============
+
+export interface AccountMapping {
+  account_code: string;
+  percentage?: number;
+  fixed_amount?: number;
+}
+
+export interface AutoJournalTemplate {
+  id: string;
+  trigger_event: string;
+  template_name: string;
+  description?: string;
+  debit_accounts: AccountMapping[];
+  credit_accounts: AccountMapping[];
+  is_active: boolean;
+  priority: number;
+  created_at: string;
+}
+
+export interface AutoJournalTemplateInsert {
+  trigger_event: string;
+  template_name: string;
+  description?: string;
+  debit_accounts: AccountMapping[];
+  credit_accounts: AccountMapping[];
+  is_active?: boolean;
+  priority?: number;
+}
+
+function parseAccountMappings(data: Json): AccountMapping[] {
+  if (!data || !Array.isArray(data)) return [];
+  return data as unknown as AccountMapping[];
+}
+
+export class AutoJournalService {
+  /**
+   * جلب قوالب القيود التلقائية
+   */
+  static async getTemplates(): Promise<AutoJournalTemplate[]> {
+    const { data, error } = await supabase
+      .from('auto_journal_templates')
+      .select('id, trigger_event, template_name, description, debit_accounts, credit_accounts, is_active, priority, created_at, created_by, updated_at')
+      .order('priority', { ascending: false });
+
+    if (error) throw error;
+    return (data || []).map(item => ({
+      ...item,
+      debit_accounts: parseAccountMappings(item.debit_accounts),
+      credit_accounts: parseAccountMappings(item.credit_accounts),
+      is_active: item.is_active ?? false,
+      priority: item.priority ?? 0,
+    })) as AutoJournalTemplate[];
+  }
+
+  /**
+   * إنشاء قالب قيد تلقائي
+   */
+  static async createTemplate(template: AutoJournalTemplateInsert) {
+    const { data, error } = await supabase
+      .from('auto_journal_templates')
+      .insert({
+        trigger_event: template.trigger_event,
+        template_name: template.template_name,
+        description: template.description,
+        debit_accounts: template.debit_accounts as unknown as Json,
+        credit_accounts: template.credit_accounts as unknown as Json,
+        is_active: template.is_active,
+        priority: template.priority,
+      })
+      .select()
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) throw new Error('فشل إنشاء القالب');
+    return data;
+  }
+
+  /**
+   * تحديث قالب قيد تلقائي
+   */
+  static async updateTemplate(id: string, template: Partial<AutoJournalTemplate>) {
+    const updateData: Record<string, unknown> = { ...template };
+    if (template.debit_accounts) {
+      updateData.debit_accounts = template.debit_accounts as unknown as Json;
+    }
+    if (template.credit_accounts) {
+      updateData.credit_accounts = template.credit_accounts as unknown as Json;
+    }
+    
+    const { data, error } = await supabase
+      .from('auto_journal_templates')
+      .update(updateData)
+      .eq('id', id)
+      .select()
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) throw new Error('القالب غير موجود');
+    return data;
+  }
+
+  /**
+   * حذف قالب قيد تلقائي
+   */
+  static async deleteTemplate(id: string) {
+    const { error } = await supabase
+      .from('auto_journal_templates')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+  }
+
+  /**
+   * تفعيل/تعطيل قالب
+   */
+  static async toggleActive(id: string, is_active: boolean) {
+    const { error } = await supabase
+      .from('auto_journal_templates')
+      .update({ is_active })
+      .eq('id', id);
+
+    if (error) throw error;
+  }
+}
+
+// ============ Journal Entry Form ============
+
+export class JournalEntryFormService {
+  /**
+   * جلب الحسابات للقيد
+   */
+  static async getAccountsForEntry() {
+    const { data, error } = await supabase
+      .from('accounts')
+      .select('id, code, name_ar, account_type, account_nature')
+      .eq('is_header', false)
+      .eq('is_active', true)
+      .order('code');
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * جلب السنة المالية النشطة
+   */
+  static async getActiveFiscalYear() {
+    const { data, error } = await supabase
+      .from('fiscal_years')
+      .select('id, name, start_date, end_date, is_active')
+      .eq('is_active', true)
+      .maybeSingle();
+
+    if (error) throw error;
+    return data;
+  }
+
+  /**
+   * إنشاء قيد يومي مع الأسطر
+   */
+  static async createJournalEntry(params: {
+    entryDate: string;
+    description: string;
+    fiscalYearId: string;
+    lines: Array<{
+      account_id: string;
+      description: string;
+      debit_amount: number;
+      credit_amount: number;
+    }>;
+  }) {
+    // إنشاء رقم القيد
+    const entryNumber = `JE-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`;
+
+    // إنشاء القيد
+    const { data: entry, error: entryError } = await supabase
+      .from('journal_entries')
+      .insert([
+        {
+          entry_number: entryNumber,
+          entry_date: params.entryDate,
+          description: params.description,
+          fiscal_year_id: params.fiscalYearId,
+          status: 'draft',
+        },
+      ])
+      .select()
+      .maybeSingle();
+
+    if (entryError) throw entryError;
+    if (!entry) throw new Error('فشل إنشاء القيد');
+
+    // إضافة الأسطر
+    const linesData = params.lines.map((line, index) => ({
+      journal_entry_id: entry.id,
+      account_id: line.account_id,
+      line_number: index + 1,
+      description: line.description,
+      debit_amount: line.debit_amount || 0,
+      credit_amount: line.credit_amount || 0,
+    }));
+
+    const { error: linesError } = await supabase
+      .from('journal_entry_lines')
+      .insert(linesData);
+
+    if (linesError) throw linesError;
+
+    return entry;
+  }
+}
+
 /**
  * واجهة إدخال مؤشرات الأداء المالية
  */

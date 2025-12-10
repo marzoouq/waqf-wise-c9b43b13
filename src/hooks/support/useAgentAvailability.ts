@@ -1,36 +1,26 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { SupportService } from '@/services/support.service';
 import { toast } from 'sonner';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
-interface AgentAvailability {
-  id: string;
-  user_id: string;
-  is_available: boolean;
-  current_load: number;
-  max_capacity: number;
-  skills: string[];
-  priority_level: number;
-}
-
+/**
+ * Hook لجلب توافر وكيل الدعم
+ * @version 2.8.73 - Refactored to use SupportService
+ */
 export function useAgentAvailability(userId?: string) {
   return useQuery({
-    queryKey: ['agent-availability', userId],
+    queryKey: QUERY_KEYS.AGENT_AVAILABILITY(userId || ''),
     queryFn: async () => {
       if (!userId) return null;
-
-      const { data, error } = await supabase
-        .from('support_agent_availability')
-        .select('id, user_id, is_available, current_load, max_capacity, skills, priority_level')
-        .eq('user_id', userId)
-        .maybeSingle();
-
-      if (error) throw error;
-      return data;
+      return SupportService.getAgentAvailability(userId);
     },
     enabled: !!userId,
   });
 }
 
+/**
+ * Hook لتحديث توافر وكيل الدعم
+ */
 export function useUpdateAvailability() {
   const queryClient = useQueryClient();
 
@@ -46,37 +36,12 @@ export function useUpdateAvailability() {
       maxCapacity?: number;
       skills?: string[];
     }) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('غير مصرح');
-
-      interface AvailabilityUpdate {
-        is_available?: boolean;
-        max_capacity?: number;
-        skills?: string[];
-        updated_at: string;
-      }
-
-      const updates: AvailabilityUpdate = {
-        updated_at: new Date().toISOString()
-      };
-      if (isAvailable !== undefined) updates.is_available = isAvailable;
-      if (maxCapacity !== undefined) updates.max_capacity = maxCapacity;
-      if (skills !== undefined) updates.skills = skills;
-
-      const { data, error } = await supabase
-        .from('support_agent_availability')
-        .upsert({
-          user_id: userId,
-          ...updates,
-        }, {
-          onConflict: 'user_id',
-        })
-        .select()
-        .maybeSingle();
-
-      if (error) throw error;
-      if (!data) throw new Error('فشل تحديث التوافر');
-      return data;
+      return SupportService.updateAgentAvailability({
+        userId,
+        isAvailable,
+        maxCapacity,
+        skills,
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['agent-availability'] });
@@ -88,68 +53,35 @@ export function useUpdateAvailability() {
   });
 }
 
+/**
+ * Hook لجلب إحصائيات وكيل الدعم
+ */
 export function useAgentStats(userId?: string, dateRange?: { from: string; to: string }) {
   return useQuery({
-    queryKey: ['agent-stats', userId, dateRange],
-    queryFn: async () => {
-      let query = supabase
-        .from('support_agent_stats')
-        .select('id, user_id, date, total_assigned, total_resolved, total_closed, avg_response_minutes, avg_resolution_minutes, customer_satisfaction_avg, created_at');
-
-      if (userId) {
-        query = query.eq('user_id', userId);
-      }
-
-      if (dateRange) {
-        query = query
-          .gte('date', dateRange.from)
-          .lte('date', dateRange.to);
-      }
-
-      query = query.order('date', { ascending: false });
-
-      const { data, error } = await query;
-
-      if (error) throw error;
-      return data;
-    },
+    queryKey: QUERY_KEYS.AGENT_STATS(userId || '', dateRange),
+    queryFn: () => SupportService.getAgentStats(userId, dateRange),
   });
 }
 
+/**
+ * Hook لجلب التصعيدات
+ */
 export function useEscalations() {
   return useQuery({
-    queryKey: ['support-escalations'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('support_escalations')
-        .select(`
-          *,
-          ticket:support_tickets(ticket_number, subject, status),
-          escalated_from_user:escalated_from(id),
-          escalated_to_user:escalated_to(id)
-        `)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return data;
-    },
+    queryKey: QUERY_KEYS.SUPPORT_ESCALATIONS,
+    queryFn: () => SupportService.getEscalations(),
   });
 }
 
+/**
+ * Hook لإدارة إعدادات التعيين
+ */
 export function useAssignmentSettings() {
   const queryClient = useQueryClient();
 
   const { data: settings } = useQuery({
-    queryKey: ['assignment-settings'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('support_assignment_settings')
-        .select('id, assignment_type, auto_assign, max_tickets_per_agent, created_at, updated_at')
-        .maybeSingle();
-
-      if (error && error.code !== 'PGRST116') throw error;
-      return data;
-    },
+    queryKey: QUERY_KEYS.ASSIGNMENT_SETTINGS,
+    queryFn: () => SupportService.getAssignmentSettings(),
   });
 
   const updateSettings = useMutation({
@@ -158,21 +90,10 @@ export function useAssignmentSettings() {
       auto_assign?: boolean;
       max_tickets_per_agent?: number;
     }) => {
-      const { data, error } = await supabase
-        .from('support_assignment_settings')
-        .upsert({
-          ...newSettings,
-          updated_at: new Date().toISOString(),
-        })
-        .select()
-        .maybeSingle();
-
-      if (error) throw error;
-      if (!data) throw new Error('فشل تحديث الإعدادات');
-      return data;
+      return SupportService.updateAssignmentSettings(newSettings);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['assignment-settings'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ASSIGNMENT_SETTINGS });
       toast.success('تم تحديث إعدادات التعيين');
     },
     onError: (error: Error) => {
