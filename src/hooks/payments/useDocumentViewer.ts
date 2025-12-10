@@ -48,7 +48,7 @@ export function useDocumentViewer() {
         const publicUrl = DocumentService.getPublicUrl('documents', path);
         window.open(publicUrl, '_blank');
       } else {
-        // توليد PDF فوري
+        // توليد PDF فوري - type assertions needed for PDF generator interface
         const orgSettings = await DocumentService.getOrganizationSettings();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await generateInvoicePDF(invoice as any, lines as any, orgSettings as any);
@@ -102,7 +102,7 @@ export function useDocumentViewer() {
         const publicUrl = DocumentService.getPublicUrl('documents', path);
         window.open(publicUrl, '_blank');
       } else {
-        // توليد PDF فوري
+        // توليد PDF فوري - type assertions needed for PDF generator interface
         const orgSettings = await DocumentService.getOrganizationSettings();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await generateReceiptPDF(receiptData as any, orgSettings as any);

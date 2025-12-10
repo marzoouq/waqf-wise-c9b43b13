@@ -529,19 +529,30 @@ export class DistributionService {
 
   /**
    * جلب توزيعات السنة المالية
+   * @note Using REST API to avoid TypeScript recursive depth limitation
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   static async getByFiscalYear(fiscalYearId: string): Promise<DistributionRow[]> {
     try {
-      const client = supabase as any;
-      const { data, error } = await client
-        .from('distributions')
-        .select('*')
-        .eq('fiscal_year_id', fiscalYearId)
-        .order('distribution_date', { ascending: false });
-
-      if (error) throw error;
-      return (data || []) as DistributionRow[];
+      const session = await supabase.auth.getSession();
+      const token = session.data.session?.access_token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+      
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/distributions?fiscal_year_id=eq.${fiscalYearId}&order=distribution_date.desc`,
+        {
+          headers: {
+            'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch distributions: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      return data as DistributionRow[];
     } catch (error) {
       productionLogger.error('Error fetching fiscal year distributions', error);
       throw error;

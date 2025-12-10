@@ -56,6 +56,25 @@ export interface OrganizationSettings {
   commercial_registration_number: string | null;
 }
 
+// Type for invoice with lines query result
+interface InvoiceWithLinesRow {
+  id: string;
+  invoice_number: string;
+  invoice_date: string;
+  customer_name: string | null;
+  customer_vat_number: string | null;
+  customer_phone: string | null;
+  customer_email: string | null;
+  total_amount: number | null;
+  tax_amount: number | null;
+  net_amount: number | null;
+  subtotal: number | null;
+  status: string | null;
+  payment_status: string | null;
+  qr_code_data: string | null;
+  invoice_lines: InvoiceLine[];
+}
+
 export const DocumentService = {
   /**
    * جلب بيانات الفاتورة مع البنود
@@ -70,8 +89,7 @@ export const DocumentService = {
     if (error) throw error;
     if (!data) return null;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const invoiceData = data as any;
+    const invoiceData = data as unknown as InvoiceWithLinesRow;
 
     return {
       invoice: {

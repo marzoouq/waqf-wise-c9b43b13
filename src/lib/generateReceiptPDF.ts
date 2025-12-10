@@ -3,8 +3,8 @@ import type { OrganizationSettings } from "@/hooks/useOrganizationSettings";
 import { loadAmiriFonts } from "./fonts/loadArabicFonts";
 import { logger } from "./logger";
 
-// Dynamic import type
-type JsPDF = any;
+// Dynamic import type - jsPDF instance type
+type JsPDFInstance = InstanceType<typeof import('jspdf').default>;
 
 interface Receipt {
   id: string;
@@ -21,7 +21,7 @@ interface Receipt {
 export const generateReceiptPDF = async (
   receipt: Receipt,
   orgSettings: OrganizationSettings | null
-): Promise<any> => {
+): Promise<JsPDFInstance> => {
   try {
     // Dynamic imports
     const [jsPDFModule] = await Promise.all([

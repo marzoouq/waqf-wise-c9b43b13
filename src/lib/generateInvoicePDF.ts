@@ -4,8 +4,8 @@ import type { OrganizationSettings } from "@/hooks/useOrganizationSettings";
 import { loadAmiriFonts } from "./fonts/loadArabicFonts";
 import { logger } from "./logger";
 
-// Dynamic import type
-type JsPDF = any;
+// Dynamic import type - jsPDF instance type
+type JsPDFInstance = InstanceType<typeof import('jspdf').default>;
 
 interface Invoice {
   id: string;
@@ -41,7 +41,7 @@ export const generateInvoicePDF = async (
   invoice: Invoice,
   lines: InvoiceLine[],
   orgSettings: OrganizationSettings | null
-): Promise<any> => {
+): Promise<JsPDFInstance> => {
   try {
     // Dynamic imports
     const [jsPDFModule, autoTableModule] = await Promise.all([

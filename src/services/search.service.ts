@@ -132,6 +132,7 @@ export const SearchService = {
 
   /**
    * تنفيذ البحث المتقدم
+   * @note Using PostgrestFilterBuilder type for dynamic queries
    */
   async advancedSearch(
     tableName: string,
@@ -139,32 +140,45 @@ export const SearchService = {
     query: string,
     filters: SearchFilters
   ): Promise<unknown[]> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let dbQuery: any = supabase.from(tableName as 'beneficiaries').select(columns);
-
-    // تطبيق البحث النصي
+    // Build query string for REST API to avoid TypeScript depth issues
+    const session = await supabase.auth.getSession();
+    const token = session.data.session?.access_token || '';
+    
+    let url = `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/${tableName}?select=${encodeURIComponent(columns)}`;
+    
+    // Apply text search
     if (query) {
       const searchColumns = ['full_name', 'national_id', 'phone', 'email', 'notes'];
       const orConditions = searchColumns.map(col => `${col}.ilike.%${query}%`).join(',');
-      dbQuery = dbQuery.or(orConditions);
+      url += `&or=(${encodeURIComponent(orConditions)})`;
     }
 
-    // تطبيق الفلاتر
+    // Apply filters
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== null && value !== undefined && value !== '') {
         if (Array.isArray(value)) {
-          dbQuery = dbQuery.in(key, value);
+          url += `&${key}=in.(${value.join(',')})`;
         } else if (typeof value === 'object' && value && 'gte' in value && 'lte' in value) {
-          dbQuery = dbQuery.gte(key, value.gte as string).lte(key, value.lte as string);
+          url += `&${key}=gte.${value.gte as string}&${key}=lte.${value.lte as string}`;
         } else {
-          dbQuery = dbQuery.eq(key, value as string);
+          url += `&${key}=eq.${value as string}`;
         }
       }
     });
 
-    const { data, error } = await dbQuery;
-    if (error) throw error;
-    return data || [];
+    const response = await fetch(url, {
+      headers: {
+        'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Search failed: ${response.status}`);
+    }
+
+    return response.json();
   },
 
   /**
