@@ -24,14 +24,26 @@ export default tseslint.config(
         "argsIgnorePattern": "^_",
         "varsIgnorePattern": "^_" 
       }],
-      // STRICT: منع استخدام any - يجب استخدام أنواع محددة
-      // الاستثناءات المسموحة فقط مع eslint-disable-next-line
+      
+      // ═══════════════════════════════════════════════════════════════
+      // 🚫 قواعد صارمة: منع استخدام any نهائياً
+      // STRICT RULES: No 'any' type allowed - EVER
+      // ═══════════════════════════════════════════════════════════════
       "@typescript-eslint/no-explicit-any": "error",
-      "no-console": ["error", { 
-        "allow": ["warn", "error", "info"] 
-      }],
+      "@typescript-eslint/no-unsafe-assignment": "off", // يتطلب type-checking
+      "@typescript-eslint/no-unsafe-member-access": "off", // يتطلب type-checking
+      "@typescript-eslint/no-unsafe-call": "off", // يتطلب type-checking
+      "@typescript-eslint/no-unsafe-return": "off", // يتطلب type-checking
+      
+      // ═══════════════════════════════════════════════════════════════
+      // 🏗️ قواعد جودة الكود
+      // Code Quality Rules
+      // ═══════════════════════════════════════════════════════════════
+      "no-console": ["error", { "allow": ["warn", "error", "info"] }],
       "prefer-const": "error",
       "no-var": "error",
+      "eqeqeq": ["error", "always"],
+      "no-duplicate-imports": "error",
     },
   },
 );
