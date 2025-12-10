@@ -4,7 +4,7 @@
  * @version 2.8.68
  */
 import { useQuery } from '@tanstack/react-query';
-import { ReportsService } from '@/services';
+import { CustomReportsService } from '@/services';
 
 export interface AgingItem {
   id: string;
@@ -27,7 +27,7 @@ export interface AgingSummary {
 export function useAgingReport() {
   const { data: agingData, isLoading, error } = useQuery({
     queryKey: ['aging_report'],
-    queryFn: () => ReportsService.getAgingReport(),
+    queryFn: () => CustomReportsService.getAgingReport(),
   });
 
   const summary = agingData?.reduce<AgingSummary>(

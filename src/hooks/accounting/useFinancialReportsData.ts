@@ -5,7 +5,7 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import { ReportsService } from '@/services';
+import { CustomReportsService } from '@/services';
 import type { TrialBalanceItem, AccountWithBalance } from '@/types/accounting';
 import { QUERY_KEYS } from '@/lib/query-keys';
 
@@ -13,13 +13,13 @@ export function useFinancialReportsData() {
   // ميزان المراجعة
   const { data: trialBalance = [], isLoading: loadingTrial } = useQuery({
     queryKey: QUERY_KEYS.TRIAL_BALANCE,
-    queryFn: () => ReportsService.getTrialBalance(),
+    queryFn: () => CustomReportsService.getTrialBalance(),
   });
 
   // قائمة الدخل - الحسابات
   const { data: accounts = [], isLoading: loadingIncome } = useQuery({
     queryKey: QUERY_KEYS.ACCOUNTS_WITH_BALANCES,
-    queryFn: () => ReportsService.getIncomeExpenseAccounts(),
+    queryFn: () => CustomReportsService.getIncomeExpenseAccounts(),
   });
 
   // حسابات الإيرادات والمصروفات

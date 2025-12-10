@@ -1,15 +1,19 @@
 /**
  * Hook لإدارة التقارير المخصصة
- * @version 2.8.55
+ * @version 2.8.72
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
-import { ReportsService, type ReportTemplate, type ReportResult } from '@/services/reports.service';
+import { 
+  CustomReportsService, 
+  type CustomReportTemplate, 
+  type ReportResult,
+  type ReportConfig 
+} from '@/services/report.service';
 import { QUERY_KEYS } from '@/lib/query-keys';
 
-export type { ReportTemplate, ReportResult };
-export type { ReportConfig } from '@/services/reports.service';
+export type { CustomReportTemplate as ReportTemplate, ReportResult, ReportConfig };
 
 export function useCustomReports() {
   const { toast } = useToast();
@@ -18,13 +22,13 @@ export function useCustomReports() {
   // جلب قوالب التقارير
   const { data: templates = [], isLoading } = useQuery({
     queryKey: QUERY_KEYS.CUSTOM_REPORTS,
-    queryFn: () => ReportsService.getTemplates(),
+    queryFn: () => CustomReportsService.getCustomTemplates(),
   });
 
   // إنشاء قالب تقرير جديد
   const createTemplate = useMutation({
-    mutationFn: (template: Omit<ReportTemplate, 'id' | 'created_at' | 'updated_at' | 'created_by'>) => 
-      ReportsService.createTemplate(template),
+    mutationFn: (template: Omit<CustomReportTemplate, 'id' | 'created_at' | 'updated_at' | 'created_by'>) => 
+      CustomReportsService.createCustomTemplate(template),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOM_REPORTS });
       toast({
@@ -43,8 +47,8 @@ export function useCustomReports() {
 
   // تحديث قالب تقرير
   const updateTemplate = useMutation({
-    mutationFn: ({ id, updates }: { id: string; updates: Partial<ReportTemplate> }) =>
-      ReportsService.updateTemplate(id, updates),
+    mutationFn: ({ id, updates }: { id: string; updates: Partial<CustomReportTemplate> }) =>
+      CustomReportsService.updateCustomTemplate(id, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOM_REPORTS });
       toast({
@@ -63,7 +67,7 @@ export function useCustomReports() {
 
   // حذف قالب تقرير
   const deleteTemplate = useMutation({
-    mutationFn: (id: string) => ReportsService.deleteTemplate(id),
+    mutationFn: (id: string) => CustomReportsService.deleteCustomTemplate(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOM_REPORTS });
       toast({
@@ -83,15 +87,15 @@ export function useCustomReports() {
   // تبديل المفضلة
   const toggleFavorite = useMutation({
     mutationFn: ({ id, isFavorite }: { id: string; isFavorite: boolean }) =>
-      ReportsService.toggleFavorite(id, isFavorite),
+      CustomReportsService.toggleFavorite(id, isFavorite),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CUSTOM_REPORTS });
     },
   });
 
   // تنفيذ التقرير
-  const executeReport = async (template: ReportTemplate): Promise<ReportResult> => {
-    return ReportsService.executeReport(template);
+  const executeReport = async (template: CustomReportTemplate): Promise<ReportResult> => {
+    return CustomReportsService.executeReport(template);
   };
 
   // تنفيذ تقرير مباشر
@@ -100,7 +104,7 @@ export function useCustomReports() {
     selectedFields: string[],
     sortBy?: string
   ): Promise<ReportResult> => {
-    return ReportsService.executeDirectReport(reportType, selectedFields, sortBy);
+    return CustomReportsService.executeDirectReport(reportType, selectedFields, sortBy);
   };
 
   return {
@@ -112,6 +116,6 @@ export function useCustomReports() {
     toggleFavorite: toggleFavorite.mutateAsync,
     executeReport,
     executeDirectReport,
-    REPORT_FIELDS: ReportsService.getReportFields(),
+    REPORT_FIELDS: CustomReportsService.getReportFields(),
   };
 }

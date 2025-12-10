@@ -15,8 +15,17 @@
 export { NotificationService } from './notification.service';
 export { RequestService } from './request.service';
 export { VoucherService } from './voucher.service';
-export { ReportService, type CashFlowData, type PropertyWithContracts, type OperationRecord } from './report.service';
-export { ReportsService, type ReportTemplate, type ReportResult, type ReportConfig } from './reports.service';
+export { 
+  ReportService, 
+  CustomReportsService,
+  type CashFlowData, 
+  type PropertyWithContracts, 
+  type OperationRecord,
+  type ReportTemplate,
+  type CustomReportTemplate,
+  type ReportResult,
+  type ReportConfig
+} from './report.service';
 
 // Domain Services (37)
 export { BeneficiaryService, type BeneficiaryFilters, type BeneficiaryStats } from './beneficiary.service';
