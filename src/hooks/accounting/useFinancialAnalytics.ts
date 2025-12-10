@@ -1,5 +1,9 @@
+/**
+ * useFinancialAnalytics Hook
+ * @version 2.8.68
+ */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { AccountingService } from '@/services';
 import { useToast } from '@/hooks/use-toast';
 import { safeFilter, safeReduce } from '@/lib/utils/array-safe';
 import type { Json } from '@/integrations/supabase/types';
@@ -60,34 +64,12 @@ export function useFinancialAnalytics(fiscalYearId?: string) {
 
   const { data: kpis, isLoading: isLoadingKPIs } = useQuery({
     queryKey: QUERY_KEYS.FINANCIAL_KPIS(fiscalYearId),
-    queryFn: async () => {
-      let query = supabase
-        .from('financial_kpis')
-        .select('id, kpi_name, kpi_category, kpi_value, kpi_target, period_start, period_end, fiscal_year_id, metadata, created_at')
-        .order('created_at', { ascending: false });
-
-      if (fiscalYearId) {
-        query = query.eq('fiscal_year_id', fiscalYearId);
-      }
-
-      const { data, error } = await query;
-
-      if (error) throw error;
-      return data as FinancialKPI[];
-    },
+    queryFn: () => AccountingService.getFinancialKPIs(fiscalYearId),
   });
 
   const { data: forecasts, isLoading: isLoadingForecasts } = useQuery({
     queryKey: QUERY_KEYS.FINANCIAL_FORECASTS,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('financial_forecasts')
-        .select('*, accounts(*)')
-        .order('period_start', { ascending: false });
-
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => AccountingService.getFinancialForecasts(),
   });
 
   const calculateKPIs = useMutation({
@@ -100,13 +82,7 @@ export function useFinancialAnalytics(fiscalYearId?: string) {
       periodEnd: string;
       fiscalYearId?: string;
     }) => {
-      const { data: accounts, error: accountsError } = await supabase
-        .from('accounts')
-        .select('id, code, account_type, current_balance')
-        .eq('is_active', true);
-
-      if (accountsError) throw accountsError;
-
+      const accounts = await AccountingService.getAccounts();
       const typedAccounts = (accounts || []) as Account[];
 
       const totalAssets = safeReduce(
@@ -139,16 +115,22 @@ export function useFinancialAnalytics(fiscalYearId?: string) {
         0
       );
 
-      const { data: journalLines, error: journalError } = await supabase
-        .from('journal_entry_lines')
-        .select('*, accounts(*), journal_entries!inner(*)')
-        .gte('journal_entries.entry_date', periodStart)
-        .lte('journal_entries.entry_date', periodEnd)
-        .eq('journal_entries.status', 'posted');
+      // جلب سطور القيود للفترة المحددة
+      const journalLines = await AccountingService.getJournalEntriesWithLines();
+      const filteredLines = (journalLines || []).flatMap(entry => 
+        (entry.journal_entry_lines || []).filter((line: any) => {
+          const entryDate = entry.entry_date;
+          return entry.status === 'posted' && 
+                 entryDate >= periodStart && 
+                 entryDate <= periodEnd;
+        }).map((line: any) => ({
+          ...line,
+          accounts: line.accounts,
+          journal_entries: { entry_date: entry.entry_date }
+        }))
+      );
 
-      if (journalError) throw journalError;
-
-      const typedLines = (journalLines || []) as JournalEntryLine[];
+      const typedLines = filteredLines as JournalEntryLine[];
 
       const totalRevenue = safeReduce(
         safeFilter(typedLines, (line: JournalEntryLine) => line.accounts?.account_type === 'revenue'),
@@ -252,11 +234,7 @@ export function useFinancialAnalytics(fiscalYearId?: string) {
         metadata: kpi.metadata as unknown as Json,
       }));
 
-      const { error: insertError } = await supabase
-        .from('financial_kpis')
-        .insert(insertData);
-
-      if (insertError) throw insertError;
+      await AccountingService.saveFinancialKPIs(insertData);
 
       return kpiData;
     },
@@ -283,35 +261,33 @@ export function useFinancialAnalytics(fiscalYearId?: string) {
       const startDate = new Date();
       startDate.setMonth(startDate.getMonth() - 12);
 
-      let query = supabase
-        .from('journal_entry_lines')
-        .select('*, journal_entries!inner(*), accounts(*)')
-        .gte('journal_entries.entry_date', startDate.toISOString())
-        .lte('journal_entries.entry_date', endDate.toISOString())
-        .eq('journal_entries.status', 'posted');
-
-      if (accountId) {
-        query = query.eq('account_id', accountId);
-      } else if (forecastType === 'revenue') {
-        query = query.eq('accounts.account_type', 'revenue');
-      } else if (forecastType === 'expense') {
-        query = query.eq('accounts.account_type', 'expense');
-      }
-
-      const { data: historicalData, error } = await query;
-
-      if (error) throw error;
+      // جلب البيانات التاريخية
+      const journalEntries = await AccountingService.getJournalEntriesWithLines();
+      const filteredEntries = journalEntries.filter(entry => {
+        const entryDate = new Date(entry.entry_date);
+        return entry.status === 'posted' && 
+               entryDate >= startDate && 
+               entryDate <= endDate;
+      });
 
       const monthlyTotals = new Map<string, number>();
-      const typedData = (historicalData || []) as JournalEntryLine[];
       
-      typedData.forEach((line: JournalEntryLine) => {
-        const month = new Date(line.journal_entries.entry_date).toISOString().substring(0, 7);
-        const amount = forecastType === 'revenue' 
-          ? line.credit_amount - line.debit_amount
-          : line.debit_amount - line.credit_amount;
-        
-        monthlyTotals.set(month, (monthlyTotals.get(month) || 0) + amount);
+      filteredEntries.forEach(entry => {
+        (entry.journal_entry_lines || []).forEach((line: any) => {
+          const matchesAccount = !accountId || line.account_id === accountId;
+          const matchesType = !forecastType || 
+            (forecastType === 'revenue' && line.accounts?.account_type === 'revenue') ||
+            (forecastType === 'expense' && line.accounts?.account_type === 'expense');
+
+          if (matchesAccount || matchesType) {
+            const month = new Date(entry.entry_date).toISOString().substring(0, 7);
+            const amount = forecastType === 'revenue' 
+              ? line.credit_amount - line.debit_amount
+              : line.debit_amount - line.credit_amount;
+            
+            monthlyTotals.set(month, (monthlyTotals.get(month) || 0) + amount);
+          }
+        });
       });
 
       const totals = Array.from(monthlyTotals.values());
@@ -344,11 +320,7 @@ export function useFinancialAnalytics(fiscalYearId?: string) {
         });
       }
 
-      const { error: insertError } = await supabase
-        .from('financial_forecasts')
-        .insert(forecasts);
-
-      if (insertError) throw insertError;
+      await AccountingService.saveFinancialForecasts(forecasts);
 
       return forecasts;
     },
@@ -362,7 +334,7 @@ export function useFinancialAnalytics(fiscalYearId?: string) {
   });
 
   return {
-    kpis: kpis || [],
+    kpis: (kpis || []) as FinancialKPI[],
     forecasts: forecasts || [],
     isLoading: isLoadingKPIs || isLoadingForecasts,
     calculateKPIs: calculateKPIs.mutateAsync,

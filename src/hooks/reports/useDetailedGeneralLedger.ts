@@ -1,10 +1,10 @@
 /**
  * useDetailedGeneralLedger Hook
  * Hook لدفتر الأستاذ التفصيلي
+ * @version 2.8.68
  */
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { AccountingService } from '@/services';
 
 export interface LedgerEntry {
@@ -39,30 +39,10 @@ export function useDetailedGeneralLedger() {
     queryFn: async (): Promise<LedgerEntry[]> => {
       if (!selectedAccount) return [];
 
-      let query = supabase
-        .from('journal_entry_lines')
-        .select(`
-          *,
-          journal_entries!inner(
-            entry_number,
-            entry_date,
-            description,
-            status
-          )
-        `)
-        .eq('account_id', selectedAccount)
-        .eq('journal_entries.status', 'posted')
-        .order('journal_entries(entry_date)', { ascending: true });
-
-      if (startDate) {
-        query = query.gte('journal_entries.entry_date', startDate);
-      }
-      if (endDate) {
-        query = query.lte('journal_entries.entry_date', endDate);
-      }
-
-      const { data, error } = await query;
-      if (error) throw error;
+      const data = await AccountingService.getJournalEntryLinesByAccount(selectedAccount, {
+        startDate: startDate || undefined,
+        endDate: endDate || undefined,
+      });
 
       // حساب الرصيد الجاري
       let runningBalance = 0;
@@ -74,7 +54,7 @@ export function useDetailedGeneralLedger() {
           credit_amount: entry.credit_amount,
           description: entry.description,
           running_balance: runningBalance,
-          journal_entries: entry.journal_entries as LedgerEntry['journal_entries'],
+          journal_entries: entry.journal_entries,
         };
       });
     },

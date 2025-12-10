@@ -1,6 +1,7 @@
 /**
  * useDistributionAnalysisReport Hook
  * Hook لتحليل التوزيعات
+ * @version 2.8.68
  */
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';

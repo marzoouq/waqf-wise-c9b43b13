@@ -1,11 +1,11 @@
 /**
  * Hook لتتبع حالة التحويلات
- * @version 2.8.55
+ * @version 2.8.68
  */
 
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { DistributionService } from '@/services';
 import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface TransferStatus {
@@ -24,30 +24,23 @@ export function useTransferStatusTracker(transferFileId: string) {
 
   const { data: transfers = [], isLoading: loading, refetch } = useQuery({
     queryKey: QUERY_KEYS.TRANSFER_STATUS(transferFileId),
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('bank_transfer_details')
-        .select('id, beneficiary_name, iban, amount, status, reference_number, error_message, processed_at')
-        .eq('transfer_file_id', transferFileId)
-        .order('created_at', { ascending: false });
-      if (error) throw error;
-      return data || [];
-    },
+    queryFn: () => DistributionService.getTransferDetails(transferFileId),
     enabled: !!transferFileId,
     refetchInterval: autoRefresh ? 10000 : false,
   });
 
+  const typedTransfers = transfers as TransferStatus[];
   const stats = {
-    total: transfers.length,
-    completed: transfers.filter(t => t.status === 'completed').length,
-    processing: transfers.filter(t => t.status === 'processing').length,
-    failed: transfers.filter(t => t.status === 'failed').length,
-    pending: transfers.filter(t => t.status === 'pending').length,
-    totalAmount: transfers.reduce((sum, t) => sum + t.amount, 0),
-    completedAmount: transfers.filter(t => t.status === 'completed').reduce((sum, t) => sum + t.amount, 0),
+    total: typedTransfers.length,
+    completed: typedTransfers.filter(t => t.status === 'completed').length,
+    processing: typedTransfers.filter(t => t.status === 'processing').length,
+    failed: typedTransfers.filter(t => t.status === 'failed').length,
+    pending: typedTransfers.filter(t => t.status === 'pending').length,
+    totalAmount: typedTransfers.reduce((sum, t) => sum + t.amount, 0),
+    completedAmount: typedTransfers.filter(t => t.status === 'completed').reduce((sum, t) => sum + t.amount, 0),
   };
 
   const progress = stats.total > 0 ? (stats.completed / stats.total) * 100 : 0;
 
-  return { transfers, loading, autoRefresh, setAutoRefresh, stats, progress, refetch };
+  return { transfers: typedTransfers, loading, autoRefresh, setAutoRefresh, stats, progress, refetch };
 }
