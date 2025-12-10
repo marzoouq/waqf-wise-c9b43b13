@@ -725,4 +725,44 @@ export class DistributionService {
     if (error) throw error;
     return data || [];
   }
+
+  /**
+   * جلب تفاصيل التحويلات البنكية
+   */
+  static async getTransferDetails(transferFileId: string): Promise<{
+    id: string;
+    beneficiary_name: string;
+    iban: string;
+    amount: number;
+    status: string;
+    reference_number?: string | null;
+    error_message?: string | null;
+    processed_at?: string | null;
+  }[]> {
+    const { data, error } = await supabase
+      .from('bank_transfer_details')
+      .select('id, beneficiary_name, iban, amount, status, reference_number, error_message, processed_at')
+      .eq('transfer_file_id', transferFileId)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * جلب المستفيدين للقائمة المنسدلة
+   */
+  static async getBeneficiariesForSelector(): Promise<{
+    id: string;
+    full_name: string;
+    national_id: string;
+    category: string;
+  }[]> {
+    const { data, error } = await supabase
+      .from('beneficiaries')
+      .select('id, full_name, national_id, category')
+      .eq('status', 'active')
+      .order('full_name');
+    if (error) throw error;
+    return data || [];
+  }
 }

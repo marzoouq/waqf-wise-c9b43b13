@@ -1,5 +1,10 @@
+/**
+ * useApprovalHistory Hook
+ * @version 2.8.68
+ */
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { ApprovalService } from '@/services';
 
 export interface ApprovalHistoryData {
   approval_type: 'loan' | 'payment' | 'distribution' | 'journal';
@@ -15,13 +20,7 @@ export function useApprovalHistory() {
   const queryClient = useQueryClient();
 
   const addToHistory = useMutation({
-    mutationFn: async (data: ApprovalHistoryData) => {
-      const { error } = await supabase
-        .from('approval_history')
-        .insert(data);
-      
-      if (error) throw error;
-    },
+    mutationFn: (data: ApprovalHistoryData) => ApprovalService.addToHistory(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['approval_history'] });
     },

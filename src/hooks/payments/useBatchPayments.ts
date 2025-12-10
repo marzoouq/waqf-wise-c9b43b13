@@ -1,6 +1,12 @@
+/**
+ * useBatchPayments Hook
+ * Hook لإدارة المدفوعات المجدولة
+ * @version 2.8.68
+ */
+
 import { useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { PaymentService } from '@/services';
 import { useToast } from '@/hooks/use-toast';
 
 export interface PaymentSchedule {
@@ -25,36 +31,14 @@ export function useBatchPayments(distributionId?: string) {
   // جلب جداول المدفوعات
   const { data: schedules = [], isLoading } = useQuery({
     queryKey: ['payment-schedules', distributionId],
-    queryFn: async () => {
-      let query = supabase
-        .from('payment_schedules')
-        .select('id, distribution_id, scheduled_date, scheduled_amount, status, batch_number, processed_at, error_message, notes, created_at, updated_at')
-        .order('scheduled_date', { ascending: true });
-
-      if (distributionId) {
-        query = query.eq('distribution_id', distributionId);
-      }
-
-      const { data, error } = await query;
-      if (error) throw error;
-      return data as PaymentSchedule[];
-    },
+    queryFn: () => PaymentService.getPaymentSchedules(distributionId),
     enabled: !!distributionId,
   });
 
   // إنشاء جدول مدفوعات
   const createSchedule = useMutation({
-    mutationFn: async (schedule: Omit<PaymentSchedule, 'id' | 'created_at' | 'updated_at'>) => {
-      const { data, error } = await supabase
-        .from('payment_schedules')
-        .insert([schedule])
-        .select()
-        .maybeSingle();
-
-      if (error) throw error;
-      if (!data) throw new Error('فشل إنشاء الجدول');
-      return data;
-    },
+    mutationFn: (schedule: Omit<PaymentSchedule, 'id' | 'created_at' | 'updated_at'>) =>
+      PaymentService.createPaymentSchedule(schedule),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['payment-schedules'] });
       toast({
@@ -73,18 +57,8 @@ export function useBatchPayments(distributionId?: string) {
 
   // تحديث جدول المدفوعات
   const updateSchedule = useMutation({
-    mutationFn: async ({ id, updates }: { id: string; updates: Partial<PaymentSchedule> }) => {
-      const { data, error } = await supabase
-        .from('payment_schedules')
-        .update(updates)
-        .eq('id', id)
-        .select()
-        .maybeSingle();
-
-      if (error) throw error;
-      if (!data) throw new Error('الجدول غير موجود');
-      return data;
-    },
+    mutationFn: ({ id, updates }: { id: string; updates: Partial<PaymentSchedule> }) =>
+      PaymentService.updatePaymentSchedule(id, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['payment-schedules'] });
     },
@@ -92,14 +66,7 @@ export function useBatchPayments(distributionId?: string) {
 
   // حذف جدول المدفوعات
   const deleteSchedule = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('payment_schedules')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-    },
+    mutationFn: (id: string) => PaymentService.deletePaymentSchedule(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['payment-schedules'] });
       toast({
@@ -112,42 +79,35 @@ export function useBatchPayments(distributionId?: string) {
   // إنشاء عدة جداول مجدولة (تقسيم توزيع إلى دفعات)
   const createBatchSchedules = useCallback(
     async (
-      distributionId: string,
+      distId: string,
       totalAmount: number,
       numberOfBatches: number,
       startDate: Date
     ) => {
       const amountPerBatch = totalAmount / numberOfBatches;
-      const schedules: Omit<PaymentSchedule, 'id' | 'created_at' | 'updated_at'>[] = [];
+      const schedulesToCreate = [];
 
       for (let i = 0; i < numberOfBatches; i++) {
         const scheduledDate = new Date(startDate);
-        scheduledDate.setDate(scheduledDate.getDate() + i * 7); // أسبوع بين كل دفعة
+        scheduledDate.setDate(scheduledDate.getDate() + i * 7);
 
-        schedules.push({
-          distribution_id: distributionId,
+        schedulesToCreate.push({
+          distribution_id: distId,
           scheduled_date: scheduledDate.toISOString().split('T')[0],
           scheduled_amount: Math.round(amountPerBatch * 100) / 100,
-          status: 'scheduled',
+          status: 'scheduled' as const,
           batch_number: `BATCH-${i + 1}`,
           notes: `دفعة ${i + 1} من ${numberOfBatches}`,
         });
       }
 
       try {
-        const { data, error } = await supabase
-          .from('payment_schedules')
-          .insert(schedules)
-          .select();
-
-        if (error) throw error;
-
+        const data = await PaymentService.createBatchSchedules(schedulesToCreate);
         queryClient.invalidateQueries({ queryKey: ['payment-schedules'] });
         toast({
           title: 'تم بنجاح',
           description: `تم إنشاء ${numberOfBatches} دفعة مجدولة`,
         });
-
         return data;
       } catch (error) {
         toast({
@@ -165,16 +125,13 @@ export function useBatchPayments(distributionId?: string) {
   const processBatch = useCallback(
     async (scheduleId: string) => {
       try {
-        // تحديث الحالة إلى "جاري المعالجة"
         await updateSchedule.mutateAsync({
           id: scheduleId,
           updates: { status: 'processing' },
         });
 
-        // محاكاة المعالجة (في الواقع هنا سيتم استدعاء API البنك)
         await new Promise((resolve) => setTimeout(resolve, 2000));
 
-        // تحديث الحالة إلى "مكتمل"
         await updateSchedule.mutateAsync({
           id: scheduleId,
           updates: {
@@ -212,9 +169,9 @@ export function useBatchPayments(distributionId?: string) {
 
   // معالجة جميع الدفعات المعلقة
   const processAllPending = useCallback(
-    async (distributionId: string) => {
+    async (distId: string) => {
       const pendingSchedules = schedules.filter(
-        (s) => s.distribution_id === distributionId && s.status === 'scheduled'
+        (s: PaymentSchedule) => s.distribution_id === distId && s.status === 'scheduled'
       );
 
       if (pendingSchedules.length === 0) {
@@ -241,20 +198,21 @@ export function useBatchPayments(distributionId?: string) {
   );
 
   // إحصائيات الجداول
+  const typedSchedules = schedules as PaymentSchedule[];
   const stats = {
-    total: schedules.length,
-    scheduled: schedules.filter((s) => s.status === 'scheduled').length,
-    processing: schedules.filter((s) => s.status === 'processing').length,
-    completed: schedules.filter((s) => s.status === 'completed').length,
-    failed: schedules.filter((s) => s.status === 'failed').length,
-    totalAmount: schedules.reduce((sum, s) => sum + s.scheduled_amount, 0),
-    completedAmount: schedules
+    total: typedSchedules.length,
+    scheduled: typedSchedules.filter((s) => s.status === 'scheduled').length,
+    processing: typedSchedules.filter((s) => s.status === 'processing').length,
+    completed: typedSchedules.filter((s) => s.status === 'completed').length,
+    failed: typedSchedules.filter((s) => s.status === 'failed').length,
+    totalAmount: typedSchedules.reduce((sum, s) => sum + s.scheduled_amount, 0),
+    completedAmount: typedSchedules
       .filter((s) => s.status === 'completed')
       .reduce((sum, s) => sum + s.scheduled_amount, 0),
   };
 
   return {
-    schedules,
+    schedules: typedSchedules,
     isLoading,
     stats,
     processingProgress,

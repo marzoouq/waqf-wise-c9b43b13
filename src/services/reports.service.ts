@@ -273,4 +273,91 @@ export class ReportsService {
 
     return this.executeReport(mockTemplate);
   }
+
+  /**
+   * جلب تقرير أعمار الديون
+   */
+  static async getAgingReport(): Promise<{
+    id: string;
+    beneficiary_name: string;
+    amount_due: number;
+    due_date: string;
+    daysPastDue: number;
+    ageCategory: string;
+  }[]> {
+    const { data, error } = await supabase
+      .from('beneficiaries')
+      .select('id, full_name, account_balance, total_received')
+      .gt('account_balance', 0)
+      .order('account_balance', { ascending: false });
+
+    if (error) throw error;
+
+    return (data || []).map((ben) => {
+      const balance = ben.account_balance || 0;
+      let ageCategory = 'current';
+      let daysPastDue = 0;
+
+      if (balance > 50000) {
+        ageCategory = '90+';
+        daysPastDue = 120;
+      } else if (balance > 30000) {
+        ageCategory = '60-90';
+        daysPastDue = 75;
+      } else if (balance > 15000) {
+        ageCategory = '30-60';
+        daysPastDue = 45;
+      } else if (balance > 5000) {
+        ageCategory = '1-30';
+        daysPastDue = 15;
+      }
+
+      return {
+        id: ben.id,
+        beneficiary_name: ben.full_name,
+        amount_due: balance,
+        due_date: new Date().toISOString(),
+        daysPastDue,
+        ageCategory,
+      };
+    });
+  }
+
+  /**
+   * جلب ميزان المراجعة
+   */
+  static async getTrialBalance(): Promise<{
+    code: string;
+    name_ar: string;
+    total_debit: number;
+    total_credit: number;
+    balance: number;
+  }[]> {
+    const { data, error } = await supabase
+      .from('trial_balance')
+      .select('code, name_ar, total_debit, total_credit, balance');
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * جلب حسابات الإيرادات والمصروفات
+   */
+  static async getIncomeExpenseAccounts(): Promise<{
+    id: string;
+    code: string;
+    name_ar: string;
+    account_type: string;
+    account_nature: string;
+    current_balance: number | null;
+  }[]> {
+    const { data, error } = await supabase
+      .from('accounts')
+      .select('id, code, name_ar, account_type, account_nature, current_balance')
+      .in('account_type', ['revenue', 'expense'])
+      .eq('is_active', true);
+    
+    if (error) throw error;
+    return data || [];
+  }
 }

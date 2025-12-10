@@ -246,4 +246,92 @@ export class PaymentService {
     if (error) throw error;
     return data || [];
   }
+
+  /**
+   * جلب جداول المدفوعات
+   */
+  static async getPaymentSchedules(distributionId?: string): Promise<any[]> {
+    let query = supabase
+      .from('payment_schedules')
+      .select('id, distribution_id, scheduled_date, scheduled_amount, status, batch_number, processed_at, error_message, notes, created_at, updated_at')
+      .order('scheduled_date', { ascending: true });
+
+    if (distributionId) {
+      query = query.eq('distribution_id', distributionId);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * إنشاء جدول مدفوعات
+   */
+  static async createPaymentSchedule(schedule: {
+    distribution_id: string;
+    scheduled_date: string;
+    scheduled_amount: number;
+    status?: string;
+    batch_number?: string;
+    notes?: string;
+  }): Promise<any> {
+    const { data, error } = await supabase
+      .from('payment_schedules')
+      .insert([schedule])
+      .select()
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) throw new Error('فشل إنشاء الجدول');
+    return data;
+  }
+
+  /**
+   * تحديث جدول مدفوعات
+   */
+  static async updatePaymentSchedule(id: string, updates: Record<string, unknown>): Promise<any> {
+    const { data, error } = await supabase
+      .from('payment_schedules')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) throw new Error('الجدول غير موجود');
+    return data;
+  }
+
+  /**
+   * حذف جدول مدفوعات
+   */
+  static async deletePaymentSchedule(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('payment_schedules')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+  }
+
+  /**
+   * إنشاء جداول مدفوعات متعددة
+   */
+  static async createBatchSchedules(schedules: {
+    distribution_id: string;
+    scheduled_date: string;
+    scheduled_amount: number;
+    status: string;
+    batch_number: string;
+    notes?: string;
+  }[]): Promise<any[]> {
+    const { data, error } = await supabase
+      .from('payment_schedules')
+      .insert(schedules)
+      .select();
+
+    if (error) throw error;
+    return data || [];
+  }
 }

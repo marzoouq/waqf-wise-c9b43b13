@@ -2017,4 +2017,113 @@ export class AccountingService {
     if (error) throw error;
     return data || [];
   }
+
+  /**
+   * جلب مؤشرات الأداء المالي
+   */
+  static async getFinancialKPIs(fiscalYearId?: string): Promise<{
+    id: string;
+    kpi_name: string;
+    kpi_category: string;
+    kpi_value: number;
+    kpi_target?: number;
+    period_start: string;
+    period_end: string;
+    fiscal_year_id?: string;
+    metadata?: Record<string, number | undefined>;
+    created_at: string;
+  }[]> {
+    let query = supabase
+      .from('financial_kpis')
+      .select('id, kpi_name, kpi_category, kpi_value, kpi_target, period_start, period_end, fiscal_year_id, metadata, created_at')
+      .order('created_at', { ascending: false });
+
+    if (fiscalYearId) {
+      query = query.eq('fiscal_year_id', fiscalYearId);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return data as any[];
+  }
+
+  /**
+   * جلب التنبؤات المالية
+   */
+  static async getFinancialForecasts(): Promise<any[]> {
+    const { data, error } = await supabase
+      .from('financial_forecasts')
+      .select('*, accounts(*)')
+      .order('period_start', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * حفظ مؤشرات الأداء
+   */
+  static async saveFinancialKPIs(kpis: any[]): Promise<void> {
+    const { error } = await supabase
+      .from('financial_kpis')
+      .insert(kpis);
+
+    if (error) throw error;
+  }
+
+  /**
+   * حفظ التنبؤات المالية
+   */
+  static async saveFinancialForecasts(forecasts: any[]): Promise<void> {
+    const { error } = await supabase
+      .from('financial_forecasts')
+      .insert(forecasts);
+
+    if (error) throw error;
+  }
+
+  /**
+   * جلب سطور القيود حسب الحساب
+   */
+  static async getJournalEntryLinesByAccount(accountId: string, options?: {
+    startDate?: string;
+    endDate?: string;
+  }): Promise<{
+    id: string;
+    debit_amount: number;
+    credit_amount: number;
+    description?: string;
+    journal_entries: {
+      entry_number: string;
+      entry_date: string;
+      description: string;
+      status: string;
+    };
+  }[]> {
+    let query = supabase
+      .from('journal_entry_lines')
+      .select(`
+        *,
+        journal_entries!inner(
+          entry_number,
+          entry_date,
+          description,
+          status
+        )
+      `)
+      .eq('account_id', accountId)
+      .eq('journal_entries.status', 'posted')
+      .order('journal_entries(entry_date)', { ascending: true });
+
+    if (options?.startDate) {
+      query = query.gte('journal_entries.entry_date', options.startDate);
+    }
+    if (options?.endDate) {
+      query = query.lte('journal_entries.entry_date', options.endDate);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return data as any[];
+  }
 }

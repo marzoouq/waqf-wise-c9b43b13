@@ -492,6 +492,25 @@ export class ApprovalService {
     return data;
   }
 
+  /**
+   * إضافة سجل موافقة للتاريخ
+   */
+  static async addToHistory(data: {
+    approval_type: 'loan' | 'payment' | 'distribution' | 'journal';
+    approval_id: string;
+    reference_id: string;
+    action: 'approved' | 'rejected';
+    performed_by: string;
+    performed_by_name: string;
+    notes?: string;
+  }): Promise<void> {
+    const { error } = await supabase
+      .from('approval_history')
+      .insert(data);
+    
+    if (error) throw error;
+  }
+
   static async initiateApprovalStatus(params: {
     workflowId: string;
     entityType: string;

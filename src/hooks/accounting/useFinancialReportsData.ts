@@ -1,10 +1,11 @@
 /**
  * Hook لجلب بيانات التقارير المالية
  * Financial Reports Data Hook
+ * @version 2.8.68
  */
 
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { ReportsService } from '@/services';
 import type { TrialBalanceItem, AccountWithBalance } from '@/types/accounting';
 import { QUERY_KEYS } from '@/lib/query-keys';
 
@@ -12,28 +13,13 @@ export function useFinancialReportsData() {
   // ميزان المراجعة
   const { data: trialBalance = [], isLoading: loadingTrial } = useQuery({
     queryKey: QUERY_KEYS.TRIAL_BALANCE,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('trial_balance')
-        .select('code, name_ar, total_debit, total_credit, balance');
-      if (error) throw error;
-      return (data || []) as TrialBalanceItem[];
-    },
+    queryFn: () => ReportsService.getTrialBalance(),
   });
 
   // قائمة الدخل - الحسابات
   const { data: accounts = [], isLoading: loadingIncome } = useQuery({
     queryKey: QUERY_KEYS.ACCOUNTS_WITH_BALANCES,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('accounts')
-        .select('id, code, name_ar, account_type, account_nature, current_balance')
-        .in('account_type', ['revenue', 'expense'])
-        .eq('is_active', true);
-      
-      if (error) throw error;
-      return (data || []) as AccountWithBalance[];
-    },
+    queryFn: () => ReportsService.getIncomeExpenseAccounts(),
   });
 
   // حسابات الإيرادات والمصروفات
@@ -48,8 +34,8 @@ export function useFinancialReportsData() {
   const netIncome = totalRevenue - totalExpense;
 
   return {
-    trialBalance,
-    accounts,
+    trialBalance: trialBalance as TrialBalanceItem[],
+    accounts: accounts as AccountWithBalance[],
     totalRevenue,
     totalExpense,
     netIncome,

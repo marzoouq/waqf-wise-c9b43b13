@@ -1,9 +1,10 @@
 /**
  * useAgingReport Hook
  * Hook لتقرير أعمار الديون
+ * @version 2.8.68
  */
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { ReportsService } from '@/services';
 
 export interface AgingItem {
   id: string;
@@ -26,44 +27,7 @@ export interface AgingSummary {
 export function useAgingReport() {
   const { data: agingData, isLoading, error } = useQuery({
     queryKey: ['aging_report'],
-    queryFn: async () => {
-      const { data: beneficiaries, error } = await supabase
-        .from('beneficiaries')
-        .select('id, full_name, account_balance, total_received')
-        .gt('account_balance', 0)
-        .order('account_balance', { ascending: false });
-
-      if (error) throw error;
-
-      return (beneficiaries || []).map((ben): AgingItem => {
-        const balance = ben.account_balance || 0;
-        let ageCategory = 'current';
-        let daysPastDue = 0;
-
-        if (balance > 50000) {
-          ageCategory = '90+';
-          daysPastDue = 120;
-        } else if (balance > 30000) {
-          ageCategory = '60-90';
-          daysPastDue = 75;
-        } else if (balance > 15000) {
-          ageCategory = '30-60';
-          daysPastDue = 45;
-        } else if (balance > 5000) {
-          ageCategory = '1-30';
-          daysPastDue = 15;
-        }
-
-        return {
-          id: ben.id,
-          beneficiary_name: ben.full_name,
-          amount_due: balance,
-          due_date: new Date().toISOString(),
-          daysPastDue,
-          ageCategory,
-        };
-      });
-    },
+    queryFn: () => ReportsService.getAgingReport(),
   });
 
   const summary = agingData?.reduce<AgingSummary>(
