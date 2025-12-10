@@ -2,11 +2,11 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.8.58
+ * @version 2.8.59
  * @date 2025-12-09
  */
 
-export const APP_VERSION = '2.8.58';
+export const APP_VERSION = '2.8.59';
 export const APP_VERSION_DATE = '2025-12-09';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 

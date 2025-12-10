@@ -35,7 +35,20 @@ export function useGeneralLedger({ accountId, dateFrom, dateTo }: UseGeneralLedg
 
       let balance = 0;
       
-      const processedData: GeneralLedgerEntry[] = data.map((line: any, index: number) => {
+      interface LedgerLineData {
+        id?: string;
+        debit_amount: number | null;
+        credit_amount: number | null;
+        description?: string;
+        journal_entry_id: string;
+        journal_entry: {
+          entry_date: string;
+          entry_number: string;
+          description: string;
+        };
+      }
+      
+      const processedData: GeneralLedgerEntry[] = data.map((line: LedgerLineData, index: number) => {
         const debit = Number(line.debit_amount);
         const credit = Number(line.credit_amount);
         balance += debit - credit;

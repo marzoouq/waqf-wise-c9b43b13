@@ -121,7 +121,12 @@ export function useDistributions() {
 
   const generateDistribution = async (periodStart: string, periodEnd: string, waqfCorpusPercentage: number = 0) => {
     try {
-      const result = await EdgeFunctionService.invoke("generate-distribution-summary", {
+      const result = await EdgeFunctionService.invoke<{
+        summary: {
+          distributable_amount: number;
+          beneficiaries_count: number;
+        };
+      }>("generate-distribution-summary", {
         period_start: periodStart,
         period_end: periodEnd,
         distribution_type: 'شهري',
@@ -133,7 +138,7 @@ export function useDistributions() {
       queryClient.invalidateQueries({ queryKey: ["distributions"] });
       queryClient.invalidateQueries({ queryKey: ["distribution-details"] });
       
-      const summary = result.data?.summary || {};
+      const summary = result.data?.summary || { distributable_amount: 0, beneficiaries_count: 0 };
       toast({
         title: "تم إنشاء التوزيع بنجاح",
         description: `تم توزيع ${summary.distributable_amount || 0} ريال على ${summary.beneficiaries_count || 0} مستفيد`,

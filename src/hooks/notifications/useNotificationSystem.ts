@@ -19,7 +19,15 @@ interface SendNotificationParams {
 export function useNotificationSystem() {
   const sendNotification = async (params: SendNotificationParams) => {
     try {
-      const data = await EdgeFunctionService.invoke('send-notification', params);
+      const data = await EdgeFunctionService.invoke<{ sent: boolean }>('send-notification', {
+        userId: params.userId,
+        title: params.title,
+        message: params.message,
+        type: params.type,
+        actionUrl: params.actionUrl,
+        channel: params.channel,
+        priority: params.priority,
+      });
       return { success: true, data };
     } catch (error) {
       productionLogger.error('Failed to send notification:', error);

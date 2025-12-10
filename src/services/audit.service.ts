@@ -1,10 +1,11 @@
 /**
  * Audit Service - خدمة سجل التدقيق
- * @version 2.8.22
+ * @version 2.8.59
  */
 
 import { supabase } from "@/integrations/supabase/client";
 import type { AuditLog, AuditLogFilters } from "@/types/audit";
+import type { Json } from "@/integrations/supabase/types";
 
 export class AuditService {
   /**
@@ -51,8 +52,8 @@ export class AuditService {
     user_email?: string;
     severity?: string;
     record_id?: string;
-    old_values?: any;
-    new_values?: any;
+    old_values?: Json;
+    new_values?: Json;
   }): Promise<void> {
     const { error } = await supabase.from("audit_logs").insert([log]);
     if (error) throw error;

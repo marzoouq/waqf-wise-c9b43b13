@@ -55,7 +55,7 @@ export function EditUserEmailDialog({
 
     try {
       // استدعاء Edge Function لتحديث البريد
-      const result = await EdgeFunctionService.invoke("update-user-email", {
+      const result = await EdgeFunctionService.invoke<{ error?: string }>("update-user-email", {
         userId: user.user_id,
         newEmail: newEmail.trim().toLowerCase(),
       });
