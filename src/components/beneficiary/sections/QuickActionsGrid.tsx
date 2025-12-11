@@ -24,7 +24,7 @@ export function QuickActionsGrid() {
       description: "عرض الإفصاح المالي للسنة الحالية",
       icon: FileText,
       color: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
-      action: () => navigate("/beneficiary-portal?tab=disclosures"),
+      action: () => navigate("/beneficiary-dashboard?tab=disclosures"),
     },
     {
       id: "statement",
@@ -32,7 +32,7 @@ export function QuickActionsGrid() {
       description: "عرض كشف الحساب التفصيلي",
       icon: Receipt,
       color: "bg-green-500/10 text-green-600 dark:text-green-400",
-      action: () => navigate("/beneficiary-portal?tab=statements"),
+      action: () => navigate("/beneficiary-dashboard?tab=statements"),
     },
     {
       id: "request",
