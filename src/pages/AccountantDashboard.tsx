@@ -17,6 +17,7 @@ import { WaqfCorpusCard } from "@/components/shared/WaqfCorpusCard";
 import { CurrentFiscalYearCard, RevenueProgressCard } from "@/components/dashboard/shared";
 import { PendingApprovalsList, QuickActionsGrid } from "@/components/dashboard/accountant";
 import { POSQuickAccessCard } from "@/components/pos";
+import { LastSyncIndicator } from "@/components/nazer/LastSyncIndicator";
 import { useAccountantDashboardRealtime, useAccountantDashboardRefresh } from "@/hooks/dashboard/useAccountantDashboardRealtime";
 
 // Lazy load components
@@ -45,6 +46,7 @@ const AccountantDashboard = () => {
       role="accountant"
       actions={
         <div className="flex items-center gap-2">
+          <LastSyncIndicator onRefresh={refreshAll} />
           <Button onClick={refreshAll} variant="ghost" size="icon" title="تحديث البيانات">
             <RefreshCw className="h-4 w-4" />
           </Button>
