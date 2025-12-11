@@ -10,8 +10,6 @@ import NazerKPIs from "@/components/dashboard/nazer/NazerKPIs";
 import SmartAlertsSection from "@/components/dashboard/nazer/SmartAlertsSection";
 import QuickActionsGrid from "@/components/dashboard/nazer/QuickActionsGrid";
 import { AIInsightsWidget } from "@/components/dashboard/AIInsightsWidget";
-import { BankBalanceCard } from "@/components/shared/BankBalanceCard";
-import { WaqfCorpusCard } from "@/components/shared/WaqfCorpusCard";
 import { DistributeRevenueDialog } from "@/components/nazer/DistributeRevenueDialog";
 import { PublishFiscalYearDialog } from "@/components/nazer/PublishFiscalYearDialog";
 import { FiscalYearPublishStatus } from "@/components/nazer/FiscalYearPublishStatus";
@@ -26,7 +24,6 @@ import { NazerAnalyticsSection } from "@/components/nazer/NazerAnalyticsSection"
 import { CurrentFiscalYearCard, RevenueProgressCard, FinancialCardsRow } from "@/components/dashboard/shared";
 import { useNazerDashboardRealtime, useNazerDashboardRefresh } from "@/hooks/dashboard/useNazerDashboardRealtime";
 import { useUnifiedKPIs } from "@/hooks/dashboard/useUnifiedKPIs";
-import { POSQuickAccessCard } from "@/components/pos";
 
 export default function NazerDashboard() {
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);

@@ -14,10 +14,7 @@ import { AdminKPIs } from "@/components/dashboard/admin/AdminKPIs";
 import { LazyTabContent } from "@/components/dashboard/admin/LazyTabContent";
 import { UnifiedDashboardLayout } from "@/components/dashboard/UnifiedDashboardLayout";
 import { ChartSkeleton, SectionSkeleton } from "@/components/dashboard";
-import { BankBalanceCard } from "@/components/shared/BankBalanceCard";
-import { WaqfCorpusCard } from "@/components/shared/WaqfCorpusCard";
 import { CurrentFiscalYearCard, RevenueProgressCard, FinancialCardsRow } from "@/components/dashboard/shared";
-import { POSQuickAccessCard } from "@/components/pos";
 import { LastSyncIndicator } from "@/components/nazer/LastSyncIndicator";
 import { useAdminDashboardRealtime, useAdminDashboardRefresh } from "@/hooks/dashboard/useAdminDashboardRealtime";
 
