@@ -2,7 +2,7 @@ import { lazy, Suspense, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Wallet, TrendingUp, TrendingDown, DollarSign, Receipt, Clock, CheckCircle, Mail, RefreshCw } from "lucide-react";
-import { useCashierStats } from "@/hooks/dashboard";
+import { useCashierStats, useCashierDashboardRealtime, useCashierDashboardRefresh } from "@/hooks/dashboard";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { Button } from "@/components/ui/button";
 import { AddReceiptDialog } from "@/components/payments/AddReceiptDialog";
@@ -14,7 +14,6 @@ import { SectionSkeleton } from "@/components/dashboard";
 import { AdminSendMessageDialog } from "@/components/messages/AdminSendMessageDialog";
 import { BankBalanceCard } from "@/components/shared/BankBalanceCard";
 import { WaqfCorpusCard } from "@/components/shared/WaqfCorpusCard";
-import { useQueryClient } from "@tanstack/react-query";
 import { POSQuickAccessCard } from "@/components/pos";
 
 // Lazy load heavy components
@@ -25,13 +24,10 @@ export default function CashierDashboard() {
   const [isReceiptDialogOpen, setIsReceiptDialogOpen] = useState(false);
   const [isVoucherDialogOpen, setIsVoucherDialogOpen] = useState(false);
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
-  const queryClient = useQueryClient();
 
-  const handleRefresh = () => {
-    queryClient.invalidateQueries({ queryKey: ['cashier-stats'] });
-    queryClient.invalidateQueries({ queryKey: ['bank-accounts'] });
-    queryClient.invalidateQueries({ queryKey: ['journal-entries'] });
-  };
+  // تفعيل التحديثات المباشرة الموحدة
+  useCashierDashboardRealtime();
+  const { refreshAll } = useCashierDashboardRefresh();
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل بيانات أمين الصندوق..." />;
@@ -42,7 +38,7 @@ export default function CashierDashboard() {
       role="cashier"
       actions={
         <div className="flex items-center gap-2">
-          <Button onClick={handleRefresh} variant="ghost" size="icon" title="تحديث البيانات">
+          <Button onClick={refreshAll} variant="ghost" size="icon" title="تحديث البيانات">
             <RefreshCw className="h-4 w-4" />
           </Button>
           <Button onClick={() => setMessageDialogOpen(true)} className="gap-2">

@@ -1,6 +1,30 @@
 # 📝 سجل التغييرات | Changelog
 
-**الإصدار الحالي:** 2.8.77 | **آخر تحديث:** 2025-12-11
+**الإصدار الحالي:** 2.8.78 | **آخر تحديث:** 2025-12-11
+
+---
+
+## [2.8.78] - 2025-12-11
+
+### 🔧 تحسينات لوحات التحكم - المرحلة 1
+
+#### ✅ إصلاحات حرجة
+- **AccountantDashboard**: إضافة `useAccountantDashboardRealtime` للتحديثات المباشرة
+- **CashierDashboard**: تفعيل `useCashierDashboardRealtime` (كان موجوداً لكن غير مفعّل)
+- **NazerDashboard**: إزالة `PendingApprovalsSection` المكرر من تبويب المستفيدين
+
+#### ✅ ملفات جديدة
+- `src/hooks/dashboard/useAccountantDashboardRealtime.ts`: hook موحد للتحديثات المباشرة للمحاسب
+  - يراقب 9 جداول: journal_entries, approvals, accounts, bank_accounts, bank_transactions, payments, rental_payments, fiscal_years, fiscal_year_closings
+  - إبطال تلقائي للـ queries عند تغيير البيانات
+
+#### 📋 الملفات المعدلة
+| الملف | التغيير |
+|-------|---------|
+| `src/pages/AccountantDashboard.tsx` | إضافة Realtime + إزالة useQueryClient |
+| `src/pages/CashierDashboard.tsx` | تفعيل Realtime + إزالة useQueryClient |
+| `src/pages/NazerDashboard.tsx` | إزالة PendingApprovalsSection المكرر |
+| `src/hooks/dashboard/index.ts` | تصدير hook المحاسب الجديد |
 
 ---
 

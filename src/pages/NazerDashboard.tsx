@@ -133,10 +133,6 @@ export default function NazerDashboard() {
                 <BeneficiaryActivityMonitor />
               </Suspense>
             </div>
-
-            <Suspense fallback={<ChartSkeleton />}>
-              <PendingApprovalsSection />
-            </Suspense>
           </TabsContent>
 
           {/* تبويب التقارير */}
