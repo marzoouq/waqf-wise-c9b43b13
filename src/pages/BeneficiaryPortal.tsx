@@ -37,6 +37,7 @@ import { BeneficiaryBottomNavigation } from "@/components/mobile/BeneficiaryBott
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { useBeneficiaryPortalData } from "@/hooks/beneficiary/useBeneficiaryPortalData";
 import { useBeneficiarySession } from "@/hooks/beneficiary/useBeneficiarySession";
+import { useBeneficiaryDashboardRealtime } from "@/hooks/dashboard/useBeneficiaryDashboardRealtime";
 
 export default function BeneficiaryPortal() {
   const navigate = useNavigate();
@@ -50,6 +51,12 @@ export default function BeneficiaryPortal() {
 
   // استخدام Hook المخصص لجلب البيانات
   const { beneficiary, statistics, isLoading } = useBeneficiaryPortalData();
+
+  // تفعيل Realtime للتحديثات الفورية
+  useBeneficiaryDashboardRealtime({
+    enabled: !!beneficiary?.id && !isPreviewMode,
+    beneficiaryId: beneficiary?.id,
+  });
 
   // اسم المستفيد للعرض في بانر المعاينة
   const beneficiaryName = useMemo(() => {
