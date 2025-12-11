@@ -8,6 +8,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { BeneficiaryReportData } from "@/types/reports/index";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";
 import { BeneficiaryService, RealtimeService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export function useBeneficiaryReportsData() {
   const queryClient = useQueryClient();
@@ -19,7 +20,7 @@ export function useBeneficiaryReportsData() {
     isRefetching,
     dataUpdatedAt,
   } = useQuery({
-    queryKey: ["beneficiaries-report"],
+    queryKey: QUERY_KEYS.BENEFICIARIES_REPORT,
     queryFn: async () => {
       const result = await BeneficiaryService.getAll();
       return (result.data || []).map(b => ({
@@ -46,13 +47,13 @@ export function useBeneficiaryReportsData() {
 
   useEffect(() => {
     const subscription = RealtimeService.subscribeToTable("beneficiaries", () => {
-      queryClient.invalidateQueries({ queryKey: ["beneficiaries-report"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARIES_REPORT });
     });
     return () => { subscription.unsubscribe(); };
   }, [queryClient]);
 
   const handleRefresh = () => {
-    queryClient.invalidateQueries({ queryKey: ["beneficiaries-report"] });
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARIES_REPORT });
   };
 
   return {
