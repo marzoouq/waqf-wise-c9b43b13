@@ -20,6 +20,7 @@ export { useNazerDashboardRealtime, useNazerDashboardRefresh } from './useNazerD
 export { useAdminDashboardRealtime, useAdminDashboardRefresh } from './useAdminDashboardRealtime';
 export { useCashierDashboardRealtime, useCashierDashboardRefresh } from './useCashierDashboardRealtime';
 export { useAccountantDashboardRealtime, useAccountantDashboardRefresh } from './useAccountantDashboardRealtime';
+export { useBeneficiaryDashboardRealtime, useBeneficiaryDashboardRefresh } from './useBeneficiaryDashboardRealtime';
 
 // ==================== Dashboard Data Hooks ====================
 export { useRecentJournalEntries } from './useRecentJournalEntries';

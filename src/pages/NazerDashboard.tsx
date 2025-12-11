@@ -22,6 +22,7 @@ import { PreviewAsBeneficiaryButton } from "@/components/nazer/PreviewAsBenefici
 import { LastSyncIndicator } from "@/components/nazer/LastSyncIndicator";
 import { NazerAnalyticsSection } from "@/components/nazer/NazerAnalyticsSection";
 import { CurrentFiscalYearCard, RevenueProgressCard, FinancialCardsRow } from "@/components/dashboard/shared";
+import { LazyTabContent } from "@/components/dashboard/admin/LazyTabContent";
 import { useNazerDashboardRealtime, useNazerDashboardRefresh } from "@/hooks/dashboard/useNazerDashboardRealtime";
 import { useUnifiedKPIs } from "@/hooks/dashboard/useUnifiedKPIs";
 
@@ -137,35 +138,41 @@ export default function NazerDashboard() {
             </Suspense>
           </TabsContent>
 
-          {/* تبويب المستفيدين */}
-          <TabsContent value="beneficiaries" className="space-y-6">
-            <Suspense fallback={<SectionSkeleton />}>
-              <NazerSystemOverview />
-            </Suspense>
-
-            <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
-              <Suspense fallback={<ChartSkeleton />}>
-                <NazerBeneficiaryManagement />
+          {/* تبويب المستفيدين - تحميل كسول */}
+          <LazyTabContent isActive={activeTab === "beneficiaries"}>
+            <div className="space-y-6">
+              <Suspense fallback={<SectionSkeleton />}>
+                <NazerSystemOverview />
               </Suspense>
-              <Suspense fallback={<ChartSkeleton />}>
-                <BeneficiaryActivityMonitor />
+
+              <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
+                <Suspense fallback={<ChartSkeleton />}>
+                  <NazerBeneficiaryManagement />
+                </Suspense>
+                <Suspense fallback={<ChartSkeleton />}>
+                  <BeneficiaryActivityMonitor />
+                </Suspense>
+              </div>
+            </div>
+          </LazyTabContent>
+
+          {/* تبويب التقارير - تحميل كسول */}
+          <LazyTabContent isActive={activeTab === "reports"}>
+            <div className="space-y-6">
+              <Suspense fallback={<SectionSkeleton />}>
+                <NazerReportsSection />
               </Suspense>
             </div>
-          </TabsContent>
+          </LazyTabContent>
 
-          {/* تبويب التقارير */}
-          <TabsContent value="reports" className="space-y-6">
-            <Suspense fallback={<SectionSkeleton />}>
-              <NazerReportsSection />
-            </Suspense>
-          </TabsContent>
-
-          {/* تبويب التحكم */}
-          <TabsContent value="settings" className="space-y-6">
-            <Suspense fallback={<SectionSkeleton />}>
-              <BeneficiaryControlSection />
-            </Suspense>
-          </TabsContent>
+          {/* تبويب التحكم - تحميل كسول */}
+          <LazyTabContent isActive={activeTab === "settings"}>
+            <div className="space-y-6">
+              <Suspense fallback={<SectionSkeleton />}>
+                <BeneficiaryControlSection />
+              </Suspense>
+            </div>
+          </LazyTabContent>
         </Tabs>
       </div>
 

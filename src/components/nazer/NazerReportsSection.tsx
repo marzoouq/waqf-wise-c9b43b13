@@ -1,13 +1,15 @@
 /**
  * قسم التقارير السريعة للناظر
  * وصول سريع لجميع التقارير المالية والإدارية
+ * 
+ * @version 2.8.91 - استخدام CSS Variables
  */
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { 
-  FileText, FileBarChart, PieChart, TrendingUp, 
+  FileText, FileBarChart, 
   Building2, Users, Wallet, DollarSign,
   ChevronLeft, Download, Printer, Calendar
 } from "lucide-react";
@@ -29,8 +31,8 @@ const reportCategories: ReportCategory[] = [
   {
     title: "التقارير المالية",
     icon: DollarSign,
-    color: "text-green-600",
-    bgColor: "bg-green-100",
+    color: "text-[hsl(var(--status-success))]",
+    bgColor: "bg-[hsl(var(--status-success)/0.1)]",
     reports: [
       { label: "ميزان المراجعة", path: "/accounting?tab=trial-balance" },
       { label: "قائمة الدخل", path: "/accounting?tab=income-statement" },
@@ -42,8 +44,8 @@ const reportCategories: ReportCategory[] = [
   {
     title: "تقارير العقارات",
     icon: Building2,
-    color: "text-amber-600",
-    bgColor: "bg-amber-100",
+    color: "text-[hsl(var(--status-warning))]",
+    bgColor: "bg-[hsl(var(--status-warning)/0.1)]",
     reports: [
       { label: "أداء العقارات", path: "/properties" },
       { label: "الإيجارات والتحصيل", path: "/invoices" },
@@ -54,8 +56,8 @@ const reportCategories: ReportCategory[] = [
   {
     title: "تقارير المستفيدين",
     icon: Users,
-    color: "text-blue-600",
-    bgColor: "bg-blue-100",
+    color: "text-[hsl(var(--chart-1))]",
+    bgColor: "bg-[hsl(var(--chart-1)/0.1)]",
     reports: [
       { label: "إحصائيات المستفيدين", path: "/beneficiaries" },
       { label: "التوزيعات السنوية", path: "/fiscal-years" },
@@ -66,8 +68,8 @@ const reportCategories: ReportCategory[] = [
   {
     title: "القروض والفزعات",
     icon: Wallet,
-    color: "text-red-600",
-    bgColor: "bg-red-100",
+    color: "text-destructive",
+    bgColor: "bg-destructive/10",
     reports: [
       { label: "القروض النشطة", path: "/loans", badge: "مهم" },
       { label: "الفزعات الطارئة", path: "/emergency-aid" },
@@ -78,8 +80,8 @@ const reportCategories: ReportCategory[] = [
   {
     title: "التقارير التنفيذية",
     icon: FileBarChart,
-    color: "text-purple-600",
-    bgColor: "bg-purple-100",
+    color: "text-[hsl(var(--chart-5))]",
+    bgColor: "bg-[hsl(var(--chart-5)/0.1)]",
     reports: [
       { label: "التقارير الشاملة", path: "/reports" },
       { label: "تقرير الحوكمة", path: "/governance/guide" },
