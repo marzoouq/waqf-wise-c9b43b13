@@ -20,8 +20,11 @@ import { NazerBeneficiaryManagement } from "@/components/nazer/NazerBeneficiaryM
 import { NazerReportsSection } from "@/components/nazer/NazerReportsSection";
 import { NazerSystemOverview } from "@/components/nazer/NazerSystemOverview";
 import { BeneficiaryActivityMonitor } from "@/components/nazer/BeneficiaryActivityMonitor";
+import { PreviewAsBeneficiaryButton } from "@/components/nazer/PreviewAsBeneficiaryButton";
+import { LastSyncIndicator } from "@/components/nazer/LastSyncIndicator";
 import { CurrentFiscalYearCard, RevenueProgressCard } from "@/components/dashboard/shared";
 import { useNazerDashboardRealtime, useNazerDashboardRefresh } from "@/hooks/dashboard/useNazerDashboardRealtime";
+import { useUnifiedKPIs } from "@/hooks/dashboard/useUnifiedKPIs";
 import { POSQuickAccessCard } from "@/components/pos";
 
 export default function NazerDashboard() {
@@ -29,19 +32,35 @@ export default function NazerDashboard() {
   const [distributeDialogOpen, setDistributeDialogOpen] = useState(false);
   const [publishDialogOpen, setPublishDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
+  const [isRefreshing, setIsRefreshing] = useState(false);
   
   // تفعيل التحديثات المباشرة الموحدة
   useNazerDashboardRealtime();
   const { refreshAll } = useNazerDashboardRefresh();
+  const { lastUpdated } = useUnifiedKPIs();
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    refreshAll();
+    setTimeout(() => setIsRefreshing(false), 1000);
+  };
 
   return (
     <UnifiedDashboardLayout
       role="nazer"
       actions={
-        <div className="flex items-center gap-2">
-          <Button onClick={refreshAll} variant="ghost" size="icon" title="تحديث البيانات">
-            <RefreshCw className="h-4 w-4" />
-          </Button>
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* مؤشر آخر تحديث */}
+          <LastSyncIndicator 
+            lastUpdated={lastUpdated} 
+            onRefresh={handleRefresh}
+            isRefreshing={isRefreshing}
+            className="hidden md:flex"
+          />
+          
+          {/* زر معاينة كـ مستفيد */}
+          <PreviewAsBeneficiaryButton />
+          
           <Button onClick={() => setDistributeDialogOpen(true)} className="gap-2" variant="default">
             <Coins className="h-4 w-4" />
             <span className="hidden sm:inline">توزيع الغلة</span>
