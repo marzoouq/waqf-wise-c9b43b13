@@ -106,7 +106,7 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[95vw] max-w-6xl max-h-[95vh] sm:max-h-[90vh] p-0 overflow-hidden">
+      <DialogContent className="w-full max-w-[95vw] sm:max-w-4xl lg:max-w-6xl max-h-[90vh] p-0 overflow-hidden">
         <DialogHeader className="p-3 sm:p-6 pb-0">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div>
@@ -427,9 +427,9 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-3 sm:p-6 pt-0">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                   {/* إجمالي التوزيعات */}
-                  <Card className="bg-amber-500/10 border-amber-500/20 col-span-2 md:col-span-1">
+                  <Card className="bg-amber-500/10 border-amber-500/20">
                     <CardContent className="p-2 sm:p-4 text-center">
                       <Coins className="h-6 w-6 sm:h-8 sm:w-8 mx-auto mb-1 sm:mb-2 text-amber-600" />
                       <p className="text-xs sm:text-sm text-muted-foreground">إجمالي الموزع</p>
@@ -496,8 +496,8 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-3 sm:p-6 pt-0">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4">
-                  <div className="text-center p-2 sm:p-4 bg-muted/50 rounded-lg">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                  <div className="text-center p-3 sm:p-4 bg-muted/50 rounded-lg">
                     <p className="text-xs sm:text-sm text-muted-foreground">حصة الناظر</p>
                     <p className="text-lg sm:text-2xl font-bold">{disclosure.nazer_percentage}%</p>
                     <p className="text-xs sm:text-sm text-purple-600">{formatCurrency(nazerShare)}</p>
