@@ -1,9 +1,11 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+import { 
+  handleCors, 
+  jsonResponse, 
+  errorResponse,
+  unauthorizedResponse,
+  forbiddenResponse 
+} from '../_shared/cors.ts';
 
 interface PublishRequest {
   fiscalYearId: string;
@@ -11,9 +13,8 @@ interface PublishRequest {
 }
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -23,18 +24,12 @@ Deno.serve(async (req) => {
     // Get user from auth header
     const authHeader = req.headers.get('Authorization')?.replace('Bearer ', '');
     if (!authHeader) {
-      return new Response(
-        JSON.stringify({ error: 'غير مصرح' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return unauthorizedResponse('غير مصرح');
     }
 
     const { data: { user }, error: authError } = await supabase.auth.getUser(authHeader);
     if (authError || !user) {
-      return new Response(
-        JSON.stringify({ error: 'المستخدم غير موجود' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return unauthorizedResponse('المستخدم غير موجود');
     }
 
     // Verify user is nazer or admin
@@ -46,10 +41,7 @@ Deno.serve(async (req) => {
       .single();
 
     if (!userRole) {
-      return new Response(
-        JSON.stringify({ error: 'غير مصرح لك بنشر السنة المالية' }),
-        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return forbiddenResponse('غير مصرح لك بنشر السنة المالية');
     }
 
     const body: PublishRequest = await req.json();
@@ -65,17 +57,11 @@ Deno.serve(async (req) => {
       .single();
 
     if (fyError || !fiscalYear) {
-      return new Response(
-        JSON.stringify({ error: 'السنة المالية غير موجودة' }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return errorResponse('السنة المالية غير موجودة', 404);
     }
 
     if (fiscalYear.is_published) {
-      return new Response(
-        JSON.stringify({ error: 'السنة المالية منشورة بالفعل' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return errorResponse('السنة المالية منشورة بالفعل', 400);
     }
 
     // Update fiscal year to published
@@ -90,10 +76,7 @@ Deno.serve(async (req) => {
 
     if (updateError) {
       console.error('[publish-fiscal-year] Update error:', updateError);
-      return new Response(
-        JSON.stringify({ error: 'خطأ في نشر السنة المالية', details: updateError.message }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return errorResponse('خطأ في نشر السنة المالية: ' + updateError.message, 500);
     }
 
     console.log('[publish-fiscal-year] Fiscal year marked as published');
@@ -129,25 +112,19 @@ Deno.serve(async (req) => {
       new_values: { is_published: true, published_at: new Date().toISOString() },
     });
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        message: 'تم نشر السنة المالية بنجاح',
-        fiscalYear: {
-          id: fiscalYearId,
-          name: fiscalYear.name,
-          published_at: new Date().toISOString(),
-        },
-      }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return jsonResponse({
+      success: true,
+      message: 'تم نشر السنة المالية بنجاح',
+      fiscalYear: {
+        id: fiscalYearId,
+        name: fiscalYear.name,
+        published_at: new Date().toISOString(),
+      },
+    });
 
   } catch (error: unknown) {
     console.error('[publish-fiscal-year] Error:', error);
     const errorMessage = error instanceof Error ? error.message : 'خطأ غير معروف';
-    return new Response(
-      JSON.stringify({ error: 'حدث خطأ غير متوقع', details: errorMessage }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return errorResponse('حدث خطأ غير متوقع: ' + errorMessage, 500);
   }
 });
