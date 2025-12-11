@@ -1,4 +1,4 @@
-import { Mail, Coins, Globe, RefreshCw, Settings, Users, FileText, Activity } from "lucide-react";
+import { Mail, Coins, Globe, Settings, Users, FileText, Activity } from "lucide-react";
 import { Suspense, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -22,6 +22,7 @@ import { NazerSystemOverview } from "@/components/nazer/NazerSystemOverview";
 import { BeneficiaryActivityMonitor } from "@/components/nazer/BeneficiaryActivityMonitor";
 import { PreviewAsBeneficiaryButton } from "@/components/nazer/PreviewAsBeneficiaryButton";
 import { LastSyncIndicator } from "@/components/nazer/LastSyncIndicator";
+import { NazerAnalyticsSection } from "@/components/nazer/NazerAnalyticsSection";
 import { CurrentFiscalYearCard, RevenueProgressCard } from "@/components/dashboard/shared";
 import { useNazerDashboardRealtime, useNazerDashboardRefresh } from "@/hooks/dashboard/useNazerDashboardRealtime";
 import { useUnifiedKPIs } from "@/hooks/dashboard/useUnifiedKPIs";
@@ -128,6 +129,11 @@ export default function NazerDashboard() {
                 <SmartAlertsSection />
               </Suspense>
             </div>
+
+            {/* قسم الرسوم البيانية التحليلية */}
+            <Suspense fallback={<ChartSkeleton />}>
+              <NazerAnalyticsSection />
+            </Suspense>
 
             <Suspense fallback={<ChartSkeleton />}>
               <AIInsightsWidget />
