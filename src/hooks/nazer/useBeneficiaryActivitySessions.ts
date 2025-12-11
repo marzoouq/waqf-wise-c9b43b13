@@ -1,12 +1,13 @@
 /**
  * Beneficiary Activity Sessions Hook
- * @version 2.8.44
+ * @version 2.8.86
  */
 
 import { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SystemService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface BeneficiarySession {
   id: string;
@@ -49,7 +50,7 @@ export function useBeneficiaryActivitySessions() {
   const queryClient = useQueryClient();
 
   const query = useQuery({
-    queryKey: ["beneficiary-sessions-live"],
+    queryKey: QUERY_KEYS.BENEFICIARY_SESSIONS_LIVE,
     queryFn: async (): Promise<BeneficiarySession[]> => {
       const data = await SystemService.getBeneficiaryActivitySessions();
       return data as BeneficiarySession[];

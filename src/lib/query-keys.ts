@@ -358,6 +358,16 @@ export const QUERY_KEYS = {
   // Maintenance Cost
   MAINTENANCE_COST_ANALYSIS: ['maintenance-cost-analysis'] as const,
   MAINTENANCE_TYPE_ANALYSIS: ['maintenance-type-analysis'] as const,
+  
+  // Additional Report Keys (Phase 3 Unification)
+  BENEFICIARIES_REPORT: ['beneficiaries-report'] as const,
+  BENEFICIARIES_ACTIVE: ['beneficiaries-active'] as const,
+  BENEFICIARY_SESSIONS_LIVE: ['beneficiary-sessions-live'] as const,
+  PROPERTIES_REPORT: ['properties-report'] as const,
+  PROPERTIES_STATS_ALT: ['properties-stats'] as const,
+  PROPERTIES_PERFORMANCE: ['properties-performance'] as const,
+  FISCAL_YEAR_SUMMARY: (fiscalYearId: string) => ['fiscal-year-summary', fiscalYearId] as const,
+  FISCAL_YEAR_CLOSINGS_ALT: ['fiscal_year_closings'] as const,
 } as const;
 
 // Query Config with default settings

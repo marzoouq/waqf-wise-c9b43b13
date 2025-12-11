@@ -6,6 +6,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { FiscalYearService } from "@/services/fiscal-year.service";
 import { toast } from "sonner";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 interface FiscalYearFormData {
   name: string;
@@ -58,8 +59,8 @@ export function useCreateFiscalYear(onSuccess?: () => void) {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["fiscal_years"] });
-      queryClient.invalidateQueries({ queryKey: ["fiscal_year_closings"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FISCAL_YEARS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FISCAL_YEAR_CLOSINGS_ALT });
       toast.success("تم إضافة السنة المالية بنجاح");
       onSuccess?.();
     },

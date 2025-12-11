@@ -1,7 +1,7 @@
 /**
  * useDistributeRevenue Hook
  * إدارة حالة ومنطق توزيع الغلة
- * @version 2.8.60
+ * @version 2.8.86
  */
 
 import { useState } from "react";
@@ -11,6 +11,7 @@ import { format } from "date-fns";
 import { useFiscalYearsList } from "@/hooks/fiscal-years";
 import { DistributionService, BeneficiaryService } from "@/services";
 import { EdgeFunctionService } from "@/services/edge-function.service";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface HeirShare {
   beneficiary_id: string;
@@ -40,7 +41,7 @@ export function useDistributeRevenue(onClose: () => void) {
 
   // جلب المستفيدين
   const { data: beneficiaries = [] } = useQuery({
-    queryKey: ["beneficiaries-active"],
+    queryKey: QUERY_KEYS.BENEFICIARIES_ACTIVE,
     queryFn: async () => {
       const { data } = await BeneficiaryService.getAll({ status: "نشط" });
       return data.filter(b => ["زوجة", "ابن", "بنت"].includes(b.relationship || ""));
@@ -91,9 +92,9 @@ export function useDistributeRevenue(onClose: () => void) {
       toast.success("تم توزيع الغلة بنجاح", {
         description: `تم توزيع ${parseFloat(totalAmount).toLocaleString("ar-SA")} ر.س على ${data?.summary?.heirsCount || 0} وريث`,
       });
-      queryClient.invalidateQueries({ queryKey: ["heir-distributions"] });
-      queryClient.invalidateQueries({ queryKey: ["beneficiaries"] });
-      queryClient.invalidateQueries({ queryKey: ["payments"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.HEIR_DISTRIBUTIONS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARIES });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PAYMENTS });
       resetForm();
       onClose();
     },

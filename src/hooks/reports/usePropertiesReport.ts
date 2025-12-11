@@ -1,6 +1,6 @@
 /**
  * Properties Report Hook
- * @version 2.8.45
+ * @version 2.8.86
  */
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";
 import { ReportService, type PropertyWithContracts } from "@/services/report.service";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export type { PropertyWithContracts };
 
@@ -16,7 +17,7 @@ export function usePropertiesReport() {
   const [lastUpdated, setLastUpdated] = useState<Date>();
 
   const query = useQuery<PropertyWithContracts[]>({
-    queryKey: ["properties-report"],
+    queryKey: QUERY_KEYS.PROPERTIES_REPORT,
     queryFn: () => ReportService.getPropertiesReport(),
     ...QUERY_CONFIG.REPORTS,
   });
@@ -36,14 +37,14 @@ export function usePropertiesReport() {
         'postgres_changes',
         { event: '*', schema: 'public', table: 'properties' },
         () => {
-          queryClient.invalidateQueries({ queryKey: ["properties-report"] });
+          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTIES_REPORT });
         }
       )
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'contracts' },
         () => {
-          queryClient.invalidateQueries({ queryKey: ["properties-report"] });
+          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTIES_REPORT });
         }
       )
       .subscribe();
@@ -54,7 +55,7 @@ export function usePropertiesReport() {
   }, [queryClient]);
 
   const handleRefresh = () => {
-    queryClient.invalidateQueries({ queryKey: ["properties-report"] });
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROPERTIES_REPORT });
   };
 
   return {
