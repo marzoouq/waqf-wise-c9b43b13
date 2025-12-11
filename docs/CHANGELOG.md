@@ -6,24 +6,35 @@
 
 ## [2.8.78] - 2025-12-11
 
-### 🔧 تحسينات لوحات التحكم - المرحلة 1
+### 🔧 تحسينات لوحات التحكم - المرحلة 1 + 2
 
-#### ✅ إصلاحات حرجة
+#### ✅ المرحلة 1: إصلاحات حرجة
 - **AccountantDashboard**: إضافة `useAccountantDashboardRealtime` للتحديثات المباشرة
 - **CashierDashboard**: تفعيل `useCashierDashboardRealtime` (كان موجوداً لكن غير مفعّل)
 - **NazerDashboard**: إزالة `PendingApprovalsSection` المكرر من تبويب المستفيدين
 
+#### ✅ المرحلة 2: تحسين التكامل
+- **PreviewAsBeneficiaryButton**: زر "معاينة كـ مستفيد" - ميزة Impersonation معتمدة في المنصات الكبيرة
+  - اختيار أي مستفيد من القائمة
+  - فتح لوحته في نافذة جديدة بوضع القراءة
+- **LastSyncIndicator**: مؤشر آخر تحديث مع:
+  - عرض الوقت منذ آخر تحديث بالعربية
+  - تمييز التحديثات الحديثة (< 2 دقيقة) باللون الأخضر
+  - زر تحديث يدوي
+
 #### ✅ ملفات جديدة
-- `src/hooks/dashboard/useAccountantDashboardRealtime.ts`: hook موحد للتحديثات المباشرة للمحاسب
-  - يراقب 9 جداول: journal_entries, approvals, accounts, bank_accounts, bank_transactions, payments, rental_payments, fiscal_years, fiscal_year_closings
-  - إبطال تلقائي للـ queries عند تغيير البيانات
+| الملف | الوصف |
+|-------|-------|
+| `src/hooks/dashboard/useAccountantDashboardRealtime.ts` | hook موحد للتحديثات المباشرة للمحاسب |
+| `src/components/nazer/PreviewAsBeneficiaryButton.tsx` | زر معاينة كـ مستفيد |
+| `src/components/nazer/LastSyncIndicator.tsx` | مؤشر آخر تحديث |
 
 #### 📋 الملفات المعدلة
 | الملف | التغيير |
 |-------|---------|
-| `src/pages/AccountantDashboard.tsx` | إضافة Realtime + إزالة useQueryClient |
-| `src/pages/CashierDashboard.tsx` | تفعيل Realtime + إزالة useQueryClient |
-| `src/pages/NazerDashboard.tsx` | إزالة PendingApprovalsSection المكرر |
+| `src/pages/AccountantDashboard.tsx` | إضافة Realtime |
+| `src/pages/CashierDashboard.tsx` | تفعيل Realtime |
+| `src/pages/NazerDashboard.tsx` | إضافة زر المعاينة + مؤشر التحديث + إزالة التكرار |
 | `src/hooks/dashboard/index.ts` | تصدير hook المحاسب الجديد |
 
 ---
