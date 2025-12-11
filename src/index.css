@@ -185,12 +185,25 @@
     font-feature-settings: "liga" 1, "calt" 1;
   }
   
+  /* تحسين التمرير على الجوال - إيقاف smooth scroll */
+  @media (max-width: 1024px) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+  
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Cairo', system-ui, sans-serif;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+  
+  /* تحسين التمرير على iOS */
+  main, .scroll-container {
+    -webkit-overflow-scrolling: touch;
   }
 
   /* تحسين الخطوط العربية */
