@@ -15,6 +15,7 @@ import { AdminSendMessageDialog } from "@/components/messages/AdminSendMessageDi
 import { BankBalanceCard } from "@/components/shared/BankBalanceCard";
 import { WaqfCorpusCard } from "@/components/shared/WaqfCorpusCard";
 import { POSQuickAccessCard } from "@/components/pos";
+import { LastSyncIndicator } from "@/components/nazer/LastSyncIndicator";
 
 // Lazy load heavy components
 const RecentJournalEntries = lazy(() => import("@/components/dashboard/RecentJournalEntries"));
@@ -38,6 +39,7 @@ export default function CashierDashboard() {
       role="cashier"
       actions={
         <div className="flex items-center gap-2">
+          <LastSyncIndicator onRefresh={refreshAll} />
           <Button onClick={refreshAll} variant="ghost" size="icon" title="تحديث البيانات">
             <RefreshCw className="h-4 w-4" />
           </Button>

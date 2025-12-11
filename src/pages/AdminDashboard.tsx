@@ -17,6 +17,8 @@ import { ChartSkeleton, SectionSkeleton } from "@/components/dashboard";
 import { BankBalanceCard } from "@/components/shared/BankBalanceCard";
 import { WaqfCorpusCard } from "@/components/shared/WaqfCorpusCard";
 import { CurrentFiscalYearCard, RevenueProgressCard } from "@/components/dashboard/shared";
+import { POSQuickAccessCard } from "@/components/pos";
+import { LastSyncIndicator } from "@/components/nazer/LastSyncIndicator";
 import { useAdminDashboardRealtime, useAdminDashboardRefresh } from "@/hooks/dashboard/useAdminDashboardRealtime";
 
 export default function AdminDashboard() {
@@ -36,6 +38,7 @@ export default function AdminDashboard() {
       role="admin"
       actions={
         <div className="flex items-center gap-2">
+          <LastSyncIndicator onRefresh={handleRefresh} />
           <Button onClick={handleRefresh} variant="ghost" size="icon" title="تحديث البيانات">
             <RefreshCw className="h-4 w-4" />
           </Button>
@@ -97,10 +100,11 @@ export default function AdminDashboard() {
             <AdminKPIs />
           </Suspense>
 
-          {/* بطاقات الرصيد البنكي ورقبة الوقف */}
-          <div className="grid gap-6 lg:grid-cols-2">
+          {/* بطاقات الرصيد البنكي ورقبة الوقف ونقطة البيع */}
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-3">
             <BankBalanceCard />
             <WaqfCorpusCard />
+            <POSQuickAccessCard />
           </div>
 
           <div className="grid gap-6 lg:grid-cols-2">
