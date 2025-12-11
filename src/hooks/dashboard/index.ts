@@ -1,6 +1,6 @@
 /**
  * Dashboard Hooks - خطافات لوحات التحكم
- * @version 2.6.36
+ * @version 2.8.78
  */
 
 // ==================== Core Dashboard Hooks ====================
@@ -19,6 +19,7 @@ export { useRevenueProgress, type RevenueProgressData } from './useRevenueProgre
 export { useNazerDashboardRealtime, useNazerDashboardRefresh } from './useNazerDashboardRealtime';
 export { useAdminDashboardRealtime, useAdminDashboardRefresh } from './useAdminDashboardRealtime';
 export { useCashierDashboardRealtime, useCashierDashboardRefresh } from './useCashierDashboardRealtime';
+export { useAccountantDashboardRealtime, useAccountantDashboardRefresh } from './useAccountantDashboardRealtime';
 
 // ==================== Dashboard Data Hooks ====================
 export { useRecentJournalEntries } from './useRecentJournalEntries';

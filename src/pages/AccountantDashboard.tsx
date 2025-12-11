@@ -16,8 +16,8 @@ import { BankBalanceCard } from "@/components/shared/BankBalanceCard";
 import { WaqfCorpusCard } from "@/components/shared/WaqfCorpusCard";
 import { CurrentFiscalYearCard, RevenueProgressCard } from "@/components/dashboard/shared";
 import { PendingApprovalsList, QuickActionsGrid } from "@/components/dashboard/accountant";
-import { useQueryClient } from "@tanstack/react-query";
 import { POSQuickAccessCard } from "@/components/pos";
+import { useAccountantDashboardRealtime, useAccountantDashboardRefresh } from "@/hooks/dashboard/useAccountantDashboardRealtime";
 
 // Lazy load components
 const AccountingStats = lazy(() => import("@/components/dashboard/AccountingStats"));
@@ -27,16 +27,13 @@ const AccountantDashboard = () => {
   const [selectedApproval, setSelectedApproval] = useState<JournalApproval | null>(null);
   const [isApprovalDialogOpen, setIsApprovalDialogOpen] = useState(false);
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
-  const queryClient = useQueryClient();
+  
+  // تفعيل التحديثات المباشرة الموحدة
+  useAccountantDashboardRealtime();
+  const { refreshAll } = useAccountantDashboardRefresh();
   
   const { data: kpis, isLoading: kpisLoading } = useAccountantKPIs();
   const { pendingApprovals, isLoading: approvalsLoading } = useAccountantDashboardData();
-
-  const handleRefresh = () => {
-    queryClient.invalidateQueries({ queryKey: ["accountant-kpis"] });
-    queryClient.invalidateQueries({ queryKey: ["pending_approvals"] });
-    queryClient.invalidateQueries({ queryKey: ["recent_journal_entries"] });
-  };
 
   const handleReviewApproval = (approval: JournalApproval) => {
     setSelectedApproval(approval);
@@ -48,7 +45,7 @@ const AccountantDashboard = () => {
       role="accountant"
       actions={
         <div className="flex items-center gap-2">
-          <Button onClick={handleRefresh} variant="ghost" size="icon" title="تحديث البيانات">
+          <Button onClick={refreshAll} variant="ghost" size="icon" title="تحديث البيانات">
             <RefreshCw className="h-4 w-4" />
           </Button>
           <Button onClick={() => setMessageDialogOpen(true)} className="gap-2">
