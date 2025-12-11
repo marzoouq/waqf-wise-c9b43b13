@@ -40,6 +40,7 @@ export function ReportBuilder() {
     createTemplate({
       name: reportName,
       report_type: reportType,
+      fields: selectedColumns,
       description: '',
       configuration: { columns: selectedColumns, filters: {}, sortBy: '' },
       is_public: false,

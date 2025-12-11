@@ -26,6 +26,8 @@ export interface OperationRecord {
   amount: number;
   date: string;
   journal_entry_id: string;
+  journalEntry?: string;
+  reason?: string;
 }
 
 export class FinancialReportService {
@@ -290,6 +292,7 @@ export class FinancialReportService {
           amount: p.amount,
           date: p.payment_date,
           journal_entry_id: p.journal_entry_id,
+          journalEntry: p.journal_entry_id || undefined,
         })));
       }
 
