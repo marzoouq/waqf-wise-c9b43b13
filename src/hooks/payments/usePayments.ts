@@ -6,22 +6,11 @@ import { useEffect } from "react";
 import { logger } from "@/lib/logger";
 import { paymentRequiresApproval } from "@/lib/supabase-wrappers";
 import { createMutationErrorHandler } from "@/lib/errors";
+import type { Database } from "@/integrations/supabase/types";
 
-export interface Payment {
-  id: string;
-  payment_type: "receipt" | "payment";
-  payment_number: string;
-  payment_date: string;
-  amount: number;
-  payment_method: "cash" | "bank_transfer" | "cheque" | "card";
-  payer_name: string;
-  reference_number?: string;
-  description: string;
-  notes?: string;
-  journal_entry_id?: string;
-  created_at: string;
-  updated_at: string;
-}
+type Payment = Database['public']['Tables']['payments']['Row'];
+type PaymentInsert = Database['public']['Tables']['payments']['Insert'];
+type PaymentUpdate = Database['public']['Tables']['payments']['Update'];
 
 export function usePayments() {
   const { toast } = useToast();
@@ -44,9 +33,9 @@ export function usePayments() {
   });
 
   const addPayment = useMutation({
-    mutationFn: async (payment: Omit<Payment, "id" | "created_at" | "updated_at">) => {
+    mutationFn: async (payment: Omit<PaymentInsert, "id" | "created_at" | "updated_at">) => {
       // التحقق من حاجة المدفوعة للموافقة
-      const result = await paymentRequiresApproval(payment.amount);
+      const result = await paymentRequiresApproval(payment.amount || 0);
       const requiresApproval = result.data || false;
 
       const paymentStatus = requiresApproval ? 'pending' : 'completed';
@@ -54,7 +43,7 @@ export function usePayments() {
       const data = await PaymentService.create({ 
         ...payment, 
         status: paymentStatus 
-      } as any);
+      });
 
       // إذا كانت تحتاج موافقة، إنشاء موافقات
       if (requiresApproval) {
@@ -78,8 +67,8 @@ export function usePayments() {
   });
 
   const updatePayment = useMutation({
-    mutationFn: async ({ id, ...updates }: Partial<Payment> & { id: string }) => {
-      return PaymentService.update(id, updates as any);
+    mutationFn: async ({ id, ...updates }: PaymentUpdate & { id: string }) => {
+      return PaymentService.update(id, updates);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["payments"] });

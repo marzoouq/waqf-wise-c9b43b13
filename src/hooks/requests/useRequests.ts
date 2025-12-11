@@ -65,7 +65,7 @@ export const useRequests = (beneficiaryId?: string) => {
         request_type_id: newRequest.request_type_id || '',
         description: newRequest.description,
         amount: newRequest.amount,
-        priority: newRequest.priority as any,
+        priority: newRequest.priority as 'منخفضة' | 'متوسطة' | 'عالية' | 'عاجلة' | undefined,
       });
       
       if (!result.success) throw new Error(result.message);
@@ -102,7 +102,13 @@ export const useRequests = (beneficiaryId?: string) => {
   // Update request
   const updateRequest = useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<BeneficiaryRequest> }) => {
-      return RequestService.update(id, updates as any);
+      return RequestService.update(id, {
+        beneficiary_id: updates.beneficiary_id,
+        request_type_id: updates.request_type_id,
+        description: updates.description || '',
+        amount: updates.amount,
+        priority: updates.priority as 'منخفضة' | 'متوسطة' | 'عالية' | 'عاجلة' | undefined,
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['requests'] });
