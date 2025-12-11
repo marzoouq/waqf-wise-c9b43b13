@@ -1,6 +1,41 @@
 # 📝 سجل التغييرات | Changelog
 
-**الإصدار الحالي:** 2.8.51 | **آخر تحديث:** 2025-12-09
+**الإصدار الحالي:** 2.8.77 | **آخر تحديث:** 2025-12-11
+
+---
+
+## [2.8.77] - 2025-12-11
+
+### 🔧 إصلاح مشاكل التمرير وأخطاء 404
+
+#### ✅ أخطاء 404 تم إصلاحها
+- **QuickActionsGrid.tsx**: تصحيح المسارات من `/beneficiary-portal` إلى `/beneficiary-dashboard`
+  - مسار الإفصاح السنوي
+  - مسار كشف الحساب
+
+#### ✅ إصلاح التصلب في التمرير
+- **BeneficiaryPortal.tsx**: إعادة هيكلة الحاوية الرئيسية
+  - `h-screen + overflow-hidden` على الحاوية الخارجية
+  - `overflow-y-auto + overscroll-contain + touch-pan-y` على main
+- **ViewDisclosureDialog.tsx**: استبدال `ScrollArea` بـ `div` مع CSS مباشر
+  - إضافة `-webkit-overflow-scrolling: touch` للجوال
+  - إضافة `touch-pan-y` للتمرير السلس
+- **scroll-area.tsx**: تحسين مكون ScrollArea
+  - إضافة `overflow-y-auto + overscroll-contain` للـ Viewport
+  - إضافة `WebkitOverflowScrolling: touch`
+- **index.css**: تحسينات CSS للجوال
+  - إيقاف `scroll-behavior: smooth` على الجوال (max-width: 1024px)
+  - إضافة `-webkit-overflow-scrolling: touch` لـ main
+  - إضافة `overflow-x: hidden` على body
+
+#### 📋 الملفات المعدلة
+| الملف | التغيير |
+|-------|---------|
+| `src/components/beneficiary/sections/QuickActionsGrid.tsx` | تصحيح المسارات |
+| `src/pages/BeneficiaryPortal.tsx` | إعادة هيكلة التمرير |
+| `src/components/distributions/ViewDisclosureDialog.tsx` | إصلاح تمرير الحوار |
+| `src/components/ui/scroll-area.tsx` | تحسين touch scrolling |
+| `src/index.css` | تحسينات CSS للجوال |
 
 ---
 
