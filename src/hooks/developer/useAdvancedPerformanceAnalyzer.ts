@@ -116,8 +116,9 @@ export function useAdvancedPerformanceAnalyzer(enabled: boolean = true) {
     try {
       const clsObserver = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
-          if (!(entry as any).hadRecentInput) {
-            metricsRef.current.cls += (entry as any).value || 0;
+          const layoutShift = entry as PerformanceEntry & { hadRecentInput?: boolean; value?: number };
+          if (!layoutShift.hadRecentInput) {
+            metricsRef.current.cls += layoutShift.value || 0;
           }
         }
       });
@@ -453,7 +454,8 @@ export function useAdvancedPerformanceAnalyzer(enabled: boolean = true) {
 
       let jsHeapSize: number | null = null;
       if ('memory' in performance) {
-        jsHeapSize = (performance as any).memory.usedJSHeapSize;
+        const perfWithMemory = performance as Performance & { memory?: { usedJSHeapSize: number } };
+        jsHeapSize = perfWithMemory.memory?.usedJSHeapSize ?? null;
       }
 
       const metrics: PerformanceReport['metrics'] = {

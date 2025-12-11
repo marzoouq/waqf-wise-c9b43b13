@@ -44,10 +44,12 @@ function identifyLCPElement() {
       if (lastEntry) {
         const lcpTime = lastEntry.renderTime || lastEntry.loadTime || 0;
         
-        if (lcpTime > 2500) {
-          console.warn(`⚠️ LCP عالي: ${lcpTime.toFixed(0)}ms`);
-        } else {
-          console.log(`✅ LCP: ${lcpTime.toFixed(0)}ms`);
+        if (import.meta.env.DEV) {
+          if (lcpTime > 2500) {
+            console.warn(`⚠️ LCP عالي: ${lcpTime.toFixed(0)}ms`);
+          } else {
+            console.log(`✅ LCP: ${lcpTime.toFixed(0)}ms`);
+          }
         }
       }
     });
