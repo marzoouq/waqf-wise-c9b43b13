@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity, FileText, Upload, LogIn, Send, CheckCircle } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
-import { ScrollArea } from "@/components/ui/scroll-area";
+
 import { Skeleton } from "@/components/ui/skeleton";
 import { useBeneficiaryActivity } from "@/hooks/beneficiary/useBeneficiaryActivity";
 
@@ -27,16 +27,19 @@ export function ActivityTimeline({ beneficiaryId }: ActivityTimelineProps) {
     }
   };
 
+  // عرض آخر 3 أنشطة فقط
+  const recentActivities = activities?.slice(0, 3) || [];
+
   if (isLoading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>سجل النشاط</CardTitle>
+      <Card className="border-muted">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base">سجل النشاط</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {[...Array(5)].map((_, i) => (
-              <Skeleton key={i} className="h-16" />
+          <div className="space-y-2">
+            {[...Array(3)].map((_, i) => (
+              <Skeleton key={i} className="h-10" />
             ))}
           </div>
         </CardContent>
@@ -45,48 +48,36 @@ export function ActivityTimeline({ beneficiaryId }: ActivityTimelineProps) {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Activity className="h-5 w-5" />
+    <Card className="border-muted">
+      <CardHeader className="pb-2">
+        <CardTitle className="flex items-center gap-2 text-base">
+          <Activity className="h-4 w-4" />
           سجل النشاط
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <ScrollArea className="h-[400px] pr-4">
-          {activities && activities.length > 0 ? (
-            <div className="space-y-4">
-              {activities.map((activity, index) => (
-                <div key={activity.id} className="flex gap-3 relative">
-                  {/* الخط الموصل */}
-                  {index < activities.length - 1 && (
-                    <div className="absolute right-[15px] top-8 w-[2px] h-full bg-border" />
-                  )}
-                  
-                  {/* الأيقونة */}
-                  <div className="relative z-10 h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                    {getActivityIcon(activity.action_type)}
-                  </div>
-                  
-                  {/* المحتوى */}
-                  <div className="flex-1 pb-4">
-                    <p className="font-medium text-sm">{activity.action_description}</p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {format(new Date(activity.created_at || ""), "PPp", { locale: ar })}
-                    </p>
-                    {activity.performed_by_name && (
-                      <p className="text-xs text-muted-foreground">
-                        بواسطة: {activity.performed_by_name}
-                      </p>
-                    )}
-                  </div>
+      <CardContent className="pt-0">
+        {recentActivities.length > 0 ? (
+          <div className="space-y-2">
+            {recentActivities.map((activity) => (
+              <div key={activity.id} className="flex items-center gap-2 p-2 rounded-lg bg-muted/50">
+                {/* الأيقونة */}
+                <div className="h-7 w-7 rounded-full bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
+                  {getActivityIcon(activity.action_type)}
                 </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-center text-muted-foreground py-8">لا توجد أنشطة مسجلة</p>
-          )}
-        </ScrollArea>
+                
+                {/* المحتوى */}
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-xs truncate">{activity.action_description}</p>
+                  <p className="text-[10px] text-muted-foreground">
+                    {format(new Date(activity.created_at || ""), "d MMM - h:mm a", { locale: ar })}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-center text-muted-foreground text-sm py-4">لا توجد أنشطة</p>
+        )}
       </CardContent>
     </Card>
   );
