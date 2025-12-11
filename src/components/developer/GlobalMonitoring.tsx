@@ -16,7 +16,7 @@ export function GlobalMonitoring() {
   useErrorNotifications(shouldMonitor);
 
   useEffect(() => {
-    if (shouldMonitor) {
+    if (shouldMonitor && import.meta.env.DEV) {
       const userType = isNazer ? 'الناظر' : 'المشرف';
       console.log(`
 ╔══════════════════════════════════════════════╗
