@@ -14,6 +14,7 @@ import { QUERY_KEYS } from "@/lib/query-keys";
 // الجداول التي يراقبها المحاسب
 const ACCOUNTANT_WATCHED_TABLES = [
   'journal_entries',
+  'journal_entry_lines',
   'approvals',
   'accounts',
   'bank_accounts',
@@ -30,6 +31,12 @@ const INVALIDATION_MAP: Record<string, readonly (readonly string[])[]> = {
     QUERY_KEYS.ACCOUNTANT_KPIS,
     ['journal-entries'] as const,
     ['recent_journal_entries'] as const,
+    ['unified-dashboard-kpis'] as const
+  ],
+  'journal_entry_lines': [
+    QUERY_KEYS.ACCOUNTANT_KPIS,
+    ['journal-entries'] as const,
+    ['trial-balance'] as const,
     ['unified-dashboard-kpis'] as const
   ],
   'approvals': [
