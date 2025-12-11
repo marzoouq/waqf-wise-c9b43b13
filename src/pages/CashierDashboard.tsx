@@ -16,6 +16,7 @@ import { BankBalanceCard } from "@/components/shared/BankBalanceCard";
 import { WaqfCorpusCard } from "@/components/shared/WaqfCorpusCard";
 import { POSQuickAccessCard } from "@/components/pos";
 import { LastSyncIndicator } from "@/components/nazer/LastSyncIndicator";
+import { FinancialCardsRow } from "@/components/dashboard/shared";
 
 // Lazy load heavy components
 const RecentJournalEntries = lazy(() => import("@/components/dashboard/RecentJournalEntries"));
@@ -83,11 +84,7 @@ export default function CashierDashboard() {
       </UnifiedStatsGrid>
 
       {/* بطاقات الرصيد البنكي ورقبة الوقف ونقطة البيع */}
-      <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-3 mt-6 mb-4">
-        <BankBalanceCard />
-        <WaqfCorpusCard />
-        <POSQuickAccessCard />
-      </div>
+      <FinancialCardsRow className="mt-6 mb-4" />
 
         {/* Tabs Section */}
         <Tabs defaultValue="overview" className="space-y-4">

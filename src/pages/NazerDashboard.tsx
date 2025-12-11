@@ -23,7 +23,7 @@ import { BeneficiaryActivityMonitor } from "@/components/nazer/BeneficiaryActivi
 import { PreviewAsBeneficiaryButton } from "@/components/nazer/PreviewAsBeneficiaryButton";
 import { LastSyncIndicator } from "@/components/nazer/LastSyncIndicator";
 import { NazerAnalyticsSection } from "@/components/nazer/NazerAnalyticsSection";
-import { CurrentFiscalYearCard, RevenueProgressCard } from "@/components/dashboard/shared";
+import { CurrentFiscalYearCard, RevenueProgressCard, FinancialCardsRow } from "@/components/dashboard/shared";
 import { useNazerDashboardRealtime, useNazerDashboardRefresh } from "@/hooks/dashboard/useNazerDashboardRealtime";
 import { useUnifiedKPIs } from "@/hooks/dashboard/useUnifiedKPIs";
 import { POSQuickAccessCard } from "@/components/pos";
@@ -115,11 +115,7 @@ export default function NazerDashboard() {
             </Suspense>
 
             {/* بطاقات الرصيد البنكي ورقبة الوقف ونقطة البيع */}
-            <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-3">
-              <BankBalanceCard />
-              <WaqfCorpusCard />
-              <POSQuickAccessCard />
-            </div>
+            <FinancialCardsRow />
 
             <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
               <Suspense fallback={<ChartSkeleton />}>

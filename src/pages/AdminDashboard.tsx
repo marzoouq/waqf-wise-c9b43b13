@@ -16,7 +16,7 @@ import { UnifiedDashboardLayout } from "@/components/dashboard/UnifiedDashboardL
 import { ChartSkeleton, SectionSkeleton } from "@/components/dashboard";
 import { BankBalanceCard } from "@/components/shared/BankBalanceCard";
 import { WaqfCorpusCard } from "@/components/shared/WaqfCorpusCard";
-import { CurrentFiscalYearCard, RevenueProgressCard } from "@/components/dashboard/shared";
+import { CurrentFiscalYearCard, RevenueProgressCard, FinancialCardsRow } from "@/components/dashboard/shared";
 import { POSQuickAccessCard } from "@/components/pos";
 import { LastSyncIndicator } from "@/components/nazer/LastSyncIndicator";
 import { useAdminDashboardRealtime, useAdminDashboardRefresh } from "@/hooks/dashboard/useAdminDashboardRealtime";
@@ -101,11 +101,7 @@ export default function AdminDashboard() {
           </Suspense>
 
           {/* بطاقات الرصيد البنكي ورقبة الوقف ونقطة البيع */}
-          <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-3">
-            <BankBalanceCard />
-            <WaqfCorpusCard />
-            <POSQuickAccessCard />
-          </div>
+          <FinancialCardsRow />
 
           <div className="grid gap-6 lg:grid-cols-2">
             <Suspense fallback={<ChartSkeleton />}>
