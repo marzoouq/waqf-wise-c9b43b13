@@ -39,6 +39,62 @@ interface ExpenseItem {
   amount: number;
 }
 
+// ترجمة أسماء المصروفات من الإنجليزية إلى العربية
+const expenseNameTranslations: Record<string, string> = {
+  // المصروفات الفعلية من قاعدة البيانات
+  'audit_2024': 'تدقيق 2024',
+  'audit_2025': 'تدقيق 2025',
+  'cleaning_worker': 'عامل نظافة',
+  'ejar_platform': 'منصة إيجار',
+  'electrical_works': 'أعمال كهربائية',
+  'electricity_bills': 'فواتير الكهرباء',
+  'electricity_maintenance': 'صيانة كهربائية',
+  'gypsum_works': 'أعمال جبس',
+  'miscellaneous': 'مصروفات متنوعة',
+  'plumbing_maintenance': 'صيانة سباكة',
+  'plumbing_works': 'أعمال سباكة',
+  'rental_commission': 'عمولة إيجار',
+  'water_bills': 'فواتير المياه',
+  'zakat': 'الزكاة',
+  'total': 'الإجمالي',
+  // ترجمات إضافية احتياطية
+  'maintenance': 'مصروفات الصيانة',
+  'administrative': 'مصروفات إدارية',
+  'development': 'مصروفات التطوير',
+  'other': 'مصروفات أخرى',
+  'utilities': 'المرافق والخدمات',
+  'insurance': 'التأمين',
+  'taxes': 'الضرائب والرسوم',
+  'legal': 'المصروفات القانونية',
+  'salaries': 'الرواتب والأجور',
+  'repairs': 'الإصلاحات',
+  'security': 'الأمن والحراسة',
+  'bank_charges': 'رسوم بنكية',
+};
+
+// ترجمة أسماء الإيرادات
+const revenueNameTranslations: Record<string, string> = {
+  'jeddah_properties': 'عقارات جدة',
+  'nahdi_rental': 'إيجار النهدي',
+  'remaining_2024': 'متبقي 2024',
+  'residential_monthly': 'الإيجارات السكنية الشهرية',
+  'total': 'الإجمالي',
+  // ترجمات إضافية احتياطية
+  'rental_income': 'إيرادات الإيجار',
+  'investment_returns': 'عوائد الاستثمار',
+  'other_income': 'إيرادات أخرى',
+};
+
+const translateExpenseName = (name: string): string => {
+  const lowerName = name.toLowerCase().trim();
+  return expenseNameTranslations[lowerName] || name;
+};
+
+const translateRevenueName = (name: string): string => {
+  const lowerName = name.toLowerCase().trim();
+  return revenueNameTranslations[lowerName] || name;
+};
+
 interface RevenueItem {
   name: string;
   amount: number;
@@ -70,16 +126,20 @@ const formatCurrency = (amount: number | null | undefined): string => {
 export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDisclosureDialogProps) {
   if (!disclosure) return null;
 
-  // Parse expense breakdown
+  // Parse expense breakdown (exclude 'total' as it's shown separately)
   const expensesBreakdown = disclosure.expenses_breakdown as Record<string, number> | null;
   const expenseItems: ExpenseItem[] = expensesBreakdown 
-    ? Object.entries(expensesBreakdown).map(([name, amount]) => ({ name, amount: amount || 0 }))
+    ? Object.entries(expensesBreakdown)
+        .filter(([name]) => name.toLowerCase() !== 'total')
+        .map(([name, amount]) => ({ name, amount: amount || 0 }))
     : [];
   
-  // Parse revenue breakdown
+  // Parse revenue breakdown (exclude 'total' as it's shown separately)
   const revenueBreakdown = disclosure.revenue_breakdown as Record<string, number> | null;
   const revenueItems: RevenueItem[] = revenueBreakdown
-    ? Object.entries(revenueBreakdown).map(([name, amount]) => ({ name, amount: amount || 0 }))
+    ? Object.entries(revenueBreakdown)
+        .filter(([name]) => name.toLowerCase() !== 'total')
+        .map(([name, amount]) => ({ name, amount: amount || 0 }))
     : [];
 
   // Parse beneficiaries details
@@ -320,7 +380,7 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                       <TableBody>
                         {revenueItems.map((item, index) => (
                           <TableRow key={index}>
-                            <TableCell className="font-medium text-xs sm:text-sm">{item.name}</TableCell>
+                            <TableCell className="font-medium text-xs sm:text-sm">{translateRevenueName(item.name)}</TableCell>
                             <TableCell className="text-emerald-600 font-semibold text-xs sm:text-sm">
                               {formatCurrency(item.amount)}
                             </TableCell>
@@ -367,7 +427,7 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                         {expenseItems.map((item, index) => (
                           <TableRow key={index}>
                             <TableCell className="text-muted-foreground text-xs sm:text-sm">{index + 1}</TableCell>
-                            <TableCell className="font-medium text-xs sm:text-sm">{item.name}</TableCell>
+                            <TableCell className="font-medium text-xs sm:text-sm">{translateExpenseName(item.name)}</TableCell>
                             <TableCell className="text-red-600 font-semibold text-xs sm:text-sm">
                               {formatCurrency(item.amount)}
                             </TableCell>
