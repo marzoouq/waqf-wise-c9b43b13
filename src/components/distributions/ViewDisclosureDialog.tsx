@@ -1,7 +1,7 @@
 /**
  * ViewDisclosureDialog - حوار عرض الإفصاح السنوي
  * @description صفحة إفصاح منظمة وشفافة تعرض رحلة الأموال من الإيرادات إلى المتبقي
- * @version 2.8.66
+ * @version 2.8.67
  */
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   FileText, 
   TrendingUp, 
@@ -21,12 +22,18 @@ import {
   MinusCircle,
   Coins,
   Receipt,
-  Percent
+  Percent,
+  BarChart3,
+  Lightbulb,
+  Building2
 } from "lucide-react";
-import { AnnualDisclosure } from "@/hooks/reports/useAnnualDisclosures";
+import { AnnualDisclosure, useAnnualDisclosures } from "@/hooks/reports/useAnnualDisclosures";
 import { SmartDisclosureDocuments } from "@/components/reports/SmartDisclosureDocuments";
 import { HistoricalRentalDetailsCard } from "@/components/fiscal-year/HistoricalRentalDetailsCard";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from "@/components/ui/table";
+import { YearComparisonCard } from "@/components/disclosure/YearComparisonCard";
+import { DisclosureCharts } from "@/components/disclosure/DisclosureCharts";
+import { SmartInsights } from "@/components/disclosure/SmartInsights";
 
 interface ViewDisclosureDialogProps {
   open: boolean;
@@ -124,7 +131,13 @@ const formatCurrency = (amount: number | null | undefined): string => {
 };
 
 export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDisclosureDialogProps) {
+  // جلب جميع الإفصاحات للمقارنة
+  const { disclosures: allDisclosures } = useAnnualDisclosures();
+  
   if (!disclosure) return null;
+
+  // البحث عن السنة السابقة للمقارنة
+  const previousYear = allDisclosures?.find(d => d.year === disclosure.year - 1) || null;
 
   // Parse expense breakdown (exclude 'total' as it's shown separately)
   const expensesBreakdown = disclosure.expenses_breakdown as Record<string, number> | null;
@@ -183,7 +196,157 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
         </DialogHeader>
 
         <ScrollArea className="h-[calc(95vh-80px)] sm:h-[calc(90vh-100px)]">
-          <div className="p-3 sm:p-6 space-y-4 sm:space-y-6">
+          {/* تبويبات للجوال */}
+          <div className="block sm:hidden p-3">
+            <Tabs defaultValue="summary" className="w-full">
+              <TabsList className="grid w-full grid-cols-4 h-auto">
+                <TabsTrigger value="summary" className="text-[10px] px-1 py-1.5">
+                  <Calculator className="h-3 w-3 ml-1" />
+                  ملخص
+                </TabsTrigger>
+                <TabsTrigger value="details" className="text-[10px] px-1 py-1.5">
+                  <FileText className="h-3 w-3 ml-1" />
+                  تفاصيل
+                </TabsTrigger>
+                <TabsTrigger value="charts" className="text-[10px] px-1 py-1.5">
+                  <BarChart3 className="h-3 w-3 ml-1" />
+                  رسوم
+                </TabsTrigger>
+                <TabsTrigger value="insights" className="text-[10px] px-1 py-1.5">
+                  <Lightbulb className="h-3 w-3 ml-1" />
+                  رؤى
+                </TabsTrigger>
+              </TabsList>
+
+              {/* محتوى التبويب: ملخص */}
+              <TabsContent value="summary" className="mt-3 space-y-3">
+                {/* الكشف المالي المختصر */}
+                <Card className="border-2 border-primary/20">
+                  <CardContent className="p-3 space-y-2">
+                    <div className="flex justify-between items-center p-2 bg-emerald-500/10 rounded">
+                      <span className="text-xs">الإيرادات</span>
+                      <span className="font-bold text-emerald-600 text-sm">{formatCurrency(totalRevenues)}</span>
+                    </div>
+                    <div className="flex justify-between items-center p-2 bg-red-500/10 rounded">
+                      <span className="text-xs">المصروفات</span>
+                      <span className="font-bold text-red-600 text-sm">({formatCurrency(totalExpenses)})</span>
+                    </div>
+                    <div className="flex justify-between items-center p-2 bg-blue-500/10 rounded">
+                      <span className="text-xs">صافي الدخل</span>
+                      <span className="font-bold text-blue-600 text-sm">{formatCurrency(netAfterExpenses)}</span>
+                    </div>
+                    <div className="flex justify-between items-center p-2 bg-amber-500/10 rounded">
+                      <span className="text-xs">التوزيعات</span>
+                      <span className="font-bold text-amber-600 text-sm">({formatCurrency(distributedAmount)})</span>
+                    </div>
+                    <div className="flex justify-between items-center p-2 bg-primary/10 rounded border border-primary">
+                      <span className="text-xs font-medium">رقبة الوقف</span>
+                      <span className="font-bold text-primary text-sm">{formatCurrency(corpusShare)}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* توزيعات الورثة مختصرة */}
+                <Card>
+                  <CardHeader className="p-3 pb-2">
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <Users className="h-4 w-4 text-amber-600" />
+                      توزيعات الورثة
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-3 pt-0">
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="text-center p-2 bg-heir-son/10 rounded">
+                        <p className="text-[10px] text-muted-foreground">الأبناء</p>
+                        <p className="text-xs font-bold text-heir-son">{disclosure.sons_count}</p>
+                      </div>
+                      <div className="text-center p-2 bg-heir-daughter/10 rounded">
+                        <p className="text-[10px] text-muted-foreground">البنات</p>
+                        <p className="text-xs font-bold text-heir-daughter">{disclosure.daughters_count}</p>
+                      </div>
+                      <div className="text-center p-2 bg-heir-wife/10 rounded">
+                        <p className="text-[10px] text-muted-foreground">الزوجات</p>
+                        <p className="text-xs font-bold text-heir-wife">{disclosure.wives_count}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* محتوى التبويب: تفاصيل */}
+              <TabsContent value="details" className="mt-3 space-y-3">
+                {/* تفصيل الإيرادات */}
+                {revenueItems.length > 0 && (
+                  <Card>
+                    <CardHeader className="p-3 pb-2">
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <TrendingUp className="h-4 w-4 text-emerald-600" />
+                        الإيرادات
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-3 pt-0 space-y-1">
+                      {revenueItems.map((item, i) => (
+                        <div key={i} className="flex justify-between text-xs p-1.5 bg-muted/50 rounded">
+                          <span>{translateRevenueName(item.name)}</span>
+                          <span className="text-emerald-600">{formatCurrency(item.amount)}</span>
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* تفصيل المصروفات */}
+                {expenseItems.length > 0 && (
+                  <Card>
+                    <CardHeader className="p-3 pb-2">
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <TrendingDown className="h-4 w-4 text-red-600" />
+                        المصروفات
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-3 pt-0 space-y-1">
+                      {expenseItems.map((item, i) => (
+                        <div key={i} className="flex justify-between text-xs p-1.5 bg-muted/50 rounded">
+                          <span>{translateExpenseName(item.name)}</span>
+                          <span className="text-red-600">{formatCurrency(item.amount)}</span>
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* المستندات */}
+                <SmartDisclosureDocuments disclosureId={disclosure.id} />
+              </TabsContent>
+
+              {/* محتوى التبويب: رسوم بيانية */}
+              <TabsContent value="charts" className="mt-3">
+                <DisclosureCharts disclosure={disclosure} />
+              </TabsContent>
+
+              {/* محتوى التبويب: رؤى ذكية */}
+              <TabsContent value="insights" className="mt-3 space-y-3">
+                <SmartInsights currentYear={disclosure} previousYear={previousYear} />
+                <YearComparisonCard currentYear={disclosure} previousYear={previousYear} />
+              </TabsContent>
+            </Tabs>
+          </div>
+
+          {/* عرض سطح المكتب الكامل */}
+          <div className="hidden sm:block p-3 sm:p-6 space-y-4 sm:space-y-6">
+            
+            {/* ============================================ */}
+            {/* القسم 0: الرؤى الذكية والمقارنة السنوية */}
+            {/* ============================================ */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <SmartInsights currentYear={disclosure} previousYear={previousYear} />
+              <YearComparisonCard currentYear={disclosure} previousYear={previousYear} />
+            </div>
+
+            {/* ============================================ */}
+            {/* القسم 0.5: الرسوم البيانية */}
+            {/* ============================================ */}
+            <DisclosureCharts disclosure={disclosure} />
             
             {/* ============================================ */}
             {/* القسم 1: الكشف المالي المتسلسل (الأهم) */}
