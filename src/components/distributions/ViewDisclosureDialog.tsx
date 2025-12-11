@@ -20,6 +20,7 @@ import { useDisclosureBeneficiaries } from "@/hooks/useAnnualDisclosures";
 import { AnnualDisclosure } from "@/hooks/useAnnualDisclosures";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { SmartDisclosureDocuments } from "@/components/reports/SmartDisclosureDocuments";
+import { HistoricalRentalDetailsCard } from "@/components/fiscal-year/HistoricalRentalDetailsCard";
 
 interface ViewDisclosureDialogProps {
   open: boolean;
@@ -602,6 +603,14 @@ export const ViewDisclosureDialog = ({
               </ScrollArea>
             </CardContent>
           </Card>
+        )}
+
+        {/* البيان التفصيلي للشقق السكنية */}
+        {disclosure.fiscal_year_id && (
+          <HistoricalRentalDetailsCard 
+            fiscalYearId={disclosure.fiscal_year_id} 
+            fiscalYearName={`${disclosure.year - 1}-${disclosure.year}`}
+          />
         )}
 
         {/* المستندات الداعمة للإفصاح - العرض الذكي */}
