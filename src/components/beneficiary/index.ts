@@ -90,6 +90,7 @@ export { PropertiesListView } from './PropertiesListView';
 export { PropertyAccordionView } from './PropertyAccordionView';
 export { PropertyUnitsGrid } from './PropertyUnitsGrid';
 export { PropertyUnitsDisplay } from './properties/PropertyUnitsDisplay';
+export { PreviewModeBanner } from './PreviewModeBanner';
 
 // ==================== Admin Components (للموظفين) ====================
 // يمكن الاستيراد من: @/components/beneficiary/admin

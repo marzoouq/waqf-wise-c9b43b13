@@ -27,10 +27,11 @@ import {
   YearlyComparison,
 } from "@/components/beneficiary";
 import { FiscalYearNotPublishedBanner } from "@/components/beneficiary/FiscalYearNotPublishedBanner";
+import { PreviewModeBanner } from "@/components/beneficiary/PreviewModeBanner";
 import { ChatbotQuickCard } from "@/components/dashboard/ChatbotQuickCard";
 import { FinancialSummarySection } from "@/components/beneficiary/sections/FinancialSummarySection";
 import { QuickActionsGrid } from "@/components/beneficiary/sections/QuickActionsGrid";
-import { Suspense } from "react";
+import { Suspense, useMemo } from "react";
 import { BeneficiarySidebar } from "@/components/beneficiary/BeneficiarySidebar";
 import { BeneficiaryBottomNavigation } from "@/components/mobile/BeneficiaryBottomNavigation";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
@@ -43,13 +44,22 @@ export default function BeneficiaryPortal() {
   const activeTab = searchParams.get("tab") || "overview";
   const { settings } = useVisibilitySettings();
 
+  // معالجة وضع المعاينة
+  const isPreviewMode = searchParams.get("preview") === "true";
+  const previewBeneficiaryId = searchParams.get("beneficiary_id");
+
   // استخدام Hook المخصص لجلب البيانات
   const { beneficiary, statistics, isLoading } = useBeneficiaryPortalData();
 
-  // تتبع جلسة المستفيد للناظر
+  // اسم المستفيد للعرض في بانر المعاينة
+  const beneficiaryName = useMemo(() => {
+    return beneficiary?.full_name;
+  }, [beneficiary]);
+
+  // تتبع جلسة المستفيد للناظر (فقط إذا لم يكن في وضع المعاينة)
   useBeneficiarySession({
     beneficiaryId: beneficiary?.id,
-    enabled: !!beneficiary?.id,
+    enabled: !!beneficiary?.id && !isPreviewMode,
   });
 
   // التحقق من إذن الوصول للتبويب النشط
@@ -59,7 +69,13 @@ export default function BeneficiaryPortal() {
   };
 
   const handleTabChange = (value: string) => {
-    setSearchParams({ tab: value });
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set("tab", value);
+    setSearchParams(newParams);
+  };
+
+  const handleClosePreview = () => {
+    navigate("/nazer-dashboard");
   };
 
   if (isLoading) {
@@ -94,6 +110,14 @@ export default function BeneficiaryPortal() {
         {/* Main Content - مع padding للسايدبار على Desktop */}
         <main className="flex-1 lg:mr-64 overflow-y-auto overscroll-contain scroll-smooth touch-pan-y">
           <div className="p-4 sm:p-6 lg:p-8 pb-24 md:pb-8 max-w-7xl mx-auto space-y-6">
+            {/* بانر وضع المعاينة */}
+            {isPreviewMode && (
+              <PreviewModeBanner 
+                beneficiaryName={beneficiaryName} 
+                onClose={handleClosePreview}
+              />
+            )}
+
             {/* بانر حالة نشر السنة المالية */}
             <FiscalYearNotPublishedBanner />
 
