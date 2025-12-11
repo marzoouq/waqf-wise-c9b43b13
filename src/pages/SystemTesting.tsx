@@ -84,18 +84,18 @@ export default function SystemTesting() {
   // ======================
 
   const testRetryMechanism = async () => {
-    console.log('🧪 Testing Retry Mechanism...');
+    if (import.meta.env.DEV) console.log('🧪 Testing Retry Mechanism...');
     
     let attempts = 0;
     await retryOperation(async () => {
       attempts++;
-      console.log(`Attempt ${attempts}`);
+      if (import.meta.env.DEV) console.log(`Attempt ${attempts}`);
       
       if (attempts < 2) {
         throw new Error('Simulated failure');
       }
       
-      console.log('✅ Operation succeeded!');
+      if (import.meta.env.DEV) console.log('✅ Operation succeeded!');
     });
 
     if (attempts !== 2) {
@@ -104,7 +104,7 @@ export default function SystemTesting() {
   };
 
   const testCacheFallback = async () => {
-    console.log('🧪 Testing Cache Fallback...');
+    if (import.meta.env.DEV) console.log('🧪 Testing Cache Fallback...');
     
     // أولاً: حفظ في الـ Cache
     const result1 = await fetchWithFallback(
@@ -128,11 +128,11 @@ export default function SystemTesting() {
       throw new Error('Should have used cache fallback');
     }
 
-    console.log('✅ Cache fallback working correctly!');
+    if (import.meta.env.DEV) console.log('✅ Cache fallback working correctly!');
   };
 
   const testDatabaseReconnect = async () => {
-    console.log('🧪 Testing Database Reconnection...');
+    if (import.meta.env.DEV) console.log('🧪 Testing Database Reconnection...');
     
     const success = await selfHealing.autoRecovery.reconnectDatabase();
     
@@ -140,11 +140,11 @@ export default function SystemTesting() {
       throw new Error('Database reconnection failed');
     }
 
-    console.log('✅ Database reconnection successful!');
+    if (import.meta.env.DEV) console.log('✅ Database reconnection successful!');
   };
 
   const testErrorTracking = async () => {
-    console.log('🧪 Testing Error Tracking...');
+    if (import.meta.env.DEV) console.log('🧪 Testing Error Tracking...');
     
     await errorTracker.logError(
       'Test error from system testing',
@@ -152,11 +152,11 @@ export default function SystemTesting() {
       { test: true, timestamp: Date.now() }
     );
 
-    console.log('✅ Error tracked successfully!');
+    if (import.meta.env.DEV) console.log('✅ Error tracked successfully!');
   };
 
   const testHealthMonitor = async () => {
-    console.log('🧪 Testing Health Monitor...');
+    if (import.meta.env.DEV) console.log('🧪 Testing Health Monitor...');
     
     // فحص أن المراقب يعمل
     const isRunning = selfHealing.healthMonitor !== null;
@@ -165,11 +165,11 @@ export default function SystemTesting() {
       throw new Error('Health monitor is not running');
     }
 
-    console.log('✅ Health monitor is active!');
+    if (import.meta.env.DEV) console.log('✅ Health monitor is active!');
   };
 
   const testCircuitBreaker = async () => {
-    console.log('🧪 Testing Circuit Breaker...');
+    if (import.meta.env.DEV) console.log('🧪 Testing Circuit Breaker...');
     
     // محاولة عملية فاشلة عدة مرات
     let failureCount = 0;
@@ -182,26 +182,26 @@ export default function SystemTesting() {
         },
         { maxAttempts: 3 }
       );
-    } catch (error) {
+    } catch {
       // متوقع أن يفشل
       if (failureCount !== 3) {
         throw new Error(`Expected 3 attempts, got ${failureCount}`);
       }
     }
 
-    console.log('✅ Circuit breaker working correctly!');
+    if (import.meta.env.DEV) console.log('✅ Circuit breaker working correctly!');
   };
 
   const testNotificationSystem = async () => {
-    console.log('🧪 Testing Notification System...');
+    if (import.meta.env.DEV) console.log('🧪 Testing Notification System...');
     await SystemService.testNotificationSystem();
-    console.log('✅ Notification created successfully!');
+    if (import.meta.env.DEV) console.log('✅ Notification created successfully!');
   };
 
   const testAutoFixLogging = async () => {
-    console.log('🧪 Testing Auto-Fix Logging...');
+    if (import.meta.env.DEV) console.log('🧪 Testing Auto-Fix Logging...');
     await SystemService.testAutoFixLogging();
-    console.log('✅ Auto-fix logging working!');
+    if (import.meta.env.DEV) console.log('✅ Auto-fix logging working!');
   };
 
   // ======================
