@@ -122,7 +122,7 @@ export function BeneficiarySidebar({ activeTab, onTabChange, beneficiaryName }: 
             <Button
               variant="ghost"
               size="icon"
-              className="fixed top-4 right-4 z-40 lg:hidden"
+              className="fixed top-16 right-4 z-50 lg:hidden"
               aria-label="فتح القائمة"
             >
               <Menu className="h-6 w-6" />
