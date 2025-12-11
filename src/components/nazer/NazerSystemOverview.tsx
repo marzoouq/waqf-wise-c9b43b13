@@ -1,6 +1,8 @@
 /**
  * نظرة شاملة على النظام للناظر
  * إحصائيات سريعة من جميع أقسام النظام
+ * 
+ * @version 2.8.91 - استخدام CSS Variables
  */
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -48,51 +50,51 @@ export function NazerSystemOverview() {
       label: "المستفيدون",
       value: `${stats?.beneficiaries.active}/${stats?.beneficiaries.total}`,
       icon: Users,
-      color: "text-blue-600",
+      color: "text-[hsl(var(--chart-1))]",
       percentage: stats?.beneficiaries.percentage,
     },
     {
       label: "العقارات المؤجرة",
       value: `${stats?.properties.occupied}/${stats?.properties.total}`,
       icon: Building2,
-      color: "text-amber-600",
+      color: "text-[hsl(var(--status-warning))]",
       percentage: stats?.properties.percentage,
     },
     {
       label: "العقود النشطة",
       value: stats?.contracts.active || 0,
       icon: FileText,
-      color: "text-green-600",
+      color: "text-[hsl(var(--status-success))]",
     },
     {
       label: "القروض النشطة",
       value: stats?.loans.active || 0,
       icon: Wallet,
-      color: "text-red-600",
+      color: "text-destructive",
     },
     {
       label: "إجمالي التحصيل",
       value: formatCurrency(stats?.payments.amount || 0),
       icon: TrendingUp,
-      color: "text-green-600",
+      color: "text-[hsl(var(--status-success))]",
     },
     {
       label: "رصيد القروض",
       value: formatCurrency(stats?.loans.amount || 0),
       icon: AlertTriangle,
-      color: "text-orange-600",
+      color: "text-[hsl(var(--status-warning))]",
     },
     {
       label: "الطلبات المعلقة",
       value: stats?.requests.pending || 0,
       icon: Clock,
-      color: "text-yellow-600",
+      color: "text-[hsl(var(--chart-4))]",
     },
     {
       label: "المستندات",
       value: stats?.documents || 0,
       icon: Database,
-      color: "text-purple-600",
+      color: "text-[hsl(var(--chart-5))]",
     },
   ];
 
@@ -132,15 +134,15 @@ export function NazerSystemOverview() {
         {/* مؤشرات الصحة */}
         <div className="flex items-center gap-4 mt-4 pt-4 border-t">
           <div className="flex items-center gap-2 text-sm">
-            <div className="h-2 w-2 rounded-full bg-status-success animate-pulse" />
+            <div className="h-2 w-2 rounded-full bg-[hsl(var(--status-success))] animate-pulse" />
             <span className="text-muted-foreground">النظام يعمل بشكل طبيعي</span>
           </div>
           <div className="flex items-center gap-2 text-sm">
-            <Shield className="h-4 w-4 text-status-success" />
+            <Shield className="h-4 w-4 text-[hsl(var(--status-success))]" />
             <span className="text-muted-foreground">الأمان مفعّل</span>
           </div>
           <div className="flex items-center gap-2 text-sm">
-            <CheckCircle className="h-4 w-4 text-status-success" />
+            <CheckCircle className="h-4 w-4 text-[hsl(var(--status-success))]" />
             <span className="text-muted-foreground">البيانات محدّثة</span>
           </div>
         </div>
