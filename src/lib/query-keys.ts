@@ -1,9 +1,24 @@
 /**
  * Unified Query Keys - مفاتيح الاستعلامات الموحدة
- * @version 2.8.54
+ * @version 2.8.86
+ * @module lib/query-keys
  * 
+ * @description
  * هذا الملف يوفر مفاتيح موحدة لجميع استعلامات React Query
  * لضمان الاتساق وتسهيل إدارة الكاش
+ * 
+ * @example
+ * ```typescript
+ * import { QUERY_KEYS, QUERY_CONFIG } from '@/lib/query-keys';
+ * 
+ * // استخدام مفتاح بسيط
+ * useQuery({ queryKey: QUERY_KEYS.BENEFICIARIES });
+ * 
+ * // استخدام مفتاح مع معاملات
+ * useQuery({ queryKey: QUERY_KEYS.BENEFICIARY(id) });
+ * ```
+ * 
+ * @see docs/ARCHITECTURE_OVERVIEW.md للتوثيق الكامل
  */
 
 export const QUERY_KEYS = {
