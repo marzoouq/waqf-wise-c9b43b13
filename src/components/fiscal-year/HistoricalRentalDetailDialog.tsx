@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Building2, CheckCircle, XCircle, Home, Loader2 } from 'lucide-react';
+import { Building2, CheckCircle, XCircle, Home, Loader2, FileText, Calendar } from 'lucide-react';
 import { useHistoricalRentalByMonth } from '@/hooks/fiscal-years/useHistoricalRentalDetails';
 import { formatCurrency } from '@/lib/utils';
 import { format } from 'date-fns';
@@ -86,7 +86,7 @@ export function HistoricalRentalDetailDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[85vh]">
+      <DialogContent className="max-w-6xl max-h-[85vh]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Building2 className="h-5 w-5 text-primary" />
@@ -130,19 +130,23 @@ export function HistoricalRentalDetailDialog({
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-right">العقار</TableHead>
+                    <TableHead className="text-right">رقم العقد</TableHead>
                     <TableHead className="text-center">الوحدة</TableHead>
                     <TableHead className="text-center">الدور</TableHead>
                     <TableHead className="text-right">المستأجر</TableHead>
-                    <TableHead className="text-left">الإيجار الشهري</TableHead>
+                    <TableHead className="text-center">من</TableHead>
+                    <TableHead className="text-center">إلى</TableHead>
+                    <TableHead className="text-left">قيمة العقد</TableHead>
+                    <TableHead className="text-left">الدفعة</TableHead>
                     <TableHead className="text-center">الحالة</TableHead>
+                    <TableHead className="text-right">ملاحظات</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {details.map((detail) => (
                     <TableRow key={detail.id}>
-                      <TableCell className="font-medium">
-                        {detail.property_name || '-'}
+                      <TableCell className="font-mono text-xs">
+                        {detail.contract_number || '-'}
                       </TableCell>
                       <TableCell className="text-center">
                         <Badge variant="outline">{detail.unit_number || '-'}</Badge>
@@ -150,7 +154,22 @@ export function HistoricalRentalDetailDialog({
                       <TableCell className="text-center">
                         {detail.floor_number || '-'}
                       </TableCell>
-                      <TableCell>{detail.tenant_name}</TableCell>
+                      <TableCell className="font-medium">{detail.tenant_name}</TableCell>
+                      <TableCell className="text-center text-xs">
+                        {detail.contract_start_date 
+                          ? format(new Date(detail.contract_start_date), 'dd/MM/yyyy')
+                          : '-'}
+                      </TableCell>
+                      <TableCell className="text-center text-xs">
+                        {detail.contract_end_date 
+                          ? format(new Date(detail.contract_end_date), 'dd/MM/yyyy')
+                          : '-'}
+                      </TableCell>
+                      <TableCell className="text-left text-xs">
+                        {detail.annual_contract_value 
+                          ? formatCurrency(detail.annual_contract_value)
+                          : '-'}
+                      </TableCell>
                       <TableCell className="text-left font-semibold">
                         {detail.payment_status === 'vacant' 
                           ? '-' 
@@ -158,6 +177,9 @@ export function HistoricalRentalDetailDialog({
                       </TableCell>
                       <TableCell className="text-center">
                         {getStatusBadge(detail.payment_status)}
+                      </TableCell>
+                      <TableCell className="text-right text-xs text-muted-foreground">
+                        {detail.notes || '-'}
                       </TableCell>
                     </TableRow>
                   ))}
