@@ -13,6 +13,7 @@ import { productionLogger } from "@/lib/logger/production-logger";
 const CASHIER_WATCHED_TABLES = [
   "bank_accounts",
   "journal_entries",
+  "journal_entry_lines",
   "payment_vouchers",
   "rental_payments",
   "accounts",
@@ -23,7 +24,8 @@ const CASHIER_WATCHED_TABLES = [
 // مفاتيح الاستعلامات التي يجب تحديثها
 const INVALIDATION_MAP: Record<string, string[][]> = {
   bank_accounts: [["cashier-stats"], ["bank-accounts"], ["bank-balance-realtime"]],
-  journal_entries: [["cashier-stats"], ["journal-entries"]],
+  journal_entries: [["cashier-stats"], ["journal-entries"], ["unified-dashboard-kpis"]],
+  journal_entry_lines: [["cashier-stats"], ["journal-entries"], ["unified-dashboard-kpis"]],
   payment_vouchers: [["cashier-stats"], ["payment-vouchers"]],
   rental_payments: [["cashier-stats"], ["rental-payments"]],
   accounts: [["cashier-stats"], ["accounts"]],

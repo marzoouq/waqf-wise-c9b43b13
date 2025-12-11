@@ -23,7 +23,7 @@ export function useUnifiedKPIs() {
 
   // الاشتراك في التحديثات المباشرة
   useEffect(() => {
-    const tables = ['beneficiaries', 'properties', 'contracts', 'payments', 'journal_entries', 'loans', 'beneficiary_requests', 'families', 'funds'];
+    const tables = ['beneficiaries', 'properties', 'contracts', 'payments', 'journal_entries', 'journal_entry_lines', 'loans', 'beneficiary_requests', 'families', 'funds'];
     
     const channels = tables.map(table => 
       supabase
