@@ -55,7 +55,7 @@ export function useDistributions() {
 
   const addDistribution = useMutation({
     mutationFn: async (distribution: Omit<Distribution, "id" | "created_at" | "updated_at">) => {
-      return DistributionService.create(distribution as any);
+      return DistributionService.create(distribution);
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["distributions"] });
@@ -82,7 +82,7 @@ export function useDistributions() {
 
   const updateDistribution = useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<Distribution> }) => {
-      return DistributionService.update(id, updates as any);
+      return DistributionService.update(id, updates);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["distributions"] });

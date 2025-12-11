@@ -28,7 +28,7 @@ export function useBeneficiaries() {
 
   const addBeneficiary = useMutation({
     mutationFn: async (beneficiary: Omit<Beneficiary, "id" | "created_at" | "updated_at">) => {
-      return BeneficiaryService.create(beneficiary as any);
+      return BeneficiaryService.create(beneficiary);
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARIES });
@@ -47,7 +47,7 @@ export function useBeneficiaries() {
 
   const updateBeneficiary = useMutation({
     mutationFn: async ({ id, ...updates }: Partial<Beneficiary> & { id: string }) => {
-      return BeneficiaryService.update(id, updates as any);
+      return BeneficiaryService.update(id, updates);
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARIES });

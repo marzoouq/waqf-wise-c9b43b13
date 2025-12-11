@@ -1,25 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { MaintenanceService, type ProviderRating } from "@/services/maintenance.service";
 import { toast } from "sonner";
+import type { Database } from "@/integrations/supabase/types";
 
-export interface MaintenanceProvider {
-  id: string;
-  provider_name: string;
-  contact_person?: string;
-  phone: string;
-  email?: string;
-  address?: string;
-  specialization?: string[];
-  rating: number;
-  total_jobs: number;
-  active_jobs: number;
-  average_cost?: number;
-  average_response_time?: number;
-  is_active: boolean;
-  notes?: string;
-  created_at: string;
-  updated_at: string;
-}
+type MaintenanceProvider = Database['public']['Tables']['maintenance_providers']['Row'];
+type MaintenanceProviderInsert = Database['public']['Tables']['maintenance_providers']['Insert'];
+type MaintenanceProviderUpdate = Database['public']['Tables']['maintenance_providers']['Update'];
 
 export function useMaintenanceProviders() {
   const queryClient = useQueryClient();
@@ -30,8 +16,8 @@ export function useMaintenanceProviders() {
   });
 
   const addProvider = useMutation({
-    mutationFn: (provider: Omit<MaintenanceProvider, 'id' | 'created_at' | 'updated_at'>) =>
-      MaintenanceService.addProvider(provider as any),
+    mutationFn: (provider: MaintenanceProviderInsert) =>
+      MaintenanceService.addProvider(provider),
     onSuccess: () => {
       toast.success("تمت إضافة مقدم الخدمة بنجاح");
       queryClient.invalidateQueries({ queryKey: ["maintenance-providers"] });
@@ -42,8 +28,8 @@ export function useMaintenanceProviders() {
   });
 
   const updateProvider = useMutation({
-    mutationFn: ({ id, ...updates }: Partial<MaintenanceProvider> & { id: string }) =>
-      MaintenanceService.updateProvider(id, updates as any),
+    mutationFn: ({ id, ...updates }: MaintenanceProviderUpdate & { id: string }) =>
+      MaintenanceService.updateProvider(id, updates),
     onSuccess: () => {
       toast.success("تم تحديث مقدم الخدمة بنجاح");
       queryClient.invalidateQueries({ queryKey: ["maintenance-providers"] });

@@ -146,11 +146,11 @@ export class DistributionService {
   /**
    * إنشاء توزيع جديد
    */
-  static async create(distribution: Record<string, unknown>) {
+  static async create(distribution: Omit<DistributionInsert, 'id' | 'created_at' | 'updated_at'>): Promise<DistributionRow> {
     try {
       const { data, error } = await supabase
         .from('distributions')
-        .insert([distribution as never])
+        .insert([distribution])
         .select()
         .single();
 
@@ -328,7 +328,7 @@ export class DistributionService {
         .order('distribution_date', { ascending: false });
 
       if (error) throw error;
-      return (data as unknown as DistributionRow[]) || [];
+      return data || [];
     } catch (error) {
       productionLogger.error('Error fetching beneficiary distributions', error);
       throw error;
