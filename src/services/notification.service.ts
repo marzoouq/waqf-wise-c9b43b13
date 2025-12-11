@@ -214,7 +214,7 @@ export class NotificationService {
       const { error } = await supabase
         .from('system_alerts')
         .update({
-          is_resolved: true,
+          status: 'resolved',
           resolved_at: new Date().toISOString(),
           resolved_by: user?.user?.id,
         })
