@@ -61,9 +61,9 @@ export function BeneficiaryProfileCard({
     <Card className="overflow-hidden border-primary/20 shadow-lg">
       <div className="bg-gradient-to-br from-primary/10 via-background to-primary/5 p-6">
         <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-          {/* Avatar */}
-          <Avatar className="h-24 w-24 ring-4 ring-primary/20 shadow-md">
-            <AvatarFallback className="bg-primary text-primary-foreground text-2xl font-bold">
+          {/* Avatar - أصغر على الجوال */}
+          <Avatar className="h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 ring-4 ring-primary/20 shadow-md">
+            <AvatarFallback className="bg-primary text-primary-foreground text-xl sm:text-2xl font-bold">
               {initials}
             </AvatarFallback>
           </Avatar>
@@ -115,8 +115,8 @@ export function BeneficiaryProfileCard({
               </Badge>
             </div>
 
-            {/* Contact Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4 text-sm">
+            {/* Contact Grid - عنصرين فقط على الجوال */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 text-sm">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Phone className="h-4 w-4 text-primary" />
                 <span className="font-medium">{beneficiary.phone}</span>
@@ -125,19 +125,19 @@ export function BeneficiaryProfileCard({
               {beneficiary.email && (
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Mail className="h-4 w-4 text-primary" />
-                  <span className="font-medium">{beneficiary.email}</span>
+                  <span className="font-medium truncate">{beneficiary.email}</span>
                 </div>
               )}
               
               {beneficiary.city && (
-                <div className="flex items-center gap-2 text-muted-foreground">
+                <div className="hidden sm:flex items-center gap-2 text-muted-foreground">
                   <MapPin className="h-4 w-4 text-primary" />
                   <span className="font-medium">{beneficiary.city}</span>
                 </div>
               )}
               
               {beneficiary.date_of_birth && (
-                <div className="flex items-center gap-2 text-muted-foreground">
+                <div className="hidden sm:flex items-center gap-2 text-muted-foreground">
                   <Calendar className="h-4 w-4 text-primary" />
                   <span className="font-medium">
                     {format(new Date(beneficiary.date_of_birth), "dd/MM/yyyy", { locale: ar })}

@@ -27,10 +27,9 @@ import {
   YearlyComparison,
 } from "@/components/beneficiary";
 import { FiscalYearNotPublishedBanner } from "@/components/beneficiary/FiscalYearNotPublishedBanner";
-import { WaqfDistributionsSummaryCard } from "@/components/beneficiary/cards/WaqfDistributionsSummaryCard";
-import { BankBalanceCard } from "@/components/shared/BankBalanceCard";
-import { WaqfCorpusCard } from "@/components/shared/WaqfCorpusCard";
 import { ChatbotQuickCard } from "@/components/dashboard/ChatbotQuickCard";
+import { FinancialSummarySection } from "@/components/beneficiary/sections/FinancialSummarySection";
+import { QuickActionsGrid } from "@/components/beneficiary/sections/QuickActionsGrid";
 import { Suspense } from "react";
 import { BeneficiarySidebar } from "@/components/beneficiary/BeneficiarySidebar";
 import { BeneficiaryBottomNavigation } from "@/components/mobile/BeneficiaryBottomNavigation";
@@ -100,39 +99,48 @@ export default function BeneficiaryPortal() {
 
             {/* Tab Content */}
             {activeTab === "overview" && settings?.show_overview && (
-              <div className="space-y-6">
-                {/* بطاقة الملف الشخصي */}
-                <BeneficiaryProfileCard
-                  beneficiary={beneficiary as Beneficiary}
-                  onMessages={() => navigate("/messages")}
-                  onChangePassword={() => {}}
-                />
-
-                {/* المساعد الذكي */}
-                <Suspense fallback={<div className="h-32 bg-muted animate-pulse rounded-lg" />}>
-                  <ChatbotQuickCard />
-                </Suspense>
-
-                {/* بطاقات الرصيد البنكي ورقبة الوقف */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <BankBalanceCard compact />
-                  <WaqfCorpusCard compact />
+              <div className="space-y-8">
+                {/* ==================== القسم الأول: الترحيب والمعلومات الشخصية ==================== */}
+                <div className="space-y-4">
+                  {/* بطاقة الملف الشخصي */}
+                  <BeneficiaryProfileCard
+                    beneficiary={beneficiary as Beneficiary}
+                    onMessages={() => navigate("/messages")}
+                    onChangePassword={() => {}}
+                  />
                 </div>
 
-                {/* بطاقة إجمالي المحصل من الوقف */}
-                <WaqfDistributionsSummaryCard beneficiaryId={beneficiary.id} />
+                {/* ==================== القسم الثاني: الأرقام المالية الرئيسية ==================== */}
+                <FinancialSummarySection beneficiaryId={beneficiary.id} />
 
-                {/* إحصائيات العقارات */}
-                <PropertyStatsCards />
+                {/* ==================== القسم الثالث: العقارات والإيرادات ==================== */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <div className="h-8 w-1 bg-primary rounded-full" />
+                    <h2 className="text-xl font-bold">العقارات والإيرادات</h2>
+                  </div>
+                  <PropertyStatsCards />
+                </div>
 
-                {/* الإفصاح السنوي */}
-                <AnnualDisclosureCard />
+                {/* ==================== القسم الرابع: الإجراءات السريعة والتحليلات ==================== */}
+                <div className="space-y-6">
+                  {/* الإجراءات السريعة */}
+                  <QuickActionsGrid />
 
-                {/* سجل النشاط */}
-                <ActivityTimeline beneficiaryId={beneficiary.id} />
+                  {/* الإفصاح السنوي */}
+                  <AnnualDisclosureCard />
 
-                {/* المقارنة السنوية */}
-                <YearlyComparison beneficiaryId={beneficiary.id} />
+                  {/* المساعد الذكي */}
+                  <Suspense fallback={<div className="h-32 bg-muted animate-pulse rounded-lg" />}>
+                    <ChatbotQuickCard />
+                  </Suspense>
+
+                  {/* المقارنة السنوية */}
+                  <YearlyComparison beneficiaryId={beneficiary.id} />
+
+                  {/* سجل النشاط */}
+                  <ActivityTimeline beneficiaryId={beneficiary.id} />
+                </div>
               </div>
             )}
 

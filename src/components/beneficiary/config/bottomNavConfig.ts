@@ -3,7 +3,7 @@
  * بيانات ثابتة لشريط التنقل السفلي
  */
 
-import { Home, User, FileText, Bell, Settings } from "lucide-react";
+import { Home, FileText, Bell, Settings } from "lucide-react";
 
 export interface NavigationItem {
   id: string;
@@ -19,15 +19,8 @@ export const beneficiaryNavigationItems: NavigationItem[] = [
     id: "home",
     label: "الرئيسية",
     icon: Home,
-    path: "/beneficiary-dashboard",
-    matchPaths: ["/beneficiary-dashboard"],
-  },
-  {
-    id: "portal",
-    label: "بوابتي",
-    icon: User,
-    path: "/beneficiary-dashboard",
-    matchPaths: ["/beneficiary-dashboard", "/beneficiary-portal"],
+    path: "/beneficiary-portal",
+    matchPaths: ["/beneficiary-portal", "/beneficiary-dashboard"],
   },
   {
     id: "requests",
