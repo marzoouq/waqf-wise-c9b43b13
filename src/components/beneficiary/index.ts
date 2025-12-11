@@ -81,6 +81,7 @@ export { AccountStatementView } from './AccountStatementView';
 
 // ==================== TabContent Wrapper ====================
 export { TabContentWrapper } from './common/TabContentWrapper';
+export { TabRenderer } from './TabRenderer';
 
 // NOTE: NotificationsBell is now exported from @/components/layout/NotificationsBell
 // NotificationsCenter was removed as it was unused

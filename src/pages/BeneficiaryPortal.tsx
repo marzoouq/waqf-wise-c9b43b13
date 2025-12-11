@@ -3,35 +3,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, Lock } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import type { Beneficiary } from "@/types/beneficiary";
-import {
-  BeneficiaryProfileTab,
-  BeneficiaryStatementsTab,
-  BeneficiaryDistributionsTab,
-  BeneficiaryPropertiesTab,
-  WaqfSummaryTab,
-  FamilyTreeTab,
-  BankAccountsTab,
-  FinancialReportsTab,
-  ApprovalsLogTab,
-  DisclosuresTab,
-  GovernanceTab,
-  BudgetsTab,
-  LoansOverviewTab,
-  BeneficiaryProfileCard,
-  AnnualDisclosureCard,
-  PropertyStatsCards,
-  ActivityTimeline,
-  YearlyComparison,
-} from "@/components/beneficiary";
 import { FiscalYearNotPublishedBanner } from "@/components/beneficiary/FiscalYearNotPublishedBanner";
 import { PreviewModeBanner } from "@/components/beneficiary/PreviewModeBanner";
-import { ChatbotQuickCard } from "@/components/dashboard/ChatbotQuickCard";
-import { FinancialSummarySection } from "@/components/beneficiary/sections/FinancialSummarySection";
-import { QuickActionsGrid } from "@/components/beneficiary/sections/QuickActionsGrid";
-import { Suspense, useMemo } from "react";
+import { OverviewSection } from "@/components/beneficiary/sections/OverviewSection";
+import { TabRenderer } from "@/components/beneficiary/TabRenderer";
+import { useMemo } from "react";
 import { BeneficiarySidebar } from "@/components/beneficiary/BeneficiarySidebar";
 import { BeneficiaryBottomNavigation } from "@/components/mobile/BeneficiaryBottomNavigation";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
@@ -47,7 +25,6 @@ export default function BeneficiaryPortal() {
 
   // معالجة وضع المعاينة
   const isPreviewMode = searchParams.get("preview") === "true";
-  const previewBeneficiaryId = searchParams.get("beneficiary_id");
 
   // استخدام Hook المخصص لجلب البيانات
   const { beneficiary, statistics, isLoading } = useBeneficiaryPortalData();
@@ -68,12 +45,6 @@ export default function BeneficiaryPortal() {
     beneficiaryId: beneficiary?.id,
     enabled: !!beneficiary?.id && !isPreviewMode,
   });
-
-  // التحقق من إذن الوصول للتبويب النشط
-  const isTabVisible = (tabKey: keyof typeof settings) => {
-    if (!settings) return false;
-    return settings[tabKey] === true;
-  };
 
   const handleTabChange = (value: string) => {
     const newParams = new URLSearchParams(searchParams);
@@ -128,165 +99,18 @@ export default function BeneficiaryPortal() {
             {/* بانر حالة نشر السنة المالية */}
             <FiscalYearNotPublishedBanner />
 
-            {/* Tab Content */}
+            {/* Overview Tab */}
             {activeTab === "overview" && settings?.show_overview && (
-              <div className="space-y-8">
-                {/* ==================== القسم الأول: الترحيب والمعلومات الشخصية ==================== */}
-                <div className="space-y-4">
-                  {/* بطاقة الملف الشخصي */}
-                  <BeneficiaryProfileCard
-                    beneficiary={beneficiary as Beneficiary}
-                    onMessages={() => navigate("/messages")}
-                    onChangePassword={() => {}}
-                  />
-                </div>
-
-                {/* ==================== القسم الثاني: الأرقام المالية الرئيسية ==================== */}
-                <FinancialSummarySection beneficiaryId={beneficiary.id} />
-
-                {/* ==================== القسم الثالث: العقارات والإيرادات ==================== */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <div className="h-8 w-1 bg-primary rounded-full" />
-                    <h2 className="text-xl font-bold">العقارات والإيرادات</h2>
-                  </div>
-                  <PropertyStatsCards />
-                </div>
-
-                {/* ==================== القسم الرابع: الإجراءات السريعة والتحليلات ==================== */}
-                <div className="space-y-6">
-                  {/* الإجراءات السريعة */}
-                  <QuickActionsGrid />
-
-                  {/* الإفصاح السنوي */}
-                  <AnnualDisclosureCard />
-
-                  {/* المساعد الذكي */}
-                  <Suspense fallback={<div className="h-32 bg-muted animate-pulse rounded-lg" />}>
-                    <ChatbotQuickCard />
-                  </Suspense>
-
-                  {/* المقارنة السنوية */}
-                  <YearlyComparison beneficiaryId={beneficiary.id} />
-
-                  {/* سجل النشاط */}
-                  <ActivityTimeline beneficiaryId={beneficiary.id} />
-                </div>
-              </div>
+              <OverviewSection beneficiary={beneficiary as Beneficiary} />
             )}
 
-            {/* Profile Tab */}
-            {activeTab === "profile" && settings?.show_profile && (
-              <BeneficiaryProfileTab beneficiary={beneficiary} />
-            )}
-            {activeTab === "profile" && !settings?.show_profile && (
-              <Alert>
-                <Lock className="h-4 w-4" />
-                <AlertDescription>غير مصرح لك بالوصول لهذا القسم</AlertDescription>
-              </Alert>
-            )}
-
-            {/* Distributions Tab */}
-            {activeTab === "distributions" && settings?.show_distributions && (
-              <BeneficiaryDistributionsTab beneficiaryId={beneficiary.id} />
-            )}
-            {activeTab === "distributions" && !settings?.show_distributions && (
-              <Alert>
-                <Lock className="h-4 w-4" />
-                <AlertDescription>غير مصرح لك بالوصول لهذا القسم</AlertDescription>
-              </Alert>
-            )}
-
-            {/* Statements Tab */}
-            {activeTab === "statements" && settings?.show_statements && (
-              <BeneficiaryStatementsTab beneficiaryId={beneficiary.id} />
-            )}
-            {activeTab === "statements" && !settings?.show_statements && (
-              <Alert>
-                <Lock className="h-4 w-4" />
-                <AlertDescription>غير مصرح لك بالوصول لهذا القسم</AlertDescription>
-              </Alert>
-            )}
-
-            {/* Properties Tab */}
-            {activeTab === "properties" && settings?.show_properties && (
-              <BeneficiaryPropertiesTab />
-            )}
-            {activeTab === "properties" && !settings?.show_properties && (
-              <Alert>
-                <Lock className="h-4 w-4" />
-                <AlertDescription>غير مصرح لك بالوصول لهذا القسم</AlertDescription>
-              </Alert>
-            )}
-
-            {/* Waqf Summary Tab */}
-            {activeTab === "waqf" && (
-              <WaqfSummaryTab />
-            )}
-
-            {/* Family Tree Tab */}
-            {settings?.show_family_tree && activeTab === "family" && (
-              <FamilyTreeTab beneficiaryId={beneficiary.id} />
-            )}
-            {!settings?.show_family_tree && activeTab === "family" && (
-              <Alert>
-                <Lock className="h-4 w-4" />
-                <AlertDescription>غير مصرح لك بالوصول لهذا القسم</AlertDescription>
-              </Alert>
-            )}
-
-            {/* Bank Accounts Tab */}
-            {settings?.show_bank_accounts && activeTab === "bank" && (
-              <BankAccountsTab />
-            )}
-
-            {/* Financial Reports Tab */}
-            {settings?.show_financial_reports && activeTab === "reports" && (
-              <FinancialReportsTab />
-            )}
-
-            {/* Approvals Log Tab */}
-            {settings?.show_approvals_log && activeTab === "approvals" && (
-              <ApprovalsLogTab />
-            )}
-
-            {/* Disclosures Tab */}
-            {settings?.show_disclosures && activeTab === "disclosures" && (
-              <DisclosuresTab />
-            )}
-
-            {/* Governance Tab */}
-            {settings?.show_governance && activeTab === "governance" && (
-              <GovernanceTab />
-            )}
-            {!settings?.show_governance && activeTab === "governance" && (
-              <Alert>
-                <Lock className="h-4 w-4" />
-                <AlertDescription>غير مصرح لك بالوصول لهذا القسم</AlertDescription>
-              </Alert>
-            )}
-
-            {/* Budgets Tab */}
-            {settings?.show_budgets && activeTab === "budgets" && (
-              <BudgetsTab />
-            )}
-            {!settings?.show_budgets && activeTab === "budgets" && (
-              <Alert>
-                <Lock className="h-4 w-4" />
-                <AlertDescription>غير مصرح لك بالوصول لهذا القسم</AlertDescription>
-              </Alert>
-            )}
-
-            {/* Loans Overview Tab */}
-            {settings?.show_own_loans && activeTab === "loans" && (
-              <LoansOverviewTab />
-            )}
-            {!settings?.show_own_loans && activeTab === "loans" && (
-              <Alert>
-                <Lock className="h-4 w-4" />
-                <AlertDescription>غير مصرح لك بالوصول لهذا القسم</AlertDescription>
-              </Alert>
-            )}
+            {/* All Other Tabs - Rendered via TabRenderer */}
+            <TabRenderer
+              activeTab={activeTab}
+              settings={settings}
+              beneficiaryId={beneficiary.id}
+              beneficiary={beneficiary}
+            />
           </div>
         </main>
         
