@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   FileText, 
@@ -179,8 +179,8 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-full max-w-[95vw] sm:max-w-4xl lg:max-w-6xl max-h-[90vh] p-0 overflow-hidden">
-        <DialogHeader className="p-3 sm:p-6 pb-0">
+      <DialogContent className="w-full max-w-[95vw] sm:max-w-4xl lg:max-w-6xl h-[90vh] max-h-[90vh] p-0 flex flex-col">
+        <DialogHeader className="p-3 sm:p-6 pb-0 flex-shrink-0">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div>
               <DialogTitle className="text-lg sm:text-2xl font-bold flex items-center gap-2">
@@ -195,7 +195,7 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
           </div>
         </DialogHeader>
 
-        <ScrollArea className="h-[calc(95vh-80px)] sm:h-[calc(90vh-100px)]">
+        <div className="flex-1 overflow-y-auto overscroll-contain touch-pan-y" style={{ WebkitOverflowScrolling: 'touch' }}>
           {/* تبويبات للجوال */}
           <div className="block sm:hidden p-3">
             <Tabs defaultValue="summary" className="w-full">
@@ -760,7 +760,7 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
             <SmartDisclosureDocuments disclosureId={disclosure.id} />
 
           </div>
-        </ScrollArea>
+        </div>
       </DialogContent>
     </Dialog>
   );
