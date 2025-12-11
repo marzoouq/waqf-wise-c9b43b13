@@ -30,14 +30,25 @@ export interface CustomReportTemplate {
   filters?: Record<string, unknown>;
   sort_by?: string;
   is_favorite?: boolean;
+  is_public?: boolean;
+  description?: string;
+  configuration?: Record<string, unknown>;
   created_at?: string;
   updated_at?: string;
   created_by?: string;
 }
 
+export interface ReportColumn {
+  key: string;
+  label: string;
+}
+
 export interface ReportResult {
   data: Record<string, unknown>[];
   total: number;
+  totalCount: number;
+  columns: ReportColumn[];
+  generatedAt: string;
 }
 
 export interface ReportConfig {
@@ -60,8 +71,11 @@ export const CustomReportsService = {
       id: t.id,
       name: t.template_name,
       report_type: t.report_type,
-      fields: t.columns || [],
+      fields: Array.isArray(t.columns) ? t.columns as string[] : [],
       is_favorite: false,
+      is_public: false,
+      description: '',
+      configuration: {},
       created_at: t.created_at,
     }));
   },
@@ -73,7 +87,16 @@ export const CustomReportsService = {
       .select()
       .single();
     if (error) throw error;
-    return { id: data.id, name: data.template_name, report_type: data.report_type, fields: data.columns || [] };
+    return { 
+      id: data.id, 
+      name: data.template_name, 
+      report_type: data.report_type, 
+      fields: Array.isArray(data.columns) ? data.columns as string[] : [],
+      is_favorite: false,
+      is_public: false,
+      description: '',
+      configuration: {},
+    };
   },
 
   async updateCustomTemplate(id: string, updates: Partial<CustomReportTemplate>): Promise<void> {
@@ -94,11 +117,11 @@ export const CustomReportsService = {
   },
 
   async executeReport(_template: CustomReportTemplate): Promise<ReportResult> {
-    return { data: [], total: 0 };
+    return { data: [], total: 0, totalCount: 0, columns: [], generatedAt: new Date().toISOString() };
   },
 
   async executeDirectReport(_reportType: string, _selectedFields: string[], _sortBy?: string): Promise<ReportResult> {
-    return { data: [], total: 0 };
+    return { data: [], total: 0, totalCount: 0, columns: [], generatedAt: new Date().toISOString() };
   },
 
   getReportFields() {

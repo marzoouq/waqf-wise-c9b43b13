@@ -17,10 +17,14 @@ export { RequestService } from './request.service';
 export { VoucherService } from './voucher.service';
 export { 
   ReportService, 
+  CustomReportsService,
   type CashFlowData, 
   type PropertyWithContracts, 
   type OperationRecord,
   type ReportTemplate,
+  type CustomReportTemplate,
+  type ReportResult,
+  type ReportColumn,
 } from './report.service';
 
 // Domain Services (37)

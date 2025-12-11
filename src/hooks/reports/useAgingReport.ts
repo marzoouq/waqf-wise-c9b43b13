@@ -25,12 +25,15 @@ export interface AgingSummary {
 }
 
 export function useAgingReport() {
-  const { data: agingData, isLoading, error } = useQuery({
+  const { data: agingResult, isLoading, error } = useQuery({
     queryKey: ['aging_report'],
     queryFn: () => CustomReportsService.getAgingReport(),
   });
 
-  const summary = agingData?.reduce<AgingSummary>(
+  // استخراج البيانات من النتيجة
+  const agingData = agingResult?.items || [];
+
+  const summary = agingData.reduce<AgingSummary>(
     (acc, item) => {
       const category = item.ageCategory as keyof AgingSummary;
       if (category !== 'total') {
