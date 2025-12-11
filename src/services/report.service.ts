@@ -620,7 +620,7 @@ export class ReportService {
   static async getAnnualDisclosures() {
     const { data, error } = await supabase
       .from("annual_disclosures")
-      .select("id, year, waqf_name, fiscal_year_id, disclosure_date, opening_balance, closing_balance, total_revenues, total_expenses, administrative_expenses, maintenance_expenses, development_expenses, other_expenses, net_income, nazer_percentage, nazer_share, charity_percentage, charity_share, corpus_percentage, corpus_share, sons_count, daughters_count, wives_count, total_beneficiaries, status, published_at, published_by, bank_statement_url, beneficiaries_details, expenses_breakdown, created_at, updated_at")
+      .select("id, year, waqf_name, fiscal_year_id, disclosure_date, opening_balance, closing_balance, total_revenues, total_expenses, administrative_expenses, maintenance_expenses, development_expenses, other_expenses, net_income, nazer_percentage, nazer_share, charity_percentage, charity_share, corpus_percentage, corpus_share, sons_count, daughters_count, wives_count, total_beneficiaries, status, published_at, published_by, bank_statement_url, beneficiaries_details, expenses_breakdown, revenue_breakdown, vat_amount, monthly_data, created_at, updated_at")
       .order("year", { ascending: false });
 
     if (error) throw error;
@@ -634,7 +634,7 @@ export class ReportService {
     const currentYear = new Date().getFullYear();
     const { data, error } = await supabase
       .from("annual_disclosures")
-      .select("id, year, waqf_name, fiscal_year_id, disclosure_date, opening_balance, closing_balance, total_revenues, total_expenses, administrative_expenses, maintenance_expenses, development_expenses, other_expenses, net_income, nazer_percentage, nazer_share, charity_percentage, charity_share, corpus_percentage, corpus_share, sons_count, daughters_count, wives_count, total_beneficiaries, status, published_at, published_by, bank_statement_url, beneficiaries_details, expenses_breakdown, created_at, updated_at")
+      .select("id, year, waqf_name, fiscal_year_id, disclosure_date, opening_balance, closing_balance, total_revenues, total_expenses, administrative_expenses, maintenance_expenses, development_expenses, other_expenses, net_income, nazer_percentage, nazer_share, charity_percentage, charity_share, corpus_percentage, corpus_share, sons_count, daughters_count, wives_count, total_beneficiaries, status, published_at, published_by, bank_statement_url, beneficiaries_details, expenses_breakdown, revenue_breakdown, vat_amount, monthly_data, created_at, updated_at")
       .eq("year", currentYear)
       .maybeSingle();
 
