@@ -6,46 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { TrendingUp } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { ArchiveService } from "@/services/archive.service";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function DocumentsGrowthChart() {
   const { data: growthData, isLoading } = useQuery({
     queryKey: ["documents-growth-chart"],
-    queryFn: async () => {
-      // جلب المستندات مجمعة حسب الشهر
-      const { data, error } = await supabase
-        .from("documents")
-        .select("uploaded_at")
-        .order("uploaded_at", { ascending: true });
-
-      if (error) throw error;
-
-      // تجميع حسب الشهر
-      const monthlyData: Record<string, number> = {};
-      const documents = data || [];
-
-      documents.forEach((doc) => {
-        const date = new Date(doc.uploaded_at);
-        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-        monthlyData[monthKey] = (monthlyData[monthKey] || 0) + 1;
-      });
-
-      // تحويل لمصفوفة مرتبة
-      const sortedMonths = Object.keys(monthlyData).sort();
-      let cumulative = 0;
-
-      return sortedMonths.map((month) => {
-        cumulative += monthlyData[month];
-        const [year, m] = month.split("-");
-        const monthNames = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
-        return {
-          month: `${monthNames[parseInt(m) - 1]} ${year}`,
-          count: monthlyData[month],
-          cumulative,
-        };
-      }).slice(-12); // آخر 12 شهر
-    },
+    queryFn: () => ArchiveService.getDocumentsGrowth(),
     staleTime: 5 * 60 * 1000,
   });
 

@@ -511,4 +511,77 @@ export class ArchiveService {
 
     return version;
   }
+
+  /**
+   * جلب استخدام المساحة حسب التصنيف
+   */
+  static async getStorageUsageByCategory(): Promise<{
+    name: string;
+    value: number;
+    rawValue: number;
+  }[]> {
+    const { data, error } = await supabase
+      .from("documents")
+      .select("category, file_size");
+
+    if (error) throw error;
+
+    // تجميع حسب التصنيف
+    const categoryUsage: Record<string, number> = {};
+    const documents = data || [];
+
+    documents.forEach((doc) => {
+      const category = doc.category || "أخرى";
+      const size = Number(doc.file_size) || 0;
+      categoryUsage[category] = (categoryUsage[category] || 0) + size;
+    });
+
+    // تحويل لمصفوفة
+    return Object.entries(categoryUsage).map(([name, value]) => ({
+      name,
+      value: Math.round(Number(value) / 1024 / 1024 * 100) / 100, // MB
+      rawValue: Number(value),
+    })).sort((a, b) => b.value - a.value);
+  }
+
+  /**
+   * جلب نمو المستندات بمرور الوقت
+   */
+  static async getDocumentsGrowth(): Promise<{
+    month: string;
+    count: number;
+    cumulative: number;
+  }[]> {
+    const { data, error } = await supabase
+      .from("documents")
+      .select("uploaded_at")
+      .order("uploaded_at", { ascending: true });
+
+    if (error) throw error;
+
+    // تجميع حسب الشهر
+    const monthlyData: Record<string, number> = {};
+    const documents = data || [];
+
+    documents.forEach((doc) => {
+      const date = new Date(doc.uploaded_at);
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+      monthlyData[monthKey] = (monthlyData[monthKey] || 0) + 1;
+    });
+
+    // تحويل لمصفوفة مرتبة
+    const sortedMonths = Object.keys(monthlyData).sort();
+    let cumulative = 0;
+    const monthNames = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
+
+    return sortedMonths.map((month) => {
+      cumulative += monthlyData[month];
+      const [year, m] = month.split("-");
+      return {
+        month: `${monthNames[parseInt(m) - 1]} ${year}`,
+        count: monthlyData[month],
+        cumulative,
+      };
+    }).slice(-12); // آخر 12 شهر
+  }
 }

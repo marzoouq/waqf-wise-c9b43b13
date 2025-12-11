@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { HardDrive } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { ArchiveService } from "@/services/archive.service";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const COLORS = [
@@ -20,30 +20,7 @@ const COLORS = [
 export function StorageUsageChart() {
   const { data: storageData, isLoading } = useQuery({
     queryKey: ["storage-usage-chart"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("documents")
-        .select("category, file_size");
-
-      if (error) throw error;
-
-      // تجميع حسب التصنيف
-      const categoryUsage: Record<string, number> = {};
-      const documents = data || [];
-
-      documents.forEach((doc) => {
-        const category = doc.category || "أخرى";
-        const size = Number(doc.file_size) || 0;
-        categoryUsage[category] = (categoryUsage[category] || 0) + size;
-      });
-
-      // تحويل لمصفوفة
-      return Object.entries(categoryUsage).map(([name, value]) => ({
-        name,
-        value: Math.round(Number(value) / 1024 / 1024 * 100) / 100, // MB
-        rawValue: Number(value),
-      })).sort((a, b) => b.value - a.value);
-    },
+    queryFn: () => ArchiveService.getStorageUsageByCategory(),
     staleTime: 5 * 60 * 1000,
   });
 
