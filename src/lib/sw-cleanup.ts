@@ -30,7 +30,9 @@ export async function unregisterAllServiceWorkers(): Promise<boolean> {
     
     for (const registration of registrations) {
       await registration.unregister();
-      console.log('🗑️ تم إلغاء تسجيل Service Worker:', registration.scope);
+      if (import.meta.env.DEV) {
+        console.log('🗑️ تم إلغاء تسجيل Service Worker:', registration.scope);
+      }
     }
     
     return true;
@@ -57,7 +59,9 @@ export async function clearAllWorkboxCaches(): Promise<number> {
       
       if (shouldDelete) {
         await caches.delete(cacheName);
-        console.log('🗑️ تم حذف cache:', cacheName);
+        if (import.meta.env.DEV) {
+          console.log('🗑️ تم حذف cache:', cacheName);
+        }
         deletedCount++;
       }
     }
@@ -96,12 +100,16 @@ export async function cleanupOldServiceWorkers(): Promise<void> {
     });
     
     if (!response.ok) {
-      console.log('⚠️ ملف sw.js غير متاح (HTTP', response.status, ')');
+      if (import.meta.env.DEV) {
+        console.log('⚠️ ملف sw.js غير متاح (HTTP', response.status, ')');
+      }
       await fullServiceWorkerCleanup();
     }
-  } catch (error) {
+  } catch {
     // خطأ في الشبكة أو الملف غير موجود - تنظيف كامل
-    console.log('⚠️ لا يمكن الوصول لـ sw.js، جارِ التنظيف الشامل...');
+    if (import.meta.env.DEV) {
+      console.log('⚠️ لا يمكن الوصول لـ sw.js، جارِ التنظيف الشامل...');
+    }
     await fullServiceWorkerCleanup();
   }
 }
@@ -119,7 +127,9 @@ export async function handleSWRegistrationError(error: Error): Promise<boolean> 
     error.message?.includes('Failed to fetch');
   
   if (isNotFoundError) {
-    console.log('🔧 خطأ في SW، جارِ التنظيف الشامل...');
+    if (import.meta.env.DEV) {
+      console.log('🔧 خطأ في SW، جارِ التنظيف الشامل...');
+    }
     const result = await fullServiceWorkerCleanup();
     return result.swUnregistered || result.cachesDeleted > 0;
   }

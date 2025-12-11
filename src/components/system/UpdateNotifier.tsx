@@ -20,7 +20,9 @@ export function UpdateNotifier() {
     fullServiceWorkerCleanup()
       .then(({ swUnregistered, cachesDeleted }) => {
         if (swUnregistered || cachesDeleted > 0) {
-          console.log(`✅ تنظيف SW: ${swUnregistered ? 'نعم' : 'لا'}, Caches محذوفة: ${cachesDeleted}`);
+          if (import.meta.env.DEV) {
+            console.log(`✅ تنظيف SW: ${swUnregistered ? 'نعم' : 'لا'}, Caches محذوفة: ${cachesDeleted}`);
+          }
           
           // إظهار toast فقط إذا تم حذف شيء فعلياً
           if (cachesDeleted > 0) {
@@ -31,7 +33,9 @@ export function UpdateNotifier() {
           }
         }
       })
-      .catch(console.error);
+      .catch((err) => {
+        if (import.meta.env.DEV) console.error(err);
+      });
   }, []);
 
   return null;
