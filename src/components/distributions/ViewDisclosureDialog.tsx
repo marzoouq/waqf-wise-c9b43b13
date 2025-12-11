@@ -129,7 +129,7 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
             {/* القسم 1: الكشف المالي المتسلسل (الأهم) */}
             {/* ============================================ */}
             <Card className="border-2 border-primary/20 bg-gradient-to-br from-background to-muted/30">
-              <CardHeader className="pb-2 sm:pb-4 p-3 sm:p-6">
+              <CardHeader className="pb-2 sm:pb-4 p-3 sm:p-4">
                 <CardTitle className="text-base sm:text-xl flex items-center gap-2">
                   <Calculator className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                   الكشف المالي المتسلسل
@@ -138,7 +138,7 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                   رحلة الأموال من الإيرادات إلى المتبقي (رقبة الوقف)
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-3 sm:space-y-4 p-3 sm:p-6 pt-0">
+              <CardContent className="space-y-3 sm:space-y-4 p-3 sm:p-4 pt-0">
                 
                 {/* 1. إجمالي الإيرادات */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-emerald-500/10 rounded-lg border border-emerald-500/20 gap-2">
@@ -301,14 +301,14 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
             {/* ============================================ */}
             {revenueItems.length > 0 && (
               <Card>
-                <CardHeader className="p-3 sm:p-6">
+                <CardHeader className="p-3 sm:p-4">
                   <CardTitle className="text-base sm:text-lg flex items-center gap-2">
                     <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600" />
                     تفصيل الإيرادات
                   </CardTitle>
                   <CardDescription className="text-xs sm:text-sm">جميع مصادر الدخل للسنة المالية</CardDescription>
                 </CardHeader>
-                <CardContent className="p-3 sm:p-6 pt-0">
+                <CardContent className="p-3 sm:p-4 pt-0">
                   <div className="overflow-x-auto">
                     <Table>
                       <TableHeader>
@@ -345,14 +345,14 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
             {/* القسم 3: تفصيل المصروفات */}
             {/* ============================================ */}
             <Card>
-              <CardHeader className="p-3 sm:p-6">
+              <CardHeader className="p-3 sm:p-4">
                 <CardTitle className="text-base sm:text-lg flex items-center gap-2">
                   <TrendingDown className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" />
                   تفصيل المصروفات ({expenseItems.length || 4} بند)
                 </CardTitle>
                 <CardDescription className="text-xs sm:text-sm">جميع بنود المصروفات للسنة المالية</CardDescription>
               </CardHeader>
-              <CardContent className="p-3 sm:p-6 pt-0">
+              <CardContent className="p-3 sm:p-4 pt-0">
                 {expenseItems.length > 0 ? (
                   <div className="overflow-x-auto">
                     <Table>
@@ -417,7 +417,7 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
             {/* القسم 4: توزيعات الورثة */}
             {/* ============================================ */}
             <Card>
-              <CardHeader className="p-3 sm:p-6">
+              <CardHeader className="p-3 sm:p-4">
                 <CardTitle className="text-base sm:text-lg flex items-center gap-2">
                   <Users className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600" />
                   توزيعات الورثة (وفق الشريعة الإسلامية)
@@ -426,7 +426,7 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                   للذكر مثل حظ الأنثيين - الزوجات لهن الثمن
                 </CardDescription>
               </CardHeader>
-              <CardContent className="p-3 sm:p-6 pt-0">
+              <CardContent className="p-3 sm:p-4 pt-0">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                   {/* إجمالي التوزيعات */}
                   <Card className="bg-amber-500/10 border-amber-500/20">
@@ -489,13 +489,13 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
             {/* القسم 5: ملخص النسب والحصص */}
             {/* ============================================ */}
             <Card>
-              <CardHeader className="p-3 sm:p-6">
+              <CardHeader className="p-3 sm:p-4">
                 <CardTitle className="text-base sm:text-lg flex items-center gap-2">
                   <Percent className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                   ملخص النسب والحصص
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-3 sm:p-6 pt-0">
+              <CardContent className="p-3 sm:p-4 pt-0">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                   <div className="text-center p-3 sm:p-4 bg-muted/50 rounded-lg">
                     <p className="text-xs sm:text-sm text-muted-foreground">حصة الناظر</p>
