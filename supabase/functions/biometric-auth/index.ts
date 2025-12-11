@@ -1,9 +1,11 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { 
+  handleCors, 
+  jsonResponse, 
+  errorResponse,
+  unauthorizedResponse,
+  rateLimitResponse 
+} from '../_shared/cors.ts';
 
 // ✅ تقييد المحاولات - إصلاح أمني
 const rateLimitMap = new Map<string, { count: number; lastAttempt: number }>();
@@ -39,10 +41,8 @@ function resetRateLimit(identifier: string): void {
 }
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     const { credentialId, userId, challenge } = await req.json();
@@ -51,10 +51,7 @@ Deno.serve(async (req) => {
 
     if (!credentialId || !userId) {
       console.error("Missing required parameters");
-      return new Response(
-        JSON.stringify({ error: "Missing credentialId or userId" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return errorResponse("Missing credentialId or userId", 400);
     }
 
     // ✅ التحقق من rate limit
@@ -77,10 +74,7 @@ Deno.serve(async (req) => {
         metadata: { credentialId: credentialId?.substring(0, 20) }
       });
       
-      return new Response(
-        JSON.stringify({ error: "تم تجاوز حد المحاولات. يرجى المحاولة بعد 15 دقيقة" }),
-        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return rateLimitResponse("تم تجاوز حد المحاولات. يرجى المحاولة بعد 15 دقيقة");
     }
 
     // Create admin client for user operations
@@ -110,10 +104,7 @@ Deno.serve(async (req) => {
         metadata: { credentialId: credentialId?.substring(0, 20) }
       });
       
-      return new Response(
-        JSON.stringify({ error: "Invalid credential or user" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return unauthorizedResponse("Invalid credential or user");
     }
 
     console.log("Credential verified for user:", userId);
@@ -123,10 +114,7 @@ Deno.serve(async (req) => {
 
     if (userError || !userData?.user?.email) {
       console.error("User not found:", userError);
-      return new Response(
-        JSON.stringify({ error: "User not found" }),
-        { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return errorResponse("User not found", 404);
     }
 
     console.log("User found:", userData.user.email);
@@ -139,10 +127,7 @@ Deno.serve(async (req) => {
 
     if (linkError || !linkData?.properties?.hashed_token) {
       console.error("Magic link generation failed:", linkError);
-      return new Response(
-        JSON.stringify({ error: "Failed to generate authentication token" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return errorResponse("Failed to generate authentication token", 500);
     }
 
     console.log("Magic link generated successfully");
@@ -165,19 +150,13 @@ Deno.serve(async (req) => {
       resolved: true
     });
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        token_hash: linkData.properties.hashed_token,
-        email: userData.user.email,
-      }),
-      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return jsonResponse({
+      success: true,
+      token_hash: linkData.properties.hashed_token,
+      email: userData.user.email,
+    });
   } catch (error) {
     console.error("Biometric auth error:", error);
-    return new Response(
-      JSON.stringify({ error: "Internal server error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return errorResponse("Internal server error", 500);
   }
 });

@@ -1,15 +1,15 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { 
+  handleCors, 
+  jsonResponse, 
+  errorResponse,
+  unauthorizedResponse,
+  forbiddenResponse 
+} from '../_shared/cors.ts';
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -26,10 +26,7 @@ Deno.serve(async (req) => {
     // التحقق من المستخدم الحالي
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
-      return new Response(
-        JSON.stringify({ error: "غير مصرح" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return unauthorizedResponse("غير مصرح");
     }
 
     // إنشاء عميل للتحقق من المستخدم الحالي
@@ -40,10 +37,7 @@ Deno.serve(async (req) => {
     const { data: { user: currentUser }, error: authError } = await supabaseClient.auth.getUser();
     if (authError || !currentUser) {
       console.error("Auth error:", authError);
-      return new Response(
-        JSON.stringify({ error: "غير مصرح - يرجى تسجيل الدخول" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return unauthorizedResponse("غير مصرح - يرجى تسجيل الدخول");
     }
 
     // التحقق من صلاحيات المستخدم الحالي
@@ -54,39 +48,27 @@ Deno.serve(async (req) => {
 
     if (rolesError) {
       console.error("Roles error:", rolesError);
-      return new Response(
-        JSON.stringify({ error: "خطأ في التحقق من الصلاحيات" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return errorResponse("خطأ في التحقق من الصلاحيات", 500);
     }
 
     const allowedRoles = ["nazer", "admin"];
     const hasPermission = userRoles?.some((r) => allowedRoles.includes(r.role));
 
     if (!hasPermission) {
-      return new Response(
-        JSON.stringify({ error: "ليس لديك صلاحية تعديل البريد الإلكتروني" }),
-        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return forbiddenResponse("ليس لديك صلاحية تعديل البريد الإلكتروني");
     }
 
     // قراءة البيانات من الطلب
     const { userId, newEmail } = await req.json();
 
     if (!userId || !newEmail) {
-      return new Response(
-        JSON.stringify({ error: "البيانات المطلوبة غير مكتملة" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return errorResponse("البيانات المطلوبة غير مكتملة", 400);
     }
 
     // التحقق من صحة البريد الإلكتروني
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(newEmail)) {
-      return new Response(
-        JSON.stringify({ error: "البريد الإلكتروني غير صحيح" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return errorResponse("البريد الإلكتروني غير صحيح", 400);
     }
 
     // التحقق من عدم وجود البريد الإلكتروني مسبقاً
@@ -98,10 +80,7 @@ Deno.serve(async (req) => {
       .maybeSingle();
 
     if (existingUser) {
-      return new Response(
-        JSON.stringify({ error: "البريد الإلكتروني مستخدم بالفعل" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return errorResponse("البريد الإلكتروني مستخدم بالفعل", 400);
     }
 
     console.log(`Updating email for user ${userId} to ${newEmail}`);
@@ -114,10 +93,7 @@ Deno.serve(async (req) => {
 
     if (authUpdateError) {
       console.error("Auth update error:", authUpdateError);
-      return new Response(
-        JSON.stringify({ error: `خطأ في تحديث البريد: ${authUpdateError.message}` }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return errorResponse(`خطأ في تحديث البريد: ${authUpdateError.message}`, 500);
     }
 
     // تحديث البريد في profiles
@@ -131,12 +107,7 @@ Deno.serve(async (req) => {
 
     if (profileUpdateError) {
       console.error("Profile update error:", profileUpdateError);
-      // محاولة التراجع عن تحديث auth.users
-      // لكن هذا قد لا يكون ممكناً، لذا نسجل الخطأ فقط
-      return new Response(
-        JSON.stringify({ error: `خطأ في تحديث الملف الشخصي: ${profileUpdateError.message}` }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return errorResponse(`خطأ في تحديث الملف الشخصي: ${profileUpdateError.message}`, 500);
     }
 
     // تسجيل العملية في سجل المراجعة
@@ -153,15 +124,9 @@ Deno.serve(async (req) => {
 
     console.log(`Successfully updated email for user ${userId}`);
 
-    return new Response(
-      JSON.stringify({ success: true, message: "تم تحديث البريد الإلكتروني بنجاح" }),
-      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return jsonResponse({ success: true, message: "تم تحديث البريد الإلكتروني بنجاح" });
   } catch (error) {
     console.error("Unexpected error:", error);
-    return new Response(
-      JSON.stringify({ error: "حدث خطأ غير متوقع" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return errorResponse("حدث خطأ غير متوقع", 500);
   }
 });

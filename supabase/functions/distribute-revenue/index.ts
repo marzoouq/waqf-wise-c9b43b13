@@ -1,9 +1,11 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+import { 
+  handleCors, 
+  jsonResponse, 
+  errorResponse,
+  unauthorizedResponse,
+  forbiddenResponse 
+} from '../_shared/cors.ts';
 
 interface DistributionRequest {
   totalAmount: number;
@@ -22,10 +24,8 @@ interface HeirShare {
 }
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -35,19 +35,13 @@ Deno.serve(async (req) => {
     // Get user from auth header
     const authHeader = req.headers.get('Authorization')?.replace('Bearer ', '');
     if (!authHeader) {
-      return new Response(
-        JSON.stringify({ error: 'غير مصرح' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return unauthorizedResponse('غير مصرح');
     }
 
     // Verify user is nazer or admin
     const { data: { user }, error: authError } = await supabase.auth.getUser(authHeader);
     if (authError || !user) {
-      return new Response(
-        JSON.stringify({ error: 'المستخدم غير موجود' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return unauthorizedResponse('المستخدم غير موجود');
     }
 
     const { data: userRole } = await supabase
@@ -58,10 +52,7 @@ Deno.serve(async (req) => {
       .single();
 
     if (!userRole) {
-      return new Response(
-        JSON.stringify({ error: 'غير مصرح لك بتنفيذ التوزيع' }),
-        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return forbiddenResponse('غير مصرح لك بتنفيذ التوزيع');
     }
 
     const body: DistributionRequest = await req.json();
@@ -75,10 +66,7 @@ Deno.serve(async (req) => {
 
     if (calcError) {
       console.error('[distribute-revenue] Calculation error:', calcError);
-      return new Response(
-        JSON.stringify({ error: 'خطأ في حساب التوزيع', details: calcError.message }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return errorResponse('خطأ في حساب التوزيع: ' + calcError.message, 500);
     }
 
     console.log(`[distribute-revenue] Calculated shares for ${heirShares?.length} heirs`);
@@ -110,17 +98,13 @@ Deno.serve(async (req) => {
 
     if (insertError) {
       console.error('[distribute-revenue] Insert error:', insertError);
-      return new Response(
-        JSON.stringify({ error: 'خطأ في إنشاء سجلات التوزيع', details: insertError.message }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return errorResponse('خطأ في إنشاء سجلات التوزيع: ' + insertError.message, 500);
     }
 
     console.log(`[distribute-revenue] Created ${insertedDistributions?.length} distribution records`);
 
     // Create payment records for each heir
     const paymentRecords = heirShares.map((heir: HeirShare) => {
-      const beneficiary = beneficiaryMap.get(heir.beneficiary_id);
       const distribution = insertedDistributions?.find(d => d.beneficiary_id === heir.beneficiary_id);
       return {
         payment_number: `PAY-${Date.now()}-${heir.beneficiary_id.substring(0, 8)}`,
@@ -201,21 +185,15 @@ Deno.serve(async (req) => {
 
     console.log('[distribute-revenue] Distribution completed successfully');
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        message: 'تم توزيع الغلة بنجاح',
-        summary,
-      }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return jsonResponse({
+      success: true,
+      message: 'تم توزيع الغلة بنجاح',
+      summary,
+    });
 
   } catch (error: unknown) {
     console.error('[distribute-revenue] Error:', error);
     const errorMessage = error instanceof Error ? error.message : 'خطأ غير معروف';
-    return new Response(
-      JSON.stringify({ error: 'حدث خطأ غير متوقع', details: errorMessage }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return errorResponse('حدث خطأ غير متوقع: ' + errorMessage, 500);
   }
 });
