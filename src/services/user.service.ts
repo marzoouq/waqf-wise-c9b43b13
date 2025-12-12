@@ -4,6 +4,9 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { productionLogger } from "@/lib/logger/production-logger";
+import type { Database } from "@/integrations/supabase/types";
+
+type AppRole = Database['public']['Enums']['app_role'];
 
 export interface UserStats {
   totalUsers: number;
@@ -303,10 +306,10 @@ export class UserService {
   /**
    * إضافة دور لمستخدم محدد
    */
-  static async addUserRole(userId: string, role: string): Promise<void> {
+  static async addUserRole(userId: string, role: AppRole): Promise<void> {
     const { error } = await supabase
       .from('user_roles')
-      .insert({ user_id: userId, role: role as any });
+      .insert({ user_id: userId, role });
 
     if (error) throw error;
   }
@@ -314,12 +317,12 @@ export class UserService {
   /**
    * حذف دور من مستخدم محدد
    */
-  static async deleteUserRole(userId: string, role: string): Promise<void> {
+  static async deleteUserRole(userId: string, role: AppRole): Promise<void> {
     const { error } = await supabase
       .from('user_roles')
       .delete()
       .eq('user_id', userId)
-      .eq('role', role as any);
+      .eq('role', role);
 
     if (error) throw error;
   }

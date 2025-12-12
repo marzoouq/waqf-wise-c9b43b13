@@ -118,7 +118,7 @@ export function ProfileRequestsHistory({ beneficiaryId }: ProfileRequestsHistory
                       <div className="flex items-center gap-2 mb-2">
                         <FileText className="h-4 w-4 text-muted-foreground" />
                         <h4 className="font-semibold text-foreground">
-                          {(request as any).request_types?.name_ar || 'طلب'}
+                          {(request as { request_types?: { name_ar?: string } }).request_types?.name_ar || 'طلب'}
                         </h4>
                       </div>
                       <p className="text-sm text-muted-foreground mb-2">
