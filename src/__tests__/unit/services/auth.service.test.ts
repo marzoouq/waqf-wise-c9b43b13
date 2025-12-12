@@ -43,16 +43,17 @@ describe('AuthService', () => {
     });
   });
 
-  describe('loginWithPassword', () => {
+  describe('login', () => {
     it('should login with valid credentials', async () => {
       mockSupabaseAuth.signInWithPassword.mockResolvedValueOnce({
         data: { user: { id: 'user-1' }, session: { access_token: 'token' } },
         error: null,
       });
 
-      const result = await AuthService.loginWithPassword('test@example.com', 'password123');
+      const result = await AuthService.login('test@example.com', 'password123');
       
       expect(mockSupabaseAuth.signInWithPassword).toHaveBeenCalled();
+      expect(result).toBeDefined();
     });
   });
 

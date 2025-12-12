@@ -54,6 +54,9 @@ describe('DistributionService', () => {
         fiscal_year_id: 'fy-2024',
         total_amount: 100000,
         status: 'مسودة',
+        beneficiaries_count: 10,
+        distribution_date: '2024-01-15',
+        month: 'يناير',
       };
 
       setMockTableData('distributions', [{ id: 'new-dist', ...newDistribution }]);
@@ -61,6 +64,31 @@ describe('DistributionService', () => {
       const result = await DistributionService.create(newDistribution);
       
       expect(result).toBeDefined();
+    });
+  });
+
+  describe('getSummary', () => {
+    it('should get distribution summary', async () => {
+      setMockTableData('distributions', mockDistributions);
+
+      const result = await DistributionService.getSummary();
+      
+      expect(result).toBeDefined();
+      expect(result).toHaveProperty('totalDistributions');
+      expect(result).toHaveProperty('totalAmount');
+    });
+  });
+
+  describe('simulate', () => {
+    it('should simulate distribution', () => {
+      const result = DistributionService.simulate({
+        totalAmount: 10000,
+        beneficiaryIds: ['ben-1', 'ben-2'],
+        distributionMethod: 'equal',
+      });
+      
+      expect(result).toHaveLength(2);
+      expect(result[0].amount).toBe(5000);
     });
   });
 });
