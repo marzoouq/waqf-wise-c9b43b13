@@ -28,7 +28,7 @@ export function NotificationPreferences({
     setSaving(true);
     try {
       await BeneficiaryService.update(beneficiaryId, {
-        notification_preferences: preferences as any,
+        notification_preferences: preferences,
       });
 
       toast({

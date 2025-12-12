@@ -273,14 +273,22 @@ export class MonitoringService {
     const allAlerts: SmartAlert[] = [];
 
     // عقود قرب الانتهاء
+    interface ContractWithProperty {
+      id: string;
+      contract_number: string;
+      tenant_name: string;
+      end_date: string;
+      properties?: { name?: string } | null;
+    }
+    
     if (expiringContractsResult.data) {
-      expiringContractsResult.data.forEach(contract => {
+      (expiringContractsResult.data as ContractWithProperty[]).forEach(contract => {
         const daysRemaining = Math.floor((new Date(contract.end_date).getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
         allAlerts.push({
           id: contract.id,
           type: 'contract_expiring',
           title: `عقد ${contract.contract_number} قارب الانتهاء`,
-          description: `عقد ${contract.tenant_name} - ${(contract.properties as any)?.name} ينتهي خلال ${daysRemaining} يوم`,
+          description: `عقد ${contract.tenant_name} - ${contract.properties?.name || 'عقار'} ينتهي خلال ${daysRemaining} يوم`,
           severity: daysRemaining <= 30 ? 'high' : 'medium',
           date: new Date(contract.end_date),
           actionUrl: '/properties?tab=contracts'
@@ -289,14 +297,22 @@ export class MonitoringService {
     }
 
     // إيجارات متأخرة
+    interface PaymentWithContract {
+      id: string;
+      payment_number: string;
+      amount_due: number;
+      due_date: string;
+      contracts?: { tenant_name?: string; properties?: { name?: string } } | null;
+    }
+    
     if (overduePaymentsResult.data) {
-      overduePaymentsResult.data.forEach(payment => {
+      (overduePaymentsResult.data as PaymentWithContract[]).forEach(payment => {
         const daysOverdue = Math.floor((today.getTime() - new Date(payment.due_date).getTime()) / (1000 * 60 * 60 * 24));
         allAlerts.push({
           id: payment.id,
           type: 'rent_overdue',
           title: `دفعة إيجار متأخرة - ${payment.payment_number}`,
-          description: `${(payment.contracts as any)?.tenant_name} - متأخر ${daysOverdue} يوم`,
+          description: `${payment.contracts?.tenant_name || 'مستأجر'} - متأخر ${daysOverdue} يوم`,
           severity: daysOverdue > 30 ? 'high' : 'medium',
           date: new Date(payment.due_date),
           actionUrl: '/properties?tab=payments'
@@ -305,15 +321,25 @@ export class MonitoringService {
     }
 
     // قروض مستحقة
+    interface LoanInstallmentWithLoan {
+      id: string;
+      installment_number: number;
+      principal_amount: number;
+      total_amount: number;
+      due_date: string;
+      status: string;
+      loans?: { loan_number?: string; beneficiaries?: { full_name?: string } } | null;
+    }
+    
     if (dueLoansResult.data) {
-      dueLoansResult.data.forEach(installment => {
+      (dueLoansResult.data as LoanInstallmentWithLoan[]).forEach(installment => {
         const daysUntilDue = Math.floor((new Date(installment.due_date).getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
         const isOverdue = installment.status === 'overdue' || daysUntilDue < 0;
         allAlerts.push({
           id: installment.id,
           type: 'loan_due',
           title: isOverdue ? `قسط قرض متأخر` : `قسط قرض مستحق قريبًا`,
-          description: `قرض ${(installment.loans as any)?.loan_number}`,
+          description: `قرض ${installment.loans?.loan_number || ''}`,
           severity: isOverdue || daysUntilDue <= 7 ? 'high' : 'medium',
           date: new Date(installment.due_date),
           actionUrl: '/loans'
@@ -322,13 +348,20 @@ export class MonitoringService {
     }
 
     // طلبات متأخرة
+    interface RequestWithBeneficiary {
+      id: string;
+      request_number: string | null;
+      sla_due_at: string | null;
+      beneficiaries?: { full_name?: string } | null;
+    }
+    
     if (overdueRequestsResult.data) {
-      overdueRequestsResult.data.forEach(request => {
+      (overdueRequestsResult.data as RequestWithBeneficiary[]).forEach(request => {
         allAlerts.push({
           id: request.id,
           type: 'request_overdue',
-          title: `طلب متأخر - ${request.request_number}`,
-          description: `طلب ${(request.beneficiaries as any)?.full_name} تجاوز الوقت المحدد`,
+          title: `طلب متأخر - ${request.request_number || ''}`,
+          description: `طلب ${request.beneficiaries?.full_name || 'مستفيد'} تجاوز الوقت المحدد`,
           severity: 'high',
           date: new Date(request.sla_due_at || Date.now()),
           actionUrl: '/requests'
