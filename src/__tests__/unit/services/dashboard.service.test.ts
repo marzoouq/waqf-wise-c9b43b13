@@ -1,0 +1,59 @@
+/**
+ * اختبارات خدمة لوحة التحكم
+ * Dashboard Service Tests
+ */
+
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { DashboardService } from '@/services/dashboard.service';
+import { mockSupabase, setMockTableData, clearMockTableData } from '../../utils/supabase.mock';
+
+describe('DashboardService', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    clearMockTableData();
+  });
+
+  describe('getUnifiedKPIs', () => {
+    it('should fetch unified KPIs', async () => {
+      setMockTableData('beneficiaries', []);
+      setMockTableData('properties', []);
+      setMockTableData('contracts', []);
+
+      const result = await DashboardService.getUnifiedKPIs();
+      
+      expect(result).toBeDefined();
+    });
+  });
+
+  describe('getDashboardKPIs', () => {
+    it('should fetch dashboard KPIs', async () => {
+      setMockTableData('beneficiaries', []);
+      setMockTableData('properties', []);
+
+      const result = await DashboardService.getDashboardKPIs();
+      
+      expect(result).toBeDefined();
+    });
+  });
+
+  describe('getSystemOverview', () => {
+    it('should fetch system overview', async () => {
+      setMockTableData('beneficiaries', []);
+      setMockTableData('properties', []);
+
+      const result = await DashboardService.getSystemOverview();
+      
+      expect(result).toBeDefined();
+    });
+  });
+
+  describe('getDashboardConfigs', () => {
+    it('should fetch dashboard configs', async () => {
+      setMockTableData('dashboard_configs', []);
+
+      const result = await DashboardService.getDashboardConfigs();
+      
+      expect(Array.isArray(result)).toBe(true);
+    });
+  });
+});
