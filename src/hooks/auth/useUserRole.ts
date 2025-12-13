@@ -13,7 +13,7 @@ export function useUserRole() {
   // تحويل الأدوار إلى AppRole type
   const roles = useMemo(() => authRoles as AppRole[], [authRoles]);
   
-  const hasRole = (role: AppRole) => authHasRole(role);
+  const hasRole = (role: AppRole) => (typeof authHasRole === 'function' ? authHasRole(role) : false);
   const primaryRole = (roles[0] || "user") as AppRole;
 
   const isNazer = hasRole("nazer");
