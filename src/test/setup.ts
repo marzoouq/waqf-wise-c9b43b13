@@ -4,42 +4,54 @@
 import '@testing-library/jest-dom';
 import { cleanup } from '@testing-library/react';
 import { afterEach, beforeEach, beforeAll, vi } from 'vitest';
-import React from 'react';
 
 // Make vi globally available
 globalThis.vi = vi;
 
+// Basic DOM polyfills and environment shims for Vitest
+// Ensure `window.matchMedia` exists (some components check it)
+if (typeof window.matchMedia !== 'function') {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    configurable: true,
+    value: (query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: () => {},
+      removeListener: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: () => false,
+    }),
+  });
+}
+
+// Minimal ResizeObserver mock
+if (typeof (globalThis as any).ResizeObserver === 'undefined') {
+  class MockResizeObserver {
+    observe() { return; }
+    unobserve() { return; }
+    disconnect() { return; }
+  }
+  (globalThis as any).ResizeObserver = MockResizeObserver;
+}
+
+// Force navigator language to en-US to avoid Arabic-digit formatting in tests
+if (typeof navigator !== 'undefined') {
+  try { Object.defineProperty(navigator, 'language', { value: 'en-US', configurable: true }); } catch {}
+}
+
+// Force Intl.NumberFormat to default to en-US when no locale provided
+const _OriginalNumberFormat = Intl.NumberFormat;
+// @ts-ignore
+Intl.NumberFormat = function (locales?: any, options?: any) {
+  if (!locales) locales = 'en-US';
+  return new _OriginalNumberFormat(locales, options);
+} as any;
+
 // Mock scrollIntoView for Radix UI components (Select, etc.)
 Element.prototype.scrollIntoView = vi.fn();
-
-// Mock matchMedia for responsive components
-Object.defineProperty(window, 'matchMedia', {
-  writable: true,
-  value: vi.fn().mockImplementation((query: string) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: vi.fn(),
-    removeListener: vi.fn(),
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    dispatchEvent: vi.fn(),
-  })),
-});
-
-// Mock ResizeObserver
-window.ResizeObserver = vi.fn().mockImplementation(() => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn(),
-}));
-
-// Mock IntersectionObserver
-window.IntersectionObserver = vi.fn().mockImplementation(() => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn(),
-}));
 
 // Shared mock data store
 const mockTableData: Record<string, unknown[]> = {};
@@ -144,37 +156,6 @@ vi.mock('@/integrations/supabase/client', () => {
   };
 });
 
-// Mock AuthContext with comprehensive auth state
-let mockAuthRoles: string[] = ['admin'];
-let mockAuthUser: { id: string; email: string } | null = { id: 'test-user-id', email: 'test@waqf.sa' };
-
-export const setMockAuthRoles = (roles: string[]) => {
-  mockAuthRoles = roles;
-};
-
-export const setMockAuthUser = (user: { id: string; email: string } | null) => {
-  mockAuthUser = user;
-};
-
-vi.mock('@/contexts/AuthContext', () => ({
-  useAuth: () => ({
-    user: mockAuthUser,
-    profile: mockAuthUser ? { id: mockAuthUser.id, full_name: 'Test User' } : null,
-    isLoading: false,
-    roles: mockAuthRoles,
-    rolesLoading: false,
-    signIn: vi.fn().mockResolvedValue({ user: mockAuthUser, session: {} }),
-    signInWithGoogle: vi.fn().mockResolvedValue({ url: '' }),
-    signUp: vi.fn().mockResolvedValue({ user: mockAuthUser, session: {} }),
-    signOut: vi.fn().mockResolvedValue(undefined),
-    hasPermission: vi.fn().mockResolvedValue(true),
-    isRole: vi.fn().mockResolvedValue(true),
-    checkPermissionSync: vi.fn().mockReturnValue(true),
-    hasRole: vi.fn((role: string) => mockAuthRoles.includes(role)),
-  }),
-  AuthProvider: ({ children }: { children: React.ReactNode }) => children,
-}));
-
 // Mock toast
 vi.mock('@/hooks/use-toast', () => ({
   useToast: () => ({
@@ -199,6 +180,30 @@ vi.mock('sonner', () => {
   };
 });
 
+// Mock Auth context so components using `useAuth()` work in tests
+vi.mock('@/contexts/AuthContext', () => {
+  const React = require('react');
+  return {
+    AuthProvider: ({ children }: any) => children,
+    useAuth: () => ({
+      user: null,
+      profile: null,
+      isLoading: false,
+      roles: [],
+      rolesLoading: false,
+      signIn: vi.fn(),
+      signInWithGoogle: vi.fn(),
+      signUp: vi.fn(),
+      signOut: vi.fn(),
+      hasPermission: vi.fn().mockResolvedValue(false),
+      isRole: vi.fn().mockResolvedValue(false),
+      checkPermissionSync: vi.fn().mockReturnValue(false),
+      hasRole: vi.fn().mockReturnValue(false),
+    }),
+    ROLE_PERMISSIONS: {},
+  };
+});
+
 // Suppress console errors during tests
 beforeAll(() => {
   vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -214,7 +219,4 @@ afterEach(() => {
 beforeEach(() => {
   clearMockTableData();
   vi.clearAllMocks();
-  // Reset auth state to defaults
-  mockAuthRoles = ['admin'];
-  mockAuthUser = { id: 'test-user-id', email: 'test@waqf.sa' };
 });
