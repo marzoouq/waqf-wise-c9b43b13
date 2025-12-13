@@ -1,15 +1,16 @@
 /**
  * Supabase Mock للاختبارات
- * يستخدم من src/test/setup.ts
+ * يُعاد تصديره من src/test/setup.ts
  */
 
 import { vi } from 'vitest';
 
 // Re-export from setup
-export { setMockTableData, clearMockTableData } from '@/test/setup';
+export { setMockTableData, clearMockTableData } from '../../test/setup';
 
 // Get supabase mock from the mocked module
 export const getMockSupabase = () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   return require('@/integrations/supabase/client').supabase;
 };
 
