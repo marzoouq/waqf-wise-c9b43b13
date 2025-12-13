@@ -7,8 +7,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
+import { AuthProvider } from '@/contexts/AuthContext';
 import { useRequests } from '@/hooks/requests/useRequests';
 import { clearMockTableData, setMockTableData } from '../../utils/supabase.mock';
+import React from 'react';
 
 const createWrapper = () => {
   const queryClient = new QueryClient({
@@ -19,7 +21,9 @@ const createWrapper = () => {
 
   return ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>{children}</BrowserRouter>
+      <BrowserRouter>
+        <AuthProvider>{children}</AuthProvider>
+      </BrowserRouter>
     </QueryClientProvider>
   );
 };

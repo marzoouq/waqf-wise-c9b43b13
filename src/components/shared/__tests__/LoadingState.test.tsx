@@ -1,16 +1,16 @@
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import { LoadingState } from '../LoadingState';
 
 describe('LoadingState', () => {
   it('renders with default message', () => {
-    const { getByText } = render(<LoadingState />);
-    expect(getByText('جاري التحميل...')).toBeInTheDocument();
+    render(<LoadingState />);
+    expect(screen.getByText('جاري التحميل...')).toBeInTheDocument();
   });
 
   it('renders with custom message', () => {
-    const { getByText } = render(<LoadingState message="جاري تحميل البيانات" />);
-    expect(getByText('جاري تحميل البيانات')).toBeInTheDocument();
+    render(<LoadingState message="جاري تحميل البيانات" />);
+    expect(screen.getByText('جاري تحميل البيانات')).toBeInTheDocument();
   });
 
   it('renders in fullscreen mode', () => {
@@ -19,12 +19,16 @@ describe('LoadingState', () => {
   });
 
   it('renders with different sizes', () => {
-    const { rerender, getByRole } = render(<LoadingState size="sm" />);
-    expect(getByRole('status')).toHaveClass('h-4');
-    expect(getByRole('status')).toHaveClass('w-4');
+    const { container, rerender } = render(<LoadingState size="sm" />);
+    
+    // Find the loader icon by class
+    const smallLoader = container.querySelector('.animate-spin');
+    expect(smallLoader).toHaveClass('h-4');
+    expect(smallLoader).toHaveClass('w-4');
 
     rerender(<LoadingState size="lg" />);
-    expect(getByRole('status')).toHaveClass('h-12');
-    expect(getByRole('status')).toHaveClass('w-12');
+    const largeLoader = container.querySelector('.animate-spin');
+    expect(largeLoader).toHaveClass('h-12');
+    expect(largeLoader).toHaveClass('w-12');
   });
 });

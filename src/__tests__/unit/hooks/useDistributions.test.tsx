@@ -11,13 +11,16 @@ import { setMockTableData, clearMockTableData } from '../../utils/supabase.mock'
 import { mockDistributions } from '../../utils/data.fixtures';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
+import { AuthProvider } from '@/contexts/AuthContext';
 import React from 'react';
 
 const createWrapper = () => {
   const queryClient = createTestQueryClient();
   return ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>{children}</BrowserRouter>
+      <BrowserRouter>
+        <AuthProvider>{children}</AuthProvider>
+      </BrowserRouter>
     </QueryClientProvider>
   );
 };
