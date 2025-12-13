@@ -2,7 +2,17 @@ import { vi } from 'vitest';
 
 /*
  * Shared Supabase Mock Utilities for tests
+ * 
+ * IMPORTANT: Tests should import `supabase` from '@/integrations/supabase/client'
+ * which is automatically mocked in setup.ts
+ * 
+ * Use setMockTableData and clearMockTableData from 'src/test/setup' for data control
  */
+
+// Re-export utilities from setup.ts
+export { setMockTableData, clearMockTableData } from '../../test/setup';
+
+// Legacy mockSupabase for backward compatibility with existing tests
 const mockTableData: Record<string, unknown[]> = {};
 
 const createMockQueryBuilder = <T>(data: T[] = []) => {
@@ -89,11 +99,12 @@ export const mockSupabase = {
   rpc: vi.fn().mockResolvedValue({ data: null, error: null }),
 };
 
-export const setMockTableData = <T>(tableName: string, data: T[]) => {
+// Helper to set mock table data for legacy mockSupabase
+export const setLegacyMockTableData = <T>(tableName: string, data: T[]) => {
   mockTableData[tableName] = data;
 };
 
-export const clearMockTableData = () => {
+export const clearLegacyMockTableData = () => {
   Object.keys(mockTableData).forEach(k => delete mockTableData[k]);
   vi.clearAllMocks();
 };
