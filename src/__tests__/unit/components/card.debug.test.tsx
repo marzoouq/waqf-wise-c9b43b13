@@ -1,10 +1,10 @@
 import { test } from 'vitest';
 import { render } from '@testing-library/react';
+import { screen } from '@testing-library/dom';
 import { Card } from '@/components/ui/card';
 
-test('debug card render output', () => {
-  const { container } = render(<Card className="custom-card">Content</Card>);
-  // Log HTML for debugging failing test
+test('debug card parentElement via @testing-library/dom', () => {
+  render(<Card className="custom-card">Content</Card>);
   // eslint-disable-next-line no-console
-  console.log(container.innerHTML);
+  console.log(screen.getByText('Content').parentElement?.outerHTML);
 });
