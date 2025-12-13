@@ -146,58 +146,64 @@ export class TenantService {
 
   static async getTenantsAging() {
     const today = new Date();
+    
+    // جلب المستأجرين النشطين
     const { data: tenants, error: tenantsError } = await supabase
       .from('tenants')
       .select('id, full_name')
       .eq('status', 'active');
 
     if (tenantsError) throw tenantsError;
+    if (!tenants?.length) return [];
 
-    const agingData = [];
+    // جلب جميع الفواتير مرة واحدة (حل N+1)
+    const tenantIds = tenants.map(t => t.id);
+    const { data: allLedger, error: ledgerError } = await supabase
+      .from('tenant_ledger')
+      .select('tenant_id, transaction_date, debit_amount, credit_amount')
+      .in('tenant_id', tenantIds)
+      .eq('transaction_type', 'invoice');
 
-    for (const tenant of tenants || []) {
-      const { data: ledger } = await supabase
-        .from('tenant_ledger')
-        .select('*')
-        .eq('tenant_id', tenant.id)
-        .eq('transaction_type', 'invoice');
+    if (ledgerError) throw ledgerError;
 
-      let current = 0;
-      let days_30 = 0;
-      let days_60 = 0;
-      let days_90 = 0;
-      let over_90 = 0;
+    // تجميع البيانات حسب المستأجر
+    const tenantMap = new Map(tenants.map(t => [t.id, t.full_name]));
+    const agingByTenant: Record<string, { current: number; days_30: number; days_60: number; days_90: number; over_90: number }> = {};
 
-      for (const entry of ledger || []) {
-        const transactionDate = new Date(entry.transaction_date);
-        const daysDiff = Math.floor(
-          (today.getTime() - transactionDate.getTime()) / (1000 * 60 * 60 * 24)
-        );
-        const amount = (entry.debit_amount || 0) - (entry.credit_amount || 0);
+    for (const entry of allLedger || []) {
+      const transactionDate = new Date(entry.transaction_date);
+      const daysDiff = Math.floor(
+        (today.getTime() - transactionDate.getTime()) / (1000 * 60 * 60 * 24)
+      );
+      const amount = (entry.debit_amount || 0) - (entry.credit_amount || 0);
 
-        if (amount <= 0) continue;
+      if (amount <= 0) continue;
 
-        if (daysDiff <= 30) current += amount;
-        else if (daysDiff <= 60) days_30 += amount;
-        else if (daysDiff <= 90) days_60 += amount;
-        else if (daysDiff <= 120) days_90 += amount;
-        else over_90 += amount;
+      if (!agingByTenant[entry.tenant_id]) {
+        agingByTenant[entry.tenant_id] = { current: 0, days_30: 0, days_60: 0, days_90: 0, over_90: 0 };
       }
 
-      const total = current + days_30 + days_60 + days_90 + over_90;
-      if (total > 0) {
-        agingData.push({
-          tenant_id: tenant.id,
-          tenant_name: tenant.full_name,
-          current,
-          days_30,
-          days_60,
-          days_90,
-          over_90,
-          total,
-        });
-      }
+      const aging = agingByTenant[entry.tenant_id];
+      if (daysDiff <= 30) aging.current += amount;
+      else if (daysDiff <= 60) aging.days_30 += amount;
+      else if (daysDiff <= 90) aging.days_60 += amount;
+      else if (daysDiff <= 120) aging.days_90 += amount;
+      else aging.over_90 += amount;
     }
+
+    // بناء النتيجة النهائية
+    const agingData = Object.entries(agingByTenant)
+      .map(([tenantId, aging]) => ({
+        tenant_id: tenantId,
+        tenant_name: tenantMap.get(tenantId) || '',
+        current: aging.current,
+        days_30: aging.days_30,
+        days_60: aging.days_60,
+        days_90: aging.days_90,
+        over_90: aging.over_90,
+        total: aging.current + aging.days_30 + aging.days_60 + aging.days_90 + aging.over_90,
+      }))
+      .filter(item => item.total > 0);
 
     return agingData.sort((a, b) => b.total - a.total);
   }
