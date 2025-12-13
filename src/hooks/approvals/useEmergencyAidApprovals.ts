@@ -1,13 +1,13 @@
 /**
- * Hook لإدارة موافقات طلبات الفزعة
- * Emergency Aid Approvals Hook
+ * Emergency Aid Approvals Hook - استخدام LoansService
+ * @refactored 2.9.2 - نقل منطق Supabase إلى LoansService
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { invalidateLoanQueries } from '@/lib/query-invalidation';
 import { QUERY_KEYS } from '@/lib/query-keys';
+import { LoansService } from '@/services/loans.service';
 
 export interface EmergencyRequest {
   id: string;
@@ -33,19 +33,7 @@ export function useEmergencyAidApprovals() {
   const { data: requests = [], isLoading, error } = useQuery({
     queryKey: QUERY_KEYS.EMERGENCY_APPROVALS,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('emergency_aid_requests')
-        .select(`
-          *,
-          beneficiaries!inner(
-            full_name,
-            national_id
-          )
-        `)
-        .eq('status', 'معلق')
-        .order('sla_due_at', { ascending: true });
-
-      if (error) throw error;
+      const data = await LoansService.getPendingEmergencyRequests();
       return data as EmergencyRequest[];
     },
   });
@@ -61,17 +49,7 @@ export function useEmergencyAidApprovals() {
       amount: number; 
       notes?: string;
     }) => {
-      const { error } = await supabase
-        .from('emergency_aid_requests')
-        .update({
-          status: 'معتمد',
-          amount_approved: amount,
-          approved_at: new Date().toISOString(),
-          notes,
-        })
-        .eq('id', id);
-
-      if (error) throw error;
+      await LoansService.approveEmergencyRequest(id, amount, notes);
     },
     onSuccess: () => {
       toast({
@@ -98,16 +76,7 @@ export function useEmergencyAidApprovals() {
       id: string; 
       reason: string;
     }) => {
-      const { error } = await supabase
-        .from('emergency_aid_requests')
-        .update({
-          status: 'مرفوض',
-          rejected_at: new Date().toISOString(),
-          rejection_reason: reason,
-        })
-        .eq('id', id);
-
-      if (error) throw error;
+      await LoansService.rejectEmergencyRequest(id, reason);
     },
     onSuccess: () => {
       toast({

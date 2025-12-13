@@ -463,4 +463,65 @@ export class LoansService {
       };
     }).sort((a, b) => b.days_overdue - a.days_overdue);
   }
+
+  // =====================
+  // Emergency Aid Approvals (from useEmergencyAidApprovals)
+  // =====================
+
+  /**
+   * جلب طلبات الفزعة المعلقة
+   */
+  static async getPendingEmergencyRequests() {
+    const { data, error } = await supabase
+      .from('emergency_aid_requests')
+      .select(`
+        *,
+        beneficiaries!inner(
+          full_name,
+          national_id
+        )
+      `)
+      .eq('status', 'معلق')
+      .order('sla_due_at', { ascending: true });
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  /**
+   * الموافقة على طلب فزعة
+   */
+  static async approveEmergencyRequest(
+    id: string, 
+    amount: number, 
+    notes?: string
+  ): Promise<void> {
+    const { error } = await supabase
+      .from('emergency_aid_requests')
+      .update({
+        status: 'معتمد',
+        amount_approved: amount,
+        approved_at: new Date().toISOString(),
+        notes,
+      })
+      .eq('id', id);
+
+    if (error) throw error;
+  }
+
+  /**
+   * رفض طلب فزعة
+   */
+  static async rejectEmergencyRequest(id: string, reason: string): Promise<void> {
+    const { error } = await supabase
+      .from('emergency_aid_requests')
+      .update({
+        status: 'مرفوض',
+        rejected_at: new Date().toISOString(),
+        rejection_reason: reason,
+      })
+      .eq('id', id);
+
+    if (error) throw error;
+  }
 }
