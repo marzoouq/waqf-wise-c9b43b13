@@ -21,8 +21,9 @@ interface LogEntry {
   timestamp: string;
 }
 
-const IS_DEV = import.meta.env.DEV;
-const IS_PROD = import.meta.env.PROD;
+const MODE = (import.meta.env.MODE as string) || 'development';
+const IS_DEV = MODE !== 'production';
+const IS_PROD = MODE === 'production';
 
 /**
  * تحويل مستوى الـ log إلى severity
