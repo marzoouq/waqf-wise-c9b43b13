@@ -1,9 +1,11 @@
 /**
  * usePropertyRevenueStats Hook
  * Hook لإحصائيات إيرادات العقارات
+ * @version 2.9.2
  */
 import { useQuery } from "@tanstack/react-query";
 import { PropertyService } from "@/services/property.service";
+import { QUERY_KEYS, QUERY_CONFIG } from "@/lib/query-keys";
 
 export interface RentalPaymentWithContract {
   amount_paid: number | null;
@@ -15,7 +17,8 @@ export interface RentalPaymentWithContract {
 
 export function usePropertyRevenueStats() {
   return useQuery<RentalPaymentWithContract[]>({
-    queryKey: ["rental-payments-with-frequency"],
+    queryKey: QUERY_KEYS.RENTAL_PAYMENTS_WITH_FREQUENCY,
     queryFn: () => PropertyService.getRentalPaymentsWithFrequency(),
+    ...QUERY_CONFIG.DEFAULT,
   });
 }

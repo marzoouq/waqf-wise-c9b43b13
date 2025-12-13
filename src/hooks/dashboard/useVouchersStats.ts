@@ -1,9 +1,11 @@
 /**
  * useVouchersStats Hook
  * Hook لإحصائيات سندات الدفع
+ * @version 2.9.2
  */
 import { useQuery } from "@tanstack/react-query";
 import { PaymentService } from "@/services/payment.service";
+import { QUERY_KEYS, QUERY_CONFIG } from "@/lib/query-keys";
 
 export interface VouchersStats {
   total: number;
@@ -16,7 +18,8 @@ export interface VouchersStats {
 
 export function useVouchersStats() {
   return useQuery<VouchersStats>({
-    queryKey: ["vouchers-stats"],
+    queryKey: QUERY_KEYS.VOUCHERS_STATS,
     queryFn: () => PaymentService.getVouchersStats(),
+    ...QUERY_CONFIG.DEFAULT,
   });
 }
