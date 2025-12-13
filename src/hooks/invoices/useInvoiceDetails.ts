@@ -1,10 +1,11 @@
 /**
  * Invoice Details Hook
- * @version 2.8.44
+ * @version 2.8.45
  */
 
 import { useQuery } from "@tanstack/react-query";
 import { InvoiceService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface InvoiceLine {
   id: string;
@@ -21,7 +22,7 @@ export interface InvoiceLine {
 
 export function useInvoiceDetails(invoiceId: string | null) {
   const invoiceQuery = useQuery({
-    queryKey: ["invoice", invoiceId || undefined],
+    queryKey: QUERY_KEYS.INVOICE(invoiceId || ''),
     queryFn: async () => {
       if (!invoiceId) return null;
       return InvoiceService.getInvoiceDetails(invoiceId);
@@ -30,7 +31,7 @@ export function useInvoiceDetails(invoiceId: string | null) {
   });
 
   const linesQuery = useQuery({
-    queryKey: ["invoice-lines", invoiceId || undefined],
+    queryKey: QUERY_KEYS.INVOICE_LINES(invoiceId || ''),
     queryFn: async () => {
       if (!invoiceId) return [];
       return InvoiceService.getInvoiceLines(invoiceId) as Promise<InvoiceLine[]>;

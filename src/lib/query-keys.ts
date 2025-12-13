@@ -435,6 +435,35 @@ export const QUERY_KEYS = {
   
   // Available Users
   AVAILABLE_USERS: ['available-users'] as const,
+
+  // Invoice Details
+  INVOICE_LINES: (invoiceId: string) => ['invoice-lines', invoiceId] as const,
+
+  // System Errors
+  SYSTEM_ERRORS: (severity?: string, status?: string) => ['system-errors', severity, status] as const,
+
+  // Request Approvals
+  REQUEST_APPROVALS: (requestId?: string) => ['request_approvals', requestId] as const,
+
+  // Knowledge Articles Extended
+  KNOWLEDGE_ARTICLES_LIST: ['knowledge-articles'] as const,
+  KNOWLEDGE_FAQS: ['knowledge-faqs'] as const,
+
+  // Unified Transactions
+  UNIFIED_TRANSACTIONS: ['unified-transactions'] as const,
+
+  // POS Extended
+  POS_PENDING_RENTALS: ['pos', 'pending-rentals'] as const,
+
+  // Fiscal Year Extended
+  CLOSING_PREVIEW: (fiscalYearId: string) => ['closing-preview', fiscalYearId] as const,
+
+  // Funds Performance
+  FUNDS_PERFORMANCE: ['funds-performance'] as const,
+  FUNDS_CATEGORY_DISTRIBUTION: (data?: unknown) => ['funds-category-distribution', data] as const,
+
+  // Maintenance Extended
+  MAINTENANCE_REQUESTS_DATA: ['maintenance_requests'] as const,
 } as const;
 
 // Query Config with default settings

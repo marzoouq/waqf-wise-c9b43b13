@@ -1,9 +1,11 @@
 /**
  * useFundsPerformanceReport Hook
  * Hook لتقرير أداء المصارف
+ * @version 2.8.44
  */
 import { useQuery } from '@tanstack/react-query';
 import { FundService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface FundPerformance {
   fund_id: string;
@@ -24,7 +26,7 @@ export interface CategoryDistribution {
 
 export function useFundsPerformanceReport() {
   const { data: fundPerformance, isLoading, error } = useQuery<FundPerformance[]>({
-    queryKey: ['funds-performance'],
+    queryKey: QUERY_KEYS.FUNDS_PERFORMANCE,
     queryFn: async () => {
       const funds = await FundService.getAll();
       
@@ -49,7 +51,7 @@ export function useFundsPerformanceReport() {
   });
 
   const { data: categoryDistribution } = useQuery({
-    queryKey: ['funds-category-distribution', fundPerformance],
+    queryKey: QUERY_KEYS.FUNDS_CATEGORY_DISTRIBUTION(fundPerformance),
     queryFn: async (): Promise<CategoryDistribution[]> => {
       if (!fundPerformance) return [];
 

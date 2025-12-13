@@ -257,7 +257,7 @@ export function useFinancialAnalytics(fiscalYearId?: string) {
       return kpiData;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['financial_kpis'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FINANCIAL_KPIS() });
       toast({
         title: 'تم الحساب',
         description: 'تم حساب مؤشرات الأداء المالي بنجاح',
@@ -343,7 +343,7 @@ export function useFinancialAnalytics(fiscalYearId?: string) {
       return forecasts;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['financial_forecasts'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FINANCIAL_FORECASTS });
       toast({
         title: 'تم التنبؤ',
         description: 'تم إنشاء التنبؤات المالية بنجاح',

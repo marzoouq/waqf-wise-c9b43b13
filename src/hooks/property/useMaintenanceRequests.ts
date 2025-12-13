@@ -7,6 +7,7 @@ import { useTasks } from "@/hooks/useTasks";
 import { useEffect } from "react";
 import { logger } from "@/lib/logger";
 import { MaintenanceService, RealtimeService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface MaintenanceRequest {
   id: string;
@@ -44,7 +45,7 @@ export const useMaintenanceRequests = () => {
   // Real-time subscription
   useEffect(() => {
     const subscription = RealtimeService.subscribeToTable('maintenance_requests', () => {
-      queryClient.invalidateQueries({ queryKey: ["maintenance_requests"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.MAINTENANCE_REQUESTS_DATA });
     });
 
     return () => {
@@ -53,7 +54,7 @@ export const useMaintenanceRequests = () => {
   }, [queryClient]);
 
   const { data: requests = [], isLoading } = useQuery({
-    queryKey: ["maintenance_requests"],
+    queryKey: QUERY_KEYS.MAINTENANCE_REQUESTS_DATA,
     queryFn: () => MaintenanceService.getRequestsWithProperties(),
     staleTime: 2 * 60 * 1000,
   });
@@ -62,7 +63,7 @@ export const useMaintenanceRequests = () => {
     mutationFn: (request: Omit<MaintenanceRequestInsert, 'request_number'>) =>
       MaintenanceService.createRequestWithNumber(request),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["maintenance_requests"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.MAINTENANCE_REQUESTS_DATA });
       
       // إنشاء مهمة إذا كانت مجدولة
       if (data.scheduled_date) {
@@ -113,8 +114,8 @@ export const useMaintenanceRequests = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["maintenance_requests"] });
-      queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.MAINTENANCE_REQUESTS_DATA });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.JOURNAL_ENTRIES });
       toast({
         title: "تم تحديث الطلب",
         description: "تم تحديث طلب الصيانة والقيد المحاسبي",
@@ -133,7 +134,7 @@ export const useMaintenanceRequests = () => {
   const deleteRequest = useMutation({
     mutationFn: (id: string) => MaintenanceService.deleteRequest(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["maintenance_requests"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.MAINTENANCE_REQUESTS_DATA });
       toast({
         title: "تم الحذف",
         description: "تم حذف طلب الصيانة بنجاح",

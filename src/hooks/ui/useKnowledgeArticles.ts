@@ -1,9 +1,11 @@
 /**
  * Hook for Knowledge Base Articles
  * خطاف لإدارة مقالات قاعدة المعرفة
+ * @version 2.8.44
  */
 import { useQuery } from "@tanstack/react-query";
 import { KnowledgeService, type KnowledgeArticle } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export type { KnowledgeArticle };
 
@@ -24,7 +26,7 @@ const FALLBACK_FAQS: KnowledgeFAQ[] = [
 
 export function useKnowledgeArticles() {
   return useQuery({
-    queryKey: ['knowledge-articles'],
+    queryKey: QUERY_KEYS.KNOWLEDGE_ARTICLES_LIST,
     queryFn: () => KnowledgeService.getArticles(),
     staleTime: 1000 * 60 * 5,
   });
@@ -32,7 +34,7 @@ export function useKnowledgeArticles() {
 
 export function useKnowledgeFAQs() {
   return useQuery({
-    queryKey: ['knowledge-faqs'],
+    queryKey: QUERY_KEYS.KNOWLEDGE_FAQS,
     queryFn: async () => FALLBACK_FAQS,
     staleTime: 1000 * 60 * 5,
   });

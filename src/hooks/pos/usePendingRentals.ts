@@ -1,11 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { POSService, PendingRental } from '@/services/pos.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export type { PendingRental };
 
 export function usePendingRentals() {
   const { data: pendingRentals = [], isLoading, refetch } = useQuery({
-    queryKey: ['pos', 'pending-rentals'],
+    queryKey: QUERY_KEYS.POS_PENDING_RENTALS,
     queryFn: () => POSService.getPendingRentals(),
   });
 

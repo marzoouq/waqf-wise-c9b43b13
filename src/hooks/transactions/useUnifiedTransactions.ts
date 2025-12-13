@@ -1,10 +1,12 @@
 /**
  * Hook for AllTransactions data fetching
  * يجلب المعاملات الموحدة من جميع المصادر
+ * @version 2.8.44
  */
 
 import { useQuery } from "@tanstack/react-query";
 import { AccountingService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface UnifiedTransaction {
   source: string;
@@ -38,7 +40,7 @@ export function useUnifiedTransactions() {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["unified-transactions"],
+    queryKey: QUERY_KEYS.UNIFIED_TRANSACTIONS,
     queryFn: () => AccountingService.getUnifiedTransactions(),
   });
 
