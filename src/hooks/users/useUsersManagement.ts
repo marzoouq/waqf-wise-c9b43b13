@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { AppRole } from "@/hooks/auth/useUserRole";
 import { AuthService } from "@/services/auth.service";
 import { invalidateUserQueries } from "@/lib/query-invalidation";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface UserProfile {
   id: string;
@@ -27,7 +28,7 @@ export interface UserProfile {
  */
 export function useUsersQuery() {
   return useQuery({
-    queryKey: ["users"],
+    queryKey: QUERY_KEYS.USERS,
     queryFn: async () => {
       const users = await AuthService.getUsers();
       return users as UserProfile[];

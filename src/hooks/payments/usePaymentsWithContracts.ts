@@ -6,6 +6,7 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { PaymentService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface PaymentWithContract {
   id: string;
@@ -28,7 +29,7 @@ export function usePaymentsWithContracts(payments: Array<{ id: string }>) {
   const [paymentsWithContracts, setPaymentsWithContracts] = useState<PaymentWithContract[]>([]);
 
   const { data, isLoading } = useQuery({
-    queryKey: ["payments-with-contracts", payments.length],
+    queryKey: QUERY_KEYS.PAYMENTS_WITH_CONTRACTS(payments.length),
     queryFn: () => PaymentService.getPaymentsWithContractDetails(),
     enabled: payments.length > 0,
   });

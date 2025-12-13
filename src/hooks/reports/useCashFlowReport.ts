@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";
 import { ReportService, type CashFlowData } from "@/services/report.service";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export type { CashFlowData };
 
@@ -23,7 +24,7 @@ export function useCashFlowReport() {
   const [lastUpdated, setLastUpdated] = useState<Date>();
 
   const query = useQuery({
-    queryKey: ["cash-flow-report"],
+    queryKey: QUERY_KEYS.CASH_FLOW_REPORT,
     ...QUERY_CONFIG.REPORTS,
     queryFn: () => ReportService.getCashFlowData(),
   });
@@ -40,10 +41,10 @@ export function useCashFlowReport() {
     const channel = supabase
       .channel('cash-flow-report-changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'payments' }, () => {
-        queryClient.invalidateQueries({ queryKey: ["cash-flow-report"] });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CASH_FLOW_REPORT });
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'journal_entries' }, () => {
-        queryClient.invalidateQueries({ queryKey: ["cash-flow-report"] });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CASH_FLOW_REPORT });
       })
       .subscribe();
 
@@ -53,7 +54,7 @@ export function useCashFlowReport() {
   }, [queryClient]);
 
   const handleRefresh = () => {
-    queryClient.invalidateQueries({ queryKey: ["cash-flow-report"] });
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CASH_FLOW_REPORT });
   };
 
   // حساب الإحصائيات

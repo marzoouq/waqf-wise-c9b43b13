@@ -3,6 +3,7 @@ import { useToast } from "@/hooks/use-toast";
 import { productionLogger } from "@/lib/logger/production-logger";
 import type { Database } from "@/integrations/supabase/types";
 import { GovernanceService } from "@/services/governance.service";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 type DbGovernanceDecisionInsert = Database['public']['Tables']['governance_decisions']['Insert'];
 
@@ -11,7 +12,7 @@ export function useGovernanceDecisions() {
   const queryClient = useQueryClient();
 
   const { data: decisions = [], isLoading, error } = useQuery({
-    queryKey: ["governance-decisions"],
+    queryKey: QUERY_KEYS.GOVERNANCE_DECISIONS,
     queryFn: () => GovernanceService.getDecisions(),
     retry: 2,
   });
@@ -20,7 +21,7 @@ export function useGovernanceDecisions() {
     mutationFn: (decision: DbGovernanceDecisionInsert) => 
       GovernanceService.createDecision(decision),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["governance-decisions"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.GOVERNANCE_DECISIONS });
       toast({
         title: "تم إضافة القرار بنجاح",
         description: "تم إضافة القرار وفتح التصويت عليه",
@@ -40,7 +41,7 @@ export function useGovernanceDecisions() {
     mutationFn: ({ decisionId, status }: { decisionId: string; status: 'معتمد' | 'مرفوض' }) => 
       GovernanceService.closeVoting(decisionId, status),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["governance-decisions"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.GOVERNANCE_DECISIONS });
       toast({
         title: "تم إغلاق التصويت",
         description: "تم احتساب النتائج وإغلاق التصويت",

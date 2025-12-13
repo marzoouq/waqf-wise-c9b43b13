@@ -5,6 +5,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { GovernanceService } from "@/services/governance.service";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export function useGovernanceDecisionDetails(decisionId: string | undefined) {
   const {
@@ -12,7 +13,7 @@ export function useGovernanceDecisionDetails(decisionId: string | undefined) {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["governance-decision", decisionId],
+    queryKey: QUERY_KEYS.GOVERNANCE_DECISION(decisionId!),
     queryFn: () => GovernanceService.getDecisionById(decisionId!),
     enabled: !!decisionId,
   });
