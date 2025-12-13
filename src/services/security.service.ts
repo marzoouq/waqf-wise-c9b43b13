@@ -129,12 +129,27 @@ export class SecurityService {
    * حفظ نتيجة فحص كلمة المرور المسربة
    */
   static async saveLeakedPasswordCheck(userId: string, passwordHash: string, isLeaked: boolean) {
-    const { error } = await supabase.from('leaked_password_checks' as any).insert({
-      user_id: userId,
-      password_hash: passwordHash,
-      is_leaked: isLeaked,
+    // Table not in generated types - using raw fetch
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+    
+    const response = await fetch(`${supabaseUrl}/rest/v1/leaked_password_checks`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': supabaseKey,
+        'Authorization': `Bearer ${supabaseKey}`,
+      },
+      body: JSON.stringify({
+        user_id: userId,
+        password_hash: passwordHash,
+        is_leaked: isLeaked,
+      }),
     });
-    if (error) throw error;
+    
+    if (!response.ok) {
+      throw new Error(`Failed to save leaked password check: ${response.statusText}`);
+    }
   }
 
   /**
