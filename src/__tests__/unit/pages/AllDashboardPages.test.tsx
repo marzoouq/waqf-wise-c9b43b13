@@ -10,15 +10,9 @@ import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
 import React from 'react';
 
-const mockUseAuth = vi.fn();
-
-vi.mock('@/contexts/AuthContext', async () => {
-  const actual = await vi.importActual('@/contexts/AuthContext');
-  return {
-    ...actual,
-    useAuth: () => mockUseAuth(),
-  };
-});
+// Mock useAuth - uses global mock from setup.ts
+// Import setMockAuthRoles to customize roles per test
+import { setMockAuthRoles } from '@/test/setup';
 
 const createWrapper = () => {
   const queryClient = new QueryClient({
@@ -39,23 +33,13 @@ const createWrapper = () => {
 describe('All Dashboard Pages', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockUseAuth.mockReturnValue({
-      user: { id: 'user-1', email: 'admin@waqf.sa' },
-      roles: ['admin'],
-      isLoading: false,
-      isAuthenticated: true,
-    });
+    setMockAuthRoles(['admin']);
   });
 
   // لوحة تحكم الناظر
   describe('Nazer Dashboard Pages', () => {
     beforeEach(() => {
-      mockUseAuth.mockReturnValue({
-        user: { id: 'nazer-1', email: 'nazer@waqf.sa' },
-        roles: ['nazer'],
-        isLoading: false,
-        isAuthenticated: true,
-      });
+      setMockAuthRoles(['nazer']);
     });
 
     it('should render NazerDashboard', async () => {
@@ -129,12 +113,7 @@ describe('All Dashboard Pages', () => {
   // لوحة تحكم المحاسب
   describe('Accountant Dashboard Pages', () => {
     beforeEach(() => {
-      mockUseAuth.mockReturnValue({
-        user: { id: 'acc-1', email: 'accountant@waqf.sa' },
-        roles: ['accountant'],
-        isLoading: false,
-        isAuthenticated: true,
-      });
+      setMockAuthRoles(['accountant']);
     });
 
     it('should render AccountantDashboard', async () => {
@@ -177,12 +156,7 @@ describe('All Dashboard Pages', () => {
   // لوحة تحكم الصندوق
   describe('Cashier Dashboard Pages', () => {
     beforeEach(() => {
-      mockUseAuth.mockReturnValue({
-        user: { id: 'cashier-1', email: 'cashier@waqf.sa' },
-        roles: ['cashier'],
-        isLoading: false,
-        isAuthenticated: true,
-      });
+      setMockAuthRoles(['cashier']);
     });
 
     it('should render CashierDashboard', async () => {
@@ -207,12 +181,7 @@ describe('All Dashboard Pages', () => {
   // لوحة تحكم الأرشيف
   describe('Archivist Dashboard Pages', () => {
     beforeEach(() => {
-      mockUseAuth.mockReturnValue({
-        user: { id: 'arch-1', email: 'archivist@waqf.sa' },
-        roles: ['archivist'],
-        isLoading: false,
-        isAuthenticated: true,
-      });
+      setMockAuthRoles(['archivist']);
     });
 
     it('should render ArchivistDashboard', async () => {
@@ -231,12 +200,7 @@ describe('All Dashboard Pages', () => {
   // بوابة المستفيد
   describe('Beneficiary Portal Pages', () => {
     beforeEach(() => {
-      mockUseAuth.mockReturnValue({
-        user: { id: 'ben-1', email: 'beneficiary@waqf.sa' },
-        roles: ['beneficiary'],
-        isLoading: false,
-        isAuthenticated: true,
-      });
+      setMockAuthRoles(['beneficiary']);
     });
 
     it('should render BeneficiaryPortal', async () => {

@@ -23,7 +23,7 @@ vi.mock('@/hooks/archive/useDocuments', () => ({
   }),
 }));
 
-// Mock useAuth
+// Mock useAuth with hasRole
 vi.mock('@/contexts/AuthContext', async () => {
   const actual = await vi.importActual('@/contexts/AuthContext');
   return {
@@ -33,6 +33,9 @@ vi.mock('@/contexts/AuthContext', async () => {
       roles: ['archivist'],
       isLoading: false,
       isAuthenticated: true,
+      hasRole: (role: string) => ['archivist'].includes(role),
+      hasPermission: vi.fn().mockResolvedValue(true),
+      checkPermissionSync: vi.fn().mockReturnValue(true),
     }),
   };
 });

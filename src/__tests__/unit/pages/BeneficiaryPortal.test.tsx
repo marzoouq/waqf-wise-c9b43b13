@@ -31,19 +31,7 @@ vi.mock('@/hooks/beneficiary/useBeneficiaryProfile', () => ({
   }),
 }));
 
-// Mock useAuth
-vi.mock('@/contexts/AuthContext', async () => {
-  const actual = await vi.importActual('@/contexts/AuthContext');
-  return {
-    ...actual,
-    useAuth: () => ({
-      user: { id: 'user-ben-1', email: 'beneficiary@waqf.sa' },
-      roles: ['beneficiary'],
-      isLoading: false,
-      isAuthenticated: true,
-    }),
-  };
-});
+// Mock useAuth - uses global mock from setup.ts
 
 const createWrapper = () => {
   const queryClient = createTestQueryClient();

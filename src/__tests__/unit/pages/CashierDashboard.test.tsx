@@ -27,7 +27,7 @@ vi.mock('@/hooks/dashboard/useUnifiedKPIs', () => ({
   }),
 }));
 
-// Mock useAuth
+// Mock useAuth with hasRole
 vi.mock('@/contexts/AuthContext', async () => {
   const actual = await vi.importActual('@/contexts/AuthContext');
   return {
@@ -37,6 +37,9 @@ vi.mock('@/contexts/AuthContext', async () => {
       roles: ['cashier'],
       isLoading: false,
       isAuthenticated: true,
+      hasRole: (role: string) => ['cashier'].includes(role),
+      hasPermission: vi.fn().mockResolvedValue(true),
+      checkPermissionSync: vi.fn().mockReturnValue(true),
     }),
   };
 });
