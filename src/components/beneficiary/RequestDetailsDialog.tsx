@@ -93,6 +93,9 @@ export function RequestDetailsDialog({
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>جاري التحميل...</DialogTitle>
+          </DialogHeader>
           <div className="flex items-center justify-center py-8">
             <p className="text-muted-foreground">جاري التحميل...</p>
           </div>
