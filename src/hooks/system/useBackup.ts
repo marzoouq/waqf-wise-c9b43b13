@@ -1,19 +1,22 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { SystemService } from "@/services/system.service";
 import { useToast } from "@/hooks/use-toast";
+import { QUERY_KEYS, QUERY_CONFIG } from "@/lib/query-keys";
 
 export function useBackup() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const { data: backupLogs, isLoading } = useQuery({
-    queryKey: ["backup-logs"],
+    queryKey: QUERY_KEYS.BACKUP_LOGS,
     queryFn: () => SystemService.getBackupLogs(),
+    staleTime: QUERY_CONFIG.DEFAULT.staleTime,
   });
 
   const { data: backupSchedules } = useQuery({
-    queryKey: ["backup-schedules"],
+    queryKey: QUERY_KEYS.BACKUP_SCHEDULES,
     queryFn: () => SystemService.getBackupSchedules(),
+    staleTime: QUERY_CONFIG.DEFAULT.staleTime,
   });
 
   const createBackup = useMutation({
@@ -37,7 +40,7 @@ export function useBackup() {
           description: `تم تصدير ${data.totalRecords} سجل من ${data.totalTables} جدول`,
         });
 
-        queryClient.invalidateQueries({ queryKey: ["backup-logs"] });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BACKUP_LOGS });
       }
     },
     onError: (error: Error) => {
@@ -59,7 +62,7 @@ export function useBackup() {
           title: "تمت الاستعادة بنجاح",
           description: data.message,
         });
-        queryClient.invalidateQueries({ queryKey: ["backup-logs"] });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BACKUP_LOGS });
         setTimeout(() => {
           window.location.reload();
         }, 1500);

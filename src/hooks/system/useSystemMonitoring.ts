@@ -6,6 +6,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { MonitoringService, type SystemStats } from "@/services";
+import { QUERY_KEYS, QUERY_CONFIG } from "@/lib/query-keys";
 
 export type { SystemStats };
 
@@ -29,31 +30,29 @@ export function useSystemMonitoring() {
     isLoading: statsLoading,
     refetch: refetchStats,
   } = useQuery({
-    queryKey: ["system-stats"],
+    queryKey: QUERY_KEYS.SYSTEM_STATS,
     queryFn: () => MonitoringService.getSystemStats(),
-    staleTime: 60 * 1000,
-    refetchInterval: false,
+    staleTime: QUERY_CONFIG.DEFAULT.staleTime,
+    refetchOnWindowFocus: QUERY_CONFIG.DEFAULT.refetchOnWindowFocus,
   });
 
   // جلب الأخطاء الأخيرة
   const { data: recentErrors, refetch: refetchErrors } = useQuery({
-    queryKey: ["recent-errors"],
+    queryKey: QUERY_KEYS.RECENT_ERRORS,
     queryFn: () => MonitoringService.getRecentErrors(10),
-    staleTime: 30 * 1000,
-    refetchInterval: false,
+    staleTime: QUERY_CONFIG.DEFAULT.staleTime,
   });
 
   // جلب التنبيهات النشطة
   const { data: activeAlerts, refetch: refetchAlerts } = useQuery({
-    queryKey: ["active-alerts"],
+    queryKey: QUERY_KEYS.ACTIVE_ALERTS,
     queryFn: () => MonitoringService.getActiveAlerts(),
-    staleTime: 30 * 1000,
-    refetchInterval: false,
+    staleTime: QUERY_CONFIG.DEFAULT.staleTime,
   });
 
   // جلب محاولات الإصلاح
   const { data: fixAttempts, refetch: refetchFixes } = useQuery({
-    queryKey: ["fix-attempts"],
+    queryKey: QUERY_KEYS.FIX_ATTEMPTS,
     queryFn: async (): Promise<FixAttempt[]> => {
       const errors = await MonitoringService.getRecentErrors(20);
       const resolved = errors.filter(e => e.status === "resolved" || e.status === "auto_resolved");
@@ -67,16 +66,15 @@ export function useSystemMonitoring() {
         created_at: e.resolved_at || e.created_at,
       }));
     },
-    staleTime: 30 * 1000,
-    refetchInterval: false,
+    staleTime: QUERY_CONFIG.DEFAULT.staleTime,
   });
 
   // حل تنبيه
   const resolveAlertMutation = useMutation({
     mutationFn: (alertId: string) => MonitoringService.resolveAlert(alertId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["active-alerts"] });
-      queryClient.invalidateQueries({ queryKey: ["system-stats"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ACTIVE_ALERTS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.SYSTEM_STATS });
       toast({ title: "تم حل التنبيه بنجاح" });
     },
     onError: (error: Error) => {

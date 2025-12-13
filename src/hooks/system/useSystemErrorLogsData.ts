@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { MonitoringService } from "@/services";
+import { QUERY_KEYS, QUERY_CONFIG } from "@/lib/query-keys";
 import type { Database } from "@/integrations/supabase/types";
 
 type SystemErrorRow = Database['public']['Tables']['system_error_logs']['Row'];
@@ -30,21 +31,23 @@ export function useSystemErrorLogsData() {
     data: errorLogs,
     isLoading,
   } = useQuery({
-    queryKey: ["system-error-logs"],
+    queryKey: QUERY_KEYS.SYSTEM_ERROR_LOGS,
     queryFn: () => MonitoringService.getErrorLogs(100),
+    staleTime: QUERY_CONFIG.DEFAULT.staleTime,
   });
 
   // جلب التنبيهات النشطة
   const { data: activeAlerts } = useQuery({
-    queryKey: ["system-alerts"],
+    queryKey: QUERY_KEYS.SYSTEM_ALERTS,
     queryFn: () => MonitoringService.getActiveAlerts(),
+    staleTime: QUERY_CONFIG.DEFAULT.staleTime,
   });
 
   // حذف جميع الأخطاء المحلولة
   const deleteResolvedMutation = useMutation({
     mutationFn: () => MonitoringService.deleteResolvedErrors(),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["system-error-logs"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.SYSTEM_ERROR_LOGS });
       toast({
         title: "تم الحذف",
         description: "تم حذف جميع الأخطاء المحلولة بنجاح",
@@ -64,7 +67,7 @@ export function useSystemErrorLogsData() {
     mutationFn: ({ id, status, notes }: { id: string; status: string; notes?: string }) =>
       MonitoringService.updateError(id, status, notes),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["system-error-logs"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.SYSTEM_ERROR_LOGS });
       toast({
         title: "تم التحديث",
         description: "تم تحديث حالة الخطأ بنجاح",

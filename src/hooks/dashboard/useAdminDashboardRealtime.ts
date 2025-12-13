@@ -2,12 +2,14 @@
  * useAdminDashboardRealtime Hook
  * قناة Realtime موحدة لجميع بيانات لوحة المشرف
  * يمنع تكرار الاشتراكات المتعددة
+ * @version 2.9.2 - Phase 1 QUERY_KEYS unification
  */
 
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { productionLogger } from "@/lib/logger/production-logger";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 // الجداول التي يحتاج المشرف لمتابعتها
 const ADMIN_WATCHED_TABLES = [
@@ -22,21 +24,25 @@ const ADMIN_WATCHED_TABLES = [
   "families",
   "funds",
   "beneficiary_requests",
+  "system_error_logs",
+  "system_health_checks",
 ] as const;
 
-// مفاتيح الاستعلامات التي يجب تحديثها
-const INVALIDATION_MAP: Record<string, string[][]> = {
-  beneficiaries: [["admin-kpis"], ["beneficiaries"]],
-  properties: [["admin-kpis"], ["properties"]],
-  user_roles: [["admin-kpis"], ["user-stats"], ["users"]],
-  profiles: [["user-stats"], ["users-activity-metrics"]],
-  audit_logs: [["audit-logs"], ["security-alerts"]],
-  system_alerts: [["security-alerts"], ["system-health"]],
-  login_attempts_log: [["users-activity-metrics"], ["security-alerts"]],
-  activities: [["users-activity-metrics"], ["activities"]],
-  families: [["admin-kpis"]],
-  funds: [["admin-kpis"]],
-  beneficiary_requests: [["admin-kpis"], ["requests"]],
+// مفاتيح الاستعلامات التي يجب تحديثها - باستخدام QUERY_KEYS الموحدة
+const INVALIDATION_MAP: Record<string, readonly (readonly string[])[]> = {
+  beneficiaries: [QUERY_KEYS.ADMIN_KPIS, QUERY_KEYS.BENEFICIARIES],
+  properties: [QUERY_KEYS.ADMIN_KPIS, QUERY_KEYS.PROPERTIES],
+  user_roles: [QUERY_KEYS.ADMIN_KPIS, QUERY_KEYS.USER_STATS, QUERY_KEYS.USERS],
+  profiles: [QUERY_KEYS.USER_STATS, QUERY_KEYS.USERS_ACTIVITY_METRICS],
+  audit_logs: [QUERY_KEYS.AUDIT_LOGS, QUERY_KEYS.SECURITY_ALERTS],
+  system_alerts: [QUERY_KEYS.SECURITY_ALERTS, QUERY_KEYS.SYSTEM_HEALTH, QUERY_KEYS.SYSTEM_ALERTS],
+  login_attempts_log: [QUERY_KEYS.USERS_ACTIVITY_METRICS, QUERY_KEYS.SECURITY_ALERTS],
+  activities: [QUERY_KEYS.USERS_ACTIVITY_METRICS, QUERY_KEYS.ACTIVITIES],
+  families: [QUERY_KEYS.ADMIN_KPIS],
+  funds: [QUERY_KEYS.ADMIN_KPIS],
+  beneficiary_requests: [QUERY_KEYS.ADMIN_KPIS, QUERY_KEYS.REQUESTS],
+  system_error_logs: [QUERY_KEYS.SYSTEM_ERROR_LOGS, QUERY_KEYS.RECENT_ERRORS, QUERY_KEYS.SYSTEM_STATS],
+  system_health_checks: [QUERY_KEYS.SYSTEM_HEALTH, QUERY_KEYS.SYSTEM_STATS],
 };
 
 interface UseAdminDashboardRealtimeOptions {
@@ -71,7 +77,7 @@ export function useAdminDashboardRealtime(options: UseAdminDashboardRealtimeOpti
           // تحديث الاستعلامات المرتبطة
           const queryKeys = INVALIDATION_MAP[table] || [];
           queryKeys.forEach((queryKey) => {
-            queryClient.invalidateQueries({ queryKey });
+            queryClient.invalidateQueries({ queryKey: [...queryKey] });
           });
 
           // callback خارجي
@@ -99,19 +105,22 @@ export function useAdminDashboardRefresh() {
   const queryClient = useQueryClient();
 
   const refreshAll = () => {
-    // تحديث جميع الاستعلامات المرتبطة بلوحة المشرف
+    // تحديث جميع الاستعلامات المرتبطة بلوحة المشرف - باستخدام QUERY_KEYS الموحدة
     const adminQueryKeys = [
-      ["admin-kpis"],
-      ["user-stats"],
-      ["users-activity-metrics"],
-      ["system-health"],
-      ["security-alerts"],
-      ["audit-logs"],
-      ["system-performance-metrics"],
+      QUERY_KEYS.ADMIN_KPIS,
+      QUERY_KEYS.USER_STATS,
+      QUERY_KEYS.USERS_ACTIVITY_METRICS,
+      QUERY_KEYS.SYSTEM_HEALTH,
+      QUERY_KEYS.SECURITY_ALERTS,
+      QUERY_KEYS.AUDIT_LOGS,
+      QUERY_KEYS.SYSTEM_PERFORMANCE_METRICS,
+      QUERY_KEYS.SYSTEM_ERROR_LOGS,
+      QUERY_KEYS.SYSTEM_STATS,
+      QUERY_KEYS.BACKUP_LOGS,
     ];
     
     adminQueryKeys.forEach((queryKey) => {
-      queryClient.invalidateQueries({ queryKey });
+      queryClient.invalidateQueries({ queryKey: [...queryKey] });
     });
   };
 
