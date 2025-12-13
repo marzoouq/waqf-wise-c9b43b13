@@ -5,7 +5,8 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { UserService } from '@/services/user.service';
-import { mockSupabase, setMockTableData, clearMockTableData } from '../../utils/supabase.mock';
+import { supabase } from '@/integrations/supabase/client';
+import { setMockTableData, clearMockTableData } from '../../utils/supabase.mock';
 
 describe('UserService', () => {
   beforeEach(() => {
@@ -54,7 +55,7 @@ describe('UserService', () => {
         UserService.addRole('user-1', 'accountant')
       ).resolves.not.toThrow();
 
-      expect(mockSupabase.from).toHaveBeenCalledWith('user_roles');
+      expect(supabase.from).toHaveBeenCalledWith('user_roles');
     });
   });
 
@@ -64,7 +65,7 @@ describe('UserService', () => {
         UserService.removeRole('user-1', 'accountant')
       ).resolves.not.toThrow();
 
-      expect(mockSupabase.from).toHaveBeenCalledWith('user_roles');
+      expect(supabase.from).toHaveBeenCalledWith('user_roles');
     });
   });
 

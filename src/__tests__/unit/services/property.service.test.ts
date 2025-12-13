@@ -5,7 +5,8 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { PropertyService } from '@/services/property.service';
-import { mockSupabase, setMockTableData, clearMockTableData } from '../../utils/supabase.mock';
+import { supabase } from '@/integrations/supabase/client';
+import { setMockTableData, clearMockTableData } from '../../utils/supabase.mock';
 import { mockProperties } from '../../utils/data.fixtures';
 
 describe('PropertyService', () => {
@@ -20,7 +21,7 @@ describe('PropertyService', () => {
 
       const result = await PropertyService.getAll();
       
-      expect(mockSupabase.from).toHaveBeenCalledWith('properties');
+      expect(supabase.from).toHaveBeenCalledWith('properties');
       expect(result).toBeDefined();
     });
   });

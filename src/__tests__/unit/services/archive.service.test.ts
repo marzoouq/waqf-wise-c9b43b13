@@ -5,7 +5,8 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ArchiveService } from '@/services/archive.service';
-import { mockSupabase, setMockTableData, clearMockTableData } from '../../utils/supabase.mock';
+import { supabase } from '@/integrations/supabase/client';
+import { setMockTableData, clearMockTableData } from '../../utils/supabase.mock';
 
 describe('ArchiveService', () => {
   const mockDocuments = [
@@ -36,7 +37,7 @@ describe('ArchiveService', () => {
 
       const result = await ArchiveService.getDocuments();
       
-      expect(mockSupabase.from).toHaveBeenCalledWith('documents');
+      expect(supabase.from).toHaveBeenCalledWith('documents');
       expect(result).toBeDefined();
     });
   });
@@ -67,7 +68,7 @@ describe('ArchiveService', () => {
 
       await ArchiveService.deleteDocument(mockDocuments[0].id);
       
-      expect(mockSupabase.from).toHaveBeenCalledWith('documents');
+      expect(supabase.from).toHaveBeenCalledWith('documents');
     });
   });
 
