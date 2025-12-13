@@ -143,6 +143,37 @@ vi.mock('@/integrations/supabase/client', () => {
   };
 });
 
+// Mock AuthContext with comprehensive auth state
+let mockAuthRoles: string[] = ['admin'];
+let mockAuthUser: { id: string; email: string } | null = { id: 'test-user-id', email: 'test@waqf.sa' };
+
+export const setMockAuthRoles = (roles: string[]) => {
+  mockAuthRoles = roles;
+};
+
+export const setMockAuthUser = (user: { id: string; email: string } | null) => {
+  mockAuthUser = user;
+};
+
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => ({
+    user: mockAuthUser,
+    profile: mockAuthUser ? { id: mockAuthUser.id, full_name: 'Test User' } : null,
+    isLoading: false,
+    roles: mockAuthRoles,
+    rolesLoading: false,
+    signIn: vi.fn().mockResolvedValue({ user: mockAuthUser, session: {} }),
+    signInWithGoogle: vi.fn().mockResolvedValue({ url: '' }),
+    signUp: vi.fn().mockResolvedValue({ user: mockAuthUser, session: {} }),
+    signOut: vi.fn().mockResolvedValue(undefined),
+    hasPermission: vi.fn().mockResolvedValue(true),
+    isRole: vi.fn().mockResolvedValue(true),
+    checkPermissionSync: vi.fn().mockReturnValue(true),
+    hasRole: vi.fn((role: string) => mockAuthRoles.includes(role)),
+  }),
+  AuthProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
+
 // Mock toast
 vi.mock('@/hooks/use-toast', () => ({
   useToast: () => ({
