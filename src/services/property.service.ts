@@ -323,7 +323,7 @@ export class PropertyService {
         .from('property_units')
         .select('property_id')
         .eq('id', unitId)
-        .single();
+        .maybeSingle();
 
       const { error } = await supabase
         .from('property_units')
@@ -588,7 +588,7 @@ export class PropertyService {
           .select("current_balance")
           .eq("fiscal_year_id", fiscalYear.id)
           .eq("reserve_type", "احتياطي")
-          .single();
+          .maybeSingle();
 
         carryForwardWaqfCorpus = waqfReserve?.current_balance || 0;
       }

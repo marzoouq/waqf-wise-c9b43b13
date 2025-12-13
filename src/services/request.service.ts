@@ -287,7 +287,7 @@ export class RequestService {
       .from('request_workflows')
       .select('id, request_id, workflow_status, current_step, assigned_to, assigned_at, due_date, sla_hours, escalated_at, escalation_level, created_at, updated_at')
       .eq('request_id', requestId)
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data;
@@ -339,7 +339,7 @@ export class RequestService {
       .from("beneficiary_requests")
       .select("attachments_count")
       .eq("id", requestId)
-      .single();
+      .maybeSingle();
 
     if (currentRequest) {
       await supabase
@@ -370,7 +370,7 @@ export class RequestService {
       .from("beneficiary_requests")
       .select("attachments_count")
       .eq("id", requestId)
-      .single();
+      .maybeSingle();
 
     if (currentRequest) {
       await supabase
@@ -397,7 +397,7 @@ export class RequestService {
             .from("profiles")
             .select("full_name, email")
             .eq("user_id", comment.user_id)
-            .single();
+            .maybeSingle();
 
           return {
             ...comment,

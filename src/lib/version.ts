@@ -2,11 +2,11 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.9.2
+ * @version 2.9.3
  * @date 2025-12-13
  */
 
-export const APP_VERSION = '2.9.2';
+export const APP_VERSION = '2.9.3';
 export const APP_VERSION_DATE = '2025-12-13';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
@@ -16,12 +16,13 @@ export const VERSION_INFO = {
   name: APP_VERSION_NAME,
   changelog: '/docs/CHANGELOG.md',
   features: [
-    '51 خدمة متكاملة في طبقة الخدمات',
+    '55+ خدمة متكاملة في طبقة الخدمات',
     '170+ hooks منظمة في 36 مجلد',
     'QUERY_KEYS موحد لـ React Query',
     'Realtime موحد للوحات التحكم',
     '0 استدعاء Supabase مباشر من Components أو Pages',
     '0 أنواع any في الخدمات (Type Safety كامل)',
+    '.maybeSingle() بدلاً من .single() للاستعلامات غير المضمونة',
   ],
 } as const;
 
