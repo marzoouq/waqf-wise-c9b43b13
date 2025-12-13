@@ -136,8 +136,10 @@ describe('Circuit Breaker', () => {
 
     expect(circuitBreaker.getState()).toBe('OPEN');
 
-    // Advance time past timeout using fake timers
+    // Advance time past timeout using fake timers AND update Date.now()
+    const now = Date.now();
     vi.advanceTimersByTime(5100);
+    vi.setSystemTime(now + 5100);
 
     // Execute successful call
     const result = await circuitBreaker.execute(successFn);
@@ -227,8 +229,10 @@ describe('Circuit Breaker - Edge Cases', () => {
 
     expect(breaker.getState()).toBe('OPEN');
 
-    // Advance time past timeout
+    // Advance time past timeout AND update Date.now()
+    const now = Date.now();
     vi.advanceTimersByTime(1100);
+    vi.setSystemTime(now + 1100);
 
     // Should transition to HALF_OPEN and then CLOSED on success
     const result = await breaker.execute(successFn);
@@ -251,8 +255,10 @@ describe('Circuit Breaker - Edge Cases', () => {
       }
     }
 
-    // Advance time past timeout
+    // Advance time past timeout AND update Date.now()
+    const now2 = Date.now();
     vi.advanceTimersByTime(1100);
+    vi.setSystemTime(now2 + 1100);
 
     // Failure in HALF_OPEN should open again
     try {

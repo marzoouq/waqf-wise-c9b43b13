@@ -18,9 +18,9 @@ Component (UI) → Hook (State) → Service (Data) → Supabase
 src/
 ├── components/     # UI components only - NO business logic
 ├── hooks/          # 170+ hooks in 25 feature folders (see src/hooks/README.md)
-├── services/       # 42+ services for ALL data operations (see src/services/README.md)
+├── services/       # 51+ services for ALL data operations (see src/services/README.md)
 ├── types/          # TypeScript types - NEVER use `any`
-├── lib/            # Utilities including QUERY_KEYS (src/lib/query-keys.ts)
+├── lib/            # Utilities: QUERY_KEYS, errors, query-invalidation
 ├── pages/          # Route pages - use hooks for data
 └── routes/         # Route definitions in 6 files (see src/routes/README.md)
 ```
@@ -29,44 +29,73 @@ src/
 
 ### 1. TypeScript Strictness
 ```typescript
-// ❌ FORBIDDEN
+// ❌ FORBIDDEN - any type
 const data: any = fetchData();
 
-// ✅ REQUIRED
+// ✅ REQUIRED - explicit types
 const data: UserData = fetchData();
 ```
 
 ### 2. Supabase Query Safety
 ```typescript
-// ❌ DANGEROUS - fails if record doesn't exist
+// ❌ DANGEROUS - throws if not found
 const { data } = await supabase.from('users').select('*').eq('id', id).single();
 
 // ✅ SAFE - returns null if not found
 const { data } = await supabase.from('users').select('*').eq('id', id).maybeSingle();
 ```
 
-### 3. Query Keys (Use QUERY_KEYS from src/lib/query-keys.ts)
+### 3. Query Keys & Config (ALWAYS use centralized)
 ```typescript
 import { QUERY_KEYS, QUERY_CONFIG } from '@/lib/query-keys';
 
-// ✅ Use centralized keys
-useQuery({ queryKey: QUERY_KEYS.BENEFICIARIES, ...QUERY_CONFIG.DEFAULT });
+// 370+ keys organized by domain
+useQuery({ 
+  queryKey: QUERY_KEYS.BENEFICIARIES, 
+  queryFn: () => BeneficiaryService.getAll(),
+  ...QUERY_CONFIG.DEFAULT  // 2min stale, refetchOnWindowFocus
+});
+
+// Available configs:
+// QUERY_CONFIG.DEFAULT   - 2min stale, refetchOnWindowFocus
+// QUERY_CONFIG.REPORTS   - 2min stale, 5min refetchInterval
+// QUERY_CONFIG.REALTIME  - 30s stale
+// QUERY_CONFIG.STATIC    - 30min stale
 ```
 
-### 4. Service Pattern
+### 4. Service Pattern (Facade for Large Services)
 ```typescript
-// In hooks, call services - NOT Supabase directly
+// Simple service
 import { BeneficiaryService } from '@/services';
-
 const { data } = useQuery({
   queryKey: QUERY_KEYS.BENEFICIARIES,
   queryFn: () => BeneficiaryService.getAll()
 });
+
+// Large services use facade pattern (beneficiary, accounting, report, dashboard)
+src/services/beneficiary/
+├── index.ts              # Re-exports all (facade)
+├── core.service.ts       # CRUD operations
+├── documents.service.ts  # Document handling
+├── analytics.service.ts  # Statistics
+└── tabs.service.ts       # Portal tabs data
 ```
 
-### 5. Realtime Subscriptions
-Realtime subscriptions are the **only exception** - acceptable in hooks using `useEffect`:
+### 5. Cache Invalidation (BATCHED)
 ```typescript
+// ❌ WRONG - multiple individual calls
+queryClient.invalidateQueries({ queryKey: ['journal-entries'] });
+queryClient.invalidateQueries({ queryKey: ['accounts'] });
+queryClient.invalidateQueries({ queryKey: ['trial-balance'] });
+
+// ✅ CORRECT - batched invalidation
+import { invalidateAccountingQueries } from '@/lib/query-invalidation';
+invalidateAccountingQueries(queryClient); // Invalidates all related queries
+```
+
+### 6. Realtime Subscriptions (Exception to service rule)
+```typescript
+// Realtime acceptable in hooks via useEffect (requires lifecycle)
 useEffect(() => {
   const subscription = supabase
     .channel('beneficiaries')
@@ -74,6 +103,24 @@ useEffect(() => {
     .subscribe();
   return () => subscription.unsubscribe();
 }, []);
+
+// Dashboard unified realtime (preferred pattern)
+import { useNazerDashboardRealtime } from '@/hooks/nazer/useNazerDashboardRealtime';
+// Subscribes to 10+ tables in one channel, auto-invalidates React Query cache
+```
+
+### 7. Error Handling
+```typescript
+import { handleError, showSuccess } from '@/lib/errors';
+
+// In mutations
+useMutation({
+  mutationFn: () => BeneficiaryService.create(data),
+  onSuccess: () => showSuccess('تم الإنشاء بنجاح'),
+  onError: (error: unknown) => {
+    handleError(error, { context: { operation: 'create', component: 'BeneficiaryForm' } });
+  }
+});
 ```
 
 ## Design System
@@ -87,78 +134,89 @@ className="text-white bg-blue-500"
 className="text-foreground bg-primary"
 ```
 
-Key semantic tokens: `--background`, `--foreground`, `--primary`, `--secondary`, `--muted`, `--accent`, `--destructive`
+Key tokens: `--background`, `--foreground`, `--primary`, `--secondary`, `--muted`, `--accent`, `--destructive`, `--heir-wife`, `--heir-son`, `--heir-daughter`, `--status-success`, `--status-warning`, `--status-error`
 
 ### RTL Support
-All components must support Arabic RTL layout. Use directional utilities like `start/end` instead of `left/right`.
-
-## Key Patterns
-
-### Hook Creation
-```typescript
-// src/hooks/beneficiary/useBeneficiaries.ts
-export function useBeneficiaries() {
-  return useQuery({
-    queryKey: QUERY_KEYS.BENEFICIARIES,
-    queryFn: () => BeneficiaryService.getAll(),
-    ...QUERY_CONFIG.DEFAULT
-  });
-}
-```
-
-### Service Creation
-```typescript
-// src/services/beneficiary.service.ts
-export class BeneficiaryService {
-  static async getAll(): Promise<Beneficiary[]> {
-    const { data, error } = await supabase
-      .from('beneficiaries')
-      .select('*');
-    if (error) throw error;
-    return data ?? [];
-  }
-}
-```
-
-### Cache Invalidation
-Use batched invalidation from `src/lib/query-invalidation.ts`:
-```typescript
-import { invalidateBeneficiaryQueries } from '@/lib/query-invalidation';
-```
-
-## Testing
-
-```bash
-npx vitest run          # Run all tests
-npx vitest              # Interactive mode
-```
-
-## Database Types
-
-**NEVER** edit `src/integrations/supabase/types.ts` - it's auto-generated.
-
-Import types from there:
-```typescript
-import { Database } from '@/integrations/supabase/types';
-type Beneficiary = Database['public']['Tables']['beneficiaries']['Row'];
-```
+All components must support Arabic RTL layout. Use `start/end` instead of `left/right`.
 
 ## Role-Based Access
 
-Roles: `nazer` (supervisor), `admin`, `accountant`, `cashier`, `archivist`, `beneficiary`, `waqf_heir`
+| Role | Arabic | Access Level |
+|------|--------|--------------|
+| nazer | الناظر | Full system control, approvals, visibility settings |
+| admin | المدير | System settings, users management |
+| accountant | المحاسب | Accounting, reports, financial operations |
+| cashier | أمين الصندوق | Payments, POS, collection center |
+| archivist | الأرشيفي | Documents, archive management |
+| beneficiary | المستفيد | Personal portal only (own data) |
+| waqf_heir | وريث الوقف | Full transparency view (all waqf data) |
 
 Check `src/hooks/auth/usePermissions.ts` for permission patterns.
 
 ## Performance Patterns
 
-1. **Parallel Queries**: Use `Promise.all` for independent fetches
-2. **Lazy Loading**: Use `React.lazy()` for route-level code splitting
-3. **Unified KPIs**: Use `useUnifiedKPIs` hook as single source of truth for dashboard metrics
+### Parallel Queries (MANDATORY for dashboards)
+```typescript
+// ❌ SLOW - sequential
+const beneficiaries = await BeneficiaryService.getAll();
+const properties = await PropertyService.getAll();
+
+// ✅ FAST - parallel (60% faster)
+const [beneficiaries, properties, payments] = await Promise.all([
+  BeneficiaryService.getAll(),
+  PropertyService.getAll(),
+  PaymentService.getAll(),
+]);
+```
+
+### Lazy Tab Loading
+```typescript
+// Use LazyTabContent for dashboard tabs
+<LazyTabContent isActive={activeTab === 'reports'}>
+  <ReportsTab />
+</LazyTabContent>
+```
+
+## Testing
+
+### Commands
+```bash
+npx vitest run          # Run all tests (408+ tests)
+npx vitest              # Interactive watch mode
+npx vitest --ui         # UI mode
+```
+
+### Test Structure
+```
+src/__tests__/
+├── unit/
+│   ├── services/       # Service unit tests
+│   ├── hooks/          # Hook tests (require AuthProvider wrapper)
+│   └── components/     # Component tests
+├── integration/        # Integration tests
+└── utils/
+    └── test-utils.tsx  # Render with all providers
+```
+
+### Test Utilities
+```typescript
+import { render, screen } from '@/__tests__/utils/test-utils';
+import { setMockTableData } from '@/test/setup';
+
+// All hooks require AuthProvider wrapper
+const createWrapper = () => ({ children }) => (
+  <QueryClientProvider client={queryClient}>
+    <AuthProvider>{children}</AuthProvider>
+  </QueryClientProvider>
+);
+```
 
 ## Files to Reference
 
 - `docs/ARCHITECTURE_RULES.md` - Strict coding rules
-- `src/services/README.md` - Service layer documentation
+- `src/services/README.md` - Service layer documentation  
 - `src/hooks/README.md` - Hooks organization
 - `src/routes/README.md` - Routing structure
-- `src/lib/query-keys.ts` - All query keys
+- `src/lib/query-keys.ts` - All query keys (370+)
+- `src/lib/query-invalidation.ts` - Batched cache invalidation
+- `src/lib/errors/index.ts` - Error handling utilities
