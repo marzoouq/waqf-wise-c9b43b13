@@ -8,54 +8,64 @@ import { afterEach, beforeEach, beforeAll, vi } from 'vitest';
 // Make vi globally available
 globalThis.vi = vi;
 
+// Shared mock data store
+const mockTableData: Record<string, unknown[]> = {};
+
+// Export mock utilities directly (not via require)
+export const setMockTableData = <T>(tableName: string, data: T[]) => {
+  mockTableData[tableName] = data;
+};
+
+export const clearMockTableData = () => {
+  Object.keys(mockTableData).forEach(key => delete mockTableData[key]);
+};
+
+const createMockQueryBuilder = <T>(data: T[] = []) => {
+  let operation = 'select';
+  const builder = {
+    select: () => { operation = 'select'; return builder; },
+    insert: () => { operation = 'insert'; return builder; },
+    update: () => { operation = 'update'; return builder; },
+    delete: () => { operation = 'delete'; return builder; },
+    upsert: () => { operation = 'upsert'; return builder; },
+    eq: () => builder,
+    neq: () => builder,
+    in: () => builder,
+    gt: () => builder,
+    gte: () => builder,
+    lt: () => builder,
+    lte: () => builder,
+    like: () => builder,
+    ilike: () => builder,
+    is: () => builder,
+    or: (_filters?: string) => builder,
+    order: () => builder,
+    limit: () => builder,
+    range: () => builder,
+    single: async () => ({ data: data[0] || null, error: null }),
+    maybeSingle: async () => ({ data: data[0] || null, error: null }),
+    then: async <TResult>(
+      onfulfilled?: ((value: { data: T[]; error: null; count: number }) => TResult | PromiseLike<TResult>) | null
+    ): Promise<TResult> => {
+      let result: { data: T[] | T | null; error: null; count?: number };
+      if (operation === 'select') {
+        result = { data: data, error: null, count: data.length };
+      } else if (operation === 'delete') {
+        result = { data: null, error: null };
+      } else {
+        result = { data: data[0] || null, error: null };
+      }
+      if (onfulfilled) {
+        return onfulfilled(result as { data: T[]; error: null; count: number });
+      }
+      return result as unknown as TResult;
+    },
+  };
+  return builder;
+};
+
 // Mock Supabase BEFORE anything else loads
 vi.mock('@/integrations/supabase/client', () => {
-  const mockTableData: Record<string, unknown[]> = {};
-
-  const createMockQueryBuilder = <T>(data: T[] = []) => {
-    let operation = 'select';
-    const builder = {
-      select: () => { operation = 'select'; return builder; },
-      insert: () => { operation = 'insert'; return builder; },
-      update: () => { operation = 'update'; return builder; },
-      delete: () => { operation = 'delete'; return builder; },
-      upsert: () => { operation = 'upsert'; return builder; },
-      eq: () => builder,
-      neq: () => builder,
-      in: () => builder,
-      gt: () => builder,
-      gte: () => builder,
-      lt: () => builder,
-      lte: () => builder,
-      like: () => builder,
-      ilike: () => builder,
-      is: () => builder,
-      or: (_filters?: string) => builder,
-      order: () => builder,
-      limit: () => builder,
-      range: () => builder,
-      single: async () => ({ data: data[0] || null, error: null }),
-      maybeSingle: async () => ({ data: data[0] || null, error: null }),
-      then: async <TResult>(
-        onfulfilled?: ((value: { data: T[]; error: null; count: number }) => TResult | PromiseLike<TResult>) | null
-      ): Promise<TResult> => {
-        let result: { data: T[] | T | null; error: null; count?: number };
-        if (operation === 'select') {
-          result = { data: data, error: null, count: data.length };
-        } else if (operation === 'delete') {
-          result = { data: null, error: null };
-        } else {
-          result = { data: data[0] || null, error: null };
-        }
-        if (onfulfilled) {
-          return onfulfilled(result as { data: T[]; error: null; count: number });
-        }
-        return result as unknown as TResult;
-      },
-    };
-    return builder;
-  };
-
   return {
     supabase: {
       from: vi.fn((tableName: string) => createMockQueryBuilder(mockTableData[tableName] || [])),
@@ -89,12 +99,6 @@ vi.mock('@/integrations/supabase/client', () => {
       removeChannel: vi.fn(),
       rpc: vi.fn().mockResolvedValue({ data: null, error: null }),
     },
-    setMockTableData: <T>(tableName: string, data: T[]) => {
-      mockTableData[tableName] = data;
-    },
-    clearMockTableData: () => {
-      Object.keys(mockTableData).forEach(key => delete mockTableData[key]);
-    },
   };
 });
 
@@ -114,17 +118,6 @@ vi.mock('sonner', () => ({
     warning: vi.fn(),
   },
 }));
-
-// Export mock utilities
-export const setMockTableData = <T>(tableName: string, data: T[]) => {
-  const { setMockTableData: setter } = require('@/integrations/supabase/client');
-  setter(tableName, data);
-};
-
-export const clearMockTableData = () => {
-  const { clearMockTableData: clearer } = require('@/integrations/supabase/client');
-  clearer();
-};
 
 // Suppress console errors during tests
 beforeAll(() => {
