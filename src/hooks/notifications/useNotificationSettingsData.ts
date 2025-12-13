@@ -7,6 +7,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { NotificationSettings } from "@/types/notifications";
 import { NotificationSettingsService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export function useNotificationSettingsData() {
   const { toast } = useToast();
@@ -17,7 +18,7 @@ export function useNotificationSettingsData() {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["notification-settings"],
+    queryKey: QUERY_KEYS.NOTIFICATION_SETTINGS,
     queryFn: () => NotificationSettingsService.getSettings(),
   });
 
@@ -25,7 +26,7 @@ export function useNotificationSettingsData() {
     mutationFn: (updates: Partial<NotificationSettings>) =>
       NotificationSettingsService.updateSettings(settings?.id, updates),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notification-settings"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.NOTIFICATION_SETTINGS });
       toast({
         title: "تم التحديث",
         description: "تم تحديث إعدادات الإشعارات بنجاح",

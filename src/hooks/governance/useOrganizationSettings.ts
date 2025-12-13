@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { GovernanceService } from "@/services/governance.service";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface OrganizationSettings {
   id: string;
@@ -35,7 +36,7 @@ export const useOrganizationSettings = () => {
   const queryClient = useQueryClient();
 
   const { data: settings, isLoading } = useQuery({
-    queryKey: ["organization-settings"],
+    queryKey: QUERY_KEYS.ORGANIZATION_SETTINGS,
     queryFn: () => GovernanceService.getOrganizationSettings(),
   });
 
@@ -43,7 +44,7 @@ export const useOrganizationSettings = () => {
     mutationFn: (values: Omit<OrganizationSettings, "id" | "created_at" | "updated_at">) =>
       GovernanceService.updateOrganizationSettings(settings?.id, values),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["organization-settings"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORGANIZATION_SETTINGS });
       toast({
         title: "✅ تم الحفظ",
         description: "تم حفظ إعدادات المنشأة بنجاح",

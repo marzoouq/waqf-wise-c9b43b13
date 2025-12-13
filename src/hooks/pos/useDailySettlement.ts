@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { POSService } from "@/services/pos.service";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface ShiftReport {
   shift_id: string;
@@ -21,7 +22,7 @@ export const useDailySettlement = (startDate: Date, endDate: Date) => {
   const queryClient = useQueryClient();
 
   const { data: shiftsReport, isLoading, refetch } = useQuery({
-    queryKey: ["pos-shifts-report", format(startDate, "yyyy-MM-dd"), format(endDate, "yyyy-MM-dd")],
+    queryKey: QUERY_KEYS.POS_SHIFTS_REPORT(format(startDate, "yyyy-MM-dd"), format(endDate, "yyyy-MM-dd")),
     queryFn: () => POSService.getShiftsReport(
       format(startDate, "yyyy-MM-dd"),
       format(endDate, "yyyy-MM-dd")
@@ -32,8 +33,8 @@ export const useDailySettlement = (startDate: Date, endDate: Date) => {
     mutationFn: (shiftId: string) => POSService.settleShift(shiftId),
     onSuccess: () => {
       toast.success("تمت التسوية بنجاح");
-      queryClient.invalidateQueries({ queryKey: ["pos-shifts-report"] });
-      queryClient.invalidateQueries({ queryKey: ["cashier-shift"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.POS_SHIFTS_REPORT() });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CASHIER_SHIFT });
     },
     onError: () => {
       toast.error("حدث خطأ أثناء التسوية");

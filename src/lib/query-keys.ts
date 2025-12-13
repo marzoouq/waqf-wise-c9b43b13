@@ -464,6 +464,40 @@ export const QUERY_KEYS = {
 
   // Maintenance Extended
   MAINTENANCE_REQUESTS_DATA: ['maintenance_requests'] as const,
+  
+  // Distribution Analysis
+  DISTRIBUTION_ANALYSIS: ['distribution-analysis'] as const,
+  DISTRIBUTION_STATUS_STATS: ['distribution-status-stats'] as const,
+  
+  // Visibility Settings
+  VISIBILITY_SETTINGS: (role: string) => ['visibility-settings', role] as const,
+  
+  // Waqf Revenue
+  WAQF_REVENUE: (waqfUnitId?: string, fiscalYearId?: string) => ['waqf_revenue', waqfUnitId, fiscalYearId] as const,
+  
+  // POS Shifts
+  POS_SHIFTS_REPORT: (startDate?: string, endDate?: string) => ['pos-shifts-report', startDate, endDate] as const,
+  CASHIER_SHIFT: ['cashier-shift'] as const,
+  
+  // System Health
+  SYSTEM_HEALTH_LIVE: ['system-health-live'] as const,
+  
+  // Distribution Settings
+  DISTRIBUTION_SETTINGS: ['distribution-settings'] as const,
+  
+  // Governance Voting
+  GOVERNANCE_VOTES: (decisionId: string) => ['governance-votes', decisionId] as const,
+  USER_VOTE: (decisionId: string) => ['user-vote', decisionId] as const,
+  GOVERNANCE_DECISIONS: ['governance-decisions'] as const,
+  
+  // Properties Stats
+  PROPERTIES_STATS: ['properties-stats'] as const,
+  
+  // Loan Schedules
+  LOAN_SCHEDULES: (loanId: string) => ['loan-schedules', loanId] as const,
+  
+  // Request Comments
+  REQUEST_COMMENTS: (requestId?: string) => ['request-comments', requestId] as const,
 } as const;
 
 // Query Config with default settings

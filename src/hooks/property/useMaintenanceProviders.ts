@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { MaintenanceService, type ProviderRating } from "@/services/maintenance.service";
 import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 type MaintenanceProvider = Database['public']['Tables']['maintenance_providers']['Row'];
 type MaintenanceProviderInsert = Database['public']['Tables']['maintenance_providers']['Insert'];
@@ -11,7 +12,7 @@ export function useMaintenanceProviders() {
   const queryClient = useQueryClient();
 
   const { data: providers = [], isLoading } = useQuery({
-    queryKey: ["maintenance-providers"],
+    queryKey: QUERY_KEYS.MAINTENANCE_PROVIDERS,
     queryFn: () => MaintenanceService.getProviders(true),
   });
 
@@ -20,7 +21,7 @@ export function useMaintenanceProviders() {
       MaintenanceService.addProvider(provider),
     onSuccess: () => {
       toast.success("تمت إضافة مقدم الخدمة بنجاح");
-      queryClient.invalidateQueries({ queryKey: ["maintenance-providers"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.MAINTENANCE_PROVIDERS });
     },
     onError: () => {
       toast.error("حدث خطأ أثناء إضافة مقدم الخدمة");
@@ -32,7 +33,7 @@ export function useMaintenanceProviders() {
       MaintenanceService.updateProvider(id, updates),
     onSuccess: () => {
       toast.success("تم تحديث مقدم الخدمة بنجاح");
-      queryClient.invalidateQueries({ queryKey: ["maintenance-providers"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.MAINTENANCE_PROVIDERS });
     },
     onError: () => {
       toast.error("حدث خطأ أثناء تحديث مقدم الخدمة");
@@ -43,7 +44,7 @@ export function useMaintenanceProviders() {
     mutationFn: (id: string) => MaintenanceService.deleteProvider(id),
     onSuccess: () => {
       toast.success("تم حذف مقدم الخدمة بنجاح");
-      queryClient.invalidateQueries({ queryKey: ["maintenance-providers"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.MAINTENANCE_PROVIDERS });
     },
     onError: () => {
       toast.error("حدث خطأ أثناء حذف مقدم الخدمة");
@@ -54,7 +55,7 @@ export function useMaintenanceProviders() {
     mutationFn: (rating: ProviderRating) => MaintenanceService.rateProvider(rating),
     onSuccess: () => {
       toast.success("تم إضافة التقييم بنجاح");
-      queryClient.invalidateQueries({ queryKey: ["maintenance-providers"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.MAINTENANCE_PROVIDERS });
     },
     onError: () => {
       toast.error("حدث خطأ أثناء إضافة التقييم");

@@ -3,13 +3,14 @@ import { GovernanceService, AuthService } from "@/services";
 import { useToast } from "@/hooks/use-toast";
 import { productionLogger } from "@/lib/logger/production-logger";
 import type { GovernanceVote, VoteType } from "@/types/governance";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export function useGovernanceVoting(decisionId: string) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const { data: votes = [], isLoading, error: votesError } = useQuery({
-    queryKey: ["governance-votes", decisionId],
+    queryKey: QUERY_KEYS.GOVERNANCE_VOTES(decisionId),
     queryFn: async () => {
       try {
         return await GovernanceService.getVotes(decisionId);
@@ -23,7 +24,7 @@ export function useGovernanceVoting(decisionId: string) {
   });
 
   const { data: userVote } = useQuery({
-    queryKey: ["user-vote", decisionId],
+    queryKey: QUERY_KEYS.USER_VOTE(decisionId),
     queryFn: async () => {
       const user = await AuthService.getCurrentUser();
       if (!user) return null;
@@ -42,9 +43,9 @@ export function useGovernanceVoting(decisionId: string) {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["governance-votes", decisionId] });
-      queryClient.invalidateQueries({ queryKey: ["user-vote", decisionId] });
-      queryClient.invalidateQueries({ queryKey: ["governance-decisions"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.GOVERNANCE_VOTES(decisionId) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USER_VOTE(decisionId) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.GOVERNANCE_DECISIONS });
       toast({
         title: "تم تسجيل صوتك بنجاح",
         description: "شكراً لمشاركتك في التصويت",

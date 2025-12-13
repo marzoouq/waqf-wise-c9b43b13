@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { useUserRole } from "@/hooks/useUserRole";
 import { GovernanceService } from "@/services/governance.service";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface VisibilitySettings {
   id: string;
@@ -78,7 +79,7 @@ export function useVisibilitySettings(targetRole?: 'beneficiary' | 'waqf_heir') 
   const effectiveRole = targetRole || (isWaqfHeir ? 'waqf_heir' : 'beneficiary');
 
   const { data: settings, isLoading } = useQuery({
-    queryKey: ["visibility-settings", effectiveRole],
+    queryKey: QUERY_KEYS.VISIBILITY_SETTINGS(effectiveRole),
     queryFn: async () => {
       const data = await GovernanceService.getVisibilitySettings(effectiveRole);
       if (!data) {
@@ -93,7 +94,7 @@ export function useVisibilitySettings(targetRole?: 'beneficiary' | 'waqf_heir') 
     mutationFn: (updates: Partial<VisibilitySettings>) => 
       GovernanceService.updateVisibilitySettings(settings?.id!, updates),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["visibility-settings", effectiveRole] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.VISIBILITY_SETTINGS(effectiveRole) });
       toast({
         title: "تم الحفظ",
         description: `تم تحديث إعدادات الشفافية ${effectiveRole === 'waqf_heir' ? 'للورثة' : 'للمستفيدين'} بنجاح`,

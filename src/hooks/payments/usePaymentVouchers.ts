@@ -3,6 +3,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
 import { VoucherService, type VoucherData } from "@/services/voucher.service";
 import { RealtimeService } from "@/services/realtime.service";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface PaymentVoucher {
   id: string;
@@ -32,7 +33,7 @@ export function usePaymentVouchers() {
   // Real-time subscription
   useEffect(() => {
     const subscription = RealtimeService.subscribeToTable('payment_vouchers', () => {
-      queryClient.invalidateQueries({ queryKey: ["payment_vouchers"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PAYMENT_VOUCHERS });
     });
 
     return () => {
@@ -41,7 +42,7 @@ export function usePaymentVouchers() {
   }, [queryClient]);
 
   const { data: vouchers = [], isLoading } = useQuery({
-    queryKey: ["payment_vouchers"],
+    queryKey: QUERY_KEYS.PAYMENT_VOUCHERS,
     queryFn: async () => {
       const result = await VoucherService.getWithFilters();
       return result;
@@ -55,8 +56,8 @@ export function usePaymentVouchers() {
       return result.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["payment_vouchers"] });
-      queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PAYMENT_VOUCHERS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.JOURNAL_ENTRIES });
       toast({
         title: "تم إنشاء السند بنجاح",
         description: "تم توليد رقم السند تلقائياً",
@@ -77,8 +78,8 @@ export function usePaymentVouchers() {
       return result.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["payment_vouchers"] });
-      queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PAYMENT_VOUCHERS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.JOURNAL_ENTRIES });
       toast({
         title: "تم تحديث حالة السند",
         description: "تم إنشاء القيد المحاسبي تلقائياً",
@@ -98,7 +99,7 @@ export function usePaymentVouchers() {
       await VoucherService.delete(voucherId);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["payment_vouchers"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PAYMENT_VOUCHERS });
       toast({
         title: "تم حذف السند بنجاح",
       });
@@ -118,7 +119,7 @@ export function usePaymentVouchers() {
       return result;
     },
     onSuccess: (result) => {
-      queryClient.invalidateQueries({ queryKey: ["payment_vouchers"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PAYMENT_VOUCHERS });
       toast({
         title: "تم توليد السندات بنجاح",
         description: `تم إنشاء ${result.count} سند من التوزيع`,

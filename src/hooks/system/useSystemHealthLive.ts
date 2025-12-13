@@ -5,6 +5,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { SystemService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface SystemHealthStats {
   totalErrors: number;
@@ -26,7 +27,7 @@ export interface SystemHealthStats {
 
 export function useSystemHealthLive() {
   return useQuery({
-    queryKey: ["system-health-live"],
+    queryKey: QUERY_KEYS.SYSTEM_HEALTH_LIVE,
     queryFn: async (): Promise<SystemHealthStats> => {
       return SystemService.getHealthStats();
     },

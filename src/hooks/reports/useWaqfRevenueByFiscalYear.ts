@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useFiscalYears } from "@/hooks/accounting/useFiscalYears";
 import { ReportService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface WaqfRevenueData {
   fiscalYearId: string;
@@ -25,7 +26,7 @@ export function useWaqfRevenueByFiscalYear(waqfUnitId?: string, fiscalYearId?: s
   const activeFiscalYear = fiscalYears.find(fy => fy.is_active);
 
   const { data: revenueData, isLoading } = useQuery({
-    queryKey: ['waqf_revenue', waqfUnitId, fiscalYearId],
+    queryKey: QUERY_KEYS.WAQF_REVENUE(waqfUnitId, fiscalYearId),
     enabled: !!fiscalYearId && !!selectedYear,
     queryFn: () => ReportService.getWaqfRevenue(fiscalYearId!, selectedYear!, waqfUnitId),
   });
