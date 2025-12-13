@@ -106,7 +106,6 @@ export const realBeneficiaries: Partial<Beneficiary>[] = [
     eligibility_status: 'مؤهل',
     created_at: '2024-01-01T00:00:00Z',
   },
-  // المزيد من المستفيدين للوصول إلى 14
   {
     id: 'ben-006',
     full_name: 'أحمد مرزوق الثبيتي',
@@ -226,17 +225,6 @@ export const realBeneficiaries: Partial<Beneficiary>[] = [
   },
 ];
 
-// إحصائيات المستفيدين المحسوبة
-export const beneficiaryStats = {
-  total: realBeneficiaries.length,
-  active: realBeneficiaries.filter(b => b.status === 'نشط').length,
-  sons: realBeneficiaries.filter(b => b.category === 'ابن').length,
-  daughters: realBeneficiaries.filter(b => b.category === 'بنت').length,
-  wives: realBeneficiaries.filter(b => b.category === 'زوجة').length,
-  totalReceived: realBeneficiaries.reduce((sum, b) => sum + (b.total_received || 0), 0),
-  totalBalance: realBeneficiaries.reduce((sum, b) => sum + (b.account_balance || 0), 0),
-};
-
 // بيانات جلسات المستفيدين للمراقبة الحية
 export const beneficiarySessions = [
   {
@@ -270,6 +258,21 @@ export const beneficiarySessions = [
     ip_address: '192.168.1.3',
   },
 ];
+
+// Aliases for compatibility with integration tests
+export const mockBeneficiaries = realBeneficiaries;
+export const mockBeneficiarySessions = beneficiarySessions;
+
+// إحصائيات المستفيدين المحسوبة
+export const beneficiaryStats = {
+  total: realBeneficiaries.length,
+  active: realBeneficiaries.filter(b => b.status === 'نشط').length,
+  sons: realBeneficiaries.filter(b => b.category === 'ابن').length,
+  daughters: realBeneficiaries.filter(b => b.category === 'بنت').length,
+  wives: realBeneficiaries.filter(b => b.category === 'زوجة').length,
+  totalReceived: realBeneficiaries.reduce((sum, b) => sum + (b.total_received || 0), 0),
+  totalBalance: realBeneficiaries.reduce((sum, b) => sum + (b.account_balance || 0), 0),
+};
 
 // Helper functions
 export const getActiveBeneficiaries = () => 
