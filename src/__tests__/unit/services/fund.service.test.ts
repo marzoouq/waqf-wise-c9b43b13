@@ -5,7 +5,8 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { FundService } from '@/services/fund.service';
-import { mockSupabase, setMockTableData, clearMockTableData } from '../../utils/supabase.mock';
+import { supabase } from '@/integrations/supabase/client';
+import { setMockTableData, clearMockTableData } from '../../utils/supabase.mock';
 
 describe('FundService', () => {
   beforeEach(() => {
@@ -22,7 +23,7 @@ describe('FundService', () => {
 
       const result = await FundService.getAll();
       
-      expect(mockSupabase.from).toHaveBeenCalledWith('funds');
+      expect(supabase.from).toHaveBeenCalledWith('funds');
       expect(result).toBeDefined();
     });
   });
@@ -48,7 +49,7 @@ describe('FundService', () => {
 
       const result = await FundService.create(newFund);
       
-      expect(mockSupabase.from).toHaveBeenCalledWith('funds');
+      expect(supabase.from).toHaveBeenCalledWith('funds');
     });
   });
 
@@ -56,7 +57,7 @@ describe('FundService', () => {
     it('should update fund', async () => {
       const result = await FundService.update('fund-1', { name: 'اسم محدث' });
       
-      expect(mockSupabase.from).toHaveBeenCalledWith('funds');
+      expect(supabase.from).toHaveBeenCalledWith('funds');
     });
   });
 
@@ -64,7 +65,7 @@ describe('FundService', () => {
     it('should delete fund', async () => {
       const result = await FundService.delete('fund-1');
       
-      expect(mockSupabase.from).toHaveBeenCalledWith('funds');
+      expect(supabase.from).toHaveBeenCalledWith('funds');
     });
   });
 

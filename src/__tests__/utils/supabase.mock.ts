@@ -8,15 +8,6 @@ import { vi } from 'vitest';
 // Re-export from setup
 export { setMockTableData, clearMockTableData } from '../../test/setup';
 
-// Get supabase mock from the mocked module using relative path
-export const getMockSupabase = () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  return require('../../integrations/supabase/client').supabase;
-};
-
-// Export the mocked supabase directly for use in tests
-export { supabase as mockSupabase } from '@/integrations/supabase/client';
-
 // Mock لـ Supabase Auth - للاستخدام المباشر في الاختبارات
 export const mockSupabaseAuth = {
   getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }),
@@ -29,3 +20,6 @@ export const mockSupabaseAuth = {
   resetPasswordForEmail: vi.fn().mockResolvedValue({ error: null }),
   updateUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }),
 };
+
+// Note: Tests should import supabase directly from '@/integrations/supabase/client'
+// which is automatically mocked in setup.ts

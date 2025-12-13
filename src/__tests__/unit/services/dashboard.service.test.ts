@@ -5,7 +5,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { DashboardService } from '@/services/dashboard.service';
-import { mockSupabase, setMockTableData, clearMockTableData } from '../../utils/supabase.mock';
+import { setMockTableData, clearMockTableData } from '../../utils/supabase.mock';
 
 describe('DashboardService', () => {
   beforeEach(() => {
