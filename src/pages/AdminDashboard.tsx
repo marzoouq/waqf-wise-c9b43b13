@@ -12,6 +12,7 @@ import { UsersActivityChart } from "@/components/dashboard/admin/UsersActivityCh
 import { AdminSettingsSection } from "@/components/dashboard/admin/AdminSettingsSection";
 import { AdminKPIs } from "@/components/dashboard/admin/AdminKPIs";
 import { LazyTabContent } from "@/components/dashboard/admin/LazyTabContent";
+import { AdminDashboardErrorBoundary } from "@/components/dashboard/admin/AdminDashboardErrorBoundary";
 import { UnifiedDashboardLayout } from "@/components/dashboard/UnifiedDashboardLayout";
 import { ChartSkeleton, SectionSkeleton } from "@/components/dashboard";
 import { CurrentFiscalYearCard, RevenueProgressCard, FinancialCardsRow } from "@/components/dashboard/shared";
@@ -101,12 +102,16 @@ export default function AdminDashboard() {
           <FinancialCardsRow />
 
           <div className="grid gap-6 lg:grid-cols-2">
-            <Suspense fallback={<ChartSkeleton />}>
-              <SystemHealthMonitor />
-            </Suspense>
-            <Suspense fallback={<ChartSkeleton />}>
-              <SecurityAlertsSection />
-            </Suspense>
+            <AdminDashboardErrorBoundary fallbackTitle="خطأ في تحميل صحة النظام">
+              <Suspense fallback={<ChartSkeleton />}>
+                <SystemHealthMonitor />
+              </Suspense>
+            </AdminDashboardErrorBoundary>
+            <AdminDashboardErrorBoundary fallbackTitle="خطأ في تحميل التنبيهات الأمنية">
+              <Suspense fallback={<ChartSkeleton />}>
+                <SecurityAlertsSection />
+              </Suspense>
+            </AdminDashboardErrorBoundary>
           </div>
 
           <Suspense fallback={<ChartSkeleton />}>
@@ -124,10 +129,8 @@ export default function AdminDashboard() {
             <Suspense fallback={<ChartSkeleton />}>
               <UsersActivityChart />
             </Suspense>
-
-            <Suspense fallback={<ChartSkeleton />}>
-              <AuditLogsPreview />
-            </Suspense>
+            
+            {/* AuditLogsPreview removed - available in System tab */}
           </LazyTabContent>
         </TabsContent>
 
@@ -137,10 +140,8 @@ export default function AdminDashboard() {
             <Suspense fallback={<ChartSkeleton />}>
               <SecurityAlertsSection />
             </Suspense>
-
-            <Suspense fallback={<ChartSkeleton />}>
-              <AuditLogsPreview />
-            </Suspense>
+            
+            {/* AuditLogsPreview removed - available in System tab */}
           </LazyTabContent>
         </TabsContent>
 

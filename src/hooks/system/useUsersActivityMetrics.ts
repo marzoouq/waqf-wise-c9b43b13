@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { subDays, format, eachDayOfInterval, parseISO, startOfDay, endOfDay } from "date-fns";
 import { ar } from "date-fns/locale";
 import { MonitoringService } from "@/services";
+import { QUERY_KEYS, QUERY_CONFIG } from "@/lib/query-keys";
 
 interface UserActivityDataPoint {
   day: string;
@@ -16,7 +17,7 @@ interface UserActivityDataPoint {
  */
 export function useUsersActivityMetrics() {
   return useQuery({
-    queryKey: ["users-activity-metrics"],
+    queryKey: QUERY_KEYS.USERS_ACTIVITY_METRICS,
     queryFn: async (): Promise<UserActivityDataPoint[]> => {
       const now = new Date();
       const weekAgo = subDays(now, 7);
@@ -62,7 +63,7 @@ export function useUsersActivityMetrics() {
 
       return dataPoints;
     },
-    staleTime: 5 * 60 * 1000,
-    refetchInterval: false,
+    staleTime: QUERY_CONFIG.DEFAULT.staleTime,
+    refetchOnWindowFocus: QUERY_CONFIG.DEFAULT.refetchOnWindowFocus,
   });
 }

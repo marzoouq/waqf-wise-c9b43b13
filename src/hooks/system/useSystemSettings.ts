@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { SystemService, type SystemSetting } from "@/services/system.service";
 import { useToast } from "@/hooks/use-toast";
 import { createMutationErrorHandler } from "@/lib/errors";
+import { QUERY_KEYS, QUERY_CONFIG } from "@/lib/query-keys";
 
 export type { SystemSetting };
 
@@ -10,15 +11,16 @@ export function useSystemSettings() {
   const queryClient = useQueryClient();
 
   const { data: settings = [], isLoading } = useQuery({
-    queryKey: ["system_settings"],
+    queryKey: QUERY_KEYS.SYSTEM_SETTINGS,
     queryFn: () => SystemService.getSettings(),
+    staleTime: QUERY_CONFIG.DEFAULT.staleTime,
   });
 
   const updateSetting = useMutation({
     mutationFn: ({ key, value }: { key: string; value: string }) =>
       SystemService.updateSetting(key, value),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["system_settings"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.SYSTEM_SETTINGS });
       toast({
         title: "تم التحديث",
         description: "تم تحديث الإعداد بنجاح",

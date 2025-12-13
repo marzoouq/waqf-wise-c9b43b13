@@ -193,6 +193,26 @@ export const QUERY_KEYS = {
   AUDIT_LOGS: ['audit-logs'] as const,
   ACTIVITIES: ['activities'] as const,
   ERROR_LOGS: ['error-logs'] as const,
+  
+  // System Monitoring & Performance (Phase 1 - Admin Dashboard)
+  SECURITY_ALERTS: ['security-alerts'] as const,
+  SYSTEM_PERFORMANCE_METRICS: ['system-performance-metrics'] as const,
+  USERS_ACTIVITY_METRICS: ['users-activity-metrics'] as const,
+  SYSTEM_ERROR_LOGS: ['system-error-logs'] as const,
+  SYSTEM_ALERTS: ['system-alerts'] as const,
+  SYSTEM_STATS: ['system-stats'] as const,
+  RECENT_ERRORS: ['recent-errors'] as const,
+  ACTIVE_ALERTS: ['active-alerts'] as const,
+  FIX_ATTEMPTS: ['fix-attempts'] as const,
+  
+  // Integrations
+  BANK_INTEGRATIONS: ['bank-integrations'] as const,
+  PAYMENT_GATEWAYS: ['payment-gateways'] as const,
+  GOVERNMENT_INTEGRATIONS: ['government-integrations'] as const,
+  
+  // Backup
+  BACKUP_LOGS: ['backup-logs'] as const,
+  BACKUP_SCHEDULES: ['backup-schedules'] as const,
 
   // Organization
   ORGANIZATION_SETTINGS: ['organization-settings'] as const,

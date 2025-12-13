@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { startOfDay, subDays, format, eachHourOfInterval, parseISO } from "date-fns";
+import { subDays, format, eachHourOfInterval, parseISO } from "date-fns";
 import { ar } from "date-fns/locale";
 import { MonitoringService } from "@/services";
+import { QUERY_KEYS, QUERY_CONFIG } from "@/lib/query-keys";
 
 interface PerformanceDataPoint {
   time: string;
@@ -16,7 +17,7 @@ interface PerformanceDataPoint {
  */
 export function useSystemPerformanceMetrics() {
   return useQuery({
-    queryKey: ["system-performance-metrics"],
+    queryKey: QUERY_KEYS.SYSTEM_PERFORMANCE_METRICS,
     queryFn: async (): Promise<PerformanceDataPoint[]> => {
       const now = new Date();
       const yesterday = subDays(now, 1);
@@ -49,7 +50,7 @@ export function useSystemPerformanceMetrics() {
 
       return dataPoints;
     },
-    staleTime: 5 * 60 * 1000,
-    refetchInterval: false,
+    staleTime: QUERY_CONFIG.DEFAULT.staleTime,
+    refetchOnWindowFocus: QUERY_CONFIG.DEFAULT.refetchOnWindowFocus,
   });
 }
