@@ -1,10 +1,12 @@
 /**
  * Hook for BeneficiaryPortal data fetching
  * يجلب بيانات المستفيد والإحصائيات
+ * يدعم وضع المعاينة للناظر
  */
 
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
+import { useSearchParams } from "react-router-dom";
 import { BeneficiaryService } from "@/services";
 import { QUERY_KEYS } from "@/lib/query-keys";
 
@@ -16,7 +18,15 @@ export interface BeneficiaryStatistics {
 }
 
 export function useBeneficiaryPortalData() {
-  const { user } = useAuth();
+  const { user, hasRole } = useAuth();
+  const [searchParams] = useSearchParams();
+  
+  // التحقق من وضع المعاينة
+  const isPreviewMode = searchParams.get("preview") === "true";
+  const previewBeneficiaryId = searchParams.get("beneficiary_id");
+  
+  // هل المستخدم ناظر أو مسؤول في وضع المعاينة؟
+  const isNazerPreview = isPreviewMode && previewBeneficiaryId && (hasRole("nazer") || hasRole("admin"));
 
   // جلب بيانات المستفيد الحالي
   const {
@@ -24,12 +34,19 @@ export function useBeneficiaryPortalData() {
     isLoading: beneficiaryLoading,
     error: beneficiaryError,
   } = useQuery({
-    queryKey: QUERY_KEYS.CURRENT_BENEFICIARY(user?.id),
+    queryKey: isNazerPreview 
+      ? ['preview-beneficiary', previewBeneficiaryId] 
+      : QUERY_KEYS.CURRENT_BENEFICIARY(user?.id),
     queryFn: async () => {
+      // وضع المعاينة للناظر
+      if (isNazerPreview && previewBeneficiaryId) {
+        return BeneficiaryService.getById(previewBeneficiaryId);
+      }
+      // الوضع العادي للمستفيد
       if (!user?.id) throw new Error("غير مصرح");
       return BeneficiaryService.getByUserId(user.id);
     },
-    enabled: !!user?.id,
+    enabled: isNazerPreview ? !!previewBeneficiaryId : !!user?.id,
   });
 
   // جلب الإحصائيات
@@ -59,5 +76,6 @@ export function useBeneficiaryPortalData() {
     isLoading: beneficiaryLoading,
     isStatisticsLoading: statisticsLoading,
     error: beneficiaryError,
+    isPreviewMode: isNazerPreview,
   };
 }

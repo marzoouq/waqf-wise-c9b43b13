@@ -23,11 +23,8 @@ export default function BeneficiaryPortal() {
   const activeTab = searchParams.get("tab") || "overview";
   const { settings } = useVisibilitySettings();
 
-  // معالجة وضع المعاينة
-  const isPreviewMode = searchParams.get("preview") === "true";
-
-  // استخدام Hook المخصص لجلب البيانات
-  const { beneficiary, statistics, isLoading } = useBeneficiaryPortalData();
+  // استخدام Hook المخصص لجلب البيانات (يتضمن التحقق من وضع المعاينة)
+  const { beneficiary, statistics, isLoading, isPreviewMode } = useBeneficiaryPortalData();
 
   // تفعيل Realtime للتحديثات الفورية
   useBeneficiaryDashboardRealtime({
