@@ -10,18 +10,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
 import React from 'react';
 
-vi.mock('@/contexts/AuthContext', async () => {
-  const actual = await vi.importActual('@/contexts/AuthContext');
-  return {
-    ...actual,
-    useAuth: () => ({
-      user: { id: 'admin-1', email: 'admin@waqf.sa' },
-      roles: ['admin'],
-      isLoading: false,
-      isAuthenticated: true,
-    }),
-  };
-});
+// Mock useAuth - uses global mock from setup.ts
 
 const createWrapper = () => {
   const queryClient = new QueryClient({
