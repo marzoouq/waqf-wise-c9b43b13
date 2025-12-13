@@ -1,17 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-// Mock the supabase client BEFORE importing the logger
-vi.mock('@/integrations/supabase/client', () => ({
-  supabase: {
-    functions: {
-      invoke: vi.fn().mockResolvedValue({ data: null, error: null }),
-    },
-    auth: {
-      getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }),
-    },
-  },
-}));
-
 describe('ProductionLogger', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -24,10 +12,17 @@ describe('ProductionLogger', () => {
 
   describe('info()', () => {
     it('should NOT add info messages to queue in production', async () => {
-      // Info messages should never go to queue regardless of environment
+      // Mock the supabase client
+      vi.doMock('@/integrations/supabase/client', () => ({
+        supabase: {
+          functions: { invoke: vi.fn() },
+          auth: { getSession: vi.fn().mockResolvedValue({ data: { session: null } }) },
+        },
+      }));
+
       const { productionLogger } = await import('../production-logger');
       
-      // Clear queue using unknown cast for private property access
+      // Clear queue using any cast for private property access
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (productionLogger as any).queue = [];
       
@@ -41,6 +36,13 @@ describe('ProductionLogger', () => {
 
   describe('warn()', () => {
     it('should NOT add warn messages to queue by default', async () => {
+      vi.doMock('@/integrations/supabase/client', () => ({
+        supabase: {
+          functions: { invoke: vi.fn() },
+          auth: { getSession: vi.fn().mockResolvedValue({ data: { session: null } }) },
+        },
+      }));
+
       const { productionLogger } = await import('../production-logger');
       
       // Clear queue
@@ -56,18 +58,22 @@ describe('ProductionLogger', () => {
   });
 
   describe('error()', () => {
-    it('should add error messages to queue when in production mode', async () => {
-      // In test environment, IS_PROD is false, so we need to test the addToQueue logic directly
+    it('should log errors to console in dev mode', async () => {
+      vi.doMock('@/integrations/supabase/client', () => ({
+        supabase: {
+          functions: { invoke: vi.fn() },
+          auth: { getSession: vi.fn().mockResolvedValue({ data: { session: null } }) },
+        },
+      }));
+
       const { productionLogger } = await import('../production-logger');
       
-      // The actual behavior depends on IS_PROD which is false in tests
-      // So we verify that the error method is callable and processes correctly
+      // Spy on console.error
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       
       productionLogger.error('Test error', new Error('Test'));
       
       // In dev mode, it logs to console
-      // The queue behavior depends on IS_PROD flag
       expect(consoleSpy).toHaveBeenCalled();
       
       consoleSpy.mockRestore();
@@ -76,12 +82,20 @@ describe('ProductionLogger', () => {
 
   describe('flush()', () => {
     it('should filter and only process error-level logs', async () => {
+      vi.doMock('@/integrations/supabase/client', () => ({
+        supabase: {
+          functions: { invoke: vi.fn() },
+          auth: { getSession: vi.fn().mockResolvedValue({ data: { session: null } }) },
+        },
+      }));
+
       const { productionLogger } = await import('../production-logger');
       
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const queue = (productionLogger as any).queue as Array<{ level: string; message: string; timestamp: string; data?: unknown }>;
       
-      // Add mixed logs directly to queue for testing
+      // Clear and add mixed logs
+      queue.length = 0;
       queue.push(
         { level: 'error', message: 'Error 1', timestamp: new Date().toISOString(), data: {} },
         { level: 'warn', message: 'Warning 1', timestamp: new Date().toISOString(), data: {} },
@@ -100,6 +114,13 @@ describe('ProductionLogger', () => {
 
   describe('cleanup()', () => {
     it('should have cleanup method available', async () => {
+      vi.doMock('@/integrations/supabase/client', () => ({
+        supabase: {
+          functions: { invoke: vi.fn() },
+          auth: { getSession: vi.fn().mockResolvedValue({ data: { session: null } }) },
+        },
+      }));
+
       const { productionLogger } = await import('../production-logger');
       
       // Verify cleanup is a function

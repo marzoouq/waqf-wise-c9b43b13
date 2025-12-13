@@ -3,7 +3,7 @@
  * اختبارات نمط Circuit Breaker
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
 class CircuitBreaker {
   private failureCount = 0;
@@ -70,7 +70,12 @@ describe('Circuit Breaker', () => {
   let circuitBreaker: CircuitBreaker;
 
   beforeEach(() => {
+    vi.useFakeTimers();
     circuitBreaker = new CircuitBreaker(3, 5000);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('should start in CLOSED state', () => {
@@ -131,15 +136,15 @@ describe('Circuit Breaker', () => {
 
     expect(circuitBreaker.getState()).toBe('OPEN');
 
-    // Wait for timeout to transition to HALF_OPEN
-    await new Promise(resolve => setTimeout(resolve, 5100));
+    // Advance time past timeout using fake timers
+    vi.advanceTimersByTime(5100);
 
     // Execute successful call
     const result = await circuitBreaker.execute(successFn);
     
     expect(result).toBe('Success');
     expect(circuitBreaker.getState()).toBe('CLOSED');
-  }, 10000); // Extended timeout for this test
+  });
 
   it('should track failure and success counts', async () => {
     const successFn = async () => 'Success';
@@ -196,6 +201,14 @@ describe('Circuit Breaker', () => {
 });
 
 describe('Circuit Breaker - Edge Cases', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('should handle immediate success after opening', async () => {
     const breaker = new CircuitBreaker(2, 1000);
     const failingFn = async () => {
@@ -214,8 +227,8 @@ describe('Circuit Breaker - Edge Cases', () => {
 
     expect(breaker.getState()).toBe('OPEN');
 
-    // Wait for timeout
-    await new Promise(resolve => setTimeout(resolve, 1100));
+    // Advance time past timeout
+    vi.advanceTimersByTime(1100);
 
     // Should transition to HALF_OPEN and then CLOSED on success
     const result = await breaker.execute(successFn);
@@ -238,8 +251,8 @@ describe('Circuit Breaker - Edge Cases', () => {
       }
     }
 
-    // Wait for timeout to go HALF_OPEN
-    await new Promise(resolve => setTimeout(resolve, 1100));
+    // Advance time past timeout
+    vi.advanceTimersByTime(1100);
 
     // Failure in HALF_OPEN should open again
     try {
