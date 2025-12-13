@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTenantsRealtime } from '@/hooks/property/useTenantsRealtime';
 import MainLayout from '@/components/layout/MainLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -56,6 +57,7 @@ const statusLabels: Record<string, { label: string; variant: 'default' | 'second
 export default function Tenants() {
   const navigate = useNavigate();
   const { tenants, isLoading, addTenant, updateTenant, deleteTenant, isAdding, isUpdating } = useTenants();
+  useTenantsRealtime(); // تحديثات فورية
   
   const [searchQuery, setSearchQuery] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -144,7 +146,7 @@ export default function Tenants() {
                     {tenants.filter((t) => t.status === 'active').length}
                   </p>
                 </div>
-                <Building className="h-8 w-8 text-green-500" />
+                <Building className="h-8 w-8 text-status-success" />
               </div>
             </CardContent>
           </Card>
@@ -244,7 +246,7 @@ export default function Tenants() {
                               tenant.current_balance > 0
                                 ? 'text-destructive font-medium'
                                 : tenant.current_balance < 0
-                                ? 'text-green-600 font-medium'
+                                ? 'text-status-success font-medium'
                                 : ''
                             }
                           >

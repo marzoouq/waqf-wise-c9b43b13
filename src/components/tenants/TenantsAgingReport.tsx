@@ -87,13 +87,13 @@ export function TenantsAgingReport() {
                     <TableCell className="text-left">
                       {item.current > 0 ? formatCurrency(item.current) : '-'}
                     </TableCell>
-                    <TableCell className="text-left text-yellow-600">
+                    <TableCell className="text-left text-status-warning">
                       {item.days_30 > 0 ? formatCurrency(item.days_30) : '-'}
                     </TableCell>
-                    <TableCell className="text-left text-orange-600">
+                    <TableCell className="text-left text-amber-600">
                       {item.days_60 > 0 ? formatCurrency(item.days_60) : '-'}
                     </TableCell>
-                    <TableCell className="text-left text-red-500">
+                    <TableCell className="text-left text-status-error">
                       {item.days_90 > 0 ? formatCurrency(item.days_90) : '-'}
                     </TableCell>
                     <TableCell className="text-left text-destructive font-medium">
@@ -109,13 +109,13 @@ export function TenantsAgingReport() {
                 <TableRow className="bg-muted/50 font-bold">
                   <TableCell>الإجمالي</TableCell>
                   <TableCell className="text-left">{formatCurrency(totals.current)}</TableCell>
-                  <TableCell className="text-left text-yellow-600">
+                  <TableCell className="text-left text-status-warning">
                     {formatCurrency(totals.days_30)}
                   </TableCell>
-                  <TableCell className="text-left text-orange-600">
+                  <TableCell className="text-left text-amber-600">
                     {formatCurrency(totals.days_60)}
                   </TableCell>
-                  <TableCell className="text-left text-red-500">
+                  <TableCell className="text-left text-status-error">
                     {formatCurrency(totals.days_90)}
                   </TableCell>
                   <TableCell className="text-left text-destructive">
