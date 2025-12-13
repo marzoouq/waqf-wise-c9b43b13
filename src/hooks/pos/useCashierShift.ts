@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { toast } from 'sonner';
 import { POSService, CashierShift } from '@/services/pos.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export type { CashierShift };
 
@@ -11,13 +12,13 @@ export function useCashierShift() {
 
   // جلب الجلسة الحالية النشطة
   const { data: currentShift, isLoading: isLoadingShift } = useQuery({
-    queryKey: ['pos', 'current-shift'],
+    queryKey: QUERY_KEYS.POS_CURRENT_SHIFT,
     queryFn: () => POSService.getCurrentShift(),
   });
 
   // جلب جميع الجلسات
   const { data: shifts = [], isLoading: isLoadingShifts } = useQuery({
-    queryKey: ['pos', 'shifts'],
+    queryKey: QUERY_KEYS.POS_SHIFTS,
     queryFn: () => POSService.getShifts(50),
   });
 
@@ -28,7 +29,7 @@ export function useCashierShift() {
       return POSService.openShift(user.id, notes);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pos'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.POS });
       toast.success('تم بدء جلسة العمل بنجاح');
     },
     onError: (error: Error) => {
@@ -43,7 +44,7 @@ export function useCashierShift() {
       return POSService.closeShift(shiftId, user.id, notes);
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['pos'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.POS });
       const netAmount = data.total_collections - data.total_payments;
       toast.success(
         `تم إنهاء الجلسة بنجاح - صافي الحركة: ${netAmount.toLocaleString('ar-SA')} ر.س`

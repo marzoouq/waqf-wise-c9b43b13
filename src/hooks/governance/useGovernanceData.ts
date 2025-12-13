@@ -6,6 +6,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { GovernanceService } from "@/services";
 import type { EligibleVoter, GovernanceDecisionInput } from "@/services/governance.service";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 // ==================== Legacy Hook ====================
 export function useGovernanceData() {
@@ -24,7 +25,7 @@ export function useGovernanceData() {
 // ==================== Eligible Voters Hook ====================
 export function useEligibleVoters(decision: GovernanceDecisionInput) {
   return useQuery({
-    queryKey: ["eligible-voters", decision.id],
+    queryKey: QUERY_KEYS.ELIGIBLE_VOTERS(decision.id || ''),
     queryFn: () => GovernanceService.getEligibleVoters(decision),
     enabled: !!decision.id,
   });
@@ -33,7 +34,7 @@ export function useEligibleVoters(decision: GovernanceDecisionInput) {
 // ==================== Recent Governance Decisions Hook ====================
 export function useRecentGovernanceDecisions() {
   return useQuery({
-    queryKey: ["recent-governance-decisions"],
+    queryKey: QUERY_KEYS.RECENT_GOVERNANCE_DECISIONS,
     queryFn: () => GovernanceService.getRecentDecisions(),
   });
 }

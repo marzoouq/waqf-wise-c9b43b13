@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";
 import { LoansService } from "@/services/loans.service";
 import { RealtimeService } from "@/services/realtime.service";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface LoanInstallment {
   id: string;
@@ -28,7 +29,7 @@ export function useLoanInstallments(loanId?: string) {
   useEffect(() => {
     const subscription = RealtimeService.subscribeToTable(
       'loan_installments',
-      () => queryClient.invalidateQueries({ queryKey: ['loan_installments'] })
+      () => queryClient.invalidateQueries({ queryKey: QUERY_KEYS.LOAN_INSTALLMENTS() })
     );
 
     return () => {
@@ -38,7 +39,7 @@ export function useLoanInstallments(loanId?: string) {
 
   // Fetch installments
   const { data: installments = [], isLoading } = useQuery({
-    queryKey: ['loan_installments', loanId],
+    queryKey: QUERY_KEYS.LOAN_INSTALLMENTS(loanId),
     queryFn: () => LoansService.getInstallments(loanId),
     enabled: !!loanId,
     ...QUERY_CONFIG.LOANS,
@@ -70,8 +71,8 @@ export function useLoanInstallments(loanId?: string) {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['loan_installments'] });
-      queryClient.invalidateQueries({ queryKey: ['loans'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.LOAN_INSTALLMENTS() });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.LOANS });
       
       toast({
         title: "تم تحديث القسط بنجاح",

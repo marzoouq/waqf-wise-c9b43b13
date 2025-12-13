@@ -66,8 +66,8 @@ export function useDistributions() {
       return DistributionService.update(id, updates);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["distributions"] });
-      queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DISTRIBUTIONS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.JOURNAL_ENTRIES });
       
       toast({
         title: "تم التحديث بنجاح",
@@ -87,7 +87,7 @@ export function useDistributions() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DISTRIBUTIONS });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.JOURNAL_ENTRIES });
-      queryClient.invalidateQueries({ queryKey: ["funds"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FUNDS });
       
       toast({
         title: "تم الحذف بنجاح",

@@ -107,7 +107,7 @@ export const QUERY_KEYS = {
   LOANS: ['loans'] as const,
   LOAN: (id: string) => ['loan', id] as const,
   LOAN_PAYMENTS: (loanId: string) => ['loan-payments', loanId] as const,
-  LOAN_INSTALLMENTS: (loanId: string) => ['loan-installments', loanId] as const,
+  LOAN_INSTALLMENTS: (loanId?: string) => ['loan-installments', loanId] as const,
 
   // Distributions
   DISTRIBUTIONS: ['distributions'] as const,
@@ -498,6 +498,22 @@ export const QUERY_KEYS = {
   
   // Request Comments
   REQUEST_COMMENTS: (requestId?: string) => ['request-comments', requestId] as const,
+  
+  // POS & Cashier (additional)
+  POS: ['pos'] as const,
+  POS_CURRENT_SHIFT: ['pos', 'current-shift'] as const,
+  POS_SHIFTS: ['pos', 'shifts'] as const,
+  
+  // Payments with Contracts
+  PAYMENTS_WITH_CONTRACTS: (count: number) => ['payments-with-contracts', count] as const,
+  
+  // Governance (additional)
+  GOVERNANCE_DECISION: (id: string) => ['governance-decision', id] as const,
+  ELIGIBLE_VOTERS: (decisionId: string) => ['eligible-voters', decisionId] as const,
+  RECENT_GOVERNANCE_DECISIONS: ['recent-governance-decisions'] as const,
+  
+  // Cash Flow Report
+  CASH_FLOW_REPORT: ['cash-flow-report'] as const,
 } as const;
 
 // Query Config with default settings
