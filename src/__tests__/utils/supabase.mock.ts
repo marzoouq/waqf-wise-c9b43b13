@@ -8,13 +8,16 @@ import { vi } from 'vitest';
 // Re-export from setup
 export { setMockTableData, clearMockTableData } from '../../test/setup';
 
-// Get supabase mock from the mocked module
+// Get supabase mock from the mocked module using relative path
 export const getMockSupabase = () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  return require('@/integrations/supabase/client').supabase;
+  return require('../../integrations/supabase/client').supabase;
 };
 
-// Mock لـ Supabase Auth - يمكن استخدامه مباشرة في الاختبارات
+// Export the mocked supabase directly for use in tests
+export { supabase as mockSupabase } from '@/integrations/supabase/client';
+
+// Mock لـ Supabase Auth - للاستخدام المباشر في الاختبارات
 export const mockSupabaseAuth = {
   getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }),
   getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }),
@@ -25,27 +28,4 @@ export const mockSupabaseAuth = {
   signInWithOAuth: vi.fn().mockResolvedValue({ data: { url: '' }, error: null }),
   resetPasswordForEmail: vi.fn().mockResolvedValue({ error: null }),
   updateUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }),
-};
-
-export const mockSupabase = {
-  from: vi.fn(),
-  auth: mockSupabaseAuth,
-  storage: {
-    from: vi.fn().mockReturnValue({
-      upload: vi.fn().mockResolvedValue({ data: { path: 'test/path' }, error: null }),
-      download: vi.fn().mockResolvedValue({ data: new Blob(), error: null }),
-      remove: vi.fn().mockResolvedValue({ data: [], error: null }),
-      getPublicUrl: vi.fn().mockReturnValue({ data: { publicUrl: 'https://test.com/file' } }),
-      list: vi.fn().mockResolvedValue({ data: [], error: null }),
-    }),
-  },
-  functions: {
-    invoke: vi.fn().mockResolvedValue({ data: null, error: null }),
-  },
-  channel: vi.fn().mockReturnValue({
-    on: vi.fn().mockReturnThis(),
-    subscribe: vi.fn().mockReturnValue({ unsubscribe: vi.fn() }),
-  }),
-  removeChannel: vi.fn(),
-  rpc: vi.fn().mockResolvedValue({ data: null, error: null }),
 };

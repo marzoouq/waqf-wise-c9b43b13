@@ -23,27 +23,36 @@ export const clearMockTableData = () => {
 const createMockQueryBuilder = <T>(data: T[] = []) => {
   let operation = 'select';
   const builder = {
-    select: () => { operation = 'select'; return builder; },
-    insert: () => { operation = 'insert'; return builder; },
-    update: () => { operation = 'update'; return builder; },
+    select: (_columns?: string) => { operation = 'select'; return builder; },
+    insert: (_data?: unknown) => { operation = 'insert'; return builder; },
+    update: (_data?: unknown) => { operation = 'update'; return builder; },
     delete: () => { operation = 'delete'; return builder; },
-    upsert: () => { operation = 'upsert'; return builder; },
-    eq: () => builder,
-    neq: () => builder,
-    in: () => builder,
-    gt: () => builder,
-    gte: () => builder,
-    lt: () => builder,
-    lte: () => builder,
-    like: () => builder,
-    ilike: () => builder,
-    is: () => builder,
+    upsert: (_data?: unknown) => { operation = 'upsert'; return builder; },
+    eq: (_column?: string, _value?: unknown) => builder,
+    neq: (_column?: string, _value?: unknown) => builder,
+    in: (_column?: string, _values?: unknown[]) => builder,
+    gt: (_column?: string, _value?: unknown) => builder,
+    gte: (_column?: string, _value?: unknown) => builder,
+    lt: (_column?: string, _value?: unknown) => builder,
+    lte: (_column?: string, _value?: unknown) => builder,
+    like: (_column?: string, _pattern?: string) => builder,
+    ilike: (_column?: string, _pattern?: string) => builder,
+    is: (_column?: string, _value?: unknown) => builder,
+    not: (_column?: string, _operator?: string, _value?: unknown) => builder,
     or: (_filters?: string) => builder,
-    order: () => builder,
-    limit: () => builder,
-    range: () => builder,
+    and: (_filters?: string) => builder,
+    filter: (_column?: string, _operator?: string, _value?: unknown) => builder,
+    match: (_query?: Record<string, unknown>) => builder,
+    contains: (_column?: string, _value?: unknown) => builder,
+    containedBy: (_column?: string, _value?: unknown) => builder,
+    textSearch: (_column?: string, _query?: string, _options?: unknown) => builder,
+    order: (_column?: string, _options?: { ascending?: boolean }) => builder,
+    limit: (_count?: number) => builder,
+    range: (_from?: number, _to?: number) => builder,
+    count: (_options?: { count?: string; head?: boolean }) => builder,
     single: async () => ({ data: data[0] || null, error: null }),
     maybeSingle: async () => ({ data: data[0] || null, error: null }),
+    throwOnError: () => builder,
     then: async <TResult>(
       onfulfilled?: ((value: { data: T[]; error: null; count: number }) => TResult | PromiseLike<TResult>) | null
     ): Promise<TResult> => {
@@ -109,15 +118,22 @@ vi.mock('@/hooks/use-toast', () => ({
   }),
 }));
 
-// Mock sonner toast
-vi.mock('sonner', () => ({
-  toast: {
+// Mock sonner toast - must be both a function and object
+vi.mock('sonner', () => {
+  const toastFn = Object.assign(vi.fn(), {
     success: vi.fn(),
     error: vi.fn(),
     info: vi.fn(),
     warning: vi.fn(),
-  },
-}));
+    loading: vi.fn(),
+    dismiss: vi.fn(),
+    promise: vi.fn(),
+  });
+  return {
+    toast: toastFn,
+    Toaster: () => null,
+  };
+});
 
 // Suppress console errors during tests
 beforeAll(() => {
