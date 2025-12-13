@@ -38,8 +38,9 @@ describe('Card', () => {
   });
 
   it('should apply custom className to Card', () => {
-    const { container } = render(<Card className="custom-card">Content</Card>);
-    const cardElement = container.firstChild as HTMLElement;
+    render(<Card className="custom-card">Content</Card>);
+    const cardElement = screen.getByText('Content').closest('.custom-card');
+    expect(cardElement).toBeInTheDocument();
     expect(cardElement).toHaveClass('custom-card');
   });
 
