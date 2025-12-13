@@ -12,11 +12,12 @@ const mockFamilies = [
 ];
 
 const mockBeneficiaries = [
-  { id: 'b1', full_name: 'محمد مرزوق الثبيتي', family_id: 'f1', is_head_of_family: true, relationship: 'رب الأسرة', category: 'زوجة' },
+  { id: 'b1', full_name: 'محمد مرزوق الثبيتي', family_id: 'f1', is_head_of_family: true, relationship: 'رب الأسرة', category: 'رب الأسرة' },
   { id: 'b2', full_name: 'أحمد محمد الثبيتي', family_id: 'f1', is_head_of_family: false, relationship: 'ابن', category: 'ابن' },
   { id: 'b3', full_name: 'سارة محمد الثبيتي', family_id: 'f1', is_head_of_family: false, relationship: 'بنت', category: 'بنت' },
   { id: 'b4', full_name: 'فاطمة الثبيتي', family_id: 'f1', is_head_of_family: false, relationship: 'زوجة', category: 'زوجة' },
   { id: 'b5', full_name: 'خالد محمد الثبيتي', family_id: 'f1', is_head_of_family: false, relationship: 'ابن', category: 'ابن' },
+  { id: 'b6', full_name: 'نورة الثبيتي', family_id: 'f1', is_head_of_family: false, relationship: 'زوجة', category: 'زوجة' },
 ];
 
 describe('Families Page - Complete Tests', () => {
@@ -55,7 +56,7 @@ describe('Families Page - Complete Tests', () => {
 
     it('should show family members', () => {
       const family1Members = mockBeneficiaries.filter(b => b.family_id === 'f1');
-      expect(family1Members).toHaveLength(5);
+      expect(family1Members).toHaveLength(6);
     });
 
     it('should identify family head', () => {
@@ -88,7 +89,7 @@ describe('Families Page - Complete Tests', () => {
     it('should build family tree structure', () => {
       const head = mockBeneficiaries.find(b => b.is_head_of_family);
       const children = mockBeneficiaries.filter(b => !b.is_head_of_family && b.family_id === head?.family_id);
-      expect(children).toHaveLength(4);
+      expect(children).toHaveLength(5);
     });
 
     it('should group by category', () => {
