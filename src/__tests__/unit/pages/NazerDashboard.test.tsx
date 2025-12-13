@@ -9,7 +9,6 @@ import { createTestQueryClient } from '../../utils/test-utils';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
-import NazerDashboard from '@/pages/dashboards/NazerDashboard';
 import React from 'react';
 
 // Mock useUnifiedKPIs
@@ -72,7 +71,7 @@ describe('NazerDashboard', () => {
 
   describe('rendering', () => {
     it('should render dashboard container', async () => {
-      const NazerDashboard = (await import('@/pages/dashboards/NazerDashboard')).default;
+      const { default: NazerDashboard } = await import('@/pages/NazerDashboard');
       render(<NazerDashboard />, { wrapper: createWrapper() });
       
       await waitFor(() => {
@@ -81,7 +80,7 @@ describe('NazerDashboard', () => {
     });
 
     it('should render welcome message with Nazer title', async () => {
-      const NazerDashboard = (await import('@/pages/dashboards/NazerDashboard')).default;
+      const { default: NazerDashboard } = await import('@/pages/NazerDashboard');
       render(<NazerDashboard />, { wrapper: createWrapper() });
       
       await waitFor(() => {
@@ -91,7 +90,7 @@ describe('NazerDashboard', () => {
     });
 
     it('should render tabs navigation', async () => {
-      const NazerDashboard = (await import('@/pages/dashboards/NazerDashboard')).default;
+      const { default: NazerDashboard } = await import('@/pages/NazerDashboard');
       render(<NazerDashboard />, { wrapper: createWrapper() });
       
       await waitFor(() => {
@@ -103,7 +102,7 @@ describe('NazerDashboard', () => {
 
   describe('tabs', () => {
     it('should have overview tab', async () => {
-      const NazerDashboard = (await import('@/pages/dashboards/NazerDashboard')).default;
+      const { default: NazerDashboard } = await import('@/pages/NazerDashboard');
       render(<NazerDashboard />, { wrapper: createWrapper() });
       
       await waitFor(() => {
@@ -113,7 +112,7 @@ describe('NazerDashboard', () => {
     });
 
     it('should have beneficiaries tab', async () => {
-      const NazerDashboard = (await import('@/pages/dashboards/NazerDashboard')).default;
+      const { default: NazerDashboard } = await import('@/pages/NazerDashboard');
       render(<NazerDashboard />, { wrapper: createWrapper() });
       
       await waitFor(() => {
@@ -123,7 +122,7 @@ describe('NazerDashboard', () => {
     });
 
     it('should have reports tab', async () => {
-      const NazerDashboard = (await import('@/pages/dashboards/NazerDashboard')).default;
+      const { default: NazerDashboard } = await import('@/pages/NazerDashboard');
       render(<NazerDashboard />, { wrapper: createWrapper() });
       
       await waitFor(() => {
@@ -133,7 +132,7 @@ describe('NazerDashboard', () => {
     });
 
     it('should have control tab', async () => {
-      const NazerDashboard = (await import('@/pages/dashboards/NazerDashboard')).default;
+      const { default: NazerDashboard } = await import('@/pages/NazerDashboard');
       render(<NazerDashboard />, { wrapper: createWrapper() });
       
       await waitFor(() => {
@@ -145,7 +144,7 @@ describe('NazerDashboard', () => {
 
   describe('KPIs', () => {
     it('should display bank balance KPI', async () => {
-      const NazerDashboard = (await import('@/pages/dashboards/NazerDashboard')).default;
+      const { default: NazerDashboard } = await import('@/pages/NazerDashboard');
       render(<NazerDashboard />, { wrapper: createWrapper() });
       
       await waitFor(() => {
@@ -155,7 +154,7 @@ describe('NazerDashboard', () => {
     });
 
     it('should display waqf corpus KPI', async () => {
-      const NazerDashboard = (await import('@/pages/dashboards/NazerDashboard')).default;
+      const { default: NazerDashboard } = await import('@/pages/NazerDashboard');
       render(<NazerDashboard />, { wrapper: createWrapper() });
       
       await waitFor(() => {
@@ -165,7 +164,7 @@ describe('NazerDashboard', () => {
     });
 
     it('should display beneficiaries count', async () => {
-      const NazerDashboard = (await import('@/pages/dashboards/NazerDashboard')).default;
+      const { default: NazerDashboard } = await import('@/pages/NazerDashboard');
       render(<NazerDashboard />, { wrapper: createWrapper() });
       
       await waitFor(() => {
@@ -175,7 +174,7 @@ describe('NazerDashboard', () => {
     });
 
     it('should display properties count', async () => {
-      const NazerDashboard = (await import('@/pages/dashboards/NazerDashboard')).default;
+      const { default: NazerDashboard } = await import('@/pages/NazerDashboard');
       render(<NazerDashboard />, { wrapper: createWrapper() });
       
       await waitFor(() => {
@@ -187,7 +186,7 @@ describe('NazerDashboard', () => {
 
   describe('beneficiary activity monitoring', () => {
     it('should show online beneficiaries section', async () => {
-      const NazerDashboard = (await import('@/pages/dashboards/NazerDashboard')).default;
+      const { default: NazerDashboard } = await import('@/pages/NazerDashboard');
       render(<NazerDashboard />, { wrapper: createWrapper() });
       
       await waitFor(() => {
@@ -197,7 +196,7 @@ describe('NazerDashboard', () => {
     });
 
     it('should display last activity time', async () => {
-      const NazerDashboard = (await import('@/pages/dashboards/NazerDashboard')).default;
+      const { default: NazerDashboard } = await import('@/pages/NazerDashboard');
       render(<NazerDashboard />, { wrapper: createWrapper() });
       
       await waitFor(() => {
@@ -209,7 +208,7 @@ describe('NazerDashboard', () => {
 
   describe('control section', () => {
     it('should have visibility settings', async () => {
-      const NazerDashboard = (await import('@/pages/dashboards/NazerDashboard')).default;
+      const { default: NazerDashboard } = await import('@/pages/NazerDashboard');
       render(<NazerDashboard />, { wrapper: createWrapper() });
       
       await waitFor(() => {
@@ -219,7 +218,7 @@ describe('NazerDashboard', () => {
     });
 
     it('should allow toggling sections visibility', async () => {
-      const NazerDashboard = (await import('@/pages/dashboards/NazerDashboard')).default;
+      const { default: NazerDashboard } = await import('@/pages/NazerDashboard');
       render(<NazerDashboard />, { wrapper: createWrapper() });
       
       await waitFor(() => {
@@ -231,7 +230,7 @@ describe('NazerDashboard', () => {
 
   describe('real-time updates', () => {
     it('should subscribe to data channels', async () => {
-      const NazerDashboard = (await import('@/pages/dashboards/NazerDashboard')).default;
+      const { default: NazerDashboard } = await import('@/pages/NazerDashboard');
       render(<NazerDashboard />, { wrapper: createWrapper() });
       
       await waitFor(() => {
@@ -240,7 +239,7 @@ describe('NazerDashboard', () => {
     });
 
     it('should update KPIs on data change', async () => {
-      const NazerDashboard = (await import('@/pages/dashboards/NazerDashboard')).default;
+      const { default: NazerDashboard } = await import('@/pages/NazerDashboard');
       render(<NazerDashboard />, { wrapper: createWrapper() });
       
       await waitFor(() => {
