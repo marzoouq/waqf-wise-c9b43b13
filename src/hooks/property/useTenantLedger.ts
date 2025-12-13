@@ -5,6 +5,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { TenantService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
 import type { TenantLedgerEntry, TenantLedgerInsert, TenantAgingItem } from '@/types/tenants';
 
 export function useTenantLedger(tenantId: string | undefined) {
@@ -12,7 +13,7 @@ export function useTenantLedger(tenantId: string | undefined) {
   const queryClient = useQueryClient();
 
   const { data: entries = [], isLoading } = useQuery({
-    queryKey: ['tenant-ledger', tenantId],
+    queryKey: QUERY_KEYS.TENANT_LEDGER(tenantId || ''),
     queryFn: async (): Promise<TenantLedgerEntry[]> => {
       if (!tenantId) return [];
       return TenantService.getLedger(tenantId) as Promise<TenantLedgerEntry[]>;
@@ -23,8 +24,8 @@ export function useTenantLedger(tenantId: string | undefined) {
   const addEntry = useMutation({
     mutationFn: (entry: TenantLedgerInsert) => TenantService.addLedgerEntry(entry),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tenant-ledger', tenantId] });
-      queryClient.invalidateQueries({ queryKey: ['tenants'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TENANT_LEDGER(tenantId || '') });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TENANTS });
     },
     onError: (error: Error) => {
       toast({
@@ -51,7 +52,7 @@ export function useTenantLedger(tenantId: string | undefined) {
 
 export function useTenantsAging() {
   return useQuery({
-    queryKey: ['tenants-aging'],
+    queryKey: QUERY_KEYS.TENANTS_AGING,
     queryFn: (): Promise<TenantAgingItem[]> => TenantService.getTenantsAging(),
   });
 }
@@ -92,8 +93,8 @@ export function useRecordInvoiceToLedger() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tenant-ledger'] });
-      queryClient.invalidateQueries({ queryKey: ['tenants'] });
+      queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0] === 'tenant-ledger' });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TENANTS });
     },
     onError: (error: Error) => {
       toast({
@@ -141,8 +142,8 @@ export function useRecordPaymentToLedger() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tenant-ledger'] });
-      queryClient.invalidateQueries({ queryKey: ['tenants'] });
+      queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0] === 'tenant-ledger' });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TENANTS });
     },
     onError: (error: Error) => {
       toast({
