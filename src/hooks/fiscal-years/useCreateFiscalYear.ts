@@ -60,7 +60,7 @@ export function useCreateFiscalYear(onSuccess?: () => void) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FISCAL_YEARS });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FISCAL_YEAR_CLOSINGS_ALT });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FISCAL_YEAR_CLOSINGS });
       toast.success("تم إضافة السنة المالية بنجاح");
       onSuccess?.();
     },

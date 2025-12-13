@@ -28,7 +28,7 @@ export interface ApprovalStatus {
 
 export function useApprovalWorkflow() {
   const { data: pendingApprovals, isLoading } = useQuery({
-    queryKey: QUERY_KEYS.PENDING_APPROVALS_ALT,
+    queryKey: QUERY_KEYS.PENDING_APPROVALS,
     queryFn: async () => {
       const data = await AccountingService.getApprovalWorkflowStatus();
       return data as ApprovalStatus[];

@@ -1,11 +1,13 @@
-import { useMutation } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/useAuth';
+/**
+ * Global Search Hook - استخدام SearchService
+ * @refactored 2.9.2 - نقل منطق Supabase إلى SearchService
+ */
 
-export interface SearchHistoryData {
-  query: string;
-  resultsCount: number;
-}
+import { useMutation } from '@tanstack/react-query';
+import { useAuth } from '@/hooks/useAuth';
+import { SearchService, type SearchHistoryData } from '@/services/search.service';
+
+export type { SearchHistoryData };
 
 export function useGlobalSearch() {
   const { user } = useAuth();
@@ -13,17 +15,7 @@ export function useGlobalSearch() {
   const saveSearchHistory = useMutation({
     mutationFn: async (data: SearchHistoryData) => {
       if (!user) return;
-      
-      const { error } = await supabase
-        .from('search_history')
-        .insert({
-          user_id: user.id,
-          search_query: data.query,
-          search_type: 'global',
-          results_count: data.resultsCount,
-        });
-      
-      if (error) throw error;
+      await SearchService.saveGlobalSearchHistory(user.id, data);
     },
   });
 

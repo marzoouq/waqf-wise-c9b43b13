@@ -101,8 +101,7 @@ export const QUERY_KEYS = {
   BUDGETS_BY_PERIOD: (periodType?: string) => ['budgets', periodType] as const,
   GENERAL_LEDGER: (accountId?: string, dateFrom?: string, dateTo?: string) => ['general_ledger', accountId, dateFrom, dateTo] as const,
   FINANCIAL_DATA: ['financial-data'] as const,
-  PENDING_APPROVALS: ['pending_approvals'] as const,
-  PENDING_APPROVALS_ALT: ['pending-approvals'] as const,
+  PENDING_APPROVALS: ['pending-approvals'] as const,
 
   // Loans
   LOANS: ['loans'] as const,
@@ -117,8 +116,7 @@ export const QUERY_KEYS = {
   HEIR_DISTRIBUTIONS: ['heir-distributions'] as const,
 
   // Fiscal Years
-  FISCAL_YEARS: ['fiscal_years'] as const,
-  FISCAL_YEARS_ALT: ['fiscal-years'] as const,
+  FISCAL_YEARS: ['fiscal-years'] as const,
   FISCAL_YEAR_ACTIVE: ['fiscal-year', 'active'] as const,
   ACTIVE_FISCAL_YEAR: ['active-fiscal-year'] as const,
   ACTIVE_FISCAL_YEARS: ['active-fiscal-years'] as const,
@@ -367,7 +365,6 @@ export const QUERY_KEYS = {
   PROPERTIES_STATS_ALT: ['properties-stats'] as const,
   PROPERTIES_PERFORMANCE: ['properties-performance'] as const,
   FISCAL_YEAR_SUMMARY: (fiscalYearId: string) => ['fiscal-year-summary', fiscalYearId] as const,
-  FISCAL_YEAR_CLOSINGS_ALT: ['fiscal_year_closings'] as const,
 } as const;
 
 // Query Config with default settings

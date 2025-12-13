@@ -26,7 +26,27 @@ export interface RecentSearch {
   created_at: string;
 }
 
+export interface SearchHistoryData {
+  query: string;
+  resultsCount: number;
+}
+
 export const SearchService = {
+  /**
+   * حفظ سجل البحث العام (من useGlobalSearch)
+   */
+  async saveGlobalSearchHistory(userId: string, data: SearchHistoryData): Promise<void> {
+    const { error } = await supabase
+      .from('search_history')
+      .insert({
+        user_id: userId,
+        search_query: data.query,
+        search_type: 'global',
+        results_count: data.resultsCount,
+      });
+    
+    if (error) throw error;
+  },
   /**
    * جلب سجل البحث
    */
