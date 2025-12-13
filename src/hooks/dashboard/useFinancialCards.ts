@@ -1,12 +1,13 @@
 /**
  * Financial Cards Data Hooks - خطافات بيانات البطاقات المالية
- * @version 2.8.45
+ * @version 2.9.2
  */
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { DashboardService, RealtimeService, type FiscalYearCorpus as ServiceFiscalYearCorpus } from "@/services";
 import { productionLogger } from "@/lib/logger/production-logger";
+import { QUERY_KEYS, QUERY_CONFIG } from "@/lib/query-keys";
 
 // Re-export type for backward compatibility
 export type FiscalYearCorpus = ServiceFiscalYearCorpus;
@@ -27,7 +28,7 @@ export function useBankBalance() {
           productionLogger.info("Bank balance updated via realtime", { payload });
           setLastUpdated(new Date());
           setIsLive(true);
-          queryClient.invalidateQueries({ queryKey: ["bank-balance-realtime"] });
+          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BANK_BALANCE_REALTIME });
           setTimeout(() => setIsLive(false), 3000);
         }
       }
@@ -39,8 +40,9 @@ export function useBankBalance() {
   }, [queryClient]);
 
   const query = useQuery({
-    queryKey: ["bank-balance-realtime"],
+    queryKey: QUERY_KEYS.BANK_BALANCE_REALTIME,
     queryFn: () => DashboardService.getBankBalance(),
+    ...QUERY_CONFIG.DEFAULT,
   });
 
   return {
@@ -64,7 +66,7 @@ export function useWaqfCorpus() {
         productionLogger.info("Waqf corpus updated via realtime", { payload });
         setLastUpdated(new Date());
         setIsLive(true);
-        queryClient.invalidateQueries({ queryKey: ["waqf-corpus-realtime"] });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WAQF_CORPUS_REALTIME });
         setTimeout(() => setIsLive(false), 3000);
       }
     );
@@ -75,8 +77,9 @@ export function useWaqfCorpus() {
   }, [queryClient]);
 
   const query = useQuery({
-    queryKey: ["waqf-corpus-realtime"],
+    queryKey: QUERY_KEYS.WAQF_CORPUS_REALTIME,
     queryFn: () => DashboardService.getWaqfCorpus(),
+    ...QUERY_CONFIG.DEFAULT,
   });
 
   return {

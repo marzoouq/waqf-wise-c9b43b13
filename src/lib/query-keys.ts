@@ -312,6 +312,13 @@ export const QUERY_KEYS = {
   // Dashboard Charts
   BUDGET_COMPARISON_CHART: ['budget-comparison-chart'] as const,
   REVENUE_EXPENSE_CHART: ['revenue-expense-chart'] as const,
+  BANK_BALANCE_REALTIME: ['bank-balance-realtime'] as const,
+  WAQF_CORPUS_REALTIME: ['waqf-corpus-realtime'] as const,
+  REVENUE_DISTRIBUTION: ['revenue-distribution'] as const,
+  REVENUE_PROGRESS: (fiscalYearId?: string) => ['revenue-progress', fiscalYearId] as const,
+  VOUCHERS_STATS: ['vouchers-stats'] as const,
+  RECENT_JOURNAL_ENTRIES: (limit?: number) => ['recent_journal_entries', limit] as const,
+  KPIS: (category?: string) => ['kpis', category] as const,
   
   // Search History
   SEARCH_HISTORY: (searchType?: string) => ['search-history', searchType] as const,

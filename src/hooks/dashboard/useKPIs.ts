@@ -2,11 +2,13 @@
  * useKPIs Hook
  * Hook لجلب مؤشرات الأداء الرئيسية
  * يستخدم DashboardService + RealtimeService
+ * @version 2.9.2
  */
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";
 import { DashboardService, RealtimeService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface KPI {
   id: string;
@@ -36,7 +38,7 @@ export function useKPIs(category?: string) {
   const queryClient = useQueryClient();
 
   const { data: kpis = [], isLoading, isRefetching, dataUpdatedAt } = useQuery({
-    queryKey: ["kpis", category],
+    queryKey: QUERY_KEYS.KPIS(category),
     ...QUERY_CONFIG.REPORTS,
     queryFn: async () => {
       const data = await DashboardService.getKPIDefinitions(category);
@@ -77,14 +79,14 @@ export function useKPIs(category?: string) {
   useEffect(() => {
     const subscription = RealtimeService.subscribeToChanges(
       ['distributions', 'beneficiaries', 'payments', 'contracts'],
-      () => { queryClient.invalidateQueries({ queryKey: ["kpis"] }); }
+      () => { queryClient.invalidateQueries({ queryKey: QUERY_KEYS.KPIS(category) }); }
     );
 
     return () => { subscription.unsubscribe(); };
   }, [queryClient, category]);
 
   const handleRefresh = () => {
-    queryClient.invalidateQueries({ queryKey: ["kpis", category] });
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.KPIS(category) });
   };
 
   return {

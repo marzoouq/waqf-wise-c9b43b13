@@ -1,11 +1,13 @@
 /**
  * usePublishFiscalYear Hook
  * نشر السنة المالية
+ * @version 2.9.2
  */
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { EdgeFunctionService } from "@/services";
 import { toast } from "sonner";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 interface PublishParams {
   fiscalYearId: string;
@@ -32,7 +34,7 @@ export function usePublishFiscalYear(onSuccess?: () => void) {
           ? `أصبحت بيانات ${variables.fiscalYearName} متاحة للورثة`
           : "أصبحت البيانات متاحة للورثة",
       });
-      queryClient.invalidateQueries({ queryKey: ["fiscal-years"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FISCAL_YEARS });
       onSuccess?.();
     },
     onError: (error: Error) => {
