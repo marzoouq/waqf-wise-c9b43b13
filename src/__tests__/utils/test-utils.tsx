@@ -8,6 +8,7 @@ import { render, RenderOptions } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import { Toaster } from '@/components/ui/sonner';
+import { AuthProvider } from '@/contexts/AuthContext';
 import { vi } from 'vitest';
 
 // إنشاء QueryClient للاختبارات
@@ -35,8 +36,10 @@ const AllProviders: React.FC<AllProvidersProps> = ({ children }) => {
   return (
     <QueryClientProvider client={testQueryClient}>
       <BrowserRouter>
-        {children}
-        <Toaster />
+        <AuthProvider>
+          {children}
+          <Toaster />
+        </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>
   );
