@@ -3,13 +3,14 @@
  * قناة Realtime موحدة لجميع بيانات بوابة المستفيد
  * يمنع تكرار الاشتراكات المتعددة
  * 
- * @version 2.8.91
+ * @version 2.9.2 - Phase 2 QUERY_KEYS unification
  */
 
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { productionLogger } from "@/lib/logger/production-logger";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 // الجداول التي يحتاج المستفيد لمتابعتها
 const BENEFICIARY_WATCHED_TABLES = [
@@ -26,19 +27,19 @@ const BENEFICIARY_WATCHED_TABLES = [
   "annual_disclosures",
 ] as const;
 
-// مفاتيح الاستعلامات التي يجب تحديثها
-const INVALIDATION_MAP: Record<string, string[][]> = {
-  beneficiaries: [["beneficiary-portal-data"], ["beneficiary-statistics"]],
-  payments: [["beneficiary-portal-data"], ["beneficiary-statistics"], ["beneficiary-payments"]],
-  distributions: [["distributions"], ["beneficiary-distributions"], ["waqf-distributions-summary"]],
-  heir_distributions: [["heir-distributions"], ["beneficiary-distributions"], ["waqf-distributions-summary"]],
-  beneficiary_requests: [["beneficiary-requests"], ["pending-requests"]],
-  properties: [["properties"], ["property-stats"]],
-  contracts: [["contracts"], ["property-stats"]],
-  rental_payments: [["rental-payments"], ["revenue-progress"]],
-  loans: [["loans"], ["beneficiary-loans"]],
-  fiscal_years: [["fiscal-year", "active"], ["fiscal-years"]],
-  annual_disclosures: [["annual-disclosures"], ["disclosures"]],
+// مفاتيح الاستعلامات التي يجب تحديثها - باستخدام QUERY_KEYS الموحدة
+const INVALIDATION_MAP: Record<string, readonly (readonly string[])[]> = {
+  beneficiaries: [QUERY_KEYS.BENEFICIARIES, QUERY_KEYS.BENEFICIARY_STATS],
+  payments: [QUERY_KEYS.PAYMENTS, QUERY_KEYS.BENEFICIARY_STATS],
+  distributions: [QUERY_KEYS.DISTRIBUTIONS, QUERY_KEYS.HEIR_DISTRIBUTIONS],
+  heir_distributions: [QUERY_KEYS.HEIR_DISTRIBUTIONS, QUERY_KEYS.DISTRIBUTIONS],
+  beneficiary_requests: [QUERY_KEYS.REQUESTS],
+  properties: [QUERY_KEYS.PROPERTIES, QUERY_KEYS.PROPERTY_STATS],
+  contracts: [QUERY_KEYS.CONTRACTS, QUERY_KEYS.PROPERTY_STATS],
+  rental_payments: [QUERY_KEYS.RENTAL_PAYMENTS],
+  loans: [QUERY_KEYS.LOANS],
+  fiscal_years: [QUERY_KEYS.FISCAL_YEAR_ACTIVE, QUERY_KEYS.FISCAL_YEARS],
+  annual_disclosures: [QUERY_KEYS.ANNUAL_DISCLOSURES],
 };
 
 interface UseBeneficiaryDashboardRealtimeOptions {

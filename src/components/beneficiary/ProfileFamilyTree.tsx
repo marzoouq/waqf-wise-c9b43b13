@@ -3,22 +3,18 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { Users, User, Crown } from 'lucide-react';
-import { useBeneficiaryFamilyTree } from '@/hooks/beneficiary/useBeneficiaryFamilyTree';
+import { useFamilyTree } from '@/hooks/beneficiary/useBeneficiaryProfileData';
 
 interface ProfileFamilyTreeProps {
   beneficiaryId: string;
 }
 
 export function ProfileFamilyTree({ beneficiaryId }: ProfileFamilyTreeProps) {
-  const { data: familyData, isLoading } = useBeneficiaryFamilyTree(beneficiaryId);
+  const { data: familyMembers = [], isLoading } = useFamilyTree(beneficiaryId);
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل شجرة العائلة..." />;
   }
-
-  if (!familyData) return null;
-
-  const { beneficiary, familyMembers } = familyData;
 
   const getInitials = (name: string) => {
     return name
@@ -51,35 +47,6 @@ export function ProfileFamilyTree({ beneficiaryId }: ProfileFamilyTreeProps) {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        {/* المستفيد الحالي */}
-        <div className="mb-6 p-4 bg-primary/10 rounded-lg border-2 border-primary/20">
-          <div className="flex items-center gap-4">
-            <Avatar className="h-16 w-16 ring-2 ring-primary">
-              <AvatarFallback className="text-xl bg-primary/20 text-primary">
-                {getInitials(beneficiary.full_name)}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <h3 className="text-lg font-bold text-foreground">
-                  {beneficiary.full_name}
-                </h3>
-                {beneficiary.is_head_of_family && (
-                  <Crown className="h-4 w-4 text-warning" />
-                )}
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <Badge className={getCategoryColor(beneficiary.category)}>
-                  {beneficiary.category}
-                </Badge>
-                {beneficiary.relationship && (
-                  <Badge variant="outline">{beneficiary.relationship}</Badge>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* أفراد العائلة */}
         {familyMembers.length > 0 ? (
           <div className="space-y-3">
@@ -140,38 +107,6 @@ export function ProfileFamilyTree({ beneficiaryId }: ProfileFamilyTreeProps) {
           <div className="text-center py-8">
             <User className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
             <p className="text-muted-foreground">لا يوجد أفراد عائلة مسجلين</p>
-          </div>
-        )}
-
-        {/* إحصائيات العائلة */}
-        {beneficiary.family_name && (
-          <div className="mt-6 pt-6 border-t border-border">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-              <div>
-                <p className="text-2xl font-bold text-foreground">
-                  {beneficiary.number_of_sons || 0}
-                </p>
-                <p className="text-sm text-muted-foreground">أبناء</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-foreground">
-                  {beneficiary.number_of_daughters || 0}
-                </p>
-                <p className="text-sm text-muted-foreground">بنات</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-foreground">
-                  {beneficiary.number_of_wives || 0}
-                </p>
-                <p className="text-sm text-muted-foreground">زوجات</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-foreground">
-                  {beneficiary.family_size || 0}
-                </p>
-                <p className="text-sm text-muted-foreground">حجم العائلة</p>
-              </div>
-            </div>
           </div>
         )}
       </CardContent>

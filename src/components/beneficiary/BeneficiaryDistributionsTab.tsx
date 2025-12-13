@@ -7,7 +7,6 @@ import { format, arLocale as ar } from "@/lib/date";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { MaskedValue } from "@/components/shared/MaskedValue";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { WaqfDistributionsSummaryCard } from "./cards/WaqfDistributionsSummaryCard";
 import { useBeneficiaryDistributions } from "@/hooks/beneficiary/useBeneficiaryDistributions";
 
 interface BeneficiaryDistributionsTabProps {
@@ -60,9 +59,6 @@ export function BeneficiaryDistributionsTab({ beneficiaryId }: BeneficiaryDistri
 
   return (
     <div className="space-y-6">
-      {/* بطاقة إجمالي المحصل من الوقف */}
-      <WaqfDistributionsSummaryCard beneficiaryId={beneficiaryId} />
-
       {/* ملخص التوزيعات */}
       {distributions.length > 0 && (
         <Card className="border-dashed">
