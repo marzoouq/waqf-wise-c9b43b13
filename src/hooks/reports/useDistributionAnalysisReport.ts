@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { DistributionService } from '@/services';
 import { supabase } from '@/integrations/supabase/client';
 import { QUERY_CONFIG } from '@/lib/queryOptimization';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface DistributionTrendData {
   month: string;
@@ -27,7 +28,7 @@ export function useDistributionAnalysisReport() {
   const [lastUpdated, setLastUpdated] = useState<Date>();
 
   const { data: distributionTrends, isLoading, isRefetching, dataUpdatedAt, error } = useQuery({
-    queryKey: ['distribution-analysis'],
+    queryKey: QUERY_KEYS.DISTRIBUTION_ANALYSIS,
     ...QUERY_CONFIG.REPORTS,
     queryFn: async (): Promise<DistributionTrendData[]> => {
       const distributions = await DistributionService.getAll();
@@ -64,7 +65,7 @@ export function useDistributionAnalysisReport() {
   });
 
   const { data: statusStats } = useQuery<StatusStatData[]>({
-    queryKey: ['distribution-status-stats'],
+    queryKey: QUERY_KEYS.DISTRIBUTION_STATUS_STATS,
     ...QUERY_CONFIG.REPORTS,
     queryFn: async () => {
       const distributions = await DistributionService.getAll();
@@ -90,8 +91,8 @@ export function useDistributionAnalysisReport() {
     const channel = supabase
       .channel('distribution-report-changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'distributions' }, () => {
-        queryClient.invalidateQueries({ queryKey: ['distribution-analysis'] });
-        queryClient.invalidateQueries({ queryKey: ['distribution-status-stats'] });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DISTRIBUTION_ANALYSIS });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DISTRIBUTION_STATUS_STATS });
       })
       .subscribe();
 
@@ -101,8 +102,8 @@ export function useDistributionAnalysisReport() {
   }, [queryClient]);
 
   const handleRefresh = () => {
-    queryClient.invalidateQueries({ queryKey: ['distribution-analysis'] });
-    queryClient.invalidateQueries({ queryKey: ['distribution-status-stats'] });
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DISTRIBUTION_ANALYSIS });
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DISTRIBUTION_STATUS_STATS });
   };
 
   const totals = distributionTrends ? {

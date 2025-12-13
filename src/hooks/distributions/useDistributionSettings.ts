@@ -2,13 +2,14 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { WaqfDistributionSettings } from "@/types/distributions";
 import { FundService } from "@/services/fund.service";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export function useDistributionSettings() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const { data: settings, isLoading } = useQuery({
-    queryKey: ["distribution-settings"],
+    queryKey: QUERY_KEYS.DISTRIBUTION_SETTINGS,
     queryFn: () => FundService.getDistributionSettings(),
   });
 
@@ -16,7 +17,7 @@ export function useDistributionSettings() {
     mutationFn: (updates: Partial<WaqfDistributionSettings> & { calculation_order?: string }) => 
       FundService.updateDistributionSettings(settings?.id, updates),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["distribution-settings"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DISTRIBUTION_SETTINGS });
       toast({
         title: "تم التحديث بنجاح",
         description: "تم تحديث إعدادات التوزيع",

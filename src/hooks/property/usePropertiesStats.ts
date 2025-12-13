@@ -5,6 +5,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { PropertyService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface PropertyStats {
   totalProperties: number;
@@ -31,7 +32,7 @@ export interface PropertyStats {
 
 export function usePropertiesStats() {
   return useQuery({
-    queryKey: ["properties-stats"],
+    queryKey: QUERY_KEYS.PROPERTIES_STATS,
     queryFn: (): Promise<PropertyStats> => PropertyService.getPropertiesStats(),
     staleTime: 30 * 1000,
     refetchOnWindowFocus: true,

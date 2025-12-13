@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { TOAST_MESSAGES, QUERY_STALE_TIME } from "@/lib/constants";
 import { createMutationErrorHandler } from "@/lib/errors";
 import { RequestService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface RequestComment {
   id: string;
@@ -24,7 +25,7 @@ export function useRequestComments(requestId?: string) {
   const queryClient = useQueryClient();
 
   const { data: comments = [], isLoading } = useQuery({
-    queryKey: ["request-comments", requestId],
+    queryKey: QUERY_KEYS.REQUEST_COMMENTS(requestId),
     queryFn: () => RequestService.getComments(requestId!),
     staleTime: QUERY_STALE_TIME.DEFAULT,
     enabled: !!requestId,
@@ -34,7 +35,7 @@ export function useRequestComments(requestId?: string) {
     mutationFn: (data: { request_id: string; comment: string; is_internal?: boolean }) =>
       RequestService.addComment(data.request_id, data.comment, data.is_internal),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["request-comments"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REQUEST_COMMENTS() });
       toast({ title: "تم بنجاح", description: "تم إضافة التعليق بنجاح" });
     },
     onError: createMutationErrorHandler({ context: 'add_request_comment', toastTitle: TOAST_MESSAGES.ERROR.ADD }),
@@ -44,7 +45,7 @@ export function useRequestComments(requestId?: string) {
     mutationFn: ({ id, comment }: { id: string; comment: string }) =>
       RequestService.updateComment(id, comment),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["request-comments"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REQUEST_COMMENTS() });
       toast({ title: "تم بنجاح", description: "تم تحديث التعليق بنجاح" });
     },
     onError: createMutationErrorHandler({ context: 'update_request_comment', toastTitle: TOAST_MESSAGES.ERROR.UPDATE }),
@@ -53,7 +54,7 @@ export function useRequestComments(requestId?: string) {
   const deleteComment = useMutation({
     mutationFn: (id: string) => RequestService.deleteComment(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["request-comments"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REQUEST_COMMENTS() });
       toast({ title: "تم بنجاح", description: "تم حذف التعليق بنجاح" });
     },
     onError: createMutationErrorHandler({ context: 'delete_request_comment', toastTitle: TOAST_MESSAGES.ERROR.DELETE }),

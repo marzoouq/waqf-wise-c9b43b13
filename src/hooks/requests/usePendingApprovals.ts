@@ -5,6 +5,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { ApprovalService } from "@/services";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface PendingApproval {
   id: string;
@@ -18,7 +19,7 @@ export interface PendingApproval {
 
 export function usePendingApprovals() {
   return useQuery({
-    queryKey: ["pending-approvals"],
+    queryKey: QUERY_KEYS.PENDING_APPROVALS,
     queryFn: () => ApprovalService.getPendingApprovals(),
     ...QUERY_CONFIG.APPROVALS,
   });

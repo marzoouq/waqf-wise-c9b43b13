@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { NotificationService, RealtimeService, AuthService } from "@/services";
 import { useEffect } from "react";
 import { toast } from "sonner";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface Notification {
   id: string;
@@ -28,7 +29,7 @@ export const useNotifications = () => {
 
   // Fetch notifications - get user inside query
   const { data: notifications = [], isLoading } = useQuery({
-    queryKey: ["notifications"],
+    queryKey: QUERY_KEYS.NOTIFICATIONS,
     queryFn: async () => {
       const user = await AuthService.getCurrentUser();
       if (!user) return [];
@@ -42,7 +43,7 @@ export const useNotifications = () => {
   const markAsReadMutation = useMutation({
     mutationFn: (notificationId: string) => NotificationService.markAsRead(notificationId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.NOTIFICATIONS });
     },
   });
 
@@ -54,7 +55,7 @@ export const useNotifications = () => {
       return NotificationService.markAllAsRead(user.id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.NOTIFICATIONS });
       toast.success("تم تعليم جميع الإشعارات كمقروءة");
     },
   });
@@ -64,7 +65,7 @@ export const useNotifications = () => {
     const subscription = RealtimeService.subscribeToTable(
       "notifications",
       () => {
-        queryClient.invalidateQueries({ queryKey: ["notifications"] });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.NOTIFICATIONS });
       }
     );
 
@@ -79,11 +80,11 @@ export const useNotifications = () => {
       ["approvals", "payments", "journal_entries"],
       (payload) => {
         if (payload.table === 'approvals') {
-          queryClient.invalidateQueries({ queryKey: ["approvals"] });
+          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.APPROVALS });
         } else if (payload.table === 'payments') {
-          queryClient.invalidateQueries({ queryKey: ["payments"] });
+          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PAYMENTS });
         } else if (payload.table === 'journal_entries') {
-          queryClient.invalidateQueries({ queryKey: ["journal-entries"] });
+          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.JOURNAL_ENTRIES });
         }
       }
     );
