@@ -104,12 +104,12 @@ export function WaqfDistributionsSummaryCard({ beneficiaryId }: WaqfDistribution
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {/* السنة الحالية */}
-          <div className="p-4 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 space-y-2">
-            <div className="flex items-center gap-2 text-sm text-emerald-700 dark:text-emerald-400">
+          <div className="p-4 rounded-lg bg-[hsl(var(--status-success)/0.1)] border border-[hsl(var(--status-success)/0.3)] space-y-2">
+            <div className="flex items-center gap-2 text-sm text-[hsl(var(--status-success))]">
               <CircleDot className="h-4 w-4" />
               السنة الحالية 2025-2026
             </div>
-            <div className="text-2xl font-bold text-emerald-700 dark:text-emerald-300">
+            <div className="text-2xl font-bold text-[hsl(var(--status-success))]">
               {currentYearAmount > 0 ? (
                 <>{currentYearAmount.toLocaleString("ar-SA")} ر.س</>
               ) : (
@@ -117,13 +117,13 @@ export function WaqfDistributionsSummaryCard({ beneficiaryId }: WaqfDistribution
               )}
             </div>
             {latestCurrentDate && (
-              <div className="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400">
+              <div className="flex items-center gap-1 text-xs text-[hsl(var(--status-success))]">
                 <Calendar className="h-3 w-3" />
                 {formatDate(latestCurrentDate, "dd/MM/yyyy")}
               </div>
             )}
             {currentYearAmount > 0 && (
-              <Badge variant="outline" className="bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 border-emerald-300">
+              <Badge variant="outline" className="bg-[hsl(var(--status-success)/0.1)] text-[hsl(var(--status-success))] border-[hsl(var(--status-success)/0.3)]">
                 <CheckCircle2 className="h-3 w-3 ml-1" />
                 تم الصرف
               </Badge>
@@ -131,12 +131,12 @@ export function WaqfDistributionsSummaryCard({ beneficiaryId }: WaqfDistribution
           </div>
 
           {/* السنوات السابقة (مؤرشفة) */}
-          <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 space-y-2">
-            <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+          <div className="p-4 rounded-lg bg-muted/50 border border-border space-y-2">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Archive className="h-4 w-4" />
               السنوات السابقة (مؤرشفة)
             </div>
-            <div className="text-2xl font-bold text-slate-700 dark:text-slate-300">
+            <div className="text-2xl font-bold text-muted-foreground">
               {historicalAmount > 0 ? (
                 <>{historicalAmount.toLocaleString("ar-SA")} ر.س</>
               ) : (
@@ -144,13 +144,13 @@ export function WaqfDistributionsSummaryCard({ beneficiaryId }: WaqfDistribution
               )}
             </div>
             {latestHistoricalDate && (
-              <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
                 <Calendar className="h-3 w-3" />
                 {formatDate(latestHistoricalDate, "dd/MM/yyyy")}
               </div>
             )}
             {historicalAmount > 0 && (
-              <Badge variant="secondary" className="bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+              <Badge variant="secondary" className="bg-muted text-muted-foreground">
                 <Archive className="h-3 w-3 ml-1" />
                 مؤرشف
               </Badge>
@@ -197,21 +197,21 @@ export function WaqfDistributionsSummaryCard({ beneficiaryId }: WaqfDistribution
                         key={year.yearName} 
                         className={`overflow-hidden ${
                           year.isClosed 
-                            ? 'border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/30' 
-                            : 'border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/30'
+                            ? 'border-border bg-muted/30' 
+                            : 'border-[hsl(var(--status-success)/0.3)] bg-[hsl(var(--status-success)/0.05)]'
                         }`}
                       >
                         <CardHeader className={`py-3 ${
                           year.isClosed 
-                            ? 'bg-slate-100 dark:bg-slate-800/50' 
-                            : 'bg-emerald-100 dark:bg-emerald-900/50'
+                            ? 'bg-muted/50' 
+                            : 'bg-[hsl(var(--status-success)/0.1)]'
                         }`}>
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                               {year.isClosed ? (
-                                <Archive className="h-4 w-4 text-slate-500" />
+                                <Archive className="h-4 w-4 text-muted-foreground" />
                               ) : (
-                                <CircleDot className="h-4 w-4 text-emerald-600" />
+                                <CircleDot className="h-4 w-4 text-[hsl(var(--status-success))]" />
                               )}
                               <span className="font-semibold">{year.yearName}</span>
                               <Badge variant={year.isClosed ? "secondary" : "default"}>
@@ -228,7 +228,7 @@ export function WaqfDistributionsSummaryCard({ beneficiaryId }: WaqfDistribution
                                 )}
                               </Badge>
                             </div>
-                            <span className={`font-bold ${year.isClosed ? 'text-slate-600 dark:text-slate-300' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                            <span className={`font-bold ${year.isClosed ? 'text-muted-foreground' : 'text-[hsl(var(--status-success))]'}`}>
                               {year.total.toLocaleString("ar-SA")} ر.س
                             </span>
                           </div>

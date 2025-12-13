@@ -14,7 +14,7 @@ const BENEFICIARY_QUICK_ACTIONS = [
     description: "عرض الإفصاح المالي للسنة الحالية",
     color: "text-[hsl(var(--chart-1))]",
     bgColor: "bg-[hsl(var(--chart-1)/0.1)]",
-    path: "/beneficiary-dashboard?tab=disclosures",
+    path: "/beneficiary-portal?tab=disclosures",
   },
   {
     icon: Receipt,
@@ -22,7 +22,7 @@ const BENEFICIARY_QUICK_ACTIONS = [
     description: "عرض كشف الحساب التفصيلي",
     color: "text-[hsl(var(--status-success))]",
     bgColor: "bg-[hsl(var(--status-success)/0.1)]",
-    path: "/beneficiary-dashboard?tab=statements",
+    path: "/beneficiary-portal?tab=statements",
   },
   {
     icon: Send,

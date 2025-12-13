@@ -35,7 +35,6 @@ export { useEmergencyAid } from './useEmergencyAid';
 export { useBeneficiarySession } from './useBeneficiarySession';
 export { useIdentityVerification } from './useIdentityVerification';
 export { useBeneficiaryTimeline, type TimelineEvent } from './useBeneficiaryTimeline';
-export { useBeneficiaryFamilyTree } from './useBeneficiaryFamilyTree';
 
 // ==================== Tabs Data Hooks ====================
 export {

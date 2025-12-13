@@ -130,8 +130,8 @@ describe('Beneficiary Flow Integration', () => {
         { id: 'fam-1', family_name: 'آل الثبيتي', head_id: 'ben-001', created_at: new Date().toISOString() }
       ]);
 
-      const { useBeneficiaryFamilyTree } = await import('@/hooks/beneficiary/useBeneficiaryFamilyTree');
-      const { result } = renderHook(() => useBeneficiaryFamilyTree('ben-001'), {
+      const { useFamilyTree } = await import('@/hooks/beneficiary/useBeneficiaryProfileData');
+      const { result } = renderHook(() => useFamilyTree('ben-001'), {
         wrapper: createWrapper(),
       });
 

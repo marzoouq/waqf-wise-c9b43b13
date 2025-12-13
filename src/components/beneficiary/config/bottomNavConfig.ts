@@ -20,7 +20,7 @@ export const beneficiaryNavigationItems: NavigationItem[] = [
     label: "الرئيسية",
     icon: Home,
     path: "/beneficiary-portal",
-    matchPaths: ["/beneficiary-portal", "/beneficiary-dashboard"],
+    matchPaths: ["/beneficiary-portal"],
   },
   {
     id: "requests",
