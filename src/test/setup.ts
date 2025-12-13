@@ -214,4 +214,7 @@ afterEach(() => {
 beforeEach(() => {
   clearMockTableData();
   vi.clearAllMocks();
+  // Reset auth state to defaults
+  mockAuthRoles = ['admin'];
+  mockAuthUser = { id: 'test-user-id', email: 'test@waqf.sa' };
 });
