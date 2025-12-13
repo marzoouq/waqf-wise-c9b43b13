@@ -9,7 +9,6 @@ import { createTestQueryClient } from '../../utils/test-utils';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
-import CashierDashboard from '@/pages/dashboards/CashierDashboard';
 import React from 'react';
 
 // Mock useUnifiedKPIs
@@ -62,7 +61,7 @@ describe('CashierDashboard', () => {
 
   describe('rendering', () => {
     it('should render dashboard container', async () => {
-      const CashierDashboard = (await import('@/pages/dashboards/CashierDashboard')).default;
+      const { default: CashierDashboard } = await import('@/pages/CashierDashboard');
       render(<CashierDashboard />, { wrapper: createWrapper() });
       
       await waitFor(() => {
@@ -71,7 +70,7 @@ describe('CashierDashboard', () => {
     });
 
     it('should render cashier title', async () => {
-      const CashierDashboard = (await import('@/pages/dashboards/CashierDashboard')).default;
+      const { default: CashierDashboard } = await import('@/pages/CashierDashboard');
       render(<CashierDashboard />, { wrapper: createWrapper() });
       
       await waitFor(() => {
@@ -83,7 +82,7 @@ describe('CashierDashboard', () => {
 
   describe('KPIs', () => {
     it('should display bank balance', async () => {
-      const CashierDashboard = (await import('@/pages/dashboards/CashierDashboard')).default;
+      const { default: CashierDashboard } = await import('@/pages/CashierDashboard');
       render(<CashierDashboard />, { wrapper: createWrapper() });
       
       await waitFor(() => {
@@ -93,7 +92,7 @@ describe('CashierDashboard', () => {
     });
 
     it('should display today collections', async () => {
-      const CashierDashboard = (await import('@/pages/dashboards/CashierDashboard')).default;
+      const { default: CashierDashboard } = await import('@/pages/CashierDashboard');
       render(<CashierDashboard />, { wrapper: createWrapper() });
       
       await waitFor(() => {
@@ -103,7 +102,7 @@ describe('CashierDashboard', () => {
     });
 
     it('should display pending payments', async () => {
-      const CashierDashboard = (await import('@/pages/dashboards/CashierDashboard')).default;
+      const { default: CashierDashboard } = await import('@/pages/CashierDashboard');
       render(<CashierDashboard />, { wrapper: createWrapper() });
       
       await waitFor(() => {
@@ -115,7 +114,7 @@ describe('CashierDashboard', () => {
 
   describe('work session', () => {
     it('should have start session button', async () => {
-      const CashierDashboard = (await import('@/pages/dashboards/CashierDashboard')).default;
+      const { default: CashierDashboard } = await import('@/pages/CashierDashboard');
       render(<CashierDashboard />, { wrapper: createWrapper() });
       
       await waitFor(() => {
@@ -125,7 +124,7 @@ describe('CashierDashboard', () => {
     });
 
     it('should display session status', async () => {
-      const CashierDashboard = (await import('@/pages/dashboards/CashierDashboard')).default;
+      const { default: CashierDashboard } = await import('@/pages/CashierDashboard');
       render(<CashierDashboard />, { wrapper: createWrapper() });
       
       await waitFor(() => {
@@ -137,7 +136,7 @@ describe('CashierDashboard', () => {
 
   describe('collection actions', () => {
     it('should have record payment action', async () => {
-      const CashierDashboard = (await import('@/pages/dashboards/CashierDashboard')).default;
+      const { default: CashierDashboard } = await import('@/pages/CashierDashboard');
       render(<CashierDashboard />, { wrapper: createWrapper() });
       
       await waitFor(() => {
@@ -147,7 +146,7 @@ describe('CashierDashboard', () => {
     });
 
     it('should have process disbursement action', async () => {
-      const CashierDashboard = (await import('@/pages/dashboards/CashierDashboard')).default;
+      const { default: CashierDashboard } = await import('@/pages/CashierDashboard');
       render(<CashierDashboard />, { wrapper: createWrapper() });
       
       await waitFor(() => {
@@ -159,7 +158,7 @@ describe('CashierDashboard', () => {
 
   describe('recent transactions', () => {
     it('should display recent transactions list', async () => {
-      const CashierDashboard = (await import('@/pages/dashboards/CashierDashboard')).default;
+      const { default: CashierDashboard } = await import('@/pages/CashierDashboard');
       render(<CashierDashboard />, { wrapper: createWrapper() });
       
       await waitFor(() => {
@@ -171,7 +170,7 @@ describe('CashierDashboard', () => {
 
   describe('real-time updates', () => {
     it('should subscribe to payment channels', async () => {
-      const CashierDashboard = (await import('@/pages/dashboards/CashierDashboard')).default;
+      const { default: CashierDashboard } = await import('@/pages/CashierDashboard');
       render(<CashierDashboard />, { wrapper: createWrapper() });
       
       await waitFor(() => {
@@ -180,7 +179,7 @@ describe('CashierDashboard', () => {
     });
 
     it('should update on new payments', async () => {
-      const CashierDashboard = (await import('@/pages/dashboards/CashierDashboard')).default;
+      const { default: CashierDashboard } = await import('@/pages/CashierDashboard');
       render(<CashierDashboard />, { wrapper: createWrapper() });
       
       await waitFor(() => {
