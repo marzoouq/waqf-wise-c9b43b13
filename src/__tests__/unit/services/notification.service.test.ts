@@ -5,8 +5,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NotificationService } from '@/services/notification.service';
-import { supabase } from '@/integrations/supabase/client';
-import { setMockTableData, clearMockTableData } from '../../utils/supabase.mock';
+import { mockSupabase, setMockTableData, clearMockTableData } from '../../utils/supabase.mock';
 
 describe('NotificationService', () => {
   beforeEach(() => {
@@ -27,7 +26,7 @@ describe('NotificationService', () => {
 
       const result = await NotificationService.send(notification);
       
-      expect(supabase.from).toHaveBeenCalledWith('notifications');
+      expect(mockSupabase.from).toHaveBeenCalledWith('notifications');
       expect(result).toBeDefined();
       expect(result.success).toBe(true);
     });
@@ -54,7 +53,7 @@ describe('NotificationService', () => {
 
       await NotificationService.markAsRead('n-1');
       
-      expect(supabase.from).toHaveBeenCalledWith('notifications');
+      expect(mockSupabase.from).toHaveBeenCalledWith('notifications');
     });
   });
 
@@ -67,7 +66,7 @@ describe('NotificationService', () => {
 
       await NotificationService.markAllAsRead('user-1');
       
-      expect(supabase.from).toHaveBeenCalledWith('notifications');
+      expect(mockSupabase.from).toHaveBeenCalledWith('notifications');
     });
   });
 

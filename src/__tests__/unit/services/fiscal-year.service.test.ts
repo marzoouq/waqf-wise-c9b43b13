@@ -5,8 +5,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { FiscalYearService } from '@/services/fiscal-year.service';
-import { supabase } from '@/integrations/supabase/client';
-import { setMockTableData, clearMockTableData } from '../../utils/supabase.mock';
+import { mockSupabase, setMockTableData, clearMockTableData } from '../../utils/supabase.mock';
 
 describe('FiscalYearService', () => {
   const mockFiscalYears = [
@@ -39,7 +38,7 @@ describe('FiscalYearService', () => {
 
       const result = await FiscalYearService.getAll();
       
-      expect(supabase.from).toHaveBeenCalledWith('fiscal_years');
+      expect(mockSupabase.from).toHaveBeenCalledWith('fiscal_years');
       expect(result).toBeDefined();
     });
   });

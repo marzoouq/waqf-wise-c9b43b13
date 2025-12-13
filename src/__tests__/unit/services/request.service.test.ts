@@ -5,8 +5,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { RequestService } from '@/services/request.service';
-import { supabase } from '@/integrations/supabase/client';
-import { setMockTableData, clearMockTableData } from '../../utils/supabase.mock';
+import { mockSupabase, setMockTableData, clearMockTableData } from '../../utils/supabase.mock';
 
 describe('RequestService', () => {
   beforeEach(() => {
@@ -23,7 +22,7 @@ describe('RequestService', () => {
 
       const result = await RequestService.getAll();
       
-      expect(supabase.from).toHaveBeenCalledWith('beneficiary_requests');
+      expect(mockSupabase.from).toHaveBeenCalledWith('beneficiary_requests');
       expect(result).toBeDefined();
     });
   });
@@ -50,7 +49,7 @@ describe('RequestService', () => {
 
       const result = await RequestService.create(newRequest);
       
-      expect(supabase.from).toHaveBeenCalledWith('beneficiary_requests');
+      expect(mockSupabase.from).toHaveBeenCalledWith('beneficiary_requests');
     });
   });
 
@@ -58,7 +57,7 @@ describe('RequestService', () => {
     it('should approve request', async () => {
       const result = await RequestService.approve('req-1', 'user-1', 'Nazer', 'تمت الموافقة');
       
-      expect(supabase.from).toHaveBeenCalledWith('beneficiary_requests');
+      expect(mockSupabase.from).toHaveBeenCalledWith('beneficiary_requests');
     });
   });
 
@@ -66,7 +65,7 @@ describe('RequestService', () => {
     it('should reject request', async () => {
       const result = await RequestService.reject('req-1', 'user-1', 'Nazer', 'لا يستوفي الشروط');
       
-      expect(supabase.from).toHaveBeenCalledWith('beneficiary_requests');
+      expect(mockSupabase.from).toHaveBeenCalledWith('beneficiary_requests');
     });
   });
 

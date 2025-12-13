@@ -5,8 +5,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ContractService } from '@/services/contract.service';
-import { supabase } from '@/integrations/supabase/client';
-import { setMockTableData, clearMockTableData } from '../../utils/supabase.mock';
+import { mockSupabase, setMockTableData, clearMockTableData } from '../../utils/supabase.mock';
 import { mockContracts } from '../../utils/data.fixtures';
 
 describe('ContractService', () => {
@@ -21,7 +20,7 @@ describe('ContractService', () => {
 
       const result = await ContractService.getAll();
       
-      expect(supabase.from).toHaveBeenCalledWith('contracts');
+      expect(mockSupabase.from).toHaveBeenCalledWith('contracts');
       expect(result).toBeDefined();
     });
 
@@ -110,7 +109,7 @@ describe('ContractService', () => {
 
       await ContractService.delete(mockContracts[0].id);
       
-      expect(supabase.from).toHaveBeenCalledWith('contracts');
+      expect(mockSupabase.from).toHaveBeenCalledWith('contracts');
     });
   });
 });

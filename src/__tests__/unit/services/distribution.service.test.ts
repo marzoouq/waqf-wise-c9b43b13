@@ -5,8 +5,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { DistributionService } from '@/services/distribution.service';
-import { supabase } from '@/integrations/supabase/client';
-import { setMockTableData, clearMockTableData } from '../../utils/supabase.mock';
+import { mockSupabase, setMockTableData, clearMockTableData } from '../../utils/supabase.mock';
 import { mockDistributions } from '../../utils/data.fixtures';
 
 describe('DistributionService', () => {
@@ -21,7 +20,7 @@ describe('DistributionService', () => {
 
       const result = await DistributionService.getAll();
       
-      expect(supabase.from).toHaveBeenCalledWith('distributions');
+      expect(mockSupabase.from).toHaveBeenCalledWith('distributions');
       expect(result).toBeDefined();
     });
   });
