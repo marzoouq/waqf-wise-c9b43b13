@@ -14,7 +14,7 @@ interface MockQueryResult<T> {
 
 // بناء سلسلة الاستعلامات
 interface MockQueryBuilder<T> {
-  select: (columns?: string) => MockQueryBuilder<T>;
+  select: (columns?: string, options?: { count?: string }) => MockQueryBuilder<T>;
   insert: (data: Partial<T> | Partial<T>[]) => MockQueryBuilder<T>;
   update: (data: Partial<T>) => MockQueryBuilder<T>;
   delete: () => MockQueryBuilder<T>;
@@ -29,6 +29,7 @@ interface MockQueryBuilder<T> {
   like: (column: string, pattern: string) => MockQueryBuilder<T>;
   ilike: (column: string, pattern: string) => MockQueryBuilder<T>;
   is: (column: string, value: unknown) => MockQueryBuilder<T>;
+  or: (filters: string) => MockQueryBuilder<T>;
   order: (column: string, options?: { ascending?: boolean }) => MockQueryBuilder<T>;
   limit: (count: number) => MockQueryBuilder<T>;
   range: (from: number, to: number) => MockQueryBuilder<T>;
@@ -41,12 +42,13 @@ interface MockQueryBuilder<T> {
 
 // إنشاء query builder وهمي
 const createMockQueryBuilder = <T>(mockData: T[] = []): MockQueryBuilder<T> => {
+  let operation: 'select' | 'insert' | 'update' | 'delete' | 'upsert' = 'select';
   const builder: MockQueryBuilder<T> = {
-    select: () => builder,
-    insert: () => builder,
-    update: () => builder,
-    delete: () => builder,
-    upsert: () => builder,
+    select: () => { operation = 'select'; return builder; },
+    insert: () => { operation = 'insert'; return builder; },
+    update: () => { operation = 'update'; return builder; },
+    delete: () => { operation = 'delete'; return builder; },
+    upsert: () => { operation = 'upsert'; return builder; },
     eq: () => builder,
     neq: () => builder,
     in: () => builder,
@@ -57,6 +59,7 @@ const createMockQueryBuilder = <T>(mockData: T[] = []): MockQueryBuilder<T> => {
     like: () => builder,
     ilike: () => builder,
     is: () => builder,
+    or: () => builder,
     order: () => builder,
     limit: () => builder,
     range: () => builder,
@@ -65,9 +68,18 @@ const createMockQueryBuilder = <T>(mockData: T[] = []): MockQueryBuilder<T> => {
     then: async <TResult>(
       onfulfilled?: ((value: { data: T[]; error: null; count: number }) => TResult | PromiseLike<TResult>) | null
     ): Promise<TResult> => {
-      const result = { data: mockData, error: null as null, count: mockData.length };
+      let result: { data: T[] | T | null; error: null; count?: number };
+      if (operation === 'select') {
+        result = { data: mockData, error: null, count: mockData.length };
+      } else if (operation === 'delete') {
+        result = { data: null, error: null };
+      } else if (operation === 'insert' || operation === 'update' || operation === 'upsert') {
+        result = { data: mockData[0] || null, error: null };
+      } else {
+        result = { data: mockData, error: null, count: mockData.length };
+      }
       if (onfulfilled) {
-        return onfulfilled(result);
+        return onfulfilled(result as { data: T[]; error: null; count: number });
       }
       return result as unknown as TResult;
     },
@@ -142,8 +154,3 @@ export const createMockSupabaseClient = () => ({
 
 // تصدير Mock
 export const mockSupabase = createMockSupabaseClient();
-
-// Mock module
-vi.mock('@/integrations/supabase/client', () => ({
-  supabase: mockSupabase,
-}));
