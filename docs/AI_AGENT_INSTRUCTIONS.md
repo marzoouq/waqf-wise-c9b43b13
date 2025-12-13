@@ -172,4 +172,4 @@ const { data } = useQuery({
 
 ---
 
-**Version:** 2.9.2 | **Last Updated:** 2025-12-13
+**Version:** 2.9.3 | **Last Updated:** 2025-12-13

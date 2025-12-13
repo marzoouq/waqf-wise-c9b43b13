@@ -91,7 +91,7 @@ export class NotificationService {
       .from('distributions')
       .select('month, total_amount, distribution_date')
       .eq('id', distributionId)
-      .single();
+      .maybeSingle();
 
     if (!distribution) return;
 
@@ -130,7 +130,7 @@ export class NotificationService {
       .from('beneficiaries')
       .select('user_id')
       .eq('id', beneficiaryId)
-      .single();
+      .maybeSingle();
 
     if (!beneficiary?.user_id) return;
 

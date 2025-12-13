@@ -49,7 +49,7 @@ export class FiscalYearService {
       .from('fiscal_years')
       .select('*')
       .eq('id', id)
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data;
@@ -63,9 +63,9 @@ export class FiscalYearService {
       .from('fiscal_years')
       .select('*')
       .eq('is_active', true)
-      .single();
+      .maybeSingle();
 
-    if (error && error.code !== 'PGRST116') throw error;
+    if (error) throw error;
     return data;
   }
 
@@ -285,9 +285,9 @@ export class FiscalYearService {
       .from('fiscal_year_closings')
       .select('*')
       .eq('fiscal_year_id', fiscalYearId)
-      .single();
+      .maybeSingle();
 
-    if (error && error.code !== 'PGRST116') throw error;
+    if (error) throw error;
     return data;
   }
 

@@ -441,7 +441,7 @@ export class ApprovalService {
       .from("user_roles")
       .select("role")
       .eq("user_id", userId)
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data?.role || null;

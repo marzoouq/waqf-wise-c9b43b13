@@ -98,9 +98,10 @@ export class BeneficiaryTabsService {
         .from('beneficiaries')
         .select('id, full_name, beneficiary_number, account_balance, total_received')
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('لم يتم العثور على بيانات المستفيد');
       return data;
     } catch (error) {
       productionLogger.error('Error fetching account statement data', error);
@@ -147,7 +148,7 @@ export class BeneficiaryTabsService {
         .from('beneficiaries')
         .select('*')
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
 
       if (beneficiaryError) throw beneficiaryError;
       if (!beneficiary) throw new Error('لم يتم العثور على حساب مستفيد');
@@ -288,14 +289,14 @@ export class BeneficiaryTabsService {
         .from('beneficiaries')
         .select('family_id')
         .eq('id', beneficiaryId)
-        .single();
+        .maybeSingle();
 
       if (rawBen?.family_id) {
         const { data: familyData } = await supabase
           .from('families')
           .select('*')
           .eq('id', rawBen.family_id)
-          .single();
+          .maybeSingle();
         family = familyData;
 
         familyMembers = await BeneficiaryCoreService.getFamilyMembers(beneficiaryId);
