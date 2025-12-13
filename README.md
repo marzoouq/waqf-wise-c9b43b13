@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-2.8.73-blue.svg)
+![Version](https://img.shields.io/badge/version-2.9.2-blue.svg)
 ![Type Safety](https://img.shields.io/badge/type--safety-99.5%25-green.svg)
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)
 ![License](https://img.shields.io/badge/license-Proprietary-red.svg)
@@ -185,6 +185,7 @@ npm run dev
 | الوثيقة | الوصف |
 |---------|--------|
 | [`README.md`](README.md) | نظرة عامة على المشروع |
+| [`AI_CODING_AGENT.md`](AI_CODING_AGENT.md) | 🤖 دليل الـ AI Agent والمطورين |
 | [`CHANGELOG.md`](CHANGELOG.md) | سجل التغييرات التفصيلي |
 | [`ARCHITECTURE.md`](ARCHITECTURE.md) | البنية المعمارية |
 
@@ -192,10 +193,9 @@ npm run dev
 
 | الوثيقة | المحتوى |
 |---------|---------|
-| [`LATEST_FIXES.md`](docs/LATEST_FIXES.md) | آخر الإصلاحات (v2.6.8) |
+| [`ARCHITECTURE_RULES.md`](docs/ARCHITECTURE_RULES.md) | قواعد الهيكل المعماري الصارمة |
 | [`DEVELOPER_MASTER_GUIDE.md`](docs/DEVELOPER_MASTER_GUIDE.md) | دليل المطور الشامل |
 | [`PERFORMANCE.md`](docs/PERFORMANCE.md) | تقرير الأداء |
-| [`CLEANUP.md`](docs/CLEANUP.md) | سجل التنظيف |
 | [`SECURITY_FIX_PLAN.md`](docs/SECURITY_FIX_PLAN.md) | خطة الأمان |
 | [`DEBUGGING_GUIDE.md`](docs/DEBUGGING_GUIDE.md) | دليل التصحيح |
 | [`DEPLOYMENT.md`](docs/DEPLOYMENT.md) | دليل النشر |
@@ -276,13 +276,14 @@ logger.info('Operation completed', { data });
 
 ```
 ✅ 22 مرحلة وظيفية مكتملة
-✅ 650 سياسة RLS موحدة
-✅ 170+ Custom Hook منظم في 36 مجلد
-✅ 51 Service متكاملة
-✅ 39 Edge Function
+✅ 724 سياسة RLS موحدة
+✅ 170+ Custom Hook منظم في 25 مجلد
+✅ 51+ Service متكاملة
+✅ 370+ Query Key موحد
 ✅ Type Safety شامل (99.5%)
 ✅ RTL Support كامل
 ✅ Component → Hook → Service → Supabase Architecture
+✅ 408+ Test (Unit + Integration)
 ✅ Production Ready ⭐⭐⭐⭐⭐
 ```
 
@@ -343,7 +344,7 @@ logger.info('Operation completed', { data });
 
 **مبني بـ ❤️ باستخدام React + TypeScript + Lovable Cloud**
 
-**النسخة: 2.8.73** | **الحالة: 🟢 جاهز للإنتاج**
+**النسخة: 2.9.2** | **الحالة: 🟢 جاهز للإنتاج**
 
 ---
 

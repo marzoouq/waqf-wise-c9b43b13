@@ -1,8 +1,8 @@
 # قواعد الهيكل المعماري الصارمة
 # Strict Architecture Rules
 
-> **الإصدار**: 2.8.74  
-> **آخر تحديث**: 2025-12-10
+> **الإصدار**: 2.9.2  
+> **آخر تحديث**: 2025-12-13
 
 ---
 
@@ -132,8 +132,51 @@ grep -r "\.select.*\.eq.*\.single()" src/services/ --include="*.ts"
 | Components تستدعي Supabase | 0 | ✅ |
 | Pages تستدعي Supabase | 0 | ✅ |
 | Hooks تستخدم Services | 170+ | ✅ |
-| الخدمات الإجمالية | 54 | ✅ |
+| الخدمات الإجمالية | 51+ | ✅ |
 | استخدام `.maybeSingle()` | 474+ | ✅ |
+| QUERY_KEYS موحد | 370+ | ✅ |
+| RLS Policies | 724 | ✅ |
+
+---
+
+## 🔑 Query Keys & Config (MANDATORY)
+
+```typescript
+import { QUERY_KEYS, QUERY_CONFIG } from '@/lib/query-keys';
+
+// ✅ CORRECT - Use centralized keys
+useQuery({ 
+  queryKey: QUERY_KEYS.BENEFICIARIES, 
+  queryFn: () => BeneficiaryService.getAll(),
+  ...QUERY_CONFIG.DEFAULT
+});
+
+// Available configs:
+// QUERY_CONFIG.DEFAULT   - 2min stale, refetchOnWindowFocus
+// QUERY_CONFIG.REPORTS   - 2min stale, 5min refetchInterval
+// QUERY_CONFIG.REALTIME  - 30s stale
+// QUERY_CONFIG.STATIC    - 30min stale
+```
+
+---
+
+## 🧪 الاختبارات - Testing
+
+```bash
+# Run tests
+npx vitest run
+
+# Interactive mode
+npx vitest
+
+# Coverage
+npx vitest run --coverage
+```
+
+### Test Setup
+- `src/test/setup.ts` - Global mocks (Supabase, sonner, matchMedia)
+- `src/__tests__/utils/test-utils.tsx` - Render with providers
+- Use `setMockTableData('tableName', rows)` to mock Supabase data
 
 ---
 
