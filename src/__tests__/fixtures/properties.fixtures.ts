@@ -239,3 +239,8 @@ export const getContractsByPropertyId = (propertyId: string) =>
 
 export const getTenantById = (id: string) => 
   realTenants.find(t => t.id === id);
+
+// Aliases for compatibility with integration tests
+export const mockProperties = realProperties;
+export const mockContracts = realContracts;
+export const mockTenants = realTenants;

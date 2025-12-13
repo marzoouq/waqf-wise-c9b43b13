@@ -4,16 +4,57 @@
  */
 
 // المستفيدين
-export * from './beneficiaries.fixtures';
+export { 
+  realBeneficiaries,
+  beneficiaryStats,
+  beneficiarySessions,
+  getActiveBeneficiaries,
+  getBeneficiaryById,
+  getBeneficiariesByCategory,
+  getOnlineBeneficiaries,
+  mockBeneficiaries,
+  mockBeneficiarySessions,
+} from './beneficiaries.fixtures';
 
 // العقارات والعقود
-export * from './properties.fixtures';
+export {
+  realProperties,
+  realContracts,
+  realTenants,
+  propertyStats,
+  contractStats,
+  getActiveProperties,
+  getPropertyById,
+  getActiveContracts,
+  getContractsByPropertyId,
+  getTenantById,
+  mockProperties,
+  mockContracts,
+  mockTenants,
+} from './properties.fixtures';
 
 // المالية والمحاسبة
-export * from './financial.fixtures';
-
-// Re-export from original fixtures for backward compatibility
-export * from '../utils/data.fixtures';
+export {
+  realAccounts,
+  realPayments,
+  realJournalEntries,
+  realJournalEntryLines,
+  realFiscalYears,
+  realDistributions,
+  realHeirDistributions,
+  financialStats,
+  getAccountByCode,
+  getActivePayments,
+  getJournalEntriesByFiscalYear,
+  getActiveFiscalYear,
+  getDistributionsByFiscalYear,
+  mockAccounts,
+  mockJournalEntries,
+  mockFiscalYears,
+  mockPayments,
+  mockDistributions,
+  mockRentalPayments,
+} from './financial.fixtures';
 
 // ==================== KPIs الموحدة ====================
 import { beneficiaryStats } from './beneficiaries.fixtures';
@@ -100,8 +141,15 @@ export const mockUsers = {
 
 // ==================== Test Helpers ====================
 
-import { realBeneficiaries, beneficiarySessions } from './beneficiaries.fixtures';
-import { realProperties, realContracts, realTenants } from './properties.fixtures';
+import { 
+  realBeneficiaries, 
+  beneficiarySessions 
+} from './beneficiaries.fixtures';
+import { 
+  realProperties, 
+  realContracts, 
+  realTenants 
+} from './properties.fixtures';
 import { 
   realAccounts, 
   realPayments, 

@@ -355,3 +355,11 @@ export const getActiveFiscalYear = () =>
 
 export const getDistributionsByFiscalYear = (fiscalYearId: string) => 
   realDistributions.filter(d => d.fiscal_year_id === fiscalYearId);
+
+// Aliases for compatibility with integration tests
+export const mockAccounts = realAccounts;
+export const mockJournalEntries = realJournalEntries;
+export const mockFiscalYears = realFiscalYears;
+export const mockPayments = realPayments;
+export const mockDistributions = realDistributions;
+export const mockRentalPayments = realPayments;
