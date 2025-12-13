@@ -1,15 +1,10 @@
 import { format, arLocale as ar } from "@/lib/date";
+import type { Distribution } from "@/types/distributions";
 
-interface Distribution {
-  id: string;
-  month: string;
-  distribution_date: string;
-  total_amount: number;
-  beneficiaries_count: number;
+interface PrintDistribution extends Pick<Distribution, 'id' | 'month' | 'distribution_date' | 'total_amount' | 'beneficiaries_count' | 'status'> {
   nazer_share?: number;
   charity_share?: number;
   maintenance_share?: number;
-  status: string;
 }
 
 interface DistributionDetail {
@@ -20,7 +15,7 @@ interface DistributionDetail {
 }
 
 interface DistributionPrintTemplateProps {
-  distribution: Distribution;
+  distribution: PrintDistribution;
   details?: DistributionDetail[];
 }
 

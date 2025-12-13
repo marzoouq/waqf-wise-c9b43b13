@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
 import { createMutationErrorHandler } from "@/lib/errors";
 import { FundService, RealtimeService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface DistributionApproval {
   id: string;
@@ -29,15 +30,15 @@ export function useDistributionApprovals(distributionId?: string) {
     const subscription = RealtimeService.subscribeToTable(
       'distribution_approvals',
       () => {
-        queryClient.invalidateQueries({ queryKey: ["distribution_approvals"] });
-        queryClient.invalidateQueries({ queryKey: ["distributions"] });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DISTRIBUTIONS_WITH_APPROVALS });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DISTRIBUTIONS });
       }
     );
     return () => { subscription.unsubscribe(); };
   }, [queryClient]);
 
   const { data: approvals = [], isLoading } = useQuery({
-    queryKey: ["distribution_approvals", distributionId],
+    queryKey: [...QUERY_KEYS.DISTRIBUTIONS_WITH_APPROVALS, distributionId],
     queryFn: () => FundService.getDistributionApprovals(distributionId),
     enabled: !!distributionId,
   });
@@ -46,8 +47,8 @@ export function useDistributionApprovals(distributionId?: string) {
     mutationFn: (approval: Omit<DistributionApproval, "id" | "created_at" | "updated_at">) => 
       FundService.addDistributionApproval(approval),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["distribution_approvals"] });
-      queryClient.invalidateQueries({ queryKey: ["distributions"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DISTRIBUTIONS_WITH_APPROVALS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DISTRIBUTIONS });
       toast({ title: "تمت الموافقة بنجاح", description: "تم تسجيل الموافقة على التوزيع" });
     },
     onError: createMutationErrorHandler({ context: 'approve_distribution', toastTitle: 'خطأ في الموافقة' }),
@@ -57,8 +58,8 @@ export function useDistributionApprovals(distributionId?: string) {
     mutationFn: ({ id, updates }: { id: string; updates: Partial<DistributionApproval> }) => 
       FundService.updateDistributionApproval(id, updates),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["distribution_approvals"] });
-      queryClient.invalidateQueries({ queryKey: ["distributions"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DISTRIBUTIONS_WITH_APPROVALS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DISTRIBUTIONS });
       toast({ title: "تم التحديث بنجاح", description: "تم تحديث حالة الموافقة" });
     },
     onError: createMutationErrorHandler({ context: 'update_distribution_approval', toastTitle: 'خطأ في التحديث' }),

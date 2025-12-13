@@ -7,29 +7,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
 import { logger } from "@/lib/logger";
 import { createMutationErrorHandler } from "@/lib/errors";
+import { QUERY_KEYS } from "@/lib/query-keys";
+import type { Distribution } from "@/types/distributions";
 
-export interface Distribution {
-  id: string;
-  month: string;
-  total_amount: number;
-  beneficiaries_count: number;
-  status: string;
-  distribution_date: string;
-  distribution_type?: string;
-  period_start?: string;
-  period_end?: string;
-  total_revenues?: number;
-  total_expenses?: number;
-  net_revenues?: number;
-  nazer_share?: number;
-  waqif_charity?: number;
-  waqf_corpus?: number;
-  distributable_amount?: number;
-  notes?: string;
-  journal_entry_id?: string;
-  created_at: string;
-  updated_at: string;
-}
+export type { Distribution };
 
 export function useDistributions() {
   const { toast } = useToast();
@@ -41,14 +22,14 @@ export function useDistributions() {
   // Real-time subscription
   useEffect(() => {
     const { unsubscribe } = RealtimeService.subscribeToTable('distributions', () => {
-      queryClient.invalidateQueries({ queryKey: ["distributions"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DISTRIBUTIONS });
     });
 
     return () => unsubscribe();
   }, [queryClient]);
 
   const { data: distributions = [], isLoading } = useQuery({
-    queryKey: ["distributions"],
+    queryKey: QUERY_KEYS.DISTRIBUTIONS,
     queryFn: () => DistributionService.getAll(),
     staleTime: 3 * 60 * 1000,
   });
@@ -58,9 +39,9 @@ export function useDistributions() {
       return DistributionService.create(distribution);
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["distributions"] });
-      queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
-      queryClient.invalidateQueries({ queryKey: ["funds"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DISTRIBUTIONS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.JOURNAL_ENTRIES });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FUNDS });
       
       addActivity({
         action: `تم إنشاء توزيع جديد لشهر ${data.month} بمبلغ ${data.total_amount} ريال`,
@@ -104,8 +85,8 @@ export function useDistributions() {
       return DistributionService.delete(id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["distributions"] });
-      queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DISTRIBUTIONS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.JOURNAL_ENTRIES });
       queryClient.invalidateQueries({ queryKey: ["funds"] });
       
       toast({
@@ -135,8 +116,8 @@ export function useDistributions() {
       
       if (!result.success) throw new Error(result.error);
       
-      queryClient.invalidateQueries({ queryKey: ["distributions"] });
-      queryClient.invalidateQueries({ queryKey: ["distribution-details"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DISTRIBUTIONS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.HEIR_DISTRIBUTIONS });
       
       const summary = result.data?.summary || { distributable_amount: 0, beneficiaries_count: 0 };
       toast({
