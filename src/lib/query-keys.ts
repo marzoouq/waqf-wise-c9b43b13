@@ -312,6 +312,10 @@ export const QUERY_KEYS = {
   // Dashboard Charts
   BUDGET_COMPARISON_CHART: ['budget-comparison-chart'] as const,
   REVENUE_EXPENSE_CHART: ['revenue-expense-chart'] as const,
+  DASHBOARD_KPIS: ['dashboard-kpis'] as const,
+  DASHBOARD_BENEFICIARIES: (timeRange?: string) => ['dashboard-beneficiaries', timeRange] as const,
+  DASHBOARD_PAYMENTS: (timeRange?: string) => ['dashboard-payments', timeRange] as const,
+  DASHBOARD_PROPERTIES: ['dashboard-properties'] as const,
   BANK_BALANCE_REALTIME: ['bank-balance-realtime'] as const,
   WAQF_CORPUS_REALTIME: ['waqf-corpus-realtime'] as const,
   REVENUE_DISTRIBUTION: ['revenue-distribution'] as const,

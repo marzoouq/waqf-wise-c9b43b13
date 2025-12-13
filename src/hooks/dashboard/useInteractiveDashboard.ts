@@ -10,6 +10,7 @@ import { useDashboardKPIs } from '@/hooks/useDashboardKPIs';
 import { ChartDataPoint } from '@/components/unified/UnifiedChart';
 import { QUERY_CONFIG } from '@/lib/queryOptimization';
 import { BeneficiaryService, PropertyService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export function useInteractiveDashboard() {
   const [timeRange, setTimeRange] = useState('month');
@@ -19,7 +20,7 @@ export function useInteractiveDashboard() {
 
   // إحصائيات المستفيدين
   const { data: beneficiariesStats, isLoading: loadingBeneficiaries, dataUpdatedAt } = useQuery({
-    queryKey: ['dashboard-beneficiaries', timeRange],
+    queryKey: QUERY_KEYS.DASHBOARD_BENEFICIARIES(timeRange),
     queryFn: async () => {
       const result = await BeneficiaryService.getAll();
       const data = result.data || [];
@@ -49,13 +50,13 @@ export function useInteractiveDashboard() {
     const channel = supabase
       .channel('interactive-dashboard-changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'beneficiaries' }, () => {
-        queryClient.invalidateQueries({ queryKey: ['dashboard-beneficiaries'] });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DASHBOARD_BENEFICIARIES() });
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'payments' }, () => {
-        queryClient.invalidateQueries({ queryKey: ['dashboard-payments'] });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DASHBOARD_PAYMENTS() });
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'properties' }, () => {
-        queryClient.invalidateQueries({ queryKey: ['dashboard-properties'] });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DASHBOARD_PROPERTIES });
       })
       .subscribe();
 
@@ -65,15 +66,15 @@ export function useInteractiveDashboard() {
   }, [queryClient]);
 
   const handleRefresh = () => {
-    queryClient.invalidateQueries({ queryKey: ['dashboard-beneficiaries'] });
-    queryClient.invalidateQueries({ queryKey: ['dashboard-payments'] });
-    queryClient.invalidateQueries({ queryKey: ['dashboard-properties'] });
-    queryClient.invalidateQueries({ queryKey: ['dashboard-kpis'] });
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DASHBOARD_BENEFICIARIES() });
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DASHBOARD_PAYMENTS() });
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DASHBOARD_PROPERTIES });
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DASHBOARD_KPIS });
   };
 
   // إحصائيات المدفوعات
   const { data: paymentsStats, isLoading: loadingPayments, isRefetching: isRefetchingPayments } = useQuery({
-    queryKey: ['dashboard-payments', timeRange],
+    queryKey: QUERY_KEYS.DASHBOARD_PAYMENTS(timeRange),
     ...QUERY_CONFIG.REPORTS,
     queryFn: async () => {
       const startDate = new Date();
@@ -104,7 +105,7 @@ export function useInteractiveDashboard() {
 
   // إحصائيات العقارات
   const { data: propertiesStats, isLoading: loadingProperties, isRefetching: isRefetchingProperties } = useQuery({
-    queryKey: ['dashboard-properties'],
+    queryKey: QUERY_KEYS.DASHBOARD_PROPERTIES,
     ...QUERY_CONFIG.REPORTS,
     queryFn: async () => {
       const data = await PropertyService.getAll();

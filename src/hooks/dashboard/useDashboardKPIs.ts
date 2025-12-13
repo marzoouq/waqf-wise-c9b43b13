@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { QUERY_CONFIG } from '@/lib/queryOptimization';
 import { useEffect } from 'react';
 import { DashboardService } from '@/services';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface DashboardKPIs {
   beneficiaries: number;
@@ -20,7 +21,7 @@ export function useDashboardKPIs() {
   const queryClient = useQueryClient();
 
   const query = useQuery({
-    queryKey: ['dashboard-kpis'],
+    queryKey: QUERY_KEYS.DASHBOARD_KPIS,
     queryFn: () => DashboardService.getDashboardKPIs(),
     ...QUERY_CONFIG.DASHBOARD_KPIS,
   });
@@ -30,16 +31,16 @@ export function useDashboardKPIs() {
     const channel = supabase
       .channel('dashboard-kpis-changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'beneficiaries' }, () => {
-        queryClient.invalidateQueries({ queryKey: ['dashboard-kpis'] });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DASHBOARD_KPIS });
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'properties' }, () => {
-        queryClient.invalidateQueries({ queryKey: ['dashboard-kpis'] });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DASHBOARD_KPIS });
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'payments' }, () => {
-        queryClient.invalidateQueries({ queryKey: ['dashboard-kpis'] });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DASHBOARD_KPIS });
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'contracts' }, () => {
-        queryClient.invalidateQueries({ queryKey: ['dashboard-kpis'] });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DASHBOARD_KPIS });
       })
       .subscribe();
 
@@ -50,6 +51,6 @@ export function useDashboardKPIs() {
 
   return {
     ...query,
-    refresh: () => queryClient.invalidateQueries({ queryKey: ['dashboard-kpis'] }),
+    refresh: () => queryClient.invalidateQueries({ queryKey: QUERY_KEYS.DASHBOARD_KPIS }),
   };
 }

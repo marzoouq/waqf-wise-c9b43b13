@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";
 import { useEffect, useCallback } from "react";
 import { DashboardService, type UnifiedKPIsData } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export type { UnifiedKPIsData };
 
@@ -16,7 +17,7 @@ export function useUnifiedKPIs() {
   const queryClient = useQueryClient();
 
   const query = useQuery({
-    queryKey: ['unified-dashboard-kpis'],
+    queryKey: QUERY_KEYS.UNIFIED_KPIS,
     queryFn: () => DashboardService.getUnifiedKPIs(),
     ...QUERY_CONFIG.DASHBOARD_KPIS
   });
@@ -29,7 +30,7 @@ export function useUnifiedKPIs() {
     
     tables.forEach(table => {
       channel.on('postgres_changes', { event: '*', schema: 'public', table }, () => {
-        queryClient.invalidateQueries({ queryKey: ['unified-dashboard-kpis'] });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.UNIFIED_KPIS });
       });
     });
     
@@ -41,7 +42,7 @@ export function useUnifiedKPIs() {
   }, [queryClient]);
 
   const refresh = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: ['unified-dashboard-kpis'] });
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.UNIFIED_KPIS });
   }, [queryClient]);
 
   return {
