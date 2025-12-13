@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { LoansService } from "@/services";
 import type { Database } from "@/integrations/supabase/types";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export type Loan = Database['public']['Tables']['loans']['Row'] & {
   beneficiaries?: {
@@ -19,7 +20,7 @@ export function useLoans() {
   const queryClient = useQueryClient();
 
   const { data: loans = [], isLoading } = useQuery({
-    queryKey: ["loans"],
+    queryKey: QUERY_KEYS.LOANS,
     queryFn: () => LoansService.getAllWithBeneficiary(),
   });
 
@@ -27,7 +28,7 @@ export function useLoans() {
     mutationFn: (loan: Database['public']['Tables']['loans']['Insert']) => 
       LoansService.create(loan),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["loans"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.LOANS });
       toast({
         title: "تم إضافة القرض",
         description: "تم إضافة القرض بنجاح",
@@ -46,7 +47,7 @@ export function useLoans() {
     mutationFn: ({ id, ...updates }: Partial<Loan> & { id: string }) => 
       LoansService.update(id, updates),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["loans"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.LOANS });
       toast({
         title: "تم التحديث",
         description: "تم تحديث القرض بنجاح",

@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { productionLogger } from "@/lib/logger/production-logger";
 import { DocumentationService, type ProjectPhase, type ChangelogEntry, type AddPhaseInput } from "@/services";
 import type { Json } from "@/integrations/supabase/types";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export type { ProjectPhase, ChangelogEntry, AddPhaseInput };
 
@@ -33,14 +34,14 @@ export function parseDeliverables(data: Json | null): PhaseDeliverable[] {
 
 export const useProjectDocumentation = (category?: string) => {
   return useQuery({
-    queryKey: ["project-documentation", category],
+    queryKey: QUERY_KEYS.PROJECT_DOCUMENTATION(category),
     queryFn: () => DocumentationService.getPhases(category),
   });
 };
 
 export const usePhaseChangelog = (phaseId: string) => {
   return useQuery({
-    queryKey: ["phase-changelog", phaseId],
+    queryKey: QUERY_KEYS.PHASE_CHANGELOG(phaseId),
     queryFn: () => DocumentationService.getPhaseChangelog(phaseId),
   });
 };
@@ -52,7 +53,7 @@ export const useUpdatePhaseStatus = () => {
     mutationFn: ({ phaseId, status, notes }: { phaseId: string; status: string; notes?: string }) =>
       DocumentationService.updatePhaseStatus(phaseId, status, notes),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["project-documentation"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROJECT_DOCUMENTATION() });
       toast.success("تم تحديث حالة المرحلة بنجاح");
     },
     onError: (error) => {
@@ -69,7 +70,7 @@ export const useUpdatePhaseProgress = () => {
     mutationFn: ({ phaseId, percentage }: { phaseId: string; percentage: number }) =>
       DocumentationService.updatePhaseProgress(phaseId, percentage),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["project-documentation"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROJECT_DOCUMENTATION() });
       toast.success("تم تحديث نسبة الإنجاز");
     },
     onError: (error) => {
@@ -86,7 +87,7 @@ export const useUpdatePhaseTasks = () => {
     mutationFn: ({ phaseId, tasks }: { phaseId: string; tasks: PhaseTask[] }) =>
       DocumentationService.updatePhaseTasks(phaseId, tasks),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["project-documentation"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROJECT_DOCUMENTATION() });
       toast.success("تم تحديث المهام");
     },
     onError: (error) => {
@@ -102,7 +103,7 @@ export const useAddPhase = () => {
   return useMutation({
     mutationFn: (phaseData: AddPhaseInput) => DocumentationService.addPhase(phaseData),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["project-documentation"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROJECT_DOCUMENTATION() });
       toast.success("تمت إضافة المرحلة بنجاح");
     },
     onError: (error) => {

@@ -5,6 +5,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { UserService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface AvailableUser {
   id: string;
@@ -16,7 +17,7 @@ export interface AvailableUser {
 
 export function useAvailableUsers() {
   return useQuery({
-    queryKey: ["available-users"],
+    queryKey: QUERY_KEYS.AVAILABLE_USERS,
     queryFn: async (): Promise<AvailableUser[]> => {
       return UserService.getAvailableUsers();
     },

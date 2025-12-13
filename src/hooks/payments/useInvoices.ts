@@ -7,7 +7,7 @@ import { createMutationErrorHandler } from "@/lib/errors";
 import type { InvoiceWithLines, InvoiceLineInsert } from "@/types/invoices";
 import { InvoiceService } from "@/services/invoice.service";
 import { RealtimeService } from "@/services/realtime.service";
-
+import { QUERY_KEYS } from "@/lib/query-keys";
 export interface Invoice {
   id: string;
   invoice_number: string;
@@ -55,7 +55,7 @@ export function useInvoices() {
   // Real-time subscription
   useEffect(() => {
     const subscription = RealtimeService.subscribeToTable('invoices', () => {
-      queryClient.invalidateQueries({ queryKey: ["invoices"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INVOICES });
     });
 
     return () => {
@@ -64,7 +64,7 @@ export function useInvoices() {
   }, [queryClient]);
 
   const { data: invoices = [], isLoading } = useQuery({
-    queryKey: ["invoices"],
+    queryKey: QUERY_KEYS.INVOICES,
     queryFn: () => InvoiceService.getAll(),
     staleTime: 3 * 60 * 1000,
   });
@@ -97,8 +97,8 @@ export function useInvoices() {
       return invoiceRecord;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["invoices"] });
-      queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INVOICES });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.JOURNAL_ENTRIES });
       toast({
         title: "تم إنشاء الفاتورة بنجاح",
         description: "تم إنشاء الفاتورة والقيد المحاسبي",
@@ -165,8 +165,8 @@ export function useInvoices() {
       return invoiceData;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["invoices"] });
-      queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INVOICES });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.JOURNAL_ENTRIES });
       toast({
         title: "تم التحديث بنجاح",
         description: "تم تحديث الفاتورة بنجاح",
@@ -181,8 +181,8 @@ export function useInvoices() {
   const deleteInvoice = useMutation({
     mutationFn: (invoiceId: string) => InvoiceService.delete(invoiceId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["invoices"] });
-      queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INVOICES });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.JOURNAL_ENTRIES });
       toast({
         title: "تم حذف الفاتورة بنجاح",
         description: "تم حذف الفاتورة والقيد المحاسبي المرتبط بها",

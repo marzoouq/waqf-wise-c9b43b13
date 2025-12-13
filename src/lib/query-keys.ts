@@ -398,6 +398,43 @@ export const QUERY_KEYS = {
   PROPERTIES_STATS_ALT: ['properties-stats'] as const,
   PROPERTIES_PERFORMANCE: ['properties-performance'] as const,
   FISCAL_YEAR_SUMMARY: (fiscalYearId: string) => ['fiscal-year-summary', fiscalYearId] as const,
+  
+  // Project Documentation (Phase 3 Unification)
+  PROJECT_DOCUMENTATION: (category?: string) => ['project-documentation', category] as const,
+  PHASE_CHANGELOG: (phaseId: string) => ['phase-changelog', phaseId] as const,
+  
+  // Disclosure
+  ANNUAL_DISCLOSURE_CURRENT: ['annual-disclosure-current'] as const,
+  DISCLOSURE_BENEFICIARIES: (disclosureId?: string) => ['disclosure-beneficiaries', disclosureId] as const,
+  DISCLOSURE_DOCUMENTS: (disclosureId?: string) => ['disclosure-documents', disclosureId] as const,
+  
+  // Payment Schedules
+  PAYMENT_SCHEDULES: (distributionId?: string) => ['payment-schedules', distributionId] as const,
+  
+  // Staff Requests
+  ALL_BENEFICIARY_REQUESTS: ['all-beneficiary-requests'] as const,
+  
+  // Property Units Data
+  PROPERTY_UNITS_DATA: (propertyId: string) => ['property-units-data', propertyId] as const,
+  
+  // Distribution Tabs
+  DISTRIBUTION_VOUCHERS_TAB: (distributionId: string) => ['distribution-vouchers-tab', distributionId] as const,
+  DISTRIBUTION_VOUCHERS_STATS_TAB: (distributionId: string) => ['distribution-vouchers-stats-tab', distributionId] as const,
+  PAYMENT_VOUCHERS_LIST: ['payment-vouchers-list'] as const,
+  FAMILY_MEMBERS_DIALOG: (familyName: string) => ['family-members-dialog', familyName] as const,
+  
+  // Role Permissions
+  ROLE_PERMISSIONS: (role?: string) => ['role-permissions', role] as const,
+  
+  // Saved Searches
+  SAVED_SEARCHES: ['saved-searches'] as const,
+  
+  // Bank Data
+  BANK_STATEMENTS_DATA: ['bank_statements'] as const,
+  BANK_TRANSACTIONS_DATA: ['bank_transactions'] as const,
+  
+  // Available Users
+  AVAILABLE_USERS: ['available-users'] as const,
 } as const;
 
 // Query Config with default settings

@@ -11,6 +11,7 @@ import {
   BankTransactionMatch 
 } from "@/types/banking";
 import { getErrorMessage } from "@/types/errors";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface BankStatement {
   id: string;
@@ -45,12 +46,12 @@ export function useBankReconciliation() {
   const queryClient = useQueryClient();
 
   const { data: statements = [], isLoading } = useQuery({
-    queryKey: ["bank_statements"],
+    queryKey: QUERY_KEYS.BANK_STATEMENTS_DATA,
     queryFn: () => BankReconciliationService.getStatements(),
   });
 
   const { data: transactions = [] } = useQuery({
-    queryKey: ["bank_transactions"],
+    queryKey: QUERY_KEYS.BANK_TRANSACTIONS_DATA,
     queryFn: () => BankReconciliationService.getTransactions(),
   });
 
@@ -58,7 +59,7 @@ export function useBankReconciliation() {
     mutationFn: (statement: BankStatementInsert) => 
       BankReconciliationService.createStatement(statement),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["bank_statements"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BANK_STATEMENTS_DATA });
       toast({ title: "تم الإنشاء", description: "تم إنشاء كشف الحساب بنجاح" });
     },
     onError: (error: unknown) => {
@@ -70,7 +71,7 @@ export function useBankReconciliation() {
     mutationFn: (transaction: BankTransactionInsert) => 
       BankReconciliationService.addTransaction(transaction),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["bank_transactions"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BANK_TRANSACTIONS_DATA });
       toast({ title: "تم الإضافة", description: "تم إضافة الحركة بنجاح" });
     },
     onError: (error: unknown) => {
@@ -82,7 +83,7 @@ export function useBankReconciliation() {
     mutationFn: (match: BankTransactionMatch) => 
       BankReconciliationService.matchTransaction(match),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["bank_transactions"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BANK_TRANSACTIONS_DATA });
       toast({ title: "تمت المطابقة", description: "تمت مطابقة الحركة بنجاح" });
     },
     onError: (error: unknown) => {
@@ -94,7 +95,7 @@ export function useBankReconciliation() {
     mutationFn: (statementId: string) => 
       BankReconciliationService.reconcileStatement(statementId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["bank_statements"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BANK_STATEMENTS_DATA });
       toast({ title: "تمت التسوية", description: "تمت تسوية كشف الحساب بنجاح" });
     },
     onError: (error: unknown) => {
