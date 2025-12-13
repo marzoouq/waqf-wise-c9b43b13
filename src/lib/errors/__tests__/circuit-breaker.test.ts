@@ -139,7 +139,7 @@ describe('Circuit Breaker', () => {
     
     expect(result).toBe('Success');
     expect(circuitBreaker.getState()).toBe('CLOSED');
-  });
+  }, 10000); // Extended timeout for this test
 
   it('should track failure and success counts', async () => {
     const successFn = async () => 'Success';

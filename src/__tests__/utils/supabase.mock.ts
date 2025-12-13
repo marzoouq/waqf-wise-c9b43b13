@@ -12,7 +12,11 @@ import { vi } from 'vitest';
 // Re-export utilities from setup.ts
 export { setMockTableData, clearMockTableData } from '../../test/setup';
 
-// Legacy mockSupabase for backward compatibility with existing tests
+// Export the mocked supabase client for assertions
+// This is the SAME instance that services use
+export { supabase as mockSupabase } from '@/integrations/supabase/client';
+
+// Legacy mockSupabase for backward compatibility with existing tests that need a standalone mock
 const mockTableData: Record<string, unknown[]> = {};
 
 const createMockQueryBuilder = <T>(data: T[] = []) => {
@@ -63,7 +67,8 @@ const createMockQueryBuilder = <T>(data: T[] = []) => {
   return builder;
 };
 
-export const mockSupabase = {
+// Standalone mock for tests that don't use the global mock
+export const legacyMockSupabase = {
   from: vi.fn((tableName: string) => {
     const data = (mockTableData[tableName] || []) as unknown[];
     return createMockQueryBuilder(data);
@@ -110,4 +115,4 @@ export const clearLegacyMockTableData = () => {
 };
 
 // Re-export mockSupabase Auth for direct use
-export const mockSupabaseAuth = mockSupabase.auth;
+export const mockSupabaseAuth = legacyMockSupabase.auth;

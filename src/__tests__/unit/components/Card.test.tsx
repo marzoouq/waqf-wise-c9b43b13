@@ -39,8 +39,8 @@ describe('Card', () => {
   });
 
   it('should apply custom className to Card', () => {
-    render(<Card className="custom-card">Content</Card>);
-    expect(screen.getByText('Content').parentElement).toHaveClass('custom-card');
+    render(<Card className="custom-card" data-testid="card">Content</Card>);
+    expect(screen.getByTestId('card')).toHaveClass('custom-card');
   });
 
   it('should render CardHeader with custom className', () => {

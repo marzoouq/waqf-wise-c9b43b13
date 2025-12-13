@@ -8,6 +8,9 @@ import { afterEach, beforeEach, beforeAll, vi } from 'vitest';
 // Make vi globally available
 globalThis.vi = vi;
 
+// Mock scrollIntoView for Radix UI components (Select, etc.)
+Element.prototype.scrollIntoView = vi.fn();
+
 // Shared mock data store
 const mockTableData: Record<string, unknown[]> = {};
 
