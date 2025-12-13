@@ -41,7 +41,7 @@ export function PreviewAsBeneficiaryButton() {
     if (!selectedBeneficiaryId) return;
     
     // فتح لوحة المستفيد في نافذة جديدة مع وضع المعاينة
-    const previewUrl = `/beneficiary-dashboard?preview=true&beneficiary_id=${selectedBeneficiaryId}`;
+    const previewUrl = `/beneficiary-portal?preview=true&beneficiary_id=${selectedBeneficiaryId}`;
     window.open(previewUrl, '_blank', 'noopener,noreferrer');
     setOpen(false);
   };

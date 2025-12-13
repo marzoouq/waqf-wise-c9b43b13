@@ -19,7 +19,7 @@ const navigationItems: NavigationItem[] = [
     label: 'الرئيسية',
     icon: Home,
     path: '/redirect',
-    matchPaths: ['/dashboard', '/nazer-dashboard', '/admin-dashboard', '/accountant-dashboard', '/beneficiary-dashboard'],
+    matchPaths: ['/dashboard', '/nazer-dashboard', '/admin-dashboard', '/accountant-dashboard', '/beneficiary-portal'],
   },
   {
     id: 'beneficiaries',
