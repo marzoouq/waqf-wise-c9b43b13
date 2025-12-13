@@ -132,7 +132,7 @@ export function PublishFiscalYearDialog({
                     {selectedYear.is_closed && (
                       <Badge variant="secondary">مغلقة</Badge>
                     )}
-                    <Badge variant="outline" className="bg-amber-50 text-amber-700">
+                    <Badge variant="outline" className="bg-status-warning/10 text-status-warning">
                       غير منشورة
                     </Badge>
                   </div>
@@ -149,15 +149,15 @@ export function PublishFiscalYearDialog({
                 {publishedYears.slice(0, 3).map((fy) => (
                   <div
                     key={fy.id}
-                    className="flex items-center justify-between p-2 bg-green-50 dark:bg-green-900/20 rounded-lg text-sm"
+                    className="flex items-center justify-between p-2 bg-status-success/10 rounded-lg text-sm"
                   >
                     <div className="flex items-center gap-2">
-                      <Eye className="h-4 w-4 text-green-600" />
+                      <Eye className="h-4 w-4 text-status-success" />
                       <span>{fy.name}</span>
                     </div>
                     <Badge
                       variant="outline"
-                      className="bg-green-100 text-green-700 border-green-200"
+                      className="bg-status-success/10 text-status-success border-status-success/20"
                     >
                       منشورة
                     </Badge>
@@ -179,15 +179,15 @@ export function PublishFiscalYearDialog({
           </div>
 
           {/* Warning */}
-          <Card className="border-amber-200 bg-amber-50 dark:bg-amber-900/20">
+          <Card className="border-status-warning/30 bg-status-warning/10">
             <CardContent className="p-4">
               <div className="flex gap-3">
-                <AlertCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+                <AlertCircle className="h-5 w-5 text-status-warning shrink-0 mt-0.5" />
                 <div className="space-y-1">
-                  <p className="font-medium text-amber-800 dark:text-amber-200">
+                  <p className="font-medium text-status-warning">
                     ماذا يعني النشر؟
                   </p>
-                  <ul className="text-sm text-amber-700 dark:text-amber-300 space-y-1">
+                  <ul className="text-sm text-status-warning/80 space-y-1">
                     <li>• ستظهر تفاصيل العقود والإيجارات للورثة</li>
                     <li>• ستظهر تقارير المصروفات والإيرادات</li>
                     <li>• لا يمكن إلغاء النشر بعد التنفيذ</li>

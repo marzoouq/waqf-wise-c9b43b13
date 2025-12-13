@@ -5,6 +5,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { BeneficiaryService } from "@/services";
+import { QUERY_KEYS, QUERY_CONFIG } from "@/lib/query-keys";
 
 export interface NazerBeneficiary {
   id: string;
@@ -20,10 +21,10 @@ export interface NazerBeneficiary {
 
 export function useNazerBeneficiariesQuick() {
   return useQuery({
-    queryKey: ["nazer-beneficiaries-quick"],
+    queryKey: QUERY_KEYS.NAZER_BENEFICIARIES_QUICK,
     queryFn: async (): Promise<NazerBeneficiary[]> => {
       return BeneficiaryService.getQuickList(20) as Promise<NazerBeneficiary[]>;
     },
-    staleTime: 2 * 60 * 1000,
+    staleTime: QUERY_CONFIG.DEFAULT.staleTime,
   });
 }

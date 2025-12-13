@@ -25,14 +25,14 @@ export function FiscalYearPublishStatus({
             <div
               className={`p-2 rounded-full ${
                 activeFiscalYear.is_published
-                  ? "bg-green-100 dark:bg-green-900/30"
-                  : "bg-amber-100 dark:bg-amber-900/30"
+                  ? "bg-status-success/10"
+                  : "bg-status-warning/10"
               }`}
             >
               {activeFiscalYear.is_published ? (
-                <Eye className="h-5 w-5 text-green-600" />
+                <Eye className="h-5 w-5 text-status-success" />
               ) : (
-                <EyeOff className="h-5 w-5 text-amber-600" />
+                <EyeOff className="h-5 w-5 text-status-warning" />
               )}
             </div>
             <div>
@@ -42,8 +42,8 @@ export function FiscalYearPublishStatus({
                   variant={activeFiscalYear.is_published ? "default" : "secondary"}
                   className={
                     activeFiscalYear.is_published
-                      ? "bg-green-100 text-green-700 hover:bg-green-100"
-                      : "bg-amber-100 text-amber-700 hover:bg-amber-100"
+                      ? "bg-status-success/10 text-status-success hover:bg-status-success/20"
+                      : "bg-status-warning/10 text-status-warning hover:bg-status-warning/20"
                   }
                 >
                   {activeFiscalYear.is_published ? "منشورة للورثة" : "غير منشورة"}

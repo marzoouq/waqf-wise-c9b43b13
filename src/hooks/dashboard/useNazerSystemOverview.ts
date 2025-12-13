@@ -6,13 +6,14 @@
  */
 import { useQuery } from "@tanstack/react-query";
 import { DashboardService, type SystemOverviewStats } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 import { QUERY_STALE_TIME } from "@/lib/constants";
 
 export type { SystemOverviewStats };
 
 export function useNazerSystemOverview() {
   return useQuery({
-    queryKey: ["nazer-system-overview"],
+    queryKey: QUERY_KEYS.NAZER_SYSTEM_OVERVIEW,
     queryFn: () => DashboardService.getSystemOverview(),
     staleTime: QUERY_STALE_TIME.DASHBOARD,
   });
