@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { MessageService, MessageWithUsers } from '@/services/message.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export interface MessageData {
   receiver_id: string;
@@ -19,7 +20,7 @@ export function useMessages() {
 
   // جلب الرسائل
   const { data: messages = [], isLoading } = useQuery({
-    queryKey: ['messages', user?.id],
+    queryKey: [...QUERY_KEYS.MESSAGES, user?.id],
     queryFn: () => MessageService.getAllMessages(user!.id),
     enabled: !!user,
   });
@@ -31,7 +32,7 @@ export function useMessages() {
       return MessageService.markAsRead(messageId, user.id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['messages'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.MESSAGES });
     },
   });
 
@@ -45,7 +46,7 @@ export function useMessages() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['messages'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.MESSAGES });
       toast({
         title: 'تم الإرسال',
         description: 'تم إرسال الرسالة بنجاح',

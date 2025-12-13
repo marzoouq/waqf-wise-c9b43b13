@@ -3,6 +3,7 @@ import { MaintenanceService } from "@/services/maintenance.service";
 import { useToast } from "@/hooks/use-toast";
 import { productionLogger } from "@/lib/logger/production-logger";
 import { Database } from "@/integrations/supabase/types";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 type MaintenanceSchedule = Database['public']['Tables']['maintenance_schedules']['Row'];
 type MaintenanceScheduleInsert = Database['public']['Tables']['maintenance_schedules']['Insert'];
@@ -12,14 +13,14 @@ export const useMaintenanceSchedules = () => {
   const queryClient = useQueryClient();
 
   const { data: schedules = [], isLoading } = useQuery({
-    queryKey: ['maintenance-schedules'],
+    queryKey: QUERY_KEYS.MAINTENANCE_SCHEDULES,
     queryFn: () => MaintenanceService.getSchedules(),
   });
 
   const addSchedule = useMutation({
     mutationFn: (schedule: MaintenanceScheduleInsert) => MaintenanceService.addSchedule(schedule),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['maintenance-schedules'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.MAINTENANCE_SCHEDULES });
       toast({
         title: "تم بنجاح",
         description: "تم إضافة جدول الصيانة بنجاح",
@@ -39,7 +40,7 @@ export const useMaintenanceSchedules = () => {
     mutationFn: ({ id, ...updates }: Partial<MaintenanceSchedule> & { id: string }) =>
       MaintenanceService.updateSchedule(id, updates),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['maintenance-schedules'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.MAINTENANCE_SCHEDULES });
       toast({
         title: "تم بنجاح",
         description: "تم تحديث جدول الصيانة",
@@ -57,7 +58,7 @@ export const useMaintenanceSchedules = () => {
   const deleteSchedule = useMutation({
     mutationFn: (id: string) => MaintenanceService.deleteSchedule(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['maintenance-schedules'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.MAINTENANCE_SCHEDULES });
       toast({
         title: "تم بنجاح",
         description: "تم حذف جدول الصيانة",

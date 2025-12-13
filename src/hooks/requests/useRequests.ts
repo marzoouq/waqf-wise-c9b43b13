@@ -7,6 +7,7 @@ import { useTasks } from '@/hooks/useTasks';
 import type { BeneficiaryRequest, RequestType } from '@/types';
 import { logger } from '@/lib/logger';
 import { createMutationErrorHandler } from '@/lib/errors';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 // ===========================
 // Request Types Hook
@@ -14,7 +15,7 @@ import { createMutationErrorHandler } from '@/lib/errors';
 
 export const useRequestTypes = () => {
   const { data: requestTypes = [], isLoading } = useQuery({
-    queryKey: ['request-types'],
+    queryKey: QUERY_KEYS.REQUEST_TYPES,
     queryFn: () => RequestService.getRequestTypes(),
   });
 
@@ -35,14 +36,14 @@ export const useRequests = (beneficiaryId?: string) => {
 
   // Fetch requests using RequestService
   const { data: requests = [], isLoading } = useQuery({
-    queryKey: beneficiaryId ? ['requests', 'beneficiary', beneficiaryId] : ['requests'],
+    queryKey: beneficiaryId ? [...QUERY_KEYS.REQUESTS, 'beneficiary', beneficiaryId] : QUERY_KEYS.REQUESTS,
     queryFn: () => RequestService.getAll(beneficiaryId),
   });
 
   // Real-time subscription using RealtimeService
   useEffect(() => {
     const { unsubscribe } = RealtimeService.subscribeToTable('beneficiary_requests', () => {
-      queryClient.invalidateQueries({ queryKey: ['requests'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REQUESTS });
     });
 
     return () => unsubscribe();
@@ -51,7 +52,7 @@ export const useRequests = (beneficiaryId?: string) => {
   // Get single request
   const getRequest = (requestId: string) => {
     return useQuery({
-      queryKey: ['request', requestId],
+      queryKey: QUERY_KEYS.REQUEST(requestId),
       queryFn: () => RequestService.getById(requestId),
       enabled: !!requestId,
     });
@@ -78,7 +79,7 @@ export const useRequests = (beneficiaryId?: string) => {
       throw new Error('Failed to get created request');
     },
     onSuccess: (data: BeneficiaryRequest) => {
-      queryClient.invalidateQueries({ queryKey: ['requests'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REQUESTS });
       
       // إنشاء مهمة للمراجعة
       if (data?.status === 'قيد المراجعة') {
@@ -111,7 +112,7 @@ export const useRequests = (beneficiaryId?: string) => {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['requests'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REQUESTS });
       toast({
         title: 'تم بنجاح',
         description: 'تم تحديث الطلب بنجاح',
@@ -126,7 +127,7 @@ export const useRequests = (beneficiaryId?: string) => {
       return RequestService.delete(id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['requests'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REQUESTS });
       toast({
         title: 'تم بنجاح',
         description: 'تم حذف الطلب بنجاح',
@@ -151,7 +152,7 @@ export const useRequests = (beneficiaryId?: string) => {
       return RequestService.review(id, status, decision_notes, rejection_reason);
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['requests'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REQUESTS });
       toast({
         title: 'تم بنجاح',
         description: variables.status === 'موافق' ? 'تم الموافقة على الطلب' : 'تم رفض الطلب',
