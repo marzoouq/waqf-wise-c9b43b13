@@ -44,6 +44,17 @@ export interface Distribution {
   approved_by?: string | null;
   executed_at?: string | null;
   executed_by?: string | null;
+  // حقول إضافية للتقارير والعرض
+  period_start?: string;
+  period_end?: string;
+  total_revenues?: number;
+  total_expenses?: number;
+  net_revenues?: number;
+  nazer_share?: number;
+  waqif_charity?: number;
+  waqf_corpus?: number;
+  distributable_amount?: number;
+  journal_entry_id?: string;
 }
 
 // ====================
