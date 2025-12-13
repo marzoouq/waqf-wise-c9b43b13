@@ -106,31 +106,42 @@ export class TenantService {
   }
 
   static async getTenantsWithBalance() {
-    const tenantsData = await this.getAll();
-    
-    const tenantsWithBalance = await Promise.all(
-      tenantsData.map(async (tenant) => {
-        const { data: ledgerData } = await supabase
-          .from('tenant_ledger')
-          .select('debit_amount, credit_amount, transaction_type')
-          .eq('tenant_id', tenant.id);
+    // استعلام واحد بدلاً من N+1
+    const { data: tenantsData, error: tenantsError } = await supabase
+      .from('tenants')
+      .select('*')
+      .order('created_at', { ascending: false });
 
-        const ledger = ledgerData || [];
-        const totalDebit = ledger.reduce((sum, e) => sum + (e.debit_amount || 0), 0);
-        const totalCredit = ledger.reduce((sum, e) => sum + (e.credit_amount || 0), 0);
-        const totalInvoices = ledger.filter(e => e.transaction_type === 'invoice').length;
-        const totalPayments = ledger.filter(e => e.transaction_type === 'payment').length;
+    if (tenantsError) throw tenantsError;
+    if (!tenantsData?.length) return [];
 
-        return {
-          ...tenant,
-          current_balance: totalDebit - totalCredit,
-          total_invoices: totalInvoices,
-          total_payments: totalPayments,
-        };
-      })
-    );
+    // جلب جميع سجلات الدفتر مرة واحدة
+    const tenantIds = tenantsData.map(t => t.id);
+    const { data: allLedger, error: ledgerError } = await supabase
+      .from('tenant_ledger')
+      .select('tenant_id, debit_amount, credit_amount, transaction_type')
+      .in('tenant_id', tenantIds);
 
-    return tenantsWithBalance;
+    if (ledgerError) throw ledgerError;
+
+    // تجميع البيانات لكل مستأجر
+    const ledgerByTenant = (allLedger || []).reduce((acc, entry) => {
+      if (!acc[entry.tenant_id]) {
+        acc[entry.tenant_id] = { debit: 0, credit: 0, invoices: 0, payments: 0 };
+      }
+      acc[entry.tenant_id].debit += entry.debit_amount || 0;
+      acc[entry.tenant_id].credit += entry.credit_amount || 0;
+      if (entry.transaction_type === 'invoice') acc[entry.tenant_id].invoices++;
+      if (entry.transaction_type === 'payment') acc[entry.tenant_id].payments++;
+      return acc;
+    }, {} as Record<string, { debit: number; credit: number; invoices: number; payments: number }>);
+
+    return tenantsData.map(tenant => ({
+      ...tenant,
+      current_balance: (ledgerByTenant[tenant.id]?.debit || 0) - (ledgerByTenant[tenant.id]?.credit || 0),
+      total_invoices: ledgerByTenant[tenant.id]?.invoices || 0,
+      total_payments: ledgerByTenant[tenant.id]?.payments || 0,
+    }));
   }
 
   static async getTenantsAging() {

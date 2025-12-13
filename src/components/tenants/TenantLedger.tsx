@@ -82,8 +82,8 @@ export function TenantLedger({ tenantId, tenantName }: TenantLedgerProps) {
                     <div className="flex items-center gap-2">
                       <div className={`p-1.5 rounded-full ${
                         entry.credit_amount > 0 
-                          ? 'bg-green-100 text-green-600 dark:bg-green-900/30' 
-                          : 'bg-red-100 text-red-600 dark:bg-red-900/30'
+                          ? 'bg-status-success/10 text-status-success' 
+                          : 'bg-destructive/10 text-destructive'
                       }`}>
                         {transactionTypeIcons[entry.transaction_type]}
                       </div>
@@ -97,8 +97,8 @@ export function TenantLedger({ tenantId, tenantName }: TenantLedgerProps) {
                       </div>
                     </div>
                     <div className="text-left">
-                      {entry.credit_amount > 0 && (
-                        <p className="font-bold text-green-600 text-sm sm:text-base">
+                    {entry.credit_amount > 0 && (
+                        <p className="font-bold text-status-success text-sm sm:text-base">
                           +{formatCurrency(entry.credit_amount)}
                         </p>
                       )}
@@ -124,7 +124,7 @@ export function TenantLedger({ tenantId, tenantName }: TenantLedgerProps) {
                       entry.balance > 0 
                         ? 'text-destructive' 
                         : entry.balance < 0 
-                          ? 'text-green-600' 
+                          ? 'text-status-success' 
                           : ''
                     }`}>
                       {formatCurrency(Math.abs(entry.balance))}
