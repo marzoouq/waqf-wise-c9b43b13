@@ -9,6 +9,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ACTIVE_FISCAL_YEAR_QUERY_KEY, FISCAL_YEARS_QUERY_KEY } from "@/hooks/fiscal-years";
 import { productionLogger } from "@/lib/logger/production-logger";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 // الجداول التي يحتاج الناظر لمتابعتها
 const NAZER_WATCHED_TABLES = [
@@ -27,21 +28,21 @@ const NAZER_WATCHED_TABLES = [
   "approvals",
 ] as const;
 
-// مفاتيح الاستعلامات التي يجب تحديثها
-const INVALIDATION_MAP: Record<string, string[][]> = {
-  beneficiaries: [["nazer-kpis"], ["beneficiaries"]],
-  properties: [["nazer-kpis"], ["properties"]],
-  contracts: [["nazer-kpis"], ["contracts"], ["revenue-progress"]],
-  loans: [["nazer-kpis"], ["loans"], ["pending-approvals"]],
-  journal_entries: [["nazer-kpis"], ["journal-entries"], ["pending-approvals"], ["unified-dashboard-kpis"]],
-  journal_entry_lines: [["nazer-kpis"], ["journal-entries"], ["unified-dashboard-kpis"]],
-  rental_payments: [["revenue-progress"], ["rental-payments"]],
-  fiscal_years: [ACTIVE_FISCAL_YEAR_QUERY_KEY as unknown as string[], FISCAL_YEARS_QUERY_KEY as unknown as string[]],
-  fiscal_year_closings: [["waqf-corpus-realtime"]],
-  accounts: [["bank-balance-realtime"], ["nazer-kpis"]],
-  distributions: [["distributions"], ["pending-approvals"]],
-  heir_distributions: [["heir-distributions"]],
-  approvals: [["pending-approvals"], ["smart-alerts"]],
+// مفاتيح الاستعلامات التي يجب تحديثها - باستخدام QUERY_KEYS الموحدة
+const INVALIDATION_MAP: Record<string, readonly (readonly string[])[]> = {
+  beneficiaries: [QUERY_KEYS.NAZER_KPIS, QUERY_KEYS.BENEFICIARIES, QUERY_KEYS.NAZER_BENEFICIARIES_QUICK],
+  properties: [QUERY_KEYS.NAZER_KPIS, QUERY_KEYS.PROPERTIES],
+  contracts: [QUERY_KEYS.NAZER_KPIS, QUERY_KEYS.CONTRACTS, ['revenue-progress'] as const],
+  loans: [QUERY_KEYS.NAZER_KPIS, QUERY_KEYS.LOANS, QUERY_KEYS.PENDING_APPROVALS],
+  journal_entries: [QUERY_KEYS.NAZER_KPIS, QUERY_KEYS.JOURNAL_ENTRIES, QUERY_KEYS.PENDING_APPROVALS, QUERY_KEYS.UNIFIED_KPIS],
+  journal_entry_lines: [QUERY_KEYS.NAZER_KPIS, QUERY_KEYS.JOURNAL_ENTRIES, QUERY_KEYS.UNIFIED_KPIS],
+  rental_payments: [['revenue-progress'] as const, QUERY_KEYS.RENTAL_PAYMENTS],
+  fiscal_years: [ACTIVE_FISCAL_YEAR_QUERY_KEY, FISCAL_YEARS_QUERY_KEY],
+  fiscal_year_closings: [['waqf-corpus-realtime'] as const],
+  accounts: [['bank-balance-realtime'] as const, QUERY_KEYS.NAZER_KPIS, QUERY_KEYS.NAZER_SYSTEM_OVERVIEW],
+  distributions: [QUERY_KEYS.DISTRIBUTIONS, QUERY_KEYS.PENDING_APPROVALS],
+  heir_distributions: [QUERY_KEYS.HEIR_DISTRIBUTIONS],
+  approvals: [QUERY_KEYS.PENDING_APPROVALS, QUERY_KEYS.SMART_ALERTS],
 };
 
 interface UseNazerDashboardRealtimeOptions {

@@ -181,6 +181,8 @@ export const QUERY_KEYS = {
   // Dashboard KPIs
   UNIFIED_KPIS: ['unified-dashboard-kpis'] as const,
   NAZER_KPIS: ['nazer-kpis'] as const,
+  NAZER_SYSTEM_OVERVIEW: ['nazer-system-overview'] as const,
+  NAZER_BENEFICIARIES_QUICK: ['nazer-beneficiaries-quick'] as const,
   ADMIN_KPIS: ['admin-kpis'] as const,
   ACCOUNTANT_KPIS: ['accountant-kpis'] as const,
   CASHIER_KPIS: ['cashier-kpis'] as const,

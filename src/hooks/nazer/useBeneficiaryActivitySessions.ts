@@ -71,7 +71,8 @@ export function useBeneficiaryActivitySessions() {
           table: "beneficiary_sessions",
         },
         () => {
-          query.refetch();
+          // استخدام invalidateQueries بدلاً من refetch لتجنب إعادة التصيير غير الضرورية
+          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BENEFICIARY_SESSIONS_LIVE });
         }
       )
       .subscribe();
@@ -79,7 +80,7 @@ export function useBeneficiaryActivitySessions() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [query.refetch]);
+  }, [queryClient]);
 
   const sessions = query.data || [];
 
