@@ -11,8 +11,6 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import React from 'react';
 
 // Mock useAuth - uses global mock from setup.ts
-// Import setMockAuthRoles to customize roles per test
-import { setMockAuthRoles } from '@/test/setup';
 
 const createWrapper = () => {
   const queryClient = new QueryClient({
@@ -33,15 +31,10 @@ const createWrapper = () => {
 describe('All Dashboard Pages', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    setMockAuthRoles(['admin']);
   });
 
   // لوحة تحكم الناظر
   describe('Nazer Dashboard Pages', () => {
-    beforeEach(() => {
-      setMockAuthRoles(['nazer']);
-    });
-
     it('should render NazerDashboard', async () => {
       const Page = (await import('@/pages/NazerDashboard')).default;
       render(<Page />, { wrapper: createWrapper() });
@@ -112,10 +105,6 @@ describe('All Dashboard Pages', () => {
 
   // لوحة تحكم المحاسب
   describe('Accountant Dashboard Pages', () => {
-    beforeEach(() => {
-      setMockAuthRoles(['accountant']);
-    });
-
     it('should render AccountantDashboard', async () => {
       const Page = (await import('@/pages/AccountantDashboard')).default;
       render(<Page />, { wrapper: createWrapper() });
@@ -155,10 +144,6 @@ describe('All Dashboard Pages', () => {
 
   // لوحة تحكم الصندوق
   describe('Cashier Dashboard Pages', () => {
-    beforeEach(() => {
-      setMockAuthRoles(['cashier']);
-    });
-
     it('should render CashierDashboard', async () => {
       const Page = (await import('@/pages/CashierDashboard')).default;
       render(<Page />, { wrapper: createWrapper() });
@@ -180,10 +165,6 @@ describe('All Dashboard Pages', () => {
 
   // لوحة تحكم الأرشيف
   describe('Archivist Dashboard Pages', () => {
-    beforeEach(() => {
-      setMockAuthRoles(['archivist']);
-    });
-
     it('should render ArchivistDashboard', async () => {
       const Page = (await import('@/pages/ArchivistDashboard')).default;
       render(<Page />, { wrapper: createWrapper() });
@@ -199,10 +180,6 @@ describe('All Dashboard Pages', () => {
 
   // بوابة المستفيد
   describe('Beneficiary Portal Pages', () => {
-    beforeEach(() => {
-      setMockAuthRoles(['beneficiary']);
-    });
-
     it('should render BeneficiaryPortal', async () => {
       const Page = (await import('@/pages/BeneficiaryPortal')).default;
       render(<Page />, { wrapper: createWrapper() });

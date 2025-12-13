@@ -11,7 +11,6 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import React from 'react';
 
 // Mock useAuth - uses global mock from setup.ts
-import { setMockAuthRoles } from '@/test/setup';
 
 const createWrapper = () => {
   const queryClient = new QueryClient({
@@ -36,10 +35,6 @@ describe('Dashboard Pages', () => {
   });
 
   describe('Admin Dashboard', () => {
-    beforeEach(() => {
-      setMockAuthRoles(['admin']);
-    });
-
     it('should render admin dashboard', async () => {
       const AdminDashboard = (await import('@/pages/AdminDashboard')).default;
       render(<AdminDashboard />, { wrapper: createWrapper() });
@@ -55,10 +50,6 @@ describe('Dashboard Pages', () => {
   });
 
   describe('Nazer Dashboard', () => {
-    beforeEach(() => {
-      setMockAuthRoles(['nazer']);
-    });
-
     it('should render nazer dashboard', async () => {
       const NazerDashboard = (await import('@/pages/NazerDashboard')).default;
       render(<NazerDashboard />, { wrapper: createWrapper() });
@@ -74,10 +65,6 @@ describe('Dashboard Pages', () => {
   });
 
   describe('Accountant Dashboard', () => {
-    beforeEach(() => {
-      setMockAuthRoles(['accountant']);
-    });
-
     it('should render accountant dashboard', async () => {
       const AccountantDashboard = (await import('@/pages/AccountantDashboard')).default;
       render(<AccountantDashboard />, { wrapper: createWrapper() });
@@ -89,10 +76,6 @@ describe('Dashboard Pages', () => {
   });
 
   describe('Beneficiary Portal', () => {
-    beforeEach(() => {
-      setMockAuthRoles(['beneficiary']);
-    });
-
     it('should render beneficiary portal', async () => {
       const BeneficiaryPortal = (await import('@/pages/BeneficiaryPortal')).default;
       render(<BeneficiaryPortal />, { wrapper: createWrapper() });
@@ -104,10 +87,6 @@ describe('Dashboard Pages', () => {
   });
 
   describe('Cashier Dashboard', () => {
-    beforeEach(() => {
-      setMockAuthRoles(['cashier']);
-    });
-
     it('should render cashier dashboard', async () => {
       const CashierDashboard = (await import('@/pages/CashierDashboard')).default;
       render(<CashierDashboard />, { wrapper: createWrapper() });
@@ -119,10 +98,6 @@ describe('Dashboard Pages', () => {
   });
 
   describe('Archivist Dashboard', () => {
-    beforeEach(() => {
-      setMockAuthRoles(['archivist']);
-    });
-
     it('should render archivist dashboard', async () => {
       const ArchivistDashboard = (await import('@/pages/ArchivistDashboard')).default;
       render(<ArchivistDashboard />, { wrapper: createWrapper() });
