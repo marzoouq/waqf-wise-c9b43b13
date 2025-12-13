@@ -5,7 +5,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AuthService } from '@/services/auth.service';
-import { mockSupabaseAuth } from '../../utils/supabase.mock';
+import { supabase } from '@/integrations/supabase/client';
 
 describe('AuthService', () => {
   beforeEach(() => {
@@ -16,8 +16,8 @@ describe('AuthService', () => {
     it('should return current authenticated user', async () => {
       const mockUser = { id: 'user-1', email: 'test@example.com' };
       
-      mockSupabaseAuth.getUser.mockResolvedValueOnce({
-        data: { user: mockUser },
+      vi.mocked(supabase.auth.getUser).mockResolvedValueOnce({
+        data: { user: mockUser as any },
         error: null,
       });
 
@@ -45,25 +45,25 @@ describe('AuthService', () => {
 
   describe('login', () => {
     it('should login with valid credentials', async () => {
-      mockSupabaseAuth.signInWithPassword.mockResolvedValueOnce({
-        data: { user: { id: 'user-1' }, session: { access_token: 'token' } },
+      vi.mocked(supabase.auth.signInWithPassword).mockResolvedValueOnce({
+        data: { user: { id: 'user-1' } as any, session: { access_token: 'token' } as any },
         error: null,
       });
 
       const result = await AuthService.login('test@example.com', 'password123');
       
-      expect(mockSupabaseAuth.signInWithPassword).toHaveBeenCalled();
+      expect(supabase.auth.signInWithPassword).toHaveBeenCalled();
       expect(result).toBeDefined();
     });
   });
 
   describe('logout', () => {
     it('should logout user', async () => {
-      mockSupabaseAuth.signOut.mockResolvedValueOnce({ error: null });
+      vi.mocked(supabase.auth.signOut).mockResolvedValueOnce({ error: null });
 
       await AuthService.logout();
       
-      expect(mockSupabaseAuth.signOut).toHaveBeenCalled();
+      expect(supabase.auth.signOut).toHaveBeenCalled();
     });
   });
 });
