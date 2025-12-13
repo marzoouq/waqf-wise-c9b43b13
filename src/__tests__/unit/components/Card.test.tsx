@@ -4,7 +4,8 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
+import { screen } from '@testing-library/dom';
 import {
   Card,
   CardHeader,
@@ -39,32 +40,28 @@ describe('Card', () => {
 
   it('should apply custom className to Card', () => {
     render(<Card className="custom-card">Content</Card>);
-    const cardElement = screen.getByText('Content').closest('.custom-card');
-    expect(cardElement).toBeInTheDocument();
-    expect(cardElement).toHaveClass('custom-card');
+    expect(screen.getByText('Content').closest('.rounded-lg')).toHaveClass('custom-card');
   });
 
   it('should render CardHeader with custom className', () => {
-    const { container } = render(
+    render(
       <Card>
         <CardHeader className="custom-header">
           <CardTitle>Title</CardTitle>
         </CardHeader>
       </Card>
     );
-    const header = container.querySelector('.custom-header');
-    expect(header).toBeInTheDocument();
+    expect(screen.getByText('Title').parentElement).toHaveClass('custom-header');
   });
 
   it('should render CardContent correctly', () => {
-    const { container } = render(
+    render(
       <Card>
         <CardContent className="custom-content">
           <span>Test Content</span>
         </CardContent>
       </Card>
     );
-    const content = container.querySelector('.custom-content');
-    expect(content).toBeInTheDocument();
+    expect(screen.getByText('Test Content').parentElement).toHaveClass('custom-content');
   });
 });
