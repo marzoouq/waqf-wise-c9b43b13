@@ -101,7 +101,6 @@ export const AuditLogs = lazyWithRetry(() => import("@/pages/AuditLogs"));
 export const SystemMonitoring = lazyWithRetry(() => import("@/pages/SystemMonitoring"));
 export const SystemErrorLogs = lazyWithRetry(() => import("@/pages/SystemErrorLogs"));
 export const SystemMaintenance = lazyWithRetry(() => import("@/pages/SystemMaintenance"));
-export const SystemTesting = lazyWithRetry(() => import("@/pages/SystemTesting"));
 export const SecurityDashboard = lazyWithRetry(() => import("@/pages/SecurityDashboard"));
 export const PerformanceDashboard = lazyWithRetry(() => import("@/pages/PerformanceDashboard"));
 export const IntegrationsManagement = lazyWithRetry(() => import("@/pages/IntegrationsManagement"));
