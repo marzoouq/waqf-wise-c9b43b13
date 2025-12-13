@@ -5,8 +5,9 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BeneficiaryService } from '@/services/beneficiary.service';
-import { mockSupabase, setMockTableData, clearMockTableData } from '../../utils/supabase.mock';
+import { supabase } from '@/integrations/supabase/client';
 import { mockBeneficiaries } from '../../utils/data.fixtures';
+import { setMockTableData, clearMockTableData } from '@/test/setup';
 
 describe('BeneficiaryService', () => {
   beforeEach(() => {
@@ -20,7 +21,7 @@ describe('BeneficiaryService', () => {
 
       const result = await BeneficiaryService.getAll();
       
-      expect(mockSupabase.from).toHaveBeenCalledWith('beneficiaries');
+      expect(supabase.from).toHaveBeenCalledWith('beneficiaries');
       expect(result).toBeDefined();
     });
   });
@@ -42,7 +43,7 @@ describe('BeneficiaryService', () => {
 
       const result = await BeneficiaryService.getBeneficiaryIdByUserId('user-1');
       
-      expect(mockSupabase.from).toHaveBeenCalledWith('beneficiaries');
+      expect(supabase.from).toHaveBeenCalledWith('beneficiaries');
     });
   });
 

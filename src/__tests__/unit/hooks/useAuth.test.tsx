@@ -7,7 +7,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { createTestQueryClient } from '../../utils/test-utils';
-import { mockSupabaseAuth } from '../../utils/supabase.mock';
+import { supabase } from '@/integrations/supabase/client';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
@@ -40,7 +40,7 @@ describe('useAuth', () => {
     });
 
     it('should have null user initially', () => {
-      mockSupabaseAuth.getUser.mockResolvedValueOnce({
+      vi.mocked(supabase.auth.getUser).mockResolvedValueOnce({
         data: { user: null },
         error: null,
       });
@@ -56,8 +56,8 @@ describe('useAuth', () => {
   describe('signIn', () => {
     it('should sign in user successfully', async () => {
       const mockUser = { id: 'user-1', email: 'test@example.com' };
-      mockSupabaseAuth.signInWithPassword.mockResolvedValueOnce({
-        data: { user: mockUser, session: { access_token: 'token' } },
+      vi.mocked(supabase.auth.signInWithPassword).mockResolvedValueOnce({
+        data: { user: mockUser as any, session: { access_token: 'token' } as any },
         error: null,
       });
 
@@ -69,13 +69,13 @@ describe('useAuth', () => {
         await result.current.signIn('test@example.com', 'password');
       });
 
-      expect(mockSupabaseAuth.signInWithPassword).toHaveBeenCalled();
+      expect(supabase.auth.signInWithPassword).toHaveBeenCalled();
     });
 
     it('should handle sign in error', async () => {
-      mockSupabaseAuth.signInWithPassword.mockResolvedValueOnce({
+      vi.mocked(supabase.auth.signInWithPassword).mockResolvedValueOnce({
         data: { user: null, session: null },
-        error: { message: 'Invalid credentials' },
+        error: { message: 'Invalid credentials' } as any,
       });
 
       const { result } = renderHook(() => useAuth(), {
@@ -87,13 +87,13 @@ describe('useAuth', () => {
       });
 
       // Error should be handled internally
-      expect(mockSupabaseAuth.signInWithPassword).toHaveBeenCalled();
+      expect(supabase.auth.signInWithPassword).toHaveBeenCalled();
     });
   });
 
   describe('signOut', () => {
     it('should sign out user', async () => {
-      mockSupabaseAuth.signOut.mockResolvedValueOnce({ error: null });
+      vi.mocked(supabase.auth.signOut).mockResolvedValueOnce({ error: null });
 
       const { result } = renderHook(() => useAuth(), {
         wrapper: createWrapper(),
@@ -103,7 +103,7 @@ describe('useAuth', () => {
         await result.current.signOut();
       });
 
-      expect(mockSupabaseAuth.signOut).toHaveBeenCalled();
+      expect(supabase.auth.signOut).toHaveBeenCalled();
     });
   });
 
