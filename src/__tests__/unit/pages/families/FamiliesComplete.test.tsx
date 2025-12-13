@@ -6,9 +6,10 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { setMockTableData, clearMockTableData } from '@/test/setup';
 
+// Mock data that matches realistic family structure
 const mockFamilies = [
-  { id: 'f1', name: 'عائلة محمد مرزوق الثبيتي', head_id: 'b1', member_count: 5, created_at: '2024-01-01' },
-  { id: 'f2', name: 'عائلة أحمد الثبيتي', head_id: 'b2', member_count: 3, created_at: '2024-02-01' },
+  { id: 'f1', name: 'عائلة محمد مرزوق الثبيتي', head_id: 'b1', member_count: 6, created_at: '2024-01-01' },
+  { id: 'f2', name: 'عائلة أحمد الثبيتي', head_id: 'b7', member_count: 3, created_at: '2024-02-01' },
 ];
 
 const mockBeneficiaries = [
@@ -37,15 +38,23 @@ describe('Families Page - Complete Tests', () => {
 
     it('should show family names', () => {
       expect(mockFamilies[0].name).toBe('عائلة محمد مرزوق الثبيتي');
+      expect(mockFamilies[1].name).toBe('عائلة أحمد الثبيتي');
     });
 
     it('should show member count', () => {
-      expect(mockFamilies[0].member_count).toBe(5);
+      expect(mockFamilies[0].member_count).toBe(6);
+      expect(mockFamilies[1].member_count).toBe(3);
     });
 
     it('should calculate total members', () => {
       const totalMembers = mockFamilies.reduce((sum, f) => sum + f.member_count, 0);
-      expect(totalMembers).toBe(8);
+      expect(totalMembers).toBe(9);
+    });
+
+    it('should have head_id for each family', () => {
+      mockFamilies.forEach(family => {
+        expect(family.head_id).toBeDefined();
+      });
     });
   });
 
@@ -62,6 +71,7 @@ describe('Families Page - Complete Tests', () => {
     it('should identify family head', () => {
       const head = mockBeneficiaries.find(b => b.is_head_of_family);
       expect(head?.full_name).toBe('محمد مرزوق الثبيتي');
+      expect(head?.relationship).toBe('رب الأسرة');
     });
 
     it('should show relationships', () => {
@@ -69,6 +79,7 @@ describe('Families Page - Complete Tests', () => {
       expect(relationships).toContain('ابن');
       expect(relationships).toContain('بنت');
       expect(relationships).toContain('زوجة');
+      expect(relationships).toContain('رب الأسرة');
     });
 
     it('should count by relationship', () => {
@@ -76,8 +87,11 @@ describe('Families Page - Complete Tests', () => {
         acc[b.relationship] = (acc[b.relationship] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
+      
       expect(byRelationship['ابن']).toBe(2);
       expect(byRelationship['زوجة']).toBe(2);
+      expect(byRelationship['بنت']).toBe(1);
+      expect(byRelationship['رب الأسرة']).toBe(1);
     });
   });
 
@@ -97,9 +111,16 @@ describe('Families Page - Complete Tests', () => {
         acc[b.category] = (acc[b.category] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
+      
       expect(byCategory['ابن']).toBe(2);
       expect(byCategory['بنت']).toBe(1);
       expect(byCategory['زوجة']).toBe(2);
+      expect(byCategory['رب الأسرة']).toBe(1);
+    });
+
+    it('should have one head of family', () => {
+      const heads = mockBeneficiaries.filter(b => b.is_head_of_family);
+      expect(heads).toHaveLength(1);
     });
   });
 
@@ -111,6 +132,12 @@ describe('Families Page - Complete Tests', () => {
         member_count: 1
       };
       expect(newFamily.name).toBe('عائلة جديدة');
+      expect(newFamily.member_count).toBe(1);
+    });
+
+    it('should validate family name', () => {
+      const validName = 'عائلة الثبيتي';
+      expect(validName.length).toBeGreaterThan(0);
     });
   });
 
@@ -123,6 +150,7 @@ describe('Families Page - Complete Tests', () => {
       }));
       const result = linkMember('b10', 'f1');
       expect(result.linked).toBe(true);
+      expect(linkMember).toHaveBeenCalledWith('b10', 'f1');
     });
 
     it('should update member count', () => {
@@ -131,7 +159,31 @@ describe('Families Page - Complete Tests', () => {
         member_count: family.member_count + delta
       });
       const updated = updateCount(mockFamilies[0], 1);
-      expect(updated.member_count).toBe(6);
+      expect(updated.member_count).toBe(7);
+    });
+
+    it('should decrease member count on removal', () => {
+      const updateCount = (family: typeof mockFamilies[0], delta: number) => ({
+        ...family,
+        member_count: family.member_count + delta
+      });
+      const updated = updateCount(mockFamilies[0], -1);
+      expect(updated.member_count).toBe(5);
+    });
+  });
+
+  describe('Data Integrity', () => {
+    it('should have unique beneficiary IDs', () => {
+      const ids = mockBeneficiaries.map(b => b.id);
+      const uniqueIds = new Set(ids);
+      expect(uniqueIds.size).toBe(ids.length);
+    });
+
+    it('should have valid family references', () => {
+      const familyIds = mockFamilies.map(f => f.id);
+      mockBeneficiaries.forEach(b => {
+        expect(familyIds).toContain(b.family_id);
+      });
     });
   });
 });
