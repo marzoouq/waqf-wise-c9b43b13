@@ -21,21 +21,22 @@ export function useUnifiedKPIs() {
     ...QUERY_CONFIG.DASHBOARD_KPIS
   });
 
-  // الاشتراك في التحديثات المباشرة
+  // الاشتراك في التحديثات المباشرة عبر قناة واحدة موحدة
   useEffect(() => {
     const tables = ['beneficiaries', 'properties', 'contracts', 'payments', 'journal_entries', 'journal_entry_lines', 'loans', 'beneficiary_requests', 'families', 'funds'];
     
-    const channels = tables.map(table => 
-      supabase
-        .channel(`unified-dashboard-kpis-${table}`)
-        .on('postgres_changes', { event: '*', schema: 'public', table }, () => {
-          queryClient.invalidateQueries({ queryKey: ['unified-dashboard-kpis'] });
-        })
-        .subscribe()
-    );
+    const channel = supabase.channel('unified-dashboard-kpis-realtime');
+    
+    tables.forEach(table => {
+      channel.on('postgres_changes', { event: '*', schema: 'public', table }, () => {
+        queryClient.invalidateQueries({ queryKey: ['unified-dashboard-kpis'] });
+      });
+    });
+    
+    channel.subscribe();
 
     return () => {
-      channels.forEach(channel => supabase.removeChannel(channel));
+      supabase.removeChannel(channel);
     };
   }, [queryClient]);
 
