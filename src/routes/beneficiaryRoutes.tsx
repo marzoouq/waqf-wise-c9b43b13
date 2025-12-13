@@ -22,7 +22,7 @@ export const beneficiaryStandaloneRoutes = [
     key="beneficiary-dashboard"
     path="/beneficiary-dashboard" 
     element={
-      <ProtectedRoute requiredRoles={["beneficiary", "waqf_heir"]}>
+      <ProtectedRoute requiredRoles={["beneficiary", "waqf_heir", "nazer", "admin"]}>
         <BeneficiaryPortal />
       </ProtectedRoute>
     } 
