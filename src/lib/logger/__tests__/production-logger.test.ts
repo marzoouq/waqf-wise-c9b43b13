@@ -11,8 +11,7 @@ describe('ProductionLogger', () => {
   });
 
   describe('info()', () => {
-    it('should NOT add info messages to queue in production', async () => {
-      // Mock the supabase client
+    it('should NOT add info messages to queue (info is never queued)', async () => {
       vi.doMock('@/integrations/supabase/client', () => ({
         supabase: {
           functions: { invoke: vi.fn() },
@@ -22,20 +21,19 @@ describe('ProductionLogger', () => {
 
       const { productionLogger } = await import('../production-logger');
       
-      // Clear queue using any cast for private property access
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (productionLogger as any).queue = [];
       
       productionLogger.info('Test info message', { data: 'test' });
       
-      // Queue should be empty - info doesn't add to queue
+      // Queue should be empty - info never adds to queue
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expect((productionLogger as any).queue).toHaveLength(0);
     });
   });
 
   describe('warn()', () => {
-    it('should NOT add warn messages to queue by default', async () => {
+    it('should NOT add warn messages to queue (only sent directly for high severity)', async () => {
       vi.doMock('@/integrations/supabase/client', () => ({
         supabase: {
           functions: { invoke: vi.fn() },
@@ -45,20 +43,19 @@ describe('ProductionLogger', () => {
 
       const { productionLogger } = await import('../production-logger');
       
-      // Clear queue
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (productionLogger as any).queue = [];
       
       productionLogger.warn('Test warning', { data: 'test' });
       
-      // Queue should be empty - warn doesn't add to queue unless high severity
+      // Queue should be empty - warn doesn't add to queue
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expect((productionLogger as any).queue).toHaveLength(0);
     });
   });
 
   describe('error()', () => {
-    it('should have error method that accepts message and error', async () => {
+    it('should call console.error in DEV environment', async () => {
       vi.doMock('@/integrations/supabase/client', () => ({
         supabase: {
           functions: { invoke: vi.fn() },
@@ -66,18 +63,17 @@ describe('ProductionLogger', () => {
         },
       }));
 
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      
       const { productionLogger } = await import('../production-logger');
       
-      // Verify error method exists and is callable
-      expect(typeof productionLogger.error).toBe('function');
+      productionLogger.error('Test error', new Error('Test'));
       
-      // Should not throw when called
-      expect(() => productionLogger.error('Test error', new Error('Test'))).not.toThrow();
+      expect(consoleSpy).toHaveBeenCalled();
+      consoleSpy.mockRestore();
     });
-  });
 
-  describe('flush()', () => {
-    it('should filter and only process error-level logs', async () => {
+    it('should NOT add to queue in DEV environment (IS_PROD is false)', async () => {
       vi.doMock('@/integrations/supabase/client', () => ({
         supabase: {
           functions: { invoke: vi.fn() },
@@ -88,28 +84,18 @@ describe('ProductionLogger', () => {
       const { productionLogger } = await import('../production-logger');
       
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const queue = (productionLogger as any).queue as Array<{ level: string; message: string; timestamp: string; data?: unknown }>;
+      (productionLogger as any).queue = [];
       
-      // Clear and add mixed logs
-      queue.length = 0;
-      queue.push(
-        { level: 'error', message: 'Error 1', timestamp: new Date().toISOString(), data: {} },
-        { level: 'warn', message: 'Warning 1', timestamp: new Date().toISOString(), data: {} },
-        { level: 'info', message: 'Info 1', timestamp: new Date().toISOString(), data: {} },
-        { level: 'error', message: 'Error 2', timestamp: new Date().toISOString(), data: {} }
-      );
+      productionLogger.error('Test error', new Error('Test'));
       
-      // Verify queue has the entries
-      expect(queue.length).toBe(4);
-      
-      // Filter to show only errors (this is what flush does internally)
-      const errorsOnly = queue.filter(log => log.level === 'error');
-      expect(errorsOnly.length).toBe(2);
+      // In DEV, addToQueue checks IS_PROD and doesn't add
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      expect((productionLogger as any).queue).toHaveLength(0);
     });
   });
 
-  describe('cleanup()', () => {
-    it('should have cleanup method available', async () => {
+  describe('flush()', () => {
+    it('should clear queue immediately in DEV environment', async () => {
       vi.doMock('@/integrations/supabase/client', () => ({
         supabase: {
           functions: { invoke: vi.fn() },
@@ -119,11 +105,68 @@ describe('ProductionLogger', () => {
 
       const { productionLogger } = await import('../production-logger');
       
-      // Verify cleanup is a function
-      expect(typeof productionLogger.cleanup).toBe('function');
+      // Manually add items to queue for testing
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (productionLogger as any).queue = [
+        { level: 'error', message: 'Error 1', timestamp: new Date().toISOString(), data: {} },
+        { level: 'warn', message: 'Warning 1', timestamp: new Date().toISOString(), data: {} },
+      ];
       
-      // Call cleanup - it should not throw
-      expect(() => productionLogger.cleanup()).not.toThrow();
+      // Call flush
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (productionLogger as any).flush();
+      
+      // In DEV, flush clears queue and returns immediately
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      expect((productionLogger as any).queue).toHaveLength(0);
+    });
+  });
+
+  describe('cleanup()', () => {
+    it('should not call clearInterval if flushInterval is null', async () => {
+      vi.doMock('@/integrations/supabase/client', () => ({
+        supabase: {
+          functions: { invoke: vi.fn() },
+          auth: { getSession: vi.fn().mockResolvedValue({ data: { session: null } }) },
+        },
+      }));
+
+      const clearIntervalSpy = vi.spyOn(global, 'clearInterval');
+      
+      const { productionLogger } = await import('../production-logger');
+      
+      // Ensure flushInterval is null (it should be in DEV since constructor doesn't start it)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (productionLogger as any).flushInterval = null;
+      
+      productionLogger.cleanup();
+      
+      expect(clearIntervalSpy).not.toHaveBeenCalled();
+      clearIntervalSpy.mockRestore();
+    });
+
+    it('should call clearInterval if flushInterval exists', async () => {
+      vi.doMock('@/integrations/supabase/client', () => ({
+        supabase: {
+          functions: { invoke: vi.fn() },
+          auth: { getSession: vi.fn().mockResolvedValue({ data: { session: null } }) },
+        },
+      }));
+
+      const clearIntervalSpy = vi.spyOn(global, 'clearInterval');
+      
+      const { productionLogger } = await import('../production-logger');
+      
+      // Set a fake interval
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const fakeInterval = setInterval(() => {}, 1000);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (productionLogger as any).flushInterval = fakeInterval;
+      
+      productionLogger.cleanup();
+      
+      expect(clearIntervalSpy).toHaveBeenCalledWith(fakeInterval);
+      clearIntervalSpy.mockRestore();
     });
   });
 });
