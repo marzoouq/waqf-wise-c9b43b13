@@ -123,7 +123,7 @@ export default function BeneficiarySupport() {
           </div>
           <Button 
             variant="outline" 
-            onClick={() => navigate("/beneficiary-dashboard")}
+            onClick={() => navigate("/beneficiary-portal")}
             className="min-h-[44px] w-full sm:w-auto"
           >
             <ArrowRight className="h-4 w-4 ml-2" />

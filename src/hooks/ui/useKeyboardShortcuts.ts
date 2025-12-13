@@ -45,7 +45,7 @@ export function useBeneficiaryKeyboardShortcuts() {
     {
       key: 'h',
       alt: true,
-      action: () => navigate('/beneficiary-dashboard'),
+      action: () => navigate('/beneficiary-portal'),
       description: 'الذهاب للصفحة الرئيسية',
     },
     {

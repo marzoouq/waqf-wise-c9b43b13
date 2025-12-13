@@ -38,7 +38,6 @@ const PAGE_NAMES: Record<string, string> = {
   "/beneficiary-portal/requests": "الطلبات",
   "/beneficiary-portal/documents": "المستندات",
   "/beneficiary-portal/loans": "القروض",
-  "/beneficiary-dashboard": "لوحة التحكم",
 };
 
 export function getPageName(path: string | null): string {

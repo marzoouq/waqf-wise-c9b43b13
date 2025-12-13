@@ -18,6 +18,17 @@ import {
  * مسارات المستفيد المستقلة (خارج MainLayout)
  */
 export const beneficiaryStandaloneRoutes = [
+  // المسار الرئيسي - beneficiary-portal
+  <Route 
+    key="beneficiary-portal"
+    path="/beneficiary-portal" 
+    element={
+      <ProtectedRoute requiredRoles={["beneficiary", "waqf_heir", "nazer", "admin"]}>
+        <BeneficiaryPortal />
+      </ProtectedRoute>
+    } 
+  />,
+  // المسار القديم للتوافق - يعيد التوجيه إلى beneficiary-portal
   <Route 
     key="beneficiary-dashboard"
     path="/beneficiary-dashboard" 

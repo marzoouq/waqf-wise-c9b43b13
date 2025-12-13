@@ -9,8 +9,8 @@ export type AppRole = "nazer" | "admin" | "accountant" | "cashier" | "archivist"
  * خريطة التوجيه حسب الدور
  */
 const ROLE_DASHBOARD_MAP: Record<AppRole, string> = {
-  waqf_heir: '/beneficiary-dashboard',
-  beneficiary: '/beneficiary-dashboard',
+  waqf_heir: '/beneficiary-portal',
+  beneficiary: '/beneficiary-portal',
   nazer: '/nazer-dashboard',
   admin: '/admin-dashboard',
   accountant: '/accountant-dashboard',
