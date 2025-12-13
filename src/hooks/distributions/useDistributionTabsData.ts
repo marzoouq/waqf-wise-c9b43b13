@@ -5,6 +5,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { DistributionService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 import type { 
   DistributionApproval, 
   ApprovalHistoryItem, 
@@ -42,14 +43,14 @@ export function useDistributionTimeline(distributionId: string | undefined) {
 // ==================== Distribution Vouchers Hook ====================
 export function useDistributionVouchers(distributionId: string) {
   const vouchersQuery = useQuery({
-    queryKey: ["distribution-vouchers-tab", distributionId],
+    queryKey: QUERY_KEYS.DISTRIBUTION_VOUCHERS_TAB(distributionId),
     queryFn: async (): Promise<VoucherRecord[]> => {
       return DistributionService.getDistributionVouchersWithDetails(distributionId);
     },
   });
 
   const statsQuery = useQuery({
-    queryKey: ["distribution-vouchers-stats-tab", distributionId],
+    queryKey: QUERY_KEYS.DISTRIBUTION_VOUCHERS_STATS_TAB(distributionId),
     queryFn: async (): Promise<VoucherStats> => {
       return DistributionService.getDistributionVoucherStats(distributionId);
     },
@@ -66,7 +67,7 @@ export function useDistributionVouchers(distributionId: string) {
 // ==================== Payment Vouchers List Hook ====================
 export function usePaymentVouchersList() {
   return useQuery({
-    queryKey: ["payment-vouchers-list"],
+    queryKey: QUERY_KEYS.PAYMENT_VOUCHERS_LIST,
     queryFn: () => DistributionService.getPaymentVouchersList(),
   });
 }
@@ -74,7 +75,7 @@ export function usePaymentVouchersList() {
 // ==================== Family Members Dialog Hook ====================
 export function useFamilyMembersDialog(familyName: string, enabled: boolean) {
   return useQuery({
-    queryKey: ["family-members-dialog", familyName],
+    queryKey: QUERY_KEYS.FAMILY_MEMBERS_DIALOG(familyName),
     queryFn: () => DistributionService.getFamilyMembers(familyName),
     enabled,
   });

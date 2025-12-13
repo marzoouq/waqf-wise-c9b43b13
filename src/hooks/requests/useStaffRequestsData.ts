@@ -6,6 +6,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { RequestService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface RequestWithBeneficiary {
   id: string;
@@ -38,7 +39,7 @@ export function useStaffRequestsData() {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['all-beneficiary-requests'],
+    queryKey: QUERY_KEYS.ALL_BENEFICIARY_REQUESTS,
     queryFn: () => RequestService.getAllWithBeneficiary() as Promise<RequestWithBeneficiary[]>,
   });
 
@@ -47,7 +48,7 @@ export function useStaffRequestsData() {
       return RequestService.updateRequestStatus(requestId, status, notes);
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['all-beneficiary-requests'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ALL_BENEFICIARY_REQUESTS });
       toast.success(variables.status === 'approved' ? 'تمت الموافقة على الطلب' : 'تم رفض الطلب');
     },
     onError: (error: Error) => {

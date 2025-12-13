@@ -8,6 +8,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { AppRole } from "@/hooks/useUserRole";
 import { SecurityService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 interface RolePermissionState {
   permissionId: string;
@@ -21,7 +22,7 @@ export function useRolePermissionsData(role: AppRole) {
   const [modifications, setModifications] = useState<Map<string, RolePermissionState>>(new Map());
 
   const query = useQuery({
-    queryKey: ["role-permissions", role],
+    queryKey: QUERY_KEYS.ROLE_PERMISSIONS(role),
     queryFn: () => SecurityService.getRolePermissions(role),
     enabled: !!role,
   });
@@ -31,8 +32,8 @@ export function useRolePermissionsData(role: AppRole) {
       await SecurityService.upsertRolePermission(role, permissionId, granted);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["role-permissions"] });
-      queryClient.invalidateQueries({ queryKey: ["user-permissions"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ROLE_PERMISSIONS() });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USER_PERMISSIONS() });
       toast({
         title: "تم الحفظ",
         description: "تم تحديث الصلاحيات بنجاح",

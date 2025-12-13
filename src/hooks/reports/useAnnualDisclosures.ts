@@ -4,6 +4,7 @@ import { logger } from "@/lib/logger";
 import { getErrorMessage } from "@/types/errors";
 import type { Database } from "@/integrations/supabase/types";
 import { ReportService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 type DbAnnualDisclosure = Database['public']['Tables']['annual_disclosures']['Row'];
 
@@ -26,12 +27,12 @@ export function useAnnualDisclosures() {
   const queryClient = useQueryClient();
 
   const { data: disclosures = [], isLoading } = useQuery({
-    queryKey: ["annual-disclosures"],
+    queryKey: QUERY_KEYS.ANNUAL_DISCLOSURES,
     queryFn: () => ReportService.getAnnualDisclosures(),
   });
 
   const { data: currentYearDisclosure, isLoading: loadingCurrent } = useQuery({
-    queryKey: ["annual-disclosure-current"],
+    queryKey: QUERY_KEYS.ANNUAL_DISCLOSURE_CURRENT,
     queryFn: () => ReportService.getCurrentYearDisclosure(),
   });
 
@@ -39,8 +40,8 @@ export function useAnnualDisclosures() {
     mutationFn: ({ year, waqfName }: { year: number; waqfName: string }) =>
       ReportService.generateAnnualDisclosure(year, waqfName),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["annual-disclosures"] });
-      queryClient.invalidateQueries({ queryKey: ["annual-disclosure-current"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ANNUAL_DISCLOSURES });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ANNUAL_DISCLOSURE_CURRENT });
       toast({
         title: "تم إنشاء الإفصاح بنجاح",
         description: "تم توليد الإفصاح السنوي بنجاح",
@@ -59,7 +60,7 @@ export function useAnnualDisclosures() {
   const publishDisclosure = useMutation({
     mutationFn: (disclosureId: string) => ReportService.publishDisclosure(disclosureId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["annual-disclosures"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ANNUAL_DISCLOSURES });
       toast({
         title: "تم نشر الإفصاح",
         description: "أصبح الإفصاح متاحاً للمستفيدين وتم إرسال الإشعارات",
@@ -86,7 +87,7 @@ export function useAnnualDisclosures() {
 
 export function useDisclosureBeneficiaries(disclosureId?: string) {
   const { data: beneficiaries = [], isLoading } = useQuery({
-    queryKey: ["disclosure-beneficiaries", disclosureId],
+    queryKey: QUERY_KEYS.DISCLOSURE_BENEFICIARIES(disclosureId),
     queryFn: () => disclosureId ? ReportService.getDisclosureBeneficiaries(disclosureId) : [],
     enabled: !!disclosureId,
   });

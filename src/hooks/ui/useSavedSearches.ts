@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { UIService, type SavedSearch } from "@/services/ui.service";
 import { useToast } from "@/hooks/use-toast";
 import { createMutationErrorHandler } from "@/lib/errors";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export type { SavedSearch };
 
@@ -10,7 +11,7 @@ export function useSavedSearches() {
   const queryClient = useQueryClient();
 
   const { data: searches = [], isLoading } = useQuery({
-    queryKey: ["saved-searches"],
+    queryKey: QUERY_KEYS.SAVED_SEARCHES,
     queryFn: () => UIService.getSavedSearches(),
   });
 
@@ -18,7 +19,7 @@ export function useSavedSearches() {
     mutationFn: (search: Omit<SavedSearch, "id" | "user_id" | "created_at" | "updated_at" | "usage_count">) =>
       UIService.saveSearch(search),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["saved-searches"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.SAVED_SEARCHES });
       toast({
         title: "تم الحفظ بنجاح",
         description: "تم حفظ البحث بنجاح",
@@ -33,7 +34,7 @@ export function useSavedSearches() {
   const deleteSearch = useMutation({
     mutationFn: (id: string) => UIService.deleteSearch(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["saved-searches"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.SAVED_SEARCHES });
       toast({
         title: "تم الحذف بنجاح",
         description: "تم حذف البحث المحفوظ بنجاح",

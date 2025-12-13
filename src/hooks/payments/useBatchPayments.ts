@@ -8,7 +8,7 @@ import { useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PaymentService } from '@/services';
 import { useToast } from '@/hooks/use-toast';
-
+import { QUERY_KEYS } from '@/lib/query-keys';
 export interface PaymentSchedule {
   id: string;
   distribution_id: string;
@@ -30,7 +30,7 @@ export function useBatchPayments(distributionId?: string) {
 
   // جلب جداول المدفوعات
   const { data: schedules = [], isLoading } = useQuery({
-    queryKey: ['payment-schedules', distributionId],
+    queryKey: QUERY_KEYS.PAYMENT_SCHEDULES(distributionId),
     queryFn: () => PaymentService.getPaymentSchedules(distributionId),
     enabled: !!distributionId,
   });
@@ -40,7 +40,7 @@ export function useBatchPayments(distributionId?: string) {
     mutationFn: (schedule: Omit<PaymentSchedule, 'id' | 'created_at' | 'updated_at'>) =>
       PaymentService.createPaymentSchedule(schedule),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['payment-schedules'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PAYMENT_SCHEDULES() });
       toast({
         title: 'تم بنجاح',
         description: 'تم إضافة جدول المدفوعات',
@@ -60,7 +60,7 @@ export function useBatchPayments(distributionId?: string) {
     mutationFn: ({ id, updates }: { id: string; updates: Partial<PaymentSchedule> }) =>
       PaymentService.updatePaymentSchedule(id, updates),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['payment-schedules'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PAYMENT_SCHEDULES() });
     },
   });
 
@@ -68,7 +68,7 @@ export function useBatchPayments(distributionId?: string) {
   const deleteSchedule = useMutation({
     mutationFn: (id: string) => PaymentService.deletePaymentSchedule(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['payment-schedules'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PAYMENT_SCHEDULES() });
       toast({
         title: 'تم الحذف',
         description: 'تم حذف الجدول',
@@ -103,7 +103,7 @@ export function useBatchPayments(distributionId?: string) {
 
       try {
         const data = await PaymentService.createBatchSchedules(schedulesToCreate);
-        queryClient.invalidateQueries({ queryKey: ['payment-schedules'] });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PAYMENT_SCHEDULES() });
         toast({
           title: 'تم بنجاح',
           description: `تم إنشاء ${numberOfBatches} دفعة مجدولة`,
