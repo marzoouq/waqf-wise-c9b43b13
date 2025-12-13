@@ -458,7 +458,7 @@ export class AccountingService {
    * جلب إحصائيات أمين الصندوق
    */
   static async getCashierStats() {
-    const { data: bankAccount } = await supabase.from('accounts').select('current_balance').eq('code', '1.1.1').single();
+    const { data: bankAccount } = await supabase.from('accounts').select('current_balance').eq('code', '1.1.1').maybeSingle();
     return {
       cashBalance: bankAccount?.current_balance || 0,
       todayReceipts: 0,

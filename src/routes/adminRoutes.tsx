@@ -13,7 +13,6 @@ import {
   SystemMonitoring,
   SystemErrorLogs,
   SystemMaintenance,
-  SystemTesting,
   SecurityDashboard,
   PerformanceDashboard,
   IntegrationsManagement,
@@ -88,15 +87,6 @@ export const adminRoutes = [
     element={
       <ProtectedRoute requiredRole="admin">
         <SystemMaintenance />
-      </ProtectedRoute>
-    } 
-  />,
-  <Route 
-    key="system-testing"
-    path="/system-testing" 
-    element={
-      <ProtectedRoute requiredRole="admin">
-        <SystemTesting />
       </ProtectedRoute>
     } 
   />,
