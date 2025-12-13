@@ -589,7 +589,7 @@ export class ApprovalService {
         })
         .eq('id', status.id);
     } else {
-      const steps = status.approval_steps as any[];
+      const steps = (status.approval_steps ?? []) as Array<{ level?: number; action?: string }>;
       const allApproved = steps
         .filter((s) => s.level <= (step.level ?? 0))
         .every((s) => s.action === 'approved');
