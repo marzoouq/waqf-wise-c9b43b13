@@ -3,8 +3,11 @@
  * useAuth Hook Tests
  */
 
+// Unmock AuthContext to test real implementation
+vi.unmock('@/contexts/AuthContext');
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { createTestQueryClient } from '../../utils/test-utils';
 import { supabase } from '@/integrations/supabase/client';
@@ -83,14 +86,11 @@ describe('useAuth', () => {
         wrapper: createWrapper(),
       });
 
-      // Wrap in try-catch to handle the expected error
-      try {
-        await act(async () => {
+      await expect(
+        act(async () => {
           await result.current.signIn('wrong@example.com', 'wrong');
-        });
-      } catch {
-        // Error is expected
-      }
+        })
+      ).rejects.toThrow();
 
       expect(supabase.auth.signInWithPassword).toHaveBeenCalled();
     });

@@ -81,6 +81,9 @@ describe('ProductionLogger', () => {
         },
       }));
 
+      // Suppress console.error output during this test
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
       const { productionLogger } = await import('../production-logger');
       
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -91,6 +94,8 @@ describe('ProductionLogger', () => {
       // In DEV, addToQueue checks IS_PROD and doesn't add
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expect((productionLogger as any).queue).toHaveLength(0);
+
+      consoleSpy.mockRestore();
     });
   });
 
