@@ -17,7 +17,7 @@ type Invoice = {
 const ITEMS_PER_PAGE = 20;
 
 export function useInvoicesPage() {
-  const { invoices, isLoading, deleteInvoice } = useInvoices();
+  const { invoices, isLoading, error, refetch, deleteInvoice } = useInvoices();
   
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
@@ -135,6 +135,8 @@ export function useInvoicesPage() {
     paginatedInvoices,
     statistics,
     isLoading,
+    error,
+    refetch,
     
     // Pagination
     currentPage,

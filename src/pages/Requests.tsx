@@ -29,6 +29,8 @@ const Requests = memo(() => {
     paginatedRequests,
     stats,
     isLoading,
+    error,
+    refetch,
     currentPage,
     setCurrentPage,
     itemsPerPage,
@@ -69,6 +71,17 @@ const Requests = memo(() => {
 
   if (isLoading) {
     return <LoadingState size="lg" />;
+  }
+
+  if (error) {
+    return (
+      <ErrorState 
+        title="فشل تحميل الطلبات" 
+        message="حدث خطأ أثناء تحميل طلبات المستفيدين"
+        onRetry={refetch}
+        fullScreen
+      />
+    );
   }
 
   return (

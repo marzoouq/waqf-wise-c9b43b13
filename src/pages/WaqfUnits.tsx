@@ -26,8 +26,7 @@ import { toast } from "sonner";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 
 export default function WaqfUnits() {
-  const { waqfUnits, isLoading } = useWaqfUnits();
-  const refetch = () => window.location.reload();
+  const { waqfUnits, isLoading, error, refetch } = useWaqfUnits();
   const { fiscalYears } = useFiscalYears();
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<string>("all");
@@ -118,6 +117,17 @@ export default function WaqfUnits() {
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل أقلام الوقف..." />;
+  }
+
+  if (error) {
+    return (
+      <ErrorState 
+        title="فشل تحميل أقلام الوقف" 
+        message="حدث خطأ أثناء تحميل بيانات أقلام الوقف"
+        onRetry={refetch}
+        fullScreen
+      />
+    );
   }
 
   return (

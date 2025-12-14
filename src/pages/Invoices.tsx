@@ -38,6 +38,8 @@ const Invoices = () => {
     paginatedInvoices,
     statistics,
     isLoading,
+    error,
+    refetch,
     currentPage,
     setCurrentPage,
     totalPages,
@@ -68,6 +70,17 @@ const Invoices = () => {
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل الفواتير..." />;
+  }
+
+  if (error) {
+    return (
+      <ErrorState 
+        title="فشل تحميل الفواتير" 
+        message="حدث خطأ أثناء تحميل بيانات الفواتير"
+        onRetry={refetch}
+        fullScreen
+      />
+    );
   }
 
   return (

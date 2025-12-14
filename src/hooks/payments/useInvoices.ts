@@ -63,7 +63,7 @@ export function useInvoices() {
     };
   }, [queryClient]);
 
-  const { data: invoices = [], isLoading } = useQuery({
+  const { data: invoices = [], isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.INVOICES,
     queryFn: () => InvoiceService.getAll(),
     staleTime: 3 * 60 * 1000,
@@ -200,6 +200,8 @@ export function useInvoices() {
   return {
     invoices,
     isLoading,
+    error,
+    refetch,
     addInvoice: addInvoice.mutateAsync,
     updateInvoice: updateInvoice.mutateAsync,
     deleteInvoice: deleteInvoice.mutateAsync,

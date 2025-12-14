@@ -11,7 +11,7 @@ interface ArchiveStats {
 }
 
 export function useArchiveStats() {
-  const { data: stats, isLoading } = useQuery({
+  const { data: stats, isLoading, error, refetch } = useQuery({
     queryKey: [...QUERY_KEYS.DOCUMENTS, "stats"],
     queryFn: () => ArchiveService.getStats(),
     staleTime: QUERY_STALE_TIME.DEFAULT,
@@ -20,5 +20,7 @@ export function useArchiveStats() {
   return {
     stats: stats || { totalDocuments: 0, totalFolders: 0, totalSize: "0 B", thisMonthAdditions: 0 },
     isLoading,
+    error,
+    refetch,
   };
 }

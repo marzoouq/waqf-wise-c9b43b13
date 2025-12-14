@@ -18,7 +18,7 @@ export function useFolders() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: folders = [], isLoading } = useQuery({
+  const { data: folders = [], isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.FOLDERS,
     queryFn: () => ArchiveService.getFolders(),
     staleTime: QUERY_STALE_TIME.DEFAULT,
@@ -59,6 +59,8 @@ export function useFolders() {
   return {
     folders,
     isLoading,
+    error,
+    refetch,
     addFolder: addFolder.mutateAsync,
     updateFolder: updateFolder.mutateAsync,
   };
