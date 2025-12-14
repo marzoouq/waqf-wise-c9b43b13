@@ -153,7 +153,7 @@ export function LoanApprovalsTab() {
                       onClick={() => handleApprovalClick(loan, "approve")}
                       disabled={isApproving}
                     >
-                      <CheckCircle className="h-4 w-4 ml-1" />
+                      <CheckCircle className="h-4 w-4 ms-1" />
                       موافقة
                     </Button>
                     <Button
@@ -162,7 +162,7 @@ export function LoanApprovalsTab() {
                       onClick={() => handleApprovalClick(loan, "reject")}
                       disabled={isApproving}
                     >
-                      <XCircle className="h-4 w-4 ml-1" />
+                      <XCircle className="h-4 w-4 ms-1" />
                       رفض
                     </Button>
                   </div>

@@ -80,7 +80,7 @@ export function PushNotificationsSettings() {
                   disabled={isLoading}
                   variant="outline"
                 >
-                  <Bell className="h-4 w-4 ml-2" />
+                  <Bell className="h-4 w-4 ms-2" />
                   طلب الإذن
                 </Button>
               )}
@@ -88,7 +88,7 @@ export function PushNotificationsSettings() {
                 onClick={subscribe}
                 disabled={isLoading || permission === 'denied'}
               >
-                <Bell className="h-4 w-4 ml-2" />
+                <Bell className="h-4 w-4 ms-2" />
                 تفعيل الإشعارات
               </Button>
             </>
@@ -98,7 +98,7 @@ export function PushNotificationsSettings() {
               disabled={isLoading}
               variant="destructive"
             >
-              <BellOff className="h-4 w-4 ml-2" />
+              <BellOff className="h-4 w-4 ms-2" />
               إلغاء الاشتراك
             </Button>
           )}

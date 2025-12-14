@@ -126,7 +126,7 @@ export default function BeneficiarySupport() {
             onClick={() => navigate("/beneficiary-portal")}
             className="min-h-[44px] w-full sm:w-auto"
           >
-            <ArrowRight className="h-4 w-4 ml-2" />
+            <ArrowRight className="h-4 w-4 ms-2" />
             العودة
           </Button>
         </div>
@@ -257,7 +257,7 @@ export default function BeneficiarySupport() {
                       "جاري الإرسال..."
                     ) : (
                       <>
-                        <Send className="h-4 w-4 ml-2" />
+                        <Send className="h-4 w-4 ms-2" />
                         إرسال الرسالة
                       </>
                     )}

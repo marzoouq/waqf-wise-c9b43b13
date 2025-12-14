@@ -99,7 +99,7 @@ export function VoucherDetailsDialog({
                 </div>
               </div>
               <Badge variant={config.variant} className={`${config.className || ""} text-base px-4 py-2`}>
-                <StatusIcon className="ml-1 h-4 w-4" />
+                <StatusIcon className="ms-1 h-4 w-4" />
                 {config.label}
               </Badge>
             </div>
@@ -235,7 +235,7 @@ export function VoucherDetailsDialog({
             إغلاق
           </Button>
           <Button onClick={handlePrint}>
-            <Download className="ml-2 h-4 w-4" />
+            <Download className="ms-2 h-4 w-4" />
             طباعة السند
           </Button>
         </div>

@@ -154,9 +154,9 @@ export function ActiveSessionsDialog({ open, onOpenChange }: ActiveSessionsDialo
                           disabled={isEndingAllSessions}
                         >
                           {isEndingAllSessions ? (
-                            <Loader2 className="h-4 w-4 animate-spin ml-2" />
+                            <Loader2 className="h-4 w-4 animate-spin ms-2" />
                           ) : (
-                            <LogOut className="h-4 w-4 ml-2" />
+                            <LogOut className="h-4 w-4 ms-2" />
                           )}
                           إنهاء جميع الجلسات الأخرى
                         </Button>

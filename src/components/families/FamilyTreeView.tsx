@@ -415,7 +415,7 @@ export function FamilyTreeView({ familyId, familyName }: FamilyTreeViewProps) {
               ابدأ بإضافة أفراد العائلة من المستفيدين المسجلين
             </p>
             <Button onClick={() => setIsAddDialogOpen(true)}>
-              <UserPlus className="h-4 w-4 ml-2" />
+              <UserPlus className="h-4 w-4 ms-2" />
               إضافة أول فرد
             </Button>
           </CardContent>

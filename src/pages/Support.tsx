@@ -91,7 +91,7 @@ export default function Support() {
           icon={<Ticket className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
           actions={
             <Button onClick={() => setCreateDialogOpen(true)} size="sm">
-              <Plus className="h-4 w-4 ml-2" />
+              <Plus className="h-4 w-4 ms-2" />
               <span className="hidden sm:inline">تذكرة جديدة</span>
               <span className="sm:hidden">جديد</span>
             </Button>
@@ -171,7 +171,7 @@ export default function Support() {
                                   setRatingTicketId(ticket.id);
                                 }}
                               >
-                                <Star className="h-3 w-3 ml-1" />
+                                <Star className="h-3 w-3 ms-1" />
                                 تقييم
                               </Button>
                             )}
@@ -188,7 +188,7 @@ export default function Support() {
                         className="mt-4"
                         onClick={() => setCreateDialogOpen(true)}
                       >
-                        <Plus className="h-4 w-4 ml-2" />
+                        <Plus className="h-4 w-4 ms-2" />
                         إنشاء تذكرة جديدة
                       </Button>
                     </div>

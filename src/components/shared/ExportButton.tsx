@@ -68,17 +68,17 @@ export const ExportButton = <T extends object>({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant={variant} size={size} className={className}>
-          <Download className="h-4 w-4 ml-2" />
+          <Download className="h-4 w-4 ms-2" />
           تصدير
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={handleExportPDF}>
-          <FileText className="h-4 w-4 ml-2" />
+          <FileText className="h-4 w-4 ms-2" />
           تصدير PDF
         </DropdownMenuItem>
         <DropdownMenuItem onClick={handleExportExcel}>
-          <FileSpreadsheet className="h-4 w-4 ml-2" />
+          <FileSpreadsheet className="h-4 w-4 ms-2" />
           تصدير Excel
         </DropdownMenuItem>
       </DropdownMenuContent>

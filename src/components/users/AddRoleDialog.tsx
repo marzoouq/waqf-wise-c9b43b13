@@ -65,7 +65,7 @@ export function AddRoleDialog({
                   <Button
                     size="sm"
                     variant="ghost"
-                    className="h-5 w-5 p-0 mr-2 hover:bg-transparent"
+                    className="h-5 w-5 p-0 me-2 hover:bg-transparent"
                     onClick={() => onRemoveRole(selectedUser.id, role)}
                   >
                     <Trash2 className="h-3 w-3" />

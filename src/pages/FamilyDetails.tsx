@@ -39,7 +39,7 @@ export default function FamilyDetails() {
         <div className="text-center py-12">
           <h2 className="text-2xl font-bold mb-4">العائلة غير موجودة</h2>
           <Button onClick={() => navigate('/families')} size="lg" className="min-h-[44px]">
-            <ArrowRight className="ml-2 h-4 w-4" />
+            <ArrowRight className="ms-2 h-4 w-4" />
             العودة للعائلات
           </Button>
         </div>
