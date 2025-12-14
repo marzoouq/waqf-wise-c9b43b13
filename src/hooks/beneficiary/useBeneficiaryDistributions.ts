@@ -1,18 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { DistributionService } from "@/services";
 import { QUERY_KEYS } from "@/lib/query-keys";
-
-interface HeirDistribution {
-  id: string;
-  share_amount: number;
-  heir_type: string;
-  distribution_date: string;
-  fiscal_year_id: string;
-  fiscal_years: {
-    name: string;
-    is_closed: boolean;
-  } | null;
-}
+import type { HeirDistribution } from "@/types/distributions";
 
 export function useBeneficiaryDistributions(beneficiaryId: string) {
   const { data: distributions = [], isLoading } = useQuery({

@@ -34,7 +34,7 @@ export function OverviewSection({ beneficiary }: OverviewSectionProps) {
         <BeneficiaryProfileCard
           beneficiary={beneficiary}
           onMessages={() => navigate("/messages")}
-          onChangePassword={() => {}}
+          onChangePassword={() => navigate("/beneficiary-portal?tab=profile")}
         />
       </div>
 

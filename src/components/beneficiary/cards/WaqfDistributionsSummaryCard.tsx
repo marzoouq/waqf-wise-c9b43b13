@@ -8,24 +8,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Wallet, TrendingUp, Calendar, ChevronLeft, CheckCircle2, Clock, Loader2, Archive, CircleDot } from "lucide-react";
 import { formatDate } from "@/lib/date";
 import { ErrorState } from "@/components/shared/ErrorState";
+import type { HeirDistribution } from "@/types/distributions";
 
 interface WaqfDistributionsSummaryCardProps {
   beneficiaryId: string;
-}
-
-interface HeirDistribution {
-  id: string;
-  share_amount: number;
-  heir_type: string;
-  distribution_date: string;
-  fiscal_year_id: string;
-  fiscal_years: {
-    name: string;
-    start_date: string;
-    end_date: string;
-    is_closed: boolean;
-    is_active: boolean;
-  } | null;
 }
 
 export function WaqfDistributionsSummaryCard({ beneficiaryId }: WaqfDistributionsSummaryCardProps) {

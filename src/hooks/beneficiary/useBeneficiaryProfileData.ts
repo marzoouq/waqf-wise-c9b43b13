@@ -1,11 +1,12 @@
 /**
  * Beneficiary Profile Data Hooks - خطافات بيانات ملف المستفيد
- * @version 2.8.67
+ * @version 2.9.2
  */
 
 import { useQuery } from "@tanstack/react-query";
 import { BeneficiaryService, RequestService, MessageService } from "@/services";
 import { QUERY_KEYS } from "@/lib/query-keys";
+import type { HeirDistribution } from "@/types/distributions";
 
 // ==================== Family Tree Hook ====================
 export function useFamilyTree(beneficiaryId: string, enabled: boolean = true) {
@@ -73,21 +74,6 @@ export function useBeneficiaryIntegrationStats(beneficiaryId: string) {
 }
 
 // ==================== Waqf Distributions Summary Hook ====================
-interface HeirDistribution {
-  id: string;
-  share_amount: number;
-  heir_type: string;
-  distribution_date: string;
-  fiscal_year_id: string;
-  fiscal_years: {
-    name: string;
-    start_date: string;
-    end_date: string;
-    is_closed: boolean;
-    is_active: boolean;
-  } | null;
-}
-
 export function useWaqfDistributionsSummary(beneficiaryId: string) {
   return useQuery({
     queryKey: QUERY_KEYS.HEIR_DISTRIBUTIONS_SUMMARY(beneficiaryId),
@@ -99,4 +85,5 @@ export function useWaqfDistributionsSummary(beneficiaryId: string) {
   });
 }
 
-export type { RequestWithDetails, HeirDistribution };
+export type { RequestWithDetails };
+export type { HeirDistribution } from "@/types/distributions";

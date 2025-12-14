@@ -10,13 +10,7 @@ import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { BeneficiaryService } from "@/services";
 import { QUERY_KEYS } from "@/lib/query-keys";
-
-interface HeirDistribution {
-  share_amount: number;
-  distribution_date: string;
-  heir_type: string;
-  notes: string | null;
-}
+import type { HeirDistribution } from "@/types/distributions";
 
 interface Request {
   status: string | null;
