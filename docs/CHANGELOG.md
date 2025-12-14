@@ -1,6 +1,46 @@
 # 📝 سجل التغييرات | Changelog
 
-**الإصدار الحالي:** 2.9.9 | **آخر تحديث:** 2025-12-14
+**الإصدار الحالي:** 2.9.11 | **آخر تحديث:** 2025-12-14
+
+---
+
+## [2.9.11] - 2025-12-14
+
+### 🏗️ تحسين هيكل إدارة المستخدمين والأدوار
+
+#### ✅ ملفات جديدة
+| الملف | الوصف |
+|-------|-------|
+| `src/hooks/users/useUsersFilter.ts` | Hook موحد للفلترة - يدعم UserProfile و UserWithRoles |
+| `src/hooks/users/useUsersPaginated.ts` | Server-side Pagination للمستخدمين |
+| `src/utils/export-users.ts` | Utility منفصل لتصدير المستخدمين (CSV/JSON) |
+
+#### ✅ تحسينات رئيسية
+| المكون | التحسين |
+|--------|---------|
+| `UsersContext.tsx` | تفعيل السياق مع الفلترة المدمجة |
+| `Users.tsx` | استخدام UsersProvider بدلاً من props drilling |
+| `useUsersManagement.ts` | استبدال console.error بـ productionLogger |
+| `pagination.types.ts` | إضافة PaginatedResult interface |
+
+#### 📊 نتائج التحسين
+- تقليل props من 9 إلى 0 عبر Context
+- فلترة موحدة قابلة لإعادة الاستخدام
+- تصدير CSV/JSON منفصل ومنظم
+- جاهزية Server-side Pagination
+
+---
+
+## [2.9.10] - 2025-12-14
+
+### 📄 إضافة Server-side Pagination للعقود والحوكمة
+
+#### ✅ مكونات جديدة
+| الملف | الوصف |
+|-------|-------|
+| `src/lib/pagination.types.ts` | أنواع Pagination الموحدة |
+| `src/hooks/property/useContractsPaginated.ts` | Pagination للعقود |
+| `src/hooks/governance/useGovernanceDecisionsPaginated.ts` | Pagination للحوكمة |
 
 ---
 

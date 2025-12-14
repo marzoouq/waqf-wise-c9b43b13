@@ -1,6 +1,6 @@
 /**
  * Pagination Types - أنواع التصفح
- * @version 2.9.10
+ * @version 2.9.11
  */
 
 export interface PaginatedResponse<T> {
@@ -9,6 +9,16 @@ export interface PaginatedResponse<T> {
   page: number;
   pageSize: number;
   totalPages: number;
+}
+
+export interface PaginatedResult<T> {
+  data: T[];
+  totalItems: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
 }
 
 export interface PaginationParams {
