@@ -31,7 +31,7 @@ export { useRevenueDistribution } from './useRevenueDistribution';
 export { useAccountDistribution } from './useAccountDistribution';
 
 // ==================== Re-exports from other folders ====================
-export { useAdminKPIs } from '../admin/useAdminKPIs';
+// useAdminKPIs removed - use useUnifiedKPIs directly
 export { useAccountantKPIs } from '../accounting';
 export { useArchivistDashboard, useArchivistStats, useRecentDocuments } from '../archive/useArchivistDashboard';
 export { useInteractiveDashboard } from './useInteractiveDashboard';

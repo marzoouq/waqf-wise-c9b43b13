@@ -5,9 +5,8 @@
  * @version 2.6.36
  */
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";
-import { useEffect, useCallback } from "react";
+import { useCallback } from "react";
 import { DashboardService, type UnifiedKPIsData } from "@/services";
 import { QUERY_KEYS } from "@/lib/query-keys";
 
@@ -22,24 +21,9 @@ export function useUnifiedKPIs() {
     ...QUERY_CONFIG.DASHBOARD_KPIS
   });
 
-  // الاشتراك في التحديثات المباشرة عبر قناة واحدة موحدة
-  useEffect(() => {
-    const tables = ['beneficiaries', 'properties', 'contracts', 'payments', 'journal_entries', 'journal_entry_lines', 'loans', 'beneficiary_requests', 'families', 'funds'];
-    
-    const channel = supabase.channel('unified-dashboard-kpis-realtime');
-    
-    tables.forEach(table => {
-      channel.on('postgres_changes', { event: '*', schema: 'public', table }, () => {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.UNIFIED_KPIS });
-      });
-    });
-    
-    channel.subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
+  // ملاحظة: الاشتراك في التحديثات المباشرة يتم عبر hooks موحدة لكل dashboard
+  // مثل useAdminDashboardRealtime, useNazerDashboardRealtime
+  // لتجنب تكرار الاشتراكات
 
   const refresh = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: QUERY_KEYS.UNIFIED_KPIS });

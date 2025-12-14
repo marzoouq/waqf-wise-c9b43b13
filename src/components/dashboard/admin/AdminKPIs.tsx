@@ -1,13 +1,29 @@
 import { memo, useMemo } from "react";
 import { Users, UsersRound, Building2, Wallet, AlertCircle, TrendingUp, TrendingDown, Clock } from "lucide-react";
-import { useAdminKPIs } from "@/hooks/admin";
+import { useUnifiedKPIs } from "@/hooks/dashboard/useUnifiedKPIs";
 import { formatCurrency, formatNumber } from "@/lib/utils";
 import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
 import { ErrorState } from "@/components/shared/ErrorState";
 
 export const AdminKPIs = memo(() => {
-  const { data: kpis, isLoading, error, refresh } = useAdminKPIs();
+  const { data, isLoading, isError, refresh } = useUnifiedKPIs();
+  
+  // تحويل البيانات الموحدة لصيغة KPIs المشرف
+  const kpis = data ? {
+    totalBeneficiaries: data.totalBeneficiaries,
+    activeBeneficiaries: data.activeBeneficiaries,
+    totalFamilies: data.totalFamilies,
+    totalProperties: data.totalProperties,
+    occupiedProperties: data.occupiedProperties,
+    totalFunds: data.totalFunds,
+    activeFunds: data.activeFunds,
+    pendingRequests: data.pendingRequests,
+    overdueRequests: data.overdueRequests,
+    totalRevenue: data.totalRevenue,
+    totalExpenses: data.totalExpenses,
+    netIncome: data.netIncome,
+  } : undefined;
 
   const stats = useMemo(() => {
     if (!kpis) return [];
@@ -93,7 +109,7 @@ export const AdminKPIs = memo(() => {
     );
   }
 
-  if (error) {
+  if (isError) {
     return <ErrorState title="خطأ في التحميل" message="فشل تحميل إحصائيات المشرف" onRetry={refresh} />;
   }
 
