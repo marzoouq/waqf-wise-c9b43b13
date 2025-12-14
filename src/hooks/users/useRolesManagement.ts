@@ -44,7 +44,7 @@ export function useRolesManagement() {
   const [auditDialogOpen, setAuditDialogOpen] = useState(false);
 
   const { data: users = [], isLoading } = useQuery({
-    queryKey: QUERY_KEYS.USERS_PROFILES_CACHE,
+    queryKey: QUERY_KEYS.USERS,
     queryFn: () => UserService.getUsersWithRoles(),
     staleTime: 30 * 1000,
   });
