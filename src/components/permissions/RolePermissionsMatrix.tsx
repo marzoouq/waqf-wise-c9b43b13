@@ -128,7 +128,7 @@ export function RolePermissionsMatrix({ role, permissions }: RolePermissionsMatr
                         <TableCell className="font-mono text-xs">
                           {perm.name}
                           {isModified && (
-                            <Badge variant="outline" className="mr-2 text-[10px]">
+                            <Badge variant="outline" className="me-2 text-[10px]">
                               معدل
                             </Badge>
                           )}

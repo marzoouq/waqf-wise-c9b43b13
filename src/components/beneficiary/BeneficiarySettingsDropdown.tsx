@@ -81,15 +81,15 @@ export function BeneficiarySettingsDropdown({
         <DropdownMenuContent align="end" className="w-56 bg-background">
           <DropdownMenuLabel>حسابي</DropdownMenuLabel>
           <DropdownMenuItem onClick={() => setEditEmailOpen(true)}>
-            <Mail className="ml-2 h-4 w-4" />
+            <Mail className="ms-2 h-4 w-4" />
             تعديل الإيميل
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setEditPhoneOpen(true)}>
-            <Phone className="ml-2 h-4 w-4" />
+            <Phone className="ms-2 h-4 w-4" />
             تعديل رقم الهاتف
           </DropdownMenuItem>
           <DropdownMenuItem onClick={onChangePassword}>
-            <Lock className="ml-2 h-4 w-4" />
+            <Lock className="ms-2 h-4 w-4" />
             تغيير كلمة المرور
           </DropdownMenuItem>
 
@@ -97,14 +97,14 @@ export function BeneficiarySettingsDropdown({
 
           <DropdownMenuLabel>الإعدادات</DropdownMenuLabel>
           <DropdownMenuItem onClick={() => setNotificationSettingsOpen(true)}>
-            <Bell className="ml-2 h-4 w-4" />
+            <Bell className="ms-2 h-4 w-4" />
             إعدادات الإشعارات
           </DropdownMenuItem>
           <DropdownMenuItem onClick={toggleTheme}>
             {theme === "dark" ? (
-              <Sun className="ml-2 h-4 w-4" />
+              <Sun className="ms-2 h-4 w-4" />
             ) : (
-              <Moon className="ml-2 h-4 w-4" />
+              <Moon className="ms-2 h-4 w-4" />
             )}
             {theme === "dark" ? "الوضع النهاري" : "الوضع الليلي"}
           </DropdownMenuItem>
@@ -112,7 +112,7 @@ export function BeneficiarySettingsDropdown({
           <DropdownMenuSeparator />
 
           <DropdownMenuItem onClick={handleLogout} className="text-destructive">
-            <LogOut className="ml-2 h-4 w-4" />
+            <LogOut className="ms-2 h-4 w-4" />
             تسجيل الخروج
           </DropdownMenuItem>
         </DropdownMenuContent>

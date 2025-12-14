@@ -135,7 +135,7 @@ export function DecisionCard({ decision }: DecisionCardProps) {
           onClick={() => navigate(`/governance/decisions/${decision.id}`)}
         >
           عرض التفاصيل والتصويت
-          <ChevronLeft className="h-4 w-4 mr-2" />
+          <ChevronLeft className="h-4 w-4 me-2" />
         </Button>
       </CardContent>
     </Card>

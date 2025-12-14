@@ -67,7 +67,7 @@ export function TicketCard({
           </p>
         )}
       </div>
-      <div className="text-left space-y-1 sm:space-y-2 shrink-0 mr-2">
+      <div className="text-left space-y-1 sm:space-y-2 shrink-0 me-2">
         {isOverdue ? (
           <Badge variant="destructive">متأخر</Badge>
         ) : (

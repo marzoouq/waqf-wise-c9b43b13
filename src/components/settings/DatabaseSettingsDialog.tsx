@@ -151,11 +151,11 @@ export function DatabaseSettingsDialog({
                         <span>الحالة:</span>
                         <Badge variant={latestBackup.status === 'completed' ? 'default' : 'destructive'}>
                           {latestBackup.status === 'completed' ? (
-                            <><CheckCircle2 className="h-3 w-3 ml-1" /> مكتملة</>
+                            <><CheckCircle2 className="h-3 w-3 ms-1" /> مكتملة</>
                           ) : latestBackup.status === 'in_progress' ? (
-                            <><Clock className="h-3 w-3 ml-1" /> جارية</>
+                            <><Clock className="h-3 w-3 ms-1" /> جارية</>
                           ) : (
-                            <><XCircle className="h-3 w-3 ml-1" /> فاشلة</>
+                            <><XCircle className="h-3 w-3 ms-1" /> فاشلة</>
                           )}
                         </Badge>
                       </div>
@@ -171,7 +171,7 @@ export function DatabaseSettingsDialog({
 
                 <div className="text-sm text-muted-foreground">
                   <p className="font-medium mb-2">البيانات المشمولة:</p>
-                  <ul className="list-disc list-inside space-y-1 mr-4">
+                  <ul className="list-disc list-inside space-y-1 me-4">
                     <li>الحسابات المحاسبية</li>
                     <li>القيود اليومية</li>
                     <li>المدفوعات والفواتير</li>

@@ -96,8 +96,8 @@ function AccountNode({ account, level, onEdit, onAddChild, onDelete }: AccountNo
             account.current_balance > 0 ? "text-success" : account.current_balance < 0 ? "text-destructive" : "text-muted-foreground"
           )}>
             {formatBalance(account.current_balance)}
-            {account.current_balance > 0 && <TrendingUp className="inline h-3 w-3 mr-1" />}
-            {account.current_balance < 0 && <TrendingDown className="inline h-3 w-3 mr-1" />}
+            {account.current_balance > 0 && <TrendingUp className="inline h-3 w-3 me-1" />}
+            {account.current_balance < 0 && <TrendingDown className="inline h-3 w-3 me-1" />}
           </span>
 
             <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
@@ -254,7 +254,7 @@ export function EnhancedAccountsTree() {
                 setSelectedAccount(null);
                 setDialogOpen(true);
               }}>
-                <Plus className="ml-2 h-4 w-4" />
+                <Plus className="ms-2 h-4 w-4" />
                 إضافة حساب رئيسي
               </Button>
             </div>

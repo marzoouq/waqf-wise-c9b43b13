@@ -87,7 +87,7 @@ export function DistributionSettingsDialog() {
             <Info className="h-4 w-4 text-info" />
             <AlertDescription className="text-info text-sm">
               <strong>الترتيب الشرعي للاستقطاعات:</strong>
-              <ol className="list-decimal mr-6 mt-2 space-y-1 text-xs">
+              <ol className="list-decimal me-6 mt-2 space-y-1 text-xs">
                 <li>الصيانة والعمارة (حفظ أصل الوقف) - أولوية</li>
                 <li>نسبة الناظر (من الباقي)</li>
                 <li>صدقة الواقف (من الباقي)</li>

@@ -170,7 +170,7 @@ export function AutoJournalTemplatesManager() {
               </CardDescription>
             </div>
             <Button onClick={handleAdd}>
-              <Plus className="h-4 w-4 ml-2" />
+              <Plus className="h-4 w-4 ms-2" />
               قالب جديد
             </Button>
           </div>

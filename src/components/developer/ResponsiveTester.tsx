@@ -59,9 +59,9 @@ export function ResponsiveTester() {
                     className="justify-start"
                     onClick={() => setSelectedDevice(device)}
                   >
-                    <Icon className="w-4 h-4 ml-2" />
+                    <Icon className="w-4 h-4 ms-2" />
                     {device.name}
-                    <span className="mr-auto text-xs text-muted-foreground">
+                    <span className="me-auto text-xs text-muted-foreground">
                       {device.width}×{device.height}
                     </span>
                   </Button>
@@ -130,7 +130,7 @@ export function ResponsiveTester() {
                 <p className="text-sm text-muted-foreground">الحجم الحالي</p>
                 <p className="text-xl font-bold">
                   {size.width} × {size.height}
-                  <span className="text-sm font-normal text-muted-foreground mr-2">
+                  <span className="text-sm font-normal text-muted-foreground me-2">
                     ({(size.width * size.height / 1000000).toFixed(2)} megapixels)
                   </span>
                 </p>
@@ -144,7 +144,7 @@ export function ResponsiveTester() {
           {/* Actions */}
           <div className="flex gap-2">
             <Button variant="outline" className="flex-1" onClick={openInNewWindow}>
-              <Maximize className="w-4 h-4 ml-2" />
+              <Maximize className="w-4 h-4 ms-2" />
               فتح في نافذة جديدة
             </Button>
           </div>
