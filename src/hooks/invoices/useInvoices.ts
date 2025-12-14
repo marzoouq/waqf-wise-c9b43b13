@@ -5,12 +5,13 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { InvoiceService, InvoiceSummary } from '@/services/invoice.service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export type { InvoiceSummary as Invoice };
 
 export function useInvoices() {
   const { data: invoices, isLoading, error, refetch } = useQuery({
-    queryKey: ['invoices'],
+    queryKey: QUERY_KEYS.INVOICES,
     queryFn: () => InvoiceService.getInvoiceSummaries(),
   });
 
