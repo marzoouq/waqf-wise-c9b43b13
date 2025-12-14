@@ -1,8 +1,35 @@
 /**
  * أنواع المصادقة والأدوار
- * Role types aligned with database enum: app_role
+ * Auth Types - Unified definitions
+ * @version 2.9.2
  */
 
+// Re-export from roles.ts for backward compatibility
+export type { AppRole, AllRole, WorkflowRole } from './roles';
+export { ROLE_LABELS, SYSTEM_ROLES, ROLE_COLORS, ROLE_PRIORITY, ROLE_DASHBOARD_MAP } from './roles';
+
+// ==================== User Profile (Unified) ====================
+/**
+ * ملف تعريف المستخدم الموحد
+ * يُستخدم في جميع أنحاء التطبيق
+ */
+export interface UserProfile {
+  id: string;
+  user_id?: string;
+  email: string;
+  full_name: string | null;
+  phone?: string | null;
+  position?: string | null;
+  avatar_url?: string | null;
+  is_active?: boolean;
+  last_login_at?: string | null;
+  created_at: string;
+  updated_at?: string;
+  roles?: string[];
+  user_roles?: Array<{ role: string }>;
+}
+
+// ==================== Role Interface ====================
 export interface Role {
   id: string;
   role_name: string;
@@ -14,6 +41,7 @@ export interface Role {
   updated_at: string;
 }
 
+// ==================== Profile Interface ====================
 export interface Profile {
   id: string;
   full_name: string;
@@ -29,6 +57,7 @@ export interface Profile {
   roles?: Role;
 }
 
+// ==================== User Permission ====================
 export interface UserPermission {
   id: string;
   user_id: string;
@@ -39,6 +68,7 @@ export interface UserPermission {
   expires_at: string | null;
 }
 
+// ==================== User Session ====================
 export interface UserSession {
   id: string;
   user_id: string;
@@ -50,10 +80,12 @@ export interface UserSession {
   ended_at: string | null;
 }
 
-// تم نقل تعريفات الأدوار إلى src/types/roles.ts
-// Re-export for backward compatibility
-export type { AppRole } from './roles';
-export { ROLE_LABELS, SYSTEM_ROLES } from './roles';
+// ==================== Login Result ====================
+export interface LoginResult {
+  success: boolean;
+  user?: UserProfile;
+  error?: string;
+}
 
 /** @deprecated استخدم AppRole بدلاً من RoleName */
 export type RoleName = 

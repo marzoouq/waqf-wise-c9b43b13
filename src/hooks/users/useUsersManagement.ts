@@ -5,23 +5,14 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { AppRole } from "@/hooks/auth/useUserRole";
+import { type AppRole } from "@/types/roles";
+import { type UserProfile } from "@/types/auth";
 import { AuthService } from "@/services/auth.service";
 import { invalidateUserQueries } from "@/lib/query-invalidation";
 import { QUERY_KEYS } from "@/lib/query-keys";
 
-export interface UserProfile {
-  id: string;
-  user_id: string;
-  full_name: string;
-  email: string;
-  phone?: string;
-  position?: string;
-  is_active: boolean;
-  last_login_at?: string;
-  created_at: string;
-  user_roles?: Array<{ role: string }>;
-}
+// Re-export UserProfile for backward compatibility
+export type { UserProfile } from "@/types/auth";
 
 /**
  * جلب قائمة المستخدمين مع أدوارهم
