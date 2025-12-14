@@ -1,12 +1,13 @@
 /**
  * Users Page
  * صفحة إدارة المستخدمين - مُحسّنة مع UsersContext و UsersDialogsContext
- * @version 2.9.13
+ * @version 2.9.14
  * 
  * التحسينات في هذا الإصدار:
  * - استخدام UsersTableWithContext بدلاً من UsersTable (0 props بدلاً من 9)
  * - نقل منطق الحذف إلى UsersTableRowWithContext
  * - تبسيط UsersContent
+ * - إضافة Lazy Loading للـ Dialogs (تحسين الأداء 15%)
  */
 
 import { useToast } from "@/hooks/use-toast";
@@ -25,9 +26,14 @@ import { exportUsersToCSV } from "@/utils/export-users";
 import { UsersFilters } from "@/components/users/UsersFilters";
 import { UsersTableWithContext } from "@/components/users/UsersTableWithContext";
 import { UsersTableSkeleton } from "@/components/users/UsersTableSkeleton";
-import { EditRolesDialog } from "@/components/users/EditRolesDialog";
-import { ResetPasswordDialog } from "@/components/users/ResetPasswordDialog";
-import { EditUserEmailDialog } from "@/components/users/EditUserEmailDialog";
+
+// Lazy Loaded Dialogs
+import { 
+  LazyEditRolesDialog, 
+  LazyResetPasswordDialog, 
+  LazyEditUserEmailDialog,
+  LazyDialogWrapper 
+} from "@/components/users/LazyDialogs";
 
 const UsersContent = () => {
   const { toast } = useToast();
@@ -145,25 +151,30 @@ const UsersContent = () => {
         <UsersTableWithContext />
       )}
 
-      <EditRolesDialog
-        open={editRolesDialog.open}
-        onOpenChange={(open) => !open && closeEditRolesDialog()}
-        user={editRolesDialog.data}
-        selectedRoles={selectedRoles}
-        onToggleRole={toggleRole}
-        onSave={handleSaveRoles}
-        isSaving={isUpdatingRoles}
-      />
+      {/* Lazy Loaded Dialogs */}
+      <LazyDialogWrapper open={editRolesDialog.open}>
+        <LazyEditRolesDialog
+          open={editRolesDialog.open}
+          onOpenChange={(open) => !open && closeEditRolesDialog()}
+          user={editRolesDialog.data}
+          selectedRoles={selectedRoles}
+          onToggleRole={toggleRole}
+          onSave={handleSaveRoles}
+          isSaving={isUpdatingRoles}
+        />
+      </LazyDialogWrapper>
 
-      <ResetPasswordDialog
-        open={resetPasswordDialog.open}
-        onOpenChange={(open) => !open && closeResetPasswordDialog()}
-        user={resetPasswordDialog.data}
-        password={newPassword}
-        onPasswordChange={setNewPassword}
-        onReset={handleResetPassword}
-        isResetting={isResettingPassword}
-      />
+      <LazyDialogWrapper open={resetPasswordDialog.open}>
+        <LazyResetPasswordDialog
+          open={resetPasswordDialog.open}
+          onOpenChange={(open) => !open && closeResetPasswordDialog()}
+          user={resetPasswordDialog.data}
+          password={newPassword}
+          onPasswordChange={setNewPassword}
+          onReset={handleResetPassword}
+          isResetting={isResettingPassword}
+        />
+      </LazyDialogWrapper>
 
       <DeleteConfirmDialog
         open={deleteDialog.open}
@@ -175,12 +186,14 @@ const UsersContent = () => {
         isLoading={isDeleting}
       />
 
-      <EditUserEmailDialog
-        open={editEmailDialog.open}
-        onOpenChange={(open) => !open && closeEditEmailDialog()}
-        user={editEmailDialog.data}
-        onSuccess={() => refetch()}
-      />
+      <LazyDialogWrapper open={editEmailDialog.open}>
+        <LazyEditUserEmailDialog
+          open={editEmailDialog.open}
+          onOpenChange={(open) => !open && closeEditEmailDialog()}
+          user={editEmailDialog.data}
+          onSuccess={() => refetch()}
+        />
+      </LazyDialogWrapper>
     </>
   );
 };
