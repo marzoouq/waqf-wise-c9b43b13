@@ -15,8 +15,8 @@ Never call Supabase directly from components/pages.
 ```
 src/
 ├── components/     # UI only, no business logic
-├── hooks/          # 170+ hooks in 25 feature folders
-├── services/       # 51+ services for all data operations
+├── hooks/          # 175+ hooks in 36 feature folders
+├── services/       # 55+ services for all data operations
 ├── types/          # Strict TypeScript types, no `any`
 ├── lib/            # QUERY_KEYS, errors, query-invalidation
 ├── pages/          # Route pages using hooks

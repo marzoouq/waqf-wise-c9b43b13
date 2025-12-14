@@ -201,7 +201,7 @@ const Archive = () => {
           actions={
             canManageArchive ? (
               <Button onClick={() => setUploadDialogOpen(true)}>
-                <Upload className="h-4 w-4 ml-2" />
+                <Upload className="h-4 w-4 ms-2" />
                 رفع مستند
               </Button>
             ) : undefined
@@ -214,15 +214,15 @@ const Archive = () => {
           <Tabs defaultValue="folders" className="space-y-6">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="folders">
-                <FolderOpen className="h-4 w-4 ml-2" />
+                <FolderOpen className="h-4 w-4 ms-2" />
                 المجلدات
               </TabsTrigger>
               <TabsTrigger value="documents">
-                <FileText className="h-4 w-4 ml-2" />
+                <FileText className="h-4 w-4 ms-2" />
                 المستندات
               </TabsTrigger>
               <TabsTrigger value="smart">
-                <Search className="h-4 w-4 ml-2" />
+                <Search className="h-4 w-4 ms-2" />
                 الميزات الذكية
               </TabsTrigger>
             </TabsList>

@@ -117,7 +117,7 @@ export default function Tenants() {
             setDialogOpen(true);
           }}
         >
-          <Plus className="ml-2 h-4 w-4" />
+          <Plus className="ms-2 h-4 w-4" />
           إضافة مستأجر
         </Button>
       </div>
@@ -265,7 +265,7 @@ export default function Tenants() {
                                 handleEdit(tenant);
                               }}
                             >
-                              <Edit className="ml-2 h-4 w-4" />
+                              <Edit className="ms-2 h-4 w-4" />
                               تعديل
                             </DropdownMenuItem>
                             <DropdownMenuItem
@@ -274,7 +274,7 @@ export default function Tenants() {
                                 navigate(`/tenants/${tenant.id}`);
                               }}
                             >
-                              <FileText className="ml-2 h-4 w-4" />
+                              <FileText className="ms-2 h-4 w-4" />
                               كشف الحساب
                             </DropdownMenuItem>
                             <DropdownMenuItem
@@ -284,7 +284,7 @@ export default function Tenants() {
                                 openDeleteDialog(tenant);
                               }}
                             >
-                              <Trash2 className="ml-2 h-4 w-4" />
+                              <Trash2 className="ms-2 h-4 w-4" />
                               حذف
                             </DropdownMenuItem>
                           </DropdownMenuContent>
