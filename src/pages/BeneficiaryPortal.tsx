@@ -9,7 +9,7 @@ import { FiscalYearNotPublishedBanner } from "@/components/beneficiary/FiscalYea
 import { PreviewModeBanner } from "@/components/beneficiary/PreviewModeBanner";
 import { OverviewSection } from "@/components/beneficiary/sections/OverviewSection";
 import { TabRenderer } from "@/components/beneficiary/TabRenderer";
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import { BeneficiarySidebar } from "@/components/beneficiary/BeneficiarySidebar";
 import { BeneficiaryBottomNavigation } from "@/components/mobile/BeneficiaryBottomNavigation";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
@@ -17,15 +17,17 @@ import { useBeneficiaryPortalData } from "@/hooks/beneficiary/useBeneficiaryPort
 import { useBeneficiarySession } from "@/hooks/beneficiary/useBeneficiarySession";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { useBeneficiaryDashboardRealtime } from "@/hooks/dashboard/useBeneficiaryDashboardRealtime";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function BeneficiaryPortal() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get("tab") || "overview";
   const { settings } = useVisibilitySettings();
 
   // استخدام Hook المخصص لجلب البيانات (يتضمن التحقق من وضع المعاينة)
-  const { beneficiary, statistics, isLoading, isPreviewMode, error } = useBeneficiaryPortalData();
+  const { beneficiary, statistics, isLoading, isPreviewMode, error, refetch } = useBeneficiaryPortalData();
 
   // تفعيل Realtime للتحديثات الفورية
   useBeneficiaryDashboardRealtime({
@@ -54,14 +56,16 @@ export default function BeneficiaryPortal() {
     navigate("/nazer-dashboard");
   };
 
+  // إعادة جلب البيانات عند حدوث خطأ (استخدام React Query بدلاً من reload)
+  const handleRetry = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['beneficiary'] });
+    queryClient.invalidateQueries({ queryKey: ['preview-beneficiary'] });
+    refetch?.();
+  }, [queryClient, refetch]);
+
   if (isLoading) {
     return <LoadingState fullScreen />;
   }
-
-  // إعادة جلب البيانات عند حدوث خطأ
-  const handleRetry = () => {
-    window.location.reload();
-  };
 
   if (error) {
     return <ErrorState title="خطأ في تحميل البيانات" message="فشل تحميل بيانات المستفيد" onRetry={handleRetry} fullScreen />;

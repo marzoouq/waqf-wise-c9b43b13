@@ -56,16 +56,14 @@ export function GovernanceTab() {
                   <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                     <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-primary shrink-0" />
                     <div className="min-w-0 flex-1">
-                    <h4 className="font-medium text-xs sm:text-sm truncate">{meeting.title || "اجتماع"}</h4>
+                    <h4 className="font-medium text-xs sm:text-sm truncate">{meeting.meeting_title || "اجتماع"}</h4>
                       <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
-                        {meeting.date ? format(new Date(meeting.date), "dd MMMM yyyy", { locale: ar }) : ""}
+                        {meeting.scheduled_date ? format(new Date(meeting.scheduled_date), "dd MMMM yyyy", { locale: ar }) : ""}
                       </p>
                     </div>
                   </div>
                   <div className="text-right text-[10px] sm:text-xs shrink-0">
-                  {meeting.attendees && (
-                      <p className="text-muted-foreground">{meeting.attendees} حاضر</p>
-                    )}
+                    <p className="text-muted-foreground">{meeting.attendees_count || 0} حاضر</p>
                   </div>
                 </div>
               ))}
@@ -94,12 +92,12 @@ export function GovernanceTab() {
               {decisions.map((decision) => (
                 <div key={decision.id} className="flex items-center justify-between p-3 sm:p-4 border rounded-lg gap-2">
                   <div className="min-w-0 flex-1">
-                    <h4 className="font-medium text-xs sm:text-sm truncate">{decision.title}</h4>
+                    <h4 className="font-medium text-xs sm:text-sm truncate">{decision.decision_title}</h4>
                     <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
-                      {decision.date ? format(new Date(decision.date), "dd MMMM yyyy", { locale: ar }) : ""}
+                      {decision.decision_date ? format(new Date(decision.decision_date), "dd MMMM yyyy", { locale: ar }) : ""}
                     </p>
                   </div>
-                  <Badge className="bg-success text-[10px] sm:text-xs shrink-0">{decision.status || "نافذ"}</Badge>
+                  <Badge className="bg-success text-[10px] sm:text-xs shrink-0">{decision.decision_status || "نافذ"}</Badge>
                 </div>
               ))}
             </CardContent>
@@ -136,12 +134,12 @@ export function GovernanceTab() {
               {auditReports.map((report) => (
                 <div key={report.id} className="flex items-center justify-between p-3 sm:p-4 border rounded-lg gap-2">
                   <div className="min-w-0 flex-1">
-                    <h4 className="font-medium text-xs sm:text-sm truncate">{report.title}</h4>
+                    <h4 className="font-medium text-xs sm:text-sm truncate">{report.description || "تقرير تدقيق"}</h4>
                     <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
-                      {report.date ? format(new Date(report.date), "dd MMMM yyyy", { locale: ar }) : ""}
+                      {report.created_at ? format(new Date(report.created_at), "dd MMMM yyyy", { locale: ar }) : ""}
                     </p>
                   </div>
-                  <Badge className="bg-success text-[10px] sm:text-xs shrink-0">{report.status || "مكتمل"}</Badge>
+                  <Badge className="bg-success text-[10px] sm:text-xs shrink-0">{report.severity || "مكتمل"}</Badge>
                 </div>
               ))}
             </CardContent>
