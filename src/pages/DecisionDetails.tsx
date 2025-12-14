@@ -28,7 +28,7 @@ export default function DecisionDetails() {
           title="خطأ"
           actions={
             <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
-              <ArrowRight className="h-4 w-4 ml-2" />
+              <ArrowRight className="h-4 w-4 ms-2" />
               رجوع
             </Button>
           }
@@ -51,7 +51,7 @@ export default function DecisionDetails() {
           title="خطأ"
           actions={
             <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
-              <ArrowRight className="h-4 w-4 ml-2" />
+              <ArrowRight className="h-4 w-4 ms-2" />
               رجوع
             </Button>
           }
@@ -77,7 +77,7 @@ export default function DecisionDetails() {
         title="تفاصيل القرار"
         actions={
           <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
-            <ArrowRight className="h-4 w-4 ml-2" />
+            <ArrowRight className="h-4 w-4 ms-2" />
             رجوع
           </Button>
         }

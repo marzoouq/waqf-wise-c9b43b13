@@ -196,7 +196,7 @@ export default function Contact() {
                       "جاري الإرسال..."
                     ) : (
                       <>
-                        <Send className="w-4 h-4 ml-2" />
+                        <Send className="w-4 h-4 ms-2" />
                         إرسال الرسالة
                       </>
                     )}

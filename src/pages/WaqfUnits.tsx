@@ -241,7 +241,7 @@ export default function WaqfUnits() {
           />
           <Select value={selectedFiscalYear} onValueChange={setSelectedFiscalYear}>
             <SelectTrigger className="w-full md:w-56">
-              <CalendarDays className="h-4 w-4 ml-2" />
+              <CalendarDays className="h-4 w-4 ms-2" />
               <SelectValue placeholder="السنة المالية" />
             </SelectTrigger>
             <SelectContent>

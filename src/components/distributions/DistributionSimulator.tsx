@@ -228,7 +228,7 @@ export function DistributionSimulator({ open, onOpenChange }: DistributionSimula
           </div>
 
           <Button onClick={runSimulation} className="w-full" disabled={isSimulating}>
-            <Play className="h-4 w-4 ml-2" />
+            <Play className="h-4 w-4 ms-2" />
             {isSimulating ? "جاري المحاكاة..." : "تشغيل المحاكاة"}
           </Button>
 

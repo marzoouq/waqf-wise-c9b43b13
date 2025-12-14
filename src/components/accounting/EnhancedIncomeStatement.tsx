@@ -74,11 +74,11 @@ export function EnhancedIncomeStatement() {
           </div>
           <div className="flex gap-2 flex-wrap print:hidden">
             <Button variant="outline" size="sm" className="text-xs sm:text-sm" onClick={handlePrint}>
-              <Printer className="ml-2 h-3 w-3 sm:h-4 sm:w-4" />
+              <Printer className="ms-2 h-3 w-3 sm:h-4 sm:w-4" />
               طباعة
             </Button>
             <Button variant="outline" size="sm" className="text-xs sm:text-sm" onClick={handleExportPDF}>
-              <FileText className="ml-2 h-3 w-3 sm:h-4 sm:w-4" />
+              <FileText className="ms-2 h-3 w-3 sm:h-4 sm:w-4" />
               تصدير PDF
             </Button>
           </div>

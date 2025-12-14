@@ -136,15 +136,15 @@ export default function Budgets() {
                   </SelectContent>
                 </Select>
                 <Button variant="outline" size="sm" onClick={handleCalculateVariances}>
-                  <Calculator className="h-4 w-4 ml-2" />
+                  <Calculator className="h-4 w-4 ms-2" />
                   حساب الانحرافات
                 </Button>
                 <Button variant="outline" size="sm" onClick={handleExport}>
-                  <FileSpreadsheet className="h-4 w-4 ml-2" />
+                  <FileSpreadsheet className="h-4 w-4 ms-2" />
                   تصدير Excel
                 </Button>
                 <Button size="sm" onClick={() => handleOpenDialog()}>
-                  <Plus className="h-4 w-4 ml-2" />
+                  <Plus className="h-4 w-4 ms-2" />
                   إضافة ميزانية
                 </Button>
               </div>
@@ -185,7 +185,7 @@ export default function Budgets() {
                       <TableCell className={getVarianceColor(budget.variance_amount)}>
                         {formatCurrency(Math.abs(budget.variance_amount || 0))}
                         {budget.variance_amount !== null && (
-                          <Badge variant={budget.variance_amount >= 0 ? "default" : "destructive"} className="mr-2">
+                          <Badge variant={budget.variance_amount >= 0 ? "default" : "destructive"} className="me-2">
                             {budget.variance_amount >= 0 ? "توفير" : "تجاوز"}
                           </Badge>
                         )}

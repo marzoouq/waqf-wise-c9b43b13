@@ -151,11 +151,11 @@ export function MaintenanceCostReport() {
           </CardTitle>
           <div className="flex gap-2">
             <Button onClick={handleExportPDF} variant="outline" size="sm">
-              <Download className="h-4 w-4 ml-2" />
+              <Download className="h-4 w-4 ms-2" />
               PDF
             </Button>
             <Button onClick={handleExportExcel} variant="outline" size="sm">
-              <Download className="h-4 w-4 ml-2" />
+              <Download className="h-4 w-4 ms-2" />
               Excel
             </Button>
           </div>
