@@ -1,4 +1,6 @@
 import { format, arLocale as ar } from "@/lib/date";
+import { PrintHeader } from "@/components/shared/PrintHeader";
+import { PrintFooter } from "@/components/shared/PrintFooter";
 import type { Distribution } from "@/types/distributions";
 
 interface PrintDistribution extends Pick<Distribution, 'id' | 'month' | 'distribution_date' | 'total_amount' | 'beneficiaries_count' | 'status'> {
@@ -24,78 +26,25 @@ export const DistributionPrintTemplate = ({ distribution, details }: Distributio
     <div className="print-template" style={{ display: 'none' }}>
       <style>{`
         @media print {
-          body * {
-            visibility: hidden;
-          }
-          .print-template, .print-template * {
-            visibility: visible;
-          }
-          .print-template {
-            position: absolute;
-            right: 0;
-            top: 0;
-            width: 100%;
-            padding: 40px;
-          }
-          .dist-header {
-            text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 3px solid #333;
-            padding-bottom: 20px;
-          }
-          .dist-title {
-            font-size: 28px;
-            font-weight: bold;
-          }
-          .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            margin: 30px 0;
-          }
-          .summary-card {
-            border: 2px solid #e5e7eb;
-            padding: 15px;
-            border-radius: 8px;
-          }
-          .summary-label {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 5px;
-          }
-          .summary-value {
-            font-size: 20px;
-            font-weight: bold;
-            color: #2563eb;
-          }
-          .details-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 30px;
-          }
-          .details-table th,
-          .details-table td {
-            border: 1px solid #ddd;
-            padding: 12px;
-            text-align: right;
-          }
-          .details-table th {
-            background-color: #f5f5f5;
-            font-weight: bold;
-          }
-          .total-row {
-            background-color: #f0f9ff;
-            font-weight: bold;
-          }
+          body * { visibility: hidden; }
+          .print-template, .print-template * { visibility: visible; }
+          .print-template { position: absolute; right: 0; top: 0; width: 100%; padding: 40px; }
+          .summary-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 30px 0; }
+          .summary-card { border: 2px solid #166534; padding: 15px; border-radius: 8px; background: #f0fdf4; }
+          .summary-label { font-size: 14px; color: #166534; margin-bottom: 5px; }
+          .summary-value { font-size: 20px; font-weight: bold; color: #166534; }
+          .details-table { width: 100%; border-collapse: collapse; margin-top: 30px; }
+          .details-table th, .details-table td { border: 1px solid #ddd; padding: 12px; text-align: right; }
+          .details-table th { background-color: #166534; color: white; font-weight: bold; }
+          .details-table tr:nth-child(even) { background-color: #f9fafb; }
+          .total-row { background-color: #fef9c3 !important; font-weight: bold; }
         }
       `}</style>
       
-      <div className="dist-header">
-        <div className="dist-title">سند توزيع غلة الوقف</div>
-        <p>شهر: {distribution.month}</p>
-        <p>التاريخ: {format(new Date(distribution.distribution_date), "dd MMMM yyyy", { locale: ar })}</p>
-        <p>الحالة: {distribution.status}</p>
-      </div>
+      <PrintHeader 
+        title="سند توزيع غلة الوقف" 
+        subtitle={`شهر: ${distribution.month} | الحالة: ${distribution.status}`} 
+      />
 
       <div className="summary-grid">
         <div className="summary-card">
@@ -122,7 +71,7 @@ export const DistributionPrintTemplate = ({ distribution, details }: Distributio
 
       {details && details.length > 0 && (
         <>
-          <h3 style={{ marginTop: '30px', marginBottom: '15px' }}>تفاصيل التوزيع</h3>
+          <h3 style={{ marginTop: '30px', marginBottom: '15px', color: '#166534' }}>تفاصيل التوزيع</h3>
           <table className="details-table">
             <thead>
               <tr>
@@ -151,10 +100,7 @@ export const DistributionPrintTemplate = ({ distribution, details }: Distributio
         </>
       )}
 
-      <div style={{ marginTop: '60px', textAlign: 'center', fontSize: '12px', color: '#666' }}>
-        <p>تم إصدار هذا السند من نظام إدارة الوقف الإلكتروني</p>
-        <p>© {new Date().getFullYear()}</p>
-      </div>
+      <PrintFooter />
     </div>
   );
 };

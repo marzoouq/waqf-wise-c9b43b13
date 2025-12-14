@@ -1,4 +1,6 @@
 import { format, arLocale as ar } from "@/lib/date";
+import { PrintHeader } from "@/components/shared/PrintHeader";
+import { PrintFooter } from "@/components/shared/PrintFooter";
 
 interface Account {
   id: string;
@@ -41,15 +43,10 @@ export const AccountsPrintTemplate = ({ accounts, title }: AccountsPrintTemplate
             width: 100%;
             padding: 30px;
           }
-          .accounts-header {
-            text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 3px solid #333;
-            padding-bottom: 20px;
-          }
           .accounts-table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 20px;
           }
           .accounts-table th,
           .accounts-table td {
@@ -58,11 +55,15 @@ export const AccountsPrintTemplate = ({ accounts, title }: AccountsPrintTemplate
             text-align: right;
           }
           .accounts-table th {
-            background-color: #f5f5f5;
+            background-color: #166534;
+            color: white;
             font-weight: bold;
           }
+          .accounts-table tr:nth-child(even) {
+            background-color: #f9fafb;
+          }
           .total-row {
-            background-color: #e3f2fd;
+            background-color: #fef9c3 !important;
             font-weight: bold;
           }
           .debit-amount {
@@ -71,14 +72,18 @@ export const AccountsPrintTemplate = ({ accounts, title }: AccountsPrintTemplate
           .credit-amount {
             color: #dc2626;
           }
+          .summary-info {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f3f4f6;
+            border-radius: 8px;
+            text-align: center;
+          }
         }
       `}</style>
       
-      <div className="accounts-header">
-        <h1>{title}</h1>
-        <p>تاريخ الطباعة: {format(new Date(), "dd MMMM yyyy", { locale: ar })}</p>
-        <p>عدد الحسابات: {accounts.length}</p>
-      </div>
+      {/* ترويسة الوقف */}
+      <PrintHeader title={title} subtitle={`عدد الحسابات: ${accounts.length}`} />
 
       <table className="accounts-table">
         <thead>
@@ -114,6 +119,9 @@ export const AccountsPrintTemplate = ({ accounts, title }: AccountsPrintTemplate
           </tr>
         </tbody>
       </table>
+
+      {/* تذييل الوقف */}
+      <PrintFooter />
     </div>
   );
 };

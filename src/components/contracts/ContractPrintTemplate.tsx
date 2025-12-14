@@ -1,4 +1,6 @@
 import { formatDate } from "@/lib/date";
+import { PrintHeader } from "@/components/shared/PrintHeader";
+import { PrintFooter } from "@/components/shared/PrintFooter";
 
 interface Contract {
   id: string;
@@ -38,40 +40,35 @@ export const ContractPrintTemplate = ({ contract }: ContractPrintTemplateProps) 
             padding: 40px;
             font-family: Arial, sans-serif;
           }
-          .contract-header {
-            text-align: center;
-            margin-bottom: 40px;
-            border-bottom: 3px solid #333;
-            padding-bottom: 20px;
-          }
-          .contract-title {
-            font-size: 28px;
-            font-weight: bold;
-            margin-bottom: 10px;
-          }
           .contract-section {
-            margin-bottom: 30px;
+            margin: 25px 0;
+            padding: 15px;
+            background-color: #f9fafb;
+            border-radius: 8px;
           }
           .section-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             margin-bottom: 15px;
-            color: #333;
-            border-bottom: 2px solid #eee;
+            color: #166534;
+            border-bottom: 2px solid #166534;
             padding-bottom: 5px;
           }
           .info-row {
             display: flex;
             justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
+            padding: 8px 0;
+            border-bottom: 1px solid #e5e7eb;
+          }
+          .info-row:last-child {
+            border-bottom: none;
           }
           .info-label {
             font-weight: bold;
-            color: #555;
+            color: #374151;
           }
           .info-value {
-            color: #333;
+            color: #1f2937;
           }
           .signature-section {
             margin-top: 60px;
@@ -90,11 +87,11 @@ export const ContractPrintTemplate = ({ contract }: ContractPrintTemplateProps) 
         }
       `}</style>
       
-      <div className="contract-header">
-        <div className="contract-title">عقد إيجار</div>
-        <p>رقم العقد: {contract.contract_number}</p>
-        <p>التاريخ: {formatDate(new Date(), "dd MMMM yyyy")}</p>
-      </div>
+      {/* ترويسة الوقف */}
+      <PrintHeader 
+        title="عقد إيجار" 
+        subtitle={`رقم العقد: ${contract.contract_number}`} 
+      />
 
       <div className="contract-section">
         <div className="section-title">بيانات العقار</div>
@@ -152,6 +149,9 @@ export const ContractPrintTemplate = ({ contract }: ContractPrintTemplateProps) 
           </div>
         </div>
       </div>
+
+      {/* تذييل الوقف */}
+      <PrintFooter />
     </div>
   );
 };
