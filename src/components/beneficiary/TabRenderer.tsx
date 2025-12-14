@@ -1,12 +1,13 @@
 /**
  * TabRenderer Component
- * مكون موحد لعرض التبويبات مع دعم الصلاحيات والتحميل الكسول
+ * مكون موحد لعرض التبويبات مع دعم الصلاحيات والتحميل الكسول وError Boundaries
  */
 
 import { Suspense, lazy, ComponentType } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Lock } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { TabErrorBoundary } from "./common/TabErrorBoundary";
 import type { VisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
 
 // Lazy loaded tab components with named exports
@@ -124,9 +125,28 @@ export function TabRenderer({ activeTab, settings, beneficiaryId, beneficiary }:
     props.beneficiary = beneficiary;
   }
 
+  // Get tab name for error boundary
+  const tabNames: Record<string, string> = {
+    profile: "الملف الشخصي",
+    distributions: "التوزيعات",
+    statements: "كشف الحساب",
+    properties: "العقارات",
+    waqf: "الوقف",
+    family: "شجرة العائلة",
+    bank: "الحسابات البنكية",
+    reports: "التقارير المالية",
+    approvals: "سجل الموافقات",
+    disclosures: "الإفصاحات",
+    governance: "الحوكمة",
+    budgets: "الميزانيات",
+    loans: "القروض",
+  };
+
   return (
-    <Suspense fallback={<TabSkeleton />}>
-      <TabComponent {...props} />
-    </Suspense>
+    <TabErrorBoundary tabName={tabNames[activeTab] || activeTab}>
+      <Suspense fallback={<TabSkeleton />}>
+        <TabComponent {...props} />
+      </Suspense>
+    </TabErrorBoundary>
   );
 }

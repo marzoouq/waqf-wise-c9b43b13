@@ -79,9 +79,18 @@ export { ReportsMenu } from './ReportsMenu';
 export { SystemHealthIndicator } from './SystemHealthIndicator';
 export { AccountStatementView } from './AccountStatementView';
 
-// ==================== TabContent Wrapper ====================
+// ==================== TabContent Wrapper & Error Boundary ====================
 export { TabContentWrapper } from './common/TabContentWrapper';
+export { TabErrorBoundary } from './common/TabErrorBoundary';
 export { TabRenderer } from './TabRenderer';
+
+// ==================== Mobile Card Components ====================
+export { 
+  MobileCardBase, 
+  CardInfoRow, 
+  CardInfoGrid, 
+  CardInfoItem,
+} from './cards/MobileCardBase';
 
 // NOTE: NotificationsBell is now exported from @/components/layout/NotificationsBell
 // NotificationsCenter was removed as it was unused

@@ -17,5 +17,11 @@ export { ReportsMenu } from '../ReportsMenu';
 export { SystemHealthIndicator } from '../SystemHealthIndicator';
 export { AccountStatementView } from '../AccountStatementView';
 
+// Error Boundary for Tabs
+export { TabErrorBoundary } from './TabErrorBoundary';
+
+// Tab Content Wrapper
+export { TabContentWrapper } from './TabContentWrapper';
+
 // NOTE: NotificationsBell is now exported from @/components/layout/NotificationsBell
 // NotificationsCenter was removed as it was unused
