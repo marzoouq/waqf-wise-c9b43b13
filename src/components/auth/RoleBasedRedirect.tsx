@@ -2,54 +2,11 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { type AppRole, getDashboardForRoles } from '@/types/roles';
 
-export type AppRole = "nazer" | "admin" | "accountant" | "cashier" | "archivist" | "beneficiary" | "waqf_heir" | "user";
-
-/**
- * خريطة التوجيه حسب الدور
- */
-const ROLE_DASHBOARD_MAP: Record<AppRole, string> = {
-  waqf_heir: '/beneficiary-portal',
-  beneficiary: '/beneficiary-portal',
-  nazer: '/nazer-dashboard',
-  admin: '/admin-dashboard',
-  accountant: '/accountant-dashboard',
-  cashier: '/cashier-dashboard',
-  archivist: '/archivist-dashboard',
-  user: '/dashboard',
-};
-
-/**
- * أولوية الأدوار - الدور الأعلى يأخذ الأولوية
- */
-const ROLE_PRIORITY: AppRole[] = [
-  'nazer',
-  'admin', 
-  'accountant',
-  'cashier',
-  'archivist',
-  'waqf_heir',
-  'beneficiary',
-  'user',
-];
-
-/**
- * الحصول على لوحة التحكم المناسبة حسب الأدوار
- */
-export function getDashboardForRoles(roles: AppRole[]): string {
-  if (!roles || roles.length === 0) {
-    return '/dashboard';
-  }
-
-  // البحث عن الدور ذو الأولوية الأعلى
-  for (const priorityRole of ROLE_PRIORITY) {
-    if (roles.includes(priorityRole)) {
-      return ROLE_DASHBOARD_MAP[priorityRole];
-    }
-  }
-
-  return '/dashboard';
-}
+// Re-export for backward compatibility
+export type { AppRole } from '@/types/roles';
+export { getDashboardForRoles } from '@/types/roles';
 
 /**
  * مكون التوجيه التلقائي حسب الدور

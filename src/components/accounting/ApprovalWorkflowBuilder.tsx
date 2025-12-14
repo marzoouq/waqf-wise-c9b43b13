@@ -3,7 +3,16 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Plus, CheckCircle } from 'lucide-react';
 import { useApprovalWorkflows } from '@/hooks/useApprovalWorkflows';
-import { ROLE_LABELS, ENTITY_TYPE_LABELS } from '@/lib/role-labels';
+import { ROLE_LABELS } from '@/types/roles';
+
+const ENTITY_TYPE_LABELS: Record<string, string> = {
+  journal_entry: 'قيد محاسبي',
+  distribution: 'توزيع غلة',
+  payment: 'دفع مستحقات',
+  loan: 'قرض',
+  request: 'طلب',
+  contract: 'عقد',
+};
 import { ErrorState } from '@/components/shared/ErrorState';
 
 /**

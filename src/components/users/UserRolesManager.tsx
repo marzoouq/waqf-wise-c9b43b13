@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2, UserPlus, Trash2, Shield } from 'lucide-react';
-import { ROLE_NAMES_AR, type RoleName } from '@/types/auth';
+import { ROLE_LABELS, SYSTEM_ROLES, type AppRole } from '@/types/roles';
 import { useUserRolesManager } from '@/hooks/users/useUserRolesManager';
 import { ErrorState } from '@/components/shared/ErrorState';
 
@@ -58,7 +58,7 @@ export function UserRolesManager({ userId }: { userId: string }) {
             ) : (
               userRoles.map((role) => (
                 <Badge key={role} variant="secondary" className="gap-2">
-                  {ROLE_NAMES_AR[role]}
+                  {ROLE_LABELS[role as AppRole] || role}
                   <Button
                     size="sm"
                     variant="ghost"
@@ -76,14 +76,14 @@ export function UserRolesManager({ userId }: { userId: string }) {
 
         {/* إضافة دور جديد */}
         <div className="flex gap-2">
-          <Select value={selectedRole} onValueChange={(v) => setSelectedRole(v as RoleName)}>
+          <Select value={selectedRole} onValueChange={(v) => setSelectedRole(v as AppRole)}>
             <SelectTrigger className="flex-1">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {Object.entries(ROLE_NAMES_AR).map(([key, label]) => (
-                <SelectItem key={key} value={key}>
-                  {label}
+              {SYSTEM_ROLES.map((role) => (
+                <SelectItem key={role} value={role}>
+                  {ROLE_LABELS[role]}
                 </SelectItem>
               ))}
             </SelectContent>

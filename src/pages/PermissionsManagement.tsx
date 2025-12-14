@@ -21,9 +21,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { AppRole } from "@/hooks/useUserRole";
+import { type AppRole, ROLE_LABELS } from "@/types/roles";
 import { usePermissionsManagement } from "@/hooks/usePermissionsManagement";
-import { ROLE_LABELS } from "@/lib/role-labels";
 
 const CATEGORY_LABELS: Record<string, string> = {
   funds: "المصارف",

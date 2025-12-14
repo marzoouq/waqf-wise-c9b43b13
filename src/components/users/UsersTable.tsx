@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Shield, Edit, Trash2, CheckCircle, XCircle, Key, Mail } from "lucide-react";
 import { EmptyState } from "@/components/shared/EmptyState";
-import { ROLE_LABELS, ROLE_COLORS, type AppRole } from "@/lib/role-labels";
+import { ROLE_LABELS, ROLE_COLORS, type AppRole } from "@/types/roles";
 import type { UserProfile } from "@/hooks/useUsersManagement";
 
 interface UsersTableProps {

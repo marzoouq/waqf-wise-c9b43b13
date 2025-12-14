@@ -11,9 +11,9 @@ export interface BeneficiaryEmailResult {
   email: string;
   user_id: string;
 }
+import type { AppRole } from "@/types/roles";
 
 type UserRoleRow = Database['public']['Tables']['user_roles']['Row'];
-type AppRole = Database['public']['Enums']['app_role'];
 
 export interface UserProfile {
   id: string;
