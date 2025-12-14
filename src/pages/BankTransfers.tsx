@@ -184,7 +184,7 @@ export default function BankTransfers() {
             )}
 
             <Button onClick={handleExport} disabled={!selectedDistribution} className="w-full" size="lg">
-              <Download className="ml-2 h-4 w-4" />
+              <Download className="ms-2 h-4 w-4" />
               تصدير الملف
             </Button>
           </CardContent>

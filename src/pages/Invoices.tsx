@@ -107,7 +107,7 @@ const Invoices = () => {
                 size="sm"
               />
               <Button size="sm" onClick={handleAddNew}>
-                <Plus className="h-4 w-4 sm:h-5 sm:w-5 ml-2" />
+                <Plus className="h-4 w-4 sm:h-5 sm:w-5 ms-2" />
                 <span className="hidden sm:inline">فاتورة جديدة</span>
                 <span className="sm:hidden">جديد</span>
               </Button>
@@ -150,7 +150,7 @@ const Invoices = () => {
                         <h3 className="text-lg font-semibold mb-2">لا توجد فواتير بعد</h3>
                         <p className="text-sm text-muted-foreground mb-4">ابدأ بإنشاء أول فاتورة</p>
                         <Button size="sm" onClick={handleAddNew}>
-                          <Plus className="h-4 w-4 ml-2" />
+                          <Plus className="h-4 w-4 ms-2" />
                           إنشاء فاتورة
                         </Button>
                       </CardContent>
@@ -178,11 +178,11 @@ const Invoices = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={() => handleViewInvoice(invoice.id)}>
-                            <Eye className="ml-2 h-4 w-4" /> معاينة
+                            <Eye className="ms-2 h-4 w-4" /> معاينة
                           </DropdownMenuItem>
                           {invoice.status === "draft" && (
                             <DropdownMenuItem onClick={() => handleEditClick(invoice)}>
-                              <Edit className="ml-2 h-4 w-4" /> تعديل
+                              <Edit className="ms-2 h-4 w-4" /> تعديل
                             </DropdownMenuItem>
                           )}
                           <DropdownMenuSeparator />
@@ -191,7 +191,7 @@ const Invoices = () => {
                             disabled={invoice.status === "paid"}
                             onClick={() => handleDeleteClick(invoice.id, invoice.status)}
                           >
-                            <Trash2 className="ml-2 h-4 w-4" /> حذف
+                            <Trash2 className="ms-2 h-4 w-4" /> حذف
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>

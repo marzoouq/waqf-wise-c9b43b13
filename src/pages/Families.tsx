@@ -241,10 +241,10 @@ const Families = memo(() => {
                                 <Button variant="ghost" size="sm"><MoreVertical className="h-4 w-4" /></Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => handleViewMembers(family)}><Eye className="ml-2 h-4 w-4" />عرض الأفراد</DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => handleEditFamily(family)}><Edit className="ml-2 h-4 w-4" />تعديل</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleViewMembers(family)}><Eye className="ms-2 h-4 w-4" />عرض الأفراد</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleEditFamily(family)}><Edit className="ms-2 h-4 w-4" />تعديل</DropdownMenuItem>
                                 <DropdownMenuItem className="text-destructive" onClick={() => handleDeleteClick(family)}>
-                                  <Trash2 className="ml-2 h-4 w-4" />حذف
+                                  <Trash2 className="ms-2 h-4 w-4" />حذف
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>

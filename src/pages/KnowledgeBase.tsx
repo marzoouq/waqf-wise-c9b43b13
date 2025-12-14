@@ -72,19 +72,19 @@ const KnowledgeBase = () => {
           <ScrollArea className="w-full">
             <TabsList className="inline-flex w-full min-w-max h-auto p-1">
               <TabsTrigger value="articles" className="text-xs sm:text-sm min-h-[44px]">
-                <FileText className="h-4 w-4 ml-1" />
+                <FileText className="h-4 w-4 ms-1" />
                 <span className="hidden sm:inline">المقالات</span> ({filteredArticles.length})
               </TabsTrigger>
               <TabsTrigger value="faqs" className="text-xs sm:text-sm min-h-[44px]">
-                <HelpCircle className="h-4 w-4 ml-1" />
+                <HelpCircle className="h-4 w-4 ms-1" />
                 <span className="hidden sm:inline">الأسئلة الشائعة</span> ({filteredFAQs.length})
               </TabsTrigger>
               <TabsTrigger value="videos" className="text-xs sm:text-sm min-h-[44px]">
-                <Video className="h-4 w-4 ml-1" />
+                <Video className="h-4 w-4 ms-1" />
                 <span className="hidden sm:inline">شروحات فيديو</span>
               </TabsTrigger>
               <TabsTrigger value="downloads" className="text-xs sm:text-sm min-h-[44px]">
-                <Download className="h-4 w-4 ml-1" />
+                <Download className="h-4 w-4 ms-1" />
                 <span className="hidden sm:inline">التنزيلات</span>
               </TabsTrigger>
             </TabsList>

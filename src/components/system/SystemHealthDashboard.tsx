@@ -68,7 +68,7 @@ export function SystemHealthDashboard() {
               variant="outline"
               onClick={() => refetch()}
             >
-              <RefreshCw className="h-4 w-4 ml-2" />
+              <RefreshCw className="h-4 w-4 ms-2" />
               تحديث
             </Button>
             <Button 
@@ -76,7 +76,7 @@ export function SystemHealthDashboard() {
               variant="default"
               onClick={handleManualCleanup}
             >
-              <Zap className="h-4 w-4 ml-2" />
+              <Zap className="h-4 w-4 ms-2" />
               تنظيف فوري
             </Button>
             <Button 
@@ -84,7 +84,7 @@ export function SystemHealthDashboard() {
               variant="destructive"
               onClick={handleBulkResolve}
             >
-              <CheckCircle2 className="h-4 w-4 ml-2" />
+              <CheckCircle2 className="h-4 w-4 ms-2" />
               حل القديمة
             </Button>
             <Button 
@@ -92,7 +92,7 @@ export function SystemHealthDashboard() {
               variant="secondary"
               onClick={handleCleanupResolved}
             >
-              <Trash2 className="h-4 w-4 ml-2" />
+              <Trash2 className="h-4 w-4 ms-2" />
               مسح المحلولة
             </Button>
           </div>

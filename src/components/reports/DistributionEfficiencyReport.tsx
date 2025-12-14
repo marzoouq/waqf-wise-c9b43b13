@@ -123,7 +123,7 @@ export function DistributionEfficiencyReport({ distributions }: DistributionEffi
           <p className="text-muted-foreground">تحليل الأداء وأوقات المعالجة</p>
         </div>
         <Button>
-          <Download className="h-4 w-4 ml-2" />
+          <Download className="h-4 w-4 ms-2" />
           تصدير التقرير
         </Button>
       </div>

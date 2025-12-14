@@ -140,12 +140,12 @@ export function SelfHealingToolsPanel() {
                 >
                   {isHealthMonitorRunning ? (
                     <>
-                      <PauseCircle className="h-4 w-4 ml-1" />
+                      <PauseCircle className="h-4 w-4 ms-1" />
                       إيقاف
                     </>
                   ) : (
                     <>
-                      <PlayCircle className="h-4 w-4 ml-1" />
+                      <PlayCircle className="h-4 w-4 ms-1" />
                       تشغيل
                     </>
                   )}
@@ -174,7 +174,7 @@ export function SelfHealingToolsPanel() {
               onClick={clearCache}
               className="w-full justify-start"
             >
-              <Trash2 className="h-4 w-4 ml-2" />
+              <Trash2 className="h-4 w-4 ms-2" />
               مسح الذاكرة المؤقتة
             </Button>
 
@@ -193,7 +193,7 @@ export function SelfHealingToolsPanel() {
               }}
               className="w-full justify-start"
             >
-              <Wifi className="h-4 w-4 ml-2" />
+              <Wifi className="h-4 w-4 ms-2" />
               إعادة الاتصال بقاعدة البيانات
             </Button>
 
@@ -205,7 +205,7 @@ export function SelfHealingToolsPanel() {
               }}
               className="w-full justify-start"
             >
-              <Database className="h-4 w-4 ml-2" />
+              <Database className="h-4 w-4 ms-2" />
               مزامنة البيانات المعلقة
             </Button>
 
@@ -217,7 +217,7 @@ export function SelfHealingToolsPanel() {
               }}
               className="w-full justify-start"
             >
-              <RefreshCw className="h-4 w-4 ml-2" />
+              <RefreshCw className="h-4 w-4 ms-2" />
               إعادة تعيين Cache
             </Button>
           </div>
@@ -227,7 +227,7 @@ export function SelfHealingToolsPanel() {
             onClick={handleComprehensiveCleanup}
             className="w-full"
           >
-            <AlertCircle className="h-4 w-4 ml-2" />
+            <AlertCircle className="h-4 w-4 ms-2" />
             تنظيف شامل للنظام
           </Button>
         </CardContent>
