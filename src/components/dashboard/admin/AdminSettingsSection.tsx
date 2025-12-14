@@ -1,8 +1,9 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { LoadingState } from "@/components/shared/LoadingState";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { Settings, ArrowLeft } from "lucide-react";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   SettingsCategoryCard, 
   SettingsQuickActions, 
@@ -11,10 +12,14 @@ import {
 
 export function AdminSettingsSection() {
   const navigate = useNavigate();
-  const { categories, isLoading } = useSettingsCategories();
+  const { categories, isLoading, error, refetch } = useSettingsCategories();
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل الإعدادات..." />;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل الإعدادات" message={(error as Error).message} onRetry={refetch} />;
   }
 
   return (

@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -38,6 +38,7 @@ import {
 import { usePropertyUnits } from "@/hooks/usePropertyUnits";
 import { PropertyUnitDialog } from "./PropertyUnitDialog";
 import { LoadingState } from "@/components/shared/LoadingState";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { EnhancedEmptyState } from "@/components/shared";
 import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
 import { useToast } from "@/hooks/use-toast";
@@ -56,7 +57,7 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [unitToDelete, setUnitToDelete] = useState<DbPropertyUnit | null>(null);
   
-  const { units, isLoading, deleteUnit } = usePropertyUnits(propertyId);
+  const { units, isLoading, deleteUnit, error, refetch } = usePropertyUnits(propertyId);
   const { toast } = useToast();
 
   // Show message if no propertyId selected
@@ -138,6 +139,10 @@ export function PropertyUnitsManagement({ propertyId = '' }: PropertyUnitsManage
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل الوحدات..." />;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل الوحدات" message={(error as Error).message} onRetry={refetch} />;
   }
 
   const occupiedCount = units.filter(u => u.occupancy_status === 'مشغول').length;

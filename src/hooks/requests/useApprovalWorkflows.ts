@@ -69,7 +69,7 @@ export function useApprovalWorkflows() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const { data: workflowsRaw, isLoading: isLoadingWorkflows } = useQuery({
+  const { data: workflowsRaw, isLoading: isLoadingWorkflows, error: workflowsError, refetch: refetchWorkflows } = useQuery({
     queryKey: QUERY_KEYS.APPROVAL_WORKFLOWS,
     queryFn: () => ApprovalService.getAllWorkflows(),
   });
@@ -168,6 +168,8 @@ export function useApprovalWorkflows() {
     workflows,
     statuses: statuses || [],
     isLoading: isLoadingWorkflows || isLoadingStatuses,
+    error: workflowsError,
+    refetch: refetchWorkflows,
     createWorkflow: createWorkflow.mutateAsync,
     initiateApproval: initiateApproval.mutateAsync,
     processApproval: processApproval.mutateAsync,

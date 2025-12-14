@@ -10,7 +10,7 @@ export function useSystemSettings() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: settings = [], isLoading } = useQuery({
+  const { data: settings = [], isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.SYSTEM_SETTINGS,
     queryFn: () => SystemService.getSettings(),
     staleTime: QUERY_CONFIG.DEFAULT.staleTime,
@@ -44,6 +44,8 @@ export function useSystemSettings() {
   return {
     settings,
     isLoading,
+    error,
+    refetch,
     updateSetting: updateSetting.mutateAsync,
     getSetting,
     getPaymentApprovalThreshold,

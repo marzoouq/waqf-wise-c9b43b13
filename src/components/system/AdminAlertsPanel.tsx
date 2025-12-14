@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Bell, CheckCircle, AlertTriangle, XCircle, Clock } from 'lucide-react';
 import { formatRelative } from "@/lib/date";
 import { useAdminAlerts } from '@/hooks/system/useAdminAlerts';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 export function AdminAlertsPanel() {
   const { 
@@ -13,7 +14,9 @@ export function AdminAlertsPanel() {
     acknowledge, 
     resolve, 
     isAcknowledging, 
-    isResolving 
+    isResolving,
+    error,
+    refetch
   } = useAdminAlerts();
 
   const getSeverityIcon = (severity: string) => {
@@ -65,6 +68,10 @@ export function AdminAlertsPanel() {
         </CardContent>
       </Card>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل تنبيهات النظام" message={(error as Error).message} onRetry={refetch} />;
   }
 
   return (

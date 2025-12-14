@@ -15,7 +15,7 @@ import {
 
 export function useSettingsCategories() {
   const navigate = useNavigate();
-  const { isLoading, getSetting } = useSystemSettings();
+  const { isLoading, getSetting, error, refetch } = useSystemSettings();
 
   const categories = [
     {
@@ -130,5 +130,5 @@ export function useSettingsCategories() {
     },
   ];
 
-  return { categories, isLoading };
+  return { categories, isLoading, error, refetch };
 }

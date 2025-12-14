@@ -24,7 +24,7 @@ export interface SystemAlert {
 export function useAdminAlerts() {
   const queryClient = useQueryClient();
 
-  const { data: alerts = [], isLoading, refetch } = useQuery({
+  const { data: alerts = [], isLoading, refetch, error } = useQuery({
     queryKey: QUERY_KEYS.ADMIN_ALERTS,
     queryFn: () => SystemService.getAdminAlerts(),
     staleTime: 60 * 1000,
@@ -57,6 +57,7 @@ export function useAdminAlerts() {
     acknowledgedAlerts,
     isLoading,
     refetch,
+    error,
     acknowledge: acknowledgeMutation.mutate,
     resolve: resolveMutation.mutate,
     isAcknowledging: acknowledgeMutation.isPending,

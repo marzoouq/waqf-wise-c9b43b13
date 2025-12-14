@@ -2,12 +2,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { usePropertiesPerformance } from "@/hooks/dashboard/usePropertiesPerformance";
 import { ChartSkeleton } from "@/components/dashboard/ChartSkeleton";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export default function PropertiesPerformanceChart() {
-  const { data, isLoading } = usePropertiesPerformance();
+  const { data, isLoading, error, refetch } = usePropertiesPerformance();
 
   if (isLoading) {
     return <ChartSkeleton title="أداء العقارات" />;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل أداء العقارات" message={(error as Error).message} onRetry={refetch} />;
   }
 
   if (!data || data.length === 0) {
