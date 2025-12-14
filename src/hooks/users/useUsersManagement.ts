@@ -131,14 +131,8 @@ export function useResetUserPassword() {
 
   return useMutation({
     mutationFn: async ({ userId, password }: { userId: string; password: string }) => {
-      // هذه العملية تتطلب Edge Function
-      const { supabase } = await import('@/integrations/supabase/client');
-      const { data, error } = await supabase.functions.invoke('reset-user-password', {
-        body: { user_id: userId, new_password: password }
-      });
-      
-      if (error) throw error;
-      return data;
+      // استخدام AuthService بدلاً من استيراد مباشر
+      return AuthService.resetUserPassword(userId, password);
     },
     onSuccess: () => {
       toast({
