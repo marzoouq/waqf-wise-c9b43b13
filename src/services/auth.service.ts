@@ -235,30 +235,40 @@ export class AuthService {
 
   /**
    * جلب قائمة المستخدمين مع أدوارهم
+   * ✅ محسّن: استعلامين فقط بدلاً من N+1
    */
   static async getUsers() {
-    const { data, error } = await supabase
+    // استعلام واحد لجلب جميع الملفات الشخصية
+    const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
       .select("*")
       .order("created_at", { ascending: false });
 
-    if (error) throw error;
+    if (profilesError) throw profilesError;
+    if (!profiles || profiles.length === 0) return [];
 
-    const usersWithRoles = await Promise.all(
-      (data || []).map(async (profile) => {
-        const { data: rolesData } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", profile.user_id);
+    // استعلام واحد لجلب جميع الأدوار
+    const userIds = profiles.map(p => p.user_id).filter(Boolean);
+    const { data: allRoles, error: rolesError } = await supabase
+      .from("user_roles")
+      .select("user_id, role")
+      .in("user_id", userIds);
 
-        return {
-          ...profile,
-          user_roles: rolesData || [],
-        };
-      })
-    );
+    if (rolesError) throw rolesError;
 
-    return usersWithRoles;
+    // تجميع الأدوار حسب المستخدم في الذاكرة
+    const rolesMap = new Map<string, Array<{ role: string }>>();
+    (allRoles || []).forEach(r => {
+      const existing = rolesMap.get(r.user_id) || [];
+      existing.push({ role: r.role });
+      rolesMap.set(r.user_id, existing);
+    });
+
+    // دمج البيانات
+    return profiles.map(profile => ({
+      ...profile,
+      user_roles: rolesMap.get(profile.user_id) || [],
+    }));
   }
 
   /**
@@ -464,5 +474,19 @@ export class AuthService {
         .insert({ user_id: userId, ...settings });
       if (error) throw error;
     }
+  }
+
+  // ==================== إعادة تعيين كلمة المرور للمستخدم ====================
+
+  /**
+   * إعادة تعيين كلمة مرور مستخدم آخر (للمشرفين)
+   */
+  static async resetUserPassword(userId: string, newPassword: string): Promise<{ success: boolean }> {
+    const { data, error } = await supabase.functions.invoke('reset-user-password', {
+      body: { user_id: userId, new_password: newPassword }
+    });
+    
+    if (error) throw error;
+    return data || { success: true };
   }
 }
