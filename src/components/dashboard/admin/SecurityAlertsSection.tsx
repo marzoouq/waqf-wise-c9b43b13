@@ -5,9 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export function SecurityAlertsSection() {
-  const { data: alerts, isLoading } = useSecurityAlerts();
+  const { data: alerts, isLoading, error, refetch } = useSecurityAlerts();
   const navigate = useNavigate();
 
   if (isLoading) {
@@ -28,6 +29,10 @@ export function SecurityAlertsSection() {
         </CardContent>
       </Card>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل التنبيهات الأمنية" message={(error as Error).message} onRetry={refetch} />;
   }
 
   if (!alerts) return null;

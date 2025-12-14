@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Download, Users } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { exportToExcel, exportToPDF } from "@/lib/exportHelpers";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +20,7 @@ export function BeneficiaryReports() {
     isRefetching,
     lastUpdated,
     handleRefresh,
+    error,
   } = useBeneficiaryReportsData();
 
   const handleExportPDF = () => {
@@ -102,6 +104,10 @@ export function BeneficiaryReports() {
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل بيانات المستفيدين..." />;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل بيانات المستفيدين" message={(error as Error).message} onRetry={handleRefresh} />;
   }
 
   if (beneficiaries.length === 0) {

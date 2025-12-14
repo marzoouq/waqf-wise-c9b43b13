@@ -19,9 +19,10 @@ import {
 import { errorTracker } from "@/lib/errors/tracker";
 import { useSystemHealthLive } from "@/hooks/system/useSystemHealthLive";
 import { useSystemHealthActions } from "@/hooks/system/useSystemHealthActions";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export function SystemHealthDashboard() {
-  const { data: liveStats, isLoading, refetch } = useSystemHealthLive();
+  const { data: liveStats, isLoading, error, refetch } = useSystemHealthLive();
   
   // استخدام hook مخصص للعمليات
   const { handleBulkResolve, handleCleanupResolved, handleManualCleanup } = useSystemHealthActions(refetch);
@@ -39,6 +40,10 @@ export function SystemHealthDashboard() {
         </CardContent>
       </Card>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل حالة النظام" message={(error as Error).message} onRetry={refetch} />;
   }
 
   const healthScore = liveStats?.healthScore || 0;

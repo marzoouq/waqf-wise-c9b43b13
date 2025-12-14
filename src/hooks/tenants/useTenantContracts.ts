@@ -22,7 +22,7 @@ export interface TenantContract {
 }
 
 export function useTenantContracts(tenantId: string) {
-  const { data: contracts = [], isLoading, error } = useQuery({
+  const { data: contracts = [], isLoading, error, refetch } = useQuery({
     queryKey: ['tenant-contracts', tenantId],
     queryFn: () => TenantService.getContractsDetailed(tenantId) as Promise<TenantContract[]>,
     enabled: !!tenantId,
@@ -32,5 +32,6 @@ export function useTenantContracts(tenantId: string) {
     contracts,
     isLoading,
     error,
+    refetch,
   };
 }

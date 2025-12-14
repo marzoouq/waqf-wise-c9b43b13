@@ -22,7 +22,7 @@ export function useBankAccounts() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: bankAccounts = [], isLoading } = useQuery({
+  const { data: bankAccounts = [], isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.BANK_ACCOUNTS,
     queryFn: () => PaymentService.getBankAccounts(),
   });
@@ -77,6 +77,8 @@ export function useBankAccounts() {
   return {
     bankAccounts,
     isLoading,
+    error,
+    refetch,
     addBankAccount: addBankAccount.mutateAsync,
     updateBankAccount: updateBankAccount.mutateAsync,
     deleteBankAccount: deleteBankAccount.mutateAsync,

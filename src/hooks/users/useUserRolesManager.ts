@@ -19,7 +19,7 @@ export function useUserRolesManager(userId: string) {
   const userRolesKey = QUERY_KEYS.USER_ROLES(userId);
   
   // جلب أدوار المستخدم الحالية
-  const { data: userRoles = [], isLoading } = useQuery({
+  const { data: userRoles = [], isLoading, error, refetch } = useQuery({
     queryKey: userRolesKey,
     queryFn: () => UserService.getUserRolesForManager(userId),
     enabled: !!userId,
@@ -80,6 +80,8 @@ export function useUserRolesManager(userId: string) {
   return {
     userRoles: userRoles as RoleName[],
     isLoading,
+    error,
+    refetch,
     selectedRole,
     setSelectedRole,
     addRole: handleAddRole,

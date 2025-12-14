@@ -5,6 +5,7 @@ import { Plus, Pencil, Trash2, Building2 } from "lucide-react";
 import { useBankAccounts } from "@/hooks/useBankAccounts";
 import { useAccounts } from "@/hooks/useAccounts";
 import { LoadingState } from "@/components/shared/LoadingState";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { EmptyAccountingState } from "./EmptyAccountingState";
 import { logger } from "@/lib/logger";
 import { ResponsiveDialog, DialogFooter } from "@/components/shared/ResponsiveDialog";
@@ -23,7 +24,7 @@ import { BankAccountRow } from "@/types/supabase-helpers";
 import { UnifiedDataTable, type Column } from "@/components/unified/UnifiedDataTable";
 
 export function BankAccountsManagement() {
-  const { bankAccounts, isLoading, addBankAccount, updateBankAccount, deleteBankAccount } =
+  const { bankAccounts, isLoading, addBankAccount, updateBankAccount, deleteBankAccount, error, refetch } =
     useBankAccounts();
   const { accounts } = useAccounts();
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -43,6 +44,10 @@ export function BankAccountsManagement() {
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل الحسابات البنكية..." />;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل الحسابات البنكية" message={(error as Error).message} onRetry={refetch} />;
   }
 
   const handleOpenDialog = (account?: BankAccountRow) => {

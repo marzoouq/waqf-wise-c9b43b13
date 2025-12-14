@@ -4,6 +4,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { Building, Calendar, FileText, CreditCard } from 'lucide-react';
 import { useTenantContracts } from '@/hooks/tenants/useTenantContracts';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 interface TenantContractsProps {
   tenantId: string;
@@ -18,7 +19,7 @@ const statusLabels: Record<string, { label: string; variant: 'default' | 'second
 };
 
 export function TenantContracts({ tenantId }: TenantContractsProps) {
-  const { contracts, isLoading } = useTenantContracts(tenantId);
+  const { contracts, isLoading, error, refetch } = useTenantContracts(tenantId);
 
   if (isLoading) {
     return (
@@ -28,6 +29,10 @@ export function TenantContracts({ tenantId }: TenantContractsProps) {
         ))}
       </div>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل العقود" message={(error as Error).message} onRetry={refetch} />;
   }
 
   if (contracts.length === 0) {

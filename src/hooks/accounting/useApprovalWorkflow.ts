@@ -27,7 +27,7 @@ export interface ApprovalStatus {
 }
 
 export function useApprovalWorkflow() {
-  const { data: pendingApprovals, isLoading } = useQuery({
+  const { data: pendingApprovals = [], isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.PENDING_APPROVALS,
     queryFn: async () => {
       const data = await AccountingService.getApprovalWorkflowStatus();
@@ -38,5 +38,7 @@ export function useApprovalWorkflow() {
   return {
     pendingApprovals,
     isLoading,
+    error,
+    refetch,
   };
 }

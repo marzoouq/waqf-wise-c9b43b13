@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Loader2, UserPlus, Trash2, Shield } from 'lucide-react';
 import { ROLE_NAMES_AR, type RoleName } from '@/types/auth';
 import { useUserRolesManager } from '@/hooks/users/useUserRolesManager';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 /**
  * مكون إدارة أدوار المستخدمين
@@ -20,6 +21,8 @@ export function UserRolesManager({ userId }: { userId: string }) {
     deleteRole,
     isAdding,
     isDeleting,
+    error,
+    refetch,
   } = useUserRolesManager(userId);
 
   if (isLoading) {
@@ -28,6 +31,10 @@ export function UserRolesManager({ userId }: { userId: string }) {
         <Loader2 className="h-6 w-6 animate-spin text-primary" />
       </div>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل الأدوار" message={(error as Error).message} onRetry={refetch} />;
   }
 
   return (

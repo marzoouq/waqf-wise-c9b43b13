@@ -10,7 +10,7 @@ export function useSavedSearches() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: searches = [], isLoading } = useQuery({
+  const { data: searches = [], isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.SAVED_SEARCHES,
     queryFn: () => UIService.getSavedSearches(),
   });
@@ -53,6 +53,8 @@ export function useSavedSearches() {
   return {
     searches,
     isLoading,
+    error,
+    refetch,
     saveSearch: saveSearch.mutateAsync,
     deleteSearch: deleteSearch.mutateAsync,
     updateUsage: updateUsage.mutate,
