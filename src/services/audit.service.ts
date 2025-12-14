@@ -36,7 +36,7 @@ export class AuditService {
       query = query.lte("created_at", filters.endDate);
     }
 
-    const { data, error } = await query.limit(filters ? 100 : 10);
+    const { data, error } = await query.limit(1000);
 
     if (error) throw error;
     return data as AuditLog[];
