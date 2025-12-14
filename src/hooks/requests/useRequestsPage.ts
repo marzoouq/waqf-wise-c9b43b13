@@ -10,7 +10,7 @@ import type { FullRequest } from '@/types/request.types';
 export type RequestData = FullRequest;
 
 export function useRequestsPage() {
-  const { requests, isLoading, deleteRequest } = useRequests();
+  const { requests, isLoading, error, refetch, deleteRequest } = useRequests();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedRequest, setSelectedRequest] = useState<FullRequest | null>(null);
@@ -109,6 +109,8 @@ export function useRequestsPage() {
     sortedData,
     stats,
     isLoading,
+    error,
+    refetch,
     deleteRequest,
     
     // Pagination

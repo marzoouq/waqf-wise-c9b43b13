@@ -67,12 +67,18 @@ const Archive = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   // Data Hooks
-  const { documents, isLoading: documentsLoading } = useDocuments();
-  const { folders: allFolders, isLoading: foldersLoading, addFolder } = useFolders();
-  const { stats, isLoading: statsLoading } = useArchiveStats();
+  const { documents, isLoading: documentsLoading, error: documentsError, refetch: refetchDocuments } = useDocuments();
+  const { folders: allFolders, isLoading: foldersLoading, error: foldersError, refetch: refetchFolders, addFolder } = useFolders();
+  const { stats, isLoading: statsLoading, error: statsError, refetch: refetchStats } = useArchiveStats();
   const { deleteDocumentWithFile } = useDocumentUpload();
 
   const isLoading = documentsLoading || foldersLoading || statsLoading;
+  const error = documentsError || foldersError || statsError;
+  const refetch = () => {
+    refetchDocuments();
+    refetchFolders();
+    refetchStats();
+  };
 
   // فلترة المجلدات حسب إعدادات الشفافية للورثة والمستفيدين
   const folders = useMemo(() => {
@@ -151,6 +157,17 @@ const Archive = () => {
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل الأرشيف..." />;
+  }
+
+  if (error) {
+    return (
+      <ErrorState 
+        title="فشل تحميل الأرشيف" 
+        message="حدث خطأ أثناء تحميل بيانات الأرشيف"
+        onRetry={refetch}
+        fullScreen
+      />
+    );
   }
 
   // إذا كان المستفيد/الوريث ممنوع من رؤية الأرشيف

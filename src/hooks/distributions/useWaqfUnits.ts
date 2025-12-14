@@ -43,7 +43,7 @@ export function useWaqfUnits() {
     return () => { subscription.unsubscribe(); };
   }, [queryClient]);
 
-  const { data: waqfUnits = [], isLoading } = useQuery({
+  const { data: waqfUnits = [], isLoading, error, refetch } = useQuery({
     queryKey: ['waqf_units'],
     queryFn: () => FundService.getWaqfUnits(),
   });
@@ -98,6 +98,8 @@ export function useWaqfUnits() {
   return {
     waqfUnits,
     isLoading,
+    error,
+    refetch,
     addWaqfUnit: addWaqfUnit.mutateAsync,
     updateWaqfUnit: updateWaqfUnit.mutateAsync,
     deleteWaqfUnit: deleteWaqfUnit.mutateAsync,

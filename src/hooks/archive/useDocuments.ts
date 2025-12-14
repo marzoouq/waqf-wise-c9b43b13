@@ -24,7 +24,7 @@ export function useDocuments() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: documents = [], isLoading } = useQuery({
+  const { data: documents = [], isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.DOCUMENTS,
     queryFn: () => ArchiveService.getDocuments(),
     staleTime: QUERY_STALE_TIME.DEFAULT,
@@ -81,6 +81,8 @@ export function useDocuments() {
   return {
     documents,
     isLoading,
+    error,
+    refetch,
     addDocument: addDocument.mutateAsync,
     updateDocument: updateDocument.mutateAsync,
     deleteDocument: deleteDocument.mutateAsync,

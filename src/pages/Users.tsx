@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Search, Shield, Edit, Trash2, CheckCircle, XCircle, Download, Key, AlertCircle, Mail } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Label } from "@/components/ui/label";
@@ -50,6 +51,7 @@ const Users = () => {
   const {
     users,
     isLoading,
+    error,
     refetch,
     deleteUser: deleteUserMutation,
     updateRoles: updateRolesMutation,
@@ -181,6 +183,17 @@ const Users = () => {
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل المستخدمين..." />;
+  }
+
+  if (error) {
+    return (
+      <ErrorState 
+        title="فشل تحميل المستخدمين" 
+        message="حدث خطأ أثناء تحميل بيانات المستخدمين"
+        onRetry={refetch}
+        fullScreen
+      />
+    );
   }
 
   return (

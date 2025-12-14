@@ -35,7 +35,7 @@ export const useRequests = (beneficiaryId?: string) => {
   const { addTask } = useTasks();
 
   // Fetch requests using RequestService
-  const { data: requests = [], isLoading } = useQuery({
+  const { data: requests = [], isLoading, error, refetch } = useQuery({
     queryKey: beneficiaryId ? [...QUERY_KEYS.REQUESTS, 'beneficiary', beneficiaryId] : QUERY_KEYS.REQUESTS,
     queryFn: () => RequestService.getAll(beneficiaryId),
   });
@@ -170,6 +170,8 @@ export const useRequests = (beneficiaryId?: string) => {
   return {
     requests,
     isLoading,
+    error,
+    refetch,
     getRequest,
     createRequest,
     updateRequest,
