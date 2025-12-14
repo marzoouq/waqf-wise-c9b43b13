@@ -10,22 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Shield, Edit, Trash2, CheckCircle, XCircle, Key, Mail } from "lucide-react";
 import { EmptyState } from "@/components/shared/EmptyState";
-import { ROLE_LABELS } from "@/lib/role-labels";
-import { Database } from "@/integrations/supabase/types";
+import { ROLE_LABELS, ROLE_COLORS, type AppRole } from "@/lib/role-labels";
 import type { UserProfile } from "@/hooks/useUsersManagement";
-
-type AppRole = Database['public']['Enums']['app_role'];
-
-const roleColors: Record<AppRole, string> = {
-  nazer: "bg-primary/10 text-primary border-primary/30",
-  admin: "bg-destructive/10 text-destructive border-destructive/30",
-  accountant: "bg-info/10 text-info border-info/30",
-  cashier: "bg-success/10 text-success border-success/30",
-  archivist: "bg-warning/10 text-warning border-warning/30",
-  beneficiary: "bg-accent/10 text-accent border-accent/30",
-  waqf_heir: "bg-amber-100 text-amber-700 border-amber-300",
-  user: "bg-muted/10 text-muted-foreground border-border/30",
-};
 
 interface UsersTableProps {
   users: UserProfile[];
@@ -93,7 +79,7 @@ export function UsersTable({
                             <Badge
                               key={idx}
                               variant="outline"
-                              className={roleColors[role] + " text-xs whitespace-nowrap"}
+                              className={ROLE_COLORS[role] + " text-xs whitespace-nowrap"}
                             >
                               {ROLE_LABELS[role as keyof typeof ROLE_LABELS] || role}
                             </Badge>

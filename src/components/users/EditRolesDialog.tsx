@@ -8,24 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
-import { ROLE_LABELS } from "@/lib/role-labels";
-import { Database } from "@/integrations/supabase/types";
+import { ROLE_LABELS, ROLE_COLORS, SYSTEM_ROLES, type AppRole } from "@/lib/role-labels";
 import type { UserProfile } from "@/hooks/useUsersManagement";
 
-type AppRole = Database['public']['Enums']['app_role'];
-
-const roleColors: Record<AppRole, string> = {
-  nazer: "bg-primary/10 text-primary border-primary/30",
-  admin: "bg-destructive/10 text-destructive border-destructive/30",
-  accountant: "bg-info/10 text-info border-info/30",
-  cashier: "bg-success/10 text-success border-success/30",
-  archivist: "bg-warning/10 text-warning border-warning/30",
-  beneficiary: "bg-accent/10 text-accent border-accent/30",
-  waqf_heir: "bg-amber-100 text-amber-700 border-amber-300",
-  user: "bg-muted/10 text-muted-foreground border-border/30",
-};
-
-const EDITABLE_ROLES: AppRole[] = ['nazer', 'admin', 'accountant', 'cashier', 'archivist', 'beneficiary', 'user'];
+const EDITABLE_ROLES: AppRole[] = SYSTEM_ROLES.filter(r => r !== 'waqf_heir') as AppRole[];
 
 interface EditRolesDialogProps {
   open: boolean;
@@ -68,7 +54,7 @@ export function EditRolesDialog({
               />
               <Label className="cursor-pointer">{ROLE_LABELS[role as keyof typeof ROLE_LABELS]}</Label>
             </div>
-            <Badge variant="outline" className={roleColors[role]}>
+            <Badge variant="outline" className={ROLE_COLORS[role]}>
               {role}
             </Badge>
           </div>
