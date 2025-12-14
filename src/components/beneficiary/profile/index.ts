@@ -11,5 +11,5 @@ export { ProfilePaymentsHistory } from '../ProfilePaymentsHistory';
 export { ProfileRequestsHistory } from '../ProfileRequestsHistory';
 export { ProfileFamilyTree } from '../ProfileFamilyTree';
 export { ProfileDocumentsGallery } from '../ProfileDocumentsGallery';
-export { BeneficiaryProfileTab } from '../BeneficiaryProfileTab';
+export { BeneficiaryProfileTab } from '../tabs/BeneficiaryProfileTab';
 export { BeneficiaryProfileCard } from '../BeneficiaryProfileCard';

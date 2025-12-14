@@ -1,15 +1,15 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Building2, FileText, TrendingUp, PieChart } from "lucide-react";
-import { PropertyAccordionView } from "./PropertyAccordionView";
-import { ContractsTable } from "./ContractsTable";
-import { MonthlyRevenueChart } from "./MonthlyRevenueChart";
-import { DistributionPieChart } from "./DistributionPieChart";
-import { EmptyPaymentsState } from "./EmptyPaymentsState";
+import { PropertyAccordionView } from "../PropertyAccordionView";
+import { ContractsTable } from "../ContractsTable";
+import { MonthlyRevenueChart } from "../MonthlyRevenueChart";
+import { DistributionPieChart } from "../DistributionPieChart";
+import { EmptyPaymentsState } from "../EmptyPaymentsState";
 import { HistoricalRentalDetailsCard } from "@/components/fiscal-year";
 import { useBeneficiaryProfile } from "@/hooks/beneficiary";
 import { useAuth } from "@/hooks/useAuth";
 import { useFiscalYearPublishStatus } from "@/hooks/useFiscalYearPublishStatus";
-import { FiscalYearNotPublishedBanner } from "./FiscalYearNotPublishedBanner";
+import { FiscalYearNotPublishedBanner } from "../FiscalYearNotPublishedBanner";
 import { useFiscalYearsList } from "@/hooks/fiscal-years";
 
 export function FinancialTransparencyTab() {

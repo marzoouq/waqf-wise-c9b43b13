@@ -12,43 +12,43 @@ import type { VisibilitySettings } from "@/hooks/governance/useVisibilitySetting
 
 // Lazy loaded tab components with named exports
 const LazyBeneficiaryProfileTab = lazy(() => 
-  import("@/components/beneficiary/BeneficiaryProfileTab").then(m => ({ default: m.BeneficiaryProfileTab }))
+  import("@/components/beneficiary/tabs/BeneficiaryProfileTab").then(m => ({ default: m.BeneficiaryProfileTab }))
 );
 const LazyBeneficiaryDistributionsTab = lazy(() => 
-  import("@/components/beneficiary/BeneficiaryDistributionsTab").then(m => ({ default: m.BeneficiaryDistributionsTab }))
+  import("@/components/beneficiary/tabs/BeneficiaryDistributionsTab").then(m => ({ default: m.BeneficiaryDistributionsTab }))
 );
 const LazyBeneficiaryStatementsTab = lazy(() => 
-  import("@/components/beneficiary/BeneficiaryStatementsTab").then(m => ({ default: m.BeneficiaryStatementsTab }))
+  import("@/components/beneficiary/tabs/BeneficiaryStatementsTab").then(m => ({ default: m.BeneficiaryStatementsTab }))
 );
 const LazyBeneficiaryPropertiesTab = lazy(() => 
-  import("@/components/beneficiary/BeneficiaryPropertiesTab").then(m => ({ default: m.BeneficiaryPropertiesTab }))
+  import("@/components/beneficiary/tabs/BeneficiaryPropertiesTab").then(m => ({ default: m.BeneficiaryPropertiesTab }))
 );
 const LazyWaqfSummaryTab = lazy(() => 
-  import("@/components/beneficiary/WaqfSummaryTab").then(m => ({ default: m.WaqfSummaryTab }))
+  import("@/components/beneficiary/tabs/WaqfSummaryTab").then(m => ({ default: m.WaqfSummaryTab }))
 );
 const LazyFamilyTreeTab = lazy(() => 
-  import("@/components/beneficiary/FamilyTreeTab").then(m => ({ default: m.FamilyTreeTab }))
+  import("@/components/beneficiary/tabs/FamilyTreeTab").then(m => ({ default: m.FamilyTreeTab }))
 );
 const LazyBankAccountsTab = lazy(() => 
-  import("@/components/beneficiary/BankAccountsTab").then(m => ({ default: m.BankAccountsTab }))
+  import("@/components/beneficiary/tabs/BankAccountsTab").then(m => ({ default: m.BankAccountsTab }))
 );
 const LazyFinancialReportsTab = lazy(() => 
-  import("@/components/beneficiary/FinancialReportsTab").then(m => ({ default: m.FinancialReportsTab }))
+  import("@/components/beneficiary/tabs/FinancialReportsTab").then(m => ({ default: m.FinancialReportsTab }))
 );
 const LazyApprovalsLogTab = lazy(() => 
-  import("@/components/beneficiary/ApprovalsLogTab").then(m => ({ default: m.ApprovalsLogTab }))
+  import("@/components/beneficiary/tabs/ApprovalsLogTab").then(m => ({ default: m.ApprovalsLogTab }))
 );
 const LazyDisclosuresTab = lazy(() => 
-  import("@/components/beneficiary/DisclosuresTab").then(m => ({ default: m.DisclosuresTab }))
+  import("@/components/beneficiary/tabs/DisclosuresTab").then(m => ({ default: m.DisclosuresTab }))
 );
 const LazyGovernanceTab = lazy(() => 
-  import("@/components/beneficiary/GovernanceTab").then(m => ({ default: m.GovernanceTab }))
+  import("@/components/beneficiary/tabs/GovernanceTab").then(m => ({ default: m.GovernanceTab }))
 );
 const LazyBudgetsTab = lazy(() => 
-  import("@/components/beneficiary/BudgetsTab").then(m => ({ default: m.BudgetsTab }))
+  import("@/components/beneficiary/tabs/BudgetsTab").then(m => ({ default: m.BudgetsTab }))
 );
 const LazyLoansOverviewTab = lazy(() => 
-  import("@/components/beneficiary/LoansOverviewTab").then(m => ({ default: m.LoansOverviewTab }))
+  import("@/components/beneficiary/tabs/LoansOverviewTab").then(m => ({ default: m.LoansOverviewTab }))
 );
 
 interface TabConfig {
