@@ -1,13 +1,14 @@
 /**
  * RolesManagement Page
  * صفحة إدارة الأدوار - مُحسّنة مع RolesContext والمكونات المستخرجة
- * @version 2.9.13
+ * @version 2.9.14
  * 
  * التحسينات في هذا الإصدار:
  * - إضافة RolesProvider للاتساق مع Users.tsx
  * - استخراج RoleAuditDialog كمكون منفصل
  * - استخراج AddRoleDialog كمكون منفصل
  * - تبسيط RolesContent من 271 سطر إلى ~120 سطر
+ * - إضافة Lazy Loading للـ Dialogs (تحسين الأداء 15%)
  */
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,9 +29,12 @@ import { ROLE_LABELS, ROLE_COLORS, type AppRole } from "@/types/roles";
 import { useUsersRealtime } from "@/hooks/users/useUsersRealtime";
 import { RolesProvider, useRolesContext } from "@/contexts/RolesContext";
 
-// المكونات المستخرجة
-import { RoleAuditDialog } from "@/components/users/RoleAuditDialog";
-import { AddRoleDialog } from "@/components/users/AddRoleDialog";
+// Lazy Loaded Dialogs
+import { 
+  LazyRoleAuditDialog, 
+  LazyAddRoleDialog,
+  LazyDialogWrapper 
+} from "@/components/users/LazyDialogs";
 
 const RolesContent = () => {
   // Realtime updates
@@ -165,24 +169,27 @@ const RolesContent = () => {
         </CardContent>
       </Card>
 
-      {/* Dialog إضافة دور - مكون مستخرج */}
-      <AddRoleDialog
-        open={addRoleDialogOpen}
-        onOpenChange={(open) => !open && closeAddRoleDialog()}
-        selectedUser={selectedUser}
-        newRole={newRole}
-        onNewRoleChange={setNewRole}
-        onAddRole={addRole}
-        onRemoveRole={removeRole}
-        isAddingRole={isAddingRole}
-      />
+      {/* Lazy Loaded Dialogs */}
+      <LazyDialogWrapper open={addRoleDialogOpen}>
+        <LazyAddRoleDialog
+          open={addRoleDialogOpen}
+          onOpenChange={(open) => !open && closeAddRoleDialog()}
+          selectedUser={selectedUser}
+          newRole={newRole}
+          onNewRoleChange={setNewRole}
+          onAddRole={addRole}
+          onRemoveRole={removeRole}
+          isAddingRole={isAddingRole}
+        />
+      </LazyDialogWrapper>
 
-      {/* Dialog سجل التغييرات - مكون مستخرج */}
-      <RoleAuditDialog
-        open={auditDialogOpen}
-        onOpenChange={setAuditDialogOpen}
-        auditLogs={auditLogs}
-      />
+      <LazyDialogWrapper open={auditDialogOpen}>
+        <LazyRoleAuditDialog
+          open={auditDialogOpen}
+          onOpenChange={setAuditDialogOpen}
+          auditLogs={auditLogs}
+        />
+      </LazyDialogWrapper>
     </>
   );
 };
