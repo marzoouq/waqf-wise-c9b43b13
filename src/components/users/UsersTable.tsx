@@ -1,17 +1,14 @@
 /**
  * UsersTable Component
- * جدول عرض المستخدمين مع الإجراءات
+ * جدول عرض المستخدمين مع الإجراءات - مُحسّن
  */
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
-import { Shield, Edit, Trash2, CheckCircle, XCircle, Key, Mail } from "lucide-react";
+import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Shield } from "lucide-react";
 import { EmptyState } from "@/components/shared/EmptyState";
-import { ROLE_LABELS, ROLE_COLORS, type AppRole } from "@/types/roles";
-import type { UserProfile } from "@/hooks/useUsersManagement";
+import { UsersTableRow } from "./UsersTableRow";
+import type { UserProfile } from "@/types/auth";
 
 interface UsersTableProps {
   users: UserProfile[];
@@ -36,6 +33,14 @@ export function UsersTable({
   onStatusChange,
   onShowNotAvailableToast,
 }: UsersTableProps) {
+  const handleAction = (user: UserProfile, action: () => void) => {
+    if (!user.user_id) {
+      onShowNotAvailableToast();
+      return;
+    }
+    action();
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -67,109 +72,17 @@ export function UsersTable({
               </TableHeader>
               <TableBody>
                 {users.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell className="font-medium text-xs sm:text-sm">{user.full_name}</TableCell>
-                    <TableCell className="text-xs sm:text-sm">{user.email}</TableCell>
-                    <TableCell className="hidden md:table-cell text-xs sm:text-sm">{user.phone || "-"}</TableCell>
-                    <TableCell>
-                      <div className="flex flex-wrap gap-1">
-                        {user.user_roles?.map((roleObj, idx) => {
-                          const role = roleObj.role as AppRole;
-                          return (
-                            <Badge
-                              key={idx}
-                              variant="outline"
-                              className={ROLE_COLORS[role] + " text-xs whitespace-nowrap"}
-                            >
-                              {ROLE_LABELS[role as keyof typeof ROLE_LABELS] || role}
-                            </Badge>
-                          );
-                        })}
-                      </div>
-                    </TableCell>
-                    <TableCell className="hidden lg:table-cell">
-                      <div className="flex items-center gap-2">
-                        <Switch
-                          checked={user.is_active}
-                          onCheckedChange={(checked) => onStatusChange(user.user_id, checked)}
-                        />
-                        {user.is_active ? (
-                          <CheckCircle className="h-4 w-4 text-success" />
-                        ) : (
-                          <XCircle className="h-4 w-4 text-destructive" />
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {user.last_login_at
-                        ? new Date(user.last_login_at).toLocaleDateString("ar-SA")
-                        : "-"}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            if (!user.user_id) {
-                              onShowNotAvailableToast();
-                              return;
-                            }
-                            onEditRoles(user);
-                          }}
-                          title={user.user_id ? "تعديل الأدوار" : "غير متاح - لا يوجد حساب"}
-                          disabled={!user.user_id}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        {canEditEmail && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              if (!user.user_id) {
-                                onShowNotAvailableToast();
-                                return;
-                              }
-                              onEditEmail(user);
-                            }}
-                            title={user.user_id ? "تعديل البريد الإلكتروني" : "غير متاح - لا يوجد حساب"}
-                            disabled={!user.user_id}
-                          >
-                            <Mail className="h-4 w-4" />
-                          </Button>
-                        )}
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            if (!user.user_id) {
-                              onShowNotAvailableToast();
-                              return;
-                            }
-                            onResetPassword(user);
-                          }}
-                          title={user.user_id ? "تعيين كلمة مرور مؤقتة" : "غير متاح - لا يوجد حساب"}
-                          disabled={!user.user_id}
-                        >
-                          <Key className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => onDelete(user)}
-                          title="حذف المستخدم"
-                          className="text-destructive hover:text-destructive"
-                          disabled={
-                            user.user_id === currentUserId ||
-                            user.user_roles?.some(r => r.role === "nazer")
-                          }
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
+                  <UsersTableRow
+                    key={user.id}
+                    user={user}
+                    currentUserId={currentUserId}
+                    canEditEmail={canEditEmail}
+                    onEditRoles={() => handleAction(user, () => onEditRoles(user))}
+                    onEditEmail={() => handleAction(user, () => onEditEmail(user))}
+                    onResetPassword={() => handleAction(user, () => onResetPassword(user))}
+                    onDelete={() => onDelete(user)}
+                    onStatusChange={(isActive) => onStatusChange(user.user_id, isActive)}
+                  />
                 ))}
               </TableBody>
             </Table>

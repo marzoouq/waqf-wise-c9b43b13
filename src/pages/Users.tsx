@@ -17,6 +17,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { ROLE_LABELS, type AppRole } from "@/types/roles";
 import { useUsersManagement, type UserProfile } from "@/hooks/useUsersManagement";
 import { usePermissions } from "@/hooks/usePermissions";
+import { useUsersRealtime } from "@/hooks/users/useUsersRealtime";
 
 // Components
 import { UsersFilters } from "@/components/users/UsersFilters";
@@ -29,6 +30,9 @@ const Users = () => {
   const { toast } = useToast();
   const { user: currentUser } = useAuth();
   const { hasPermission } = usePermissions();
+  
+  // Realtime updates
+  useUsersRealtime();
   
   const {
     users,
