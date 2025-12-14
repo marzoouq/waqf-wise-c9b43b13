@@ -217,7 +217,7 @@ export function NotificationTemplateEditor() {
                         size="sm"
                         onClick={() => toggleChannel(channel)}
                       >
-                        <Icon className="h-4 w-4 ml-2" />
+                        <Icon className="h-4 w-4 ms-2" />
                         {channel === 'app' && 'التطبيق'}
                         {channel === 'email' && 'بريد'}
                         {channel === 'sms' && 'SMS'}
@@ -267,7 +267,7 @@ export function NotificationTemplateEditor() {
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">قوالب الإشعارات</h3>
         <Button onClick={() => setIsCreating(true)}>
-          <Plus className="h-4 w-4 ml-2" />
+          <Plus className="h-4 w-4 ms-2" />
           قالب جديد
         </Button>
       </div>

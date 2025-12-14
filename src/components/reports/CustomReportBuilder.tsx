@@ -319,7 +319,7 @@ export function CustomReportBuilder() {
                 الفلاتر
               </CardTitle>
               <Button size="sm" variant="outline" onClick={addFilter}>
-                <Plus className="h-4 w-4 ml-2" />
+                <Plus className="h-4 w-4 ms-2" />
                 إضافة فلتر
               </Button>
             </div>
@@ -452,14 +452,14 @@ export function CustomReportBuilder() {
           </Button>
           <Button variant="outline" onClick={handleRunReport} disabled={isRunning}>
             {isRunning ? (
-              <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+              <Loader2 className="h-4 w-4 ms-2 animate-spin" />
             ) : (
-              <Play className="h-4 w-4 ml-2" />
+              <Play className="h-4 w-4 ms-2" />
             )}
             تشغيل التقرير
           </Button>
           <Button onClick={handleSaveReport}>
-            <Save className="h-4 w-4 ml-2" />
+            <Save className="h-4 w-4 ms-2" />
             حفظ القالب
           </Button>
         </div>

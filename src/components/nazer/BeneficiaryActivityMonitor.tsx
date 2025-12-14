@@ -181,12 +181,12 @@ function SessionCard({ session, isOnline }: SessionCardProps) {
       <div className="flex items-center gap-2">
         {isOnline ? (
           <Badge className="bg-status-success/10 text-status-success border-status-success/20 text-xs">
-            <Eye className="h-3 w-3 ml-1" />
+            <Eye className="h-3 w-3 ms-1" />
             يتصفح
           </Badge>
         ) : (
           <Badge variant="outline" className="text-xs">
-            <Calendar className="h-3 w-3 ml-1" />
+            <Calendar className="h-3 w-3 ms-1" />
             {new Date(session.session_start).toLocaleDateString("ar-SA")}
           </Badge>
         )}

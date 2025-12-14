@@ -65,7 +65,7 @@ export function ToolsPanel() {
             className="w-full justify-start"
             onClick={handleClearCache}
           >
-            <Trash2 className="w-4 h-4 ml-2" />
+            <Trash2 className="w-4 h-4 ms-2" />
             مسح الذاكرة المؤقتة
           </Button>
 
@@ -74,7 +74,7 @@ export function ToolsPanel() {
             className="w-full justify-start"
             onClick={handleReconnectDB}
           >
-            <Database className="w-4 h-4 ml-2" />
+            <Database className="w-4 h-4 ms-2" />
             إعادة الاتصال بقاعدة البيانات
           </Button>
 
@@ -83,7 +83,7 @@ export function ToolsPanel() {
             className="w-full justify-start"
             onClick={handleSyncData}
           >
-            <RefreshCw className="w-4 h-4 ml-2" />
+            <RefreshCw className="w-4 h-4 ms-2" />
             مزامنة البيانات المعلقة
           </Button>
 
@@ -92,7 +92,7 @@ export function ToolsPanel() {
             className="w-full justify-start"
             onClick={handleHealthCheck}
           >
-            <Activity className="w-4 h-4 ml-2" />
+            <Activity className="w-4 h-4 ms-2" />
             فحص صحة النظام
           </Button>
         </CardContent>

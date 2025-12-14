@@ -182,7 +182,7 @@ export function TicketDetailsDialog({
                     disabled={!newComment.trim() || addComment.isPending}
                     className="w-full"
                   >
-                    <Send className="ml-2 h-4 w-4" />
+                    <Send className="ms-2 h-4 w-4" />
                     إرسال التعليق
                   </Button>
                 </div>

@@ -72,7 +72,7 @@ export function ScenarioComparison({ scenarios, onExport }: ScenarioComparisonPr
             </div>
             {onExport && (
               <Button onClick={onExport} variant="outline" size="sm">
-                <Download className="h-4 w-4 ml-2" />
+                <Download className="h-4 w-4 ms-2" />
                 تصدير التقرير
               </Button>
             )}

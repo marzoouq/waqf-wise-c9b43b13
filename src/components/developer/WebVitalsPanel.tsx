@@ -265,7 +265,7 @@ export function WebVitalsPanel() {
                 <Gauge className="w-4 h-4 text-primary" />
                 LCP (أكبر عنصر) - الهدف: &lt;2.5s
               </h4>
-              <ul className="space-y-1 text-muted-foreground mr-6">
+              <ul className="space-y-1 text-muted-foreground me-6">
                 <li>• استخدم lazy loading للصور</li>
                 <li>• ضغط الصور واستخدام WebP</li>
                 <li>• تحميل CSS المهم أولاً</li>
@@ -277,7 +277,7 @@ export function WebVitalsPanel() {
                 <Clock className="w-4 h-4 text-primary" />
                 TTFB (وقت الاستجابة) - الهدف: &lt;800ms
               </h4>
-              <ul className="space-y-1 text-muted-foreground mr-6">
+              <ul className="space-y-1 text-muted-foreground me-6">
                 <li>• استخدام CDN</li>
                 <li>• تفعيل HTTP/2 أو HTTP/3</li>
                 <li>• تحسين استعلامات قاعدة البيانات</li>
@@ -289,7 +289,7 @@ export function WebVitalsPanel() {
                 <Zap className="w-4 h-4 text-primary" />
                 FCP (أول رسم) - الهدف: &lt;1.8s
               </h4>
-              <ul className="space-y-1 text-muted-foreground mr-6">
+              <ul className="space-y-1 text-muted-foreground me-6">
                 <li>• تقليل حجم JavaScript</li>
                 <li>• تأجيل تحميل السكريبتات غير الضرورية</li>
                 <li>• تقليل حجم CSS</li>
@@ -301,7 +301,7 @@ export function WebVitalsPanel() {
                 <Activity className="w-4 h-4 text-primary" />
                 CLS (استقرار التخطيط) - الهدف: &lt;0.1
               </h4>
-              <ul className="space-y-1 text-muted-foreground mr-6">
+              <ul className="space-y-1 text-muted-foreground me-6">
                 <li>• تحديد أبعاد الصور والفيديو</li>
                 <li>• حجز مساحة للإعلانات</li>
                 <li>• تجنب إدراج محتوى ديناميكي فوق المحتوى</li>

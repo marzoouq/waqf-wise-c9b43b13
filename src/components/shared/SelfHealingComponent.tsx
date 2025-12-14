@@ -148,7 +148,7 @@ export class SelfHealingComponent extends Component<Props, State> {
                 disabled={this.state.isRetrying}
                 size="sm"
               >
-                <RefreshCw className={`h-4 w-4 ml-2 ${this.state.isRetrying ? 'animate-spin' : ''}`} />
+                <RefreshCw className={`h-4 w-4 ms-2 ${this.state.isRetrying ? 'animate-spin' : ''}`} />
                 {this.state.isRetrying
                   ? 'جاري الاسترجاع...'
                   : 'إعادة المحاولة'}

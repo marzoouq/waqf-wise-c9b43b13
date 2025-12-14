@@ -91,12 +91,12 @@ export function DistributionApprovalsTab() {
                         size="sm"
                         onClick={() => flowDialog.open(dist)}
                       >
-                        <Eye className="h-4 w-4 ml-1" />
+                        <Eye className="h-4 w-4 ms-1" />
                         عرض التفاصيل
                       </Button>
                       {userRole && (
                         <Badge variant="outline" className="text-xs">
-                          <Lock className="h-3 w-3 ml-1" />
+                          <Lock className="h-3 w-3 ms-1" />
                           {userRole === 'nazer' ? 'ناظر' : userRole === 'accountant' ? 'محاسب' : userRole}
                         </Badge>
                       )}

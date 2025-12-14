@@ -107,14 +107,14 @@ export function MultiChannelNotifications() {
       case 'active':
         return (
           <Badge className="bg-success/10 text-success border-success/20">
-            <CheckCircle2 className="h-3 w-3 ml-1" />
+            <CheckCircle2 className="h-3 w-3 ms-1" />
             مفعّل
           </Badge>
         );
       case 'pending':
         return (
           <Badge variant="outline" className="text-muted-foreground">
-            <AlertCircle className="h-3 w-3 ml-1" />
+            <AlertCircle className="h-3 w-3 ms-1" />
             قريباً
           </Badge>
         );

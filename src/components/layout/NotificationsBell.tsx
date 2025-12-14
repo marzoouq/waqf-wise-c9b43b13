@@ -72,7 +72,7 @@ export const NotificationsBell = memo(function NotificationsBell() {
               disabled={isMarkingAllAsRead}
               className="h-7 sm:h-8 text-xs"
             >
-              <Check className="w-3 h-3 sm:w-4 sm:h-4 ml-1" />
+              <Check className="w-3 h-3 sm:w-4 sm:h-4 ms-1" />
               <span className="hidden sm:inline">تعليم الكل كمقروء</span>
               <span className="sm:hidden">الكل مقروء</span>
             </Button>

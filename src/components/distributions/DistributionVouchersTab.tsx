@@ -93,7 +93,7 @@ export function DistributionVouchersTab({ distributionId }: DistributionVouchers
               سندات الصرف
             </CardTitle>
             <Button onClick={() => createDialog.open()} size="sm">
-              <Plus className="ml-2 h-4 w-4" />
+              <Plus className="ms-2 h-4 w-4" />
               إنشاء سند
             </Button>
           </div>

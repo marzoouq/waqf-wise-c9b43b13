@@ -155,7 +155,7 @@ export function BudgetVarianceReport() {
                           <TableCell>
                             {getVarianceBadge(variance)}
                             {status === 'critical' && (
-                              <AlertTriangle className="h-4 w-4 text-red-600 inline mr-1" />
+                              <AlertTriangle className="h-4 w-4 text-red-600 inline me-1" />
                             )}
                           </TableCell>
                         </TableRow>

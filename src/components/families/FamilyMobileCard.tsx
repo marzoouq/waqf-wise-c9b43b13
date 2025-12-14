@@ -91,19 +91,19 @@ export const FamilyMobileCard = memo(({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => navigate(`/families/${family.id}`)}>
-                <Eye className="ml-2 h-4 w-4" />
+                <Eye className="ms-2 h-4 w-4" />
                 شجرة العائلة
               </DropdownMenuItem>
               <DropdownMenuItem onClick={onViewMembers}>
-                <Users className="ml-2 h-4 w-4" />
+                <Users className="ms-2 h-4 w-4" />
                 عرض الأفراد ({family.total_members})
               </DropdownMenuItem>
               <DropdownMenuItem onClick={onEdit}>
-                <Edit className="ml-2 h-4 w-4" />
+                <Edit className="ms-2 h-4 w-4" />
                 تعديل
               </DropdownMenuItem>
               <DropdownMenuItem onClick={onDelete} className="text-destructive">
-                <Trash2 className="ml-2 h-4 w-4" />
+                <Trash2 className="ms-2 h-4 w-4" />
                 حذف
               </DropdownMenuItem>
             </DropdownMenuContent>

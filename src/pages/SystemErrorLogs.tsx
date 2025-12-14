@@ -169,7 +169,7 @@ export default function SystemErrorLogs() {
               disabled={isDeleting}
               className="text-destructive hover:text-destructive"
             >
-              <Trash2 className="h-4 w-4 ml-2" />
+              <Trash2 className="h-4 w-4 ms-2" />
               حذف المحلولة ({stats.resolved})
             </Button>
           )}

@@ -71,7 +71,7 @@ export function FAQAccordion({ faqs, onRate }: FAQAccordionProps) {
                   size="sm"
                   onClick={() => onRate(faq.id)}
                 >
-                  <ThumbsUp className="h-4 w-4 ml-2" />
+                  <ThumbsUp className="h-4 w-4 ms-2" />
                   مفيدة
                 </Button>
               )}

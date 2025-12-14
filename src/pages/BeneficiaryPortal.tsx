@@ -97,7 +97,7 @@ export default function BeneficiaryPortal() {
         />
 
         {/* Main Content - مع padding للسايدبار على Desktop */}
-        <main className="flex-1 lg:mr-64 overflow-y-auto overscroll-contain scroll-smooth touch-pan-y">
+        <main className="flex-1 lg:me-64 overflow-y-auto overscroll-contain scroll-smooth touch-pan-y">
           <div className="p-4 sm:p-6 lg:p-8 pb-20 md:pb-6 max-w-7xl mx-auto space-y-6">
             {/* بانر وضع المعاينة */}
             {isPreviewMode && (

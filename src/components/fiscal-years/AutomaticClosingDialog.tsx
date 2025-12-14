@@ -75,7 +75,7 @@ export function AutomaticClosingDialog({
           {isLoading && (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              <span className="mr-3">جاري حساب الإقفال التلقائي...</span>
+              <span className="me-3">جاري حساب الإقفال التلقائي...</span>
             </div>
           )}
 
@@ -85,7 +85,7 @@ export function AutomaticClosingDialog({
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>
-                    <ul className="list-disc mr-4">
+                    <ul className="list-disc me-4">
                       {preview.warnings.map((warning, idx) => (
                         <li key={idx}>{warning}</li>
                       ))}
@@ -179,7 +179,7 @@ export function AutomaticClosingDialog({
               onClick={handleConfirm} 
               disabled={confirming || isLoading || !preview?.can_close}
             >
-              {confirming && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+              {confirming && <Loader2 className="ms-2 h-4 w-4 animate-spin" />}
               تأكيد الإقفال التلقائي
             </Button>
           </div>

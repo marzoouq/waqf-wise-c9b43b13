@@ -71,14 +71,14 @@ export function ApproveJournalDialog({ open, onOpenChange, approval }: ApproveJo
             onClick={() => handleReject(approval, notes)}
             disabled={isSubmitting}
           >
-            <XCircle className="h-4 w-4 mr-2" />
+            <XCircle className="h-4 w-4 me-2" />
             رفض
           </Button>
           <Button
             onClick={() => handleApprove(approval, notes)}
             disabled={isSubmitting}
           >
-            <CheckCircle className="h-4 w-4 mr-2" />
+            <CheckCircle className="h-4 w-4 me-2" />
             {isSubmitting ? "جاري المعالجة..." : "موافقة"}
           </Button>
         </DialogFooter>
