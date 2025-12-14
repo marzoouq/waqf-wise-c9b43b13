@@ -6,13 +6,13 @@ import { DistributionDialog } from "@/components/funds/DistributionDialog";
 import { SimulationDialog } from "@/components/funds/SimulationDialog";
 import { DistributionSettingsDialog } from "@/components/distributions/DistributionSettingsDialog";
 import { useDistributions } from "@/hooks/useDistributions";
-import { useFunds } from "@/hooks/useFunds";
+import { useWaqfUnits } from "@/hooks/distributions/useWaqfUnits";
 import { useJournalEntries } from "@/hooks/useJournalEntries";
 import { logger } from "@/lib/logger";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { AnnualDisclosureTab } from "@/components/funds/tabs/AnnualDisclosureTab";
 import { OverviewTab } from "@/components/funds/tabs/OverviewTab";
-import { FundsTab } from "@/components/funds/tabs/FundsTab";
+import { WaqfUnitsTab } from "@/components/funds/tabs/WaqfUnitsTab";
 import { DistributionsTab } from "@/components/funds/tabs/DistributionsTab";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -23,7 +23,7 @@ const Funds = () => {
   const [activeTab, setActiveTab] = useState("overview");
 
   const { distributions, isLoading: distributionsLoading, addDistributionAsync } = useDistributions();
-  const { funds, isLoading: fundsLoading } = useFunds();
+  const { waqfUnits, isLoading: waqfUnitsLoading } = useWaqfUnits();
   const { createAutoEntry } = useJournalEntries();
 
   const handleDistribute = async (data: Record<string, unknown>) => {
@@ -55,18 +55,20 @@ const Funds = () => {
   };
 
   const summaryStats = useMemo(() => {
-    const totalAllocated = funds.reduce((sum, f) => sum + Number(f.allocated_amount), 0);
-    const totalSpent = funds.reduce((sum, f) => sum + Number(f.spent_amount), 0);
-    const totalAvailable = totalAllocated - totalSpent;
-    const activeBeneficiaries = funds.reduce((sum, f) => sum + f.beneficiaries_count, 0);
+    // حساب الإحصائيات من أقلام الوقف الفعلية
+    const totalAcquisitionValue = waqfUnits.reduce((sum, u) => sum + Number(u.acquisition_value || 0), 0);
+    const totalCurrentValue = waqfUnits.reduce((sum, u) => sum + Number(u.current_value || 0), 0);
+    const totalAnnualReturn = waqfUnits.reduce((sum, u) => sum + Number(u.annual_return || 0), 0);
+    const activeUnits = waqfUnits.filter(u => u.is_active).length;
 
     return {
-      totalAllocated,
-      totalSpent,
-      totalAvailable,
-      activeBeneficiaries,
+      totalAllocated: totalAcquisitionValue,
+      totalSpent: totalCurrentValue - totalAcquisitionValue, // الفرق = الربح/الخسارة
+      totalAvailable: totalCurrentValue,
+      activeBeneficiaries: activeUnits, // عدد الأقلام النشطة
+      totalAnnualReturn,
     };
-  }, [funds]);
+  }, [waqfUnits]);
 
   return (
     <PageErrorBoundary pageName="صفحة الأموال والتوزيعات">
@@ -111,7 +113,7 @@ const Funds = () => {
           </TabsContent>
 
           <TabsContent value="funds" className="space-y-6">
-            <FundsTab funds={funds} isLoading={fundsLoading} />
+            <WaqfUnitsTab waqfUnits={waqfUnits} isLoading={waqfUnitsLoading} />
           </TabsContent>
 
           <TabsContent value="distributions" className="space-y-6">
