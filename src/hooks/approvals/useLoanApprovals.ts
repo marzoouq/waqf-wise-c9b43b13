@@ -20,7 +20,7 @@ export function useLoanApprovals() {
   const { addToHistory } = useApprovalHistory();
 
   // جلب القروض مع الموافقات
-  const { data: loans, isLoading, error } = useQuery<LoanForApproval[]>({
+  const { data: loans, isLoading, error, refetch } = useQuery<LoanForApproval[]>({
     queryKey: QUERY_KEYS.LOANS_WITH_APPROVALS,
     queryFn: async () => {
       const data = await LoansService.getLoansWithApprovals();
@@ -104,6 +104,7 @@ export function useLoanApprovals() {
     loans: loans || [],
     isLoading,
     error,
+    refetch,
     approveLoan: approveMutation.mutateAsync,
     isApproving: approveMutation.isPending,
   };

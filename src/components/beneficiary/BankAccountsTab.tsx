@@ -4,10 +4,11 @@ import { Landmark } from "lucide-react";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { useBeneficiaryBankAccounts } from "@/hooks/beneficiary/useBeneficiaryTabsData";
 import { MaskedValue } from "@/components/shared/MaskedValue";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export function BankAccountsTab() {
   const { settings } = useVisibilitySettings();
-  const { data: bankAccounts, isLoading } = useBeneficiaryBankAccounts(settings?.show_bank_accounts || false);
+  const { data: bankAccounts, isLoading, error, refetch } = useBeneficiaryBankAccounts(settings?.show_bank_accounts || false);
 
   if (!settings?.show_bank_accounts) {
     return (
@@ -27,6 +28,10 @@ export function BankAccountsTab() {
         </CardContent>
       </Card>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل الحسابات البنكية" message={error.message} onRetry={refetch} />;
   }
 
   return (

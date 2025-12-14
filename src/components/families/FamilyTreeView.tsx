@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Users, Plus, Edit, Trash2, User, UserPlus } from 'lucide-react';
 import { useFamilyMembers } from '@/hooks/useFamilies';
 import { LoadingState } from '@/components/shared/LoadingState';
+import { ErrorState } from '@/components/shared/ErrorState';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -50,7 +51,7 @@ interface MemberFormData {
  * يعرض أفراد العائلة بشكل هرمي
  */
 export function FamilyTreeView({ familyId, familyName }: FamilyTreeViewProps) {
-  const { members, isLoading, addMember, updateMember, removeMember } = useFamilyMembers(familyId);
+  const { members, isLoading, addMember, updateMember, removeMember, error, refetch } = useFamilyMembers(familyId);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [formData, setFormData] = useState<MemberFormData>({
     beneficiary_id: '',
@@ -102,6 +103,10 @@ export function FamilyTreeView({ familyId, familyName }: FamilyTreeViewProps) {
 
   if (isLoading) {
     return <LoadingState />;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل أفراد العائلة" message={error.message} onRetry={refetch} />;
   }
 
   // تصنيف الأفراد حسب العلاقة  

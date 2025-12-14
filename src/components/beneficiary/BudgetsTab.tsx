@@ -6,10 +6,11 @@ import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { MaskedValue } from "@/components/shared/MaskedValue";
 import { useWaqfBudgets } from "@/hooks/useWaqfBudgets";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export function BudgetsTab() {
   const { settings } = useVisibilitySettings();
-  const { budgetCategories, annualBudget, reserveTotals, isLoading, hasBudgets, hasReserves } = useWaqfBudgets();
+  const { budgetCategories, annualBudget, reserveTotals, isLoading, hasBudgets, hasReserves, error, refetch } = useWaqfBudgets();
 
   if (!settings?.show_budgets) {
     return (
@@ -34,6 +35,10 @@ export function BudgetsTab() {
         </Card>
       </div>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل الميزانيات" message={error.message} onRetry={refetch} />;
   }
 
   return (

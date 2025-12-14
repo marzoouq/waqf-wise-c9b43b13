@@ -4,6 +4,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useTenantLedger } from '@/hooks/property/useTenantLedger';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { FileText, CreditCard, ArrowUpCircle, ArrowDownCircle, Receipt } from 'lucide-react';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 interface TenantLedgerProps {
   tenantId: string;
@@ -25,7 +26,7 @@ const transactionTypeIcons: Record<string, React.ReactNode> = {
 };
 
 export function TenantLedger({ tenantId, tenantName }: TenantLedgerProps) {
-  const { entries, isLoading, balance } = useTenantLedger(tenantId);
+  const { entries, isLoading, balance, error, refetch } = useTenantLedger(tenantId);
 
   if (isLoading) {
     return (
@@ -42,6 +43,10 @@ export function TenantLedger({ tenantId, tenantName }: TenantLedgerProps) {
         </CardContent>
       </Card>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل كشف الحساب" message={error.message} onRetry={refetch} />;
   }
 
   return (

@@ -10,12 +10,12 @@ interface BudgetCategory {
 }
 
 export function useWaqfBudgets(fiscalYearId?: string) {
-  const { data: budgets, isLoading: budgetsLoading } = useQuery({
+  const { data: budgets, isLoading: budgetsLoading, error: budgetsError, refetch: refetchBudgets } = useQuery({
     queryKey: QUERY_KEYS.WAQF_BUDGETS(fiscalYearId),
     queryFn: () => FundService.getBudgets(fiscalYearId),
   });
 
-  const { data: reserves, isLoading: reservesLoading } = useQuery({
+  const { data: reserves, isLoading: reservesLoading, error: reservesError, refetch: refetchReserves } = useQuery({
     queryKey: QUERY_KEYS.WAQF_RESERVES,
     queryFn: () => FundService.getReserves(),
   });
@@ -46,6 +46,10 @@ export function useWaqfBudgets(fiscalYearId?: string) {
     liquid: reserves?.reduce((sum, r) => sum + (r.current_balance || 0), 0) || 0,
   };
 
+  const refetch = async () => {
+    await Promise.all([refetchBudgets(), refetchReserves()]);
+  };
+
   return {
     budgets: budgets || [],
     reserves: reserves || [],
@@ -53,6 +57,8 @@ export function useWaqfBudgets(fiscalYearId?: string) {
     annualBudget,
     reserveTotals,
     isLoading: budgetsLoading || reservesLoading,
+    error: budgetsError || reservesError,
+    refetch,
     hasBudgets: (budgets?.length || 0) > 0,
     hasReserves: (reserves?.length || 0) > 0,
   };

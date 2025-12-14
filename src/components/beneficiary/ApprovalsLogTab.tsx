@@ -4,10 +4,11 @@ import { CheckCircle2, XCircle, Clock } from "lucide-react";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { useApprovalsLog } from "@/hooks/beneficiary/useBeneficiaryTabsData";
 import { format, arLocale as ar } from "@/lib/date";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export function ApprovalsLogTab() {
   const { settings } = useVisibilitySettings();
-  const { data: approvals, isLoading } = useApprovalsLog(settings?.show_approvals_log || false);
+  const { data: approvals, isLoading, error, refetch } = useApprovalsLog(settings?.show_approvals_log || false);
 
   if (!settings?.show_approvals_log) {
     return (
@@ -27,6 +28,10 @@ export function ApprovalsLogTab() {
         </CardContent>
       </Card>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل سجل الموافقات" message={error.message} onRetry={refetch} />;
   }
 
   const getActionIcon = (action: string) => {
