@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Download, TrendingUp, TrendingDown, DollarSign, FileText, ChevronLeft, ChevronRight } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { format, arLocale as ar } from "@/lib/date";
 import { useUnifiedTransactions, UnifiedTransaction } from "@/hooks/transactions/useUnifiedTransactions";
@@ -20,7 +21,8 @@ export default function AllTransactions() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
-  const { transactions, isLoading, calculateStats } = useUnifiedTransactions();
+  const { transactions, isLoading, error, calculateStats } = useUnifiedTransactions();
+  const refetch = () => window.location.reload();
 
   // تصفية البيانات
   const filteredTransactions = transactions.filter((transaction) => {
@@ -79,7 +81,18 @@ export default function AllTransactions() {
   };
 
   if (isLoading) {
-    return <LoadingState />;
+    return <LoadingState message="جاري تحميل المعاملات..." />;
+  }
+
+  if (error) {
+    return (
+      <ErrorState 
+        title="فشل تحميل المعاملات" 
+        message="حدث خطأ أثناء تحميل بيانات المعاملات"
+        onRetry={() => refetch()}
+        fullScreen
+      />
+    );
   }
 
   return (

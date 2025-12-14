@@ -28,7 +28,7 @@ export const useNotifications = () => {
   const queryClient = useQueryClient();
 
   // Fetch notifications - get user inside query
-  const { data: notifications = [], isLoading } = useQuery({
+  const { data: notifications = [], isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.NOTIFICATIONS,
     queryFn: async () => {
       const user = await AuthService.getCurrentUser();
@@ -99,6 +99,8 @@ export const useNotifications = () => {
   return {
     notifications,
     isLoading,
+    error,
+    refetch,
     unreadCount,
     markAsRead: markAsReadMutation.mutate,
     markAllAsRead: markAllAsReadMutation.mutate,

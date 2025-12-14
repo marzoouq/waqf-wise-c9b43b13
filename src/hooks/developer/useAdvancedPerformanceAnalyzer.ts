@@ -97,7 +97,9 @@ export function useAdvancedPerformanceAnalyzer(enabled: boolean = true) {
       });
       lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
       observers.push(lcpObserver);
-    } catch (e) {}
+    } catch {
+      // PerformanceObserver for LCP may not be supported in all browsers - safe to ignore
+    }
 
     // FCP Observer
     try {
@@ -110,7 +112,9 @@ export function useAdvancedPerformanceAnalyzer(enabled: boolean = true) {
       });
       fcpObserver.observe({ type: 'paint', buffered: true });
       observers.push(fcpObserver);
-    } catch (e) {}
+    } catch {
+      // PerformanceObserver for paint may not be supported in all browsers - safe to ignore
+    }
 
     // CLS Observer
     try {
@@ -124,7 +128,9 @@ export function useAdvancedPerformanceAnalyzer(enabled: boolean = true) {
       });
       clsObserver.observe({ type: 'layout-shift', buffered: true });
       observers.push(clsObserver);
-    } catch (e) {}
+    } catch {
+      // PerformanceObserver for layout-shift may not be supported in all browsers - safe to ignore
+    }
 
     // FID Observer
     try {
@@ -136,7 +142,9 @@ export function useAdvancedPerformanceAnalyzer(enabled: boolean = true) {
       });
       fidObserver.observe({ type: 'first-input', buffered: true });
       observers.push(fidObserver);
-    } catch (e) {}
+    } catch {
+      // PerformanceObserver for first-input may not be supported in all browsers - safe to ignore
+    }
 
     // Long Tasks Observer
     try {
@@ -149,7 +157,9 @@ export function useAdvancedPerformanceAnalyzer(enabled: boolean = true) {
       });
       longTaskObserver.observe({ type: 'longtask', buffered: true });
       observers.push(longTaskObserver);
-    } catch (e) {}
+    } catch {
+      // PerformanceObserver for longtask may not be supported in all browsers - safe to ignore
+    }
 
     observersRef.current = observers;
 

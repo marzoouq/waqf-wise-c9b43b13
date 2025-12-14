@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useWaqfUnits, type WaqfUnit } from "@/hooks/useWaqfUnits";
 import { useFiscalYears } from "@/hooks/useFiscalYears";
 import { LoadingState } from "@/components/shared/LoadingState";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { EnhancedEmptyState } from "@/components/shared";
 import { WaqfUnitDialog } from "@/components/waqf/WaqfUnitDialog";
 import { WaqfUnitDetailsDialog } from "@/components/waqf/WaqfUnitDetailsDialog";
@@ -26,6 +27,7 @@ import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layou
 
 export default function WaqfUnits() {
   const { waqfUnits, isLoading } = useWaqfUnits();
+  const refetch = () => window.location.reload();
   const { fiscalYears } = useFiscalYears();
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<string>("all");
@@ -115,7 +117,7 @@ export default function WaqfUnits() {
   };
 
   if (isLoading) {
-    return <LoadingState />;
+    return <LoadingState message="جاري تحميل أقلام الوقف..." />;
   }
 
   return (

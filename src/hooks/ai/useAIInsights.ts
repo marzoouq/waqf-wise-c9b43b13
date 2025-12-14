@@ -7,7 +7,7 @@ import { QUERY_KEYS } from '@/lib/query-keys';
 export function useAIInsights() {
   const queryClient = useQueryClient();
 
-  const { data: insights, isLoading } = useQuery({
+  const { data: insights, isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.AI_INSIGHTS,
     queryFn: () => AIService.getInsights(),
   });
@@ -42,6 +42,8 @@ export function useAIInsights() {
   return {
     insights,
     isLoading,
+    error,
+    refetch,
     generateInsights: generateInsightsMutation.mutate,
     isGenerating: generateInsightsMutation.isPending,
     dismissInsight: dismissInsightMutation.mutate,

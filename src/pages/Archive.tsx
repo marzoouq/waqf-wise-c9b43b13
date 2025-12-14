@@ -9,6 +9,7 @@ import { FolderOpen, FileText, Search, Upload, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { LoadingState } from "@/components/shared/LoadingState";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { useDocuments } from "@/hooks/useDocuments";
 import { useFolders } from "@/hooks/useFolders";

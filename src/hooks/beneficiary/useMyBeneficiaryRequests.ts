@@ -49,7 +49,7 @@ export function useMyBeneficiaryRequests(userId?: string) {
   });
 
   // جلب الطلبات باستخدام الخدمة
-  const { data: requests = [], isLoading } = useQuery({
+  const { data: requests = [], isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.BENEFICIARY_REQUESTS(beneficiary?.id || ''),
     queryFn: async () => {
       if (!beneficiary?.id) return [];
@@ -114,6 +114,8 @@ export function useMyBeneficiaryRequests(userId?: string) {
     requests,
     stats,
     isLoading,
+    error,
+    refetch,
 
     // النموذج
     formData,

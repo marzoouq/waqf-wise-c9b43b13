@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { LoadingState } from "@/components/shared/LoadingState";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { VotingInterface } from "@/components/governance/VotingInterface";
 import { EligibleVotersList } from "@/components/governance/EligibleVotersList";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,9 +17,32 @@ export default function DecisionDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const { decision, isLoading } = useGovernanceDecisionDetails(id);
+  const { decision, isLoading, error } = useGovernanceDecisionDetails(id);
 
   if (isLoading) return <LoadingState message="جاري تحميل تفاصيل القرار..." />;
+  
+  if (error) {
+    return (
+      <MobileOptimizedLayout>
+        <MobileOptimizedHeader 
+          title="خطأ"
+          actions={
+            <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+              <ArrowRight className="h-4 w-4 ml-2" />
+              رجوع
+            </Button>
+          }
+        />
+        <div className="p-4">
+          <ErrorState 
+            title="فشل تحميل القرار" 
+            message="حدث خطأ أثناء تحميل تفاصيل القرار"
+            onRetry={() => window.location.reload()}
+          />
+        </div>
+      </MobileOptimizedLayout>
+    );
+  }
 
   if (!decision) {
     return (
