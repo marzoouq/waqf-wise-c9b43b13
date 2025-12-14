@@ -1,6 +1,7 @@
 /**
  * UsersTable Component
- * جدول عرض المستخدمين مع الإجراءات - مُحسّن
+ * جدول عرض المستخدمين - يستخدم UsersContext
+ * @version 2.9.11
  */
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -81,7 +82,7 @@ export function UsersTable({
                     onEditEmail={() => handleAction(user, () => onEditEmail(user))}
                     onResetPassword={() => handleAction(user, () => onResetPassword(user))}
                     onDelete={() => onDelete(user)}
-                    onStatusChange={(isActive) => onStatusChange(user.user_id, isActive)}
+                    onStatusChange={(isActive) => onStatusChange(user.user_id!, isActive)}
                   />
                 ))}
               </TableBody>
@@ -92,3 +93,9 @@ export function UsersTable({
     </Card>
   );
 }
+
+/**
+ * UsersTableWithContext - نسخة تستخدم Context مباشرة
+ * للاستخدام داخل UsersProvider
+ */
+export { UsersTable as default };

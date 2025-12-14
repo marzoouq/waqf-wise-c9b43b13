@@ -1,6 +1,7 @@
 /**
  * useRolesManagement Hook
- * إدارة أدوار المستخدمين
+ * إدارة أدوار المستخدمين - مُحسّن مع useUsersFilter
+ * @version 2.9.11
  */
 
 import { useState } from "react";
@@ -10,6 +11,8 @@ import { type AppRole } from "@/types/roles";
 import { UserService } from "@/services";
 import { invalidateUserQueries } from "@/lib/query-invalidation";
 import { QUERY_KEYS } from "@/lib/query-keys";
+import { useUsersFilter } from "./useUsersFilter";
+import { productionLogger } from "@/lib/logger/production-logger";
 
 export interface UserWithRoles {
   id: string;
@@ -36,8 +39,6 @@ export function useRolesManagement() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  const [searchQuery, setSearchQuery] = useState("");
-  const [roleFilter, setRoleFilter] = useState<string>("all");
   const [addRoleDialogOpen, setAddRoleDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserWithRoles | null>(null);
   const [newRole, setNewRole] = useState<AppRole>("user");
@@ -49,6 +50,15 @@ export function useRolesManagement() {
     staleTime: 30 * 1000,
   });
 
+  // استخدام useUsersFilter الموحد
+  const {
+    filteredUsers,
+    searchTerm: searchQuery,
+    setSearchTerm: setSearchQuery,
+    roleFilter,
+    setRoleFilter,
+  } = useUsersFilter({ users: users as UserWithRoles[] });
+
   const { data: auditLogs = [] } = useQuery({
     queryKey: QUERY_KEYS.USER_ROLES_AUDIT,
     queryFn: () => UserService.getRolesAuditLog(),
@@ -56,7 +66,7 @@ export function useRolesManagement() {
 
   const addRoleMutation = useMutation({
     mutationFn: ({ userId, role }: { userId: string; role: string }) =>
-      UserService.addRole(userId, role as "accountant" | "admin" | "archivist" | "beneficiary" | "cashier" | "nazer" | "user" | "waqf_heir"),
+      UserService.addRole(userId, role as AppRole),
     onSuccess: () => {
       invalidateUserQueries(queryClient);
       toast({ title: "تمت الإضافة", description: "تم إضافة الدور بنجاح" });
@@ -64,29 +74,22 @@ export function useRolesManagement() {
       setSelectedUser(null);
     },
     onError: (error: Error) => {
+      productionLogger.error("Error adding role:", error);
       toast({ title: "خطأ", description: error.message || "فشلت إضافة الدور", variant: "destructive" });
     },
   });
 
   const removeRoleMutation = useMutation({
     mutationFn: ({ userId, role }: { userId: string; role: string }) =>
-      UserService.removeRole(userId, role as "accountant" | "admin" | "archivist" | "beneficiary" | "cashier" | "nazer" | "user" | "waqf_heir"),
+      UserService.removeRole(userId, role as AppRole),
     onSuccess: () => {
       invalidateUserQueries(queryClient);
       toast({ title: "تم الحذف", description: "تم حذف الدور بنجاح" });
     },
     onError: (error: Error) => {
+      productionLogger.error("Error removing role:", error);
       toast({ title: "خطأ", description: error.message || "فشل حذف الدور", variant: "destructive" });
     },
-  });
-
-  const filteredUsers = users.filter((user) => {
-    const matchesSearch =
-      user.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesRole =
-      roleFilter === "all" || user.roles_array?.includes(roleFilter as AppRole);
-    return matchesSearch && matchesRole;
   });
 
   const openAddRoleDialog = (user: UserWithRoles) => {
