@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { LoadingState } from '@/components/shared/LoadingState';
+import { ErrorState } from '@/components/shared/ErrorState';
 import { FileText, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
@@ -12,10 +13,14 @@ interface ProfileRequestsHistoryProps {
 }
 
 export function ProfileRequestsHistory({ beneficiaryId }: ProfileRequestsHistoryProps) {
-  const { data: requests, isLoading } = useBeneficiaryProfileRequests(beneficiaryId);
+  const { data: requests, isLoading, error, refetch } = useBeneficiaryProfileRequests(beneficiaryId);
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل الطلبات..." />;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل الطلبات" message={error.message} onRetry={refetch} />;
   }
 
   const pendingCount = requests?.filter(r => r.status === 'قيد المراجعة').length || 0;

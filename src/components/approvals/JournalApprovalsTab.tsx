@@ -8,11 +8,11 @@ import { BadgeVariant, JournalEntryWithLines } from "@/types";
 import { LucideIcon } from "lucide-react";
 import { useJournalApprovals } from "@/hooks/approvals";
 import { useDialogState } from "@/hooks/ui/useDialogState";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export function JournalApprovalsTab() {
   const viewDialog = useDialogState<JournalEntryWithLines>();
-
-  const { data: approvals, isLoading } = useJournalApprovals();
+  const { data: approvals, isLoading, error, refetch } = useJournalApprovals();
 
   const getStatusBadge = (status: string) => {
     const config: Record<string, { label: string; variant: BadgeVariant; icon: LucideIcon }> = {
@@ -36,6 +36,10 @@ export function JournalApprovalsTab() {
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
       </div>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل الموافقات" message={error.message} onRetry={refetch} />;
   }
 
   return (

@@ -9,9 +9,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useLoanApprovals } from "@/hooks/approvals/useLoanApprovals";
 import { LoanForApproval, LoanApprovalRow, getNextPendingApproval, BadgeVariant } from "@/types";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export function LoanApprovalsTab() {
-  const { loans, isLoading, approveLoan, isApproving } = useLoanApprovals();
+  const { loans, isLoading, approveLoan, isApproving, error, refetch } = useLoanApprovals();
   const [selectedLoan, setSelectedLoan] = useState<LoanForApproval | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [approvalNotes, setApprovalNotes] = useState("");
@@ -72,6 +73,10 @@ export function LoanApprovalsTab() {
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
       </div>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل القروض" message={error.message} onRetry={refetch} />;
   }
 
   return (

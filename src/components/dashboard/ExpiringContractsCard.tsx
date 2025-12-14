@@ -5,11 +5,16 @@ import { AlertTriangle, Calendar, Eye } from "lucide-react";
 import { useContracts } from "@/hooks/useContracts";
 import { differenceInDays, formatDate } from "@/lib/date";
 import { useNavigate } from "react-router-dom";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export const ExpiringContractsCard = () => {
-  const { contracts, isLoading } = useContracts();
+  const { contracts, isLoading, error, refetch } = useContracts();
   const navigate = useNavigate();
   const today = new Date();
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل العقود" message={(error as Error).message} onRetry={refetch} />;
+  }
 
   // فحص البيانات بشكل آمن
   if (isLoading) {

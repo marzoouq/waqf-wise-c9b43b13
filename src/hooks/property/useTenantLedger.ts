@@ -12,7 +12,7 @@ export function useTenantLedger(tenantId: string | undefined) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: entries = [], isLoading } = useQuery({
+  const { data: entries = [], isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.TENANT_LEDGER(tenantId || ''),
     queryFn: async (): Promise<TenantLedgerEntry[]> => {
       if (!tenantId) return [];
@@ -45,6 +45,8 @@ export function useTenantLedger(tenantId: string | undefined) {
     entries,
     isLoading,
     balance,
+    error,
+    refetch,
     addEntry: addEntry.mutateAsync,
     isAdding: addEntry.isPending,
   };

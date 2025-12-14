@@ -119,7 +119,7 @@ export const useFamilyMembers = (familyId?: string) => {
   const queryClient = useQueryClient();
 
   // Fetch family members
-  const { data: members = [], isLoading } = useQuery({
+  const { data: members = [], isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.FAMILY_MEMBERS(familyId),
     queryFn: () => familyId ? FamilyService.getMembers(familyId) : Promise.resolve([]),
     enabled: !!familyId,
@@ -189,6 +189,8 @@ export const useFamilyMembers = (familyId?: string) => {
   return {
     members,
     isLoading,
+    error,
+    refetch,
     addMember,
     updateMember,
     removeMember,

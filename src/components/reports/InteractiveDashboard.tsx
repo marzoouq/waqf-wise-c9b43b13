@@ -1,6 +1,7 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Users, Building2, DollarSign, Calendar } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
+import { ErrorState } from '@/components/shared/ErrorState';
 import { UnifiedChart } from '@/components/unified/UnifiedChart';
 import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
 import { UnifiedKPICard } from '@/components/unified/UnifiedKPICard';
@@ -20,11 +21,16 @@ export function InteractiveDashboard() {
     kpis,
     isLoading,
     isRefetching,
+    error,
     handleRefresh,
   } = useInteractiveDashboard();
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل البيانات..." />;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل البيانات" message={(error as Error).message} onRetry={handleRefresh} />;
   }
 
   return (

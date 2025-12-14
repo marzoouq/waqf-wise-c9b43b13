@@ -19,7 +19,7 @@ export function useInteractiveDashboard() {
   const [lastUpdated, setLastUpdated] = useState<Date>();
 
   // إحصائيات المستفيدين
-  const { data: beneficiariesStats, isLoading: loadingBeneficiaries, dataUpdatedAt } = useQuery({
+  const { data: beneficiariesStats, isLoading: loadingBeneficiaries, dataUpdatedAt, error: beneficiariesError } = useQuery({
     queryKey: QUERY_KEYS.DASHBOARD_BENEFICIARIES(timeRange),
     queryFn: async () => {
       const result = await BeneficiaryService.getAll();
@@ -73,7 +73,7 @@ export function useInteractiveDashboard() {
   };
 
   // إحصائيات المدفوعات
-  const { data: paymentsStats, isLoading: loadingPayments, isRefetching: isRefetchingPayments } = useQuery({
+  const { data: paymentsStats, isLoading: loadingPayments, isRefetching: isRefetchingPayments, error: paymentsError } = useQuery({
     queryKey: QUERY_KEYS.DASHBOARD_PAYMENTS(timeRange),
     ...QUERY_CONFIG.REPORTS,
     queryFn: async () => {
@@ -104,7 +104,7 @@ export function useInteractiveDashboard() {
   });
 
   // إحصائيات العقارات
-  const { data: propertiesStats, isLoading: loadingProperties, isRefetching: isRefetchingProperties } = useQuery({
+  const { data: propertiesStats, isLoading: loadingProperties, isRefetching: isRefetchingProperties, error: propertiesError } = useQuery({
     queryKey: QUERY_KEYS.DASHBOARD_PROPERTIES,
     ...QUERY_CONFIG.REPORTS,
     queryFn: async () => {
@@ -127,6 +127,7 @@ export function useInteractiveDashboard() {
 
   const isLoading = loadingBeneficiaries || loadingPayments || loadingProperties || loadingKPIs;
   const isRefetching = isRefetchingPayments || isRefetchingProperties || isRefetchingKPIs;
+  const error = beneficiariesError || paymentsError || propertiesError;
 
   return {
     timeRange,
@@ -140,6 +141,7 @@ export function useInteractiveDashboard() {
     kpis,
     isLoading,
     isRefetching,
+    error,
     handleRefresh,
   };
 }

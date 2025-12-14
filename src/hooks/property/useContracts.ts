@@ -10,7 +10,7 @@ export type { Contract, ContractInsert };
 export const useContracts = () => {
   const queryClient = useQueryClient();
 
-  const { data: contracts = [], isLoading } = useQuery({
+  const { data: contracts = [], isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.CONTRACTS,
     queryFn: () => ContractService.getAllWithProperties(),
     staleTime: 3 * 60 * 1000,
@@ -84,6 +84,8 @@ export const useContracts = () => {
   return {
     contracts,
     isLoading,
+    error,
+    refetch,
     addContract,
     updateContract,
     deleteContract,

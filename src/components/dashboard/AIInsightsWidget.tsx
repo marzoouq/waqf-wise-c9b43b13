@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Sparkles, TrendingUp, AlertTriangle, Lightbulb, ArrowLeft, LucideIcon } from "lucide-react";
 import { useAIInsights } from "@/hooks/useAIInsights";
 import { useNavigate } from "react-router-dom";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 const categoryIcons: Record<string, LucideIcon> = {
   prediction: TrendingUp,
@@ -20,7 +21,7 @@ const severityColors = {
 
 export function AIInsightsWidget() {
   const navigate = useNavigate();
-  const { insights, isLoading } = useAIInsights();
+  const { insights, isLoading, error, refetch } = useAIInsights();
 
   if (isLoading) {
     return (
@@ -39,6 +40,10 @@ export function AIInsightsWidget() {
         </CardContent>
       </Card>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل الرؤى" message={(error as Error).message} onRetry={refetch} />;
   }
 
   const activeInsights = insights?.filter(i => !i.is_dismissed).slice(0, 3) || [];

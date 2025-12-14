@@ -2,6 +2,7 @@ import { useBeneficiaryProfilePayments } from '@/hooks/beneficiary/useBeneficiar
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { LoadingState } from '@/components/shared/LoadingState';
+import { ErrorState } from '@/components/shared/ErrorState';
 import { DollarSign, TrendingUp, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
@@ -11,10 +12,14 @@ interface ProfilePaymentsHistoryProps {
 }
 
 export function ProfilePaymentsHistory({ beneficiaryId }: ProfilePaymentsHistoryProps) {
-  const { data: payments, isLoading } = useBeneficiaryProfilePayments(beneficiaryId);
+  const { data: payments, isLoading, error, refetch } = useBeneficiaryProfilePayments(beneficiaryId);
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل سجل المدفوعات..." />;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل المدفوعات" message={error.message} onRetry={refetch} />;
   }
 
   const totalPayments = payments?.reduce((sum, p) => sum + (p.amount || 0), 0) || 0;
