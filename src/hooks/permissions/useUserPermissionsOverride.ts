@@ -5,6 +5,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { SecurityService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface UserPermissionOverride {
   id: string;
@@ -18,7 +19,7 @@ export function useUserPermissionsOverride(userId: string) {
   const queryClient = useQueryClient();
 
   const overridesQuery = useQuery({
-    queryKey: ["user-permissions-overrides", userId],
+    queryKey: QUERY_KEYS.USER_PERMISSIONS_OVERRIDES(userId),
     queryFn: () => SecurityService.getUserPermissionOverrides(userId),
     enabled: !!userId,
   });
@@ -27,8 +28,8 @@ export function useUserPermissionsOverride(userId: string) {
     mutationFn: ({ permissionKey, granted }: { permissionKey: string; granted: boolean }) => 
       SecurityService.upsertUserPermissionOverride(userId, permissionKey, granted),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user-permissions-overrides"] });
-      queryClient.invalidateQueries({ queryKey: ["user-permissions"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USER_PERMISSIONS_OVERRIDES(userId) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USER_PERMISSIONS(userId) });
     },
   });
 
@@ -36,8 +37,8 @@ export function useUserPermissionsOverride(userId: string) {
     mutationFn: (permissionKey: string) => 
       SecurityService.removeUserPermissionOverride(userId, permissionKey),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user-permissions-overrides"] });
-      queryClient.invalidateQueries({ queryKey: ["user-permissions"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USER_PERMISSIONS_OVERRIDES(userId) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USER_PERMISSIONS(userId) });
     },
   });
 

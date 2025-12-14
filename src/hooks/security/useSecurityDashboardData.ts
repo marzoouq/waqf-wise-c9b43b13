@@ -5,6 +5,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { SecurityService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface SecurityStats {
   total: number;
@@ -18,7 +19,7 @@ export function useSecurityDashboardData() {
     data: securityEvents = [],
     isLoading: eventsLoading,
   } = useQuery({
-    queryKey: ["security-events"],
+    queryKey: QUERY_KEYS.SECURITY_EVENTS,
     queryFn: () => SecurityService.getSecurityEvents(50),
   });
 
@@ -26,7 +27,7 @@ export function useSecurityDashboardData() {
     data: loginAttempts = [],
     isLoading: attemptsLoading,
   } = useQuery({
-    queryKey: ["login-attempts"],
+    queryKey: QUERY_KEYS.LOGIN_ATTEMPTS,
     queryFn: () => SecurityService.getLoginAttempts(20),
   });
 

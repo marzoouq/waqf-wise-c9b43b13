@@ -4,6 +4,7 @@
  */
 import { useQuery } from "@tanstack/react-query";
 import { DisclosureService, SmartDisclosureDocument } from "@/services/disclosure.service";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export type { SmartDisclosureDocument };
 
@@ -26,7 +27,7 @@ const DOCUMENT_TYPE_LABELS: Record<string, string> = {
 
 export function useSmartDisclosureDocuments(disclosureId?: string) {
   const { data: documents = [], isLoading } = useQuery({
-    queryKey: ["smart-disclosure-documents", disclosureId],
+    queryKey: QUERY_KEYS.SMART_DISCLOSURE_DOCUMENTS(disclosureId),
     queryFn: () => DisclosureService.getSmartDocuments(disclosureId!),
     enabled: !!disclosureId,
   });

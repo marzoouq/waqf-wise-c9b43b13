@@ -373,8 +373,7 @@ export const QUERY_KEYS = {
   // Budget Variance
   BUDGETS_VARIANCE: (fiscalYearId: string) => ['budgets_variance', fiscalYearId] as const,
   
-  // AI Insights
-  SMART_ALERTS: ['smart-alerts'] as const,
+  // (SMART_ALERTS moved to bottom - Security Dashboard section)
   
   // Admin Alerts
   ADMIN_ALERTS: ['admin-alerts'] as const,
@@ -514,6 +513,28 @@ export const QUERY_KEYS = {
   
   // Cash Flow Report
   CASH_FLOW_REPORT: ['cash-flow-report'] as const,
+  
+  // Security Dashboard
+  SECURITY_EVENTS: ['security-events'] as const,
+  LOGIN_ATTEMPTS: ['login-attempts'] as const,
+  SMART_ALERTS: ['smart-alerts'] as const,
+  
+  // POS Stats
+  POS_DAILY_STATS: (date: string) => ['pos-daily-stats', date] as const,
+  POS_SHIFT_STATS: (shiftId: string) => ['pos-shift-stats', shiftId] as const,
+  
+  // Smart Disclosure Documents (DISCLOSURE_DOCUMENTS already defined above)
+  SMART_DISCLOSURE_DOCUMENTS: (disclosureId?: string) => ['smart-disclosure-documents', disclosureId] as const,
+  
+  // Invoice Form
+  REVENUE_ACCOUNTS: ['revenue-accounts'] as const,
+  NEXT_INVOICE_NUMBER: ['next-invoice-number'] as const,
+  
+  // Approved Distributions
+  APPROVED_DISTRIBUTIONS: ['approved-distributions'] as const,
+  
+  // User Permission Overrides
+  USER_PERMISSIONS_OVERRIDES: (userId?: string) => ['user-permissions-overrides', userId] as const,
 } as const;
 
 // Query Config with default settings

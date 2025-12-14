@@ -4,6 +4,7 @@
  */
 import { useQuery } from "@tanstack/react-query";
 import { DisclosureService } from "@/services/disclosure.service";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface DisclosureDocument {
   id: string;
@@ -30,7 +31,7 @@ const DOCUMENT_TYPE_LABELS: Record<string, string> = {
 
 export function useDisclosureDocuments(disclosureId?: string) {
   const { data: documents = [], isLoading } = useQuery({
-    queryKey: ["disclosure-documents", disclosureId],
+    queryKey: QUERY_KEYS.DISCLOSURE_DOCUMENTS(disclosureId),
     queryFn: () => DisclosureService.getDocuments(disclosureId!),
     enabled: !!disclosureId,
   });

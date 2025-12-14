@@ -5,6 +5,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { FundService } from "@/services/fund.service";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface ApprovedDistribution {
   id: string;
@@ -24,7 +25,7 @@ export interface ApprovedDistribution {
 
 export function useBankTransfersData() {
   const { data: distributions = [], isLoading, error } = useQuery({
-    queryKey: ["approved-distributions"],
+    queryKey: QUERY_KEYS.APPROVED_DISTRIBUTIONS,
     queryFn: () => FundService.getApprovedDistributions(),
   });
 
