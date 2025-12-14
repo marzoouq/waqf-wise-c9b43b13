@@ -71,11 +71,11 @@ export const POSShiftReport = () => {
             <RefreshCw className="h-4 w-4" />
           </Button>
           <Button variant="outline" size="sm" onClick={handleExport}>
-            <FileDown className="h-4 w-4 ml-1" />
+            <FileDown className="h-4 w-4 ms-1" />
             تصدير
           </Button>
           <Button variant="outline" size="sm" onClick={() => window.print()}>
-            <Printer className="h-4 w-4 ml-1" />
+            <Printer className="h-4 w-4 ms-1" />
             طباعة
           </Button>
         </div>

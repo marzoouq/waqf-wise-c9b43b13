@@ -113,12 +113,12 @@ export const InvoiceOCRUpload = ({ onDataExtracted, onCancel }: InvoiceOCRUpload
                   >
                     {isProcessing ? (
                       <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        <Loader2 className="me-2 h-4 w-4 animate-spin" />
                         جاري التحليل...
                       </>
                     ) : (
                       <>
-                        <CheckCircle className="mr-2 h-4 w-4" />
+                        <CheckCircle className="me-2 h-4 w-4" />
                         استخراج البيانات
                       </>
                     )}
@@ -188,7 +188,7 @@ export const InvoiceOCRUpload = ({ onDataExtracted, onCancel }: InvoiceOCRUpload
                     <p>
                       <strong>الرقم الضريبي:</strong> {extractedData.customer_vat_number || 'غير متوفر'}
                       {extractedData.customer_vat_number && !validateVATNumber(extractedData.customer_vat_number) && (
-                        <span className="text-red-600 text-xs mr-2">⚠️ رقم غير صحيح</span>
+                        <span className="text-red-600 text-xs me-2">⚠️ رقم غير صحيح</span>
                       )}
                     </p>
                   </div>
@@ -225,7 +225,7 @@ export const InvoiceOCRUpload = ({ onDataExtracted, onCancel }: InvoiceOCRUpload
               {/* أزرار الإجراءات */}
               <div className="flex gap-2">
                 <Button onClick={handleUseData} className="flex-1">
-                  <CheckCircle className="mr-2 h-4 w-4" />
+                  <CheckCircle className="me-2 h-4 w-4" />
                   استخدام هذه البيانات
                 </Button>
                 <Button variant="outline" onClick={handleReset}>

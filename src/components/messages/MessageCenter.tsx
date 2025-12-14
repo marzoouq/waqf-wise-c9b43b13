@@ -85,7 +85,7 @@ export function MessageCenter() {
           <Dialog open={isComposing} onOpenChange={setIsComposing}>
             <DialogTrigger asChild>
               <Button size="sm" variant="default">
-                <Send className="h-4 w-4 ml-2" />
+                <Send className="h-4 w-4 ms-2" />
                 رسالة جديدة
               </Button>
             </DialogTrigger>
@@ -285,7 +285,7 @@ export function MessageCenter() {
                       // يمكن تعبئة حقول الرد هنا
                     }}
                   >
-                    <Reply className="h-4 w-4 ml-2" />
+                    <Reply className="h-4 w-4 ms-2" />
                     رد
                   </Button>
                 </div>
