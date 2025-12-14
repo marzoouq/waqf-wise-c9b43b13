@@ -1,6 +1,60 @@
 # 📝 سجل التغييرات | Changelog
 
-**الإصدار الحالي:** 2.9.5 | **آخر تحديث:** 2025-12-14
+**الإصدار الحالي:** 2.9.6 | **آخر تحديث:** 2025-12-14
+
+---
+
+## [2.9.6] - 2025-12-14
+
+### 🔧 تدقيق وإصلاح لوحة تحكم المدير (Admin Dashboard Audit & Fixes)
+
+#### ✅ المرحلة 1: إصلاحات حرجة
+| المشكلة | الحل | الموقع |
+|---------|------|--------|
+| `AdminKPIs` يستخدم `useAdminKPIs` بدلاً من `useUnifiedKPIs` | استبدال بـ `useUnifiedKPIs` | `AdminKPIs.tsx` |
+| `UsersActivityChart` مكرر في tabs "users" و "performance" | إزالة من tab "performance" | `AdminDashboard.tsx` |
+| `AuditLogsPreview` مكرر في tabs "security" و "system" | إزالة من tab "system" | `AdminDashboard.tsx` |
+
+#### ✅ المرحلة 2: توحيد لوحة المحاسب
+| المشكلة | الحل |
+|---------|------|
+| `useAccountantKPIs` hook مستقل | حذف واستخدام `useUnifiedKPIs` |
+| `AccountingStats` يستخدم hook قديم | تحديث لـ `useUnifiedKPIs` |
+| بيانات المحاسبة غير موجودة في `kpi.service.ts` | إضافة حقول المحاسبة للـ `UnifiedKPIsData` |
+
+#### ✅ المرحلة 3: إصلاحات متوسطة
+| المشكلة | الحل |
+|---------|------|
+| `responseTime` و `cpu` قيم ثابتة (0) | جلب من `system_health_checks` |
+| `useSettingsCategories` hook في مجلد settings | نقل إلى `src/hooks/settings/` |
+| ثوابت مكررة | إضافة `DASHBOARD_METRICS` و `CHART_CONSTANTS` |
+
+#### ✅ المرحلة 4: تحسينات اختيارية
+| التحسين | الوصف |
+|---------|-------|
+| توحيد معالجة الأخطاء | استخدام `ErrorState` component |
+| تحسين Skeleton loading | توحيد الأنماط عبر المكونات |
+
+#### 📊 إحصائيات التحسين
+| المقياس | قبل | بعد |
+|---------|-----|-----|
+| Hooks مكررة لـ KPIs | 3 (Admin, Nazer, Accountant) | 1 (useUnifiedKPIs) |
+| مكونات مكررة | 2 (UsersActivity, AuditLogs) | 0 |
+| Hook Settings في component | 1 | 0 (منقول لـ hooks/) |
+| بيانات أداء ثابتة | 2 (cpu, responseTime) | 0 (جلب ديناميكي) |
+
+#### 📁 الملفات المعدلة/المحذوفة
+| الملف | التغيير |
+|-------|---------|
+| `src/pages/AdminDashboard.tsx` | إزالة التكرارات |
+| `src/components/dashboard/admin/AdminKPIs.tsx` | استخدام `useUnifiedKPIs` |
+| `src/pages/AccountantDashboard.tsx` | استخدام `useUnifiedKPIs` |
+| `src/components/dashboard/AccountingStats.tsx` | استخدام `useUnifiedKPIs` |
+| `src/services/dashboard/kpi.service.ts` | إضافة حقول المحاسبة |
+| `src/hooks/settings/useSettingsCategories.ts` | نقل من components |
+| `src/hooks/system/useSystemPerformanceMetrics.ts` | جلب بيانات فعلية |
+| ❌ `src/hooks/accounting/useAccountantKPIs.ts` | **محذوف** |
+| ❌ `src/components/dashboard/admin/settings/useSettingsCategories.ts` | **محذوف** |
 
 ---
 
