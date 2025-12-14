@@ -1,3 +1,8 @@
+/**
+ * useSettingsCategories Hook
+ * Hook لإدارة فئات الإعدادات - تم نقله من components إلى hooks
+ * @version 2.9.2
+ */
 import { useNavigate } from "react-router-dom";
 import { useSystemSettings } from "@/hooks/useSystemSettings";
 import {
@@ -11,13 +16,28 @@ import {
   Palette,
   Globe,
   Eye,
+  LucideIcon,
 } from "lucide-react";
+
+export interface SettingItem {
+  label: string;
+  value: string;
+}
+
+export interface SettingsCategory {
+  title: string;
+  icon: LucideIcon;
+  description: string;
+  color: string;
+  action: () => void;
+  settings: SettingItem[];
+}
 
 export function useSettingsCategories() {
   const navigate = useNavigate();
   const { isLoading, getSetting, error, refetch } = useSystemSettings();
 
-  const categories = [
+  const categories: SettingsCategory[] = [
     {
       title: "إعدادات النظام العامة",
       icon: Settings,

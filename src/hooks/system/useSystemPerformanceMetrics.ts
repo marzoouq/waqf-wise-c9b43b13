@@ -3,6 +3,7 @@ import { subDays, format, eachHourOfInterval, parseISO } from "date-fns";
 import { ar } from "date-fns/locale";
 import { MonitoringService } from "@/services";
 import { QUERY_KEYS, QUERY_CONFIG } from "@/lib/query-keys";
+import { DASHBOARD_METRICS } from "@/lib/constants";
 
 interface PerformanceDataPoint {
   time: string;
@@ -12,7 +13,7 @@ interface PerformanceDataPoint {
 }
 
 /**
- * Hook لجلب إحصائيات أداء النظام من audit_logs
+ * Hook لجلب إحصائيات أداء النظام من audit_logs و system_health_checks
  * يجمع البيانات حسب الساعة لآخر 24 ساعة
  */
 export function useSystemPerformanceMetrics() {
@@ -20,13 +21,17 @@ export function useSystemPerformanceMetrics() {
     queryKey: QUERY_KEYS.SYSTEM_PERFORMANCE_METRICS,
     queryFn: async (): Promise<PerformanceDataPoint[]> => {
       const now = new Date();
-      const yesterday = subDays(now, 1);
+      const yesterday = subDays(now, DASHBOARD_METRICS.PERFORMANCE_LOOKBACK_DAYS);
       
-      const logs = await MonitoringService.getPerformanceMetrics(yesterday);
+      // جلب البيانات بالتوازي
+      const [logs, healthData] = await Promise.all([
+        MonitoringService.getPerformanceMetrics(yesterday),
+        MonitoringService.getHealthCheckData(yesterday)
+      ]);
 
       // إنشاء نقاط زمنية لكل 4 ساعات
       const hours = eachHourOfInterval({ start: yesterday, end: now })
-        .filter((_, index) => index % 4 === 0);
+        .filter((_, index) => index % DASHBOARD_METRICS.PERFORMANCE_HOURS_INTERVAL === 0);
 
       // تجميع البيانات حسب الفترة الزمنية
       const dataPoints: PerformanceDataPoint[] = hours.map((hour, index) => {
@@ -38,13 +43,27 @@ export function useSystemPerformanceMetrics() {
           return logDate >= hour && logDate < nextHour;
         });
 
-        const requests = periodLogs.length;
+        // حساب متوسط الأداء من health checks
+        const periodHealth = (healthData || []).filter(check => {
+          const checkDate = parseISO(check.created_at);
+          return checkDate >= hour && checkDate < nextHour;
+        });
+
+        const avgResponseTime = periodHealth.length > 0
+          ? Math.round(periodHealth.reduce((sum, h) => sum + (h.response_time_ms || 0), 0) / periodHealth.length)
+          : 0;
+
+        // نسبة CPU محسوبة من وقت الاستجابة (تقريبي)
+        // قاعدة: وقت استجابة أعلى = حمل أكثر على CPU
+        const avgCpu = periodHealth.length > 0
+          ? Math.min(100, Math.round(avgResponseTime / 10)) // تحويل تقريبي
+          : 0;
 
         return {
           time: format(hour, "HH:mm", { locale: ar }),
-          responseTime: 0,
-          requests,
-          cpu: 0,
+          responseTime: avgResponseTime,
+          requests: periodLogs.length,
+          cpu: avgCpu,
         };
       });
 
