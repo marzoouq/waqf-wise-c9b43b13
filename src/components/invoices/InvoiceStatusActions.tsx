@@ -58,19 +58,19 @@ export const InvoiceStatusActions = ({ invoice, onStatusChanged }: InvoiceStatus
     <div className="flex gap-2 flex-wrap">
       {invoice.status === "draft" && (
         <Button size="sm" onClick={handleIssue}>
-          <Send className="h-4 w-4 ml-2" />
+          <Send className="h-4 w-4 ms-2" />
           إصدار الفاتورة
         </Button>
       )}
       {invoice.status === "sent" && (
         <Button size="sm" variant="default" onClick={handleMarkPaid}>
-          <CheckCircle className="h-4 w-4 ml-2" />
+          <CheckCircle className="h-4 w-4 ms-2" />
           تسجيل الدفع
         </Button>
       )}
       {(invoice.status === "draft" || invoice.status === "sent") && (
         <Button size="sm" variant="destructive" onClick={handleCancel}>
-          <XCircle className="h-4 w-4 ml-2" />
+          <XCircle className="h-4 w-4 ms-2" />
           إلغاء
         </Button>
       )}

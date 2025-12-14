@@ -142,11 +142,11 @@ export function CashFlowStatement() {
         </div>
         <div className="flex gap-2 print:hidden flex-wrap">
           <Button variant="outline" size="sm" onClick={handlePrint} className="text-xs sm:text-sm">
-            <Printer className="h-3 w-3 sm:h-4 sm:w-4 ml-2" />
+            <Printer className="h-3 w-3 sm:h-4 sm:w-4 ms-2" />
             طباعة
           </Button>
           <Button variant="outline" size="sm" onClick={handleExport} className="text-xs sm:text-sm">
-            <FileDown className="h-3 w-3 sm:h-4 sm:w-4 ml-2" />
+            <FileDown className="h-3 w-3 sm:h-4 sm:w-4 ms-2" />
             تصدير PDF
           </Button>
         </div>

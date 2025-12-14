@@ -97,7 +97,7 @@ export const ZATCAQRCode = ({ data, size = 256, className }: ZATCAQRCodeProps) =
             onClick={handleDownload}
             className="flex-1"
           >
-            <Download className="w-4 h-4 ml-2" />
+            <Download className="w-4 h-4 ms-2" />
             تحميل
           </Button>
           <Button
@@ -107,12 +107,12 @@ export const ZATCAQRCode = ({ data, size = 256, className }: ZATCAQRCodeProps) =
           >
             {copied ? (
               <>
-                <CheckCircle className="w-4 h-4 ml-2" />
+                <CheckCircle className="w-4 h-4 ms-2" />
                 تم النسخ
               </>
             ) : (
               <>
-                <Copy className="w-4 h-4 ml-2" />
+                <Copy className="w-4 h-4 ms-2" />
                 نسخ البيانات
               </>
             )}

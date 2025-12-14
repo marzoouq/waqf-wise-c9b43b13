@@ -148,7 +148,7 @@ export function PushNotificationsSetup() {
 
             {permission === 'default' && (
               <Button onClick={handleEnable} className="w-full">
-                <Bell className="h-4 w-4 ml-2" />
+                <Bell className="h-4 w-4 ms-2" />
                 تفعيل الإشعارات الفورية
               </Button>
             )}

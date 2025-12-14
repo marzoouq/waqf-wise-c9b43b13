@@ -126,11 +126,11 @@ export function ApprovalWorkflowManager() {
                           {!step.action && (approval.current_level || 0) === (step.level || 0) && (
                             <div className="flex gap-2">
                               <Button size="sm" className="bg-success hover:bg-success/90">
-                                <CheckCircle className="ml-2 h-4 w-4" />
+                                <CheckCircle className="ms-2 h-4 w-4" />
                                 موافقة
                               </Button>
                               <Button size="sm" variant="destructive">
-                                <XCircle className="ml-2 h-4 w-4" />
+                                <XCircle className="ms-2 h-4 w-4" />
                                 رفض
                               </Button>
                             </div>

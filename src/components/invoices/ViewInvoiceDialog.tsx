@@ -99,20 +99,20 @@ export const ViewInvoiceDialog = ({ invoiceId, open, onOpenChange }: ViewInvoice
       <div className="space-y-4">
         <div className="flex gap-2 print:hidden">
           <Button variant="outline" size="sm" onClick={handlePrint}>
-            <Printer className="h-4 w-4 ml-2" />
+            <Printer className="h-4 w-4 ms-2" />
             طباعة
           </Button>
           <Button variant="outline" size="sm" onClick={handleDownloadPDF} disabled={isExporting}>
             {isExporting ? (
-              <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+              <Loader2 className="h-4 w-4 ms-2 animate-spin" />
             ) : (
-              <Download className="h-4 w-4 ml-2" />
+              <Download className="h-4 w-4 ms-2" />
             )}
             {isExporting ? "جاري التصدير..." : "تصدير PDF"}
           </Button>
           {invoice.customer_email && (
             <Button variant="outline" size="sm" onClick={handleSendEmail}>
-              <Mail className="h-4 w-4 ml-2" />
+              <Mail className="h-4 w-4 ms-2" />
               إرسال بريد
             </Button>
           )}

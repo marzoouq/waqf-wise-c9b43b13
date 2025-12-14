@@ -539,7 +539,7 @@ export const AddInvoiceDialog = ({ open, onOpenChange, isEdit = false, invoiceTo
               type="submit" 
               disabled={isCreating || lines.length === 0}
             >
-              {isCreating && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+              {isCreating && <Loader2 className="ms-2 h-4 w-4 animate-spin" />}
               إنشاء الفاتورة
             </Button>
           </div>

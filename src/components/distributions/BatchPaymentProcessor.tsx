@@ -234,28 +234,28 @@ export function BatchPaymentProcessor({
         <div className="flex gap-2">
           {!isProcessing && batches.length === 0 && (
             <Button onClick={startProcessing} className="flex-1">
-              <Play className="h-4 w-4 ml-2" />
+              <Play className="h-4 w-4 ms-2" />
               بدء المعالجة
             </Button>
           )}
           
           {isProcessing && !isPaused && (
             <Button onClick={pauseProcessing} variant="outline" className="flex-1">
-              <Pause className="h-4 w-4 ml-2" />
+              <Pause className="h-4 w-4 ms-2" />
               إيقاف مؤقت
             </Button>
           )}
           
           {isPaused && (
             <Button onClick={resumeProcessing} className="flex-1">
-              <Play className="h-4 w-4 ml-2" />
+              <Play className="h-4 w-4 ms-2" />
               استئناف
             </Button>
           )}
           
           {failedBatches > 0 && !isProcessing && (
             <Button onClick={retryFailedBatches} variant="destructive" className="flex-1">
-              <AlertCircle className="h-4 w-4 ml-2" />
+              <AlertCircle className="h-4 w-4 ms-2" />
               إعادة محاولة الفاشلة ({failedBatches})
             </Button>
           )}

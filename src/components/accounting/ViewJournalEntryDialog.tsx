@@ -146,18 +146,18 @@ const ViewJournalEntryDialog = ({ open, onOpenChange, entry }: Props) => {
 
         <DialogFooter className="flex gap-2 print:hidden">
           <Button variant="outline" onClick={handlePrint}>
-            <Printer className="h-4 w-4 ml-2" />
+            <Printer className="h-4 w-4 ms-2" />
             طباعة
           </Button>
           {entry.status === "posted" && (
             <Button variant="secondary" onClick={() => setIsApprovalDialogOpen(true)}>
-              <UserCheck className="h-4 w-4 ml-2" />
+              <UserCheck className="h-4 w-4 ms-2" />
               طلب موافقة
             </Button>
           )}
           {entry.status === "draft" && (
             <Button onClick={handlePost} disabled={isPosting}>
-              <CheckCircle className="h-4 w-4 ml-2" />
+              <CheckCircle className="h-4 w-4 ms-2" />
               ترحيل القيد
             </Button>
           )}

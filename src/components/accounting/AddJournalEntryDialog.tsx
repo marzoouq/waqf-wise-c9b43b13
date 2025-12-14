@@ -218,7 +218,7 @@ const AddJournalEntryDialog = ({ open, onOpenChange }: Props) => {
             <div className="flex items-center justify-between">
               <FormLabel>تفاصيل القيد</FormLabel>
               <Button type="button" variant="outline" size="sm" onClick={addLine}>
-                <Plus className="h-4 w-4 ml-2" />
+                <Plus className="h-4 w-4 ms-2" />
                 إضافة سطر
               </Button>
             </div>

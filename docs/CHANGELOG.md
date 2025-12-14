@@ -23,11 +23,33 @@
 | `src/contexts/TenantsDialogsContext.tsx` | إدارة حوارات صفحة المستأجرين |
 | `src/contexts/ArchiveDialogsContext.tsx` | إدارة حوارات صفحة الأرشيف |
 
-#### ✅ RTL Margins (المرحلة 1 - جزئي)
-| الصفحة | التغيير |
-|--------|---------|
-| `Tenants.tsx` | `ml-2` → `ms-2` (4 مواقع) |
-| `Archive.tsx` | `ml-2` → `ms-2` (4 مواقع) |
+#### ✅ RTL Margins (المرحلة 1)
+| الملف | عدد الإصلاحات |
+|--------|---------------|
+| `Tenants.tsx` | 4 |
+| `Archive.tsx` | 4 |
+| `CashFlowStatement.tsx` | 2 |
+| `RequestSubmissionDialog.tsx` | 1 |
+| `BatchPaymentProcessor.tsx` | 4 |
+| `ApprovalWorkflowDialog.tsx` | 2 |
+| `FundsPerformanceReport.tsx` | 2 |
+| `PushNotificationsSetup.tsx` | 1 |
+| `BeneficiaryMobileCard.tsx` | 7 |
+| `IntegratedReportsWidget.tsx` | 1 |
+| `ZATCAQRCode.tsx` | 3 |
+| `ViewInvoiceDialog.tsx` | 4 |
+| `InvoiceStatusActions.tsx` | 3 |
+| `AddInvoiceDialog.tsx` | 1 |
+| `InvoiceManager.tsx` | 1 |
+| `FinancialReports.tsx` | 1 |
+| `ViewJournalEntryDialog.tsx` | 3 |
+| `TrialBalanceReport.tsx` | 3 |
+| `ApprovalDialog.tsx` | 2 |
+| `AddJournalEntryDialog.tsx` | 1 |
+| `GeneralLedgerReport.tsx` | 3 |
+| `InvoiceManagement.tsx` | 4 |
+| `BudgetManagement.tsx` | 1 |
+| `ApprovalWorkflowManager.tsx` | 2 |
 
 #### ✅ تحديث الوثائق (المرحلة 4)
 - توحيد الإصدار إلى 2.9.15 عبر جميع الملفات
@@ -39,7 +61,7 @@
 |---------|-----|-----|
 | Dialog Contexts | 2 | 5 (+3) |
 | CSS Variables للألوان | 80% | 100% |
-| RTL Margins (جزئي) | 0% | ~5% |
+| RTL Margins | 0% | ~15% (60+ إصلاح) |
 | Theming متسق | جزئي | كامل |
 
 ---
