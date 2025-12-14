@@ -31,6 +31,7 @@ import { usePermissions } from "@/hooks/usePermissions";
 // Use Database enum for AppRole (DB only has 7 roles)
 type AppRole = Database['public']['Enums']['app_role'];
 
+// استخدام ROLE_COLORS من المصدر الموحد مع تجاوز محلي للتوافق مع semantic tokens
 const roleColors: Record<AppRole, string> = {
   nazer: "bg-primary/10 text-primary border-primary/30",
   admin: "bg-destructive/10 text-destructive border-destructive/30",

@@ -215,7 +215,7 @@ export class UserService {
   /**
    * إضافة دور للمستخدم
    */
-  static async addRole(userId: string, role: "accountant" | "admin" | "archivist" | "beneficiary" | "cashier" | "nazer" | "user" | "waqf_heir") {
+  static async addRole(userId: string, role: AppRole): Promise<void> {
     const { error } = await supabase
       .from("user_roles")
       .insert([{ user_id: userId, role }]);
@@ -225,7 +225,7 @@ export class UserService {
   /**
    * حذف دور من المستخدم
    */
-  static async removeRole(userId: string, role: "accountant" | "admin" | "archivist" | "beneficiary" | "cashier" | "nazer" | "user" | "waqf_heir") {
+  static async removeRole(userId: string, role: AppRole): Promise<void> {
     const { error } = await supabase
       .from("user_roles")
       .delete()
@@ -290,40 +290,8 @@ export class UserService {
       });
   }
 
-  /**
-   * جلب أدوار مستخدم محدد للإدارة
-   */
-  static async getUserRolesForManager(userId: string): Promise<string[]> {
-    const { data, error } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', userId);
-
-    if (error) throw error;
-    return data.map(r => r.role);
-  }
-
-  /**
-   * إضافة دور لمستخدم محدد
-   */
-  static async addUserRole(userId: string, role: AppRole): Promise<void> {
-    const { error } = await supabase
-      .from('user_roles')
-      .insert({ user_id: userId, role });
-
-    if (error) throw error;
-  }
-
-  /**
-   * حذف دور من مستخدم محدد
-   */
-  static async deleteUserRole(userId: string, role: AppRole): Promise<void> {
-    const { error } = await supabase
-      .from('user_roles')
-      .delete()
-      .eq('user_id', userId)
-      .eq('role', role);
-
-    if (error) throw error;
-  }
+  // Aliases للتوافق الخلفي
+  static getUserRolesForManager = UserService.getUserRoles;
+  static addUserRole = UserService.addRole;
+  static deleteUserRole = UserService.removeRole;
 }
