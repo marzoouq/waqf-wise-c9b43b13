@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useBeneficiaries } from '@/hooks/useBeneficiaries';
 import { LoadingState } from '@/components/shared/LoadingState';
+import { ErrorState } from '@/components/shared/ErrorState';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
 import { MobileOptimizedLayout } from '@/components/layout/MobileOptimizedLayout';

@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowRight, Save, RotateCcw, Eye, Shield, DollarSign, Users, Lock, Briefcase, CreditCard, PieChart, MessageSquare } from "lucide-react";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { Separator } from "@/components/ui/separator";

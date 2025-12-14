@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Download, FileText, AlertCircle } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
+import { ErrorState } from "@/components/shared/ErrorState";
 import {
   generateCSVFile,
   generateMT940File,
@@ -22,7 +23,7 @@ export default function BankTransfers() {
   const [selectedFormat, setSelectedFormat] = useState<string>("csv");
   const [selectedDistribution, setSelectedDistribution] = useState<string>("");
 
-  const { distributions, isLoading } = useBankTransfersData();
+  const { distributions, isLoading, error } = useBankTransfersData();
 
   const handleExport = () => {
     if (!selectedDistribution) {
@@ -104,6 +105,10 @@ export default function BankTransfers() {
 
   if (isLoading) {
     return <LoadingState />;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في التحميل" message="فشل تحميل بيانات التوزيعات" onRetry={() => window.location.reload()} />;
   }
 
   const selectedDist = distributions.find((d) => d.id === selectedDistribution);

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Briefcase, DollarSign, ArrowUpCircle, Receipt } from 'lucide-react';
+import { ErrorState } from '@/components/shared/ErrorState';
 import {
   useCashierShift,
   usePOSTransactions,

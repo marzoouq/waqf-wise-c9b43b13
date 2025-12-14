@@ -28,7 +28,7 @@ export interface PaymentFilters {
 }
 
 export function useBeneficiaryAccountStatementData(userId: string | undefined, filters: PaymentFilters) {
-  const { data: beneficiary, isLoading: beneficiaryLoading } = useQuery({
+  const { data: beneficiary, isLoading: beneficiaryLoading, error: beneficiaryError, refetch: refetchBeneficiary } = useQuery({
     queryKey: QUERY_KEYS.MY_BENEFICIARY(userId),
     queryFn: async () => {
       if (!userId) return null;
@@ -37,7 +37,7 @@ export function useBeneficiaryAccountStatementData(userId: string | undefined, f
     enabled: !!userId,
   });
 
-  const { data: payments = [], isLoading: paymentsLoading } = useQuery({
+  const { data: payments = [], isLoading: paymentsLoading, error: paymentsError, refetch: refetchPayments } = useQuery({
     queryKey: QUERY_KEYS.BENEFICIARY_PAYMENTS(beneficiary?.id || '', filters.dateFrom, filters.dateTo, filters.paymentMethod),
     queryFn: async () => {
       if (!beneficiary?.id) return [];
@@ -57,5 +57,17 @@ export function useBeneficiaryAccountStatementData(userId: string | undefined, f
     largestPayment: filteredPayments.length > 0 ? Math.max(...filteredPayments.map((p) => Number(p.amount))) : 0,
   });
 
-  return { beneficiary, payments, isLoading: beneficiaryLoading || paymentsLoading, calculateStats };
+  const refetch = () => {
+    refetchBeneficiary();
+    refetchPayments();
+  };
+
+  return { 
+    beneficiary, 
+    payments, 
+    isLoading: beneficiaryLoading || paymentsLoading, 
+    error: beneficiaryError || paymentsError,
+    refetch,
+    calculateStats 
+  };
 }

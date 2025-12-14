@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FileText, Download, Printer, TrendingUp, DollarSign } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
+import { ErrorState } from '@/components/shared/ErrorState';
 import { formatCurrency } from '@/lib/utils';
 import { format } from 'date-fns';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
@@ -22,6 +23,8 @@ export default function BeneficiaryReports() {
     monthlyData,
     requestsStatusData,
     isLoading,
+    error,
+    refetch,
     selectedYear,
     setSelectedYear,
     reportType,
@@ -88,6 +91,10 @@ export default function BeneficiaryReports() {
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل التقارير..." />;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في التحميل" message="فشل تحميل التقارير" onRetry={refetch} />;
   }
 
   return (

@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { FileText, Download, Filter, Search, Calendar, TrendingUp, TrendingDown } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
+import { ErrorState } from '@/components/shared/ErrorState';
 import { useAuth } from '@/hooks/useAuth';
 import { formatCurrency } from '@/lib/utils';
 import { format } from 'date-fns';
@@ -20,7 +21,7 @@ export default function BeneficiaryAccountStatement() {
   const [searchTerm, setSearchTerm] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('all');
 
-  const { beneficiary, payments, isLoading, calculateStats } = useBeneficiaryAccountStatementData(
+  const { beneficiary, payments, isLoading, error, refetch, calculateStats } = useBeneficiaryAccountStatementData(
     user?.id,
     { dateFrom, dateTo, paymentMethod }
   );
@@ -91,6 +92,10 @@ export default function BeneficiaryAccountStatement() {
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل كشف الحساب..." />;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في التحميل" message="فشل تحميل كشف الحساب" onRetry={refetch} />;
   }
 
   return (
