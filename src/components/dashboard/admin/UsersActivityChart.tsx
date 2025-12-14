@@ -4,9 +4,11 @@ import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Toolti
 import { useUsersActivityMetrics } from "@/hooks/useUsersActivityMetrics";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ErrorState } from "@/components/shared/ErrorState";
+import { CHART_CONSTANTS } from "@/lib/constants";
 
 export function UsersActivityChart() {
-  const { data, isLoading, error, refetch, isFetching } = useUsersActivityMetrics();
+  const { data, isLoading, isError, refetch, isFetching } = useUsersActivityMetrics();
 
   if (isLoading) {
     return (
@@ -24,7 +26,7 @@ export function UsersActivityChart() {
     );
   }
 
-  if (error) {
+  if (isError) {
     return (
       <Card>
         <CardHeader>
@@ -33,13 +35,11 @@ export function UsersActivityChart() {
             نشاط المستخدمين
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="flex flex-col items-center justify-center h-[300px] text-muted-foreground">
-            <p>حدث خطأ في تحميل البيانات</p>
-            <Button variant="outline" onClick={() => refetch()} className="mt-2">
-              إعادة المحاولة
-            </Button>
-          </div>
+        <CardContent className="p-0">
+          <ErrorState 
+            title="خطأ في تحميل بيانات النشاط"
+            onRetry={refetch}
+          />
         </CardContent>
       </Card>
     );

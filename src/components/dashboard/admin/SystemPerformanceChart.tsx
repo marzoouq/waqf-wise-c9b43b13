@@ -4,9 +4,11 @@ import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tool
 import { useSystemPerformanceMetrics } from "@/hooks/useSystemPerformanceMetrics";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ErrorState } from "@/components/shared/ErrorState";
+import { CHART_CONSTANTS } from "@/lib/constants";
 
 export function SystemPerformanceChart() {
-  const { data, isLoading, error, refetch, isFetching } = useSystemPerformanceMetrics();
+  const { data, isLoading, isError, refetch, isFetching } = useSystemPerformanceMetrics();
 
   if (isLoading) {
     return (
@@ -24,7 +26,7 @@ export function SystemPerformanceChart() {
     );
   }
 
-  if (error) {
+  if (isError) {
     return (
       <Card>
         <CardHeader>
@@ -33,13 +35,11 @@ export function SystemPerformanceChart() {
             أداء النظام
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="flex flex-col items-center justify-center h-[300px] text-muted-foreground">
-            <p>حدث خطأ في تحميل البيانات</p>
-            <Button variant="outline" onClick={() => refetch()} className="mt-2">
-              إعادة المحاولة
-            </Button>
-          </div>
+        <CardContent className="p-0">
+          <ErrorState 
+            title="خطأ في تحميل بيانات الأداء"
+            onRetry={refetch}
+          />
         </CardContent>
       </Card>
     );
