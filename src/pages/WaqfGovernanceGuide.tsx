@@ -4,7 +4,7 @@
  */
 
 import { useState } from "react";
-import { ScrollText, Printer, Download, ChevronUp, Info, Calendar, Building2 } from "lucide-react";
+import { ScrollText, Printer, Download, ChevronUp, Info, Calendar, Building2, Loader2 } from "lucide-react";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,15 +12,26 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { CoreValuesSection } from "@/components/governance/CoreValuesSection";
 import { RegulationsContent } from "@/components/governance/RegulationsContent";
+import { RegulationsSearchBar } from "@/components/governance/RegulationsSearchBar";
+import { useRegulationsSearch } from "@/hooks/governance/useRegulationsSearch";
+import { generateGovernancePDF } from "@/utils/governance-pdf";
+import { toast } from "sonner";
 
 const WaqfGovernanceGuide = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
-
-  // مراقبة التمرير لإظهار زر العودة للأعلى
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const target = e.target as HTMLDivElement;
-    setShowScrollTop(target.scrollTop > 500);
-  };
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  
+  const {
+    searchQuery,
+    setSearchQuery,
+    searchResults,
+    filteredParts,
+    goToResult,
+    clearSearch,
+    resultsCount,
+    expandedParts,
+    setExpandedParts,
+  } = useRegulationsSearch();
 
   const scrollToTop = () => {
     const container = document.querySelector('[data-scroll-container]');
@@ -31,6 +42,19 @@ const WaqfGovernanceGuide = () => {
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const handleDownloadPDF = async () => {
+    try {
+      setIsGeneratingPDF(true);
+      toast.info('جاري إنشاء ملف PDF...');
+      await generateGovernancePDF();
+      toast.success('تم تحميل اللائحة التنفيذية بنجاح');
+    } catch (error) {
+      toast.error('فشل إنشاء ملف PDF');
+    } finally {
+      setIsGeneratingPDF(false);
+    }
   };
 
   return (
@@ -52,12 +76,32 @@ const WaqfGovernanceGuide = () => {
             <Printer className="h-4 w-4" />
             <span className="hidden sm:inline">طباعة</span>
           </Button>
-          <Button variant="outline" size="sm" className="gap-2">
-            <Download className="h-4 w-4" />
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="gap-2"
+            onClick={handleDownloadPDF}
+            disabled={isGeneratingPDF}
+          >
+            {isGeneratingPDF ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Download className="h-4 w-4" />
+            )}
             <span className="hidden sm:inline">تحميل PDF</span>
           </Button>
         </div>
       </div>
+
+      {/* شريط البحث */}
+      <RegulationsSearchBar
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        onClear={clearSearch}
+        searchResults={searchResults}
+        onResultClick={goToResult}
+        resultsCount={resultsCount}
+      />
 
       {/* معلومات الوقف الأساسية */}
       <Card className="mb-6 border-red-200 dark:border-red-800/30 bg-gradient-to-br from-red-50/50 to-background dark:from-red-950/20">
@@ -145,8 +189,13 @@ const WaqfGovernanceGuide = () => {
       {/* القيم الأساسية */}
       <CoreValuesSection />
 
-      {/* محتوى اللائحة */}
-      <RegulationsContent />
+      {/* محتوى اللائحة مع دعم البحث */}
+      <RegulationsContent 
+        filteredParts={filteredParts}
+        expandedParts={expandedParts}
+        onExpandedChange={setExpandedParts}
+        searchQuery={searchQuery}
+      />
 
       {/* زر العودة للأعلى */}
       {showScrollTop && (

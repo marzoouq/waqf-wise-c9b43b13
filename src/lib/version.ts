@@ -2,11 +2,11 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.9.11
+ * @version 2.9.12
  * @date 2025-12-14
  */
 
-export const APP_VERSION = '2.9.11';
+export const APP_VERSION = '2.9.12';
 export const APP_VERSION_DATE = '2025-12-14';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
@@ -22,10 +22,10 @@ export const VERSION_INFO = {
     'Realtime موحد للوحات التحكم والمستخدمين',
     '50+ صلاحية مفعلة للناظر والمدير',
     'Server-side Pagination للعقود والحوكمة والمستخدمين',
-    'Pagination موحد مع 15 عنصر لكل صفحة',
-    'UsersContext لتقليل Props Drilling',
-    'useUsersFilter hook موحد للفلترة',
-    'exportUsersToCSV utility منفصل',
+    'تحميل PDF للائحة التنفيذية',
+    'بحث متقدم داخل اللائحة التنفيذية',
+    'useRegulationsSearch hook للبحث',
+    'RegulationsSearchBar مكون البحث',
   ],
 } as const;
 
