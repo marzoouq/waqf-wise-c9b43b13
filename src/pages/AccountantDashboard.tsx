@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { FileText, AlertCircle, TrendingUp, FileCheck, FileClock, LayoutDashboard, Mail, RefreshCw } from "lucide-react";
-import { useAccountantKPIs, useAccountantDashboardData } from "@/hooks/accounting";
+import { useAccountantDashboardData } from "@/hooks/accounting";
+import { useUnifiedKPIs } from "@/hooks/dashboard/useUnifiedKPIs";
 import { ApproveJournalDialog } from "@/components/accounting/ApproveJournalDialog";
 import { UnifiedDashboardLayout } from "@/components/dashboard/UnifiedDashboardLayout";
 import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
@@ -30,8 +31,18 @@ const AccountantDashboard = () => {
   useAccountantDashboardRealtime();
   const { refreshAll } = useAccountantDashboardRefresh();
   
-  const { data: kpis, isLoading: kpisLoading } = useAccountantKPIs();
+  const { data: unifiedKPIs, isLoading: kpisLoading } = useUnifiedKPIs();
   const { pendingApprovals, isLoading: approvalsLoading } = useAccountantDashboardData();
+  
+  // استخراج KPIs المحاسب من البيانات الموحدة
+  const kpis = unifiedKPIs ? {
+    pendingApprovals: unifiedKPIs.pendingApprovals,
+    draftEntries: unifiedKPIs.draftJournalEntries,
+    postedEntries: unifiedKPIs.postedJournalEntries,
+    todayEntries: unifiedKPIs.todayJournalEntries,
+    totalEntries: unifiedKPIs.totalJournalEntries,
+    cancelledEntries: unifiedKPIs.cancelledJournalEntries
+  } : null;
 
   const handleReviewApproval = (approval: JournalApproval) => {
     setSelectedApproval(approval);

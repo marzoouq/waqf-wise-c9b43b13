@@ -4,7 +4,7 @@
  */
 
 // ==================== Dashboard Hooks ====================
-export { useAccountantKPIs, type AccountantKPIs } from './useAccountantKPIs';
+// useAccountantKPIs removed - use useUnifiedKPIs directly
 export { useAccountantDashboardData } from './useAccountantDashboardData';
 
 // ==================== Core Hooks ====================
