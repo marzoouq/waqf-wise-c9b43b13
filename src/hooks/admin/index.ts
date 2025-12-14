@@ -4,4 +4,4 @@
  */
 
 export { useUserStats, type UserStats } from './useUserStats';
-export { useAdminKPIs } from './useAdminKPIs';
+// useAdminKPIs removed - use useUnifiedKPIs from @/hooks/dashboard/useUnifiedKPIs directly

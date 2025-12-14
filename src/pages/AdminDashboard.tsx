@@ -125,22 +125,17 @@ export default function AdminDashboard() {
             <Suspense fallback={<ChartSkeleton />}>
               <UserManagementSection />
             </Suspense>
-
-            <Suspense fallback={<ChartSkeleton />}>
-              <UsersActivityChart />
-            </Suspense>
-            
-            {/* AuditLogsPreview removed - available in System tab */}
+            {/* UsersActivityChart متاح في تبويب الأداء */}
           </LazyTabContent>
         </TabsContent>
 
         {/* Security Tab - Lazy Load */}
         <TabsContent value="security" className="space-y-6 mt-6">
           <LazyTabContent isActive={activeTab === "security"}>
-            {/* SecurityAlertsSection موجود في System tab - هنا نعرض فقط AuditLogs */}
             <Suspense fallback={<ChartSkeleton />}>
-              <AuditLogsPreview />
+              <SecurityAlertsSection />
             </Suspense>
+            {/* AuditLogsPreview متاح في تبويب النظام */}
           </LazyTabContent>
         </TabsContent>
 
