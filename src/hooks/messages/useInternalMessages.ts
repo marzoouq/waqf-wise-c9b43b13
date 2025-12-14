@@ -6,6 +6,7 @@ import type { InternalMessageInsert } from "@/types/messages";
 import { createMutationErrorHandler } from "@/lib/errors";
 import { MessageService } from "@/services/message.service";
 import { RealtimeService } from "@/services/realtime.service";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export function useInternalMessages() {
   const { toast } = useToast();
@@ -15,19 +16,19 @@ export function useInternalMessages() {
   useEffect(() => {
     const subscription = RealtimeService.subscribeToTable(
       'internal_messages',
-      () => queryClient.invalidateQueries({ queryKey: ["internal_messages"] })
+      () => queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTERNAL_MESSAGES })
     );
     return () => { subscription.unsubscribe(); };
   }, [queryClient]);
 
   const { data: inboxMessages = [], isLoading: isLoadingInbox } = useQuery({
-    queryKey: ["internal_messages", "inbox", user?.id],
+    queryKey: [...QUERY_KEYS.INTERNAL_MESSAGES, "inbox", user?.id],
     queryFn: () => MessageService.getInboxMessages(user!.id),
     enabled: !!user?.id,
   });
 
   const { data: sentMessages = [], isLoading: isLoadingSent } = useQuery({
-    queryKey: ["internal_messages", "sent", user?.id],
+    queryKey: [...QUERY_KEYS.INTERNAL_MESSAGES, "sent", user?.id],
     queryFn: () => MessageService.getSentMessages(user!.id),
     enabled: !!user?.id,
   });
@@ -36,7 +37,7 @@ export function useInternalMessages() {
     mutationFn: (message: InternalMessageInsert) => 
       MessageService.sendMessage(message),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["internal_messages"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTERNAL_MESSAGES });
       toast({
         title: "تم إرسال الرسالة",
         description: "تم إرسال الرسالة بنجاح",
@@ -51,7 +52,7 @@ export function useInternalMessages() {
   const markAsRead = useMutation({
     mutationFn: (messageId: string) => MessageService.markAsRead(messageId, user!.id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["internal_messages"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTERNAL_MESSAGES });
     },
   });
 

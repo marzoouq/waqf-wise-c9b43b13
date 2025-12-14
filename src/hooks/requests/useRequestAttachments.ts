@@ -5,6 +5,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { RequestService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface RequestAttachment {
   id: string;
@@ -23,7 +24,7 @@ export function useRequestAttachments(requestId?: string) {
   const queryClient = useQueryClient();
 
   const { data: attachments = [], isLoading } = useQuery({
-    queryKey: ["request-attachments", requestId],
+    queryKey: QUERY_KEYS.REQUEST_ATTACHMENTS(requestId),
     queryFn: () => RequestService.getAttachments(requestId!),
     enabled: !!requestId,
   });
@@ -34,8 +35,8 @@ export function useRequestAttachments(requestId?: string) {
       return RequestService.uploadAttachment(requestId, file, description);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["request-attachments", requestId] });
-      queryClient.invalidateQueries({ queryKey: ["requests"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REQUEST_ATTACHMENTS(requestId) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REQUESTS });
       toast({ title: "تم رفع المرفق", description: "تم رفع المرفق بنجاح" });
     },
     onError: (error: Error) => {
@@ -50,8 +51,8 @@ export function useRequestAttachments(requestId?: string) {
       return RequestService.deleteAttachment(attachmentId, attachment.file_path, requestId!);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["request-attachments", requestId] });
-      queryClient.invalidateQueries({ queryKey: ["requests"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REQUEST_ATTACHMENTS(requestId) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REQUESTS });
       toast({ title: "تم الحذف", description: "تم حذف المرفق بنجاح" });
     },
     onError: (error: Error) => {

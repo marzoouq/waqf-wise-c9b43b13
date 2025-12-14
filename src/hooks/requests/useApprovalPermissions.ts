@@ -1,6 +1,7 @@
 import { useAuth } from "@/hooks/auth";
 import { useQuery } from "@tanstack/react-query";
 import { ApprovalService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export type ApprovalLevel = 1 | 2 | 3;
 
@@ -21,7 +22,7 @@ export function useApprovalPermissions(): ApprovalPermissions {
   const { user } = useAuth();
 
   const { data: userRole, isLoading } = useQuery({
-    queryKey: ["user_role", user?.id],
+    queryKey: QUERY_KEYS.USER_ROLES(user?.id || ''),
     queryFn: () => ApprovalService.getUserRole(user!.id),
     enabled: !!user?.id,
     staleTime: 5 * 60 * 1000, // 5 دقائق

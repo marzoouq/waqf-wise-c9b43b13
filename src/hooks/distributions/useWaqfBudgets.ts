@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { FundService } from "@/services/fund.service";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 interface BudgetCategory {
   name: string;
@@ -10,12 +11,12 @@ interface BudgetCategory {
 
 export function useWaqfBudgets(fiscalYearId?: string) {
   const { data: budgets, isLoading: budgetsLoading } = useQuery({
-    queryKey: ["waqf-budgets", fiscalYearId],
+    queryKey: QUERY_KEYS.WAQF_BUDGETS(fiscalYearId),
     queryFn: () => FundService.getBudgets(fiscalYearId),
   });
 
   const { data: reserves, isLoading: reservesLoading } = useQuery({
-    queryKey: ["waqf-reserves"],
+    queryKey: QUERY_KEYS.WAQF_RESERVES,
     queryFn: () => FundService.getReserves(),
   });
 

@@ -535,6 +535,21 @@ export const QUERY_KEYS = {
   
   // User Permission Overrides
   USER_PERMISSIONS_OVERRIDES: (userId?: string) => ['user-permissions-overrides', userId] as const,
+  
+  // Phase 4 - Final Unification Keys
+  TWO_FACTOR_STATUS: (userId?: string) => ['two-factor-status', userId] as const,
+  TASKS: ['tasks'] as const,
+  USERS_PROFILES_CACHE: ['users-profiles-cache'] as const,
+  USER_ROLES_AUDIT: ['user-roles-audit'] as const,
+  ALL_PERMISSIONS: ['all-permissions'] as const,
+  ACCOUNTING_LINK_LINKED: ['accounting-link', 'linked'] as const,
+  ACCOUNTING_LINK_UNLINKED: ['accounting-link', 'unlinked'] as const,
+  PAYMENT_VOUCHERS_FILTERED: (searchTerm?: string, status?: string) => ['payment-vouchers', searchTerm, status] as const,
+  INTERNAL_MESSAGES: ['internal_messages'] as const,
+  REQUEST_ATTACHMENTS: (requestId?: string) => ['request-attachments', requestId] as const,
+  WAQF_BUDGETS: (fiscalYearId?: string) => ['waqf-budgets', fiscalYearId] as const,
+  WAQF_RESERVES: ['waqf-reserves'] as const,
+  PERFORMANCE_METRICS_DATA: ['performance-metrics-data'] as const,
 } as const;
 
 // Query Config with default settings

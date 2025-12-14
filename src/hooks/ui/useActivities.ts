@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { TOAST_MESSAGES } from "@/lib/constants";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";
 import { createMutationErrorHandler } from "@/lib/errors";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export type { Activity };
 
@@ -12,7 +13,7 @@ export function useActivities() {
   const queryClient = useQueryClient();
 
   const { data: activities = [], isLoading } = useQuery({
-    queryKey: ["activities"],
+    queryKey: QUERY_KEYS.ACTIVITIES,
     queryFn: () => UIService.getActivities(10),
     ...QUERY_CONFIG.ACTIVITIES,
   });
@@ -21,7 +22,7 @@ export function useActivities() {
     mutationFn: (activity: Omit<Activity, "id" | "created_at" | "timestamp">) =>
       UIService.addActivity(activity),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["activities"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ACTIVITIES });
     },
     onError: createMutationErrorHandler({
       context: 'add_activity',

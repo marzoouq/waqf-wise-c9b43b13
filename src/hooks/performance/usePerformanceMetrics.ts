@@ -5,6 +5,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { MonitoringService, type PerformanceMetric, type SlowQueryLog } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export type { PerformanceMetric, SlowQueryLog };
 
@@ -20,7 +21,7 @@ export function usePerformanceMetrics() {
     data,
     isLoading,
   } = useQuery({
-    queryKey: ["performance-metrics-data"],
+    queryKey: QUERY_KEYS.PERFORMANCE_METRICS_DATA,
     queryFn: () => MonitoringService.getPerformanceMetricsData(),
   });
 

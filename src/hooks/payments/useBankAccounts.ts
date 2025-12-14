@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { createMutationErrorHandler } from "@/lib/errors";
 import { PaymentService } from "@/services/payment.service";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface BankAccount {
   id: string;
@@ -22,7 +23,7 @@ export function useBankAccounts() {
   const queryClient = useQueryClient();
 
   const { data: bankAccounts = [], isLoading } = useQuery({
-    queryKey: ["bank_accounts"],
+    queryKey: QUERY_KEYS.BANK_ACCOUNTS,
     queryFn: () => PaymentService.getBankAccounts(),
   });
 
@@ -30,7 +31,7 @@ export function useBankAccounts() {
     mutationFn: (bankAccount: Omit<BankAccount, "id" | "created_at" | "updated_at">) =>
       PaymentService.createBankAccount(bankAccount),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["bank_accounts"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BANK_ACCOUNTS });
       toast({
         title: "تمت الإضافة بنجاح",
         description: "تم إضافة الحساب البنكي بنجاح",
@@ -46,7 +47,7 @@ export function useBankAccounts() {
     mutationFn: ({ id, ...updates }: Partial<BankAccount> & { id: string }) =>
       PaymentService.updateBankAccount(id, updates),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["bank_accounts"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BANK_ACCOUNTS });
       toast({
         title: "تم التحديث بنجاح",
         description: "تم تحديث الحساب البنكي بنجاح",
@@ -61,7 +62,7 @@ export function useBankAccounts() {
   const deleteBankAccount = useMutation({
     mutationFn: (id: string) => PaymentService.deleteBankAccount(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["bank_accounts"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BANK_ACCOUNTS });
       toast({
         title: "تم الحذف بنجاح",
         description: "تم حذف الحساب البنكي بنجاح",

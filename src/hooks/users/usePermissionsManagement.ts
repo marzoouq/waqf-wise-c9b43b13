@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { AppRole } from "@/hooks/useUserRole";
 import { Permission } from "@/hooks/usePermissions";
 import { AuthService } from "@/services/auth.service";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface RolePermissionState {
   permissionId: string;
@@ -27,7 +28,7 @@ export function usePermissionsManagement(initialRole: AppRole = "accountant") {
 
   // جلب جميع الصلاحيات باستخدام الخدمة
   const { data: allPermissions = [], isLoading: loadingPermissions } = useQuery({
-    queryKey: ["all-permissions"],
+    queryKey: QUERY_KEYS.ALL_PERMISSIONS,
     queryFn: async () => {
       const permissions = await AuthService.getAllPermissions();
       return permissions as Permission[];
@@ -36,7 +37,7 @@ export function usePermissionsManagement(initialRole: AppRole = "accountant") {
 
   // جلب صلاحيات الدور المحدد باستخدام الخدمة
   const { data: rolePermissions = [], isLoading: loadingRolePerms } = useQuery({
-    queryKey: ["role-permissions", selectedRole],
+    queryKey: QUERY_KEYS.ROLE_PERMISSIONS(selectedRole),
     queryFn: async () => {
       return AuthService.getRolePermissions(selectedRole);
     },
@@ -55,7 +56,7 @@ export function usePermissionsManagement(initialRole: AppRole = "accountant") {
       await AuthService.updateRolePermission(selectedRole, permissionId, granted);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["role-permissions"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ROLE_PERMISSIONS(selectedRole) });
       toast({
         title: "تم الحفظ",
         description: "تم تحديث الصلاحيات بنجاح",

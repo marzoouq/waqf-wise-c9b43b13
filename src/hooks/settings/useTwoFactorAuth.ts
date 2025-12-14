@@ -5,12 +5,13 @@
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AuthService } from "@/services/auth.service";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export function useTwoFactorAuth(userId: string | undefined) {
   const queryClient = useQueryClient();
 
   const { data: twoFactorData, isLoading } = useQuery({
-    queryKey: ["two-factor-status", userId],
+    queryKey: QUERY_KEYS.TWO_FACTOR_STATUS(userId),
     queryFn: async () => {
       if (!userId) return null;
       return AuthService.get2FAStatus(userId);
@@ -19,8 +20,8 @@ export function useTwoFactorAuth(userId: string | undefined) {
   });
 
   const invalidate2FAStatus = async () => {
-    await queryClient.invalidateQueries({ queryKey: ["two-factor-status"] });
-    await queryClient.invalidateQueries({ queryKey: ["profile"] });
+    await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TWO_FACTOR_STATUS(userId) });
+    await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROFILE(userId) });
   };
 
   return {

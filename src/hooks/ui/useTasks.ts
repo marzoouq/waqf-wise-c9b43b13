@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { TOAST_MESSAGES } from "@/lib/constants";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";
 import { createMutationErrorHandler } from "@/lib/errors";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface Task {
   id: string;
@@ -19,7 +20,7 @@ export function useTasks() {
   const queryClient = useQueryClient();
 
   const { data: tasks = [], isLoading } = useQuery({
-    queryKey: ["tasks"],
+    queryKey: QUERY_KEYS.TASKS,
     queryFn: () => UIService.getTasks(10),
     ...QUERY_CONFIG.TASKS,
   });
@@ -28,7 +29,7 @@ export function useTasks() {
     mutationFn: (task: Omit<Task, "id" | "created_at" | "updated_at">) =>
       UIService.addTask(task),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TASKS });
       toast({
         title: TOAST_MESSAGES.SUCCESS.ADD,
         description: "تم إضافة المهمة بنجاح",
@@ -44,7 +45,7 @@ export function useTasks() {
     mutationFn: ({ id, ...updates }: Partial<Task> & { id: string }) =>
       UIService.updateTask(id, updates),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.TASKS });
       toast({
         title: TOAST_MESSAGES.SUCCESS.UPDATE,
         description: "تم تحديث المهمة بنجاح",
