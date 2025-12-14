@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { PaymentForApproval, PaymentApprovalRow, BadgeVariant } from "@/types";
 import { usePaymentApprovals } from "@/hooks/approvals";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export function PaymentApprovalsTab() {
   const [selectedPayment, setSelectedPayment] = useState<PaymentForApproval | null>(null);
@@ -17,7 +18,7 @@ export function PaymentApprovalsTab() {
   const [approvalNotes, setApprovalNotes] = useState("");
   const [approvalAction, setApprovalAction] = useState<"approve" | "reject">("approve");
 
-  const { data: payments, isLoading, approveMutation } = usePaymentApprovals();
+  const { data: payments, isLoading, error, refetch, approveMutation } = usePaymentApprovals();
 
   const handleApprovalClick = (payment: PaymentForApproval, action: "approve" | "reject") => {
     setSelectedPayment(payment);
@@ -89,6 +90,10 @@ export function PaymentApprovalsTab() {
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
       </div>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل موافقات المدفوعات" message={(error as Error).message} onRetry={refetch} />;
   }
 
   return (

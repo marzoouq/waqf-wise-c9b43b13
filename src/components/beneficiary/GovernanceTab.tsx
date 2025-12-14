@@ -6,9 +6,11 @@ import { useGovernanceData } from "@/hooks/useGovernanceData";
 import { format, arLocale as ar } from "@/lib/date";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export function GovernanceTab() {
   const { settings } = useVisibilitySettings();
+  // Note: useGovernanceData returns static empty data currently, no error/refetch available
   const { meetings, decisions, auditReports, isLoading, hasMeetings, hasDecisions, hasAuditReports } = useGovernanceData();
   const isMobile = useIsMobile();
 

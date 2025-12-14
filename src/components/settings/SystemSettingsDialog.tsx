@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useSystemSettings } from "@/hooks/useSystemSettings";
 import { Settings, DollarSign, Bell, Shield, Globe, Save, RotateCcw } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { useToast } from "@/hooks/use-toast";
 
 interface SystemSettingsDialogProps {
@@ -18,7 +19,7 @@ interface SystemSettingsDialogProps {
 }
 
 export function SystemSettingsDialog({ open, onOpenChange }: SystemSettingsDialogProps) {
-  const { settings, isLoading, updateSetting, getSetting } = useSystemSettings();
+  const { settings, isLoading, error, refetch, updateSetting, getSetting } = useSystemSettings();
   const { toast } = useToast();
   const [editedSettings, setEditedSettings] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
@@ -170,6 +171,19 @@ export function SystemSettingsDialog({ open, onOpenChange }: SystemSettingsDialo
         size="xl"
       >
         <LoadingState message="جاري تحميل الإعدادات..." />
+      </ResponsiveDialog>
+    );
+  }
+
+  if (error) {
+    return (
+      <ResponsiveDialog 
+        open={open} 
+        onOpenChange={onOpenChange}
+        title="إعدادات النظام"
+        size="xl"
+      >
+        <ErrorState title="خطأ في تحميل الإعدادات" message={(error as Error).message} onRetry={refetch} />
       </ResponsiveDialog>
     );
   }

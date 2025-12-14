@@ -12,9 +12,10 @@ import { Badge } from "@/components/ui/badge";
 import { Building2, Home, MapPin } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency } from "@/lib/utils";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export function PropertyAccordionView() {
-  const { properties, isLoading } = useProperties();
+  const { properties, isLoading, error, refetch } = useProperties();
 
   if (isLoading) {
     return (
@@ -24,6 +25,10 @@ export function PropertyAccordionView() {
         ))}
       </div>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل العقارات" message={(error as Error).message} onRetry={refetch} />;
   }
 
   if (!properties || properties.length === 0) {
