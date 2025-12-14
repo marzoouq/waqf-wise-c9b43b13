@@ -2,11 +2,11 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.9.14
+ * @version 2.9.15
  * @date 2025-12-14
  */
 
-export const APP_VERSION = '2.9.14';
+export const APP_VERSION = '2.9.15';
 export const APP_VERSION_DATE = '2025-12-14';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
@@ -26,6 +26,8 @@ export const VERSION_INFO = {
     'Lazy Loading للـ Dialogs (تحسين الأداء 15%)',
     'UsersTableWithContext (0 props بدلاً من 9)',
     'useUsersFilter موحد للفلترة',
+    'RTL Margins باستخدام CSS Logical Properties',
+    'Overlay Colors باستخدام CSS Variables',
   ],
 } as const;
 
@@ -34,12 +36,12 @@ export const VERSION_INFO = {
  */
 export const ARCHITECTURE_STATUS = {
   services: {
-    total: 52,
+    total: 55,
     status: 'complete',
-    description: 'جميع الخدمات مكتملة ومنظمة (+ governance-pdf)',
+    description: 'جميع الخدمات مكتملة ومنظمة',
   },
   hooks: {
-    total: 170,
+    total: 175,
     folders: 36,
     status: 'complete',
     description: 'جميع الـ hooks منظمة في مجلدات وظيفية',
@@ -56,6 +58,14 @@ export const ARCHITECTURE_STATUS = {
   realtime: {
     status: 'complete',
     description: 'Realtime موحد في hooks مخصصة للوحات التحكم',
+  },
+  rtlSupport: {
+    status: 'complete',
+    description: 'CSS Logical Properties (ms-*/me-*) بدلاً من ml-*/mr-*',
+  },
+  theming: {
+    status: 'complete',
+    description: 'CSS Variables للألوان بدلاً من القيم الثابتة',
   },
 } as const;
 
