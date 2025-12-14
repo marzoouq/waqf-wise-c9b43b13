@@ -62,7 +62,7 @@ export function DocumentCategorySummary({ categories }: DocumentCategorySummaryP
       <div className="flex items-center justify-between">
         <h3 className="font-semibold text-lg">ملخص المصروفات حسب الفئة</h3>
         <Badge variant="destructive" className="text-base px-3 py-1">
-          <TrendingDown className="h-4 w-4 ml-1" />
+          <TrendingDown className="h-4 w-4 ms-1" />
           {formatAmount(totalExpenses)} ريال
         </Badge>
       </div>

@@ -120,7 +120,7 @@ export default function PointOfSale() {
 
         {hasOpenShift && (
           <Button variant="destructive" onClick={() => setShowPayment(true)}>
-            <ArrowUpCircle className="h-4 w-4 ml-2" />
+            <ArrowUpCircle className="h-4 w-4 ms-2" />
             صرف مبلغ
           </Button>
         )}

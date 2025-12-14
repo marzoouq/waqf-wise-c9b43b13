@@ -109,7 +109,7 @@ export function LoanCalculator() {
           </div>
 
           <Button onClick={calculateLoan} className="w-full">
-            <Calculator className="h-4 w-4 ml-2" />
+            <Calculator className="h-4 w-4 ms-2" />
             احسب الجدول
           </Button>
 

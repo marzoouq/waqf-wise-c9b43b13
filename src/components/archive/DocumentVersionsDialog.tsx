@@ -89,7 +89,7 @@ export function DocumentVersionsDialog({
                         onClick={() => restoreVersion(version.id)}
                         disabled={isRestoring}
                       >
-                        <RotateCcw className="h-4 w-4 ml-2" />
+                        <RotateCcw className="h-4 w-4 ms-2" />
                         استعادة
                       </Button>
                     )}

@@ -221,7 +221,7 @@ export function EnhancedDisclosuresTab() {
                   
                   {settings?.allow_export_pdf && (
                     <Button variant="outline" className="flex-1 sm:flex-initial">
-                      <Download className="h-4 w-4 ml-2" />
+                      <Download className="h-4 w-4 ms-2" />
                       تحميل PDF
                     </Button>
                   )}

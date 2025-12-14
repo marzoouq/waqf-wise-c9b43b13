@@ -73,11 +73,11 @@ export function ArchiveDocumentsTab({
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row gap-3">
         <Button onClick={onUploadDocument} className="flex-1 sm:flex-none">
-          <Upload className="ml-2 h-4 w-4" />
+          <Upload className="ms-2 h-4 w-4" />
           رفع مستند
         </Button>
         <Button onClick={onCreateFolder} variant="outline" className="flex-1 sm:flex-none">
-          <Plus className="ml-2 h-4 w-4" />
+          <Plus className="ms-2 h-4 w-4" />
           إنشاء مجلد
         </Button>
         {documents.length > 0 && (

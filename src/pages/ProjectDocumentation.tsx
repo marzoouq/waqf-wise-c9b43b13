@@ -63,11 +63,11 @@ export default function ProjectDocumentation() {
         <Tabs defaultValue="summary" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="summary">
-              <BarChart3 className="h-4 w-4 ml-2" />
+              <BarChart3 className="h-4 w-4 ms-2" />
               ملخص التقدم
             </TabsTrigger>
             <TabsTrigger value="phases">
-              <BookOpen className="h-4 w-4 ml-2" />
+              <BookOpen className="h-4 w-4 ms-2" />
               تفاصيل المراحل
             </TabsTrigger>
           </TabsList>
