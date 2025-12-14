@@ -8,12 +8,13 @@ import { DistributionForApproval, StatusConfigMap } from "@/types/approvals";
 import { useApprovalPermissions } from "@/hooks/useApprovalPermissions";
 import { useDistributionApprovals } from "@/hooks/approvals";
 import { useDialogState } from "@/hooks/ui/useDialogState";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export function DistributionApprovalsTab() {
   const flowDialog = useDialogState<DistributionForApproval>();
   const { canApproveLevel, userRole } = useApprovalPermissions();
 
-  const { data: distributions, isLoading } = useDistributionApprovals();
+  const { data: distributions, isLoading, error, refetch } = useDistributionApprovals();
 
   const getStatusBadge = (status: string) => {
     const config: StatusConfigMap = {
@@ -43,6 +44,10 @@ export function DistributionApprovalsTab() {
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
       </div>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل توزيعات الموافقات" message={(error as Error).message} onRetry={refetch} />;
   }
 
   return (

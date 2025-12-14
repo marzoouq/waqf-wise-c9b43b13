@@ -14,6 +14,7 @@ import {
 import { Permission } from "@/hooks/usePermissions";
 import { AppRole } from "@/hooks/useUserRole";
 import { useRolePermissionsData } from "@/hooks/permissions/useRolePermissionsData";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 interface RolePermissionsMatrixProps {
   role: AppRole;
@@ -24,6 +25,8 @@ export function RolePermissionsMatrix({ role, permissions }: RolePermissionsMatr
   const {
     rolePermissions,
     isLoading,
+    error,
+    refetch,
     modifications,
     hasModifications,
     updatePermissionMutation,
@@ -51,6 +54,10 @@ export function RolePermissionsMatrix({ role, permissions }: RolePermissionsMatr
         </CardContent>
       </Card>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل الصلاحيات" message={(error as Error).message} onRetry={refetch} />;
   }
 
   return (

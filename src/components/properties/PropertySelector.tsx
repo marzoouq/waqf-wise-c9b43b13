@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/select";
 import { useProperties } from "@/hooks/useProperties";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 interface PropertySelectorProps {
   selectedPropertyId: string;
@@ -19,10 +20,14 @@ export const PropertySelector = memo(({
   selectedPropertyId,
   onSelect,
 }: PropertySelectorProps) => {
-  const { properties, isLoading } = useProperties();
+  const { properties, isLoading, error, refetch } = useProperties();
 
   if (isLoading) {
     return <Skeleton className="h-10 w-full" />;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل العقارات" message={(error as Error).message} onRetry={refetch} />;
   }
 
   return (

@@ -3,6 +3,7 @@ import { useFinancialAnalytics } from '@/hooks/useFinancialAnalytics';
 import { TrendingUp, TrendingDown, Activity, DollarSign } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
+import { ErrorState } from '@/components/shared/ErrorState';
 import type { FinancialRatioKPI } from '@/types/reports/index';
 
 const ratioInfo: Record<string, { label: string; description: string; goodAbove?: boolean }> = {
@@ -81,6 +82,8 @@ export function FinancialRatiosReport() {
       </Card>
     );
   }
+
+  // Note: useFinancialAnalytics doesn't expose error/refetch currently
 
   return (
     <Card>
