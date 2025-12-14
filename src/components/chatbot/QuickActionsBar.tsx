@@ -1,8 +1,8 @@
+import { memo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink } from "lucide-react";
+import { ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface QuickAction {
@@ -16,56 +16,71 @@ interface QuickActionsBarProps {
   actions: QuickAction[];
 }
 
-export function QuickActionsBar({ actions }: QuickActionsBarProps) {
+export const QuickActionsBar = memo(function QuickActionsBar({ actions }: QuickActionsBarProps) {
   const navigate = useNavigate();
+  const [isExpanded, setIsExpanded] = useState(false);
 
   if (actions.length === 0) return null;
 
+  // عرض 2 فقط عند الإغلاق
+  const visibleActions = isExpanded ? actions : actions.slice(0, 2);
+  const hasMore = actions.length > 2;
+
   return (
-    <Card className="p-4 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 animate-in fade-in slide-in-from-bottom duration-500">
-      <div className="flex items-center gap-2 mb-3">
-        <ExternalLink className="h-4 w-4 text-primary" />
-        <p className="text-sm font-semibold text-foreground">انتقل مباشرة إلى:</p>
+    <div className="bg-primary/5 border border-primary/20 rounded-lg p-2">
+      <div className="flex items-center justify-between mb-1.5">
+        <div className="flex items-center gap-1.5">
+          <ExternalLink className="h-3 w-3 text-primary" />
+          <p className="text-[10px] font-medium text-muted-foreground">انتقل إلى:</p>
+        </div>
+        {hasMore && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="h-5 px-1.5 text-[10px] text-muted-foreground hover:text-foreground"
+          >
+            {isExpanded ? (
+              <>
+                <ChevronUp className="h-3 w-3 ml-0.5" />
+                أقل
+              </>
+            ) : (
+              <>
+                <ChevronDown className="h-3 w-3 ml-0.5" />
+                +{actions.length - 2}
+              </>
+            )}
+          </Button>
+        )}
       </div>
       
-      <div className="flex flex-wrap gap-2">
-        {actions.map((action, index) => (
+      <div className="flex flex-wrap gap-1.5">
+        {visibleActions.map((action) => (
           <Button
             key={action.label}
             variant="outline"
             size="sm"
             onClick={() => navigate(action.link)}
             className={cn(
-              "group relative overflow-hidden",
+              "h-6 px-2 text-[11px]",
               "bg-background hover:bg-primary hover:text-primary-foreground",
-              "border-primary/30 hover:border-primary",
-              "transition-all duration-300 hover:scale-105 hover:shadow-md",
-              "animate-in fade-in slide-in-from-bottom duration-300"
+              "border-primary/30 hover:border-primary"
             )}
-            style={{ animationDelay: `${index * 50}ms` }}
           >
-            <span className="text-base ml-2 group-hover:scale-110 inline-block transition-transform">
-              {action.icon}
-            </span>
-            <span className="font-medium">{action.label}</span>
+            <span className="ml-1">{action.icon}</span>
+            {action.label}
             {action.count !== undefined && (
               <Badge 
                 variant="secondary" 
-                className="mr-2 bg-primary/20 group-hover:bg-primary-foreground/20 transition-colors"
+                className="mr-1 h-4 px-1 text-[9px] bg-primary/20"
               >
                 {action.count}
               </Badge>
             )}
-            
-            {/* تأثير التمويج */}
-            <span className="absolute inset-0 bg-primary/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
           </Button>
         ))}
       </div>
-      
-      <p className="text-xs text-muted-foreground mt-3 text-center">
-        💡 اضغط على أي قسم للانتقال إليه مباشرة
-      </p>
-    </Card>
+    </div>
   );
-}
+});
