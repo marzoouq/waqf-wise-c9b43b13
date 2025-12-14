@@ -1,21 +1,32 @@
 /**
  * Users Context - سياق المستخدمين
  * لتقليل Props Drilling في مكونات المستخدمين
+ * @version 2.9.11
  */
 
-import React, { createContext, useContext, ReactNode } from "react";
+import React, { createContext, useContext, ReactNode, useState, useCallback } from "react";
 import { useUsersManagement, type UserProfile } from "@/hooks/useUsersManagement";
+import { useUsersFilter } from "@/hooks/users/useUsersFilter";
 import type { AppRole } from "@/types/roles";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 
 interface UsersContextValue {
   // البيانات
   users: UserProfile[];
+  filteredUsers: UserProfile[];
   isLoading: boolean;
   error: Error | null;
   refetch: () => void;
   
+  // الفلترة
+  searchTerm: string;
+  setSearchTerm: (term: string) => void;
+  roleFilter: string;
+  setRoleFilter: (role: string) => void;
+  
   // العمليات
-  deleteUser: (userId: string) => void;
+  deleteUser: (user: UserProfile) => void;
   updateRoles: (userId: string, roles: AppRole[]) => void;
   updateStatus: (userId: string, isActive: boolean) => void;
   resetPassword: (userId: string, password: string) => void;
@@ -25,11 +36,20 @@ interface UsersContextValue {
   isUpdatingRoles: boolean;
   isUpdatingStatus: boolean;
   isResettingPassword: boolean;
+  
+  // المستخدم الحالي
+  currentUserId?: string;
+  
+  // التصدير
+  showNotAvailableToast: () => void;
 }
 
 const UsersContext = createContext<UsersContextValue | null>(null);
 
 export function UsersProvider({ children }: { children: ReactNode }) {
+  const { toast } = useToast();
+  const { user: currentUser } = useAuth();
+  
   const {
     users,
     isLoading,
@@ -45,13 +65,47 @@ export function UsersProvider({ children }: { children: ReactNode }) {
     isResettingPassword,
   } = useUsersManagement();
 
+  const {
+    filteredUsers,
+    searchTerm,
+    setSearchTerm,
+    roleFilter,
+    setRoleFilter,
+  } = useUsersFilter({ users });
+
+  const handleDeleteUser = useCallback((user: UserProfile) => {
+    if (user.user_id === currentUser?.id) {
+      toast({ title: "تحذير", description: "لا يمكنك حذف حسابك الخاص", variant: "destructive" });
+      return;
+    }
+    if (user.user_roles?.some(r => r.role === "nazer")) {
+      toast({ title: "تحذير", description: "لا يمكن حذف حساب الناظر", variant: "destructive" });
+      return;
+    }
+    deleteUserMutation.mutate(user.user_id);
+  }, [currentUser?.id, deleteUserMutation, toast]);
+
+  const showNotAvailableToast = useCallback(() => {
+    toast({ 
+      title: "غير متاح", 
+      description: "هذا المستخدم ليس لديه حساب مفعّل في النظام", 
+      variant: "destructive" 
+    });
+  }, [toast]);
+
   const value: UsersContextValue = {
     users,
+    filteredUsers,
     isLoading,
     error: error as Error | null,
     refetch,
     
-    deleteUser: (userId: string) => deleteUserMutation.mutate(userId),
+    searchTerm,
+    setSearchTerm,
+    roleFilter,
+    setRoleFilter,
+    
+    deleteUser: handleDeleteUser,
     updateRoles: (userId: string, roles: AppRole[]) => 
       updateRolesMutation.mutate({ userId, roles }),
     updateStatus: (userId: string, isActive: boolean) => 
@@ -63,6 +117,9 @@ export function UsersProvider({ children }: { children: ReactNode }) {
     isUpdatingRoles,
     isUpdatingStatus,
     isResettingPassword,
+    
+    currentUserId: currentUser?.id,
+    showNotAvailableToast,
   };
 
   return (

@@ -1,6 +1,7 @@
 /**
  * Hook لإدارة المستخدمين
  * Users Management Hook
+ * @version 2.9.11
  */
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -10,6 +11,7 @@ import { type UserProfile } from "@/types/auth";
 import { AuthService } from "@/services/auth.service";
 import { invalidateUserQueries } from "@/lib/query-invalidation";
 import { QUERY_KEYS } from "@/lib/query-keys";
+import { productionLogger } from "@/lib/logger/production-logger";
 
 // Re-export UserProfile for backward compatibility
 export type { UserProfile } from "@/types/auth";
@@ -46,7 +48,7 @@ export function useDeleteUser() {
       invalidateUserQueries(queryClient);
     },
     onError: (error) => {
-      console.error("Error deleting user:", error);
+      productionLogger.error("Error deleting user:", error);
       toast({
         title: "خطأ",
         description: "حدث خطأ أثناء حذف المستخدم",
@@ -75,7 +77,7 @@ export function useUpdateUserRoles() {
       invalidateUserQueries(queryClient);
     },
     onError: (error) => {
-      console.error("Error updating roles:", error);
+      productionLogger.error("Error updating roles:", error);
       toast({
         title: "خطأ",
         description: "حدث خطأ أثناء تحديث الأدوار",
@@ -104,7 +106,7 @@ export function useUpdateUserStatus() {
       invalidateUserQueries(queryClient);
     },
     onError: (error) => {
-      console.error("Error updating status:", error);
+      productionLogger.error("Error updating status:", error);
       toast({
         title: "خطأ",
         description: "حدث خطأ أثناء تحديث الحالة",
