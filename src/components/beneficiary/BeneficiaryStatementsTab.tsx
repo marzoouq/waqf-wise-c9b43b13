@@ -2,16 +2,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { Download } from "lucide-react";
+import { Download, FileText } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { useBeneficiaryStatements } from "@/hooks/beneficiary/useBeneficiaryTabsData";
+import { useBeneficiaryDistributions } from "@/hooks/beneficiary/useBeneficiaryDistributions";
 import { MaskedValue } from "@/components/shared/MaskedValue";
 import { toast } from "sonner";
 import { productionLogger } from "@/lib/logger/production-logger";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MobileStatementCard } from "./cards/MobileStatementCard";
 import { useBeneficiaryExport } from "@/hooks/beneficiary/useBeneficiaryExport";
+import { formatCurrency } from "@/lib/utils";
 
 interface BeneficiaryStatementsTabProps {
   beneficiaryId: string;
@@ -20,8 +22,14 @@ interface BeneficiaryStatementsTabProps {
 export function BeneficiaryStatementsTab({ beneficiaryId }: BeneficiaryStatementsTabProps) {
   const { settings } = useVisibilitySettings();
   const isMobile = useIsMobile();
-  const { data: payments = [], isLoading } = useBeneficiaryStatements(beneficiaryId);
+  const { data: payments = [], isLoading: paymentsLoading } = useBeneficiaryStatements(beneficiaryId);
+  const { distributions, isLoading: distributionsLoading } = useBeneficiaryDistributions(beneficiaryId);
   const { exportJournalEntries } = useBeneficiaryExport();
+
+  const isLoading = paymentsLoading || distributionsLoading;
+  
+  // حساب إجمالي التوزيعات
+  const totalDistributed = distributions?.reduce((sum, d) => sum + (d.share_amount || 0), 0) || 0;
 
   const handleExport = async () => {
     try {
@@ -81,9 +89,83 @@ export function BeneficiaryStatementsTab({ beneficiaryId }: BeneficiaryStatement
           )}
         </CardHeader>
         <CardContent>
-          <p className="text-center text-muted-foreground py-4">
-            لا توجد معلومات مالية متاحة
-          </p>
+          {isLoading ? (
+            <div className="text-center py-8">جاري التحميل...</div>
+          ) : distributions && distributions.length > 0 ? (
+            <div className="space-y-4">
+              {/* ملخص الحساب */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="p-4 rounded-lg bg-success/10 border border-success/20">
+                  <div className="text-sm text-muted-foreground">إجمالي المستلم</div>
+                  <div className="text-2xl font-bold text-success">
+                    {settings?.mask_exact_amounts ? (
+                      <MaskedValue value={String(totalDistributed)} type="amount" masked />
+                    ) : (
+                      formatCurrency(totalDistributed)
+                    )}
+                  </div>
+                </div>
+                <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
+                  <div className="text-sm text-muted-foreground">عدد التوزيعات</div>
+                  <div className="text-2xl font-bold text-primary">{distributions.length}</div>
+                </div>
+                <div className="p-4 rounded-lg bg-muted border">
+                  <div className="text-sm text-muted-foreground">آخر توزيع</div>
+                  <div className="text-lg font-semibold">
+                    {distributions[0]?.distribution_date 
+                      ? format(new Date(distributions[0].distribution_date), "dd/MM/yyyy", { locale: ar })
+                      : "—"}
+                  </div>
+                </div>
+              </div>
+
+              {/* جدول التوزيعات */}
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-right">التاريخ</TableHead>
+                      <TableHead className="text-right">السنة المالية</TableHead>
+                      <TableHead className="text-right">المبلغ</TableHead>
+                      <TableHead className="text-right">نوع الوريث</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {distributions.map((dist) => (
+                      <TableRow key={dist.id}>
+                        <TableCell>
+                          {dist.distribution_date && format(new Date(dist.distribution_date), "dd/MM/yyyy", { locale: ar })}
+                        </TableCell>
+                        <TableCell>{dist.fiscal_years?.name || "—"}</TableCell>
+                        <TableCell className="font-semibold text-success">
+                          {settings?.mask_exact_amounts ? (
+                            <MaskedValue value={String(dist.share_amount || 0)} type="amount" masked />
+                          ) : (
+                            formatCurrency(dist.share_amount || 0)
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                            dist.heir_type === 'ابن' ? 'bg-heir-son/10 text-heir-son' :
+                            dist.heir_type === 'بنت' ? 'bg-heir-daughter/10 text-heir-daughter' :
+                            dist.heir_type === 'زوجة' ? 'bg-heir-wife/10 text-heir-wife' :
+                            'bg-muted text-muted-foreground'
+                          }`}>
+                            {dist.heir_type}
+                          </span>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
+              <p className="text-muted-foreground">لا توجد توزيعات مسجلة بعد</p>
+            </div>
+          )}
         </CardContent>
       </Card>
 

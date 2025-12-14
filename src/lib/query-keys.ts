@@ -260,6 +260,8 @@ export const QUERY_KEYS = {
   // Governance
   GOVERNANCE: ['governance'] as const,
   GOVERNANCE_DOCUMENTS: ['governance-documents'] as const,
+  GOVERNANCE_MEETINGS: ['governance-meetings'] as const,
+  GOVERNANCE_DECISIONS: ['governance-decisions'] as const,
 
   // Knowledge Base
   KNOWLEDGE_ARTICLES: ['knowledge-articles'] as const,
@@ -487,7 +489,6 @@ export const QUERY_KEYS = {
   // Governance Voting
   GOVERNANCE_VOTES: (decisionId: string) => ['governance-votes', decisionId] as const,
   USER_VOTE: (decisionId: string) => ['user-vote', decisionId] as const,
-  GOVERNANCE_DECISIONS: ['governance-decisions'] as const,
   
   // Properties Stats
   PROPERTIES_STATS: ['properties-stats'] as const,

@@ -33,6 +33,7 @@ export function useBeneficiaryPortalData() {
     data: beneficiary,
     isLoading: beneficiaryLoading,
     error: beneficiaryError,
+    refetch,
   } = useQuery({
     queryKey: isNazerPreview 
       ? ['preview-beneficiary', previewBeneficiaryId] 
@@ -77,5 +78,6 @@ export function useBeneficiaryPortalData() {
     isStatisticsLoading: statisticsLoading,
     error: beneficiaryError,
     isPreviewMode: isNazerPreview,
+    refetch,
   };
 }
