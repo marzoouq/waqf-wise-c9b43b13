@@ -6,7 +6,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { AppRole } from "@/hooks/useUserRole";
+import { type AppRole } from "@/types/roles";
 import { SecurityService } from "@/services";
 import { QUERY_KEYS } from "@/lib/query-keys";
 

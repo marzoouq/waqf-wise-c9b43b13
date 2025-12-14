@@ -10,31 +10,12 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { useUserRole } from "@/hooks/useUserRole";
 import { Shield, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { ROLE_LABELS, ROLE_COLORS, type AllRole } from "@/types/roles";
 
 interface RolesSettingsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
-
-const ROLE_LABELS = {
-  admin: "المشرف",
-  nazer: "الناظر",
-  accountant: "المحاسب",
-  cashier: "موظف الصرف",
-  archivist: "الأرشيفي",
-  beneficiary: "مستفيد",
-  user: "مستخدم",
-};
-
-const ROLE_COLORS = {
-  admin: "bg-destructive text-destructive-foreground",
-  nazer: "bg-primary text-primary-foreground",
-  accountant: "bg-success text-success-foreground",
-  cashier: "bg-warning text-warning-foreground",
-  archivist: "bg-info text-info-foreground",
-  beneficiary: "bg-accent text-accent-foreground",
-  user: "bg-muted text-muted-foreground",
-};
 
 const ROLE_PERMISSIONS = {
   admin: [
@@ -103,11 +84,11 @@ export function RolesSettingsDialog({
             <h3 className="font-semibold mb-3">أدوارك الحالية</h3>
             <div className="flex flex-wrap gap-2">
               {roles.map((role) => (
-                <Badge
-                  key={role}
-                  className={ROLE_COLORS[role as keyof typeof ROLE_COLORS]}
-                >
-                  {ROLE_LABELS[role as keyof typeof ROLE_LABELS]}
+                  <Badge
+                    key={role}
+                    className={ROLE_COLORS[role as AllRole]}
+                  >
+                    {ROLE_LABELS[role as AllRole]}
                 </Badge>
               ))}
             </div>
@@ -123,9 +104,9 @@ export function RolesSettingsDialog({
                 <Card key={role} className="p-4">
                   <div className="flex items-center gap-2 mb-3">
                     <Badge
-                      className={ROLE_COLORS[role as keyof typeof ROLE_COLORS]}
+                      className={ROLE_COLORS[role as AllRole]}
                     >
-                      {ROLE_LABELS[role as keyof typeof ROLE_LABELS]}
+                      {ROLE_LABELS[role as AllRole]}
                     </Badge>
                   </div>
                   <ul className="space-y-2">
