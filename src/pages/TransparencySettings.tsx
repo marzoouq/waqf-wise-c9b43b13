@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowRight, Save, RotateCcw, Eye, Shield, DollarSign, Users, Lock, Briefcase, CreditCard, PieChart, MessageSquare } from "lucide-react";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { ErrorState } from "@/components/shared/ErrorState";
+import { LoadingState } from "@/components/shared/LoadingState";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { Separator } from "@/components/ui/separator";
@@ -22,7 +23,7 @@ export default function TransparencySettings() {
   const [activeRole, setActiveRole] = useState<'beneficiary' | 'waqf_heir'>('beneficiary');
   
   // جلب الإعدادات حسب الدور النشط
-  const { settings, isLoading, updateSettings, isUpdating } = useVisibilitySettings(activeRole);
+  const { settings, isLoading, error, refetch, updateSettings, isUpdating } = useVisibilitySettings(activeRole);
   const [localSettings, setLocalSettings] = useState(settings);
 
   useEffect(() => {
@@ -63,9 +64,15 @@ export default function TransparencySettings() {
   if (isLoading || !settings) {
     return (
       <MobileOptimizedLayout>
-        <div className="flex items-center justify-center h-[50vh]">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        </div>
+        <LoadingState message="جاري تحميل إعدادات الشفافية..." />
+      </MobileOptimizedLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <MobileOptimizedLayout>
+        <ErrorState title="خطأ في التحميل" message="فشل تحميل إعدادات الشفافية" onRetry={refetch} />
       </MobileOptimizedLayout>
     );
   }
