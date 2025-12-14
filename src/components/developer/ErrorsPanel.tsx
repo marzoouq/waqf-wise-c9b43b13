@@ -123,7 +123,7 @@ export function ErrorsPanel() {
               onClick={() => deleteResolvedErrors.mutate()}
               disabled={deleteResolvedErrors.isPending}
             >
-              <Trash2 className="w-4 h-4 ml-2" />
+              <Trash2 className="w-4 h-4 ms-2" />
               حذف المحلولة
             </Button>
             <Button
@@ -136,7 +136,7 @@ export function ErrorsPanel() {
               }}
               disabled={deleteAllErrors.isPending}
             >
-              <Trash2 className="w-4 h-4 ml-2" />
+              <Trash2 className="w-4 h-4 ms-2" />
               حذف الكل
             </Button>
             <Button
@@ -144,7 +144,7 @@ export function ErrorsPanel() {
               size="sm"
               onClick={() => refetch()}
             >
-              <RefreshCw className="w-4 h-4 ml-2" />
+              <RefreshCw className="w-4 h-4 ms-2" />
               تحديث
             </Button>
           </div>

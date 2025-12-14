@@ -147,11 +147,11 @@ export function AdvancedFiltersDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={handleClear}>
-            <X className="h-4 w-4 ml-2" />
+            <X className="h-4 w-4 ms-2" />
             مسح الفلاتر
           </Button>
           <Button onClick={handleApply}>
-            <Filter className="h-4 w-4 ml-2" />
+            <Filter className="h-4 w-4 ms-2" />
             تطبيق
           </Button>
         </DialogFooter>

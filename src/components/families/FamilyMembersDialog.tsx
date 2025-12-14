@@ -77,7 +77,7 @@ export function FamilyMembersDialog({ open, onOpenChange, familyId, familyName }
                       <TableCell className="font-medium">
                         {member.full_name}
                         {member.is_head_of_family && (
-                          <Badge variant="default" className="mr-2 text-xs">
+                          <Badge variant="default" className="me-2 text-xs">
                             رب الأسرة
                           </Badge>
                         )}

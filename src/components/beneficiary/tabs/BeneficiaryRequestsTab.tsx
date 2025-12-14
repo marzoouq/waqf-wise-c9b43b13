@@ -69,7 +69,7 @@ export function BeneficiaryRequestsTab({ beneficiaryId }: BeneficiaryRequestsTab
             <CardDescription>جميع الطلبات المقدمة مع حالتها الحالية</CardDescription>
           </div>
           <Button onClick={() => setIsDialogOpen(true)}>
-            <Plus className="h-4 w-4 ml-2" />
+            <Plus className="h-4 w-4 ms-2" />
             طلب جديد
           </Button>
         </CardHeader>
@@ -136,7 +136,7 @@ export function BeneficiaryRequestsTab({ beneficiaryId }: BeneficiaryRequestsTab
                           size="sm"
                           onClick={() => setSelectedRequestId(request.id)}
                         >
-                          <Eye className="h-4 w-4 ml-1" />
+                          <Eye className="h-4 w-4 ms-1" />
                           عرض
                         </Button>
                       </TableCell>

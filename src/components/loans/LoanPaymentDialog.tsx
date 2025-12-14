@@ -180,7 +180,7 @@ export function LoanPaymentDialog({
                       !paymentDate && "text-muted-foreground"
                     )}
                   >
-                    <CalendarIcon className="ml-2 h-4 w-4" />
+                    <CalendarIcon className="ms-2 h-4 w-4" />
                     {paymentDate ? (
                       format(paymentDate, "PPP", { locale: ar })
                     ) : (

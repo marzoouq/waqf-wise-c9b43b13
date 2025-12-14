@@ -99,7 +99,7 @@ export function ArticleViewDialog({ articleId, open, onOpenChange, onRate }: Art
                     toast.success('شكراً لتقييمك الإيجابي!');
                   }}
                 >
-                  <ThumbsUp className="h-4 w-4 ml-2" />
+                  <ThumbsUp className="h-4 w-4 ms-2" />
                   مفيدة ({article.helpful_count || 0})
                 </Button>
                 <Button
@@ -110,18 +110,18 @@ export function ArticleViewDialog({ articleId, open, onOpenChange, onRate }: Art
                     toast.info('شكراً لملاحظاتك، سنعمل على تحسين المحتوى');
                   }}
                 >
-                  <ThumbsDown className="h-4 w-4 ml-2" />
+                  <ThumbsDown className="h-4 w-4 ms-2" />
                   غير مفيدة ({article.not_helpful_count || 0})
                 </Button>
               </div>
 
               <div className="flex items-center gap-2">
                 <Button variant="ghost" size="sm" onClick={handleShare}>
-                  <Share2 className="h-4 w-4 ml-2" />
+                  <Share2 className="h-4 w-4 ms-2" />
                   مشاركة
                 </Button>
                 <Button variant="ghost" size="sm">
-                  <Bookmark className="h-4 w-4 ml-2" />
+                  <Bookmark className="h-4 w-4 ms-2" />
                   حفظ
                 </Button>
               </div>
