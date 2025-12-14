@@ -9,10 +9,11 @@ import { formatCurrency } from "@/lib/utils";
 import { useFiscalYearPublishStatus } from "@/hooks/useFiscalYearPublishStatus";
 import { usePropertyStats } from "@/hooks/beneficiary/useBeneficiaryTabsData";
 import { PropertyUnitsDisplay } from "./properties/PropertyUnitsDisplay";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export function PropertyStatsCards() {
   const { isCurrentYearPublished, isLoading: publishStatusLoading } = useFiscalYearPublishStatus();
-  const { data, isLoading: dataLoading } = usePropertyStats();
+  const { data, isLoading: dataLoading, error, refetch } = usePropertyStats();
 
   const isLoading = dataLoading || publishStatusLoading;
   const properties = data?.properties || [];
@@ -33,6 +34,10 @@ export function PropertyStatsCards() {
         </div>
       </div>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في التحميل" message="فشل تحميل إحصائيات العقارات" onRetry={refetch} />;
   }
 
   const totalProperties = properties.length;

@@ -4,9 +4,11 @@ import { Badge } from "@/components/ui/badge";
 import { FileText, Printer, Download } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { usePaymentVouchersList } from "@/hooks/distributions/useDistributionTabsData";
+import { ErrorState } from "@/components/shared/ErrorState";
+import { LoadingState } from "@/components/shared/LoadingState";
 
 export function PaymentVouchers() {
-  const { data: vouchers, isLoading } = usePaymentVouchersList();
+  const { data: vouchers, isLoading, error, refetch } = usePaymentVouchersList();
 
   const getStatusBadge = (status: string) => {
     const variants = {
@@ -25,7 +27,11 @@ export function PaymentVouchers() {
   };
 
   if (isLoading) {
-    return <div className="text-center p-8">جاري التحميل...</div>;
+    return <LoadingState message="جاري تحميل سندات الصرف..." />;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في التحميل" message="فشل تحميل سندات الصرف" onRetry={refetch} />;
   }
 
   return (

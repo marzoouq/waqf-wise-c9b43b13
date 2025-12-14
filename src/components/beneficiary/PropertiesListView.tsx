@@ -2,13 +2,18 @@ import { useProperties } from "@/hooks/useProperties";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { LoadingState } from "@/components/shared/LoadingState";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Building2 } from "lucide-react";
 
 export function PropertiesListView() {
-  const { properties, isLoading } = useProperties();
+  const { properties, isLoading, error, refetch } = useProperties();
 
   if (isLoading) return <LoadingState message="جاري تحميل العقارات..." />;
+
+  if (error) {
+    return <ErrorState title="خطأ في التحميل" message="فشل تحميل بيانات العقارات" onRetry={refetch} />;
+  }
   
   if (!properties || properties.length === 0) {
     return <EmptyState icon={Building2} title="لا توجد عقارات" description="لم يتم تسجيل أي عقارات بعد" />;

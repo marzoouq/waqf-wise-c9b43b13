@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useRequestApprovals } from "@/hooks/approvals";
 import { useDialogState } from "@/hooks/ui/useDialogState";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export function RequestApprovalsTab() {
   const approveDialog = useDialogState<RequestWithBeneficiary>();
@@ -17,7 +18,7 @@ export function RequestApprovalsTab() {
   const [notes, setNotes] = useState("");
   const [rejectionReason, setRejectionReason] = useState("");
 
-  const { data: requests, isLoading, approveMutation, rejectMutation } = useRequestApprovals();
+  const { data: requests, isLoading, error, refetch, approveMutation, rejectMutation } = useRequestApprovals();
 
   const getStatusBadge = (status: string) => {
     const config: StatusConfigMap = {
@@ -41,6 +42,10 @@ export function RequestApprovalsTab() {
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
       </div>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في التحميل" message="فشل تحميل موافقات الطلبات" onRetry={refetch} />;
   }
 
   return (

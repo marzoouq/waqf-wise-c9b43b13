@@ -37,7 +37,7 @@ export interface KPI {
 export function useKPIs(category?: string) {
   const queryClient = useQueryClient();
 
-  const { data: kpis = [], isLoading, isRefetching, dataUpdatedAt } = useQuery({
+  const { data: kpis = [], isLoading, isRefetching, dataUpdatedAt, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.KPIS(category),
     ...QUERY_CONFIG.REPORTS,
     queryFn: async () => {
@@ -93,8 +93,10 @@ export function useKPIs(category?: string) {
     kpis,
     isLoading,
     isRefetching,
-    lastUpdated: dataUpdatedAt ? new Date(dataUpdatedAt) : undefined,
+    lastUpdated: dataUpdatedAt ? new Date(dataUpdatedAt) : new Date(),
     refresh: handleRefresh,
+    error,
+    refetch,
   };
 }
 

@@ -26,7 +26,7 @@ const DOCUMENT_TYPE_LABELS: Record<string, string> = {
 };
 
 export function useSmartDisclosureDocuments(disclosureId?: string) {
-  const { data: documents = [], isLoading } = useQuery({
+  const { data: documents = [], isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.SMART_DISCLOSURE_DOCUMENTS(disclosureId),
     queryFn: () => DisclosureService.getSmartDocuments(disclosureId!),
     enabled: !!disclosureId,
@@ -54,6 +54,8 @@ export function useSmartDisclosureDocuments(disclosureId?: string) {
     documents,
     categorySummary,
     isLoading,
+    error,
+    refetch,
     getTypeLabel: (type: string) => DOCUMENT_TYPE_LABELS[type] || type,
   };
 }

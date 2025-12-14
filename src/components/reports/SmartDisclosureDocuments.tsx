@@ -18,13 +18,14 @@ import {
 import { useSmartDisclosureDocuments } from "@/hooks/reports/useSmartDisclosureDocuments";
 import { DocumentContentViewer, ExtractedContent } from "./DocumentContentViewer";
 import { DocumentCategorySummary } from "./DocumentCategorySummary";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 interface SmartDisclosureDocumentsProps {
   disclosureId?: string;
 }
 
 export function SmartDisclosureDocuments({ disclosureId }: SmartDisclosureDocumentsProps) {
-  const { documents, categorySummary, isLoading, getTypeLabel } = useSmartDisclosureDocuments(disclosureId);
+  const { documents, categorySummary, isLoading, error, refetch, getTypeLabel } = useSmartDisclosureDocuments(disclosureId);
   const [viewMode, setViewMode] = useState<'summary' | 'details'>('summary');
 
   if (isLoading) {
@@ -46,6 +47,10 @@ export function SmartDisclosureDocuments({ disclosureId }: SmartDisclosureDocume
         </CardContent>
       </Card>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في التحميل" message="فشل تحميل المستندات" onRetry={refetch} />;
   }
 
   if (!documents.length) {

@@ -35,7 +35,7 @@ export function useProperties() {
   const { addActivity } = useActivities();
   const { user } = useAuth();
 
-  const { data: properties = [], isLoading } = useQuery({
+  const { data: properties = [], isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.PROPERTIES,
     queryFn: () => PropertyService.getAll(),
     staleTime: 10 * 60 * 1000,
@@ -112,6 +112,8 @@ export function useProperties() {
   return {
     properties,
     isLoading,
+    error,
+    refetch,
     addProperty: addProperty.mutateAsync,
     updateProperty: updateProperty.mutateAsync,
     deleteProperty: deleteProperty.mutateAsync,
