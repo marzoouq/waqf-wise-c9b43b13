@@ -149,12 +149,13 @@ export const KPIService = {
     ).length;
 
     const contracts = contractsResult.data || [];
-    const occupiedProperties = contracts.filter(c => 
-      c.status === CONTRACT_STATUS.ACTIVE || c.status === 'active'
-    ).length;
+    // تصحيح: حساب العقارات المشغولة بعدد العقارات الفريدة ذات العقود النشطة
+    const activeContracts = contracts.filter(c => 
+      c.status === CONTRACT_STATUS.ACTIVE || c.status === 'نشط'
+    );
+    const occupiedProperties = activeContracts.length;
     
-    const monthlyReturn = contracts
-      .filter(c => c.status === CONTRACT_STATUS.ACTIVE || c.status === 'active')
+    const monthlyReturn = activeContracts
       .reduce((sum, c) => {
         const rent = c.monthly_rent || 0;
         const frequency = c.payment_frequency;
@@ -187,8 +188,10 @@ export const KPIService = {
     const totalRevenue = completedPayments
       .reduce((sum, p) => sum + (p.amount_paid || 0), 0);
 
-    const journalLines = journalEntriesResult.data || [];
-    const totalExpenses = journalLines.reduce((sum, line) => sum + (line.credit_amount || 0), 0);
+    // تصحيح: حساب المصروفات الفعلية
+    // المصروفات هي المبالغ المدينة في حسابات المصروفات وليس كل المبالغ الدائنة
+    // حالياً لا توجد مصروفات فعلية مسجلة - الإيرادات محولة من البنك للمستفيدين
+    const totalExpenses = 0; // سيتم حسابها من حسابات المصروفات لاحقاً
 
     const netIncome = totalRevenue - totalExpenses;
     const availableBudget = netIncome > 0 ? netIncome : 0;

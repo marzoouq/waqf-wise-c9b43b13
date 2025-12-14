@@ -88,7 +88,7 @@ export const FinancialCardsService = {
       supabase
         .from("contracts")
         .select("monthly_rent, payment_frequency")
-        .eq("status", "active"),
+        .eq("status", "نشط"), // تصحيح: استخدام الحالة العربية
     ]);
 
     const payments = paymentsResult.data || [];
@@ -111,8 +111,9 @@ export const FinancialCardsService = {
       }
     }, 0);
 
+    // السماح بنسبة أعلى من 100% لإظهار التحصيل الزائد
     const progress = expectedRevenue > 0 
-      ? Math.min((totalCollected / expectedRevenue) * 100, 100) 
+      ? (totalCollected / expectedRevenue) * 100
       : 0;
 
     return { totalCollected, netRevenue, totalTax, expectedRevenue, progress };

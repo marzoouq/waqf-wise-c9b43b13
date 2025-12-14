@@ -40,9 +40,15 @@ export function RevenueProgressCard() {
         <div>
           <div className="flex justify-between text-sm mb-2">
             <span className="text-muted-foreground">نسبة التحصيل</span>
-            <span className="font-bold text-success">{data.progress.toFixed(1)}%</span>
+            <span className={`font-bold ${data.progress > 100 ? 'text-primary' : 'text-success'}`}>
+              {data.progress.toFixed(1)}%
+              {data.progress > 100 && ' ✓'}
+            </span>
           </div>
-          <Progress value={data.progress} className="h-3" />
+          <Progress value={Math.min(data.progress, 100)} className="h-3" />
+          {data.progress > 100 && (
+            <p className="text-xs text-primary mt-1">تم تجاوز الهدف المتوقع!</p>
+          )}
         </div>
 
         <div className="grid grid-cols-3 gap-3 pt-2">
