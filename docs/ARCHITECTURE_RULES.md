@@ -136,6 +136,7 @@ grep -r "\.select.*\.eq.*\.single()" src/services/ --include="*.ts"
 | استخدام `.maybeSingle()` | 474+ | ✅ |
 | QUERY_KEYS موحد | 390+ | ✅ |
 | RLS Policies | 646 | ✅ |
+| Database Triggers | 178 | ✅ |
 
 ---
 
