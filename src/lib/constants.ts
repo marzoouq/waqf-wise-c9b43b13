@@ -242,3 +242,21 @@ export const FILE_LIMITS = {
   MAX_SIZE_MB: 10,
   ALLOWED_TYPES: ["pdf", "png", "jpg", "jpeg", "doc", "docx", "xls", "xlsx"],
 } as const;
+
+// Dashboard Metrics Constants
+export const DASHBOARD_METRICS = {
+  ACTIVITY_DAYS: 7,
+  PERFORMANCE_HOURS_INTERVAL: 4,
+  PERFORMANCE_LOOKBACK_DAYS: 1,
+  MAX_ALERTS_DISPLAY: 10,
+  MAX_RECENT_ENTRIES: 5,
+  REFRESH_INTERVAL_MS: 5 * 60 * 1000, // 5 minutes
+} as const;
+
+// Chart Display Constants  
+export const CHART_CONSTANTS = {
+  DEFAULT_HEIGHT: 300,
+  MOBILE_HEIGHT: 200,
+  ANIMATION_DURATION: 300,
+  LEGEND_POSITION: "bottom",
+} as const;

@@ -386,4 +386,18 @@ export class MonitoringService {
     if (error) throw error;
     return data;
   }
+
+  /**
+   * جلب بيانات فحوصات صحة النظام
+   */
+  static async getHealthCheckData(since: Date) {
+    const { data, error } = await supabase
+      .from("system_health_checks")
+      .select("id, created_at, status, response_time_ms")
+      .gte("created_at", since.toISOString())
+      .order("created_at", { ascending: true });
+
+    if (error) throw error;
+    return data || [];
+  }
 }
