@@ -3,12 +3,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { Home } from "lucide-react";
 
 export function PropertyUnitsGrid() {
-  const { units, isLoading } = usePropertyUnits();
+  const { units, isLoading, error, refetch } = usePropertyUnits();
 
   if (isLoading) return <LoadingState message="جاري تحميل الوحدات..." />;
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل الوحدات" message={error.message} onRetry={refetch} />;
+  }
   
   if (!units || units.length === 0) {
     return <EmptyState icon={Home} title="لا توجد وحدات" description="لم يتم تسجيل أي وحدات بعد" />;

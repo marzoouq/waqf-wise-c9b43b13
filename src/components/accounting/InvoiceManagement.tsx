@@ -15,6 +15,8 @@ import { BatchInvoiceOCR } from "@/components/invoices/BatchInvoiceOCR";
 import { useInvoiceManagement } from "@/hooks/accounting/useInvoiceManagement";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import { LoadingState } from "@/components/shared/LoadingState";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export function InvoiceManagement() {
   const { toast } = useToast();
@@ -22,7 +24,7 @@ export function InvoiceManagement() {
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const [showOCRDialog, setShowOCRDialog] = useState(false);
   
-  const { invoices, isLoading, updateStatus } = useInvoiceManagement(selectedStatus);
+  const { invoices, isLoading, error, refetch, updateStatus } = useInvoiceManagement(selectedStatus);
 
   const getStatusBadge = (status: string) => {
     const variants = {
@@ -37,7 +39,11 @@ export function InvoiceManagement() {
   };
 
   if (isLoading) {
-    return <div className="text-center p-8">جاري التحميل...</div>;
+    return <LoadingState message="جاري تحميل الفواتير..." />;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل الفواتير" message={error.message} onRetry={refetch} />;
   }
 
   return (

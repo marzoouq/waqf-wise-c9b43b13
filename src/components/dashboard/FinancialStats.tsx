@@ -3,9 +3,10 @@ import { useFinancialData } from "@/hooks/useFinancialData";
 import { formatCurrency } from "@/lib/utils";
 import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 const FinancialStats = () => {
-  const { data, isLoading } = useFinancialData();
+  const { data, isLoading, error, refetch } = useFinancialData();
 
   if (isLoading) {
     return (
@@ -21,6 +22,10 @@ const FinancialStats = () => {
         ))}
       </UnifiedStatsGrid>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل البيانات المالية" message={(error as Error).message} onRetry={refetch} />;
   }
 
   if (!data) return null;

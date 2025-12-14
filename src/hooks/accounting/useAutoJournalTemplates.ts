@@ -15,7 +15,7 @@ export function useAutoJournalTemplates() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const { data: templates, isLoading } = useQuery({
+  const { data: templates, isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.AUTO_JOURNAL_TEMPLATES,
     queryFn: () => AutoJournalService.getTemplates(),
   });
@@ -65,6 +65,8 @@ export function useAutoJournalTemplates() {
   return {
     templates: templates || [],
     isLoading,
+    error: error as Error | null,
+    refetch,
     createTemplate: createTemplate.mutateAsync,
     updateTemplate: updateTemplate.mutateAsync,
     deleteTemplate: deleteTemplate.mutateAsync,
