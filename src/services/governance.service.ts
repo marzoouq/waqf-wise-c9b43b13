@@ -1,11 +1,13 @@
 /**
  * Governance Service - خدمة الحوكمة
- * @version 2.8.44
+ * @version 2.9.10
  */
 
 import { supabase } from '@/integrations/supabase/client';
 import { productionLogger } from '@/lib/logger/production-logger';
 import type { Database, Json } from '@/integrations/supabase/types';
+import type { PaginatedResponse, PaginationParams } from '@/lib/pagination.types';
+import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from '@/lib/pagination.types';
 
 type GovernanceDecisionRow = Database['public']['Tables']['governance_decisions']['Row'];
 type GovernanceDecisionInsert = Database['public']['Tables']['governance_decisions']['Insert'];
@@ -40,6 +42,49 @@ export class GovernanceService {
       return data || [];
     } catch (error) {
       productionLogger.error('Error fetching governance decisions', error);
+      throw error;
+    }
+  }
+
+  /**
+   * جلب قرارات الحوكمة مع الترقيم من السيرفر
+   */
+  static async getDecisionsPaginated(
+    params: PaginationParams = { page: DEFAULT_PAGE, pageSize: DEFAULT_PAGE_SIZE },
+    filters?: { status?: string }
+  ): Promise<PaginatedResponse<GovernanceDecisionRow>> {
+    try {
+      const { page, pageSize } = params;
+      const from = (page - 1) * pageSize;
+      const to = from + pageSize - 1;
+
+      // جلب العدد الكلي
+      let countQuery = supabase.from('governance_decisions').select('*', { count: 'exact', head: true });
+      if (filters?.status) countQuery = countQuery.eq('decision_status', filters.status);
+      const { count } = await countQuery;
+
+      // جلب البيانات
+      let dataQuery = supabase
+        .from('governance_decisions')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .range(from, to);
+      
+      if (filters?.status) dataQuery = dataQuery.eq('decision_status', filters.status);
+      
+      const { data, error } = await dataQuery;
+      if (error) throw error;
+
+      const totalCount = count || 0;
+      return {
+        data: data || [],
+        totalCount,
+        page,
+        pageSize,
+        totalPages: Math.ceil(totalCount / pageSize),
+      };
+    } catch (error) {
+      productionLogger.error('Error fetching paginated governance decisions', error);
       throw error;
     }
   }

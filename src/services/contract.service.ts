@@ -1,11 +1,13 @@
 /**
  * Contract Service - خدمة العقود
- * @version 2.7.0
+ * @version 2.9.10
  */
 
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { CONTRACT_STATUS } from "@/lib/constants";
+import type { PaginatedResponse, PaginationParams } from "@/lib/pagination.types";
+import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from "@/lib/pagination.types";
 
 type Contract = Database['public']['Tables']['contracts']['Row'];
 type ContractInsert = Database['public']['Tables']['contracts']['Insert'];
@@ -31,6 +33,46 @@ export class ContractService {
 
     if (error) throw error;
     return data || [];
+  }
+
+  /**
+   * جلب العقود مع الترقيم من السيرفر
+   */
+  static async getPaginated(
+    params: PaginationParams = { page: DEFAULT_PAGE, pageSize: DEFAULT_PAGE_SIZE },
+    filters?: { status?: string; propertyId?: string }
+  ): Promise<PaginatedResponse<Contract & { properties?: { name: string; type: string; location: string } | null }>> {
+    const { page, pageSize } = params;
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
+
+    // جلب العدد الكلي
+    let countQuery = supabase.from('contracts').select('*', { count: 'exact', head: true });
+    if (filters?.status) countQuery = countQuery.eq('status', filters.status);
+    if (filters?.propertyId) countQuery = countQuery.eq('property_id', filters.propertyId);
+    const { count } = await countQuery;
+
+    // جلب البيانات
+    let dataQuery = supabase
+      .from('contracts')
+      .select(`*, properties(name, type, location)`)
+      .order('created_at', { ascending: false })
+      .range(from, to);
+    
+    if (filters?.status) dataQuery = dataQuery.eq('status', filters.status);
+    if (filters?.propertyId) dataQuery = dataQuery.eq('property_id', filters.propertyId);
+    
+    const { data, error } = await dataQuery;
+    if (error) throw error;
+
+    const totalCount = count || 0;
+    return {
+      data: data || [],
+      totalCount,
+      page,
+      pageSize,
+      totalPages: Math.ceil(totalCount / pageSize),
+    };
   }
 
   static async getById(id: string): Promise<Contract | null> {
