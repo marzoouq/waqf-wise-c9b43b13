@@ -1,28 +1,26 @@
 /**
  * Users Page
- * صفحة إدارة المستخدمين - مُحسّنة مع UsersContext
- * @version 2.9.11
+ * صفحة إدارة المستخدمين - مُحسّنة مع UsersContext و UsersDialogsContext
+ * @version 2.9.12
  */
 
-import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { Button } from "@/components/ui/button";
 import { Shield, Download } from "lucide-react";
-import { LoadingState } from "@/components/shared/LoadingState";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { usePermissions } from "@/hooks/usePermissions";
 import { useUsersRealtime } from "@/hooks/users/useUsersRealtime";
 import { UsersProvider, useUsersContext } from "@/contexts/UsersContext";
+import { UsersDialogsProvider, useUsersDialogsContext } from "@/contexts/UsersDialogsContext";
 import { exportUsersToCSV } from "@/utils/export-users";
-import type { AppRole } from "@/types/roles";
-import type { UserProfile } from "@/types/auth";
 
 // Components
 import { UsersFilters } from "@/components/users/UsersFilters";
 import { UsersTable } from "@/components/users/UsersTable";
+import { UsersTableSkeleton } from "@/components/users/UsersTableSkeleton";
 import { EditRolesDialog } from "@/components/users/EditRolesDialog";
 import { ResetPasswordDialog } from "@/components/users/ResetPasswordDialog";
 import { EditUserEmailDialog } from "@/components/users/EditUserEmailDialog";
@@ -34,7 +32,7 @@ const UsersContent = () => {
   // Realtime updates
   useUsersRealtime();
   
-  // Context
+  // Users Context
   const {
     filteredUsers,
     isLoading,
@@ -55,17 +53,28 @@ const UsersContent = () => {
     showNotAvailableToast,
   } = useUsersContext();
   
-  // Dialog State
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
-  const [selectedRoles, setSelectedRoles] = useState<AppRole[]>([]);
-  const [resetPasswordDialogOpen, setResetPasswordDialogOpen] = useState(false);
-  const [newPassword, setNewPassword] = useState("");
-  const [selectedUserForReset, setSelectedUserForReset] = useState<UserProfile | null>(null);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [userToDelete, setUserToDelete] = useState<UserProfile | null>(null);
-  const [editEmailDialogOpen, setEditEmailDialogOpen] = useState(false);
-  const [selectedUserForEmail, setSelectedUserForEmail] = useState<UserProfile | null>(null);
+  // Dialogs Context
+  const {
+    editRolesDialog,
+    selectedRoles,
+    openEditRolesDialog,
+    closeEditRolesDialog,
+    toggleRole,
+    
+    resetPasswordDialog,
+    newPassword,
+    setNewPassword,
+    openResetPasswordDialog,
+    closeResetPasswordDialog,
+    
+    deleteDialog,
+    openDeleteDialog,
+    closeDeleteDialog,
+    
+    editEmailDialog,
+    openEditEmailDialog,
+    closeEditEmailDialog,
+  } = useUsersDialogsContext();
 
   const canEditEmail = hasPermission("admin.edit_user_email");
 
@@ -78,8 +87,8 @@ const UsersContent = () => {
     });
   };
 
-  // Handlers
-  const handleDeleteClick = (user: UserProfile) => {
+  // Delete Handler (موحد - يستخدم Context فقط)
+  const handleDeleteClick = (user: typeof filteredUsers[0]) => {
     if (user.user_id === currentUserId) {
       toast({ title: "تحذير", description: "لا يمكنك حذف حسابك الخاص", variant: "destructive" });
       return;
@@ -88,53 +97,31 @@ const UsersContent = () => {
       toast({ title: "تحذير", description: "لا يمكن حذف حساب الناظر", variant: "destructive" });
       return;
     }
-    setUserToDelete(user);
-    setDeleteDialogOpen(true);
+    openDeleteDialog(user);
   };
 
   const handleDeleteConfirm = () => {
-    if (userToDelete) {
-      deleteUser(userToDelete);
-      setDeleteDialogOpen(false);
-      setUserToDelete(null);
+    if (deleteDialog.data) {
+      deleteUser(deleteDialog.data);
+      closeDeleteDialog();
     }
   };
 
-  const handleEditRoles = (user: UserProfile) => {
-    setSelectedUser(user);
-    setSelectedRoles(user.user_roles?.map(r => r.role as AppRole) || ["user"]);
-    setEditDialogOpen(true);
-  };
-
   const handleSaveRoles = () => {
-    if (selectedUser?.user_id && selectedRoles.length > 0) {
-      updateRoles(selectedUser.user_id, selectedRoles);
-      setEditDialogOpen(false);
-    } else if (!selectedUser?.user_id) {
+    if (editRolesDialog.data?.user_id && selectedRoles.length > 0) {
+      updateRoles(editRolesDialog.data.user_id, selectedRoles);
+      closeEditRolesDialog();
+    } else if (!editRolesDialog.data?.user_id) {
       toast({ title: "خطأ", description: "هذا المستخدم ليس لديه حساب مفعّل في النظام", variant: "destructive" });
     }
   };
 
-  const toggleRole = (role: AppRole) => {
-    if (selectedRoles.includes(role)) {
-      setSelectedRoles(selectedRoles.filter(r => r !== role));
-    } else {
-      setSelectedRoles([...selectedRoles, role]);
-    }
-  };
-
   const handleResetPassword = () => {
-    if (selectedUserForReset?.user_id) {
-      resetPassword(selectedUserForReset.user_id, newPassword);
-      setResetPasswordDialogOpen(false);
-      setNewPassword("");
-      setSelectedUserForReset(null);
+    if (resetPasswordDialog.data?.user_id) {
+      resetPassword(resetPasswordDialog.data.user_id, newPassword);
+      closeResetPasswordDialog();
     }
   };
-
-  if (isLoading) {
-    return <LoadingState message="جاري تحميل المستخدمين..." />;
-  }
 
   if (error) {
     return (
@@ -154,7 +141,7 @@ const UsersContent = () => {
         description="إدارة المستخدمين والأدوار والصلاحيات"
         icon={<Shield className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
         actions={
-          <Button onClick={handleExport} variant="outline" size="sm">
+          <Button onClick={handleExport} variant="outline" size="sm" disabled={isLoading}>
             <Download className="h-4 w-4 sm:h-5 sm:w-5 ml-2" />
             <span className="hidden sm:inline">تصدير ({filteredUsers.length})</span>
             <span className="sm:hidden">تصدير</span>
@@ -169,28 +156,26 @@ const UsersContent = () => {
         onRoleFilterChange={setRoleFilter}
       />
 
-      <UsersTable
-        users={filteredUsers}
-        currentUserId={currentUserId}
-        canEditEmail={canEditEmail}
-        onEditRoles={handleEditRoles}
-        onEditEmail={(user) => {
-          setSelectedUserForEmail(user);
-          setEditEmailDialogOpen(true);
-        }}
-        onResetPassword={(user) => {
-          setSelectedUserForReset(user);
-          setResetPasswordDialogOpen(true);
-        }}
-        onDelete={handleDeleteClick}
-        onStatusChange={(userId, isActive) => updateStatus(userId, isActive)}
-        onShowNotAvailableToast={showNotAvailableToast}
-      />
+      {isLoading ? (
+        <UsersTableSkeleton rows={5} />
+      ) : (
+        <UsersTable
+          users={filteredUsers}
+          currentUserId={currentUserId}
+          canEditEmail={canEditEmail}
+          onEditRoles={openEditRolesDialog}
+          onEditEmail={openEditEmailDialog}
+          onResetPassword={openResetPasswordDialog}
+          onDelete={handleDeleteClick}
+          onStatusChange={(userId, isActive) => updateStatus(userId, isActive)}
+          onShowNotAvailableToast={showNotAvailableToast}
+        />
+      )}
 
       <EditRolesDialog
-        open={editDialogOpen}
-        onOpenChange={setEditDialogOpen}
-        user={selectedUser}
+        open={editRolesDialog.open}
+        onOpenChange={(open) => !open && closeEditRolesDialog()}
+        user={editRolesDialog.data}
         selectedRoles={selectedRoles}
         onToggleRole={toggleRole}
         onSave={handleSaveRoles}
@@ -198,9 +183,9 @@ const UsersContent = () => {
       />
 
       <ResetPasswordDialog
-        open={resetPasswordDialogOpen}
-        onOpenChange={setResetPasswordDialogOpen}
-        user={selectedUserForReset}
+        open={resetPasswordDialog.open}
+        onOpenChange={(open) => !open && closeResetPasswordDialog()}
+        user={resetPasswordDialog.data}
         password={newPassword}
         onPasswordChange={setNewPassword}
         onReset={handleResetPassword}
@@ -208,19 +193,19 @@ const UsersContent = () => {
       />
 
       <DeleteConfirmDialog
-        open={deleteDialogOpen}
-        onOpenChange={setDeleteDialogOpen}
+        open={deleteDialog.open}
+        onOpenChange={(open) => !open && closeDeleteDialog()}
         onConfirm={handleDeleteConfirm}
         title="حذف المستخدم"
         description="هل أنت متأكد من حذف هذا المستخدم؟ سيتم حذف جميع البيانات المرتبطة به بشكل نهائي."
-        itemName={userToDelete ? `${userToDelete.full_name} (${userToDelete.email})` : ""}
+        itemName={deleteDialog.data ? `${deleteDialog.data.full_name} (${deleteDialog.data.email})` : ""}
         isLoading={isDeleting}
       />
 
       <EditUserEmailDialog
-        open={editEmailDialogOpen}
-        onOpenChange={setEditEmailDialogOpen}
-        user={selectedUserForEmail}
+        open={editEmailDialog.open}
+        onOpenChange={(open) => !open && closeEditEmailDialog()}
+        user={editEmailDialog.data}
         onSuccess={() => refetch()}
       />
     </>
@@ -232,7 +217,9 @@ const Users = () => {
     <PageErrorBoundary pageName="إدارة المستخدمين">
       <MobileOptimizedLayout>
         <UsersProvider>
-          <UsersContent />
+          <UsersDialogsProvider>
+            <UsersContent />
+          </UsersDialogsProvider>
         </UsersProvider>
       </MobileOptimizedLayout>
     </PageErrorBoundary>

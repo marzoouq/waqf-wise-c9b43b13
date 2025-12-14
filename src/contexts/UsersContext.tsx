@@ -1,10 +1,10 @@
 /**
  * Users Context - سياق المستخدمين
  * لتقليل Props Drilling في مكونات المستخدمين
- * @version 2.9.11
+ * @version 2.9.12
  */
 
-import React, { createContext, useContext, ReactNode, useState, useCallback } from "react";
+import React, { createContext, useContext, ReactNode, useCallback } from "react";
 import { useUsersManagement, type UserProfile } from "@/hooks/useUsersManagement";
 import { useUsersFilter } from "@/hooks/users/useUsersFilter";
 import type { AppRole } from "@/types/roles";
@@ -73,17 +73,10 @@ export function UsersProvider({ children }: { children: ReactNode }) {
     setRoleFilter,
   } = useUsersFilter({ users });
 
+  // حذف المستخدم - موحد (بدون تكرار التحقق من الصلاحيات)
   const handleDeleteUser = useCallback((user: UserProfile) => {
-    if (user.user_id === currentUser?.id) {
-      toast({ title: "تحذير", description: "لا يمكنك حذف حسابك الخاص", variant: "destructive" });
-      return;
-    }
-    if (user.user_roles?.some(r => r.role === "nazer")) {
-      toast({ title: "تحذير", description: "لا يمكن حذف حساب الناظر", variant: "destructive" });
-      return;
-    }
     deleteUserMutation.mutate(user.user_id);
-  }, [currentUser?.id, deleteUserMutation, toast]);
+  }, [deleteUserMutation]);
 
   const showNotAvailableToast = useCallback(() => {
     toast({ 
