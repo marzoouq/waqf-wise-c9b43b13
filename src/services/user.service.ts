@@ -169,6 +169,10 @@ export class UserService {
   /**
    * جلب المستخدمين مع أدوارهم
    */
+  /**
+   * جلب المستخدمين مع أدوارهم
+   * يستخدم View: user_profile_with_roles
+   */
   static async getUsersWithRoles(): Promise<{
     id: string;
     user_id: string;
@@ -180,21 +184,29 @@ export class UserService {
     roles_count: number;
   }[]> {
     const { data, error } = await supabase
-      .from("users_profiles_cache")
+      .from("user_profile_with_roles")
       .select("*")
-      .order("user_created_at", { ascending: false });
+      .order("created_at", { ascending: false });
 
     if (error) throw error;
-    return (data || []).map((u) => ({
-      id: u.user_id,
-      user_id: u.user_id,
-      full_name: u.full_name || u.email || "",
-      email: u.email || "",
-      avatar_url: null,
-      roles: Array.isArray(u.roles) ? (u.roles as string[]) : [],
-      roles_array: Array.isArray(u.roles) ? (u.roles as string[]) : [],
-      roles_count: Array.isArray(u.roles) ? u.roles.length : 0,
-    }));
+    
+    return (data || []).map((u) => {
+      // استخراج الأدوار من user_roles JSON array
+      const rolesArray = Array.isArray(u.user_roles) 
+        ? u.user_roles.map((r: { role: string }) => r.role)
+        : [];
+      
+      return {
+        id: u.id,
+        user_id: u.user_id || u.id,
+        full_name: u.full_name || u.email || "",
+        email: u.email || "",
+        avatar_url: u.avatar_url || null,
+        roles: rolesArray,
+        roles_array: rolesArray,
+        roles_count: rolesArray.length,
+      };
+    });
   }
 
   /**
