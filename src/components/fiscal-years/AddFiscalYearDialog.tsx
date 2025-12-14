@@ -300,12 +300,12 @@ export function AddFiscalYearDialog({ open, onOpenChange }: AddFiscalYearDialogP
             >
               {isCreating ? (
                 <>
-                  <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                  <Loader2 className="h-4 w-4 ms-2 animate-spin" />
                   جاري الحفظ...
                 </>
               ) : (
                 <>
-                  <Save className="h-4 w-4 ml-2" />
+                  <Save className="h-4 w-4 ms-2" />
                   حفظ السنة المالية
                 </>
               )}

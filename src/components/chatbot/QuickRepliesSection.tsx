@@ -48,12 +48,12 @@ export const QuickRepliesSection = memo(function QuickRepliesSection({
           >
             {isExpanded ? (
               <>
-                <ChevronUp className="h-3 w-3 ml-0.5" />
+                <ChevronUp className="h-3 w-3 ms-0.5" />
                 أقل
               </>
             ) : (
               <>
-                <ChevronDown className="h-3 w-3 ml-0.5" />
+                <ChevronDown className="h-3 w-3 ms-0.5" />
                 المزيد ({quickReplies.length - 3})
               </>
             )}
@@ -73,7 +73,7 @@ export const QuickRepliesSection = memo(function QuickRepliesSection({
               "disabled:opacity-50 disabled:cursor-not-allowed"
             )}
           >
-            <span className="ml-1">{reply.icon}</span>
+            <span className="ms-1">{reply.icon}</span>
             {reply.text}
           </button>
         ))}

@@ -97,7 +97,7 @@ export function SmartDisclosureDocuments({ disclosureId }: SmartDisclosureDocume
               size="sm"
               onClick={() => setViewMode('summary')}
             >
-              <LayoutGrid className="h-4 w-4 ml-1" />
+              <LayoutGrid className="h-4 w-4 ms-1" />
               ملخص
             </Button>
             <Button
@@ -105,7 +105,7 @@ export function SmartDisclosureDocuments({ disclosureId }: SmartDisclosureDocume
               size="sm"
               onClick={() => setViewMode('details')}
             >
-              <List className="h-4 w-4 ml-1" />
+              <List className="h-4 w-4 ms-1" />
               تفاصيل
             </Button>
           </div>

@@ -129,10 +129,10 @@ export function NazerReportsSection() {
                     className="w-full justify-start text-xs h-8 px-2"
                     onClick={() => navigate(report.path)}
                   >
-                    <FileText className="h-3 w-3 ml-2 text-muted-foreground" />
+                    <FileText className="h-3 w-3 ms-2 text-muted-foreground" />
                     {report.label}
                     {report.badge && (
-                      <Badge variant="destructive" className="mr-auto text-[10px] h-4 px-1">
+                      <Badge variant="destructive" className="me-auto text-[10px] h-4 px-1">
                         {report.badge}
                       </Badge>
                     )}

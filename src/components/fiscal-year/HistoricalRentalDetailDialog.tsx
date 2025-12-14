@@ -61,21 +61,21 @@ export function HistoricalRentalDetailDialog({
       case 'paid':
         return (
           <Badge className="bg-success/20 text-success hover:bg-success/30">
-            <CheckCircle className="h-3 w-3 ml-1" />
+            <CheckCircle className="h-3 w-3 ms-1" />
             مدفوع
           </Badge>
         );
       case 'unpaid':
         return (
           <Badge variant="destructive">
-            <XCircle className="h-3 w-3 ml-1" />
+            <XCircle className="h-3 w-3 ms-1" />
             غير مدفوع
           </Badge>
         );
       case 'vacant':
         return (
           <Badge variant="secondary">
-            <Home className="h-3 w-3 ml-1" />
+            <Home className="h-3 w-3 ms-1" />
             شاغر
           </Badge>
         );

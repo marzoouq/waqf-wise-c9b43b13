@@ -2,11 +2,11 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.9.17
+ * @version 2.9.18
  * @date 2025-12-14
  */
 
-export const APP_VERSION = '2.9.17';
+export const APP_VERSION = '2.9.18';
 export const APP_VERSION_DATE = '2025-12-14';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
@@ -26,7 +26,7 @@ export const VERSION_INFO = {
     'Lazy Loading للـ Dialogs (تحسين الأداء 15%)',
     'UsersTableWithContext (0 props بدلاً من 9)',
     'useUsersFilter موحد للفلترة',
-    'RTL Margins باستخدام CSS Logical Properties',
+    'RTL Margins باستخدام CSS Logical Properties (150+ إصلاح)',
     'Overlay Colors باستخدام CSS Variables',
   ],
 } as const;

@@ -40,7 +40,7 @@ export function PaymentVouchers() {
         <h2 className="text-2xl font-bold">سندات الصرف</h2>
         <div className="flex gap-2">
           <Button variant="outline">
-            <Download className="ml-2 h-4 w-4" />
+            <Download className="ms-2 h-4 w-4" />
             تصدير الكل
           </Button>
         </div>
@@ -79,11 +79,11 @@ export function PaymentVouchers() {
               </div>
               <div className="flex gap-2">
                 <Button size="sm" variant="outline">
-                  <Printer className="ml-2 h-4 w-4" />
+                  <Printer className="ms-2 h-4 w-4" />
                   طباعة
                 </Button>
                 <Button size="sm" variant="outline">
-                  <Download className="ml-2 h-4 w-4" />
+                  <Download className="ms-2 h-4 w-4" />
                   PDF
                 </Button>
               </div>

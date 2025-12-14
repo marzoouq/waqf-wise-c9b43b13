@@ -103,7 +103,7 @@ export function FiscalYearSummaryCard({ fiscalYearId, closing }: FiscalYearSumma
                   <p className="text-sm text-muted-foreground">{stat.label}</p>
                   <p className="text-2xl font-bold">
                     {stat.value.toLocaleString("ar-SA")}
-                    <span className="text-sm font-normal text-muted-foreground mr-1">
+                    <span className="text-sm font-normal text-muted-foreground me-1">
                       ر.س
                     </span>
                   </p>

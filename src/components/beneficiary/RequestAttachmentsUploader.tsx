@@ -69,7 +69,7 @@ export function RequestAttachmentsUploader({
           <Paperclip className="h-4 w-4" />
           <span>المرفقات</span>
           {attachmentsCount > 0 && (
-            <Badge variant="secondary" className="mr-1">
+            <Badge variant="secondary" className="me-1">
               {attachmentsCount}
             </Badge>
           )}

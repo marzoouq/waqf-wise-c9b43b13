@@ -122,9 +122,9 @@ export function EnhancedDisclosuresTab() {
                         }`}
                       >
                         {revenueChange > 0 ? (
-                          <TrendingUp className="h-3 w-3 ml-1" />
+                          <TrendingUp className="h-3 w-3 ms-1" />
                         ) : (
-                          <TrendingDown className="h-3 w-3 ml-1" />
+                          <TrendingDown className="h-3 w-3 ms-1" />
                         )}
                         {Math.abs(revenueChange).toFixed(0)}%
                       </Badge>
@@ -214,9 +214,9 @@ export function EnhancedDisclosuresTab() {
                     className="flex-1"
                     onClick={() => handleViewDetails(disclosure as AnnualDisclosure)}
                   >
-                    <Eye className="h-4 w-4 ml-2" />
+                    <Eye className="h-4 w-4 ms-2" />
                     عرض التفاصيل الكاملة
-                    <ChevronLeft className="h-4 w-4 mr-2" />
+                    <ChevronLeft className="h-4 w-4 me-2" />
                   </Button>
                   
                   {settings?.allow_export_pdf && (
