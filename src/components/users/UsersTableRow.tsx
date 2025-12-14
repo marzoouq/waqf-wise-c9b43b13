@@ -1,6 +1,7 @@
 /**
  * UsersTableRow Component
  * صف واحد في جدول المستخدمين
+ * @version 2.9.11
  */
 
 import { Button } from "@/components/ui/button";
@@ -53,7 +54,7 @@ export function UsersTableRow({
               <Badge
                 key={idx}
                 variant="outline"
-                className={ROLE_COLORS[role] + " text-xs whitespace-nowrap"}
+                className={`${ROLE_COLORS[role]} text-xs whitespace-nowrap`}
               >
                 {ROLE_LABELS[role as keyof typeof ROLE_LABELS] || role}
               </Badge>
@@ -66,9 +67,10 @@ export function UsersTableRow({
           <Switch
             checked={user.is_active}
             onCheckedChange={onStatusChange}
+            disabled={!hasUserId}
           />
           {user.is_active ? (
-            <CheckCircle className="h-4 w-4 text-success" />
+            <CheckCircle className="h-4 w-4 text-status-success" />
           ) : (
             <XCircle className="h-4 w-4 text-destructive" />
           )}
@@ -116,7 +118,7 @@ export function UsersTableRow({
             onClick={onDelete}
             title="حذف المستخدم"
             className="text-destructive hover:text-destructive"
-            disabled={isCurrentUser || isNazer}
+            disabled={isCurrentUser || isNazer || !hasUserId}
           >
             <Trash2 className="h-4 w-4" />
           </Button>
