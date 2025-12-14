@@ -4,9 +4,10 @@ import { useAdminKPIs } from "@/hooks/admin";
 import { formatCurrency, formatNumber } from "@/lib/utils";
 import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export const AdminKPIs = memo(() => {
-  const { data: kpis, isLoading } = useAdminKPIs();
+  const { data: kpis, isLoading, error, refresh } = useAdminKPIs();
 
   const stats = useMemo(() => {
     if (!kpis) return [];
@@ -90,6 +91,10 @@ export const AdminKPIs = memo(() => {
         ))}
       </UnifiedStatsGrid>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في التحميل" message="فشل تحميل إحصائيات المشرف" onRetry={refresh} />;
   }
 
   if (!kpis || stats.length === 0) return null;

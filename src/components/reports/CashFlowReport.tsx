@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoadingState } from "@/components/shared/LoadingState";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { TrendingUp, TrendingDown, DollarSign } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { ReportRefreshIndicator } from "./ReportRefreshIndicator";
@@ -9,6 +10,8 @@ export function CashFlowReport() {
   const { 
     data: cashFlowData = [], 
     isLoading, 
+    error,
+    refetch,
     isRefetching, 
     stats, 
     lastUpdated, 
@@ -16,7 +19,11 @@ export function CashFlowReport() {
   } = useCashFlowReport();
 
   if (isLoading) {
-    return <LoadingState />;
+    return <LoadingState message="جاري تحميل تقرير التدفق النقدي..." />;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في التحميل" message="فشل تحميل تقرير التدفق النقدي" onRetry={refetch} />;
   }
 
   return (

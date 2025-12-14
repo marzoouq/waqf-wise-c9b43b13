@@ -33,7 +33,9 @@ export function BeneficiaryActivityMonitor() {
     sessions, 
     onlineSessions, 
     offlineSessions, 
-    isLoading 
+    isLoading,
+    error,
+    refetch
   } = useBeneficiaryActivitySessions();
 
   if (isLoading) {
@@ -48,6 +50,23 @@ export function BeneficiaryActivityMonitor() {
               <Skeleton key={i} className="h-16 w-full" />
             ))}
           </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>نشاط المستفيدين</CardTitle>
+        </CardHeader>
+        <CardContent className="text-center py-8">
+          <Users className="h-10 w-10 mx-auto text-destructive mb-2 opacity-70" />
+          <p className="text-destructive font-medium">فشل تحميل بيانات النشاط</p>
+          <button onClick={() => refetch()} className="text-primary text-sm mt-2 hover:underline">
+            إعادة المحاولة
+          </button>
         </CardContent>
       </Card>
     );

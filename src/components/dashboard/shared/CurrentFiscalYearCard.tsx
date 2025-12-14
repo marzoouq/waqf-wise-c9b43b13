@@ -1,13 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, Globe } from "lucide-react";
+import { Calendar, Clock, Globe, AlertCircle } from "lucide-react";
 import { useFiscalYearsList } from "@/hooks/fiscal-years";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 
 export function CurrentFiscalYearCard() {
-  const { activeFiscalYear, closedYearsCount, publishedYearsCount, isLoading } = useFiscalYearsList();
+  const { activeFiscalYear, closedYearsCount, publishedYearsCount, isLoading, error, refetch } = useFiscalYearsList();
 
   if (isLoading) {
     return (
@@ -18,6 +18,25 @@ export function CurrentFiscalYearCard() {
         <CardContent>
           <Skeleton className="h-8 w-48 mb-2" />
           <Skeleton className="h-4 w-64" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="border-l-4 border-l-destructive">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <AlertCircle className="h-4 w-4 text-destructive" />
+            السنة المالية
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-destructive text-sm">فشل تحميل بيانات السنة المالية</p>
+          <button onClick={() => refetch()} className="text-primary text-xs mt-2 hover:underline">
+            إعادة المحاولة
+          </button>
         </CardContent>
       </Card>
     );

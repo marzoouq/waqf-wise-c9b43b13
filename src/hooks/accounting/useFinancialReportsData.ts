@@ -11,7 +11,7 @@ import { QUERY_KEYS } from '@/lib/query-keys';
 
 export function useFinancialReportsData() {
   // ميزان المراجعة
-  const { data: trialBalanceRaw = [], isLoading: loadingTrial } = useQuery({
+  const { data: trialBalanceRaw = [], isLoading: loadingTrial, error: trialError, refetch: refetchTrial } = useQuery({
     queryKey: QUERY_KEYS.TRIAL_BALANCE,
     queryFn: () => AccountingService.getTrialBalanceSimple(),
   });
@@ -27,7 +27,7 @@ export function useFinancialReportsData() {
   }));
 
   // قائمة الدخل - الحسابات
-  const { data: accounts = [], isLoading: loadingIncome } = useQuery<AccountWithBalance[]>({
+  const { data: accounts = [], isLoading: loadingIncome, error: incomeError, refetch: refetchIncome } = useQuery<AccountWithBalance[]>({
     queryKey: QUERY_KEYS.ACCOUNTS_WITH_BALANCES,
     queryFn: () => AccountingService.getRevenueAccounts(),
   });
@@ -43,6 +43,11 @@ export function useFinancialReportsData() {
 
   const netIncome = totalRevenue - totalExpense;
 
+  const refetch = () => {
+    refetchTrial();
+    refetchIncome();
+  };
+
   return {
     trialBalance,
     accounts,
@@ -50,5 +55,7 @@ export function useFinancialReportsData() {
     totalExpense,
     netIncome,
     isLoading: loadingTrial || loadingIncome,
+    error: trialError || incomeError,
+    refetch,
   };
 }
