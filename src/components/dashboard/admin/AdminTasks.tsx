@@ -3,10 +3,11 @@ import { useTasks } from "@/hooks/useTasks";
 import { CheckSquare, AlertCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const AdminTasks = () => {
-  const { tasks, isLoading } = useTasks();
+  const { tasks, isLoading, error, refetch } = useTasks();
 
   const getPriorityBadgeClasses = (priority: string) => {
     if (priority === "عالية") {
@@ -42,6 +43,10 @@ export const AdminTasks = () => {
         </CardContent>
       </Card>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل المهام" message={(error as Error).message} onRetry={refetch} />;
   }
 
   if (!tasks || tasks.length === 0) {

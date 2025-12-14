@@ -3,9 +3,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, XCircle, Clock, User } from "lucide-react";
 import { useApprovalWorkflow, type ApprovalStatus } from "@/hooks/accounting";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export function ApprovalWorkflowManager() {
-  const { pendingApprovals, isLoading } = useApprovalWorkflow();
+  const { pendingApprovals, isLoading, error, refetch } = useApprovalWorkflow();
 
   const getStatusBadge = (status: string) => {
     const variants = {
@@ -27,6 +28,10 @@ export function ApprovalWorkflowManager() {
 
   if (isLoading) {
     return <div className="text-center p-8">جاري التحميل...</div>;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل الموافقات" message={(error as Error).message} onRetry={refetch} />;
   }
 
   return (

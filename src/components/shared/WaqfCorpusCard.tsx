@@ -7,6 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Building2, RefreshCw, Wifi, ChevronLeft, CheckCircle2, Clock, TrendingUp } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useWaqfCorpus, type FiscalYearCorpus } from "@/hooks/dashboard/useFinancialCards";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 interface WaqfCorpusCardProps {
   className?: string;
@@ -17,7 +18,7 @@ export function WaqfCorpusCard({ className, compact = false }: WaqfCorpusCardPro
   const [dialogOpen, setDialogOpen] = useState(false);
 
   // جلب بيانات رقبة الوقف مع Realtime من hook
-  const { data: corpusData = [], isLoading, lastUpdated, isLive } = useWaqfCorpus();
+  const { data: corpusData = [], isLoading, lastUpdated, isLive, error, refetch } = useWaqfCorpus();
 
   // حساب إجمالي رقبة الوقف المرحلة
   const totalCorpus = corpusData.reduce((sum, item) => sum + (item.waqf_corpus || 0), 0);
@@ -36,6 +37,10 @@ export function WaqfCorpusCard({ className, compact = false }: WaqfCorpusCardPro
         </CardContent>
       </Card>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل رقبة الوقف" message={(error as Error).message} onRetry={refetch} />;
   }
 
   return (

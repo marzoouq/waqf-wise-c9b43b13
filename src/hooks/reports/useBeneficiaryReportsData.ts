@@ -19,6 +19,7 @@ export function useBeneficiaryReportsData() {
     isLoading,
     isRefetching,
     dataUpdatedAt,
+    error,
   } = useQuery({
     queryKey: QUERY_KEYS.BENEFICIARIES_REPORT,
     queryFn: async () => {
@@ -62,5 +63,6 @@ export function useBeneficiaryReportsData() {
     isRefetching,
     lastUpdated,
     handleRefresh,
+    error,
   };
 }

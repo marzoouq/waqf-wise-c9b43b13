@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Wallet, TrendingUp, Calendar, ChevronLeft, CheckCircle2, Clock, Loader2, Archive, CircleDot } from "lucide-react";
 import { formatDate } from "@/lib/date";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 interface WaqfDistributionsSummaryCardProps {
   beneficiaryId: string;
@@ -30,7 +31,7 @@ interface HeirDistribution {
 export function WaqfDistributionsSummaryCard({ beneficiaryId }: WaqfDistributionsSummaryCardProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const { data: distributions = [], isLoading } = useWaqfDistributionsSummary(beneficiaryId);
+  const { data: distributions = [], isLoading, error, refetch } = useWaqfDistributionsSummary(beneficiaryId);
 
   // فصل التوزيعات الحالية عن التاريخية
   const currentYearDistributions = distributions.filter(d => !d.fiscal_years?.is_closed);
@@ -91,6 +92,10 @@ export function WaqfDistributionsSummaryCard({ beneficiaryId }: WaqfDistribution
         </CardContent>
       </Card>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل التوزيعات" message={(error as Error).message} onRetry={refetch} />;
   }
 
   return (

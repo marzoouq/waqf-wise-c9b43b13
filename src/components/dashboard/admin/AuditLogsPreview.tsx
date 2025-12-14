@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export function AuditLogsPreview() {
-  const { data: logs, isLoading } = useAuditLogs();
+  const { data: logs, isLoading, error, refetch } = useAuditLogs();
   const navigate = useNavigate();
 
   if (isLoading) {
@@ -28,6 +29,10 @@ export function AuditLogsPreview() {
         </CardContent>
       </Card>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل سجل العمليات" message={(error as Error).message} onRetry={refetch} />;
   }
 
   if (!logs) return null;

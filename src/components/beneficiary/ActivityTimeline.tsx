@@ -4,13 +4,14 @@ import { format, arLocale as ar } from "@/lib/date";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { useBeneficiaryActivity } from "@/hooks/beneficiary/useBeneficiaryActivity";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 interface ActivityTimelineProps {
   beneficiaryId: string;
 }
 
 export function ActivityTimeline({ beneficiaryId }: ActivityTimelineProps) {
-  const { activities, isLoading } = useBeneficiaryActivity(beneficiaryId);
+  const { activities, isLoading, error, refetch } = useBeneficiaryActivity(beneficiaryId);
 
   const getActivityIcon = (actionType: string) => {
     switch (actionType) {
@@ -45,6 +46,10 @@ export function ActivityTimeline({ beneficiaryId }: ActivityTimelineProps) {
         </CardContent>
       </Card>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل سجل النشاط" message={(error as Error).message} onRetry={refetch} />;
   }
 
   return (

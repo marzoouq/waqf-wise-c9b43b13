@@ -7,12 +7,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from "recharts";
 import { useBudgetComparison } from "@/hooks/dashboard/useDashboardCharts";
 import { ChartSkeleton } from "@/components/dashboard/ChartSkeleton";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export default function BudgetComparisonChart() {
-  const { data, isLoading } = useBudgetComparison();
+  const { data, isLoading, error, refetch } = useBudgetComparison();
 
   if (isLoading) {
     return <ChartSkeleton title="مقارنة الميزانية" />;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل مقارنة الميزانية" message={(error as Error).message} onRetry={refetch} />;
   }
 
   if (!data || data.length === 0) {

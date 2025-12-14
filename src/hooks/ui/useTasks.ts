@@ -19,7 +19,7 @@ export function useTasks() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: tasks = [], isLoading } = useQuery({
+  const { data: tasks = [], isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.TASKS,
     queryFn: () => UIService.getTasks(10),
     ...QUERY_CONFIG.TASKS,
@@ -60,6 +60,8 @@ export function useTasks() {
   return {
     tasks,
     isLoading,
+    error,
+    refetch,
     addTask: addTask.mutateAsync,
     updateTask: updateTask.mutateAsync,
   };

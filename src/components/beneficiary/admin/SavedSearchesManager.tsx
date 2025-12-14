@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { ErrorState } from '@/components/shared/ErrorState';
 import { 
   Search, 
   Star, 
@@ -47,7 +48,7 @@ interface SavedSearchesManagerProps {
  * إدارة وتنظيم عمليات البحث المحفوظة
  */
 export function SavedSearchesManager({ onLoadSearch }: SavedSearchesManagerProps) {
-  const { searches, isLoading, saveSearch, deleteSearch, updateUsage } = useSavedSearches();
+  const { searches, isLoading, saveSearch, deleteSearch, updateUsage, error, refetch } = useSavedSearches();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [searchToDelete, setSearchToDelete] = useState<SavedSearch | null>(null);
@@ -105,6 +106,10 @@ export function SavedSearchesManager({ onLoadSearch }: SavedSearchesManagerProps
 
   if (isLoading) {
     return <LoadingState />;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل عمليات البحث" message={(error as Error).message} onRetry={refetch} />;
   }
 
   const favoriteSearches = searches.filter(s => s.is_favorite);
