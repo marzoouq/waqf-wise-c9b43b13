@@ -7,6 +7,7 @@ import { logger } from "@/lib/logger";
 import { paymentRequiresApproval } from "@/lib/supabase-wrappers";
 import { createMutationErrorHandler } from "@/lib/errors";
 import type { Database } from "@/integrations/supabase/types";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 type Payment = Database['public']['Tables']['payments']['Row'];
 type PaymentInsert = Database['public']['Tables']['payments']['Insert'];
@@ -20,14 +21,14 @@ export function usePayments() {
   // Real-time subscription using RealtimeService
   useEffect(() => {
     const { unsubscribe } = RealtimeService.subscribeToTable('payments', () => {
-      queryClient.invalidateQueries({ queryKey: ["payments"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PAYMENTS });
     });
 
     return () => unsubscribe();
   }, [queryClient]);
 
   const { data: payments = [], isLoading } = useQuery({
-    queryKey: ["payments"],
+    queryKey: QUERY_KEYS.PAYMENTS,
     queryFn: () => PaymentService.getAll(),
     staleTime: 3 * 60 * 1000,
   });
@@ -53,8 +54,8 @@ export function usePayments() {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["payments"] });
-      queryClient.invalidateQueries({ queryKey: ["journal_entries"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PAYMENTS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.JOURNAL_ENTRIES });
       toast({
         title: "تمت الإضافة بنجاح",
         description: "تم إضافة السند وإنشاء القيد المحاسبي",
@@ -71,7 +72,7 @@ export function usePayments() {
       return PaymentService.update(id, updates);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["payments"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PAYMENTS });
       toast({
         title: "تم التحديث بنجاح",
         description: "تم تحديث بيانات السند بنجاح",
@@ -88,7 +89,7 @@ export function usePayments() {
       return PaymentService.delete(id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["payments"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PAYMENTS });
       toast({
         title: "تم الحذف بنجاح",
         description: "تم حذف السند بنجاح",

@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { AppRole } from "@/hooks/useUserRole";
 import { UserService } from "@/services";
 import { invalidateUserQueries } from "@/lib/query-invalidation";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface UserWithRoles {
   id: string;
@@ -43,13 +44,13 @@ export function useRolesManagement() {
   const [auditDialogOpen, setAuditDialogOpen] = useState(false);
 
   const { data: users = [], isLoading } = useQuery({
-    queryKey: ["users-profiles-cache"],
+    queryKey: QUERY_KEYS.USERS_PROFILES_CACHE,
     queryFn: () => UserService.getUsersWithRoles(),
     staleTime: 30 * 1000,
   });
 
   const { data: auditLogs = [] } = useQuery({
-    queryKey: ["user-roles-audit"],
+    queryKey: QUERY_KEYS.USER_ROLES_AUDIT,
     queryFn: () => UserService.getRolesAuditLog(),
   });
 

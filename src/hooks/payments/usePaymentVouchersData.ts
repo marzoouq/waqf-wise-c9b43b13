@@ -5,6 +5,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { VoucherService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface PaymentVoucherWithDetails {
   id: string;
@@ -41,7 +42,7 @@ export function usePaymentVouchersData(searchTerm: string, selectedStatus: strin
     error,
     refetch,
   } = useQuery({
-    queryKey: ["payment-vouchers", searchTerm, selectedStatus],
+    queryKey: QUERY_KEYS.PAYMENT_VOUCHERS_FILTERED(searchTerm, selectedStatus),
     queryFn: () => VoucherService.getWithFilters(searchTerm, selectedStatus),
   });
 

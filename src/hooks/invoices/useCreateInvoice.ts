@@ -151,7 +151,7 @@ export function useCreateInvoice(onSuccess?: () => void) {
     onSuccess: () => {
       toast.success("تم إنشاء الفاتورة بنجاح");
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INVOICES });
-      queryClient.invalidateQueries({ queryKey: ["next-invoice-number"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.NEXT_INVOICE_NUMBER });
       onSuccess?.();
     },
     onError: (error: Error) => {

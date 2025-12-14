@@ -5,10 +5,11 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { PropertyService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export function usePropertyUnits(propertyId: string) {
   const query = useQuery({
-    queryKey: ["property-units-data", propertyId],
+    queryKey: QUERY_KEYS.PROPERTY_UNITS_DATA(propertyId),
     queryFn: () => PropertyService.getPropertyUnitsAndContracts(propertyId),
     enabled: !!propertyId,
   });

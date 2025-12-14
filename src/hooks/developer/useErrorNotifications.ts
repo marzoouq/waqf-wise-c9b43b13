@@ -7,12 +7,13 @@ import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { SystemErrorLog } from "@/types/system-error";
 import { RealtimeService, MonitoringService } from "@/services";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export function useErrorNotifications(enabled: boolean = true) {
   const shownErrorsRef = useRef<Set<string>>(new Set());
   
   const { data: errors } = useQuery({
-    queryKey: ["system-errors"],
+    queryKey: QUERY_KEYS.SYSTEM_ERRORS(),
     queryFn: () => MonitoringService.getRecentErrors(20),
     refetchInterval: enabled ? 60000 : false,
     staleTime: 30 * 1000,
