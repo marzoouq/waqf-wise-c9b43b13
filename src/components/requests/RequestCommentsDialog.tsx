@@ -77,7 +77,7 @@ export function RequestCommentsDialog({
               </div>
 
               <Button type="submit" disabled={!newComment.trim()}>
-                <Send className="h-4 w-4 ml-2" />
+                <Send className="h-4 w-4 ms-2" />
                 إرسال
               </Button>
             </div>

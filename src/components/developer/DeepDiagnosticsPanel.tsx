@@ -251,11 +251,11 @@ export function DeepDiagnosticsPanel() {
                       </div>
                       {getStatusBadge(result.status)}
                     </div>
-                    <p className="text-sm text-muted-foreground mt-1 mr-7">
+                    <p className="text-sm text-muted-foreground mt-1 me-7">
                       {result.message}
                     </p>
                     {result.details && (
-                      <details className="mt-2 mr-7">
+                      <details className="mt-2 me-7">
                         <summary className="text-xs cursor-pointer text-muted-foreground hover:text-foreground">
                           عرض التفاصيل
                         </summary>

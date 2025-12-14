@@ -115,7 +115,7 @@ export default function EnhancedInvoiceView({
               <span>{new Date(invoice.invoice_date).toLocaleDateString("ar-SA")}</span>
               {invoice.invoice_time && (
                 <>
-                  <Clock className="h-4 w-4 text-muted-foreground mr-4" />
+                  <Clock className="h-4 w-4 text-muted-foreground me-4" />
                   <span>{invoice.invoice_time}</span>
                 </>
               )}

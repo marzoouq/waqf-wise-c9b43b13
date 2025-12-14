@@ -163,7 +163,7 @@ export const TwoFactorDialog = ({ open, onOpenChange }: TwoFactorDialogProps) =>
                 disabled={isLoading}
                 className="w-full"
               >
-                <Key className="h-4 w-4 ml-2" />
+                <Key className="h-4 w-4 ms-2" />
                 تفعيل المصادقة الثنائية
               </Button>
             </>

@@ -95,7 +95,7 @@ export default function CustomReports() {
         icon={<FileText className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
         actions={
           <Button size="sm">
-            <Plus className="ml-2 h-4 w-4" />
+            <Plus className="ms-2 h-4 w-4" />
             <span className="hidden sm:inline">تقرير جديد</span>
             <span className="sm:hidden">جديد</span>
           </Button>

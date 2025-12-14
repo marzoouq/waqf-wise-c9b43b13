@@ -64,7 +64,7 @@ export function ShiftStatusBar({ shift, onOpenShift, onCloseShift, isOpeningShif
               <ArrowDownCircle className="h-4 w-4 text-status-success" />
               <div className="text-sm">
                 <span className="text-muted-foreground">التحصيل:</span>
-                <span className="font-medium text-status-success mr-1">
+                <span className="font-medium text-status-success me-1">
                   {shift.total_collections.toLocaleString('ar-SA')} ر.س
                 </span>
               </div>
@@ -74,7 +74,7 @@ export function ShiftStatusBar({ shift, onOpenShift, onCloseShift, isOpeningShif
               <ArrowUpCircle className="h-4 w-4 text-status-error" />
               <div className="text-sm">
                 <span className="text-muted-foreground">الصرف:</span>
-                <span className="font-medium text-status-error mr-1">
+                <span className="font-medium text-status-error me-1">
                   {shift.total_payments.toLocaleString('ar-SA')} ر.س
                 </span>
               </div>
@@ -84,7 +84,7 @@ export function ShiftStatusBar({ shift, onOpenShift, onCloseShift, isOpeningShif
               <Receipt className="h-4 w-4 text-muted-foreground" />
               <div className="text-sm">
                 <span className="text-muted-foreground">العمليات:</span>
-                <span className="font-medium mr-1">{shift.transactions_count}</span>
+                <span className="font-medium me-1">{shift.transactions_count}</span>
               </div>
             </div>
 

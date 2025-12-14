@@ -26,11 +26,11 @@ export default function TenantsAgingReportPage() {
           </div>
           <div className="flex gap-2">
             <Button variant="outline" size="sm">
-              <Printer className="ml-2 h-4 w-4" />
+              <Printer className="ms-2 h-4 w-4" />
               طباعة
             </Button>
             <Button variant="outline" size="sm">
-              <Download className="ml-2 h-4 w-4" />
+              <Download className="ms-2 h-4 w-4" />
               تصدير Excel
             </Button>
           </div>

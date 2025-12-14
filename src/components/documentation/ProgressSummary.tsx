@@ -136,7 +136,7 @@ export function ProgressSummary({ phases }: ProgressSummaryProps) {
                       {phase.phase_name}
                     </span>
                   </div>
-                  <span className="text-sm font-bold text-primary mr-2">
+                  <span className="text-sm font-bold text-primary me-2">
                     {phase.completion_percentage}%
                   </span>
                 </div>
@@ -170,7 +170,7 @@ export function ProgressSummary({ phases }: ProgressSummaryProps) {
                       {phase.phase_name}
                     </span>
                   </div>
-                  <span className="text-sm font-bold text-purple-600 mr-2">
+                  <span className="text-sm font-bold text-purple-600 me-2">
                     {phase.completion_percentage}%
                   </span>
                 </div>
@@ -200,7 +200,7 @@ export function ProgressSummary({ phases }: ProgressSummaryProps) {
                         {phase.phase_name}
                       </span>
                     </div>
-                    <span className="text-sm font-bold text-orange-600 mr-2">
+                    <span className="text-sm font-bold text-orange-600 me-2">
                       {phase.completion_percentage}%
                     </span>
                   </div>

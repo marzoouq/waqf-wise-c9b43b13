@@ -67,7 +67,7 @@ export default function SupportManagement() {
         <div className="space-y-4 sm:space-y-6">
           <div className="flex items-center justify-end">
             <Button variant="outline" onClick={() => setSettingsOpen(true)}>
-              <Settings className="h-4 w-4 ml-2" />
+              <Settings className="h-4 w-4 ms-2" />
               <span className="hidden sm:inline">إعدادات التعيين</span>
             </Button>
           </div>

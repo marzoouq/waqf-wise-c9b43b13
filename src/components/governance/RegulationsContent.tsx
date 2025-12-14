@@ -106,7 +106,7 @@ export function RegulationsContent({
                               <h5 className={`text-sm font-medium ${section.highlight ? 'text-amber-700 dark:text-amber-400' : ''}`}>
                                 {highlightText(section.subtitle)}
                                 {section.highlight && (
-                                  <Badge variant="outline" className="mr-2 text-xs bg-amber-100 dark:bg-amber-900/30 border-amber-300">
+                                  <Badge variant="outline" className="me-2 text-xs bg-amber-100 dark:bg-amber-900/30 border-amber-300">
                                     هام
                                   </Badge>
                                 )}

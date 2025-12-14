@@ -38,11 +38,11 @@ export default function NotificationSettings() {
       <Tabs defaultValue="channels" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="channels">
-            <Radio className="h-4 w-4 ml-2" />
+            <Radio className="h-4 w-4 ms-2" />
             قنوات الإشعارات
           </TabsTrigger>
           <TabsTrigger value="preferences">
-            <Settings className="h-4 w-4 ml-2" />
+            <Settings className="h-4 w-4 ms-2" />
             التفضيلات
           </TabsTrigger>
         </TabsList>

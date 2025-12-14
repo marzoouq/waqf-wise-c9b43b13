@@ -63,7 +63,7 @@ export function SettingsSearchFilter({
       
       <Select value={selectedCategory} onValueChange={onCategoryChange}>
         <SelectTrigger className="w-full sm:w-[200px]">
-          <Filter className="h-4 w-4 ml-2" />
+          <Filter className="h-4 w-4 ms-2" />
           <SelectValue placeholder="كل الفئات" />
         </SelectTrigger>
         <SelectContent>

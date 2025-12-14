@@ -152,11 +152,11 @@ export class GlobalErrorBoundary extends Component<Props, State> {
                 </Button>
                 <div className="flex gap-3 justify-center pt-2">
                   <Button onClick={this.handleReset} variant="outline" size="lg" disabled={this.state.isClearing}>
-                    <RefreshCcw className="w-4 h-4 ml-2" />
+                    <RefreshCcw className="w-4 h-4 ms-2" />
                     إعادة المحاولة
                   </Button>
                   <Button onClick={this.handleGoHome} variant="ghost" size="lg" disabled={this.state.isClearing}>
-                    <Home className="w-4 h-4 ml-2" />
+                    <Home className="w-4 h-4 ms-2" />
                     العودة للرئيسية
                   </Button>
                 </div>

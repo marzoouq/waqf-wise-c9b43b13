@@ -100,17 +100,17 @@ export default function TenantDetails() {
       <Tabs defaultValue="info" className="space-y-4">
         <TabsList className="w-full grid grid-cols-3 h-auto">
           <TabsTrigger value="info" className="text-xs sm:text-sm py-2">
-            <User className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" />
+            <User className="ms-1 sm:ms-2 h-3 w-3 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline">البيانات</span>
             <span className="sm:hidden">بيانات</span>
           </TabsTrigger>
           <TabsTrigger value="ledger" className="text-xs sm:text-sm py-2">
-            <FileText className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" />
+            <FileText className="ms-1 sm:ms-2 h-3 w-3 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline">كشف الحساب</span>
             <span className="sm:hidden">حساب</span>
           </TabsTrigger>
           <TabsTrigger value="contracts" className="text-xs sm:text-sm py-2">
-            <Building className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" />
+            <Building className="ms-1 sm:ms-2 h-3 w-3 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline">العقود</span>
             <span className="sm:hidden">عقود</span>
           </TabsTrigger>
