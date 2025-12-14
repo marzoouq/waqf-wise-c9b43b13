@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Upload, FileText, Trash2, Eye } from "lucide-react";
-import { DocumentUploadDialog } from "./DocumentUploadDialog";
+import { DocumentUploadDialog } from "../DocumentUploadDialog";
 import { useBeneficiaryDocuments } from "@/hooks/beneficiary/useBeneficiaryTabsData";
 import { format, arLocale as ar } from "@/lib/date";
 

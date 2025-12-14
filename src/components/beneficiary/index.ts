@@ -16,25 +16,25 @@ export { ProfilePaymentsHistory } from './ProfilePaymentsHistory';
 export { ProfileRequestsHistory } from './ProfileRequestsHistory';
 export { ProfileFamilyTree } from './ProfileFamilyTree';
 export { ProfileDocumentsGallery } from './ProfileDocumentsGallery';
-export { BeneficiaryProfileTab } from './BeneficiaryProfileTab';
+export { BeneficiaryProfileTab } from './tabs/BeneficiaryProfileTab';
 export { BeneficiaryProfileCard } from './BeneficiaryProfileCard';
 
 // ==================== Tab Components ====================
-export { BeneficiaryStatementsTab } from './BeneficiaryStatementsTab';
-export { BeneficiaryDistributionsTab } from './BeneficiaryDistributionsTab';
-export { BeneficiaryPropertiesTab } from './BeneficiaryPropertiesTab';
-export { BeneficiaryDocumentsTab } from './BeneficiaryDocumentsTab';
-export { BeneficiaryRequestsTab } from './BeneficiaryRequestsTab';
-export { WaqfSummaryTab } from './WaqfSummaryTab';
-export { FamilyTreeTab } from './FamilyTreeTab';
-export { GovernanceTab } from './GovernanceTab';
-export { BankAccountsTab } from './BankAccountsTab';
-export { FinancialReportsTab } from './FinancialReportsTab';
-export { FinancialTransparencyTab } from './FinancialTransparencyTab';
-export { BudgetsTab } from './BudgetsTab';
-export { LoansOverviewTab } from './LoansOverviewTab';
-export { ApprovalsLogTab } from './ApprovalsLogTab';
-export { DisclosuresTab } from './DisclosuresTab';
+export { BeneficiaryStatementsTab } from './tabs/BeneficiaryStatementsTab';
+export { BeneficiaryDistributionsTab } from './tabs/BeneficiaryDistributionsTab';
+export { BeneficiaryPropertiesTab } from './tabs/BeneficiaryPropertiesTab';
+export { BeneficiaryDocumentsTab } from './tabs/BeneficiaryDocumentsTab';
+export { BeneficiaryRequestsTab } from './tabs/BeneficiaryRequestsTab';
+export { WaqfSummaryTab } from './tabs/WaqfSummaryTab';
+export { FamilyTreeTab } from './tabs/FamilyTreeTab';
+export { GovernanceTab } from './tabs/GovernanceTab';
+export { BankAccountsTab } from './tabs/BankAccountsTab';
+export { FinancialReportsTab } from './tabs/FinancialReportsTab';
+export { FinancialTransparencyTab } from './tabs/FinancialTransparencyTab';
+export { BudgetsTab } from './tabs/BudgetsTab';
+export { LoansOverviewTab } from './tabs/LoansOverviewTab';
+export { ApprovalsLogTab } from './tabs/ApprovalsLogTab';
+export { DisclosuresTab } from './tabs/DisclosuresTab';
 
 // ==================== Form Components ====================
 export { AddFamilyMemberForm } from './AddFamilyMemberForm';

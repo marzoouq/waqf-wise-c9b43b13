@@ -11,7 +11,7 @@ import { MaskedValue } from "@/components/shared/MaskedValue";
 import { toast } from "sonner";
 import { productionLogger } from "@/lib/logger/production-logger";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { MobileStatementCard } from "./cards/MobileStatementCard";
+import { MobileStatementCard } from "../cards/MobileStatementCard";
 import { useBeneficiaryExport } from "@/hooks/beneficiary/useBeneficiaryExport";
 import { formatCurrency } from "@/lib/utils";
 

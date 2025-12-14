@@ -4,10 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, Clock, CheckCircle2, XCircle, AlertCircle, FileText, Eye, LucideIcon } from "lucide-react";
-import { RequestSubmissionDialog } from "./RequestSubmissionDialog";
-import { RequestDetailsDialog } from "./RequestDetailsDialog";
-import { RequestAttachmentsUploader } from "./RequestAttachmentsUploader";
-import { SLAIndicator } from "./SLAIndicator";
+import { RequestSubmissionDialog } from "../RequestSubmissionDialog";
+import { RequestDetailsDialog } from "../RequestDetailsDialog";
+import { RequestAttachmentsUploader } from "../RequestAttachmentsUploader";
+import { SLAIndicator } from "../SLAIndicator";
 import { useBeneficiaryRequestsTab } from "@/hooks/beneficiary/useBeneficiaryTabsData";
 import { format, arLocale as ar } from "@/lib/date";
 

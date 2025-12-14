@@ -8,8 +8,8 @@ import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { useFiscalYearPublishStatus } from "@/hooks/useFiscalYearPublishStatus";
 import { MaskedValue } from "@/components/shared/MaskedValue";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { MobilePropertyCard } from "./cards/MobilePropertyCard";
-import { MobileContractCard } from "./cards/MobileContractCard";
+import { MobilePropertyCard } from "../cards/MobilePropertyCard";
+import { MobileContractCard } from "../cards/MobileContractCard";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useBeneficiaryProperties } from "@/hooks/beneficiary/useBeneficiaryProperties";
 
