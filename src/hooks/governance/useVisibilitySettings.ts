@@ -78,7 +78,7 @@ export function useVisibilitySettings(targetRole?: 'beneficiary' | 'waqf_heir') 
   
   const effectiveRole = targetRole || (isWaqfHeir ? 'waqf_heir' : 'beneficiary');
 
-  const { data: settings, isLoading } = useQuery({
+  const { data: settings, isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.VISIBILITY_SETTINGS(effectiveRole),
     queryFn: async () => {
       const data = await GovernanceService.getVisibilitySettings(effectiveRole);
@@ -112,6 +112,8 @@ export function useVisibilitySettings(targetRole?: 'beneficiary' | 'waqf_heir') 
   return {
     settings: settings as VisibilitySettings | undefined,
     isLoading,
+    error,
+    refetch,
     updateSettings: updateSettings.mutateAsync,
     isUpdating: updateSettings.isPending,
   };

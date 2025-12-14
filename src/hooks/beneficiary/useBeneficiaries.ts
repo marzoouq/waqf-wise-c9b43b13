@@ -12,7 +12,7 @@ export function useBeneficiaries() {
   const { addActivity } = useActivities();
   const { user } = useAuth();
 
-  const { data: beneficiariesData, isLoading } = useQuery({
+  const { data: beneficiariesData, isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.BENEFICIARIES,
     queryFn: async () => {
       const result = await BeneficiaryService.getAll();
@@ -81,6 +81,8 @@ export function useBeneficiaries() {
     beneficiaries,
     totalCount,
     isLoading,
+    error,
+    refetch,
     addBeneficiary: addBeneficiary.mutateAsync,
     updateBeneficiary: updateBeneficiary.mutateAsync,
     deleteBeneficiary: deleteBeneficiary.mutateAsync,

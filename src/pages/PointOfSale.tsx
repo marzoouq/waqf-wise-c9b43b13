@@ -3,6 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Briefcase, DollarSign, ArrowUpCircle, Receipt } from 'lucide-react';
 import { ErrorState } from '@/components/shared/ErrorState';
+import { LoadingState } from '@/components/shared/LoadingState';
 import {
   useCashierShift,
   usePOSTransactions,
@@ -37,6 +38,8 @@ export default function PointOfSale() {
   const {
     currentShift,
     isLoadingShift,
+    error,
+    refetch,
     hasOpenShift,
     openShift,
     closeShift,
@@ -94,11 +97,11 @@ export default function PointOfSale() {
   };
 
   if (isLoadingShift) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <p className="text-muted-foreground">جاري التحميل...</p>
-      </div>
-    );
+    return <LoadingState message="جاري تحميل بيانات الجلسة..." />;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في التحميل" message="فشل تحميل بيانات مركز التحصيل" onRetry={refetch} fullScreen />;
   }
 
   return (

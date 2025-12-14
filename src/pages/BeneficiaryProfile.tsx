@@ -25,7 +25,7 @@ import BeneficiaryDialog from '@/components/beneficiary/admin/BeneficiaryDialog'
 export default function BeneficiaryProfile() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { beneficiaries, isLoading } = useBeneficiaries();
+  const { beneficiaries, isLoading, error, refetch } = useBeneficiaries();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('timeline');
 
@@ -39,6 +39,10 @@ export default function BeneficiaryProfile() {
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل ملف المستفيد..." />;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في التحميل" message="فشل تحميل بيانات المستفيدين" onRetry={refetch} fullScreen />;
   }
 
   if (!beneficiary) {
