@@ -236,6 +236,7 @@ queryClient.invalidateQueries({ queryKey: ['unified-dashboard-kpis'] });
 2. **Caching**: `staleTime: 2 minutes`
 3. **Lazy Loading**: تحميل المكونات عند الحاجة
 4. **Virtualization**: للقوائم الطويلة
+5. **Lazy Dialogs**: تحميل كسول للحوارات (v2.9.14)
 
 ### React Query Config
 
@@ -251,12 +252,46 @@ const QUERY_CONFIG = {
 
 ---
 
+## 🏗️ Context Pattern (v2.9.14)
+
+### إدارة Props Drilling
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     Users Page                               │
+├─────────────────────────────────────────────────────────────┤
+│  UsersProvider          UsersDialogsProvider                │
+│       │                        │                            │
+│       ▼                        ▼                            │
+│  UsersContext            UsersDialogsContext                │
+│       │                        │                            │
+│       └────────────┬───────────┘                            │
+│                    ▼                                        │
+│           UsersTableWithContext (0 props)                   │
+│                    │                                        │
+│                    ▼                                        │
+│         UsersTableRowWithContext (1 prop)                   │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Contexts المتوفرة
+
+| Context | الوظيفة |
+|---------|---------|
+| `UsersContext` | بيانات وعمليات المستخدمين |
+| `UsersDialogsContext` | حالة حوارات المستخدمين |
+| `RolesContext` | بيانات وعمليات الأدوار |
+| `AuthContext` | المصادقة والمستخدم الحالي |
+
+---
+
 ## 🧪 الجودة والاختبار
 
 - **TypeScript**: تغطية كاملة للأنواع
 - **ESLint**: قواعد الكود
 - **Error Boundaries**: معالجة الأخطاء
 - **Logging**: نظام تسجيل شامل
+- **Lazy Loading**: للحوارات والمكونات الثقيلة
 
 ---
 
@@ -269,5 +304,5 @@ const QUERY_CONFIG = {
 
 ---
 
-**الإصدار**: 2.9.5  
+**الإصدار**: 2.9.14  
 **آخر تحديث**: 2025-12-14
