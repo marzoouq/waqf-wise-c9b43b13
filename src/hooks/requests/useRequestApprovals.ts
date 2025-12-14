@@ -45,7 +45,7 @@ export function useRequestApprovals(requestId?: string) {
     };
   }, [queryClient]);
 
-  const { data: approvals = [], isLoading } = useQuery({
+  const { data: approvals = [], isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.REQUEST_APPROVALS(requestId),
     queryFn: () => ApprovalService.getRequestApprovalsByRequestId(requestId!),
     enabled: !!requestId,
@@ -101,6 +101,8 @@ export function useRequestApprovals(requestId?: string) {
   return {
     approvals,
     isLoading,
+    error,
+    refetch,
     addApproval: addApproval.mutateAsync,
     updateApproval: updateApproval.mutateAsync,
     checkAllApproved,

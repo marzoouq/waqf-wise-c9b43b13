@@ -12,7 +12,7 @@ export const useMaintenanceSchedules = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: schedules = [], isLoading } = useQuery({
+  const { data: schedules = [], isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.MAINTENANCE_SCHEDULES,
     queryFn: () => MaintenanceService.getSchedules(),
   });
@@ -76,6 +76,8 @@ export const useMaintenanceSchedules = () => {
   return {
     schedules,
     isLoading,
+    error,
+    refetch,
     addSchedule,
     updateSchedule,
     deleteSchedule,

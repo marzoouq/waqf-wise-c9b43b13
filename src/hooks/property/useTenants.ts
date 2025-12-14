@@ -12,7 +12,7 @@ export function useTenants() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: tenants = [], isLoading } = useQuery({
+  const { data: tenants = [], isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.TENANTS,
     queryFn: (): Promise<TenantWithBalance[]> => TenantService.getTenantsWithBalance(),
   });
@@ -66,6 +66,8 @@ export function useTenants() {
   return {
     tenants,
     isLoading,
+    error,
+    refetch,
     addTenant: addTenant.mutateAsync,
     updateTenant: updateTenant.mutateAsync,
     deleteTenant: deleteTenant.mutateAsync,

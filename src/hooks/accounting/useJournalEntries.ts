@@ -55,7 +55,7 @@ export function useJournalEntries() {
     };
   }, [queryClient]);
 
-  const { data: entries = [], isLoading } = useQuery({
+  const { data: entries = [], isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.JOURNAL_ENTRIES,
     queryFn: () => AccountingService.getJournalEntriesWithLines(),
   });
@@ -145,6 +145,8 @@ export function useJournalEntries() {
   return {
     entries,
     isLoading,
+    error,
+    refetch,
     createEntry: createEntry.mutateAsync,
     postEntry: postEntry.mutateAsync,
     createAutoEntry,

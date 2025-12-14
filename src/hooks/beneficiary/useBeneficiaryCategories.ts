@@ -15,7 +15,7 @@ export interface BeneficiaryCategory {
 }
 
 export function useBeneficiaryCategories() {
-  const { data: categories = [], isLoading } = useQuery({
+  const { data: categories = [], isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.BENEFICIARY_CATEGORIES,
     queryFn: () => BeneficiaryService.getCategories(),
   });
@@ -26,5 +26,7 @@ export function useBeneficiaryCategories() {
     categories,
     activeCategories,
     isLoading,
+    error,
+    refetch,
   };
 }

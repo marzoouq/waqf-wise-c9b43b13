@@ -26,7 +26,7 @@ export function useActiveSessions() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
-  const { data: sessions = [], isLoading } = useQuery({
+  const { data: sessions = [], isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.ACTIVE_SESSIONS(user?.id),
     queryFn: async () => {
       if (!user?.id) return [];
@@ -84,6 +84,8 @@ export function useActiveSessions() {
   return {
     sessions,
     isLoading,
+    error,
+    refetch,
     endSession: endSession.mutateAsync,
     endAllOtherSessions: endAllOtherSessions.mutateAsync,
     isEndingSession: endSession.isPending,

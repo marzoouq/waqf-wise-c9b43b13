@@ -7,7 +7,7 @@ export function useBackup() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: backupLogs, isLoading } = useQuery({
+  const { data: backupLogs, isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.BACKUP_LOGS,
     queryFn: () => SystemService.getBackupLogs(),
     staleTime: QUERY_CONFIG.DEFAULT.staleTime,
@@ -81,6 +81,8 @@ export function useBackup() {
     backupLogs,
     backupSchedules,
     isLoading,
+    error,
+    refetch,
     createBackup: createBackup.mutateAsync,
     restoreBackup: restoreBackup.mutateAsync,
     isCreatingBackup: createBackup.isPending,

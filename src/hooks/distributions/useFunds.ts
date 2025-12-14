@@ -33,7 +33,7 @@ export function useFunds() {
     };
   }, [queryClient]);
 
-  const { data: funds = [], isLoading } = useQuery({
+  const { data: funds = [], isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.FUNDS,
     queryFn: () => FundService.getAll(true),
     staleTime: QUERY_STALE_TIME.DEFAULT,
@@ -60,6 +60,8 @@ export function useFunds() {
   return {
     funds,
     isLoading,
+    error,
+    refetch,
     addFund: addFund.mutate,
     addFundAsync: addFund.mutateAsync,
     updateFund: updateFund.mutate,

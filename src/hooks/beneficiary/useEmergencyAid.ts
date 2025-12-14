@@ -8,7 +8,7 @@ export function useEmergencyAid() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: emergencyAids = [], isLoading } = useQuery({
+  const { data: emergencyAids = [], isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.EMERGENCY_AID,
     queryFn: () => LoansService.getEmergencyAids(),
   });
@@ -34,6 +34,8 @@ export function useEmergencyAid() {
   return {
     emergencyAids,
     isLoading,
+    error,
+    refetch,
     addEmergencyAid: addEmergencyAid.mutate,
     updateEmergencyAid: updateEmergencyAid.mutate,
   };
