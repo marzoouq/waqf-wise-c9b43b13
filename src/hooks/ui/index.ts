@@ -38,3 +38,10 @@ export {
   type MultiSheetExcelConfig,
   type FinancialStatementConfig
 } from './useUnifiedExport';
+export { 
+  useFilteredData, 
+  useSearchFilter, 
+  useRoleFilter,
+  type FilterConfig,
+  type UseFilteredDataReturn 
+} from './useFilteredData';
