@@ -41,7 +41,7 @@ export function FinancialReports() {
           التقارير المالية
         </h2>
         <Button variant="outline">
-          <Download className="h-4 w-4 ml-2" />
+          <Download className="h-4 w-4 ms-2" />
           تصدير PDF
         </Button>
       </div>

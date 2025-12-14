@@ -194,7 +194,7 @@ export function ApprovalWorkflowDialog({
                     disabled={isSubmitting}
                     className="flex-1"
                   >
-                    <CheckCircle2 className="ml-2 h-4 w-4" />
+                    <CheckCircle2 className="ms-2 h-4 w-4" />
                     موافقة
                   </Button>
                   <Button
@@ -203,7 +203,7 @@ export function ApprovalWorkflowDialog({
                     variant="destructive"
                     className="flex-1"
                   >
-                    <XCircle className="ml-2 h-4 w-4" />
+                    <XCircle className="ms-2 h-4 w-4" />
                     رفض
                   </Button>
                 </div>

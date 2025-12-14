@@ -55,7 +55,7 @@ export function IntegratedReportsWidget() {
             </CardDescription>
           </div>
           <Button variant="outline" size="sm" onClick={() => navigate("/reports")}>
-            <Download className="h-4 w-4 ml-2" />
+            <Download className="h-4 w-4 ms-2" />
             جميع التقارير
           </Button>
         </div>

@@ -24,7 +24,7 @@ export function BudgetManagement() {
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">الموازنات التقديرية</h2>
         <Button>
-          <Plus className="ml-2 h-4 w-4" />
+          <Plus className="ms-2 h-4 w-4" />
           موازنة جديدة
         </Button>
       </div>

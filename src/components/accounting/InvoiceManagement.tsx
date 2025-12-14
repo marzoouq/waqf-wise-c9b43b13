@@ -52,11 +52,11 @@ export function InvoiceManagement() {
         <h2 className="text-2xl font-bold">إدارة الفواتير</h2>
         <div className="flex gap-2">
           <Button variant="outline" onClick={() => setShowOCRDialog(true)}>
-            <ScanLine className="ml-2 h-4 w-4" />
+            <ScanLine className="ms-2 h-4 w-4" />
             استيراد من صورة
           </Button>
           <Button>
-            <Plus className="ml-2 h-4 w-4" />
+            <Plus className="ms-2 h-4 w-4" />
             فاتورة جديدة
           </Button>
         </div>
@@ -131,7 +131,7 @@ export function InvoiceManagement() {
                     size="sm"
                     onClick={() => updateStatus(invoice.id, "sent")}
                   >
-                    <Send className="ml-2 h-4 w-4" />
+                    <Send className="ms-2 h-4 w-4" />
                     إرسال
                   </Button>
                 )}
@@ -141,7 +141,7 @@ export function InvoiceManagement() {
                     className="bg-success hover:bg-success/90"
                     onClick={() => updateStatus(invoice.id, "paid")}
                   >
-                    <CheckCircle className="ml-2 h-4 w-4" />
+                    <CheckCircle className="ms-2 h-4 w-4" />
                     تأكيد الدفع
                   </Button>
                 )}

@@ -109,15 +109,15 @@ export function TrialBalanceReport() {
           </div>
           <div className="flex gap-2 print:hidden flex-wrap">
             <Button variant="outline" size="sm" onClick={handlePrint}>
-              <Printer className="ml-2 h-4 w-4" />
+              <Printer className="ms-2 h-4 w-4" />
               طباعة
             </Button>
             <Button variant="outline" size="sm" onClick={handleExportPDF}>
-              <FileText className="ml-2 h-4 w-4" />
+              <FileText className="ms-2 h-4 w-4" />
               تصدير PDF
             </Button>
             <Button variant="outline" size="sm" onClick={handleExportExcel}>
-              <Download className="ml-2 h-4 w-4" />
+              <Download className="ms-2 h-4 w-4" />
               تصدير Excel
             </Button>
           </div>

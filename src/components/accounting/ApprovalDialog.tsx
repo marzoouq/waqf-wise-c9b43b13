@@ -80,14 +80,14 @@ const ApprovalDialog = ({ open, onOpenChange, journalEntryId, entryNumber }: Pro
             onClick={() => handleApprove("rejected")}
             disabled={!approverName || addApproval.isPending}
           >
-            <XCircle className="h-4 w-4 ml-2" />
+            <XCircle className="h-4 w-4 ms-2" />
             رفض
           </Button>
           <Button
             onClick={() => handleApprove("approved")}
             disabled={!approverName || addApproval.isPending}
           >
-            <CheckCircle className="h-4 w-4 ml-2" />
+            <CheckCircle className="h-4 w-4 ms-2" />
             موافقة
           </Button>
         </DialogFooter>
