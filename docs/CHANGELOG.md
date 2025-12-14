@@ -1,6 +1,74 @@
 # 📝 سجل التغييرات | Changelog
 
-**الإصدار الحالي:** 2.9.2 | **آخر تحديث:** 2025-12-13
+**الإصدار الحالي:** 2.9.5 | **آخر تحديث:** 2025-12-14
+
+---
+
+## [2.9.5] - 2025-12-14
+
+### 🏗️ إعادة تنظيم بوابة المستفيد (BeneficiaryPortal Restructure)
+
+#### ✅ المرحلة 1: إصلاحات حرجة (Critical)
+| المشكلة | الحل | الموقع |
+|---------|------|--------|
+| `handleRetry` يستخدم `window.location.reload()` | استبدال بـ `queryClient.invalidateQueries()` + `refetch()` | `BeneficiaryPortal.tsx` |
+| `get_beneficiary_statistics` RPC تقرأ من payments فقط | تعديل لتستعلم من `heir_distributions` | Database RPC |
+| `beneficiaries.total_received = 0` للجميع | إنشاء Trigger لتحديث من `heir_distributions` | Database Trigger |
+| `BeneficiaryStatementsTab` رسالة ثابتة | عرض بيانات ديناميكية من التوزيعات | `BeneficiaryStatementsTab.tsx` |
+| `useGovernanceData` بيانات hardcoded | استعلام فعلي من `governance_meetings` و `governance_decisions` | `useGovernanceData.ts` |
+
+#### ✅ المرحلة 2: إصلاحات متوسطة (Medium)
+| المشكلة | الحل |
+|---------|------|
+| `QuickActionsGrid` يستخدم `/support` | تصحيح إلى `/beneficiary-support` |
+| `TabRenderer` يستخدم `any` | استبدال بـ `Partial<VisibilitySettings>` |
+| `onChangePassword` callback فارغ | ربط بـ `navigate('/settings')` |
+
+#### ✅ المرحلة 3: تحسينات اختيارية (Optional)
+| التحسين | الوصف |
+|---------|-------|
+| توحيد `HeirDistribution` interface | مكان واحد في `types/distribution.ts` |
+| إنشاء `MobileCardBase` | مكون أساسي موحد لبطاقات الجوال |
+| إضافة `TabErrorBoundary` | عزل الأخطاء لكل تبويب |
+| **إعادة تنظيم ملفات التبويبات** | نقل 16 ملف `*Tab.tsx` إلى `tabs/` |
+
+#### 📁 هيكل التبويبات الجديد
+```
+src/components/beneficiary/
+├── tabs/                          ← 16 ملف تبويب منظم
+│   ├── BeneficiaryProfileTab.tsx
+│   ├── BeneficiaryDistributionsTab.tsx
+│   ├── BeneficiaryStatementsTab.tsx
+│   ├── BeneficiaryPropertiesTab.tsx
+│   ├── BeneficiaryDocumentsTab.tsx
+│   ├── BeneficiaryRequestsTab.tsx
+│   ├── WaqfSummaryTab.tsx
+│   ├── FamilyTreeTab.tsx
+│   ├── GovernanceTab.tsx
+│   ├── BankAccountsTab.tsx
+│   ├── FinancialReportsTab.tsx
+│   ├── FinancialTransparencyTab.tsx
+│   ├── BudgetsTab.tsx
+│   ├── LoansOverviewTab.tsx
+│   ├── ApprovalsLogTab.tsx
+│   ├── DisclosuresTab.tsx
+│   └── index.ts
+├── cards/                         ← بطاقات الجوال
+│   ├── MobileCardBase.tsx         ← جديد
+│   └── ...
+├── common/                        ← مكونات مشتركة
+│   ├── TabErrorBoundary.tsx       ← جديد
+│   └── ...
+└── TabRenderer.tsx                ← محدث
+```
+
+#### 📊 إحصائيات التحسين
+| المقياس | قبل | بعد |
+|---------|-----|-----|
+| ملفات Tab في الجذر | 16 | 0 |
+| ملفات Tab في tabs/ | 0 | 16 |
+| Error Boundaries | 0 | 1 (TabErrorBoundary) |
+| MobileCardBase | لا يوجد | موجود |
 
 ---
 
