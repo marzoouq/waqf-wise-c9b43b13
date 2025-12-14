@@ -2,11 +2,11 @@
  * Application Version Information
  * معلومات إصدار التطبيق
  * 
- * @version 2.9.8
+ * @version 2.9.9
  * @date 2025-12-14
  */
 
-export const APP_VERSION = '2.9.8';
+export const APP_VERSION = '2.9.9';
 export const APP_VERSION_DATE = '2025-12-14';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
@@ -21,8 +21,8 @@ export const VERSION_INFO = {
     'QUERY_KEYS موحد لـ React Query',
     'Realtime موحد للوحات التحكم والمستخدمين',
     '50+ صلاحية مفعلة للناظر والمدير',
-    'UsersContext لتقليل Props Drilling',
-    'useUsersRealtime للتحديثات الفورية',
+    'Pagination لسجل التدقيق (469 سجل)',
+    'useFilteredData hook موحد للتصفية',
   ],
 } as const;
 
