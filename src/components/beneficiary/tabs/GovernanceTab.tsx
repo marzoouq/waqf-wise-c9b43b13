@@ -1,18 +1,20 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Calendar, Users, AlertCircle, Inbox } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { FileText, Calendar, Users, Inbox, ScrollText, BookOpen, ExternalLink } from "lucide-react";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { useGovernanceData } from "@/hooks/useGovernanceData";
 import { format, arLocale as ar } from "@/lib/date";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { ErrorState } from "@/components/shared/ErrorState";
+import { useNavigate } from "react-router-dom";
+import { CoreValuesSection } from "@/components/governance/CoreValuesSection";
 
 export function GovernanceTab() {
   const { settings } = useVisibilitySettings();
-  // Note: useGovernanceData returns static empty data currently, no error/refetch available
   const { meetings, decisions, auditReports, isLoading, hasMeetings, hasDecisions, hasAuditReports } = useGovernanceData();
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
 
   if (!settings?.show_governance) {
     return (
@@ -41,6 +43,59 @@ export function GovernanceTab() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
+      {/* الدليل الإرشادي والحوكمة */}
+      <Card className="border-destructive/30 bg-gradient-to-br from-destructive/5 to-background overflow-hidden">
+        <CardHeader className="p-4 sm:p-6 pb-2 sm:pb-3">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-2 rounded-lg bg-destructive/10">
+                <ScrollText className="h-5 w-5 sm:h-6 sm:w-6 text-destructive" />
+              </div>
+              <div>
+                <CardTitle className="text-sm sm:text-base">الدليل الإرشادي والحوكمة</CardTitle>
+                <CardDescription className="text-[10px] sm:text-xs mt-0.5">
+                  اللائحة التنفيذية لوقف مرزوق علي الثبيتي
+                </CardDescription>
+              </div>
+            </div>
+            <Badge variant="outline" className="text-[10px] sm:text-xs border-destructive/30 text-destructive shrink-0">
+              <BookOpen className="h-3 w-3 ml-1" />
+              17 جزء
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent className="p-4 sm:p-6 pt-2 sm:pt-3 space-y-4">
+          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+            يحتوي هذا الدليل على القيم الأساسية للوقف، الهيكل التنظيمي، صلاحيات الناظر،
+            آلية توزيع الأرباح، وسياسات الاستثمار والحوكمة.
+          </p>
+          
+          {/* القيم الأساسية مختصرة */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+            {[
+              { icon: "🛡️", label: "الأمانة" },
+              { icon: "💚", label: "النزاهة" },
+              { icon: "👁️", label: "الشفافية" },
+              { icon: "⚖️", label: "العدالة" },
+            ].map((value) => (
+              <div key={value.label} className="flex items-center gap-2 p-2 sm:p-2.5 bg-muted/50 rounded-lg">
+                <span className="text-base sm:text-lg">{value.icon}</span>
+                <span className="text-[10px] sm:text-xs font-medium">{value.label}</span>
+              </div>
+            ))}
+          </div>
+
+          <Button 
+            onClick={() => navigate('/governance/guide')}
+            variant="outline"
+            className="w-full border-destructive/30 hover:bg-destructive/10 hover:text-destructive text-xs sm:text-sm"
+          >
+            <ExternalLink className="h-3.5 w-3.5 sm:h-4 sm:w-4 ml-2" />
+            عرض الدليل الكامل واللائحة التنفيذية
+          </Button>
+        </CardContent>
+      </Card>
+
       {settings?.show_governance_meetings && (
         hasMeetings ? (
           <Card>
