@@ -137,11 +137,10 @@ export default function AdminDashboard() {
         {/* Security Tab - Lazy Load */}
         <TabsContent value="security" className="space-y-6 mt-6">
           <LazyTabContent isActive={activeTab === "security"}>
+            {/* SecurityAlertsSection موجود في System tab - هنا نعرض فقط AuditLogs */}
             <Suspense fallback={<ChartSkeleton />}>
-              <SecurityAlertsSection />
+              <AuditLogsPreview />
             </Suspense>
-            
-            {/* AuditLogsPreview removed - available in System tab */}
           </LazyTabContent>
         </TabsContent>
 
@@ -152,14 +151,9 @@ export default function AdminDashboard() {
               <SystemPerformanceChart />
             </Suspense>
 
-            <div className="grid gap-6 lg:grid-cols-2">
-              <Suspense fallback={<ChartSkeleton />}>
-                <SystemHealthMonitor />
-              </Suspense>
-              <Suspense fallback={<ChartSkeleton />}>
-                <UsersActivityChart />
-              </Suspense>
-            </div>
+            <Suspense fallback={<ChartSkeleton />}>
+              <UsersActivityChart />
+            </Suspense>
           </LazyTabContent>
         </TabsContent>
 

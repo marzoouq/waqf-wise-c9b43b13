@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { productionLogger } from "@/lib/logger/production-logger";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 // الجداول التي يحتاج أمين الصندوق لمتابعتها
 const CASHIER_WATCHED_TABLES = [
@@ -21,16 +22,16 @@ const CASHIER_WATCHED_TABLES = [
   "distributions",
 ] as const;
 
-// مفاتيح الاستعلامات التي يجب تحديثها
-const INVALIDATION_MAP: Record<string, string[][]> = {
-  bank_accounts: [["cashier-stats"], ["bank-accounts"], ["bank-balance-realtime"]],
-  journal_entries: [["cashier-stats"], ["journal-entries"], ["unified-dashboard-kpis"]],
-  journal_entry_lines: [["cashier-stats"], ["journal-entries"], ["unified-dashboard-kpis"]],
-  payment_vouchers: [["cashier-stats"], ["payment-vouchers"]],
-  rental_payments: [["cashier-stats"], ["rental-payments"]],
-  accounts: [["cashier-stats"], ["accounts"]],
-  approvals: [["cashier-stats"], ["pending-approvals"]],
-  distributions: [["cashier-stats"], ["distributions"]],
+// مفاتيح الاستعلامات التي يجب تحديثها - استخدام QUERY_KEYS
+const INVALIDATION_MAP: Record<string, readonly (readonly string[])[]> = {
+  bank_accounts: [QUERY_KEYS.CASHIER_STATS, QUERY_KEYS.BANK_ACCOUNTS, QUERY_KEYS.BANK_BALANCE_REALTIME],
+  journal_entries: [QUERY_KEYS.CASHIER_STATS, QUERY_KEYS.JOURNAL_ENTRIES, QUERY_KEYS.UNIFIED_KPIS],
+  journal_entry_lines: [QUERY_KEYS.CASHIER_STATS, QUERY_KEYS.JOURNAL_ENTRIES, QUERY_KEYS.UNIFIED_KPIS],
+  payment_vouchers: [QUERY_KEYS.CASHIER_STATS, QUERY_KEYS.PAYMENT_VOUCHERS],
+  rental_payments: [QUERY_KEYS.CASHIER_STATS, QUERY_KEYS.RENTAL_PAYMENTS],
+  accounts: [QUERY_KEYS.CASHIER_STATS, QUERY_KEYS.ACCOUNTS],
+  approvals: [QUERY_KEYS.CASHIER_STATS, QUERY_KEYS.PENDING_APPROVALS],
+  distributions: [QUERY_KEYS.CASHIER_STATS, QUERY_KEYS.DISTRIBUTIONS],
 };
 
 interface UseCashierDashboardRealtimeOptions {

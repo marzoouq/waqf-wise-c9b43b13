@@ -58,8 +58,13 @@ export default function BeneficiaryPortal() {
     return <LoadingState fullScreen />;
   }
 
+  // إعادة جلب البيانات عند حدوث خطأ
+  const handleRetry = () => {
+    window.location.reload();
+  };
+
   if (error) {
-    return <ErrorState title="خطأ في تحميل البيانات" message="فشل تحميل بيانات المستفيد" onRetry={() => window.location.reload()} fullScreen />;
+    return <ErrorState title="خطأ في تحميل البيانات" message="فشل تحميل بيانات المستفيد" onRetry={handleRetry} fullScreen />;
   }
 
   if (!beneficiary) {
