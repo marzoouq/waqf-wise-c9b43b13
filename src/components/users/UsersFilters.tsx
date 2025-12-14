@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search } from "lucide-react";
+import { SYSTEM_ROLES, ROLE_LABELS } from "@/types/roles";
 
 interface UsersFiltersProps {
   searchTerm: string;
@@ -41,13 +42,11 @@ export function UsersFilters({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">جميع الأدوار</SelectItem>
-              <SelectItem value="nazer">الناظر</SelectItem>
-              <SelectItem value="admin">المشرف</SelectItem>
-              <SelectItem value="accountant">المحاسب</SelectItem>
-              <SelectItem value="cashier">موظف صرف</SelectItem>
-              <SelectItem value="archivist">أرشيفي</SelectItem>
-              <SelectItem value="beneficiary">مستفيد</SelectItem>
-              <SelectItem value="user">مستخدم</SelectItem>
+              {SYSTEM_ROLES.map((role) => (
+                <SelectItem key={role} value={role}>
+                  {ROLE_LABELS[role]}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

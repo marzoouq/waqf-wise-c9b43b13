@@ -12,7 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Permission } from "@/hooks/usePermissions";
-import { AppRole } from "@/hooks/useUserRole";
+import { type AppRole } from "@/types/roles";
 import { useRolePermissionsData } from "@/hooks/permissions/useRolePermissionsData";
 import { ErrorState } from "@/components/shared/ErrorState";
 
