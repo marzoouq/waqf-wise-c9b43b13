@@ -458,12 +458,31 @@ export class AccountingService {
    * جلب إحصائيات أمين الصندوق
    */
   static async getCashierStats() {
-    const { data: bankAccount } = await supabase.from('accounts').select('current_balance').eq('code', '1.1.1').maybeSingle();
+    const today = new Date().toISOString().split('T')[0];
+    
+    const [bankAccountRes, receiptsRes, paymentsRes, pendingRes] = await Promise.all([
+      supabase.from('accounts').select('current_balance').eq('code', '1.1.1').maybeSingle(),
+      supabase.from('journal_entry_lines')
+        .select('debit_amount, journal_entries!inner(entry_date, status)')
+        .gte('journal_entries.entry_date', today)
+        .eq('journal_entries.status', 'posted'),
+      supabase.from('journal_entry_lines')
+        .select('credit_amount, journal_entries!inner(entry_date, status)')
+        .gte('journal_entries.entry_date', today)
+        .eq('journal_entries.status', 'posted'),
+      supabase.from('journal_entries')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'draft'),
+    ]);
+
+    const todayReceipts = (receiptsRes.data || []).reduce((sum, line) => sum + (line.debit_amount || 0), 0);
+    const todayPayments = (paymentsRes.data || []).reduce((sum, line) => sum + (line.credit_amount || 0), 0);
+    
     return {
-      cashBalance: bankAccount?.current_balance || 0,
-      todayReceipts: 0,
-      todayPayments: 0,
-      pendingTransactions: 0,
+      cashBalance: bankAccountRes.data?.current_balance || 0,
+      todayReceipts,
+      todayPayments,
+      pendingTransactions: pendingRes.count || 0,
     };
   }
 

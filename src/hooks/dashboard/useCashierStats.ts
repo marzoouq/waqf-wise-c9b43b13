@@ -18,8 +18,8 @@ export function useCashierStats() {
   return useQuery({
     queryKey: QUERY_KEYS.CASHIER_STATS,
     queryFn: (): Promise<CashierStats> => AccountingService.getCashierStats(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: 2 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: true,
   });
 }

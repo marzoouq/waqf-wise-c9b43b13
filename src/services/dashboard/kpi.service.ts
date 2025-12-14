@@ -130,7 +130,7 @@ export const KPIService = {
       supabase.from('funds').select('id, is_active'),
       supabase.from('beneficiary_requests').select('id, status, is_overdue'),
       supabase.from('loans').select('id, status'),
-      supabase.from('payments').select('id, amount, payment_type, status'),
+      supabase.from('rental_payments').select('id, amount_paid, status'),
       supabase.from('journal_entry_lines').select('id, debit_amount, credit_amount')
     ]);
 
@@ -182,11 +182,10 @@ export const KPIService = {
       l.status === LOAN_STATUS.ACTIVE || l.status === 'active'
     ).length;
 
-    const payments = paymentsResult.data || [];
-    const completedPayments = payments.filter(p => p.status === 'مدفوع' || p.status === 'completed');
+    const rentalPayments = paymentsResult.data || [];
+    const completedPayments = rentalPayments.filter(p => p.status === 'مدفوع');
     const totalRevenue = completedPayments
-      .filter(p => p.payment_type === 'payment' || p.payment_type === 'إيجار')
-      .reduce((sum, p) => sum + (p.amount || 0), 0);
+      .reduce((sum, p) => sum + (p.amount_paid || 0), 0);
 
     const journalLines = journalEntriesResult.data || [];
     const totalExpenses = journalLines.reduce((sum, line) => sum + (line.credit_amount || 0), 0);
