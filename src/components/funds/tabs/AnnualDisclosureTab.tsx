@@ -267,7 +267,7 @@ export function AnnualDisclosureTab() {
                           <TableCell>
                             <div className="text-sm">
                               <span className="font-medium">{disclosure.total_beneficiaries}</span>
-                              <span className="text-muted-foreground text-xs mr-1">
+                              <span className="text-muted-foreground text-xs me-1">
                                 ({disclosure.sons_count} ابن، {disclosure.daughters_count} بنت، {disclosure.wives_count} زوجة)
                               </span>
                             </div>

@@ -137,7 +137,7 @@ export function FamilyTreeView({ familyId, familyName }: FamilyTreeViewProps) {
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
             <Button>
-              <UserPlus className="h-4 w-4 ml-2" />
+              <UserPlus className="h-4 w-4 ms-2" />
               إضافة فرد
             </Button>
           </DialogTrigger>

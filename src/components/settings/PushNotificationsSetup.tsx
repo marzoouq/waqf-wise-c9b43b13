@@ -137,7 +137,7 @@ export function PushNotificationsSetup() {
             {(isEnabled || permission === 'granted') && (
               <div className="rounded-lg bg-muted p-4 space-y-2">
                 <p className="text-sm font-medium">ستتلقى إشعارات عن:</p>
-                <ul className="text-sm space-y-1 text-muted-foreground mr-4">
+                <ul className="text-sm space-y-1 text-muted-foreground me-4">
                   <li>• طلبات جديدة تحتاج موافقتك</li>
                   <li>• تذاكر دعم تم تعيينها لك</li>
                   <li>• تحديثات على المعاملات المالية</li>

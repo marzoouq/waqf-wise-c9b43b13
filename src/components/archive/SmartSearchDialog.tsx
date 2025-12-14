@@ -82,7 +82,7 @@ export function SmartSearchDialog({ open, onOpenChange }: SmartSearchDialogProps
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             />
             <Button onClick={handleSearch} disabled={smartSearch.isPending}>
-              <Search className="h-4 w-4 ml-2" />
+              <Search className="h-4 w-4 ms-2" />
               بحث
             </Button>
           </div>

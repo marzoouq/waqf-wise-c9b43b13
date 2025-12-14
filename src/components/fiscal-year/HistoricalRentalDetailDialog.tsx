@@ -136,11 +136,11 @@ export function HistoricalRentalDetailDialog({
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       <div>
                         <span className="text-muted-foreground">الوحدة:</span>
-                        <Badge variant="outline" className="mr-1">{detail.unit_number || '-'}</Badge>
+                        <Badge variant="outline" className="me-1">{detail.unit_number || '-'}</Badge>
                       </div>
                       <div>
                         <span className="text-muted-foreground">الدور:</span>
-                        <span className="mr-1">{detail.floor_number || '-'}</span>
+                        <span className="me-1">{detail.floor_number || '-'}</span>
                       </div>
                     </div>
                     <div className="flex items-center justify-between text-sm pt-2 border-t">

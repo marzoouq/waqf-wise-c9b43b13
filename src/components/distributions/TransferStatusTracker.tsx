@@ -127,11 +127,11 @@ export function TransferStatusTracker({ transferFileId }: TransferStatusTrackerP
                 size="sm"
                 onClick={() => setAutoRefresh(!autoRefresh)}
               >
-                <RefreshCw className={`h-4 w-4 ml-2 ${autoRefresh ? 'animate-spin' : ''}`} />
+                <RefreshCw className={`h-4 w-4 ms-2 ${autoRefresh ? 'animate-spin' : ''}`} />
                 {autoRefresh ? 'إيقاف التحديث' : 'تحديث تلقائي'}
               </Button>
               <Button variant="outline" size="sm" onClick={exportReport}>
-                <Download className="h-4 w-4 ml-2" />
+                <Download className="h-4 w-4 ms-2" />
                 تصدير التقرير
               </Button>
             </div>

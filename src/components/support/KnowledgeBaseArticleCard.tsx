@@ -66,7 +66,7 @@ export function KnowledgeBaseArticleCard({ article, onView }: KnowledgeBaseArtic
           </span>
         </div>
         <Button variant="ghost" size="sm" onClick={() => onView(article.id)}>
-          <BookOpen className="h-4 w-4 ml-2" />
+          <BookOpen className="h-4 w-4 ms-2" />
           اقرأ المزيد
         </Button>
       </CardFooter>

@@ -76,7 +76,7 @@ export function FiscalYearTestPanel() {
             </CardDescription>
           </div>
           <Button onClick={runTests} disabled={testing}>
-            {testing && <Loader2 className="h-4 w-4 ml-2 animate-spin" />}
+            {testing && <Loader2 className="h-4 w-4 ms-2 animate-spin" />}
             {testing ? "جاري الاختبار..." : "تشغيل الاختبارات"}
           </Button>
         </div>

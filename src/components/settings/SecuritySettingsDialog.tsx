@@ -166,7 +166,7 @@ export function SecuritySettingsDialog({
                 variant="outline"
                 onClick={() => setTwoFactorDialogOpen(true)}
               >
-                <Key className="h-4 w-4 ml-2" />
+                <Key className="h-4 w-4 ms-2" />
                 إعداد المصادقة الثنائية
               </Button>
             </CardContent>
@@ -186,7 +186,7 @@ export function SecuritySettingsDialog({
                 variant="outline"
                 onClick={() => setActiveSessionsDialogOpen(true)}
               >
-                <Monitor className="h-4 w-4 ml-2" />
+                <Monitor className="h-4 w-4 ms-2" />
                 إدارة الجلسات النشطة
               </Button>
             </CardContent>
