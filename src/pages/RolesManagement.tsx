@@ -18,9 +18,14 @@ import { Label } from "@/components/ui/label";
 import { type AppRole, ROLE_LABELS, ROLE_COLORS } from "@/types/roles";
 import { useRolesManagement } from "@/hooks/users/useRolesManagement";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useUsersRealtime } from "@/hooks/users/useUsersRealtime";
 
 const RolesManagement = () => {
   const isMobile = useIsMobile();
+  
+  // Realtime updates
+  useUsersRealtime();
+  
   const {
     filteredUsers,
     auditLogs,
