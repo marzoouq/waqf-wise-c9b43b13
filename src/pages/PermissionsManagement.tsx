@@ -23,17 +23,7 @@ import {
 } from "@/components/ui/table";
 import { AppRole } from "@/hooks/useUserRole";
 import { usePermissionsManagement } from "@/hooks/usePermissionsManagement";
-
-const ROLE_LABELS: Record<AppRole, string> = {
-  admin: "المشرف",
-  nazer: "الناظر",
-  accountant: "المحاسب",
-  cashier: "موظف الصرف",
-  archivist: "الأرشيفي",
-  beneficiary: "مستفيد",
-  waqf_heir: "وارث الوقف",
-  user: "مستخدم",
-};
+import { ROLE_LABELS } from "@/lib/role-labels";
 
 const CATEGORY_LABELS: Record<string, string> = {
   funds: "المصارف",

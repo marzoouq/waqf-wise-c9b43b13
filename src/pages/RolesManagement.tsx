@@ -18,28 +18,7 @@ import { Label } from "@/components/ui/label";
 import { AppRole } from "@/hooks/useUserRole";
 import { useRolesManagement } from "@/hooks/useRolesManagement";
 import { useIsMobile } from "@/hooks/use-mobile";
-
-const ROLE_LABELS: Record<AppRole, string> = {
-  admin: "المشرف",
-  nazer: "الناظر",
-  accountant: "المحاسب",
-  cashier: "موظف الصرف",
-  archivist: "الأرشيفي",
-  beneficiary: "مستفيد",
-  waqf_heir: "وارث الوقف",
-  user: "مستخدم",
-};
-
-const ROLE_COLORS: Record<AppRole, string> = {
-  admin: "bg-destructive text-destructive-foreground",
-  nazer: "bg-primary text-primary-foreground",
-  accountant: "bg-success text-success-foreground",
-  cashier: "bg-warning text-warning-foreground",
-  archivist: "bg-info text-info-foreground",
-  beneficiary: "bg-accent text-accent-foreground",
-  waqf_heir: "bg-amber-500 text-amber-50",
-  user: "bg-muted text-muted-foreground",
-};
+import { ROLE_LABELS, ROLE_COLORS } from "@/lib/role-labels";
 
 const RolesManagement = () => {
   const isMobile = useIsMobile();
