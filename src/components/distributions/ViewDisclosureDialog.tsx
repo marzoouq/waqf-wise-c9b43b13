@@ -425,7 +425,7 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                   </p>
                   
                   {/* ضريبة القيمة المضافة */}
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-2 sm:p-3 bg-orange-500/10 rounded-lg border border-orange-500/20 mr-0 sm:mr-6 gap-1">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-2 sm:p-3 bg-orange-500/10 rounded-lg border border-orange-500/20 me-0 sm:me-6 gap-1">
                     <div className="flex items-center gap-2">
                       <MinusCircle className="h-3 w-3 sm:h-4 sm:w-4 text-orange-600" />
                       <span className="text-xs sm:text-sm">(-) ضريبة القيمة المضافة (15%)</span>
@@ -434,7 +434,7 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                   </div>
 
                   {/* حصة الناظر */}
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-2 sm:p-3 bg-purple-500/10 rounded-lg border border-purple-500/20 mr-0 sm:mr-6 gap-1">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-2 sm:p-3 bg-purple-500/10 rounded-lg border border-purple-500/20 me-0 sm:me-6 gap-1">
                     <div className="flex items-center gap-2">
                       <MinusCircle className="h-3 w-3 sm:h-4 sm:w-4 text-purple-600" />
                       <span className="text-xs sm:text-sm">(-) حصة الناظر ({disclosure.nazer_percentage}%)</span>
@@ -443,7 +443,7 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                   </div>
 
                   {/* صدقة الواقف */}
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-2 sm:p-3 bg-pink-500/10 rounded-lg border border-pink-500/20 mr-0 sm:mr-6 gap-1">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-2 sm:p-3 bg-pink-500/10 rounded-lg border border-pink-500/20 me-0 sm:me-6 gap-1">
                     <div className="flex items-center gap-2">
                       <MinusCircle className="h-3 w-3 sm:h-4 sm:w-4 text-pink-600" />
                       <span className="text-xs sm:text-sm">(-) صدقة الواقف ({disclosure.charity_percentage}%)</span>
@@ -452,7 +452,7 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                   </div>
 
                   {/* إجمالي الاستقطاعات */}
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-2 sm:p-3 bg-muted rounded-lg mr-0 sm:mr-6 border gap-1">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-2 sm:p-3 bg-muted rounded-lg me-0 sm:me-6 border gap-1">
                     <span className="font-semibold text-xs sm:text-sm">إجمالي الاستقطاعات</span>
                     <p className="font-bold text-sm sm:text-base">({formatCurrency(totalDeductions)})</p>
                   </div>

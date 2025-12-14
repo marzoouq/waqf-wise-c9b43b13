@@ -93,7 +93,7 @@ export function FinancialAnalyticsDashboard() {
               </CardDescription>
             </div>
             <Button onClick={handleCalculate} disabled={isCalculating}>
-              <RefreshCw className={`h-4 w-4 ml-2 ${isCalculating ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`h-4 w-4 ms-2 ${isCalculating ? 'animate-spin' : ''}`} />
               حساب المؤشرات
             </Button>
           </div>

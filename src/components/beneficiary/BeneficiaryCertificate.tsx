@@ -125,11 +125,11 @@ export function BeneficiaryCertificate({
           </CardTitle>
           <div className="flex gap-2 print:hidden">
             <Button variant="outline" size="sm" onClick={handlePrint}>
-              <Printer className="h-4 w-4 ml-2" />
+              <Printer className="h-4 w-4 ms-2" />
               طباعة
             </Button>
             <Button variant="outline" size="sm" onClick={handleGeneratePDF}>
-              <Download className="h-4 w-4 ml-2" />
+              <Download className="h-4 w-4 ms-2" />
               تحميل PDF
             </Button>
           </div>

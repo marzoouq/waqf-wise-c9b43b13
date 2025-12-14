@@ -210,18 +210,18 @@ export function DistributionWizard({ open, onOpenChange, onComplete }: Distribut
             onClick={handleBack}
             disabled={currentStep === 1}
           >
-            <ArrowLeft className="h-4 w-4 ml-2" />
+            <ArrowLeft className="h-4 w-4 ms-2" />
             السابق
           </Button>
 
           {currentStep < steps.length ? (
             <Button onClick={handleNext} disabled={!canProceed()}>
               التالي
-              <ArrowRight className="h-4 w-4 mr-2" />
+              <ArrowRight className="h-4 w-4 me-2" />
             </Button>
           ) : (
             <Button onClick={handleComplete} disabled={!canProceed()}>
-              <Check className="h-4 w-4 ml-2" />
+              <Check className="h-4 w-4 ms-2" />
               إنشاء التوزيع
             </Button>
           )}
