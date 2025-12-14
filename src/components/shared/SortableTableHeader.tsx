@@ -43,9 +43,9 @@ export function SortableTableHeader({
         className="h-8 font-semibold hover:bg-muted"
       >
         {label}
-        {!isActive && <ArrowUpDown className="mr-2 h-4 w-4" />}
-        {direction === "asc" && <ArrowUp className="mr-2 h-4 w-4 text-primary" />}
-        {direction === "desc" && <ArrowDown className="mr-2 h-4 w-4 text-primary" />}
+        {!isActive && <ArrowUpDown className="me-2 h-4 w-4" />}
+        {direction === "asc" && <ArrowUp className="me-2 h-4 w-4 text-primary" />}
+        {direction === "desc" && <ArrowDown className="me-2 h-4 w-4 text-primary" />}
       </Button>
     </TableHead>
   );

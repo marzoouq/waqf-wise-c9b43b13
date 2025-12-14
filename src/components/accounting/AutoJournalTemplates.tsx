@@ -34,7 +34,7 @@ export function AutoJournalTemplates() {
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button>
-              <Plus className="ml-2 h-4 w-4" />
+              <Plus className="ms-2 h-4 w-4" />
               قالب جديد
             </Button>
           </DialogTrigger>

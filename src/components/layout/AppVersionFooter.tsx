@@ -5,7 +5,7 @@ const AppVersionFooter = memo(function AppVersionFooter() {
   return (
     <footer className="text-center text-xs text-muted-foreground py-2 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <span>الإصدار {APP_VERSION}</span>
-      <span className="mr-2 text-muted-foreground/70">
+      <span className="me-2 text-muted-foreground/70">
         ({new Date(APP_VERSION_DATE).toLocaleDateString('ar-SA')})
       </span>
     </footer>

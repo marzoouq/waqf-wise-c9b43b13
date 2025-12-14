@@ -29,7 +29,7 @@ export function ShiftStatusBar({ shift, onOpenShift, onCloseShift, isOpeningShif
               </div>
             </div>
             <Button onClick={onOpenShift} disabled={isOpeningShift}>
-              <Briefcase className="h-4 w-4 ml-2" />
+              <Briefcase className="h-4 w-4 ms-2" />
               {isOpeningShift ? 'جاري البدء...' : 'بدء جلسة عمل'}
             </Button>
           </div>
@@ -48,7 +48,7 @@ export function ShiftStatusBar({ shift, onOpenShift, onCloseShift, isOpeningShif
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <Badge variant="default" className="bg-status-success">
-                <Clock className="h-3 w-3 ml-1" />
+                <Clock className="h-3 w-3 ms-1" />
                 جلسة نشطة
               </Badge>
               <span className="text-sm font-medium">{shift.shift_number}</span>

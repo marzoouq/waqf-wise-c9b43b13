@@ -237,7 +237,7 @@ export function SimulationDialog({ open, onOpenChange }: SimulationDialogProps) 
 
               <div className="flex gap-2">
                 <Button type="submit" disabled={isCalculating || loadingBeneficiaries} className="flex-1">
-                  {isCalculating && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+                  {isCalculating && <Loader2 className="ms-2 h-4 w-4 animate-spin" />}
                   تشغيل المحاكاة
                 </Button>
                 <Button 
@@ -246,7 +246,7 @@ export function SimulationDialog({ open, onOpenChange }: SimulationDialogProps) 
                   onClick={handleCompareScenarios}
                   disabled={isCalculating || loadingBeneficiaries}
                 >
-                  <TrendingUp className="ml-2 h-4 w-4" />
+                  <TrendingUp className="ms-2 h-4 w-4" />
                   مقارنة الأنماط
                 </Button>
               </div>

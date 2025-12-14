@@ -98,7 +98,7 @@ export function UnifiedFormField<TFieldValues extends FieldValues>({
         <FormItem className={className}>
           <FormLabel>
             {label}
-            {required && <span className="text-destructive mr-1">*</span>}
+            {required && <span className="text-destructive me-1">*</span>}
           </FormLabel>
           <FormControl>
             {render ? (
@@ -140,7 +140,7 @@ export function UnifiedFormField<TFieldValues extends FieldValues>({
                       !field.value && "text-muted-foreground"
                     )}
                   >
-                    <CalendarIcon className="ml-2 h-4 w-4" />
+                    <CalendarIcon className="ms-2 h-4 w-4" />
                     {field.value ? (
                       format(new Date(field.value), "PPP", { locale: ar })
                     ) : (
