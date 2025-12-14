@@ -3,13 +3,16 @@
  * Test Utilities
  */
 
-import React, { ReactElement } from 'react';
+import React, { ReactElement, ReactNode } from 'react';
 import { render, RenderOptions } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import { Toaster } from '@/components/ui/sonner';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { vi } from 'vitest';
+
+// Re-export mock utilities from setup
+export { setMockTableData, clearMockTableData } from '../../test/setup';
 
 // إنشاء QueryClient للاختبارات
 export const createTestQueryClient = () =>
@@ -44,6 +47,46 @@ const AllProviders: React.FC<AllProvidersProps> = ({ children }) => {
     </QueryClientProvider>
   );
 };
+
+/**
+ * Creates a wrapper function for testing hooks with renderHook
+ * Returns a fresh QueryClient for each test
+ */
+export const createWrapper = () => {
+  const testQueryClient = createTestQueryClient();
+  return ({ children }: { children: ReactNode }) => (
+    <QueryClientProvider client={testQueryClient}>
+      <BrowserRouter>
+        <AuthProvider>
+          {children}
+        </AuthProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+};
+
+/**
+ * Helper to create a mock authenticated user
+ */
+export const mockAuthenticatedUser = (overrides: Record<string, unknown> = {}) => ({
+  id: 'test-user-id',
+  email: 'test@example.com',
+  created_at: new Date().toISOString(),
+  ...overrides,
+});
+
+/**
+ * Helper to create a mock profile
+ */
+export const mockProfile = (overrides: Record<string, unknown> = {}) => ({
+  id: 'test-user-id',
+  full_name: 'Test User',
+  email: 'test@example.com',
+  avatar_url: null,
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+  ...overrides,
+});
 
 // دالة render مخصصة
 const customRender = (

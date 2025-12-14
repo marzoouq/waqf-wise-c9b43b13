@@ -37,6 +37,20 @@ if (typeof (globalThis as any).ResizeObserver === 'undefined') {
   (globalThis as any).ResizeObserver = MockResizeObserver;
 }
 
+// Minimal IntersectionObserver mock
+if (typeof (globalThis as any).IntersectionObserver === 'undefined') {
+  class MockIntersectionObserver {
+    readonly root: Element | null = null;
+    readonly rootMargin: string = '';
+    readonly thresholds: ReadonlyArray<number> = [];
+    observe() { return; }
+    unobserve() { return; }
+    disconnect() { return; }
+    takeRecords() { return []; }
+  }
+  (globalThis as any).IntersectionObserver = MockIntersectionObserver;
+}
+
 // Force navigator language to en-US to avoid Arabic-digit formatting in tests
 if (typeof navigator !== 'undefined') {
   try { Object.defineProperty(navigator, 'language', { value: 'en-US', configurable: true }); } catch {}
@@ -181,10 +195,10 @@ vi.mock('sonner', () => {
 });
 
 // Mock Auth context so components using `useAuth()` work in tests
-vi.mock('@/contexts/AuthContext', () => {
-  const React = require('react');
+vi.mock('@/contexts/AuthContext', async () => {
+  const React = await import('react');
   return {
-    AuthProvider: ({ children }: any) => children,
+    AuthProvider: ({ children }: { children: React.ReactNode }) => children,
     useAuth: () => ({
       user: null,
       profile: null,
