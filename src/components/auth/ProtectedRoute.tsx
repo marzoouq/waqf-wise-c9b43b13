@@ -3,8 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
 import { checkPermission, type Permission } from '@/config/permissions';
 import { useState, useEffect } from 'react';
-
-type AppRole = "nazer" | "admin" | "accountant" | "cashier" | "archivist" | "beneficiary" | "waqf_heir" | "user";
+import type { AppRole } from '@/types/roles';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;

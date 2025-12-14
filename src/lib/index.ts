@@ -37,7 +37,7 @@ export { archiveDocument } from './archiveDocument';
 export * from './distribution-engine';
 export * from './exportHelpers';
 export * from './filters';
-export * from './role-labels';
+// Role labels moved to src/types/roles.ts
 export * from './design-tokens';
 export * from './version';
 export * from './mutationHelpers';

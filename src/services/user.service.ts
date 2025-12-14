@@ -4,9 +4,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { productionLogger } from "@/lib/logger/production-logger";
-import type { Database } from "@/integrations/supabase/types";
-
-type AppRole = Database['public']['Enums']['app_role'];
+import type { AppRole } from "@/types/roles";
 
 export interface UserStats {
   totalUsers: number;

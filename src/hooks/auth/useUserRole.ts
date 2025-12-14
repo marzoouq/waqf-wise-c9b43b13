@@ -1,7 +1,9 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useMemo } from "react";
+import type { AppRole } from "@/types/roles";
 
-export type AppRole = "nazer" | "admin" | "accountant" | "cashier" | "archivist" | "beneficiary" | "waqf_heir" | "user";
+// Re-export AppRole for backward compatibility
+export type { AppRole } from "@/types/roles";
 
 /**
  * Hook للحصول على أدوار المستخدم من AuthContext

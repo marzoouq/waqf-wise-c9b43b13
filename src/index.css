@@ -67,6 +67,21 @@
     --status-warning: 38 92% 50%;
     --status-error: 0 72% 51%;
     --status-info: 210 100% 50%;
+    
+    /* ألوان الأدوار */
+    --role-nazer: 270 60% 50%;
+    --role-admin: 210 80% 50%;
+    --role-accountant: 150 60% 45%;
+    --role-cashier: 45 90% 50%;
+    --role-archivist: 200 15% 50%;
+    --role-beneficiary: 330 70% 55%;
+    --role-waqf-heir: 35 90% 55%;
+    --role-user: 210 10% 55%;
+    --role-manager: 240 60% 55%;
+    --role-finance: 185 70% 45%;
+    --role-reviewer: 165 55% 45%;
+    --role-financial-manager: 145 65% 45%;
+    --role-executor: 25 85% 55%;
 
     /* الحدود والإدخال */
     --border: 150 15% 88%;
@@ -158,6 +173,21 @@
     --border: 150 20% 25%;
     --input: 150 20% 25%;
     --ring: 150 50% 50%;
+    
+    /* ألوان الأدوار - الوضع الداكن */
+    --role-nazer: 270 55% 60%;
+    --role-admin: 210 75% 60%;
+    --role-accountant: 150 55% 55%;
+    --role-cashier: 45 85% 60%;
+    --role-archivist: 200 15% 60%;
+    --role-beneficiary: 330 65% 65%;
+    --role-waqf-heir: 35 85% 65%;
+    --role-user: 210 10% 65%;
+    --role-manager: 240 55% 65%;
+    --role-finance: 185 65% 55%;
+    --role-reviewer: 165 50% 55%;
+    --role-financial-manager: 145 60% 55%;
+    --role-executor: 25 80% 65%;
 
     --sidebar-background: 150 30% 15%;
     --sidebar-foreground: 150 15% 90%;

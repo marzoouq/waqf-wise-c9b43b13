@@ -12,10 +12,9 @@ import { LoadingState } from "@/components/shared/LoadingState";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { format, arLocale as ar } from "@/lib/date";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
-import { Database } from "@/integrations/supabase/types";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { useAuth } from "@/hooks/useAuth";
-import { ROLE_LABELS } from "@/lib/role-labels";
+import { ROLE_LABELS, type AppRole } from "@/types/roles";
 import { useUsersManagement, type UserProfile } from "@/hooks/useUsersManagement";
 import { usePermissions } from "@/hooks/usePermissions";
 
@@ -25,8 +24,6 @@ import { UsersTable } from "@/components/users/UsersTable";
 import { EditRolesDialog } from "@/components/users/EditRolesDialog";
 import { ResetPasswordDialog } from "@/components/users/ResetPasswordDialog";
 import { EditUserEmailDialog } from "@/components/users/EditUserEmailDialog";
-
-type AppRole = Database['public']['Enums']['app_role'];
 
 const Users = () => {
   const { toast } = useToast();

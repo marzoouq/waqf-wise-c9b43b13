@@ -50,27 +50,18 @@ export interface UserSession {
   ended_at: string | null;
 }
 
-/**
- * أسماء الأدوار - متطابقة مع قاعدة البيانات (app_role enum)
- * Database roles: nazer, admin, accountant, cashier, archivist, user, waqf_heir, beneficiary
- */
+// تم نقل تعريفات الأدوار إلى src/types/roles.ts
+// Re-export for backward compatibility
+export type { AppRole } from './roles';
+export { ROLE_LABELS, SYSTEM_ROLES } from './roles';
+
+/** @deprecated استخدم AppRole بدلاً من RoleName */
 export type RoleName = 
   | 'nazer' 
   | 'admin' 
   | 'accountant' 
-  | 'cashier'           // موظف الصرف (was disbursement_officer)
+  | 'cashier'
   | 'archivist' 
-  | 'user'              // مستخدم عادي
-  | 'beneficiary'       // مستفيد
-  | 'waqf_heir';        // وارث الوقف
-
-export const ROLE_NAMES_AR: Record<RoleName, string> = {
-  nazer: 'الناظر',
-  admin: 'المشرف',
-  accountant: 'المحاسب',
-  cashier: 'موظف الصرف',
-  archivist: 'أرشيفي',
-  user: 'مستخدم',
-  beneficiary: 'مستفيد',
-  waqf_heir: 'وارث الوقف',
-};
+  | 'user'
+  | 'beneficiary'
+  | 'waqf_heir';

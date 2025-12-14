@@ -9,7 +9,7 @@ import {
 import { useUserRole } from "@/hooks/useUserRole";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ChevronDown, Shield, User, Calculator, Wallet, Archive, Users, LucideIcon } from "lucide-react";
-import { ROLE_LABELS } from "@/lib/role-labels";
+import { ROLE_LABELS } from "@/types/roles";
 
 const roleRoutes: Record<string, string> = {
   nazer: "/nazer-dashboard",
