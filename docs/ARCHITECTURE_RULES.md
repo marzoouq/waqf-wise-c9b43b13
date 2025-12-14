@@ -135,7 +135,7 @@ grep -r "\.select.*\.eq.*\.single()" src/services/ --include="*.ts"
 | الخدمات الإجمالية | 51+ | ✅ |
 | استخدام `.maybeSingle()` | 474+ | ✅ |
 | QUERY_KEYS موحد | 390+ | ✅ |
-| RLS Policies | 724 | ✅ |
+| RLS Policies | 646 | ✅ |
 
 ---
 
