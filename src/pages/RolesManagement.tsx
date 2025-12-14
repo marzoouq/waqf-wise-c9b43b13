@@ -16,7 +16,7 @@ import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { AppRole } from "@/hooks/useUserRole";
-import { useRolesManagement } from "@/hooks/useRolesManagement";
+import { useRolesManagement } from "@/hooks/users/useRolesManagement";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ROLE_LABELS, ROLE_COLORS } from "@/lib/role-labels";
 

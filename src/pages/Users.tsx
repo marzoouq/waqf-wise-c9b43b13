@@ -1,54 +1,38 @@
+/**
+ * Users Page
+ * صفحة إدارة المستخدمين - مُعاد هيكلتها إلى مكونات فرعية
+ */
+
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Search, Shield, Edit, Trash2, CheckCircle, XCircle, Download, Key, AlertCircle, Mail } from "lucide-react";
+import { Shield, Download } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { ErrorState } from "@/components/shared/ErrorState";
-import { EmptyState } from "@/components/shared/EmptyState";
-import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { format, arLocale as ar } from "@/lib/date";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { Database } from "@/integrations/supabase/types";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { useAuth } from "@/hooks/useAuth";
 import { ROLE_LABELS } from "@/lib/role-labels";
-import { 
-  useUsersManagement, 
-  type UserProfile 
-} from "@/hooks/useUsersManagement";
-import { EditUserEmailDialog } from "@/components/users/EditUserEmailDialog";
+import { useUsersManagement, type UserProfile } from "@/hooks/useUsersManagement";
 import { usePermissions } from "@/hooks/usePermissions";
 
-// Use Database enum for AppRole (DB only has 7 roles)
-type AppRole = Database['public']['Enums']['app_role'];
+// Components
+import { UsersFilters } from "@/components/users/UsersFilters";
+import { UsersTable } from "@/components/users/UsersTable";
+import { EditRolesDialog } from "@/components/users/EditRolesDialog";
+import { ResetPasswordDialog } from "@/components/users/ResetPasswordDialog";
+import { EditUserEmailDialog } from "@/components/users/EditUserEmailDialog";
 
-// استخدام ROLE_COLORS من المصدر الموحد مع تجاوز محلي للتوافق مع semantic tokens
-const roleColors: Record<AppRole, string> = {
-  nazer: "bg-primary/10 text-primary border-primary/30",
-  admin: "bg-destructive/10 text-destructive border-destructive/30",
-  accountant: "bg-info/10 text-info border-info/30",
-  cashier: "bg-success/10 text-success border-success/30",
-  archivist: "bg-warning/10 text-warning border-warning/30",
-  beneficiary: "bg-accent/10 text-accent border-accent/30",
-  waqf_heir: "bg-amber-100 text-amber-700 border-amber-300",
-  user: "bg-muted/10 text-muted-foreground border-border/30",
-};
+type AppRole = Database['public']['Enums']['app_role'];
 
 const Users = () => {
   const { toast } = useToast();
   const { user: currentUser } = useAuth();
   const { hasPermission } = usePermissions();
   
-  // استخدام hook إدارة المستخدمين
   const {
     users,
     isLoading,
@@ -60,6 +44,7 @@ const Users = () => {
     resetPassword: resetPasswordMutation,
   } = useUsersManagement();
   
+  // State
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -73,17 +58,14 @@ const Users = () => {
   const [editEmailDialogOpen, setEditEmailDialogOpen] = useState(false);
   const [selectedUserForEmail, setSelectedUserForEmail] = useState<UserProfile | null>(null);
 
-  // صلاحية تعديل البريد الإلكتروني
   const canEditEmail = hasPermission("admin.edit_user_email");
 
   // Filter users
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    
     const matchesRole = roleFilter === "all" || 
                        user.user_roles?.some(r => r.role === roleFilter);
-
     return matchesSearch && matchesRole;
   });
 
@@ -113,27 +95,16 @@ const Users = () => {
     });
   };
 
+  // Handlers
   const handleDeleteClick = (user: UserProfile) => {
-    // منع حذف المستخدم الحالي
     if (user.user_id === currentUser?.id) {
-      toast({
-        title: "تحذير",
-        description: "لا يمكنك حذف حسابك الخاص",
-        variant: "destructive",
-      });
+      toast({ title: "تحذير", description: "لا يمكنك حذف حسابك الخاص", variant: "destructive" });
       return;
     }
-
-    // منع حذف الناظر
     if (user.user_roles?.some(r => r.role === "nazer")) {
-      toast({
-        title: "تحذير",
-        description: "لا يمكن حذف حساب الناظر",
-        variant: "destructive",
-      });
+      toast({ title: "تحذير", description: "لا يمكن حذف حساب الناظر", variant: "destructive" });
       return;
     }
-
     setUserToDelete(user);
     setDeleteDialogOpen(true);
   };
@@ -161,16 +132,10 @@ const Users = () => {
         userId: selectedUser.user_id,
         roles: selectedRoles,
       }, {
-        onSuccess: () => {
-          setEditDialogOpen(false);
-        }
+        onSuccess: () => setEditDialogOpen(false)
       });
     } else if (!selectedUser?.user_id) {
-      toast({
-        title: "خطأ",
-        description: "هذا المستخدم ليس لديه حساب مفعّل في النظام",
-        variant: "destructive",
-      });
+      toast({ title: "خطأ", description: "هذا المستخدم ليس لديه حساب مفعّل في النظام", variant: "destructive" });
     }
   };
 
@@ -180,6 +145,25 @@ const Users = () => {
     } else {
       setSelectedRoles([...selectedRoles, role]);
     }
+  };
+
+  const handleResetPassword = () => {
+    if (selectedUserForReset?.user_id) {
+      resetPasswordMutation.mutate({
+        userId: selectedUserForReset.user_id,
+        password: newPassword
+      }, {
+        onSuccess: () => {
+          setResetPasswordDialogOpen(false);
+          setNewPassword("");
+          setSelectedUserForReset(null);
+        }
+      });
+    }
+  };
+
+  const showNotAvailableToast = () => {
+    toast({ title: "غير متاح", description: "هذا المستخدم ليس لديه حساب مفعّل في النظام", variant: "destructive" });
   };
 
   if (isLoading) {
@@ -200,322 +184,63 @@ const Users = () => {
   return (
     <PageErrorBoundary pageName="إدارة المستخدمين">
       <MobileOptimizedLayout>
-      <MobileOptimizedHeader
-        title="إدارة المستخدمين"
-        description="إدارة المستخدمين والأدوار والصلاحيات"
-        icon={<Shield className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
-        actions={
-          <Button onClick={exportUsers} variant="outline" size="sm">
-            <Download className="h-4 w-4 sm:h-5 sm:w-5 ml-2" />
-            <span className="hidden sm:inline">تصدير ({filteredUsers.length})</span>
-            <span className="sm:hidden">تصدير</span>
-          </Button>
-        }
-      />
+        <MobileOptimizedHeader
+          title="إدارة المستخدمين"
+          description="إدارة المستخدمين والأدوار والصلاحيات"
+          icon={<Shield className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
+          actions={
+            <Button onClick={exportUsers} variant="outline" size="sm">
+              <Download className="h-4 w-4 sm:h-5 sm:w-5 ml-2" />
+              <span className="hidden sm:inline">تصدير ({filteredUsers.length})</span>
+              <span className="sm:hidden">تصدير</span>
+            </Button>
+          }
+        />
 
-        {/* Filters */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="البحث بالاسم أو البريد الإلكتروني..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pr-10"
-                />
-              </div>
+        <UsersFilters
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          roleFilter={roleFilter}
+          onRoleFilterChange={setRoleFilter}
+        />
 
-              <Select value={roleFilter} onValueChange={setRoleFilter}>
-                <SelectTrigger className="w-full md:w-[200px]">
-                  <SelectValue placeholder="تصفية حسب الدور" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">جميع الأدوار</SelectItem>
-                  <SelectItem value="nazer">الناظر</SelectItem>
-                  <SelectItem value="admin">المشرف</SelectItem>
-                  <SelectItem value="accountant">المحاسب</SelectItem>
-                  <SelectItem value="cashier">موظف صرف</SelectItem>
-                  <SelectItem value="archivist">أرشيفي</SelectItem>
-                  <SelectItem value="beneficiary">مستفيد</SelectItem>
-                  <SelectItem value="user">مستخدم</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
-        </Card>
+        <UsersTable
+          users={filteredUsers}
+          currentUserId={currentUser?.id}
+          canEditEmail={canEditEmail}
+          onEditRoles={handleEditRoles}
+          onEditEmail={(user) => {
+            setSelectedUserForEmail(user);
+            setEditEmailDialogOpen(true);
+          }}
+          onResetPassword={(user) => {
+            setSelectedUserForReset(user);
+            setResetPasswordDialogOpen(true);
+          }}
+          onDelete={handleDeleteClick}
+          onStatusChange={(userId, isActive) => updateStatusMutation.mutate({ userId, isActive })}
+          onShowNotAvailableToast={showNotAvailableToast}
+        />
 
-        {/* Users Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5" />
-              المستخدمون ({filteredUsers.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {filteredUsers.length === 0 ? (
-              <EmptyState
-                icon={Shield}
-                title="لا يوجد مستخدمون"
-                description="لا يوجد مستخدمون مطابقون للبحث"
-              />
-            ) : (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="text-right whitespace-nowrap">الاسم</TableHead>
-                      <TableHead className="text-right whitespace-nowrap">البريد الإلكتروني</TableHead>
-                      <TableHead className="text-right whitespace-nowrap hidden md:table-cell">الهاتف</TableHead>
-                      <TableHead className="text-right whitespace-nowrap">الأدوار</TableHead>
-                      <TableHead className="text-right whitespace-nowrap hidden lg:table-cell">الحالة</TableHead>
-                      <TableHead className="text-right whitespace-nowrap hidden lg:table-cell">آخر تسجيل دخول</TableHead>
-                      <TableHead className="text-right whitespace-nowrap">الإجراءات</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredUsers.map((user) => (
-                      <TableRow key={user.id}>
-                        <TableCell className="font-medium text-xs sm:text-sm">{user.full_name}</TableCell>
-                        <TableCell className="text-xs sm:text-sm">{user.email}</TableCell>
-                        <TableCell className="hidden md:table-cell text-xs sm:text-sm">{user.phone || "-"}</TableCell>
-                        <TableCell>
-                          <div className="flex flex-wrap gap-1">
-                            {user.user_roles?.map((roleObj, idx) => {
-                              const role = roleObj.role as AppRole;
-                              return (
-                                <Badge
-                                  key={idx}
-                                  variant="outline"
-                                  className={roleColors[role] + " text-xs whitespace-nowrap"}
-                                >
-                                  {ROLE_LABELS[role as keyof typeof ROLE_LABELS] || role}
-                                </Badge>
-                              );
-                            })}
-                          </div>
-                        </TableCell>
-                        <TableCell className="hidden lg:table-cell">
-                          <div className="flex items-center gap-2">
-                            <Switch
-                              checked={user.is_active}
-                              onCheckedChange={(checked) =>
-                                updateStatusMutation.mutate({
-                                  userId: user.user_id,
-                                  isActive: checked,
-                                })
-                              }
-                            />
-                            {user.is_active ? (
-                              <CheckCircle className="h-4 w-4 text-success" />
-                            ) : (
-                              <XCircle className="h-4 w-4 text-destructive" />
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          {user.last_login_at
-                            ? new Date(user.last_login_at).toLocaleDateString("ar-SA")
-                            : "-"}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex gap-1">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                if (!user.user_id) {
-                                  toast({
-                                    title: "غير متاح",
-                                    description: "هذا المستخدم ليس لديه حساب مفعّل في النظام",
-                                    variant: "destructive",
-                                  });
-                                  return;
-                                }
-                                handleEditRoles(user);
-                              }}
-                              title={user.user_id ? "تعديل الأدوار" : "غير متاح - لا يوجد حساب"}
-                              disabled={!user.user_id}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            {canEditEmail && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => {
-                                  if (!user.user_id) {
-                                    toast({
-                                      title: "غير متاح",
-                                      description: "هذا المستخدم ليس لديه حساب مفعّل في النظام",
-                                      variant: "destructive",
-                                    });
-                                    return;
-                                  }
-                                  setSelectedUserForEmail(user);
-                                  setEditEmailDialogOpen(true);
-                                }}
-                                title={user.user_id ? "تعديل البريد الإلكتروني" : "غير متاح - لا يوجد حساب"}
-                                disabled={!user.user_id}
-                              >
-                                <Mail className="h-4 w-4" />
-                              </Button>
-                            )}
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                if (!user.user_id) {
-                                  toast({
-                                    title: "غير متاح",
-                                    description: "هذا المستخدم ليس لديه حساب مفعّل في النظام",
-                                    variant: "destructive",
-                                  });
-                                  return;
-                                }
-                                setSelectedUserForReset(user);
-                                setResetPasswordDialogOpen(true);
-                              }}
-                              title={user.user_id ? "تعيين كلمة مرور مؤقتة" : "غير متاح - لا يوجد حساب"}
-                              disabled={!user.user_id}
-                            >
-                              <Key className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDeleteClick(user)}
-                              title="حذف المستخدم"
-                              className="text-destructive hover:text-destructive"
-                              disabled={
-                                user.user_id === currentUser?.id ||
-                                user.user_roles?.some(r => r.role === "nazer")
-                              }
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Edit Roles Dialog */}
-        <ResponsiveDialog 
-          open={editDialogOpen} 
+        <EditRolesDialog
+          open={editDialogOpen}
           onOpenChange={setEditDialogOpen}
-          title="تعديل الأدوار"
-          description={`تحديد أدوار المستخدم: ${selectedUser?.full_name}`}
-          size="md"
-        >
-          <div className="space-y-4">
-            {(Object.keys(ROLE_LABELS).filter(r => 
-              ['nazer', 'admin', 'accountant', 'cashier', 'archivist', 'beneficiary', 'user'].includes(r)
-            ) as AppRole[]).map((role) => (
-              <div
-                key={role}
-                className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent/50 transition-colors cursor-pointer"
-                onClick={() => toggleRole(role)}
-              >
-                <div className="flex items-center gap-3">
-                  <Switch
-                    checked={selectedRoles.includes(role)}
-                    onCheckedChange={() => toggleRole(role)}
-                  />
-                  <Label className="cursor-pointer">{ROLE_LABELS[role as keyof typeof ROLE_LABELS]}</Label>
-                </div>
-                <Badge variant="outline" className={roleColors[role]}>
-                  {role}
-                </Badge>
-              </div>
-            ))}
-          </div>
+          user={selectedUser}
+          selectedRoles={selectedRoles}
+          onToggleRole={toggleRole}
+          onSave={handleSaveRoles}
+          isSaving={updateRolesMutation.isPending}
+        />
 
-          <div className="flex gap-2 justify-end mt-4">
-            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
-              إلغاء
-            </Button>
-            <Button
-              onClick={handleSaveRoles}
-              disabled={selectedRoles.length === 0 || !selectedUser?.user_id || updateRolesMutation.isPending}
-            >
-              {updateRolesMutation.isPending ? "جاري الحفظ..." : "حفظ التغييرات"}
-            </Button>
-          </div>
-        </ResponsiveDialog>
-
-        {/* Reset Password Dialog */}
-        <ResponsiveDialog 
-          open={resetPasswordDialogOpen} 
+        <ResetPasswordDialog
+          open={resetPasswordDialogOpen}
           onOpenChange={setResetPasswordDialogOpen}
-          title="تعيين كلمة مرور مؤقتة"
-          description={`تعيين كلمة مرور جديدة للمستخدم: ${selectedUserForReset?.full_name}`}
-          size="sm"
-        >
-          <div className="space-y-4">
-            <Alert className="border-warning/50 bg-warning/10">
-              <AlertCircle className="h-4 w-4 text-warning" />
-              <AlertTitle>تنبيه أمني</AlertTitle>
-              <AlertDescription>
-                سيتم إرسال إشعار للمستخدم بتغيير كلمة المرور. يُنصح بإخباره شخصياً.
-              </AlertDescription>
-            </Alert>
-
-            <div className="space-y-2">
-              <Label htmlFor="newPassword">كلمة المرور الجديدة *</Label>
-              <Input
-                id="newPassword"
-                type="text"
-                placeholder="أدخل كلمة المرور المؤقتة (8 أحرف على الأقل)"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="text-left"
-                dir="ltr"
-              />
-              <p className="text-xs text-muted-foreground">
-                مثال: User@123456
-              </p>
-            </div>
-          </div>
-
-          <div className="flex gap-2 justify-end mt-4">
-            <Button 
-              variant="outline" 
-              onClick={() => {
-                setResetPasswordDialogOpen(false);
-                setNewPassword("");
-              }}
-            >
-              إلغاء
-            </Button>
-            <Button
-              onClick={() => {
-                if (selectedUserForReset?.user_id) {
-                  resetPasswordMutation.mutate({
-                    userId: selectedUserForReset.user_id,
-                    password: newPassword
-                  }, {
-                    onSuccess: () => {
-                      setResetPasswordDialogOpen(false);
-                      setNewPassword("");
-                      setSelectedUserForReset(null);
-                    }
-                  });
-                }
-              }}
-              disabled={newPassword.length < 8 || resetPasswordMutation.isPending || !selectedUserForReset?.user_id}
-            >
-              {resetPasswordMutation.isPending ? "جاري التحديث..." : "تعيين كلمة المرور"}
-            </Button>
-          </div>
-        </ResponsiveDialog>
+          user={selectedUserForReset}
+          password={newPassword}
+          onPasswordChange={setNewPassword}
+          onReset={handleResetPassword}
+          isResetting={resetPasswordMutation.isPending}
+        />
 
         <DeleteConfirmDialog
           open={deleteDialogOpen}
