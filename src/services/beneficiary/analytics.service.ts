@@ -135,15 +135,21 @@ export class BeneficiaryAnalyticsService {
 
   /**
    * جلب التوزيعات السنوية للمستفيد
+   * تستخدم السنة المالية للوقف (25 أكتوبر - 24 أكتوبر)
    */
   static async getYearlyDistributions(beneficiaryId: string, year: string) {
     try {
+      // السنة المالية تبدأ من 25 أكتوبر وتنتهي في 24 أكتوبر من السنة التالية
+      // مثال: السنة المالية 2025 = 25 أكتوبر 2024 إلى 24 أكتوبر 2025
+      const fiscalYearStart = `${parseInt(year) - 1}-10-25`;
+      const fiscalYearEnd = `${year}-10-24`;
+      
       const { data, error } = await supabase
         .from('heir_distributions')
-        .select('share_amount, distribution_date, heir_type, notes')
+        .select('share_amount, distribution_date, heir_type, notes, fiscal_years(name)')
         .eq('beneficiary_id', beneficiaryId)
-        .gte('distribution_date', `${year}-01-01`)
-        .lte('distribution_date', `${year}-12-31`)
+        .gte('distribution_date', fiscalYearStart)
+        .lte('distribution_date', fiscalYearEnd)
         .order('distribution_date', { ascending: false });
 
       if (error) throw error;
