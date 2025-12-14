@@ -1,8 +1,7 @@
 import { useState, useMemo } from "react";
 import { Search, Printer, Edit, Trash2 } from "lucide-react";
-import { useContracts } from "@/hooks/useContracts";
+import { useContractsPaginated } from "@/hooks/property/useContractsPaginated";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { format, arLocale as ar } from "@/lib/date";
@@ -13,6 +12,8 @@ import { ContractPrintTemplate } from "@/components/contracts/ContractPrintTempl
 import { ContractStatusBadge } from "@/components/contracts/ContractStatusBadge";
 import { ContractExpiryAlert } from "@/components/contracts/ContractExpiryAlert";
 import { UnifiedDataTable } from "@/components/unified/UnifiedDataTable";
+import { PaginationControls } from "@/components/ui/pagination-controls";
+import { PAGE_SIZE_OPTIONS } from "@/lib/pagination.types";
 
 interface Props {
   onEdit: (contract: Contract) => void;
@@ -21,7 +22,20 @@ interface Props {
 export const ContractsTab = ({ onEdit }: Props) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [printContract, setPrintContract] = useState<Contract | null>(null);
-  const { contracts, isLoading, deleteContract } = useContracts();
+  
+  const { 
+    contracts, 
+    isLoading, 
+    deleteContract,
+    pagination,
+    goToPage,
+    nextPage,
+    prevPage,
+    changePageSize,
+    canGoNext,
+    canGoPrev,
+  } = useContractsPaginated();
+  
   const { printWithData } = usePrint();
 
   const handleDelete = (id: string) => {
@@ -38,6 +52,7 @@ export const ContractsTab = ({ onEdit }: Props) => {
     }, 100);
   };
 
+  // البحث المحلي في الصفحة الحالية
   const filteredContracts = useMemo(() => {
     if (!searchQuery) return contracts;
     
@@ -46,7 +61,7 @@ export const ContractsTab = ({ onEdit }: Props) => {
       (c) =>
         c.contract_number.toLowerCase().includes(query) ||
         c.tenant_name.toLowerCase().includes(query) ||
-        c.properties?.name.toLowerCase().includes(query)
+        c.properties?.name?.toLowerCase().includes(query)
     ) || [];
   }, [contracts, searchQuery]);
 
@@ -64,21 +79,10 @@ export const ContractsTab = ({ onEdit }: Props) => {
     'الحالة': c.status,
   }));
 
-  const getStatusBadge = (status: string) => {
-    const styles = {
-      "نشط": "bg-success/10 text-success",
-      "منتهي": "bg-muted text-muted-foreground",
-      "ملغي": "bg-destructive/10 text-destructive",
-      "متأخر": "bg-warning/10 text-warning",
-      "مسودة": "bg-primary/10 text-primary",
-    };
-    return styles[status as keyof typeof styles] || "bg-muted";
-  };
-
   return (
     <div className="space-y-6">
       {/* Contract Expiry Alerts */}
-      <ContractExpiryAlert contracts={contracts} />
+      <ContractExpiryAlert contracts={contracts as Contract[]} />
 
       {/* Search and Export */}
       <div className="flex flex-col sm:flex-row gap-3">
@@ -103,7 +107,7 @@ export const ContractsTab = ({ onEdit }: Props) => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="p-4">
           <div className="text-sm text-muted-foreground">إجمالي العقود</div>
-          <div className="text-2xl font-bold">{contracts?.length || 0}</div>
+          <div className="text-2xl font-bold">{pagination.totalCount}</div>
         </Card>
         <Card className="p-4">
           <div className="text-sm text-muted-foreground">عقود نشطة</div>
@@ -193,7 +197,7 @@ export const ContractsTab = ({ onEdit }: Props) => {
             )
           }
         ]}
-        data={filteredContracts}
+        data={filteredContracts as Contract[]}
         loading={isLoading}
         emptyMessage="لا توجد عقود"
         actions={(contract: Contract) => (
@@ -229,6 +233,28 @@ export const ContractsTab = ({ onEdit }: Props) => {
         )}
         showMobileScrollHint={true}
       />
+
+      {/* Pagination Controls */}
+      {pagination.totalPages > 1 && (
+        <PaginationControls
+          currentPage={pagination.page}
+          totalPages={pagination.totalPages}
+          totalItems={pagination.totalCount}
+          pageSize={pagination.pageSize}
+          pageSizeOptions={PAGE_SIZE_OPTIONS}
+          startIndex={(pagination.page - 1) * pagination.pageSize + 1}
+          endIndex={Math.min(pagination.page * pagination.pageSize, pagination.totalCount)}
+          canGoNext={canGoNext}
+          canGoPrev={canGoPrev}
+          onPageChange={goToPage}
+          onPageSizeChange={changePageSize}
+          onNext={nextPage}
+          onPrev={prevPage}
+          onFirst={() => goToPage(1)}
+          onLast={() => goToPage(pagination.totalPages)}
+          className="rounded-lg border"
+        />
+      )}
     </div>
   );
 };

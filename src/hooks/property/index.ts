@@ -5,6 +5,7 @@
 
 export { useProperties, type Property } from './useProperties';
 export { useContracts, type Contract } from './useContracts';
+export { useContractsPaginated } from './useContractsPaginated';
 export { useRentalPayments, type RentalPayment, filterRelevantPayments } from './useRentalPayments';
 export { useRentalPaymentArchiving } from './useRentalPaymentArchiving';
 export { usePropertyUnits } from './usePropertyUnits';
