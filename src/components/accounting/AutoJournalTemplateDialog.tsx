@@ -192,7 +192,7 @@ export function AutoJournalTemplateDialog({ open, onOpenChange, template }: Prop
           <div className="flex items-center justify-between">
             <Label>الحسابات المدينة *</Label>
             <Button type="button" variant="outline" size="sm" onClick={addDebitAccount}>
-              <Plus className="h-4 w-4 ml-1" />
+              <Plus className="h-4 w-4 ms-1" />
               إضافة
             </Button>
           </div>
@@ -237,7 +237,7 @@ export function AutoJournalTemplateDialog({ open, onOpenChange, template }: Prop
           <div className="flex items-center justify-between">
             <Label>الحسابات الدائنة *</Label>
             <Button type="button" variant="outline" size="sm" onClick={addCreditAccount}>
-              <Plus className="h-4 w-4 ml-1" />
+              <Plus className="h-4 w-4 ms-1" />
               إضافة
             </Button>
           </div>

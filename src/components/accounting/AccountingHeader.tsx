@@ -28,7 +28,7 @@ export const AccountingHeader = memo(({ onBankReconciliation }: AccountingHeader
         size="sm"
         className="w-full sm:w-auto"
       >
-        <Building2 className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
+        <Building2 className="ms-2 h-4 w-4 sm:h-5 sm:w-5" />
         <span className="hidden sm:inline">التسوية البنكية</span>
         <span className="sm:hidden">التسوية</span>
       </Button>

@@ -129,7 +129,7 @@ export function ContractCalculations({
       <div className="space-y-2">
         <Label>
           التأمين (ريال) - اختياري
-          <span className="text-xs text-muted-foreground mr-2">
+          <span className="text-xs text-muted-foreground me-2">
             (مبلغ يُدفع مرة واحدة عند توقيع العقد)
           </span>
         </Label>

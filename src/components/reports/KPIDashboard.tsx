@@ -156,7 +156,7 @@ export function KPIDashboard({ category, limit, className }: KPIDashboardProps) 
                   <span className={trendColor}>
                     {kpi.change_percentage > 0 ? '+' : ''}{kpi.change_percentage.toFixed(1)}%
                   </span>
-                  <span className="text-muted-foreground mr-1">من الفترة السابقة</span>
+                  <span className="text-muted-foreground me-1">من الفترة السابقة</span>
                 </div>
               )}
 

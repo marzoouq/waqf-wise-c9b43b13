@@ -223,15 +223,15 @@ export function AdvancedSearchDialog({ open, onOpenChange, onSearch }: AdvancedS
 
         <div className="flex flex-col sm:flex-row justify-end gap-2 pt-4">
           <Button variant="outline" onClick={handleClear} className="w-full sm:w-auto">
-            <X className="ml-2 h-4 w-4" />
+            <X className="ms-2 h-4 w-4" />
             مسح
           </Button>
           <Button variant="outline" onClick={() => setShowSaveDialog(true)} className="w-full sm:w-auto">
-            <Save className="ml-2 h-4 w-4" />
+            <Save className="ms-2 h-4 w-4" />
             حفظ البحث
           </Button>
           <Button onClick={handleSearch} className="w-full sm:w-auto">
-            <Search className="ml-2 h-4 w-4" />
+            <Search className="ms-2 h-4 w-4" />
             بحث
           </Button>
         </div>

@@ -129,7 +129,7 @@ export function SettingsCategoryCard({
                   id={setting.key}
                   checked={getSettingValue(setting.key)}
                   onCheckedChange={(value) => onSettingChange(setting.key, value)}
-                  className="shrink-0 mr-2"
+                  className="shrink-0 me-2"
                 />
               </div>
             ))}

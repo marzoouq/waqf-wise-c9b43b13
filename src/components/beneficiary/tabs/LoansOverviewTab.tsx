@@ -71,9 +71,9 @@ export function LoansOverviewTab() {
                   </div>
                   <Badge variant={loan.status === "active" ? "default" : "secondary"}>
                     {loan.status === "active" ? (
-                      <AlertCircle className="h-4 w-4 ml-1" />
+                      <AlertCircle className="h-4 w-4 ms-1" />
                     ) : (
-                      <CheckCircle className="h-4 w-4 ml-1" />
+                      <CheckCircle className="h-4 w-4 ms-1" />
                     )}
                     {statusLabel}
                   </Badge>

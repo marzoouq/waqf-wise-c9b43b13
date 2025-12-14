@@ -76,7 +76,7 @@ export function JournalEntryForm() {
           <div className="flex items-center justify-between">
             <Label>أسطر القيد</Label>
             <Button variant="outline" size="sm" onClick={addLine}>
-              <Plus className="h-4 w-4 ml-2" />
+              <Plus className="h-4 w-4 ms-2" />
               إضافة سطر
             </Button>
           </div>
@@ -192,7 +192,7 @@ export function JournalEntryForm() {
           className="w-full"
           size="lg"
         >
-          <Save className="h-4 w-4 ml-2" />
+          <Save className="h-4 w-4 ms-2" />
           {isSaving ? 'جاري الحفظ...' : 'حفظ القيد'}
         </Button>
 

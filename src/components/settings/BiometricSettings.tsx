@@ -108,8 +108,8 @@ export function BiometricSettings() {
           <Fingerprint className="h-5 w-5" />
           المصادقة بالبصمة
           {hasBiometricEnabled && (
-            <Badge variant="default" className="mr-2">
-              <ShieldCheck className="h-3 w-3 ml-1" />
+            <Badge variant="default" className="me-2">
+              <ShieldCheck className="h-3 w-3 ms-1" />
               مفعّلة
             </Badge>
           )}
@@ -165,12 +165,12 @@ export function BiometricSettings() {
         >
           {isRegistering ? (
             <>
-              <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+              <Loader2 className="ms-2 h-4 w-4 animate-spin" />
               جاري التسجيل...
             </>
           ) : (
             <>
-              <Fingerprint className="ml-2 h-4 w-4" />
+              <Fingerprint className="ms-2 h-4 w-4" />
               {hasBiometricEnabled ? 'إضافة جهاز آخر' : 'تفعيل البصمة'}
             </>
           )}
