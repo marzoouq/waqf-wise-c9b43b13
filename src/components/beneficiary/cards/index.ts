@@ -10,6 +10,18 @@ export { StatsCard } from '../StatsCard';
 export { StatsCardSkeleton } from '../StatsCardSkeleton';
 export { ReportsExplanationCard } from '../ReportsExplanationCard';
 
+// Mobile Card Base
+export { 
+  MobileCardBase, 
+  CardInfoRow, 
+  CardInfoGrid, 
+  CardInfoItem,
+  type MobileCardBaseProps,
+  type CardInfoRowProps,
+  type CardInfoGridProps,
+  type CardInfoItemProps,
+} from './MobileCardBase';
+
 // Mobile Cards
 export { MobileDistributionCard } from './MobileDistributionCard';
 export { MobileStatementCard } from './MobileStatementCard';
