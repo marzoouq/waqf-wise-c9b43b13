@@ -42,7 +42,7 @@ export function BulkActionsBar({
         <div className="flex gap-2">
           {onExport && (
             <Button size="sm" variant="outline" onClick={onExport}>
-              <Download className="h-4 w-4 ml-2" />
+              <Download className="h-4 w-4 ms-2" />
               تصدير
             </Button>
           )}
@@ -61,13 +61,13 @@ export function BulkActionsBar({
 
           {onDelete && (
             <Button size="sm" variant="destructive" onClick={onDelete}>
-              <Trash2 className="h-4 w-4 ml-2" />
+              <Trash2 className="h-4 w-4 ms-2" />
               حذف
             </Button>
           )}
 
           <Button size="sm" variant="ghost" onClick={onClearSelection}>
-            <X className="h-4 w-4 ml-2" />
+            <X className="h-4 w-4 ms-2" />
             إلغاء
           </Button>
         </div>

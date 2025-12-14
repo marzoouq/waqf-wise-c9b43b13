@@ -26,7 +26,7 @@ export function BeneficiaryProfileTab({ beneficiary }: BeneficiaryProfileTabProp
             <CardDescription>البيانات الأساسية للمستفيد</CardDescription>
           </div>
           <Button variant="outline" size="sm">
-            <Edit className="h-4 w-4 ml-2" />
+            <Edit className="h-4 w-4 ms-2" />
             تعديل
           </Button>
         </CardHeader>

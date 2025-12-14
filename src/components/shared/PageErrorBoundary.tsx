@@ -73,7 +73,7 @@ export class PageErrorBoundary extends Component<Props, State> {
 
               <div className="flex gap-3 pt-4">
                 <Button onClick={this.handleReset} className="flex-1">
-                  <RefreshCw className="ml-2 h-4 w-4" />
+                  <RefreshCw className="ms-2 h-4 w-4" />
                   إعادة المحاولة
                 </Button>
                 <Button
@@ -81,7 +81,7 @@ export class PageErrorBoundary extends Component<Props, State> {
                   onClick={() => window.location.href = "/"}
                   className="flex-1"
                 >
-                  <Home className="ml-2 h-4 w-4" />
+                  <Home className="ms-2 h-4 w-4" />
                   العودة للرئيسية
                 </Button>
               </div>

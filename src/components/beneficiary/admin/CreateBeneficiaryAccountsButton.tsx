@@ -172,9 +172,9 @@ export function CreateBeneficiaryAccountsButton() {
         size="sm"
       >
         {loadingBeneficiaries ? (
-          <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+          <Loader2 className="ms-2 h-4 w-4 animate-spin" />
         ) : (
-          <UserPlus className="ml-2 h-4 w-4" />
+          <UserPlus className="ms-2 h-4 w-4" />
         )}
         إنشاء حسابات المستفيدين
       </Button>

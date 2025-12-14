@@ -206,7 +206,7 @@ export const RequestsDesktopView = memo(({
                           }}
                           className="text-xs"
                         >
-                          <GitBranch className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
+                          <GitBranch className="h-3 w-3 sm:h-4 sm:w-4 ms-1 sm:ms-2" />
                           <span className="hidden sm:inline">مسار الموافقات</span>
                           <span className="sm:hidden">موافقات</span>
                         </Button>
@@ -219,7 +219,7 @@ export const RequestsDesktopView = memo(({
                           }}
                           className="text-xs"
                         >
-                          <MessageSquare className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
+                          <MessageSquare className="h-3 w-3 sm:h-4 sm:w-4 ms-1 sm:ms-2" />
                           <span className="hidden sm:inline">التعليقات</span>
                         </Button>
                         <Button

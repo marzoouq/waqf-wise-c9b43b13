@@ -275,11 +275,11 @@ export function SystemSettingsDialog({ open, onOpenChange }: SystemSettingsDialo
 
       <div className="flex justify-end gap-2 mt-6">
         <Button variant="outline" onClick={handleReset} disabled={isSaving}>
-          <RotateCcw className="h-4 w-4 ml-2" />
+          <RotateCcw className="h-4 w-4 ms-2" />
           استعادة
         </Button>
         <Button onClick={handleSave} disabled={isSaving}>
-          <Save className="h-4 w-4 ml-2" />
+          <Save className="h-4 w-4 ms-2" />
           {isSaving ? "جاري الحفظ..." : "حفظ التغييرات"}
         </Button>
       </div>

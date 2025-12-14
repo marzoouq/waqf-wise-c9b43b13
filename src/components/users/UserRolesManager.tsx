@@ -93,9 +93,9 @@ export function UserRolesManager({ userId }: { userId: string }) {
             disabled={isAdding}
           >
             {isAdding ? (
-              <Loader2 className="h-4 w-4 animate-spin ml-2" />
+              <Loader2 className="h-4 w-4 animate-spin ms-2" />
             ) : (
-              <UserPlus className="h-4 w-4 ml-2" />
+              <UserPlus className="h-4 w-4 ms-2" />
             )}
             إضافة
           </Button>
