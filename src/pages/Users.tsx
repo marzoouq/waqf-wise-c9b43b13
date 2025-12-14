@@ -1,7 +1,12 @@
 /**
  * Users Page
  * صفحة إدارة المستخدمين - مُحسّنة مع UsersContext و UsersDialogsContext
- * @version 2.9.12
+ * @version 2.9.13
+ * 
+ * التحسينات في هذا الإصدار:
+ * - استخدام UsersTableWithContext بدلاً من UsersTable (0 props بدلاً من 9)
+ * - نقل منطق الحذف إلى UsersTableRowWithContext
+ * - تبسيط UsersContent
  */
 
 import { useToast } from "@/hooks/use-toast";
@@ -11,7 +16,6 @@ import { Shield, Download } from "lucide-react";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
-import { usePermissions } from "@/hooks/usePermissions";
 import { useUsersRealtime } from "@/hooks/users/useUsersRealtime";
 import { UsersProvider, useUsersContext } from "@/contexts/UsersContext";
 import { UsersDialogsProvider, useUsersDialogsContext } from "@/contexts/UsersDialogsContext";
@@ -19,7 +23,7 @@ import { exportUsersToCSV } from "@/utils/export-users";
 
 // Components
 import { UsersFilters } from "@/components/users/UsersFilters";
-import { UsersTable } from "@/components/users/UsersTable";
+import { UsersTableWithContext } from "@/components/users/UsersTableWithContext";
 import { UsersTableSkeleton } from "@/components/users/UsersTableSkeleton";
 import { EditRolesDialog } from "@/components/users/EditRolesDialog";
 import { ResetPasswordDialog } from "@/components/users/ResetPasswordDialog";
@@ -27,12 +31,11 @@ import { EditUserEmailDialog } from "@/components/users/EditUserEmailDialog";
 
 const UsersContent = () => {
   const { toast } = useToast();
-  const { hasPermission } = usePermissions();
   
   // Realtime updates
   useUsersRealtime();
   
-  // Users Context
+  // Users Context - فقط ما نحتاجه
   const {
     filteredUsers,
     isLoading,
@@ -44,39 +47,30 @@ const UsersContent = () => {
     setRoleFilter,
     deleteUser,
     updateRoles,
-    updateStatus,
     resetPassword,
     isDeleting,
     isUpdatingRoles,
     isResettingPassword,
-    currentUserId,
-    showNotAvailableToast,
   } = useUsersContext();
   
   // Dialogs Context
   const {
     editRolesDialog,
     selectedRoles,
-    openEditRolesDialog,
     closeEditRolesDialog,
     toggleRole,
     
     resetPasswordDialog,
     newPassword,
     setNewPassword,
-    openResetPasswordDialog,
     closeResetPasswordDialog,
     
     deleteDialog,
-    openDeleteDialog,
     closeDeleteDialog,
     
     editEmailDialog,
-    openEditEmailDialog,
     closeEditEmailDialog,
   } = useUsersDialogsContext();
-
-  const canEditEmail = hasPermission("admin.edit_user_email");
 
   // Export
   const handleExport = () => {
@@ -87,19 +81,7 @@ const UsersContent = () => {
     });
   };
 
-  // Delete Handler (موحد - يستخدم Context فقط)
-  const handleDeleteClick = (user: typeof filteredUsers[0]) => {
-    if (user.user_id === currentUserId) {
-      toast({ title: "تحذير", description: "لا يمكنك حذف حسابك الخاص", variant: "destructive" });
-      return;
-    }
-    if (user.user_roles?.some(r => r.role === "nazer")) {
-      toast({ title: "تحذير", description: "لا يمكن حذف حساب الناظر", variant: "destructive" });
-      return;
-    }
-    openDeleteDialog(user);
-  };
-
+  // Delete Handler - موحد مع Context
   const handleDeleteConfirm = () => {
     if (deleteDialog.data) {
       deleteUser(deleteDialog.data);
@@ -156,20 +138,11 @@ const UsersContent = () => {
         onRoleFilterChange={setRoleFilter}
       />
 
+      {/* ✅ استخدام UsersTableWithContext - بدون Props Drilling */}
       {isLoading ? (
         <UsersTableSkeleton rows={5} />
       ) : (
-        <UsersTable
-          users={filteredUsers}
-          currentUserId={currentUserId}
-          canEditEmail={canEditEmail}
-          onEditRoles={openEditRolesDialog}
-          onEditEmail={openEditEmailDialog}
-          onResetPassword={openResetPasswordDialog}
-          onDelete={handleDeleteClick}
-          onStatusChange={(userId, isActive) => updateStatus(userId, isActive)}
-          onShowNotAvailableToast={showNotAvailableToast}
-        />
+        <UsersTableWithContext />
       )}
 
       <EditRolesDialog
