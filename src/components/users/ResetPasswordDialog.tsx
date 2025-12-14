@@ -44,8 +44,8 @@ export function ResetPasswordDialog({
       size="sm"
     >
       <div className="space-y-4">
-        <Alert className="border-warning/50 bg-warning/10">
-          <AlertCircle className="h-4 w-4 text-warning" />
+        <Alert className="border-status-warning/50 bg-status-warning/10">
+          <AlertCircle className="h-4 w-4 text-status-warning" />
           <AlertTitle>تنبيه أمني</AlertTitle>
           <AlertDescription>
             سيتم إرسال إشعار للمستخدم بتغيير كلمة المرور. يُنصح بإخباره شخصياً.
