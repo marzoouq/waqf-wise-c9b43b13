@@ -11,9 +11,10 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useBudgetComparison } from "@/hooks/dashboard/useDashboardCharts";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 const BudgetComparisonChart = () => {
-  const { data, isLoading } = useBudgetComparison();
+  const { data, isLoading, error, refetch } = useBudgetComparison();
 
   if (isLoading) {
     return (
@@ -26,6 +27,10 @@ const BudgetComparisonChart = () => {
         </CardContent>
       </Card>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل مقارنة الميزانيات" message={(error as Error).message} onRetry={refetch} />;
   }
 
   if (!data || data.length === 0) {

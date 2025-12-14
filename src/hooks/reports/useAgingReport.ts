@@ -25,7 +25,7 @@ export interface AgingSummary {
 }
 
 export function useAgingReport() {
-  const { data: agingResult, isLoading, error } = useQuery({
+  const { data: agingResult, isLoading, error, refetch } = useQuery({
     queryKey: ['aging_report'],
     queryFn: () => CustomReportsService.getAgingReport(),
   });
@@ -50,5 +50,6 @@ export function useAgingReport() {
     summary,
     isLoading,
     error,
+    refetch,
   };
 }

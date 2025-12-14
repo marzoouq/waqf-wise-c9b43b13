@@ -1,10 +1,10 @@
-import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Plus, CheckCircle } from 'lucide-react';
 import { useApprovalWorkflows } from '@/hooks/useApprovalWorkflows';
 import { ROLE_LABELS, ENTITY_TYPE_LABELS } from '@/lib/role-labels';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 /**
  * ApprovalWorkflowBuilder - عرض مسارات الموافقات من قاعدة البيانات
@@ -12,7 +12,7 @@ import { ROLE_LABELS, ENTITY_TYPE_LABELS } from '@/lib/role-labels';
  */
 
 export function ApprovalWorkflowBuilder() {
-  const { workflows, isLoading } = useApprovalWorkflows();
+  const { workflows, isLoading, error, refetch } = useApprovalWorkflows();
 
   if (isLoading) {
     return (
@@ -24,6 +24,10 @@ export function ApprovalWorkflowBuilder() {
         </CardContent>
       </Card>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل مسارات الموافقات" message={(error as Error).message} onRetry={refetch} />;
   }
 
   return (

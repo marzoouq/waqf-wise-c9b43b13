@@ -4,9 +4,10 @@ import { Clock, AlertTriangle } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { useAgingReport } from '@/hooks/reports/useAgingReport';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 export function AgingReport() {
-  const { agingData, summary, isLoading } = useAgingReport();
+  const { agingData, summary, isLoading, error, refetch } = useAgingReport();
 
   const getAgeCategoryBadge = (category: string, days: number) => {
     if (category === 'current') {
@@ -32,6 +33,10 @@ export function AgingReport() {
         </CardContent>
       </Card>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل تقرير الأعمار" message={(error as Error).message} onRetry={refetch} />;
   }
 
   return (

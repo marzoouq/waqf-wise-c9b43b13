@@ -12,6 +12,7 @@ import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { ExportButton } from "@/components/shared/ExportButton";
 import { EmptyAccountingState } from "./EmptyAccountingState";
 import { LoadingState } from "@/components/shared/LoadingState";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 interface AccountNodeProps {
   account: AccountWithBalance;
@@ -162,7 +163,7 @@ function AccountNode({ account, level, onEdit, onAddChild, onDelete }: AccountNo
 }
 
 export function EnhancedAccountsTree() {
-  const { accountTree, accounts, isLoading, deleteAccount } = useAccounts();
+  const { accountTree, accounts, isLoading, deleteAccount, error, refetch } = useAccounts();
   const [searchTerm, setSearchTerm] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<AccountRow | null>(null);
@@ -215,6 +216,10 @@ export function EnhancedAccountsTree() {
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل شجرة الحسابات..." />;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل شجرة الحسابات" message={(error as Error).message} onRetry={refetch} />;
   }
 
   if (accountTree.length === 0) {

@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Download, TrendingUp } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
+import { ErrorState } from '@/components/shared/ErrorState';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { exportToExcel, exportToPDF } from '@/lib/exportHelpers';
 import { useToast } from '@/hooks/use-toast';
@@ -17,7 +18,8 @@ export function DistributionAnalysisReport() {
     isLoading, 
     isRefetching, 
     lastUpdated, 
-    handleRefresh 
+    handleRefresh,
+    error 
   } = useDistributionAnalysisReport();
 
   const handleExportPDF = () => {
@@ -60,6 +62,10 @@ export function DistributionAnalysisReport() {
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل بيانات التوزيعات..." />;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل تحليل التوزيعات" message={(error as Error).message} onRetry={handleRefresh} />;
   }
 
   return (
