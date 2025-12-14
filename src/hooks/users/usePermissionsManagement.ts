@@ -27,21 +27,26 @@ export function usePermissionsManagement(initialRole: AppRole = "accountant") {
   const [modifications, setModifications] = useState<Map<string, RolePermissionState>>(new Map());
 
   // جلب جميع الصلاحيات باستخدام الخدمة
+  // ✅ تخزين مؤقت طويل - الصلاحيات نادراً ما تتغير
   const { data: allPermissions = [], isLoading: loadingPermissions } = useQuery({
     queryKey: QUERY_KEYS.ALL_PERMISSIONS,
     queryFn: async () => {
       const permissions = await AuthService.getAllPermissions();
       return permissions as Permission[];
     },
+    staleTime: 10 * 60 * 1000, // 10 دقائق
+    gcTime: 30 * 60 * 1000, // 30 دقيقة
   });
 
   // جلب صلاحيات الدور المحدد باستخدام الخدمة
+  // ✅ تخزين مؤقت متوسط - قد تتغير عند التحديث
   const { data: rolePermissions = [], isLoading: loadingRolePerms } = useQuery({
     queryKey: QUERY_KEYS.ROLE_PERMISSIONS(selectedRole),
     queryFn: async () => {
       return AuthService.getRolePermissions(selectedRole);
     },
     enabled: !!selectedRole,
+    staleTime: 5 * 60 * 1000, // 5 دقائق
   });
 
   // تحديث صلاحية باستخدام الخدمة

@@ -1,7 +1,16 @@
 /**
  * Auth Service - خدمة المصادقة
  * 
- * إدارة تسجيل الدخول والمستخدمين والصلاحيات
+ * المسؤوليات:
+ * - تسجيل الدخول والخروج
+ * - إدارة الجلسات
+ * - إدارة كلمات المرور
+ * - إدارة الملفات الشخصية
+ * 
+ * الخدمات المنفصلة:
+ * - PermissionsService: إدارة الصلاحيات
+ * - TwoFactorService: المصادقة الثنائية
+ * - UserService: إدارة المستخدمين
  */
 
 import { supabase } from "@/integrations/supabase/client";
@@ -13,6 +22,10 @@ export interface BeneficiaryEmailResult {
 }
 import { type UserProfile, type LoginResult } from "@/types/auth";
 import { type AppRole } from "@/types/roles";
+
+// Re-export من الخدمات المنفصلة
+export { PermissionsService } from "./permissions.service";
+export { TwoFactorService } from "./two-factor.service";
 
 type UserRoleRow = Database['public']['Tables']['user_roles']['Row'];
 
@@ -305,51 +318,31 @@ export class AuthService {
     if (error) throw error;
   }
 
-  // ==================== إدارة الصلاحيات ====================
+  // ==================== إدارة الصلاحيات (مفوضة لـ PermissionsService) ====================
+  // للتوافق الخلفي - استخدم PermissionsService مباشرة للكود الجديد
 
   /**
-   * جلب جميع الصلاحيات
+   * @deprecated استخدم PermissionsService.getAllPermissions()
    */
   static async getAllPermissions() {
-    const { data, error } = await supabase
-      .from("permissions")
-      .select("*")
-      .order("category", { ascending: true })
-      .order("name", { ascending: true });
-
-    if (error) throw error;
-    return data || [];
+    const { PermissionsService } = await import("./permissions.service");
+    return PermissionsService.getAllPermissions();
   }
 
   /**
-   * جلب صلاحيات دور معين
+   * @deprecated استخدم PermissionsService.getRolePermissions()
    */
   static async getRolePermissions(role: AppRole) {
-    const { data, error } = await supabase
-      .from("role_permissions")
-      .select("*")
-      .eq("role", role);
-
-    if (error) throw error;
-    return data || [];
+    const { PermissionsService } = await import("./permissions.service");
+    return PermissionsService.getRolePermissions(role);
   }
 
   /**
-   * تحديث صلاحية لدور
+   * @deprecated استخدم PermissionsService.updateRolePermission()
    */
   static async updateRolePermission(role: AppRole, permissionId: string, granted: boolean): Promise<void> {
-    const { error } = await supabase.from("role_permissions").upsert(
-      {
-        role,
-        permission_id: permissionId,
-        granted,
-      },
-      {
-        onConflict: "role,permission_id",
-      }
-    );
-
-    if (error) throw error;
+    const { PermissionsService } = await import("./permissions.service");
+    return PermissionsService.updateRolePermission(role, permissionId, granted);
   }
 
   /**
@@ -381,48 +374,31 @@ export class AuthService {
     return data;
   }
 
-  // ==================== المصادقة الثنائية ====================
+  // ==================== المصادقة الثنائية (مفوضة لـ TwoFactorService) ====================
+  // للتوافق الخلفي - استخدم TwoFactorService مباشرة للكود الجديد
 
   /**
-   * جلب حالة المصادقة الثنائية
+   * @deprecated استخدم TwoFactorService.getStatus()
    */
   static async get2FAStatus(userId: string) {
-    const { data, error } = await supabase
-      .from("two_factor_secrets")
-      .select("enabled, secret, backup_codes")
-      .eq("user_id", userId)
-      .maybeSingle();
-
-    if (error) throw error;
-    return data;
+    const { TwoFactorService } = await import("./two-factor.service");
+    return TwoFactorService.getStatus(userId);
   }
 
   /**
-   * تفعيل المصادقة الثنائية
+   * @deprecated استخدم TwoFactorService.enable()
    */
   static async enable2FA(userId: string, secret: string, backupCodes: string[]): Promise<void> {
-    const { error } = await supabase
-      .from("two_factor_secrets")
-      .upsert({
-        user_id: userId,
-        secret: secret,
-        backup_codes: backupCodes,
-        enabled: true,
-      });
-
-    if (error) throw error;
+    const { TwoFactorService } = await import("./two-factor.service");
+    return TwoFactorService.enable(userId, secret, backupCodes);
   }
 
   /**
-   * إلغاء المصادقة الثنائية
+   * @deprecated استخدم TwoFactorService.disable()
    */
   static async disable2FA(userId: string): Promise<void> {
-    const { error } = await supabase
-      .from("two_factor_secrets")
-      .update({ enabled: false })
-      .eq("user_id", userId);
-
-    if (error) throw error;
+    const { TwoFactorService } = await import("./two-factor.service");
+    return TwoFactorService.disable(userId);
   }
 
   // ==================== إعدادات الإشعارات ====================
