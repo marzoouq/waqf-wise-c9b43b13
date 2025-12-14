@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Wallet, TrendingUp, TrendingDown, DollarSign, Receipt, Clock, CheckCircle, Mail, RefreshCw } from "lucide-react";
 import { useCashierStats, useCashierDashboardRealtime, useCashierDashboardRefresh } from "@/hooks/dashboard";
 import { LoadingState } from "@/components/shared/LoadingState";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { Button } from "@/components/ui/button";
 import { AddReceiptDialog } from "@/components/payments/AddReceiptDialog";
 import { AddVoucherDialog } from "@/components/payments/AddVoucherDialog";
@@ -19,7 +20,7 @@ import { FinancialCardsRow } from "@/components/dashboard/shared";
 const RecentJournalEntries = lazy(() => import("@/components/dashboard/RecentJournalEntries"));
 
 export default function CashierDashboard() {
-  const { data: stats, isLoading } = useCashierStats();
+  const { data: stats, isLoading, error, refetch } = useCashierStats();
   const [isReceiptDialogOpen, setIsReceiptDialogOpen] = useState(false);
   const [isVoucherDialogOpen, setIsVoucherDialogOpen] = useState(false);
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
@@ -30,6 +31,10 @@ export default function CashierDashboard() {
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل بيانات أمين الصندوق..." />;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في التحميل" message="فشل تحميل بيانات أمين الصندوق" onRetry={refetch} />;
   }
 
   return (

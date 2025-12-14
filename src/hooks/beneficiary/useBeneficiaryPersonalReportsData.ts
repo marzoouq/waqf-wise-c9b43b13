@@ -50,7 +50,7 @@ export function useBeneficiaryPersonalReportsData() {
   const [reportType, setReportType] = useState<'annual' | 'monthly' | 'quarterly'>('annual');
 
   // جلب بيانات المستفيد
-  const { data: beneficiary } = useQuery({
+  const { data: beneficiary, error: beneficiaryError, refetch: refetchBeneficiary } = useQuery({
     queryKey: QUERY_KEYS.MY_BENEFICIARY(user?.id),
     queryFn: async () => {
       if (!user?.id) return null;
@@ -60,7 +60,7 @@ export function useBeneficiaryPersonalReportsData() {
   });
 
   // جلب التوزيعات من heir_distributions للسنة المحددة
-  const { data: distributions = [], isLoading: isLoadingDistributions } = useQuery({
+  const { data: distributions = [], isLoading: isLoadingDistributions, error: distributionsError, refetch: refetchDistributions } = useQuery({
     queryKey: QUERY_KEYS.BENEFICIARY_YEARLY_DISTRIBUTIONS(beneficiary?.id, parseInt(selectedYear)),
     queryFn: async () => {
       if (!beneficiary?.id) return [];
@@ -112,6 +112,11 @@ export function useBeneficiaryPersonalReportsData() {
     { name: 'مرفوض', value: requests.filter(r => r.status === 'rejected').length },
   ].filter(item => item.value > 0);
 
+  const refetch = () => {
+    refetchBeneficiary();
+    refetchDistributions();
+  };
+
   return {
     beneficiary,
     distributions,
@@ -120,6 +125,8 @@ export function useBeneficiaryPersonalReportsData() {
     monthlyData,
     requestsStatusData,
     isLoading: isLoadingDistributions,
+    error: beneficiaryError || distributionsError,
+    refetch,
     selectedYear,
     setSelectedYear,
     reportType,

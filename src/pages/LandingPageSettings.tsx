@@ -6,11 +6,13 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Save, Globe, Mail, RefreshCw, FileText, HelpCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { useLandingPageSettings } from "@/hooks/settings/useLandingPageSettings";
 
 export default function LandingPageSettings() {
   const {
     isLoading,
+    error,
     handleChange,
     handleSave,
     getValue,
@@ -29,6 +31,10 @@ export default function LandingPageSettings() {
         </div>
       </div>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في التحميل" message="فشل تحميل إعدادات الصفحة" onRetry={refreshSettings} />;
   }
 
   return (

@@ -15,6 +15,7 @@ import { BeneficiaryBottomNavigation } from "@/components/mobile/BeneficiaryBott
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { useBeneficiaryPortalData } from "@/hooks/beneficiary/useBeneficiaryPortalData";
 import { useBeneficiarySession } from "@/hooks/beneficiary/useBeneficiarySession";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { useBeneficiaryDashboardRealtime } from "@/hooks/dashboard/useBeneficiaryDashboardRealtime";
 
 export default function BeneficiaryPortal() {
@@ -24,7 +25,7 @@ export default function BeneficiaryPortal() {
   const { settings } = useVisibilitySettings();
 
   // استخدام Hook المخصص لجلب البيانات (يتضمن التحقق من وضع المعاينة)
-  const { beneficiary, statistics, isLoading, isPreviewMode } = useBeneficiaryPortalData();
+  const { beneficiary, statistics, isLoading, isPreviewMode, error } = useBeneficiaryPortalData();
 
   // تفعيل Realtime للتحديثات الفورية
   useBeneficiaryDashboardRealtime({
@@ -55,6 +56,10 @@ export default function BeneficiaryPortal() {
 
   if (isLoading) {
     return <LoadingState fullScreen />;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل البيانات" message="فشل تحميل بيانات المستفيد" onRetry={() => window.location.reload()} fullScreen />;
   }
 
   if (!beneficiary) {
