@@ -5,10 +5,11 @@ import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useUserStats } from "@/hooks/admin/useUserStats";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export function UserManagementSection() {
   const navigate = useNavigate();
-  const { data: stats, isLoading } = useUserStats();
+  const { data: stats, isLoading, error, refetch } = useUserStats();
 
   if (isLoading) {
     return (
@@ -28,6 +29,10 @@ export function UserManagementSection() {
         </CardContent>
       </Card>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل إحصائيات المستخدمين" message={(error as Error).message} onRetry={refetch} />;
   }
 
   if (!stats) return null;

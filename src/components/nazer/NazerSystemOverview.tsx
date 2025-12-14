@@ -16,6 +16,7 @@ import {
 import { formatCurrency } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { useNazerSystemOverview } from "@/hooks/dashboard/useNazerSystemOverview";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 interface SystemStat {
   label: string;
@@ -26,7 +27,7 @@ interface SystemStat {
 }
 
 export function NazerSystemOverview() {
-  const { data: stats, isLoading } = useNazerSystemOverview();
+  const { data: stats, isLoading, error, refetch } = useNazerSystemOverview();
 
   if (isLoading) {
     return (
@@ -43,6 +44,10 @@ export function NazerSystemOverview() {
         </CardContent>
       </Card>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل نظرة النظام" message={(error as Error).message} onRetry={refetch} />;
   }
 
   const systemStats: SystemStat[] = [

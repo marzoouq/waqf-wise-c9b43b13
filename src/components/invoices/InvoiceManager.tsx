@@ -5,9 +5,10 @@ import { Plus, Eye, Send, FileText } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatCurrency } from '@/lib/utils';
 import { useInvoices } from '@/hooks/invoices/useInvoices';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 export function InvoiceManager() {
-  const { invoices, isLoading, stats } = useInvoices();
+  const { invoices, isLoading, stats, error, refetch } = useInvoices();
 
   const getStatusBadge = (status: string) => {
     type BadgeVariant = 'default' | 'secondary' | 'destructive' | 'outline';
@@ -46,6 +47,10 @@ export function InvoiceManager() {
         </CardContent>
       </Card>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل الفواتير" message={(error as Error).message} onRetry={refetch} />;
   }
 
   return (

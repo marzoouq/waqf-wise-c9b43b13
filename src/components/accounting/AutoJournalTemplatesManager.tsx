@@ -8,6 +8,7 @@ import { useAutoJournalTemplates } from '@/hooks/useAutoJournalTemplates';
 import { AutoJournalTemplateDialog } from './AutoJournalTemplateDialog';
 import { UnifiedDataTable, type Column } from '@/components/unified/UnifiedDataTable';
 import type { AutoJournalTemplate as DialogTemplate } from '@/types/auto-journal';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 interface AccountEntry {
   account_code: string;
@@ -48,7 +49,7 @@ const triggerEventLabels: Record<string, string> = {
 };
 
 export function AutoJournalTemplatesManager() {
-  const { templates, isLoading, toggleActive, deleteTemplate } = useAutoJournalTemplates();
+  const { templates, isLoading, error, refetch, toggleActive, deleteTemplate } = useAutoJournalTemplates();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<DialogTemplate | null>(null);
 
@@ -148,6 +149,10 @@ export function AutoJournalTemplatesManager() {
         </CardContent>
       </Card>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل قوالب القيود" message={(error as Error).message} onRetry={refetch} />;
   }
 
   return (
