@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { TrendingUp, TrendingDown, Users, DollarSign, Receipt, Coins } from "lucide-react";
 import type { FiscalYearClosing } from "@/types/fiscal-year-closing";
 import { useFiscalYearSummary } from "@/hooks/fiscal-years/useFiscalYearData";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 interface FiscalYearSummaryCardProps {
   fiscalYearId: string;
@@ -16,7 +17,7 @@ interface FiscalYearSummaryCardProps {
 
 export function FiscalYearSummaryCard({ fiscalYearId, closing }: FiscalYearSummaryCardProps) {
   // حساب الملخص إذا لم يكن هناك إقفال
-  const { data: summary, isLoading } = useFiscalYearSummary(fiscalYearId, !!closing);
+  const { data: summary, isLoading, error, refetch } = useFiscalYearSummary(fiscalYearId, !!closing);
 
   if (isLoading) {
     return (
@@ -30,6 +31,10 @@ export function FiscalYearSummaryCard({ fiscalYearId, closing }: FiscalYearSumma
         ))}
       </div>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في التحميل" message="فشل تحميل ملخص السنة المالية" onRetry={refetch} />;
   }
 
   // استخدام بيانات الإقفال إن وجدت، وإلا استخدام الملخص المحسوب

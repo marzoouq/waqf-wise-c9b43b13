@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ReportRefreshIndicator } from './ReportRefreshIndicator';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   PieChart,
@@ -60,7 +61,7 @@ interface KPIDashboardProps {
 }
 
 export function KPIDashboard({ category, limit, className }: KPIDashboardProps) {
-  const { kpis, isLoading, isRefetching, lastUpdated, refresh } = useKPIs(category);
+  const { kpis, isLoading, isRefetching, lastUpdated, refresh, error } = useKPIs(category);
 
   if (isLoading) {
     return (
@@ -78,6 +79,10 @@ export function KPIDashboard({ category, limit, className }: KPIDashboardProps) 
         ))}
       </div>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في التحميل" message="فشل تحميل مؤشرات الأداء" onRetry={refresh} />;
   }
 
   const filteredKPIs = limit ? kpis.slice(0, limit) : kpis;

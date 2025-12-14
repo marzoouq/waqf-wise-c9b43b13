@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAgentStats } from '@/hooks/useAgentAvailability';
 import { LoadingState } from '@/components/shared/LoadingState';
+import { ErrorState } from '@/components/shared/ErrorState';
 import { TrendingUp, Clock, CheckCircle, Star, User } from 'lucide-react';
 
 interface AgentPerformanceReportProps {
@@ -9,10 +10,14 @@ interface AgentPerformanceReportProps {
 }
 
 export function AgentPerformanceReport({ userId, dateRange }: AgentPerformanceReportProps) {
-  const { data: stats, isLoading } = useAgentStats(userId, dateRange);
+  const { data: stats, isLoading, error, refetch } = useAgentStats(userId, dateRange);
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل إحصائيات الأداء..." />;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في التحميل" message="فشل تحميل إحصائيات الأداء" onRetry={refetch} />;
   }
 
   if (!stats || stats.length === 0) {

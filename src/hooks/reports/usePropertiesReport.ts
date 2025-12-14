@@ -64,5 +64,7 @@ export function usePropertiesReport() {
     isRefetching: query.isRefetching,
     lastUpdated,
     handleRefresh,
+    error: query.error,
+    refetch: query.refetch,
   };
 }

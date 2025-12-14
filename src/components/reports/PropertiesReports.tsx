@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, Building2 } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { exportToExcel, exportToPDF } from "@/lib/exportHelpers";
 import { useToast } from "@/hooks/use-toast";
@@ -19,7 +20,7 @@ import { usePropertiesReport } from "@/hooks/reports/usePropertiesReport";
 
 export function PropertiesReports() {
   const { toast } = useToast();
-  const { properties, isLoading, isRefetching, lastUpdated, handleRefresh } = usePropertiesReport();
+  const { properties, isLoading, isRefetching, lastUpdated, handleRefresh, error } = usePropertiesReport();
 
   const handleExportPDF = () => {
     const headers = ["اسم العقار", "الموقع", "نوع العقار", "الحالة", "الإيجار الشهري"];
@@ -70,6 +71,10 @@ export function PropertiesReports() {
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل بيانات العقارات..." />;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في التحميل" message="فشل تحميل تقرير العقارات" onRetry={handleRefresh} />;
   }
 
   if (properties.length === 0) {

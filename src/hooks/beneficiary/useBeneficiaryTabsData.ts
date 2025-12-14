@@ -84,10 +84,17 @@ export function useDisclosures(enabled: boolean = true) {
 
 // Hook for distribution pie chart data
 export function useDistributionChartData() {
-  return useQuery({
+  const query = useQuery({
     queryKey: QUERY_KEYS.DISTRIBUTION_PIE_CHART,
     queryFn: () => BeneficiaryService.getDistributionChartData(),
   });
+  
+  return {
+    data: query.data,
+    isLoading: query.isLoading,
+    error: query.error,
+    refetch: query.refetch,
+  };
 }
 
 // Hook for beneficiary requests

@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { LoadingState } from "@/components/shared/LoadingState";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { useDistributionChartData } from "@/hooks/beneficiary/useBeneficiaryTabsData";
 
 const COLORS = [
@@ -12,9 +13,13 @@ const COLORS = [
 ];
 
 export function DistributionPieChart() {
-  const { data = [], isLoading } = useDistributionChartData();
+  const { data = [], isLoading, error, refetch } = useDistributionChartData();
 
   if (isLoading) return <LoadingState message="جاري تحميل البيانات..." />;
+
+  if (error) {
+    return <ErrorState title="خطأ في التحميل" message="فشل تحميل بيانات التوزيع" onRetry={refetch} />;
+  }
 
   if (data.length === 0) {
     return (
