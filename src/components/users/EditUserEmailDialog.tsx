@@ -11,8 +11,9 @@ interface EditUserEmailDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   user: {
-    user_id: string;
-    full_name: string;
+    user_id?: string;
+    id?: string;
+    full_name: string | null;
     email: string;
   } | null;
   onSuccess?: () => void;
@@ -29,7 +30,8 @@ export function EditUserEmailDialog({
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async () => {
-    if (!user?.user_id || !newEmail) return;
+    const userId = user?.user_id || user?.id;
+    if (!userId || !newEmail) return;
 
     // التحقق من صحة البريد الإلكتروني
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -56,7 +58,7 @@ export function EditUserEmailDialog({
     try {
       // استدعاء Edge Function لتحديث البريد
       const result = await EdgeFunctionService.invoke<{ error?: string }>("update-user-email", {
-        userId: user.user_id,
+        userId: userId,
         newEmail: newEmail.trim().toLowerCase(),
       });
 

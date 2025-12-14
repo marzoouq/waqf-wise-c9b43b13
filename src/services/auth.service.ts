@@ -11,24 +11,13 @@ export interface BeneficiaryEmailResult {
   email: string;
   user_id: string;
 }
-import type { AppRole } from "@/types/roles";
+import { type UserProfile, type LoginResult } from "@/types/auth";
+import { type AppRole } from "@/types/roles";
 
 type UserRoleRow = Database['public']['Tables']['user_roles']['Row'];
 
-export interface UserProfile {
-  id: string;
-  email: string;
-  full_name: string | null;
-  avatar_url: string | null;
-  roles: string[];
-  created_at: string;
-}
-
-export interface LoginResult {
-  success: boolean;
-  user?: UserProfile;
-  error?: string;
-}
+// Re-export for backward compatibility
+export type { UserProfile, LoginResult } from "@/types/auth";
 
 export class AuthService {
   /**
