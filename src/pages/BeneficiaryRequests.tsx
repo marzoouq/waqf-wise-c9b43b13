@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Badge } from '@/components/ui/badge';
 import { FileText, Plus, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
+import { ErrorState } from '@/components/shared/ErrorState';
 import { useAuth } from '@/hooks/useAuth';
 import { useMyBeneficiaryRequests, BeneficiaryRequest } from '@/hooks/useMyBeneficiaryRequests';
 
@@ -48,6 +49,7 @@ export default function BeneficiaryRequests() {
     requests,
     stats,
     isLoading,
+    error,
     formData,
     updateFormData,
     isDialogOpen,
@@ -59,6 +61,17 @@ export default function BeneficiaryRequests() {
 
   if (isLoading) {
     return <LoadingState size="lg" />;
+  }
+
+  if (error) {
+    return (
+      <ErrorState 
+        title="فشل تحميل الطلبات" 
+        message="حدث خطأ أثناء تحميل طلباتك"
+        onRetry={() => window.location.reload()}
+        fullScreen
+      />
+    );
   }
 
   return (

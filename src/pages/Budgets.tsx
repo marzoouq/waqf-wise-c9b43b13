@@ -5,6 +5,7 @@ import { Plus, Pencil, Trash2, Calculator, FileSpreadsheet } from "lucide-react"
 import { useBudgets } from "@/hooks/useBudgets";
 import { useFiscalYears } from "@/hooks/useFiscalYears";
 import { LoadingState } from "@/components/shared/LoadingState";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { BudgetDialog } from "@/components/budgets/BudgetDialog";
 import { BudgetAnalysisCard } from "@/components/budgets/BudgetAnalysisCard";
 import {
@@ -34,7 +35,7 @@ export default function Budgets() {
   const activeFiscalYear = fiscalYears.find(fy => fy.is_active);
   
   const [selectedFiscalYear, setSelectedFiscalYear] = useState(activeFiscalYear?.id || "");
-  const { budgets, isLoading, addBudget, updateBudget, deleteBudget, calculateVariances } = 
+  const { budgets, isLoading, error, refetch, addBudget, updateBudget, deleteBudget, calculateVariances } = 
     useBudgets(selectedFiscalYear);
   
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -42,6 +43,17 @@ export default function Budgets() {
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل الميزانيات..." />;
+  }
+
+  if (error) {
+    return (
+      <ErrorState 
+        title="فشل تحميل الميزانيات" 
+        message="حدث خطأ أثناء تحميل بيانات الميزانيات"
+        onRetry={() => refetch()}
+        fullScreen
+      />
+    );
   }
 
   const handleOpenDialog = (budget?: Budget) => {

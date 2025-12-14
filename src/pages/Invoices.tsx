@@ -5,6 +5,8 @@ import { ViewInvoiceDialog } from "@/components/invoices/ViewInvoiceDialog";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { ExportButton } from "@/components/shared/ExportButton";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
+import { LoadingState } from "@/components/shared/LoadingState";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   DropdownMenu,
@@ -65,16 +67,7 @@ const Invoices = () => {
   } = useInvoicesPage();
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto p-4 md:p-6">
-          <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-            <p className="mt-2 text-muted-foreground">جاري التحميل...</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <LoadingState message="جاري تحميل الفواتير..." />;
   }
 
   return (

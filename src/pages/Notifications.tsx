@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useNotifications } from "@/hooks/useNotifications";
 import { NotificationItem } from "@/components/notifications/NotificationItem";
 import { LoadingState } from "@/components/shared/LoadingState";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Bell, Check } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -13,6 +14,8 @@ const Notifications = () => {
   const { 
     notifications, 
     isLoading, 
+    error,
+    refetch,
     unreadCount, 
     markAsRead, 
     markAllAsRead,
@@ -24,6 +27,17 @@ const Notifications = () => {
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل الإشعارات..." />;
+  }
+
+  if (error) {
+    return (
+      <ErrorState 
+        title="فشل تحميل الإشعارات" 
+        message="حدث خطأ أثناء تحميل الإشعارات"
+        onRetry={() => refetch?.()}
+        fullScreen
+      />
+    );
   }
 
   return (

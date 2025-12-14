@@ -7,12 +7,25 @@ import { NotificationSettings as NotificationSettingsType } from "@/types/notifi
 import { MultiChannelNotifications } from "@/components/notifications/MultiChannelNotifications";
 import { Settings, Radio } from "lucide-react";
 import { useNotificationSettingsData } from "@/hooks/notifications/useNotificationSettingsData";
+import { LoadingState } from "@/components/shared/LoadingState";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export default function NotificationSettings() {
-  const { settings, isLoading, handleToggle } = useNotificationSettingsData();
+  const { settings, isLoading, error, handleToggle } = useNotificationSettingsData();
 
   if (isLoading) {
-    return <div className="container-custom py-6">جاري التحميل...</div>;
+    return <LoadingState message="جاري تحميل الإعدادات..." />;
+  }
+
+  if (error) {
+    return (
+      <ErrorState 
+        title="فشل تحميل الإعدادات" 
+        message="حدث خطأ أثناء تحميل إعدادات الإشعارات"
+        onRetry={() => window.location.reload()}
+        fullScreen
+      />
+    );
   }
 
   return (

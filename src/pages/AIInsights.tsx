@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Sparkles, TrendingUp, AlertTriangle, Lightbulb, X, RefreshCw } from "lucide-react";
 import { useAIInsights } from "@/hooks/useAIInsights";
 import { LoadingState } from "@/components/shared/LoadingState";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { EnhancedEmptyState } from "@/components/shared";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
@@ -23,10 +24,21 @@ const severityColors = {
 };
 
 export default function AIInsights() {
-  const { insights, isLoading, generateInsights, isGenerating, dismissInsight } = useAIInsights();
+  const { insights, isLoading, error, generateInsights, isGenerating, dismissInsight } = useAIInsights();
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل الرؤى الذكية..." />;
+  }
+
+  if (error) {
+    return (
+      <ErrorState 
+        title="فشل تحميل الرؤى" 
+        message="حدث خطأ أثناء تحميل الرؤى الذكية"
+        onRetry={() => window.location.reload()}
+        fullScreen
+      />
+    );
   }
 
   return (

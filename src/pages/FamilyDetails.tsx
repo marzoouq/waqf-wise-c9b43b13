@@ -3,6 +3,7 @@ import { ArrowRight, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useFamilies } from '@/hooks/useFamilies';
 import { LoadingState } from '@/components/shared/LoadingState';
+import { ErrorState } from '@/components/shared/ErrorState';
 import { FamilyTreeView } from '@/components/families/FamilyTreeView';
 import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
 import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
@@ -13,10 +14,21 @@ import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layou
 export default function FamilyDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { families, isLoading } = useFamilies();
+  const { families, isLoading, error, refetch } = useFamilies();
 
   if (isLoading) {
     return <LoadingState size="lg" />;
+  }
+
+  if (error) {
+    return (
+      <ErrorState 
+        title="فشل تحميل العائلة" 
+        message="حدث خطأ أثناء تحميل بيانات العائلة"
+        onRetry={() => refetch()}
+        fullScreen
+      />
+    );
   }
 
   const family = families.find((f) => f.id === id);

@@ -22,6 +22,7 @@ import { Search, Filter, Download, Shield, AlertCircle, Info, AlertTriangle } fr
 import { useAuditLogs } from "@/hooks/useAuditLogs";
 import { format, arLocale as ar } from "@/lib/date";
 import { LoadingState } from "@/components/shared/LoadingState";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { cleanFilters } from '@/lib/utils/cleanFilters';
@@ -35,7 +36,7 @@ const AuditLogs = () => {
     endDate: "",
   });
 
-  const { data: logs, isLoading } = useAuditLogs(cleanFilters(filters));
+  const { data: logs, isLoading, error, refetch } = useAuditLogs(cleanFilters(filters));
 
   const exportLogs = () => {
     if (!logs || logs.length === 0) {
@@ -86,6 +87,17 @@ const AuditLogs = () => {
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل سجل العمليات..." />;
+  }
+
+  if (error) {
+    return (
+      <ErrorState 
+        title="فشل تحميل السجلات" 
+        message="حدث خطأ أثناء تحميل سجل العمليات"
+        onRetry={() => refetch()}
+        fullScreen
+      />
+    );
   }
 
   return (

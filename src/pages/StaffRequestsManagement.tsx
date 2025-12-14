@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { CheckCircle, XCircle, Clock, FileText, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { LoadingState } from '@/components/shared/LoadingState';
+import { ErrorState } from '@/components/shared/ErrorState';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useStaffRequestsData, RequestWithBeneficiary } from '@/hooks/requests/useStaffRequestsData';
 
@@ -19,7 +20,8 @@ export default function StaffRequestsManagement() {
   const [reviewNotes, setReviewNotes] = useState('');
   const [selectedTab, setSelectedTab] = useState('pending');
   
-  const { requests, stats, isLoading, updateRequestStatus, filterRequests, isUpdating } = useStaffRequestsData();
+  const { requests, stats, isLoading, error, updateRequestStatus, filterRequests, isUpdating } = useStaffRequestsData();
+  const refetch = () => window.location.reload();
 
   const handleApprove = () => {
     if (!selectedRequest) return;
@@ -56,6 +58,17 @@ export default function StaffRequestsManagement() {
 
   if (isLoading) {
     return <LoadingState size="lg" />;
+  }
+
+  if (error) {
+    return (
+      <ErrorState 
+        title="فشل تحميل الطلبات" 
+        message="حدث خطأ أثناء تحميل طلبات المستفيدين"
+        onRetry={() => refetch()}
+        fullScreen
+      />
+    );
   }
 
   return (
