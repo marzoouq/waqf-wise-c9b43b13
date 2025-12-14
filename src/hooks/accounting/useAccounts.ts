@@ -11,7 +11,7 @@ export function useAccounts() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: accounts = [], isLoading } = useQuery({
+  const { data: accounts = [], isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.ACCOUNTS,
     queryFn: () => AccountingService.getAccounts(),
   });
@@ -128,6 +128,8 @@ export function useAccounts() {
     accounts,
     accountTree: buildAccountTree(),
     isLoading,
+    error: error as Error | null,
+    refetch,
     addAccount: addAccount.mutateAsync,
     updateAccount: updateAccount.mutateAsync,
     deleteAccount: deleteAccount.mutateAsync,

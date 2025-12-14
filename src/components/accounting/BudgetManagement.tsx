@@ -5,15 +5,20 @@ import { Progress } from "@/components/ui/progress";
 import { Plus, TrendingUp, TrendingDown } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { useBudgetManagement } from "@/hooks/accounting/useBudgetManagement";
+import { LoadingState } from "@/components/shared/LoadingState";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export function BudgetManagement() {
   const [selectedPeriod, setSelectedPeriod] = useState("annual");
-  const { budgets, isLoading, calculatePercentage } = useBudgetManagement(selectedPeriod);
+  const { budgets, isLoading, error, refetch, calculatePercentage } = useBudgetManagement(selectedPeriod);
 
   if (isLoading) {
-    return <div className="text-center p-8">جاري التحميل...</div>;
+    return <LoadingState message="جاري تحميل الموازنات..." />;
   }
 
+  if (error) {
+    return <ErrorState title="خطأ في تحميل الموازنات" message={error.message} onRetry={refetch} />;
+  }
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">

@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { useAccountDistribution } from "@/hooks/dashboard/useAccountDistribution";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 const COLORS = [
   'hsl(var(--chart-1))',
@@ -12,7 +13,7 @@ const COLORS = [
 ];
 
 const AccountDistributionChart = () => {
-  const { data, isLoading } = useAccountDistribution();
+  const { data, isLoading, error, refetch } = useAccountDistribution();
 
   if (isLoading) {
     return (
@@ -25,6 +26,10 @@ const AccountDistributionChart = () => {
         </CardContent>
       </Card>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل توزيع الحسابات" message={(error as Error).message} onRetry={refetch} />;
   }
 
   return (

@@ -10,15 +10,21 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useAutoJournalTemplates, type AutoJournalTemplate } from "@/hooks/accounting/useAutoJournalTemplates";
+import { LoadingState } from "@/components/shared/LoadingState";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export function AutoJournalTemplates() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<AutoJournalTemplate | null>(null);
 
-  const { templates, isLoading, toggleActive, deleteTemplate } = useAutoJournalTemplates();
+  const { templates, isLoading, error, refetch, toggleActive, deleteTemplate } = useAutoJournalTemplates();
 
   if (isLoading) {
-    return <div className="text-center p-8">جاري التحميل...</div>;
+    return <LoadingState message="جاري تحميل قوالب القيود..." />;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل القوالب" message={error.message} onRetry={refetch} />;
   }
 
   return (

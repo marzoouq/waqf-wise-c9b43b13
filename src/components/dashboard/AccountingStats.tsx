@@ -2,9 +2,10 @@ import { FileText, CheckCircle2, FileEdit, XCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAccountantKPIs } from "@/hooks/accounting";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 const AccountingStats = () => {
-  const { data, isLoading } = useAccountantKPIs();
+  const { data, isLoading, error, refetch } = useAccountantKPIs();
 
   if (isLoading) {
     return (
@@ -21,6 +22,10 @@ const AccountingStats = () => {
         ))}
       </div>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل الإحصائيات" message={(error as Error).message} onRetry={refetch} />;
   }
 
   if (!data) return null;

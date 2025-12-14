@@ -3,9 +3,10 @@ import { Progress } from "@/components/ui/progress";
 import { TrendingUp, Target, Wallet } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRevenueProgress } from "@/hooks/dashboard/useRevenueProgress";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export function RevenueProgressCard() {
-  const { data, isLoading } = useRevenueProgress();
+  const { data, isLoading, error, refetch } = useRevenueProgress();
 
   if (isLoading) {
     return (
@@ -19,6 +20,10 @@ export function RevenueProgressCard() {
         </CardContent>
       </Card>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل تقدم الإيرادات" message={(error as Error).message} onRetry={refetch} />;
   }
 
   if (!data) return null;

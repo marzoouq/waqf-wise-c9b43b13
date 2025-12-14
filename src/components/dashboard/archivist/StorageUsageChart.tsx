@@ -8,6 +8,7 @@ import { HardDrive } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { ArchiveService } from "@/services/archive.service";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 const COLORS = [
   "hsl(var(--chart-1))",
@@ -18,7 +19,7 @@ const COLORS = [
 ];
 
 export function StorageUsageChart() {
-  const { data: storageData, isLoading } = useQuery({
+  const { data: storageData, isLoading, error, refetch } = useQuery({
     queryKey: ["storage-usage-chart"],
     queryFn: () => ArchiveService.getStorageUsageByCategory(),
     staleTime: 5 * 60 * 1000,
@@ -40,6 +41,10 @@ export function StorageUsageChart() {
         </CardContent>
       </Card>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل بيانات المساحة" message={(error as Error).message} onRetry={refetch} />;
   }
 
   return (

@@ -7,12 +7,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { useRevenueExpenseChart } from "@/hooks/dashboard/useDashboardCharts";
 import { ChartSkeleton } from "@/components/dashboard/ChartSkeleton";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export default function RevenueExpenseChart() {
-  const { data, isLoading } = useRevenueExpenseChart();
+  const { data, isLoading, error, refetch } = useRevenueExpenseChart();
 
   if (isLoading) {
     return <ChartSkeleton title="الإيرادات والمصروفات" />;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل بيانات الإيرادات" message={(error as Error).message} onRetry={refetch} />;
   }
 
   if (!data || data.length === 0) {

@@ -4,9 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDate } from "@/lib/date";
 import { FileText } from "lucide-react";
 import { StatusBadge } from "@/components/shared/StatusBadge";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 const RecentJournalEntries = memo(() => {
-  const { data: entries, isLoading } = useRecentJournalEntries(5);
+  const { data: entries, isLoading, error, refetch } = useRecentJournalEntries(5);
 
   if (isLoading) {
     return (
@@ -21,6 +22,10 @@ const RecentJournalEntries = memo(() => {
         </CardContent>
       </Card>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل القيود" message={(error as Error).message} onRetry={refetch} />;
   }
 
   return (

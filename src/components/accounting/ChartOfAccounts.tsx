@@ -11,6 +11,7 @@ import { Plus, FolderTree, ChevronLeft, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { Account, AccountType, AccountNature } from '@/types/accounting';
 import { LoadingState } from '@/components/shared/LoadingState';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 /**
  * مكون شجرة الحسابات
@@ -31,7 +32,7 @@ export function ChartOfAccounts() {
   });
 
   // استخدام hook موحد بدلاً من useQuery/useMutation مباشرة
-  const { accounts, isLoading, addAccount } = useAccounts();
+  const { accounts, isLoading, error, refetch, addAccount } = useAccounts();
 
   const resetForm = () => {
     setFormData({
@@ -134,7 +135,11 @@ export function ChartOfAccounts() {
   };
 
   if (isLoading) {
-    return <LoadingState />;
+    return <LoadingState message="جاري تحميل شجرة الحسابات..." />;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل الحسابات" message={error.message} onRetry={refetch} />;
   }
 
   return (

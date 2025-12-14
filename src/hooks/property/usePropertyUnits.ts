@@ -11,7 +11,7 @@ export function usePropertyUnits(propertyId?: string) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: units = [], isLoading } = useQuery({
+  const { data: units = [], isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.PROPERTY_UNITS(propertyId || ''),
     queryFn: () => PropertyService.getUnits(propertyId),
   });
@@ -56,6 +56,8 @@ export function usePropertyUnits(propertyId?: string) {
   return {
     units,
     isLoading,
+    error: error as Error | null,
+    refetch,
     addUnit: addUnit.mutateAsync,
     updateUnit: updateUnit.mutateAsync,
     deleteUnit: deleteUnit.mutateAsync,
