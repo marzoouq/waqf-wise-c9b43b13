@@ -34,9 +34,9 @@ export const VERSION_INFO = {
  */
 export const ARCHITECTURE_STATUS = {
   services: {
-    total: 51,
+    total: 52,
     status: 'complete',
-    description: 'جميع الخدمات مكتملة ومنظمة',
+    description: 'جميع الخدمات مكتملة ومنظمة (+ governance-pdf)',
   },
   hooks: {
     total: 170,
