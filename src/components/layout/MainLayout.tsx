@@ -89,7 +89,7 @@ const MobileHeader = memo(function MobileHeader({
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={onSignOut} className="text-destructive cursor-pointer">
-            <LogOut className="ml-2 h-4 w-4" />
+            <LogOut className="ms-2 h-4 w-4" />
             تسجيل الخروج
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -130,7 +130,7 @@ const DesktopHeader = memo(function DesktopHeader({
           >
             <Search className="h-4 w-4" aria-hidden="true" />
             <span className="hidden md:inline">بحث</span>
-            <kbd className="hidden md:inline pointer-events-none h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 ml-2" aria-hidden="true">
+            <kbd className="hidden md:inline pointer-events-none h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 ms-2" aria-hidden="true">
               <span className="text-xs">Ctrl+K</span>
             </kbd>
           </Button>
@@ -155,7 +155,7 @@ const DesktopHeader = memo(function DesktopHeader({
               <DropdownMenuLabel>حسابي</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={onSignOut} className="text-destructive cursor-pointer">
-                <LogOut className="ml-2 h-4 w-4" />
+                <LogOut className="ms-2 h-4 w-4" />
                 تسجيل الخروج
               </DropdownMenuItem>
             </DropdownMenuContent>

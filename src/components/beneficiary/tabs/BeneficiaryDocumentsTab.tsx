@@ -33,7 +33,7 @@ export function BeneficiaryDocumentsTab({ beneficiaryId }: BeneficiaryDocumentsT
             <CardDescription>جميع المستندات والمرفقات المرفوعة</CardDescription>
           </div>
           <Button onClick={() => setIsUploadOpen(true)}>
-            <Upload className="h-4 w-4 ml-2" />
+            <Upload className="h-4 w-4 ms-2" />
             رفع مستند
           </Button>
         </CardHeader>

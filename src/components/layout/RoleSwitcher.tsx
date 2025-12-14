@@ -79,7 +79,7 @@ export const RoleSwitcher = memo(function RoleSwitcher() {
               onClick={() => handleRoleSwitch(role)}
               className={isActive ? "bg-accent" : ""}
             >
-              <Icon className="h-4 w-4 ml-2" />
+              <Icon className="h-4 w-4 ms-2" />
               <span>{ROLE_LABELS[role as keyof typeof ROLE_LABELS]}</span>
             </DropdownMenuItem>
           );

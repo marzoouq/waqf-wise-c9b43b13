@@ -202,7 +202,7 @@ export function PaymentVoucherDialog({
             إلغاء
           </Button>
           <Button type="submit" disabled={isLoading}>
-            {isLoading && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+            {isLoading && <Loader2 className="ms-2 h-4 w-4 animate-spin" />}
             حفظ السند
           </Button>
         </div>

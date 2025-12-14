@@ -30,7 +30,7 @@ export const PropertiesHeader = ({ activeTab, properties, onAddClick, onAIClick,
         className="bg-primary hover:bg-primary-hover text-primary-foreground shadow-soft w-full md:w-auto"
         onClick={() => onAddClick(button.type)}
       >
-        <Icon className="ml-2 h-4 w-4 md:h-5 md:w-5" />
+        <Icon className="ms-2 h-4 w-4 md:h-5 md:w-5" />
         <span className="text-sm md:text-base">{button.label}</span>
       </Button>
     );
@@ -49,13 +49,13 @@ export const PropertiesHeader = ({ activeTab, properties, onAddClick, onAIClick,
       <div className="flex gap-2 flex-wrap">
         {onAIClick && (
           <Button variant="outline" size="sm" onClick={onAIClick}>
-            <Brain className="h-4 w-4 ml-2" />
+            <Brain className="h-4 w-4 ms-2" />
             مساعد AI
           </Button>
         )}
         {onProvidersClick && (
           <Button variant="outline" size="sm" onClick={onProvidersClick}>
-            <Users className="h-4 w-4 ml-2" />
+            <Users className="h-4 w-4 ms-2" />
             مقدمي الخدمة
           </Button>
         )}

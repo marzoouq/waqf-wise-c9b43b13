@@ -167,7 +167,7 @@ export function LoanDialog({ open, onOpenChange, loan }: LoanDialogProps) {
                       !startDate && "text-muted-foreground"
                     )}
                   >
-                    <CalendarIcon className="ml-2 h-4 w-4" />
+                    <CalendarIcon className="ms-2 h-4 w-4" />
                     {startDate ? (
                       format(startDate, "PPP", { locale: ar })
                     ) : (

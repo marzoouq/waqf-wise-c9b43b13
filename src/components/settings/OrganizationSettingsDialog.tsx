@@ -308,7 +308,7 @@ export default function OrganizationSettingsDialog({
                 إلغاء
               </Button>
               <Button type="submit" disabled={isSaving}>
-                {isSaving && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+                {isSaving && <Loader2 className="ms-2 h-4 w-4 animate-spin" />}
                 حفظ الإعدادات
               </Button>
             </DialogFooter>

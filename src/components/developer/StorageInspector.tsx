@@ -184,7 +184,7 @@ export function StorageInspector() {
               size="sm"
               onClick={() => clearStorage("local")}
             >
-              <Trash2 className="w-4 h-4 ml-2" />
+              <Trash2 className="w-4 h-4 ms-2" />
               مسح الكل
             </Button>
           </div>
@@ -239,7 +239,7 @@ export function StorageInspector() {
             size="sm"
             onClick={() => clearStorage("session")}
           >
-            <Trash2 className="w-4 h-4 ml-2" />
+            <Trash2 className="w-4 h-4 ms-2" />
             مسح الكل
           </Button>
         </CardHeader>

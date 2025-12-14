@@ -69,7 +69,7 @@ export function MaintenanceProvidersDialog({ open, onOpenChange }: MaintenancePr
           <DialogTitle className="flex items-center justify-between">
             <span>مقدمي خدمات الصيانة</span>
             <Button onClick={() => setIsAddingNew(!isAddingNew)} size="sm">
-              <Plus className="h-4 w-4 ml-2" />
+              <Plus className="h-4 w-4 ms-2" />
               إضافة مقدم خدمة
             </Button>
           </DialogTitle>
