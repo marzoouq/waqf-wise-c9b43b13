@@ -74,7 +74,7 @@ export function UsersTableRow({
           )}
         </div>
       </TableCell>
-      <TableCell>
+      <TableCell className="hidden lg:table-cell text-xs sm:text-sm">
         {user.last_login_at
           ? new Date(user.last_login_at).toLocaleDateString("ar-SA")
           : "-"}
