@@ -91,7 +91,7 @@ export function PublishFiscalYearDialog({
                         <EyeOff className="h-4 w-4 text-muted-foreground" />
                         {fy.name}
                         {fy.is_active && (
-                          <Badge variant="secondary" className="mr-2">
+                          <Badge variant="secondary" className="me-2">
                             نشطة
                           </Badge>
                         )}

@@ -64,7 +64,7 @@ export function GovernanceSection() {
             onClick={() => navigate("/governance/decisions")}
           >
             عرض الكل
-            <ChevronLeft className="h-4 w-4 mr-2" />
+            <ChevronLeft className="h-4 w-4 me-2" />
           </Button>
         </div>
       </CardHeader>
@@ -133,7 +133,7 @@ export function GovernanceSection() {
           className="w-full"
           onClick={() => navigate("/governance/decisions")}
         >
-          <Vote className="h-4 w-4 ml-2" />
+          <Vote className="h-4 w-4 ms-2" />
           إدارة القرارات والتصويت
         </Button>
       </CardContent>

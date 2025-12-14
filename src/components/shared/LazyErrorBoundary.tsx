@@ -193,7 +193,7 @@ export class LazyErrorBoundary extends Component<Props, State> {
                   className="w-full"
                   disabled={!isOnline}
                 >
-                  <RefreshCw className="w-4 h-4 ml-2" />
+                  <RefreshCw className="w-4 h-4 ms-2" />
                   إعادة المحاولة
                 </Button>
                 
@@ -203,7 +203,7 @@ export class LazyErrorBoundary extends Component<Props, State> {
                     onClick={this.handleHardRefresh}
                     className="w-full"
                   >
-                    <RefreshCw className="w-4 h-4 ml-2" />
+                    <RefreshCw className="w-4 h-4 ms-2" />
                     تحديث الصفحة بالكامل
                   </Button>
                 )}
@@ -213,7 +213,7 @@ export class LazyErrorBoundary extends Component<Props, State> {
                   onClick={this.handleGoHome}
                   className="w-full"
                 >
-                  <Home className="w-4 h-4 ml-2" />
+                  <Home className="w-4 h-4 ms-2" />
                   العودة للرئيسية
                 </Button>
               </div>

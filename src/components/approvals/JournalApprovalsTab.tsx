@@ -90,7 +90,7 @@ export function JournalApprovalsTab() {
                     }
                   }}
                 >
-                  <Eye className="h-4 w-4 ml-1" />
+                  <Eye className="h-4 w-4 ms-1" />
                   عرض القيد
                 </Button>
               </div>

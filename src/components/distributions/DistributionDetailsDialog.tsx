@@ -81,11 +81,11 @@ export function DistributionDetailsDialog({
             <Tabs defaultValue="beneficiaries" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="beneficiaries">
-                  <Users className="ml-2 h-4 w-4" />
+                  <Users className="ms-2 h-4 w-4" />
                   المستفيدون
                 </TabsTrigger>
                 <TabsTrigger value="vouchers">
-                  <Receipt className="ml-2 h-4 w-4" />
+                  <Receipt className="ms-2 h-4 w-4" />
                   سندات الصرف
                 </TabsTrigger>
               </TabsList>

@@ -134,7 +134,7 @@ export function ProfileHeader({ beneficiary }: ProfileHeaderProps) {
                     variant="ghost"
                     size="sm"
                     onClick={() => setEditPhoneOpen(true)}
-                    className="h-6 px-2 text-xs gap-1 mr-2"
+                    className="h-6 px-2 text-xs gap-1 me-2"
                   >
                     <Edit2 className="h-3 w-3" />
                     تعديل

@@ -52,7 +52,7 @@ export function SmartRecommendations({ scenarios, onSelectScenario }: SmartRecom
                 onClick={() => onSelectScenario(analysis.balancedOption.pattern)}
                 size="sm"
                 variant="outline"
-                className="mr-4"
+                className="me-4"
               >
                 اختيار
               </Button>

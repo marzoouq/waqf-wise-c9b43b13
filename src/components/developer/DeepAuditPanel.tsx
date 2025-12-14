@@ -56,7 +56,7 @@ function IssueCard({ issue }: { issue: AuditIssue }) {
           <div className="flex items-center gap-2 mb-1">
             <h4 className="font-medium text-sm truncate">{issue.title}</h4>
             <Badge variant="outline" className="text-xs">
-              <CategoryIcon className={`h-3 w-3 mr-1 ${category.color}`} />
+              <CategoryIcon className={`h-3 w-3 me-1 ${category.color}`} />
               {category.label}
             </Badge>
           </div>

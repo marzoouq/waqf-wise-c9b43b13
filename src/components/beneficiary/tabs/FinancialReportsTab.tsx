@@ -59,11 +59,11 @@ export function FinancialReportsTab() {
                   {settings?.allow_export_pdf && (
                     <>
                       <Button variant="outline" size="sm">
-                        <Eye className="h-4 w-4 ml-2" />
+                        <Eye className="h-4 w-4 ms-2" />
                         عرض
                       </Button>
                       <Button variant="outline" size="sm">
-                        <Download className="h-4 w-4 ml-2" />
+                        <Download className="h-4 w-4 ms-2" />
                         PDF
                       </Button>
                     </>

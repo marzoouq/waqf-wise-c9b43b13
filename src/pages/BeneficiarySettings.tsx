@@ -142,7 +142,7 @@ const BeneficiarySettings = () => {
               className="w-full"
               size="lg"
             >
-              <LogOut className="ml-2 h-5 w-5" />
+              <LogOut className="ms-2 h-5 w-5" />
               تسجيل الخروج
             </Button>
           </CardContent>

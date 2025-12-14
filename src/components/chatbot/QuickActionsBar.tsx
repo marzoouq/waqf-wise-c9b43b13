@@ -73,7 +73,7 @@ export const QuickActionsBar = memo(function QuickActionsBar({ actions }: QuickA
             {action.count !== undefined && (
               <Badge 
                 variant="secondary" 
-                className="mr-1 h-4 px-1 text-[9px] bg-primary/20"
+                className="me-1 h-4 px-1 text-[9px] bg-primary/20"
               >
                 {action.count}
               </Badge>

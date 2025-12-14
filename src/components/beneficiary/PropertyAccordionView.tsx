@@ -66,7 +66,7 @@ export function PropertyAccordionView() {
                 </div>
               </div>
               
-              <div className="flex gap-2 mr-4">
+              <div className="flex gap-2 me-4">
                 <Badge variant="secondary" className="gap-1 whitespace-nowrap">
                   <Home className="h-3 w-3" />
                   {property.units} وحدة

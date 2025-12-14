@@ -88,7 +88,7 @@ const Install = () => {
                   size="lg"
                   className="w-full"
                 >
-                  <Download className="ml-2" />
+                  <Download className="ms-2" />
                   ثبّت التطبيق الآن
                 </Button>
               ) : (

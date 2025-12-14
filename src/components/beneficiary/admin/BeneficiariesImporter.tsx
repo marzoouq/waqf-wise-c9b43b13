@@ -131,7 +131,7 @@ export function BeneficiariesImporter({ onSuccess }: BeneficiariesImporterProps)
   return (
     <>
       <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
-        <Upload className="ml-2 h-4 w-4" />
+        <Upload className="ms-2 h-4 w-4" />
         استيراد من Excel
       </Button>
 

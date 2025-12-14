@@ -158,11 +158,11 @@ export function RequestApprovalDialog({
                 />
                 <div className="flex gap-2">
                   <Button onClick={handleApprove} className="flex-1">
-                    <CheckCircle2 className="h-4 w-4 ml-2" />
+                    <CheckCircle2 className="h-4 w-4 ms-2" />
                     موافقة
                   </Button>
                   <Button onClick={handleReject} variant="destructive" className="flex-1">
-                    <XCircle className="h-4 w-4 ml-2" />
+                    <XCircle className="h-4 w-4 ms-2" />
                     رفض
                   </Button>
                 </div>

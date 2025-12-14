@@ -130,7 +130,7 @@ const UsersContent = () => {
         icon={<Shield className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
         actions={
           <Button onClick={handleExport} variant="outline" size="sm" disabled={isLoading}>
-            <Download className="h-4 w-4 sm:h-5 sm:w-5 ml-2" />
+            <Download className="h-4 w-4 sm:h-5 sm:w-5 ms-2" />
             <span className="hidden sm:inline">تصدير ({filteredUsers.length})</span>
             <span className="sm:hidden">تصدير</span>
           </Button>

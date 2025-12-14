@@ -6,7 +6,7 @@
  * @date 2025-12-14
  */
 
-export const APP_VERSION = '2.9.20';
+export const APP_VERSION = '2.9.21';
 export const APP_VERSION_DATE = '2025-12-14';
 export const APP_VERSION_NAME = 'منصة إدارة الوقف الإلكترونية';
 
