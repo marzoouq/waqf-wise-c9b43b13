@@ -40,7 +40,7 @@ export function useLoanPayments(loanId?: string) {
   }, [queryClient]);
 
   // Fetch payments
-  const { data: payments = [], isLoading } = useQuery({
+  const { data: payments = [], isLoading, error, refetch } = useQuery({
     queryKey: ['loan_payments', loanId],
     queryFn: () => LoansService.getLoanPayments(loanId),
     enabled: !!loanId,
@@ -129,6 +129,8 @@ export function useLoanPayments(loanId?: string) {
   return {
     payments: payments as LoanPayment[],
     isLoading,
+    error,
+    refetch,
     addPayment: addPayment.mutateAsync,
   };
 }

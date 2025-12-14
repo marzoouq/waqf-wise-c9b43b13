@@ -19,7 +19,7 @@ export function useSavedFilters(filterType: string) {
   const { user } = useAuth();
 
   // جلب الفلاتر المحفوظة
-  const { data: filters = [], isLoading } = useQuery({
+  const { data: filters = [], isLoading, error, refetch } = useQuery({
     queryKey: ['saved-filters', filterType],
     queryFn: async () => {
       if (!user) return [];
@@ -78,6 +78,8 @@ export function useSavedFilters(filterType: string) {
   return {
     filters,
     isLoading,
+    error,
+    refetch,
     saveFilter: saveFilter.mutateAsync,
     updateFilter: updateFilter.mutateAsync,
     deleteFilter: deleteFilter.mutateAsync,

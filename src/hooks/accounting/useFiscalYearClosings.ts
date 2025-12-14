@@ -12,7 +12,7 @@ export function useFiscalYearClosings() {
   const queryClient = useQueryClient();
 
   // استرجاع جميع عمليات الإقفال
-  const { data: closings, isLoading } = useQuery({
+  const { data: closings, isLoading, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.FISCAL_YEAR_CLOSINGS,
     queryFn: async () => {
       const data = await AccountingService.getFiscalYearClosings();
@@ -64,6 +64,8 @@ export function useFiscalYearClosings() {
   return {
     closings,
     isLoading,
+    error,
+    refetch,
     getClosingByFiscalYear,
     calculateSummary,
     createClosing,
