@@ -1,11 +1,19 @@
 import { FileText, CheckCircle2, FileEdit, XCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAccountantKPIs } from "@/hooks/accounting";
+import { useUnifiedKPIs } from "@/hooks/dashboard/useUnifiedKPIs";
 import { ErrorState } from "@/components/shared/ErrorState";
 
 const AccountingStats = () => {
-  const { data, isLoading, error, refetch } = useAccountantKPIs();
+  const { data: unifiedData, isLoading, isError, refetch } = useUnifiedKPIs();
+  
+  // تحويل البيانات الموحدة إلى صيغة المحاسب
+  const data = unifiedData ? {
+    totalEntries: unifiedData.totalJournalEntries,
+    postedEntries: unifiedData.postedJournalEntries,
+    draftEntries: unifiedData.draftJournalEntries,
+    cancelledEntries: unifiedData.cancelledJournalEntries
+  } : null;
 
   if (isLoading) {
     return (
@@ -24,8 +32,8 @@ const AccountingStats = () => {
     );
   }
 
-  if (error) {
-    return <ErrorState title="خطأ في تحميل الإحصائيات" message={(error as Error).message} onRetry={refetch} />;
+  if (isError) {
+    return <ErrorState title="خطأ في تحميل الإحصائيات" onRetry={refetch} />;
   }
 
   if (!data) return null;

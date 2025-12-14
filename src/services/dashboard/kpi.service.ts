@@ -40,6 +40,13 @@ export interface UnifiedKPIsData {
   pendingRequests: number;
   overdueRequests: number;
   pendingLoans: number;
+  // حقول القيود المحاسبية
+  pendingApprovals: number;
+  draftJournalEntries: number;
+  postedJournalEntries: number;
+  cancelledJournalEntries: number;
+  todayJournalEntries: number;
+  totalJournalEntries: number;
   lastUpdated: Date;
 }
 
@@ -121,7 +128,8 @@ export const KPIService = {
       requestsResult,
       loansResult,
       paymentsResult,
-      journalEntriesResult
+      journalEntriesResult,
+      journalEntriesStatusResult
     ] = await Promise.all([
       supabase.from('beneficiaries').select('id, status'),
       supabase.from('families').select('id'),
@@ -131,7 +139,8 @@ export const KPIService = {
       supabase.from('beneficiary_requests').select('id, status, is_overdue'),
       supabase.from('loans').select('id, status'),
       supabase.from('rental_payments').select('id, amount_paid, status'),
-      supabase.from('journal_entry_lines').select('id, debit_amount, credit_amount')
+      supabase.from('journal_entry_lines').select('id, debit_amount, credit_amount'),
+      supabase.from('journal_entries').select('id, status, entry_date')
     ]);
 
     const beneficiaries = beneficiariesResult.data || [];
@@ -197,6 +206,16 @@ export const KPIService = {
     const availableBudget = netIncome > 0 ? netIncome : 0;
     const totalAssets = totalRevenue;
 
+    // حساب إحصائيات القيود المحاسبية
+    const journalEntries = journalEntriesStatusResult.data || [];
+    const todayStr = now.toISOString().split('T')[0];
+    const draftJournalEntries = journalEntries.filter(e => e.status === 'draft').length;
+    const postedJournalEntries = journalEntries.filter(e => e.status === 'posted').length;
+    const cancelledJournalEntries = journalEntries.filter(e => e.status === 'cancelled').length;
+    const todayJournalEntries = journalEntries.filter(e => e.entry_date === todayStr).length;
+    const totalJournalEntries = journalEntries.length;
+    const pendingApprovals = draftJournalEntries; // الموافقات المعلقة = القيود المسودة
+
     return {
       totalBeneficiaries,
       activeBeneficiaries,
@@ -215,6 +234,12 @@ export const KPIService = {
       pendingRequests,
       overdueRequests,
       pendingLoans,
+      pendingApprovals,
+      draftJournalEntries,
+      postedJournalEntries,
+      cancelledJournalEntries,
+      todayJournalEntries,
+      totalJournalEntries,
       lastUpdated: now
     };
   },
