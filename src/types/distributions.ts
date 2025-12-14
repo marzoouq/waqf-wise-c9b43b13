@@ -199,3 +199,27 @@ export interface DistributionStats {
   completed: number;
   pending: number;
 }
+
+// ====================
+// أنواع توزيعات الورثة (موحد)
+// ====================
+
+/**
+ * واجهة موحدة لتوزيعات الورثة
+ * تُستخدم في جميع مكونات وhooks التوزيعات
+ */
+export interface HeirDistribution {
+  id: string;
+  share_amount: number;
+  heir_type: string;
+  distribution_date: string;
+  fiscal_year_id: string;
+  notes?: string | null;
+  fiscal_years: {
+    name: string;
+    start_date?: string;
+    end_date?: string;
+    is_closed: boolean;
+    is_active?: boolean;
+  } | null;
+}

@@ -38,7 +38,7 @@ const BENEFICIARY_QUICK_ACTIONS = [
     description: "التواصل مع فريق الدعم",
     color: "text-[hsl(var(--chart-5))]",
     bgColor: "bg-[hsl(var(--chart-5)/0.1)]",
-    path: "/support",
+    path: "/beneficiary-support",
   },
 ];
 

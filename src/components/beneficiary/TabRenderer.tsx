@@ -7,6 +7,7 @@ import { Suspense, lazy, ComponentType } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Lock } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import type { VisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
 
 // Lazy loaded tab components with named exports
 const LazyBeneficiaryProfileTab = lazy(() => 
@@ -94,8 +95,7 @@ function AccessDenied() {
 
 interface TabRendererProps {
   activeTab: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  settings: Record<string, any> | null;
+  settings: Partial<VisibilitySettings> | null;
   beneficiaryId?: string;
   beneficiary?: unknown;
 }
