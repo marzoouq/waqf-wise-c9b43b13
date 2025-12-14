@@ -33,11 +33,14 @@ export function UnifiedTabsList({ tabs, columns = 4, className }: UnifiedTabsLis
       <TabsList
         className={cn(
           "h-auto p-1 bg-muted/50 w-full",
-          "grid gap-1",
-          gridColsMap[columns],
-          "lg:w-auto lg:inline-grid",
+          // Mobile: flex scrollable
+          "flex flex-nowrap gap-1 overflow-x-auto",
+          // Desktop: grid layout
+          `lg:grid lg:${gridColsMap[columns]}`,
+          "lg:w-auto",
           className
         )}
+        style={{ WebkitOverflowScrolling: 'touch' }}
       >
         {tabs.map((tab) => (
           <TabsTrigger
@@ -45,7 +48,7 @@ export function UnifiedTabsList({ tabs, columns = 4, className }: UnifiedTabsLis
             value={tab.value}
             className={cn(
               "flex items-center justify-center gap-2",
-              "px-3 py-2 text-sm whitespace-nowrap",
+              "px-3 py-2 text-sm whitespace-nowrap flex-shrink-0",
               "data-[state=active]:bg-background data-[state=active]:shadow-sm"
             )}
           >
