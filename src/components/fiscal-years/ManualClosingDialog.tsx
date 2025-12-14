@@ -97,7 +97,7 @@ export function ManualClosingDialog({
               )}
               {currentStep === 4 && (
                 <Button disabled={loading}>
-                  {loading && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+                  {loading && <Loader2 className="ms-2 h-4 w-4 animate-spin" />}
                   تأكيد الإقفال
                 </Button>
               )}

@@ -127,12 +127,12 @@ export function AIAssistantDialog({ open, onOpenChange, propertyData, actionType
               <Button onClick={handleAnalyze} disabled={isAnalyzing}>
                 {isAnalyzing ? (
                   <>
-                    <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                    <Loader2 className="h-4 w-4 ms-2 animate-spin" />
                     جاري التحليل...
                   </>
                 ) : (
                   <>
-                    <Brain className="h-4 w-4 ml-2" />
+                    <Brain className="h-4 w-4 ms-2" />
                     تحليل الآن
                   </>
                 )}

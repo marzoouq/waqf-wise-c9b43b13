@@ -39,11 +39,11 @@ export function DetailedGeneralLedger() {
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => window.print()}>
-              <Printer className="h-4 w-4 ml-2" />
+              <Printer className="h-4 w-4 ms-2" />
               طباعة
             </Button>
             <Button variant="outline">
-              <FileDown className="h-4 w-4 ml-2" />
+              <FileDown className="h-4 w-4 ms-2" />
               تصدير Excel
             </Button>
           </div>

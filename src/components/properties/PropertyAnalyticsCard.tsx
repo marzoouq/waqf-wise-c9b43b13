@@ -99,7 +99,7 @@ export function PropertyAnalyticsCard({ property, onAnalyzeClick }: PropertyAnal
           variant="outline"
           onClick={onAnalyzeClick}
         >
-          <Brain className="h-4 w-4 ml-2" />
+          <Brain className="h-4 w-4 ms-2" />
           تحليل بالذكاء الاصطناعي
         </Button>
       </CardContent>

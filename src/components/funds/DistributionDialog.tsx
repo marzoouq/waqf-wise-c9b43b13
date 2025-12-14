@@ -386,12 +386,12 @@ export function DistributionDialog({
             >
               {isSimulating ? (
                 <>
-                  <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                  <Loader2 className="h-4 w-4 ms-2 animate-spin" />
                   جاري المحاكاة...
                 </>
               ) : (
                 <>
-                  <Calculator className="h-4 w-4 ml-2" />
+                  <Calculator className="h-4 w-4 ms-2" />
                   محاكاة التوزيع
                 </>
               )}

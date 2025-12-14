@@ -109,11 +109,11 @@ export function AccountStatementView({
           </div>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={handlePrint}>
-              <FileText className="h-4 w-4 ml-2" />
+              <FileText className="h-4 w-4 ms-2" />
               طباعة
             </Button>
             <Button variant="outline" size="sm" onClick={handleExportPDF}>
-              <Download className="h-4 w-4 ml-2" />
+              <Download className="h-4 w-4 ms-2" />
               تحميل PDF
             </Button>
           </div>
