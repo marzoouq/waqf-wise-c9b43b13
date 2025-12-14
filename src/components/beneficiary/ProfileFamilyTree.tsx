@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { LoadingState } from '@/components/shared/LoadingState';
+import { ErrorState } from '@/components/shared/ErrorState';
 import { Users, User, Crown } from 'lucide-react';
 import { useFamilyTree } from '@/hooks/beneficiary/useBeneficiaryProfileData';
 
@@ -10,10 +11,14 @@ interface ProfileFamilyTreeProps {
 }
 
 export function ProfileFamilyTree({ beneficiaryId }: ProfileFamilyTreeProps) {
-  const { data: familyMembers = [], isLoading } = useFamilyTree(beneficiaryId);
+  const { data: familyMembers = [], isLoading, error, refetch } = useFamilyTree(beneficiaryId);
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل شجرة العائلة..." />;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في التحميل" message="فشل تحميل شجرة العائلة" onRetry={refetch} />;
   }
 
   const getInitials = (name: string) => {

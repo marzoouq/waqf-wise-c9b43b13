@@ -2,16 +2,21 @@ import { useBeneficiaryProfileStats } from '@/hooks/beneficiary/useBeneficiaryPr
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DollarSign, FileText, Users, TrendingUp, Calendar, CheckCircle } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 interface ProfileStatsProps {
   beneficiaryId: string;
 }
 
 export function ProfileStats({ beneficiaryId }: ProfileStatsProps) {
-  const { data: stats, isLoading } = useBeneficiaryProfileStats(beneficiaryId);
+  const { data: stats, isLoading, error, refetch } = useBeneficiaryProfileStats(beneficiaryId);
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل الإحصائيات..." />;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في التحميل" message="فشل تحميل الإحصائيات" onRetry={refetch} />;
   }
 
   const statCards = [

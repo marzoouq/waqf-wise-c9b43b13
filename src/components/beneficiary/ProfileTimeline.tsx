@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { LoadingState } from '@/components/shared/LoadingState';
+import { ErrorState } from '@/components/shared/ErrorState';
 import { 
   Clock, 
   DollarSign, 
@@ -16,10 +17,14 @@ interface ProfileTimelineProps {
 }
 
 export function ProfileTimeline({ beneficiaryId }: ProfileTimelineProps) {
-  const { data: events, isLoading } = useBeneficiaryTimeline(beneficiaryId);
+  const { data: events, isLoading, error, refetch } = useBeneficiaryTimeline(beneficiaryId);
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل الخط الزمني..." />;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في التحميل" message="فشل تحميل الخط الزمني" onRetry={refetch} />;
   }
 
   const getIcon = (type: string) => {

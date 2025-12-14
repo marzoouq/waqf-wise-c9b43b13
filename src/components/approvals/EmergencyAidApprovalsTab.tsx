@@ -21,6 +21,7 @@ export function EmergencyAidApprovalsTab() {
   const { 
     requests, 
     isLoading, 
+    error,
     approveRequest, 
     rejectRequest, 
     isApproving, 
@@ -94,7 +95,19 @@ export function EmergencyAidApprovalsTab() {
   };
 
   if (isLoading) {
-    return <LoadingState />;
+    return <LoadingState message="جاري تحميل طلبات الفزعة..." />;
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardContent className="p-8 text-center">
+          <AlertCircle className="h-12 w-12 mx-auto text-destructive mb-4" />
+          <p className="text-destructive font-medium">فشل تحميل طلبات الفزعة</p>
+          <p className="text-muted-foreground text-sm mt-1">{(error as Error).message}</p>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (

@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { FileText, Download, TrendingUp, TrendingDown } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
+import { ErrorState } from '@/components/shared/ErrorState';
 import { Badge } from '@/components/ui/badge';
 import { useFinancialReportsData } from '@/hooks/accounting/useFinancialReportsData';
 
@@ -19,11 +20,17 @@ export function FinancialReports() {
     totalRevenue, 
     totalExpense, 
     netIncome, 
-    isLoading 
+    isLoading,
+    error,
+    refetch
   } = useFinancialReportsData();
 
   if (isLoading) {
-    return <LoadingState />;
+    return <LoadingState message="جاري تحميل التقارير المالية..." />;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في التحميل" message="فشل تحميل التقارير المالية" onRetry={refetch} />;
   }
 
   return (

@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { LoadingState } from '@/components/shared/LoadingState';
+import { ErrorState } from '@/components/shared/ErrorState';
 import { 
   FileText, 
   Download, 
@@ -20,10 +21,14 @@ interface ProfileDocumentsGalleryProps {
 }
 
 export function ProfileDocumentsGallery({ beneficiaryId }: ProfileDocumentsGalleryProps) {
-  const { data: documents, isLoading } = useBeneficiaryProfileDocuments(beneficiaryId);
+  const { data: documents, isLoading, error, refetch } = useBeneficiaryProfileDocuments(beneficiaryId);
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل المستندات..." />;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في التحميل" message="فشل تحميل المستندات" onRetry={refetch} />;
   }
 
   const verifiedCount = documents?.filter(d => d.is_verified).length || 0;
