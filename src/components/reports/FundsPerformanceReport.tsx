@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Download, PieChart as PieChartIcon } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
+import { ErrorState } from '@/components/shared/ErrorState';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Progress } from '@/components/ui/progress';
 import { exportToExcel, exportToPDF } from '@/lib/exportHelpers';
@@ -61,6 +62,7 @@ export function FundsPerformanceReport() {
   if (isLoading) {
     return <LoadingState message="جاري تحليل أداء المصارف..." />;
   }
+
 
   return (
     <div className="space-y-6">

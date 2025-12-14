@@ -12,9 +12,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useTenantsAging } from '@/hooks/property/useTenantLedger';
 import { formatCurrency } from '@/lib/utils';
 import { AlertTriangle, Clock } from 'lucide-react';
+import { ErrorState } from '@/components/shared/ErrorState';
 
 export function TenantsAgingReport() {
-  const { data: agingData = [], isLoading } = useTenantsAging();
+  const { data: agingData = [], isLoading, error, refetch } = useTenantsAging();
 
   const totals = agingData.reduce(
     (acc, item) => ({
@@ -43,6 +44,10 @@ export function TenantsAgingReport() {
         </CardContent>
       </Card>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل تقرير أعمار الديون" message={(error as Error).message} onRetry={refetch} />;
   }
 
   return (

@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Download, Wrench } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
+import { ErrorState } from '@/components/shared/ErrorState';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { exportToExcel, exportToPDF } from '@/lib/exportHelpers';
@@ -57,6 +58,7 @@ export function MaintenanceCostReport() {
   if (isLoading) {
     return <LoadingState message="جاري تحليل تكاليف الصيانة..." />;
   }
+
 
   return (
     <div className="space-y-6">

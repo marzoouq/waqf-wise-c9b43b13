@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Printer, FileDown, TrendingUp, TrendingDown, Activity } from "lucide-react";
 import { useCashFlowCalculation } from "@/hooks/accounting/useCashFlowCalculation";
 import { LoadingState } from "@/components/shared/LoadingState";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { EmptyAccountingState } from "./EmptyAccountingState";
 import { format, arLocale as ar } from "@/lib/date";
 import { toast } from "sonner";

@@ -24,6 +24,7 @@ import { useDisclosures } from "@/hooks/beneficiary/useBeneficiaryTabsData";
 import { MaskedValue } from "@/components/shared/MaskedValue";
 import { ViewDisclosureDialog } from "@/components/distributions/ViewDisclosureDialog";
 import { AnnualDisclosure } from "@/hooks/reports/useAnnualDisclosures";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 const formatCurrency = (amount: number): string => {
   return new Intl.NumberFormat("ar-SA", {
@@ -35,7 +36,7 @@ const formatCurrency = (amount: number): string => {
 
 export function EnhancedDisclosuresTab() {
   const { settings } = useVisibilitySettings();
-  const { data: disclosures, isLoading } = useDisclosures(settings?.show_disclosures || false);
+  const { data: disclosures, isLoading, error, refetch } = useDisclosures(settings?.show_disclosures || false);
   const [selectedDisclosure, setSelectedDisclosure] = useState<AnnualDisclosure | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -70,6 +71,10 @@ export function EnhancedDisclosuresTab() {
         ))}
       </div>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل الإفصاحات" message={(error as Error).message} onRetry={refetch} />;
   }
 
   const handleViewDetails = (disclosure: AnnualDisclosure) => {

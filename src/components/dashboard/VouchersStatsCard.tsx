@@ -3,9 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Receipt, TrendingUp, Clock, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export function VouchersStatsCard() {
-  const { data: stats, isLoading } = useVouchersStats();
+  const { data: stats, isLoading, error, refetch } = useVouchersStats();
 
   if (isLoading) {
     return (
@@ -18,6 +19,10 @@ export function VouchersStatsCard() {
         </CardContent>
       </Card>
     );
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل إحصائيات السندات" message={(error as Error).message} onRetry={refetch} />;
   }
 
   return (

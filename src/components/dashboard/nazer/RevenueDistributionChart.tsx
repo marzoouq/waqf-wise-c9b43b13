@@ -2,14 +2,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { useRevenueDistribution } from "@/hooks/dashboard/useRevenueDistribution";
 import { ChartSkeleton } from "@/components/dashboard/ChartSkeleton";
+import { ErrorState } from "@/components/shared/ErrorState";
 
 export default function RevenueDistributionChart() {
-  const { data, isLoading } = useRevenueDistribution();
+  const { data, isLoading, error, refetch } = useRevenueDistribution();
 
   const COLORS = ['#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#6366f1'];
 
   if (isLoading) {
     return <ChartSkeleton title="توزيع الإيرادات" />;
+  }
+
+  if (error) {
+    return <ErrorState title="خطأ في تحميل توزيع الإيرادات" message={(error as Error).message} onRetry={refetch} />;
   }
 
   if (!data || data.length === 0) {
