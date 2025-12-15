@@ -1,6 +1,7 @@
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useDebouncedSearch } from '@/hooks/useDebouncedSearch';
 
 interface FamiliesFiltersProps {
   searchQuery: string;
@@ -8,6 +9,8 @@ interface FamiliesFiltersProps {
 }
 
 export function FamiliesFilters({ searchQuery, onSearchChange }: FamiliesFiltersProps) {
+  const { value, onChange } = useDebouncedSearch(searchQuery, onSearchChange, 300);
+
   return (
     <Card>
       <CardHeader>
@@ -18,9 +21,10 @@ export function FamiliesFilters({ searchQuery, onSearchChange }: FamiliesFilters
         <div className="relative">
           <Search className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
           <Input
+            name="families-search"
             placeholder="ابحث عن عائلة..."
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
             className="pr-10"
           />
         </div>

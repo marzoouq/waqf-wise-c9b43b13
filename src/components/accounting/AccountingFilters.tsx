@@ -8,6 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Search, Calendar } from "lucide-react";
+import { useDebouncedSearch } from "@/hooks/useDebouncedSearch";
 
 interface AccountingFiltersProps {
   searchQuery: string;
@@ -41,6 +42,8 @@ export function AccountingFilters({
   showStatus = true,
   showDate = true,
 }: AccountingFiltersProps) {
+  const { value, onChange } = useDebouncedSearch(searchQuery, onSearchChange, 300);
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
       <div className="space-y-2">
@@ -49,9 +52,10 @@ export function AccountingFilters({
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             id="search"
+            name="accounting-search"
             placeholder="ابحث..."
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
             className="pr-10"
           />
         </div>
