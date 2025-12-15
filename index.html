@@ -39,49 +39,17 @@
     <link rel="canonical" href="https://waqf.lovable.app/" />
     
     <!-- Performance: Preconnect to external domains (HIGH PRIORITY) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://zsacuvrcohmraoldilph.supabase.co" crossorigin>
     <link rel="dns-prefetch" href="https://zsacuvrcohmraoldilph.supabase.co">
     
-    <!-- Performance: Critical font with display swap -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" as="style" fetchpriority="high">
+    <!-- Performance: System font fallback for instant FCP, then load Cairo -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" as="style" fetchpriority="low">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap"></noscript>
     
-    <!-- Performance: Prefetch critical routes -->
-    <link rel="prefetch" href="/login" as="document">
-    <link rel="prefetch" href="/dashboard" as="document">
-    
-    <!-- Note: modulepreload is handled automatically by Vite during build -->
-    
-    <!-- Performance: Preload CSS to reduce render blocking -->
-    <script>
-      // Dynamically preload CSS to avoid render-blocking
-      (function() {
-        var link = document.createElement('link');
-        link.rel = 'preload';
-        link.as = 'style';
-        link.href = '';
-        // Find and preload Vite CSS when available
-        var observer = new MutationObserver(function(mutations) {
-          mutations.forEach(function(mutation) {
-            mutation.addedNodes.forEach(function(node) {
-              if (node.tagName === 'LINK' && node.rel === 'stylesheet' && node.href.includes('/assets/')) {
-                var preload = document.createElement('link');
-                preload.rel = 'preload';
-                preload.as = 'style';
-                preload.href = node.href;
-                document.head.insertBefore(preload, document.head.firstChild);
-                observer.disconnect();
-              }
-            });
-          });
-        });
-        observer.observe(document.head, { childList: true });
-      })();
-    </script>
-    <!-- Critical CSS inline for faster LCP -->
+    <!-- Critical CSS inline for faster FCP -->
     <style>
       /* Reset and base styles */
       *, *::before, *::after { box-sizing: border-box; }
