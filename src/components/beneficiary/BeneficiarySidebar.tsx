@@ -50,18 +50,18 @@ export function BeneficiarySidebar({
   });
 
   const SidebarContent = () => (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col text-sidebar-foreground">
       {/* Header */}
-      <div className="p-6 border-b">
+      <div className="p-6 border-b border-sidebar-border">
         <div className="flex items-center gap-3">
-          <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-            <User className="h-6 w-6 text-primary" />
+          <div className="h-12 w-12 rounded-full bg-sidebar-accent flex items-center justify-center">
+            <User className="h-6 w-6 text-sidebar-primary" />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-sm truncate">
+            <h3 className="font-semibold text-sm truncate text-sidebar-foreground">
               {beneficiaryName || "المستفيد"}
             </h3>
-            <p className="text-xs text-muted-foreground">بوابة الوقف</p>
+            <p className="text-xs text-sidebar-foreground/70">بوابة الوقف</p>
           </div>
         </div>
       </div>
@@ -73,52 +73,52 @@ export function BeneficiarySidebar({
             const isActive = activeTab === item.tab;
             const Icon = item.icon;
 
-            if (item.href) {
+              if (item.href) {
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      navigate(item.href!);
+                      setMobileOpen(false);
+                    }}
+                    className={cn(
+                      "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                      "hover:bg-sidebar-accent active:bg-sidebar-accent text-sidebar-foreground/70 hover:text-sidebar-foreground"
+                    )}
+                  >
+                    <Icon className="h-5 w-5 flex-shrink-0" />
+                    <span className="flex-1 text-right">{item.label}</span>
+                  </button>
+                );
+              }
+
               return (
                 <button
                   key={item.id}
-                  onClick={() => {
-                    navigate(item.href!);
-                    setMobileOpen(false);
-                  }}
+                  onClick={() => item.tab && handleItemClick(item.tab)}
                   className={cn(
                     "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
-                    "hover:bg-accent/50 active:bg-accent text-muted-foreground hover:text-foreground"
+                    "hover:bg-sidebar-accent active:bg-sidebar-accent",
+                    isActive
+                      ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
+                      : "text-sidebar-foreground/70 hover:text-sidebar-foreground"
                   )}
                 >
-                  <Icon className="h-5 w-5 flex-shrink-0" />
+                  <Icon className={cn("h-5 w-5 flex-shrink-0", isActive && "text-sidebar-primary-foreground")} />
                   <span className="flex-1 text-right">{item.label}</span>
+                  {isActive && (
+                    <div className="w-1.5 h-1.5 rounded-full bg-sidebar-primary-foreground" />
+                  )}
                 </button>
               );
-            }
-
-            return (
-              <button
-                key={item.id}
-                onClick={() => item.tab && handleItemClick(item.tab)}
-                className={cn(
-                  "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
-                  "hover:bg-accent/50 active:bg-accent",
-                  isActive
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                <Icon className={cn("h-5 w-5 flex-shrink-0", isActive && "text-primary-foreground")} />
-                <span className="flex-1 text-right">{item.label}</span>
-                {isActive && (
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary-foreground" />
-                )}
-              </button>
-            );
           })}
         </div>
       </ScrollArea>
 
-      <Separator />
+      <div className="border-t border-sidebar-border" />
 
       {/* Footer */}
-      <div className="p-4 text-xs text-center text-muted-foreground">
+      <div className="p-4 text-xs text-center text-sidebar-foreground/70">
         <p>منصة إدارة الوقف</p>
         <p className="mt-1">الإصدار {APP_VERSION}</p>
       </div>
@@ -130,7 +130,7 @@ export function BeneficiarySidebar({
       {/* Mobile: Sheet - بدون زر هنا، الزر في الـ Header */}
       <div className="lg:hidden">
         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-          <SheetContent side="right" className="w-[280px] p-0">
+          <SheetContent side="right" className="w-[280px] p-0 bg-sidebar border-sidebar-border">
             <SheetHeader className="sr-only">
               <SheetTitle>قائمة التنقل</SheetTitle>
             </SheetHeader>
@@ -140,7 +140,7 @@ export function BeneficiarySidebar({
       </div>
 
       {/* Desktop: Fixed sidebar */}
-      <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 lg:right-0 lg:border-s lg:bg-card lg:shadow-sm">
+      <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 lg:right-0 lg:border-s lg:border-sidebar-border lg:bg-sidebar lg:shadow-sm">
         <SidebarContent />
       </aside>
     </>
