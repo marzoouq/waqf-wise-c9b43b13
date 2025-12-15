@@ -56,6 +56,32 @@
     <!-- Performance: Modulepreload for faster JS execution -->
     <link rel="modulepreload" href="/src/main.tsx">
     
+    <!-- Performance: Preload CSS to reduce render blocking -->
+    <script>
+      // Dynamically preload CSS to avoid render-blocking
+      (function() {
+        var link = document.createElement('link');
+        link.rel = 'preload';
+        link.as = 'style';
+        link.href = '';
+        // Find and preload Vite CSS when available
+        var observer = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            mutation.addedNodes.forEach(function(node) {
+              if (node.tagName === 'LINK' && node.rel === 'stylesheet' && node.href.includes('/assets/')) {
+                var preload = document.createElement('link');
+                preload.rel = 'preload';
+                preload.as = 'style';
+                preload.href = node.href;
+                document.head.insertBefore(preload, document.head.firstChild);
+                observer.disconnect();
+              }
+            });
+          });
+        });
+        observer.observe(document.head, { childList: true });
+      })();
+    </script>
     <!-- Critical CSS inline for faster LCP -->
     <style>
       /* Reset and base styles */
