@@ -133,12 +133,6 @@ export function ToolsPanel() {
               </p>
             </div>
 
-            <div className="border rounded-lg p-3 bg-muted/50">
-              <code className="text-sm">toggleQueryDevtools()</code>
-              <p className="text-xs text-muted-foreground mt-1">
-                عرض/إخفاء React Query DevTools
-              </p>
-            </div>
           </div>
         </CardContent>
       </Card>

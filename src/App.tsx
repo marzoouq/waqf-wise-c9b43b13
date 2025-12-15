@@ -19,9 +19,6 @@ import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { RoleBasedRedirect } from "./components/auth/RoleBasedRedirect";
 // ✅ نقل التهيئة الثقيلة إلى MainLayout للصفحات المحمية فقط
 
-// Import DevTools configuration
-import { DEVTOOLS_CONFIG } from "./lib/devtools";
-
 // Import routes
 import { 
   publicRoutes, 
@@ -31,20 +28,6 @@ import {
   coreRoutes,
   beneficiaryProtectedRoutes,
 } from "./routes";
-
-// Lazy load React Query DevTools
-const ReactQueryDevtools =
-  DEVTOOLS_CONFIG.enabled
-    ? lazy(() =>
-        import("@tanstack/react-query-devtools")
-          .then((d) => ({
-            default: d.ReactQueryDevtools,
-          }))
-          .catch(() => {
-            return { default: () => null };
-          })
-      )
-    : null;
 
 // Configure QueryClient - تحسين التحديث المباشر
 const queryClient = new QueryClient({
@@ -130,14 +113,6 @@ const App = () => {
                 </BrowserRouter>
               </TooltipProvider>
               
-              {/* React Query DevTools */}
-              {DEVTOOLS_CONFIG.enabled && ReactQueryDevtools && (
-                <Suspense fallback={null}>
-                  <ReactQueryDevtools 
-                    initialIsOpen={DEVTOOLS_CONFIG.initialIsOpen}
-                  />
-                </Suspense>
-              )}
             </SettingsProvider>
           </AuthProvider>
         </ThemeProvider>
