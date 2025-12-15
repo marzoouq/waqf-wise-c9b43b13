@@ -11075,54 +11075,6 @@ export type Database = {
           },
         ]
       }
-      users_profiles_cache: {
-        Row: {
-          created_at: string | null
-          email: string
-          full_name: string | null
-          id: string
-          is_active: boolean | null
-          last_login_at: string | null
-          last_sign_in_at: string | null
-          phone: string | null
-          position: string | null
-          roles: Json | null
-          updated_at: string | null
-          user_created_at: string | null
-          user_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          email: string
-          full_name?: string | null
-          id?: string
-          is_active?: boolean | null
-          last_login_at?: string | null
-          last_sign_in_at?: string | null
-          phone?: string | null
-          position?: string | null
-          roles?: Json | null
-          updated_at?: string | null
-          user_created_at?: string | null
-          user_id: string
-        }
-        Update: {
-          created_at?: string | null
-          email?: string
-          full_name?: string | null
-          id?: string
-          is_active?: boolean | null
-          last_login_at?: string | null
-          last_sign_in_at?: string | null
-          phone?: string | null
-          position?: string | null
-          roles?: Json | null
-          updated_at?: string | null
-          user_created_at?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
       voting_delegations: {
         Row: {
           created_at: string | null
@@ -11831,36 +11783,6 @@ export type Database = {
           user_name: string | null
         }
         Relationships: []
-      }
-      safe_active_sessions: {
-        Row: {
-          created_at: string | null
-          device_info: Json | null
-          email: string | null
-          full_name: string | null
-          id: string | null
-          idle_minutes: number | null
-          ip_address: string | null
-          last_activity_at: string | null
-          user_agent: string | null
-          user_id: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_sessions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_sessions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_profile_with_roles"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       trial_balance: {
         Row: {
