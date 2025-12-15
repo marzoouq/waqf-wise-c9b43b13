@@ -8,6 +8,9 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     
+    <!-- CSP Meta Tag Fallback (frame-ancestors لا تعمل هنا، تعتمد على HTTP header) -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https://lovable.dev https://*.supabase.co; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co; form-action 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests">
+    
     <!-- PWA Meta Tags -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="mobile-web-app-capable" content="yes">
@@ -96,33 +99,7 @@
 
   <body>
     <!-- ❌ إزالة Service Workers و Workbox Caches فوراً قبل تحميل React -->
-    <script>
-      (function() {
-        // 1. إلغاء تسجيل جميع Service Workers
-        if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.getRegistrations().then(function(registrations) {
-            registrations.forEach(function(registration) {
-              registration.unregister();
-              console.log('🗑️ SW removed:', registration.scope);
-            });
-          });
-        }
-        
-        // 2. حذف جميع Workbox/SW caches
-        if ('caches' in window) {
-          caches.keys().then(function(names) {
-            names.forEach(function(name) {
-              if (name.includes('workbox') || name.includes('precache') || 
-                  name.includes('runtime') || name.includes('sw-') || 
-                  name.includes('waqf-') || name.includes('cache')) {
-                caches.delete(name);
-                console.log('🗑️ Cache deleted:', name);
-              }
-            });
-          });
-        }
-      })();
-    </script>
+    <script src="/sw-cleanup.js"></script>
     
     <div id="root">
       <!-- Instant loading - shown immediately before React loads (LCP element) -->
