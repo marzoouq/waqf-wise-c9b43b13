@@ -6,6 +6,37 @@ import { useToast } from '@/hooks/use-toast';
 import { productionLogger } from '@/lib/logger/production-logger';
 import { ROLE_PERMISSIONS, checkPermission, type Permission } from '@/config/permissions';
 
+// ✅ DEV_BYPASS_AUTH: تجاوز المصادقة للاختبار في وضع التطوير فقط
+// لتفعيله: أضف VITE_DEV_BYPASS_AUTH=true في ملف .env.local
+const DEV_BYPASS_AUTH = import.meta.env.DEV && import.meta.env.VITE_DEV_BYPASS_AUTH === 'true';
+
+// ✅ مستخدم وهمي للاختبار عند تفعيل DEV_BYPASS_AUTH
+const DEV_MOCK_USER: User | null = DEV_BYPASS_AUTH ? {
+  id: 'dev-test-user-uuid',
+  email: 'dev-nazer@test.local',
+  aud: 'authenticated',
+  role: 'authenticated',
+  app_metadata: {},
+  user_metadata: { full_name: 'مستخدم اختباري - ناظر' },
+  created_at: new Date().toISOString(),
+} as User : null;
+
+const DEV_MOCK_ROLES: string[] = DEV_BYPASS_AUTH ? ['nazer', 'admin'] : [];
+
+const DEV_MOCK_PROFILE: Profile | null = DEV_BYPASS_AUTH ? {
+  id: 'dev-profile-uuid',
+  user_id: 'dev-test-user-uuid',
+  email: 'dev-nazer@test.local',
+  full_name: 'مستخدم اختباري - ناظر',
+  avatar_url: null,
+  phone: '0500000000',
+  position: 'ناظر',
+  is_active: true,
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+  last_login_at: new Date().toISOString(),
+} : null;
+
 interface AuthContextType {
   user: User | null;
   profile: Profile | null;
@@ -25,13 +56,14 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  // ✅ استخدام البيانات الوهمية عند تفعيل DEV_BYPASS_AUTH
+  const [user, setUser] = useState<User | null>(DEV_MOCK_USER);
   const [session, setSession] = useState<Session | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [roles, setRoles] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [rolesLoading, setRolesLoading] = useState(true);
-  const [isInitialized, setIsInitialized] = useState(false); // ✅ جديد: التهيئة اكتملت
+  const [profile, setProfile] = useState<Profile | null>(DEV_MOCK_PROFILE);
+  const [roles, setRoles] = useState<string[]>(DEV_MOCK_ROLES);
+  const [isLoading, setIsLoading] = useState(DEV_BYPASS_AUTH ? false : true);
+  const [rolesLoading, setRolesLoading] = useState(DEV_BYPASS_AUTH ? false : true);
+  const [isInitialized, setIsInitialized] = useState(DEV_BYPASS_AUTH ? true : false);
   const { toast } = useToast();
   const initRef = useRef(false);
   const rolesCache = useRef<string[]>([]);
