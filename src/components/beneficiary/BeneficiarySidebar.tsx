@@ -1,14 +1,22 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
-import { Menu, User } from "lucide-react";
-import { sidebarItems, type SidebarItem } from "./config/sidebarConfig";
+import { User } from "lucide-react";
+import { sidebarItems } from "./config/sidebarConfig";
 import { APP_VERSION } from "@/lib/version";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarHeader,
+  SidebarFooter,
+  useSidebar,
+} from "@/components/ui/sidebar";
 
 interface BeneficiarySidebarProps {
   activeTab: string;
@@ -20,27 +28,26 @@ interface BeneficiarySidebarProps {
 
 /**
  * القائمة الجانبية للمستفيدين
- * - على سطح المكتب: قائمة ثابتة على اليمين
- * - على الجوال: Sheet منزلقة بزر قائمة
+ * موحدة مع مكونات Sidebar من shadcn/ui
  */
 export function BeneficiarySidebar({ 
   activeTab, 
   onTabChange, 
   beneficiaryName,
-  mobileOpen: controlledMobileOpen,
-  onMobileOpenChange
 }: BeneficiarySidebarProps) {
-  const [internalMobileOpen, setInternalMobileOpen] = useState(false);
-  
-  // استخدام الحالة الخارجية إذا توفرت، وإلا الحالة الداخلية
-  const mobileOpen = controlledMobileOpen ?? internalMobileOpen;
-  const setMobileOpen = onMobileOpenChange ?? setInternalMobileOpen;
   const navigate = useNavigate();
   const { settings } = useVisibilitySettings();
+  const { setOpenMobile, state } = useSidebar();
+  const isCollapsed = state === "collapsed";
 
   const handleItemClick = (tab: string) => {
     onTabChange(tab);
-    setMobileOpen(false);
+    setOpenMobile(false);
+  };
+
+  const handleNavigate = (href: string) => {
+    navigate(href);
+    setOpenMobile(false);
   };
 
   // تصفية العناصر حسب إعدادات الشفافية
@@ -49,100 +56,85 @@ export function BeneficiarySidebar({
     return settings?.[item.visibilityKey as keyof typeof settings] === true;
   });
 
-  const SidebarContent = () => (
-    <div className="h-full flex flex-col text-sidebar-foreground">
+  return (
+    <Sidebar collapsible="icon" side="right" aria-label="قائمة المستفيد">
       {/* Header */}
-      <div className="p-6 border-b border-sidebar-border">
+      <SidebarHeader className="border-b border-sidebar-border p-4 bg-sidebar-accent/30">
         <div className="flex items-center gap-3">
-          <div className="h-12 w-12 rounded-full bg-sidebar-accent flex items-center justify-center">
-            <User className="h-6 w-6 text-sidebar-primary" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-sm truncate text-sidebar-foreground">
-              {beneficiaryName || "المستفيد"}
-            </h3>
-            <p className="text-xs text-sidebar-foreground/70">بوابة الوقف</p>
-          </div>
+          {!isCollapsed && (
+            <>
+              <div className="h-10 w-10 rounded-full bg-sidebar-accent flex items-center justify-center flex-shrink-0">
+                <User className="h-5 w-5 text-sidebar-primary" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-sm truncate text-sidebar-foreground">
+                  {beneficiaryName || "المستفيد"}
+                </h3>
+                <p className="text-xs text-sidebar-foreground/70">بوابة الوقف</p>
+              </div>
+            </>
+          )}
+          {isCollapsed && (
+            <div className="flex justify-center w-full">
+              <div className="h-8 w-8 rounded-full bg-sidebar-accent flex items-center justify-center">
+                <User className="h-4 w-4 text-sidebar-primary" />
+              </div>
+            </div>
+          )}
         </div>
-      </div>
+      </SidebarHeader>
 
       {/* Navigation Items */}
-      <ScrollArea className="flex-1 px-3 py-4">
-        <div className="space-y-1">
-          {visibleItems.map((item) => {
-            const isActive = activeTab === item.tab;
-            const Icon = item.icon;
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>القائمة الرئيسية</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {visibleItems.map((item) => {
+                const isActive = activeTab === item.tab;
+                const Icon = item.icon;
 
-              if (item.href) {
+                if (item.href) {
+                  return (
+                    <SidebarMenuItem key={item.id}>
+                      <SidebarMenuButton
+                        onClick={() => handleNavigate(item.href!)}
+                        tooltip={item.label}
+                      >
+                        <Icon className="h-5 w-5" />
+                        <span>{item.label}</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                }
+
                 return (
-                  <button
-                    key={item.id}
-                    onClick={() => {
-                      navigate(item.href!);
-                      setMobileOpen(false);
-                    }}
-                    className={cn(
-                      "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
-                      "hover:bg-sidebar-accent active:bg-sidebar-accent text-sidebar-foreground/70 hover:text-sidebar-foreground"
-                    )}
-                  >
-                    <Icon className="h-5 w-5 flex-shrink-0" />
-                    <span className="flex-1 text-right">{item.label}</span>
-                  </button>
+                  <SidebarMenuItem key={item.id}>
+                    <SidebarMenuButton
+                      onClick={() => item.tab && handleItemClick(item.tab)}
+                      isActive={isActive}
+                      tooltip={item.label}
+                    >
+                      <Icon className="h-5 w-5" />
+                      <span>{item.label}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
                 );
-              }
-
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => item.tab && handleItemClick(item.tab)}
-                  className={cn(
-                    "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
-                    "hover:bg-sidebar-accent active:bg-sidebar-accent",
-                    isActive
-                      ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
-                      : "text-sidebar-foreground/70 hover:text-sidebar-foreground"
-                  )}
-                >
-                  <Icon className={cn("h-5 w-5 flex-shrink-0", isActive && "text-sidebar-primary-foreground")} />
-                  <span className="flex-1 text-right">{item.label}</span>
-                  {isActive && (
-                    <div className="w-1.5 h-1.5 rounded-full bg-sidebar-primary-foreground" />
-                  )}
-                </button>
-              );
-          })}
-        </div>
-      </ScrollArea>
-
-      <div className="border-t border-sidebar-border" />
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
 
       {/* Footer */}
-      <div className="p-4 text-xs text-center text-sidebar-foreground/70">
-        <p>منصة إدارة الوقف</p>
-        <p className="mt-1">الإصدار {APP_VERSION}</p>
-      </div>
-    </div>
-  );
-
-  return (
-    <>
-      {/* Mobile: Sheet - بدون زر هنا، الزر في الـ Header */}
-      <div className="lg:hidden">
-        <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-          <SheetContent side="right" className="w-[280px] p-0 bg-sidebar border-sidebar-border">
-            <SheetHeader className="sr-only">
-              <SheetTitle>قائمة التنقل</SheetTitle>
-            </SheetHeader>
-            <SidebarContent />
-          </SheetContent>
-        </Sheet>
-      </div>
-
-      {/* Desktop: Fixed sidebar */}
-      <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 lg:right-0 lg:border-s lg:border-sidebar-border lg:bg-sidebar lg:shadow-sm">
-        <SidebarContent />
-      </aside>
-    </>
+      <SidebarFooter className="border-t border-sidebar-border p-4">
+        {!isCollapsed && (
+          <div className="text-xs text-center text-sidebar-foreground/70">
+            <p>منصة إدارة الوقف</p>
+            <p className="mt-1">الإصدار {APP_VERSION}</p>
+          </div>
+        )}
+      </SidebarFooter>
+    </Sidebar>
   );
 }
