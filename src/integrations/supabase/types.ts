@@ -12226,6 +12226,7 @@ export type Database = {
         }
       }
       get_family_statistics: { Args: { p_family_id: string }; Returns: Json }
+      get_heir_beneficiary_id: { Args: never; Returns: string }
       get_pos_daily_stats: {
         Args: { p_date?: string }
         Returns: {
@@ -12327,6 +12328,8 @@ export type Database = {
         Returns: boolean
       }
       is_fiscal_year_published: { Args: { fy_id: string }; Returns: boolean }
+      is_heir: { Args: never; Returns: boolean }
+      is_heir_own_data: { Args: { _beneficiary_id: string }; Returns: boolean }
       is_staff: { Args: never; Returns: boolean }
       is_staff_only: { Args: never; Returns: boolean }
       is_waqf_heir: { Args: { _user_id?: string }; Returns: boolean }
