@@ -11,6 +11,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import { ThemeProvider } from "next-themes";
 import { GlobalErrorBoundary } from "./components/shared/GlobalErrorBoundary";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { Toaster as Sonner } from "@/components/ui/sonner";
 
 // ✅ تحميل فوري للصفحة الترحيبية الخفيفة
 import LandingPageLight from "@/pages/LandingPageLight";
@@ -70,31 +72,37 @@ const App = () => {
               v7_relativeSplatPath: true,
             }}
           >
-            <Routes>
-              {/* ✅ الصفحة الترحيبية - تحميل فوري بدون أي تبعيات ثقيلة */}
-              <Route path="/" element={<LandingPageLight />} />
-              
-              {/* ✅ الصفحات العامة الثانوية - lazy load */}
-              <Route path="/login" element={<Suspense fallback={<LightFallback />}><Login /></Suspense>} />
-              <Route path="/signup" element={<Suspense fallback={<LightFallback />}><Signup /></Suspense>} />
-              <Route path="/install" element={<Suspense fallback={<LightFallback />}><Install /></Suspense>} />
-              <Route path="/unauthorized" element={<Suspense fallback={<LightFallback />}><Unauthorized /></Suspense>} />
-              <Route path="/privacy" element={<Suspense fallback={<LightFallback />}><PrivacyPolicy /></Suspense>} />
-              <Route path="/terms" element={<Suspense fallback={<LightFallback />}><TermsOfUse /></Suspense>} />
-              <Route path="/security-policy" element={<Suspense fallback={<LightFallback />}><SecurityPolicyPage /></Suspense>} />
-              <Route path="/faq" element={<Suspense fallback={<LightFallback />}><FAQ /></Suspense>} />
-              <Route path="/contact" element={<Suspense fallback={<LightFallback />}><Contact /></Suspense>} />
-              
-              {/* ✅ جميع المسارات المحمية - AppShell يحتوي على AuthProvider, Sonner, TooltipProvider */}
-              <Route
-                path="/*"
-                element={
-                  <Suspense fallback={<LightFallback />}>
-                    <AppShell />
-                  </Suspense>
-                }
-              />
-            </Routes>
+            {/* ✅ AuthProvider يغطي جميع المسارات لحل مشكلة useAuth */}
+            <AuthProvider>
+              <Sonner />
+              <Routes>
+                {/* ✅ الصفحة الترحيبية - تحميل فوري بدون أي تبعيات ثقيلة */}
+                <Route path="/" element={<LandingPageLight />} />
+                
+                {/* ✅ صفحات المصادقة - تحتاج AuthProvider */}
+                <Route path="/login" element={<Suspense fallback={<LightFallback />}><Login /></Suspense>} />
+                <Route path="/signup" element={<Suspense fallback={<LightFallback />}><Signup /></Suspense>} />
+                
+                {/* ✅ الصفحات العامة الثانوية - لا تحتاج AuthProvider لكن موجودة ضمنه */}
+                <Route path="/install" element={<Suspense fallback={<LightFallback />}><Install /></Suspense>} />
+                <Route path="/unauthorized" element={<Suspense fallback={<LightFallback />}><Unauthorized /></Suspense>} />
+                <Route path="/privacy" element={<Suspense fallback={<LightFallback />}><PrivacyPolicy /></Suspense>} />
+                <Route path="/terms" element={<Suspense fallback={<LightFallback />}><TermsOfUse /></Suspense>} />
+                <Route path="/security-policy" element={<Suspense fallback={<LightFallback />}><SecurityPolicyPage /></Suspense>} />
+                <Route path="/faq" element={<Suspense fallback={<LightFallback />}><FAQ /></Suspense>} />
+                <Route path="/contact" element={<Suspense fallback={<LightFallback />}><Contact /></Suspense>} />
+                
+                {/* ✅ جميع المسارات المحمية - AppShell يحتوي على SettingsProvider, TooltipProvider */}
+                <Route
+                  path="/*"
+                  element={
+                    <Suspense fallback={<LightFallback />}>
+                      <AppShell />
+                    </Suspense>
+                  }
+                />
+              </Routes>
+            </AuthProvider>
           </BrowserRouter>
         </ThemeProvider>
       </QueryClientProvider>
