@@ -14,6 +14,8 @@ interface BeneficiarySidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   beneficiaryName?: string;
+  mobileOpen?: boolean;
+  onMobileOpenChange?: (open: boolean) => void;
 }
 
 /**
@@ -21,8 +23,18 @@ interface BeneficiarySidebarProps {
  * - على سطح المكتب: قائمة ثابتة على اليمين
  * - على الجوال: Sheet منزلقة بزر قائمة
  */
-export function BeneficiarySidebar({ activeTab, onTabChange, beneficiaryName }: BeneficiarySidebarProps) {
-  const [mobileOpen, setMobileOpen] = useState(false);
+export function BeneficiarySidebar({ 
+  activeTab, 
+  onTabChange, 
+  beneficiaryName,
+  mobileOpen: controlledMobileOpen,
+  onMobileOpenChange
+}: BeneficiarySidebarProps) {
+  const [internalMobileOpen, setInternalMobileOpen] = useState(false);
+  
+  // استخدام الحالة الخارجية إذا توفرت، وإلا الحالة الداخلية
+  const mobileOpen = controlledMobileOpen ?? internalMobileOpen;
+  const setMobileOpen = onMobileOpenChange ?? setInternalMobileOpen;
   const navigate = useNavigate();
   const { settings } = useVisibilitySettings();
 
@@ -115,19 +127,9 @@ export function BeneficiarySidebar({ activeTab, onTabChange, beneficiaryName }: 
 
   return (
     <>
-      {/* Mobile: Sheet with trigger button */}
+      {/* Mobile: Sheet - بدون زر هنا، الزر في الـ Header */}
       <div className="lg:hidden">
         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-          <SheetTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="fixed top-16 right-4 z-50 lg:hidden"
-              aria-label="فتح القائمة"
-            >
-              <Menu className="h-6 w-6" />
-            </Button>
-          </SheetTrigger>
           <SheetContent side="right" className="w-[280px] p-0">
             <SheetHeader className="sr-only">
               <SheetTitle>قائمة التنقل</SheetTitle>
