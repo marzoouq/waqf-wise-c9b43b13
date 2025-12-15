@@ -51,7 +51,7 @@ export const MaintenanceScheduleCalendar = ({
       case 'عالية':
         return 'bg-warning text-warning-foreground';
       case 'متوسطة':
-        return 'bg-blue-500 text-white';
+        return 'bg-info text-info-foreground';
       default:
         return 'bg-muted text-muted-foreground';
     }

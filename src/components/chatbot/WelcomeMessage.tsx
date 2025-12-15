@@ -86,7 +86,7 @@ export function WelcomeMessage() {
               <div className={cn(
                 "p-4 rounded-2xl bg-gradient-to-br",
                 feature.color,
-                "text-white shadow-lg group-hover:scale-110 transition-transform duration-300"
+                "text-primary-foreground shadow-lg group-hover:scale-110 transition-transform duration-300"
               )}>
                 {feature.icon}
               </div>

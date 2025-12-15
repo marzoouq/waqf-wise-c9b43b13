@@ -83,15 +83,15 @@ export function ReportResultsPreview({
           
           <div className="flex items-center gap-2 flex-wrap">
             <Button variant="outline" size="sm" onClick={onExportPDF}>
-              <FileText className="h-4 w-4 ml-2" />
+              <FileText className="h-4 w-4 ms-2" />
               PDF
             </Button>
             <Button variant="outline" size="sm" onClick={onExportExcel}>
-              <FileSpreadsheet className="h-4 w-4 ml-2" />
+              <FileSpreadsheet className="h-4 w-4 ms-2" />
               Excel
             </Button>
             <Button variant="outline" size="sm" onClick={onExportCSV}>
-              <Download className="h-4 w-4 ml-2" />
+              <Download className="h-4 w-4 ms-2" />
               CSV
             </Button>
             <Button variant="ghost" size="icon" onClick={onClose}>

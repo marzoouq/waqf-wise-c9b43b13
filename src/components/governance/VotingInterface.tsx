@@ -65,7 +65,7 @@ export function VotingInterface({
           </span>
           {hasVoted && (
             <Badge variant="outline" className="bg-success-light">
-              <CheckCircle2 className="h-4 w-4 ml-1" />
+              <CheckCircle2 className="h-4 w-4 ms-1" />
               صوّتَ بالفعل
             </Badge>
           )}

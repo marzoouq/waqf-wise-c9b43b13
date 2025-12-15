@@ -218,7 +218,7 @@ export function UnifiedFileUpload({
           disabled={disabled}
           className="w-full"
         >
-          <Upload className="h-4 w-4 ml-2" />
+          <Upload className="h-4 w-4 ms-2" />
           {browseText}
         </Button>
         <input

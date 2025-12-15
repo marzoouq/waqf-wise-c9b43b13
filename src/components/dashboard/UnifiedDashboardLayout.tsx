@@ -38,7 +38,7 @@ export function UnifiedDashboardLayout({
                 "p-2 rounded-lg shadow-md",
                 `bg-gradient-to-br ${theme.gradient}`
               )}>
-                <Icon className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7 text-white" />
+                <Icon className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7 text-primary-foreground" />
               </div>
             }
           />

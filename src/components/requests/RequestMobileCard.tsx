@@ -83,11 +83,11 @@ export const RequestMobileCard = memo(function RequestMobileCard({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-44">
               <DropdownMenuItem onClick={() => onViewDetails(request)}>
-                <Eye className="ml-2 h-4 w-4" />
+                <Eye className="ms-2 h-4 w-4" />
                 عرض التفاصيل
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onViewComments(request)}>
-                <MessageSquare className="ml-2 h-4 w-4" />
+                <MessageSquare className="ms-2 h-4 w-4" />
                 التعليقات
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -95,7 +95,7 @@ export const RequestMobileCard = memo(function RequestMobileCard({
                 className="text-destructive"
                 onClick={() => onDelete(request)}
               >
-                <Trash2 className="ml-2 h-4 w-4" />
+                <Trash2 className="ms-2 h-4 w-4" />
                 حذف
               </DropdownMenuItem>
             </DropdownMenuContent>
