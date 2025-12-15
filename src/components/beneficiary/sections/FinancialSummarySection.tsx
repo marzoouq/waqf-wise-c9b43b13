@@ -1,7 +1,7 @@
 /**
  * Financial Summary Section - قسم الملخص المالي
  * يجمع البطاقات المالية الرئيسية في Grid موحد ومتجاوب
- * @version 2.8.72
+ * @version 2.9.24
  */
 
 import { BankBalanceCard } from "@/components/shared/BankBalanceCard";
@@ -14,25 +14,23 @@ interface FinancialSummarySectionProps {
 
 export function FinancialSummarySection({ beneficiaryId }: FinancialSummarySectionProps) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       {/* عنوان القسم */}
       <div className="flex items-center gap-2">
-        <div className="h-8 w-1 bg-primary rounded-full" />
-        <h2 className="text-xl font-bold">الملخص المالي</h2>
+        <div className="h-6 sm:h-8 w-1 bg-primary rounded-full" />
+        <h2 className="text-lg sm:text-xl font-bold">الملخص المالي</h2>
       </div>
 
-      {/* Grid البطاقات المالية - بطاقتان في الموبايل، 3 في اللابتوب */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+      {/* Grid البطاقات المالية - 3 أعمدة متساوية */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
         {/* الرصيد البنكي */}
-        <BankBalanceCard compact className="col-span-1" />
+        <BankBalanceCard compact />
         
         {/* رقبة الوقف */}
-        <WaqfCorpusCard compact className="col-span-1" />
+        <WaqfCorpusCard compact />
         
-        {/* إجمالي المحصل - يمتد على عمودين في الموبايل */}
-        <div className="col-span-2 lg:col-span-1">
-          <WaqfDistributionsSummaryCard beneficiaryId={beneficiaryId} />
-        </div>
+        {/* إجمالي المحصل */}
+        <WaqfDistributionsSummaryCard beneficiaryId={beneficiaryId} />
       </div>
     </div>
   );
