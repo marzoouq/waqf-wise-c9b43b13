@@ -2,11 +2,14 @@
  * Excel Helper - مساعد Excel باستخدام ExcelJS مع هوية الوقف
  * بديل آمن لـ xlsx (CVE-2024-22363)
  * 
- * @version 2.9.6
+ * @version 2.9.7 - تحسين الأداء بالتحميل الديناميكي
  */
 
-import ExcelJS from 'exceljs';
+// Dynamic import for ExcelJS - لتجنب تحميل المكتبة في الصفحة الرئيسية
 import { WAQF_IDENTITY, getCurrentDateArabic, getCurrentDateTimeArabic } from './waqf-identity';
+
+// Type imports only (no runtime impact)
+import type ExcelJS from 'exceljs';
 
 export interface ExcelColumn {
   header: string;
@@ -28,6 +31,12 @@ export interface ExcelExportWithIdentityConfig {
   subtitle?: string;
   showSummary?: boolean;
   summaryData?: { label: string; value: string | number }[];
+}
+
+// Helper to dynamically load ExcelJS
+async function getExcelJS(): Promise<typeof ExcelJS> {
+  const module = await import('exceljs');
+  return module.default;
 }
 
 /**
@@ -159,6 +168,7 @@ export async function exportToExcel(
   filename: string,
   sheetName: string = 'Sheet1'
 ): Promise<void> {
+  const ExcelJS = await getExcelJS();
   const workbook = new ExcelJS.Workbook();
   workbook.creator = WAQF_IDENTITY.platformName;
   workbook.created = new Date();
@@ -209,6 +219,7 @@ export async function exportToExcel(
 export async function exportToExcelWithIdentity(config: ExcelExportWithIdentityConfig): Promise<void> {
   const { data, filename, sheetName = 'Sheet1', title, subtitle, showSummary, summaryData } = config;
   
+  const ExcelJS = await getExcelJS();
   const workbook = new ExcelJS.Workbook();
   workbook.creator = WAQF_IDENTITY.platformName;
   workbook.created = new Date();
@@ -297,6 +308,7 @@ export async function exportToExcelMultiSheet(
   sheets: ExcelSheetData[],
   filename: string
 ): Promise<void> {
+  const ExcelJS = await getExcelJS();
   const workbook = new ExcelJS.Workbook();
   workbook.creator = WAQF_IDENTITY.platformName;
   workbook.created = new Date();
@@ -339,6 +351,7 @@ export async function exportBeneficiaryStatement(config: {
 }): Promise<void> {
   const { beneficiaryName, beneficiaryId, heirType, distributions, totalReceived } = config;
   
+  const ExcelJS = await getExcelJS();
   const workbook = new ExcelJS.Workbook();
   workbook.creator = WAQF_IDENTITY.platformName;
   workbook.created = new Date();
@@ -493,6 +506,7 @@ export async function exportBeneficiaryStatement(config: {
  * قراءة ملف Excel وتحويله إلى مصفوفة
  */
 export async function readExcelFile(file: File): Promise<Record<string, unknown>[]> {
+  const ExcelJS = await getExcelJS();
   const workbook = new ExcelJS.Workbook();
   const arrayBuffer = await file.arrayBuffer();
   await workbook.xlsx.load(arrayBuffer);
@@ -533,6 +547,7 @@ export async function readExcelFile(file: File): Promise<Record<string, unknown>
  * قراءة ملف Excel من ArrayBuffer
  */
 export async function readExcelBuffer(buffer: ArrayBuffer): Promise<Record<string, unknown>[]> {
+  const ExcelJS = await getExcelJS();
   const workbook = new ExcelJS.Workbook();
   await workbook.xlsx.load(buffer);
   

@@ -1,12 +1,16 @@
 /**
  * توليد PDF للائحة التنفيذية
  * Governance Regulations PDF Generator
+ * 
+ * @version 2.9.7 - تحسين الأداء بالتحميل الديناميكي
  */
 
-import jsPDF from 'jspdf';
 import { regulationsParts } from '@/components/governance/regulations-data';
 
 export async function generateGovernancePDF(): Promise<void> {
+  // Dynamic import for jsPDF - لتجنب تحميل المكتبة في الصفحة الرئيسية
+  const { default: jsPDF } = await import('jspdf');
+  
   const pdf = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
