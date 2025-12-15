@@ -138,7 +138,7 @@ export function BeneficiarySidebar({ activeTab, onTabChange, beneficiaryName }: 
       </div>
 
       {/* Desktop: Fixed sidebar */}
-      <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 lg:right-0 lg:border-l lg:bg-card">
+      <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 lg:right-0 lg:border-s lg:bg-card lg:shadow-sm">
         <SidebarContent />
       </aside>
     </>
