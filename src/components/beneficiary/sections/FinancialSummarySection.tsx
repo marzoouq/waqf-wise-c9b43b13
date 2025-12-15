@@ -21,16 +21,16 @@ export function FinancialSummarySection({ beneficiaryId }: FinancialSummarySecti
         <h2 className="text-xl font-bold">الملخص المالي</h2>
       </div>
 
-      {/* Grid البطاقات المالية */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* Grid البطاقات المالية - بطاقتان في الموبايل، 3 في اللابتوب */}
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         {/* الرصيد البنكي */}
-        <BankBalanceCard compact />
+        <BankBalanceCard compact className="col-span-1" />
         
         {/* رقبة الوقف */}
-        <WaqfCorpusCard compact />
+        <WaqfCorpusCard compact className="col-span-1" />
         
-        {/* إجمالي المحصل - يمتد على عمودين في الشاشات الكبيرة */}
-        <div className="sm:col-span-2 lg:col-span-1">
+        {/* إجمالي المحصل - يمتد على عمودين في الموبايل */}
+        <div className="col-span-2 lg:col-span-1">
           <WaqfDistributionsSummaryCard beneficiaryId={beneficiaryId} />
         </div>
       </div>
