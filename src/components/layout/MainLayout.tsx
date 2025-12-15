@@ -215,10 +215,8 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       
       <SidebarProvider>
         <div className="min-h-screen flex w-full bg-background">
-          {/* Hide sidebar on mobile, show bottom navigation instead */}
-          <div className="hidden md:block">
-            <AppSidebar />
-          </div>
+          {/* Sidebar - يعرض كـ Sheet على الجوال وثابت على الديسكتوب */}
+          <AppSidebar />
           <SidebarInset>
             {/* Mobile Header */}
             <MobileHeader 
