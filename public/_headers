@@ -1,4 +1,12 @@
 # Cache headers for Lovable Cloud deployment
+
+# رؤوس أمان شاملة كـ fallback لجميع الملفات
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
+
 # Assets with content hashes - cache for 1 year (immutable)
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
@@ -24,31 +32,48 @@
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
 
+# Favicon
+/favicon.ico
+  Cache-Control: public, max-age=86400
+  X-Content-Type-Options: nosniff
+
 # Fonts
 /*.woff2
   Cache-Control: public, max-age=31536000, immutable
   Access-Control-Allow-Origin: *
+  X-Content-Type-Options: nosniff
 
 /*.woff
   Cache-Control: public, max-age=31536000, immutable
   Access-Control-Allow-Origin: *
+  X-Content-Type-Options: nosniff
 
 /*.ttf
   Cache-Control: public, max-age=31536000, immutable
   Access-Control-Allow-Origin: *
+  X-Content-Type-Options: nosniff
 
 # Images
 /*.png
   Cache-Control: public, max-age=2592000
+  X-Content-Type-Options: nosniff
 
 /*.jpg
   Cache-Control: public, max-age=2592000
+  X-Content-Type-Options: nosniff
 
 /*.jpeg
   Cache-Control: public, max-age=2592000
+  X-Content-Type-Options: nosniff
 
 /*.svg
   Cache-Control: public, max-age=2592000
+  X-Content-Type-Options: nosniff
 
 /*.webp
   Cache-Control: public, max-age=2592000
+  X-Content-Type-Options: nosniff
+
+/*.ico
+  Cache-Control: public, max-age=86400
+  X-Content-Type-Options: nosniff

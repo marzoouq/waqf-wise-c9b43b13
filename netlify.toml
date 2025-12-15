@@ -1,6 +1,15 @@
 # Netlify Configuration للتحكم بـ Cache Headers
 # لتحسين الأداء عبر Cache طويل المدى
 
+# رؤوس أمان شاملة كـ fallback لجميع الملفات
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "SAMEORIGIN"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
 [[headers]]
   # All assets in /assets/ folder - immutable cache (content-hashed files)
   for = "/assets/*"
@@ -30,49 +39,70 @@
     X-Content-Type-Options = "nosniff"
 
 [[headers]]
+  # Favicon
+  for = "/favicon.ico"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+    X-Content-Type-Options = "nosniff"
+
+[[headers]]
   # Font files - long cache
   for = "/*.woff2"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
     Access-Control-Allow-Origin = "*"
+    X-Content-Type-Options = "nosniff"
 
 [[headers]]
   for = "/*.woff"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
     Access-Control-Allow-Origin = "*"
+    X-Content-Type-Options = "nosniff"
 
 [[headers]]
   for = "/*.ttf"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
     Access-Control-Allow-Origin = "*"
+    X-Content-Type-Options = "nosniff"
 
 [[headers]]
-  # Images - medium cache
+  # Images - medium cache with security
   for = "/*.png"
   [headers.values]
     Cache-Control = "public, max-age=2592000"
+    X-Content-Type-Options = "nosniff"
 
 [[headers]]
   for = "/*.jpg"
   [headers.values]
     Cache-Control = "public, max-age=2592000"
+    X-Content-Type-Options = "nosniff"
 
 [[headers]]
   for = "/*.jpeg"
   [headers.values]
     Cache-Control = "public, max-age=2592000"
+    X-Content-Type-Options = "nosniff"
 
 [[headers]]
   for = "/*.svg"
   [headers.values]
     Cache-Control = "public, max-age=2592000"
+    X-Content-Type-Options = "nosniff"
 
 [[headers]]
   for = "/*.webp"
   [headers.values]
     Cache-Control = "public, max-age=2592000"
+    X-Content-Type-Options = "nosniff"
+
+[[headers]]
+  for = "/*.ico"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+    X-Content-Type-Options = "nosniff"
 
 [[headers]]
   # HTML - no cache (always fresh)
