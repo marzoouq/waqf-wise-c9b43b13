@@ -35,7 +35,8 @@ export { cleanupAlerts, cleanupLocalStorageErrors, runFullCleanup } from './clea
 // ==================== Other Utilities ====================
 export { archiveDocument } from './archiveDocument';
 export * from './distribution-engine';
-export * from './exportHelpers';
+// ❌ exportHelpers removed from barrel - import directly to avoid bundling pdf/excel libs
+// ❌ excel-helper removed from barrel - import directly when needed
 export * from './filters';
 // Role labels moved to src/types/roles.ts
 export * from './design-tokens';
