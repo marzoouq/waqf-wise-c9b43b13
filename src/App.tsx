@@ -1,43 +1,41 @@
 /**
- * المكون الرئيسي للتطبيق
- * Main Application Component
+ * المكون الرئيسي للتطبيق - محسّن للأداء
+ * Main Application Component - Performance Optimized
+ * 
+ * ✅ الصفحة الترحيبية تُحمَّل بدون تبعيات ثقيلة (Radix UI, Sonner, etc.)
+ * ✅ المكونات الثقيلة تُحمَّل فقط للصفحات المحمية
  */
 
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import { ThemeProvider } from "next-themes";
-import { SettingsProvider } from "./contexts/SettingsContext";
-import { AuthProvider } from "./contexts/AuthContext";
-import MainLayout from "./components/layout/MainLayout";
 import { GlobalErrorBoundary } from "./components/shared/GlobalErrorBoundary";
-import { LazyErrorBoundary } from "./components/shared/LazyErrorBoundary";
-import { LoadingState } from "./components/shared/LoadingState";
-import { ProtectedRoute } from "./components/auth/ProtectedRoute";
-import { RoleBasedRedirect } from "./components/auth/RoleBasedRedirect";
-// ✅ نقل التهيئة الثقيلة إلى MainLayout للصفحات المحمية فقط
 
-// Import routes
-import { 
-  publicRoutes, 
-  beneficiaryStandaloneRoutes, 
-  dashboardRoutes,
-  adminRoutes,
-  coreRoutes,
-  beneficiaryProtectedRoutes,
-} from "./routes";
+// ✅ تحميل فوري للصفحة الترحيبية الخفيفة
+import LandingPageLight from "@/pages/LandingPageLight";
+
+// ✅ Lazy load للصفحات الثانوية والمحمية
+const AppShell = lazy(() => import("./components/layout/AppShell"));
+const Login = lazy(() => import("@/pages/Login"));
+const Signup = lazy(() => import("@/pages/Signup"));
+const Install = lazy(() => import("@/pages/Install"));
+const Unauthorized = lazy(() => import("@/pages/Unauthorized"));
+const PrivacyPolicy = lazy(() => import("@/pages/PrivacyPolicy"));
+const TermsOfUse = lazy(() => import("@/pages/TermsOfUse"));
+const SecurityPolicyPage = lazy(() => import("@/pages/SecurityPolicy"));
+const FAQ = lazy(() => import("@/pages/FAQ"));
+const Contact = lazy(() => import("@/pages/Contact"));
 
 // Configure QueryClient - تحسين التحديث المباشر
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 2 * 60 * 1000, // 2 دقائق بدلاً من 5 للتحديث الأسرع
+      staleTime: 2 * 60 * 1000,
       gcTime: 10 * 60 * 1000,
-      refetchOnWindowFocus: true, // ✅ تفعيل التحديث عند العودة للنافذة
+      refetchOnWindowFocus: true,
       refetchOnReconnect: true,
-      refetchOnMount: true, // ✅ تفعيل التحديث عند mount
+      refetchOnMount: true,
       structuralSharing: true,
       networkMode: 'online',
       retry: (failureCount, error: unknown) => {
@@ -46,9 +44,7 @@ const queryClient = new QueryClient({
         if (errorObj.message?.includes('auth') || errorObj.message?.includes('credentials')) return false;
         return failureCount < 3;
       },
-      retryDelay: (attemptIndex) => {
-        return Math.min(1000 * 2 ** attemptIndex, 4000);
-      },
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 4000),
     },
     mutations: {
       retry: false,
@@ -56,65 +52,50 @@ const queryClient = new QueryClient({
   },
 });
 
+// ✅ Fallback خفيف جداً
+const LightFallback = () => (
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+  </div>
+);
+
 const App = () => {
-  // ✅ useAlertCleanup نُقل إلى MainLayout
   return (
     <GlobalErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-          <AuthProvider>
-            <SettingsProvider>
-              <TooltipProvider>
-                <Sonner />
-                <BrowserRouter
-                  future={{
-                    v7_startTransition: true,
-                    v7_relativeSplatPath: true,
-                  }}
-                >
-                  <LazyErrorBoundary>
-                    <Routes>
-                      {/* ✅ المسارات العامة - بدون Suspense للتحميل الفوري */}
-                      {publicRoutes}
-                      
-                      {/* صفحة التوجيه الذكي */}
-                      <Route path="/redirect" element={<RoleBasedRedirect />} />
-                      
-                      {/* مسارات المستفيد المستقلة */}
-                      {beneficiaryStandaloneRoutes}
-                      
-                      {/* ✅ المسارات المحمية داخل Suspense */}
-                      <Route
-                        path="/*"
-                        element={
-                          <Suspense fallback={<LoadingState size="lg" fullScreen />}>
-                            <ProtectedRoute>
-                              <MainLayout>
-                                <Routes>
-                                  {/* لوحات التحكم */}
-                                  {dashboardRoutes}
-                                  
-                                  {/* مسارات الإدارة */}
-                                  {adminRoutes}
-                                  
-                                  {/* مسارات المستفيد داخل MainLayout */}
-                                  {beneficiaryProtectedRoutes}
-                                  
-                                  {/* المسارات الأساسية */}
-                                  {coreRoutes}
-                                </Routes>
-                              </MainLayout>
-                            </ProtectedRoute>
-                          </Suspense>
-                        }
-                      />
-                    </Routes>
-                  </LazyErrorBoundary>
-                </BrowserRouter>
-              </TooltipProvider>
+          <BrowserRouter
+            future={{
+              v7_startTransition: true,
+              v7_relativeSplatPath: true,
+            }}
+          >
+            <Routes>
+              {/* ✅ الصفحة الترحيبية - تحميل فوري بدون أي تبعيات ثقيلة */}
+              <Route path="/" element={<LandingPageLight />} />
               
-            </SettingsProvider>
-          </AuthProvider>
+              {/* ✅ الصفحات العامة الثانوية - lazy load */}
+              <Route path="/login" element={<Suspense fallback={<LightFallback />}><Login /></Suspense>} />
+              <Route path="/signup" element={<Suspense fallback={<LightFallback />}><Signup /></Suspense>} />
+              <Route path="/install" element={<Suspense fallback={<LightFallback />}><Install /></Suspense>} />
+              <Route path="/unauthorized" element={<Suspense fallback={<LightFallback />}><Unauthorized /></Suspense>} />
+              <Route path="/privacy" element={<Suspense fallback={<LightFallback />}><PrivacyPolicy /></Suspense>} />
+              <Route path="/terms" element={<Suspense fallback={<LightFallback />}><TermsOfUse /></Suspense>} />
+              <Route path="/security-policy" element={<Suspense fallback={<LightFallback />}><SecurityPolicyPage /></Suspense>} />
+              <Route path="/faq" element={<Suspense fallback={<LightFallback />}><FAQ /></Suspense>} />
+              <Route path="/contact" element={<Suspense fallback={<LightFallback />}><Contact /></Suspense>} />
+              
+              {/* ✅ جميع المسارات المحمية - AppShell يحتوي على AuthProvider, Sonner, TooltipProvider */}
+              <Route
+                path="/*"
+                element={
+                  <Suspense fallback={<LightFallback />}>
+                    <AppShell />
+                  </Suspense>
+                }
+              />
+            </Routes>
+          </BrowserRouter>
         </ThemeProvider>
       </QueryClientProvider>
     </GlobalErrorBoundary>
