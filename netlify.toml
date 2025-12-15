@@ -1,146 +1,151 @@
-# Netlify Configuration للتحكم بـ Cache Headers
-# لتحسين الأداء عبر Cache طويل المدى
+# ══════════════════════════════════════════════════════════════
+# Netlify Configuration - Security Headers (CSP + CORP)
+# Mozilla HTTP Observatory Target: A+ (125+ points)
+# ══════════════════════════════════════════════════════════════
 
-# رؤوس أمان شاملة كـ fallback لجميع الملفات
+# رؤوس الأمان الشاملة لجميع الملفات
 [[headers]]
   for = "/*"
   [headers.values]
     X-Content-Type-Options = "nosniff"
-    X-Frame-Options = "SAMEORIGIN"
-    X-XSS-Protection = "1; mode=block"
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "0"
     Referrer-Policy = "strict-origin-when-cross-origin"
+    Cross-Origin-Resource-Policy = "same-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=(), payment=(), usb=()"
+    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https://lovable.dev https://*.supabase.co; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests"
 
+# ══════════════════════════════════════════════════════════════
+# Assets - immutable cache
+# ══════════════════════════════════════════════════════════════
 [[headers]]
-  # All assets in /assets/ folder - immutable cache (content-hashed files)
   for = "/assets/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
-    X-Content-Type-Options = "nosniff"
 
 [[headers]]
-  # JavaScript files in root - immutable cache
   for = "/*.js"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
-    X-Content-Type-Options = "nosniff"
 
 [[headers]]
-  # CSS files in root - immutable cache
   for = "/*.css"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
-    X-Content-Type-Options = "nosniff"
+
+# ══════════════════════════════════════════════════════════════
+# Service Worker & Cleanup - no cache
+# ══════════════════════════════════════════════════════════════
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
 
 [[headers]]
-  # registerSW.js - no cache
+  for = "/sw-cleanup.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate, no-cache"
+
+[[headers]]
   for = "/registerSW.js"
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
-    X-Content-Type-Options = "nosniff"
 
 [[headers]]
-  # Favicon
+  for = "/workbox-*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# ══════════════════════════════════════════════════════════════
+# Favicon
+# ══════════════════════════════════════════════════════════════
+[[headers]]
   for = "/favicon.ico"
   [headers.values]
     Cache-Control = "public, max-age=86400"
-    X-Content-Type-Options = "nosniff"
 
+# ══════════════════════════════════════════════════════════════
+# Fonts - long cache with CORS
+# ══════════════════════════════════════════════════════════════
 [[headers]]
-  # Font files - long cache
   for = "/*.woff2"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
     Access-Control-Allow-Origin = "*"
-    X-Content-Type-Options = "nosniff"
 
 [[headers]]
   for = "/*.woff"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
     Access-Control-Allow-Origin = "*"
-    X-Content-Type-Options = "nosniff"
 
 [[headers]]
   for = "/*.ttf"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
     Access-Control-Allow-Origin = "*"
-    X-Content-Type-Options = "nosniff"
 
+# ══════════════════════════════════════════════════════════════
+# Images - medium cache
+# ══════════════════════════════════════════════════════════════
 [[headers]]
-  # Images - medium cache with security
   for = "/*.png"
   [headers.values]
     Cache-Control = "public, max-age=2592000"
-    X-Content-Type-Options = "nosniff"
 
 [[headers]]
   for = "/*.jpg"
   [headers.values]
     Cache-Control = "public, max-age=2592000"
-    X-Content-Type-Options = "nosniff"
 
 [[headers]]
   for = "/*.jpeg"
   [headers.values]
     Cache-Control = "public, max-age=2592000"
-    X-Content-Type-Options = "nosniff"
 
 [[headers]]
   for = "/*.svg"
   [headers.values]
     Cache-Control = "public, max-age=2592000"
-    X-Content-Type-Options = "nosniff"
 
 [[headers]]
   for = "/*.webp"
   [headers.values]
     Cache-Control = "public, max-age=2592000"
-    X-Content-Type-Options = "nosniff"
 
 [[headers]]
   for = "/*.ico"
   [headers.values]
     Cache-Control = "public, max-age=86400"
-    X-Content-Type-Options = "nosniff"
 
+# ══════════════════════════════════════════════════════════════
+# HTML - no cache
+# ══════════════════════════════════════════════════════════════
 [[headers]]
-  # HTML - no cache (always fresh)
   for = "/index.html"
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate, no-cache"
-    X-Frame-Options = "DENY"
-    X-Content-Type-Options = "nosniff"
-    X-XSS-Protection = "1; mode=block"
-    Referrer-Policy = "strict-origin-when-cross-origin"
 
+# ══════════════════════════════════════════════════════════════
+# Manifest
+# ══════════════════════════════════════════════════════════════
 [[headers]]
-  # Service Worker & Workbox - no cache
-  for = "/sw.js"
-  [headers.values]
-    Cache-Control = "public, max-age=0, must-revalidate"
-    X-Content-Type-Options = "nosniff"
-
-[[headers]]
-  for = "/workbox-*.js"
-  [headers.values]
-    Cache-Control = "public, max-age=0, must-revalidate"
-    X-Content-Type-Options = "nosniff"
-
-[[headers]]
-  # Manifest
   for = "/manifest.webmanifest"
   [headers.values]
     Cache-Control = "public, max-age=86400"
     Content-Type = "application/manifest+json"
 
-# Redirects
+# ══════════════════════════════════════════════════════════════
+# Redirects (SPA)
+# ══════════════════════════════════════════════════════════════
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
 
+# ══════════════════════════════════════════════════════════════
 # Build settings
+# ══════════════════════════════════════════════════════════════
 [build]
   command = "npx vite build --mode production"
   publish = "dist"

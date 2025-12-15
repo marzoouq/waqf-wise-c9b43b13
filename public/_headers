@@ -1,20 +1,31 @@
-# Cache headers for Lovable Cloud deployment
+# ══════════════════════════════════════════════════════════════
+# رؤوس الأمان الشاملة (CSP + CORP + Security Headers)
+# Mozilla HTTP Observatory Target: A+ (125+ points)
+# ══════════════════════════════════════════════════════════════
 
-# رؤوس أمان شاملة كـ fallback لجميع الملفات
 /*
   X-Content-Type-Options: nosniff
-  X-Frame-Options: SAMEORIGIN
-  X-XSS-Protection: 1; mode=block
+  X-Frame-Options: DENY
+  X-XSS-Protection: 0
   Referrer-Policy: strict-origin-when-cross-origin
+  Cross-Origin-Resource-Policy: same-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), usb=()
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https://lovable.dev https://*.supabase.co; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests
 
+# ══════════════════════════════════════════════════════════════
 # Assets with content hashes - cache for 1 year (immutable)
+# ══════════════════════════════════════════════════════════════
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
-  X-Content-Type-Options: nosniff
 
-# Service Worker - no cache (مهم جداً لمنع الأخطاء)
+# ══════════════════════════════════════════════════════════════
+# Service Worker & Cleanup Scripts - no cache
+# ══════════════════════════════════════════════════════════════
 /sw.js
   Cache-Control: public, max-age=0, must-revalidate, no-cache, no-store
+
+/sw-cleanup.js
+  Cache-Control: public, max-age=0, must-revalidate, no-cache
 
 /registerSW.js
   Cache-Control: public, max-age=0, must-revalidate, no-cache
@@ -22,58 +33,56 @@
 /workbox-*.js
   Cache-Control: public, max-age=0, must-revalidate, no-cache
 
+# ══════════════════════════════════════════════════════════════
 # Manifest
+# ══════════════════════════════════════════════════════════════
 /manifest.webmanifest
   Cache-Control: public, max-age=86400
 
+# ══════════════════════════════════════════════════════════════
 # HTML - no cache
+# ══════════════════════════════════════════════════════════════
 /index.html
   Cache-Control: public, max-age=0, must-revalidate
-  X-Frame-Options: DENY
-  X-Content-Type-Options: nosniff
 
+# ══════════════════════════════════════════════════════════════
 # Favicon
+# ══════════════════════════════════════════════════════════════
 /favicon.ico
   Cache-Control: public, max-age=86400
-  X-Content-Type-Options: nosniff
 
-# Fonts
+# ══════════════════════════════════════════════════════════════
+# Fonts - long cache with CORS
+# ══════════════════════════════════════════════════════════════
 /*.woff2
   Cache-Control: public, max-age=31536000, immutable
   Access-Control-Allow-Origin: *
-  X-Content-Type-Options: nosniff
 
 /*.woff
   Cache-Control: public, max-age=31536000, immutable
   Access-Control-Allow-Origin: *
-  X-Content-Type-Options: nosniff
 
 /*.ttf
   Cache-Control: public, max-age=31536000, immutable
   Access-Control-Allow-Origin: *
-  X-Content-Type-Options: nosniff
 
-# Images
+# ══════════════════════════════════════════════════════════════
+# Images - medium cache
+# ══════════════════════════════════════════════════════════════
 /*.png
   Cache-Control: public, max-age=2592000
-  X-Content-Type-Options: nosniff
 
 /*.jpg
   Cache-Control: public, max-age=2592000
-  X-Content-Type-Options: nosniff
 
 /*.jpeg
   Cache-Control: public, max-age=2592000
-  X-Content-Type-Options: nosniff
 
 /*.svg
   Cache-Control: public, max-age=2592000
-  X-Content-Type-Options: nosniff
 
 /*.webp
   Cache-Control: public, max-age=2592000
-  X-Content-Type-Options: nosniff
 
 /*.ico
   Cache-Control: public, max-age=86400
-  X-Content-Type-Options: nosniff
