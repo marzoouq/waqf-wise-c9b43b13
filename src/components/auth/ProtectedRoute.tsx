@@ -5,6 +5,10 @@ import { checkPermission, type Permission } from '@/config/permissions';
 import { useState, useEffect } from 'react';
 import type { AppRole } from '@/types/roles';
 
+// ✅ DEV_BYPASS_AUTH: تجاوز المصادقة للاختبار في وضع التطوير فقط
+// لتفعيله: أضف VITE_DEV_BYPASS_AUTH=true في ملف .env.local
+const DEV_BYPASS_AUTH = import.meta.env.DEV && import.meta.env.VITE_DEV_BYPASS_AUTH === 'true';
+
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requiredPermission?: Permission;
@@ -13,6 +17,12 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children, requiredPermission, requiredRole, requiredRoles }: ProtectedRouteProps) {
+  // ✅ تجاوز المصادقة في وضع التطوير
+  if (DEV_BYPASS_AUTH) {
+    console.warn('[DEV] 🔓 تم تجاوز المصادقة في ProtectedRoute - للاختبار فقط!');
+    return <>{children}</>;
+  }
+
   const { user, isLoading: authLoading, roles, rolesLoading, hasRole } = useAuth();
   const [loadingTooLong, setLoadingTooLong] = useState(false);
 
