@@ -1,6 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useDebouncedSearch } from '@/hooks/useDebouncedSearch';
 
 interface InvoicesFiltersProps {
   searchQuery: string;
@@ -23,14 +24,17 @@ export function InvoicesFilters({
   dateTo,
   onDateToChange,
 }: InvoicesFiltersProps) {
+  const { value, onChange } = useDebouncedSearch(searchQuery, onSearchChange, 300);
+
   return (
     <Card className="mb-4">
       <CardContent className="pt-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Input
+            name="invoices-search"
             placeholder="بحث برقم الفاتورة أو اسم العميل..."
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
           />
           <Select value={statusFilter} onValueChange={onStatusChange}>
             <SelectTrigger>

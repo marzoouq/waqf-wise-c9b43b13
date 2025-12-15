@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search } from "lucide-react";
 import { SYSTEM_ROLES, ROLE_LABELS } from "@/types/roles";
+import { useDebouncedSearch } from "@/hooks/useDebouncedSearch";
 
 interface UsersFiltersProps {
   searchTerm: string;
@@ -22,6 +23,8 @@ export function UsersFilters({
   roleFilter,
   onRoleFilterChange,
 }: UsersFiltersProps) {
+  const { value, onChange } = useDebouncedSearch(searchTerm, onSearchChange, 300);
+
   return (
     <Card>
       <CardContent className="pt-6">
@@ -29,9 +32,10 @@ export function UsersFilters({
           <div className="relative flex-1">
             <Search className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
+              name="users-search"
               placeholder="البحث بالاسم أو البريد الإلكتروني..."
-              value={searchTerm}
-              onChange={(e) => onSearchChange(e.target.value)}
+              value={value}
+              onChange={(e) => onChange(e.target.value)}
               className="pr-10"
             />
           </div>
