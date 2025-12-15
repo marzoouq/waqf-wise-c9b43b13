@@ -49,7 +49,7 @@ function IssueCard({ issue }: { issue: AuditIssue }) {
   return (
     <div className="p-3 border rounded-lg bg-card hover:bg-accent/50 transition-colors">
       <div className="flex items-start gap-3">
-        <div className={`p-1.5 rounded ${severity.color} text-white`}>
+        <div className={`p-1.5 rounded ${severity.color} text-primary-foreground`}>
           <SeverityIcon className="h-4 w-4" />
         </div>
         <div className="flex-1 min-w-0">

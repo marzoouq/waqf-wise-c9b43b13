@@ -59,7 +59,7 @@ export function GovernanceTab() {
               </div>
             </div>
             <Badge variant="outline" className="text-[10px] sm:text-xs border-destructive/30 text-destructive shrink-0">
-              <BookOpen className="h-3 w-3 ml-1" />
+              <BookOpen className="h-3 w-3 ms-1" />
               17 جزء
             </Badge>
           </div>
@@ -90,7 +90,7 @@ export function GovernanceTab() {
             variant="outline"
             className="w-full border-destructive/30 hover:bg-destructive/10 hover:text-destructive text-xs sm:text-sm"
           >
-            <ExternalLink className="h-3.5 w-3.5 sm:h-4 sm:w-4 ml-2" />
+            <ExternalLink className="h-3.5 w-3.5 sm:h-4 sm:w-4 ms-2" />
             عرض الدليل الكامل واللائحة التنفيذية
           </Button>
         </CardContent>

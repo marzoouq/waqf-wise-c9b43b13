@@ -129,7 +129,7 @@ export function RolesSettingsDialog({
               className="w-full"
               variant="outline"
             >
-              <ArrowLeft className="h-4 w-4 ml-2" />
+              <ArrowLeft className="h-4 w-4 ms-2" />
               إدارة أدوار المستخدمين
             </Button>
           )}

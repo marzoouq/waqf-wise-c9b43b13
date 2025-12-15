@@ -157,7 +157,7 @@ export function BeneficiaryProfileCard({
                 onClick={onMessages}
                 className="shadow-sm hover:shadow-md transition-shadow"
               >
-                <MessageSquare className="h-4 w-4 ml-2" />
+                <MessageSquare className="h-4 w-4 ms-2" />
                 الرسائل
               </Button>
             </div>

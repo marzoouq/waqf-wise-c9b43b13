@@ -19,7 +19,7 @@ export const GovernanceGuideButton = memo(function GovernanceGuideButton() {
             aria-label="الدليل الإرشادي والحوكمة"
           >
             <div className="p-1.5 rounded-lg bg-gradient-to-br from-red-500 to-red-600 shadow-sm shadow-red-500/25">
-              <ScrollText className="h-4 w-4 text-white" />
+              <ScrollText className="h-4 w-4 text-primary-foreground" />
             </div>
           </Button>
         </TooltipTrigger>

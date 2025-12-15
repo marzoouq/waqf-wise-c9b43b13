@@ -58,7 +58,7 @@ export function CoreValuesSection() {
             >
               <CardContent className="p-4 text-center">
                 <div className={`mx-auto w-12 h-12 rounded-xl bg-gradient-to-br ${value.color} flex items-center justify-center mb-3 shadow-lg`}>
-                  <Icon className="h-6 w-6 text-white" />
+                  <Icon className="h-6 w-6 text-primary-foreground" />
                 </div>
                 <h4 className="font-bold text-foreground mb-1">{value.title}</h4>
                 <p className="text-xs text-muted-foreground leading-relaxed">

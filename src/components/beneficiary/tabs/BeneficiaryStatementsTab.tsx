@@ -83,7 +83,7 @@ export function BeneficiaryStatementsTab({ beneficiaryId }: BeneficiaryStatement
           </div>
           {settings?.allow_export_pdf && (
             <Button variant="outline" onClick={handleExport}>
-              <Download className="h-4 w-4 ml-2" />
+              <Download className="h-4 w-4 ms-2" />
               تصدير PDF
             </Button>
           )}

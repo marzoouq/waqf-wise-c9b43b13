@@ -77,10 +77,10 @@ export function UnifiedTimeline({
           return (
             <div key={event.id} className="flex gap-3">
               <div className="flex flex-col items-center">
-                <div className={cn(
+              <div className={cn(
                   "flex items-center justify-center w-8 h-8 rounded-full",
                   colorClasses[color],
-                  "text-white"
+                  "text-primary-foreground"
                 )}>
                   {Icon ? <Icon className="h-4 w-4" /> : <span className="text-xs">{index + 1}</span>}
                 </div>
@@ -123,7 +123,7 @@ export function UnifiedTimeline({
               <div className={cn(
                 "flex items-center justify-center w-10 h-10 rounded-full",
                 colorClasses[color],
-                "text-white shadow-sm"
+                "text-primary-foreground shadow-sm"
               )}>
                 {Icon ? <Icon className="h-5 w-5" /> : <span>{index + 1}</span>}
               </div>

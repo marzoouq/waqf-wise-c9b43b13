@@ -66,7 +66,7 @@ export const BeneficiariesSearchBar = memo(function BeneficiariesSearchBar({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm" className="text-xs sm:text-sm">
-                    <Save className="h-3 w-3 sm:h-4 sm:w-4 ml-2" />
+                    <Save className="h-3 w-3 sm:h-4 sm:w-4 ms-2" />
                     عمليات بحث
                   </Button>
                 </DropdownMenuTrigger>

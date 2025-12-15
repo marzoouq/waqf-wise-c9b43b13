@@ -255,7 +255,7 @@ export function InternalMessagesDialog({
                 className="w-full"
                 disabled={!newMessage.receiver_id || !newMessage.subject || !newMessage.body}
               >
-                <Send className="h-4 w-4 ml-2" />
+                <Send className="h-4 w-4 ms-2" />
                 إرسال الرسالة
               </Button>
             </div>
