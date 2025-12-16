@@ -407,7 +407,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       keysToRemove.forEach(key => localStorage.removeItem(key));
       sessionStorage.clear();
 
-      const { error } = await supabase.auth.signOut();
+      // ✅ استخدام scope: 'global' لمسح الجلسة من جميع الأجهزة (أمان كامل)
+      const { error } = await supabase.auth.signOut({ scope: 'global' });
       
       if (error) throw error;
 

@@ -27,15 +27,24 @@ export function RoleBasedRedirect() {
 
   // ✅ حالة التحميل الفعلية
   const isLoading = authLoading || (!!user && rolesLoading);
+  
+  // ✅ التحقق من جاهزية الأدوار فعلياً
+  const rolesReady = roles.length > 0;
 
-  // ✅ إذا استمر التحميل لأكثر من 5 ثواني مع وجود مستخدم
-  if (loadingTooLong && user) {
-    // محاولة استخدام الأدوار المخزنة مؤقتاً
+  // إذا لم يكن هناك مستخدم بعد انتهاء التحميل، توجيه لصفحة الدخول
+  if (!user && !authLoading) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // ✅ إذا استمر التحميل لأكثر من 5 ثواني مع وجود مستخدم ولم تُجلب الأدوار
+  if (loadingTooLong && user && !rolesReady) {
+    // محاولة استخدام الأدوار المخزنة مؤقتاً مع التحقق من userId
     try {
       const cached = localStorage.getItem('waqf_user_roles');
       if (cached) {
-        const { roles: cachedRoles } = JSON.parse(cached);
-        if (cachedRoles && cachedRoles.length > 0) {
+        const { roles: cachedRoles, userId } = JSON.parse(cached);
+        // ✅ تحقق أن الـ cache لنفس المستخدم!
+        if (cachedRoles && cachedRoles.length > 0 && userId === user.id) {
           const target = getDashboardForRoles(cachedRoles as AppRole[]);
           return <Navigate to={target} replace />;
         }
@@ -43,12 +52,12 @@ export function RoleBasedRedirect() {
     } catch {
       // تجاهل أخطاء localStorage
     }
-    // التوجيه للـ dashboard العام كحل أخير
-    return <Navigate to="/dashboard" replace />;
+    // ✅ لا نوجه لـ /dashboard! نعيد لصفحة الدخول
+    return <Navigate to="/login" replace />;
   }
 
-  // ✅ إظهار مؤشر التحميل فقط إذا لم يمر وقت طويل
-  if (isLoading && !loadingTooLong) {
+  // ✅ انتظار حقيقي: لا نوجه حتى تُجلب الأدوار فعلياً
+  if ((isLoading || !rolesReady) && !loadingTooLong && user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center space-y-4">
@@ -59,16 +68,14 @@ export function RoleBasedRedirect() {
     );
   }
 
-  // إذا لم يكن هناك مستخدم، توجيه لصفحة الدخول
-  if (!user) {
-    return <Navigate to="/login" replace />;
+  // ✅ الآن الأدوار جاهزة فعلياً - توجيه صحيح
+  if (user && rolesReady) {
+    const targetDashboard = getDashboardForRoles(roles as AppRole[]);
+    return <Navigate to={targetDashboard} replace />;
   }
 
-  // ✅ الحصول على المسار المناسب - استخدام الأدوار المتاحة
-  const availableRoles = roles.length > 0 ? roles : [];
-  const targetDashboard = getDashboardForRoles(availableRoles as AppRole[]);
-  
-  return <Navigate to={targetDashboard} replace />;
+  // ✅ حالة غير متوقعة - توجيه لصفحة الدخول بدلاً من /dashboard
+  return <Navigate to="/login" replace />;
 }
 
 export default RoleBasedRedirect;
