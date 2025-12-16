@@ -72,7 +72,6 @@ export { IntegrationService } from './integration.service';
 export { MonitoringService, type SystemStats, type SmartAlert, type PerformanceMetric, type SlowQueryLog } from './monitoring.service';
 export { KnowledgeService, type KnowledgeArticle, type ProjectPhase } from './knowledge.service';
 export { NotificationSettingsService } from './notification-settings.service';
-export { DocumentationService, type ProjectPhase as DocProjectPhase, type ChangelogEntry, type AddPhaseInput } from './documentation.service';
 
 // Infrastructure Services (5)
 export { StorageService } from './storage.service';

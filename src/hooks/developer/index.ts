@@ -1,19 +1,8 @@
-// أدوات المطور المتقدمة
+/**
+ * Developer Hooks - خطافات المراقبة
+ * @version 2.9.24
+ * 
+ * تم الاحتفاظ فقط بالخطافات المستخدمة
+ */
 
 export { useErrorNotifications } from './useErrorNotifications';
-export { useRenderTracker, getRenderReport, resetRenderRegistry } from './useRenderTracker';
-export { useDuplicateDetector, trackApiRequest, resetDuplicateRegistry } from './useDuplicateDetector';
-export { useMemoryMonitor, getMemorySnapshots, resetMemorySnapshots } from './useMemoryMonitor';
-export { usePerformanceGuard, getAllPerformanceIssues } from './usePerformanceGuard';
-export { useDeepDiagnostics } from './useDeepDiagnostics';
-
-// أدوات التحليل المتقدمة الجديدة
-export { useCodeHealthAnalyzer, registerIssue, getAllCodeIssues, clearAllCodeIssues } from './useCodeHealthAnalyzer';
-export { useRealTimeMonitor, getAllEvents } from './useRealTimeMonitor';
-export { useComponentProfiler, useProfiledComponent, startComponentRender, registerComponentMount, registerComponentUnmount, getAllComponentProfiles, resetComponentProfiles } from './useComponentProfiler';
-export { useAdvancedPerformanceAnalyzer } from './useAdvancedPerformanceAnalyzer';
-export { useSystemErrors, useDeleteResolvedErrors, useUpdateErrorStatus, useDeleteAllErrors } from './useSystemErrors';
-
-// أداة الفحص العميق
-export { useDeepCodeAudit } from './useDeepCodeAudit';
-export type { AuditIssue, AuditReport, AuditProgress } from './useDeepCodeAudit';

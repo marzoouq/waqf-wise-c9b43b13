@@ -17,5 +17,4 @@ export { useSecurityAlerts } from './useSecurityAlerts';
 export { useAuditLogs } from './useAuditLogs';
 export { useIntegrationsData } from './useIntegrationsData';
 export { useSystemErrorLogsData } from './useSystemErrorLogsData';
-export { useSystemMaintenanceData } from './useSystemMaintenanceData';
 export { useSelfHealingStats } from './useSelfHealingStats';

@@ -12,13 +12,9 @@ import {
   AuditLogs,
   SystemMonitoring,
   SystemErrorLogs,
-  SystemMaintenance,
   SecurityDashboard,
   PerformanceDashboard,
   IntegrationsManagement,
-  DeveloperGuide,
-  DeveloperTools,
-  ProjectDocumentation,
   AIInsights,
   AdvancedSettings,
   LandingPageSettings,
@@ -78,15 +74,6 @@ export const adminRoutes = [
     element={
       <ProtectedRoute requiredRoles={["admin", "nazer"]}>
         <SystemErrorLogs />
-      </ProtectedRoute>
-    } 
-  />,
-  <Route
-    key="system-maintenance"
-    path="/system-maintenance" 
-    element={
-      <ProtectedRoute requiredRole="admin">
-        <SystemMaintenance />
       </ProtectedRoute>
     } 
   />,
@@ -150,33 +137,6 @@ export const adminRoutes = [
     element={
       <ProtectedRoute requiredRoles={["admin", "nazer"]}>
         <SupportManagement />
-      </ProtectedRoute>
-    } 
-  />,
-  <Route 
-    key="developer-guide"
-    path="/developer-guide" 
-    element={
-      <ProtectedRoute requiredRole="admin">
-        <DeveloperGuide />
-      </ProtectedRoute>
-    } 
-  />,
-  <Route 
-    key="developer-tools"
-    path="/developer-tools" 
-    element={
-      <ProtectedRoute requiredRole="admin">
-        <DeveloperTools />
-      </ProtectedRoute>
-    } 
-  />,
-  <Route 
-    key="project-documentation"
-    path="/project-documentation" 
-    element={
-      <ProtectedRoute requiredRoles={["admin", "nazer"]}>
-        <ProjectDocumentation />
       </ProtectedRoute>
     } 
   />,
