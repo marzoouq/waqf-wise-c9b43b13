@@ -132,24 +132,24 @@ export function UnifiedKPICard({
       )}
       onClick={onClick}
     >
-      <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-        <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
+      <CardHeader className="flex flex-row items-center justify-between pb-1.5 sm:pb-2 space-y-0 px-3 sm:px-4 pt-3 sm:pt-4">
+        <CardTitle className="text-[10px] sm:text-xs md:text-sm font-medium text-muted-foreground truncate max-w-[80%]">
           {title}
         </CardTitle>
         <Icon className={cn(
-          "h-3 w-3 sm:h-4 sm:w-4 transition-transform",
+          "h-3 w-3 sm:h-4 sm:w-4 transition-transform flex-shrink-0",
           styles.icon
         )} />
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4">
         <div className={cn(
-          "text-lg sm:text-xl md:text-2xl font-bold mb-1",
+          "text-base sm:text-lg md:text-xl lg:text-2xl font-bold mb-0.5 sm:mb-1 truncate",
           styles.text
         )}>
           {value}
         </div>
         {subtitle && (
-          <p className="text-[10px] sm:text-xs text-muted-foreground">
+          <p className="text-[9px] sm:text-[10px] md:text-xs text-muted-foreground truncate">
             {subtitle}
           </p>
         )}

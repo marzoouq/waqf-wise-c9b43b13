@@ -29,7 +29,7 @@ export function UnifiedDashboardLayout({
     <PageErrorBoundary pageName={title || `لوحة تحكم ${roleDisplayName}`}>
       <MobileOptimizedLayout>
         {/* Header with role-specific styling */}
-        <div className="flex items-center justify-between mb-4 sm:mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
           <MobileOptimizedHeader
             title={title || `لوحة تحكم ${roleDisplayName}`}
             description={description || `نظرة شاملة على عمليات ${roleDisplayName}`}
@@ -43,7 +43,7 @@ export function UnifiedDashboardLayout({
             }
           />
           {actions && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap justify-end">
               {actions}
             </div>
           )}

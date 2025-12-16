@@ -48,7 +48,7 @@ export default function NazerDashboard() {
     <UnifiedDashboardLayout
       role="nazer"
       actions={
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
           {/* مؤشر آخر تحديث */}
           <LastSyncIndicator 
             lastUpdated={lastUpdated} 
@@ -60,17 +60,18 @@ export default function NazerDashboard() {
           {/* زر معاينة كـ مستفيد */}
           <PreviewAsBeneficiaryButton />
           
-          <Button onClick={() => setDistributeDialogOpen(true)} className="gap-2" variant="default">
-            <Coins className="h-4 w-4" />
-            <span className="hidden sm:inline">توزيع الغلة</span>
+          <Button onClick={() => setDistributeDialogOpen(true)} className="gap-1.5 sm:gap-2 px-2 sm:px-3" variant="default" size="sm">
+            <Coins className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <span className="hidden xs:inline text-xs sm:text-sm">توزيع</span>
+            <span className="hidden sm:inline text-sm"> الغلة</span>
           </Button>
-          <Button onClick={() => setPublishDialogOpen(true)} className="gap-2" variant="outline">
-            <Globe className="h-4 w-4" />
-            <span className="hidden sm:inline">نشر السنة</span>
+          <Button onClick={() => setPublishDialogOpen(true)} className="gap-1.5 sm:gap-2 px-2 sm:px-3" variant="outline" size="sm">
+            <Globe className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <span className="hidden xs:inline text-xs sm:text-sm">نشر</span>
           </Button>
-          <Button onClick={() => setMessageDialogOpen(true)} className="gap-2" variant="ghost">
-            <Mail className="h-4 w-4" />
-            <span className="hidden sm:inline">رسالة</span>
+          <Button onClick={() => setMessageDialogOpen(true)} className="gap-1.5 sm:gap-2 px-2 sm:px-3" variant="ghost" size="sm">
+            <Mail className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline text-sm">رسالة</span>
           </Button>
         </div>
       }
