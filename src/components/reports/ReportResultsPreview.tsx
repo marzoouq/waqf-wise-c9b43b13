@@ -19,7 +19,7 @@ import {
   Clock
 } from "lucide-react";
 import { format } from "@/lib/date";
-import type { ReportResult } from "@/hooks/useCustomReports";
+import type { ReportResult } from "@/hooks/reports/useCustomReports";
 
 interface ReportResultsPreviewProps {
   result: ReportResult;

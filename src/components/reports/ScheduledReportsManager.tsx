@@ -26,7 +26,7 @@ import {
   useDeleteScheduledReport,
   useTriggerScheduledReport,
 } from '@/hooks/reports/useScheduledReports';
-import { useCustomReports } from '@/hooks/useCustomReports';
+import { useCustomReports } from '@/hooks/reports/useCustomReports';
 import { Calendar, Clock, Mail, Play, Trash2, Plus } from 'lucide-react';
 import { Database } from '@/integrations/supabase/types';
 

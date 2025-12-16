@@ -1,4 +1,4 @@
-import { useContracts } from "@/hooks/useContracts";
+import { useContracts } from "@/hooks/property/useContracts";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { FileText, EyeOff } from "lucide-react";

@@ -8,7 +8,7 @@ import { generateInvoicePDF } from "@/lib/generateInvoicePDF";
 import { generateReceiptPDF } from "@/lib/generateReceiptPDF";
 import { useToast } from "@/hooks/ui/use-toast";
 import type { RentalPayment } from "@/hooks/useRentalPayments";
-import type { OrganizationSettings } from "@/hooks/useOrganizationSettings";
+import type { OrganizationSettings } from "@/hooks/governance/useOrganizationSettings";
 
 export function usePaymentDocuments() {
   const { toast } = useToast();

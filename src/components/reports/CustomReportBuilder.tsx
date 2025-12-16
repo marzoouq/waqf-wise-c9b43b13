@@ -25,7 +25,7 @@ import {
   Loader2
 } from "lucide-react";
 import { useToast } from "@/hooks/ui/use-toast";
-import { useCustomReports, type ReportResult } from "@/hooks/useCustomReports";
+import { useCustomReports, type ReportResult } from "@/hooks/reports/useCustomReports";
 import { ReportResultsPreview } from "./ReportResultsPreview";
 import { exportToPDF, exportToExcel, exportToCSV } from "@/lib/exportHelpers";
 import type { CustomReportFilter } from "@/types/reports/index";

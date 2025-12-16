@@ -11,7 +11,7 @@ import {
   ChevronLeft
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useGovernanceDecisions } from "@/hooks/useGovernanceDecisions";
+import { useGovernanceDecisions } from "@/hooks/governance/useGovernanceDecisions";
 import { useRecentGovernanceDecisions } from "@/hooks/governance/useGovernanceData";
 import { Database } from '@/integrations/supabase/types';
 

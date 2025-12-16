@@ -22,7 +22,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { type AppRole, ROLE_LABELS } from "@/types/roles";
-import { usePermissionsManagement } from "@/hooks/usePermissionsManagement";
+import { usePermissionsManagement } from "@/hooks/users/usePermissionsManagement";
 
 const CATEGORY_LABELS: Record<string, string> = {
   funds: "المصارف",

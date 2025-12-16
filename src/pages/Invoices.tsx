@@ -29,7 +29,7 @@ import InvoiceStatusBadge from "@/components/invoices/InvoiceStatusBadge";
 import { InvoicesStatsCards } from "@/components/invoices/InvoicesStatsCards";
 import { InvoicesFilters } from "@/components/invoices/InvoicesFilters";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
-import { useInvoicesPage } from "@/hooks/useInvoicesPage";
+import { useInvoicesPage } from "@/hooks/payments/useInvoicesPage";
 
 const Invoices = () => {
   const {

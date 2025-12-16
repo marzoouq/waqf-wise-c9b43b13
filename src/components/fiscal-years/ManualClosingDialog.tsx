@@ -14,7 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, AlertCircle } from "lucide-react";
-import type { FiscalYear } from "@/hooks/useFiscalYears";
+import type { FiscalYear } from "@/hooks/accounting/useFiscalYears";
 
 interface ManualClosingDialogProps {
   open: boolean;

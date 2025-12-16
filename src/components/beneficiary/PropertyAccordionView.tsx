@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useProperties } from "@/hooks/useProperties";
+import { useProperties } from "@/hooks/property/useProperties";
 import { usePropertyUnits } from "@/hooks/usePropertyUnits";
 import {
   Accordion,

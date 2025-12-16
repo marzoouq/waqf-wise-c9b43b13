@@ -1,5 +1,5 @@
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
-import { useBeneficiaryActivityLog } from "@/hooks/useBeneficiaryActivityLog";
+import { useBeneficiaryActivityLog } from "@/hooks/beneficiary/useBeneficiaryActivityLog";
 import { formatDate } from "@/lib/date";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";

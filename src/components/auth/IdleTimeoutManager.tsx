@@ -1,7 +1,7 @@
 import { useEffect, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRole } from "@/hooks/useUserRole";
-import { useIdleTimeout } from "@/hooks/useIdleTimeout";
+import { useIdleTimeout } from "@/hooks/auth/useIdleTimeout";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { AuthService } from "@/services";

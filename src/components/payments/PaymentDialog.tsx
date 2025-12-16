@@ -24,7 +24,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { format } from "@/lib/date";
 import { commonValidation } from "@/lib/validationSchemas";
 import { Database } from "@/integrations/supabase/types";
-import { useContracts } from "@/hooks/useContracts";
+import { useContracts } from "@/hooks/property/useContracts";
 import { Info } from "lucide-react";
 
 type Payment = Database['public']['Tables']['payments']['Row'];

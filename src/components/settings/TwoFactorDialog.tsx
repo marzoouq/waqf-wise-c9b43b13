@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Shield, Key, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
 import { AuthService } from "@/services/auth.service";
-import { useProfile } from "@/hooks/useProfile";
+import { useProfile } from "@/hooks/auth/useProfile";
 import { useTwoFactorAuth } from "@/hooks/settings/useTwoFactorAuth";
 import { logger } from "@/lib/logger";
 

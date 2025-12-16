@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { TrendingUp, TrendingDown, AlertCircle } from "lucide-react";
-import { Budget } from "@/hooks/useBudgets";
+import { Budget } from "@/hooks/accounting/useBudgets";
 import { formatCurrency } from "@/lib/utils";
 
 interface BudgetAnalysisCardProps {

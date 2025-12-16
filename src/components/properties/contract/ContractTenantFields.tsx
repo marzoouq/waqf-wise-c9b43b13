@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { ContractFormData } from "./useContractForm";
-import { Property } from "@/hooks/useProperties";
+import { Property } from "@/hooks/property/useProperties";
 import { useTenants } from "@/hooks/property/useTenants";
 import { TenantDialog } from "@/components/tenants/TenantDialog";
 import { UserPlus, Search } from "lucide-react";

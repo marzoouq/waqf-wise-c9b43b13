@@ -10,9 +10,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ResponsiveDialog, DialogFooter } from "@/components/shared/ResponsiveDialog";
-import { Budget } from "@/hooks/useBudgets";
+import { Budget } from "@/hooks/accounting/useBudgets";
 import { useAccounts } from "@/hooks/accounting/useAccounts";
-import { useFiscalYears } from "@/hooks/useFiscalYears";
+import { useFiscalYears } from "@/hooks/accounting/useFiscalYears";
 import { Database } from "@/integrations/supabase/types";
 
 type BudgetInsert = Database['public']['Tables']['budgets']['Insert'];

@@ -1,4 +1,4 @@
-import { useFinancialReports } from "@/hooks/useFinancialReports";
+import { useFinancialReports } from "@/hooks/accounting/useFinancialReports";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText, Printer, TrendingUp, TrendingDown } from "lucide-react";

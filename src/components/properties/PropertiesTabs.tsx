@@ -8,10 +8,10 @@ import { PaymentsTab } from "@/components/properties/tabs/PaymentsTab";
 import { MaintenanceTab } from "@/components/properties/tabs/MaintenanceTab";
 import { PropertyUnitsManagement } from "@/components/properties/PropertyUnitsManagement";
 import { PropertySelector } from "@/components/properties/PropertySelector";
-import { type Property } from "@/hooks/useProperties";
-import { type Contract } from "@/hooks/useContracts";
+import { type Property } from "@/hooks/property/useProperties";
+import { type Contract } from "@/hooks/property/useContracts";
 import { type RentalPayment } from "@/hooks/useRentalPayments";
-import { type MaintenanceRequest } from "@/hooks/useMaintenanceRequests";
+import { type MaintenanceRequest } from "@/hooks/property/useMaintenanceRequests";
 import { memo } from "react";
 
 interface PropertiesTabsProps {

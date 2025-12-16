@@ -13,7 +13,7 @@ import { ROLE_LABELS, ROLE_COLORS, type AppRole } from "@/types/roles";
 import type { UserProfile } from "@/types/auth";
 import { useUsersContext } from "@/contexts/UsersContext";
 import { useUsersDialogsContext } from "@/contexts/UsersDialogsContext";
-import { usePermissions } from "@/hooks/usePermissions";
+import { usePermissions } from "@/hooks/auth/usePermissions";
 import { useToast } from "@/hooks/ui/use-toast";
 
 interface UsersTableRowWithContextProps {

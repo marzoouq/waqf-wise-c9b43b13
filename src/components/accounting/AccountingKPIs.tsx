@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { FileText, TrendingUp, TrendingDown, Clock, ArrowUp, ArrowDown } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
-import { useJournalEntries } from "@/hooks/useJournalEntries";
+import { useJournalEntries } from "@/hooks/accounting/useJournalEntries";
 import { useMemo } from "react";
 import type { JournalEntryLine } from "@/types/financial";
 

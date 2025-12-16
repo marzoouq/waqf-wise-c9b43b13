@@ -1,5 +1,5 @@
 import { formatZATCACurrency } from "./zatca";
-import type { OrganizationSettings } from "@/hooks/useOrganizationSettings";
+import type { OrganizationSettings } from "@/hooks/governance/useOrganizationSettings";
 import { loadAmiriFonts } from "./fonts/loadArabicFonts";
 import { logger } from "./logger";
 

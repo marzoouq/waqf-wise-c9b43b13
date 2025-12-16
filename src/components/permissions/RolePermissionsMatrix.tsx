@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Permission } from "@/hooks/usePermissions";
+import { Permission } from "@/hooks/auth/usePermissions";
 import { type AppRole } from "@/types/roles";
 import { useRolePermissionsData } from "@/hooks/permissions/useRolePermissionsData";
 import { ErrorState } from "@/components/shared/ErrorState";

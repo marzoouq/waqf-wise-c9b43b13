@@ -6,7 +6,7 @@ import { ResponsiveDialog, DialogFooter } from "@/components/shared/ResponsiveDi
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/ui/use-toast";
-import { type Property } from "@/hooks/useProperties";
+import { type Property } from "@/hooks/property/useProperties";
 import { UnifiedFormField, FormGrid } from "@/components/unified/UnifiedFormField";
 
 const propertySchema = z.object({

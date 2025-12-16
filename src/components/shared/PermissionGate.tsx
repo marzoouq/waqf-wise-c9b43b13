@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { usePermissions } from "@/hooks/usePermissions";
+import { usePermissions } from "@/hooks/auth/usePermissions";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface PermissionGateProps {

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { useInvoices } from "@/hooks/useInvoices";
+import { useInvoices } from "@/hooks/payments/useInvoices";
 import { toast } from "sonner";
 import { CheckCircle, Send, XCircle } from "lucide-react";
 

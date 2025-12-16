@@ -9,7 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useWaqfUnits, type WaqfUnit } from "@/hooks/distributions/useWaqfUnits";
-import { useFiscalYears } from "@/hooks/useFiscalYears";
+import { useFiscalYears } from "@/hooks/accounting/useFiscalYears";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { EnhancedEmptyState } from "@/components/shared";

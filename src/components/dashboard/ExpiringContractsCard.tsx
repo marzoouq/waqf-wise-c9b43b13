@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AlertTriangle, Calendar, Eye } from "lucide-react";
-import { useContracts } from "@/hooks/useContracts";
+import { useContracts } from "@/hooks/property/useContracts";
 import { differenceInDays, formatDate } from "@/lib/date";
 import { useNavigate } from "react-router-dom";
 import { ErrorState } from "@/components/shared/ErrorState";

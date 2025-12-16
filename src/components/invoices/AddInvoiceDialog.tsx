@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import { Plus, Trash2, Loader2, AlertCircle, FileImage } from "lucide-react";
 import { format } from "@/lib/date";
 import { validateVATNumber, formatZATCACurrency } from "@/lib/zatca";
-import { useOrganizationSettings } from "@/hooks/useOrganizationSettings";
+import { useOrganizationSettings } from "@/hooks/governance/useOrganizationSettings";
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { commonValidation } from "@/lib/validationSchemas";

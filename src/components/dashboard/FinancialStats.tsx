@@ -1,5 +1,5 @@
 import { TrendingUp, TrendingDown, Wallet, PiggyBank, Calculator } from "lucide-react";
-import { useFinancialData } from "@/hooks/useFinancialData";
+import { useFinancialData } from "@/hooks/accounting/useFinancialData";
 import { formatCurrency } from "@/lib/utils";
 import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";

@@ -1,7 +1,7 @@
 import { Bell, CheckCircle, AlertCircle, DollarSign, FileText, Users } from "lucide-react";
 import { formatRelative } from "@/lib/date";
 import { cn } from "@/lib/utils";
-import type { Notification } from "@/hooks/useNotifications";
+import type { Notification } from "@/hooks/notifications/useNotifications";
 
 interface NotificationItemProps {
   notification: Notification;

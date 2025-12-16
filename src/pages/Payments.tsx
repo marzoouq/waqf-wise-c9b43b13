@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from "react";
 import { useToast } from "@/hooks/ui/use-toast";
-import { usePayments } from "@/hooks/usePayments";
+import { usePayments } from "@/hooks/payments/usePayments";
 import { usePaymentsWithContracts, PaymentWithContract } from "@/hooks/payments/usePaymentsWithContracts";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";

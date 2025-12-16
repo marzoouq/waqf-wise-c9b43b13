@@ -15,7 +15,7 @@ import {
 import { useToast } from "@/hooks/ui/use-toast";
 import { useBeneficiaryProfile } from "@/hooks/beneficiary";
 import { useAuth } from "@/hooks/useAuth";
-import { Contract } from "@/hooks/useContracts";
+import { Contract } from "@/hooks/property/useContracts";
 import { useAnnualDisclosureExport } from "@/hooks/reports/useAnnualDisclosureExport";
 
 interface ReportsMenuProps {

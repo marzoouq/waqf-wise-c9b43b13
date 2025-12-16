@@ -12,7 +12,7 @@ import { formatVATNumber, formatZATCACurrency } from "@/lib/zatca";
 import { Building2, Calendar, Clock, User, Image as ImageIcon } from "lucide-react";
 import InvoiceStatusBadge from "./InvoiceStatusBadge";
 import { ZATCAQRCode } from "./ZATCAQRCode";
-import type { OrganizationSettings } from "@/hooks/useOrganizationSettings";
+import type { OrganizationSettings } from "@/hooks/governance/useOrganizationSettings";
 
 interface Invoice {
   id: string;

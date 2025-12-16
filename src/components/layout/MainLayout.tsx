@@ -17,7 +17,7 @@ import { BeneficiaryBottomNavigation } from "@/components/mobile/BeneficiaryBott
 import { useUserRole } from "@/hooks/useUserRole";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
-import { useProfile } from "@/hooks/useProfile";
+import { useProfile } from "@/hooks/auth/useProfile";
 import { RoleSwitcher } from "./RoleSwitcher";
 import { useAlertCleanup } from "@/hooks/system/useAlertCleanup";
 import {
