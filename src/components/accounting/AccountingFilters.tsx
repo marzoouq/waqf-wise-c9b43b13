@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Search, Calendar } from "lucide-react";
-import { useDebouncedSearch } from "@/hooks/useDebouncedSearch";
+import { useDebouncedSearch } from "@/hooks/ui/useDebouncedSearch";
 
 interface AccountingFiltersProps {
   searchQuery: string;

@@ -20,7 +20,7 @@ import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { useUsersRealtime } from "@/hooks/users/useUsersRealtime";
 import { UsersProvider, useUsersContext } from "@/contexts/UsersContext";
 import { UsersDialogsProvider, useUsersDialogsContext } from "@/contexts/UsersDialogsContext";
-import { exportUsersToCSV } from "@/utils/export-users";
+import { exportUsersToCSV } from "@/lib/utils/export-users";
 
 // Components
 import { UsersFilters } from "@/components/users/UsersFilters";

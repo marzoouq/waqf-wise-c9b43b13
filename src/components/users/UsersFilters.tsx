@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search } from "lucide-react";
 import { SYSTEM_ROLES, ROLE_LABELS } from "@/types/roles";
-import { useDebouncedSearch } from "@/hooks/useDebouncedSearch";
+import { useDebouncedSearch } from "@/hooks/ui/useDebouncedSearch";
 
 interface UsersFiltersProps {
   searchTerm: string;
