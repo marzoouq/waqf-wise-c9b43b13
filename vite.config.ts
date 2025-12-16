@@ -30,6 +30,17 @@ export default defineConfig(({ mode }) => {
     },
   },
   
+  // ✅ Pre-bundle React والمكتبات التي تعتمد عليها معاً
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      'recharts',
+      'framer-motion',
+    ],
+    exclude: ['jspdf', 'exceljs', 'xlsx'], // تحمّل عند الحاجة فقط
+  },
+  
   build: {
     target: ['es2020', 'edge88', 'firefox78', 'chrome87', 'safari14'],
     minify: 'esbuild',
@@ -44,65 +55,31 @@ export default defineConfig(({ mode }) => {
     
     rollupOptions: {
       output: {
-        // ✅ تحسين تقسيم الكود - فصل المكتبات الكبيرة
+        // ✅ manualChunks آمن - فقط المكتبات المستقلة التي لا تعتمد على React
         manualChunks: (id) => {
-          // ✅ مكتبات PDF - تحمّل عند الحاجة فقط
+          // ✅ مكتبات PDF - مستقلة، آمنة للفصل
           if (id.includes('jspdf') || id.includes('autotable')) {
             return 'pdf-lib';
           }
-          // ✅ مكتبات Excel - تحمّل عند الحاجة فقط
+          
+          // ✅ مكتبات Excel - مستقلة، آمنة للفصل
           if (id.includes('exceljs') || id.includes('xlsx')) {
             return 'excel-lib';
           }
           
-          // ✅ المصادقة البيومترية - chunk منفصل
-          if (id.includes('useBiometricAuth') || id.includes('BiometricSettings') || id.includes('otpauth') || id.includes('qrcode')) {
-            return 'auth-biometric';
-          }
-          
-          // ✅ Charts - تحمّل فقط مع لوحات التحكم
-          if (id.includes('recharts')) {
-            return 'charts-vendor';
-          }
-          
-          // ✅ Framer Motion - للأنيميشن
-          if (id.includes('framer-motion')) {
-            return 'animation-vendor';
-          }
-          
-          // ✅ مكتبات React الأساسية
-          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
-            return 'react-vendor';
-          }
-          
-          // ✅ Radix UI - تقسيم حسب الاستخدام
-          if (id.includes('@radix-ui/react-dialog') || id.includes('@radix-ui/react-alert-dialog') || id.includes('@radix-ui/react-sheet')) {
-            return 'ui-dialogs';
-          }
-          if (id.includes('@radix-ui/react-tabs') || id.includes('@radix-ui/react-accordion') || id.includes('@radix-ui/react-navigation-menu')) {
-            return 'ui-navigation';
-          }
-          if (id.includes('@radix-ui/react-select') || id.includes('@radix-ui/react-dropdown') || id.includes('@radix-ui/react-popover') || id.includes('@radix-ui/react-menubar')) {
-            return 'ui-menus';
-          }
-          if (id.includes('@radix-ui')) {
-            return 'ui-core';
-          }
-          
-          // ✅ Supabase
+          // ✅ Supabase - مستقل، آمن للفصل
           if (id.includes('@supabase')) {
             return 'supabase-vendor';
           }
           
-          // ✅ TanStack Query
-          if (id.includes('@tanstack')) {
-            return 'tanstack-vendor';
-          }
-          
-          // ✅ date-fns
+          // ✅ date-fns - مستقل، آمن للفصل
           if (id.includes('date-fns')) {
             return 'date-vendor';
           }
+          
+          // ❌ تمت إزالة: recharts, framer-motion, @radix-ui, react-vendor
+          // هذه المكتبات تعتمد على React وتُحمَّل معه تلقائياً
+          // لتجنب خطأ: Cannot read properties of undefined (reading 'useState')
         },
         chunkFileNames: 'assets/[name]-[hash].js',
         entryFileNames: 'assets/[name]-[hash].js',
