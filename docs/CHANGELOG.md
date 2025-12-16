@@ -1,6 +1,80 @@
 # 📝 سجل التغييرات | Changelog
 
-**الإصدار الحالي:** 2.9.15 | **آخر تحديث:** 2025-12-14
+**الإصدار الحالي:** 2.9.23 | **آخر تحديث:** 2025-12-16
+
+---
+
+## [2.9.23] - 2025-12-16
+
+### 🧹 تنظيف شامل لمجلد Hooks
+
+#### ✅ حذف ملفات Re-export (125+ ملف)
+
+تم حذف جميع ملفات إعادة التصدير غير الضرورية من `src/hooks/` والتي كانت تعيد تصدير hooks من مجلداتها الفرعية.
+
+**الملفات المحذوفة تشمل:**
+| الفئة | الملفات المحذوفة |
+|-------|-----------------|
+| Auth | `useAuth.ts`, `useActiveSessions.ts`, `useUserRole.ts` |
+| Beneficiary | `useBeneficiaries.ts`, `useBeneficiaryCategories.ts`, `useBeneficiariesFilters.ts` |
+| Accounting | `useAccounts.ts`, `useBudgets.ts`, `useJournalEntries.ts`, `useFiscalYears.ts` |
+| Property | `useProperties.ts`, `useContracts.ts`, `useRentalPayments.ts`, `usePropertyUnits.ts` |
+| Distributions | `useDistributions.ts`, `useDistributionEngine.ts`, `useDistributionSettings.ts` |
+| Payments | `usePayments.ts`, `useLoans.ts`, `useBankAccounts.ts`, `useBankReconciliation.ts` |
+| Notifications | `useNotifications.ts`, `usePushNotifications.ts` |
+| Archive | `useDocuments.ts`, `useFolders.ts`, `useArchiveStats.ts` |
+| System | `useSystemMonitoring.ts`, `useSystemSettings.ts`, `useBackup.ts` |
+| Users | `useUsersManagement.ts`, `usePermissions.ts`, `usePermissionsManagement.ts` |
+| UI | `useSavedSearches.ts`, `usePrint.ts`, `useContactForm.ts` |
+| وغيرها... | 90+ ملف إضافي |
+
+#### ✅ تحديث الاستيرادات (220+ تحديث)
+
+جميع الملفات التي كانت تستورد من المسارات القديمة تم تحديثها للمسارات المباشرة:
+
+```typescript
+// قبل (مسار قديم)
+import { useBeneficiaries } from "@/hooks/useBeneficiaries";
+
+// بعد (مسار مباشر)
+import { useBeneficiaries } from "@/hooks/beneficiary/useBeneficiaries";
+```
+
+#### ✅ useAuth الآن من AuthContext مباشرة
+
+```typescript
+// قبل
+import { useAuth } from "@/hooks/useAuth";
+
+// بعد
+import { useAuth } from "@/contexts/AuthContext";
+```
+
+#### 📁 الهيكل النهائي لمجلد Hooks
+
+```
+src/hooks/
+├── index.ts              # barrel exports للتصدير المركزي
+├── README.md             # التوثيق
+└── [36 مجلد فرعي]/       # كل hook في مجلده الوظيفي
+    ├── accounting/
+    ├── auth/
+    ├── beneficiary/
+    ├── dashboard/
+    ├── distributions/
+    ├── payments/
+    ├── property/
+    └── ... (29 مجلد آخر)
+```
+
+#### 📊 إحصائيات التنظيف
+
+| المقياس | القيمة |
+|---------|--------|
+| ملفات re-export محذوفة | 125+ |
+| استيرادات محدثة | 220+ |
+| أخطاء بناء | 0 |
+| مجلدات فرعية | 36 |
 
 ---
 
