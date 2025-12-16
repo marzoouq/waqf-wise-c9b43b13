@@ -11075,6 +11075,51 @@ export type Database = {
           },
         ]
       }
+      users_profiles_cache: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          full_name: string | null
+          is_active: boolean | null
+          last_login_at: string | null
+          last_sign_in_at: string | null
+          phone: string | null
+          position: string | null
+          roles: Json | null
+          updated_at: string | null
+          user_created_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          is_active?: boolean | null
+          last_login_at?: string | null
+          last_sign_in_at?: string | null
+          phone?: string | null
+          position?: string | null
+          roles?: Json | null
+          updated_at?: string | null
+          user_created_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          is_active?: boolean | null
+          last_login_at?: string | null
+          last_sign_in_at?: string | null
+          phone?: string | null
+          position?: string | null
+          roles?: Json | null
+          updated_at?: string | null
+          user_created_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       voting_delegations: {
         Row: {
           created_at: string | null
