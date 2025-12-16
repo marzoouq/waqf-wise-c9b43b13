@@ -151,18 +151,19 @@ export default function Budgets() {
             </div>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>الحساب</TableHead>
-                  <TableHead>الفترة</TableHead>
-                  <TableHead>المقدّر</TableHead>
-                  <TableHead>الفعلي</TableHead>
-                  <TableHead>الانحراف</TableHead>
-                  <TableHead>نسبة التنفيذ</TableHead>
-                  <TableHead>الإجراءات</TableHead>
-                </TableRow>
-              </TableHeader>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-xs sm:text-sm">الحساب</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden md:table-cell">الفترة</TableHead>
+                    <TableHead className="text-xs sm:text-sm">المقدّر</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden lg:table-cell">الفعلي</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden lg:table-cell">الانحراف</TableHead>
+                    <TableHead className="text-xs sm:text-sm">نسبة التنفيذ</TableHead>
+                    <TableHead className="text-xs sm:text-sm">الإجراءات</TableHead>
+                  </TableRow>
+                </TableHeader>
               <TableBody>
                 {budgets.map((budget) => {
                   const utilization = budget.budgeted_amount > 0 
@@ -171,32 +172,32 @@ export default function Budgets() {
 
                   return (
                     <TableRow key={budget.id}>
-                      <TableCell className="font-medium">
+                      <TableCell className="font-medium text-xs sm:text-sm">
                         <div>
-                          <div className="text-sm">{budget.accounts?.name_ar}</div>
+                          <div className="text-xs sm:text-sm">{budget.accounts?.name_ar}</div>
                           <div className="text-xs text-muted-foreground">{budget.accounts?.code}</div>
                         </div>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="hidden md:table-cell text-xs sm:text-sm">
                         {budget.period_type} {budget.period_number}
                       </TableCell>
-                      <TableCell>{formatCurrency(budget.budgeted_amount)}</TableCell>
-                      <TableCell>{formatCurrency(budget.actual_amount || 0)}</TableCell>
-                      <TableCell className={getVarianceColor(budget.variance_amount)}>
+                      <TableCell className="text-xs sm:text-sm">{formatCurrency(budget.budgeted_amount)}</TableCell>
+                      <TableCell className="hidden lg:table-cell text-xs sm:text-sm">{formatCurrency(budget.actual_amount || 0)}</TableCell>
+                      <TableCell className={`hidden lg:table-cell text-xs sm:text-sm ${getVarianceColor(budget.variance_amount)}`}>
                         {formatCurrency(Math.abs(budget.variance_amount || 0))}
                         {budget.variance_amount !== null && (
-                          <Badge variant={budget.variance_amount >= 0 ? "default" : "destructive"} className="me-2">
+                          <Badge variant={budget.variance_amount >= 0 ? "default" : "destructive"} className="me-2 text-xs">
                             {budget.variance_amount >= 0 ? "توفير" : "تجاوز"}
                           </Badge>
                         )}
                       </TableCell>
-                      <TableCell>
-                        <Badge variant={utilization > 100 ? "destructive" : utilization > 80 ? "secondary" : "default"}>
+                      <TableCell className="text-xs sm:text-sm">
+                        <Badge variant={utilization > 100 ? "destructive" : utilization > 80 ? "secondary" : "default"} className="text-xs">
                           {utilization.toFixed(1)}%
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <div className="flex gap-2">
+                        <div className="flex gap-1">
                           <Button
                             variant="ghost"
                             size="sm"
@@ -224,7 +225,8 @@ export default function Budgets() {
                   </TableRow>
                 )}
               </TableBody>
-            </Table>
+              </Table>
+            </div>
           </CardContent>
         </Card>
       </div>

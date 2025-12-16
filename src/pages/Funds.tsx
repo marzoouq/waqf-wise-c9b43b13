@@ -101,12 +101,14 @@ const Funds = () => {
         />
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-6">
-            <TabsTrigger value="overview" className="text-xs sm:text-sm">نظرة عامة</TabsTrigger>
-            <TabsTrigger value="funds" className="text-xs sm:text-sm">أقلام الوقف</TabsTrigger>
-            <TabsTrigger value="distributions" className="text-xs sm:text-sm">التوزيعات</TabsTrigger>
-            <TabsTrigger value="disclosure" className="text-xs sm:text-sm">الإفصاح السنوي</TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 pb-2">
+            <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-4 mb-6 h-auto">
+              <TabsTrigger value="overview" className="text-xs sm:text-sm px-3 py-2">نظرة عامة</TabsTrigger>
+              <TabsTrigger value="funds" className="text-xs sm:text-sm px-3 py-2">أقلام الوقف</TabsTrigger>
+              <TabsTrigger value="distributions" className="text-xs sm:text-sm px-3 py-2">التوزيعات</TabsTrigger>
+              <TabsTrigger value="disclosure" className="text-xs sm:text-sm px-3 py-2">الإفصاح السنوي</TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="overview" className="space-y-6">
             <OverviewTab summaryStats={summaryStats} distributions={distributions} />
