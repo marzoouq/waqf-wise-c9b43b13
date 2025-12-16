@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAgentStats } from '@/hooks/useAgentAvailability';
+import { useAgentStats } from '@/hooks/support/useAgentAvailability';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { TrendingUp, Clock, CheckCircle, Star, User } from 'lucide-react';

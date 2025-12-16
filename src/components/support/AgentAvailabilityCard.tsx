@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { useAgentAvailability, useUpdateAvailability } from '@/hooks/useAgentAvailability';
+import { useAgentAvailability, useUpdateAvailability } from '@/hooks/support/useAgentAvailability';
 import { useAuth } from '@/hooks/useAuth';
 import { User, AlertCircle } from 'lucide-react';
 

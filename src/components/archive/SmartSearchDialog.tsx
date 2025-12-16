@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { useSmartSearch, useDocumentTags } from '@/hooks/useDocumentTags';
+import { useSmartSearch, useDocumentTags } from '@/hooks/archive/useDocumentTags';
 import { Search, Tag, FileText, Sparkles } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
 

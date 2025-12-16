@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useDocumentVersions } from '@/hooks/useDocumentVersions';
+import { useDocumentVersions } from '@/hooks/archive/useDocumentVersions';
 import { History, RotateCcw, FileText, Check } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { formatDate } from '@/lib/date';

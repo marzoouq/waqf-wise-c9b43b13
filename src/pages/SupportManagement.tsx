@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useSupportTickets } from '@/hooks/useSupportTickets';
-import { useSupportStats } from '@/hooks/useSupportStats';
+import { useSupportStats } from '@/hooks/support/useSupportStats';
 import { TicketDetailsDialog } from '@/components/support/TicketDetailsDialog';
 import { AgentPerformanceReport } from '@/components/support/AgentPerformanceReport';
 import { AssignmentSettingsDialog } from '@/components/support/AssignmentSettingsDialog';

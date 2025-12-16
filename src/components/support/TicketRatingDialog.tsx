@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Star } from 'lucide-react';
-import { useAddTicketRating } from '@/hooks/useTicketRatings';
+import { useAddTicketRating } from '@/hooks/support/useTicketRatings';
 
 interface TicketRatingDialogProps {
   ticketId: string | null;

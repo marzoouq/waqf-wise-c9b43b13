@@ -18,7 +18,7 @@ import {
   Star
 } from 'lucide-react';
 import { useSupportTickets } from '@/hooks/useSupportTickets';
-import { useKnowledgeBase } from '@/hooks/useKnowledgeBase';
+import { useKnowledgeBase } from '@/hooks/ui/useKnowledgeBase';
 import { CreateTicketDialog } from '@/components/support/CreateTicketDialog';
 import { TicketDetailsDialog } from '@/components/support/TicketDetailsDialog';
 import { TicketRatingDialog } from '@/components/support/TicketRatingDialog';
