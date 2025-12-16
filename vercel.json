@@ -34,7 +34,7 @@
       ]
     },
     {
-      "source": "/assets/(.*)",
+      "source": "/assets/:path*",
       "headers": [
         {
           "key": "Cache-Control",
@@ -52,7 +52,7 @@
       ]
     },
     {
-      "source": "/(.*).js",
+      "source": "/:path*.js",
       "headers": [
         {
           "key": "Cache-Control",
