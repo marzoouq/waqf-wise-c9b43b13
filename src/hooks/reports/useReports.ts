@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 import { ReportService, type ReportTemplate } from "@/services/report.service";
 import { QUERY_KEYS } from "@/lib/query-keys";
 

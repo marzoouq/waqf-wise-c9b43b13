@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { CheckCircle, XCircle } from "lucide-react";
-import { useApprovals } from "@/hooks/useApprovals";
+import { useApprovals } from "@/hooks/requests/useApprovals";
 
 type Props = {
   open: boolean;

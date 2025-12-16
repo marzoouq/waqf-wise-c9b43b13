@@ -3,7 +3,7 @@
  * @version 2.8.60
  */
 import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 import { AuthService } from "@/services";
 
 interface ChangePasswordResult {

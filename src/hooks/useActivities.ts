@@ -1,1 +1,0 @@
-export { useActivities, type Activity } from './ui/useActivities';

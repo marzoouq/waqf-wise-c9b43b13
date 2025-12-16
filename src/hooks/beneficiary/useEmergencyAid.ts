@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { LoansService } from "@/services";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 import { EmergencyAid } from "@/types/loans";
 import { QUERY_KEYS } from "@/lib/query-keys";
 

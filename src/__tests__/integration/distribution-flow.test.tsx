@@ -157,7 +157,7 @@ describe('Distribution Flow Integration', () => {
         }
       ]);
 
-      const { useAnnualDisclosures } = await import('@/hooks/useAnnualDisclosures');
+      const { useAnnualDisclosures } = await import('@/hooks/reports/useAnnualDisclosures');
       const { result } = renderHook(() => useAnnualDisclosures(), {
         wrapper: createWrapper(),
       });

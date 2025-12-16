@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/ui/use-toast";
 import { createMutationErrorHandler } from "@/lib/errors";
 import type { MaintenanceRequestInsert } from "@/types/maintenance";
 import { useJournalEntries } from "@/hooks/accounting/useJournalEntries";

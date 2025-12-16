@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { PropertyService, RealtimeService } from "@/services";
-import { useToast } from "@/hooks/use-toast";
-import { useActivities } from "@/hooks/useActivities";
+import { useToast } from "@/hooks/ui/use-toast";
+import { useActivities } from "@/hooks/ui/useActivities";
 import { useAuth } from "@/hooks/useAuth";
 import { logger } from "@/lib/logger";
 import { createMutationErrorHandler } from "@/lib/errors";

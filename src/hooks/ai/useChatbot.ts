@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ChatbotService, ChatMessage, QuickReply } from "@/services/chatbot.service";
 import { UserService } from "@/services/user.service";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { QUERY_KEYS } from "@/lib/query-keys";
 

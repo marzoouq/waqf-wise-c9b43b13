@@ -5,7 +5,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ApprovalService } from "@/services/approval.service";
 import { PaymentForApproval } from "@/types";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useApprovalHistory } from "@/hooks/useApprovalHistory";
 import { invalidateQueryGroups } from "@/lib/query-invalidation";

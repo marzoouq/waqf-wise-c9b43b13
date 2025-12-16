@@ -15,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2, FileText } from "lucide-react";
-import { useAnnualDisclosures } from "@/hooks/useAnnualDisclosures";
+import { useAnnualDisclosures } from "@/hooks/reports/useAnnualDisclosures";
 
 const disclosureSchema = z.object({
   year: z.coerce.number().min(2020, "السنة يجب أن تكون 2020 أو أحدث").max(2100),

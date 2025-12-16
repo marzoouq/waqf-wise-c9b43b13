@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 import { logger } from "@/lib/logger";
 import { DisclosurePayload } from "@/types/disclosure";
 import { supabase } from "@/integrations/supabase/client";

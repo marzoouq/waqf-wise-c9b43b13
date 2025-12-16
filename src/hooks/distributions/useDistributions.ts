@@ -1,8 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { DistributionService, RealtimeService, EdgeFunctionService } from "@/services";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 import { useJournalEntries } from "@/hooks/accounting/useJournalEntries";
-import { useActivities } from "@/hooks/useActivities";
+import { useActivities } from "@/hooks/ui/useActivities";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
 import { logger } from "@/lib/logger";

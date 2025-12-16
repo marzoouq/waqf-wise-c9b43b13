@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 import { useEffect } from "react";
 import { QUERY_CONFIG } from "@/lib/queryOptimization";
 import { LoansService } from "@/services/loans.service";

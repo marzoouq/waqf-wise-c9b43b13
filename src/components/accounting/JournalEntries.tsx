@@ -8,7 +8,7 @@ import AddJournalEntryDialog from "./AddJournalEntryDialog";
 import ViewJournalEntryDialog from "./ViewJournalEntryDialog";
 import { BadgeVariant } from "@/types";
 import { ExportButton } from "@/components/shared/ExportButton";
-import { useAccountingFilters } from "@/hooks/useAccountingFilters";
+import { useAccountingFilters } from "@/hooks/accounting/useAccountingFilters";
 import { AccountingFilters } from "./AccountingFilters";
 import { EmptyAccountingState } from "./EmptyAccountingState";
 import { AccountingErrorState } from "./AccountingErrorState";

@@ -14,7 +14,7 @@ import {
 import { BatchInvoiceOCR } from "@/components/invoices/BatchInvoiceOCR";
 import { useInvoiceManagement } from "@/hooks/accounting/useInvoiceManagement";
 import { useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { ErrorState } from "@/components/shared/ErrorState";
 
