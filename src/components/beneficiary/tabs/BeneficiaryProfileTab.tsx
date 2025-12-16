@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Edit, Phone, Mail, MapPin, CreditCard, Users, Calendar } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
 import type { Database } from "@/integrations/supabase/types";
-import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
+import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
 import { MaskedValue } from "@/components/shared/MaskedValue";
 
 type Beneficiary = Database['public']['Tables']['beneficiaries']['Row'];

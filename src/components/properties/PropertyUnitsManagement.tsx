@@ -35,7 +35,7 @@ import {
   Edit,
   Trash2
 } from "lucide-react";
-import { usePropertyUnits } from "@/hooks/usePropertyUnits";
+import { usePropertyUnits } from "@/hooks/property/usePropertyUnits";
 import { PropertyUnitDialog } from "./PropertyUnitDialog";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { ErrorState } from "@/components/shared/ErrorState";

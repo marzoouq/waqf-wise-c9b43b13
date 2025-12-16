@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useProperties } from "@/hooks/property/useProperties";
-import { usePropertyUnits } from "@/hooks/usePropertyUnits";
+import { usePropertyUnits } from "@/hooks/property/usePropertyUnits";
 import {
   Accordion,
   AccordionContent,

@@ -4,7 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { CheckCircle2, Clock, Wallet, Calendar, Archive, CircleDot, TrendingUp } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
-import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
+import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
 import { MaskedValue } from "@/components/shared/MaskedValue";
 import { useIsMobile } from "@/hooks/ui/use-mobile";
 import { useBeneficiaryDistributions } from "@/hooks/beneficiary/useBeneficiaryDistributions";

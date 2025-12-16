@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useRequestComments } from "@/hooks/useRequestComments";
+import { useRequestComments } from "@/hooks/requests/useRequestComments";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";

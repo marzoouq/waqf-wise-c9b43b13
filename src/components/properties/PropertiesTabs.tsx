@@ -10,7 +10,7 @@ import { PropertyUnitsManagement } from "@/components/properties/PropertyUnitsMa
 import { PropertySelector } from "@/components/properties/PropertySelector";
 import { type Property } from "@/hooks/property/useProperties";
 import { type Contract } from "@/hooks/property/useContracts";
-import { type RentalPayment } from "@/hooks/useRentalPayments";
+import { type RentalPayment } from "@/hooks/property/useRentalPayments";
 import { type MaintenanceRequest } from "@/hooks/property/useMaintenanceRequests";
 import { memo } from "react";
 

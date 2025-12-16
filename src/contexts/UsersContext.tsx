@@ -5,7 +5,7 @@
  */
 
 import React, { createContext, useContext, ReactNode, useCallback } from "react";
-import { useUsersManagement, type UserProfile } from "@/hooks/useUsersManagement";
+import { useUsersManagement, type UserProfile } from "@/hooks/users/useUsersManagement";
 import { useUsersFilter } from "@/hooks/users/useUsersFilter";
 import type { AppRole } from "@/types/roles";
 import { useAuth } from "@/hooks/useAuth";

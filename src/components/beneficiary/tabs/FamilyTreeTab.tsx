@@ -2,7 +2,7 @@ import { useFamilyTree } from "@/hooks/beneficiary/useBeneficiaryProfileData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Users, User } from "lucide-react";
-import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
+import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
 import { MaskedValue } from "@/components/shared/MaskedValue";
 import { useIsMobile } from "@/hooks/ui/use-mobile";
 

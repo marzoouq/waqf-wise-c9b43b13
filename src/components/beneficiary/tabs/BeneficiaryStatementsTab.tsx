@@ -4,7 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Download, FileText } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
-import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
+import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
 import { useBeneficiaryStatements } from "@/hooks/beneficiary/useBeneficiaryTabsData";
 import { useBeneficiaryDistributions } from "@/hooks/beneficiary/useBeneficiaryDistributions";
 import { MaskedValue } from "@/components/shared/MaskedValue";

@@ -14,7 +14,7 @@ import { FloatingChatButton } from "@/components/chatbot/FloatingChatButton";
 import { GlobalSearch } from "@/components/shared/GlobalSearch";
 import { BottomNavigation } from "@/components/mobile/BottomNavigation";
 import { BeneficiaryBottomNavigation } from "@/components/mobile/BeneficiaryBottomNavigation";
-import { useUserRole } from "@/hooks/useUserRole";
+import { useUserRole } from "@/hooks/auth/useUserRole";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/auth/useProfile";

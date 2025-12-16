@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
-import type { UserProfile } from "@/hooks/useUsersManagement";
+import type { UserProfile } from "@/hooks/users/useUsersManagement";
 
 interface ResetPasswordDialogProps {
   open: boolean;

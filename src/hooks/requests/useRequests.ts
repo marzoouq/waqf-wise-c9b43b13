@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { RequestService, RealtimeService } from '@/services';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/ui/use-toast';
-import { useTasks } from '@/hooks/useTasks';
+import { useTasks } from '@/hooks/ui/useTasks';
 import type { BeneficiaryRequest, RequestType } from '@/types';
 import { logger } from '@/lib/logger';
 import { createMutationErrorHandler } from '@/lib/errors';

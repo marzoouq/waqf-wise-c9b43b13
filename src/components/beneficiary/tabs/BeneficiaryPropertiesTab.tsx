@@ -4,7 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Building2, Home, MapPin, Calendar, EyeOff } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
-import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
+import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
 import { useFiscalYearPublishInfo } from "@/hooks/fiscal-years";
 import { MaskedValue } from "@/components/shared/MaskedValue";
 import { useIsMobile } from "@/hooks/ui/use-mobile";

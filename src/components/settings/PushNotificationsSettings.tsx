@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Bell, BellOff } from "lucide-react";
-import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { usePushNotifications } from "@/hooks/notifications/usePushNotifications";
 import { Badge } from "@/components/ui/badge";
 
 export function PushNotificationsSettings() {

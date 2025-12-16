@@ -8,7 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { useUserRole } from "@/hooks/useUserRole";
+import { useUserRole } from "@/hooks/auth/useUserRole";
 import { Shield, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { ROLE_LABELS, ROLE_COLORS, type AllRole } from "@/types/roles";
 

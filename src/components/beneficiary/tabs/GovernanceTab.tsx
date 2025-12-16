@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { FileText, Calendar, Users, Inbox, ScrollText, BookOpen, ExternalLink } from "lucide-react";
-import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
+import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
 import { useGovernanceData } from "@/hooks/governance/useGovernanceData";
 import { format, arLocale as ar } from "@/lib/date";
 import { Skeleton } from "@/components/ui/skeleton";

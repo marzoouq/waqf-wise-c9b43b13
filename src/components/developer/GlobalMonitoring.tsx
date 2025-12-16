@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useUserRole } from "@/hooks/useUserRole";
+import { useUserRole } from "@/hooks/auth/useUserRole";
 import { useErrorNotifications } from "@/hooks/developer/useErrorNotifications";
 
 /**

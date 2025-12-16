@@ -12,7 +12,7 @@ import {
   CreditCard,
   PieChart
 } from "lucide-react";
-import { useUnifiedKPIs } from "@/hooks/useUnifiedKPIs";
+import { useUnifiedKPIs } from "@/hooks/dashboard/useUnifiedKPIs";
 import { formatCurrency, formatNumber } from "@/lib/utils";
 import { UnifiedStatsGrid } from "@/components/unified/UnifiedStatsGrid";
 import { UnifiedKPICard } from "@/components/unified/UnifiedKPICard";

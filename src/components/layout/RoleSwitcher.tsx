@@ -6,7 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useUserRole } from "@/hooks/useUserRole";
+import { useUserRole } from "@/hooks/auth/useUserRole";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ChevronDown, Shield, User, Calculator, Wallet, Archive, Users, LucideIcon } from "lucide-react";
 import { ROLE_LABELS } from "@/types/roles";

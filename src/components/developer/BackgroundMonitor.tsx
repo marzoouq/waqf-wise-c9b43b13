@@ -5,7 +5,7 @@
  */
 import { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
-import { useUserRole } from '@/hooks/useUserRole';
+import { useUserRole } from '@/hooks/auth/useUserRole';
 import { productionLogger } from '@/lib/logger/production-logger';
 
 // حدود التحذير - مرفوعة لتقليل الضوضاء

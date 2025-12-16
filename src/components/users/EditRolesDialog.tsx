@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { ROLE_LABELS, ROLE_COLORS, SYSTEM_ROLES, type AppRole } from "@/types/roles";
-import type { UserProfile } from "@/hooks/useUsersManagement";
+import type { UserProfile } from "@/hooks/users/useUsersManagement";
 
 const EDITABLE_ROLES: AppRole[] = SYSTEM_ROLES.filter(r => r !== 'waqf_heir') as AppRole[];
 

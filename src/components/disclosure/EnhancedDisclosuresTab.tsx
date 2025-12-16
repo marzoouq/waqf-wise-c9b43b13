@@ -19,7 +19,7 @@ import {
   FileText,
   ChevronLeft
 } from "lucide-react";
-import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
+import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
 import { useDisclosures } from "@/hooks/beneficiary/useBeneficiaryTabsData";
 import { MaskedValue } from "@/components/shared/MaskedValue";
 import { ViewDisclosureDialog } from "@/components/distributions/ViewDisclosureDialog";

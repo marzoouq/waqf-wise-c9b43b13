@@ -4,7 +4,7 @@
  * @version 2.9.2
  */
 import { useNavigate } from "react-router-dom";
-import { useSystemSettings } from "@/hooks/useSystemSettings";
+import { useSystemSettings } from "@/hooks/system/useSystemSettings";
 import {
   Settings,
   Database,
