@@ -277,7 +277,7 @@ export default function Login() {
                   <Input
                     id="national-id"
                     type="text"
-                    placeholder="1014548273"
+                    placeholder="أدخل رقم الهوية"
                     value={identifier}
                     onChange={(e) => setIdentifier(e.target.value)}
                     required
