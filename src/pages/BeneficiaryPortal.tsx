@@ -108,7 +108,7 @@ export default function BeneficiaryPortal() {
 
             {/* Main Content */}
             <main className="flex-1 overflow-y-auto overscroll-contain scroll-smooth touch-pan-y">
-              <div className="p-4 sm:p-6 lg:p-8 pb-20 lg:pb-6 max-w-7xl mx-auto space-y-6">
+              <div className="px-3 py-4 sm:px-4 sm:py-5 md:px-6 md:py-6 lg:px-8 lg:py-8 pb-20 lg:pb-8 max-w-7xl mx-auto space-y-4 sm:space-y-5 md:space-y-6">
                 {/* بانر وضع المعاينة */}
                 {isPreviewMode && (
                   <PreviewModeBanner 
