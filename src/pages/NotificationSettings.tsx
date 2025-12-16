@@ -36,14 +36,14 @@ export default function NotificationSettings() {
       />
 
       <Tabs defaultValue="channels" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="channels">
-            <Radio className="h-4 w-4 ms-2" />
-            قنوات الإشعارات
+        <TabsList className="grid w-full grid-cols-2 h-auto">
+          <TabsTrigger value="channels" className="gap-1.5 sm:gap-2 text-xs sm:text-sm py-2.5">
+            <Radio className="h-4 w-4" />
+            <span>قنوات الإشعارات</span>
           </TabsTrigger>
-          <TabsTrigger value="preferences">
-            <Settings className="h-4 w-4 ms-2" />
-            التفضيلات
+          <TabsTrigger value="preferences" className="gap-1.5 sm:gap-2 text-xs sm:text-sm py-2.5">
+            <Settings className="h-4 w-4" />
+            <span>التفضيلات</span>
           </TabsTrigger>
         </TabsList>
 
