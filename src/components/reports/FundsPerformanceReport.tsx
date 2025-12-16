@@ -6,7 +6,7 @@ import { ErrorState } from '@/components/shared/ErrorState';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Progress } from '@/components/ui/progress';
 import { exportToExcel, exportToPDF } from '@/lib/exportHelpers';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/ui/use-toast';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useFundsPerformanceReport } from '@/hooks/reports/useFundsPerformanceReport';
 

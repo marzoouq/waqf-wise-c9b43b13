@@ -13,7 +13,7 @@
 
 import { useCallback } from "react";
 import { toast } from "sonner";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 import { logger } from "@/lib/logger";
 import { getErrorMessage } from "@/types/errors";
 import { loadAmiriFonts } from "@/lib/fonts/loadArabicFonts";

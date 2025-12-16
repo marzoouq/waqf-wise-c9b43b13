@@ -24,7 +24,7 @@ import {
   BarChart3,
   Loader2
 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 import { useCustomReports, type ReportResult } from "@/hooks/useCustomReports";
 import { ReportResultsPreview } from "./ReportResultsPreview";
 import { exportToPDF, exportToExcel, exportToCSV } from "@/lib/exportHelpers";

@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AccountingService } from "@/services";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 import { logger } from "@/lib/logger";
 import { AccountRow, AccountWithBalance } from "@/types/supabase-helpers";
 import { AccountInsert, AccountUpdate } from "@/types/accounting";

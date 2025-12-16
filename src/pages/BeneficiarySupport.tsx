@@ -14,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { HelpCircle, MessageSquare, Send, ArrowRight, Phone, Mail } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useBeneficiaryProfile } from "@/hooks/beneficiary";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { useNavigate } from "react-router-dom";

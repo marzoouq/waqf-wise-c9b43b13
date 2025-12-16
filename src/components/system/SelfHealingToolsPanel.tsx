@@ -16,7 +16,7 @@ import {
   AlertCircle
 } from "lucide-react";
 import { useSelfHealing } from "@/hooks/useSelfHealing";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 import { selfHealing } from "@/lib/selfHealing";
 import { useSelfHealingStats } from "@/hooks/system/useSelfHealingStats";
 

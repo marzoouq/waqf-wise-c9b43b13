@@ -4,7 +4,7 @@ import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { exportToExcel, exportToPDF } from "@/lib/exportHelpers";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { UnifiedDataTable, Column } from "@/components/unified/UnifiedDataTable";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";

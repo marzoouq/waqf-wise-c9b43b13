@@ -12,7 +12,7 @@ import {
   User,
   Info,
 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 import { useBeneficiaryProfile } from "@/hooks/beneficiary";
 import { useAuth } from "@/hooks/useAuth";
 import { Contract } from "@/hooks/useContracts";

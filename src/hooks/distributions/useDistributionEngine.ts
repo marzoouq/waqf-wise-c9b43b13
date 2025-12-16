@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { DistributionEngine, DistributionParams, DistributionResult, DistributionSummary } from '@/lib/distribution-engine';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/ui/use-toast';
 import { productionLogger } from '@/lib/logger/production-logger';
 
 export interface SimulationResult {

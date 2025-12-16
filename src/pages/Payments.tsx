@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 import { usePayments } from "@/hooks/usePayments";
 import { usePaymentsWithContracts, PaymentWithContract } from "@/hooks/payments/usePaymentsWithContracts";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Printer } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/ui/use-toast";
 
 interface PrintButtonProps {
   data: unknown;
