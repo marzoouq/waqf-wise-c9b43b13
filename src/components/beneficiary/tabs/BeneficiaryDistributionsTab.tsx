@@ -6,7 +6,7 @@ import { CheckCircle2, Clock, Wallet, Calendar, Archive, CircleDot, TrendingUp }
 import { format, arLocale as ar } from "@/lib/date";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { MaskedValue } from "@/components/shared/MaskedValue";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/ui/use-mobile";
 import { useBeneficiaryDistributions } from "@/hooks/beneficiary/useBeneficiaryDistributions";
 
 interface BeneficiaryDistributionsTabProps {

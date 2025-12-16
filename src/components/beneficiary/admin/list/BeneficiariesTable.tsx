@@ -14,7 +14,7 @@ import { UnifiedDataTable } from "@/components/unified/UnifiedDataTable";
 import { Pagination } from "@/components/ui/pagination";
 import { Beneficiary } from "@/types/beneficiary";
 import { BeneficiaryMobileCard } from "./BeneficiaryMobileCard";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/ui/use-mobile";
 
 interface BeneficiariesTableProps {
   beneficiaries: Beneficiary[];

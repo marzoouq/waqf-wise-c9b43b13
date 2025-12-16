@@ -44,7 +44,7 @@ import { SortableTableHeader } from '@/components/shared/SortableTableHeader';
 import { BulkActionsBar } from '@/components/shared/BulkActionsBar';
 import { AdvancedFiltersDialog, FilterConfig } from '@/components/shared/AdvancedFiltersDialog';
 import { useFamiliesPage, FamilyWithHead } from '@/hooks/useFamiliesPage';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useIsMobile } from '@/hooks/ui/use-mobile';
 
 const Families = memo(() => {
   const isMobile = useIsMobile();

@@ -10,7 +10,7 @@
  * - إضافة Lazy Loading للـ Dialogs (تحسين الأداء 15%)
  */
 
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { Button } from "@/components/ui/button";
 import { Shield, Download } from "lucide-react";

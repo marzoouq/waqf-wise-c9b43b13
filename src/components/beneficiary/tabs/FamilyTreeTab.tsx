@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Users, User } from "lucide-react";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { MaskedValue } from "@/components/shared/MaskedValue";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/ui/use-mobile";
 
 interface FamilyTreeTabProps {
   beneficiaryId: string;

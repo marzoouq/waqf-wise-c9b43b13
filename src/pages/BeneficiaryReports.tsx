@@ -7,7 +7,7 @@ import { ErrorState } from '@/components/shared/ErrorState';
 import { formatCurrency } from '@/lib/utils';
 import { format } from 'date-fns';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/ui/use-toast';
 import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
 import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
 import { useBeneficiaryPersonalReportsData } from '@/hooks/beneficiary/useBeneficiaryPersonalReportsData';
