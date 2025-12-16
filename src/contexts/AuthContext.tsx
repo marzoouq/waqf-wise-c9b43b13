@@ -318,18 +318,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setSession(newSession);
         setUser(newSession.user);
         
-        // ✅ جلب البيانات فقط عند SIGNED_IN من صفحة محمية
+        // ✅ جلب البيانات دائماً عند SIGNED_IN (تسجيل دخول جديد)
         if (event === 'SIGNED_IN' && rolesCache.current.length === 0) {
-          const isPublic = isCurrentRoutePublic();
-          
-          if (!isPublic) {
-            if (!isInitialized) {
-              setIsLoading(true);
-            }
-            setTimeout(() => {
-              fetchUserData(newSession.user.id);
-            }, 0);
+          if (!isInitialized) {
+            setIsLoading(true);
           }
+          setTimeout(() => {
+            fetchUserData(newSession.user.id);
+          }, 0);
         }
       }
     });
