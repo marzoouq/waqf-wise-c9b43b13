@@ -79,7 +79,9 @@ export function EditUserEmailDialog({
       onOpenChange(false);
       onSuccess?.();
     } catch (error: unknown) {
-      console.error("Error updating email:", error);
+      if (import.meta.env.DEV) {
+        console.error("Error updating email:", error);
+      }
       const message = error instanceof Error ? error.message : "حدث خطأ أثناء تحديث البريد الإلكتروني";
       toast({
         title: "خطأ",

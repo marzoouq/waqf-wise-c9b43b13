@@ -133,7 +133,9 @@ export function lazyWithRetry<T extends ComponentType<any>>(
     // All retries exhausted - check if we should hard reload
     const failureCount = incrementFailureCount();
     
-    console.error(`[LazyRetry] All ${retries} attempts failed. Total failures: ${failureCount}`);
+    if (import.meta.env.DEV) {
+      console.error(`[LazyRetry] All ${retries} attempts failed. Total failures: ${failureCount}`);
+    }
     
     if (failureCount >= MAX_FAILURES_BEFORE_HARD_RELOAD) {
       console.warn('[LazyRetry] Max failures reached. Clearing cache and reloading...');

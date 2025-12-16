@@ -230,7 +230,9 @@ export function useBiometricAuth() {
           publicKey: publicKeyCredentialRequestOptions,
         }) as PublicKeyCredential;
       } catch (webauthnError) {
-        console.error('WebAuthn get error:', webauthnError);
+        if (import.meta.env.DEV) {
+          console.error('WebAuthn get error:', webauthnError);
+        }
         
         // إذا فشل بسبب rpId، نحاول بدون rpId (للسماح بالمرونة)
         if (webauthnError instanceof Error && webauthnError.name === 'SecurityError') {
@@ -292,7 +294,9 @@ export function useBiometricAuth() {
 
       return { success: true, userId: matchedCredential.user_id };
     } catch (error: unknown) {
-      console.error('Biometric auth error:', error);
+      if (import.meta.env.DEV) {
+        console.error('Biometric auth error:', error);
+      }
       
       let errorMessage = 'فشل في المصادقة بالبصمة';
       

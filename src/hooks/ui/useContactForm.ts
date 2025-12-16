@@ -36,7 +36,9 @@ export function useContactForm() {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
     },
     onError: (error) => {
-      console.error('Error sending message:', error);
+      if (import.meta.env.DEV) {
+        console.error('Error sending message:', error);
+      }
       toast({
         title: "خطأ",
         description: "حدث خطأ أثناء إرسال الرسالة",
