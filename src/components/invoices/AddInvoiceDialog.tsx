@@ -19,7 +19,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { commonValidation } from "@/lib/validationSchemas";
 import { InvoiceOCRUpload } from "./InvoiceOCRUpload";
-import { ExtractedInvoiceData } from "@/hooks/useInvoiceOCR";
+import { ExtractedInvoiceData } from "@/hooks/payments/useInvoiceOCR";
 import { useRevenueAccounts, useNextInvoiceNumber } from "@/hooks/invoices/useInvoiceFormData";
 
 const invoiceSchema = z.object({

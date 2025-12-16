@@ -5,7 +5,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Building2, Home, MapPin, Calendar, EyeOff } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
-import { useFiscalYearPublishStatus } from "@/hooks/useFiscalYearPublishStatus";
+import { useFiscalYearPublishInfo } from "@/hooks/fiscal-years";
 import { MaskedValue } from "@/components/shared/MaskedValue";
 import { useIsMobile } from "@/hooks/ui/use-mobile";
 import { MobilePropertyCard } from "../cards/MobilePropertyCard";
@@ -15,7 +15,7 @@ import { useBeneficiaryProperties } from "@/hooks/beneficiary/useBeneficiaryProp
 
 export function BeneficiaryPropertiesTab() {
   const { settings } = useVisibilitySettings();
-  const { isCurrentYearPublished, isLoading: publishStatusLoading } = useFiscalYearPublishStatus();
+  const { isCurrentYearPublished, isLoading: publishStatusLoading } = useFiscalYearPublishInfo();
   const isMobile = useIsMobile();
   
   const { properties, contracts, isLoading } = useBeneficiaryProperties(

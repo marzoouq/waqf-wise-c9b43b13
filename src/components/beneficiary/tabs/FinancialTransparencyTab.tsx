@@ -8,14 +8,14 @@ import { EmptyPaymentsState } from "../EmptyPaymentsState";
 import { HistoricalRentalDetailsCard } from "@/components/fiscal-year";
 import { useBeneficiaryProfile } from "@/hooks/beneficiary";
 import { useAuth } from "@/hooks/useAuth";
-import { useFiscalYearPublishStatus } from "@/hooks/useFiscalYearPublishStatus";
+import { useFiscalYearPublishInfo } from "@/hooks/fiscal-years";
 import { FiscalYearNotPublishedBanner } from "../FiscalYearNotPublishedBanner";
 import { useFiscalYearsList } from "@/hooks/fiscal-years";
 
 export function FinancialTransparencyTab() {
   const { user } = useAuth();
   const { payments } = useBeneficiaryProfile(user?.id);
-  const { isCurrentYearPublished } = useFiscalYearPublishStatus();
+  const { isCurrentYearPublished } = useFiscalYearPublishInfo();
   const { fiscalYears } = useFiscalYearsList();
   const hasPayments = payments && payments.length > 0;
   

@@ -149,7 +149,7 @@ describe('Property & Rental Flow Integration', () => {
     it('should calculate property counts', async () => {
       setMockTableData('properties', mockProperties);
 
-      const { usePropertiesStats } = await import('@/hooks/usePropertiesStats');
+      const { usePropertiesStats } = await import('@/hooks/property/usePropertiesStats');
       const { result } = renderHook(() => usePropertiesStats(), {
         wrapper: createWrapper(),
       });

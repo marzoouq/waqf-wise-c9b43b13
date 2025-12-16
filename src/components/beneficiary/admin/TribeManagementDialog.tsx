@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Users, Plus, Pencil, Trash2, Shield } from "lucide-react";
-import { useTribes, useAddTribe, useUpdateTribe, useDeleteTribe } from "@/hooks/useTribes";
+import { useTribes, useAddTribe, useUpdateTribe, useDeleteTribe } from "@/hooks/beneficiary/useTribes";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import {

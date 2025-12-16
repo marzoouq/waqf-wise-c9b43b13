@@ -10,7 +10,7 @@ import {
   Clock,
   AlertCircle
 } from "lucide-react";
-import { useSmartAlerts } from "@/hooks/useSmartAlerts";
+import { useSmartAlerts } from "@/hooks/notifications/useSmartAlerts";
 import { useNavigate } from "react-router-dom";
 import { format, arLocale as ar } from "@/lib/date";
 import { Skeleton } from "@/components/ui/skeleton";

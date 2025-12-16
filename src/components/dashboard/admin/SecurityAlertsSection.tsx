@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useSecurityAlerts } from "@/hooks/useSecurityAlerts";
+import { useSecurityAlerts } from "@/hooks/system/useSecurityAlerts";
 import { Shield, AlertTriangle, AlertCircle, Info } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

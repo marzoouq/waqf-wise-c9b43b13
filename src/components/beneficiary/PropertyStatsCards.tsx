@@ -6,13 +6,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { formatCurrency } from "@/lib/utils";
-import { useFiscalYearPublishStatus } from "@/hooks/useFiscalYearPublishStatus";
+import { useFiscalYearPublishInfo } from "@/hooks/fiscal-years";
 import { usePropertyStats } from "@/hooks/beneficiary/useBeneficiaryTabsData";
 import { PropertyUnitsDisplay } from "./properties/PropertyUnitsDisplay";
 import { ErrorState } from "@/components/shared/ErrorState";
 
 export function PropertyStatsCards() {
-  const { isCurrentYearPublished, isLoading: publishStatusLoading } = useFiscalYearPublishStatus();
+  const { isCurrentYearPublished, isLoading: publishStatusLoading } = useFiscalYearPublishInfo();
   const { data, isLoading: dataLoading, error, refetch } = usePropertyStats();
 
   const isLoading = dataLoading || publishStatusLoading;

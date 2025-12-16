@@ -2,13 +2,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Building2, TrendingUp, Users, Landmark, DollarSign, EyeOff } from "lucide-react";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { MaskedValue } from "@/components/shared/MaskedValue";
-import { useWaqfSummary } from "@/hooks/useWaqfSummary";
-import { useFiscalYearPublishStatus } from "@/hooks/useFiscalYearPublishStatus";
+import { useWaqfSummary } from "@/hooks/beneficiary/useWaqfSummary";
+import { useFiscalYearPublishInfo } from "@/hooks/fiscal-years";
 
 export function WaqfSummaryTab() {
   const { settings } = useVisibilitySettings();
   const { summary } = useWaqfSummary(settings?.show_overview || false);
-  const { isCurrentYearPublished } = useFiscalYearPublishStatus();
+  const { isCurrentYearPublished } = useFiscalYearPublishInfo();
   if (!settings?.show_overview) {
     return (
       <Card>

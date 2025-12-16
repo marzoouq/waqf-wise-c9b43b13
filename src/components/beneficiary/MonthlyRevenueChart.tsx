@@ -4,11 +4,11 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { LoadingState } from "@/components/shared/LoadingState";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { EyeOff } from "lucide-react";
-import { useFiscalYearPublishStatus } from "@/hooks/useFiscalYearPublishStatus";
+import { useFiscalYearPublishInfo } from "@/hooks/fiscal-years";
 import { useMonthlyRevenue } from "@/hooks/beneficiary/useBeneficiaryTabsData";
 
 export function MonthlyRevenueChart() {
-  const { isCurrentYearPublished, isLoading: publishStatusLoading } = useFiscalYearPublishStatus();
+  const { isCurrentYearPublished, isLoading: publishStatusLoading } = useFiscalYearPublishInfo();
   const { data = [], isLoading, error, refetch } = useMonthlyRevenue();
 
   if (!publishStatusLoading && !isCurrentYearPublished) {
