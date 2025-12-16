@@ -170,7 +170,7 @@ const menuGroups = [
 
 const AppSidebar = () => {
   const location = useLocation();
-  const { state } = useSidebar();
+  const { state, setOpenMobile } = useSidebar();
   const isCollapsed = state === "collapsed";
   const { 
     hasRole,
@@ -247,7 +247,10 @@ const AppSidebar = () => {
                         isActive={isActive}
                         tooltip={group.label}
                       >
-                        <NavLink to={group.path || "#"}>
+                        <NavLink 
+                          to={group.path || "#"}
+                          onClick={() => setOpenMobile(false)}
+                        >
                           <Icon className="h-5 w-5" />
                           <span>{group.label}</span>
                         </NavLink>
@@ -284,7 +287,10 @@ const AppSidebar = () => {
                                   asChild
                                   isActive={isSubActive}
                                 >
-                                  <NavLink to={subItem.path}>
+                                  <NavLink 
+                                    to={subItem.path}
+                                    onClick={() => setOpenMobile(false)}
+                                  >
                                     <SubIcon className="h-4 w-4" />
                                     <span>{subItem.label}</span>
                                   </NavLink>
