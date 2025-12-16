@@ -99,30 +99,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // جلب أدوار المستخدم من قاعدة البيانات
-  const fetchUserRoles = useCallback(async (userId: string): Promise<string[]> => {
-    const cached = getCachedRoles(userId);
-    if (cached && cached.length > 0) {
-      rolesCache.current = cached;
-      setRoles(cached);
-      setRolesLoading(false);
-      // جلب الأدوار في الخلفية للتحديث
-      supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId)
-        .then(({ data }) => {
-          if (data) {
-            const freshRoles = data.map(r => r.role);
-            if (JSON.stringify(freshRoles) !== JSON.stringify(cached)) {
-              rolesCache.current = freshRoles;
-              setRoles(freshRoles);
-              setCachedRoles(userId, freshRoles);
+  const fetchUserRoles = useCallback(async (userId: string, forceRefresh = false): Promise<string[]> => {
+    // ✅ استخدام الـ cache فقط إذا لم يكن force refresh
+    if (!forceRefresh) {
+      const cached = getCachedRoles(userId);
+      if (cached && cached.length > 0) {
+        rolesCache.current = cached;
+        setRoles(cached);
+        setRolesLoading(false);
+        // جلب الأدوار في الخلفية للتحديث
+        supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', userId)
+          .then(({ data }) => {
+            if (data) {
+              const freshRoles = data.map(r => r.role);
+              if (JSON.stringify(freshRoles) !== JSON.stringify(cached)) {
+                rolesCache.current = freshRoles;
+                setRoles(freshRoles);
+                setCachedRoles(userId, freshRoles);
+              }
             }
-          }
-        });
-      return cached;
+          });
+        return cached;
+      }
     }
 
+    // ✅ جلب الأدوار من قاعدة البيانات مباشرة
     setRolesLoading(true);
     try {
       const { data, error } = await supabase
@@ -203,11 +207,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // جلب البيانات بشكل متوازي
-  const fetchUserData = useCallback(async (userId: string) => {
+  // forceRefresh = true يجبر جلب الأدوار من قاعدة البيانات (للصفحات المحمية عند التحديث)
+  const fetchUserData = useCallback(async (userId: string, forceRefresh = false) => {
     try {
       await Promise.all([
         fetchProfile(userId),
-        fetchUserRoles(userId)
+        fetchUserRoles(userId, forceRefresh)
       ]);
     } finally {
       setIsLoading(false);
@@ -258,8 +263,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const isPublic = isCurrentRoutePublic();
           
           if (!isPublic) {
-            // ✅ صفحة محمية: جلب البيانات فوراً
-            await fetchUserData(currentSession.user.id);
+            // ✅ صفحة محمية: جلب البيانات فوراً من قاعدة البيانات (تجاهل الـ cache)
+            await fetchUserData(currentSession.user.id, true);
           } else {
             // ✅ صفحة عامة: استخدام الـ cache فقط بدون طلبات جديدة
             const cachedRoles = getCachedRoles(currentSession.user.id);
@@ -319,12 +324,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(newSession.user);
         
         // ✅ جلب البيانات دائماً عند SIGNED_IN (تسجيل دخول جديد)
-        if (event === 'SIGNED_IN' && rolesCache.current.length === 0) {
+        if (event === 'SIGNED_IN') {
           if (!isInitialized) {
             setIsLoading(true);
           }
           setTimeout(() => {
-            fetchUserData(newSession.user.id);
+            fetchUserData(newSession.user.id, true); // ✅ force refresh للحصول على الأدوار الحقيقية
           }, 0);
         }
       }
