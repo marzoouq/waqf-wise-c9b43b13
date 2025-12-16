@@ -6,7 +6,7 @@ import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { ChatbotInterface } from "./ChatbotInterface";
 import { cn } from "@/lib/utils";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/ui/use-mobile";
 
 export const FloatingChatButton = memo(function FloatingChatButton() {
   const [isOpen, setIsOpen] = useState(false);

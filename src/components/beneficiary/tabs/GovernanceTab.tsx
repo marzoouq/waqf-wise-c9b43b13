@@ -6,7 +6,7 @@ import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { useGovernanceData } from "@/hooks/useGovernanceData";
 import { format, arLocale as ar } from "@/lib/date";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/ui/use-mobile";
 import { useNavigate } from "react-router-dom";
 import { CoreValuesSection } from "@/components/governance/CoreValuesSection";
 

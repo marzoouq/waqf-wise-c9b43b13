@@ -7,7 +7,7 @@ import { format, arLocale as ar } from "@/lib/date";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { useFiscalYearPublishStatus } from "@/hooks/useFiscalYearPublishStatus";
 import { MaskedValue } from "@/components/shared/MaskedValue";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/ui/use-mobile";
 import { MobilePropertyCard } from "../cards/MobilePropertyCard";
 import { MobileContractCard } from "../cards/MobileContractCard";
 import { Alert, AlertDescription } from "@/components/ui/alert";
