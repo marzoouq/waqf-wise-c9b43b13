@@ -35,8 +35,12 @@ export default defineConfig(({ mode }) => {
     include: [
       'react',
       'react-dom',
+      'react-router-dom',
       'recharts',
       'framer-motion',
+      'sonner',
+      'next-themes',
+      '@tanstack/react-query',
     ],
     exclude: ['jspdf', 'exceljs', 'xlsx'], // تحمّل عند الحاجة فقط
   },
