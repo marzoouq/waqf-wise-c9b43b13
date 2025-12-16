@@ -214,6 +214,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [fetchProfile, fetchUserRoles]);
 
+  // ✅ قائمة المسارات العامة - Lazy Auth: لا نجلب البيانات إلا عند الحاجة
+  const PUBLIC_ROUTES_FOR_LAZY = ['/', '/login', '/signup', '/install', '/unauthorized', '/privacy', '/terms', '/security-policy', '/faq', '/contact'];
+  
+  const isCurrentRoutePublic = useCallback(() => {
+    if (typeof window === 'undefined') return false;
+    return PUBLIC_ROUTES_FOR_LAZY.includes(window.location.pathname);
+  }, []);
+
   useEffect(() => {
     if (initRef.current) return;
     initRef.current = true;
@@ -245,8 +253,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
         
+        // ✅ LAZY AUTH: جلب البيانات فقط للصفحات المحمية
         if (currentSession?.user) {
-          await fetchUserData(currentSession.user.id);
+          const isPublic = isCurrentRoutePublic();
+          
+          if (!isPublic) {
+            // ✅ صفحة محمية: جلب البيانات فوراً
+            await fetchUserData(currentSession.user.id);
+          } else {
+            // ✅ صفحة عامة: استخدام الـ cache فقط بدون طلبات جديدة
+            const cachedRoles = getCachedRoles(currentSession.user.id);
+            if (cachedRoles && cachedRoles.length > 0) {
+              rolesCache.current = cachedRoles;
+              setRoles(cachedRoles);
+            }
+            setIsLoading(false);
+            setRolesLoading(false);
+          }
         } else {
           setIsLoading(false);
           setRolesLoading(false);
@@ -295,15 +318,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setSession(newSession);
         setUser(newSession.user);
         
-        // ✅ جلب البيانات فقط عند SIGNED_IN وإذا لم تكن البيانات محملة بالفعل
+        // ✅ جلب البيانات فقط عند SIGNED_IN من صفحة محمية
         if (event === 'SIGNED_IN' && rolesCache.current.length === 0) {
-          // ✅ لا نضع isLoading = true إذا كانت التهيئة اكتملت لتجنب التعليق
-          if (!isInitialized) {
-            setIsLoading(true);
+          const isPublic = isCurrentRoutePublic();
+          
+          if (!isPublic) {
+            if (!isInitialized) {
+              setIsLoading(true);
+            }
+            setTimeout(() => {
+              fetchUserData(newSession.user.id);
+            }, 0);
           }
-          setTimeout(() => {
-            fetchUserData(newSession.user.id);
-          }, 0);
         }
       }
     });
@@ -316,7 +342,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       subscription.unsubscribe();
       initRef.current = false;
     };
-  }, [fetchUserData, cleanupInvalidSession]);
+  }, [fetchUserData, cleanupInvalidSession, isCurrentRoutePublic, getCachedRoles]);
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({
