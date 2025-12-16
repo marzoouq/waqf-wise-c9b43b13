@@ -23,7 +23,7 @@ function useSupportTicket(ticketId: string) {
     isLoading,
   };
 }
-import { useTicketComments } from '@/hooks/useTicketComments';
+import { useTicketComments } from '@/hooks/support/useTicketComments';
 import { Clock, User, MessageSquare, Send } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
 

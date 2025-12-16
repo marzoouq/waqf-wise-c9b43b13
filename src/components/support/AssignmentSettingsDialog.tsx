@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useAssignmentSettings } from '@/hooks/useAgentAvailability';
+import { useAssignmentSettings } from '@/hooks/support/useAgentAvailability';
 
 interface AssignmentSettingsDialogProps {
   open: boolean;

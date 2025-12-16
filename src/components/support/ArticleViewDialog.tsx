@@ -5,7 +5,7 @@ import { Separator } from '@/components/ui/separator';
 import { ThumbsUp, ThumbsDown, Eye, Calendar, Share2, Bookmark } from 'lucide-react';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
-import { useArticle } from '@/hooks/useKnowledgeBase';
+import { useArticle } from '@/hooks/ui/useKnowledgeBase';
 import { LoadingState } from '@/components/shared/LoadingState';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';

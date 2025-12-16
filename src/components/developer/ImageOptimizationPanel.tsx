@@ -5,7 +5,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { useImageOptimization } from '@/hooks/useImageOptimization';
+import { useImageOptimization } from '@/hooks/ui/useImageOptimization';
 import { Activity, Image as ImageIcon, Zap, AlertTriangle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
