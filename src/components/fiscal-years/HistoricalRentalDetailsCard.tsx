@@ -1,7 +1,7 @@
 /**
  * Historical Rental Details Card
  * بطاقة تفاصيل الإيجارات التاريخية
- * @version 2.8.76
+ * @version 2.9.24
  */
 
 import { useState, useEffect } from 'react';

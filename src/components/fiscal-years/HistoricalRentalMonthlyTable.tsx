@@ -1,7 +1,7 @@
 /**
  * Historical Rental Monthly Summary Table
  * جدول الملخص الشهري للإيجارات التاريخية
- * @version 2.8.76
+ * @version 2.9.24
  */
 
 import {

@@ -23,9 +23,8 @@ export interface BeneficiaryEmailResult {
 import { type UserProfile, type LoginResult } from "@/types/auth";
 import { type AppRole } from "@/types/roles";
 
-// Re-export من الخدمات المنفصلة
-export { PermissionsService } from "./permissions.service";
-export { TwoFactorService } from "./two-factor.service";
+// ملاحظة: PermissionsService و TwoFactorService يتم تصديرهم مباشرة من services/index.ts
+// لا نعيد التصدير هنا لتجنب التكرار
 
 type UserRoleRow = Database['public']['Tables']['user_roles']['Row'];
 

@@ -1,7 +1,7 @@
 /**
  * Historical Rental Detail Dialog
  * محاورة تفاصيل إيجارات شهر محدد
- * @version 2.8.76
+ * @version 2.9.24
  */
 
 import {
@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Building2, CheckCircle, XCircle, Home, Loader2, FileText, Calendar } from 'lucide-react';
+import { Building2, CheckCircle, XCircle, Home, Loader2 } from 'lucide-react';
 import { useHistoricalRentalByMonth } from '@/hooks/fiscal-years/useHistoricalRentalDetails';
 import { formatCurrency } from '@/lib/utils';
 import { format } from 'date-fns';
