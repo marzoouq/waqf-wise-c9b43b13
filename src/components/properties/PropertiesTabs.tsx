@@ -50,28 +50,30 @@ export const PropertiesTabs = memo(({
     <Card className="shadow-soft">
       <CardContent className="pt-6">
         <Tabs value={activeTab} onValueChange={handleTabChange}>
-          <TabsList className="grid w-full grid-cols-5 mb-6">
-            <TabsTrigger value="properties" className="gap-2">
-              <Building className="h-4 w-4" />
-              <span className="hidden md:inline">العقارات</span>
-            </TabsTrigger>
-            <TabsTrigger value="units" className="gap-2">
-              <Building className="h-4 w-4" />
-              <span className="hidden md:inline">الوحدات</span>
-            </TabsTrigger>
-            <TabsTrigger value="contracts" className="gap-2">
-              <FileText className="h-4 w-4" />
-              <span className="hidden md:inline">العقود</span>
-            </TabsTrigger>
-            <TabsTrigger value="payments" className="gap-2">
-              <DollarSign className="h-4 w-4" />
-              <span className="hidden md:inline">الدفعات</span>
-            </TabsTrigger>
-            <TabsTrigger value="maintenance" className="gap-2">
-              <Wrench className="h-4 w-4" />
-              <span className="hidden md:inline">الصيانة</span>
-            </TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 pb-2">
+            <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-5 mb-6 h-auto">
+              <TabsTrigger value="properties" className="gap-2 text-xs sm:text-sm px-3 py-2">
+                <Building className="h-4 w-4" />
+                <span className="hidden sm:inline">العقارات</span>
+              </TabsTrigger>
+              <TabsTrigger value="units" className="gap-2 text-xs sm:text-sm px-3 py-2">
+                <Building className="h-4 w-4" />
+                <span className="hidden sm:inline">الوحدات</span>
+              </TabsTrigger>
+              <TabsTrigger value="contracts" className="gap-2 text-xs sm:text-sm px-3 py-2">
+                <FileText className="h-4 w-4" />
+                <span className="hidden sm:inline">العقود</span>
+              </TabsTrigger>
+              <TabsTrigger value="payments" className="gap-2 text-xs sm:text-sm px-3 py-2">
+                <DollarSign className="h-4 w-4" />
+                <span className="hidden sm:inline">الدفعات</span>
+              </TabsTrigger>
+              <TabsTrigger value="maintenance" className="gap-2 text-xs sm:text-sm px-3 py-2">
+                <Wrench className="h-4 w-4" />
+                <span className="hidden sm:inline">الصيانة</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="properties">
             <PropertiesTab 

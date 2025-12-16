@@ -106,12 +106,14 @@ const Reports = () => {
 
           <TabsContent value="financial" className="space-y-6">
             <Tabs defaultValue="income" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
-                <TabsTrigger value="income">قائمة الدخل</TabsTrigger>
-                <TabsTrigger value="balance">الميزانية</TabsTrigger>
-                <TabsTrigger value="trial">ميزان المراجعة</TabsTrigger>
-                <TabsTrigger value="cashflow">التدفقات النقدية</TabsTrigger>
-              </TabsList>
+              <div className="overflow-x-auto -mx-3 px-3 sm:mx-0 sm:px-0">
+                <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-4 h-auto">
+                  <TabsTrigger value="income" className="text-xs sm:text-sm px-3 py-2">قائمة الدخل</TabsTrigger>
+                  <TabsTrigger value="balance" className="text-xs sm:text-sm px-3 py-2">الميزانية</TabsTrigger>
+                  <TabsTrigger value="trial" className="text-xs sm:text-sm px-3 py-2">ميزان المراجعة</TabsTrigger>
+                  <TabsTrigger value="cashflow" className="text-xs sm:text-sm px-3 py-2">التدفقات النقدية</TabsTrigger>
+                </TabsList>
+              </div>
 
               <TabsContent value="income">
                 <EnhancedIncomeStatement />
@@ -133,13 +135,15 @@ const Reports = () => {
 
           <TabsContent value="analysis" className="space-y-6">
             <Tabs defaultValue="accounting" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-2 md:grid-cols-5">
-                <TabsTrigger value="accounting">الربط المحاسبي</TabsTrigger>
-                <TabsTrigger value="distributions">تحليل التوزيعات</TabsTrigger>
-                <TabsTrigger value="loans">أعمار الديون</TabsTrigger>
-                <TabsTrigger value="maintenance">تكاليف الصيانة</TabsTrigger>
-                <TabsTrigger value="ledger">دفتر الأستاذ</TabsTrigger>
-              </TabsList>
+              <div className="overflow-x-auto -mx-3 px-3 sm:mx-0 sm:px-0">
+                <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-5 h-auto">
+                  <TabsTrigger value="accounting" className="text-xs sm:text-sm px-2 sm:px-3 py-2">الربط المحاسبي</TabsTrigger>
+                  <TabsTrigger value="distributions" className="text-xs sm:text-sm px-2 sm:px-3 py-2">تحليل التوزيعات</TabsTrigger>
+                  <TabsTrigger value="loans" className="text-xs sm:text-sm px-2 sm:px-3 py-2">أعمار الديون</TabsTrigger>
+                  <TabsTrigger value="maintenance" className="text-xs sm:text-sm px-2 sm:px-3 py-2">تكاليف الصيانة</TabsTrigger>
+                  <TabsTrigger value="ledger" className="text-xs sm:text-sm px-2 sm:px-3 py-2">دفتر الأستاذ</TabsTrigger>
+                </TabsList>
+              </div>
 
               <TabsContent value="accounting">
                 <AccountingLinkReport />
@@ -170,11 +174,13 @@ const Reports = () => {
 
           <TabsContent value="invoices" className="space-y-6">
             <Tabs defaultValue="manager" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="manager">إدارة الفواتير</TabsTrigger>
-                <TabsTrigger value="ratios">النسب المالية</TabsTrigger>
-                <TabsTrigger value="budget">مقارنة الميزانية</TabsTrigger>
-              </TabsList>
+              <div className="overflow-x-auto -mx-3 px-3 sm:mx-0 sm:px-0">
+                <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-3 h-auto">
+                  <TabsTrigger value="manager" className="text-xs sm:text-sm px-3 py-2">إدارة الفواتير</TabsTrigger>
+                  <TabsTrigger value="ratios" className="text-xs sm:text-sm px-3 py-2">النسب المالية</TabsTrigger>
+                  <TabsTrigger value="budget" className="text-xs sm:text-sm px-3 py-2">مقارنة الميزانية</TabsTrigger>
+                </TabsList>
+              </div>
 
               <TabsContent value="manager">
                 <InvoiceManager />
@@ -192,9 +198,9 @@ const Reports = () => {
 
           <TabsContent value="zatca" className="space-y-6">
             <Tabs defaultValue="compliance" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="compliance">فحص الامتثال</TabsTrigger>
-                <TabsTrigger value="settings">الإعدادات</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2 h-auto">
+                <TabsTrigger value="compliance" className="text-xs sm:text-sm py-2">فحص الامتثال</TabsTrigger>
+                <TabsTrigger value="settings" className="text-xs sm:text-sm py-2">الإعدادات</TabsTrigger>
               </TabsList>
 
               <TabsContent value="compliance">

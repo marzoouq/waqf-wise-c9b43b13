@@ -194,12 +194,12 @@ export default function Tenants() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>رقم المستأجر</TableHead>
-                    <TableHead>الاسم</TableHead>
-                    <TableHead>رقم الهوية</TableHead>
-                    <TableHead>التواصل</TableHead>
-                    <TableHead>الحالة</TableHead>
-                    <TableHead className="text-left">الرصيد</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden md:table-cell">رقم المستأجر</TableHead>
+                    <TableHead className="text-xs sm:text-sm">الاسم</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden lg:table-cell">رقم الهوية</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden lg:table-cell">التواصل</TableHead>
+                    <TableHead className="text-xs sm:text-sm">الحالة</TableHead>
+                    <TableHead className="text-left text-xs sm:text-sm">الرصيد</TableHead>
                     <TableHead className="w-12"></TableHead>
                   </TableRow>
                 </TableHeader>
@@ -210,35 +210,35 @@ export default function Tenants() {
                       className="cursor-pointer hover:bg-muted/50"
                       onClick={() => navigate(`/tenants/${tenant.id}`)}
                     >
-                      <TableCell className="font-mono text-sm">
+                      <TableCell className="font-mono text-xs sm:text-sm hidden md:table-cell">
                         {tenant.tenant_number}
                       </TableCell>
-                      <TableCell className="font-medium">
+                      <TableCell className="font-medium text-xs sm:text-sm">
                         {tenant.full_name}
                       </TableCell>
-                      <TableCell>{tenant.id_number}</TableCell>
-                      <TableCell>
+                      <TableCell className="hidden lg:table-cell text-xs sm:text-sm">{tenant.id_number}</TableCell>
+                      <TableCell className="hidden lg:table-cell">
                         <div className="flex flex-col gap-1">
                           {tenant.phone && (
-                            <div className="flex items-center gap-1 text-sm">
+                            <div className="flex items-center gap-1 text-xs sm:text-sm">
                               <Phone className="h-3 w-3" />
                               {tenant.phone}
                             </div>
                           )}
                           {tenant.email && (
-                            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
                               <Mail className="h-3 w-3" />
                               {tenant.email}
                             </div>
                           )}
                         </div>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-xs sm:text-sm">
                         <Badge variant={statusLabels[tenant.status]?.variant || 'secondary'}>
                           {statusLabels[tenant.status]?.label || tenant.status}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-left">
+                      <TableCell className="text-left text-xs sm:text-sm">
                         <span
                           className={
                             tenant.current_balance > 0
