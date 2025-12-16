@@ -1,5 +1,4 @@
-import { ReactNode, useEffect, useRef, useState } from 'react';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ReactNode, useEffect, useRef, useState, useCallback } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -9,9 +8,36 @@ interface ScrollableTableWrapperProps {
   showScrollIndicator?: boolean;
 }
 
+// ✅ Throttle utility لتحسين الأداء
+function throttle<T extends (...args: unknown[]) => void>(fn: T, ms: number): T {
+  let lastCall = 0;
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
+  
+  return ((...args: Parameters<T>) => {
+    const now = Date.now();
+    const remaining = ms - (now - lastCall);
+    
+    if (remaining <= 0) {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        timeoutId = null;
+      }
+      lastCall = now;
+      fn(...args);
+    } else if (!timeoutId) {
+      timeoutId = setTimeout(() => {
+        lastCall = Date.now();
+        timeoutId = null;
+        fn(...args);
+      }, remaining);
+    }
+  }) as T;
+}
+
 /**
  * مكون لتغليف الجداول بإمكانيات التمرير الأفقي
  * مع مؤشرات بصرية ودعم كامل للجوال
+ * ✅ محسّن للأداء مع throttling و requestAnimationFrame
  */
 export function ScrollableTableWrapper({
   children,
@@ -21,39 +47,54 @@ export function ScrollableTableWrapper({
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showLeftIndicator, setShowLeftIndicator] = useState(false);
   const [showRightIndicator, setShowRightIndicator] = useState(false);
+  const rafRef = useRef<number | null>(null);
 
-  const checkScrollPosition = () => {
-    if (!scrollRef.current) return;
+  // ✅ استخدام requestAnimationFrame لتجنب forced reflow
+  const checkScrollPosition = useCallback(() => {
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+    }
+    
+    rafRef.current = requestAnimationFrame(() => {
+      const el = scrollRef.current;
+      if (!el) return;
 
-    const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-    
-    // تحقق من إمكانية التمرير لليسار
-    setShowLeftIndicator(scrollLeft > 10);
-    
-    // تحقق من إمكانية التمرير لليمين
-    setShowRightIndicator(scrollLeft < scrollWidth - clientWidth - 10);
-  };
+      const { scrollLeft, scrollWidth, clientWidth } = el;
+      
+      // تحقق من إمكانية التمرير لليسار
+      setShowLeftIndicator(scrollLeft > 10);
+      
+      // تحقق من إمكانية التمرير لليمين
+      setShowRightIndicator(scrollLeft < scrollWidth - clientWidth - 10);
+    });
+  }, []);
 
   useEffect(() => {
     const scrollElement = scrollRef.current;
     if (!scrollElement) return;
 
+    // ✅ Throttled check للأداء الأمثل (100ms)
+    const throttledCheck = throttle(checkScrollPosition, 100);
+
     // فحص أولي
     checkScrollPosition();
 
-    // إضافة مستمع للتمرير
-    scrollElement.addEventListener('scroll', checkScrollPosition);
+    // ✅ إضافة مستمع للتمرير مع passive: true
+    scrollElement.addEventListener('scroll', throttledCheck, { passive: true });
     
     // إضافة مستمع لتغيير حجم النافذة
-    window.addEventListener('resize', checkScrollPosition);
+    window.addEventListener('resize', throttledCheck);
 
     return () => {
-      scrollElement.removeEventListener('scroll', checkScrollPosition);
-      window.removeEventListener('resize', checkScrollPosition);
+      scrollElement.removeEventListener('scroll', throttledCheck);
+      window.removeEventListener('resize', throttledCheck);
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+      }
     };
-  }, []);
+  }, [checkScrollPosition]);
 
-  const scroll = (direction: 'left' | 'right') => {
+  const scroll = useCallback((direction: 'left' | 'right') => {
     if (!scrollRef.current) return;
     
     const scrollAmount = 300;
@@ -63,7 +104,7 @@ export function ScrollableTableWrapper({
       left: newScrollLeft,
       behavior: 'smooth'
     });
-  };
+  }, []);
 
   return (
     <div className="relative group">
