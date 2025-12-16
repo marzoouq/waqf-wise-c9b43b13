@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Upload, Loader2, CheckCircle, XCircle, FileImage } from 'lucide-react';
-import { useInvoiceOCR } from '@/hooks/useInvoiceOCR';
+import { useInvoiceOCR } from '@/hooks/payments/useInvoiceOCR';
 import { toast } from 'sonner';
 import { BatchProcessingResult, InvoiceOCRResult } from '@/types/invoices';
 

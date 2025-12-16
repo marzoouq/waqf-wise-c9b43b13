@@ -1,11 +1,15 @@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Eye, Calendar } from "lucide-react";
-import { useFiscalYearPublishStatus } from "@/hooks/useFiscalYearPublishStatus";
+import { useFiscalYearPublishInfo, useFiscalYearsList } from "@/hooks/fiscal-years";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 
 export function FiscalYearNotPublishedBanner() {
-  const { activeFiscalYear, isCurrentYearPublished, publishedYears } = useFiscalYearPublishStatus();
+  const { activeFiscalYear, isCurrentYearPublished } = useFiscalYearPublishInfo();
+  const { fiscalYears } = useFiscalYearsList();
+  
+  // جلب السنوات المنشورة
+  const publishedYears = fiscalYears.filter(fy => fy.is_published);
 
   // إذا كانت السنة الحالية منشورة، لا نعرض البانر
   if (isCurrentYearPublished || !activeFiscalYear) {

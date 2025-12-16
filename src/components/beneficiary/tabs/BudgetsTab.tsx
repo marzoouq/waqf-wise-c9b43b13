@@ -4,7 +4,7 @@ import { Progress } from "@/components/ui/progress";
 import { TrendingUp, DollarSign, PiggyBank, TrendingDown, Inbox } from "lucide-react";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { MaskedValue } from "@/components/shared/MaskedValue";
-import { useWaqfBudgets } from "@/hooks/useWaqfBudgets";
+import { useWaqfBudgets } from "@/hooks/distributions/useWaqfBudgets";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorState } from "@/components/shared/ErrorState";
 

@@ -4,7 +4,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { FileText, EyeOff } from "lucide-react";
 import { UnifiedDataTable, type Column } from "@/components/unified/UnifiedDataTable";
 import { format, arLocale as ar } from "@/lib/date";
-import { useFiscalYearPublishStatus } from "@/hooks/useFiscalYearPublishStatus";
+import { useFiscalYearPublishInfo } from "@/hooks/fiscal-years";
 
 interface Contract {
   id: string;
@@ -19,7 +19,7 @@ interface Contract {
 
 export function ContractsTable() {
   const { contracts, isLoading } = useContracts();
-  const { isCurrentYearPublished, isLoading: publishStatusLoading } = useFiscalYearPublishStatus();
+  const { isCurrentYearPublished, isLoading: publishStatusLoading } = useFiscalYearPublishInfo();
 
   // إذا لم تكن السنة منشورة، نعرض رسالة
   if (!publishStatusLoading && !isCurrentYearPublished) {

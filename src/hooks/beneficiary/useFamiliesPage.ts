@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useFamilies } from './useFamilies';
-import { useTableSort } from '@/hooks/useTableSort';
-import { useBulkSelection } from '@/hooks/useBulkSelection';
+import { useTableSort } from '@/hooks/ui/useTableSort';
+import { useBulkSelection } from '@/hooks/ui/useBulkSelection';
 import { Family } from '@/types';
 import { toast } from 'sonner';
 import type { FiltersRecord } from '@/components/shared/AdvancedFiltersDialog';

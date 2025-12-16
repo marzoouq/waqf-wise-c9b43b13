@@ -14,7 +14,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format } from "@/lib/date";
 import type { WaqfUnit } from "@/hooks/useWaqfUnits";
-import { useWaqfRevenueByFiscalYear } from "@/hooks/useWaqfRevenueByFiscalYear";
+import { useWaqfRevenueByFiscalYear } from "@/hooks/reports/useWaqfRevenueByFiscalYear";
 import { useWaqfUnitProperties } from "@/hooks/waqf/useWaqfProperties";
 import { LinkPropertyDialog } from "./LinkPropertyDialog";
 

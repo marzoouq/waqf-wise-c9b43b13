@@ -9,7 +9,7 @@ import { PropertiesHeader } from "@/components/properties/PropertiesHeader";
 import { PropertiesTabs } from "@/components/properties/PropertiesTabs";
 import { useProperties, type Property } from "@/hooks/useProperties";
 import { usePropertiesDialogs } from "@/hooks/usePropertiesDialogs";
-import { usePropertiesStats } from "@/hooks/usePropertiesStats";
+import { usePropertiesStats } from "@/hooks/property/usePropertiesStats";
 import { logger } from "@/lib/logger";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";

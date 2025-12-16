@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Landmark, RefreshCw, Wifi, EyeOff } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useFiscalYearPublishStatus } from "@/hooks/useFiscalYearPublishStatus";
+import { useFiscalYearPublishInfo } from "@/hooks/fiscal-years";
 import { useAuth } from "@/hooks/useAuth";
 import { useBankBalance } from "@/hooks/dashboard/useFinancialCards";
 
@@ -14,7 +14,7 @@ interface BankBalanceCardProps {
 
 export function BankBalanceCard({ className, compact = false }: BankBalanceCardProps) {
   const { roles } = useAuth();
-  const { isCurrentYearPublished, isLoading: publishStatusLoading } = useFiscalYearPublishStatus();
+  const { isCurrentYearPublished, isLoading: publishStatusLoading } = useFiscalYearPublishInfo();
   
   // التحقق من أن المستخدم مستفيد/وارث وليس موظف
   const isBeneficiaryOrHeir = roles.some(r => ['beneficiary', 'waqf_heir'].includes(r)) && 

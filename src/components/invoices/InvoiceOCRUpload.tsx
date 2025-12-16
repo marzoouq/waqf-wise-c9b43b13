@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Upload, FileImage, CheckCircle, AlertCircle } from 'lucide-react';
-import { useInvoiceOCR, ExtractedInvoiceData } from '@/hooks/useInvoiceOCR';
+import { useInvoiceOCR, ExtractedInvoiceData } from '@/hooks/payments/useInvoiceOCR';
 import { OCRConfidenceIndicator } from './OCRConfidenceIndicator';
 import { validateVATNumber } from '@/lib/zatca';
 
