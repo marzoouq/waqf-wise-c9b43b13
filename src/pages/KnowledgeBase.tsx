@@ -11,7 +11,7 @@ import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layou
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { LoadingState } from "@/components/shared/LoadingState";
-import { useKnowledgeArticles, useKnowledgeFAQs } from "@/hooks/useKnowledgeArticles";
+import { useKnowledgeArticles, useKnowledgeFAQs } from "@/hooks/ui/useKnowledgeArticles";
 import {
   KnowledgeArticlesTab,
   KnowledgeFAQsTab,

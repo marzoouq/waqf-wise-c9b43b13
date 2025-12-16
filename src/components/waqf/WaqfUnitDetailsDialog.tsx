@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format } from "@/lib/date";
-import type { WaqfUnit } from "@/hooks/useWaqfUnits";
+import type { WaqfUnit } from "@/hooks/distributions/useWaqfUnits";
 import { useWaqfRevenueByFiscalYear } from "@/hooks/reports/useWaqfRevenueByFiscalYear";
 import { useWaqfUnitProperties } from "@/hooks/waqf/useWaqfProperties";
 import { LinkPropertyDialog } from "./LinkPropertyDialog";

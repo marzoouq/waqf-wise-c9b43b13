@@ -4,7 +4,7 @@
  */
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { KnowledgeFAQ } from "@/hooks/useKnowledgeArticles";
+import { KnowledgeFAQ } from "@/hooks/ui/useKnowledgeArticles";
 
 interface KnowledgeFAQsTabProps {
   faqs: KnowledgeFAQ[];

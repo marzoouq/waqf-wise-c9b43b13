@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useSupportTickets } from '@/hooks/useSupportTickets';
+import { useSupportTickets } from '@/hooks/support/useSupportTickets';
 import { useSupportStats } from '@/hooks/support/useSupportStats';
 import { TicketDetailsDialog } from '@/components/support/TicketDetailsDialog';
 import { AgentPerformanceReport } from '@/components/support/AgentPerformanceReport';

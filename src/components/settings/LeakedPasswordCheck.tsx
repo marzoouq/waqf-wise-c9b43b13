@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useLeakedPassword } from '@/hooks/useLeakedPassword';
+import { useLeakedPassword } from '@/hooks/auth/useLeakedPassword';
 import { Shield, AlertTriangle, CheckCircle, Loader2 } from 'lucide-react';
 
 export const LeakedPasswordCheck = () => {

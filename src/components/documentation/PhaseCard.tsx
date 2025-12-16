@@ -24,8 +24,8 @@ import { PhaseChangeLog } from "./PhaseChangeLog";
 import { Calendar, FileText, History, User } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
 import { useState } from "react";
-import { useUpdatePhaseStatus, parseTasks } from "@/hooks/useProjectDocumentation";
-import type { ProjectPhase } from "@/hooks/useProjectDocumentation";
+import { useUpdatePhaseStatus, parseTasks } from "@/hooks/ui/useProjectDocumentation";
+import type { ProjectPhase } from "@/hooks/ui/useProjectDocumentation";
 
 
 interface PhaseCardProps {

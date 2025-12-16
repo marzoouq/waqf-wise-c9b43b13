@@ -18,7 +18,7 @@ import { useToast } from "@/hooks/ui/use-toast";
 import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { useNavigate } from "react-router-dom";
-import { useSupportTickets } from "@/hooks/useSupportTickets";
+import { useSupportTickets } from "@/hooks/support/useSupportTickets";
 import { BeneficiaryBottomNavigation } from "@/components/mobile/BeneficiaryBottomNavigation";
 
 export default function BeneficiarySupport() {

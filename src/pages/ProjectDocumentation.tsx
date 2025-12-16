@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useProjectDocumentation, parseTasks } from "@/hooks/useProjectDocumentation";
+import { useProjectDocumentation, parseTasks } from "@/hooks/ui/useProjectDocumentation";
 import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";
 import { PhaseCard } from "@/components/documentation/PhaseCard";
 import { PhaseFilter } from "@/components/documentation/PhaseFilter";

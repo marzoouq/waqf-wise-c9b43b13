@@ -11,7 +11,7 @@ import { logger } from "@/lib/logger";
 import { nationalIdToEmail, generateSecurePassword } from "@/lib/beneficiaryAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ResetPasswordDialog } from "./ResetPasswordDialog";
-import { useLeakedPassword } from "@/hooks/useLeakedPassword";
+import { useLeakedPassword } from "@/hooks/auth/useLeakedPassword";
 
 interface EnableLoginDialogProps {
   open: boolean;
