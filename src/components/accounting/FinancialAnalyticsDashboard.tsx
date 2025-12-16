@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { TrendingUp, TrendingDown, DollarSign, Activity, RefreshCw } from 'lucide-react';
-import { useFinancialAnalytics } from '@/hooks/useFinancialAnalytics';
+import { useFinancialAnalytics } from '@/hooks/accounting/useFinancialAnalytics';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import type { FinancialKPI, KPIsByName, KPIsByCategory } from '@/types/financial';

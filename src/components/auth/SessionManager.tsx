@@ -4,7 +4,7 @@
  */
 
 import { useEffect } from 'react';
-import { useSessionCleanup, checkPendingCleanup } from '@/hooks/useSessionCleanup';
+import { useSessionCleanup, checkPendingCleanup } from '@/hooks/auth/useSessionCleanup';
 import { useAuth } from '@/contexts/AuthContext';
 import { productionLogger } from '@/lib/logger/production-logger';
 

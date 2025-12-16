@@ -10,7 +10,7 @@ import { useToast } from '@/hooks/ui/use-toast';
 import { Loader2, LogIn, Smartphone, Fingerprint, Chrome } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AuthService } from '@/services/auth.service';
-import { useBiometricAuth } from '@/hooks/useBiometricAuth';
+import { useBiometricAuth } from '@/hooks/auth/useBiometricAuth';
 
 export default function Login() {
   const [identifier, setIdentifier] = useState('');

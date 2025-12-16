@@ -1,5 +1,5 @@
 import { UsersRound, Users, TrendingUp, Calendar } from 'lucide-react';
-import { useFamilies } from '@/hooks/useFamilies';
+import { useFamilies } from '@/hooks/beneficiary/useFamilies';
 import { useNavigate } from 'react-router-dom';
 import { UnifiedSectionHeader } from '@/components/unified/UnifiedSectionHeader';
 import { UnifiedStatsGrid } from '@/components/unified/UnifiedStatsGrid';
