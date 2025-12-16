@@ -2,9 +2,12 @@
  * صفحة ترحيبية خفيفة - بدون تبعيات ثقيلة
  * Lightweight Landing Page - No heavy dependencies
  * هذه الصفحة تتجنب استيراد أي مكونات من Radix UI أو مكتبات ثقيلة أخرى
+ * 
+ * ✅ توجيه تلقائي للمستخدمين المسجلين إلى لوحة التحكم الخاصة بهم
  */
 
-import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { 
   Shield, 
   Users, 
@@ -17,6 +20,8 @@ import {
   Banknote,
   CalendarDays
 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { getDashboardForRoles } from "@/types/roles";
 
 // ✅ مكون زر خفيف بدون Radix UI
 function LightButton({ 
@@ -128,6 +133,22 @@ const stats = [
 ];
 
 export default function LandingPageLight() {
+  const { user, roles, isLoading } = useAuth();
+  const navigate = useNavigate();
+
+  // ✅ توجيه تلقائي للمستخدمين المسجلين إلى لوحة التحكم
+  useEffect(() => {
+    // انتظر حتى ينتهي التحميل
+    if (isLoading) return;
+    
+    // إذا كان المستخدم مسجل دخوله
+    if (user) {
+      // استخدم الأدوار المتاحة (من الـ cache أو فارغة)
+      const dashboard = getDashboardForRoles(roles as Parameters<typeof getDashboardForRoles>[0]);
+      navigate(dashboard, { replace: true });
+    }
+  }, [user, roles, isLoading, navigate]);
+
   return (
     <div className="min-h-screen bg-background" dir="rtl">
       {/* Header */}
