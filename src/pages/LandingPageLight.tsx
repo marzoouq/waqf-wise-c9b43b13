@@ -12,10 +12,10 @@ import {
   ArrowLeft, 
   Play, 
   BarChart3, 
-  FileText, 
   Wallet,
-  CheckCircle,
-  ChevronLeft
+  ChevronLeft,
+  Banknote,
+  CalendarDays
 } from "lucide-react";
 
 // ✅ مكون زر خفيف بدون Radix UI
@@ -59,15 +59,73 @@ function FeatureCard({ icon: Icon, title, description }: {
   );
 }
 
-// ✅ مكون إحصائية خفيف
-function StatItem({ value, label }: { value: string; label: string }) {
+// ✅ مكون إحصائية غني مع أيقونات ملونة
+function StatItem({ 
+  icon: Icon, 
+  value, 
+  suffix, 
+  label, 
+  color 
+}: { 
+  icon: React.ComponentType<{ className?: string }>;
+  value: number;
+  suffix: string;
+  label: string;
+  color: string;
+}) {
   return (
-    <div className="text-center p-4">
-      <div className="text-3xl sm:text-4xl font-bold text-primary-foreground mb-1">{value}</div>
-      <div className="text-sm text-primary-foreground/80">{label}</div>
+    <div className="relative group">
+      <div className="flex flex-col items-center text-center p-6 sm:p-8">
+        {/* Icon with gradient background */}
+        <div
+          className={`inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl ${color} mb-4 sm:mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg`}
+        >
+          <Icon className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+        </div>
+
+        {/* Value */}
+        <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-2">
+          <span>{value.toLocaleString("ar-SA")}</span>
+          <span className="text-primary">{suffix}</span>
+        </div>
+
+        {/* Label */}
+        <p className="text-muted-foreground text-sm sm:text-base">{label}</p>
+      </div>
     </div>
   );
 }
+
+const stats = [
+  {
+    icon: Users,
+    value: 1000,
+    suffix: "+",
+    label: "مستفيد مسجل",
+    color: "bg-gradient-to-br from-blue-500 to-blue-600",
+  },
+  {
+    icon: Building2,
+    value: 50,
+    suffix: "+",
+    label: "عقار مُدار",
+    color: "bg-gradient-to-br from-emerald-500 to-emerald-600",
+  },
+  {
+    icon: Banknote,
+    value: 5,
+    suffix: "M+",
+    label: "ريال موزعة",
+    color: "bg-gradient-to-br from-amber-500 to-amber-600",
+  },
+  {
+    icon: CalendarDays,
+    value: 10,
+    suffix: "+",
+    label: "سنوات خبرة",
+    color: "bg-gradient-to-br from-violet-500 to-violet-600",
+  },
+];
 
 export default function LandingPageLight() {
   return (
@@ -190,14 +248,30 @@ export default function LandingPageLight() {
           </div>
         </section>
 
-        {/* Stats Section */}
-        <section className="py-16 sm:py-20 bg-primary text-primary-foreground">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <StatItem value="+1000" label="مستفيد نشط" />
-              <StatItem value="+50" label="عقار مُدار" />
-              <StatItem value="99.9%" label="وقت التشغيل" />
-              <StatItem value="+5M" label="ريال موزع" />
+        {/* Stats Section - Rich Design */}
+        <section id="stats" className="py-16 sm:py-24 relative overflow-hidden">
+          {/* Background with gradient */}
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
+
+          <div className="container relative mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Section Header */}
+            <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
+              <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
+                إحصائيات
+              </span>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4">
+                أرقام تتحدث عن نجاحنا
+              </h2>
+              <p className="text-muted-foreground text-base sm:text-lg">
+                نفخر بثقة عملائنا وبالنتائج التي حققناها معهم
+              </p>
+            </div>
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
+              {stats.map((stat, index) => (
+                <StatItem key={index} {...stat} />
+              ))}
             </div>
           </div>
         </section>
