@@ -76,7 +76,7 @@ verify_jwt = true
 verify_jwt = true
 
 [functions.biometric-auth]
-verify_jwt = true
+verify_jwt = false
 
 [functions.auto-create-journal]
 verify_jwt = true
