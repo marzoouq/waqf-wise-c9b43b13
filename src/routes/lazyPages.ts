@@ -100,15 +100,10 @@ export const AuditLogs = lazyWithRetry(() => import("@/pages/AuditLogs"));
 // ==================== النظام والمراقبة ====================
 export const SystemMonitoring = lazyWithRetry(() => import("@/pages/SystemMonitoring"));
 export const SystemErrorLogs = lazyWithRetry(() => import("@/pages/SystemErrorLogs"));
-export const SystemMaintenance = lazyWithRetry(() => import("@/pages/SystemMaintenance"));
+
 export const SecurityDashboard = lazyWithRetry(() => import("@/pages/SecurityDashboard"));
 export const PerformanceDashboard = lazyWithRetry(() => import("@/pages/PerformanceDashboard"));
 export const IntegrationsManagement = lazyWithRetry(() => import("@/pages/IntegrationsManagement"));
-
-// ==================== أدوات المطور ====================
-export const DeveloperGuide = lazyWithRetry(() => import("@/pages/DeveloperGuide"));
-export const DeveloperTools = lazyWithRetry(() => import("@/pages/DeveloperTools"));
-export const ProjectDocumentation = lazyWithRetry(() => import("@/pages/ProjectDocumentation"));
 
 // ==================== الذكاء الاصطناعي ====================
 export const AIInsights = lazyWithRetry(() => import("@/pages/AIInsights"));
