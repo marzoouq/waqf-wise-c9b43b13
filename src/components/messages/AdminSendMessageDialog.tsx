@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Send, Mail, Users } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { useBeneficiaries } from "@/hooks/beneficiary/useBeneficiaries";
 import { MessageService } from "@/services/message.service";
 import { useToast } from "@/hooks/ui/use-toast";

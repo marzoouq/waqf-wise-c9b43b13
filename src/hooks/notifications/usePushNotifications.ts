@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/ui/use-toast';
 import { logger } from '@/lib/logger';
 import { NotificationService } from '@/services/notification.service';

@@ -8,7 +8,7 @@ import { Beneficiary } from '@/types/beneficiary';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import { EditPhoneDialog } from './EditPhoneDialog';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/auth/useUserRole';
 import { useQueryClient } from '@tanstack/react-query';
 

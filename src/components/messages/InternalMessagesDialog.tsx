@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Send, Mail, MailOpen, Inbox, SendIcon, Reply } from "lucide-react";
 import { useInternalMessages } from "@/hooks/messages/useInternalMessages";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { format, arLocale as ar } from "@/lib/date";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRecipients } from "@/hooks/messages/useRecipients";

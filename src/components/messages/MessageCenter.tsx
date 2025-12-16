@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { useMessages, type Message } from "@/hooks/messages/useMessages";
 import { useAvailableUsers } from "@/hooks/messages/useAvailableUsers";
 import { format, arLocale as ar } from "@/lib/date";

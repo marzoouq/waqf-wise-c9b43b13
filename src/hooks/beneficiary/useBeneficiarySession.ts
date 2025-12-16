@@ -5,7 +5,7 @@
 import { useEffect, useRef, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import { BeneficiaryService } from "@/services";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface UseBeneficiarySessionOptions {
   beneficiaryId?: string;

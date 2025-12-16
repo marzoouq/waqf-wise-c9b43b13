@@ -35,19 +35,19 @@ src/hooks/
 
 ### 1. من المجلد الرئيسي (موصى به للاستيراد العام)
 ```typescript
-import { useAuth, useBeneficiaries, useNotifications } from '@/hooks';
+import { useBeneficiaries, useNotifications } from '@/hooks';
 ```
 
 ### 2. من المجلد الفرعي (موصى به للاستيراد المحدد)
 ```typescript
-import { useAuth, usePermissions } from '@/hooks/auth';
+import { useUserRole, usePermissions } from '@/hooks/auth';
 import { useBeneficiaries, useFamilies } from '@/hooks/beneficiary';
 import { useAccounts, useJournalEntries } from '@/hooks/accounting';
 ```
 
-### 3. من الملف مباشرة
+### 3. للمصادقة (من AuthContext مباشرة)
 ```typescript
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/contexts/AuthContext';
 ```
 
 ## 📋 المجلدات الفرعية

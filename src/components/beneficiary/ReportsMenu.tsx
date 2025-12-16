@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/ui/use-toast";
 import { useBeneficiaryProfile } from "@/hooks/beneficiary";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { Contract } from "@/hooks/property/useContracts";
 import { useAnnualDisclosureExport } from "@/hooks/reports/useAnnualDisclosureExport";
 

@@ -4,7 +4,7 @@
  */
 
 import { useMutation } from '@tanstack/react-query';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/contexts/AuthContext';
 import { SearchService, type SearchHistoryData } from '@/services/search.service';
 
 export type { SearchHistoryData };

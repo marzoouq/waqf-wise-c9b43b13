@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { FileText, Plus, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { ErrorState } from '@/components/shared/ErrorState';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/contexts/AuthContext';
 import { useMyBeneficiaryRequests, BeneficiaryRequest } from '@/hooks/beneficiary/useMyBeneficiaryRequests';
 
 const getStatusIcon = (status: string) => {
