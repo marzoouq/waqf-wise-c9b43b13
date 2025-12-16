@@ -14,7 +14,7 @@ export * from './accounting';
 export * from './auth';
 export * from './errors';
 export * from './alerts';
-export * from './activity';
+
 export * from './audit';
 export * from './contracts'; // Contract, ContractInsert
 export * from './distributions'; // Distribution types - unified
