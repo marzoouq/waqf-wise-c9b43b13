@@ -8,7 +8,7 @@ import { useDistributionApprovals } from "@/hooks/distributions/useDistributionA
 import { Distribution } from "@/hooks/distributions/useDistributions";
 import { CheckCircle2, XCircle, Clock, User } from "lucide-react";
 import { useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/auth/useUserRole";
 
 interface ApprovalWorkflowDialogProps {

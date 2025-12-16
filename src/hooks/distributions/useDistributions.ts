@@ -3,7 +3,7 @@ import { DistributionService, RealtimeService, EdgeFunctionService } from "@/ser
 import { useToast } from "@/hooks/ui/use-toast";
 import { useJournalEntries } from "@/hooks/accounting/useJournalEntries";
 import { useActivities } from "@/hooks/ui/useActivities";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
 import { logger } from "@/lib/logger";
 import { createMutationErrorHandler } from "@/lib/errors";

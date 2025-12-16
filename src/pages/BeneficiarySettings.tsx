@@ -10,7 +10,7 @@ import { PushNotificationsSettings } from "@/components/settings/PushNotificatio
 import { LeakedPasswordCheck } from "@/components/settings/LeakedPasswordCheck";
 import { BiometricSettings } from "@/components/settings/BiometricSettings";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/ui/use-toast";
 import { MobileOptimizedLayout, MobileOptimizedHeader, MobileOptimizedGrid } from "@/components/layout/MobileOptimizedLayout";
 

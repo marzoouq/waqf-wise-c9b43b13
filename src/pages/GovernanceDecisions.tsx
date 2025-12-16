@@ -12,7 +12,7 @@ import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { PaginationControls } from "@/components/ui/pagination-controls";
 import { Database } from "@/integrations/supabase/types";
 import type { GovernanceDecision } from "@/types/governance";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { PAGE_SIZE_OPTIONS } from "@/lib/pagination.types";
 
 type GovernanceDecisionRow = Database['public']['Tables']['governance_decisions']['Row'];

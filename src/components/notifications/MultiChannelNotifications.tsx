@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Bell, Mail, MessageSquare, Smartphone, CheckCircle2, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/ui/use-toast";
 import { AuthService } from "@/services/auth.service";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface NotificationChannel {
   id: string;

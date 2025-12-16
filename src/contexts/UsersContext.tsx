@@ -8,7 +8,7 @@ import React, { createContext, useContext, ReactNode, useCallback } from "react"
 import { useUsersManagement, type UserProfile } from "@/hooks/users/useUsersManagement";
 import { useUsersFilter } from "@/hooks/users/useUsersFilter";
 import type { AppRole } from "@/types/roles";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/ui/use-toast";
 
 interface UsersContextValue {

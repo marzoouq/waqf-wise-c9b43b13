@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/accordion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { HelpCircle, MessageSquare, Send, ArrowRight, Phone, Mail } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { useBeneficiaryProfile } from "@/hooks/beneficiary";
 import { useToast } from "@/hooks/ui/use-toast";
 import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout";

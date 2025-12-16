@@ -5,7 +5,7 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { BeneficiaryService } from "@/services";

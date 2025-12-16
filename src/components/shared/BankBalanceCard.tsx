@@ -4,7 +4,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Landmark, RefreshCw, Wifi, EyeOff } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useFiscalYearPublishInfo } from "@/hooks/fiscal-years";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { useBankBalance } from "@/hooks/dashboard/useFinancialCards";
 
 interface BankBalanceCardProps {

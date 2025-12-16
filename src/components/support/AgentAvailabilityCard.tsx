@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useAgentAvailability, useUpdateAvailability } from '@/hooks/support/useAgentAvailability';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/contexts/AuthContext';
 import { User, AlertCircle } from 'lucide-react';
 
 export function AgentAvailabilityCard() {

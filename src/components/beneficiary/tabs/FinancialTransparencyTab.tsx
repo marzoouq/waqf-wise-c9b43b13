@@ -7,7 +7,7 @@ import { DistributionPieChart } from "../DistributionPieChart";
 import { EmptyPaymentsState } from "../EmptyPaymentsState";
 import { HistoricalRentalDetailsCard } from "@/components/fiscal-year";
 import { useBeneficiaryProfile } from "@/hooks/beneficiary";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { useFiscalYearPublishInfo } from "@/hooks/fiscal-years";
 import { FiscalYearNotPublishedBanner } from "../FiscalYearNotPublishedBanner";
 import { useFiscalYearsList } from "@/hooks/fiscal-years";

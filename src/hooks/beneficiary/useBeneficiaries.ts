@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { BeneficiaryService } from "@/services";
 import { handleError, showSuccess } from "@/lib/errors";
 import { useActivities } from "@/hooks/ui/useActivities";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { Beneficiary } from "@/types/beneficiary";
 import { logger } from "@/lib/logger";
 import { QUERY_KEYS } from "@/lib/query-keys";
