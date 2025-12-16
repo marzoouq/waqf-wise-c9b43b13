@@ -29,17 +29,17 @@ const steps = [
 
 export function HowItWorksSection() {
   return (
-    <section id="how-it-works" className="py-16 sm:py-24 bg-background">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="how-it-works" className="py-12 sm:py-16 md:py-24 bg-background">
+      <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
-          <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4 animate-fade-in">
+        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12 md:mb-16 px-2">
+          <span className="inline-block px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-primary/10 text-primary text-xs sm:text-sm font-medium mb-3 sm:mb-4 animate-fade-in">
             كيف يعمل
           </span>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4">
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-3 sm:mb-4">
             ابدأ في 4 خطوات بسيطة
           </h2>
-          <p className="text-muted-foreground text-base sm:text-lg">
+          <p className="text-muted-foreground text-sm sm:text-base md:text-lg">
             نظام سهل الاستخدام يمكنك البدء به في دقائق
           </p>
         </div>
@@ -49,7 +49,7 @@ export function HowItWorksSection() {
           {/* Connection Line - Desktop */}
           <div className="hidden lg:block absolute top-24 left-[10%] right-[10%] h-0.5 bg-gradient-to-l from-primary/20 via-primary/40 to-primary/20" />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-6 lg:gap-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8">
             {steps.map((step, index) => (
               <div
                 key={index}
@@ -57,32 +57,25 @@ export function HowItWorksSection() {
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 {/* Step Number */}
-                <div className="absolute -top-2 -right-2 sm:-top-3 sm:-right-3 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm sm:text-base font-bold shadow-lg z-10">
+                <div className="absolute -top-1.5 -right-1.5 xs:-top-2 xs:-right-2 sm:-top-3 sm:-right-3 w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs sm:text-sm md:text-base font-bold shadow-lg z-10">
                   {step.step}
                 </div>
 
                 {/* Card */}
-                <div className="relative bg-card border border-border/50 rounded-2xl p-6 sm:p-8 text-center hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 h-full">
+                <div className="relative bg-card border border-border/50 rounded-xl sm:rounded-2xl p-3 xs:p-4 sm:p-6 md:p-8 text-center hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 h-full">
                   {/* Icon */}
-                  <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 text-primary mb-4 sm:mb-6 group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300">
-                    <step.icon className="w-7 h-7 sm:w-8 sm:h-8" />
+                  <div className="inline-flex items-center justify-center w-10 h-10 xs:w-12 xs:h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl bg-primary/10 text-primary mb-3 sm:mb-4 md:mb-6 group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300">
+                    <step.icon className="w-5 h-5 xs:w-6 xs:h-6 sm:w-7 sm:h-7 md:w-8 md:h-8" />
                   </div>
 
                   {/* Content */}
-                  <h3 className="text-lg sm:text-xl font-bold text-foreground mb-2 sm:mb-3">
+                  <h3 className="text-sm xs:text-base sm:text-lg md:text-xl font-bold text-foreground mb-1.5 sm:mb-2 md:mb-3">
                     {step.title}
                   </h3>
-                  <p className="text-muted-foreground text-sm sm:text-base">
+                  <p className="text-muted-foreground text-xs sm:text-sm md:text-base leading-relaxed">
                     {step.description}
                   </p>
                 </div>
-
-                {/* Arrow - Mobile */}
-                {index < steps.length - 1 && (
-                  <div className="lg:hidden flex justify-center my-4 sm:hidden">
-                    <div className="w-0.5 h-8 bg-gradient-to-b from-primary/40 to-primary/20" />
-                  </div>
-                )}
               </div>
             ))}
           </div>

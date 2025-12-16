@@ -25,43 +25,43 @@ export function LandingFooter() {
   return (
     <footer className="bg-card border-t border-border">
       {/* Main Footer */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12">
+      <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-8 sm:py-12 md:py-16">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 md:gap-12">
           {/* Brand */}
-          <div className="sm:col-span-2 lg:col-span-1">
-            <Link to="/" className="flex items-center gap-3 mb-4 sm:mb-6">
-              <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-primary to-primary/80 shadow-lg">
-                <Landmark className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground" />
+          <div className="col-span-2 lg:col-span-1">
+            <Link to="/" className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4 md:mb-6">
+              <div className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-primary to-primary/80 shadow-lg">
+                <Landmark className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-primary-foreground" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-foreground">منصة الوقف</h3>
+                <h3 className="text-base sm:text-lg font-bold text-foreground">منصة الوقف</h3>
                 <p className="text-xs text-muted-foreground">
                   إدارة الأوقاف الإلكترونية
                 </p>
               </div>
             </Link>
-            <p className="text-muted-foreground text-sm leading-relaxed mb-6">
+            <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed mb-4 sm:mb-6">
               منصة متكاملة لإدارة الأوقاف الإسلامية بكفاءة وشفافية، تدعم توزيع
               الغلة وإدارة المستفيدين والمحاسبة المتقدمة.
             </p>
             {/* Contact Info */}
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               <a
                 href="mailto:info@waqf.sa"
-                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                <Mail className="w-4 h-4" />
+                <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
                 info@waqf.sa
               </a>
               <a
                 href="tel:+966500000000"
-                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                <Phone className="w-4 h-4" />
+                <Phone className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
                 +966 50 000 0000
               </a>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <MapPin className="w-4 h-4" />
+              <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-muted-foreground">
+                <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
                 الرياض، المملكة العربية السعودية
               </div>
             </div>
@@ -69,21 +69,21 @@ export function LandingFooter() {
 
           {/* Links - Platform */}
           <div>
-            <h4 className="font-semibold text-foreground mb-4">المنصة</h4>
-            <ul className="space-y-3">
+            <h4 className="font-semibold text-foreground text-sm sm:text-base mb-3 sm:mb-4">المنصة</h4>
+            <ul className="space-y-2 sm:space-y-3">
               {links.platform.map((link) => (
                 <li key={link.label}>
                   {link.isAnchor ? (
                     <a
                       href={link.href}
-                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                      className="text-xs sm:text-sm text-muted-foreground hover:text-foreground transition-colors"
                     >
                       {link.label}
                     </a>
                   ) : (
                     <Link
                       to={link.href}
-                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                      className="text-xs sm:text-sm text-muted-foreground hover:text-foreground transition-colors"
                     >
                       {link.label}
                     </Link>
@@ -95,21 +95,21 @@ export function LandingFooter() {
 
           {/* Links - Support */}
           <div>
-            <h4 className="font-semibold text-foreground mb-4">الدعم</h4>
-            <ul className="space-y-3">
+            <h4 className="font-semibold text-foreground text-sm sm:text-base mb-3 sm:mb-4">الدعم</h4>
+            <ul className="space-y-2 sm:space-y-3">
               {links.support.map((link) => (
                 <li key={link.label}>
                   {link.isAnchor ? (
                     <a
                       href={link.href}
-                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                      className="text-xs sm:text-sm text-muted-foreground hover:text-foreground transition-colors"
                     >
                       {link.label}
                     </a>
                   ) : (
                     <Link
                       to={link.href}
-                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                      className="text-xs sm:text-sm text-muted-foreground hover:text-foreground transition-colors"
                     >
                       {link.label}
                     </Link>
@@ -121,21 +121,21 @@ export function LandingFooter() {
 
           {/* Links - Legal */}
           <div>
-            <h4 className="font-semibold text-foreground mb-4">قانوني</h4>
-            <ul className="space-y-3">
+            <h4 className="font-semibold text-foreground text-sm sm:text-base mb-3 sm:mb-4">قانوني</h4>
+            <ul className="space-y-2 sm:space-y-3">
               {links.legal.map((link) => (
                 <li key={link.label}>
                   {link.isAnchor ? (
                     <a
                       href={link.href}
-                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                      className="text-xs sm:text-sm text-muted-foreground hover:text-foreground transition-colors"
                     >
                       {link.label}
                     </a>
                   ) : (
                     <Link
                       to={link.href}
-                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                      className="text-xs sm:text-sm text-muted-foreground hover:text-foreground transition-colors"
                     >
                       {link.label}
                     </Link>
@@ -149,12 +149,12 @@ export function LandingFooter() {
 
       {/* Bottom Bar */}
       <div className="border-t border-border">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-muted-foreground text-center sm:text-right">
+        <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 md:py-6">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+            <p className="text-xs sm:text-sm text-muted-foreground text-center sm:text-right">
               © {currentYear} منصة الوقف. جميع الحقوق محفوظة.
             </p>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 sm:gap-4">
               <a
                 href="#"
                 className="text-muted-foreground hover:text-foreground transition-colors"
