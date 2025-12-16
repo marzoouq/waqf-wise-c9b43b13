@@ -29,7 +29,9 @@ export function AlertsPanel() {
     try {
       await resolveAlert(alertId);
     } catch (error) {
-      console.error('Error resolving alert:', error);
+      if (import.meta.env.DEV) {
+        console.error('Error resolving alert:', error);
+      }
     }
   };
 

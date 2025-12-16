@@ -33,7 +33,9 @@ export function useLinkProperty(isOpen: boolean) {
       const data = await PropertyService.getUnlinkedToWaqf();
       setProperties(data as Property[]);
     } catch (error) {
-      console.error("Error fetching properties:", error);
+      if (import.meta.env.DEV) {
+        console.error("Error fetching properties:", error);
+      }
       toast.error("فشل في جلب العقارات");
     } finally {
       setIsLoading(false);
@@ -54,7 +56,9 @@ export function useLinkProperty(isOpen: boolean) {
       onSuccess?.();
       return true;
     } catch (error) {
-      console.error("Error linking property:", error);
+      if (import.meta.env.DEV) {
+        console.error("Error linking property:", error);
+      }
       toast.error("فشل في ربط العقار");
       return false;
     } finally {

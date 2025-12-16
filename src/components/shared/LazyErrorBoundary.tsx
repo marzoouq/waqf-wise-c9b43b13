@@ -41,9 +41,11 @@ export class LazyErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
-    // Log the error
-    console.error('[LazyErrorBoundary] Caught error:', error);
-    console.error('[LazyErrorBoundary] Error info:', errorInfo);
+    // Log the error (development only)
+    if (import.meta.env.DEV) {
+      console.error('[LazyErrorBoundary] Caught error:', error);
+      console.error('[LazyErrorBoundary] Error info:', errorInfo);
+    }
 
     // Call custom error handler if provided
     if (this.props.onError) {

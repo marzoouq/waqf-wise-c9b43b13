@@ -65,7 +65,9 @@ export function useCreateFiscalYear(onSuccess?: () => void) {
       onSuccess?.();
     },
     onError: (error) => {
-      console.error("Error creating fiscal year:", error);
+      if (import.meta.env.DEV) {
+        console.error("Error creating fiscal year:", error);
+      }
       toast.error("فشل في إضافة السنة المالية");
     },
   });

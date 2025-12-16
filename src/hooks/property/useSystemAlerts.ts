@@ -21,7 +21,9 @@ export function useSystemAlerts() {
       await NotificationService.resolveAlert(alertId);
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.SYSTEM_ALERTS });
     } catch (error) {
-      console.error('Error resolving alert:', error);
+      if (import.meta.env.DEV) {
+        console.error('Error resolving alert:', error);
+      }
       throw error;
     }
   };
