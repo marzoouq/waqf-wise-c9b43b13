@@ -12024,6 +12024,7 @@ export type Database = {
         Returns: boolean
       }
       cleanup_old_alerts: { Args: never; Returns: undefined }
+      cleanup_old_chatbot_conversations: { Args: never; Returns: undefined }
       cleanup_old_error_logs: { Args: never; Returns: undefined }
       cleanup_old_records: { Args: never; Returns: undefined }
       create_auto_journal_entry: {
