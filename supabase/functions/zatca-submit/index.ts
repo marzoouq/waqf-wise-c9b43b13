@@ -3,7 +3,9 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { 
   handleCors, 
   jsonResponse, 
-  errorResponse 
+  errorResponse,
+  unauthorizedResponse,
+  forbiddenResponse
 } from '../_shared/cors.ts';
 
 interface ZATCASubmitRequest {
@@ -11,15 +13,49 @@ interface ZATCASubmitRequest {
   submission_type: 'reporting' | 'clearance';
 }
 
+// الأدوار المسموح لها بإرسال الفواتير لـ ZATCA
+const ALLOWED_ROLES = ['admin', 'nazer', 'accountant'];
+
 serve(async (req) => {
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
 
   try {
+    // ============ التحقق من المصادقة والصلاحيات ============
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.error('ZATCA submission attempt without authorization header');
+      return unauthorizedResponse('مطلوب تسجيل الدخول لإرسال الفواتير');
+    }
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
+
+    // التحقق من صحة التوكن
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+    if (authError || !user) {
+      console.error('ZATCA submission: Invalid or expired token');
+      return unauthorizedResponse('جلسة منتهية - يرجى إعادة تسجيل الدخول');
+    }
+
+    // التحقق من صلاحيات المستخدم
+    const { data: roles } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id);
+
+    const hasPermission = roles?.some(r => ALLOWED_ROLES.includes(r.role));
+    
+    if (!hasPermission) {
+      console.warn('ZATCA submission: Unauthorized role attempt by:', user.id);
+      return forbiddenResponse('ليس لديك صلاحية إرسال الفواتير لهيئة الزكاة والضريبة');
+    }
+
+    // ============ نهاية التحقق من المصادقة ============
 
     const { invoice_id, submission_type }: ZATCASubmitRequest = await req.json();
 
