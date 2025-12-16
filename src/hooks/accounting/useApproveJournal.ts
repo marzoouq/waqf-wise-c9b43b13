@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { AccountingService } from "@/services/accounting.service";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 import { JournalApproval } from "@/types/approvals";
 import { invalidateAccountingQueries } from "@/lib/query-invalidation";
 

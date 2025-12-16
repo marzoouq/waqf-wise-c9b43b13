@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { format } from "@/lib/date";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { commonValidation } from "@/lib/validationSchemas";
 import { useAutoJournalEntry } from "@/hooks/payments/useAutoJournalEntry";

@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select";
 import { ResponsiveDialog, DialogFooter } from "@/components/shared/ResponsiveDialog";
 import { Budget } from "@/hooks/useBudgets";
-import { useAccounts } from "@/hooks/useAccounts";
+import { useAccounts } from "@/hooks/accounting/useAccounts";
 import { useFiscalYears } from "@/hooks/useFiscalYears";
 import { Database } from "@/integrations/supabase/types";
 

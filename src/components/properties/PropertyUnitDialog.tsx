@@ -29,7 +29,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { PropertyService } from "@/services";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import type { Database } from "@/integrations/supabase/types";
 

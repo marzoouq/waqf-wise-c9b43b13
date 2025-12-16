@@ -6,7 +6,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Download, FileText, FileSpreadsheet } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/ui/use-toast";
 import { exportToPDF, exportToExcel } from "@/lib/exportHelpers";
 
 interface ExportButtonProps<T extends object> {

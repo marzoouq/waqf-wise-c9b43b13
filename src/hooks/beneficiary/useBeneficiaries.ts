@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { BeneficiaryService } from "@/services";
 import { handleError, showSuccess } from "@/lib/errors";
-import { useActivities } from "@/hooks/useActivities";
+import { useActivities } from "@/hooks/ui/useActivities";
 import { useAuth } from "@/hooks/useAuth";
 import { Beneficiary } from "@/types/beneficiary";
 import { logger } from "@/lib/logger";

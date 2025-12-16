@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAccounts } from "@/hooks/useAccounts";
+import { useAccounts } from "@/hooks/accounting/useAccounts";
 import { ChevronDown, ChevronLeft, Plus, Edit, TrendingUp, TrendingDown, Trash2, TreePine } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

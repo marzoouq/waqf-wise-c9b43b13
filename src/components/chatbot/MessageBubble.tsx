@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 
 interface StatCardProps {
   icon: React.ReactNode;

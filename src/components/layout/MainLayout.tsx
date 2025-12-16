@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import { RoleSwitcher } from "./RoleSwitcher";
-import { useAlertCleanup } from "@/hooks/useAlertCleanup";
+import { useAlertCleanup } from "@/hooks/system/useAlertCleanup";
 import {
   DropdownMenu,
   DropdownMenuContent,

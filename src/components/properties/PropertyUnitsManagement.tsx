@@ -41,7 +41,7 @@ import { LoadingState } from "@/components/shared/LoadingState";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { EnhancedEmptyState } from "@/components/shared";
 import { ScrollableTableWrapper } from "@/components/shared/ScrollableTableWrapper";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 import type { Database } from "@/integrations/supabase/types";
 
 type DbPropertyUnit = Database['public']['Tables']['property_units']['Row'];

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 import { EdgeFunctionService } from "@/services/edge-function.service";
 import { Mail, Loader2 } from "lucide-react";
 

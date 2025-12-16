@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useActivities } from "@/hooks/useActivities";
+import { useActivities } from "@/hooks/ui/useActivities";
 import { Clock } from "lucide-react";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Skeleton } from "@/components/ui/skeleton";

@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { AlertCircle, Mail, Phone, DollarSign } from "lucide-react";
 import { differenceInDays, format, arLocale as ar } from "@/lib/date";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 
 interface RentalPayment {
   id: string;

@@ -14,7 +14,7 @@ import type { UserProfile } from "@/types/auth";
 import { useUsersContext } from "@/contexts/UsersContext";
 import { useUsersDialogsContext } from "@/contexts/UsersDialogsContext";
 import { usePermissions } from "@/hooks/usePermissions";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 
 interface UsersTableRowWithContextProps {
   user: UserProfile;

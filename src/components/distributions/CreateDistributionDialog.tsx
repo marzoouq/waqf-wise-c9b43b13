@@ -16,7 +16,7 @@ import { Separator } from "@/components/ui/separator";
 import { Loader2, Calculator, Users, Bell } from "lucide-react";
 import { useBeneficiaries } from "@/hooks/useBeneficiaries";
 import { useDistributions } from "@/hooks/useDistributions";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 import { useDistributionSettings } from "@/hooks/useDistributionSettings";
 import { UnifiedFormField, FormGrid, FormSection } from "@/components/unified/UnifiedFormField";
 

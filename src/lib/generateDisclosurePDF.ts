@@ -1,4 +1,4 @@
-import { AnnualDisclosure } from "@/hooks/useAnnualDisclosures";
+import { AnnualDisclosure } from "@/hooks/reports/useAnnualDisclosures";
 import { logger } from "@/lib/logger";
 import { Database } from "@/integrations/supabase/types";
 import { loadAmiriFonts } from "./fonts/loadArabicFonts";

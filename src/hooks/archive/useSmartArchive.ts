@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { ArchiveService } from "@/services";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 
 export function useSmartArchive() {
   const { toast } = useToast();

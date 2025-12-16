@@ -19,7 +19,7 @@ import {
   TrendingDown,
   Plus,
 } from "lucide-react";
-import { useAnnualDisclosures, AnnualDisclosure } from "@/hooks/useAnnualDisclosures";
+import { useAnnualDisclosures, AnnualDisclosure } from "@/hooks/reports/useAnnualDisclosures";
 import { GenerateDisclosureDialog } from "@/components/distributions/GenerateDisclosureDialog";
 import { ViewDisclosureDialog } from "@/components/distributions/ViewDisclosureDialog";
 import { generateDisclosurePDF } from "@/lib/generateDisclosurePDF";

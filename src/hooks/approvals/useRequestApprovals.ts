@@ -6,7 +6,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ApprovalService } from "@/services/approval.service";
 import { RequestService } from "@/services";
 import { RequestWithBeneficiary } from "@/types/approvals";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 import { QUERY_KEYS } from "@/lib/query-keys";
 
 export function useRequestApprovals() {

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Plus, Edit, Trash2, Zap, Settings } from 'lucide-react';
-import { useAutoJournalTemplates } from '@/hooks/useAutoJournalTemplates';
+import { useAutoJournalTemplates } from '@/hooks/accounting/useAutoJournalTemplates';
 import { AutoJournalTemplateDialog } from './AutoJournalTemplateDialog';
 import { UnifiedDataTable, type Column } from '@/components/unified/UnifiedDataTable';
 import type { AutoJournalTemplate as DialogTemplate } from '@/types/auto-journal';

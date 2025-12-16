@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Pencil, Trash2, Building2 } from "lucide-react";
 import { useBankAccounts } from "@/hooks/useBankAccounts";
-import { useAccounts } from "@/hooks/useAccounts";
+import { useAccounts } from "@/hooks/accounting/useAccounts";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { EmptyAccountingState } from "./EmptyAccountingState";

@@ -6,7 +6,7 @@
 import { InvoiceService, PaymentService, SettingsService, StorageService } from "@/services";
 import { generateInvoicePDF } from "@/lib/generateInvoicePDF";
 import { generateReceiptPDF } from "@/lib/generateReceiptPDF";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 import type { RentalPayment } from "@/hooks/useRentalPayments";
 import type { OrganizationSettings } from "@/hooks/useOrganizationSettings";
 

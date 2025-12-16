@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/ui/use-toast";
 
 export const usePrint = () => {
   const print = useCallback((elementId?: string) => {
