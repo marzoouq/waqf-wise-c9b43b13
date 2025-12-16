@@ -1,4 +1,4 @@
-import { usePhaseChangelog } from "@/hooks/useProjectDocumentation";
+import { usePhaseChangelog } from "@/hooks/ui/useProjectDocumentation";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { format, arLocale as ar } from "@/lib/date";
 import { Clock, User, FileText, CheckCircle } from "lucide-react";

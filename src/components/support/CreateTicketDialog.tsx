@@ -27,7 +27,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { useSupportTickets } from '@/hooks/useSupportTickets';
+import { useSupportTickets } from '@/hooks/support/useSupportTickets';
 import { Loader2 } from 'lucide-react';
 
 const ticketSchema = z.object({

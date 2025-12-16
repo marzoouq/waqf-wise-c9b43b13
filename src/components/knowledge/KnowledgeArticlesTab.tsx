@@ -5,7 +5,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText } from "lucide-react";
-import { KnowledgeArticle } from "@/hooks/useKnowledgeArticles";
+import { KnowledgeArticle } from "@/hooks/ui/useKnowledgeArticles";
 
 interface KnowledgeArticlesTabProps {
   articles: KnowledgeArticle[];

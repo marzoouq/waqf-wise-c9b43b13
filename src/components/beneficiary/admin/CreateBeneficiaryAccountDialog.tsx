@@ -11,7 +11,7 @@ import { BeneficiaryService } from "@/services/beneficiary.service";
 import { UserPlus, Copy, Eye, EyeOff } from "lucide-react";
 import { Beneficiary } from "@/types/beneficiary";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useLeakedPassword } from "@/hooks/useLeakedPassword";
+import { useLeakedPassword } from "@/hooks/auth/useLeakedPassword";
 
 const accountSchema = z.object({
   password: z.string().min(8, "كلمة المرور يجب أن تكون 8 أحرف على الأقل"),
