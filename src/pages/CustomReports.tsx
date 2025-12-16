@@ -2,7 +2,7 @@ import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layou
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, FileText, Download, Eye, Trash2 } from "lucide-react";
-import { useCustomReports, type ReportTemplate } from "@/hooks/useCustomReports";
+import { useCustomReports, type ReportTemplate } from "@/hooks/reports/useCustomReports";
 import { UnifiedDataTable, type Column } from "@/components/unified/UnifiedDataTable";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { Badge } from "@/components/ui/badge";

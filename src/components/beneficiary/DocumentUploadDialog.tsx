@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload, File, X } from "lucide-react";
 import { useToast } from "@/hooks/ui/use-toast";
-import { useBeneficiaryAttachments } from "@/hooks/useBeneficiaryAttachments";
+import { useBeneficiaryAttachments } from "@/hooks/beneficiary/useBeneficiaryAttachments";
 
 interface DocumentUploadDialogProps {
   open: boolean;

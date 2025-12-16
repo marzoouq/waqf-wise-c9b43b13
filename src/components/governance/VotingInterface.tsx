@@ -11,7 +11,7 @@ import {
   Users,
   CheckCircle2
 } from "lucide-react";
-import { useGovernanceVoting } from "@/hooks/useGovernanceVoting";
+import { useGovernanceVoting } from "@/hooks/governance/useGovernanceVoting";
 import type { VoteType } from "@/types/governance";
 
 interface VotingInterfaceProps {

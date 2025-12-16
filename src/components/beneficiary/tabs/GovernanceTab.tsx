@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { FileText, Calendar, Users, Inbox, ScrollText, BookOpen, ExternalLink } from "lucide-react";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
-import { useGovernanceData } from "@/hooks/useGovernanceData";
+import { useGovernanceData } from "@/hooks/governance/useGovernanceData";
 import { format, arLocale as ar } from "@/lib/date";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useIsMobile } from "@/hooks/ui/use-mobile";

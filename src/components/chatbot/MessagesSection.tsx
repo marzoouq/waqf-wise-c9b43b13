@@ -3,7 +3,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { MessageBubble } from "./MessageBubble";
 import { WelcomeMessage } from "./WelcomeMessage";
 import { TypingIndicator } from "./TypingIndicator";
-import { ChatMessage } from "@/hooks/useChatbot";
+import { ChatMessage } from "@/hooks/ai/useChatbot";
 import { cn } from "@/lib/utils";
 
 interface MessagesSectionProps {

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Contract } from "@/hooks/useContracts";
+import { Contract } from "@/hooks/property/useContracts";
 
 export interface ContractFormData {
   contract_number: string;

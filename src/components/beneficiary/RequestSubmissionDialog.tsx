@@ -20,7 +20,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useRequestTypes } from "@/hooks/useRequests";
-import { useBeneficiaryRequests } from "@/hooks/useBeneficiaryRequests";
+import { useBeneficiaryRequests } from "@/hooks/beneficiary/useBeneficiaryRequests";
 import { Plus, FileText } from "lucide-react";
 
 interface RequestSubmissionDialogProps {

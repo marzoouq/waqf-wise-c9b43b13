@@ -1,4 +1,4 @@
-import { useProperties } from "@/hooks/useProperties";
+import { useProperties } from "@/hooks/property/useProperties";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { LoadingState } from "@/components/shared/LoadingState";

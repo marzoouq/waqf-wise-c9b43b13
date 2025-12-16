@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, memo } from "react";
 import { Database } from "@/integrations/supabase/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Bot, Sparkles } from "lucide-react";
-import { useChatbot } from "@/hooks/useChatbot";
+import { useChatbot } from "@/hooks/ai/useChatbot";
 import { cn } from "@/lib/utils";
 import { ChatbotActions } from "./ChatbotActions";
 import { MessagesSection } from "./MessagesSection";

@@ -1,6 +1,6 @@
 import { Bell } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { useNotifications } from "@/hooks/useNotifications";
+import { useNotifications } from "@/hooks/notifications/useNotifications";
 
 export function NotificationBadge() {
   const { unreadCount } = useNotifications();

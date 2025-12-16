@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Building, TrendingUp, Home, Landmark, Receipt, Wallet } from "lucide-react";
-import { useProperties } from "@/hooks/useProperties";
+import { useProperties } from "@/hooks/property/useProperties";
 import { usePropertyUnits } from "@/hooks/usePropertyUnits";
 import { usePropertyRevenueStats } from "@/hooks/dashboard/usePropertyRevenueStats";
 import { safeFilter, safeLength } from '@/lib/utils/array-safe';

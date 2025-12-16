@@ -21,8 +21,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useDocumentUpload } from "@/hooks/useDocumentUpload";
-import { useFolders } from "@/hooks/useFolders";
+import { useDocumentUpload } from "@/hooks/archive/useDocumentUpload";
+import { useFolders } from "@/hooks/archive/useFolders";
 import { Upload, Loader2, FileText } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { DocumentUploadData } from "@/types/documents";

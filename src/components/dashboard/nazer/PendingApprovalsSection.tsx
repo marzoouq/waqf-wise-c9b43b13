@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Clock, FileText, TrendingUp, DollarSign, AlertCircle } from "lucide-react";
-import { usePendingApprovals } from "@/hooks/usePendingApprovals";
+import { usePendingApprovals } from "@/hooks/requests/usePendingApprovals";
 import { useNavigate } from "react-router-dom";
 import { format, arLocale as ar } from "@/lib/date";
 import { Skeleton } from "@/components/ui/skeleton";

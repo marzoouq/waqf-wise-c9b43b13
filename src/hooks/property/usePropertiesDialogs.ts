@@ -1,8 +1,8 @@
 import { useState, useCallback } from "react";
-import { type Property } from "@/hooks/useProperties";
-import { type Contract } from "@/hooks/useContracts";
+import { type Property } from "@/hooks/property/useProperties";
+import { type Contract } from "@/hooks/property/useContracts";
 import { type RentalPayment } from "@/hooks/useRentalPayments";
-import { type MaintenanceRequest } from "@/hooks/useMaintenanceRequests";
+import { type MaintenanceRequest } from "@/hooks/property/useMaintenanceRequests";
 
 export const usePropertiesDialogs = () => {
   const [propertyDialogOpen, setPropertyDialogOpen] = useState(false);

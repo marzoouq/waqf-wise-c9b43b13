@@ -8,8 +8,8 @@ import { MobileOptimizedLayout } from "@/components/layout/MobileOptimizedLayout
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useFiscalYears } from "@/hooks/useFiscalYears";
-import { useFiscalYearClosings } from "@/hooks/useFiscalYearClosings";
+import { useFiscalYears } from "@/hooks/accounting/useFiscalYears";
+import { useFiscalYearClosings } from "@/hooks/accounting/useFiscalYearClosings";
 import { CalendarIcon, Lock, Unlock, FileCheck, FileX, TrendingUp, AlertCircle, TestTube, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format, arLocale as ar } from "@/lib/date";

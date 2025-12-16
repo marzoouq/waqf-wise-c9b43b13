@@ -7,7 +7,7 @@ import { SimulationDialog } from "@/components/funds/SimulationDialog";
 import { DistributionSettingsDialog } from "@/components/distributions/DistributionSettingsDialog";
 import { useDistributions } from "@/hooks/distributions/useDistributions";
 import { useWaqfUnits } from "@/hooks/distributions/useWaqfUnits";
-import { useJournalEntries } from "@/hooks/useJournalEntries";
+import { useJournalEntries } from "@/hooks/accounting/useJournalEntries";
 import { logger } from "@/lib/logger";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { AnnualDisclosureTab } from "@/components/funds/tabs/AnnualDisclosureTab";

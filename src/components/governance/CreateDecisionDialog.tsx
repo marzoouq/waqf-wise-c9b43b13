@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useGovernanceDecisions } from "@/hooks/useGovernanceDecisions";
+import { useGovernanceDecisions } from "@/hooks/governance/useGovernanceDecisions";
 import { useToast } from "@/hooks/ui/use-toast";
 import {
   Dialog,

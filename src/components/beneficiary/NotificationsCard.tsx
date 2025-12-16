@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Bell, CheckCircle2, AlertCircle, Info, ChevronLeft } from "lucide-react";
-import { useNotifications, Notification } from "@/hooks/useNotifications";
+import { useNotifications, Notification } from "@/hooks/notifications/useNotifications";
 import { useNavigate } from "react-router-dom";
 import { format, arLocale as ar } from "@/lib/date";
 

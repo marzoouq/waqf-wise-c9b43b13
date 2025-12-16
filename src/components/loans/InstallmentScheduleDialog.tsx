@@ -1,7 +1,7 @@
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { useLoanInstallments } from "@/hooks/useLoanInstallments";
+import { useLoanInstallments } from "@/hooks/payments/useLoanInstallments";
 import { formatDate } from "@/lib/date";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { Calendar, DollarSign, CheckCircle2, Clock, AlertCircle } from "lucide-react";

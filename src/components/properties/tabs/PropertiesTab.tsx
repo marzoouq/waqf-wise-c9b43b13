@@ -1,12 +1,12 @@
 import { useState, useMemo } from "react";
 import { Search, MapPin, DollarSign, Home, Building, Edit, Trash2, Eye } from "lucide-react";
-import { useProperties } from "@/hooks/useProperties";
+import { useProperties, type Property } from "@/hooks/property/useProperties";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { StatCard } from "@/components/dashboard/DashboardStats";
 import { UnifiedDataTable } from "@/components/unified/UnifiedDataTable";
-import { type Property } from "@/hooks/useProperties";
+
 
 interface Props {
   onEdit: (property: Property) => void;

@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useNotifications } from "@/hooks/useNotifications";
+import { useNotifications } from "@/hooks/notifications/useNotifications";
 import { NotificationItem } from "@/components/notifications/NotificationItem";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { useNavigate } from "react-router-dom";

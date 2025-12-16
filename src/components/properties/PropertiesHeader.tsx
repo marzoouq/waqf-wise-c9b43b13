@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Building, FileText, DollarSign, Wrench, LucideIcon, Brain, Users } from "lucide-react";
 import { ExportButton } from "@/components/shared/ExportButton";
-import { type Property } from "@/hooks/useProperties";
+import { type Property } from "@/hooks/property/useProperties";
 
 interface PropertiesHeaderProps {
   activeTab: string;

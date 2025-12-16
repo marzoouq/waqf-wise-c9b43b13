@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/hooks/useAuth";
-import { useMessages, type Message } from "@/hooks/useMessages";
+import { useMessages, type Message } from "@/hooks/messages/useMessages";
 import { useAvailableUsers } from "@/hooks/messages/useAvailableUsers";
 import { format, arLocale as ar } from "@/lib/date";
 import {

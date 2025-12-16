@@ -1,14 +1,14 @@
 import { useState, useMemo } from "react";
 import { Search, Edit, Trash2 } from "lucide-react";
-import { useMaintenanceRequests } from "@/hooks/useMaintenanceRequests";
-import { useMaintenanceSchedules } from "@/hooks/useMaintenanceSchedules";
+import { useMaintenanceRequests } from "@/hooks/property/useMaintenanceRequests";
+import { useMaintenanceSchedules } from "@/hooks/property/useMaintenanceSchedules";
 import { Input } from "@/components/ui/input";
 import { MaintenanceScheduleCalendar } from "@/components/maintenance/MaintenanceScheduleCalendar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { format, arLocale as ar } from "@/lib/date";
-import { type MaintenanceRequest } from "@/hooks/useMaintenanceRequests";
+import { type MaintenanceRequest } from "@/hooks/property/useMaintenanceRequests";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { ExportButton } from "@/components/shared/ExportButton";
 import { UnifiedDataTable } from "@/components/unified/UnifiedDataTable";

@@ -3,7 +3,7 @@ import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layou
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { AlertCircle, Clock, CheckCircle, XCircle } from "lucide-react";
-import { useEmergencyAid } from "@/hooks/useEmergencyAid";
+import { useEmergencyAid } from "@/hooks/beneficiary/useEmergencyAid";
 import { UnifiedDataTable, type Column } from "@/components/unified/UnifiedDataTable";
 import { Badge } from "@/components/ui/badge";
 import { format, arLocale as ar } from "@/lib/date";

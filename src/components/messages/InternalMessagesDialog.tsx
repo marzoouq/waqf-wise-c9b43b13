@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Send, Mail, MailOpen, Inbox, SendIcon, Reply } from "lucide-react";
-import { useInternalMessages } from "@/hooks/useInternalMessages";
+import { useInternalMessages } from "@/hooks/messages/useInternalMessages";
 import { useAuth } from "@/hooks/useAuth";
 import { format, arLocale as ar } from "@/lib/date";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";

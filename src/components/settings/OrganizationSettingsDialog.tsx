@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useOrganizationSettings } from "@/hooks/useOrganizationSettings";
+import { useOrganizationSettings } from "@/hooks/governance/useOrganizationSettings";
 import { Building2, Loader2 } from "lucide-react";
 
 const organizationSchema = z.object({

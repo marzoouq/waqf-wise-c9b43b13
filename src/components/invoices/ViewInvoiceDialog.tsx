@@ -3,7 +3,7 @@ import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { Printer, Download, Loader2, Mail } from "lucide-react";
 import EnhancedInvoiceView from "./EnhancedInvoiceView";
-import { useOrganizationSettings } from "@/hooks/useOrganizationSettings";
+import { useOrganizationSettings } from "@/hooks/governance/useOrganizationSettings";
 import { generateInvoicePDF } from "@/lib/generateInvoicePDF";
 import { toast } from "sonner";
 import { useState } from "react";

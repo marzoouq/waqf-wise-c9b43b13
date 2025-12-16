@@ -16,7 +16,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
 import { EdgeFunctionService } from "@/services";
 import { toast } from "sonner";
-import type { FiscalYear } from "@/hooks/useFiscalYears";
+import type { FiscalYear } from "@/hooks/accounting/useFiscalYears";
 import { FiscalYearClosingStats } from "./FiscalYearClosingStats";
 import { formatCurrency } from "@/lib/utils";
 import { useClosingPreview } from "@/hooks/fiscal-years/useFiscalYearData";

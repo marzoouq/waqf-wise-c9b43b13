@@ -7,7 +7,7 @@ import { MobileScrollHint } from "@/components/shared/MobileScrollHint";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { Wallet } from "lucide-react";
-import { Fund } from "@/hooks/useFunds";
+import { Fund } from "@/hooks/distributions/useFunds";
 
 interface FundsTabProps {
   funds: Fund[];
