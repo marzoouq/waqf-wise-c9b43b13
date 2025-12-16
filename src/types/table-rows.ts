@@ -4,7 +4,7 @@
 
 import type { Database } from "@/integrations/supabase/types";
 import type { EmergencyAid } from "./loans";
-import type { Loan } from "@/hooks/useLoans";
+import type { Loan } from "@/hooks/payments/useLoans";
 
 // Badge variants type
 export type BadgeVariant = "default" | "secondary" | "destructive" | "outline";

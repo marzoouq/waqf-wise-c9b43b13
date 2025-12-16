@@ -87,7 +87,7 @@ describe('Distribution Flow Integration', () => {
         { id: 'hd-2', distribution_id: mockDistributions[0].id, beneficiary_id: mockBeneficiaries[1].id, amount: 75000, status: 'مدفوع' },
       ]);
 
-      const { useDistributionDetails } = await import('@/hooks/useDistributionDetails');
+      const { useDistributionDetails } = await import('@/hooks/distributions/useDistributionDetails');
       const { result } = renderHook(() => useDistributionDetails(mockDistributions[0].id), {
         wrapper: createWrapper(),
       });
@@ -189,7 +189,7 @@ describe('Distribution Flow Integration', () => {
     it('should calculate Islamic heir shares', async () => {
       setMockTableData('beneficiaries', mockBeneficiaries);
       
-      const { useDistributionEngine } = await import('@/hooks/useDistributionEngine');
+      const { useDistributionEngine } = await import('@/hooks/distributions/useDistributionEngine');
       const { result } = renderHook(() => useDistributionEngine(), {
         wrapper: createWrapper(),
       });

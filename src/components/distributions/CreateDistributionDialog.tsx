@@ -14,10 +14,10 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Loader2, Calculator, Users, Bell } from "lucide-react";
-import { useBeneficiaries } from "@/hooks/useBeneficiaries";
-import { useDistributions } from "@/hooks/useDistributions";
+import { useBeneficiaries } from "@/hooks/beneficiary/useBeneficiaries";
+import { useDistributions } from "@/hooks/distributions/useDistributions";
 import { useToast } from "@/hooks/ui/use-toast";
-import { useDistributionSettings } from "@/hooks/useDistributionSettings";
+import { useDistributionSettings } from "@/hooks/distributions/useDistributionSettings";
 import { UnifiedFormField, FormGrid, FormSection } from "@/components/unified/UnifiedFormField";
 
 const distributionSchema = z.object({

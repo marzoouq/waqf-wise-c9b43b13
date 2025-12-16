@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/ui/use-toast";
 import { Card, CardContent } from "@/components/ui/card";
 import { Database, Download, Upload, AlertCircle, Clock, CheckCircle2, XCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useBackup } from "@/hooks/useBackup";
+import { useBackup } from "@/hooks/system/useBackup";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { Badge } from "@/components/ui/badge";
 

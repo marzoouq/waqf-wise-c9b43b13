@@ -5,8 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Save, X } from "lucide-react";
-import { useBeneficiaryCategories } from "@/hooks/useBeneficiaryCategories";
-import { useSavedSearches } from "@/hooks/useSavedSearches";
+import { useBeneficiaryCategories } from "@/hooks/beneficiary/useBeneficiaryCategories";
+import { useSavedSearches } from "@/hooks/ui/useSavedSearches";
 
 interface AdvancedSearchDialogProps {
   open: boolean;

@@ -1,5 +1,5 @@
 import { UnifiedTimeline, TimelineEvent } from "@/components/unified/UnifiedTimeline";
-import { Distribution } from "@/hooks/useDistributions";
+import { Distribution } from "@/hooks/distributions/useDistributions";
 import { CheckCircle, XCircle, Clock, FileText } from "lucide-react";
 import { useMemo } from "react";
 import { useDistributionTimeline } from "@/hooks/distributions/useDistributionTabsData";

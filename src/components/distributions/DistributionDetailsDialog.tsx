@@ -2,8 +2,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { useDistributionDetails } from "@/hooks/useDistributionDetails";
-import { Distribution } from "@/hooks/useDistributions";
+import { useDistributionDetails } from "@/hooks/distributions/useDistributionDetails";
+import { Distribution } from "@/hooks/distributions/useDistributions";
 import { DistributionVouchersTab } from "./DistributionVouchersTab";
 import { Loader2, Users, Receipt } from "lucide-react";
 

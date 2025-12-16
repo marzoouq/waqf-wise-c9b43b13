@@ -25,7 +25,7 @@ import {
   Users
 } from "lucide-react";
 import { useToast } from "@/hooks/ui/use-toast";
-import { useBeneficiaries } from "@/hooks/useBeneficiaries";
+import { useBeneficiaries } from "@/hooks/beneficiary/useBeneficiaries";
 
 interface SimulationResult {
   beneficiary_id: string;

@@ -7,7 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Send, Mail, Users } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { useBeneficiaries } from "@/hooks/useBeneficiaries";
+import { useBeneficiaries } from "@/hooks/beneficiary/useBeneficiaries";
 import { MessageService } from "@/services/message.service";
 import { useToast } from "@/hooks/ui/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";

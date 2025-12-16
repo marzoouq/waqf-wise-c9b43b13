@@ -26,7 +26,7 @@ import {
   Loader2,
   AlertTriangle
 } from "lucide-react";
-import { useActiveSessions } from "@/hooks/useActiveSessions";
+import { useActiveSessions } from "@/hooks/auth/useActiveSessions";
 import { formatDate, formatRelative } from "@/lib/date";
 import {
   AlertDialog,
