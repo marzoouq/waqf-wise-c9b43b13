@@ -5,7 +5,7 @@ import { ContractsTable } from "../ContractsTable";
 import { MonthlyRevenueChart } from "../MonthlyRevenueChart";
 import { DistributionPieChart } from "../DistributionPieChart";
 import { EmptyPaymentsState } from "../EmptyPaymentsState";
-import { HistoricalRentalDetailsCard } from "@/components/fiscal-year";
+import { HistoricalRentalDetailsCard } from "@/components/fiscal-years";
 import { useBeneficiaryProfile } from "@/hooks/beneficiary";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFiscalYearPublishInfo } from "@/hooks/fiscal-years";

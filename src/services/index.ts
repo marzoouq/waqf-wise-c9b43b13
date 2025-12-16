@@ -1,6 +1,6 @@
 /**
  * Services Layer - الطبقة الخدمية للتطبيق
- * @version 2.8.86
+ * @version 2.9.24
  * @description تغطية 100% - جميع عمليات Supabase تمر عبر الخدمات
  * 
  * @summary
@@ -42,9 +42,9 @@ export { DistributionService, type DistributionSummary } from './distribution.se
 export { AccountingService, type FinancialSummary } from './accounting.service';
 export { ArchiveService, type ArchiveStats } from './archive.service';
 export { LoansService, type LoanStats, type LoanWithInstallments } from './loans.service';
-export { AuthService, PermissionsService, TwoFactorService, type UserProfile, type LoginResult } from './auth.service';
-export { PermissionsService as PermissionsSvc, type Permission, type RolePermission } from './permissions.service';
-export { TwoFactorService as TwoFactorSvc, type TwoFactorStatus } from './two-factor.service';
+export { AuthService, type UserProfile, type LoginResult } from './auth.service';
+export { PermissionsService, type Permission, type RolePermission } from './permissions.service';
+export { TwoFactorService, type TwoFactorStatus } from './two-factor.service';
 export { DashboardService, type SystemOverviewStats, type UnifiedKPIsData, type DashboardKPIs, type BankBalanceData, type FiscalYearCorpus } from './dashboard.service';
 export { ApprovalService } from './approval.service';
 export { FiscalYearService } from './fiscal-year.service';

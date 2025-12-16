@@ -29,7 +29,7 @@ import {
 } from "lucide-react";
 import { AnnualDisclosure, useAnnualDisclosures } from "@/hooks/reports/useAnnualDisclosures";
 import { SmartDisclosureDocuments } from "@/components/reports/SmartDisclosureDocuments";
-import { HistoricalRentalDetailsCard } from "@/components/fiscal-year/HistoricalRentalDetailsCard";
+import { HistoricalRentalDetailsCard } from "@/components/fiscal-years";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from "@/components/ui/table";
 import { YearComparisonCard } from "@/components/disclosure/YearComparisonCard";
 import { DisclosureCharts } from "@/components/disclosure/DisclosureCharts";
