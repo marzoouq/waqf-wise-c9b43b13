@@ -18,7 +18,7 @@ import { LeakedPasswordCheck } from "@/components/settings/LeakedPasswordCheck";
 import { LanguageSelector } from "@/components/settings/LanguageSelector";
 import { RolesSettingsDialog } from "@/components/settings/RolesSettingsDialog";
 import { BiometricSettings } from "@/components/settings/BiometricSettings";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 import { useUserRole } from "@/hooks/useUserRole";
 import { MobileOptimizedLayout, MobileOptimizedHeader, MobileOptimizedGrid } from "@/components/layout/MobileOptimizedLayout";
 

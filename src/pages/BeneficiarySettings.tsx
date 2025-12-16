@@ -11,7 +11,7 @@ import { LeakedPasswordCheck } from "@/components/settings/LeakedPasswordCheck";
 import { BiometricSettings } from "@/components/settings/BiometricSettings";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 import { MobileOptimizedLayout, MobileOptimizedHeader, MobileOptimizedGrid } from "@/components/layout/MobileOptimizedLayout";
 
 const BeneficiarySettings = () => {

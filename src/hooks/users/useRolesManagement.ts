@@ -6,7 +6,7 @@
 
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 import { type AppRole } from "@/types/roles";
 import { UserService } from "@/services";
 import { invalidateUserQueries } from "@/lib/query-invalidation";

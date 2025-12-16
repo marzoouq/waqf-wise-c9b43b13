@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { ResponsiveDialog, DialogFooter } from "@/components/shared/ResponsiveDialog";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 import { type Property } from "@/hooks/useProperties";
 import { UnifiedFormField, FormGrid } from "@/components/unified/UnifiedFormField";
 

@@ -11,7 +11,7 @@ import { useSystemSettings } from "@/hooks/useSystemSettings";
 import { Settings, DollarSign, Bell, Shield, Globe, Save, RotateCcw } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { ErrorState } from "@/components/shared/ErrorState";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 
 interface SystemSettingsDialogProps {
   open: boolean;

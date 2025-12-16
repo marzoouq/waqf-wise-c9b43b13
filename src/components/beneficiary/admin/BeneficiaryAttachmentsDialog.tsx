@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { UnifiedFileUpload, UploadedFile } from "@/components/unified/UnifiedFileUpload";
 import { Button } from "@/components/ui/button";
 import { BeneficiaryService } from "@/services/beneficiary.service";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/ui/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { Beneficiary } from "@/types/beneficiary";
 import { Loader2 } from "lucide-react";

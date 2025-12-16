@@ -5,7 +5,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AutoJournalService, type AutoJournalTemplate, type AutoJournalTemplateInsert } from '@/services/accounting.service';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/ui/use-toast';
 import { QUERY_KEYS } from '@/lib/query-keys';
 
 export type { AutoJournalTemplate, AutoJournalTemplateInsert };

@@ -5,7 +5,7 @@ import { LoadingState } from '@/components/shared/LoadingState';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { exportToExcel, exportToPDF } from '@/lib/exportHelpers';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/ui/use-toast';
 import { ReportRefreshIndicator } from './ReportRefreshIndicator';
 import { useDistributionAnalysisReport } from '@/hooks/reports/useDistributionAnalysisReport';
 
