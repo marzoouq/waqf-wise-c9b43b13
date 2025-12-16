@@ -77,7 +77,7 @@ export default function SystemErrorLogs() {
 
   return (
     <PageErrorBoundary pageName="سجلات الأخطاء">
-      <div className="container mx-auto p-6 space-y-6">
+      <div className="container mx-auto px-3 py-4 sm:px-4 sm:py-5 md:px-6 md:py-6 lg:px-8 lg:py-8 space-y-4 sm:space-y-5 md:space-y-6">
       <div>
         <h1 className="text-3xl font-bold">سجلات الأخطاء والتنبيهات</h1>
         <p className="text-muted-foreground">مراقبة وإدارة أخطاء النظام</p>

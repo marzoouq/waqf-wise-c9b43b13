@@ -44,7 +44,7 @@ export default function SystemMonitoring() {
 
   return (
     <PageErrorBoundary pageName="مراقبة النظام">
-      <div className="container mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
+      <div className="container mx-auto px-3 py-4 sm:px-4 sm:py-5 md:px-6 md:py-6 lg:px-8 lg:py-8 space-y-4 sm:space-y-5 md:space-y-6">
         {/* العنوان */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div>
