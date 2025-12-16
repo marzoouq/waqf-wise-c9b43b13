@@ -3,6 +3,7 @@
  */
 
 import { supabase } from "@/integrations/supabase/client";
+import { productionLogger } from "@/lib/logger/production-logger";
 
 export interface BankBalanceData {
   id: string;
@@ -127,7 +128,7 @@ export const FinancialCardsService = {
       .rpc('get_waqf_public_stats');
 
     if (publicError) {
-      console.error('Error fetching public stats:', publicError);
+      productionLogger.error('Error fetching public stats:', publicError);
       throw publicError;
     }
 
