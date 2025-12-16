@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Lock, Activity, Settings, Mail, RefreshCw } from "lucide-react";
+import { LayoutDashboard, Users, Lock, Activity, Settings, Mail } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Suspense, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -37,9 +37,6 @@ export default function AdminDashboard() {
       actions={
         <div className="flex items-center gap-2">
           <LastSyncIndicator onRefresh={handleRefresh} />
-          <Button onClick={handleRefresh} variant="ghost" size="icon" title="تحديث البيانات">
-            <RefreshCw className="h-4 w-4" />
-          </Button>
           <Button onClick={() => setMessageDialogOpen(true)} className="gap-2">
             <Mail className="h-4 w-4" />
             <span className="hidden sm:inline">إرسال رسالة</span>
