@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Landmark } from "lucide-react";
-import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
+import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
 import { useBeneficiaryBankAccounts } from "@/hooks/beneficiary/useBeneficiaryTabsData";
 import { MaskedValue } from "@/components/shared/MaskedValue";
 import { ErrorState } from "@/components/shared/ErrorState";

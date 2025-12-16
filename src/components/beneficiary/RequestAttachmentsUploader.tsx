@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useRequestAttachments } from "@/hooks/useRequestAttachments";
+import { useRequestAttachments } from "@/hooks/requests/useRequestAttachments";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useTasks } from "@/hooks/useTasks";
+import { useTasks } from "@/hooks/ui/useTasks";
 import { CheckSquare, AlertCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/shared/EmptyState";

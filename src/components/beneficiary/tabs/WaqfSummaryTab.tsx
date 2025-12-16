@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Building2, TrendingUp, Users, Landmark, DollarSign, EyeOff } from "lucide-react";
-import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
+import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
 import { MaskedValue } from "@/components/shared/MaskedValue";
 import { useWaqfSummary } from "@/hooks/beneficiary/useWaqfSummary";
 import { useFiscalYearPublishInfo } from "@/hooks/fiscal-years";

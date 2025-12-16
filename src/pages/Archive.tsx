@@ -16,7 +16,7 @@ import { useFolders } from "@/hooks/archive/useFolders";
 import { useArchiveStats } from "@/hooks/archive/useArchiveStats";
 import { useDocumentUpload } from "@/hooks/archive/useDocumentUpload";
 import { useAuth } from "@/hooks/useAuth";
-import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
+import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   ArchiveStatsCards,

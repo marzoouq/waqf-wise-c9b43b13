@@ -22,7 +22,7 @@ import { SystemError, SystemAlert } from "@/types/monitoring";
 import { AdminAlertsPanel } from "@/components/system/AdminAlertsPanel";
 import { SelfHealingToolsPanel } from "@/components/system/SelfHealingToolsPanel";
 import { SystemHealthDashboard } from "@/components/system/SystemHealthDashboard";
-import { useSystemMonitoring } from "@/hooks/useSystemMonitoring";
+import { useSystemMonitoring } from "@/hooks/system/useSystemMonitoring";
 
 export default function SystemMonitoring() {
   const [activeTab, setActiveTab] = useState("overview");

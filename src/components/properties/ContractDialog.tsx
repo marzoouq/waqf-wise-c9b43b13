@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useContracts, Contract } from "@/hooks/property/useContracts";
 import { useProperties } from "@/hooks/property/useProperties";
-import { usePropertyUnits } from "@/hooks/usePropertyUnits";
+import { usePropertyUnits } from "@/hooks/property/usePropertyUnits";
 import { toast } from "@/hooks/ui/use-toast";
 import { Lightbulb } from "lucide-react";
 import { useContractForm } from "./contract/useContractForm";

@@ -55,7 +55,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { useUserRole } from "@/hooks/useUserRole";
+import { useUserRole } from "@/hooks/auth/useUserRole";
 import { useMemo } from "react";
 
 // القائمة المنظمة الجديدة - 8 مجموعات رئيسية

@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
+import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
 import { User } from "lucide-react";
 import { sidebarItems } from "./config/sidebarConfig";
 import { APP_VERSION } from "@/lib/version";

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { usePushNotifications } from '@/hooks/usePushNotifications';
+import { usePushNotifications } from '@/hooks/notifications/usePushNotifications';
 import { Bell, Check, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';

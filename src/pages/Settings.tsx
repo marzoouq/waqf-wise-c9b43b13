@@ -19,7 +19,7 @@ import { LanguageSelector } from "@/components/settings/LanguageSelector";
 import { RolesSettingsDialog } from "@/components/settings/RolesSettingsDialog";
 import { BiometricSettings } from "@/components/settings/BiometricSettings";
 import { useToast } from "@/hooks/ui/use-toast";
-import { useUserRole } from "@/hooks/useUserRole";
+import { useUserRole } from "@/hooks/auth/useUserRole";
 import { MobileOptimizedLayout, MobileOptimizedHeader, MobileOptimizedGrid } from "@/components/layout/MobileOptimizedLayout";
 
 const Settings = () => {

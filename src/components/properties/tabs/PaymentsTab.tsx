@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { Search, Edit, Trash2, FileText, Receipt } from "lucide-react";
-import { useRentalPayments } from "@/hooks/useRentalPayments";
+import { useRentalPayments, type RentalPayment } from "@/hooks/property/useRentalPayments";
 import { useDocumentViewer } from "@/hooks/payments/useDocumentViewer";
 import { Input } from "@/components/ui/input";
 import { ArrearsReport } from "@/components/rental/ArrearsReport";
@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { format, arLocale as ar } from "@/lib/date";
-import { type RentalPayment } from "@/hooks/useRentalPayments";
+
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 
 interface Props {

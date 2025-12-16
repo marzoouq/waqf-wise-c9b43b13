@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useSystemSettings } from "@/hooks/useSystemSettings";
+import { useSystemSettings } from "@/hooks/system/useSystemSettings";
 import { Settings, DollarSign, Bell, Shield, Globe, Save, RotateCcw } from "lucide-react";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { ErrorState } from "@/components/shared/ErrorState";

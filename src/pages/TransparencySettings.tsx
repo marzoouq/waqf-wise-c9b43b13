@@ -6,13 +6,13 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowRight, Save, RotateCcw, Eye, Shield, DollarSign, Users, Lock, Briefcase, CreditCard, PieChart, MessageSquare } from "lucide-react";
-import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
+import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { Separator } from "@/components/ui/separator";
-import { useUserRole } from "@/hooks/useUserRole";
+import { useUserRole } from "@/hooks/auth/useUserRole";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function TransparencySettings() {

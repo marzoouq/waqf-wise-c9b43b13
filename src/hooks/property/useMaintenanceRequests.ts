@@ -3,7 +3,7 @@ import { toast } from "@/hooks/ui/use-toast";
 import { createMutationErrorHandler } from "@/lib/errors";
 import type { MaintenanceRequestInsert } from "@/types/maintenance";
 import { useJournalEntries } from "@/hooks/accounting/useJournalEntries";
-import { useTasks } from "@/hooks/useTasks";
+import { useTasks } from "@/hooks/ui/useTasks";
 import { useEffect } from "react";
 import { logger } from "@/lib/logger";
 import { MaintenanceService, RealtimeService } from "@/services";

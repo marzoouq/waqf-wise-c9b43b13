@@ -1,4 +1,4 @@
-import { usePropertyUnits } from "@/hooks/usePropertyUnits";
+import { usePropertyUnits } from "@/hooks/property/usePropertyUnits";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { LoadingState } from "@/components/shared/LoadingState";

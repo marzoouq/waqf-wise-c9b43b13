@@ -1,5 +1,5 @@
 import { ClipboardList, Clock, AlertTriangle, CheckCircle, TrendingUp } from 'lucide-react';
-import { useRequests } from '@/hooks/useRequests';
+import { useRequests } from '@/hooks/requests/useRequests';
 import { useNavigate } from 'react-router-dom';
 import { safeFilter, safeLength } from '@/lib/utils/array-safe';
 import { UnifiedSectionHeader } from '@/components/unified/UnifiedSectionHeader';

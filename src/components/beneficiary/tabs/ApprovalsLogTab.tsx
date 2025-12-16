@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, XCircle, Clock } from "lucide-react";
-import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
+import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
 import { useApprovalsLog } from "@/hooks/beneficiary/useBeneficiaryTabsData";
 import { format, arLocale as ar } from "@/lib/date";
 import { ErrorState } from "@/components/shared/ErrorState";
