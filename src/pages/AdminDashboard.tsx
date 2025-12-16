@@ -48,43 +48,46 @@ export default function AdminDashboard() {
       }
     >
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-grid h-auto p-1 bg-muted/50">
-          <TabsTrigger 
-            value="system" 
-            className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
-          >
-            <LayoutDashboard className="h-4 w-4" />
-            <span className="hidden sm:inline">النظام</span>
-          </TabsTrigger>
-          <TabsTrigger 
-            value="users" 
-            className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
-          >
-            <Users className="h-4 w-4" />
-            <span className="hidden sm:inline">المستخدمون</span>
-          </TabsTrigger>
-          <TabsTrigger 
-            value="security" 
-            className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
-          >
-            <Lock className="h-4 w-4" />
-            <span className="hidden sm:inline">الأمان</span>
-          </TabsTrigger>
-          <TabsTrigger 
-            value="performance" 
-            className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
-          >
-            <Activity className="h-4 w-4" />
-            <span className="hidden sm:inline">الأداء</span>
-          </TabsTrigger>
-          <TabsTrigger 
-            value="settings" 
-            className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
-          >
-            <Settings className="h-4 w-4" />
-            <span className="hidden sm:inline">الإعدادات</span>
-          </TabsTrigger>
-        </TabsList>
+        {/* التبويبات - قابلة للتمرير على الجوال */}
+        <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+          <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-5 h-auto p-1 bg-muted/50 min-w-full sm:min-w-0">
+            <TabsTrigger 
+              value="system" 
+              className="gap-1.5 sm:gap-2 px-3 sm:px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm whitespace-nowrap"
+            >
+              <LayoutDashboard className="h-4 w-4" />
+              <span className="text-xs sm:text-sm">النظام</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="users" 
+              className="gap-1.5 sm:gap-2 px-3 sm:px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm whitespace-nowrap"
+            >
+              <Users className="h-4 w-4" />
+              <span className="text-xs sm:text-sm">المستخدمون</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="security" 
+              className="gap-1.5 sm:gap-2 px-3 sm:px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm whitespace-nowrap"
+            >
+              <Lock className="h-4 w-4" />
+              <span className="text-xs sm:text-sm">الأمان</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="performance" 
+              className="gap-1.5 sm:gap-2 px-3 sm:px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm whitespace-nowrap"
+            >
+              <Activity className="h-4 w-4" />
+              <span className="text-xs sm:text-sm">الأداء</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="settings" 
+              className="gap-1.5 sm:gap-2 px-3 sm:px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm whitespace-nowrap"
+            >
+              <Settings className="h-4 w-4" />
+              <span className="text-xs sm:text-sm">الإعدادات</span>
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         {/* System Tab */}
         <TabsContent value="system" className="space-y-6 mt-6">

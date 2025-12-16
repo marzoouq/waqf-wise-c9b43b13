@@ -99,14 +99,14 @@ export default function FiscalYearsManagement() {
           )}
 
           <Tabs defaultValue="open" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="open">
-                <Unlock className="h-4 w-4 ml-2" />
-                السنوات المفتوحة ({openYears.length})
+            <TabsList className="grid w-full grid-cols-2 h-auto">
+              <TabsTrigger value="open" className="gap-1.5 sm:gap-2 text-xs sm:text-sm py-2.5">
+                <Unlock className="h-4 w-4" />
+                <span>المفتوحة ({openYears.length})</span>
               </TabsTrigger>
-              <TabsTrigger value="closed">
-                <Lock className="h-4 w-4 ml-2" />
-                السنوات المغلقة ({closedYears.length})
+              <TabsTrigger value="closed" className="gap-1.5 sm:gap-2 text-xs sm:text-sm py-2.5">
+                <Lock className="h-4 w-4" />
+                <span>المغلقة ({closedYears.length})</span>
               </TabsTrigger>
             </TabsList>
 

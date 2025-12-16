@@ -54,20 +54,20 @@ export function UserManagementSection() {
       </CardHeader>
       <CardContent className="space-y-4">
         {/* إحصائيات سريعة */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
           <div className="text-center p-3 rounded-lg bg-primary/10">
-            <Users className="h-5 w-5 mx-auto mb-2 text-primary" />
-            <p className="text-2xl font-bold">{stats.totalUsers}</p>
+            <Users className="h-4 w-4 sm:h-5 sm:w-5 mx-auto mb-1 sm:mb-2 text-primary" />
+            <p className="text-xl sm:text-2xl font-bold">{stats.totalUsers}</p>
             <p className="text-xs text-muted-foreground">إجمالي المستخدمين</p>
           </div>
           <div className="text-center p-3 rounded-lg bg-status-success/10">
-            <UserCheck className="h-5 w-5 mx-auto mb-2 text-status-success" />
-            <p className="text-2xl font-bold">{stats.activeUsers}</p>
+            <UserCheck className="h-4 w-4 sm:h-5 sm:w-5 mx-auto mb-1 sm:mb-2 text-status-success" />
+            <p className="text-xl sm:text-2xl font-bold">{stats.activeUsers}</p>
             <p className="text-xs text-muted-foreground">نشط</p>
           </div>
           <div className="text-center p-3 rounded-lg bg-accent/10">
-            <Shield className="h-5 w-5 mx-auto mb-2 text-accent" />
-            <p className="text-2xl font-bold">{stats.adminCount}</p>
+            <Shield className="h-4 w-4 sm:h-5 sm:w-5 mx-auto mb-1 sm:mb-2 text-accent" />
+            <p className="text-xl sm:text-2xl font-bold">{stats.adminCount}</p>
             <p className="text-xs text-muted-foreground">مشرفين</p>
           </div>
         </div>

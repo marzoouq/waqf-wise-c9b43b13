@@ -81,24 +81,26 @@ export default function NazerDashboard() {
 
         {/* تبويبات لوحة التحكم الشاملة */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-4">
-            <TabsTrigger value="overview" className="gap-2">
-              <Activity className="h-4 w-4" />
-              <span className="hidden sm:inline">نظرة عامة</span>
-            </TabsTrigger>
-            <TabsTrigger value="beneficiaries" className="gap-2">
-              <Users className="h-4 w-4" />
-              <span className="hidden sm:inline">المستفيدون</span>
-            </TabsTrigger>
-            <TabsTrigger value="reports" className="gap-2">
-              <FileText className="h-4 w-4" />
-              <span className="hidden sm:inline">التقارير</span>
-            </TabsTrigger>
-            <TabsTrigger value="settings" className="gap-2">
-              <Settings className="h-4 w-4" />
-              <span className="hidden sm:inline">التحكم</span>
-            </TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+            <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-4 mb-4 min-w-full sm:min-w-0">
+              <TabsTrigger value="overview" className="gap-1.5 sm:gap-2 px-3 sm:px-4 whitespace-nowrap">
+                <Activity className="h-4 w-4" />
+                <span className="text-xs sm:text-sm">نظرة عامة</span>
+              </TabsTrigger>
+              <TabsTrigger value="beneficiaries" className="gap-1.5 sm:gap-2 px-3 sm:px-4 whitespace-nowrap">
+                <Users className="h-4 w-4" />
+                <span className="text-xs sm:text-sm">المستفيدون</span>
+              </TabsTrigger>
+              <TabsTrigger value="reports" className="gap-1.5 sm:gap-2 px-3 sm:px-4 whitespace-nowrap">
+                <FileText className="h-4 w-4" />
+                <span className="text-xs sm:text-sm">التقارير</span>
+              </TabsTrigger>
+              <TabsTrigger value="settings" className="gap-1.5 sm:gap-2 px-3 sm:px-4 whitespace-nowrap">
+                <Settings className="h-4 w-4" />
+                <span className="text-xs sm:text-sm">التحكم</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* تبويب نظرة عامة */}
           <TabsContent value="overview" className="space-y-6">

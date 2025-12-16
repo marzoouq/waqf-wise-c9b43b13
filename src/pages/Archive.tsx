@@ -212,20 +212,22 @@ const Archive = () => {
           <ArchiveStatsCards stats={stats} />
 
           <Tabs defaultValue="folders" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="folders">
-                <FolderOpen className="h-4 w-4 ms-2" />
-                المجلدات
-              </TabsTrigger>
-              <TabsTrigger value="documents">
-                <FileText className="h-4 w-4 ms-2" />
-                المستندات
-              </TabsTrigger>
-              <TabsTrigger value="smart">
-                <Search className="h-4 w-4 ms-2" />
-                الميزات الذكية
-              </TabsTrigger>
-            </TabsList>
+            <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+              <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-3 min-w-full sm:min-w-0">
+                <TabsTrigger value="folders" className="gap-1.5 sm:gap-2 px-3 sm:px-4 whitespace-nowrap">
+                  <FolderOpen className="h-4 w-4" />
+                  <span className="text-xs sm:text-sm">المجلدات</span>
+                </TabsTrigger>
+                <TabsTrigger value="documents" className="gap-1.5 sm:gap-2 px-3 sm:px-4 whitespace-nowrap">
+                  <FileText className="h-4 w-4" />
+                  <span className="text-xs sm:text-sm">المستندات</span>
+                </TabsTrigger>
+                <TabsTrigger value="smart" className="gap-1.5 sm:gap-2 px-3 sm:px-4 whitespace-nowrap">
+                  <Search className="h-4 w-4" />
+                  <span className="text-xs sm:text-sm">الميزات الذكية</span>
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
             <TabsContent value="folders">
               <ArchiveFoldersTab

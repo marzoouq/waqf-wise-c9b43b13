@@ -90,29 +90,31 @@ export default function CashierDashboard() {
 
         {/* Tabs Section */}
         <Tabs defaultValue="overview" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-3 h-auto p-1 bg-muted/50">
-            <TabsTrigger 
-              value="overview" 
-              className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
-            >
-              <CheckCircle className="h-4 w-4" />
-              <span className="hidden sm:inline">نظرة عامة</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="actions"
-              className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
-            >
-              <Receipt className="h-4 w-4" />
-              <span className="hidden sm:inline">إجراءات سريعة</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="recent"
-              className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
-            >
-              <Clock className="h-4 w-4" />
-              <span className="hidden sm:inline">العمليات الأخيرة</span>
-            </TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+            <TabsList className="inline-flex w-max sm:w-full sm:grid sm:grid-cols-3 h-auto p-1 bg-muted/50 min-w-full sm:min-w-0">
+              <TabsTrigger 
+                value="overview" 
+                className="gap-1.5 sm:gap-2 px-3 sm:px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm whitespace-nowrap"
+              >
+                <CheckCircle className="h-4 w-4" />
+                <span className="text-xs sm:text-sm">نظرة عامة</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="actions"
+                className="gap-1.5 sm:gap-2 px-3 sm:px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm whitespace-nowrap"
+              >
+                <Receipt className="h-4 w-4" />
+                <span className="text-xs sm:text-sm">إجراءات سريعة</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="recent"
+                className="gap-1.5 sm:gap-2 px-3 sm:px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm whitespace-nowrap"
+              >
+                <Clock className="h-4 w-4" />
+                <span className="text-xs sm:text-sm">العمليات الأخيرة</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-4">
