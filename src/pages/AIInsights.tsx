@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, TrendingUp, AlertTriangle, Lightbulb, X, RefreshCw } from "lucide-react";
-import { useAIInsights } from "@/hooks/useAIInsights";
+import { useAIInsights } from "@/hooks/ai/useAIInsights";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { EnhancedEmptyState } from "@/components/shared";

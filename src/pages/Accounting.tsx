@@ -5,7 +5,7 @@ import { AccountingHeader } from "@/components/accounting/AccountingHeader";
 import { AccountingTabs } from "@/components/accounting/AccountingTabs";
 import { AccountingKPIs } from "@/components/accounting/AccountingKPIs";
 import { AccountingBreadcrumb } from "@/components/accounting/AccountingBreadcrumb";
-import { useAccountingTabs } from "@/hooks/useAccountingTabs";
+import { useAccountingTabs } from "@/hooks/accounting/useAccountingTabs";
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 
 const Accounting = () => {

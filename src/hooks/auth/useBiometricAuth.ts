@@ -4,7 +4,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/ui/use-toast';
 import { BiometricService, type BiometricCredential } from '@/services/biometric.service';
 
 export type { BiometricCredential };

@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAuditLogs } from "@/hooks/useAuditLogs";
+import { useAuditLogs } from "@/hooks/system/useAuditLogs";
 import { FileText, User, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
