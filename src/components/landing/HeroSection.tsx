@@ -23,23 +23,23 @@ export function HeroSection() {
           </div>
 
           {/* Main Heading - LCP Element - No complex styles */}
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight mb-4 sm:mb-6">
+          <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight mb-4 sm:mb-6 px-2 sm:px-0">
             منصة إدارة{" "}
             <span className="text-primary">الوقف الإلكترونية</span>
           </h1>
 
           {/* Description */}
-          <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mb-8 sm:mb-10 leading-relaxed">
+          <p className="text-sm xs:text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mb-6 sm:mb-10 leading-relaxed px-2 sm:px-0">
             نظام شامل ومتكامل لإدارة الأوقاف الإسلامية بكفاءة عالية وشفافية تامة،
             يدعم توزيع الغلة وإدارة المستفيدين والمحاسبة المتقدمة
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto px-4 sm:px-0">
             <Link to="/login" className="w-full sm:w-auto">
               <Button
-                size="lg"
-                className="w-full sm:w-auto gap-2 shadow-lg hover:shadow-xl transition-shadow"
+                size="default"
+                className="w-full sm:w-auto gap-2 shadow-lg hover:shadow-xl transition-shadow text-sm sm:text-base h-10 sm:h-11"
               >
                 تسجيل الدخول
                 <ArrowLeft className="w-4 h-4" />
@@ -48,8 +48,8 @@ export function HeroSection() {
             <a href="#how-it-works" className="w-full sm:w-auto">
               <Button
                 variant="outline"
-                size="lg"
-                className="w-full sm:w-auto gap-2 border-2"
+                size="default"
+                className="w-full sm:w-auto gap-2 border-2 text-sm sm:text-base h-10 sm:h-11"
               >
                 <Play className="w-4 h-4" />
                 شاهد كيف يعمل
@@ -58,18 +58,18 @@ export function HeroSection() {
           </div>
 
           {/* Trust Indicators */}
-          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 mt-12 sm:mt-16 pt-8 sm:pt-12 border-t border-border/50">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Shield className="w-5 h-5 text-primary" />
-              <span className="text-sm">آمن ومشفر</span>
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-8 mt-8 sm:mt-16 pt-6 sm:pt-12 border-t border-border/50 px-2 sm:px-0">
+            <div className="flex items-center gap-1.5 sm:gap-2 text-muted-foreground">
+              <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+              <span className="text-xs sm:text-sm">آمن ومشفر</span>
             </div>
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Users className="w-5 h-5 text-primary" />
-              <span className="text-sm">+1000 مستفيد</span>
+            <div className="flex items-center gap-1.5 sm:gap-2 text-muted-foreground">
+              <Users className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+              <span className="text-xs sm:text-sm">+1000 مستفيد</span>
             </div>
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Building2 className="w-5 h-5 text-primary" />
-              <span className="text-sm">+50 عقار مُدار</span>
+            <div className="flex items-center gap-1.5 sm:gap-2 text-muted-foreground">
+              <Building2 className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+              <span className="text-xs sm:text-sm">+50 عقار مُدار</span>
             </div>
           </div>
         </div>
