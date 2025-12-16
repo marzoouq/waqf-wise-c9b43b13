@@ -4,6 +4,7 @@
  * هذه الصفحة تتجنب استيراد أي مكونات من Radix UI أو مكتبات ثقيلة أخرى
  * 
  * ✅ توجيه تلقائي للمستخدمين المسجلين إلى لوحة التحكم الخاصة بهم
+ * ✅ لا تستخدم AuthContext - تستخدم useLightAuth الخفيف
  */
 
 import { useEffect } from "react";
@@ -20,8 +21,7 @@ import {
   Banknote,
   CalendarDays
 } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
-import { getDashboardForRoles } from "@/types/roles";
+import { useLightAuth } from "@/hooks/auth/useLightAuth";
 
 // ✅ مكون زر خفيف بدون Radix UI
 function LightButton({ 
@@ -133,21 +133,18 @@ const stats = [
 ];
 
 export default function LandingPageLight() {
-  const { user, roles, isLoading } = useAuth();
+  // ✅ استخدام useLightAuth بدلاً من useAuth الثقيل
+  const { isLoggedIn, isLoading, redirectPath } = useLightAuth();
   const navigate = useNavigate();
 
   // ✅ توجيه تلقائي للمستخدمين المسجلين إلى لوحة التحكم
   useEffect(() => {
-    // انتظر حتى ينتهي التحميل
     if (isLoading) return;
     
-    // إذا كان المستخدم مسجل دخوله
-    if (user) {
-      // استخدم الأدوار المتاحة (من الـ cache أو فارغة)
-      const dashboard = getDashboardForRoles(roles as Parameters<typeof getDashboardForRoles>[0]);
-      navigate(dashboard, { replace: true });
+    if (isLoggedIn && redirectPath) {
+      navigate(redirectPath, { replace: true });
     }
-  }, [user, roles, isLoading, navigate]);
+  }, [isLoggedIn, isLoading, redirectPath, navigate]);
 
   return (
     <div className="min-h-screen bg-background" dir="rtl">
