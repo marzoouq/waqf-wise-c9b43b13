@@ -63,8 +63,8 @@ function FeatureCard({ icon: Icon, title, description }: {
 function StatItem({ value, label }: { value: string; label: string }) {
   return (
     <div className="text-center p-4">
-      <div className="text-3xl sm:text-4xl font-bold text-primary mb-1">{value}</div>
-      <div className="text-sm text-muted-foreground">{label}</div>
+      <div className="text-3xl sm:text-4xl font-bold text-primary-foreground mb-1">{value}</div>
+      <div className="text-sm text-primary-foreground/80">{label}</div>
     </div>
   );
 }

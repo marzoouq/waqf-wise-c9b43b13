@@ -170,7 +170,7 @@ export default function CashierDashboard() {
                     تسجيل مقبوضات نقدية أو بنكية جديدة
                   </p>
                   <Button className="w-full mt-4" variant="default">
-                    <TrendingUp className="h-4 w-4 ml-2" />
+                    <TrendingUp className="h-4 w-4 ms-2" />
                     سند قبض جديد
                   </Button>
                 </CardContent>
@@ -189,7 +189,7 @@ export default function CashierDashboard() {
                     تسجيل مدفوعات نقدية أو بنكية جديدة
                   </p>
                   <Button className="w-full mt-4" variant="destructive">
-                    <TrendingDown className="h-4 w-4 ml-2" />
+                    <TrendingDown className="h-4 w-4 ms-2" />
                     سند صرف جديد
                   </Button>
                 </CardContent>
