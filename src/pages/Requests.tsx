@@ -20,7 +20,7 @@ import { RequestsFilters } from '@/components/requests/RequestsFilters';
 import { RequestsDesktopView } from '@/components/requests/RequestsDesktopView';
 import { RequestsMobileView } from '@/components/requests/RequestsMobileView';
 import { RequestsDialogs } from '@/components/requests/RequestsDialogs';
-import { useRequestsPage } from '@/hooks/useRequestsPage';
+import { useRequestsPage } from '@/hooks/requests/useRequestsPage';
 
 const Requests = memo(() => {
   const isMobile = useIsMobile();

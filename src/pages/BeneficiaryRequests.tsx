@@ -10,7 +10,7 @@ import { FileText, Plus, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide
 import { LoadingState } from '@/components/shared/LoadingState';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { useAuth } from '@/hooks/useAuth';
-import { useMyBeneficiaryRequests, BeneficiaryRequest } from '@/hooks/useMyBeneficiaryRequests';
+import { useMyBeneficiaryRequests, BeneficiaryRequest } from '@/hooks/beneficiary/useMyBeneficiaryRequests';
 
 const getStatusIcon = (status: string) => {
   switch (status) {

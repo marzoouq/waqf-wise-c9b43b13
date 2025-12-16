@@ -2,7 +2,7 @@
  * لوحة مؤشرات الأداء الرئيسية
  */
 
-import { useKPIs, type KPI } from '@/hooks/useKPIs';
+import { useKPIs, type KPI } from '@/hooks/dashboard/useKPIs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';

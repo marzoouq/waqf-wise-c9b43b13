@@ -6,7 +6,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useDashboardKPIs } from '@/hooks/useDashboardKPIs';
+import { useDashboardKPIs } from '@/hooks/dashboard/useDashboardKPIs';
 import { ChartDataPoint } from '@/components/unified/UnifiedChart';
 import { QUERY_CONFIG } from '@/lib/queryOptimization';
 import { BeneficiaryService, PropertyService } from '@/services';

@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Users, Plus, Edit, Trash2, User, UserPlus } from 'lucide-react';
-import { useFamilyMembers } from '@/hooks/useFamilies';
+import { useFamilyMembers } from '@/hooks/beneficiary/useFamilies';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';

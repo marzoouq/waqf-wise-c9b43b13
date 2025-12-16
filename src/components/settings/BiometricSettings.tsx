@@ -4,7 +4,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { useBiometricAuth } from '@/hooks/useBiometricAuth';
+import { useBiometricAuth } from '@/hooks/auth/useBiometricAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';

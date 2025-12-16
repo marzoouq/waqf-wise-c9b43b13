@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useFinancialAnalytics } from '@/hooks/useFinancialAnalytics';
+import { useFinancialAnalytics } from '@/hooks/accounting/useFinancialAnalytics';
 import { TrendingUp, TrendingDown, Activity, DollarSign } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';

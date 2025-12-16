@@ -23,7 +23,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { useIntelligentSearch, SearchType, SearchResult } from '@/hooks/useIntelligentSearch';
+import { useIntelligentSearch, SearchType, SearchResult } from '@/hooks/ai/useIntelligentSearch';
 import { 
   Search, 
   FileText, 

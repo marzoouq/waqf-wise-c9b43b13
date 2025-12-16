@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowRight, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useFamilies } from '@/hooks/useFamilies';
+import { useFamilies } from '@/hooks/beneficiary/useFamilies';
 import { LoadingState } from '@/components/shared/LoadingState';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { FamilyTreeView } from '@/components/families/FamilyTreeView';

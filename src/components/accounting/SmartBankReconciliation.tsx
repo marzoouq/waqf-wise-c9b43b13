@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Sparkles, CheckCircle2, AlertCircle, TrendingUp } from 'lucide-react';
-import { useBankMatching } from '@/hooks/useBankMatching';
+import { useBankMatching } from '@/hooks/payments/useBankMatching';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { productionLogger } from '@/lib/logger/production-logger';
 
