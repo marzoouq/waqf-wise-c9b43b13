@@ -46,29 +46,62 @@ export default defineConfig(({ mode }) => {
       output: {
         // ✅ تحسين تقسيم الكود - فصل المكتبات الكبيرة
         manualChunks: (id) => {
-          // مكتبات PDF - تحمّل عند الحاجة فقط
+          // ✅ مكتبات PDF - تحمّل عند الحاجة فقط
           if (id.includes('jspdf') || id.includes('autotable')) {
             return 'pdf-lib';
           }
-          // مكتبات Excel - تحمّل عند الحاجة فقط
+          // ✅ مكتبات Excel - تحمّل عند الحاجة فقط
           if (id.includes('exceljs') || id.includes('xlsx')) {
             return 'excel-lib';
           }
-          // مكتبات React الأساسية
+          
+          // ✅ المصادقة البيومترية - chunk منفصل
+          if (id.includes('useBiometricAuth') || id.includes('BiometricSettings') || id.includes('otpauth') || id.includes('qrcode')) {
+            return 'auth-biometric';
+          }
+          
+          // ✅ Charts - تحمّل فقط مع لوحات التحكم
+          if (id.includes('recharts')) {
+            return 'charts-vendor';
+          }
+          
+          // ✅ Framer Motion - للأنيميشن
+          if (id.includes('framer-motion')) {
+            return 'animation-vendor';
+          }
+          
+          // ✅ مكتبات React الأساسية
           if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
             return 'react-vendor';
           }
-          // مكتبات Radix UI
-          if (id.includes('@radix-ui')) {
-            return 'ui-vendor';
+          
+          // ✅ Radix UI - تقسيم حسب الاستخدام
+          if (id.includes('@radix-ui/react-dialog') || id.includes('@radix-ui/react-alert-dialog') || id.includes('@radix-ui/react-sheet')) {
+            return 'ui-dialogs';
           }
-          // Supabase
+          if (id.includes('@radix-ui/react-tabs') || id.includes('@radix-ui/react-accordion') || id.includes('@radix-ui/react-navigation-menu')) {
+            return 'ui-navigation';
+          }
+          if (id.includes('@radix-ui/react-select') || id.includes('@radix-ui/react-dropdown') || id.includes('@radix-ui/react-popover') || id.includes('@radix-ui/react-menubar')) {
+            return 'ui-menus';
+          }
+          if (id.includes('@radix-ui')) {
+            return 'ui-core';
+          }
+          
+          // ✅ Supabase
           if (id.includes('@supabase')) {
             return 'supabase-vendor';
           }
-          // TanStack Query
+          
+          // ✅ TanStack Query
           if (id.includes('@tanstack')) {
             return 'tanstack-vendor';
+          }
+          
+          // ✅ date-fns
+          if (id.includes('date-fns')) {
+            return 'date-vendor';
           }
         },
         chunkFileNames: 'assets/[name]-[hash].js',
