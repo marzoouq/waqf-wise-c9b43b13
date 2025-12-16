@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, DollarSign, Users, PieChart } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
-import { Distribution } from "@/hooks/useDistributions";
+import { Distribution } from "@/hooks/distributions/useDistributions";
 
 interface OverviewTabProps {
   summaryStats: {

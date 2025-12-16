@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { SimulationResult } from '@/hooks/useDistributionEngine';
+import { SimulationResult } from '@/hooks/distributions/useDistributionEngine';
 import { Download, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';

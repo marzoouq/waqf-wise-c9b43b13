@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { DistributionDialog } from "@/components/funds/DistributionDialog";
 import { SimulationDialog } from "@/components/funds/SimulationDialog";
 import { DistributionSettingsDialog } from "@/components/distributions/DistributionSettingsDialog";
-import { useDistributions } from "@/hooks/useDistributions";
+import { useDistributions } from "@/hooks/distributions/useDistributions";
 import { useWaqfUnits } from "@/hooks/distributions/useWaqfUnits";
 import { useJournalEntries } from "@/hooks/useJournalEntries";
 import { logger } from "@/lib/logger";

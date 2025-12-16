@@ -7,7 +7,7 @@ import { ApprovalWorkflowDialog } from "@/components/distributions/ApprovalWorkf
 import { DistributionSimulator } from "@/components/distributions/DistributionSimulator";
 import { CreateDistributionDialog } from "@/components/distributions/CreateDistributionDialog";
 import { DistributionTimelineTab } from "@/components/distributions/DistributionTimelineTab";
-import { useDistributions, Distribution } from "@/hooks/useDistributions";
+import { useDistributions, Distribution } from "@/hooks/distributions/useDistributions";
 import { ExportButton } from "@/components/shared/ExportButton";
 import { UnifiedDataTable } from "@/components/unified/UnifiedDataTable";
 import { format, arLocale as ar } from "@/lib/date";

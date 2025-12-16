@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Settings, Info } from "lucide-react";
-import { useDistributionSettings } from "@/hooks/useDistributionSettings";
+import { useDistributionSettings } from "@/hooks/distributions/useDistributionSettings";
 
 export function DistributionSettingsDialog() {
   const { settings, updateSettings } = useDistributionSettings();

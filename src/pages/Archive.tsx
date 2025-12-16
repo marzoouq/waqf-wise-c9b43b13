@@ -13,7 +13,7 @@ import { ErrorState } from "@/components/shared/ErrorState";
 import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layout/MobileOptimizedLayout";
 import { useDocuments } from "@/hooks/useDocuments";
 import { useFolders } from "@/hooks/useFolders";
-import { useArchiveStats } from "@/hooks/useArchiveStats";
+import { useArchiveStats } from "@/hooks/archive/useArchiveStats";
 import { useDocumentUpload } from "@/hooks/useDocumentUpload";
 import { useAuth } from "@/hooks/useAuth";
 import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";

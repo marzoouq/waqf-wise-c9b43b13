@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle2, XCircle, Clock, User } from "lucide-react";
-import { useDistributionApprovals } from "@/hooks/useDistributionApprovals";
+import { useDistributionApprovals } from "@/hooks/distributions/useDistributionApprovals";
 import { useAuth } from "@/hooks/useAuth";
 import { format, arLocale as ar } from "@/lib/date";
 

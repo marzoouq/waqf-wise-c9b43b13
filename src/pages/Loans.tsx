@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { useLoans, type Loan } from "@/hooks/useLoans";
+import { useLoans, type Loan } from "@/hooks/payments/useLoans";
 import {
   Plus,
   Search,
