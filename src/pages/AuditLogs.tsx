@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Filter, Download, Shield, AlertCircle, Info, AlertTriangle } from "lucide-react";
-import { useAuditLogs } from "@/hooks/useAuditLogs";
+import { useAuditLogs } from "@/hooks/system/useAuditLogs";
 import { format, arLocale as ar } from "@/lib/date";
 import { LoadingState } from "@/components/shared/LoadingState";
 import { ErrorState } from "@/components/shared/ErrorState";

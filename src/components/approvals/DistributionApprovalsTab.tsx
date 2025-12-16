@@ -5,7 +5,7 @@ import { CheckCircle, XCircle, Clock, Eye, Lock } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
 import { ApprovalFlowDialog } from "@/components/funds/ApprovalFlowDialog";
 import { DistributionForApproval, StatusConfigMap } from "@/types/approvals";
-import { useApprovalPermissions } from "@/hooks/useApprovalPermissions";
+import { useApprovalPermissions } from "@/hooks/requests/useApprovalPermissions";
 import { useDistributionApprovals } from "@/hooks/approvals";
 import { useDialogState } from "@/hooks/ui/useDialogState";
 import { ErrorState } from "@/components/shared/ErrorState";

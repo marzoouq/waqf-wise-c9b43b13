@@ -4,7 +4,7 @@
  * @version 2.8.56
  */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/hooks/ui/use-toast';
 import { logger } from '@/lib/logger';
 import { QUERY_KEYS } from '@/lib/query-keys';
 import { ArchiveService } from '@/services';

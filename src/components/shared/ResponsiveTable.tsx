@@ -8,7 +8,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Card } from '@/components/ui/card';
-import { useMediaQuery } from '@/hooks/use-media-query';
+import { useMediaQuery } from '@/hooks/ui/use-media-query';
 import { cn } from '@/lib/utils';
 import { ScrollableTableWrapper } from './ScrollableTableWrapper';
 import { TableRow as TableRowType, TableColumn, ResponsiveTableProps } from '@/types/table';

@@ -7,7 +7,7 @@ import { ApprovalService } from "@/services/approval.service";
 import { PaymentForApproval } from "@/types";
 import { useToast } from "@/hooks/ui/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { useApprovalHistory } from "@/hooks/useApprovalHistory";
+import { useApprovalHistory } from "@/hooks/requests/useApprovalHistory";
 import { invalidateQueryGroups } from "@/lib/query-invalidation";
 import { QUERY_KEYS } from "@/lib/query-keys";
 

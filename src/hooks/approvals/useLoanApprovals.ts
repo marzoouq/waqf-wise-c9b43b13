@@ -6,9 +6,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { LoansService } from '@/services/loans.service';
 import { AccountingService } from '@/services/accounting.service';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/ui/use-toast';
 import { useAuth } from '@/hooks/useAuth';
-import { useApprovalHistory } from '@/hooks/useApprovalHistory';
+import { useApprovalHistory } from '@/hooks/requests/useApprovalHistory';
 import { invalidateAccountingQueries } from '@/lib/query-invalidation';
 import type { LoanForApproval } from '@/types';
 import { QUERY_KEYS } from '@/lib/query-keys';

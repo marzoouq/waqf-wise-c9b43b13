@@ -4,7 +4,7 @@
  */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AccountingService } from '@/services';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/ui/use-toast';
 import { safeFilter, safeReduce } from '@/lib/utils/array-safe';
 import type { Json } from '@/integrations/supabase/types';
 import { QUERY_KEYS } from '@/lib/query-keys';

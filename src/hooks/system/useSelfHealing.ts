@@ -5,7 +5,7 @@
 
 import { useCallback } from 'react';
 import { selfHealing, fetchWithFallback, retryOperation } from '@/lib/selfHealing';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/ui/use-toast';
 
 interface UseSelfHealingOptions {
   showToastOnFallback?: boolean;
