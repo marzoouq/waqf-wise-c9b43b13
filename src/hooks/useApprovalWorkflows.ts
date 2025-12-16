@@ -1,4 +1,1 @@
-/**
- * Re-export from requests folder for backward compatibility
- */
-export { useApprovalWorkflows } from './requests/useApprovalWorkflows';
+export { useApprovalWorkflows, type ApprovalWorkflow, type ApprovalLevel } from './requests/useApprovalWorkflows';

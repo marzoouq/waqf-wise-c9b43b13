@@ -1,7 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useDebouncedSearch } from '@/hooks/useDebouncedSearch';
+import { useDebouncedSearch } from '@/hooks/ui/useDebouncedSearch';
 
 interface InvoicesFiltersProps {
   searchQuery: string;

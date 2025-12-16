@@ -14,7 +14,7 @@ import { CoreValuesSection } from "@/components/governance/CoreValuesSection";
 import { RegulationsContent } from "@/components/governance/RegulationsContent";
 import { RegulationsSearchBar } from "@/components/governance/RegulationsSearchBar";
 import { useRegulationsSearch } from "@/hooks/governance/useRegulationsSearch";
-import { generateGovernancePDF } from "@/utils/governance-pdf";
+import { generateGovernancePDF } from "@/lib/pdf/governance-pdf";
 import { toast } from "sonner";
 
 const WaqfGovernanceGuide = () => {
