@@ -200,8 +200,15 @@ export function SelfHealingToolsPanel() {
             <Button
               variant="outline"
               onClick={async () => {
-                await syncPendingData();
-                toast({ title: "✅ تمت مزامنة البيانات المعلقة" });
+                try {
+                  await syncPendingData();
+                  toast({ title: "✅ تمت مزامنة البيانات المعلقة" });
+                } catch {
+                  toast({ 
+                    title: "❌ فشل مزامنة البيانات", 
+                    variant: "destructive" 
+                  });
+                }
               }}
               className="w-full justify-start"
             >
