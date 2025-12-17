@@ -1,10 +1,11 @@
 /**
  * مولّد تقرير PDF للسنة المالية
+ * @version 2.9.42
  */
 
 import type { FiscalYearClosing } from "@/types/fiscal-year-closing";
 import { logger } from "@/lib/logger";
-import { loadAmiriFonts } from "./fonts/loadArabicFonts";
+import { loadArabicFontToPDF, WAQF_COLORS } from "./pdf/arabic-pdf-utils";
 
 type JsPDF = import('jspdf').jsPDF;
 
@@ -14,27 +15,6 @@ declare module 'jspdf' {
     lastAutoTable?: { finalY: number };
   }
 }
-
-const loadArabicFont = async (doc: JsPDF) => {
-  try {
-    const { regular: amiriRegular, bold: amiriBold } = await loadAmiriFonts();
-    
-    doc.addFileToVFS("Amiri-Regular.ttf", amiriRegular);
-    doc.addFont("Amiri-Regular.ttf", "Amiri", "normal");
-    
-    doc.addFileToVFS("Amiri-Bold.ttf", amiriBold);
-    doc.addFont("Amiri-Bold.ttf", "Amiri", "bold");
-    
-    doc.setFont("Amiri", "normal");
-    return true;
-  } catch (error) {
-    logger.error(error, { 
-      context: 'load_arabic_font_fiscal_year', 
-      severity: 'low'
-    });
-    return false;
-  }
-};
 
 export const generateFiscalYearPDF = async (
   closing: FiscalYearClosing,
@@ -50,11 +30,8 @@ export const generateFiscalYearPDF = async (
     const autoTable = autoTableModule.default;
     const doc = new jsPDF();
     
-    const hasArabicFont = await loadArabicFont(doc);
-    const fontName = hasArabicFont ? "Amiri" : "helvetica";
-    
-    doc.setR2L(true);
-    doc.setLanguage("ar");
+    // تحميل الخط العربي باستخدام النظام الموحد
+    const fontName = await loadArabicFontToPDF(doc);
 
     // صفحة الغلاف
     doc.setDrawColor(66, 139, 202);
