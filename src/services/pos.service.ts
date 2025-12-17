@@ -16,6 +16,21 @@ export interface POSDailyStats {
   transfer_amount: number;
 }
 
+export interface ShiftReportItem {
+  shift_id: string;
+  shift_number: string;
+  cashier_name: string;
+  opened_at: string;
+  closed_at: string | null;
+  opening_balance: number;
+  closing_balance: number | null;
+  total_collections: number;
+  total_payments: number;
+  transactions_count: number;
+  variance: number | null;
+  status: string;
+}
+
 export interface CashierShift {
   id: string;
   shift_number: string;
@@ -463,13 +478,13 @@ export class POSService {
   /**
    * جلب تقرير الورديات
    */
-  static async getShiftsReport(startDate: string, endDate: string): Promise<any[]> {
+  static async getShiftsReport(startDate: string, endDate: string): Promise<ShiftReportItem[]> {
     const { data, error } = await supabase.rpc("get_shifts_report", {
       p_start_date: startDate,
       p_end_date: endDate,
     });
 
     if (error) throw error;
-    return data || [];
+    return (data || []) as ShiftReportItem[];
   }
 }

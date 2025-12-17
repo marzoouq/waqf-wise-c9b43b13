@@ -6,15 +6,16 @@
 
 import { useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { PaymentService } from '@/services';
+import { PaymentService, PaymentScheduleResult } from '@/services';
 import { useToast } from '@/hooks/ui/use-toast';
 import { QUERY_KEYS } from '@/lib/query-keys';
+
 export interface PaymentSchedule {
   id: string;
   distribution_id: string;
   scheduled_date: string;
   scheduled_amount: number;
-  status: 'scheduled' | 'processing' | 'completed' | 'failed' | 'cancelled';
+  status: string;
   batch_number?: string;
   processed_at?: string;
   error_message?: string;

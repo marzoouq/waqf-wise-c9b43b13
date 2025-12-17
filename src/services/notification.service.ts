@@ -18,6 +18,45 @@ export interface NotificationData {
   action_url?: string;
 }
 
+export interface SystemAlert {
+  id: string;
+  alert_type: string;
+  severity: string;
+  title: string;
+  description: string;
+  message?: string;
+  status: string;
+  created_at: string;
+  resolved_at?: string | null;
+  resolved_by?: string | null;
+  metadata?: Record<string, unknown> | null;
+  occurrence_count?: number;
+  related_error_type?: string | null;
+  acknowledged_at?: string | null;
+  acknowledged_by?: string | null;
+}
+
+export interface UserNotification {
+  id: string;
+  user_id: string;
+  title: string;
+  message: string;
+  type: 'approval' | 'payment' | 'journal_entry' | 'distribution' | 'system';
+  priority?: 'low' | 'medium' | 'high' | 'urgent';
+  is_read: boolean;
+  reference_type: string | null;
+  reference_id: string | null;
+  action_url: string | null;
+  created_at: string;
+  read_at: string | null;
+  channel?: string;
+  sent_at?: string | null;
+  delivery_status?: string;
+  scheduled_for?: string | null;
+  retry_count?: number;
+  error_message?: string | null;
+}
+
 export class NotificationService {
   /**
    * إرسال إشعار واحد
@@ -189,7 +228,7 @@ export class NotificationService {
   /**
    * جلب تنبيهات النظام
    */
-  static async getSystemAlerts(limit: number = 10): Promise<any[]> {
+  static async getSystemAlerts(limit: number = 10): Promise<SystemAlert[]> {
     try {
       const { data, error } = await supabase
         .from('system_alerts')
@@ -198,7 +237,7 @@ export class NotificationService {
         .limit(limit);
 
       if (error) throw error;
-      return data || [];
+      return (data || []) as SystemAlert[];
     } catch (error) {
       productionLogger.error('Error fetching system alerts', error);
       return [];
@@ -230,7 +269,7 @@ export class NotificationService {
   /**
    * جلب إشعارات المستخدم
    */
-  static async getUserNotifications(userId: string, limit: number = 20): Promise<any[]> {
+  static async getUserNotifications(userId: string, limit: number = 20): Promise<UserNotification[]> {
     try {
       const { data, error } = await supabase
         .from('notifications')
@@ -240,7 +279,7 @@ export class NotificationService {
         .limit(limit);
 
       if (error) throw error;
-      return data || [];
+      return (data || []) as UserNotification[];
     } catch (error) {
       productionLogger.error('Error fetching user notifications', error);
       return [];

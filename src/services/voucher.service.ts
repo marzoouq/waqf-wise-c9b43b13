@@ -3,6 +3,7 @@ import { logger } from "@/lib/logger";
 import type { Database } from "@/integrations/supabase/types";
 
 type PaymentVoucherInsert = Database['public']['Tables']['payment_vouchers']['Insert'];
+type PaymentVoucher = Database['public']['Tables']['payment_vouchers']['Row'];
 
 export interface VoucherData {
   voucher_type: string;
@@ -23,6 +24,17 @@ export interface DistributionLineItem {
   percentage?: number;
   iban?: string;
   bank_name?: string;
+}
+
+export interface VoucherWithDetails extends PaymentVoucher {
+  beneficiaries?: {
+    full_name: string;
+    national_id: string;
+  } | null;
+  distributions?: {
+    total_amount: number;
+    distribution_date: string;
+  } | null;
 }
 
 /**
@@ -368,7 +380,7 @@ export class VoucherService {
   /**
    * جلب السندات مع الفلترة
    */
-  static async getWithFilters(searchTerm?: string, status?: string): Promise<any[]> {
+  static async getWithFilters(searchTerm?: string, status?: string): Promise<VoucherWithDetails[]> {
     let query = supabase
       .from('payment_vouchers')
       .select(`
@@ -388,6 +400,6 @@ export class VoucherService {
 
     const { data, error } = await query;
     if (error) throw error;
-    return data || [];
+    return (data || []) as VoucherWithDetails[];
   }
 }
