@@ -121,12 +121,12 @@ export const GenerateDisclosureDialog = ({
             <Button type="submit" disabled={generating}>
               {generating ? (
                 <>
-                  <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="ms-2 h-4 w-4 animate-spin" />
                   جاري التوليد...
                 </>
               ) : (
                 <>
-                  <FileText className="ml-2 h-4 w-4" />
+                  <FileText className="ms-2 h-4 w-4" />
                   توليد الإفصاح
                 </>
               )}

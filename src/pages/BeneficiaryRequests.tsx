@@ -89,7 +89,7 @@ export default function BeneficiaryRequests() {
           <Dialog open={isDialogOpen} onOpenChange={(open) => open ? openDialog() : closeDialog()}>
             <DialogTrigger asChild>
               <Button>
-                <Plus className="h-4 w-4 ml-2" />
+                <Plus className="h-4 w-4 ms-2" />
                 طلب جديد
               </Button>
             </DialogTrigger>

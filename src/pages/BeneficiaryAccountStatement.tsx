@@ -112,7 +112,7 @@ export default function BeneficiaryAccountStatement() {
           </p>
         </div>
         <Button onClick={exportToPDF} variant="outline">
-          <Download className="h-4 w-4 ml-2" />
+          <Download className="h-4 w-4 ms-2" />
           تصدير PDF
         </Button>
       </div>

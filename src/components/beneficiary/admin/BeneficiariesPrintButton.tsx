@@ -58,17 +58,17 @@ export function BeneficiariesPrintButton({ beneficiaries }: BeneficiariesPrintBu
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm">
-          <Printer className="ml-2 h-4 w-4" />
+          <Printer className="ms-2 h-4 w-4" />
           طباعة وتصدير
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={handlePrint}>
-          <Printer className="ml-2 h-4 w-4" />
+          <Printer className="ms-2 h-4 w-4" />
           طباعة الكشف
         </DropdownMenuItem>
         <DropdownMenuItem onClick={handleExportExcel}>
-          <FileDown className="ml-2 h-4 w-4" />
+          <FileDown className="ms-2 h-4 w-4" />
           تصدير Excel
         </DropdownMenuItem>
       </DropdownMenuContent>

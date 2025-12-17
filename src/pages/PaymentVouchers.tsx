@@ -32,7 +32,7 @@ export default function PaymentVouchers() {
 
     return (
       <Badge variant={config.variant} className={config.className || ""}>
-        <Icon className="ml-1 h-3 w-3" />
+        <Icon className="ms-1 h-3 w-3" />
         {config.label}
       </Badge>
     );
@@ -56,7 +56,7 @@ export default function PaymentVouchers() {
         icon={<Receipt className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary" />}
         actions={
           <Button onClick={() => setShowCreateDialog(true)} size="sm">
-            <Receipt className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
+            <Receipt className="ms-2 h-4 w-4 sm:h-5 sm:w-5" />
             <span className="hidden sm:inline">إنشاء سند جديد</span>
             <span className="sm:hidden">جديد</span>
           </Button>

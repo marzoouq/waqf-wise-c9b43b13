@@ -29,7 +29,7 @@ export function KnowledgeBaseArticleCard({ article, onView }: KnowledgeBaseArtic
             <CardTitle className="text-lg line-clamp-2">{article.title}</CardTitle>
             {article.is_featured && (
               <Badge variant="secondary" className="mt-2">
-                <Star className="h-3 w-3 ml-1 fill-current" />
+                <Star className="h-3 w-3 ms-1 fill-current" />
                 مميز
               </Badge>
             )}

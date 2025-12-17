@@ -102,7 +102,7 @@ export function ContractTenantFields({ formData, onUpdate, properties }: Props) 
               size="sm"
               onClick={() => setSearchMode('select')}
             >
-              <Search className="h-4 w-4 ml-1" />
+              <Search className="h-4 w-4 ms-1" />
               اختيار من القائمة
             </Button>
             <Button
@@ -119,7 +119,7 @@ export function ContractTenantFields({ formData, onUpdate, properties }: Props) 
               size="sm"
               onClick={() => setShowTenantDialog(true)}
             >
-              <UserPlus className="h-4 w-4 ml-1" />
+              <UserPlus className="h-4 w-4 ms-1" />
               مستأجر جديد
             </Button>
           </div>

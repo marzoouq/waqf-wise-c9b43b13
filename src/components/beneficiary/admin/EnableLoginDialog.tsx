@@ -212,7 +212,7 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
                 }}
                 className="w-full sm:w-auto"
               >
-                <Key className="ml-2 h-4 w-4" />
+                <Key className="ms-2 h-4 w-4" />
                 إعادة تعيين كلمة المرور
               </Button>
               <Button 
@@ -275,7 +275,7 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
 
           <div className="space-y-2">
             <Label htmlFor="username">
-              <User className="inline h-4 w-4 ml-1" />
+              <User className="inline h-4 w-4 ms-1" />
               اسم المستخدم *
             </Label>
             <Input
@@ -289,7 +289,7 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
 
           <div className="space-y-2">
             <Label htmlFor="email">
-              <Mail className="inline h-4 w-4 ml-1" />
+              <Mail className="inline h-4 w-4 ms-1" />
               البريد الإلكتروني *
             </Label>
             <Input
@@ -304,7 +304,7 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
 
           <div className="space-y-2">
             <Label htmlFor="password">
-              <Key className="inline h-4 w-4 ml-1" />
+              <Key className="inline h-4 w-4 ms-1" />
               كلمة المرور *
             </Label>
             <Input
@@ -320,7 +320,7 @@ export function EnableLoginDialog({ open, onOpenChange, beneficiary, onSuccess }
 
           <div className="space-y-2">
             <Label htmlFor="confirmPassword">
-              <Key className="inline h-4 w-4 ml-1" />
+              <Key className="inline h-4 w-4 ms-1" />
               تأكيد كلمة المرور *
             </Label>
             <Input

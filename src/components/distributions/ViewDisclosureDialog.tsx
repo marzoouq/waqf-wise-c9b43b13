@@ -201,19 +201,19 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
             <Tabs defaultValue="summary" className="w-full">
               <TabsList className="grid w-full grid-cols-4 h-auto">
                 <TabsTrigger value="summary" className="text-[10px] px-1 py-1.5">
-                  <Calculator className="h-3 w-3 ml-1" />
+                  <Calculator className="h-3 w-3 ms-1" />
                   ملخص
                 </TabsTrigger>
                 <TabsTrigger value="details" className="text-[10px] px-1 py-1.5">
-                  <FileText className="h-3 w-3 ml-1" />
+                  <FileText className="h-3 w-3 ms-1" />
                   تفاصيل
                 </TabsTrigger>
                 <TabsTrigger value="charts" className="text-[10px] px-1 py-1.5">
-                  <BarChart3 className="h-3 w-3 ml-1" />
+                  <BarChart3 className="h-3 w-3 ms-1" />
                   رسوم
                 </TabsTrigger>
                 <TabsTrigger value="insights" className="text-[10px] px-1 py-1.5">
-                  <Lightbulb className="h-3 w-3 ml-1" />
+                  <Lightbulb className="h-3 w-3 ms-1" />
                   رؤى
                 </TabsTrigger>
               </TabsList>

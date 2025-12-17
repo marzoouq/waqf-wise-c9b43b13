@@ -30,7 +30,7 @@ export const ReportRefreshIndicator = memo(function ReportRefreshIndicator({
         disabled={isRefetching}
         className="h-7 px-2"
       >
-        <RefreshCw className={`h-3 w-3 ml-1 ${isRefetching ? "animate-spin" : ""}`} />
+        <RefreshCw className={`h-3 w-3 ms-1 ${isRefetching ? "animate-spin" : ""}`} />
         {isRefetching ? "جاري التحديث..." : "تحديث"}
       </Button>
     </div>

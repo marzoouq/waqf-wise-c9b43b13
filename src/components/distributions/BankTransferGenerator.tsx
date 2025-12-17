@@ -105,7 +105,7 @@ export function BankTransferGenerator({ distributionId, onSuccess }: BankTransfe
 
         {!generatedFile ? (
           <Button onClick={handleGenerate} disabled={isLoading} className="w-full">
-            {isLoading && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+            {isLoading && <Loader2 className="ms-2 h-4 w-4 animate-spin" />}
             توليد الملف
           </Button>
         ) : (
@@ -123,7 +123,7 @@ export function BankTransferGenerator({ distributionId, onSuccess }: BankTransfe
 
             <div className="flex gap-2">
               <Button onClick={handleDownload} className="flex-1">
-                <Download className="ml-2 h-4 w-4" />
+                <Download className="ms-2 h-4 w-4" />
                 تنزيل الملف
               </Button>
               <Button
