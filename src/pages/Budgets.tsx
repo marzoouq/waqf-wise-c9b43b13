@@ -29,6 +29,8 @@ import { MobileOptimizedLayout, MobileOptimizedHeader } from "@/components/layou
 import { PageErrorBoundary } from "@/components/shared/PageErrorBoundary";
 import { format } from "@/lib/date";
 import { formatCurrency } from "@/lib/utils";
+import { useDeleteConfirmation } from "@/hooks/shared/useDeleteConfirmation";
+import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 
 export default function Budgets() {
   const { fiscalYears } = useFiscalYears();
@@ -40,6 +42,21 @@ export default function Budgets() {
   
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
+
+  const {
+    confirmDelete,
+    isOpen: deleteDialogOpen,
+    onOpenChange: setDeleteDialogOpen,
+    executeDelete,
+    isDeleting,
+    itemName,
+  } = useDeleteConfirmation({
+    onDelete: deleteBudget,
+    successMessage: "تم حذف الميزانية بنجاح",
+    errorMessage: "حدث خطأ أثناء حذف الميزانية",
+    title: "حذف الميزانية",
+    description: "هل أنت متأكد من حذف هذه الميزانية؟",
+  });
 
   if (isLoading) {
     return <LoadingState message="جاري تحميل الميزانيات..." />;
@@ -66,12 +83,6 @@ export default function Budgets() {
       await updateBudget(data);
     } else {
       await addBudget(data);
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    if (confirm("هل أنت متأكد من حذف هذه الميزانية؟")) {
-      await deleteBudget(id);
     }
   };
 
@@ -208,7 +219,7 @@ export default function Budgets() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleDelete(budget.id)}
+                            onClick={() => confirmDelete(budget.id, budget.accounts?.name_ar)}
                           >
                             <Trash2 className="h-4 w-4 text-destructive" />
                           </Button>
@@ -236,6 +247,16 @@ export default function Budgets() {
         onOpenChange={setDialogOpen}
         budget={editingBudget}
         onSave={handleSave}
+      />
+
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={executeDelete}
+        title="حذف الميزانية"
+        description="هل أنت متأكد من حذف هذه الميزانية؟"
+        itemName={itemName}
+        isLoading={isDeleting}
       />
     </MobileOptimizedLayout>
     </PageErrorBoundary>

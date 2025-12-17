@@ -9,6 +9,8 @@ import { AutoJournalTemplateDialog } from './AutoJournalTemplateDialog';
 import { UnifiedDataTable, type Column } from '@/components/unified/UnifiedDataTable';
 import type { AutoJournalTemplate as DialogTemplate } from '@/types/auto-journal';
 import { ErrorState } from '@/components/shared/ErrorState';
+import { useDeleteConfirmation } from '@/hooks/shared/useDeleteConfirmation';
+import { DeleteConfirmDialog } from '@/components/shared/DeleteConfirmDialog';
 
 interface AccountEntry {
   account_code: string;
@@ -53,6 +55,21 @@ export function AutoJournalTemplatesManager() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<DialogTemplate | null>(null);
 
+  const {
+    confirmDelete,
+    isOpen: deleteDialogOpen,
+    onOpenChange: setDeleteDialogOpen,
+    executeDelete,
+    isDeleting,
+    itemName,
+  } = useDeleteConfirmation({
+    onDelete: deleteTemplate,
+    successMessage: 'تم حذف القالب بنجاح',
+    errorMessage: 'حدث خطأ أثناء حذف القالب',
+    title: 'حذف القالب',
+    description: 'هل أنت متأكد من حذف هذا القالب؟',
+  });
+
   const handleEdit = (template: Template) => {
     setEditingTemplate(template as unknown as DialogTemplate);
     setDialogOpen(true);
@@ -61,12 +78,6 @@ export function AutoJournalTemplatesManager() {
   const handleAdd = () => {
     setEditingTemplate(null);
     setDialogOpen(true);
-  };
-
-  const handleDelete = async (id: string) => {
-    if (confirm('هل أنت متأكد من حذف هذا القالب؟')) {
-      await deleteTemplate(id);
-    }
   };
 
   const handleToggle = async (id: string, isActive: boolean) => {
@@ -193,7 +204,7 @@ export function AutoJournalTemplatesManager() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => handleDelete(template.id)}
+                  onClick={() => confirmDelete(template.id, template.template_name)}
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -217,6 +228,16 @@ export function AutoJournalTemplatesManager() {
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         template={editingTemplate}
+      />
+
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={executeDelete}
+        title="حذف القالب"
+        description="هل أنت متأكد من حذف هذا القالب؟"
+        itemName={itemName}
+        isLoading={isDeleting}
       />
     </>
   );

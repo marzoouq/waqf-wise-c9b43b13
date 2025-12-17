@@ -15,6 +15,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Paperclip, Upload, Trash2, FileText, Download, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatBytes } from "@/lib/utils";
+import { useDeleteConfirmation } from "@/hooks/shared/useDeleteConfirmation";
+import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 
 interface RequestAttachmentsUploaderProps {
   requestId: string;
@@ -30,6 +32,21 @@ export function RequestAttachmentsUploader({
   const [description, setDescription] = useState("");
   const { attachments, isLoading, uploadAttachment, deleteAttachment, isUploading } =
     useRequestAttachments(requestId);
+
+  const {
+    confirmDelete,
+    isOpen: deleteDialogOpen,
+    onOpenChange: setDeleteDialogOpen,
+    executeDelete,
+    isDeleting,
+    itemName,
+  } = useDeleteConfirmation({
+    onDelete: deleteAttachment,
+    successMessage: "تم حذف المرفق بنجاح",
+    errorMessage: "حدث خطأ أثناء حذف المرفق",
+    title: "حذف المرفق",
+    description: "هل أنت متأكد من حذف هذا المرفق؟",
+  });
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -49,12 +66,6 @@ export function RequestAttachmentsUploader({
     setDescription("");
   };
 
-  const handleDelete = async (attachmentId: string) => {
-    if (confirm("هل أنت متأكد من حذف هذا المرفق؟")) {
-      await deleteAttachment(attachmentId);
-    }
-  };
-
   const getFileIcon = (fileType: string) => {
     if (fileType.includes("pdf")) return "📄";
     if (fileType.includes("image")) return "🖼️";
@@ -63,6 +74,7 @@ export function RequestAttachmentsUploader({
   };
 
   return (
+    <>
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="gap-2">
@@ -192,7 +204,7 @@ export function RequestAttachmentsUploader({
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => handleDelete(attachment.id)}
+                          onClick={() => confirmDelete(attachment.id, attachment.file_name)}
                           title="حذف"
                           className="text-destructive hover:text-destructive"
                         >
@@ -208,5 +220,16 @@ export function RequestAttachmentsUploader({
         </div>
       </DialogContent>
     </Dialog>
+
+    <DeleteConfirmDialog
+      open={deleteDialogOpen}
+      onOpenChange={setDeleteDialogOpen}
+      onConfirm={executeDelete}
+      title="حذف المرفق"
+      description="هل أنت متأكد من حذف هذا المرفق؟"
+      itemName={itemName}
+      isLoading={isDeleting}
+    />
+    </>
   );
 }
