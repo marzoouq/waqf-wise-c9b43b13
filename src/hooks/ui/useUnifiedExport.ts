@@ -8,7 +8,7 @@
  * - تصدير متعدد الصفحات
  * - تنسيق البيانات
  * 
- * @version 2.6.32
+ * @version 2.9.42
  */
 
 import { useCallback } from "react";
@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import { useToast } from "@/hooks/ui/use-toast";
 import { logger } from "@/lib/logger";
 import { getErrorMessage } from "@/types/errors";
-import { loadAmiriFonts } from "@/lib/fonts/loadArabicFonts";
+import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, getDefaultTableStyles, WAQF_COLORS } from "@/lib/pdf/arabic-pdf-utils";
 import type { 
   PDFTableData, 
   ExcelRowData, 
@@ -60,39 +60,6 @@ export interface FinancialStatementConfig {
   totals: { label: string; amount: number }[];
 }
 
-// ==================== Helper Functions ====================
-
-// Type for jsPDF document
-interface PDFDocument {
-  addFileToVFS: (filename: string, data: string) => void;
-  addFont: (filename: string, fontName: string, fontStyle: string) => void;
-  setFont: (fontName: string, fontStyle: string) => void;
-  setLanguage: (lang: string) => void;
-}
-
-/**
- * تحميل الخط العربي إلى مستند PDF
- */
-const loadArabicFontToPDF = async (doc: PDFDocument): Promise<boolean> => {
-  try {
-    const { regular: amiriRegular, bold: amiriBold } = await loadAmiriFonts();
-    
-    doc.addFileToVFS("Amiri-Regular.ttf", amiriRegular);
-    doc.addFont("Amiri-Regular.ttf", "Amiri", "normal");
-    
-    doc.addFileToVFS("Amiri-Bold.ttf", amiriBold);
-    doc.addFont("Amiri-Bold.ttf", "Amiri", "bold");
-    
-    doc.setFont("Amiri", "normal");
-    doc.setLanguage("ar");
-    return true;
-  } catch (error) {
-    logger.error(error, { context: 'load_arabic_font_unified_export', severity: 'low' });
-    doc.setLanguage("ar");
-    return false;
-  }
-};
-
 // ==================== Main Hook ====================
 
 export function useUnifiedExport() {
@@ -113,44 +80,27 @@ export function useUnifiedExport() {
       
       const doc = new jsPDF();
       
-      // تحميل الخط العربي
-      const hasArabicFont = await loadArabicFontToPDF(doc);
-      const fontName = hasArabicFont ? "Amiri" : "helvetica";
+      // تحميل الخط العربي باستخدام النظام الموحد
+      const fontName = await loadArabicFontToPDF(doc);
 
-      // Title
-      doc.setFont(fontName, "bold");
-      doc.setFontSize(16);
-      doc.text(config.title, doc.internal.pageSize.width / 2, 15, { align: "center" });
+      // إضافة ترويسة الوقف
+      let yPos = addWaqfHeader(doc, fontName, config.title);
 
-      // Date
-      if (config.showDate !== false) {
-        doc.setFont(fontName, "normal");
-        doc.setFontSize(10);
-        const date = new Date().toLocaleDateString("ar-SA");
-        doc.text(`التاريخ: ${date}`, doc.internal.pageSize.width - 20, 25, {
-          align: "right",
-        });
-      }
-
-      // Table
+      // Table with unified styles
+      const tableStyles = getDefaultTableStyles(fontName);
       autoTable(doc, {
         head: [config.headers],
         body: config.data,
-        startY: 35,
-        styles: {
-          font: fontName,
-          fontSize: 10,
-          halign: "right",
-        },
+        startY: yPos,
+        ...tableStyles,
         headStyles: {
-          fillColor: config.headerColor || [34, 139, 34],
-          textColor: [255, 255, 255],
-          fontStyle: "bold",
-        },
-        alternateRowStyles: {
-          fillColor: [245, 245, 245],
+          ...tableStyles.headStyles,
+          fillColor: config.headerColor || WAQF_COLORS.primary,
         },
       });
+
+      // إضافة تذييل الوقف
+      addWaqfFooter(doc, fontName);
 
       doc.save(`${config.filename}.pdf`);
 
@@ -214,28 +164,11 @@ export function useUnifiedExport() {
       
       const doc = new jsPDF();
       
-      // تحميل الخط العربي
-      const hasArabicFont = await loadArabicFontToPDF(doc);
-      const fontName = hasArabicFont ? "Amiri" : "helvetica";
+      // تحميل الخط العربي باستخدام النظام الموحد
+      const fontName = await loadArabicFontToPDF(doc);
 
-      let yPosition = 20;
-
-      // Title
-      doc.setFontSize(18);
-      doc.setFont(fontName, "bold");
-      doc.text(config.title, doc.internal.pageSize.width / 2, yPosition, {
-        align: "center",
-      });
-      yPosition += 10;
-
-      // Date
-      doc.setFontSize(10);
-      doc.setFont(fontName, "normal");
-      const date = new Date().toLocaleDateString("ar-SA");
-      doc.text(`كما في: ${date}`, doc.internal.pageSize.width / 2, yPosition, {
-        align: "center",
-      });
-      yPosition += 15;
+      // إضافة ترويسة الوقف
+      let yPosition = addWaqfHeader(doc, fontName, config.title);
 
       // Sections
       doc.setFontSize(11);
@@ -277,6 +210,9 @@ export function useUnifiedExport() {
         });
         yPosition += 7;
       });
+
+      // إضافة تذييل الوقف
+      addWaqfFooter(doc, fontName);
 
       doc.save(`${config.filename}.pdf`);
 
