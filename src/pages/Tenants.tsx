@@ -141,7 +141,7 @@ export default function Tenants() {
               <div>
                 <p className="text-sm text-muted-foreground">المستأجرين النشطين</p>
                 <p className="text-2xl font-bold">
-                  {tenants.filter((t) => t.status === 'active').length}
+                  {tenants.filter((t) => t.status === 'نشط' || t.status === 'active').length}
                 </p>
               </div>
               <Building className="h-8 w-8 text-status-success" />
