@@ -18,10 +18,9 @@ import {
   Area,
 } from "recharts";
 import { Activity, Clock, TrendingUp, Users, Database, Zap } from "lucide-react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
+import { useLivePerformance } from "@/hooks/monitoring/useLivePerformance";
 
 interface PerformanceMetric {
   timestamp: string;
@@ -34,29 +33,9 @@ interface PerformanceMetric {
 
 export function LivePerformanceChart() {
   const [metrics, setMetrics] = useState<PerformanceMetric[]>([]);
-  const queryClient = useQueryClient();
 
-  // جلب البيانات الأولية
-  const { data: initialData } = useQuery({
-    queryKey: ["live-performance"],
-    queryFn: async () => {
-      // جلب الإحصائيات من آخر ساعة
-      const hourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-      
-      const [{ count: requestsCount }, { count: errorsCount }, { count: usersCount }] = await Promise.all([
-        supabase.from("audit_logs").select("*", { count: "exact", head: true }).gte("created_at", hourAgo),
-        supabase.from("system_error_logs").select("*", { count: "exact", head: true }).gte("created_at", hourAgo),
-        supabase.from("beneficiary_sessions").select("*", { count: "exact", head: true }).eq("is_online", true),
-      ]);
-
-      return {
-        requests: requestsCount || 0,
-        errors: errorsCount || 0,
-        activeUsers: usersCount || 0,
-      };
-    },
-    refetchInterval: 30000, // تحديث كل 30 ثانية
-  });
+  // جلب البيانات عبر Hook (Component → Hook → Service → Supabase)
+  const { data: initialData } = useLivePerformance();
 
   // تحديث المقاييس الحية
   useEffect(() => {
@@ -79,31 +58,6 @@ export function LivePerformanceChart() {
 
     return () => clearInterval(interval);
   }, [initialData]);
-
-  // اشتراك Realtime للتحديثات الفورية
-  useEffect(() => {
-    const channel = supabase
-      .channel("live-performance")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "audit_logs" },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ["live-performance"] });
-        }
-      )
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "system_error_logs" },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ["live-performance"] });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
 
   const currentMetric = metrics[metrics.length - 1];
 
