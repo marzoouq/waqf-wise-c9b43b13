@@ -1,24 +1,15 @@
 /**
  * Invoice Details Hook
- * @version 2.8.45
+ * @version 2.9.43
  */
 
 import { useQuery } from "@tanstack/react-query";
 import { InvoiceService } from "@/services";
 import { QUERY_KEYS } from "@/lib/query-keys";
+import type { InvoiceLine } from "@/types/invoice-line";
 
-export interface InvoiceLine {
-  id: string;
-  invoice_id: string;
-  line_number: number;
-  description: string;
-  quantity: number;
-  unit_price: number;
-  line_total: number;
-  tax_amount?: number;
-  subtotal?: number;
-  tax_rate?: number;
-}
+// إعادة تصدير النوع للتوافق مع الكود القديم
+export type { InvoiceLine } from "@/types/invoice-line";
 
 export function useInvoiceDetails(invoiceId: string | null) {
   const invoiceQuery = useQuery({

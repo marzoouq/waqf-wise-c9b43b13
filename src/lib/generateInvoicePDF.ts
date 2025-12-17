@@ -1,8 +1,14 @@
+/**
+ * مولّد فواتير PDF
+ * @version 2.9.43
+ */
+
 import QRCode from "qrcode";
 import { formatZATCACurrency, formatVATNumber } from "./zatca";
 import type { OrganizationSettings } from "@/hooks/governance/useOrganizationSettings";
 import { loadAmiriFonts } from "./fonts/loadArabicFonts";
 import { logger } from "./logger";
+import type { InvoiceLine } from "@/types/invoice-line";
 
 // Dynamic import type - jsPDF instance type
 type JsPDFInstance = InstanceType<typeof import('jspdf').default>;
@@ -26,20 +32,18 @@ interface Invoice {
   qr_code_data?: string;
 }
 
-interface InvoiceLine {
-  line_number: number;
-  description: string;
-  quantity: number;
-  unit_price: number;
-  subtotal: number;
-  tax_rate: number;
-  tax_amount: number;
-  line_total: number;
-}
-
 export const generateInvoicePDF = async (
   invoice: Invoice,
-  lines: InvoiceLine[],
+  lines: Array<{
+    line_number: number;
+    description: string;
+    quantity: number;
+    unit_price: number;
+    subtotal: number;
+    tax_rate: number;
+    tax_amount: number;
+    line_total: number;
+  }>,
   orgSettings: OrganizationSettings | null
 ): Promise<JsPDFInstance> => {
   try {
