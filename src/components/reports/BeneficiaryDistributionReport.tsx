@@ -267,7 +267,7 @@ export function BeneficiaryDistributionReport({
                   <td className="p-2 font-medium">{b.full_name}</td>
                   <td className="p-2">{b.category}</td>
                   <td className="p-2">{b.beneficiary_type || '-'}</td>
-                  <td className="p-2 font-bold text-green-500">
+                  <td className="p-2 font-bold text-success">
                     {(b.total_received || 0).toLocaleString('ar-SA')} ريال
                   </td>
                   <td className="p-2">

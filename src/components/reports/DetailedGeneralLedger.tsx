@@ -129,10 +129,10 @@ export function DetailedGeneralLedger() {
                           <TableCell>
                             {entry.description || entry.journal_entries.description}
                           </TableCell>
-                          <TableCell className="text-right text-green-600">
+                          <TableCell className="text-right text-success">
                             {entry.debit_amount > 0 ? formatCurrency(entry.debit_amount) : '-'}
                           </TableCell>
-                          <TableCell className="text-right text-red-600">
+                          <TableCell className="text-right text-destructive">
                             {entry.credit_amount > 0 ? formatCurrency(entry.credit_amount) : '-'}
                           </TableCell>
                           <TableCell className="text-right font-medium">
@@ -144,10 +144,10 @@ export function DetailedGeneralLedger() {
                     {ledgerEntries && ledgerEntries.length > 0 && (
                       <TableRow className="font-bold bg-primary/10">
                         <TableCell colSpan={3}>الإجمالي</TableCell>
-                        <TableCell className="text-right text-green-600">
+                        <TableCell className="text-right text-success">
                           {formatCurrency(totalDebit)}
                         </TableCell>
-                        <TableCell className="text-right text-red-600">
+                        <TableCell className="text-right text-destructive">
                           {formatCurrency(totalCredit)}
                         </TableCell>
                         <TableCell className="text-right">
@@ -171,7 +171,7 @@ export function DetailedGeneralLedger() {
                   <Card>
                     <CardContent className="pt-4">
                       <div className="text-sm text-muted-foreground">إجمالي المدين</div>
-                      <div className="text-2xl font-bold text-green-600">
+                      <div className="text-2xl font-bold text-success">
                         {formatCurrency(totalDebit)}
                       </div>
                     </CardContent>
@@ -179,7 +179,7 @@ export function DetailedGeneralLedger() {
                   <Card>
                     <CardContent className="pt-4">
                       <div className="text-sm text-muted-foreground">إجمالي الدائن</div>
-                      <div className="text-2xl font-bold text-red-600">
+                      <div className="text-2xl font-bold text-destructive">
                         {formatCurrency(totalCredit)}
                       </div>
                     </CardContent>

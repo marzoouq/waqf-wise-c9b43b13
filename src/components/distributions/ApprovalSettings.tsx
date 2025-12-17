@@ -78,7 +78,7 @@ export function ApprovalSettings({ values, onChange }: ApprovalSettingsProps) {
         </div>
       </Card>
 
-      <div className="p-4 bg-blue-500/10 text-blue-700 dark:text-blue-400 rounded-lg text-sm">
+      <div className="p-4 bg-info/10 text-info dark:text-info rounded-lg text-sm">
         سيتم إرسال إشعار لكل شخص في سلسلة الموافقات عند وصول الدور إليه
       </div>
     </div>
