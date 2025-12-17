@@ -285,8 +285,8 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="p-3 pt-0 space-y-1">
-                      {revenueItems.map((item, i) => (
-                        <div key={i} className="flex justify-between text-xs p-1.5 bg-muted/50 rounded">
+                      {revenueItems.map((item) => (
+                        <div key={`revenue-${item.name}`} className="flex justify-between text-xs p-1.5 bg-muted/50 rounded">
                           <span>{translateRevenueName(item.name)}</span>
                           <span className="text-success">{formatCurrency(item.amount)}</span>
                         </div>
@@ -305,8 +305,8 @@ export function ViewDisclosureDialog({ open, onOpenChange, disclosure }: ViewDis
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="p-3 pt-0 space-y-1">
-                      {expenseItems.map((item, i) => (
-                        <div key={i} className="flex justify-between text-xs p-1.5 bg-muted/50 rounded">
+                      {expenseItems.map((item) => (
+                        <div key={`expense-${item.name}`} className="flex justify-between text-xs p-1.5 bg-muted/50 rounded">
                           <span>{translateExpenseName(item.name)}</span>
                           <span className="text-red-600">{formatCurrency(item.amount)}</span>
                         </div>
