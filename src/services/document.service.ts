@@ -1,9 +1,13 @@
 /**
  * Document Service - خدمة المستندات والفواتير
- * @version 2.8.47
+ * @version 2.9.43
  */
 
 import { supabase } from "@/integrations/supabase/client";
+import type { InvoiceLine, InvoiceLineDB, normalizeInvoiceLine } from "@/types/invoice-line";
+
+// إعادة تصدير للتوافق
+export type { InvoiceLine } from "@/types/invoice-line";
 
 export interface InvoiceData {
   id: string;
@@ -19,17 +23,6 @@ export interface InvoiceData {
   status: string | null;
   payment_status: string | null;
   qr_code_data: string | null;
-}
-
-export interface InvoiceLine {
-  id: string;
-  line_number: number;
-  description: string | null;
-  quantity: number;
-  unit_price: number;
-  tax_rate: number | null;
-  tax_amount: number | null;
-  line_total: number;
 }
 
 export interface ReceiptData {

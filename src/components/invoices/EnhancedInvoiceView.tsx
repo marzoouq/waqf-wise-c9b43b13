@@ -13,6 +13,7 @@ import { Building2, Calendar, Clock, User, Image as ImageIcon } from "lucide-rea
 import InvoiceStatusBadge from "./InvoiceStatusBadge";
 import { ZATCAQRCode } from "./ZATCAQRCode";
 import type { OrganizationSettings } from "@/hooks/governance/useOrganizationSettings";
+import type { InvoiceLine } from "@/types/invoice-line";
 
 interface Invoice {
   id: string;
@@ -36,18 +37,6 @@ interface Invoice {
   source_image_url?: string;
   ocr_extracted?: boolean;
   ocr_confidence_score?: number;
-}
-
-interface InvoiceLine {
-  id: string;
-  line_number: number;
-  description: string;
-  quantity: number;
-  unit_price: number;
-  subtotal: number;
-  tax_rate: number;
-  tax_amount: number;
-  line_total: number;
 }
 
 interface EnhancedInvoiceViewProps {

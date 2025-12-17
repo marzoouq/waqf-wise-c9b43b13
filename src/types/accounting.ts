@@ -92,17 +92,8 @@ export interface Invoice {
   updated_at: string;
 }
 
-export interface InvoiceLine {
-  id: string;
-  invoice_id: string;
-  line_number: number;
-  description: string;
-  quantity: number;
-  unit_price: number;
-  line_total: number;
-  account_id: string | null;
-  created_at: string;
-}
+// استخدام النوع الموحد من invoice-line.ts
+export type { InvoiceLine } from "./invoice-line";
 
 export interface Approval {
   id: string;

@@ -42,7 +42,7 @@ export const ViewInvoiceDialog = ({ invoiceId, open, onOpenChange }: ViewInvoice
     if (invoice && invoiceLines) {
       setIsExporting(true);
       try {
-        await generateInvoicePDF(invoice, invoiceLines as any, orgSettings);
+        await generateInvoicePDF(invoice, invoiceLines, orgSettings);
         toast.success("تم تصدير الفاتورة بنجاح");
       } catch (error) {
         logger.error(error, { context: 'generate_invoice_pdf', severity: 'medium' });
@@ -118,7 +118,7 @@ export const ViewInvoiceDialog = ({ invoiceId, open, onOpenChange }: ViewInvoice
           )}
         </div>
         <div id="invoice-content">
-          <EnhancedInvoiceView invoice={invoice} lines={invoiceLines as any || []} orgSettings={orgSettings} />
+          <EnhancedInvoiceView invoice={invoice} lines={invoiceLines} orgSettings={orgSettings} />
         </div>
         <div className="border-t pt-4 mt-4 print:hidden">
           <InvoiceStatusActions 
