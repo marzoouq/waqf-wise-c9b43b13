@@ -11,9 +11,19 @@ import {
   Legend,
 } from "recharts";
 import { useRevenueExpenseChart } from "@/hooks/dashboard/useDashboardCharts";
+import { useIsMobile } from "@/hooks/ui/use-mobile";
 
 const RevenueExpenseChart = () => {
   const { data, isLoading } = useRevenueExpenseChart();
+  const isMobile = useIsMobile();
+
+  // Responsive chart dimensions
+  const chartHeight = isMobile ? 200 : 300;
+  const fontSize = isMobile ? '9px' : '12px';
+  const xAxisAngle = isMobile ? -45 : 0;
+  const xAxisTextAnchor = isMobile ? "end" : "middle";
+  const xAxisHeight = isMobile ? 60 : 30;
+  const yAxisWidth = isMobile ? 40 : 60;
 
   if (isLoading) {
     return (
@@ -34,7 +44,7 @@ const RevenueExpenseChart = () => {
         <CardTitle className="text-sm sm:text-base md:text-xl font-bold">الإيرادات والمصروفات الشهرية</CardTitle>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 200 : 300}>
+        <ResponsiveContainer width="100%" height={chartHeight}>
           <AreaChart data={data || []}>
             <defs>
               <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
@@ -50,15 +60,15 @@ const RevenueExpenseChart = () => {
             <XAxis 
               dataKey="month" 
               stroke="hsl(var(--muted-foreground))"
-              style={{ fontSize: window.innerWidth < 640 ? '9px' : '12px' }}
-              angle={window.innerWidth < 640 ? -45 : 0}
-              textAnchor={window.innerWidth < 640 ? "end" : "middle"}
-              height={window.innerWidth < 640 ? 60 : 30}
+              style={{ fontSize }}
+              angle={xAxisAngle}
+              textAnchor={xAxisTextAnchor}
+              height={xAxisHeight}
             />
             <YAxis 
               stroke="hsl(var(--muted-foreground))"
-              style={{ fontSize: window.innerWidth < 640 ? '9px' : '12px' }}
-              width={window.innerWidth < 640 ? 40 : 60}
+              style={{ fontSize }}
+              width={yAxisWidth}
               tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`}
             />
             <Tooltip
