@@ -526,7 +526,7 @@ const BeneficiaryDialog = ({
 
             {/* Employment & Housing Section */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-foreground border-r-4 border-r-warning pr-3">
+              <h3 className="text-lg font-semibold text-foreground border-e-4 border-e-warning pe-3">
                 معلومات الوظيفة والسكن
               </h3>
 
@@ -595,7 +595,7 @@ const BeneficiaryDialog = ({
 
             {/* Additional Information Section */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-foreground border-r-4 border-r-success pr-3">
+              <h3 className="text-lg font-semibold text-foreground border-e-4 border-e-success pe-3">
                 معلومات إضافية
               </h3>
 

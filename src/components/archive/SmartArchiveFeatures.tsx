@@ -79,7 +79,7 @@ export function SmartArchiveFeatures() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSmartSearch()}
-                className="pr-10"
+                className="pe-10"
               />
             </div>
             <Button onClick={handleSmartSearch}>

@@ -154,7 +154,7 @@ function VisibilityPanel({ targetRole, roleLabel }: VisibilityPanelProps) {
       )}
 
       {/* الفئات */}
-      <ScrollArea className="h-[500px] pr-2">
+      <ScrollArea className="h-[500px] pe-2">
         <div className="space-y-3">
           {filteredCategories.map((category) => (
             <SettingsCategoryCard

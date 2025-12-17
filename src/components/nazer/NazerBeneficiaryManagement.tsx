@@ -87,7 +87,7 @@ export function NazerBeneficiaryManagement() {
             placeholder="بحث بالاسم أو الهاتف أو الهوية..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pr-10"
+            className="pe-10"
           />
         </div>
 

@@ -41,7 +41,7 @@ export function BeneficiarySelector({ selected, onChange }: BeneficiarySelectorP
             placeholder="ابحث بالاسم أو رقم الهوية..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pr-9"
+            className="pe-9"
           />
         </div>
         <Button variant="outline" onClick={handleSelectAll}>

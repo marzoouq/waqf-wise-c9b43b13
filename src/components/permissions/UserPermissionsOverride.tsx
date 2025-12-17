@@ -152,7 +152,7 @@ export function UserPermissionsOverride({ userId, userName }: UserPermissionsOve
                       placeholder="بحث عن صلاحية..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pr-10"
+                      className="pe-10"
                     />
                   </div>
 

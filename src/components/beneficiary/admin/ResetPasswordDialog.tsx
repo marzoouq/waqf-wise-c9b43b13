@@ -80,7 +80,7 @@ export function ResetPasswordDialog({
                     placeholder="أدخل كلمة المرور الجديدة (6 أحرف على الأقل)"
                     disabled={isLoading}
                     dir="ltr"
-                    className="pr-10"
+                    className="pe-10"
                   />
                   <Button
                     type="button"

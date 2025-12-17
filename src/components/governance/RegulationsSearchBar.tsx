@@ -39,7 +39,7 @@ export function RegulationsSearchBar({
           placeholder="ابحث في اللائحة التنفيذية..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="pr-10 pl-20"
+          className="pe-10 ps-20"
         />
         <div className="absolute left-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
           {searchQuery && (
