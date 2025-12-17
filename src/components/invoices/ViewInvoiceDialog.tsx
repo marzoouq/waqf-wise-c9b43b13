@@ -6,7 +6,7 @@ import EnhancedInvoiceView from "./EnhancedInvoiceView";
 import { useOrganizationSettings } from "@/hooks/governance/useOrganizationSettings";
 import { generateInvoicePDF } from "@/lib/generateInvoicePDF";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { logger } from "@/lib/logger";
 import { InvoiceStatusActions } from "./InvoiceStatusActions";
 import { format } from "@/lib/date";
@@ -23,13 +23,13 @@ export const ViewInvoiceDialog = ({ invoiceId, open, onOpenChange }: ViewInvoice
   const { settings: orgSettings } = useOrganizationSettings();
   const [isExporting, setIsExporting] = useState(false);
   const queryClient = useQueryClient();
+  const invoiceContentRef = useRef<HTMLDivElement>(null);
   
   const { invoice, invoiceLines, invoiceLoading, linesLoading } = useInvoiceDetails(invoiceId);
 
   const handlePrint = () => {
-    // الحصول على محتوى الفاتورة
-    const invoiceContent = document.querySelector('#invoice-content');
-    if (!invoiceContent) {
+    // الحصول على محتوى الفاتورة باستخدام useRef
+    if (!invoiceContentRef.current) {
       toast.error("لم يتم العثور على محتوى الفاتورة");
       return;
     }
@@ -117,7 +117,7 @@ export const ViewInvoiceDialog = ({ invoiceId, open, onOpenChange }: ViewInvoice
             </Button>
           )}
         </div>
-        <div id="invoice-content">
+        <div ref={invoiceContentRef} id="invoice-content">
           <EnhancedInvoiceView invoice={invoice} lines={invoiceLines} orgSettings={orgSettings} />
         </div>
         <div className="border-t pt-4 mt-4 print:hidden">

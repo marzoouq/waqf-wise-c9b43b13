@@ -9,6 +9,15 @@ import { useRevenueExpenseChart } from "@/hooks/dashboard/useDashboardCharts";
 import { ChartSkeleton } from "@/components/dashboard/ChartSkeleton";
 import { ErrorState } from "@/components/shared/ErrorState";
 
+// استخراج الأنماط خارج المكون لتحسين الأداء
+const TOOLTIP_STYLE = {
+  backgroundColor: 'hsl(var(--popover))',
+  borderColor: 'hsl(var(--border))',
+  borderRadius: '8px'
+} as const;
+
+const TOOLTIP_LABEL_STYLE = { color: 'hsl(var(--popover-foreground))' } as const;
+
 export default function RevenueExpenseChart() {
   const { data, isLoading, error, refetch } = useRevenueExpenseChart();
 
@@ -65,12 +74,8 @@ export default function RevenueExpenseChart() {
                 `${value.toLocaleString('ar-SA')} ر.س`,
                 name === 'revenue' ? 'الإيرادات' : 'المصروفات'
               ]}
-              contentStyle={{
-                backgroundColor: 'hsl(var(--popover))',
-                borderColor: 'hsl(var(--border))',
-                borderRadius: '8px'
-              }}
-              labelStyle={{ color: 'hsl(var(--popover-foreground))' }}
+              contentStyle={TOOLTIP_STYLE}
+              labelStyle={TOOLTIP_LABEL_STYLE}
             />
             <Legend 
               formatter={(value) => value === 'revenue' ? 'الإيرادات' : 'المصروفات'}

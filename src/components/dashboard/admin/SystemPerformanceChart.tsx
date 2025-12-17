@@ -7,6 +7,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { CHART_CONSTANTS } from "@/lib/constants";
 
+// استخراج الأنماط خارج المكون لتحسين الأداء
+const TOOLTIP_STYLE = {
+  backgroundColor: 'hsl(var(--background))',
+  border: '1px solid hsl(var(--border))',
+  borderRadius: '6px',
+} as const;
+
 export function SystemPerformanceChart() {
   const { data, isLoading, isError, refetch, isFetching } = useSystemPerformanceMetrics();
 
@@ -74,13 +81,7 @@ export function SystemPerformanceChart() {
               className="text-xs"
               tick={{ fill: 'hsl(var(--muted-foreground))' }}
             />
-            <Tooltip 
-              contentStyle={{
-                backgroundColor: 'hsl(var(--background))',
-                border: '1px solid hsl(var(--border))',
-                borderRadius: '6px',
-              }}
-            />
+            <Tooltip contentStyle={TOOLTIP_STYLE} />
             <Legend />
             <Line 
               type="monotone" 
