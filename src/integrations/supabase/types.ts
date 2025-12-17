@@ -7428,6 +7428,7 @@ export type Database = {
           id: string
           is_read: boolean
           message: string
+          priority: string | null
           read_at: string | null
           reference_id: string | null
           reference_type: string | null
@@ -7447,6 +7448,7 @@ export type Database = {
           id?: string
           is_read?: boolean
           message: string
+          priority?: string | null
           read_at?: string | null
           reference_id?: string | null
           reference_type?: string | null
@@ -7466,6 +7468,7 @@ export type Database = {
           id?: string
           is_read?: boolean
           message?: string
+          priority?: string | null
           read_at?: string | null
           reference_id?: string | null
           reference_type?: string | null
