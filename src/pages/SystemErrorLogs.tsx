@@ -137,7 +137,7 @@ export default function SystemErrorLogs() {
           <CardContent>
             <div className="space-y-3">
               {activeAlerts.map((alert) => (
-                <div key={alert.id} className="flex items-start gap-3 p-3 bg-white dark:bg-gray-900 rounded-lg">
+                <div key={alert.id} className="flex items-start gap-3 p-3 bg-card rounded-lg">
                   {getSeverityIcon(alert.severity)}
                   <div className="flex-1">
                     <p className="font-semibold">{alert.title}</p>
