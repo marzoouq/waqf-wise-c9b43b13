@@ -5402,6 +5402,7 @@ export type Database = {
           journal_entry_id: string | null
           notes: string | null
           share_amount: number
+          status: string | null
           updated_at: string | null
         }
         Insert: {
@@ -5415,6 +5416,7 @@ export type Database = {
           journal_entry_id?: string | null
           notes?: string | null
           share_amount?: number
+          status?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -5428,6 +5430,7 @@ export type Database = {
           journal_entry_id?: string | null
           notes?: string | null
           share_amount?: number
+          status?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -6706,6 +6709,7 @@ export type Database = {
           notes: string | null
           paid_amount: number | null
           principal_amount: number | null
+          remaining_balance: number | null
           start_date: string
           status: string | null
           term_months: number
@@ -6726,6 +6730,7 @@ export type Database = {
           notes?: string | null
           paid_amount?: number | null
           principal_amount?: number | null
+          remaining_balance?: number | null
           start_date: string
           status?: string | null
           term_months: number
@@ -6746,6 +6751,7 @@ export type Database = {
           notes?: string | null
           paid_amount?: number | null
           principal_amount?: number | null
+          remaining_balance?: number | null
           start_date?: string
           status?: string | null
           term_months?: number
