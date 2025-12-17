@@ -1,7 +1,12 @@
+/**
+ * مولّد تقرير الإفصاح السنوي PDF
+ * @version 2.9.42
+ */
+
 import { AnnualDisclosure } from "@/hooks/reports/useAnnualDisclosures";
-import { logger } from "@/lib/logger";
 import { Database } from "@/integrations/supabase/types";
-import { loadAmiriFonts } from "./fonts/loadArabicFonts";
+import { logger } from "@/lib/logger";
+import { loadArabicFontToPDF, WAQF_COLORS } from "./pdf/arabic-pdf-utils";
 
 type DisclosureBeneficiary = Database['public']['Tables']['disclosure_beneficiaries']['Row'];
 
@@ -13,38 +18,6 @@ declare module 'jspdf' {
     lastAutoTable?: { finalY: number };
   }
 }
-
-const loadArabicFont = async (doc: JsPDF) => {
-  try {
-    const { regular: amiriRegular, bold: amiriBold } = await loadAmiriFonts();
-    
-    // التحقق من صحة البيانات
-    if (!amiriRegular || amiriRegular.length < 1000) {
-      throw new Error('Font data is invalid or too small');
-    }
-    
-    doc.addFileToVFS("Amiri-Regular.ttf", amiriRegular);
-    doc.addFont("Amiri-Regular.ttf", "Amiri", "normal");
-    
-    doc.addFileToVFS("Amiri-Bold.ttf", amiriBold);
-    doc.addFont("Amiri-Bold.ttf", "Amiri", "bold");
-    
-    doc.setFont("Amiri", "normal");
-    
-    logger.info('Arabic font loaded successfully', { 
-      context: 'load_arabic_font_disclosure',
-      metadata: { fontSize: amiriRegular.length }
-    });
-    
-    return true;
-  } catch (error) {
-    logger.error(error, { 
-      context: 'load_arabic_font_disclosure', 
-      severity: 'high'
-    });
-    return false;
-  }
-};
 
 export const generateDisclosurePDF = async (
   disclosure: AnnualDisclosure,
@@ -60,13 +33,8 @@ export const generateDisclosurePDF = async (
     const autoTable = autoTableModule.default;
     const doc = new jsPDF();
     
-    // تحميل الخط العربي
-    const hasArabicFont = await loadArabicFont(doc);
-    const fontName = hasArabicFont ? "Amiri" : "helvetica";
-    
-    // RTL support
-    doc.setR2L(true);
-    doc.setLanguage("ar");
+    // تحميل الخط العربي باستخدام النظام الموحد
+    const fontName = await loadArabicFontToPDF(doc);
 
     let yPos = 20;
 
