@@ -2,17 +2,18 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Download, AlertTriangle } from 'lucide-react';
 import { LoadingState } from '@/components/shared/LoadingState';
-import { ErrorState } from '@/components/shared/ErrorState';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { exportToExcel, exportToPDF } from '@/lib/exportHelpers';
 import { useToast } from '@/hooks/ui/use-toast';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useLoansAgingReport } from '@/hooks/reports/useLoansAgingReport';
+import { useIsMobile } from '@/hooks/ui/use-mobile';
 
 export function LoansAgingReport() {
   const { toast } = useToast();
   const { agingData, agingByCategory, isLoading } = useLoansAgingReport();
+  const isMobile = useIsMobile();
 
   const handleExportPDF = () => {
     if (!agingData) return;
@@ -61,7 +62,6 @@ export function LoansAgingReport() {
     return <LoadingState message="جاري تحليل أعمار الديون..." />;
   }
 
-
   return (
     <div className="space-y-6">
       {/* التحليل البياني */}
@@ -103,44 +103,88 @@ export function LoansAgingReport() {
           <CardTitle>تفاصيل القروض حسب أيام التأخير</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="rounded-lg border overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-xs sm:text-sm whitespace-nowrap">رقم القرض</TableHead>
-                  <TableHead className="text-xs sm:text-sm">المستفيد</TableHead>
-                  <TableHead className="text-xs sm:text-sm whitespace-nowrap hidden md:table-cell">المبلغ الأصلي</TableHead>
-                  <TableHead className="text-xs sm:text-sm whitespace-nowrap">المتبقي</TableHead>
-                  <TableHead className="text-xs sm:text-sm whitespace-nowrap hidden lg:table-cell">أيام التأخير</TableHead>
-                  <TableHead className="text-xs sm:text-sm">الفئة</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {agingData?.map((loan) => (
-                  <TableRow key={loan.loan_id}>
-                    <TableCell className="font-medium text-xs sm:text-sm whitespace-nowrap">{loan.loan_number}</TableCell>
-                    <TableCell className="text-xs sm:text-sm">{loan.beneficiary_name}</TableCell>
-                    <TableCell className="text-xs sm:text-sm whitespace-nowrap hidden md:table-cell">{loan.principal_amount.toLocaleString('ar-SA')} ريال</TableCell>
-                    <TableCell className="font-bold text-xs sm:text-sm whitespace-nowrap">{loan.remaining_balance.toLocaleString('ar-SA')} ريال</TableCell>
-                    <TableCell className="text-xs sm:text-sm hidden lg:table-cell">
-                      <Badge variant={loan.days_overdue > 60 ? 'destructive' : loan.days_overdue > 30 ? 'default' : 'secondary'}>
-                        {loan.days_overdue} يوم
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-xs sm:text-sm">
-                      <Badge variant={
-                        loan.aging_category.includes('خطير') ? 'destructive' :
-                        loan.aging_category.includes('متأخر جداً') ? 'destructive' :
-                        loan.aging_category.includes('متأخر') ? 'default' : 'secondary'
-                      }>
-                        {loan.aging_category}
-                      </Badge>
-                    </TableCell>
+          {!agingData || agingData.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              لا توجد قروض متأخرة
+            </div>
+          ) : isMobile ? (
+            // Mobile Card View
+            <div className="space-y-3">
+              {agingData.map((loan) => (
+                <Card key={loan.loan_id} className="p-3">
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <span className="font-mono text-sm text-muted-foreground">{loan.loan_number}</span>
+                      <p className="font-medium">{loan.beneficiary_name}</p>
+                    </div>
+                    <Badge variant={
+                      loan.aging_category.includes('خطير') ? 'destructive' :
+                      loan.aging_category.includes('متأخر جداً') ? 'destructive' :
+                      loan.aging_category.includes('متأخر') ? 'default' : 'secondary'
+                    }>
+                      {loan.aging_category}
+                    </Badge>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">الأصلي:</span>
+                      <span>{loan.principal_amount.toLocaleString('ar-SA')} ريال</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">المتبقي:</span>
+                      <span className="font-bold">{loan.remaining_balance.toLocaleString('ar-SA')} ريال</span>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center mt-2 pt-2 border-t">
+                    <span className="text-muted-foreground text-sm">أيام التأخير:</span>
+                    <Badge variant={loan.days_overdue > 60 ? 'destructive' : loan.days_overdue > 30 ? 'default' : 'secondary'}>
+                      {loan.days_overdue} يوم
+                    </Badge>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            // Desktop Table View
+            <div className="rounded-lg border overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-xs sm:text-sm whitespace-nowrap">رقم القرض</TableHead>
+                    <TableHead className="text-xs sm:text-sm">المستفيد</TableHead>
+                    <TableHead className="text-xs sm:text-sm whitespace-nowrap">المبلغ الأصلي</TableHead>
+                    <TableHead className="text-xs sm:text-sm whitespace-nowrap">المتبقي</TableHead>
+                    <TableHead className="text-xs sm:text-sm whitespace-nowrap">أيام التأخير</TableHead>
+                    <TableHead className="text-xs sm:text-sm">الفئة</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                </TableHeader>
+                <TableBody>
+                  {agingData.map((loan) => (
+                    <TableRow key={loan.loan_id}>
+                      <TableCell className="font-medium text-xs sm:text-sm whitespace-nowrap">{loan.loan_number}</TableCell>
+                      <TableCell className="text-xs sm:text-sm">{loan.beneficiary_name}</TableCell>
+                      <TableCell className="text-xs sm:text-sm whitespace-nowrap">{loan.principal_amount.toLocaleString('ar-SA')} ريال</TableCell>
+                      <TableCell className="font-bold text-xs sm:text-sm whitespace-nowrap">{loan.remaining_balance.toLocaleString('ar-SA')} ريال</TableCell>
+                      <TableCell className="text-xs sm:text-sm">
+                        <Badge variant={loan.days_overdue > 60 ? 'destructive' : loan.days_overdue > 30 ? 'default' : 'secondary'}>
+                          {loan.days_overdue} يوم
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-xs sm:text-sm">
+                        <Badge variant={
+                          loan.aging_category.includes('خطير') ? 'destructive' :
+                          loan.aging_category.includes('متأخر جداً') ? 'destructive' :
+                          loan.aging_category.includes('متأخر') ? 'default' : 'secondary'
+                        }>
+                          {loan.aging_category}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

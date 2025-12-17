@@ -13,9 +13,12 @@ import { useTenantsAging } from '@/hooks/property/useTenantLedger';
 import { formatCurrency } from '@/lib/utils';
 import { AlertTriangle, Clock } from 'lucide-react';
 import { ErrorState } from '@/components/shared/ErrorState';
+import { useIsMobile } from '@/hooks/ui/use-mobile';
+import { Badge } from '@/components/ui/badge';
 
 export function TenantsAgingReport() {
   const { data: agingData = [], isLoading, error, refetch } = useTenantsAging();
+  const isMobile = useIsMobile();
 
   const totals = agingData.reduce(
     (acc, item) => ({
@@ -66,7 +69,78 @@ export function TenantsAgingReport() {
           <div className="text-center py-8 text-muted-foreground">
             لا توجد ذمم مستحقة
           </div>
+        ) : isMobile ? (
+          // Mobile Card View
+          <div className="space-y-3">
+            {agingData.map((item) => (
+              <Card key={item.tenant_id} className="p-3">
+                <div className="flex justify-between items-start mb-2">
+                  <span className="font-medium">{item.tenant_name}</span>
+                  <Badge variant="destructive" className="text-xs">
+                    {formatCurrency(item.total)}
+                  </Badge>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">جاري:</span>
+                    <span>{item.current > 0 ? formatCurrency(item.current) : '-'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">31-60:</span>
+                    <span className="text-status-warning">{item.days_30 > 0 ? formatCurrency(item.days_30) : '-'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">61-90:</span>
+                    <span className="text-amber-600">{item.days_60 > 0 ? formatCurrency(item.days_60) : '-'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">91-120:</span>
+                    <span className="text-status-error">{item.days_90 > 0 ? formatCurrency(item.days_90) : '-'}</span>
+                  </div>
+                  {item.over_90 > 0 && (
+                    <div className="col-span-2 flex justify-between border-t pt-1 mt-1">
+                      <span className="text-destructive flex items-center gap-1">
+                        <AlertTriangle className="h-3 w-3" />
+                        أكثر من 120:
+                      </span>
+                      <span className="text-destructive font-medium">{formatCurrency(item.over_90)}</span>
+                    </div>
+                  )}
+                </div>
+              </Card>
+            ))}
+            {/* Mobile Totals Card */}
+            <Card className="p-3 bg-muted/50">
+              <div className="flex justify-between items-center mb-2">
+                <span className="font-bold">الإجمالي</span>
+                <span className="font-bold text-lg">{formatCurrency(totals.total)}</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="flex justify-between">
+                  <span>جاري:</span>
+                  <span>{formatCurrency(totals.current)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>31-60:</span>
+                  <span className="text-status-warning">{formatCurrency(totals.days_30)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>61-90:</span>
+                  <span className="text-amber-600">{formatCurrency(totals.days_60)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>91-120:</span>
+                  <span className="text-status-error">{formatCurrency(totals.days_90)}</span>
+                </div>
+                <div className="col-span-2 flex justify-between">
+                  <span className="text-destructive">أكثر من 120:</span>
+                  <span className="text-destructive">{formatCurrency(totals.over_90)}</span>
+                </div>
+              </div>
+            </Card>
+          </div>
         ) : (
+          // Desktop Table View
           <div className="rounded-md border overflow-x-auto">
             <Table>
               <TableHeader>
