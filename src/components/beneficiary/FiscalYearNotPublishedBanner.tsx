@@ -19,12 +19,12 @@ export function FiscalYearNotPublishedBanner() {
   const lastPublishedYear = publishedYears[0];
 
   return (
-    <Alert className="border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-800">
-      <Eye className="h-4 w-4 text-amber-600" />
-      <AlertTitle className="text-amber-800 dark:text-amber-200">
+    <Alert className="border-warning/30 bg-warning/10">
+      <Eye className="h-4 w-4 text-warning" />
+      <AlertTitle className="text-warning">
         السنة المالية الحالية غير منشورة بعد
       </AlertTitle>
-      <AlertDescription className="text-amber-700 dark:text-amber-300">
+      <AlertDescription className="text-warning/80">
         <div className="flex items-center gap-2 mt-1">
           <Calendar className="h-3 w-3" />
           <span>

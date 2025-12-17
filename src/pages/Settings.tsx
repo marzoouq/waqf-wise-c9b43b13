@@ -114,7 +114,7 @@ const Settings = () => {
       title: "قاعدة البيانات",
       description: "إعدادات النسخ الاحتياطي والاستعادة",
       icon: Database,
-      color: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+      color: "bg-warning/10 text-warning",
     },
     {
       id: 6,

@@ -15,8 +15,8 @@ const patterns = [
     label: 'التوزيع الشرعي',
     description: 'حسب الأنصبة الشرعية (الذكر له ضعف الأنثى)',
     icon: Scale,
-    color: 'text-emerald-600',
-    bgColor: 'bg-emerald-50 dark:bg-emerald-950',
+    color: 'text-success',
+    bgColor: 'bg-success/10',
     recommended: true,
   },
   {

@@ -177,7 +177,7 @@ export class LazyErrorBoundary extends Component<Props, State> {
               <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
                 {isOnline ? (
                   <>
-                    <Wifi className="w-4 h-4 text-green-500" />
+                    <Wifi className="w-4 h-4 text-success" />
                     <span>متصل بالإنترنت</span>
                   </>
                 ) : (

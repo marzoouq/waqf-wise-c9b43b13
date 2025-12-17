@@ -38,7 +38,7 @@ export function RegulationsContent({
     
     return parts.map((part, index) => 
       regex.test(part) ? (
-        <mark key={index} className="bg-yellow-200 dark:bg-yellow-800 px-0.5 rounded">
+        <mark key={index} className="bg-warning/30 px-0.5 rounded">
           {part}
         </mark>
       ) : (
@@ -52,7 +52,7 @@ export function RegulationsContent({
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg flex items-center gap-2">
-            <BookOpen className="h-5 w-5 text-red-500" />
+            <BookOpen className="h-5 w-5 text-destructive" />
             محتوى اللائحة التنفيذية
           </CardTitle>
           <Badge variant="secondary" className="text-xs">
@@ -74,12 +74,12 @@ export function RegulationsContent({
                 key={part.id} 
                 value={part.id}
                 data-part-id={part.id}
-                className={`border rounded-lg px-4 ${part.highlight ? 'border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-900/10' : ''}`}
+                className={`border rounded-lg px-4 ${part.highlight ? 'border-destructive/30 bg-destructive/5' : ''}`}
               >
                 <AccordionTrigger className="hover:no-underline py-3">
                   <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg ${part.highlight ? 'bg-red-100 dark:bg-red-900/30' : 'bg-muted'}`}>
-                      <Icon className={`h-4 w-4 ${part.highlight ? 'text-red-600 dark:text-red-400' : 'text-muted-foreground'}`} />
+                    <div className={`p-2 rounded-lg ${part.highlight ? 'bg-destructive/10' : 'bg-muted'}`}>
+                      <Icon className={`h-4 w-4 ${part.highlight ? 'text-destructive' : 'text-muted-foreground'}`} />
                     </div>
                     <span className="text-sm font-semibold text-right">
                       {highlightText(part.title)}
@@ -99,14 +99,14 @@ export function RegulationsContent({
                               key={sectionIndex} 
                               className={`space-y-2 p-3 rounded-lg ${
                                 section.highlight 
-                                  ? 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800' 
+                                  ? 'bg-warning/10 border border-warning/30' 
                                   : 'bg-muted/50'
                               }`}
                             >
-                              <h5 className={`text-sm font-medium ${section.highlight ? 'text-amber-700 dark:text-amber-400' : ''}`}>
+                              <h5 className={`text-sm font-medium ${section.highlight ? 'text-warning' : ''}`}>
                                 {highlightText(section.subtitle)}
                                 {section.highlight && (
-                                  <Badge variant="outline" className="me-2 text-xs bg-amber-100 dark:bg-amber-900/30 border-amber-300">
+                                  <Badge variant="outline" className="me-2 text-xs bg-warning/20 border-warning/30">
                                     هام
                                   </Badge>
                                 )}
@@ -114,7 +114,7 @@ export function RegulationsContent({
                               <ul className="space-y-1.5">
                                 {section.items.map((item, itemIndex) => (
                                   <li key={itemIndex} className="text-sm text-muted-foreground flex items-start gap-2">
-                                    <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-red-400 flex-shrink-0" />
+                                    <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-destructive flex-shrink-0" />
                                     <span className="leading-relaxed">{highlightText(item)}</span>
                                   </li>
                                 ))}

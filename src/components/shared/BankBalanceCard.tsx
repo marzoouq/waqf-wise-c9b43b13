@@ -28,10 +28,10 @@ export function BankBalanceCard({ className, compact = false }: BankBalanceCardP
   // إخفاء الرصيد للمستفيدين/الورثة إذا لم تكن السنة منشورة
   if (isBeneficiaryOrHeir && !publishStatusLoading && !isCurrentYearPublished) {
     return (
-      <Alert className={`border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-800 ${className}`}>
-        <EyeOff className="h-4 w-4 text-amber-600" />
-        <AlertTitle className="text-amber-800 dark:text-amber-200">الرصيد البنكي مخفي</AlertTitle>
-        <AlertDescription className="text-amber-700 dark:text-amber-300">
+      <Alert className={`border-warning/30 bg-warning/10 ${className}`}>
+        <EyeOff className="h-4 w-4 text-warning" />
+        <AlertTitle className="text-warning">الرصيد البنكي مخفي</AlertTitle>
+        <AlertDescription className="text-warning/80">
           سيتم عرض الرصيد البنكي بعد اعتماد ونشر السنة المالية من قبل الناظر
         </AlertDescription>
       </Alert>
