@@ -16,6 +16,8 @@ import {
 } from "@/components/beneficiary/admin/list";
 import { BeneficiariesDialogs } from "@/components/beneficiary/admin/BeneficiariesDialogs";
 import { PAGINATION } from "@/lib/constants";
+import { useDeleteConfirmation } from "@/hooks/shared";
+import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 
 const ITEMS_PER_PAGE = PAGINATION.BENEFICIARIES_PAGE_SIZE;
 
@@ -41,6 +43,25 @@ const Beneficiaries = () => {
     searchQuery,
     advancedCriteria
   );
+
+  const {
+    confirmDelete,
+    isOpen: isDeleteOpen,
+    isDeleting,
+    executeDelete,
+    onOpenChange: onDeleteOpenChange,
+    itemName,
+    dialogTitle,
+    dialogDescription,
+  } = useDeleteConfirmation<string>({
+    onDelete: async (id) => {
+      await deleteBeneficiary(id);
+    },
+    successMessage: 'تم حذف المستفيد بنجاح',
+    errorMessage: 'فشل حذف المستفيد',
+    title: 'حذف المستفيد',
+    description: 'هل أنت متأكد من حذف هذا المستفيد؟',
+  });
 
   const paginatedBeneficiaries = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -69,11 +90,9 @@ const Beneficiaries = () => {
     setDialogOpen(false);
   };
 
-  const handleDeleteBeneficiary = useCallback(async (id: string) => {
-    if (confirm("هل أنت متأكد من حذف هذا المستفيد؟")) {
-      await deleteBeneficiary(id);
-    }
-  }, [deleteBeneficiary]);
+  const handleDeleteBeneficiary = useCallback((id: string) => {
+    confirmDelete(id);
+  }, [confirmDelete]);
 
   const handleAdvancedSearch = (criteria: SearchCriteria) => {
     setAdvancedCriteria(criteria);
@@ -144,6 +163,17 @@ const Beneficiaries = () => {
             onSaveBeneficiary={handleSaveBeneficiary}
             onAdvancedSearch={handleAdvancedSearch}
             onSuccessCallback={() => queryClient.invalidateQueries({ queryKey: ["beneficiaries"] })}
+          />
+
+          <DeleteConfirmDialog
+            open={isDeleteOpen}
+            onOpenChange={onDeleteOpenChange}
+            onConfirm={executeDelete}
+            title={dialogTitle}
+            description={dialogDescription}
+            itemName={itemName}
+            isLoading={isDeleting}
+            isDestructive={true}
           />
       </MobileOptimizedLayout>
     </PageErrorBoundary>

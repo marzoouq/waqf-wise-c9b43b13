@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback } from 'react';
 import { useFamilies } from './useFamilies';
 import { useTableSort } from '@/hooks/ui/useTableSort';
 import { useBulkSelection } from '@/hooks/ui/useBulkSelection';
+import { useDeleteConfirmation } from '@/hooks/shared';
 import { Family } from '@/types';
 import { toast } from 'sonner';
 import type { FiltersRecord } from '@/components/shared/AdvancedFiltersDialog';
@@ -65,6 +66,17 @@ export function useFamiliesPage() {
     totalMembers: families.reduce((sum, f) => sum + f.total_members, 0),
   };
 
+  const bulkDeleteConfirmation = useDeleteConfirmation<string[]>({
+    onDelete: async (ids) => {
+      await Promise.all(ids.map(id => deleteFamily.mutateAsync(id)));
+      bulkSelection.clearSelection();
+    },
+    successMessage: `تم حذف ${bulkSelection.selectedCount} عائلة بنجاح`,
+    errorMessage: 'فشل حذف بعض العائلات',
+    title: 'حذف العائلات',
+    description: `هل تريد حذف ${bulkSelection.selectedCount} عائلة؟`,
+  });
+
   const handleAddFamily = () => {
     setSelectedFamily(null);
     setDialogOpen(true);
@@ -85,19 +97,9 @@ export function useFamiliesPage() {
     setMembersDialogOpen(true);
   };
 
-  const handleBulkDelete = async () => {
+  const handleBulkDelete = () => {
     if (bulkSelection.selectedCount === 0) return;
-    
-    const confirmed = window.confirm(`هل تريد حذف ${bulkSelection.selectedCount} عائلة؟`);
-    if (!confirmed) return;
-
-    try {
-      await Promise.all(bulkSelection.selectedIds.map(id => deleteFamily.mutateAsync(id)));
-      toast.success(`تم حذف ${bulkSelection.selectedCount} عائلة بنجاح`);
-      bulkSelection.clearSelection();
-    } catch (error) {
-      toast.error('فشل حذف بعض العائلات');
-    }
+    bulkDeleteConfirmation.confirmDelete(bulkSelection.selectedIds);
   };
 
   const handleBulkExport = () => {
@@ -177,6 +179,7 @@ export function useFamiliesPage() {
     bulkSelection,
     handleBulkDelete,
     handleBulkExport,
+    bulkDeleteConfirmation,
     
     // Dialog States
     dialogOpen,
