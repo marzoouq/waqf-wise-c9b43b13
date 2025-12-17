@@ -155,7 +155,7 @@ export function DocumentContentViewer({
                 </TableHeader>
                 <TableBody>
                   {filteredItems.map((item, index) => (
-                    <TableRow key={index}>
+                    <TableRow key={`${item.description}-${index}`}>
                       {content.items.some(i => i.date) && (
                         <TableCell className="font-mono text-sm">
                           {item.date || "-"}

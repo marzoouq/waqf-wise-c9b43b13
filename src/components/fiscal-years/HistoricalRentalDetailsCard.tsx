@@ -27,7 +27,11 @@ export function HistoricalRentalDetailsCard({
   
   useEffect(() => {
     if (fiscalYearId) {
-      HistoricalRentalService.getClosingIdByFiscalYear(fiscalYearId).then(setClosingId);
+      HistoricalRentalService.getClosingIdByFiscalYear(fiscalYearId)
+        .then(setClosingId)
+        .catch((error) => {
+          console.error('Error fetching closing ID:', error);
+        });
     }
   }, [fiscalYearId]);
   
