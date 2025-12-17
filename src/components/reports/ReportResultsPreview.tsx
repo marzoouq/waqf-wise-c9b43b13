@@ -120,7 +120,7 @@ export function ReportResultsPreview({
               </TableHeader>
               <TableBody>
                 {result.data.map((row, index) => (
-                  <TableRow key={index}>
+                  <TableRow key={(row as Record<string, unknown>).id as string || `row-${index}`}>
                     <TableCell className="text-center text-muted-foreground">
                       {index + 1}
                     </TableCell>

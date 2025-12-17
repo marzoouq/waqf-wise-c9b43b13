@@ -129,8 +129,8 @@ export function FiscalYearTestPanel() {
 
             {/* تفاصيل الاختبارات */}
             <div className="space-y-3">
-              {results.map((result, index) => (
-                <Card key={index}>
+              {results.map((result) => (
+                <Card key={result.test}>
                   <CardContent className="py-4">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex items-start gap-3 flex-1">

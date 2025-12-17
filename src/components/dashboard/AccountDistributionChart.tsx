@@ -3,6 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { useAccountDistribution } from "@/hooks/dashboard/useAccountDistribution";
 import { ErrorState } from "@/components/shared/ErrorState";
+import { useIsMobile } from "@/hooks/ui/use-mobile";
 
 const COLORS = [
   'hsl(var(--chart-1))',
@@ -14,6 +15,11 @@ const COLORS = [
 
 const AccountDistributionChart = () => {
   const { data, isLoading, error, refetch } = useAccountDistribution();
+  const isMobile = useIsMobile();
+
+  // Responsive chart dimensions
+  const chartHeight = isMobile ? 200 : 300;
+  const outerRadius = isMobile ? 60 : 80;
 
   if (isLoading) {
     return (
@@ -38,19 +44,19 @@ const AccountDistributionChart = () => {
         <CardTitle className="text-sm sm:text-base md:text-xl font-bold">توزيع الحسابات حسب النوع</CardTitle>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 200 : 300}>
+        <ResponsiveContainer width="100%" height={chartHeight}>
           <PieChart>
             <Pie
               data={data as { name: string; value: number; count: number; [key: string]: string | number }[] || []}
               cx="50%"
               cy="50%"
               labelLine={false}
-              label={window.innerWidth >= 640 ? (props) => {
+              label={!isMobile ? (props) => {
                 const name = props.name || '';
                 const percent = props.percent || 0;
                 return `${name} ${(percent * 100).toFixed(0)}%`;
               } : false}
-              outerRadius={window.innerWidth < 640 ? 60 : 80}
+              outerRadius={outerRadius}
               fill="#8884d8"
               dataKey="value"
             >
