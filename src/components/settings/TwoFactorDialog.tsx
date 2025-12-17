@@ -1,3 +1,8 @@
+/**
+ * TwoFactorDialog Component
+ * @version 2.9.43
+ */
+
 import { useState } from "react";
 import { ResponsiveDialog } from "@/components/shared/ResponsiveDialog";
 import { Button } from "@/components/ui/button";
@@ -5,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Shield, Key, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
-import { AuthService } from "@/services/auth.service";
+import { TwoFactorService } from "@/services/two-factor.service";
 import { useProfile } from "@/hooks/auth/useProfile";
 import { useTwoFactorAuth } from "@/hooks/settings/useTwoFactorAuth";
 import { logger } from "@/lib/logger";
@@ -70,7 +75,7 @@ export const TwoFactorDialog = ({ open, onOpenChange }: TwoFactorDialogProps) =>
 
     setIsLoading(true);
     try {
-      await AuthService.enable2FA(profile?.user_id || "", secret, backupCodes);
+      await TwoFactorService.enable(profile?.user_id || "", secret, backupCodes);
 
       await invalidate2FAStatus();
       toast.success("تم تفعيل المصادقة الثنائية بنجاح");
@@ -88,7 +93,7 @@ export const TwoFactorDialog = ({ open, onOpenChange }: TwoFactorDialogProps) =>
   const handleDisable2FA = async () => {
     setIsLoading(true);
     try {
-      await AuthService.disable2FA(profile?.user_id || "");
+      await TwoFactorService.disable(profile?.user_id || "");
 
       await invalidate2FAStatus();
       toast.success("تم إلغاء تفعيل المصادقة الثنائية");

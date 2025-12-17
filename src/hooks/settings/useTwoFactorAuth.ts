@@ -1,10 +1,11 @@
 /**
  * useTwoFactorAuth Hook
  * إدارة المصادقة الثنائية
+ * @version 2.9.43
  */
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { AuthService } from "@/services/auth.service";
+import { TwoFactorService } from "@/services/two-factor.service";
 import { QUERY_KEYS } from "@/lib/query-keys";
 
 export function useTwoFactorAuth(userId: string | undefined) {
@@ -14,7 +15,7 @@ export function useTwoFactorAuth(userId: string | undefined) {
     queryKey: QUERY_KEYS.TWO_FACTOR_STATUS(userId),
     queryFn: async () => {
       if (!userId) return null;
-      return AuthService.get2FAStatus(userId);
+      return TwoFactorService.getStatus(userId);
     },
     enabled: !!userId,
   });

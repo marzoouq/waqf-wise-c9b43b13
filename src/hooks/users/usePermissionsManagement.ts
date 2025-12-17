@@ -1,6 +1,7 @@
 /**
  * usePermissionsManagement Hook
  * إدارة الصلاحيات التفصيلية للأدوار
+ * @version 2.9.43
  */
 
 import { useState } from "react";
@@ -8,7 +9,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/ui/use-toast";
 import { type AppRole } from "@/types/roles";
 import { Permission } from "@/hooks/auth/usePermissions";
-import { AuthService } from "@/services/auth.service";
+import { PermissionsService } from "@/services/permissions.service";
 import { QUERY_KEYS } from "@/lib/query-keys";
 
 export interface RolePermissionState {
@@ -31,7 +32,7 @@ export function usePermissionsManagement(initialRole: AppRole = "accountant") {
   const { data: allPermissions = [], isLoading: loadingPermissions } = useQuery({
     queryKey: QUERY_KEYS.ALL_PERMISSIONS,
     queryFn: async () => {
-      const permissions = await AuthService.getAllPermissions();
+      const permissions = await PermissionsService.getAllPermissions();
       return permissions as Permission[];
     },
     staleTime: 10 * 60 * 1000, // 10 دقائق
@@ -43,7 +44,7 @@ export function usePermissionsManagement(initialRole: AppRole = "accountant") {
   const { data: rolePermissions = [], isLoading: loadingRolePerms } = useQuery({
     queryKey: QUERY_KEYS.ROLE_PERMISSIONS(selectedRole),
     queryFn: async () => {
-      return AuthService.getRolePermissions(selectedRole);
+      return PermissionsService.getRolePermissions(selectedRole);
     },
     enabled: !!selectedRole,
     staleTime: 5 * 60 * 1000, // 5 دقائق
@@ -58,7 +59,7 @@ export function usePermissionsManagement(initialRole: AppRole = "accountant") {
       permissionId: string;
       granted: boolean;
     }) => {
-      await AuthService.updateRolePermission(selectedRole, permissionId, granted);
+      await PermissionsService.updateRolePermission(selectedRole, permissionId, granted);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ROLE_PERMISSIONS(selectedRole) });
