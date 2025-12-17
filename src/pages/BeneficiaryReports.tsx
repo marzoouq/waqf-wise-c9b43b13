@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/ui/use-toast';
 import { MobileOptimizedLayout, MobileOptimizedHeader } from '@/components/layout/MobileOptimizedLayout';
 import { PageErrorBoundary } from '@/components/shared/PageErrorBoundary';
 import { useBeneficiaryPersonalReportsData } from '@/hooks/beneficiary/useBeneficiaryPersonalReportsData';
+import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, getDefaultTableStyles } from '@/lib/pdf/arabic-pdf-utils';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
@@ -39,41 +40,64 @@ export default function BeneficiaryReports() {
     ]);
     
     const jsPDF = jsPDFModule.default;
-    const autoTable = autoTableModule.default;
     const doc = new jsPDF();
-    doc.setR2L(true);
     
-    // العنوان
-    doc.setFontSize(20);
-    doc.text(`التقرير السنوي ${selectedYear}`, 105, 20, { align: 'center' });
+    // تحميل الخط العربي
+    const fontName = await loadArabicFontToPDF(doc);
+    
+    // إضافة ترويسة الوقف
+    let yPos = addWaqfHeader(doc, fontName, `التقرير السنوي ${selectedYear}`);
+    
+    const pageWidth = doc.internal.pageSize.width;
     
     // معلومات المستفيد
-    doc.setFontSize(12);
-    doc.text(`الاسم: ${beneficiary?.full_name || ''}`, 20, 40);
-    doc.text(`رقم المستفيد: ${beneficiary?.beneficiary_number || ''}`, 20, 50);
-    doc.text(`تاريخ التقرير: ${format(new Date(), 'dd/MM/yyyy')}`, 20, 60);
+    doc.setFont(fontName, 'normal');
+    doc.setFontSize(11);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`الاسم: ${beneficiary?.full_name || ''}`, pageWidth - 20, yPos, { align: 'right' });
+    yPos += 7;
+    doc.text(`رقم المستفيد: ${beneficiary?.beneficiary_number || ''}`, pageWidth - 20, yPos, { align: 'right' });
+    yPos += 7;
+    doc.text(`تاريخ التقرير: ${format(new Date(), 'dd/MM/yyyy')}`, pageWidth - 20, yPos, { align: 'right' });
+    yPos += 12;
     
     // الإحصائيات الرئيسية
+    doc.setFont(fontName, 'bold');
     doc.setFontSize(14);
-    doc.text('الإحصائيات السنوية', 20, 75);
+    doc.setTextColor(22, 101, 52);
+    doc.text('الإحصائيات السنوية', pageWidth - 20, yPos, { align: 'right' });
+    yPos += 8;
+    
+    doc.setFont(fontName, 'normal');
     doc.setFontSize(11);
-    doc.text(`إجمالي المستلم: ${formatCurrency(yearlyStats.totalReceived)}`, 25, 85);
-    doc.text(`عدد التوزيعات: ${yearlyStats.paymentsCount}`, 25, 93);
-    doc.text(`متوسط التوزيع: ${formatCurrency(yearlyStats.avgPayment)}`, 25, 101);
-    doc.text(`عدد الطلبات: ${yearlyStats.requestsCount}`, 25, 109);
-    doc.text(`الطلبات المعتمدة: ${yearlyStats.approvedRequests}`, 25, 117);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`إجمالي المستلم: ${formatCurrency(yearlyStats.totalReceived)}`, pageWidth - 25, yPos, { align: 'right' });
+    yPos += 7;
+    doc.text(`عدد التوزيعات: ${yearlyStats.paymentsCount}`, pageWidth - 25, yPos, { align: 'right' });
+    yPos += 7;
+    doc.text(`متوسط التوزيع: ${formatCurrency(yearlyStats.avgPayment)}`, pageWidth - 25, yPos, { align: 'right' });
+    yPos += 7;
+    doc.text(`عدد الطلبات: ${yearlyStats.requestsCount}`, pageWidth - 25, yPos, { align: 'right' });
+    yPos += 7;
+    doc.text(`الطلبات المعتمدة: ${yearlyStats.approvedRequests}`, pageWidth - 25, yPos, { align: 'right' });
+    yPos += 12;
     
     // جدول التوزيعات الشهرية
     const tableData = monthlyData
       .filter(m => m.amount > 0)
       .map(m => [m.month, m.count, formatCurrency(m.amount)]);
     
-    doc.autoTable({
-      startY: 130,
+    const tableStyles = getDefaultTableStyles(fontName);
+    
+    (doc as unknown as { autoTable: (options: unknown) => void }).autoTable({
+      startY: yPos,
       head: [['الشهر', 'عدد التوزيعات', 'المبلغ الإجمالي']],
       body: tableData,
-      styles: { font: 'helvetica', fontSize: 10 },
-      headStyles: { fillColor: [71, 85, 105] },
+      ...tableStyles,
+      margin: { bottom: 30 },
+      didDrawPage: () => {
+        addWaqfFooter(doc, fontName);
+      },
     });
     
     doc.save(`تقرير-سنوي-${selectedYear}.pdf`);

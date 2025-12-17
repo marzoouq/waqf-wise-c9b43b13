@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Download, Link2, AlertCircle, FileText } from "lucide-react";
 import { format, arLocale as ar } from "@/lib/date";
 import { useAccountingLinkReport } from "@/hooks/reports/useAccountingLinkReport";
+import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, getDefaultTableStyles } from "@/lib/pdf/arabic-pdf-utils";
 
 export function AccountingLinkReport() {
   const [activeTab, setActiveTab] = useState("linked");
@@ -22,11 +23,11 @@ export function AccountingLinkReport() {
     const autoTable = autoTableModule.default;
     const doc = new jsPDF();
     
-    // إعداد الخط العربي
-    doc.setLanguage("ar");
+    // تحميل الخط العربي
+    const fontName = await loadArabicFontToPDF(doc);
     
-    doc.text("تقرير ربط العمليات المحاسبية", 105, 20, { align: "center" });
-    doc.text(`التاريخ: ${format(new Date(), "dd MMMM yyyy", { locale: ar })}`, 105, 30, { align: "center" });
+    // إضافة ترويسة الوقف
+    const startY = addWaqfHeader(doc, fontName, 'تقرير ربط العمليات المحاسبية');
 
     const tableData = linkedOperations.map(op => [
       op.type,
@@ -37,15 +38,26 @@ export function AccountingLinkReport() {
       op.journalEntry || "-",
     ]);
 
+    const tableStyles = getDefaultTableStyles(fontName);
+
     autoTable(doc, {
       head: [["النوع", "الرقم", "الوصف", "المبلغ", "التاريخ", "رقم القيد"]],
       body: tableData,
-      startY: 40,
-      styles: { font: "helvetica", halign: "right" },
-      headStyles: { fillColor: [59, 130, 246] },
+      startY: startY,
+      ...tableStyles,
+      headStyles: {
+        fillColor: [59, 130, 246],
+        textColor: [255, 255, 255],
+        fontStyle: "bold",
+        font: fontName,
+      },
+      margin: { bottom: 30 },
+      didDrawPage: () => {
+        addWaqfFooter(doc, fontName);
+      },
     });
 
-    doc.save(`accounting-link-report-${format(new Date(), "yyyy-MM-dd")}.pdf`);
+    doc.save(`تقرير-الربط-المحاسبي-${format(new Date(), "yyyy-MM-dd")}.pdf`);
   };
 
   return (

@@ -2,13 +2,14 @@
  * توليد PDF للائحة التنفيذية
  * Governance Regulations PDF Generator
  * 
- * @version 2.9.7 - تحسين الأداء بالتحميل الديناميكي
+ * @version 2.9.42 - إصلاح الخط العربي
  */
 
 import { regulationsParts } from '@/components/governance/regulations-data';
+import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, WAQF_COLORS } from './arabic-pdf-utils';
 
 export async function generateGovernancePDF(): Promise<void> {
-  // Dynamic import for jsPDF - لتجنب تحميل المكتبة في الصفحة الرئيسية
+  // Dynamic import for jsPDF
   const { default: jsPDF } = await import('jspdf');
   
   const pdf = new jsPDF({
@@ -17,39 +18,21 @@ export async function generateGovernancePDF(): Promise<void> {
     format: 'a4',
   });
 
-  // إعداد الخط العربي
-  pdf.setFont('helvetica');
-  pdf.setR2L(true);
+  // تحميل الخط العربي
+  const fontName = await loadArabicFontToPDF(pdf);
 
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
   const margin = 20;
   const contentWidth = pageWidth - (margin * 2);
-  let yPosition = margin;
-
-  // العنوان الرئيسي
-  pdf.setFontSize(18);
-  pdf.setTextColor(139, 0, 0); // أحمر داكن
-  const title = 'اللائحة التنفيذية لوقف مرزوق علي الثبيتي';
-  pdf.text(title, pageWidth - margin, yPosition, { align: 'right' });
-  yPosition += 12;
-
-  // العنوان الفرعي
-  pdf.setFontSize(12);
-  pdf.setTextColor(100, 100, 100);
-  const subtitle = 'الدليل الإرشادي والحوكمة';
-  pdf.text(subtitle, pageWidth - margin, yPosition, { align: 'right' });
-  yPosition += 10;
-
-  // خط فاصل
-  pdf.setDrawColor(139, 0, 0);
-  pdf.setLineWidth(0.5);
-  pdf.line(margin, yPosition, pageWidth - margin, yPosition);
-  yPosition += 10;
+  
+  // إضافة ترويسة الوقف
+  let yPosition = addWaqfHeader(pdf, fontName, 'اللائحة التنفيذية لوقف مرزوق علي الثبيتي');
+  yPosition += 5;
 
   // معلومات الوقف
   pdf.setFontSize(10);
-  pdf.setTextColor(60, 60, 60);
+  pdf.setTextColor(...WAQF_COLORS.text);
   const waqfInfo = [
     'تاريخ الإنشاء: 5/5/1441هـ',
     'تاريخ التأسيس: 30/03/1445هـ',
@@ -71,45 +54,53 @@ export async function generateGovernancePDF(): Promise<void> {
   for (const part of regulationsParts) {
     // التحقق من المساحة المتبقية
     if (yPosition > pageHeight - 40) {
+      addWaqfFooter(pdf, fontName);
       pdf.addPage();
       yPosition = margin;
     }
 
     // عنوان الجزء
+    pdf.setFont(fontName, 'bold');
     pdf.setFontSize(12);
-    pdf.setTextColor(139, 0, 0);
+    pdf.setTextColor(...WAQF_COLORS.primary);
     pdf.text(part.title, pageWidth - margin, yPosition, { align: 'right' });
     yPosition += 8;
 
     for (const chapter of part.chapters) {
       if (yPosition > pageHeight - 40) {
+        addWaqfFooter(pdf, fontName);
         pdf.addPage();
         yPosition = margin;
       }
 
       // عنوان الفصل
+      pdf.setFont(fontName, 'bold');
       pdf.setFontSize(11);
-      pdf.setTextColor(0, 100, 0);
+      pdf.setTextColor(...WAQF_COLORS.secondary);
       pdf.text(chapter.title, pageWidth - margin - 5, yPosition, { align: 'right' });
       yPosition += 6;
 
       for (const section of chapter.content) {
         if (yPosition > pageHeight - 30) {
+          addWaqfFooter(pdf, fontName);
           pdf.addPage();
           yPosition = margin;
         }
 
         // العنوان الفرعي
+        pdf.setFont(fontName, 'bold');
         pdf.setFontSize(10);
         pdf.setTextColor(0, 0, 0);
         pdf.text(`• ${section.subtitle}`, pageWidth - margin - 10, yPosition, { align: 'right' });
         yPosition += 5;
 
         // العناصر
+        pdf.setFont(fontName, 'normal');
         pdf.setFontSize(9);
-        pdf.setTextColor(80, 80, 80);
+        pdf.setTextColor(...WAQF_COLORS.muted);
         for (const item of section.items) {
           if (yPosition > pageHeight - 20) {
+            addWaqfFooter(pdf, fontName);
             pdf.addPage();
             yPosition = margin;
           }
@@ -128,16 +119,20 @@ export async function generateGovernancePDF(): Promise<void> {
     yPosition += 5;
   }
 
-  // تذييل
+  // تذييل لجميع الصفحات
   const totalPages = pdf.getNumberOfPages();
   for (let i = 1; i <= totalPages; i++) {
     pdf.setPage(i);
+    addWaqfFooter(pdf, fontName);
+    
+    // رقم الصفحة
+    pdf.setFont(fontName, 'normal');
     pdf.setFontSize(8);
-    pdf.setTextColor(150, 150, 150);
+    pdf.setTextColor(...WAQF_COLORS.muted);
     pdf.text(
       `صفحة ${i} من ${totalPages}`,
       pageWidth / 2,
-      pageHeight - 10,
+      pageHeight - 8,
       { align: 'center' }
     );
   }

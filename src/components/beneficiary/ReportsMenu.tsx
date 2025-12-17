@@ -17,6 +17,7 @@ import { useBeneficiaryProfile } from "@/hooks/beneficiary";
 import { useAuth } from "@/contexts/AuthContext";
 import { Contract } from "@/hooks/property/useContracts";
 import { useAnnualDisclosureExport } from "@/hooks/reports/useAnnualDisclosureExport";
+import { loadArabicFontToPDF, addWaqfHeader, addWaqfFooter, getDefaultTableStyles, WAQF_COLORS } from "@/lib/pdf/arabic-pdf-utils";
 
 interface ReportsMenuProps {
   type?: "beneficiary" | "waqf";
@@ -38,30 +39,51 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
       const jsPDF = jsPDFModule.default;
       const doc = new jsPDF();
       
-      // العنوان
-      doc.setFontSize(18);
-      doc.text("تقرير المدفوعات", 105, 20, { align: "center" });
+      // تحميل الخط العربي
+      const fontName = await loadArabicFontToPDF(doc);
+      
+      // إضافة ترويسة الوقف
+      let yPos = addWaqfHeader(doc, fontName, 'تقرير المدفوعات');
+      
+      const pageWidth = doc.internal.pageSize.width;
       
       // معلومات المستفيد
+      doc.setFont(fontName, 'normal');
       doc.setFontSize(11);
-      doc.text(`الاسم: ${beneficiary?.full_name || ""}`, 20, 35);
-      doc.text(`رقم الهوية: ${beneficiary?.national_id || ""}`, 20, 42);
-      doc.text(`الجوال: ${beneficiary?.phone || ""}`, 20, 49);
-      doc.text(`الفئة: ${beneficiary?.category || ""}`, 120, 35);
-      doc.text(`الحالة: ${beneficiary?.status || ""}`, 120, 42);
-      doc.text(`التاريخ: ${new Date().toLocaleDateString("ar-SA")}`, 120, 49);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`الاسم: ${beneficiary?.full_name || ""}`, pageWidth - 20, yPos, { align: 'right' });
+      yPos += 7;
+      doc.text(`رقم الهوية: ${beneficiary?.national_id || ""}`, pageWidth - 20, yPos, { align: 'right' });
+      yPos += 7;
+      doc.text(`الجوال: ${beneficiary?.phone || ""}`, pageWidth - 20, yPos, { align: 'right' });
+      yPos += 7;
+      doc.text(`الفئة: ${beneficiary?.category || ""}`, pageWidth - 20, yPos, { align: 'right' });
+      yPos += 7;
+      doc.text(`الحالة: ${beneficiary?.status || ""}`, pageWidth - 20, yPos, { align: 'right' });
+      yPos += 7;
+      doc.text(`التاريخ: ${new Date().toLocaleDateString("ar-SA")}`, pageWidth - 20, yPos, { align: 'right' });
+      yPos += 10;
 
       // الملخص المالي إذا وُجدت مدفوعات
       if (payments && payments.length > 0) {
         const totalAmount = payments.reduce((sum, p) => sum + (p.amount || 0), 0);
         const avgAmount = totalAmount / payments.length;
 
+        doc.setFont(fontName, 'bold');
         doc.setFontSize(14);
-        doc.text("الملخص المالي", 105, 60, { align: "center" });
+        doc.setTextColor(...WAQF_COLORS.primary);
+        doc.text("الملخص المالي", pageWidth / 2, yPos, { align: "center" });
+        yPos += 8;
+        
+        doc.setFont(fontName, 'normal');
         doc.setFontSize(11);
-        doc.text(`إجمالي المدفوعات: ${totalAmount.toLocaleString("ar-SA")} ر.س`, 20, 68);
-        doc.text(`عدد الدفعات: ${payments.length}`, 20, 75);
-        doc.text(`متوسط الدفعة: ${avgAmount.toLocaleString("ar-SA")} ر.س`, 20, 82);
+        doc.setTextColor(0, 0, 0);
+        doc.text(`إجمالي المدفوعات: ${totalAmount.toLocaleString("ar-SA")} ر.س`, pageWidth - 20, yPos, { align: 'right' });
+        yPos += 7;
+        doc.text(`عدد الدفعات: ${payments.length}`, pageWidth - 20, yPos, { align: 'right' });
+        yPos += 7;
+        doc.text(`متوسط الدفعة: ${avgAmount.toLocaleString("ar-SA")} ر.س`, pageWidth - 20, yPos, { align: 'right' });
+        yPos += 10;
 
         // جدول المدفوعات
         const tableData = payments.map((payment) => [
@@ -71,29 +93,28 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
           payment.description || "-",
         ]);
 
-        doc.autoTable({
+        const tableStyles = getDefaultTableStyles(fontName);
+
+        (doc as unknown as { autoTable: (options: unknown) => void }).autoTable({
           head: [["رقم الدفعة", "التاريخ", "المبلغ", "الوصف"]],
           body: tableData,
-          startY: 90,
-          styles: {
-            font: "helvetica",
-            fontSize: 9,
-            halign: "right",
-          },
-          headStyles: {
-            fillColor: [34, 139, 34],
-            textColor: [255, 255, 255],
+          startY: yPos,
+          ...tableStyles,
+          margin: { bottom: 30 },
+          didDrawPage: () => {
+            addWaqfFooter(doc, fontName);
           },
         });
       } else {
         // رسالة عدم وجود مدفوعات
         doc.setFontSize(12);
-        doc.setTextColor(150, 150, 150);
-        doc.text("لا توجد مدفوعات مسجلة حتى الآن", 105, 70, { align: "center" });
-        doc.text("سيتم تحديث هذا التقرير عند إضافة مدفوعات جديدة", 105, 80, { align: "center" });
+        doc.setTextColor(...WAQF_COLORS.muted);
+        doc.text("لا توجد مدفوعات مسجلة حتى الآن", pageWidth / 2, yPos + 10, { align: "center" });
+        doc.text("سيتم تحديث هذا التقرير عند إضافة مدفوعات جديدة", pageWidth / 2, yPos + 20, { align: "center" });
+        addWaqfFooter(doc, fontName);
       }
 
-      doc.save(`payments-report-${Date.now()}.pdf`);
+      doc.save(`تقرير-المدفوعات-${Date.now()}.pdf`);
 
       toast({
         title: "تم التصدير",
@@ -132,29 +153,45 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
       const jsPDF = jsPDFModule.default;
       const doc = new jsPDF();
       
-      doc.setFontSize(18);
-      doc.text("Annual Disclosure / الإفصاح السنوي", 105, 20, { align: "center" });
+      // تحميل الخط العربي
+      const fontName = await loadArabicFontToPDF(doc);
       
+      // إضافة ترويسة الوقف
+      let yPos = addWaqfHeader(doc, fontName, `الإفصاح السنوي ${disclosure.year}`);
+      
+      const pageWidth = doc.internal.pageSize.width;
+      
+      doc.setFont(fontName, 'normal');
       doc.setFontSize(12);
-      doc.text(`Year / السنة: ${disclosure.year}`, 20, 40);
-      doc.text(`Waqf / الوقف: ${disclosure.waqf_name}`, 20, 50);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`السنة: ${disclosure.year}`, pageWidth - 20, yPos, { align: 'right' });
+      yPos += 7;
+      doc.text(`الوقف: ${disclosure.waqf_name}`, pageWidth - 20, yPos, { align: 'right' });
+      yPos += 12;
       
       const financialData = [
-        ["Total Revenue / إجمالي الإيرادات", disclosure.total_revenues.toLocaleString("ar-SA")],
-        ["Total Expenses / إجمالي المصروفات", disclosure.total_expenses.toLocaleString("ar-SA")],
-        ["Net Income / صافي الدخل", disclosure.net_income.toLocaleString("ar-SA")],
-        ["Nazer Share / نصيب الناظر", disclosure.nazer_share.toLocaleString("ar-SA")],
-        ["Charity Share / نصيب الخيرية", disclosure.charity_share.toLocaleString("ar-SA")],
-        ["Corpus Share / نصيب أصل الوقف", disclosure.corpus_share.toLocaleString("ar-SA")],
+        ["إجمالي الإيرادات", disclosure.total_revenues.toLocaleString("ar-SA") + " ر.س"],
+        ["إجمالي المصروفات", disclosure.total_expenses.toLocaleString("ar-SA") + " ر.س"],
+        ["صافي الدخل", disclosure.net_income.toLocaleString("ar-SA") + " ر.س"],
+        ["نصيب الناظر", disclosure.nazer_share.toLocaleString("ar-SA") + " ر.س"],
+        ["نصيب الخيرية", disclosure.charity_share.toLocaleString("ar-SA") + " ر.س"],
+        ["نصيب أصل الوقف", disclosure.corpus_share.toLocaleString("ar-SA") + " ر.س"],
       ];
       
-      doc.autoTable({
-        startY: 60,
-        head: [["Item / البيان", "Amount / المبلغ (ر.س)"]],
+      const tableStyles = getDefaultTableStyles(fontName);
+      
+      (doc as unknown as { autoTable: (options: unknown) => void }).autoTable({
+        startY: yPos,
+        head: [["البيان", "المبلغ"]],
         body: financialData,
+        ...tableStyles,
+        margin: { bottom: 30 },
+        didDrawPage: () => {
+          addWaqfFooter(doc, fontName);
+        },
       });
       
-      doc.save(`annual-disclosure-${disclosure.year}.pdf`);
+      doc.save(`الإفصاح-السنوي-${disclosure.year}.pdf`);
       
       toast({
         title: "تم التصدير",
@@ -203,7 +240,7 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
       // Dynamic import for excel-helper
       const { exportToExcel } = await import("@/lib/excel-helper");
       
-      await exportToExcel(data, `properties-report-${Date.now()}`, "العقارات");
+      await exportToExcel(data, `تقرير-العقارات-${Date.now()}`, "العقارات");
 
       toast({
         title: "تم التصدير",
@@ -228,33 +265,55 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
       const jsPDF = jsPDFModule.default;
       const doc = new jsPDF();
       
-      // العنوان
-      doc.setFontSize(18);
-      doc.text("كشف حساب المستفيد", 105, 20, { align: "center" });
+      // تحميل الخط العربي
+      const fontName = await loadArabicFontToPDF(doc);
+      
+      // إضافة ترويسة الوقف
+      let yPos = addWaqfHeader(doc, fontName, 'كشف حساب المستفيد');
+      
+      const pageWidth = doc.internal.pageSize.width;
 
       // معلومات المستفيد الكاملة
+      doc.setFont(fontName, 'normal');
       doc.setFontSize(11);
-      doc.text(`الاسم: ${beneficiary?.full_name || ""}`, 20, 35);
-      doc.text(`رقم الهوية: ${beneficiary?.national_id || ""}`, 20, 42);
-      doc.text(`الجوال: ${beneficiary?.phone || ""}`, 20, 49);
-      doc.text(`البريد: ${beneficiary?.email || "لا يوجد"}`, 20, 56);
-      
-      doc.text(`الفئة: ${beneficiary?.category || ""}`, 120, 35);
-      doc.text(`الحالة: ${beneficiary?.status || ""}`, 120, 42);
-      doc.text(`البنك: ${beneficiary?.bank_name || "لا يوجد"}`, 120, 49);
-      doc.text(`الآيبان: ${beneficiary?.iban || "لا يوجد"}`, 120, 56);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`الاسم: ${beneficiary?.full_name || ""}`, pageWidth - 20, yPos, { align: 'right' });
+      yPos += 7;
+      doc.text(`رقم الهوية: ${beneficiary?.national_id || ""}`, pageWidth - 20, yPos, { align: 'right' });
+      yPos += 7;
+      doc.text(`الجوال: ${beneficiary?.phone || ""}`, pageWidth - 20, yPos, { align: 'right' });
+      yPos += 7;
+      doc.text(`البريد: ${beneficiary?.email || "لا يوجد"}`, pageWidth - 20, yPos, { align: 'right' });
+      yPos += 7;
+      doc.text(`الفئة: ${beneficiary?.category || ""}`, pageWidth - 20, yPos, { align: 'right' });
+      yPos += 7;
+      doc.text(`الحالة: ${beneficiary?.status || ""}`, pageWidth - 20, yPos, { align: 'right' });
+      yPos += 7;
+      doc.text(`البنك: ${beneficiary?.bank_name || "لا يوجد"}`, pageWidth - 20, yPos, { align: 'right' });
+      yPos += 7;
+      doc.text(`الآيبان: ${beneficiary?.iban || "لا يوجد"}`, pageWidth - 20, yPos, { align: 'right' });
+      yPos += 10;
 
       // الملخص المالي
       if (payments && payments.length > 0) {
         const totalAmount = payments.reduce((sum, p) => sum + (p.amount || 0), 0);
         const avgAmount = totalAmount / payments.length;
 
+        doc.setFont(fontName, 'bold');
         doc.setFontSize(14);
-        doc.text("الملخص المالي", 105, 68, { align: "center" });
+        doc.setTextColor(...WAQF_COLORS.primary);
+        doc.text("الملخص المالي", pageWidth / 2, yPos, { align: "center" });
+        yPos += 8;
+        
+        doc.setFont(fontName, 'normal');
         doc.setFontSize(11);
-        doc.text(`إجمالي المدفوعات: ${totalAmount.toLocaleString("ar-SA")} ر.س`, 20, 76);
-        doc.text(`عدد الدفعات: ${payments.length}`, 20, 83);
-        doc.text(`متوسط الدفعة: ${avgAmount.toLocaleString("ar-SA")} ر.س`, 20, 90);
+        doc.setTextColor(0, 0, 0);
+        doc.text(`إجمالي المدفوعات: ${totalAmount.toLocaleString("ar-SA")} ر.س`, pageWidth - 20, yPos, { align: 'right' });
+        yPos += 7;
+        doc.text(`عدد الدفعات: ${payments.length}`, pageWidth - 20, yPos, { align: 'right' });
+        yPos += 7;
+        doc.text(`متوسط الدفعة: ${avgAmount.toLocaleString("ar-SA")} ر.س`, pageWidth - 20, yPos, { align: 'right' });
+        yPos += 10;
 
         // جدول المدفوعات
         const tableData = payments.map((payment) => [
@@ -263,35 +322,35 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
           payment.amount.toLocaleString("ar-SA") + " ر.س",
         ]);
 
-        doc.autoTable({
+        const tableStyles = getDefaultTableStyles(fontName);
+
+        (doc as unknown as { autoTable: (options: unknown) => void }).autoTable({
           head: [["التاريخ", "الوصف", "المبلغ"]],
           body: tableData,
-          startY: 98,
-          styles: {
-            font: "helvetica",
-            fontSize: 9,
-            halign: "right",
-          },
-          headStyles: {
-            fillColor: [34, 139, 34],
-            textColor: [255, 255, 255],
+          startY: yPos,
+          ...tableStyles,
+          margin: { bottom: 30 },
+          didDrawPage: () => {
+            addWaqfFooter(doc, fontName);
           },
         });
 
         // الإجمالي النهائي
-        const finalY = doc.lastAutoTable?.finalY || 98;
+        const finalY = (doc as unknown as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY || yPos;
+        doc.setFont(fontName, "bold");
         doc.setFontSize(12);
-        doc.setFont("helvetica", "bold");
-        doc.text(`الإجمالي الكلي: ${totalAmount.toLocaleString("ar-SA")} ر.س`, 20, finalY + 10);
+        doc.setTextColor(...WAQF_COLORS.primary);
+        doc.text(`الإجمالي الكلي: ${totalAmount.toLocaleString("ar-SA")} ر.س`, pageWidth - 20, finalY + 10, { align: 'right' });
       } else {
         // رسالة عدم وجود معاملات
         doc.setFontSize(12);
-        doc.setTextColor(150, 150, 150);
-        doc.text("لا توجد معاملات مالية مسجلة حتى الآن", 105, 75, { align: "center" });
-        doc.text("سيتم تحديث الكشف عند إضافة معاملات جديدة", 105, 85, { align: "center" });
+        doc.setTextColor(...WAQF_COLORS.muted);
+        doc.text("لا توجد معاملات مالية مسجلة حتى الآن", pageWidth / 2, yPos + 10, { align: "center" });
+        doc.text("سيتم تحديث الكشف عند إضافة معاملات جديدة", pageWidth / 2, yPos + 20, { align: "center" });
+        addWaqfFooter(doc, fontName);
       }
 
-      doc.save(`account-statement-${Date.now()}.pdf`);
+      doc.save(`كشف-حساب-${Date.now()}.pdf`);
 
       toast({
         title: "تم التصدير",
@@ -322,131 +381,148 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
       const { default: jsPDF } = await import('jspdf');
       const doc = new jsPDF();
 
-      // العنوان
-      doc.setFontSize(18);
-      doc.text("تقرير البيانات الشخصية", 105, 20, { align: "center" });
-      doc.setFontSize(10);
-      doc.text(`تاريخ التقرير: ${new Date().toLocaleDateString("ar-SA")}`, 105, 28, { align: "center" });
-
-      let yPos = 40;
+      // تحميل الخط العربي
+      const fontName = await loadArabicFontToPDF(doc);
+      
+      // إضافة ترويسة الوقف
+      let yPos = addWaqfHeader(doc, fontName, 'تقرير البيانات الشخصية');
+      
+      const pageWidth = doc.internal.pageSize.width;
 
       // المعلومات الشخصية
+      doc.setFont(fontName, "bold");
       doc.setFontSize(14);
-      doc.setFont("helvetica", "bold");
-      doc.text("المعلومات الشخصية", 20, yPos);
+      doc.setTextColor(...WAQF_COLORS.primary);
+      doc.text("المعلومات الشخصية", pageWidth - 20, yPos, { align: 'right' });
       yPos += 8;
 
+      doc.setFont(fontName, "normal");
       doc.setFontSize(11);
-      doc.setFont("helvetica", "normal");
-      doc.text(`الاسم الكامل: ${beneficiary.full_name}`, 25, yPos);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`الاسم الكامل: ${beneficiary.full_name}`, pageWidth - 25, yPos, { align: 'right' });
       yPos += 7;
-      doc.text(`رقم الهوية الوطنية: ${beneficiary.national_id}`, 25, yPos);
+      doc.text(`رقم الهوية الوطنية: ${beneficiary.national_id}`, pageWidth - 25, yPos, { align: 'right' });
       yPos += 7;
-      doc.text(`الجنس: ${beneficiary.gender || "غير محدد"}`, 25, yPos);
+      doc.text(`الجنس: ${beneficiary.gender || "غير محدد"}`, pageWidth - 25, yPos, { align: 'right' });
       yPos += 7;
-      doc.text(`تاريخ الميلاد: ${beneficiary.date_of_birth ? new Date(beneficiary.date_of_birth).toLocaleDateString("ar-SA") : "غير محدد"}`, 25, yPos);
+      doc.text(`تاريخ الميلاد: ${beneficiary.date_of_birth ? new Date(beneficiary.date_of_birth).toLocaleDateString("ar-SA") : "غير محدد"}`, pageWidth - 25, yPos, { align: 'right' });
       yPos += 7;
-      doc.text(`الجنسية: ${beneficiary.nationality || "غير محددة"}`, 25, yPos);
+      doc.text(`الجنسية: ${beneficiary.nationality || "غير محددة"}`, pageWidth - 25, yPos, { align: 'right' });
       yPos += 10;
 
       // معلومات الاتصال
+      doc.setFont(fontName, "bold");
       doc.setFontSize(14);
-      doc.setFont("helvetica", "bold");
-      doc.text("معلومات الاتصال", 20, yPos);
+      doc.setTextColor(...WAQF_COLORS.primary);
+      doc.text("معلومات الاتصال", pageWidth - 20, yPos, { align: 'right' });
       yPos += 8;
 
+      doc.setFont(fontName, "normal");
       doc.setFontSize(11);
-      doc.setFont("helvetica", "normal");
-      doc.text(`رقم الجوال: ${beneficiary.phone}`, 25, yPos);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`رقم الجوال: ${beneficiary.phone}`, pageWidth - 25, yPos, { align: 'right' });
       yPos += 7;
-      doc.text(`البريد الإلكتروني: ${beneficiary.email || "لا يوجد"}`, 25, yPos);
+      doc.text(`البريد الإلكتروني: ${beneficiary.email || "لا يوجد"}`, pageWidth - 25, yPos, { align: 'right' });
       yPos += 7;
-      doc.text(`المدينة: ${beneficiary.city || "غير محددة"}`, 25, yPos);
+      doc.text(`المدينة: ${beneficiary.city || "غير محددة"}`, pageWidth - 25, yPos, { align: 'right' });
       yPos += 7;
-      doc.text(`العنوان: ${beneficiary.address || "غير محدد"}`, 25, yPos);
+      doc.text(`العنوان: ${beneficiary.address || "غير محدد"}`, pageWidth - 25, yPos, { align: 'right' });
       yPos += 10;
 
       // المعلومات العائلية
+      doc.setFont(fontName, "bold");
       doc.setFontSize(14);
-      doc.setFont("helvetica", "bold");
-      doc.text("المعلومات العائلية", 20, yPos);
+      doc.setTextColor(...WAQF_COLORS.primary);
+      doc.text("المعلومات العائلية", pageWidth - 20, yPos, { align: 'right' });
       yPos += 8;
 
+      doc.setFont(fontName, "normal");
       doc.setFontSize(11);
-      doc.setFont("helvetica", "normal");
-      doc.text(`الحالة الاجتماعية: ${beneficiary.marital_status || "غير محددة"}`, 25, yPos);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`الحالة الاجتماعية: ${beneficiary.marital_status || "غير محددة"}`, pageWidth - 25, yPos, { align: 'right' });
       yPos += 7;
-      doc.text(`عدد الأبناء: ${beneficiary.number_of_sons || 0}`, 25, yPos);
+      doc.text(`عدد الأبناء: ${beneficiary.number_of_sons || 0}`, pageWidth - 25, yPos, { align: 'right' });
       yPos += 7;
-      doc.text(`عدد البنات: ${beneficiary.number_of_daughters || 0}`, 25, yPos);
+      doc.text(`عدد البنات: ${beneficiary.number_of_daughters || 0}`, pageWidth - 25, yPos, { align: 'right' });
       yPos += 7;
-      doc.text(`عدد الزوجات: ${beneficiary.number_of_wives || 0}`, 25, yPos);
+      doc.text(`عدد الزوجات: ${beneficiary.number_of_wives || 0}`, pageWidth - 25, yPos, { align: 'right' });
       yPos += 7;
-      doc.text(`حجم الأسرة: ${beneficiary.family_size || 0}`, 25, yPos);
+      doc.text(`حجم الأسرة: ${beneficiary.family_size || 0}`, pageWidth - 25, yPos, { align: 'right' });
       yPos += 10;
 
       // معلومات العمل والسكن
+      doc.setFont(fontName, "bold");
       doc.setFontSize(14);
-      doc.setFont("helvetica", "bold");
-      doc.text("معلومات العمل والسكن", 20, yPos);
+      doc.setTextColor(...WAQF_COLORS.primary);
+      doc.text("معلومات العمل والسكن", pageWidth - 20, yPos, { align: 'right' });
       yPos += 8;
 
+      doc.setFont(fontName, "normal");
       doc.setFontSize(11);
-      doc.setFont("helvetica", "normal");
-      doc.text(`الحالة الوظيفية: ${beneficiary.employment_status || "غير محددة"}`, 25, yPos);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`الحالة الوظيفية: ${beneficiary.employment_status || "غير محددة"}`, pageWidth - 25, yPos, { align: 'right' });
       yPos += 7;
-      doc.text(`الدخل الشهري: ${beneficiary.monthly_income ? beneficiary.monthly_income.toLocaleString("ar-SA") + " ر.س" : "غير محدد"}`, 25, yPos);
+      doc.text(`الدخل الشهري: ${beneficiary.monthly_income ? beneficiary.monthly_income.toLocaleString("ar-SA") + " ر.س" : "غير محدد"}`, pageWidth - 25, yPos, { align: 'right' });
       yPos += 7;
-      doc.text(`نوع السكن: ${beneficiary.housing_type || "غير محدد"}`, 25, yPos);
+      doc.text(`نوع السكن: ${beneficiary.housing_type || "غير محدد"}`, pageWidth - 25, yPos, { align: 'right' });
       yPos += 10;
 
       // معلومات الوقف
+      doc.setFont(fontName, "bold");
       doc.setFontSize(14);
-      doc.setFont("helvetica", "bold");
-      doc.text("معلومات الوقف", 20, yPos);
+      doc.setTextColor(...WAQF_COLORS.primary);
+      doc.text("معلومات الوقف", pageWidth - 20, yPos, { align: 'right' });
       yPos += 8;
 
+      doc.setFont(fontName, "normal");
       doc.setFontSize(11);
-      doc.setFont("helvetica", "normal");
-      doc.text(`الفئة: ${beneficiary.category}`, 25, yPos);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`الفئة: ${beneficiary.category}`, pageWidth - 25, yPos, { align: 'right' });
       yPos += 7;
-      doc.text(`القبيلة: ${beneficiary.tribe || "غير محددة"}`, 25, yPos);
+      doc.text(`القبيلة: ${beneficiary.tribe || "غير محددة"}`, pageWidth - 25, yPos, { align: 'right' });
       yPos += 7;
-      doc.text(`الحالة: ${beneficiary.status}`, 25, yPos);
+      doc.text(`الحالة: ${beneficiary.status}`, pageWidth - 25, yPos, { align: 'right' });
       yPos += 7;
-      doc.text(`مستوى الأولوية: ${beneficiary.priority_level || "غير محدد"}`, 25, yPos);
+      doc.text(`مستوى الأولوية: ${beneficiary.priority_level || "غير محدد"}`, pageWidth - 25, yPos, { align: 'right' });
       yPos += 7;
-      doc.text(`تاريخ القيد: ${new Date(beneficiary.created_at).toLocaleDateString("ar-SA")}`, 25, yPos);
+      doc.text(`تاريخ القيد: ${new Date(beneficiary.created_at).toLocaleDateString("ar-SA")}`, pageWidth - 25, yPos, { align: 'right' });
       yPos += 10;
 
       // المعلومات البنكية
+      doc.setFont(fontName, "bold");
       doc.setFontSize(14);
-      doc.setFont("helvetica", "bold");
-      doc.text("المعلومات البنكية", 20, yPos);
+      doc.setTextColor(...WAQF_COLORS.primary);
+      doc.text("المعلومات البنكية", pageWidth - 20, yPos, { align: 'right' });
       yPos += 8;
 
+      doc.setFont(fontName, "normal");
       doc.setFontSize(11);
-      doc.setFont("helvetica", "normal");
-      doc.text(`البنك: ${beneficiary.bank_name || "لم يتم التحديث"}`, 25, yPos);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`البنك: ${beneficiary.bank_name || "لم يتم التحديث"}`, pageWidth - 25, yPos, { align: 'right' });
       yPos += 7;
-      doc.text(`رقم الحساب: ${beneficiary.bank_account_number || "لم يتم التحديث"}`, 25, yPos);
+      doc.text(`رقم الحساب: ${beneficiary.bank_account_number || "لم يتم التحديث"}`, pageWidth - 25, yPos, { align: 'right' });
       yPos += 7;
-      doc.text(`الآيبان: ${beneficiary.iban || "لم يتم التحديث"}`, 25, yPos);
+      doc.text(`الآيبان: ${beneficiary.iban || "لم يتم التحديث"}`, pageWidth - 25, yPos, { align: 'right' });
 
       // الملاحظات
       if (beneficiary.notes) {
         yPos += 10;
+        doc.setFont(fontName, "bold");
         doc.setFontSize(14);
-        doc.setFont("helvetica", "bold");
-        doc.text("ملاحظات إدارية", 20, yPos);
+        doc.setTextColor(...WAQF_COLORS.primary);
+        doc.text("ملاحظات إدارية", pageWidth - 20, yPos, { align: 'right' });
         yPos += 8;
+        doc.setFont(fontName, "normal");
         doc.setFontSize(11);
-        doc.setFont("helvetica", "normal");
+        doc.setTextColor(0, 0, 0);
         const splitNotes = doc.splitTextToSize(beneficiary.notes, 170);
-        doc.text(splitNotes, 25, yPos);
+        doc.text(splitNotes, pageWidth - 25, yPos, { align: 'right' });
       }
 
-      doc.save(`personal-data-${beneficiary.full_name}-${Date.now()}.pdf`);
+      // إضافة التذييل
+      addWaqfFooter(doc, fontName);
+
+      doc.save(`البيانات-الشخصية-${beneficiary.full_name}-${Date.now()}.pdf`);
 
       toast({
         title: "تم التصدير",
@@ -482,11 +558,13 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
       const jsPDF = jsPDFModule.default;
       const doc = new jsPDF();
 
-      // العنوان
-      doc.setFontSize(18);
-      doc.text("تقرير العقارات والإيجارات", 105, 20, { align: "center" });
-      doc.setFontSize(10);
-      doc.text(`تاريخ التقرير: ${new Date().toLocaleDateString("ar-SA")}`, 105, 28, { align: "center" });
+      // تحميل الخط العربي
+      const fontName = await loadArabicFontToPDF(doc);
+      
+      // إضافة ترويسة الوقف
+      let yPos = addWaqfHeader(doc, fontName, 'تقرير العقارات والإيجارات');
+      
+      const pageWidth = doc.internal.pageSize.width;
 
       // حساب الإجماليات
       const totalMonthlyRent = properties.reduce((sum, prop) => {
@@ -497,10 +575,15 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
       const totalAnnualRent = totalMonthlyRent * 12;
 
       // الملخص
+      doc.setFont(fontName, 'normal');
       doc.setFontSize(12);
-      doc.text(`عدد العقارات: ${properties.length}`, 20, 40);
-      doc.text(`الإيجار الشهري: ${totalMonthlyRent.toLocaleString("ar-SA")} ر.س`, 20, 47);
-      doc.text(`الإيجار السنوي: ${totalAnnualRent.toLocaleString("ar-SA")} ر.س`, 20, 54);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`عدد العقارات: ${properties.length}`, pageWidth - 20, yPos, { align: 'right' });
+      yPos += 7;
+      doc.text(`الإيجار الشهري: ${totalMonthlyRent.toLocaleString("ar-SA")} ر.س`, pageWidth - 20, yPos, { align: 'right' });
+      yPos += 7;
+      doc.text(`الإيجار السنوي: ${totalAnnualRent.toLocaleString("ar-SA")} ر.س`, pageWidth - 20, yPos, { align: 'right' });
+      yPos += 10;
 
       // جدول العقارات
       const tableData = properties.map((prop) => {
@@ -517,22 +600,20 @@ export function ReportsMenu({ type = "beneficiary" }: ReportsMenuProps) {
         ];
       });
 
-      doc.autoTable({
+      const tableStyles = getDefaultTableStyles(fontName);
+
+      (doc as unknown as { autoTable: (options: unknown) => void }).autoTable({
         head: [["اسم العقار", "النوع", "الوحدات", "المؤجرة", "الإيجار الشهري"]],
         body: tableData,
-        startY: 65,
-        styles: {
-          font: "helvetica",
-          fontSize: 9,
-          halign: "right",
-        },
-        headStyles: {
-          fillColor: [34, 139, 34],
-          textColor: [255, 255, 255],
+        startY: yPos,
+        ...tableStyles,
+        margin: { bottom: 30 },
+        didDrawPage: () => {
+          addWaqfFooter(doc, fontName);
         },
       });
 
-      doc.save(`properties-report-${Date.now()}.pdf`);
+      doc.save(`تقرير-العقارات-${Date.now()}.pdf`);
 
       toast({
         title: "تم التصدير",
