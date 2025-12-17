@@ -222,23 +222,23 @@ export function WaqfUnitDetailsDialog({
               {revenueData ? (
                 revenueData.isClosed ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <Card className="p-4 border-green-200 bg-green-50/50 dark:border-green-800 dark:bg-green-950/20">
-                      <div className="flex items-center gap-2 text-green-600 dark:text-green-400 mb-2">
+                    <Card className="p-4 border-success/30 bg-success/5">
+                      <div className="flex items-center gap-2 text-success mb-2">
                         <Wallet className="h-5 w-5" />
                         <span className="font-semibold">إجمالي الإيرادات</span>
                       </div>
-                      <p className="text-2xl font-bold text-green-700 dark:text-green-300">
+                      <p className="text-2xl font-bold text-success">
                         {revenueData.totalCollected.toLocaleString("ar-SA")} ريال
                       </p>
                       <Badge variant="secondary" className="mt-2">سنة مغلقة</Badge>
                     </Card>
 
-                    <Card className="p-4 border-red-200 bg-red-50/50 dark:border-red-800 dark:bg-red-950/20">
-                      <div className="flex items-center gap-2 text-red-600 dark:text-red-400 mb-2">
+                    <Card className="p-4 border-destructive/30 bg-destructive/5">
+                      <div className="flex items-center gap-2 text-destructive mb-2">
                         <TrendingDown className="h-5 w-5" />
                         <span className="font-semibold">المصروفات</span>
                       </div>
-                      <p className="text-2xl font-bold text-red-700 dark:text-red-300">
+                      <p className="text-2xl font-bold text-destructive">
                         {(revenueData.totalExpenses || 0).toLocaleString("ar-SA")} ريال
                       </p>
                     </Card>
@@ -253,46 +253,46 @@ export function WaqfUnitDetailsDialog({
                       </p>
                     </Card>
 
-                    <Card className="p-4 border-amber-200 bg-amber-50/50 dark:border-amber-800 dark:bg-amber-950/20">
-                      <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 mb-2">
+                    <Card className="p-4 border-warning/30 bg-warning/5">
+                      <div className="flex items-center gap-2 text-warning mb-2">
                         <TrendingUp className="h-5 w-5" />
                         <span className="font-semibold">رقبة الوقف</span>
                       </div>
-                      <p className="text-2xl font-bold text-amber-700 dark:text-amber-300">
+                      <p className="text-2xl font-bold text-warning">
                         {(revenueData.waqfCorpus || 0).toLocaleString("ar-SA")} ريال
                       </p>
                     </Card>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <Card className="p-4 border-blue-200 bg-blue-50/50 dark:border-blue-800 dark:bg-blue-950/20">
-                      <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 mb-2">
+                    <Card className="p-4 border-info/30 bg-info/5">
+                      <div className="flex items-center gap-2 text-info mb-2">
                         <CalendarDays className="h-5 w-5" />
                         <span className="font-semibold">المحصّل الشهري</span>
                       </div>
-                      <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">
+                      <p className="text-2xl font-bold text-info">
                         {revenueData.monthlyCollected.toLocaleString("ar-SA")} ريال
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">من عقود شهرية</p>
                     </Card>
 
-                    <Card className="p-4 border-green-200 bg-green-50/50 dark:border-green-800 dark:bg-green-950/20">
-                      <div className="flex items-center gap-2 text-green-600 dark:text-green-400 mb-2">
+                    <Card className="p-4 border-success/30 bg-success/5">
+                      <div className="flex items-center gap-2 text-success mb-2">
                         <CalendarRange className="h-5 w-5" />
                         <span className="font-semibold">المحصّل السنوي</span>
                       </div>
-                      <p className="text-2xl font-bold text-green-700 dark:text-green-300">
+                      <p className="text-2xl font-bold text-success">
                         {revenueData.annualCollected.toLocaleString("ar-SA")} ريال
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">من عقود سنوية</p>
                     </Card>
 
-                    <Card className="p-4 border-amber-200 bg-amber-50/50 dark:border-amber-800 dark:bg-amber-950/20">
-                      <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 mb-2">
+                    <Card className="p-4 border-warning/30 bg-warning/5">
+                      <div className="flex items-center gap-2 text-warning mb-2">
                         <Receipt className="h-5 w-5" />
                         <span className="font-semibold">الضريبة</span>
                       </div>
-                      <p className="text-2xl font-bold text-amber-700 dark:text-amber-300">
+                      <p className="text-2xl font-bold text-warning">
                         {revenueData.totalTax.toLocaleString("ar-SA")} ريال
                       </p>
                     </Card>
