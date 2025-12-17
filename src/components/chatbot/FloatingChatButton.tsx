@@ -20,7 +20,6 @@ export const FloatingChatButton = memo(function FloatingChatButton() {
     "/chatbot",
     "/support-management",
     "/admin",
-    "/developer-tools",
     "/system-monitoring"
   ];
   

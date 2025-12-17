@@ -38,7 +38,7 @@ export function useErrorNotifications(enabled: boolean = true) {
         toast.error(`خطأ حرج: ${latestError.error_type}`, {
           description: latestError.error_message,
           duration: 10000,
-          action: { label: "عرض التفاصيل", onClick: () => window.location.href = "/developer-tools?tab=errors" }
+          action: { label: "عرض التفاصيل", onClick: () => window.location.href = "/system-monitoring" }
         });
       } else if (severity === "error") {
         toast.warning(`خطأ: ${latestError.error_type}`, {

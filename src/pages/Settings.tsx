@@ -72,9 +72,6 @@ const Settings = () => {
       case "إعدادات الشفافية":
         navigate("/transparency-settings");
         break;
-      case "دليل المطور":
-        navigate("/developer-guide");
-        break;
       default:
         toast({
           title: `إعدادات ${sectionTitle}`,
@@ -161,14 +158,6 @@ const Settings = () => {
       icon: Eye,
       color: "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400",
       requiredRole: "nazer",
-    },
-    {
-      id: 12,
-      title: "دليل المطور",
-      description: "دليل شامل للبنية المعمارية والميزات والتوثيق",
-      icon: BookOpen,
-      color: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
-      requiredRole: "admin",
     },
   ];
 
