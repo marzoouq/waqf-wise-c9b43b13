@@ -22,6 +22,20 @@ import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { useLivePerformance } from "@/hooks/monitoring/useLivePerformance";
 
+// استخراج الأنماط خارج المكون لتحسين الأداء
+const TOOLTIP_STYLE_RTL = {
+  backgroundColor: "hsl(var(--card))",
+  border: "1px solid hsl(var(--border))",
+  borderRadius: "8px",
+  direction: "rtl" as const,
+} as const;
+
+const TOOLTIP_STYLE = {
+  backgroundColor: "hsl(var(--card))",
+  border: "1px solid hsl(var(--border))",
+  borderRadius: "8px",
+} as const;
+
 interface PerformanceMetric {
   timestamp: string;
   time: string;
@@ -154,12 +168,7 @@ export function LivePerformanceChart() {
                 <XAxis dataKey="time" tick={{ fontSize: 12 }} />
                 <YAxis tick={{ fontSize: 12 }} />
                 <Tooltip
-                  contentStyle={{
-                    backgroundColor: "hsl(var(--card))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "8px",
-                    direction: "rtl",
-                  }}
+                  contentStyle={TOOLTIP_STYLE_RTL}
                   labelFormatter={(label) => `الوقت: ${label}`}
                 />
                 <Area
@@ -199,13 +208,7 @@ export function LivePerformanceChart() {
                 <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                 <XAxis dataKey="time" tick={{ fontSize: 12 }} />
                 <YAxis tick={{ fontSize: 12 }} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "hsl(var(--card))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "8px",
-                  }}
-                />
+                <Tooltip contentStyle={TOOLTIP_STYLE} />
                 <Line
                   type="monotone"
                   dataKey="responseTime"

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -50,15 +50,6 @@ export const CreateDistributionDialog = ({
   const [creating, setCreating] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
 
-  // حساب النسب تلقائياً من الإعدادات
-  useMemo(() => {
-    if (settings && open) {
-      form.setValue("nazer_percentage", settings.nazer_percentage || 10);
-      form.setValue("charity_percentage", settings.waqif_charity_percentage || 5);
-      form.setValue("waqf_corpus_percentage", settings.waqf_corpus_percentage || 0);
-    }
-  }, [settings, open]);
-
   const form = useForm<DistributionFormValues>({
     resolver: zodResolver(distributionSchema),
     defaultValues: {
@@ -75,6 +66,15 @@ export const CreateDistributionDialog = ({
   });
 
   const selectedBeneficiaries = form.watch("selected_beneficiaries");
+
+  // حساب النسب تلقائياً من الإعدادات
+  useEffect(() => {
+    if (settings && open) {
+      form.setValue("nazer_percentage", settings.nazer_percentage || 10);
+      form.setValue("charity_percentage", settings.waqif_charity_percentage || 5);
+      form.setValue("waqf_corpus_percentage", settings.waqf_corpus_percentage || 0);
+    }
+  }, [settings, open, form]);
 
   const handleSelectAll = (checked: boolean) => {
     setSelectAll(checked);
