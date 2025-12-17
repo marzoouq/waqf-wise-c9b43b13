@@ -29,7 +29,7 @@ export function RevenueProgressCard() {
   if (!data) return null;
 
   return (
-    <Card className="border-l-4 border-l-success">
+    <Card className="border-s-4 border-s-success">
       <CardHeader className="pb-3">
         <CardTitle className="text-sm flex items-center gap-2">
           <TrendingUp className="h-4 w-4 text-success" />

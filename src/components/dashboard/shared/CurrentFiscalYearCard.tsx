@@ -11,7 +11,7 @@ export function CurrentFiscalYearCard() {
 
   if (isLoading) {
     return (
-      <Card className="border-l-4 border-l-primary">
+      <Card className="border-s-4 border-s-primary">
         <CardHeader className="pb-3">
           <Skeleton className="h-5 w-32" />
         </CardHeader>
@@ -25,7 +25,7 @@ export function CurrentFiscalYearCard() {
 
   if (error) {
     return (
-      <Card className="border-l-4 border-l-destructive">
+      <Card className="border-s-4 border-s-destructive">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm flex items-center gap-2">
             <AlertCircle className="h-4 w-4 text-destructive" />
@@ -44,7 +44,7 @@ export function CurrentFiscalYearCard() {
 
   if (!activeFiscalYear) {
     return (
-      <Card className="border-l-4 border-l-warning">
+      <Card className="border-s-4 border-s-warning">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm flex items-center gap-2">
             <Calendar className="h-4 w-4 text-warning" />
@@ -59,7 +59,7 @@ export function CurrentFiscalYearCard() {
   }
 
   return (
-    <Card className="border-l-4 border-l-primary bg-gradient-to-br from-primary/5 to-transparent">
+    <Card className="border-s-4 border-s-primary bg-gradient-to-br from-primary/5 to-transparent">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-sm flex items-center gap-2">

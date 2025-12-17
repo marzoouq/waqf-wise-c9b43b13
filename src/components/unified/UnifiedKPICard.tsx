@@ -19,43 +19,43 @@ interface UnifiedKPICardProps {
 
 const variantStyles = {
   primary: {
-    border: 'border-l-primary',
+    border: 'border-s-primary',
     text: 'text-primary',
     bg: 'bg-primary/5 hover:bg-primary/10',
     icon: 'text-primary group-hover:scale-110'
   },
   success: {
-    border: 'border-l-[hsl(var(--chart-2))]',
+    border: 'border-s-[hsl(var(--chart-2))]',
     text: 'text-[hsl(var(--chart-2))]',
     bg: 'bg-[hsl(var(--chart-2))]/5 hover:bg-[hsl(var(--chart-2))]/10',
     icon: 'text-[hsl(var(--chart-2))] group-hover:scale-110'
   },
   warning: {
-    border: 'border-l-[hsl(var(--chart-4))]',
+    border: 'border-s-[hsl(var(--chart-4))]',
     text: 'text-[hsl(var(--chart-4))]',
     bg: 'bg-[hsl(var(--chart-4))]/5 hover:bg-[hsl(var(--chart-4))]/10',
     icon: 'text-[hsl(var(--chart-4))] group-hover:scale-110'
   },
   info: {
-    border: 'border-l-[hsl(var(--chart-1))]',
+    border: 'border-s-[hsl(var(--chart-1))]',
     text: 'text-[hsl(var(--chart-1))]',
     bg: 'bg-[hsl(var(--chart-1))]/5 hover:bg-[hsl(var(--chart-1))]/10',
     icon: 'text-[hsl(var(--chart-1))] group-hover:scale-110'
   },
   destructive: {
-    border: 'border-l-destructive',
+    border: 'border-s-destructive',
     text: 'text-destructive',
     bg: 'bg-destructive/5 hover:bg-destructive/10',
     icon: 'text-destructive group-hover:scale-110'
   },
   danger: {
-    border: 'border-l-[hsl(var(--chart-3))]',
+    border: 'border-s-[hsl(var(--chart-3))]',
     text: 'text-[hsl(var(--chart-3))]',
     bg: 'bg-[hsl(var(--chart-3))]/5 hover:bg-[hsl(var(--chart-3))]/10',
     icon: 'text-[hsl(var(--chart-3))] group-hover:scale-110'
   },
   default: {
-    border: 'border-l-muted-foreground',
+    border: 'border-s-muted-foreground',
     text: 'text-foreground',
     bg: 'bg-muted/30 hover:bg-muted/50',
     icon: 'text-muted-foreground group-hover:scale-110'
@@ -124,7 +124,7 @@ export function UnifiedKPICard({
     <Card 
       className={cn(
         "group transition-all duration-300",
-        "border-l-4",
+        "border-s-4",
         styles.border,
         styles.bg,
         onClick && "cursor-pointer hover:shadow-lg hover:scale-[1.02]",

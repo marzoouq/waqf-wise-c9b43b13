@@ -49,7 +49,7 @@ export function PropertyAnalyticsCard({ property, onAnalyzeClick }: PropertyAnal
   const performance = getPerformanceStatus();
 
   return (
-    <Card className="border-l-4 border-l-primary">
+    <Card className="border-s-4 border-s-primary">
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span className="text-lg">{property.name}</span>

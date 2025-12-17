@@ -94,7 +94,7 @@ export const POSDailyReport = () => {
       <CardContent>
         {/* Summary Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <Card className="p-4 border-r-4 border-r-status-success">
+          <Card className="p-4 border-e-4 border-e-status-success">
             <div className="flex items-center gap-2 mb-2">
               <TrendingUp className="h-5 w-5 text-status-success" />
               <p className="text-sm text-muted-foreground">إجمالي التحصيل</p>
@@ -103,7 +103,7 @@ export const POSDailyReport = () => {
               {dailyStats.total_collections.toLocaleString("ar-SA")} ريال
             </p>
           </Card>
-          <Card className="p-4 border-r-4 border-r-status-error">
+          <Card className="p-4 border-e-4 border-e-status-error">
             <div className="flex items-center gap-2 mb-2">
               <TrendingDown className="h-5 w-5 text-status-error" />
               <p className="text-sm text-muted-foreground">إجمالي الصرف</p>
@@ -112,7 +112,7 @@ export const POSDailyReport = () => {
               {dailyStats.total_payments.toLocaleString("ar-SA")} ريال
             </p>
           </Card>
-          <Card className="p-4 border-r-4 border-r-primary">
+          <Card className="p-4 border-e-4 border-e-primary">
             <div className="flex items-center gap-2 mb-2">
               <Wallet className="h-5 w-5 text-primary" />
               <p className="text-sm text-muted-foreground">صافي العمليات</p>
@@ -121,7 +121,7 @@ export const POSDailyReport = () => {
               {dailyStats.net_amount.toLocaleString("ar-SA")} ريال
             </p>
           </Card>
-          <Card className="p-4 border-r-4 border-r-muted-foreground">
+          <Card className="p-4 border-e-4 border-e-muted-foreground">
             <div className="flex items-center gap-2 mb-2">
               <Receipt className="h-5 w-5 text-muted-foreground" />
               <p className="text-sm text-muted-foreground">عدد العمليات</p>

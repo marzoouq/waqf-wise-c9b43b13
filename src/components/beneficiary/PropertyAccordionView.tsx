@@ -158,8 +158,8 @@ function PropertyUnitsSection({ propertyId, propertyName, totalUnits, occupiedUn
       {/* شبكة الوحدات */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {units.map((unit) => (
-          <Card key={unit.id} className="hover:shadow-md transition-all duration-200 border-l-4" 
-                style={{ borderLeftColor: unit.occupancy_status === 'مشغول' ? 'hsl(var(--primary))' : 'hsl(var(--muted))' }}>
+          <Card key={unit.id} className="hover:shadow-md transition-all duration-200 border-s-4" 
+                style={{ borderInlineStartColor: unit.occupancy_status === 'مشغول' ? 'hsl(var(--primary))' : 'hsl(var(--muted))' }}>
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
