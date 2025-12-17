@@ -116,7 +116,7 @@ export const BeneficiariesTable = memo(function BeneficiariesTable({
           </Badge>
           {row.can_login && (
             <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30 text-xs">
-              <Key className="h-2 w-2 sm:h-3 sm:w-3 ml-1" />
+              <Key className="h-2 w-2 sm:h-3 sm:w-3 ms-1" />
               مفعل
             </Badge>
           )}
@@ -147,25 +147,25 @@ export const BeneficiariesTable = memo(function BeneficiariesTable({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
         <DropdownMenuItem onClick={() => onViewProfile(beneficiary)}>
-          <Eye className="ml-2 h-4 w-4" />
+          <Eye className="ms-2 h-4 w-4" />
           عرض الملف الشخصي
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => onEdit(beneficiary)}>
-          <Edit className="ml-2 h-4 w-4" />
+          <Edit className="ms-2 h-4 w-4" />
           تعديل البيانات
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => onViewAttachments(beneficiary)}>
-          <FileText className="ml-2 h-4 w-4" />
+          <FileText className="ms-2 h-4 w-4" />
           المرفقات
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => onViewActivity(beneficiary)}>
-          <Activity className="ml-2 h-4 w-4" />
+          <Activity className="ms-2 h-4 w-4" />
           سجل النشاط
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => onEnableLogin(beneficiary)}>
-          <Key className="ml-2 h-4 w-4" />
+          <Key className="ms-2 h-4 w-4" />
           {beneficiary.can_login ? "إدارة الحساب" : "تفعيل حساب الدخول"}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -173,7 +173,7 @@ export const BeneficiariesTable = memo(function BeneficiariesTable({
           className="text-destructive"
           onClick={() => onDelete(beneficiary.id)}
         >
-          <Trash2 className="ml-2 h-4 w-4" />
+          <Trash2 className="ms-2 h-4 w-4" />
           حذف المستفيد
         </DropdownMenuItem>
       </DropdownMenuContent>

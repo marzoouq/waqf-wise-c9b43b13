@@ -138,7 +138,7 @@ export function SmartArchiveFeatures() {
                     onClick={feature.action}
                     disabled={isProcessing}
                   >
-                    <Zap className="h-3 w-3 ml-2" />
+                    <Zap className="h-3 w-3 ms-2" />
                     تفعيل
                   </Button>
                 </div>

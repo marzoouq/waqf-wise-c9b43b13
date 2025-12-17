@@ -80,7 +80,7 @@ export function RequestApprovalsTab() {
                   onClick={() => approveDialog.open(request)}
                   disabled={request.status !== 'قيد المراجعة'}
                 >
-                  <CheckCircle className="h-4 w-4 ml-1" />
+                  <CheckCircle className="h-4 w-4 ms-1" />
                   موافقة
                 </Button>
                 <Button
@@ -89,7 +89,7 @@ export function RequestApprovalsTab() {
                   onClick={() => rejectDialog.open(request)}
                   disabled={request.status !== 'قيد المراجعة'}
                 >
-                  <XCircle className="h-4 w-4 ml-1" />
+                  <XCircle className="h-4 w-4 ms-1" />
                   رفض
                 </Button>
               </div>

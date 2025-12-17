@@ -44,7 +44,7 @@ export const BeneficiariesHeader = memo(function BeneficiariesHeader({
           onClick={onAddBeneficiary}
           size="sm"
         >
-          <Plus className="ml-2 h-4 w-4" />
+          <Plus className="ms-2 h-4 w-4" />
           إضافة مستفيد
         </Button>
       </div>
@@ -56,7 +56,7 @@ export const BeneficiariesHeader = memo(function BeneficiariesHeader({
           onClick={onAddBeneficiary}
           size="sm"
         >
-          <Plus className="ml-1.5 h-3.5 w-3.5" />
+          <Plus className="ms-1.5 h-3.5 w-3.5" />
           إضافة مستفيد
         </Button>
         

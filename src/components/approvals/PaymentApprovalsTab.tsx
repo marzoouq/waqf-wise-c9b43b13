@@ -181,7 +181,7 @@ export function PaymentApprovalsTab() {
                       onClick={() => handleApprovalClick(payment, "approve")}
                       disabled={approveMutation.isPending}
                     >
-                      <CheckCircle className="h-4 w-4 ml-1" />
+                      <CheckCircle className="h-4 w-4 ms-1" />
                       موافقة
                     </Button>
                     <Button
@@ -190,7 +190,7 @@ export function PaymentApprovalsTab() {
                       onClick={() => handleApprovalClick(payment, "reject")}
                       disabled={approveMutation.isPending}
                     >
-                      <XCircle className="h-4 w-4 ml-1" />
+                      <XCircle className="h-4 w-4 ms-1" />
                       رفض
                     </Button>
                   </div>

@@ -67,7 +67,7 @@ export const FamilyMobileCard = memo(({
 
               <div className="flex items-center flex-wrap gap-2">
                 <Badge variant="outline" className="text-xs">
-                  <Users className="h-3 w-3 ml-1" />
+                  <Users className="h-3 w-3 ms-1" />
                   {family.total_members} أفراد
                 </Badge>
                 {family.tribe && (

@@ -108,11 +108,11 @@ export default function BeneficiaryReports() {
             actions={
               <div className="flex gap-2">
                 <Button onClick={printReport} variant="outline" size="sm" className="min-h-[44px]">
-                  <Printer className="h-4 w-4 sm:ml-2" />
+                  <Printer className="h-4 w-4 sm:ms-2" />
                   <span className="hidden sm:inline">طباعة</span>
                 </Button>
                 <Button onClick={exportAnnualReport} size="sm" className="min-h-[44px]">
-                  <Download className="h-4 w-4 sm:ml-2" />
+                  <Download className="h-4 w-4 sm:ms-2" />
                   <span className="hidden sm:inline">تصدير PDF</span>
                 </Button>
               </div>

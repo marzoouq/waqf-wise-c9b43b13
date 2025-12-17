@@ -58,7 +58,7 @@ export function EmptyState({
           {action && (
             <div className="flex gap-3">
               <Button onClick={action.onClick} size="lg">
-                {action.icon && <action.icon className="h-5 w-5 ml-2" />}
+                {action.icon && <action.icon className="h-5 w-5 ms-2" />}
                 {action.label}
               </Button>
               {secondaryAction && (

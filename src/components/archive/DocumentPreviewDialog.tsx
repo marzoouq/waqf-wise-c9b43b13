@@ -79,7 +79,7 @@ export function DocumentPreviewDialog({
           يرجى تحميل الملف لعرضه.
         </p>
         <Button onClick={handleDownload} disabled={loading} size="lg">
-          <Download className="ml-2 h-5 w-5" />
+          <Download className="ms-2 h-5 w-5" />
           تحميل الملف
         </Button>
       </div>
@@ -101,7 +101,7 @@ export function DocumentPreviewDialog({
                 onClick={handleDownload}
                 disabled={loading}
               >
-                <Download className="ml-2 h-4 w-4" />
+                <Download className="ms-2 h-4 w-4" />
                 تحميل
               </Button>
               <Button

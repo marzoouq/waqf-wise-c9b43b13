@@ -73,7 +73,7 @@ export const BeneficiariesSearchBar = memo(function BeneficiariesSearchBar({
                 <DropdownMenuContent align="end">
                   {savedSearches.map((search) => (
                     <DropdownMenuItem key={search.id} onClick={() => onLoadSearch(search)}>
-                      {search.is_favorite && <Star className="ml-2 h-3 w-3 fill-current" />}
+                      {search.is_favorite && <Star className="ms-2 h-3 w-3 fill-current" />}
                       {search.name}
                     </DropdownMenuItem>
                   ))}

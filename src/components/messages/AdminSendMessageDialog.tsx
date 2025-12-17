@@ -240,7 +240,7 @@ export function AdminSendMessageDialog({
           className="w-full"
           disabled={isLoading}
         >
-          <Send className="h-4 w-4 ml-2" />
+          <Send className="h-4 w-4 ms-2" />
           {isLoading ? "جاري الإرسال..." : "إرسال الرسالة"}
         </Button>
       </div>
