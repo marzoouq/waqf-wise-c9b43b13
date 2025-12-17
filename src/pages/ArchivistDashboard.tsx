@@ -209,7 +209,7 @@ export default function ArchivistDashboard() {
               className="w-full"
               onClick={() => navigate('/archive')}
             >
-              <Upload className="h-4 w-4 ml-2" />
+              <Upload className="h-4 w-4 ms-2" />
               رفع مستند
             </Button>
             <Button 
@@ -217,7 +217,7 @@ export default function ArchivistDashboard() {
               className="w-full"
               onClick={() => navigate('/archive')}
             >
-              <FolderOpen className="h-4 w-4 ml-2" />
+              <FolderOpen className="h-4 w-4 ms-2" />
               إنشاء مجلد
             </Button>
             <Button 
@@ -225,7 +225,7 @@ export default function ArchivistDashboard() {
               className="w-full"
               onClick={() => navigate('/archive')}
             >
-              <Search className="h-4 w-4 ml-2" />
+              <Search className="h-4 w-4 ms-2" />
               البحث المتقدم
             </Button>
           </div>

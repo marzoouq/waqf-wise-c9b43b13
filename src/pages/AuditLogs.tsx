@@ -294,7 +294,7 @@ const AuditLogs = () => {
                           </TableCell>
                           <TableCell>
                             <Badge className={config.color + " text-xs whitespace-nowrap"}>
-                              <SeverityIcon className="h-3 w-3 ml-1" />
+                              <SeverityIcon className="h-3 w-3 ms-1" />
                               {config.label}
                             </Badge>
                           </TableCell>

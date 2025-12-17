@@ -138,7 +138,7 @@ export default function SystemMonitoring() {
               <TabsTrigger value="alerts" className="text-xs sm:text-sm px-3 sm:px-4 gap-1">
                 التنبيهات
                 {stats?.activeAlerts && stats.activeAlerts > 0 && (
-                  <Badge variant="destructive" className="mr-1 text-[10px] h-5">
+                  <Badge variant="destructive" className="me-1 text-[10px] h-5">
                     {stats.activeAlerts}
                   </Badge>
                 )}

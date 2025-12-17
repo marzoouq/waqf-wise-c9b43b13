@@ -151,7 +151,7 @@ export function ScheduledReportsManager() {
                     variant="outline"
                     onClick={() => triggerReport.mutate(report.id)}
                   >
-                    <Play className="h-4 w-4 ml-2" />
+                    <Play className="h-4 w-4 ms-2" />
                     تشغيل الآن
                   </Button>
                   <Button
@@ -169,7 +169,7 @@ export function ScheduledReportsManager() {
                     variant="destructive"
                     onClick={() => deleteReport.mutate(report.id)}
                   >
-                    <Trash2 className="h-4 w-4 ml-2" />
+                    <Trash2 className="h-4 w-4 ms-2" />
                     حذف
                   </Button>
                 </div>

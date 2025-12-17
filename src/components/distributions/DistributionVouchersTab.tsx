@@ -38,7 +38,7 @@ export function DistributionVouchersTab({ distributionId }: DistributionVouchers
 
     return (
       <Badge variant={config.variant} className={config.className || ""}>
-        <Icon className="ml-1 h-3 w-3" />
+        <Icon className="ms-1 h-3 w-3" />
         {config.label}
       </Badge>
     );

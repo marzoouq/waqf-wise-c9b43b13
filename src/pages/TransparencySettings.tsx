@@ -85,7 +85,7 @@ export default function TransparencySettings() {
           description="التحكم الكامل في البيانات المتاحة للمستفيدين والورثة"
           actions={
             <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
-              <ArrowRight className="h-4 w-4 ml-2" />
+              <ArrowRight className="h-4 w-4 ms-2" />
               رجوع
             </Button>
           }
@@ -111,7 +111,7 @@ export default function TransparencySettings() {
                   onClick={() => setActiveRole('beneficiary')}
                   size="sm"
                 >
-                  <Users className="h-4 w-4 ml-2" />
+                  <Users className="h-4 w-4 ms-2" />
                   المستفيدون
                 </Button>
                 <Button
@@ -119,7 +119,7 @@ export default function TransparencySettings() {
                   onClick={() => setActiveRole('waqf_heir')}
                   size="sm"
                 >
-                  <Shield className="h-4 w-4 ml-2" />
+                  <Shield className="h-4 w-4 ms-2" />
                   الورثة
                 </Button>
               </div>
@@ -523,11 +523,11 @@ export default function TransparencySettings() {
 
           <div className="flex gap-3">
             <Button onClick={handleSave} disabled={isUpdating} className="flex-1">
-              <Save className="ml-2 h-4 w-4" />
+              <Save className="ms-2 h-4 w-4" />
               {isUpdating ? "جارِ الحفظ..." : "حفظ التغييرات"}
             </Button>
             <Button variant="outline" onClick={handleReset} disabled={isUpdating}>
-              <RotateCcw className="ml-2 h-4 w-4" />
+              <RotateCcw className="ms-2 h-4 w-4" />
               إلغاء
             </Button>
           </div>

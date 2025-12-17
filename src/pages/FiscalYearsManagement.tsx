@@ -217,11 +217,11 @@ export default function FiscalYearsManagement() {
                   {!selectedYear.is_closed && (
                     <div className="flex gap-2">
                       <Button onClick={handleManualClosing} variant="outline">
-                        <FileCheck className="h-4 w-4 ml-2" />
+                        <FileCheck className="h-4 w-4 ms-2" />
                         إقفال يدوي
                       </Button>
                       <Button onClick={handleAutomaticClosing}>
-                        <FileCheck className="h-4 w-4 ml-2" />
+                        <FileCheck className="h-4 w-4 ms-2" />
                         إقفال تلقائي
                       </Button>
                     </div>

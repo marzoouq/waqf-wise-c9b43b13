@@ -128,7 +128,7 @@ export function BeneficiaryDistributionReport({
           <p className="text-muted-foreground">تحليل شامل للمستفيدين والمبالغ الموزعة</p>
         </div>
         <Button>
-          <Download className="h-4 w-4 ml-2" />
+          <Download className="h-4 w-4 ms-2" />
           تصدير التقرير
         </Button>
       </div>

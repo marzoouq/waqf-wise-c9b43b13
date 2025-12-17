@@ -169,7 +169,7 @@ export function EmergencyAidApprovalsTab() {
                             variant="default"
                             onClick={() => openApproveDialog(request)}
                           >
-                            <CheckCircle className="h-3 w-3 ml-1" />
+                            <CheckCircle className="h-3 w-3 ms-1" />
                             موافقة
                           </Button>
                           <Button
@@ -177,7 +177,7 @@ export function EmergencyAidApprovalsTab() {
                             variant="destructive"
                             onClick={() => openRejectDialog(request)}
                           >
-                            <XCircle className="h-3 w-3 ml-1" />
+                            <XCircle className="h-3 w-3 ms-1" />
                             رفض
                           </Button>
                         </div>

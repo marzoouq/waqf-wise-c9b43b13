@@ -42,12 +42,12 @@ export const QuickActionsBar = memo(function QuickActionsBar({ actions }: QuickA
           >
             {isExpanded ? (
               <>
-                <ChevronUp className="h-3 w-3 ml-0.5" />
+                <ChevronUp className="h-3 w-3 ms-0.5" />
                 أقل
               </>
             ) : (
               <>
-                <ChevronDown className="h-3 w-3 ml-0.5" />
+                <ChevronDown className="h-3 w-3 ms-0.5" />
                 +{actions.length - 2}
               </>
             )}
@@ -68,7 +68,7 @@ export const QuickActionsBar = memo(function QuickActionsBar({ actions }: QuickA
               "border-primary/30 hover:border-primary"
             )}
           >
-            <span className="ml-1">{action.icon}</span>
+            <span className="ms-1">{action.icon}</span>
             {action.label}
             {action.count !== undefined && (
               <Badge 

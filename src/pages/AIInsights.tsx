@@ -55,7 +55,7 @@ export default function AIInsights() {
                 onClick={() => generateInsights('beneficiaries')}
                 disabled={isGenerating}
               >
-                <RefreshCw className={`h-4 w-4 ml-2 ${isGenerating ? 'animate-spin' : ''}`} />
+                <RefreshCw className={`h-4 w-4 ms-2 ${isGenerating ? 'animate-spin' : ''}`} />
                 <span className="hidden sm:inline">توليد رؤى المستفيدين</span>
                 <span className="sm:hidden">مستفيدين</span>
               </Button>
@@ -65,7 +65,7 @@ export default function AIInsights() {
                 onClick={() => generateInsights('financial')}
                 disabled={isGenerating}
               >
-                <RefreshCw className={`h-4 w-4 ml-2 ${isGenerating ? 'animate-spin' : ''}`} />
+                <RefreshCw className={`h-4 w-4 ms-2 ${isGenerating ? 'animate-spin' : ''}`} />
                 <span className="hidden sm:inline">توليد رؤى مالية</span>
                 <span className="sm:hidden">مالية</span>
               </Button>

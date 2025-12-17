@@ -24,7 +24,7 @@ export default function Unauthorized() {
           <Button asChild className="w-full">
             <Link to="/dashboard">
               العودة للوحة التحكم
-              <ArrowRight className="mr-2 h-4 w-4" />
+              <ArrowRight className="me-2 h-4 w-4" />
             </Link>
           </Button>
         </CardContent>

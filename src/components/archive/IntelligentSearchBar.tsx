@@ -204,7 +204,7 @@ export function IntelligentSearchBar({ onResultClick }: IntelligentSearchBarProp
                         onSelect={() => handleRecentSearch(term)}
                         className="cursor-pointer"
                       >
-                        <Clock className="h-4 w-4 ml-2 text-muted-foreground" />
+                        <Clock className="h-4 w-4 ms-2 text-muted-foreground" />
                         {term}
                       </CommandItem>
                     ))}
@@ -234,7 +234,7 @@ export function IntelligentSearchBar({ onResultClick }: IntelligentSearchBarProp
         </Popover>
         
         <Button onClick={handleSearch} disabled={isSearching || query.length < 2}>
-          <Search className="h-4 w-4 ml-2" />
+          <Search className="h-4 w-4 ms-2" />
           بحث
         </Button>
       </div>

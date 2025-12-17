@@ -265,7 +265,7 @@ export default function StaffRequestsManagement() {
                         disabled={isUpdating}
                         className="flex-1 bg-green-600 hover:bg-green-700"
                       >
-                        <CheckCircle className="h-4 w-4 ml-2" />
+                        <CheckCircle className="h-4 w-4 ms-2" />
                         موافقة
                       </Button>
                       <Button
@@ -274,7 +274,7 @@ export default function StaffRequestsManagement() {
                         variant="destructive"
                         className="flex-1"
                       >
-                        <XCircle className="h-4 w-4 ml-2" />
+                        <XCircle className="h-4 w-4 ms-2" />
                         رفض
                       </Button>
                     </div>
@@ -303,9 +303,9 @@ function getRequestStatusBadge(status: string) {
   };
   
   const icons: Record<string, JSX.Element> = {
-    'pending': <Clock className="h-3 w-3 ml-1" />,
-    'approved': <CheckCircle className="h-3 w-3 ml-1" />,
-    'rejected': <XCircle className="h-3 w-3 ml-1" />,
+    'pending': <Clock className="h-3 w-3 ms-1" />,
+    'approved': <CheckCircle className="h-3 w-3 ms-1" />,
+    'rejected': <XCircle className="h-3 w-3 ms-1" />,
   };
 
   return (
