@@ -42,8 +42,8 @@ export function PropertyUnitsDisplay({ propertyId }: PropertyUnitsDisplayProps) 
         return (
           <Card
             key={unit.id}
-            className={`border-l-4 ${
-              isOccupied ? "border-l-success" : "border-l-border"
+            className={`border-s-4 ${
+              isOccupied ? "border-s-success" : "border-s-border"
             }`}
           >
             <CardContent className="p-2 sm:p-3">

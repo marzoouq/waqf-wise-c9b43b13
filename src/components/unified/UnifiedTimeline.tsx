@@ -85,7 +85,7 @@ export function UnifiedTimeline({
                   {Icon ? <Icon className="h-4 w-4" /> : <span className="text-xs">{index + 1}</span>}
                 </div>
                 {index < sortedEvents.length - 1 && (
-                  <div className={cn("w-0.5 h-full min-h-8 border-r-2", lineColorClasses[color])} />
+                  <div className={cn("w-0.5 h-full min-h-8 border-e-2", lineColorClasses[color])} />
                 )}
               </div>
               <div className="flex-1 pb-4">
@@ -128,7 +128,7 @@ export function UnifiedTimeline({
                 {Icon ? <Icon className="h-5 w-5" /> : <span>{index + 1}</span>}
               </div>
               {index < sortedEvents.length - 1 && (
-                <div className={cn("w-0.5 flex-1 min-h-12 border-r-2 mt-2", lineColorClasses[color])} />
+                <div className={cn("w-0.5 flex-1 min-h-12 border-e-2 mt-2", lineColorClasses[color])} />
               )}
             </div>
             <Card className="flex-1">

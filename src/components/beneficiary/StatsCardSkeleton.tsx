@@ -3,8 +3,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export function StatsCardSkeleton() {
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 border-l-4" 
-          style={{ borderLeftColor: `hsl(var(--primary))` }}>
+    <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 border-s-4" 
+          style={{ borderInlineStartColor: `hsl(var(--primary))` }}>
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div className="space-y-2 flex-1">

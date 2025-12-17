@@ -52,7 +52,7 @@ export function ManualClosingDialog({
                     : step === currentStep
                     ? "border-primary"
                     : "border-muted"
-                } ${step !== 4 ? "border-l-2" : ""}`}
+                } ${step !== 4 ? "border-s-2" : ""}`}
               >
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center mx-auto ${

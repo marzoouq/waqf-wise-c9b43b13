@@ -81,7 +81,7 @@ export function AlertsPanel() {
                   const Icon = config.icon;
                   
                   return (
-                    <Card key={alert.id} className="border-l-4" style={{ borderLeftColor: `var(--${alert.severity})` }}>
+                    <Card key={alert.id} className="border-s-4" style={{ borderInlineStartColor: `var(--${alert.severity})` }}>
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex-1">
