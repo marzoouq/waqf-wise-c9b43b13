@@ -4,16 +4,16 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 
-interface NavigationItem {
+export interface NavigationItem {
   id: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   path: string;
-  matchPaths?: string[]; // مسارات إضافية للتطابق
+  matchPaths?: string[];
   badge?: number;
 }
 
-const navigationItems: NavigationItem[] = [
+const defaultNavigationItems: NavigationItem[] = [
   {
     id: 'home',
     label: 'الرئيسية',
@@ -47,10 +47,19 @@ const navigationItems: NavigationItem[] = [
   },
 ];
 
+interface BottomNavigationProps {
+  items?: NavigationItem[];
+  ariaLabel?: string;
+}
+
 /**
- * شريط التنقل السفلي للجوال - محسّن للأداء
+ * شريط التنقل السفلي للجوال - موحد ومحسّن للأداء
  */
-export const BottomNavigation = memo(function BottomNavigation() {
+export const BottomNavigation = memo(function BottomNavigation({ 
+  items,
+  ariaLabel = "التنقل السفلي"
+}: BottomNavigationProps) {
+  const navigationItems = items || defaultNavigationItems;
   const location = useLocation();
 
   // تحديد العنصر النشط
@@ -69,7 +78,7 @@ export const BottomNavigation = memo(function BottomNavigation() {
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
       }}
       role="navigation"
-      aria-label="التنقل السفلي"
+      aria-label={ariaLabel}
     >
       <div className="flex items-center justify-around h-16 max-w-screen-xl mx-auto">
         {navigationItems.map((item) => {

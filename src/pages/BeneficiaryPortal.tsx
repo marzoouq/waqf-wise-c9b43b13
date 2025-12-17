@@ -11,7 +11,8 @@ import { OverviewSection } from "@/components/beneficiary/sections/OverviewSecti
 import { TabRenderer } from "@/components/beneficiary/TabRenderer";
 import { useMemo, useCallback } from "react";
 import { BeneficiarySidebar } from "@/components/beneficiary/BeneficiarySidebar";
-import { BeneficiaryBottomNavigation } from "@/components/mobile/BeneficiaryBottomNavigation";
+import { BottomNavigation } from "@/components/mobile/BottomNavigation";
+import { beneficiaryNavigationItems } from "@/components/beneficiary/config/bottomNavConfig";
 import { useVisibilitySettings } from "@/hooks/governance/useVisibilitySettings";
 import { useBeneficiaryPortalData } from "@/hooks/beneficiary/useBeneficiaryPortalData";
 import { useBeneficiarySession } from "@/hooks/beneficiary/useBeneficiarySession";
@@ -138,7 +139,7 @@ export default function BeneficiaryPortal() {
         </div>
         
         {/* Mobile Bottom Navigation */}
-        <BeneficiaryBottomNavigation />
+        <BottomNavigation items={beneficiaryNavigationItems} ariaLabel="التنقل السفلي للمستفيد" />
       </SidebarProvider>
     </PageErrorBoundary>
   );
