@@ -27,7 +27,7 @@ export function GlobalMonitoring() {
 ✅ المراقبة على كامل التطبيق
 
 🎯 الوصول السريع:
-  • /developer-tools - لوحة المطور الكاملة
+  • /system-monitoring - مراقبة النظام
       `);
     }
   }, [shouldMonitor, isNazer]);
