@@ -174,11 +174,11 @@ export function JournalEntryForm() {
 
             <div
               className={`text-center p-3 rounded-lg ${
-                isBalanced ? 'bg-green-100 dark:bg-green-950' : 'bg-destructive/10'
+                isBalanced ? 'bg-success/10' : 'bg-destructive/10'
               }`}
             >
               <p className="text-xs text-muted-foreground mb-1">الفرق</p>
-              <p className={`text-lg font-bold font-mono ${isBalanced ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
+              <p className={`text-lg font-bold font-mono ${isBalanced ? 'text-success' : 'text-destructive'}`}>
                 {Math.abs(totalDebit - totalCredit).toLocaleString('ar-SA', { minimumFractionDigits: 2 })}
               </p>
             </div>

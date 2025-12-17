@@ -86,7 +86,7 @@ export default function TenantDetails() {
               <span className="text-sm text-muted-foreground">الرصيد الحالي</span>
               <span
                 className={`text-lg sm:text-xl font-bold ${
-                  balance > 0 ? 'text-destructive' : balance < 0 ? 'text-green-600' : ''
+                  balance > 0 ? 'text-destructive' : balance < 0 ? 'text-success' : ''
                 }`}
               >
                 {formatCurrency(Math.abs(balance))}

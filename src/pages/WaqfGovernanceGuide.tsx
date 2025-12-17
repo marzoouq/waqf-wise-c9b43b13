@@ -104,11 +104,11 @@ const WaqfGovernanceGuide = () => {
       />
 
       {/* معلومات الوقف الأساسية */}
-      <Card className="mb-6 border-red-200 dark:border-red-800/30 bg-gradient-to-br from-red-50/50 to-background dark:from-red-950/20">
+      <Card className="mb-6 border-destructive/30 bg-gradient-to-br from-destructive/5 to-background">
         <CardHeader className="pb-3">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-red-100 dark:bg-red-900/30">
-              <Building2 className="h-5 w-5 text-red-600 dark:text-red-400" />
+            <div className="p-2 rounded-lg bg-destructive/10">
+              <Building2 className="h-5 w-5 text-destructive" />
             </div>
             <CardTitle className="text-lg">معلومات الوقف</CardTitle>
           </div>
@@ -147,20 +147,20 @@ const WaqfGovernanceGuide = () => {
           {/* الجهات المعنية */}
           <div className="space-y-3">
             <h4 className="text-sm font-semibold flex items-center gap-2">
-              <Info className="h-4 w-4 text-red-500" />
+              <Info className="h-4 w-4 text-destructive" />
               الجهات المعنية
             </h4>
             <div className="flex flex-wrap gap-2">
-              <Badge variant="outline" className="bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800">
+              <Badge variant="outline" className="bg-destructive/10 border-destructive/30">
                 الهيئة العامة للأوقاف
               </Badge>
-              <Badge variant="outline" className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+              <Badge variant="outline" className="bg-info/10 border-info/30">
                 الناظر المعين
               </Badge>
-              <Badge variant="outline" className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
+              <Badge variant="outline" className="bg-success/10 border-success/30">
                 ورثة الواقف
               </Badge>
-              <Badge variant="outline" className="bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800">
+              <Badge variant="outline" className="bg-primary/10 border-primary/30">
                 الجهات القضائية المختصة
               </Badge>
             </div>
@@ -172,14 +172,14 @@ const WaqfGovernanceGuide = () => {
           <div className="space-y-3">
             <h4 className="text-sm font-semibold">الأثر المتوقع</h4>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
-                <p className="text-sm text-green-700 dark:text-green-300">تعزيز التنمية الاجتماعية والاقتصادية</p>
+              <div className="p-3 rounded-lg bg-success/10 border border-success/30">
+                <p className="text-sm text-success">تعزيز التنمية الاجتماعية والاقتصادية</p>
               </div>
-              <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
-                <p className="text-sm text-blue-700 dark:text-blue-300">الحفاظ على الأصول الوقفية وتنميتها</p>
+              <div className="p-3 rounded-lg bg-info/10 border border-info/30">
+                <p className="text-sm text-info">الحفاظ على الأصول الوقفية وتنميتها</p>
               </div>
-              <div className="p-3 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
-                <p className="text-sm text-purple-700 dark:text-purple-300">تحقيق الغبطة والمصلحة العامة</p>
+              <div className="p-3 rounded-lg bg-primary/10 border border-primary/30">
+                <p className="text-sm text-primary">تحقيق الغبطة والمصلحة العامة</p>
               </div>
             </div>
           </div>

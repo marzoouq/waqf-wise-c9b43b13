@@ -102,33 +102,33 @@ export default function StaffRequestsManagement() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-yellow-600">
+              <div className="text-2xl font-bold text-warning">
                 {stats.pending}
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-green-200 dark:border-green-900">
+          <Card className="border-success/30">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 موافق عليها
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">
+              <div className="text-2xl font-bold text-success">
                 {stats.approved}
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-red-200 dark:border-red-900">
+          <Card className="border-destructive/30">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 مرفوضة
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-red-600">
+              <div className="text-2xl font-bold text-destructive">
                 {stats.rejected}
               </div>
             </CardContent>
@@ -263,7 +263,7 @@ export default function StaffRequestsManagement() {
                       <Button
                         onClick={handleApprove}
                         disabled={isUpdating}
-                        className="flex-1 bg-green-600 hover:bg-green-700"
+                        className="flex-1 bg-success hover:bg-success/90"
                       >
                         <CheckCircle className="h-4 w-4 ms-2" />
                         موافقة

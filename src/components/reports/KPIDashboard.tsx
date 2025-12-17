@@ -37,21 +37,21 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 };
 
 const colorMap: Record<string, string> = {
-  green: 'text-emerald-600 bg-emerald-50 border-emerald-200',
-  blue: 'text-blue-600 bg-blue-50 border-blue-200',
-  emerald: 'text-emerald-600 bg-emerald-50 border-emerald-200',
-  amber: 'text-amber-600 bg-amber-50 border-amber-200',
-  pink: 'text-pink-600 bg-pink-50 border-pink-200',
-  orange: 'text-orange-600 bg-orange-50 border-orange-200',
-  red: 'text-red-600 bg-red-50 border-red-200',
-  yellow: 'text-yellow-600 bg-yellow-50 border-yellow-200',
+  green: 'text-success bg-success/10 border-success/30',
+  blue: 'text-info bg-info/10 border-info/30',
+  emerald: 'text-success bg-success/10 border-success/30',
+  amber: 'text-warning bg-warning/10 border-warning/30',
+  pink: 'text-accent-foreground bg-accent/10 border-accent/30',
+  orange: 'text-warning bg-warning/10 border-warning/30',
+  red: 'text-destructive bg-destructive/10 border-destructive/30',
+  yellow: 'text-warning bg-warning/10 border-warning/30',
 };
 
 const statusColors: Record<string, string> = {
-  success: 'bg-emerald-100 text-emerald-800 border-emerald-300',
-  warning: 'bg-amber-100 text-amber-800 border-amber-300',
-  danger: 'bg-red-100 text-red-800 border-red-300',
-  neutral: 'bg-gray-100 text-gray-800 border-gray-300',
+  success: 'bg-success/20 text-success border-success/30',
+  warning: 'bg-warning/20 text-warning border-warning/30',
+  danger: 'bg-destructive/20 text-destructive border-destructive/30',
+  neutral: 'bg-muted text-muted-foreground border-border',
 };
 
 interface KPIDashboardProps {
@@ -111,7 +111,7 @@ export function KPIDashboard({ category, limit, className }: KPIDashboardProps) 
         const IconComponent = iconMap[kpi.icon || 'PieChart'] || PieChart;
         const cardColor = colorMap[kpi.color || 'blue'] || colorMap.blue;
         const TrendIcon = kpi.trend === 'up' ? TrendingUp : kpi.trend === 'down' ? TrendingDown : Minus;
-        const trendColor = kpi.trend === 'up' ? 'text-emerald-600' : kpi.trend === 'down' ? 'text-red-600' : 'text-gray-500';
+        const trendColor = kpi.trend === 'up' ? 'text-success' : kpi.trend === 'down' ? 'text-destructive' : 'text-muted-foreground';
 
         const formattedValue = kpi.unit === 'ر.س' 
           ? `${(kpi.current_value || 0).toLocaleString('ar-SA')} ${kpi.unit}`
@@ -170,9 +170,9 @@ export function KPIDashboard({ category, limit, className }: KPIDashboardProps) 
                     <div 
                       className={cn(
                         'h-full rounded-full transition-all',
-                        kpi.status === 'success' ? 'bg-emerald-500' :
-                        kpi.status === 'warning' ? 'bg-amber-500' :
-                        kpi.status === 'danger' ? 'bg-red-500' : 'bg-gray-400'
+                        kpi.status === 'success' ? 'bg-success' :
+                        kpi.status === 'warning' ? 'bg-warning' :
+                        kpi.status === 'danger' ? 'bg-destructive' : 'bg-muted-foreground'
                       )}
                       style={{ 
                         width: `${Math.min(100, ((kpi.current_value || 0) / kpi.target_value * 100))}%` 

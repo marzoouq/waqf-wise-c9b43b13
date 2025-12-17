@@ -15,11 +15,11 @@ import { useMyBeneficiaryRequests, BeneficiaryRequest } from '@/hooks/beneficiar
 const getStatusIcon = (status: string) => {
   switch (status) {
     case 'pending':
-      return <Clock className="h-4 w-4 text-yellow-600" />;
+      return <Clock className="h-4 w-4 text-warning" />;
     case 'approved':
-      return <CheckCircle className="h-4 w-4 text-green-600" />;
+      return <CheckCircle className="h-4 w-4 text-success" />;
     case 'rejected':
-      return <XCircle className="h-4 w-4 text-red-600" />;
+      return <XCircle className="h-4 w-4 text-destructive" />;
     default:
       return <AlertCircle className="h-4 w-4" />;
   }
@@ -175,7 +175,7 @@ export default function BeneficiaryRequests() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
+              <div className="text-2xl font-bold text-warning">{stats.pending}</div>
             </CardContent>
           </Card>
 
@@ -186,7 +186,7 @@ export default function BeneficiaryRequests() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">{stats.approved}</div>
+              <div className="text-2xl font-bold text-success">{stats.approved}</div>
             </CardContent>
           </Card>
 
@@ -197,7 +197,7 @@ export default function BeneficiaryRequests() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-red-600">{stats.rejected}</div>
+              <div className="text-2xl font-bold text-destructive">{stats.rejected}</div>
             </CardContent>
           </Card>
         </div>

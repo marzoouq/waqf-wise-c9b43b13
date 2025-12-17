@@ -118,8 +118,8 @@ export default function Contact() {
           <div className="bg-card rounded-xl p-6 border border-border">
             {isSubmitted ? (
               <div className="flex flex-col items-center justify-center py-12 text-center">
-                <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mb-6">
-                  <CheckCircle className="w-8 h-8 text-green-600" />
+                <div className="w-16 h-16 rounded-full bg-success/10 flex items-center justify-center mb-6">
+                  <CheckCircle className="w-8 h-8 text-success" />
                 </div>
                 <h3 className="text-xl font-semibold text-foreground mb-2">تم إرسال رسالتك</h3>
                 <p className="text-muted-foreground mb-6">

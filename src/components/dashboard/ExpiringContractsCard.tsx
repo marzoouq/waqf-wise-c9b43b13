@@ -90,7 +90,7 @@ export const ExpiringContractsCard = () => {
     if (days <= 60) {
       return { variant: "secondary" as const, label: "تحذير", color: "bg-warning/10 text-warning border-warning/20" };
     }
-    return { variant: "outline" as const, label: "قريب", color: "bg-blue-500/10 text-blue-600 border-blue-500/20" };
+    return { variant: "outline" as const, label: "قريب", color: "bg-info/10 text-info border-info/20" };
   };
 
   if (expiringContracts.length === 0) {
