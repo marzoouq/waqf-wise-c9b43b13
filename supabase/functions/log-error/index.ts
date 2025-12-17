@@ -1,4 +1,4 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 import { 
   handleCors, 
@@ -7,6 +7,45 @@ import {
   unauthorizedResponse,
   rateLimitResponse 
 } from '../_shared/cors.ts';
+
+// Interfaces for type safety
+interface ErrorLog {
+  id: string;
+  error_type: string;
+  error_message: string;
+  severity: string;
+  created_at: string;
+  status?: string;
+}
+
+interface AlertRule {
+  rule_name: string;
+  error_type_pattern?: string;
+  min_severity?: string;
+  notify_roles?: string[];
+  auto_escalate?: boolean;
+  escalation_delay_minutes?: number;
+}
+
+interface SystemAlert {
+  id: string;
+  alert_type: string;
+  severity: string;
+  status?: string;
+}
+
+interface User {
+  user_id: string;
+  role?: string;
+}
+
+interface NotificationPreference {
+  user_id: string;
+  notify_low?: boolean;
+  notify_medium?: boolean;
+  notify_high?: boolean;
+  notify_critical?: boolean;
+}
 
 // Schema للتحقق من صحة المدخلات - مع قيم افتراضية
 const errorReportSchema = z.object({
@@ -18,14 +57,6 @@ const errorReportSchema = z.object({
   user_agent: z.string().max(500).default('unknown'),
   user_id: z.string().uuid().optional(),
   additional_data: z.record(z.unknown()).optional()
-});
-
-// Schema للرسائل العامة (INFO, DEBUG, etc.)
-const generalLogSchema = z.object({
-  level: z.enum(['info', 'debug', 'warn', 'error']).optional(),
-  message: z.string().optional(),
-  data: z.record(z.unknown()).optional(),
-  timestamp: z.string().optional(),
 });
 
 type ErrorReport = z.infer<typeof errorReportSchema>;
@@ -208,11 +239,14 @@ Deno.serve(async (req) => {
 
     console.log('✅ Error logged:', errorLog.id);
 
+    // Cast to typed ErrorLog
+    const typedErrorLog = errorLog as ErrorLog;
+
     // معالجة متوازية للمهام
     await Promise.all([
-      applyAlertRules(supabase, errorLog, errorReport),
-      analyzeRecurringErrors(supabase, errorReport, errorLog.id),
-      attemptAutoFix(supabase, errorLog, errorReport),
+      applyAlertRules(supabase, typedErrorLog, errorReport),
+      analyzeRecurringErrors(supabase, errorReport, typedErrorLog.id),
+      attemptAutoFix(supabase, typedErrorLog, errorReport),
       recordPerformanceMetric(supabase, errorReport),
     ]);
 
@@ -230,7 +264,7 @@ Deno.serve(async (req) => {
 /**
  * تطبيق قواعد الإشعارات وإرسال الإشعارات المناسبة
  */
-async function applyAlertRules(supabase: any, errorLog: any, errorReport: ErrorReport) {
+async function applyAlertRules(supabase: SupabaseClient, errorLog: ErrorLog, errorReport: ErrorReport) {
   try {
     const { data: rules, error: rulesError } = await supabase
       .from('alert_rules')
@@ -244,15 +278,16 @@ async function applyAlertRules(supabase: any, errorLog: any, errorReport: ErrorR
     }
 
     for (const rule of rules) {
-      if (shouldApplyRule(rule, errorReport)) {
-        console.log(`✅ Applying rule: ${rule.rule_name}`);
+      const typedRule = rule as AlertRule;
+      if (shouldApplyRule(typedRule, errorReport)) {
+        console.log(`✅ Applying rule: ${typedRule.rule_name}`);
         
         const { data: alert } = await supabase
           .from('system_alerts')
           .insert({
             alert_type: errorReport.error_type,
             severity: errorReport.severity,
-            title: `تنبيه: ${rule.rule_name}`,
+            title: `تنبيه: ${typedRule.rule_name}`,
             description: errorReport.error_message,
             occurrence_count: 1,
             related_error_type: errorReport.error_type,
@@ -263,13 +298,14 @@ async function applyAlertRules(supabase: any, errorLog: any, errorReport: ErrorR
 
         if (!alert) continue;
 
-        const notifyRoles = Array.isArray(rule.notify_roles) ? rule.notify_roles : [];
-        await sendRoleNotifications(supabase, notifyRoles, errorLog, alert);
+        const typedAlert = alert as SystemAlert;
+        const notifyRoles = Array.isArray(typedRule.notify_roles) ? typedRule.notify_roles : [];
+        await sendRoleNotifications(supabase, notifyRoles, errorLog, typedAlert);
 
-        if (rule.auto_escalate) {
+        if (typedRule.auto_escalate && typedRule.escalation_delay_minutes) {
           setTimeout(() => {
-            handleAutoEscalation(supabase, alert.id, errorLog.id, rule.escalation_delay_minutes);
-          }, rule.escalation_delay_minutes * 60 * 1000);
+            handleAutoEscalation(supabase, typedAlert.id, errorLog.id, typedRule.escalation_delay_minutes!);
+          }, typedRule.escalation_delay_minutes * 60 * 1000);
         }
       }
     }
@@ -278,7 +314,7 @@ async function applyAlertRules(supabase: any, errorLog: any, errorReport: ErrorR
   }
 }
 
-function shouldApplyRule(rule: any, errorReport: ErrorReport): boolean {
+function shouldApplyRule(rule: AlertRule, errorReport: ErrorReport): boolean {
   if (rule.error_type_pattern) {
     const regex = new RegExp(rule.error_type_pattern);
     if (!regex.test(errorReport.error_type)) {
@@ -297,7 +333,7 @@ function shouldApplyRule(rule: any, errorReport: ErrorReport): boolean {
   return true;
 }
 
-async function sendRoleNotifications(supabase: any, roles: string[], errorLog: any, alert: any) {
+async function sendRoleNotifications(supabase: SupabaseClient, roles: string[], errorLog: ErrorLog, alert: SystemAlert) {
   try {
     const validAppRoles = ['admin', 'nazer', 'accountant', 'disbursement_officer', 'archivist'];
     const validRoles = roles?.filter(r => r && r.trim() !== '' && validAppRoles.includes(r)) || [];
@@ -319,16 +355,20 @@ async function sendRoleNotifications(supabase: any, roles: string[], errorLog: a
       return;
     }
 
+    const typedUsers = users as User[];
+
     const { data: preferences } = await supabase
       .from('notification_preferences')
       .select('*')
-      .in('user_id', users.map((u: any) => u.user_id));
+      .in('user_id', typedUsers.map((u: User) => u.user_id));
 
+    const typedPreferences = (preferences || []) as NotificationPreference[];
     const notifications = [];
     
-    for (const user of users) {
-      const userPref = preferences?.find((p: any) => p.user_id === user.user_id);
-      const shouldNotify = userPref ? userPref[`notify_${errorLog.severity}`] : true;
+    for (const user of typedUsers) {
+      const userPref = typedPreferences.find((p: NotificationPreference) => p.user_id === user.user_id);
+      const severityKey = `notify_${errorLog.severity}` as keyof NotificationPreference;
+      const shouldNotify = userPref ? userPref[severityKey] !== false : true;
 
       if (shouldNotify) {
         notifications.push({
@@ -352,7 +392,7 @@ async function sendRoleNotifications(supabase: any, roles: string[], errorLog: a
   }
 }
 
-async function handleAutoEscalation(supabase: any, alertId: string, errorLogId: string, delayMinutes: number) {
+async function handleAutoEscalation(supabase: SupabaseClient, alertId: string, errorLogId: string, delayMinutes: number) {
   try {
     const { data: alert } = await supabase
       .from('system_alerts')
@@ -400,7 +440,7 @@ async function handleAutoEscalation(supabase: any, alertId: string, errorLogId: 
   }
 }
 
-async function analyzeRecurringErrors(supabase: any, errorReport: ErrorReport, errorLogId: string) {
+async function analyzeRecurringErrors(supabase: SupabaseClient, errorReport: ErrorReport, errorLogId: string) {
   try {
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
     
@@ -429,7 +469,7 @@ async function analyzeRecurringErrors(supabase: any, errorReport: ErrorReport, e
   }
 }
 
-async function attemptAutoFix(supabase: any, errorLog: any, errorReport: ErrorReport) {
+async function attemptAutoFix(supabase: SupabaseClient, errorLog: ErrorLog, errorReport: ErrorReport) {
   try {
     let fixStrategy = 'retry';
     
@@ -456,13 +496,14 @@ async function attemptAutoFix(supabase: any, errorLog: any, errorReport: ErrorRe
   }
 }
 
-async function recordPerformanceMetric(supabase: any, errorReport: ErrorReport) {
+async function recordPerformanceMetric(supabase: SupabaseClient, errorReport: ErrorReport) {
   try {
     if (errorReport.error_type.includes('performance') || errorReport.error_type === 'layout_shift') {
+      const additionalData = errorReport.additional_data as Record<string, unknown> | undefined;
       await supabase.from('performance_metrics').insert({
         metric_type: errorReport.error_type,
         metric_name: errorReport.error_message,
-        value: errorReport.additional_data?.duration || errorReport.additional_data?.value || 0,
+        value: (additionalData?.duration as number) || (additionalData?.value as number) || 0,
         unit: errorReport.error_type === 'layout_shift' ? 'score' : 'ms',
         url: errorReport.url,
         user_id: errorReport.user_id,

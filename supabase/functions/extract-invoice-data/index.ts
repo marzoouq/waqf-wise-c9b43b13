@@ -37,6 +37,26 @@ interface ExtractedInvoiceData {
   overall_confidence: number;
 }
 
+interface AIMessageContent {
+  type: string;
+  text?: string;
+  image_url?: {
+    url: string;
+  };
+}
+
+interface AIMessage {
+  role: string;
+  content: AIMessageContent[];
+}
+
+interface AIPayload {
+  model: string;
+  messages: AIMessage[];
+  temperature: number;
+  max_tokens: number;
+}
+
 Deno.serve(async (req) => {
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
@@ -161,7 +181,7 @@ Deno.serve(async (req) => {
   "overall_confidence": 92
 }`;
 
-    const aiPayload: any = {
+    const aiPayload: AIPayload = {
       model: 'google/gemini-2.5-flash',
       messages: [
         {
@@ -247,11 +267,9 @@ Deno.serve(async (req) => {
       data: extractedData,
       processed_at: new Date().toISOString(),
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'خطأ غير معروف';
     console.error('❌ خطأ في معالجة الطلب:', error);
-    return errorResponse(
-      error?.message || 'خطأ غير معروف',
-      500
-    );
+    return errorResponse(errorMessage, 500);
   }
 });

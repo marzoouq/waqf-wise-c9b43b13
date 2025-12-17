@@ -1,4 +1,4 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import { 
   handleCors, 
   jsonResponse, 
@@ -7,6 +7,18 @@ import {
   forbiddenResponse,
   rateLimitResponse 
 } from '../_shared/cors.ts';
+
+interface ErrorLog {
+  id: string;
+  error_type: string;
+  error_message: string;
+  severity: string;
+  created_at: string;
+}
+
+interface Admin {
+  user_id: string;
+}
 
 Deno.serve(async (req) => {
   const corsResponse = handleCors(req);
@@ -161,7 +173,7 @@ Deno.serve(async (req) => {
     // تنفيذ كل محاولة إصلاح
     for (const fix of pendingFixes) {
       try {
-        const errorLog = fix.system_error_logs;
+        const errorLog = fix.system_error_logs as ErrorLog | null;
         if (!errorLog) {
           console.warn(`⚠️ No error log found for fix ${fix.id}`);
           continue;
@@ -250,7 +262,7 @@ Deno.serve(async (req) => {
 /**
  * تنفيذ استراتيجية إعادة المحاولة
  */
-async function executeRetryStrategy(supabase: any, errorLog: any): Promise<string> {
+async function executeRetryStrategy(supabase: SupabaseClient, errorLog: ErrorLog): Promise<string> {
   // للأخطاء المتعلقة بالشبكة، نعتبرها محلولة إذا كانت قديمة
   if (errorLog.error_type === 'network_error') {
     const errorAge = Date.now() - new Date(errorLog.created_at).getTime();
@@ -278,7 +290,7 @@ async function executeRetryStrategy(supabase: any, errorLog: any): Promise<strin
 /**
  * تنفيذ استراتيجية الاحتياطية
  */
-async function executeFallbackStrategy(supabase: any, errorLog: any): Promise<string> {
+async function executeFallbackStrategy(_supabase: SupabaseClient, errorLog: ErrorLog): Promise<string> {
   // للأخطاء المتعلقة بالأداء، نعتبرها محلولة إذا كانت قديمة
   if (errorLog.error_type === 'performance_issue' || errorLog.error_type === 'layout_shift') {
     return 'Performance issue marked as resolved (non-critical)';
@@ -290,7 +302,7 @@ async function executeFallbackStrategy(supabase: any, errorLog: any): Promise<st
 /**
  * تنفيذ استراتيجية إعادة التشغيل
  */
-async function executeRestartStrategy(supabase: any, errorLog: any): Promise<string> {
+async function executeRestartStrategy(supabase: SupabaseClient, errorLog: ErrorLog): Promise<string> {
   // للأخطاء الحرجة، نسجلها فقط ونعلم المسؤولين
   if (errorLog.severity === 'critical') {
     // إنشاء إشعار للمسؤولين
@@ -300,7 +312,8 @@ async function executeRestartStrategy(supabase: any, errorLog: any): Promise<str
       .eq('role', 'admin');
     
     if (admins && admins.length > 0) {
-      const notifications = admins.map((admin: any) => ({
+      const typedAdmins = admins as Admin[];
+      const notifications = typedAdmins.map((admin: Admin) => ({
         user_id: admin.user_id,
         title: '🚨 خطأ حرج يتطلب تدخل',
         message: errorLog.error_message,

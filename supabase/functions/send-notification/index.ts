@@ -17,6 +17,12 @@ interface NotificationRequest {
   priority?: 'low' | 'medium' | 'high';
 }
 
+interface NotificationPreferences {
+  email?: boolean;
+  sms?: boolean;
+  [key: string]: unknown;
+}
+
 serve(async (req) => {
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
@@ -88,7 +94,7 @@ serve(async (req) => {
         .single();
 
       // التحقق من تفضيلات المستخدم
-      const preferences = profile?.notification_preferences as any;
+      const preferences = profile?.notification_preferences as NotificationPreferences | null;
       const emailEnabled = preferences?.email !== false;
 
       if (profile?.email && emailEnabled) {
@@ -120,7 +126,7 @@ serve(async (req) => {
         .eq('user_id', userId)
         .single();
 
-      const preferences = profile?.notification_preferences as any;
+      const preferences = profile?.notification_preferences as NotificationPreferences | null;
       const smsEnabled = preferences?.sms !== false;
 
       if (profile?.phone && smsEnabled) {

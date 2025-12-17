@@ -14,6 +14,12 @@ interface ClosingRequest {
   preview_only?: boolean;
 }
 
+interface HeirDistribution {
+  heir_type: string;
+  share_amount: number;
+  beneficiary_id: string;
+}
+
 Deno.serve(async (req) => {
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
@@ -126,6 +132,9 @@ Deno.serve(async (req) => {
       .select('*')
       .eq('fiscal_year_id', fiscal_year_id);
 
+    // Cast to typed array
+    const typedHeirDistributions = (heirDistributions || []) as HeirDistribution[];
+
     // 5. الحصول على إعدادات التوزيع
     const { data: settings } = await supabase
       .from('waqf_distribution_settings')
@@ -196,7 +205,7 @@ Deno.serve(async (req) => {
       },
       closing_entry: closingEntry,
       waqf_corpus: waqfCorpus,
-      heir_distributions: heirDistributions || [],
+      heir_distributions: typedHeirDistributions,
       can_close: true,
       warnings: []
     };
@@ -269,7 +278,7 @@ Deno.serve(async (req) => {
         net_income: netIncome,
         waqf_corpus: waqfCorpus,
         closing_journal_entry_id: journalEntry.id,
-        heir_distributions: heirDistributions
+        heir_distributions: typedHeirDistributions
       });
 
     if (closingError) {
@@ -294,13 +303,13 @@ Deno.serve(async (req) => {
     console.log('Creating annual disclosure...');
     
     // حساب عدد الورثة حسب النوع
-    const sonsCount = heirDistributions?.filter((h: any) => h.heir_type === 'ابن').length || 0;
-    const daughtersCount = heirDistributions?.filter((h: any) => h.heir_type === 'ابنة' || h.heir_type === 'بنت').length || 0;
-    const wivesCount = heirDistributions?.filter((h: any) => h.heir_type === 'زوجة').length || 0;
+    const sonsCount = typedHeirDistributions.filter((h: HeirDistribution) => h.heir_type === 'ابن').length;
+    const daughtersCount = typedHeirDistributions.filter((h: HeirDistribution) => h.heir_type === 'ابنة' || h.heir_type === 'بنت').length;
+    const wivesCount = typedHeirDistributions.filter((h: HeirDistribution) => h.heir_type === 'زوجة').length;
 
     // استخراج السنة من اسم السنة المالية
     const yearMatch = fiscalYear.name.match(/\d{4}/);
-    const disclosureYear = yearMatch ? parseInt(yearMatch[0]) : new Date().getFullYear();
+    const disclosureYear = yearMatch ? parseInt(yearMatch[0], 10) : new Date().getFullYear();
 
     // الحصول على إعدادات الوقف
     const { data: waqfSettings } = await supabase
@@ -328,7 +337,7 @@ Deno.serve(async (req) => {
         corpus_share: waqfCorpus,
         charity_percentage: waqifPercentage,
         charity_share: waqifShare,
-        total_beneficiaries: heirDistributions?.length || 0,
+        total_beneficiaries: typedHeirDistributions.length,
         sons_count: sonsCount,
         daughters_count: daughtersCount,
         wives_count: wivesCount,
@@ -338,7 +347,7 @@ Deno.serve(async (req) => {
         maintenance_expenses: summary.total_expenses * 0.4,
         development_expenses: summary.total_expenses * 0.2,
         other_expenses: summary.total_expenses * 0.1,
-        beneficiaries_details: heirDistributions,
+        beneficiaries_details: typedHeirDistributions,
         expenses_breakdown: {
           administrative: summary.total_expenses * 0.3,
           maintenance: summary.total_expenses * 0.4,

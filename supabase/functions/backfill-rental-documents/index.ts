@@ -8,6 +8,13 @@ import {
   forbiddenResponse 
 } from '../_shared/cors.ts';
 
+interface ProcessedPayment {
+  payment_number: string;
+  invoice_id: string;
+  receipt_id: string;
+  journal_entry_id: string;
+}
+
 serve(async (req) => {
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
@@ -89,7 +96,7 @@ serve(async (req) => {
     let successCount = 0;
     let failedCount = 0;
     const errors: string[] = [];
-    const processedPayments: any[] = [];
+    const processedPayments: ProcessedPayment[] = [];
 
     // 2️⃣ معالجة كل دفعة
     for (const payment of paidPayments) {
