@@ -30,6 +30,13 @@ export function ProfileFamilyTree({ beneficiaryId }: ProfileFamilyTreeProps) {
       .toUpperCase();
   };
 
+  // حساب العمر بكفاءة (new Date() مرة واحدة)
+  const calculateAge = (dateOfBirth: string): number => {
+    const currentYear = new Date().getFullYear();
+    const birthYear = new Date(dateOfBirth).getFullYear();
+    return currentYear - birthYear;
+  };
+
   const getCategoryColor = (category: string) => {
     switch (category) {
       case 'الفئة الأولى':
@@ -95,7 +102,7 @@ export function ProfileFamilyTree({ beneficiaryId }: ProfileFamilyTreeProps) {
                       )}
                       {member.date_of_birth && (
                         <span className="text-muted-foreground">
-                          {new Date().getFullYear() - new Date(member.date_of_birth).getFullYear()} سنة
+                          {calculateAge(member.date_of_birth)} سنة
                         </span>
                       )}
                     </div>
