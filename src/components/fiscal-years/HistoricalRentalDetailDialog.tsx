@@ -111,7 +111,7 @@ export function HistoricalRentalDetailDialog({
                   {monthlySummary.vacant_count} شاغر
                 </span>
               )}
-              <span className="w-full sm:w-auto sm:mr-auto font-semibold text-success text-sm mt-2 sm:mt-0">
+              <span className="w-full sm:w-auto sm:me-auto font-semibold text-success text-sm mt-2 sm:mt-0">
                 المحصّل: {formatCurrency(Number(monthlySummary.paid_amount))}
               </span>
             </DialogDescription>
