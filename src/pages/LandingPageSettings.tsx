@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -261,46 +262,51 @@ export default function LandingPageSettings() {
             </CardHeader>
             <CardContent>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                <a 
-                  href="/privacy" 
-                  target="_blank" 
-                  className="p-4 rounded-lg border border-border hover:bg-muted/50 transition-colors"
+                <Link 
+                  to="/privacy" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-4 rounded-lg border border-border hover:bg-muted/50 transition-colors block"
                 >
                   <h3 className="font-medium mb-1">سياسة الخصوصية</h3>
                   <p className="text-sm text-muted-foreground">عرض الصفحة</p>
-                </a>
-                <a 
-                  href="/terms" 
-                  target="_blank" 
-                  className="p-4 rounded-lg border border-border hover:bg-muted/50 transition-colors"
+                </Link>
+                <Link 
+                  to="/terms" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-4 rounded-lg border border-border hover:bg-muted/50 transition-colors block"
                 >
                   <h3 className="font-medium mb-1">شروط الاستخدام</h3>
                   <p className="text-sm text-muted-foreground">عرض الصفحة</p>
-                </a>
-                <a 
-                  href="/security-policy" 
-                  target="_blank" 
-                  className="p-4 rounded-lg border border-border hover:bg-muted/50 transition-colors"
+                </Link>
+                <Link 
+                  to="/security-policy" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-4 rounded-lg border border-border hover:bg-muted/50 transition-colors block"
                 >
                   <h3 className="font-medium mb-1">سياسة الأمان</h3>
                   <p className="text-sm text-muted-foreground">عرض الصفحة</p>
-                </a>
-                <a 
-                  href="/faq" 
-                  target="_blank" 
-                  className="p-4 rounded-lg border border-border hover:bg-muted/50 transition-colors"
+                </Link>
+                <Link 
+                  to="/faq" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-4 rounded-lg border border-border hover:bg-muted/50 transition-colors block"
                 >
                   <h3 className="font-medium mb-1">الأسئلة الشائعة</h3>
                   <p className="text-sm text-muted-foreground">عرض الصفحة</p>
-                </a>
-                <a 
-                  href="/contact" 
-                  target="_blank" 
-                  className="p-4 rounded-lg border border-border hover:bg-muted/50 transition-colors"
+                </Link>
+                <Link 
+                  to="/contact" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-4 rounded-lg border border-border hover:bg-muted/50 transition-colors block"
                 >
                   <h3 className="font-medium mb-1">تواصل معنا</h3>
                   <p className="text-sm text-muted-foreground">عرض الصفحة</p>
-                </a>
+                </Link>
               </div>
             </CardContent>
           </Card>

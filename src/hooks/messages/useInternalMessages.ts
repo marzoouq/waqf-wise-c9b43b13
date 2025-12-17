@@ -50,7 +50,10 @@ export function useInternalMessages() {
   });
 
   const markAsRead = useMutation({
-    mutationFn: (messageId: string) => MessageService.markAsRead(messageId, user!.id),
+    mutationFn: async (messageId: string) => {
+      if (!user) throw new Error('User not authenticated');
+      return MessageService.markAsRead(messageId, user.id);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTERNAL_MESSAGES });
     },

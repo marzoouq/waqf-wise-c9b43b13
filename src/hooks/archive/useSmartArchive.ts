@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { ArchiveService } from "@/services";
 import { useToast } from "@/hooks/ui/use-toast";
 
@@ -7,16 +7,26 @@ export function useSmartArchive() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [ocrProgress, setOcrProgress] = useState(0);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleOCRScan = useCallback(async () => {
     setIsProcessing(true);
     setOcrProgress(0);
 
+    // تنظيف أي interval سابق
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
     try {
-      const interval = setInterval(() => {
+      intervalRef.current = setInterval(() => {
         setOcrProgress(prev => {
           if (prev >= 100) {
-            clearInterval(interval);
+            if (intervalRef.current) {
+              clearInterval(intervalRef.current);
+              intervalRef.current = null;
+            }
             return 100;
           }
           return prev + 10;
@@ -37,6 +47,11 @@ export function useSmartArchive() {
         description: errorMessage,
       });
     } finally {
+      // تنظيف مضمون في finally
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
       setIsProcessing(false);
     }
   }, [toast]);
