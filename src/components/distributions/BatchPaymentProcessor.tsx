@@ -221,11 +221,11 @@ export function BatchPaymentProcessor({
             <p className="text-xs text-muted-foreground">دفعات مكتملة</p>
           </div>
           <div className="text-center p-3 bg-muted rounded-lg">
-            <p className="text-2xl font-bold text-amber-600">{currentBatch}</p>
+            <p className="text-2xl font-bold text-warning">{currentBatch}</p>
             <p className="text-xs text-muted-foreground">دفعة حالية</p>
           </div>
           <div className="text-center p-3 bg-muted rounded-lg">
-            <p className="text-2xl font-bold text-red-600">{failedBatches}</p>
+            <p className="text-2xl font-bold text-destructive">{failedBatches}</p>
             <p className="text-xs text-muted-foreground">دفعات فاشلة</p>
           </div>
         </div>
@@ -269,9 +269,9 @@ export function BatchPaymentProcessor({
               <div className="space-y-2">
                 {batches.map((batch) => (
                   <Card key={batch.batchNumber} className={
-                    batch.status === 'completed' ? 'border-emerald-500' :
-                    batch.status === 'failed' ? 'border-red-500' :
-                    batch.status === 'processing' ? 'border-blue-500' :
+                    batch.status === 'completed' ? 'border-success' :
+                    batch.status === 'failed' ? 'border-destructive' :
+                    batch.status === 'processing' ? 'border-info' :
                     ''
                   }>
                     <CardContent className="p-3">
@@ -291,9 +291,9 @@ export function BatchPaymentProcessor({
                           </Badge>
                         </div>
                         <div className="flex items-center gap-2">
-                          {batch.status === 'completed' && <CheckCircle className="h-4 w-4 text-emerald-600" />}
-                          {batch.status === 'failed' && <XCircle className="h-4 w-4 text-red-600" />}
-                          {batch.status === 'processing' && <Loader2 className="h-4 w-4 animate-spin text-blue-600" />}
+                          {batch.status === 'completed' && <CheckCircle className="h-4 w-4 text-success" />}
+                          {batch.status === 'failed' && <XCircle className="h-4 w-4 text-destructive" />}
+                          {batch.status === 'processing' && <Loader2 className="h-4 w-4 animate-spin text-info" />}
                         </div>
                       </div>
                       

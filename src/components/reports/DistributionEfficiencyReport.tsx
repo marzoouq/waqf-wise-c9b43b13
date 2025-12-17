@@ -132,7 +132,7 @@ export function DistributionEfficiencyReport({ distributions }: DistributionEffi
       <div className="grid gap-4 md:grid-cols-4">
         <Card className="p-4">
           <div className="flex items-center justify-between mb-2">
-            <Clock className="h-8 w-8 text-blue-500" />
+            <Clock className="h-8 w-8 text-info" />
           </div>
           <div className="text-sm text-muted-foreground mb-1">متوسط وقت الموافقة</div>
           <div className="text-2xl font-bold">{metrics.avgApprovalTime.toFixed(1)} ساعة</div>
@@ -141,7 +141,7 @@ export function DistributionEfficiencyReport({ distributions }: DistributionEffi
 
         <Card className="p-4">
           <div className="flex items-center justify-between mb-2">
-            <Clock className="h-8 w-8 text-purple-500" />
+            <Clock className="h-8 w-8 text-primary" />
           </div>
           <div className="text-sm text-muted-foreground mb-1">متوسط وقت المعالجة</div>
           <div className="text-2xl font-bold">{metrics.avgProcessingTime.toFixed(1)} ساعة</div>
@@ -150,10 +150,10 @@ export function DistributionEfficiencyReport({ distributions }: DistributionEffi
 
         <Card className="p-4">
           <div className="flex items-center justify-between mb-2">
-            <Award className="h-8 w-8 text-green-500" />
+            <Award className="h-8 w-8 text-success" />
           </div>
           <div className="text-sm text-muted-foreground mb-1">التسليم في الموعد</div>
-          <div className="text-2xl font-bold text-green-500">{onTimePercentage.toFixed(1)}%</div>
+          <div className="text-2xl font-bold text-success">{onTimePercentage.toFixed(1)}%</div>
           <div className="text-xs text-muted-foreground mt-1">
             {metrics.onTimeDelivery} من {metrics.totalProcessed}
           </div>
@@ -161,10 +161,10 @@ export function DistributionEfficiencyReport({ distributions }: DistributionEffi
 
         <Card className="p-4">
           <div className="flex items-center justify-between mb-2">
-            <AlertTriangle className="h-8 w-8 text-red-500" />
+            <AlertTriangle className="h-8 w-8 text-destructive" />
           </div>
           <div className="text-sm text-muted-foreground mb-1">تأخيرات</div>
-          <div className="text-2xl font-bold text-red-500">{metrics.delayedDelivery}</div>
+          <div className="text-2xl font-bold text-destructive">{metrics.delayedDelivery}</div>
           <div className="text-xs text-muted-foreground mt-1">
             {((metrics.delayedDelivery / metrics.totalProcessed) * 100).toFixed(1)}%
           </div>
@@ -239,15 +239,15 @@ export function DistributionEfficiencyReport({ distributions }: DistributionEffi
       </div>
 
       {/* Recommendations */}
-      <Card className="p-6 bg-blue-500/10">
+      <Card className="p-6 bg-info/10">
         <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-          <TrendingUp className="h-5 w-5 text-blue-500" />
+          <TrendingUp className="h-5 w-5 text-info" />
           توصيات لتحسين الكفاءة
         </h3>
         <ul className="space-y-2 text-sm">
           {metrics.avgApprovalTime > 48 && (
             <li className="flex items-start gap-2">
-              <span className="text-blue-500 mt-1">•</span>
+              <span className="text-info mt-1">•</span>
               <span>
                 وقت الموافقة مرتفع ({metrics.avgApprovalTime.toFixed(1)} ساعة). يُنصح بتفعيل
                 التنبيهات التلقائية للموافقين.
@@ -256,7 +256,7 @@ export function DistributionEfficiencyReport({ distributions }: DistributionEffi
           )}
           {onTimePercentage < 80 && (
             <li className="flex items-start gap-2">
-              <span className="text-blue-500 mt-1">•</span>
+              <span className="text-info mt-1">•</span>
               <span>
                 نسبة التسليم في الموعد منخفضة ({onTimePercentage.toFixed(1)}%). يُنصح بمراجعة
                 مسارات الموافقات وتبسيطها.
@@ -265,14 +265,14 @@ export function DistributionEfficiencyReport({ distributions }: DistributionEffi
           )}
           {metrics.avgProcessingTime > 24 && (
             <li className="flex items-start gap-2">
-              <span className="text-blue-500 mt-1">•</span>
+              <span className="text-info mt-1">•</span>
               <span>
                 وقت المعالجة مرتفع. يُنصح بأتمتة التحويلات البنكية للتسريع.
               </span>
             </li>
           )}
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-1">•</span>
+            <span className="text-info mt-1">•</span>
             <span>استخدام المسارات السريعة للتوزيعات الصغيرة (أقل من 50,000 ريال).</span>
           </li>
         </ul>

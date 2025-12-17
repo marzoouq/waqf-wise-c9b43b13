@@ -91,7 +91,7 @@ export function TenantsAgingReport() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">61-90:</span>
-                    <span className="text-amber-600">{item.days_60 > 0 ? formatCurrency(item.days_60) : '-'}</span>
+                    <span className="text-warning">{item.days_60 > 0 ? formatCurrency(item.days_60) : '-'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">91-120:</span>
@@ -126,7 +126,7 @@ export function TenantsAgingReport() {
                 </div>
                 <div className="flex justify-between">
                   <span>61-90:</span>
-                  <span className="text-amber-600">{formatCurrency(totals.days_60)}</span>
+                  <span className="text-warning">{formatCurrency(totals.days_60)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>91-120:</span>
@@ -169,7 +169,7 @@ export function TenantsAgingReport() {
                     <TableCell className="text-left text-status-warning">
                       {item.days_30 > 0 ? formatCurrency(item.days_30) : '-'}
                     </TableCell>
-                    <TableCell className="text-left text-amber-600">
+                    <TableCell className="text-left text-warning">
                       {item.days_60 > 0 ? formatCurrency(item.days_60) : '-'}
                     </TableCell>
                     <TableCell className="text-left text-status-error">
@@ -191,7 +191,7 @@ export function TenantsAgingReport() {
                   <TableCell className="text-left text-status-warning">
                     {formatCurrency(totals.days_30)}
                   </TableCell>
-                  <TableCell className="text-left text-amber-600">
+                  <TableCell className="text-left text-warning">
                     {formatCurrency(totals.days_60)}
                   </TableCell>
                   <TableCell className="text-left text-status-error">
