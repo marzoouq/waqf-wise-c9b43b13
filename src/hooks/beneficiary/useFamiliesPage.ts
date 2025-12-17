@@ -61,7 +61,7 @@ export function useFamiliesPage() {
 
   const stats = {
     total: families.length,
-    active: families.filter(f => f.status === 'نشط').length,
+    active: families.filter(f => f.status === 'نشط' || f.status === 'active').length,
     totalMembers: families.reduce((sum, f) => sum + f.total_members, 0),
   };
 

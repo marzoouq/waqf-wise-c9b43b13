@@ -201,9 +201,9 @@ export class BeneficiaryCoreService {
 
       const stats: BeneficiaryStats = {
         total: data?.length || 0,
-        active: data?.filter(b => b.status === 'active').length || 0,
-        inactive: data?.filter(b => b.status === 'inactive').length || 0,
-        pending: data?.filter(b => b.status === 'pending').length || 0,
+        active: data?.filter(b => b.status === 'نشط' || b.status === 'active').length || 0,
+        inactive: data?.filter(b => b.status === 'غير نشط' || b.status === 'inactive').length || 0,
+        pending: data?.filter(b => b.status === 'معلق' || b.status === 'pending').length || 0,
         totalPaid: data?.reduce((sum, b) => sum + (b.total_received || 0), 0) || 0,
         totalPending: data?.reduce((sum, b) => sum + (b.pending_amount || 0), 0) || 0,
       };
