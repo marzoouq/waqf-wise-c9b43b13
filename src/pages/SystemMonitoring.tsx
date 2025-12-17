@@ -22,6 +22,7 @@ import { SystemError, SystemAlert } from "@/types/monitoring";
 import { AdminAlertsPanel } from "@/components/system/AdminAlertsPanel";
 import { SelfHealingToolsPanel } from "@/components/system/SelfHealingToolsPanel";
 import { SystemHealthDashboard } from "@/components/system/SystemHealthDashboard";
+import { LivePerformanceChart } from "@/components/system/LivePerformanceChart";
 import { useSystemMonitoring } from "@/hooks/system/useSystemMonitoring";
 
 export default function SystemMonitoring() {
@@ -128,8 +129,12 @@ export default function SystemMonitoring() {
         {/* التبويبات الرئيسية */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <div className="overflow-x-auto pb-2 -mx-3 px-3 sm:mx-0 sm:px-0">
-            <TabsList className="inline-flex w-full min-w-max sm:grid sm:grid-cols-5 gap-1">
+            <TabsList className="inline-flex w-full min-w-max sm:grid sm:grid-cols-6 gap-1">
               <TabsTrigger value="overview" className="text-xs sm:text-sm px-3 sm:px-4">نظرة عامة</TabsTrigger>
+              <TabsTrigger value="live" className="text-xs sm:text-sm px-3 sm:px-4 gap-1">
+                <span className="h-2 w-2 bg-status-success rounded-full animate-pulse"></span>
+                مباشر
+              </TabsTrigger>
               <TabsTrigger value="alerts" className="text-xs sm:text-sm px-3 sm:px-4 gap-1">
                 التنبيهات
                 {stats?.activeAlerts && stats.activeAlerts > 0 && (
@@ -192,6 +197,11 @@ export default function SystemMonitoring() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* المراقبة الحية */}
+          <TabsContent value="live" className="space-y-4">
+            <LivePerformanceChart />
           </TabsContent>
 
           {/* التنبيهات النشطة */}
