@@ -53,7 +53,7 @@ export { ContractService } from './contract.service';
 export { TenantService } from './tenant.service';
 export { MaintenanceService, type ProviderRating } from './maintenance.service';
 export { FundService } from './fund.service';
-export { PaymentService, type PaymentFilters } from './payment.service';
+export { PaymentService, type PaymentFilters, type PaymentScheduleResult, type PaymentWithContractDetails } from './payment.service';
 export { RentalPaymentService, type RentalPayment, type RentalPaymentFilters } from './rental-payment.service';
 export { TribeService } from './tribe.service';
 export { FamilyService } from './family.service';

@@ -368,7 +368,7 @@ export class ApprovalService {
   }
 
   // ==================== موافقات الطلبات الخاصة ====================
-  static async getRequestApprovalsByRequestId(requestId: string): Promise<any[]> {
+  static async getRequestApprovalsByRequestId(requestId: string): Promise<RequestApproval[]> {
     const { data, error } = await supabase
       .from("request_approvals")
       .select("*")
@@ -376,7 +376,7 @@ export class ApprovalService {
       .order("level", { ascending: true });
     
     if (error) throw error;
-    return data || [];
+    return (data || []) as RequestApproval[];
   }
 
   static async upsertRequestApproval(approval: {

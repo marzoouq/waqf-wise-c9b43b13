@@ -9,6 +9,21 @@ import type { Database } from "@/integrations/supabase/types";
 type Payment = Database['public']['Tables']['payments']['Row'];
 type PaymentInsert = Database['public']['Tables']['payments']['Insert'];
 type PaymentUpdate = Database['public']['Tables']['payments']['Update'];
+type BankAccount = Database['public']['Tables']['bank_accounts']['Row'];
+
+export interface PaymentScheduleResult {
+  id: string;
+  distribution_id: string;
+  scheduled_date: string;
+  scheduled_amount: number;
+  status: string;
+  batch_number: string;
+  processed_at: string;
+  error_message: string;
+  notes: string;
+  created_at: string;
+  updated_at: string;
+}
 
 export interface PaymentFilters {
   payment_type?: 'receipt' | 'payment';
@@ -17,6 +32,26 @@ export interface PaymentFilters {
   startDate?: string;
   endDate?: string;
   limit?: number;
+}
+
+export interface PaymentWithContractDetails {
+  id: string;
+  payment_number?: string | null;
+  payment_date: string;
+  amount: number;
+  payment_type?: string | null;
+  payment_method: string;
+  status: string;
+  description?: string | null;
+  payer_name?: string | null;
+  notes?: string | null;
+  contract_id?: string | null;
+  tenant_name?: string | null;
+  property_name?: string | null;
+  unit_number?: string | null;
+  created_at: string;
+  updated_at: string;
+  beneficiary_id?: string | null;
 }
 
 export class PaymentService {
@@ -183,14 +218,14 @@ export class PaymentService {
   /**
    * جلب الحسابات البنكية
    */
-  static async getBankAccounts(): Promise<any[]> {
+  static async getBankAccounts(): Promise<BankAccount[]> {
     const { data, error } = await supabase
       .from("bank_accounts")
       .select("id, account_id, bank_name, account_number, iban, swift_code, currency, current_balance, is_active, created_at, updated_at")
       .order("bank_name", { ascending: true });
 
     if (error) throw error;
-    return data || [];
+    return (data || []) as BankAccount[];
   }
 
   /**
@@ -237,20 +272,20 @@ export class PaymentService {
   /**
    * جلب السندات مع تفاصيل العقود
    */
-  static async getPaymentsWithContractDetails(): Promise<any[]> {
+  static async getPaymentsWithContractDetails(): Promise<PaymentWithContractDetails[]> {
     const { data, error } = await supabase
       .from("payments_with_contract_details")
       .select("*")
       .order("created_at", { ascending: false });
 
     if (error) throw error;
-    return data || [];
+    return (data || []) as PaymentWithContractDetails[];
   }
 
   /**
    * جلب جداول المدفوعات
    */
-  static async getPaymentSchedules(distributionId?: string): Promise<any[]> {
+  static async getPaymentSchedules(distributionId?: string): Promise<PaymentScheduleResult[]> {
     let query = supabase
       .from('payment_schedules')
       .select('id, distribution_id, scheduled_date, scheduled_amount, status, batch_number, processed_at, error_message, notes, created_at, updated_at')
@@ -262,7 +297,7 @@ export class PaymentService {
 
     const { data, error } = await query;
     if (error) throw error;
-    return data || [];
+    return (data || []) as PaymentScheduleResult[];
   }
 
   /**
