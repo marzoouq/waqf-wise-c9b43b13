@@ -1,6 +1,7 @@
 /**
  * Route Prefetching Utilities
  * تحميل مسبق للمسارات لتحسين الأداء
+ * v2.9.33 - محسّن مع Network Information API
  */
 
 import { useEffect, useCallback } from 'react';
@@ -22,26 +23,53 @@ type RouteKey = keyof typeof PREFETCH_ROUTES;
 // تخزين المسارات المحملة
 const loadedRoutes = new Set<RouteKey>();
 
+// التحقق من سرعة الاتصال
+function shouldPrefetch(): boolean {
+  // لا تحمّل مسبقاً على الاتصالات البطيئة
+  if ('connection' in navigator) {
+    const connection = (navigator as Navigator & { 
+      connection?: { 
+        effectiveType?: string; 
+        saveData?: boolean 
+      } 
+    }).connection;
+    
+    if (connection?.saveData) return false;
+    if (connection?.effectiveType === '2g' || connection?.effectiveType === 'slow-2g') {
+      return false;
+    }
+  }
+  return true;
+}
+
 /**
  * تحميل مسبق لمسار معين
  */
 export function prefetchRoute(route: RouteKey): void {
   if (loadedRoutes.has(route)) return;
+  if (!shouldPrefetch()) return;
   
   const loader = PREFETCH_ROUTES[route];
   if (loader) {
     // تحميل في الخلفية عند الخمول
     if ('requestIdleCallback' in window) {
-      window.requestIdleCallback(() => {
-        loader().then(() => {
-          loadedRoutes.add(route);
-        });
-      });
+      window.requestIdleCallback(
+        () => {
+          loader().then(() => {
+            loadedRoutes.add(route);
+          }).catch(() => {
+            // تجاهل أخطاء التحميل المسبق
+          });
+        },
+        { timeout: 2000 }
+      );
     } else {
       // fallback للمتصفحات القديمة
       setTimeout(() => {
         loader().then(() => {
           loadedRoutes.add(route);
+        }).catch(() => {
+          // تجاهل أخطاء التحميل المسبق
         });
       }, 100);
     }
@@ -52,7 +80,10 @@ export function prefetchRoute(route: RouteKey): void {
  * تحميل مسبق لعدة مسارات
  */
 export function prefetchRoutes(routes: RouteKey[]): void {
-  routes.forEach(prefetchRoute);
+  routes.forEach((route, index) => {
+    // تأخير تدريجي لتجنب إغراق الشبكة
+    setTimeout(() => prefetchRoute(route), index * 200);
+  });
 }
 
 /**
@@ -72,8 +103,9 @@ export function usePrefetchOnHover(route: RouteKey) {
 export function useRolePrefetch(role?: string) {
   useEffect(() => {
     if (!role) return;
+    if (!shouldPrefetch()) return;
 
-    // تأخير قليل لضمان تحميل الصفحة الحالية أولاً
+    // تأخير لضمان تحميل الصفحة الحالية أولاً
     const timer = setTimeout(() => {
       switch (role) {
         case 'nazer':
@@ -92,7 +124,7 @@ export function useRolePrefetch(role?: string) {
         default:
           prefetchRoutes(['dashboard']);
       }
-    }, 2000);
+    }, 3000); // زيادة التأخير لتحسين الأداء الأولي
 
     return () => clearTimeout(timer);
   }, [role]);
@@ -102,9 +134,21 @@ export function useRolePrefetch(role?: string) {
  * تحميل مسبق للمسارات الشائعة
  */
 export function prefetchCommonRoutes(): void {
+  if (!shouldPrefetch()) return;
+  
   if ('requestIdleCallback' in window) {
-    window.requestIdleCallback(() => {
-      prefetchRoutes(['dashboard', 'beneficiaries', 'properties']);
-    });
+    window.requestIdleCallback(
+      () => {
+        prefetchRoutes(['dashboard', 'beneficiaries', 'properties']);
+      },
+      { timeout: 5000 }
+    );
   }
+}
+
+/**
+ * إعادة تعيين حالة التحميل المسبق (للاختبارات)
+ */
+export function resetPrefetchState(): void {
+  loadedRoutes.clear();
 }

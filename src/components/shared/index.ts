@@ -42,3 +42,8 @@ export { PermissionGate } from './PermissionGate';
 // Search
 export { RecentSearches } from './RecentSearches';
 export { GlobalSearch } from './GlobalSearch';
+
+// Performance
+export { VirtualizedTable } from './VirtualizedTable';
+export type { VirtualColumn, VirtualizedTableProps } from './VirtualizedTable';
+export { LazyLoadWrapper } from './LazyLoadWrapper';
